@@ -44,7 +44,7 @@ import scala.collection.mutable
 trait XFormsModelSubmissionSupportTrait {
 
   import Private.*
-  import RelevanceHandling._
+  import RelevanceHandling.*
 
   // Run the given submission. This must be for a `replace="all"` submission.
   // Called from `XFormsServer` only
@@ -423,7 +423,7 @@ trait XFormsModelSubmissionSupportTrait {
     def findFirstElementOrAttributeWith(startNode: Node, check: Node => Boolean): Option[Node] = {
 
       val breaks = new scala.util.control.Breaks
-      import breaks._
+      import breaks.*
 
       var foundNode: Node = null
 

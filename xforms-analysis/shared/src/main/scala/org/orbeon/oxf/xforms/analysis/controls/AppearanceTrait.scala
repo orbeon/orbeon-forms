@@ -22,7 +22,7 @@ import org.orbeon.xforms.XFormsNames.*
 
 trait AppearanceTrait extends ElementAnalysis {
 
-  import AppearanceTrait._
+  import AppearanceTrait.*
 
   val appearances: Set[QName]     = ElementAnalysis.attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
   val mediatype  : Option[String] = element.attributeValueOpt(MEDIATYPE_QNAME)

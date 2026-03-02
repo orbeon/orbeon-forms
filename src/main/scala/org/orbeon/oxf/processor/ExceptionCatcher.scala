@@ -32,7 +32,7 @@ import scala.util.control.NonFatal
  */
 class ExceptionCatcher extends ProcessorImpl {
 
-  import ProcessorImpl._
+  import ProcessorImpl.*
 
   addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA))
   addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA))

@@ -27,7 +27,7 @@ trait ArrayFunction extends FunctionSupport
 
 trait ReturnArrayFunction extends ArrayFunction {
 
-  import ArrayFunctions._
+  import ArrayFunctions.*
 
   override def getItemType(th: TypeHierarchy): ItemType =
     saxonTypeForArray(th.getConfiguration)
@@ -38,7 +38,7 @@ trait ReturnArrayFunction extends ArrayFunction {
 //
 class ArraySize extends ArrayFunction {
 
-  import ArrayFunctions._
+  import ArrayFunctions.*
 
   override def evaluateItem(context: XPathContext): IntegerValue = {
 
@@ -53,7 +53,7 @@ class ArraySize extends ArrayFunction {
 //
 class ArrayGet extends ArrayFunction {
 
-  import ArrayFunctions._
+  import ArrayFunctions.*
 
   override def iterate(context: XPathContext): SequenceIterator = {
 
@@ -75,7 +75,7 @@ class ArrayGet extends ArrayFunction {
 //
 class ArrayPut extends ArrayFunction {
 
-  import ArrayFunctions._
+  import ArrayFunctions.*
 
   override def evaluateItem(context: XPathContext): ObjectValue = {
 
@@ -97,7 +97,7 @@ class ArrayPut extends ArrayFunction {
 //
 class ArrayAppend extends ArrayFunction {
 
-  import ArrayFunctions._
+  import ArrayFunctions.*
 
   override def evaluateItem(context: XPathContext): ObjectValue = {
 
@@ -118,7 +118,7 @@ class ArrayAppend extends ArrayFunction {
 //
 class ArrayJoin extends ReturnArrayFunction {
 
-  import ArrayFunctions._
+  import ArrayFunctions.*
 
   override def evaluateItem(context: XPathContext): ObjectValue = {
 

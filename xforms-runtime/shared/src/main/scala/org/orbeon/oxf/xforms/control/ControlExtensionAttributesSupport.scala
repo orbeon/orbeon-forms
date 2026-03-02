@@ -25,7 +25,7 @@ trait ControlExtensionAttributesSupport {
 
   self: XFormsControl =>
 
-  import ControlExtensionAttributesSupport._
+  import ControlExtensionAttributesSupport.*
 
   // Optional extension attributes supported by the control
   private[ControlExtensionAttributesSupport] var _extensionAttributes: Option[Map[QName, String]] = None

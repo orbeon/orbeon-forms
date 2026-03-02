@@ -104,7 +104,7 @@ object OS extends js.Object {
 
 @js.native
 @JSImport("buffer", "Buffer")
-class Buffer(array: js.Array[_]) extends js.Object {
+class Buffer(array: js.Array[?]) extends js.Object {
 
   @JSBracketAccess
   def apply(index: Int): Int = js.native

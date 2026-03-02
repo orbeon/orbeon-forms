@@ -43,7 +43,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     extends XFormsControl(container, parent, element, _effectiveId)
        with VisibilityTrait {
 
-  import XFormsSingleNodeControl._
+  import XFormsSingleNodeControl.*
 
   override type Control <: SingleNodeTrait
 

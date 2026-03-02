@@ -36,8 +36,8 @@ import scala.util.control.NonFatal
 
 class PEVersion extends Version {
 
-  import org.orbeon.oxf.common.PEVersion._
-  import org.orbeon.oxf.common.Version._
+  import org.orbeon.oxf.common.PEVersion.*
+  import org.orbeon.oxf.common.Version.*
 
   // Check license file during construction
   // If the license doesn't pass, throw an exception so that processing is interrupted
@@ -89,7 +89,7 @@ class PEVersion extends Version {
 
 private object PEVersion {
 
-  import org.orbeon.oxf.common.Version._
+  import org.orbeon.oxf.common.Version.*
 
   val LicensePath        = "/config/license.xml"
   val LicenseURL         = "oxf:" + LicensePath

@@ -59,7 +59,7 @@ object SectionGridEditor {
       case object ContainerMerge       extends ContainerEditor
     }
 
-    import ContainerEditor._
+    import ContainerEditor.*
 
     // Position editor when block becomes current
     Position.currentContainerChanged(

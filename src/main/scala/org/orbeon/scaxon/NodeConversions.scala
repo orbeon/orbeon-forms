@@ -43,7 +43,7 @@ object NodeConversions {
   def nodeInfoToElem(nodeInfo: om.NodeInfo): Elem =
     scala.xml.XML.loadString(TransformerUtils.tinyTreeToString(nodeInfo))
 
-  import org.orbeon.scaxon.SimplePath._
+  import org.orbeon.scaxon.SimplePath.*
 
   implicit def elemToNodeInfo(e: Elem): om.NodeInfo = elemToNodeInfoSeq(e).head
   implicit def elemToNodeInfoSeq(e: Elem): scala.collection.Seq[om.NodeInfo] = elemToDocumentInfo(e) / *

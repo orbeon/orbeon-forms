@@ -29,7 +29,7 @@ class SendTest
      with XFormsSupport
      with XMLSupport {
 
-  import FormRunnerPersistence._
+  import FormRunnerPersistence.*
 
   describe("The `send` action") {
 

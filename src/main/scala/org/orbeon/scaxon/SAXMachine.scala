@@ -23,7 +23,7 @@ import org.orbeon.oxf.xml.{XMLUtils, NamespaceContext}
 // FSM specifically handling SAX events
 trait SAXMachine[S, D] extends FSM[S, SAXEvents.SAXEvent, D] with ContentHandler with LexicalHandler {
 
-  import SAXEvents._
+  import SAXEvents.*
 
   // Get current element level
   private var _level = 0
@@ -32,7 +32,7 @@ trait SAXMachine[S, D] extends FSM[S, SAXEvents.SAXEvent, D] with ContentHandler
   protected val namespaceContext: NamespaceContext = new NamespaceContext
 
   // Forward the given SAX event to the output
-  final protected def forward(out: ContentHandler with LexicalHandler, saxEvent: SAXEvent) = saxEvent match {
+  final protected def forward(out: ContentHandler & LexicalHandler, saxEvent: SAXEvent) = saxEvent match {
     case StartDocument                                   => out.startDocument()
     case EndDocument                                     => out.endDocument()
     case StartElement(qName: QName, atts: Atts)          => out.startElement(qName.getNamespaceURI, qName.getLocalPart, XMLUtils.buildQName(qName.getPrefix, qName.getLocalPart), atts)

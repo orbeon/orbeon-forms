@@ -138,7 +138,7 @@ class ItemsetActionTest
             }
           }
 
-          import Counts._
+          import Counts.*
 
           def assertSectionIteration(stateControl: XFormsComponentControl, stateValue: String, expected: List[(List[Int], String, String)]): Unit = {
 

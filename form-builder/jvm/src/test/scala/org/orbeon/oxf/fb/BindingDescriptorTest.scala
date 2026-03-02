@@ -35,7 +35,7 @@ class BindingDescriptorTest
      with AnyFunSpecLike
      with FormBuilderSupport {
 
-  import BindingDescriptor._
+  import BindingDescriptor.*
 
   val ComponentsDocument: NodeInfo =
     <components xmlns:xs="http://www.w3.org/2001/XMLSchema"

@@ -8,7 +8,7 @@ import scala.util.{Failure, Success}
 
 object MessageFormatCache {
 
-  import MessageFormatter._
+  import MessageFormatter.*
 
   private val cache = new ConcurrentHashMap[String, Message]
 
@@ -23,7 +23,7 @@ object MessageFormatCache {
 // TODO: also what about syntax with variable names, like `$iteration`? Support natively?
 class MessageFormatter(val input: ParserInput) extends Parser {
 
-  import MessageFormatter._
+  import MessageFormatter.*
 
   def MessageRule: Rule1[Message] = rule {
     zeroOrMore(FormatRule) ~> (Message.apply _) ~ EOI

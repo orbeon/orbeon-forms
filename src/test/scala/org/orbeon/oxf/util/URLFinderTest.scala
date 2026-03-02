@@ -19,7 +19,7 @@ import org.scalatest.funspec.AnyFunSpecLike
 
 class URLFinderTest extends AnyFunSpecLike {
 
-  import URLFinder._
+  import URLFinder.*
 
   describe("The `findURLs` function") {
 

@@ -26,8 +26,8 @@ object FSM {
 }
 
 trait FSM[S, E, D] {
-  
-  import FSM._
+
+  import FSM.*
 
   // Each state function is passed an Event containing an event and data
   case class Event[D](ev: E, data: D)

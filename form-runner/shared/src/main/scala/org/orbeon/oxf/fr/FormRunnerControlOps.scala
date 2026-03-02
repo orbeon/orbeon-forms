@@ -522,7 +522,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     // in other forms.
     def buildBindPath(bind: NodeInfo): Option[List[PathElem]] =
       (bind ancestorOrSelf XFBindTest flatMap bindRefOpt).reverse match {
-        case collection.Seq(_, tail @ _*) =>
+        case collection.Seq(_, tail*) =>
           tail.map(bindRef =>
             PathElem(
               if (bindRef.endsWith(FBLangPredicate))

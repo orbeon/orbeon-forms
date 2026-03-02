@@ -61,8 +61,8 @@ object InstanceMirror {
     case object NonRelevant                                     extends NodeMatcherResult
   }
 
-  import ListenerResult._
-  import NodeMatcherResult._
+  import ListenerResult.*
+  import NodeMatcherResult.*
 
   // (sourceInstance, sourceNode, siblingIndexOpt) => Option[(destinationInstance, destinationNode)]
   type NodeMatcher = (XFormsInstance, om.NodeInfo, Option[Int]) => NodeMatcherResult

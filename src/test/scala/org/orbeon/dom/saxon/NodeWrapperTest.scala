@@ -33,7 +33,7 @@ class NodeWrapperTest extends AnyFunSpec {
     rootElem.add(XS)
     rootElem.add(XF)
 
-    import org.orbeon.oxf.util.CoreUtils._
+    import org.orbeon.oxf.util.CoreUtils.*
 
     val text1  = dom.Text("before")          |!> rootElem.add
     val child1 = dom.Element("elem1")        |!> rootElem.add

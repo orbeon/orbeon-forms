@@ -24,7 +24,7 @@ import scala.collection.mutable
 
 class AuthorizerTest extends AnyFunSpecLike with MockitoSugar {
 
-  import Authorizer._
+  import Authorizer.*
 
   describe("Authorization with token") {
 

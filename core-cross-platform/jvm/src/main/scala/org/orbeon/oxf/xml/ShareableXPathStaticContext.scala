@@ -88,7 +88,7 @@ class ShareableXPathStaticContext(
       } else
         namespaceMapping.mapping.getOrElse(prefix, null)
 
-    def iteratePrefixes: util.Iterator[_] =
+    def iteratePrefixes: util.Iterator[?] =
       namespaceMapping.mapping.keySet.iterator.asJava
   }
 

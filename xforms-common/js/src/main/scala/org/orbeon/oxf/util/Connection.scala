@@ -258,7 +258,7 @@ object Connection extends ConnectionTrait {
     val responseContentTypeOpt =
       Headers.firstItemIgnoreCase(responseHeaders, Headers.ContentType)
 
-    def contentFromJsIterable(v: js.Iterable[_]) =
+    def contentFromJsIterable(v: js.Iterable[?]) =
       StreamedContent.fromBytes(v.asInstanceOf[js.Iterable[Byte]].toArray[Byte], responseContentTypeOpt)
 
     // NOTE: Can't match on `js.Iterable[_]` "because it is a JS trait"
@@ -294,7 +294,7 @@ object Connection extends ConnectionTrait {
     val responseContentTypeOpt =
       Headers.firstItemIgnoreCase(responseHeaders, Headers.ContentType)
 
-    def streamFromJsIterable(v: js.Iterable[_]) =
+    def streamFromJsIterable(v: js.Iterable[?]) =
       fs2.Stream.emits(v.asInstanceOf[js.Iterable[Byte]].toArray[Byte])
 
     // NOTE: Can't match on `js.Iterable[_]` "because it is a JS trait"

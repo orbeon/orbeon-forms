@@ -148,7 +148,7 @@ object DateUtilsUsingSaxon {
     def getCurrentGroupIterator                    : GroupIterator       = illegal
     def getCurrentRegexIterator                    : RegexIterator       = illegal
     def getCurrentDateTime                         : DateTimeValue       = illegal
-    def iterateStackFrames                         : util.Iterator[_]    = illegal
+    def iterateStackFrames                         : util.Iterator[?]    = illegal
 
     private def illegal = throw new IllegalStateException
   }

@@ -88,7 +88,7 @@ object XFormsContainingDocumentBuilder {
       case Some(request) =>
         // Remember if filter provided separate deployment information
 
-        import org.orbeon.oxf.servlet.OrbeonXFormsFilterImpl._
+        import org.orbeon.oxf.servlet.OrbeonXFormsFilterImpl.*
 
         val deploymentType =
           request.getAttributesMap.get(RendererDeploymentAttributeName).asInstanceOf[String] match {

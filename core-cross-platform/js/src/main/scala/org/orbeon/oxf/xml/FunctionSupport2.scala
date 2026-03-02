@@ -13,7 +13,7 @@ import scala.jdk.CollectionConverters.*
 
 trait FunctionSupport2 extends SystemFunction {
 
-  import FunctionSupport2._
+  import FunctionSupport2.*
 
   def decodeSaxonArg[T : Decode](s: om.Sequence): T =
     implicitly[Decode[T]].apply(s)

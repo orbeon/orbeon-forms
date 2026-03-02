@@ -39,7 +39,7 @@ object CredentialsSerializer {
     ev         : T[String] => Iterable[String]
   ): List[(String, T[String])] = {
 
-    import org.orbeon.oxf.util.CoreUtils._
+    import org.orbeon.oxf.util.CoreUtils.*
 
     val usernameT    = (cbf.newBuilder += credentials.userAndGroup.username).result()
     val credentialsT = (cbf.newBuilder += serializeCredentials(credentials, encodeForHeader = true)).result()

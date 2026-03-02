@@ -33,7 +33,7 @@ class DocumentSource(document: Document) extends SAXSource {
       case xmlFilter: XMLFilter =>
 
         val breaks = new scala.util.control.Breaks
-        import breaks._
+        import breaks.*
 
         var currentFilter = xmlFilter
         breakable {

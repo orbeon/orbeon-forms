@@ -35,7 +35,7 @@ import scala.language.postfixOps
  */
 class XFormsDeleteAction extends XFormsAction {
 
-  import XFormsDeleteAction._
+  import XFormsDeleteAction.*
 
   override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 

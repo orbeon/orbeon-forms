@@ -34,7 +34,7 @@ class ForwardServletRequestWrapper(
   with RequestRemoveHeaders
   with RequestEmptyBody {
 
-  import ServletRequestWrapper._
+  import ServletRequestWrapper.*
 
   // "Constructors" for traits
   def overriddenPathQuery = pathQuery
@@ -113,7 +113,7 @@ trait RequestRemoveHeaders extends HttpServletRequestWrapper {
 
 trait RequestEmptyBody extends HttpServletRequestWrapper {
 
-  import ServletRequestWrapper._
+  import ServletRequestWrapper.*
 
   private lazy val inputStream  = newEmptyInputStream
   private lazy val reader       = newEmptyReader

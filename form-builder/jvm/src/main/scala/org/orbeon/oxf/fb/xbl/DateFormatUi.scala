@@ -10,7 +10,7 @@ object DateFormatUi extends ScalaToXml {
 
   type MyState = DateFormat
 
-  import io.circe.generic.auto._
+  import io.circe.generic.auto.*
 
   val encoder: Encoder[DateFormat] = implicitly
   val decoder: Decoder[DateFormat] = implicitly

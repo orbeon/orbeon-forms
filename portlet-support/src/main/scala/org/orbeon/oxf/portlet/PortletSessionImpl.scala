@@ -22,7 +22,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 class PortletSessionImpl(portletSession: PortletSession)
   extends ExternalContext.Session {
 
-  import PortletSession._
+  import PortletSession.*
 
   // Delegate
   def getCreationTime                       = portletSession.getCreationTime

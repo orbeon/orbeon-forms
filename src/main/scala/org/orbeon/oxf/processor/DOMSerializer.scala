@@ -24,7 +24,7 @@ import org.w3c.dom.Document as W3CDocument
  */
 class DOMSerializer extends ProcessorImpl {
 
-  import ProcessorImpl._
+  import ProcessorImpl.*
 
   addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA))
 

@@ -31,7 +31,7 @@ class XFormsSelectEvent(
   cancelable = false
 ) {
 
-  import XFormsSelectEvent._
+  import XFormsSelectEvent.*
 
   def this(target: XFormsEventTarget, itemValue: Item.Value[om.Item]) =
     this(target, Map(XFormsSelectEvent.ItemValueProperty -> Option(itemValue)))
@@ -43,7 +43,7 @@ class XFormsSelectEvent(
 
 private object XFormsSelectEvent {
 
-  import XFormsEvent._
+  import XFormsEvent.*
 
   val ItemValueProperty = xxfName("item-value")
 }

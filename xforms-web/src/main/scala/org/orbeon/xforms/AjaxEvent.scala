@@ -95,7 +95,7 @@ class AjaxEvent(args: js.Any*) extends js.Object {
 
   require(args.nonEmpty)
 
-  import AjaxEvent._
+  import AjaxEvent.*
 
   // Normalize parameters:
   //

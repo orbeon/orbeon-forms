@@ -27,7 +27,7 @@ trait LiferayUser {
 
 object LiferaySupport {
 
-  import LiferayAPI._
+  import LiferayAPI.*
 
   def getCredentialsAsSerializedJson(u: UserFacade, c: CompanyFacade): String = {
 

@@ -8,7 +8,7 @@ import scala.scalajs.js
 
 
 trait DynamicDropdownTests {
-  this: FixtureAsyncFunSpecLike with ClientTestSupport =>
+  this: FixtureAsyncFunSpecLike & ClientTestSupport =>
 
   describe("The Dynamic Dropdown With Search control") {
 

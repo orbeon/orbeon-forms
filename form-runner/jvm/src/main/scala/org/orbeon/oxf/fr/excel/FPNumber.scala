@@ -129,7 +129,7 @@ private object FPNumber {
 
 case class FPNumber(significand: BigInteger, binaryExponent: Int) {
 
-  import FPNumber._
+  import FPNumber.*
 
   def normalise64bit: FPNumber = {
 

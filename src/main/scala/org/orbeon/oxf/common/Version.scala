@@ -24,7 +24,7 @@ import scala.util.control.NonFatal
 // NOTE: This could be a trait, but this causes difficulties to XPath callers to reach `object Version` functions.
 abstract class Version {
 
-  import Version._
+  import Version.*
 
   def requirePEFeature(featureName: String): Unit
   def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean

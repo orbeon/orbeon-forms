@@ -73,7 +73,7 @@ object Compressor {
   def compressBytesMeasurePerformance(bytesToEncode: Array[Byte]): Array[Byte] = {
 
     implicit val indentedLogger: IndentedLogger = new IndentedLogger(Logger)
-    import org.orbeon.oxf.util.Logging._
+    import org.orbeon.oxf.util.Logging.*
 
     val settings = Map(
     Deflater.BEST_SPEED          -> "BEST_SPEED",

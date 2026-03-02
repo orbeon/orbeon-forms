@@ -5,7 +5,7 @@ import org.scalatest.funspec.AnyFunSpec
 
 class MessageFormatterTest extends AnyFunSpec {
 
-  import MessageFormatter._
+  import MessageFormatter.*
 
   val Expected = List(
     (

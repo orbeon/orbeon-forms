@@ -42,7 +42,7 @@ object XFormsStaticStateTest {
 
 class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
-  import XFormsStaticStateTest._
+  import XFormsStaticStateTest.*
 
   @Test def lhhaAnalysis(): Unit = {
     Assume.assumeTrue(Version.isPE)
@@ -389,7 +389,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
       }
     }
 
-    import ModelSeq._
+    import ModelSeq.*
 
     val topLevelModel    = mockModel("model", nextSeq())
     val topLevelInstance = mockInstance("instance", topLevelModel)

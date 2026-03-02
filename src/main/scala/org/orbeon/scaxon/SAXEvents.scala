@@ -108,7 +108,7 @@ object SAXEvents {
 
 class DocumentAndElementsCollector extends XMLReceiverAdapter {
 
-  import org.orbeon.scaxon.SAXEvents._
+  import org.orbeon.scaxon.SAXEvents.*
 
   private var _events = ListBuffer[SAXEvent]()
   def events: List[SAXEvent] = _events.result()
@@ -123,7 +123,7 @@ class DocumentAndElementsCollector extends XMLReceiverAdapter {
 
 class AllCollector extends XMLReceiverAdapter {
 
-  import org.orbeon.scaxon.SAXEvents._
+  import org.orbeon.scaxon.SAXEvents.*
 
   private var _events = ListBuffer[SAXEvent]()
   def events: List[SAXEvent] = _events.result()

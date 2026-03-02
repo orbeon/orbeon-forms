@@ -38,7 +38,7 @@ object ResourceManagerWrapper {
         case factoryImpl: String =>
           try {
             val factoryClass = Class.forName(factoryImpl).asInstanceOf[Class[ResourceManagerFactory]]
-            val constructor = factoryClass.getConstructor(classOf[ju.Map[_, _]])
+            val constructor = factoryClass.getConstructor(classOf[ju.Map[?, ?]])
             constructor.newInstance(props)
           } catch {
             case e: ClassNotFoundException =>

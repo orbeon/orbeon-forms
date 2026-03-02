@@ -38,7 +38,7 @@ import scala.util.control.NonFatal
  */
 object XPathCache extends XPathCacheTrait {
 
-  import XPath._
+  import XPath.*
 
   private val XPathCacheName = "cache.xpath"
   private val XPathCacheDefaultSize = 200

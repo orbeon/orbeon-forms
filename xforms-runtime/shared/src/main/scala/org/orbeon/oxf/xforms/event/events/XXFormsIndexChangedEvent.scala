@@ -33,7 +33,7 @@ class XXFormsIndexChangedEvent(target: XFormsEventTarget, properties: PropertyGe
 
 private object XXFormsIndexChangedEvent {
 
-  import XFormsEvent._
+  import XFormsEvent.*
 
   val OldIndexProperty = xxfName("old-index")
   val NewIndexProperty = xxfName("new-index")

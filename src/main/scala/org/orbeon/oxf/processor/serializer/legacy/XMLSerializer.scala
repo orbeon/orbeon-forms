@@ -31,7 +31,7 @@ private object XMLSerializer {
 
 class XMLSerializer extends HttpTextSerializer {
 
-  import XMLSerializer._
+  import XMLSerializer.*
 
   //    protected
   override def getDefaultContentType: String = DefaultContentType

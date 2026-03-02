@@ -51,8 +51,8 @@ case class MigrationSet20191(migrations: List[Migration20191]) extends Migration
 
 object MigrationOps20191 extends MigrationOps {
 
-  import io.circe.generic.auto._
-  import io.circe.syntax._
+  import io.circe.generic.auto.*
+  import io.circe.syntax.*
 
   type M = MigrationSet20191
   val version: MigrationVersion = DataFormatVersion.V20191

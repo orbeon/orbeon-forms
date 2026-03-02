@@ -201,7 +201,7 @@ trait NumberSupport[Binding] {
 
 object NumberSupportJava extends NumberSupport[om.Item] {
 
-  import io.circe.generic.auto._
+  import io.circe.generic.auto.*
 
   def getStringValue(binding: om.Item): String =
     binding.getStringValue
@@ -263,7 +263,7 @@ object NumberSupportJava extends NumberSupport[om.Item] {
       roundWhenStoring    = roundWhenStoring
     )
 
-    import io.circe.syntax._
+    import io.circe.syntax.*
 
     NumberExternalValue(
       displayValue(binding),

@@ -31,7 +31,7 @@ private object ConcreteElement {
 class ConcreteElement(var qname: QName)
   extends AbstractBranch with Element with WithData {
 
-  import ConcreteElement._
+  import ConcreteElement.*
 
   def this(name: String) =
     this(QName(name))

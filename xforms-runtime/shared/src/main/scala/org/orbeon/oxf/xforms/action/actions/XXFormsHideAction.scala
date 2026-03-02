@@ -52,7 +52,7 @@ class XXFormsHideAction extends XFormsAction {
 
 object XXFormsHideAction {
 
-  import XFormsEvent._
+  import XFormsEvent.*
 
   def hideDialog(
     targetDialog : XFormsEventTarget,

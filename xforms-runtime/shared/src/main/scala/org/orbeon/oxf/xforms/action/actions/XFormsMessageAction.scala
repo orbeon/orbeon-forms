@@ -60,7 +60,7 @@ private object XFormsMessageAction {
 
 class XFormsMessageAction extends XFormsAction {
 
-  import XFormsMessageAction._
+  import XFormsMessageAction.*
 
   // We handle the binding ourselves
   override val pushBinding: Boolean = false

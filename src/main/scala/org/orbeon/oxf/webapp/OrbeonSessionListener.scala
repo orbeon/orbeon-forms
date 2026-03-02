@@ -34,7 +34,7 @@ abstract class OrbeonSessionListenerImpl extends HttpSessionListener with WithSe
 
   def newServletException(throwable: Throwable): Exception
 
-  import OrbeonSessionListener._
+  import OrbeonSessionListener.*
 
   private val InitProcessorPrefix     = "oxf.session-created-processor."
   private val InitInputPrefix         = "oxf.session-created-processor.input."

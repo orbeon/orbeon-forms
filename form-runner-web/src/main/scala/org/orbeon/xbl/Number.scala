@@ -42,7 +42,7 @@ object Number {
     companion =>
 
     import Private.*
-    import io.circe.generic.auto._
+    import io.circe.generic.auto.*
     import io.circe.{Decoder, Encoder}
 
     type State = NumberExternalValue

@@ -133,7 +133,7 @@ object XFormsError {
     )
   }
 
-  import XMLReceiverSupport._
+  import XMLReceiverSupport.*
 
   // Insert server errors into the Ajax response
   def outputAjaxErrors(errors: Seq[ServerError])(implicit xmlReceiver: XMLReceiver): Unit =

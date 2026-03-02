@@ -2,17 +2,17 @@ package org.orbeon.sbt
 
 import sbt.FilesInfo.{exists, lastModified}
 import sbt.Keys.*
-import sbt.{Def, _}
+import sbt.{Def, *}
 
 object Compat {
 
-  import sbt._
-  import sbt.Keys._
+  import sbt.*
+  import sbt.Keys.*
   import sbt.util.CacheStoreFactory
   import sbt.util.FileInfo.Style
   import sbt.util.FileFunction.UpdateFunction
   import OrbeonWebappPlugin.autoImport.webappPrepare
-  import sbt.util.CacheImplicits._
+  import sbt.util.CacheImplicits.*
 
   def cached(storeFactory: CacheStoreFactory, inStyle: Style, outStyle: Style)(action: UpdateFunction): Set[File] => Set[File] =
     FileFunction.cached(
@@ -85,7 +85,7 @@ object OrbeonSupport {
 // Custom version of `xsbt-web-plugin`'s `WebappPlugin` by Earl Douglas under  BSD-3-Clause-license
 object OrbeonWebappPlugin {
 
-  import OrbeonSupport._
+  import OrbeonSupport.*
 
   object autoImport {
     lazy val webappPrepare       = taskKey[Seq[(File, String)]]("prepare webapp contents for packaging")
@@ -93,9 +93,9 @@ object OrbeonWebappPlugin {
     lazy val webappWebInfClasses = settingKey[Boolean]("use WEB-INF/classes instead of WEB-INF/lib")
   }
 
-  import autoImport._
+  import autoImport.*
 
-  def projectSettings: Seq[Setting[_]] =
+  def projectSettings: Seq[Setting[?]] =
     Seq(
       webappPrepare / sourceDirectory  := (Compile / sourceDirectory).value / "webapp",
       webappPrepare / target           := (Compile / target).value / "webapp",

@@ -15,7 +15,7 @@ class AddLiferayUserHeadersFilter
      with ResourceFilter
      with EventFilter {
 
-  import AddLiferayUserHeadersFilter._
+  import AddLiferayUserHeadersFilter.*
 
   def doFilter(req: RenderRequest, res: RenderResponse, chain: FilterChain): Unit =
     chain.doFilter(amendRequestWithUser(req)(wrapWithLiferayUserHeaders), res)

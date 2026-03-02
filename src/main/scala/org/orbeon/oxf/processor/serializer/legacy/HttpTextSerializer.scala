@@ -40,7 +40,7 @@ abstract class HttpTextSerializer extends HttpSerializerBase {
 
   self =>
 
-  import HttpTextSerializer._
+  import HttpTextSerializer.*
 
   override final protected def readInput(
     pipelineContext: PipelineContext,

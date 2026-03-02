@@ -71,7 +71,7 @@ object ElementHandlerController {
 
 trait ElementHandlerControllerHandlers[Ctx] extends XMLReceiver {
 
-  import ElementHandlerController._
+  import ElementHandlerController.*
 
   private var _handlerInfos: List[HandlerInfo[Ctx]] = Nil
 
@@ -110,7 +110,7 @@ trait ElementHandlerControllerHandlers[Ctx] extends XMLReceiver {
   def findFirstHandlerOrElem: Option[ElementHandler[Ctx] Either StructuredQName] = {
 
     val breaks = new scala.util.control.Breaks
-    import breaks._
+    import breaks.*
 
     var result: Option[ElementHandler[Ctx] Either StructuredQName] = None
 
@@ -171,7 +171,7 @@ trait ElementHandlerControllerHandlers[Ctx] extends XMLReceiver {
 
 trait ElementHandlerControllerXMLReceiver[Ctx] extends XMLReceiver {
 
-  import ElementHandlerController._
+  import ElementHandlerController.*
 
   private var _locator: OutputLocator = null
   implicit def locator: OutputLocator = _locator

@@ -38,7 +38,7 @@ import scala.util.control.NonFatal
 // Helper trait for `xforms-submit-done`/`xforms-submit-error`
 trait SubmitResponseEvent extends XFormsEvent {
 
-  def connectionResult: Option[ConnectionResultT[_]]
+  def connectionResult: Option[ConnectionResultT[?]]
   final def headers: Option[Map[String, List[String]]] = connectionResult map (_.headers)
 
   // For a given event, temporarily keep a reference to the body so that it's possible to call
@@ -52,7 +52,7 @@ trait SubmitResponseEvent extends XFormsEvent {
 
 private object SubmitResponseEvent {
 
-  import org.orbeon.oxf.util.XPathCache._
+  import org.orbeon.oxf.util.XPathCache.*
 
   // "Zero or more elements, each one representing a content header in the error response received by a
   // failed submission. The returned node-set is empty if the failed submission did not receive an error
@@ -87,7 +87,7 @@ private object SubmitResponseEvent {
 
     implicit val logger = e.indentedLogger
 
-    def readOrReturn(cxr: ConnectionResultT[_]): Option[String Either DocumentNodeInfoType] =
+    def readOrReturn(cxr: ConnectionResultT[?]): Option[String Either DocumentNodeInfoType] =
       e.cachedBody getOrElse {
         val result = tryToReadBody(cxr)
         e.cachedBody = Some(result)
@@ -100,7 +100,7 @@ private object SubmitResponseEvent {
     }
   }
 
-  private def tryToReadBody(cxr: ConnectionResultT[_])(implicit logger: IndentedLogger): Option[String Either DocumentNodeInfoType] = {
+  private def tryToReadBody(cxr: ConnectionResultT[?])(implicit logger: IndentedLogger): Option[String Either DocumentNodeInfoType] = {
     // Log response details if not done already
     cxr.logResponseDetailsOnce(log4s.Debug)
 

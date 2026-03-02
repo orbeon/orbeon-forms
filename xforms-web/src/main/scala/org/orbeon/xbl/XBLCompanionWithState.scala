@@ -30,8 +30,8 @@ object XBLCompanionWithState {
 
 abstract class XBLCompanionWithState(containerElem: html.Element) extends XBLCompanion {
 
-  import XBLCompanionWithState._
-  import io.circe.syntax._
+  import XBLCompanionWithState.*
+  import io.circe.syntax.*
 
   type State
 

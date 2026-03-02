@@ -29,7 +29,7 @@ private object TextSerializer {
 
 class TextSerializer extends HttpTextSerializer {
 
-  import TextSerializer._
+  import TextSerializer.*
 
   //    protected
   override def getDefaultContentType: String = DefaultContentType

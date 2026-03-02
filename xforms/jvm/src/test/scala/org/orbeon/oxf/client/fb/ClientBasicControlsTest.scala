@@ -19,7 +19,7 @@ import org.scalatestplus.junit.AssertionsForJUnit
 
 trait ClientBasicControlsTest extends AssertionsForJUnit with FormBuilderOps with XFormsOps {
 
-  import Builder._
+  import Builder.*
 
   @Test def addGridsSectionsControls(): Unit = {
 

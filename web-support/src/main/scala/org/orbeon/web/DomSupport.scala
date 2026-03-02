@@ -196,7 +196,7 @@ object DomSupport {
       }: Unit
     } else {
 
-      lazy val readyStateChanged: js.Function1[dom.Event, _] = (_: dom.Event) =>
+      lazy val readyStateChanged: js.Function1[dom.Event, ?] = (_: dom.Event) =>
         if (interactiveReadyState(doc, state)) {
           doc.removeEventListener(ReadystateChange, readyStateChanged)
           promise.success(())

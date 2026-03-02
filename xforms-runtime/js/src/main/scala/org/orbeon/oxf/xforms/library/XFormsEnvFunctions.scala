@@ -45,7 +45,7 @@ import shapeless.syntax.typeable.*
  */
 trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
 
-  import XFormsEnvFunctions._
+  import XFormsEnvFunctions.*
 
   @XPathFunction
   def index(repeatStaticId: String)(implicit xfc: XFormsFunction.Context): Int =
@@ -54,7 +54,7 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
   @XPathFunction
   def property(propertyName: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[om.Item] = {
 
-    import Property._
+    import Property.*
 
 //    var arg: Either[(String, String), Map[String, String]] = null
 //

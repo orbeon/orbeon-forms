@@ -24,7 +24,7 @@ trait RebuildBindOps {
   self: XFormsModelBinds =>
 
   // TEMP: Picked a different name or `fullOptJS` fails!
-  import Private1._
+  import Private1.*
 
   final def topLevelBinds: List[RuntimeBind] = _topLevelBinds
 

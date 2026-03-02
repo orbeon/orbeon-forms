@@ -51,7 +51,7 @@ class XXFormsShowAction extends XFormsAction {
 
 object XXFormsShowAction {
 
-  import XFormsEvent._
+  import XFormsEvent.*
 
   def showDialog(
     targetDialog        : XFormsEventTarget,

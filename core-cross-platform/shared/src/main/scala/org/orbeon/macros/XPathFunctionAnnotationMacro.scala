@@ -69,7 +69,7 @@ object XPathFunctionAnnotationMacro {
 
   def impl(c: whitebox.Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
 
-    import c.universe._
+    import c.universe.*
 
     val results = {
 

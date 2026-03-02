@@ -14,14 +14,13 @@
 package org.orbeon.xforms
 
 import org.scalajs.dom
-import io.udash.wrappers.jquery.{JQueryCallback, JQueryEvent}
 
 import scala.scalajs.js
 
 
 trait EventListenerSupport {
 
-  private var listeners: List[(dom.EventTarget, String, js.Function1[_, _], Boolean)] = Nil
+  private var listeners: List[(dom.EventTarget, String, js.Function1[?, ?], Boolean)] = Nil
 
   def addListener[E <: dom.Event](target: dom.EventTarget, name: String, fn: E => Unit, useCapture: Boolean = false): Unit =
     addJsListener(target, name, fn: js.Function1[E, Unit], useCapture)

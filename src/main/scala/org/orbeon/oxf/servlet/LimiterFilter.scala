@@ -43,7 +43,7 @@ class JakartaLimiterFilter extends JakartaFilter(new LimiterFilterImpl)
 
 class LimiterFilterImpl extends Filter {
 
-  import LimiterFilter.Logger._
+  import LimiterFilter.Logger.*
 
   private case class FilterSettings(semaphore: Semaphore, include: Regex, exclude: Regex)
 

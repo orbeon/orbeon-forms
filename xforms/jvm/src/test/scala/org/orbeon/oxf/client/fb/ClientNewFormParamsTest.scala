@@ -19,7 +19,7 @@ import org.scalatestplus.junit.AssertionsForJUnit
 
 trait ClientNewFormParamsTest extends AssertionsForJUnit with FormBuilderOps with XFormsOps {
 
-  import Builder._
+  import Builder.*
 
   @Test def showNewFormDialogIfNoParameters(): Unit = {
     for {

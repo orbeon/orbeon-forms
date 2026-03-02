@@ -90,7 +90,7 @@ object MigrationOps48 extends MigrationOps {
     jsonString : String
   ): MigrationSet48 = {
 
-    import io.circe.generic.auto._
+    import io.circe.generic.auto.*
     import io.circe.parser
 
     case class PathAndName(path: String, `iteration-name`: String)

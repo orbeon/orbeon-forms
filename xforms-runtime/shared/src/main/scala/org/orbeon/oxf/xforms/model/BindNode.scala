@@ -31,7 +31,7 @@ import scala.jdk.CollectionConverters.*
 // The constructor automatically adds the BindNode to the instance data node if any.
 class BindNode(val parentBind: RuntimeBind, val position: Int, val item: om.Item) {
 
-  import BindNode._
+  import BindNode.*
 
   require(parentBind ne null)
 

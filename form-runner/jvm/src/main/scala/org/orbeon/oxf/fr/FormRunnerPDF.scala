@@ -144,7 +144,7 @@ trait FormRunnerPDF {
       formRunnerParams            = FormRunnerParams(app, form, Some(1), None, None, mode)
     )
 
-  import URLFinder._
+  import URLFinder.*
 
   // Add http/https/mailto hyperlinks to a plain string
   //@XPathFunction

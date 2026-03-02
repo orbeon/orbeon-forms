@@ -131,7 +131,7 @@ class XFormsModelSubmission(
     )
 
 
-  def getReplacer(cxr: ConnectionResultT[_], submissionParameters: SubmissionParameters)(implicit logger: IndentedLogger): Replacer = {
+  def getReplacer(cxr: ConnectionResultT[?], submissionParameters: SubmissionParameters)(implicit logger: IndentedLogger): Replacer = {
     // NOTE: This can be called from other threads so it must NOT modify the XFCD or submission
     // Handle response
     if (cxr.dontHandleResponse) {

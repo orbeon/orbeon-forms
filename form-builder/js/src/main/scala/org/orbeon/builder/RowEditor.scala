@@ -24,7 +24,7 @@ import org.orbeon.xforms.$
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.document
 import io.udash.wrappers.jquery.JQuery
- 
+
 import org.orbeon.web.DomSupport.DomEventOps
 import org.scalajs.dom
 
@@ -58,7 +58,7 @@ object RowEditor {
     case object InsertBelow extends RowEditor
   }
 
-  import RowEditor._
+  import RowEditor.*
 
   Position.currentContainerChanged(
     containerCache = BlockCache.gridBodyCache,

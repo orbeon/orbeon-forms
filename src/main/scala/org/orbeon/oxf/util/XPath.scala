@@ -65,8 +65,8 @@ object XPath extends XPathTrait {
     def getNodeListCreator(node: scala.Any): PJConverter = null
     def unravel(source: Source, config: Configuration): NodeInfo = null
 
-    val SupportedScalaToSaxonClasses = List(classOf[Iterable[_]], classOf[Option[_]], classOf[Iterator[_]])
-    val SupportedSaxonToScalaClasses = List(classOf[List[_]], classOf[Option[_]], classOf[Iterator[_]])
+    val SupportedScalaToSaxonClasses = List(classOf[Iterable[?]], classOf[Option[?]], classOf[Iterator[?]])
+    val SupportedSaxonToScalaClasses = List(classOf[List[?]], classOf[Option[?]], classOf[Iterator[?]])
 
     val ScalaToSaxonConverter = new JPConverter {
 
@@ -101,16 +101,16 @@ object XPath extends XPathTrait {
       }
 
       def convert(value: ValueRepresentation, targetClass: Class[?], context: XPathContext): AnyRef =
-        if (targetClass.isAssignableFrom(classOf[List[_]])) {
+        if (targetClass.isAssignableFrom(classOf[List[?]])) {
 
           val values =
             for (item <- Implicits.asScalaIterator(Value.asIterator(value)))
             yield itemToAny(item, context)
 
           values.toList
-        } else if (targetClass.isAssignableFrom(classOf[Option[_]])) {
+        } else if (targetClass.isAssignableFrom(classOf[Option[?]])) {
           Implicits.asScalaIterator(Value.asIterator(value)).nextOption() map (itemToAny(_, context))
-        } else if (targetClass.isAssignableFrom(classOf[Iterator[_]])) {
+        } else if (targetClass.isAssignableFrom(classOf[Iterator[?]])) {
           Implicits.asScalaIterator(Value.asIterator(value)) map (itemToAny(_, context))
         } else {
           throw new IllegalStateException(targetClass.getName)

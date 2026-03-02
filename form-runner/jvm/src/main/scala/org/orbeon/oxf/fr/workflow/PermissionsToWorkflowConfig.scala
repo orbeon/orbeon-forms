@@ -1,13 +1,13 @@
 package org.orbeon.oxf.fr.workflow
 
-import org.orbeon.oxf.fr.permission.{Operation as PermissionOperation, _}
+import org.orbeon.oxf.fr.permission.{Operation as PermissionOperation, *}
 import org.orbeon.oxf.util.CoreUtils.*
 
 
 object PermissionsToWorkflowConfig {
 
   import Private.*
-  import org.orbeon.oxf.fr.workflow.definitions20201._
+  import org.orbeon.oxf.fr.workflow.definitions20201.*
 
   def convert(permissions: Permissions): WorkflowConfig = {
 

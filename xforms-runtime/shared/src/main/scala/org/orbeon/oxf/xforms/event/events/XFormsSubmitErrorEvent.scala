@@ -41,7 +41,7 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
   }
 
   // 20 callers
-  def this(target: XFormsEventTarget, errorType: ErrorType, cxrOpt: Option[ConnectionResultT[_]], tunnelProperties: Option[TunnelProperties]) = {
+  def this(target: XFormsEventTarget, errorType: ErrorType, cxrOpt: Option[ConnectionResultT[?]], tunnelProperties: Option[TunnelProperties]) = {
     this(
       target     = target,
       properties = Map(
@@ -56,8 +56,8 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
   private var _errorType: ErrorType = _
   def errorType: ErrorType = _errorType
 
-  private var _connectionResult: Option[ConnectionResultT[_]] = None
-  def connectionResult: Option[ConnectionResultT[_]] = _connectionResult
+  private var _connectionResult: Option[ConnectionResultT[?]] = None
+  def connectionResult: Option[ConnectionResultT[?]] = _connectionResult
 
   def logMessage(throwable: Throwable): Unit =
     if (errorType != ErrorType.ValidationError)

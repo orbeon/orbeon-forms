@@ -12,7 +12,7 @@ object GetRequestHeaderSupport {
     getter   : String => Option[List[String]]
   ): Option[List[String]] = {
 
-    import CharsetNames._
+    import CharsetNames.*
 
     val decode: String => String =
       encoding map (_.toUpperCase) match {

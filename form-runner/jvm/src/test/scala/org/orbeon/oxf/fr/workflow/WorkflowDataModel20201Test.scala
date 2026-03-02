@@ -27,7 +27,7 @@ class WorkflowDataModel20201Test
      with ResourceManagerSupport
      with XMLSupport {
 
-  import definitions20201._
+  import definitions20201.*
 
   val TestState = WorkflowConfig(
     Vector(
@@ -117,12 +117,12 @@ class WorkflowDataModel20201Test
         </perspectives>
     </json>
 
-  import io.circe.generic.auto._
+  import io.circe.generic.auto.*
 
   describe("2020.1 workflow data model") {
 
     import io.circe.parser
-    import io.circe.syntax._
+    import io.circe.syntax.*
 
     it("must encode/decode back to original via JSON") {
       val jsonString = TestState.asJson.noSpaces

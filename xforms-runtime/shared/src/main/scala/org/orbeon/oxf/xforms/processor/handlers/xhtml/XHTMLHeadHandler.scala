@@ -48,7 +48,7 @@ class XHTMLHeadHandler(
     forwarding = true
   ) {
 
-  import XHTMLHeadHandler._
+  import XHTMLHeadHandler.*
 
   private var formattingPrefix: String = null
 

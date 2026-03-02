@@ -17,13 +17,13 @@ import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.util.{IndentedLogger, WhitespaceMatching}
-import org.orbeon.xforms.XXBLScope
+import org.orbeon.oxf.util.WhitespaceMatching
 import org.orbeon.oxf.xforms.analysis.{Metadata, XFormsAnnotator, XFormsExtractor}
 import org.orbeon.oxf.xml.ParserConfiguration.*
-import org.orbeon.oxf.xml.{JXQName, _}
+import org.orbeon.oxf.xml.*
 import org.orbeon.scaxon.DocumentAndElementsCollector
 import org.orbeon.scaxon.SAXEvents.*
+import org.orbeon.xforms.XXBLScope
 import org.scalatest.funspec.AnyFunSpecLike
 
 
@@ -87,7 +87,8 @@ class ExtractorTest
       )
     )
 
-    import JXQName._
+    import JXQName.*
+
     import javax.xml.namespace.QName as JQName
 
     val XMLURI    = "http://www.w3.org/XML/1998/namespace"

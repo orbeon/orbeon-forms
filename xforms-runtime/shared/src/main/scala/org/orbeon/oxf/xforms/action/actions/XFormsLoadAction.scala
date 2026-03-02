@@ -28,7 +28,7 @@ import org.orbeon.xforms.{Load, UrlType, XFormsCrossPlatformSupport, XFormsNames
 
 class XFormsLoadAction extends XFormsAction {
 
-  import XFormsLoadAction._
+  import XFormsLoadAction.*
 
   override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
@@ -108,7 +108,7 @@ class XFormsLoadAction extends XFormsAction {
 
 object XFormsLoadAction {
 
-  import enumeratum._
+  import enumeratum.*
 
   sealed trait LegacyShow extends EnumEntry
   object LegacyShow extends Enum[LegacyShow] {

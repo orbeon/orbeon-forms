@@ -41,7 +41,7 @@ class XFormsSubmitSerializeEvent(target: XFormsEventTarget, properties: Property
 
 private object XFormsSubmitSerializeEvent {
 
-  import XFormsEvent._
+  import XFormsEvent.*
 
   def createSubmissionBodyElement(containingDocument: XFormsContainingDocument) = {
     val document = dom.Document()

@@ -21,7 +21,7 @@ object Workflow20201 extends ScalaToXml {
 
   type MyState = definitions20201.WorkflowConfig
 
-  import io.circe.generic.auto._
+  import io.circe.generic.auto.*
 
   val encoder: Encoder[MyState] = implicitly
   val decoder: Decoder[MyState] = implicitly

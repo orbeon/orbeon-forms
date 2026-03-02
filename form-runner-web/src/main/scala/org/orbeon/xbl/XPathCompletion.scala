@@ -118,7 +118,7 @@ object XPathCompletion {
                     role := "option",
                     data("value") := value
                   )
-                }.toSeq: _*
+                }.toSeq*
               ).render
           }
         )

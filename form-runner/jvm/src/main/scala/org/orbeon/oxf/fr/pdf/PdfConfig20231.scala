@@ -20,7 +20,7 @@ object PdfConfig20231 extends ScalaToXml {
   type MyState = FormRunnerPdfConfigRoot
 
   // We use `auto` for what we can, and custom encoders/decoders for the rest
-  import io.circe.generic.auto._
+  import io.circe.generic.auto.*
 
   implicit val headerFooterTypeEncoder: KeyEncoder[HeaderFooterType] = {
     case HeaderFooterType.Header => "header"

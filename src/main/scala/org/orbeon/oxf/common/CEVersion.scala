@@ -18,8 +18,8 @@ import java.util as ju
 
 class CEVersion extends Version {
 
-  import CEVersion._
-  import Version._
+  import CEVersion.*
+  import Version.*
 
   // Feature is disallowed
   def requirePEFeature(featureName: String): Unit =

@@ -102,7 +102,7 @@ object XFormsAssetsBuilder {
       jsonObject(key) match {
         case Some(jsonArray) =>
 
-          import io.circe.generic.auto._
+          import io.circe.generic.auto.*
 
           case class FullMin(full: String, min: Boolean)
 

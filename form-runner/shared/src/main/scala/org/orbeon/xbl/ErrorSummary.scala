@@ -418,7 +418,7 @@ object ErrorSummary {
 
       val rootElem = errorsInstanceDoc.rootElement
 
-      import CustomJavaConversions._
+      import CustomJavaConversions.*
 
       // We work with the underlying DOM here
       val newElemForSorting   = unsafeUnwrapElement(newErrorElem)
@@ -453,7 +453,7 @@ object ErrorSummary {
 object CustomJavaConversions {
 
   import java.util as ju
-  import scala.jdk.CollectionConverters._
+  import scala.jdk.CollectionConverters.*
 
   implicit class ListHasAsScala[A](l: ju.List[A] & ju.RandomAccess) {
     def asScala: mutable.IndexedBuffer[A] = l match {

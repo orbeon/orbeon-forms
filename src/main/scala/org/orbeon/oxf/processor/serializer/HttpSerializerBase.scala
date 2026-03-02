@@ -129,7 +129,7 @@ object HttpSerializerBase {
 abstract class HttpSerializerBase protected
   extends CachedSerializer[HttpSerializerBase.Config] {
 
-  import HttpSerializerBase._
+  import HttpSerializerBase.*
 
   addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, getConfigSchemaNamespaceURI))
 

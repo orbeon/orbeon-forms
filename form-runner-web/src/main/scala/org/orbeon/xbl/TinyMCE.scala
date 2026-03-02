@@ -15,7 +15,7 @@ package org.orbeon.xbl
 
 import io.udash.wrappers.jquery.JQueryPromise
 import org.orbeon.facades.TinyMce.*
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade.{Events, XBL, XBLCompanion}

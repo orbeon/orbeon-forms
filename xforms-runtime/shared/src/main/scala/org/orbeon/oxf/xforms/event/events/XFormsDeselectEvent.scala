@@ -34,7 +34,7 @@ class XFormsDeselectEvent(target: XFormsEventTarget, properties: PropertyGetter)
 
 private object XFormsDeselectEvent {
 
-  import XFormsEvent._
+  import XFormsEvent.*
 
   val ItemValueProperty = xxfName("item-value")
 }

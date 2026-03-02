@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeInfoConversions
-import org.orbeon.scaxon.SimplePath.{URIQualifiedName, _}
+import org.orbeon.scaxon.SimplePath.{URIQualifiedName, *}
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable.*
 

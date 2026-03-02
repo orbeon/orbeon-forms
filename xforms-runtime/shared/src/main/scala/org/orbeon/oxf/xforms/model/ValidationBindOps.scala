@@ -38,7 +38,7 @@ trait ValidationBindOps extends Logging {
   self: XFormsModelBinds =>
 
   // TEMP: Picked a different name or `fullOptJS` fails!
-  import Private2._
+  import Private2.*
 
   def applyValidationBinds(invalidInstances: m.Set[String], collector: ErrorEventCollector): Unit = {
     if (! staticModel.mustRevalidate) {

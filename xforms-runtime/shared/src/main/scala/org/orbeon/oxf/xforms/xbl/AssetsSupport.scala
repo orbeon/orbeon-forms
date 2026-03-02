@@ -3,7 +3,7 @@ package org.orbeon.oxf.xforms.xbl
 import org.orbeon.oxf.xforms.AssetPath
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiver
-import org.orbeon.oxf.xml.XMLReceiverSupport.{withElement, _}
+import org.orbeon.oxf.xml.XMLReceiverSupport.{withElement, *}
 import org.orbeon.xforms.HeadElement
 
 import scala.collection.mutable

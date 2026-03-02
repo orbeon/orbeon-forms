@@ -50,7 +50,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     with SingleNodeFocusableTrait
     with FileMetadata {
 
-  import XFormsUploadControl._
+  import XFormsUploadControl.*
 
   def supportedFileMetadata: Seq[String] = FileMetadata.AllMetadataNames
 

@@ -8,7 +8,7 @@ import scala.util.{Failure, Success}
 
 class ProcessParser(val input: ParserInput) extends Parser {
 
-  import ProcessParser._
+  import ProcessParser.*
 
   // Root rule
   def Process: Rule1[GroupNode] = rule {

@@ -46,7 +46,7 @@ class XFormsSelectControl(
 
   selfControl =>
 
-  import XFormsSelectControl._
+  import XFormsSelectControl.*
 
   /**
    * Set an external value. This consists of a list of space-separated tokens.

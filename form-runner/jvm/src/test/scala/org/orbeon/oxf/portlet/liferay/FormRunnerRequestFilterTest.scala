@@ -81,7 +81,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
       def getAuthType     = LiferayAPI.LiferayEmailAddressAuthType.name
     }
 
-    import org.orbeon.oxf.portlet.liferay.FormRunnerAuthFilter._
+    import org.orbeon.oxf.portlet.liferay.FormRunnerAuthFilter.*
 
     val amendedRequest =
       wrapWithOrbeonAuthHeaders(AddLiferayUserHeadersFilter.wrapWithLiferayUserHeaders(mockRequest, new LiferayUser {

@@ -61,7 +61,7 @@ class CredentialsTest extends AnyFunSpec with ResourceManagerSupport with XMLSup
   describe("External JSON format") {
 
     import org.orbeon.oxf.json.Converter
-    import org.orbeon.scaxon.SimplePath._
+    import org.orbeon.scaxon.SimplePath.*
 
     val rootElem =
       Converter.jsonStringToXmlDoc(CredentialsSerializer.serializeCredentials(TestCredentials, encodeForHeader = false)).rootElement

@@ -26,7 +26,7 @@ class IndentedLoggerTest extends AnyFunSpec {
 
     implicit val indentedLogger = new IndentedLogger(logger)
 
-    import Logging._
+    import Logging.*
 
     val result =
       withDebug("around block") {

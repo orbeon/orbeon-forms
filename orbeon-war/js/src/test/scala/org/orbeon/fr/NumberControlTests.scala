@@ -9,7 +9,7 @@ import scala.scalajs.js
 
 
 trait NumberControlTests {
-  this: FixtureAsyncFunSpecLike with ClientTestSupport =>
+  this: FixtureAsyncFunSpecLike & ClientTestSupport =>
 
   describe("Number control") {
     it("must round value to 2 decimal places on blur") { _ =>

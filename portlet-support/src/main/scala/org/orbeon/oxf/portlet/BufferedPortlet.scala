@@ -82,7 +82,7 @@ class PortletEmbeddingContextWithResponse(
 // This doesn't deal directly with HTTP proxying
 trait BufferedPortlet {
 
-  import StoredResponse._
+  import StoredResponse.*
 
   def findTitle(request: RenderRequest): Option[String]
   def portletContext: PortletContext

@@ -164,7 +164,7 @@ class SAXContentHandler(
       var whitespace = true
 
       val breaks = new scala.util.control.Breaks
-      import breaks._
+      import breaks.*
 
       breakable {
         for (i <- 0 until textBuffer.length if ! Character.isWhitespace(textBuffer.charAt(i))) {

@@ -22,7 +22,7 @@ import scala.collection.mutable
 
 trait PartEventHandlerScripts {
 
-  import PartEventHandlerScripts._
+  import PartEventHandlerScripts.*
 
   def controlTypes: mutable.HashMap[String, mutable.LinkedHashMap[String, ElementAnalysis]]
 

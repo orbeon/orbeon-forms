@@ -9,7 +9,7 @@ import scala.scalajs.js
 
 
 trait FormRunnerApiTests {
-  this: FixtureAsyncFunSpecLike with ClientTestSupport =>
+  this: FixtureAsyncFunSpecLike & ClientTestSupport =>
 
   describe("Form Runner API client tests") {
     it("must find form controls by name, set values, get values, and activate") { _ =>

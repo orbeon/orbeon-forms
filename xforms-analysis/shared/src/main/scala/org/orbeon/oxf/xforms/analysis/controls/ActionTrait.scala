@@ -20,7 +20,7 @@ import org.orbeon.xforms.XFormsNames.*
 
 trait ActionTrait extends ElementAnalysis {
 
-  import ActionTrait._
+  import ActionTrait.*
 
   private def find(qNames: Seq[QName]): Option[String] = qNames.iterator map element.attributeValue find (_ ne null)
 

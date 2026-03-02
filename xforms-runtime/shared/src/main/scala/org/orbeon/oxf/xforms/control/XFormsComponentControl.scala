@@ -59,7 +59,7 @@ class XFormsValueComponentControl(
   // TODO: Fix hierarchy! We don't necessarily have `StaticLHHASupport`, in particular.
   // 2024-04-30: `staticControl` without `StaticLHHASupport` can be passed, but we claim it has `StaticLHHASupport`.
   // Concrete value controls always have LHHA support, while static value controls don't.
-  override type Control <: ComponentControl with ValueComponentTrait with ViewTrait with StaticLHHASupport
+  override type Control <: ComponentControl & ValueComponentTrait & ViewTrait & StaticLHHASupport
 
   // Don't expose an external value unless explicitly allowed
   override def handleExternalValue: Boolean = staticControl.commonBinding.modeExternalValue

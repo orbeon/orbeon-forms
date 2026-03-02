@@ -47,7 +47,7 @@ object PartAnalysisBuilder {
   val XFormsFunctionLibraryClassName = "org.orbeon.oxf.xforms.library.XFormsFunctionLibrary"
 
   // Create and analyze an entire part, whether a top-level, immutable part or a nested, mutable part.
-  def apply[T >: TopLevelPartAnalysis with NestedPartAnalysis](
+  def apply[T >: TopLevelPartAnalysis & NestedPartAnalysis](
     staticProperties    : XFormsStaticStateStaticProperties,
     parent              : Option[PartAnalysis],
     startScope          : Scope,

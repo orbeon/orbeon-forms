@@ -22,7 +22,7 @@ import scala.collection.mutable
 // placed in a Set. Ids which are not automatically generated are also added to a Set.
 class IdGenerator(var _nextSequenceNumber: Int = 1) {
 
-  import IdGenerator._
+  import IdGenerator.*
 
   private val _bits   = mutable.BitSet()
   private val _others = mutable.Set[String]()

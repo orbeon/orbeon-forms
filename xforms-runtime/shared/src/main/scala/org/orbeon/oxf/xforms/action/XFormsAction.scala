@@ -123,7 +123,7 @@ object XFormsAction {
     val contextStack = actionInterpreter.actionXPathContext
 
     val properties =
-      actionAnalysis.narrowTo[ActionTrait with WithChildrenTrait].toList flatMap
+      actionAnalysis.narrowTo[ActionTrait & WithChildrenTrait].toList flatMap
         (_.children) collect {
           case e if PropertyQNames(e.element.getQName) => e
         }

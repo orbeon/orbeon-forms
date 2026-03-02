@@ -51,7 +51,7 @@ import scala.jdk.CollectionConverters.*
 // combined into a ZIP file for example.
 class PDFToImageProcessor extends ProcessorImpl {
 
-  import PDFToImage._
+  import PDFToImage.*
 
   private val Logger = LoggerFactory.createLogger(classOf[PDFToImageProcessor])
 

@@ -178,15 +178,14 @@ object FormRunnerPersistence {
 
   val PersistenceDefaultDataFormatVersion = DataFormatVersion.V400
 
+  val OrbeonFormDefinitionApp             = "Orbeon-Form-Definition-App"
+  val OrbeonFormDefinitionForm            = "Orbeon-Form-Definition-Form"
   val OrbeonOperations                    = "Orbeon-Operations"
   val OrbeonPathToHolder                  = "Orbeon-Path-To-Holder"
-  val OrbeonPathToHolderLower             = OrbeonPathToHolder.toLowerCase
   val OrbeonHashAlgorithm                 = "Orbeon-Hash-Algorithm"
   val OrbeonHashValue                     = "Orbeon-Hash-Value"
   val OrbeonDidEncryptHeader              = "Orbeon-Did-Encrypt"
-  val OrbeonDidEncryptHeaderLower         = OrbeonDidEncryptHeader.toLowerCase
   val OrbeonDecryptHeader                 = "Orbeon-Decrypt"
-  val OrbeonDecryptHeaderLower            = OrbeonDecryptHeader.toLowerCase
   val AttachmentEncryptedAttributeName    = QName("attachment-encrypted", XMLNames.FRNamespace)
   val TmpFileAttributeName                = QName("tmp-file", XMLNames.FRNamespace)
   val ValueEncryptedAttributeName         = QName("value-encrypted"     , XMLNames.FRNamespace)

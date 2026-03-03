@@ -17,7 +17,7 @@ import org.apache.commons.io.input.ReaderInputStream
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
-import org.orbeon.oxf.fr.FormRunnerPersistence.{OrbeonHashAlgorithm, OrbeonHashValue}
+import org.orbeon.oxf.fr.FormRunnerPersistence.{OrbeonFormDefinitionApp, OrbeonFormDefinitionForm, OrbeonHashAlgorithm, OrbeonHashValue}
 import org.orbeon.oxf.fr.Version.*
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.persistence.relational.*
@@ -125,7 +125,11 @@ trait Read {
 
     if (! headersSet) {
       // Send headers
+      httpResponse.setHeader(OrbeonFormDefinitionApp,     fromDatabase.app)
+      httpResponse.setHeader(OrbeonFormDefinitionForm,    fromDatabase.form)
       httpResponse.setHeader(OrbeonFormDefinitionVersion, fromDatabase.formVersion.toString)
+
+      fromDatabase
 
       fromDatabase.dataUserOpt.foreach { dataUser =>
         dataUser.userAndGroup.foreach { userAndGroup =>
@@ -187,9 +191,9 @@ trait Read {
       case Some(nextBodyContent) =>
         getOrHeadOnceOrRepeatedly(
           req            = req,
-          hasStage       = hasStage,
           // Only set headers once
           headersSet     = true,
+          hasStage       = hasStage,
           bodyContentOpt = Some(nextBodyContent)
         )
     }
@@ -197,17 +201,19 @@ trait Read {
 
   // Holds the data we will read from the database
   private case class FromDatabase(
-   idOpt               : Option[Int],
-   dataUserOpt         : Option[CheckWithDataUser], // set to `Some(_)` if `forData == true`
-   lastModifiedByOpt   : Option[UserAndGroup],
-   formVersion         : Int,
-   stageOpt            : Option[String],
-   createdDateTime     : Instant,
-   lastModifiedDateTime: Instant,
-   bodyOpt             : Option[Array[Byte]],
-   totalAttachmentSize : Option[Int],
-   hashAlgorithmOpt    : Option[String],
-   hashValueOpt        : Option[String]
+    idOpt               : Option[Int],
+    dataUserOpt         : Option[CheckWithDataUser], // set to `Some(_)` if `forData == true`
+    lastModifiedByOpt   : Option[UserAndGroup],
+    app                 : String,
+    form                : String,
+    formVersion         : Int,
+    stageOpt            : Option[String],
+    createdDateTime     : Instant,
+    lastModifiedDateTime: Instant,
+    bodyOpt             : Option[Array[Byte]],
+    totalAttachmentSize : Option[Int],
+    hashAlgorithmOpt    : Option[String],
+    hashValueOpt        : Option[String]
  )
 
   private sealed trait BodyContent
@@ -273,7 +279,7 @@ trait Read {
               |        ${if (req.forData)              ", t.username, t.groupname, t.organization_id" else ""}
               |        ${if (hasStage)                 ", t.stage"                                    else ""}
               |        ${if (req.forAttachment)        ", t.hash_algorithm, t.hash_value"            else ""}
-              |        , t.form_version, t.deleted
+              |        , t.app, t.form, t.form_version, t.deleted
               |FROM    $table t
               |WHERE   t.app  = ?
               |        and t.form = ?
@@ -290,7 +296,7 @@ trait Read {
               |        ${if (req.forData)              ", t.username, t.groupname, t.organization_id" else ""}
               |        ${if (hasStage)                 ", t.stage"                                    else ""}
               |        ${if (req.forAttachment)        ", t.hash_algorithm, t.hash_value"            else ""}
-              |        , t.form_version, t.deleted
+              |        , t.app, t.form, t.form_version, t.deleted
               |FROM    $table t,
               |        (
               |            SELECT   max($maxColumn) $maxColumn, ${idCols.mkString(", ")}
@@ -332,9 +338,6 @@ trait Read {
           if (deleted && ! forceDelete)
             return Left(HttpStatusCodeException(StatusCode.Gone))
 
-          // Check version if specified
-          val dbFormVersion = resultSet.getInt("form_version")
-
           // Info about the owner, which will be used to check the user can access the data
           val dataUser = req.forData.option(CheckWithDataUser(
             userAndGroup = UserAndGroup.fromStrings(resultSet.getString("username"), resultSet.getString("groupname")),
@@ -370,7 +373,9 @@ trait Read {
               idOpt                = req.forDataNotAttachment.option(resultSet.getInt("id")),
               dataUserOpt          = dataUser,
               lastModifiedByOpt    = lastModifiedByOpt,
-              formVersion          = dbFormVersion,
+              app                  = resultSet.getString("app"),
+              form                 = resultSet.getString("form"),
+              formVersion          = resultSet.getInt("form_version"),
               stageOpt             = hasStage.option(resultSet.getString("stage")),
               createdDateTime      = resultSet.getTimestamp("created").toInstant,
               lastModifiedDateTime = resultSet.getTimestamp("last_modified_time").toInstant,

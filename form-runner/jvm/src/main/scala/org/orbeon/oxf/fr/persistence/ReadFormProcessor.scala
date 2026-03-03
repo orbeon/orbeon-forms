@@ -4,13 +4,15 @@ import cats.syntax.option.*
 import org.orbeon.connection.ConnectionResult
 import org.orbeon.oxf.cache.{OutputCacheKey, SimpleOutputCacheKey}
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.fr.FormRunnerPersistence.{OrbeonFormDefinitionApp, OrbeonFormDefinitionForm}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi.headerFromRFC1123OrIso
-import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, FormRunnerParams, Version}
+import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunner, FormRunnerParams, Version}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorOutput, ScalaProcessorOutputImpl}
 import org.orbeon.oxf.util.*
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.scaxon.SimplePath.*
@@ -171,18 +173,20 @@ private object ReadFormProcessor {
   )
 
   class ReadFormProcessorState(
-    computeParams       : ()                                                         => FormRunnerParams,
-    computeRequest      : FormRunnerParams                                           => OutgoingRequest,
-    computeResponse     : OutgoingRequest                                            => (Option[Instant], Option[FormDefinitionVersion.Specific]),
-    computeUpdatedParams: (FormRunnerParams, Option[FormDefinitionVersion.Specific]) => FormRunnerParams,
+    computeParams       : ()                                                                  => FormRunnerParams,
+    computeRequest      : FormRunnerParams                                                    => OutgoingRequest,
+    computeResponse     : OutgoingRequest                                                     => (Option[Instant], Option[AppForm], Option[FormDefinitionVersion.Specific]),
+    computeUpdatedParams: (FormRunnerParams, AppForm, Option[FormDefinitionVersion.Specific]) => FormRunnerParams,
   ) {
-    lazy val params                  : FormRunnerParams                                = computeParams()                                                      .tap(_ => debugLog(s"Computed FormRunnerParams"))
-    lazy val outgoingRequest         : OutgoingRequest                                 = computeRequest(params)                                               .tap(_ => debugLog(s"Computed OutgoingRequest"))
-    lazy val (lastModifiedFromPersistenceOpt, formDefinitionVersionFromPersistenceOpt) = computeResponse(outgoingRequest)                                     .tap(_ => debugLog(s"Issued HEAD request"))
-    lazy val updatedParams           : FormRunnerParams                                = computeUpdatedParams(params, formDefinitionVersionFromPersistenceOpt).tap(_ => debugLog(s"Computed updated FormRunnerParams"))
+    lazy val params                  : FormRunnerParams                                = computeParams()                                                 .tap(_ => debugLog(s"Computed FormRunnerParams"))
+    lazy val outgoingRequest         : OutgoingRequest                                 = computeRequest(params)                                          .tap(_ => debugLog(s"Computed OutgoingRequest"))
+    lazy val (lastModifiedFromPersistenceOpt, appFormFromPersistenceOpt, versionFromPersistenceOpt) = computeResponse(outgoingRequest)                   .tap(_ => debugLog(s"Issued HEAD request"))
+    lazy val updatedParams           : FormRunnerParams                                = computeUpdatedParams(params, appForm, versionFromPersistenceOpt).tap(_ => debugLog(s"Computed updated FormRunnerParams"))
+
+    private def appForm: AppForm = appFormFromPersistenceOpt.getOrElse(params.appForm)
 
     lazy val key: String =
-      (params.app :: params.form :: formDefinitionVersionFromPersistenceOpt.map(_.version.toString).getOrElse("") :: Nil)
+      (appForm.toList ::: versionFromPersistenceOpt.map(_.version.toString).getOrElse("") :: Nil)
         .mkString("|")
         .tap(key => debugLog(s"Computed key for ReadFormProcessorState: `$key`"))
 
@@ -231,27 +235,38 @@ private object ReadFormProcessor {
     OutgoingRequest(outgoingRequestHeaders, pathQuery)
   }
 
-  def issueHeadOrThrow(outgoingRequest: OutgoingRequest): (Option[Instant], Option[FormDefinitionVersion.Specific]) =
+  def issueHeadOrThrow(outgoingRequest: OutgoingRequest): (Option[Instant], Option[AppForm], Option[FormDefinitionVersion.Specific]) =
     ConnectionResult.trySuccessConnection(issueRequest(HttpMethod.HEAD, outgoingRequest))
       .map { cxr =>
 
-        val lastModifiedFromResponseHeaderOpt = headerFromRFC1123OrIso(cxr.headers, Headers.OrbeonLastModified, Headers.LastModified)
-        val formDefinitionVersionOpt          = Headers.firstItemIgnoreCase(cxr.headers, Version.OrbeonFormDefinitionVersion)
+        val lastModifiedOpt          = headerFromRFC1123OrIso(cxr.headers, Headers.OrbeonLastModified, Headers.LastModified)
+        val formDefinitionVersionOpt = Headers.firstItemIgnoreCase(cxr.headers, Version.OrbeonFormDefinitionVersion)
+
+        val appFormOpt =
+          AppForm(
+            Headers.firstItemIgnoreCase(cxr.headers, OrbeonFormDefinitionApp).flatMap(_.trimAllToOpt),
+            Headers.firstItemIgnoreCase(cxr.headers, OrbeonFormDefinitionForm).flatMap(_.trimAllToOpt)
+          )
 
         cxr.close()
 
         (
-          lastModifiedFromResponseHeaderOpt,
+          lastModifiedOpt,
+          appFormOpt,
           formDefinitionVersionOpt.map(_.toInt).map(FormDefinitionVersion.Specific.apply)
         )
       }
       .get // throws in case of connection `Failure`
 
-  def computeUpdatedParams(params: FormRunnerParams, formDefinitionVersionOpt: Option[FormDefinitionVersion.Specific]): FormRunnerParams =
+  def computeUpdatedParams(
+    params    : FormRunnerParams,
+    appForm   : AppForm,
+    versionOpt: Option[FormDefinitionVersion.Specific]
+  ): FormRunnerParams =
     FormRunnerParams(
-      app            = params.app,
-      form           = params.form,
       formVersionOpt = formDefinitionVersionOpt.map(_.version),
+      app            = appForm.app,
+      form           = appForm.form,
       document       = params.document,
       isDraft        = params.isDraft,
       mode           = params.mode,

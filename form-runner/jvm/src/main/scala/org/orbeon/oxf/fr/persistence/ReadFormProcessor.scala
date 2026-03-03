@@ -165,20 +165,6 @@ private object ReadFormProcessor {
   type ValidityType = java.lang.Long
   type StateType    = ReadFormProcessorState
 
-  // This contains metadata extracted from the form definition as it is read. This information is needed to compute
-  // `FormRunnerConfig`. It can be cached against the form definition, while taking much less space.
-  case class CacheableFormMetadata(
-    tocModes                        : Set[String],
-    tocMinSections                  : Int,
-    tocPositionRaw                  : Option[String],
-    hasPdfAttachments               : Boolean,
-    sectionCount                    : Int,
-    useFormulaDebugger              : Boolean,
-    useWizard                       : Option[Boolean],
-    readonlyDisableCalculate        : Option[Boolean],
-    validateSelectionControlsChoices: Option[Boolean],
-  )
-
   case class OutgoingRequest(
     headers  : List[(String, List[String])],
     pathQuery: String

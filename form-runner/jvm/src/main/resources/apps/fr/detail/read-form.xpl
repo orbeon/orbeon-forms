@@ -117,6 +117,8 @@
 
                 <!-- Read the Orbeon-Form-Definition-Version, if provided -->
                 <read-header>orbeon-form-definition-version</read-header>
+                <read-header>orbeon-form-definition-app</read-header>
+                <read-header>orbeon-form-definition-form</read-header>
 
             </config>
         </p:input>
@@ -146,6 +148,22 @@
                             select="p:get-request-attribute('oxf.url-generator.header.orbeon-form-definition-version', 'text/plain')"/>
                         <!-- Use 1 if no version was returned by the persistence layer -->
                         <xsl:value-of select="($version-from-persistence, 1)[1]"/>
+                    </xsl:copy>
+                </xsl:template>
+                <xsl:template match="app">
+                    <xsl:copy>
+                        <xsl:variable
+                            name="app-from-persistence"
+                            select="p:get-request-attribute('oxf.url-generator.header.orbeon-form-definition-app', 'text/plain')[p:non-blank()]"/>
+                        <xsl:value-of select="($app-from-persistence, string(.))[1]"/>
+                    </xsl:copy>
+                </xsl:template>
+                <xsl:template match="form">
+                    <xsl:copy>
+                        <xsl:variable
+                            name="form-from-persistence"
+                            select="p:get-request-attribute('oxf.url-generator.header.orbeon-form-definition-form', 'text/plain')[p:non-blank()]"/>
+                        <xsl:value-of select="($form-from-persistence, string(.))[1]"/>
                     </xsl:copy>
                 </xsl:template>
             </xsl:stylesheet>

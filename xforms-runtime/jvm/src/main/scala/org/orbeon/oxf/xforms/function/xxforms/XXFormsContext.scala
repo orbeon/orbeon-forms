@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
-import org.orbeon.oxf.xforms.function.{MatchSimpleAnalysis, XFormsFunction}
+import org.orbeon.oxf.xforms.function.{XFormsPathMapSupport, XFormsFunction}
 import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.om.*
 
@@ -23,7 +23,7 @@ import org.orbeon.saxon.om.*
  * xf:repeat, or xf:switch. It takes one mandatory string parameter containing the id of an enclosing grouping
  * XForms control. For xf:repeat, the context returned is the context of the current iteration.
  */
-class XXFormsContext extends XFormsFunction with MatchSimpleAnalysis {
+class XXFormsContext extends XFormsFunction {
 
   override def iterate(xpathContext: XPathContext): SequenceIterator =
     argument.lift(0) match {
@@ -48,7 +48,7 @@ class XXFormsContext extends XFormsFunction with MatchSimpleAnalysis {
         // Get static context id
         val contextStaticId = contextIdExpression.getStringValue
         // Handle context
-        matchSimpleAnalysis(pathMap, context.getInScopeContexts.get(contextStaticId))
+        XFormsPathMapSupport.updateWithBindingAnalysis(pathMap, context.getInScopeContexts.get(contextStaticId))
       case _ =>
         // Argument is not literal so we can't figure it out
         pathMap.setInvalidated(true)

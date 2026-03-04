@@ -13,12 +13,16 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
+import org.orbeon.oxf.xforms.analysis.ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext
+import org.orbeon.oxf.xforms.analysis.controls.SelectionControl
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.event.EventCollector
-import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
+import org.orbeon.oxf.xforms.function.{XFormsFunction, XFormsPathMapSupport}
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.expr.{ExpressionTool, XPathContext}
+import org.orbeon.saxon.expr.*
+import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits.*
 import shapeless.syntax.typeable.*
@@ -71,4 +75,35 @@ class XXFormsItemset extends XFormsFunction {
 
     jsonOrXMLOpt.orNull
   }
+
+  override def addToPathMap(
+    pathMap        : PathMap,
+    pathMapNodeSet : PathMapNodeSet
+  ): PathMapNodeSet =
+    arguments.head match {
+        case s: StringLiteral =>
+
+          val controlStaticId = s.getStringValue
+
+          val pathMapCtx: SimplePathMapContext = getPathMapContext(pathMap)
+
+          val controlPrefixedId =
+            pathMapCtx
+              .element
+              .scope
+              .prefixedIdForStaticId(controlStaticId)
+
+          pathMapCtx
+            .partAnalysisCtx
+            .findControlAnalysis(controlPrefixedId)
+            .collect { case sc: SelectionControl => sc.itemsetAnalysis }
+            .flatten
+            .map(XFormsPathMapSupport.updateWithXPathAnalysis(pathMap, _))
+            .getOrElse(XFormsPathMapSupport.invalidatePathMap(pathMap))
+
+          null
+
+        case _ =>
+          XFormsPathMapSupport.invalidatePathMap(pathMap)
+    }
 }

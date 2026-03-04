@@ -15,13 +15,13 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 
 import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
-import org.orbeon.oxf.xforms.function.{MatchSimpleAnalysis, XFormsFunction}
+import org.orbeon.oxf.xforms.function.{XFormsPathMapSupport, XFormsFunction}
 import org.orbeon.saxon.expr.*
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.value.Int64Value
 
 
-class XXFormsRepeatPosition extends XFormsFunction with MatchSimpleAnalysis {
+class XXFormsRepeatPosition extends XFormsFunction {
 
   override def evaluateItem(xpathContext: XPathContext): Int64Value = {
     implicit val ctx = xpathContext
@@ -34,11 +34,11 @@ class XXFormsRepeatPosition extends XFormsFunction with MatchSimpleAnalysis {
         // Argument is literal and we have a context to ask
         val context = getPathMapContext(pathMap)
         // Get PathMap for context id
-        matchSimpleAnalysis(pathMap, context.getInScopeContexts.get(repeatIdExpression.getStringValue))
+        XFormsPathMapSupport.updateWithBindingAnalysis(pathMap, context.getInScopeContexts.get(repeatIdExpression.getStringValue))
       case None =>
         // Argument is not specified, ask `PathMap` for the result
         val context = getPathMapContext(pathMap)
-        matchSimpleAnalysis(pathMap, context.getRepeatIgnoreScope) // ignore scope as `fr:grid`/`fr:section` rely on this
+        XFormsPathMapSupport.updateWithBindingAnalysis(pathMap, context.getRepeatIgnoreScope) // ignore scope as `fr:grid`/`fr:section` rely on this
       case _ =>
         // Argument is not literal so we can't figure it out
         pathMap.setInvalidated(true)

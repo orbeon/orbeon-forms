@@ -7973,4 +7973,145 @@
         </output>
     </test>
 
+    <test description="For #7401: add dependency support for `xxf:itemset()`" name="oxf:xforms-xpath-analysis">
+        <input name="form">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="m">
+                        <xf:instance id="i">
+                            <_/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:select1 id="my-select1" ref="@value">
+                        <xf:itemset ref="instance()/item">
+                            <xf:label ref="label"/>
+                            <xf:value ref="@value"/>
+                        </xf:itemset>
+                    </xf:select1>
+                    <xf:var name="my-itemset-json" value="xxf:itemset('my-select1', 'json')"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <root scope="" prefixed-id="#document" model-prefixed-id="m" binding="false" value="false">
+                <model scope="" prefixed-id="m" default-instance-prefixed-id="i" analyzed-binds="true">
+                    <instance scope="" prefixed-id="i" model-prefixed-id="m" binding="false" value="false"/>
+                </model>
+                <select1 scope="" prefixed-id="my-select1" model-prefixed-id="m" binding="true" value="true">
+                    <binding>
+                        <analysis expression="@value" analyzed="true">
+                            <returnable>
+                                <path>instance('i')/@value</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>i</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <value>
+                        <analysis expression="string((.)[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i')/@value</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                    <analysis expression="((instance()/item) | (string((label)[1]))) | (string((@value)[1]))" analyzed="true">
+                        <value-dependent>
+                            <path>instance('i')/item</path>
+                            <path>instance('i')/item/label</path>
+                            <path>instance('i')/item/@value</path>
+                        </value-dependent>
+                        <dependent-models>
+                            <model>m</model>
+                        </dependent-models>
+                        <dependent-instances>
+                            <instance>i</instance>
+                        </dependent-instances>
+                    </analysis>
+                    <itemset scope="" prefixed-id="xf-1" model-prefixed-id="m" binding="true" value="false">
+                        <binding>
+                            <analysis expression="instance()/item" analyzed="true">
+                                <returnable>
+                                    <path>instance('i')/item</path>
+                                </returnable>
+                                <dependent-models>
+                                    <model>m</model>
+                                </dependent-models>
+                                <dependent-instances>
+                                    <instance>i</instance>
+                                </dependent-instances>
+                                <returnable-instances>
+                                    <instance>i</instance>
+                                </returnable-instances>
+                            </analysis>
+                        </binding>
+                        <label scope="" prefixed-id="xf-2" model-prefixed-id="m" binding="true" value="false">
+                            <value>
+                                <analysis expression="string((label)[1])" analyzed="true">
+                                    <value-dependent>
+                                        <path>instance('i')/item/label</path>
+                                    </value-dependent>
+                                    <dependent-models>
+                                        <model>m</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>i</instance>
+                                    </dependent-instances>
+                                </analysis>
+                            </value>
+                        </label>
+                        <value scope="" prefixed-id="xf-3" model-prefixed-id="m" binding="true" value="false">
+                            <binding>
+                                <analysis expression="@value" analyzed="true">
+                                    <returnable>
+                                        <path>instance('i')/item/@value</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>m</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>i</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>i</instance>
+                                    </returnable-instances>
+                                </analysis>
+                            </binding>
+                        </value>
+                    </itemset>
+                </select1>
+                <var scope="" prefixed-id="xf-4" model-prefixed-id="m" binding="false" value="false" name="my-itemset-json">
+                    <value>
+                        <analysis expression="xxf:itemset('my-select1', 'json')" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i')/item/label</path>
+                                <path>instance('i')/item/@value</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </var>
+            </root>
+        </output>
+    </test>
+
 </group>

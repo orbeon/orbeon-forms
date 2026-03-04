@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import org.orbeon.oxf.xforms.analysis.ElementAnalysisTreeXPathAnalyzer
 import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.oxf.xml.DependsOnContextItem
 import org.orbeon.saxon.expr.{PathMap, XPathContext}
@@ -26,11 +25,11 @@ import org.orbeon.saxon.expr.{PathMap, XPathContext}
  * ancestor element may have been created dynamically as part of the run-time expansion of repeated content as
  * described in Section 4.7 Resolving ID References in XForms."
  */
-class Context extends XFormsFunction with MatchSimpleAnalysis with DependsOnContextItem {
+class Context extends XFormsFunction with DependsOnContextItem {
 
   override def evaluateItem(xpathContext: XPathContext) =
     bindingContext.contextItem
 
   override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet =
-    matchSimpleAnalysis(pathMap, getPathMapContext(pathMap).context)
+    XFormsPathMapSupport.updateWithBindingAnalysis(pathMap, getPathMapContext(pathMap).context)
 }

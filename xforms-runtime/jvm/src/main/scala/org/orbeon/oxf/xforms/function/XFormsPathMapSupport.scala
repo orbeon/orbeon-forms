@@ -13,31 +13,36 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import org.orbeon.oxf.xforms.analysis.{ConstantXPathAnalysis, ElementAnalysis, PathMapXPathAnalysis}
+import org.orbeon.oxf.xforms.analysis.{ConstantXPathAnalysis, ElementAnalysis, PathMapXPathAnalysis, XPathAnalysis}
 import org.orbeon.saxon.expr.PathMap
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 
 
-trait MatchSimpleAnalysis {
+object XFormsPathMapSupport {
 
-  def matchSimpleAnalysis(pathMap: PathMap, analysisOption: Option[ElementAnalysis]): PathMapNodeSet = analysisOption match {
-    case Some(element) if element.bindingAnalysis.exists(_.figuredOutDependencies) =>
-      // Clone the PathMap first because the nodes returned must belong to this PathMap
-      element.bindingAnalysis.get match {
-        case bindingAnalysis: PathMapXPathAnalysis =>
-          val clonedContextPathMap = bindingAnalysis.pathMapOrThrow.clone
+  def updateWithBindingAnalysis(pathMap: PathMap, elementAnalysisOpt: Option[ElementAnalysis]): PathMapNodeSet =
+    elementAnalysisOpt
+      .flatMap(_.bindingAnalysis)
+      .map(updateWithXPathAnalysis(pathMap, _))
+      .getOrElse(invalidatePathMap(pathMap))
+
+  def updateWithXPathAnalysis(pathMap: PathMap, xpathAnalysis: XPathAnalysis): PathMapNodeSet =
+    if (xpathAnalysis.figuredOutDependencies)
+      xpathAnalysis match {
+        case pathMapXPathAnalysis: PathMapXPathAnalysis =>
+          val clonedContextPathMap = pathMapXPathAnalysis.pathMapOrThrow.clone // clone the `PathMap` first because the nodes returned must belong to this `PathMap`
           pathMap.addRoots(clonedContextPathMap.getPathMapRoots)
           clonedContextPathMap.findFinalNodes
         case bindingAnalysis: ConstantXPathAnalysis if bindingAnalysis.figuredOutDependencies =>
           null
         case _ =>
-          pathMap.setInvalidated(true)
-          null
+          invalidatePathMap(pathMap)
       }
+  else
+    invalidatePathMap(pathMap)
 
-    case _ =>
-      // Either there is no analysis at all or we couldn't figure out binding analysis
-      pathMap.setInvalidated(true)
-      null
+  def invalidatePathMap(pathMap: PathMap): PathMapNodeSet = {
+    pathMap.setInvalidated(true)
+    null
   }
 }

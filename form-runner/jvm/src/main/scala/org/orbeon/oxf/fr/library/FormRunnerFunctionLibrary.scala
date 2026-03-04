@@ -86,6 +86,8 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     Fun("process-dateTime", classOf[FRProcessDateTime], op = 0, min = 0, DATE_TIME, ALLOWS_ZERO_OR_ONE)
 
     Fun("workflow-stage-value",        classOf[FRWorkflowStageValue],   op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
+    Fun("lang",                        classOf[FRLang],                 op = 0, min = 0, STRING, EXACTLY_ONE)
+    Fun("fr-lang",                     classOf[FRFrLang],               op = 0, min = 0, STRING, EXACTLY_ONE)
 
     // Form runner parameter functions
     Fun("mode",                        classOf[FRMode],                 op = 0, min = 0, STRING, EXACTLY_ONE)
@@ -224,8 +226,6 @@ private object FormRunnerFunctions {
 
   val StringGettersByName: Seq[(String, () => Option[String])] = List(
     "form-title"                  -> (() => FormRunner.formTitleFromMetadata),
-    "lang"                        -> (() => Some(FormRunner.currentLang)),
-    "fr-lang"                     -> (() => Some(FormRunner.currentFRLang)),
     "username"                    -> (() => NetUtils.getExternalContext.getRequest.credentials map     (_.userAndGroup.username)),
     "user-group"                  -> (() => NetUtils.getExternalContext.getRequest.credentials flatMap (_.userAndGroup.groupname)),
     "relevant-form-values-string" -> (() => Some(FormRunnerMetadata.findAllControlsWithValues(html = false, Nil))),
@@ -832,6 +832,52 @@ class FRWorkflowStageValue extends FunctionSupport with RuntimeDependentFunction
       instancePrefixedId = "fr-document-metadata",
       path               = List(QName("workflow-stage")),
       isAttribute        = true
+    )
+
+    null
+  }
+}
+
+class FRLang extends FunctionSupport with RuntimeDependentFunction {
+
+  override def evaluateItem(xpathContext: XPathContext): StringValue =
+    FormRunner.currentLang
+
+  override def addToPathMap(
+    pathMap        : PathMap,
+    pathMapNodeSet : PathMapNodeSet
+  ): PathMapNodeSet = {
+
+    implicit val exprContainer: Container = getContainer
+
+    PathMapSupport.addAbsoluteInstancePath(
+      pathMap            = pathMap,
+      instancePrefixedId = "fr-language-instance",
+      path               = Nil,
+      isAttribute        = false
+    )
+
+    null
+  }
+}
+
+class FRFrLang extends FunctionSupport with RuntimeDependentFunction {
+
+  override def evaluateItem(xpathContext: XPathContext): StringValue =
+    FormRunner.currentFRLang
+
+  override def addToPathMap(
+    pathMap        : PathMap,
+    pathMapNodeSet : PathMapNodeSet
+  ): PathMapNodeSet = {
+
+    implicit val exprContainer: Container = getContainer
+
+    PathMapSupport.addAbsoluteInstancePath(
+      pathMap            = pathMap,
+      instancePrefixedId = "fr-fr-language-instance",
+      path               = Nil,
+      isAttribute        = false
     )
 
     null

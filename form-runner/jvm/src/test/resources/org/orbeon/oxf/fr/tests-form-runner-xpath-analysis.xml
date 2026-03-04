@@ -340,4 +340,66 @@
             </root>
         </output>
     </test>
+
+    <test description="For #7401: add dependency support for `fr:lang()` and `fr:fr-lang()`" name="oxf:xforms-xpath-analysis">
+        <input name="form">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model
+                         xxf:xpath-analysis="true"
+                         id="m"
+                         xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+                        <xf:instance id="fr-language-instance">
+                            <lang xmlns=""/>
+                        </xf:instance>
+                        <xf:instance id="fr-fr-language-instance">
+                            <lang xmlns=""/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="my-lang"                    value="fr:lang()"/>
+                    <xf:output id="my-fr-lang"                 value="fr:fr-lang()"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <root scope="" prefixed-id="#document" model-prefixed-id="m" binding="false" value="false">
+                <model scope="" prefixed-id="m" default-instance-prefixed-id="fr-language-instance" analyzed-binds="true">
+                    <instance scope="" prefixed-id="fr-language-instance" model-prefixed-id="m" binding="false" value="false"/>
+                    <instance scope="" prefixed-id="fr-fr-language-instance" model-prefixed-id="m" binding="false" value="false"/>
+                </model>
+                <output scope="" prefixed-id="my-lang" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((fr:lang())[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('fr-language-instance')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>fr-language-instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="my-fr-lang" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((fr:fr-lang())[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('fr-fr-language-instance')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>fr-fr-language-instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+            </root>
+        </output>
+    </test>
 </group>

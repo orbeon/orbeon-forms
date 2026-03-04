@@ -264,7 +264,7 @@ private object ReadFormProcessor {
     versionOpt: Option[FormDefinitionVersion.Specific]
   ): FormRunnerParams =
     FormRunnerParams(
-      formVersionOpt = formDefinitionVersionOpt.map(_.version),
+      formVersionOpt = versionOpt.map(_.version),
       app            = appForm.app,
       form           = appForm.form,
       document       = params.document,

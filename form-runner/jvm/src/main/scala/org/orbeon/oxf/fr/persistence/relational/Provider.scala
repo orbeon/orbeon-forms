@@ -42,11 +42,8 @@ object Provider extends Enum[Provider] {
 
   def driverClass(provider: Provider): String =
     provider match {
-      case Oracle     => "oracle.jdbc.OracleDriver"
       case MySQL      => "com.mysql.cj.jdbc.Driver"
-      case SQLServer  => "com.microsoft.sqlserver.jdbc.SQLServerDriver"
       case PostgreSQL => "org.postgresql.Driver"
-      case DB2        => "com.ibm.db2.jcc.DB2Driver"
       case SQLite     => "org.sqlite.JDBC"
     }
 

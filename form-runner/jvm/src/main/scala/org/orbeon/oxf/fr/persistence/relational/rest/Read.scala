@@ -129,8 +129,6 @@ trait Read {
       httpResponse.setHeader(OrbeonFormDefinitionForm,    fromDatabase.form)
       httpResponse.setHeader(OrbeonFormDefinitionVersion, fromDatabase.formVersion.toString)
 
-      fromDatabase
-
       fromDatabase.dataUserOpt.foreach { dataUser =>
         dataUser.userAndGroup.foreach { userAndGroup =>
           httpResponse.setHeader(Headers.OrbeonUsername, userAndGroup.username)

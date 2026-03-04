@@ -68,7 +68,7 @@ object URLGeneratorBase {
       Nil
     }
 
-  def storeHeadersIntoRequest(connectionResult: ConnectionResult, headers: List[(String, String)]): Unit = {
+  def storeHeadersIntoRequest(headers: List[(String, String)]): Unit = {
     val requestAttributes = NetUtils.getExternalContext.getRequest.getAttributesMap
     headers foreach { case (name, value) =>
       requestAttributes.put("oxf.url-generator.header." + name.toLowerCase, value)

@@ -1053,7 +1053,7 @@ public class URLGenerator extends ProcessorImpl {
 
                 headersToPropagate = URLGeneratorBase.collectHeaders(connectionResult, config.getReadHeaders());
 
-                URLGeneratorBase.storeHeadersIntoRequest(connectionResult, headersToPropagate);
+                URLGeneratorBase.storeHeadersIntoRequest(headersToPropagate);
             }
         }
 

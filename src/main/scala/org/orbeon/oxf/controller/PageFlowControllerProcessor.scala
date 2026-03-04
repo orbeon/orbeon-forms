@@ -228,9 +228,15 @@ class PageFlowControllerProcessor extends ProcessorImpl {
     if (! pageFlow.interceptor.exists(_.process()(pc, ec)))
       findRoute(path, request.getMethod.some) match {
         case Some((route: FileRoute, matchResult)) =>
-          // Run the given route and let the caller handle errors
+          // Run the given route and let the caller handle errors (except connection interruptions)
           debug("processing file", logParams)
-          route.process(pc, ec, matchResult)
+          try
+            route.process(pc, ec, matchResult)
+          catch {
+            case NonFatal(t) if isConnectionInterruption(t) =>
+              info(s"connection interrupted: ${getRootThrowable(t).getMessage}", logParams)
+          }
+
         case Some((route: PageOrServiceRoute, matchResult)) =>
           debug("processing page/service", logParams)
 

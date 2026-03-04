@@ -197,6 +197,10 @@ trait FormRunnerActionsCommon {
           Nil
         )
 
+      // Ensure that data is fully up to date first
+      // https://github.com/orbeon/orbeon-forms/issues/7533
+      inScopeContainingDocument.synchronizeAndRefresh()
+
       // If the feature is enabled, we'll try to detect concurrent data modifications
       val detectDataConflict = frc.formRunnerProperty("oxf.fr.detail.conflict-detection").contains("save-only")
 

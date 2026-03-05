@@ -1,6 +1,8 @@
 <%@ page pageEncoding="utf-8" contentType="text/html; charset=UTF-8" import="org.orbeon.oxf.fr.embedding.servlet.API" %>
 <%@ page import="java.util.Objects" %>
 <%@ page import="java.util.stream.Collectors" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Map" %>
 <!DOCTYPE HTML>
 <%
     // Where Orbeon Forms is deployed (used by JS API and Angular/React components). Use orbeon-forms-context context
@@ -32,12 +34,14 @@
                             (isEmbeddingApiAngular ? "Angular Component"
                                                    : "React Component"));
 
-    String  appParameter  = request.getParameter("app");
-    String  formParameter = request.getParameter("form");
-    String  selectedApp   = appParameter != null ? appParameter : "orbeon";
-    String  selectedForm  = formParameter != null &&
+    String  appParameter        = request.getParameter("app");
+    String  formParameter       = request.getParameter("form");
+    String  documentIdParameter = request.getParameter("document-id");
+    String  selectedApp         = appParameter != null ? appParameter : "orbeon";
+    String  selectedForm        = formParameter != null &&
             !((isEmbeddingApiAngular || isEmbeddingApiReact) && formParameter.equals("builder")) ?
             formParameter : "bookshelf";
+    String  selectedMode        = documentIdParameter != null ? "edit" : "new";
 %>
 <html>
 <head>
@@ -108,7 +112,8 @@
                 "<%= orbeonFormsContext %>",
                 "<%= selectedApp %>",
                 "<%= selectedForm %>",
-                "new"
+                "<%= selectedMode %>",
+                <% if (documentIdParameter != null) { %>"<%= documentIdParameter %>"<% } else { %>undefined<% } %>
             )
                 .then(() => console.log("`embedForm()` successfully loaded the form"))
                 .catch((e) => {
@@ -197,15 +202,20 @@
 <div id="my-form" class="container">
     <%
         if (isEmbeddingApiJava) {
+            Map<String, String> headers = new HashMap<String, String>();
+            String username = request.getHeader("Orbeon-Username");
+            String roles    = request.getHeader("Orbeon-Roles");
+            if (username != null) headers.put("Orbeon-Username", username);
+            if (roles    != null) headers.put("Orbeon-Roles",    roles);
             API.embedFormJava(
                     request,
                     out,
                     selectedApp,
                     selectedForm,
-                    "new",
+                    selectedMode,
+                    documentIdParameter,
                     null,
-                    null,
-                    null
+                    headers.isEmpty() ? null : headers
             );
         }
     %>

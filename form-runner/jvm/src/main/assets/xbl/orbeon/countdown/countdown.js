@@ -83,6 +83,10 @@
                 outputEls.push(this.outputEl);
         },
 
+        destroy: function() {
+            outputEls = _.without(outputEls, this.outputEl);
+        },
+
         setAlertThreshold: function(alertThreshold) {
             this.alertThreshold = parseInt(alertThreshold) * 60;
         },

@@ -27,6 +27,7 @@
     <xbl:script src="/webjars/tinymce/6.8.6/themes/silver/theme.min.js"/>
     <xbl:script src="/webjars/tinymce/6.8.6/plugins/lists/plugin.min.js"/>
     <xbl:script src="/webjars/tinymce/6.8.6/plugins/link/plugin.min.js"/>
+
     <xbl:binding
         id="fr-tinymce"
         element="fr|tinymce, xf|textarea[mediatype = 'text/html']"
@@ -129,6 +130,18 @@
                     <xf:output mediatype="text/html" ref="$binding"/>
                 </xf:case>
             </xf:switch>
+        </xbl:template>
+    </xbl:binding>
+
+    <xbl:binding
+        id="fr-tinymce-output"
+        element="
+            fr|tinymce[fr|pdf-template = true],
+            xf|textarea[mediatype = 'text/html'][fr|pdf-template = true]"
+        xxbl:mode="lhha binding value"
+    >
+        <xbl:template>
+            <xf:output mediatype="text/html" ref="xxf:binding('fr-tinymce-output')"/>
         </xbl:template>
     </xbl:binding>
 

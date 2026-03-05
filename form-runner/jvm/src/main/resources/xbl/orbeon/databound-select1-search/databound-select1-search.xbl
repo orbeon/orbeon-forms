@@ -572,11 +572,22 @@
                             <xf:action event="xforms-value-changed" propagate="stop"/>
                             <xxf:value value="instance('result-raw')" xxbl:scope="inner"/>
                         </xf:var>
-                        <xf:select1 ref="$binding" appearance="xxf:internal">
+                        <xf:select1 id="internal-select1" ref="$binding" appearance="xxf:internal">
                             <xf:choices context="$result-raw" xxbl:scope="outer">
                                 <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
                             </xf:choices>
                         </xf:select1>
+
+                        <!-- Update the label when the itemset changes, e.g. on language change -->
+                        <xf:var
+                            name="current-label-from-itemset"
+                            value="xxf:itemset('internal-select1', 'xml')//item[value = $binding]/label/string()">
+                            <xf:action event="xforms-value-changed">
+                                <xf:setvalue if="exists($binding/@label) and not(xxf:readonly($binding))"
+                                             ref="$binding/@label"         value="$current-label-from-itemset"/>
+                                <xf:setvalue ref="instance('local')/label" value="$current-label-from-itemset"/>
+                            </xf:action>
+                        </xf:var>
 
                         <xf:group
                             ref="if (not($view)) then . else ()"

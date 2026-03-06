@@ -100,13 +100,6 @@
                 name="binding"
                 value="xxf:binding('fr-tinymce')"/>
 
-            <xf:var
-                name="script"
-                value="
-                    not(
-                        xxf:readonly($binding) and property('xxf:readonly-appearance') = 'static'
-                    )"/>
-
             <!-- In portlet mode, we want the resource id to be processed into a base URL, and we use a magic value to
                  indicate that. Search for 1b713b2e6d7fd45753f4b8a6270b776e in the code for more details.
                  NOTE: Don't put '/' before 1b713b2e6d7fd45753f4b8a6270b776e because TinyMCE will automatically
@@ -122,26 +115,24 @@
                 href="/webjars/tinymce/6.8.61b713b2e6d7fd45753f4b8a6270b776e.js"
                 class="tinymce-base-url xforms-hidden"/>
 
-            <!-- This is a workaround for the lack of https://github.com/orbeon/orbeon-forms/issues/5366.
-                 The `<xf:switch>` must never switch during the lifetime of the form. -->
-            <xf:switch id="tinymce-div" xxf:element="div" caseref="$script" xxf:update="full" class="xbl-fr-tinymce-div xbl-html-input" role="textbox">
-                <xf:case value="true()"/>
-                <xf:case value="false()">
-                    <xf:output mediatype="text/html" ref="$binding"/>
-                </xf:case>
-            </xf:switch>
+            <xh:div id="tinymce-div" class="xbl-fr-tinymce-div xbl-html-input" role="textbox">
+                <xf:output mediatype="text/html" ref="$binding"/>
+            </xh:div>
         </xbl:template>
     </xbl:binding>
 
     <xbl:binding
         id="fr-tinymce-output"
         element="
+            fr|tinymce[fr|static-readonly = true],
             fr|tinymce[fr|pdf-template = true],
+            xf|textarea[mediatype = 'text/html'][fr|static-readonly = true],
             xf|textarea[mediatype = 'text/html'][fr|pdf-template = true]"
         xxbl:mode="lhha binding value"
+        xxbl:label-for="output"
     >
         <xbl:template>
-            <xf:output mediatype="text/html" ref="xxf:binding('fr-tinymce-output')"/>
+            <xf:output id="output" mediatype="text/html" ref="xxf:binding('fr-tinymce-output')"/>
         </xbl:template>
     </xbl:binding>
 

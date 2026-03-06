@@ -5,6 +5,9 @@
 // a few of these rules. The reason we override them is because if we use Friendly Captcha's `.frc-captcha` class, it
 // has the side effect of causing the captcha to reload automatically, which we don't want. This might be a bug in
 // Friendly Captcha.
+
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
 .xbl-fr-friendly-captcha-div {
     font-size: var(--orbeon-friendly-captcha-font-size);
 
@@ -34,20 +37,7 @@
         font-weight: 700
     }
 
-    @media screen {
-        .fr-color-scheme-dark & {
-            .dark-color-scheme()
-        }
-    }
-
-    // System-preference dark mode (screen only)
-    @media screen and (prefers-color-scheme: dark) {
-        .fr-color-scheme-system & {
-            .dark-color-scheme()
-        }
-    }
-
-    .dark-color-scheme() {
+    .xbl-dark-mode({
         svg {
             filter: invert(1) !important;
         }
@@ -55,5 +45,5 @@
         .frc-banner * {
             opacity: 1;
         }
-    }
+    });
 }

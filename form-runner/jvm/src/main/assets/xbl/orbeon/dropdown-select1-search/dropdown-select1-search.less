@@ -48,16 +48,29 @@
             .select2-results__option[aria-selected=true] {
                 background-color: var(--orbeon-dropdown-selected-background-color);
             }
+
+            .select2-results__option--highlighted[aria-selected] {
+                background-color: var(--orbeon-dropdown-menu-hover-background-color);
+                color: var(--orbeon-dropdown-menu-hover-color);
+            }
         }
     }
 
     // "x" button to clear the dropdown
     .select2-selection__clear {
-        padding: 0 5px;    // Wider to be easier to activate
-        top: 3px;          // For the highlight not to go over or under the dropdown border
-        line-height: 20px; // Better alignment of the clear icon with the selection / arrow down icon
-        color: #888;       // Use the same shade of grey as the selection / arrow down icon
+        padding: 0 5px;                            // Wider to be easier to activate
+        top: 3px;                                  // For the highlight not to go over or under the dropdown border
+        line-height: 20px;                         // Better alignment of the clear icon with the selection / arrow down icon
+        color: var(--orbeon-dropdown-caret-color); // Use the same shade of grey as the selection / arrow down icon
         .focusHighlightGroup();
+    }
+
+    // Caret (arrow down/up)
+    .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        border-color: var(--orbeon-dropdown-caret-color) transparent transparent transparent;
+    }
+    .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+        border-color: transparent transparent var(--orbeon-dropdown-caret-color) transparent;
     }
 
     .fr-service-error .select2-container .select2-selection {

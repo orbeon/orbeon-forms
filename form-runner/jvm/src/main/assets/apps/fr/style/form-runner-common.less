@@ -175,6 +175,7 @@
     background: transparent;
 }
 
+// To be used in .orbeon contexts
 .dark-mode(@rules) {
     // Explicit dark mode
     @media screen {
@@ -185,6 +186,23 @@
     // System-preference dark mode (screen only)
     @media screen and (prefers-color-scheme: dark) {
         .fr-color-scheme-system, &:has(.fr-color-scheme-system) {
+            @rules();
+        }
+    }
+}
+
+// To be used in .xbl-fr-* contexts
+.xbl-dark-mode(@rules) {
+    // Explicit dark mode
+    @media screen {
+        .fr-color-scheme-dark & {
+            @rules();
+        }
+    }
+
+    // System-preference dark mode (screen only)
+    @media screen and (prefers-color-scheme: dark) {
+        .fr-color-scheme-system & {
             @rules();
         }
     }

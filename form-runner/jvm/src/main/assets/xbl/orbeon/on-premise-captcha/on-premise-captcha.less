@@ -9,7 +9,9 @@
 // See the GNU Lesser General Public License for more details.
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
 @import (reference) "../../../../../../../../bootstrap-src/less/variables";
+@import (reference) "../../../apps/fr/style/form-runner-common";
 
 .xbl-fr-on-premise-captcha {
 
@@ -45,4 +47,10 @@
         display: block;
         margin-left: 17px;
     }
+
+    .xbl-dark-mode({
+        label:not(.checkbox):not(.radio), .xforms-label {
+           color: var(--orbeon-on-premise-captcha-label-color);
+       }
+    });
 }

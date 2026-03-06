@@ -99,7 +99,7 @@
                     display: flex;
                     align-items: baseline;
                     label, output {
-                        color: white;
+                        color: var(--orbeon-navbar-color);
                     }
                     label:after {
                         content: ":"
@@ -312,12 +312,8 @@
 
         .navbar-inverse & {
             .btn-link .fa {
-                color: white;
+                color: var(--orbeon-navbar-color);
             }
-        }
-
-        .btn-link .fa {
-            color: #777777; // TODO: this matches other icon colors, but do we have a constant?
         }
 
         .xforms-label {

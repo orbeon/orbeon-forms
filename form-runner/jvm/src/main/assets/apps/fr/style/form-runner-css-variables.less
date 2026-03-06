@@ -269,6 +269,7 @@
   // Misc
   --orbeon-header-footer-font-size: 1.10em;
   --orbeon-kbd-hint-font-size     : 0.82em; // 8pt
+  --orbeon-version-color          : @minGrayText;
 
   // Headings
   --orbeon-h1-font-size: 2.96em; // 38px = 296% * 13px = 275% * 14px
@@ -292,8 +293,9 @@
   --orbeon-landing-card-link-color             : #08c;
   --orbeon-landing-card-link-hover-color       : darken(#08c, 15%);
 
-  // Friendly Captcha
-  --orbeon-friendly-captcha-font-size: 1.08em; // 14px
+  // Captcha
+  --orbeon-friendly-captcha-font-size    : 1.08em; // 14px
+  --orbeon-on-premise-captcha-label-color: var(--orbeon-base-color);
 
   // XForms inspector (by default, keep the font size absolute)
   --orbeon-inspector-font-size: 13px;
@@ -307,6 +309,9 @@
   .dark-color-scheme() {
 
     color-scheme: dark;
+
+    // TODO: simplify dark palette with oklch function instead of hls
+    // TODO: (when widely available) use light-dark function to simplify light/dark palette definition
 
     @base-blue: 217;
 
@@ -465,6 +470,8 @@
     --orbeon-dialog-background-color                         : @gray-20;
     --orbeon-dialog-title-color                              : @text-light;
     --orbeon-dialog-title-background-color                   : @gray-16;
+    --orbeon-version-color                                   : @gray-53;
+    --orbeon-on-premise-captcha-label-color                  : @gray-16;
     --orbeon-stripe-color-1                                  : @gray-20;
     --orbeon-stripe-color-2                                  : @base-bg;
   }

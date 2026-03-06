@@ -1399,6 +1399,7 @@
     </xsl:template>
 
     <!-- Optional standard explanation message for view mode -->
+    <!-- TODO: is this still used? -->
     <xsl:template name="fr-explanation">
         <xf:group
                 xxf:element="div"

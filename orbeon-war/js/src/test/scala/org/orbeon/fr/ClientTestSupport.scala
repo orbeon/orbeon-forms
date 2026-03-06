@@ -266,10 +266,13 @@ trait ClientTestSupport {
       val resources            = "usable"
       val runScripts           = "dangerously" // "outside-only"
 
-      // On JSDOM, mock matchMedia, used by TinyMCE, so we can avoid `omitJSDOMErrors = false`
       val beforeParse: js.Function1[dom.Window, Unit] = (window: dom.Window) => {
+
+        val windowDyn = window.asInstanceOf[js.Dynamic]
+
+        // Mock matchMedia, used by TinyMCE
         val noop: js.Function0[Unit] = () => ()
-        window.asInstanceOf[js.Dynamic].matchMedia = ((query: String) =>
+        windowDyn.matchMedia = ((query: String) =>
           js.Dynamic.literal(
             matches             = false,
             media               = query,
@@ -281,6 +284,17 @@ trait ClientTestSupport {
             dispatchEvent       = (() => false): js.Function0[Boolean]
           )
         ): js.Function1[String, js.Dynamic]
+
+        // Mock HTMLDialogElement.showModal/close, not implemented by JSDOM
+        val dialogProto = windowDyn.HTMLDialogElement.prototype
+        if (js.isUndefined(dialogProto.showModal))
+          dialogProto.showModal = ({ (thisDialog: js.Dynamic) =>
+            thisDialog.open = true
+          }: js.ThisFunction0[js.Dynamic, Unit])
+        if (js.isUndefined(dialogProto.close))
+          dialogProto.close = ({ (thisDialog: js.Dynamic) =>
+            thisDialog.open = false
+          }: js.ThisFunction0[js.Dynamic, Unit])
       }
     }
 

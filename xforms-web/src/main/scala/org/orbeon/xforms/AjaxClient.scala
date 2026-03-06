@@ -25,6 +25,7 @@ import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.{XXFormsUploadProgress, XXFormsValue}
 import org.orbeon.xforms.facade.Events
+import org.orbeon.facades.HTMLDialogElement
 import org.scalajs.dom
 import org.scalajs.dom.{EventListenerOptions, html}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -186,8 +187,7 @@ object AjaxClient {
         )
 
       // Show the dialog
-      js.Dynamic.global.dialogPolyfill.registerDialog(dialogEl)
-      dialogEl.asInstanceOf[js.Dynamic].showModal()
+      dialogEl.asInstanceOf[HTMLDialogElement].showModal()
     }
   }
 

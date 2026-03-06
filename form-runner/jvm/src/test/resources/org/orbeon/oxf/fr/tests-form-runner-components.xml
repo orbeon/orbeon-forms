@@ -100,7 +100,6 @@
                 <xh:script src="/webjars/bowser/1.9.4/bowser.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/mousetrap/1.6.5/mousetrap.min.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/whatwg-fetch/3.0.0/dist/fetch.umd.js" class="xforms-baseline"/>
-                <xh:script src="/ops/dialog-polyfill-0.5.6/dialog-polyfill.js" class="xforms-baseline"/>
                 <xh:script src="/ops/web-streams-polyfill/ponyfill.es2018.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/yahoo/yahoo.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/event/event.min.js" class="xforms-baseline"/>

@@ -13,7 +13,7 @@
  */
 package org.orbeon.fr
 
-import org.orbeon.facades.{Ladda, ResizeObserver}
+import org.orbeon.facades.{HTMLDialogElement, Ladda, ResizeObserver}
 import org.orbeon.web.{DomEventNames, DomSupport}
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xbl
@@ -209,7 +209,6 @@ object FormRunnerApp extends App {
     }
 
     def showDialog(): Unit = {
-      js.Dynamic.global.dialogPolyfill.registerDialog(dialog)
       dialog.showModal()
       dialogShown = true
     }
@@ -223,7 +222,6 @@ object FormRunnerApp extends App {
   private def initDuplicateTabDialog(dialogElem: html.Element): Unit =
     DuplicateTab.duplicateTabDetectedF.foreach { _ =>
       dialogElem.closestOpt(s"form.$InitiallyHiddenClass").foreach(_.classList.remove(InitiallyHiddenClass))
-      js.Dynamic.global.dialogPolyfill.registerDialog(dialogElem)
       dialogElem.asInstanceOf[HTMLDialogElement].showModal()
     }
 

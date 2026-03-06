@@ -147,7 +147,11 @@ trait ClientTestSupport {
 
         (domWindow, window)
       }.flatMap { case (domWindow, window) =>
-        body(window).andThen { case _ => domWindow.close() }
+        val savedDescriptors = swapGlobalsToWindow(domWindow)
+        body(window).andThen { case _ =>
+          restoreGlobals(savedDescriptors)
+          domWindow.close()
+        }
       }
     }
 
@@ -307,4 +311,32 @@ trait ClientTestSupport {
           Future.failed(new NoSuchElementException(s"No `$HeaderStart` header found"))
       }
     }
+  }
+
+  private def swapGlobalsToWindow(targetWindow: dom.Window): Map[String, js.UndefOr[js.Dynamic]] = {
+    val JsObject        = js.Dynamic.global.Object
+    val globalObj       = js.Dynamic.global.globalThis
+    val targetWindowDyn = targetWindow.asInstanceOf[js.Dynamic]
+    val propNames       = JsObject.getOwnPropertyNames(targetWindowDyn).asInstanceOf[js.Array[String]]
+
+    (for {
+      propName       <- propNames
+      value           = targetWindowDyn.selectDynamic(propName)
+      if                js.typeOf(value) == "function" && propName.head.isUpper // Only things that look like constructors
+      prevDesc        = JsObject.getOwnPropertyDescriptor(globalObj      , propName)
+      newDesc         = JsObject.getOwnPropertyDescriptor(targetWindowDyn, propName)
+    } yield {
+      JsObject.defineProperty(globalObj, propName, newDesc)
+      propName -> prevDesc.asInstanceOf[js.UndefOr[js.Dynamic]]
+    }).toMap
+  }
+
+  private def restoreGlobals(saved: Map[String, js.UndefOr[js.Dynamic]]): Unit = {
+    val JsObject  = js.Dynamic.global.Object
+    val globalObj = js.Dynamic.global.globalThis
+
+    saved.foreach { case (name, desc) =>
+      JsObject.defineProperty(globalObj, name, desc)
+    }
+  }
 }

@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.xforms.function
 
+import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.oxf.xforms.model.RuntimeBind
 import org.orbeon.oxf.xml.DependsOnContextItem
-import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
+import org.orbeon.saxon.expr.{PathMap, StringLiteral, XPathContext}
 import org.orbeon.saxon.om.{EmptyIterator, ListIterator, SequenceIterator}
-
 
 
 class Bind extends XFormsFunction with DependsOnContextItem {
@@ -51,5 +52,26 @@ class Bind extends XFormsFunction with DependsOnContextItem {
     }
   }
 
-  // TODO: PathMap
+  override def addToPathMap(
+    pathMap        : PathMap,
+    pathMapNodeSet : PathMapNodeSet
+  ): PathMapNodeSet =
+    arguments.head match {
+        case s: StringLiteral =>
+
+          val bindStaticId = s.getStringValue
+          val pathMapCtx   = getPathMapContext(pathMap)
+          val scope        = pathMapCtx.element.scope
+
+          pathMapCtx
+            .partAnalysisCtx
+            .findModelByScopeAndBind(scope, bindStaticId)
+            .flatMap(_.bindsById.get(bindStaticId))
+            .flatMap(_.bindingAnalysis)
+            .map(XFormsPathMapSupport.updateWithXPathAnalysis(pathMap, _))
+            .getOrElse(XFormsPathMapSupport.invalidatePathMap(pathMap))
+
+        case _ =>
+          XFormsPathMapSupport.invalidatePathMap(pathMap)
+    }
 }

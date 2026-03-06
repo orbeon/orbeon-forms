@@ -8114,4 +8114,87 @@
         </output>
     </test>
 
+    <test description="With #7401: add dependency support for `bind()`" name="oxf:xforms-xpath-analysis">
+        <input name="form">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="m">
+                        <xf:instance id="i">
+                            <_/>
+                        </xf:instance>
+                        <xf:bind ref="a">
+                            <xf:bind id="b-bind" ref="b"/>
+                        </xf:bind>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="my-output" value="bind('b-bind')"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <root scope="" prefixed-id="#document" model-prefixed-id="m" binding="false" value="false">
+                <model scope="" prefixed-id="m" default-instance-prefixed-id="i" analyzed-binds="true">
+                    <instance scope="" prefixed-id="i" model-prefixed-id="m" binding="false" value="false"/>
+                    <binds>
+                        <bind id="xf-1" ref="a">
+                            <binding>
+                                <analysis expression="a" analyzed="true">
+                                    <returnable>
+                                        <path>instance('i')/a</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>m</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>i</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>i</instance>
+                                    </returnable-instances>
+                                </analysis>
+                            </binding>
+                            <bind id="b-bind" ref="b">
+                                <binding>
+                                    <analysis expression="b" analyzed="true">
+                                        <returnable>
+                                            <path>instance('i')/a/b</path>
+                                        </returnable>
+                                        <dependent-models>
+                                            <model>m</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>i</instance>
+                                        </dependent-instances>
+                                        <returnable-instances>
+                                            <instance>i</instance>
+                                        </returnable-instances>
+                                    </analysis>
+                                </binding>
+                            </bind>
+                        </bind>
+                    </binds>
+                    <bind-instances>
+                        <instance>i</instance>
+                    </bind-instances>
+                </model>
+                <output scope="" prefixed-id="my-output" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((bind('b-bind'))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i')/a/b</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+            </root>
+        </output>
+    </test>
+
 </group>

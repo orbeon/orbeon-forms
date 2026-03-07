@@ -34,7 +34,8 @@ trait AttachmentTests {
       withFormReady(app = "tests", form = "attachment") { case FormRunnerWindow(xformsWindow, _) =>
         async {
           val document = xformsWindow.window.document
-          simulateFileUpload(document, fileContent = "Hello World")
+          val attachmentControl = document.querySelectorT(".fr-attachment")
+          simulateFileUpload(attachmentControl, fileContent = "Hello World")
 
           await(eventually(500.millis, 30.seconds) {
             Future {
@@ -47,11 +48,12 @@ trait AttachmentTests {
       }
     }
 
-    it("must fail uploading an empty file") { _ =>
+    it("must show dialog for empty file") { _ =>
       withFormReady(app = "tests", form = "attachment") { case FormRunnerWindow(xformsWindow, _) =>
         async {
           val document = xformsWindow.window.document
-          simulateFileUpload(document, fileContent = "")
+          val attachmentControl = document.querySelectorT(".fr-attachment")
+          simulateFileUpload(attachmentControl, fileContent = "")
 
           await(eventually(500.millis, 30.seconds) {
             Future {
@@ -66,8 +68,34 @@ trait AttachmentTests {
           })
 
           // The attachment control is still empty.
-          val attachmentControl = document.querySelectorT(".fr-attachment")
           val messageText = attachmentControl.textContent
+          assert(messageText.contains("Drag file here or select file."))
+        }
+      }
+    }
+
+    it("must show inline error message for empty file") { _ =>
+      withFormReady(app = "tests", form = "attachment") { case FormRunnerWindow(xformsWindow, _) =>
+        async {
+          val document = xformsWindow.window.document
+          val attachmentControls = document.querySelectorAllT(".fr-attachment")
+          val inlineControl = attachmentControls(1)
+          simulateFileUpload(inlineControl, fileContent = "")
+
+          await(eventually(500.millis, 30.seconds) {
+            Future {
+              val inlineMessage = inlineControl.querySelectorOpt(".fr-attachment-upload-error-message")
+              assert(inlineMessage.isDefined, "Inline error message not yet visible")
+              assert(inlineMessage.get.textContent.contains("The file uploaded is empty."))
+            }
+          })
+
+          // No dialog is shown.
+          val dialog = document.querySelectorOpt("dialog[open]")
+          assert(dialog.isEmpty, "Error dialog should not be shown for inline appearance")
+
+          // The attachment control is still empty.
+          val messageText = inlineControl.textContent
           assert(messageText.contains("Drag file here or select file."))
         }
       }
@@ -75,11 +103,10 @@ trait AttachmentTests {
   }
 
   private object Private {
-    def simulateFileUpload(document: html.Document, fileContent: String): Unit = {
-      val attachmentControl = document.querySelectorT(".fr-attachment")
-      val fileInputElem     = attachmentControl.querySelectorT("input[type='file']").asInstanceOf[html.Input]
-      val file              = new dom.File(js.Array(fileContent), "test.txt")
-      val fileList          = js.Array(file).asInstanceOf[dom.FileList]
+    def simulateFileUpload(attachmentControl: dom.Element, fileContent: String): Unit = {
+      val fileInputElem = attachmentControl.querySelectorT("input[type='file']").asInstanceOf[html.Input]
+      val file          = new dom.File(js.Array(fileContent), "test.txt")
+      val fileList      = js.Array(file).asInstanceOf[dom.FileList]
 
       js.Object.defineProperty(
         fileInputElem,

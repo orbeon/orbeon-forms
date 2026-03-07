@@ -304,6 +304,7 @@
         <xbl:handlers>
             <xbl:handler event="xxforms-upload-error" phase="target" defaultAction="cancel" xxbl:scope="outer">
                 <xf:action>
+
                     <xf:var
                         name="error-message"
                         value="
@@ -365,31 +366,21 @@
                                 )
                         "/>
 
-                    <xf:var
-                        name="upload-error-message-appearance"
-                        value="
-                            xxf:property(
-                                string-join(
-                                    (
-                                        'oxf.fr.detail.attachment.upload-error-message-appearance',
-                                        fr:app-name(),
-                                        fr:form-name()
-                                    ),
-                                    '.'
-                                )
-                            )
-                        "/>
 
                     <xf:setvalue
                         ref="xxf:instance('i')/error-message"
                         value="$error-message"/>
 
-                    <xf:action if="$upload-error-message-appearance = 'inline'">
+                    <xf:var name="upload-error-appearance">
+                        <xxf:value xxbl:scope="inner" value="fr:component-param-value('upload-error-appearance')"/>
+                    </xf:var>
+                    <xf:action if="$upload-error-appearance = 'inline'">
                         <xf:toggle xxbl:scope="inner" case="inline-upload-error-message-shown"/>
                     </xf:action>
-                    <xf:action if="$upload-error-message-appearance != 'inline'" type="xpath">
+                    <xf:action if="$upload-error-appearance != 'inline'" type="xpath">
                         frf:errorMessage($error-message)
                     </xf:action>
+
                 </xf:action>
             </xbl:handler>
 

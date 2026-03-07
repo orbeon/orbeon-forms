@@ -22,7 +22,8 @@
                 <form>
                     <section-1>
                         <grid-1>
-                            <single filename="" mediatype="" size=""/>
+                            <single-default filename="" mediatype="" size=""/>
+                            <single-inline filename="" mediatype="" size=""/>
                         </grid-1>
                     </section-1>
                 </form>
@@ -30,7 +31,8 @@
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="section-1-bind" ref="section-1" name="section-1">
                     <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
-                        <xf:bind id="single-bind" ref="single" name="single" type="xf:anyURI"/>
+                        <xf:bind id="single-default-bind" ref="single-default" name="single-default" type="xf:anyURI"/>
+                        <xf:bind id="single-inline-bind" ref="single-inline" name="single-inline" type="xf:anyURI"/>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
@@ -54,12 +56,18 @@
                         <section-1>
                             <label>Attachment Section</label>
                         </section-1>
-                        <single>
-                            <label>Single</label>
+                        <single-default>
+                            <label>Single Default</label>
                             <hint/>
                             <help/>
                             <alert/>
-                        </single>
+                        </single-default>
+                        <single-inline>
+                            <label>Single Inline</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </single-inline>
                     </resource>
                 </resources>
             </xf:instance>
@@ -73,9 +81,16 @@
                     <xf:label ref="$form-resources/section-1/label"/>
                     <fr:grid id="grid-1-grid" bind="grid-1-bind">
                         <fr:c y="1" x="1" w="12">
-                            <fr:attachment bind="single-bind" id="single-control" class="fr-attachment">
-                                <xf:label ref="$form-resources/single/label"/>
-                                <xf:hint ref="$form-resources/single/hint"/>
+                            <fr:attachment bind="single-default-bind" id="single-default-control" class="fr-attachment">
+                                <xf:label ref="$form-resources/single-default/label"/>
+                                <xf:hint ref="$form-resources/single-default/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:attachment>
+                        </fr:c>
+                        <fr:c y="2" x="1" w="12">
+                            <fr:attachment bind="single-inline-bind" id="single-inline-control" class="fr-attachment" upload-error-appearance="inline">
+                                <xf:label ref="$form-resources/single-inline/label"/>
+                                <xf:hint ref="$form-resources/single-inline/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:attachment>
                         </fr:c>

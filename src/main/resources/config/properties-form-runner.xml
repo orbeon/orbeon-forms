@@ -388,7 +388,6 @@
     <property as="xs:string"  name="oxf.fr.detail.attachment.max-size-aggregate-per-form.*.*"      value=""/>
     <property as="xs:string"  name="oxf.fr.detail.attachment.max-files-per-control.*.*"            value=""/>
     <property as="xs:string"  name="oxf.fr.detail.attachment.mediatypes.*.*"                       value="*/*"/>
-    <property as="xs:string"  name="oxf.fr.detail.attachment.upload-error-message-appearance.*.*" value="dialog"/> <!-- dialog | inline -->
 
     <!-- PDF fonts -->
     <property as="xs:string"  name="oxf.fr.pdf.font.family.inter"                                  value="Helvetica Neue"/>
@@ -742,6 +741,7 @@
     <!-- Blank string means `if (fr:created-with-or-newer('2018.2')) then 'full' else 'minimal'`. But we cannot
          actually use that expression, since the logic runs in XSLT. So that behavior is implicit. -->
     <property as="xs:string"  name="oxf.xforms.xbl.fr.calculated-value.appearance.*.*"             value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.attachment.upload-error-appearance.*.*"      value="dialog"/> <!-- dialog | inline -->
 
     <!-- Process for the publish API -->
     <property as="xs:string"  name="oxf.fr.detail.process.before-publish.*.*"/>

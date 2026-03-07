@@ -601,18 +601,6 @@
                         <xf:property name="content-length" value="event('content-length')"/>
                     </xf:dispatch>
 
-                    <xf:dispatch
-                        event="xxforms-upload-error"
-                        targetid="fr-image-attachment"
-                        name="{event('xxf:type')}"
-                        propagate="stop"
-                        defaultAction="cancel">
-                        <xf:property name="error-type" value="event('error-type')"/>
-                        <xf:property name="permitted"  value="event('permitted')"/>
-                        <xf:property name="actual"     value="event('actual')"/>
-                        <xf:property name="message"    value="event('message')"/>
-                    </xf:dispatch>
-
                     <xf:action
                         event="xxforms-upload-done"
                         if="exists(

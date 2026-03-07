@@ -16,6 +16,7 @@
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
@@ -299,6 +300,71 @@
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/attachment/attachment.css"/>
         </xbl:resources>
+
+        <xbl:handlers>
+            <xbl:handler event="xxforms-upload-error" phase="target" defaultAction="cancel" xxbl:scope="outer">
+                <xf:action type="xpath">
+                    frf:errorMessage(
+                        if (event('error-type') = 'empty-file-error') then
+                            xxf:format-message(
+                                xxf:r(
+                                    'detail.messages.upload-error-empty-file',
+                                    'fr-fr-resources'
+                                ),
+                                ()
+                            )
+                        else if (event('error-type') = 'size-error') then
+                            xxf:format-message(
+                                xxf:r(
+                                    'detail.messages.upload-error-size',
+                                    'fr-fr-resources'
+                                ),
+                                (
+                                    event('permitted'),
+                                    event('actual')
+                                )
+                            )
+                        else if (event('error-type') = 'max-files-per-control') then
+                            xxf:format-message(
+                                xxf:r(
+                                    'detail.messages.upload-error-max-files-per-control',
+                                    'fr-fr-resources'
+                                ),
+                                (
+                                    event('permitted')
+                                )
+                            )
+                        else if (event('error-type') = 'mediatype-error') then
+                            xxf:format-message(
+                                xxf:r(
+                                    'detail.messages.upload-error-mediatype',
+                                    'fr-fr-resources'
+                                ),
+                                (
+                                    event('filename'),
+                                    event('permitted'),
+                                    event('actual')
+                                )
+                            )
+                        else if (event('error-type') = 'file-scan-error') then
+                            xxf:format-message(
+                                xxf:r(
+                                    'detail.messages.upload-error-file-scan',
+                                    'fr-fr-resources'
+                                ),
+                                (
+                                    event('message')
+                                )
+                            )
+                        else
+                            xxf:r(
+                                'detail.messages.upload-error',
+                                'fr-fr-resources'
+                            )
+                    )
+                </xf:action>
+            </xbl:handler>
+        </xbl:handlers>
 
         <xbl:implementation>
             <xf:model xxf:custom-mips="">

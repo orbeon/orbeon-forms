@@ -303,66 +303,99 @@
 
         <xbl:handlers>
             <xbl:handler event="xxforms-upload-error" phase="target" defaultAction="cancel" xxbl:scope="outer">
-                <xf:action type="xpath">
-                    frf:errorMessage(
-                        if (event('error-type') = 'empty-file-error') then
-                            xxf:format-message(
+                <xf:action>
+                    <xf:var
+                        name="error-message"
+                        value="
+                            if (event('error-type') = 'empty-file-error') then
+                                xxf:format-message(
+                                    xxf:r(
+                                        'detail.messages.upload-error-empty-file',
+                                        'fr-fr-resources'
+                                    ),
+                                    ()
+                                )
+                            else if (event('error-type') = 'size-error') then
+                                xxf:format-message(
+                                    xxf:r(
+                                        'detail.messages.upload-error-size',
+                                        'fr-fr-resources'
+                                    ),
+                                    (
+                                        event('permitted'),
+                                        event('actual')
+                                    )
+                                )
+                            else if (event('error-type') = 'max-files-per-control') then
+                                xxf:format-message(
+                                    xxf:r(
+                                        'detail.messages.upload-error-max-files-per-control',
+                                        'fr-fr-resources'
+                                    ),
+                                    (
+                                        event('permitted')
+                                    )
+                                )
+                            else if (event('error-type') = 'mediatype-error') then
+                                xxf:format-message(
+                                    xxf:r(
+                                        'detail.messages.upload-error-mediatype',
+                                        'fr-fr-resources'
+                                    ),
+                                    (
+                                        event('filename'),
+                                        event('permitted'),
+                                        event('actual')
+                                    )
+                                )
+                            else if (event('error-type') = 'file-scan-error') then
+                                xxf:format-message(
+                                    xxf:r(
+                                        'detail.messages.upload-error-file-scan',
+                                        'fr-fr-resources'
+                                    ),
+                                    (
+                                        event('message')
+                                    )
+                                )
+                            else
                                 xxf:r(
-                                    'detail.messages.upload-error-empty-file',
+                                    'detail.messages.upload-error',
                                     'fr-fr-resources'
-                                ),
-                                ()
-                            )
-                        else if (event('error-type') = 'size-error') then
-                            xxf:format-message(
-                                xxf:r(
-                                    'detail.messages.upload-error-size',
-                                    'fr-fr-resources'
-                                ),
-                                (
-                                    event('permitted'),
-                                    event('actual')
+                                )
+                        "/>
+
+                    <xf:var
+                        name="upload-error-message-appearance"
+                        value="
+                            xxf:property(
+                                string-join(
+                                    (
+                                        'oxf.fr.detail.attachment.upload-error-message-appearance',
+                                        fr:app-name(),
+                                        fr:form-name()
+                                    ),
+                                    '.'
                                 )
                             )
-                        else if (event('error-type') = 'max-files-per-control') then
-                            xxf:format-message(
-                                xxf:r(
-                                    'detail.messages.upload-error-max-files-per-control',
-                                    'fr-fr-resources'
-                                ),
-                                (
-                                    event('permitted')
-                                )
-                            )
-                        else if (event('error-type') = 'mediatype-error') then
-                            xxf:format-message(
-                                xxf:r(
-                                    'detail.messages.upload-error-mediatype',
-                                    'fr-fr-resources'
-                                ),
-                                (
-                                    event('filename'),
-                                    event('permitted'),
-                                    event('actual')
-                                )
-                            )
-                        else if (event('error-type') = 'file-scan-error') then
-                            xxf:format-message(
-                                xxf:r(
-                                    'detail.messages.upload-error-file-scan',
-                                    'fr-fr-resources'
-                                ),
-                                (
-                                    event('message')
-                                )
-                            )
-                        else
-                            xxf:r(
-                                'detail.messages.upload-error',
-                                'fr-fr-resources'
-                            )
-                    )
+                        "/>
+
+                    <xf:setvalue
+                        ref="xxf:instance('i')/error-message"
+                        value="$error-message"/>
+
+                    <xf:action if="$upload-error-message-appearance = 'inline'">
+                        <xf:toggle xxbl:scope="inner" case="inline-upload-error-message-shown"/>
+                    </xf:action>
+                    <xf:action if="$upload-error-message-appearance != 'inline'" type="xpath">
+                        frf:errorMessage($error-message)
+                    </xf:action>
                 </xf:action>
+            </xbl:handler>
+
+            <xbl:handler event="xxforms-upload-start xxforms-upload-done" phase="target" xxbl:scope="outer">
+                <xf:setvalue ref="xxf:instance('i')/error-message"/>
+                <xf:toggle case="inline-upload-error-message-hidden"/>
             </xbl:handler>
         </xbl:handlers>
 
@@ -371,7 +404,10 @@
 
                 <!-- The upload takes place to the local instance first -->
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
-                    <_ filename="" mediatype="" size="" hash-algorithm="" hash-value=""/>
+                    <_>
+                        <file filename="" mediatype="" size="" hash-algorithm="" hash-value=""/>
+                        <error-message/>
+                    </_>
                 </xf:instance>
 
                 <!-- Propagate `base64Binary` -->
@@ -384,14 +420,14 @@
                                 )
                             ) = 'base64Binary'
                         ) then
-                            instance()
+                            instance()/file
                         else
                             ()"
                     type="xf:base64Binary"/>
 
                 <!-- Manual copy of upload constraints from the bound node -->
                 <xf:bind
-                    ref="instance()"
+                    ref="instance()/file"
                     constraint="
                         for $binding in xxf:binding('fr-attachment')
                         return
@@ -720,7 +756,7 @@
                         data-r-uploading="{xxf:r('uploading')}"
                         id="xf-upload"
                         class="fr-attachment-upload"
-                        ref="if ($readonly) then '' else instance()"
+                        ref="if ($readonly) then '' else instance()/file"
                         xbl:attr="xxf:multiple=multiple"
                         accept="{
                             (
@@ -747,7 +783,7 @@
                                     (: Create an `_` element respecting the default namespace in the instance, if any :)
                                     xf:element(
                                         resolve-QName('_', $binding),
-                                        (instance()/@*, instance()/string())
+                                        (instance()/file/@*, instance()/file/string())
                                     )
                                 "/>
 
@@ -757,13 +793,13 @@
                                 </xf:action>
                                 <xf:setvalue
                                     ref="$binding"
-                                    value="instance()"/>
+                                    value="instance()/file"/>
                                 <!-- https://github.com/orbeon/orbeon-forms/issues/5768 -->
                                 <xf:delete
                                     ref="$binding/@fr:tmp-file"/>
                                 <xf:insert
                                     context="$binding"
-                                    origin="instance()/@*"/>
+                                    origin="instance()/file/@*"/>
                             </xf:action>
 
                         </xf:action>
@@ -818,17 +854,36 @@
 
                             targetid="fr-attachment"
                             name="xforms-value-changed">
-                            <xf:property name="xxf:value" value="instance()/string()"/>
+                            <xf:property name="xxf:value" value="instance()/file/string()"/>
                         </xf:dispatch>
 
                         <!-- Clear local instance upon upload completion, successful or not -->
                         <xf:action event="xxforms-upload-done xxforms-upload-error">
                             <xf:setvalue
-                                iterate="instance(), instance()/@*"
+                                iterate="(instance()/file, instance()/file/@*)"
                                 ref="."/>
                         </xf:action>
 
                     </xf:upload>
+
+                    <xf:switch xxf:element="div">
+                        <xf:case id="inline-upload-error-message-hidden"/>
+                        <xf:case id="inline-upload-error-message-shown">
+                            <xh:div class="alert alert-warning fr-attachment-upload-error-message" role="alert">
+                                <xf:trigger
+                                    appearance="minimal"
+                                    class="close">
+                                    <xf:label>&#215;</xf:label>
+                                    <xf:action event="DOMActivate">
+                                        <xf:setvalue ref="instance()/error-message"/>
+                                        <xf:toggle case="inline-upload-error-message-hidden"/>
+                                    </xf:action>
+                                </xf:trigger>
+                                <xh:i class="fa fa-fw fa-exclamation-triangle" aria-hidden="true"/>
+                                <xf:output ref="instance()/error-message"/>
+                            </xh:div>
+                        </xf:case>
+                    </xf:switch>
                 </xh:div>
             </xh:div>
 

@@ -388,6 +388,7 @@
     <property as="xs:string"  name="oxf.fr.detail.attachment.max-size-aggregate-per-form.*.*"      value=""/>
     <property as="xs:string"  name="oxf.fr.detail.attachment.max-files-per-control.*.*"            value=""/>
     <property as="xs:string"  name="oxf.fr.detail.attachment.mediatypes.*.*"                       value="*/*"/>
+    <property as="xs:string"  name="oxf.fr.detail.attachment.upload-error-message-appearance.*.*" value="dialog"/> <!-- dialog | inline -->
 
     <!-- PDF fonts -->
     <property as="xs:string"  name="oxf.fr.pdf.font.family.inter"                                  value="Helvetica Neue"/>

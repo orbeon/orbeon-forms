@@ -801,6 +801,16 @@ body.orbeon {
     }
 }
 
+.dark-mode({
+    .btn:focus {
+        outline: none;
+    }
+
+    .btn-group > .btn + .dropdown-toggle {
+        box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.02), 0 1px 3px rgba(0, 0, 0, 0.3)
+    }
+});
+
 @media print {
     .orbeon {
 

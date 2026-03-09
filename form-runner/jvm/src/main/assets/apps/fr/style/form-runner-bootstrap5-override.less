@@ -248,4 +248,10 @@
     background-color : var(--orbeon-alert-warning-background-color);
     border-color     : var(--orbeon-alert-warning-border-color);
   }
+
+  .dark-mode({
+    .btn-check:focus + .btn-primary, .btn-primary:focus {
+      box-shadow: none;
+    }
+  });
 }

@@ -41,8 +41,8 @@
         .nav {
 
             & > li:first-of-type + li .btn-link {
-                border-top-left-radius: @baseBorderRadius;
-                border-top-right-radius: @baseBorderRadius;
+                border-top-left-radius: (@baseBorderRadius - @frBodyDecorationsBorderWidth);
+                border-top-right-radius: (@baseBorderRadius - @frBodyDecorationsBorderWidth);
             }
 
             ul, li {

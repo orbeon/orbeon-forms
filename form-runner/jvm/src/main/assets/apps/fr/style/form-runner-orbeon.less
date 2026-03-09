@@ -17,7 +17,7 @@
 body.orbeon { background-color: var(--orbeon-base-background-color); }
 
 .fr-body-decorations() {
-    border: 1px solid var(--orbeon-base-border-color);
+    border: @frBodyDecorationsBorderWidth solid var(--orbeon-base-border-color);
     border-radius: @baseBorderRadius;
     background-color: var(--orbeon-base-background-color);
 }
@@ -107,7 +107,7 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
 
 .fr-toc-body-styling() {
     min-height: 20px;
-    border: 1px solid var(--orbeon-base-border-color);
+    border: @frBodyDecorationsBorderWidth solid var(--orbeon-base-border-color);
     border-radius: @baseBorderRadius;
 }
 
@@ -291,6 +291,15 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
     .xforms-items[role = radiogroup][tabindex = '0'] {
         .focusHighlightGroup();
         border-radius: @inputBorderRadius;
+    }
+
+    // ***** Sections **************************************************************************************************
+
+    // Round the top corners of the first section title to match the container's border-radius
+    .fr-view-appearance-full > .xbl-fr-section:first-child h2.fr-section-title,
+    .fr-wizard-body .xbl-fr-section:first-child h2.fr-section-title {
+        border-top-left-radius: (@baseBorderRadius - @frBodyDecorationsBorderWidth);
+        border-top-right-radius: (@baseBorderRadius - @frBodyDecorationsBorderWidth);
     }
 
     // ***** Other *****************************************************************************************************

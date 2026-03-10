@@ -143,7 +143,7 @@
                     concat('{''fb-selected''[xxf:get-variable(''fr-form-model'', ''selected-cell'') = ''', $id, ''']}'),
                     'xforms-activable'
                 )[$is-editable and $th-td-tr = 'td'], (: for cell selection :)
-                '{''fr-grid-empty-row''[$fr-empty-row]}'[$th-td-tr = 'td']
+                '{''fr-grid-empty-row''[$fr-empty-row]}'[$use-css-grids-output and $th-td-tr = 'td']
             "/>
     </xsl:function>
 

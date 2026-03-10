@@ -581,6 +581,10 @@
                 <label>Szyfruj dane w spoczynku</label>
                 <value>fr-encrypt</value>
             </item>
+            <item>
+                <label>Persist control value</label>
+                <value>fr-persist</value>
+            </item>
         </options>
         <summary-show>
             <do-not-show>Nie pokazuj na stronie podsumowania</do-not-show>

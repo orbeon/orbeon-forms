@@ -1096,12 +1096,13 @@ trait FormRunnerPersistence {
     // This will be a copy of the data
     val preparedData =
       XFormsModelSubmissionSupport.prepareXML(
-        xfcd              = xfcd,
-        ref               = migrate.map(_(liveData)).getOrElse(liveData), // avoid extra copy if no migration
-        relevanceHandling = RelevanceHandling.Keep,
-        namespaceContext  = formModel.staticModel.namespaceMapping.mapping,
-        annotateWith      = Set("relevant=fr:relevant"),
-        relevantAttOpt    = Some(XMLNames.FRRelevantQName)
+        xfcd               = xfcd,
+        ref                = migrate.map(_(liveData)).getOrElse(liveData), // avoid extra copy if no migration
+        relevanceHandling  = RelevanceHandling.Keep,
+        namespaceContext   = formModel.staticModel.namespaceMapping.mapping,
+        annotateWith       = Set("relevant=fr:relevant"),
+        relevantAttOpt     = Some(XMLNames.FRRelevantQName),
+        persistMipQNameOpt = (! FormRunner.isFormBuilder).option(XMLNames.FRPersistQName)
       )
 
     val preparedDataDocumentInfo =

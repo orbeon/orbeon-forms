@@ -566,6 +566,7 @@ class XFormsModelSubmission(
             submissionParameters.relevanceHandling,
             submissionParameters.xxfAnnotate,
             submissionParameters.xxfRelevantAttOpt,
+            submissionParameters.xxfPersistMipQNameOpt,
             submissionParameters.tunnelProperties
           )
         )
@@ -577,6 +578,7 @@ class XFormsModelSubmission(
       relevanceHandling : RelevanceHandling,
       annotateWith      : Set[String],
       relevantAttOpt    : Option[QName],
+      persistMipQNameOpt: Option[QName],
       tunnelProperties  : Option[TunnelProperties]
     )(implicit
       indentedLogger    : IndentedLogger
@@ -596,12 +598,13 @@ class XFormsModelSubmission(
       // Get selected nodes (re-root and handle relevance)
       val documentToSubmit =
         prepareXML(
-          xfcd              = containingDocument,
-          ref               = currentNodeInfo,
-          relevanceHandling = relevanceHandling,
-          namespaceContext  = staticSubmission.namespaceMapping.mapping,
-          annotateWith      = annotateWith,
-          relevantAttOpt    = relevantAttOpt
+          xfcd               = containingDocument,
+          ref                = currentNodeInfo,
+          relevanceHandling  = relevanceHandling,
+          namespaceContext   = staticSubmission.namespaceMapping.mapping,
+          annotateWith       = annotateWith,
+          relevantAttOpt     = relevantAttOpt,
+          persistMipQNameOpt = persistMipQNameOpt
         )
 
       // Check that there are no validation errors

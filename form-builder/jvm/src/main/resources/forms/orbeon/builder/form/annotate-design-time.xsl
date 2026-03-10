@@ -130,7 +130,8 @@
                        | xf:bind/@readonly
                        | xf:bind/@constraint
                        | xf:bind/@calculate
-                       | xf:bind/@xxf:default"
+                       | xf:bind/@xxf:default
+                       | xf:bind/@fr:persist"
                   mode="within-model">
         <xsl:attribute name="fb:{local-name()}" select="."/>
     </xsl:template>

@@ -118,10 +118,17 @@
 
                     <xsl:copy>
                         <!-- Make sure xxf:custom-mips is not missing otherwise all fb:* MIPs are evaluated -->
-                        <xsl:if test="empty(@xxf:custom-mips)">
-                            <xsl:attribute name="xxf:custom-mips"/>
-                            <xsl:attribute name="fb:added-empty-custom-mips" select="'true'"/>
-                        </xsl:if>
+                        <xsl:choose>
+                            <xsl:when test="empty(@xxf:custom-mips)">
+                                <xsl:attribute name="xxf:custom-mips">fr:persist</xsl:attribute>
+                            </xsl:when>
+                            <xsl:when test="exists(@xxf:custom-mips/p:split()[. = 'fr:persist'])">
+                                <xsl:apply-templates select="@xxf:custom-mips" mode="within-model"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="xxf:custom-mips" select="concat(@xxf:custom-mips, ' fr:persist')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
 
                         <xsl:apply-templates
                             select="(@* except (@xxf:custom-mips, @fb:added-empty-custom-mips)) | node()"

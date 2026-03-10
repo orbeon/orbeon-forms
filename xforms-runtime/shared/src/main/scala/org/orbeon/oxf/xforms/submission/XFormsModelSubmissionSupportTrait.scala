@@ -25,6 +25,7 @@ import org.orbeon.oxf.util.PathUtils.decodeSimpleQuery
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.MipName.Relevant
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
@@ -66,7 +67,8 @@ trait XFormsModelSubmissionSupportTrait {
     relevanceHandling : RelevanceHandling,
     namespaceContext  : Map[String, String],
     annotateWith      : Set[String],
-    relevantAttOpt    : Option[QName]
+    relevantAttOpt    : Option[QName],
+    persistMipQNameOpt: Option[QName]
   ): Document =
     ref match {
       case virtualNode: VirtualNodeType =>
@@ -106,7 +108,8 @@ trait XFormsModelSubmissionSupportTrait {
           doc                           = copy,
           relevanceHandling             = relevanceHandling,
           relevantAttOpt                = relevantAttOpt,
-          relevantAnnotationAttQNameOpt = attributeNamesForTokens.get(Relevant.name)
+          relevantAnnotationAttQNameOpt = attributeNamesForTokens.get(Relevant.name),
+          persistMipQNameOpt            = persistMipQNameOpt
         )
 
         val root = copy.getRootElement
@@ -145,8 +148,10 @@ trait XFormsModelSubmissionSupportTrait {
     doc                           : Document,
     relevanceHandling             : RelevanceHandling,
     relevantAttOpt                : Option[QName],
-    relevantAnnotationAttQNameOpt : Option[QName]
+    relevantAnnotationAttQNameOpt : Option[QName],
+    persistMipQNameOpt            : Option[QName]
   ): Unit = {
+
     // If we have `xxf:relevant-attribute="fr:relevant"`, say, then we use that attribute to also determine
     // the relevance of the element. See https://github.com/orbeon/orbeon-forms/issues/3829.
     def isNonRelevantSupportAnnotationIfPresent(node: Node): Boolean = {
@@ -159,40 +164,45 @@ trait XFormsModelSubmissionSupportTrait {
       nonRelevantLocally || nonRelevantByAnnotation
     }
 
-    relevanceHandling match {
-      case RelevanceHandling.Keep | RelevanceHandling.Empty =>
+    val attsToRemoveFromRelevance =
+      relevanceHandling match {
+        case RelevanceHandling.Keep | RelevanceHandling.Empty =>
 
-        if (relevanceHandling == RelevanceHandling.Empty)
-          blankNonRelevantNodes(
-            doc                  = doc,
-            attsToPreserve       = relevantAnnotationAttQNameOpt.toSet ++ relevantAttOpt,
-            isLocallyNonRelevant = isNonRelevantSupportAnnotationIfPresent
-          )
+          if (relevanceHandling == RelevanceHandling.Empty)
+            blankNonRelevantNodes(
+              doc                  = doc,
+              attsToPreserve       = relevantAnnotationAttQNameOpt.toSet ++ relevantAttOpt,
+              isLocallyNonRelevant = isNonRelevantSupportAnnotationIfPresent
+            )
 
-        relevantAnnotationAttQNameOpt foreach { relevantAnnotationAttName =>
-          annotateNonRelevantElements(
-            doc                        = doc,
-            relevantAnnotationAttQName = relevantAnnotationAttName,
-            isNonRelevant              = isNonRelevantSupportAnnotationIfPresent
-          )
-        }
-
-        if (relevantAnnotationAttQNameOpt != relevantAttOpt)
-          relevantAttOpt foreach { relevantAtt =>
-            removeNestedAnnotations(doc.getRootElement, relevantAtt, includeSelf = true)
+          relevantAnnotationAttQNameOpt foreach { relevantAnnotationAttName =>
+            annotateNonRelevantElements(
+              doc                        = doc,
+              relevantAnnotationAttQName = relevantAnnotationAttName,
+              isNonRelevant              = isNonRelevantSupportAnnotationIfPresent
+            )
           }
 
-      case RelevanceHandling.Remove =>
+          (relevantAnnotationAttQNameOpt != relevantAttOpt)
+            .flatList(relevantAttOpt.toList)
 
-        pruneNonRelevantNodes(doc, isNonRelevantSupportAnnotationIfPresent)
+        case RelevanceHandling.Remove =>
 
-        // There can be leftover annotations, in particular attributes with value `true`!
-        val attsToRemove = relevantAttOpt.toList :::
-          (if (relevantAnnotationAttQNameOpt != relevantAttOpt) relevantAnnotationAttQNameOpt.toList else Nil)
+          pruneNonRelevantNodes(doc, isNonRelevantSupportAnnotationIfPresent)
 
-        attsToRemove foreach { attQName =>
-          removeNestedAnnotations(doc.getRootElement, attQName, includeSelf = true)
-        }
+          // There can be leftover annotations, in particular attributes with value `true`!
+          relevantAttOpt.toList :::
+            (relevantAnnotationAttQNameOpt != relevantAttOpt)
+              .flatList(relevantAnnotationAttQNameOpt.toList)
+      }
+
+    // Independently of relevance, a custom MIP can be used to determine whether nodes should be pruned
+    persistMipQNameOpt.foreach { persistMipQName =>
+      pruneNonRelevantNodes(doc, InstanceData.findCustomMip(_, persistMipQName).contains(false.toString))
+    }
+
+    attsToRemoveFromRelevance.foreach { attQName =>
+      removeNestedAnnotations(doc.getRootElement, attQName, includeSelf = true)
     }
   }
 

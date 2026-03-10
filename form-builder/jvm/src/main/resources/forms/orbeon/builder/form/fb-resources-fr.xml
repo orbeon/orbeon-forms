@@ -579,6 +579,10 @@
                 <label>Crypter les données au repos</label>
                 <value>fr-encrypt</value>
             </item>
+            <item>
+                <label>Persist control value</label>
+                <value>fr-persist</value>
+            </item>
         </options>
         <summary-show>
             <do-not-show>Ne pas inclure dans le sommaire</do-not-show>

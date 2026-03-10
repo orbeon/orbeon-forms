@@ -561,6 +561,10 @@
                 <label>Cifrar datos en reposo</label>
                 <value>fr-encrypt</value>
             </item>
+            <item>
+                <label>Persist control value</label>
+                <value>fr-persist</value>
+            </item>
         </options>
         <summary-show>
             <do-not-show>No mostrar en la página de Resumen</do-not-show>

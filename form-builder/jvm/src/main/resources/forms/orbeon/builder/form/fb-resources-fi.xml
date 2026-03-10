@@ -582,6 +582,10 @@
                 <label>Salaa tallennetut tiedot</label>
                 <value>fr-encrypt</value>
             </item>
+            <item>
+                <label>Persist control value</label>
+                <value>fr-persist</value>
+            </item>
         </options>
         <summary-show>
             <do-not-show>Älä näytä yhteenvetosivulla</do-not-show>

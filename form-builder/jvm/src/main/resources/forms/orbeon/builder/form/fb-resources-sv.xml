@@ -562,6 +562,10 @@
                 <label todo="true">[Encrypt data at rest]</label>
                 <value>fr-encrypt</value>
             </item>
+            <item>
+                <label todo="true">[Persist control value]</label>
+                <value>fr-persist</value>
+            </item>
         </options>
         <summary-show>
             <do-not-show todo="true">[Don't show on Summary page]</do-not-show>

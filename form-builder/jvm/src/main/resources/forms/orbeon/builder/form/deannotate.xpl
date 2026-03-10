@@ -103,6 +103,9 @@
                 <xsl:template match="xf:bind/@fb:default">
                     <xsl:attribute name="xxf:{local-name()}" select="."/>
                 </xsl:template>
+                <xsl:template match="xf:bind/@fb:persist">
+                    <xsl:attribute name="fr:{local-name()}" select="."/>
+                </xsl:template>
 
                 <xsl:template match="xf:bind/fb:relevant
                                    | xf:bind/fb:readonly

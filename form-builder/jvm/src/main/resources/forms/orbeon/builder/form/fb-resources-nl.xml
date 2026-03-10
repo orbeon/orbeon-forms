@@ -562,6 +562,10 @@
                 <label>Encrypt gegevens in rust</label>
                 <value>fr-encrypt</value>
             </item>
+            <item>
+                <label>Persist control value</label>
+                <value>fr-persist</value>
+            </item>
         </options>
         <summary-show>
             <do-not-show>Niet tonen op overzichtspagina</do-not-show>

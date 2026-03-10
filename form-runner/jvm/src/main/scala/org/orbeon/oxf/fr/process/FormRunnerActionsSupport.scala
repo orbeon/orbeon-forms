@@ -113,12 +113,13 @@ object FormRunnerActionsSupport {
     // TODO: lazy if we don't need data or attachments
     val dataCopiedAndMaybeMigrated =
       XFormsModelSubmissionSupport.prepareXML(
-        xfcd              = inScopeContainingDocument,
-        ref               = dataMaybeLiveMaybeMigrated,
-        relevanceHandling = relevanceHandling,
-        namespaceContext  = ProcessInterpreter.StandardNamespaceMapping.mapping, // Q: other?
-        annotateWith      = annotateWith,
-        relevantAttOpt    = Some(XMLNames.FRRelevantQName)
+        xfcd               = inScopeContainingDocument,
+        ref                = dataMaybeLiveMaybeMigrated,
+        relevanceHandling  = relevanceHandling,
+        namespaceContext   = ProcessInterpreter.StandardNamespaceMapping.mapping, // Q: other?
+        annotateWith       = annotateWith,
+        relevantAttOpt     = Some(XMLNames.FRRelevantQName),
+        persistMipQNameOpt = None // xxx
       )
 
     // Find all instance nodes containing file URLs we need to upload

@@ -561,6 +561,10 @@
                 <label>Krypter data i hvile</label>
                 <value>fr-encrypt</value>
             </item>
+            <item>
+                <label>Persist control value</label>
+                <value>fr-persist</value>
+            </item>
         </options>
         <summary-show>
             <do-not-show>Ikke vis på oppsummeringssiden</do-not-show>

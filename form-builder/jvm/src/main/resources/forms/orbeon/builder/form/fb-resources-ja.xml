@@ -581,6 +581,10 @@
                 <label>保存データを暗号化</label>
                 <value>fr-encrypt</value>
             </item>
+            <item>
+                <label>Persist control value</label>
+                <value>fr-persist</value>
+            </item>
         </options>
         <summary-show>
             <do-not-show>サマリーに表示しない</do-not-show>

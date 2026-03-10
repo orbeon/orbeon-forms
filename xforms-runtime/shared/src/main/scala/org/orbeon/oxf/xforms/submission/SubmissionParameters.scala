@@ -41,6 +41,7 @@ case class SubmissionParameters(
   xxfCalculate                   : Boolean,
   xxfUploads                     : Boolean,
   xxfRelevantAttOpt              : Option[QName],
+  xxfPersistMipQNameOpt          : Option[QName],
   xxfAnnotate                    : Set[String],
   isHandlingClientGetAll         : Boolean,
   isDeferredSubmission           : Boolean,
@@ -192,16 +193,26 @@ object SubmissionParameters {
     val resolvedXxfUploads =
       serialize && ! (staticSubmission.avtXxfUploadsOpt flatMap booleanAvtOpt contains false)
 
+    def resolveQNameAvt(attValueOpt: Option[String]): Option[QName] =
+      attValueOpt
+        .flatMap(stringAvtTrimmedOpt)
+        .flatMap(
+          Extensions.resolveQName(
+            staticSubmission.namespaceMapping.mapping.get,
+            _,
+            unprefixedIsNoNamespace = true
+          )
+        )
+
     val resolvedXxfRelevantAtt: Option[QName] =
       if (serialize)
-        staticSubmission.avtXxfRelevantAttOpt flatMap
-          stringAvtTrimmedOpt                 flatMap (
-            Extensions.resolveQName(
-              staticSubmission.namespaceMapping.mapping.get,
-              _,
-              unprefixedIsNoNamespace = true
-            )
-          )
+        resolveQNameAvt(staticSubmission.avtXxfRelevantAttOpt)
+      else
+        None
+
+    val resolvedXxfPersistMipQNameOpt: Option[QName] =
+      if (serialize)
+        resolveQNameAvt(staticSubmission.avtXxfPersistMipQNameOpt)
       else
         None
 
@@ -352,6 +363,7 @@ object SubmissionParameters {
       xxfCalculate                   = resolvedXxfCalculate,
       xxfUploads                     = resolvedXxfUploads,
       xxfRelevantAttOpt              = resolvedXxfRelevantAtt,
+      xxfPersistMipQNameOpt          = resolvedXxfPersistMipQNameOpt,
       xxfAnnotate                    = resolvedXxfAnnotate,
       isHandlingClientGetAll         = isHandlingClientGetAll,
       isDeferredSubmission           = isDeferredSubmission,

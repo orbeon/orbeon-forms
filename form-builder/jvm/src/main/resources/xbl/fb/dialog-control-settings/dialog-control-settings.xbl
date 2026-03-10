@@ -115,7 +115,7 @@
                         value="if (exists($control-element/@direction)) then $control-element/@direction else 'asc'"/>
                 </xf:action>
                 <xf:setvalue ref="$i/fr-encrypt/@enabled" value="exists($control/fr:encrypt)"/>
-
+                <xf:setvalue ref="$i/fr-persist/@enabled" value="not(fbf:findBindByNameOrEmpty($i/control-name)/@fb:persist = 'false()')"/>
                 <!-- TODO: move this logic, also found in workflow20201, to a common component -->
                 <xf:var
                     name="process-names"
@@ -565,6 +565,13 @@
                             <xf:insert context="$control" origin="xf:element('fr:encrypt')"/>
                         </xf:action>
 
+                        <!-- Write persist settings -->
+                        <xf:var name="bind-element" value="fbf:findBindByNameOrEmpty($i/control-name)"/>
+                        <xf:delete ref="$bind-element/@fb:persist"/>
+                        <xf:action if="$i/fr-persist/@enabled = false()">
+                            <xf:insert context="$bind-element" origin="xf:attribute('fb:persist', 'false()')"/>
+                        </xf:action>
+
                         <xf:action type="xpath">
                             (: Write alerts and constraints :)
                             fbf:writeAlertsAndValidationsAsXML(
@@ -829,6 +836,7 @@
                         </fr-allow-bulk-edit>
                         <fr-default-sort-column enabled="" direction=""/>
                         <fr-encrypt             enabled=""/>
+                        <fr-persist             enabled=""/>
 
                         <default-alert
                             global-default-alert-message=""
@@ -1160,6 +1168,7 @@
                         value=". = false() or empty(xxf:split(fbf:controlsWithSorting($i/original-control-name)))"/>
                 </xf:bind>
                 <xf:bind ref="$i/fr-encrypt/@enabled"             type="xs:boolean"/>
+                <xf:bind ref="$i/fr-persist/@enabled"             type="xs:boolean"/>
 
                 <xf:instance id="processes">
                     <_>

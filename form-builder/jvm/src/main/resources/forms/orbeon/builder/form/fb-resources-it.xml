@@ -569,6 +569,10 @@
                 <label>Cifra i dati a riposo</label>
                 <value>fr-encrypt</value>
             </item>
+            <item>
+                <label>Persist control value</label>
+                <value>fr-persist</value>
+            </item>
         </options>
         <summary-show>
             <do-not-show>Non mostrare nella pagina Sommario</do-not-show>

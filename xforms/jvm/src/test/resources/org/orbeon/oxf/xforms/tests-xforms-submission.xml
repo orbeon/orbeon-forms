@@ -2665,4 +2665,67 @@ az4K</document>
            </xxf:event-response>
         </output>
     </test>
+
+    <test description="#1671: pruning of nodes with `fr:persist=&quot;false&quot;`" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="main-model" xxf:custom-mips="fr:persist">
+                        <xf:instance id="main-instance" xxf:exclude-result-prefixes="#all">
+                            <_>
+                                <without-persist>v1</without-persist>
+                                <with-persist-false>v2</with-persist-false>
+                                <with-persist-true>v3</with-persist-true>
+                                <nested-relevant>
+                                    <without-persist>v4</without-persist>
+                                    <with-persist-false>v5</with-persist-false>
+                                    <with-persist-true>v6</with-persist-true>
+                                </nested-relevant>
+                                <nested-non-relevant>
+                                    <without-persist>v7</without-persist>
+                                    <with-persist-false>v8</with-persist-false>
+                                    <with-persist-true>v9</with-persist-true>
+                                </nested-non-relevant>
+                            </_>
+                        </xf:instance>
+
+                        <xf:bind ref=".//with-persist-false" fr:persist="false()"/>
+                        <xf:bind ref=".//with-persist-true"  fr:persist="true()"/>
+                        <xf:bind ref="nested-non-relevant"  relevant="false()"/>
+
+                        <xf:submission id="test-submission" method="post" action="echo:" replace="instance" xxf:persist-mip="fr:persist" nonrelevant="empty"/>
+                        <xf:send event="xforms-ready" submission="test-submission"/>
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="main-instance" model-id="main-model">
+                                <_>
+                                    <without-persist>v1</without-persist>
+                                    <with-persist-true>v3</with-persist-true>
+                                    <nested-relevant>
+                                        <without-persist>v4</without-persist>
+                                        <with-persist-true>v6</with-persist-true>
+                                    </nested-relevant>
+                                    <nested-non-relevant>
+                                        <without-persist/>
+                                        <with-persist-true/>
+                                    </nested-non-relevant>
+                                </_>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 </group>

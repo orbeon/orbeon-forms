@@ -561,6 +561,10 @@
                 <label>Шифровать данные при хранении</label>
                 <value>fr-encrypt</value>
             </item>
+            <item>
+                <label>Persist control value</label>
+                <value>fr-persist</value>
+            </item>
         </options>
         <summary-show>
             <do-not-show>Не показывать на сводной странице</do-not-show>

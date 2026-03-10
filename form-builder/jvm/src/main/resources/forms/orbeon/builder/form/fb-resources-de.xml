@@ -573,6 +573,10 @@
                 <label>Daten in der Datenbank verschlüsseln</label>
                 <value>fr-encrypt</value>
             </item>
+            <item>
+                <label>Persist control value</label>
+                <value>fr-persist</value>
+            </item>
         </options>
         <summary-show>
             <do-not-show>Nicht in der Übersicht anzeigen</do-not-show>

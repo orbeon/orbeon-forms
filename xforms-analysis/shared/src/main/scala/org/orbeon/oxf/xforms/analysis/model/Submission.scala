@@ -62,6 +62,7 @@ class Submission(
   val avtXxfCalculateOpt         = element.attributeValueOpt(XXFORMS_CALCULATE_QNAME)
   val avtXxfUploadsOpt           = element.attributeValueOpt(XXFORMS_UPLOADS_QNAME)
   val avtXxfRelevantAttOpt       = element.attributeValueOpt(XXFORMS_RELEVANT_ATTRIBUTE_QNAME)
+  val avtXxfPersistMipQNameOpt   = element.attributeValueOpt(XXFORMS_PERSIST_MIP_QNAME)
   val avtXxfAnnotateOpt          = element.attributeValueOpt(XXFORMS_ANNOTATE_QNAME)
 
   val avtSerializationOpt        = element.attributeValueOpt("serialization")

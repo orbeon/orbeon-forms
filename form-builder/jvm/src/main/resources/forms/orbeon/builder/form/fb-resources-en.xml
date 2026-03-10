@@ -581,6 +581,10 @@
                 <label>Encrypt data at rest</label>
                 <value>fr-encrypt</value>
             </item>
+            <item>
+                <label>Persist control value</label>
+                <value>fr-persist</value>
+            </item>
         </options>
         <summary-show>
             <do-not-show>Don't show on Summary page</do-not-show>

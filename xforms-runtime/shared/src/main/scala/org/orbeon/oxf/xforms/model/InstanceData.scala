@@ -81,11 +81,19 @@ object InstanceData {
     Option(existingInstanceData) flatMap (_.findCustomMip(mipName))
   }
 
+  def findCustomMip(node: Node, mipName: String): Option[String] = {
+    val existingInstanceData = getLocalInstanceData(node)
+    Option(existingInstanceData) flatMap (_.findCustomMip(mipName))
+  }
+
   def findCustomMip(nodeInfo: om.Item, qName: QName): Option[String] =
     nodeInfo match {
       case nodeInfo: om.NodeInfo => findCustomMip(nodeInfo, MipName.buildInternalCustomMIPName(qName))
       case _                     => None
     }
+
+  def findCustomMip(node: Node, qName: QName): Option[String] =
+    findCustomMip(node, MipName.buildInternalCustomMIPName(qName))
 
   def getInheritedRelevant(nodeInfo: om.NodeInfo): Boolean =
     if (nodeInfo.isInstanceOf[VirtualNodeType])

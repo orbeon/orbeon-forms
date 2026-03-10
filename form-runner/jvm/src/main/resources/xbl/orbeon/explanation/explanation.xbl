@@ -35,6 +35,7 @@
                 <fb:icon-class>fa fa-fw fa-comment</fb:icon-class>
             </fb:icon>
             <fb:templates>
+                <fb:bind fr:persist="false()"/>
                 <fb:resources>
                     <text/>
                 </fb:resources>

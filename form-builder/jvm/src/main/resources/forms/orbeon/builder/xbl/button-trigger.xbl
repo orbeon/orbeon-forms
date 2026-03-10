@@ -11,8 +11,10 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:xbl="http://www.w3.org/ns/xbl">
+<xbl:xbl
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xbl:binding id="fb-trigger" element="xf|trigger">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -47,14 +49,17 @@
             <icon>
                 <icon-class>fa fa-fw fa-bolt</icon-class>
             </icon>
-            <template>
-                <xf:trigger id="" xmlns="">
-                    <xf:label ref=""/>
-                    <xf:help ref=""/>
-                    <xf:hint ref=""/>
-                    <xf:alert ref=""/>
-                </xf:trigger>
-            </template>
+            <templates>
+                <bind fr:persist="false()"/>
+                <view>
+                    <xf:trigger id="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:help ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:alert ref=""/>
+                    </xf:trigger>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -92,14 +97,17 @@
             <icon>
                 <icon-class>fa fa-fw fa-bolt</icon-class>
             </icon>
-            <template>
-                <xf:trigger id="" xmlns="" appearance="xxf:primary">
-                    <xf:label ref=""/>
-                    <xf:help ref=""/>
-                    <xf:hint ref=""/>
-                    <xf:alert ref=""/>
-                </xf:trigger>
-            </template>
+            <templates>
+                <bind fr:persist="false()"/>
+                <view>
+                    <xf:trigger id="" xmlns="" appearance="xxf:primary">
+                        <xf:label ref=""/>
+                        <xf:help ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:alert ref=""/>
+                    </xf:trigger>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -137,14 +145,17 @@
             <icon>
                 <icon-class>fa fa-fw fa-bolt</icon-class>
             </icon>
-            <template>
-                <xf:trigger id="" xmlns="" appearance="xxf:inverse">
-                    <xf:label ref=""/>
-                    <xf:help ref=""/>
-                    <xf:hint ref=""/>
-                    <xf:alert ref=""/>
-                </xf:trigger>
-            </template>
+            <templates>
+                <bind fr:persist="false()"/>
+                <view>
+                    <xf:trigger id="" xmlns="" appearance="xxf:inverse">
+                        <xf:label ref=""/>
+                        <xf:help ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:alert ref=""/>
+                    </xf:trigger>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -182,14 +193,17 @@
             <icon>
                 <icon-class>fa fa-fw fa-bolt</icon-class>
             </icon>
-            <template>
-                <xf:trigger id="" xmlns="" appearance="xxf:success">
-                    <xf:label ref=""/>
-                    <xf:help ref=""/>
-                    <xf:hint ref=""/>
-                    <xf:alert ref=""/>
-                </xf:trigger>
-            </template>
+            <templates>
+                <bind fr:persist="false()"/>
+                <view>
+                    <xf:trigger id="" xmlns="" appearance="xxf:success">
+                        <xf:label ref=""/>
+                        <xf:help ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:alert ref=""/>
+                    </xf:trigger>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -227,14 +241,17 @@
             <icon>
                 <icon-class>fa fa-fw fa-bolt</icon-class>
             </icon>
-            <template>
-                <xf:trigger id="" xmlns="" appearance="xxf:danger">
-                    <xf:label ref=""/>
-                    <xf:help ref=""/>
-                    <xf:hint ref=""/>
-                    <xf:alert ref=""/>
-                </xf:trigger>
-            </template>
+            <templates>
+                <bind fr:persist="false()"/>
+                <view>
+                    <xf:trigger id="" xmlns="" appearance="xxf:danger">
+                        <xf:label ref=""/>
+                        <xf:help ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:alert ref=""/>
+                    </xf:trigger>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -272,14 +289,17 @@
             <icon>
                 <icon-class>fa fa-fw fa-bolt</icon-class>
             </icon>
-            <template>
-                <xf:trigger id="" xmlns="" appearance="xxf:warning">
-                    <xf:label ref=""/>
-                    <xf:help ref=""/>
-                    <xf:hint ref=""/>
-                    <xf:alert ref=""/>
-                </xf:trigger>
-            </template>
+            <templates>
+                <bind fr:persist="false()"/>
+                <view>
+                    <xf:trigger id="" xmlns="" appearance="xxf:warning">
+                        <xf:label ref=""/>
+                        <xf:help ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:alert ref=""/>
+                    </xf:trigger>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -317,14 +337,17 @@
             <icon>
                 <icon-class>fa fa-fw fa-bolt</icon-class>
             </icon>
-            <template>
-                <xf:trigger id="" xmlns="" appearance="xxf:info">
-                    <xf:label ref=""/>
-                    <xf:help ref=""/>
-                    <xf:hint ref=""/>
-                    <xf:alert ref=""/>
-                </xf:trigger>
-            </template>
+            <templates>
+                <bind fr:persist="false()"/>
+                <view>
+                    <xf:trigger id="" xmlns="" appearance="xxf:info">
+                        <xf:label ref=""/>
+                        <xf:help ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:alert ref=""/>
+                    </xf:trigger>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 

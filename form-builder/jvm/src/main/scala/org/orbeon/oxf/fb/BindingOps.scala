@@ -286,10 +286,11 @@ trait BindingOps {
     def bindingMetadata(binding: NodeInfo): NodeColl =
       binding / FBMetadataTest
 
-    // In other words we leave Type and Required and custom MIPs as they are
+    // In other words we leave Type and Required and custom MIPs except `fr:persist` as they are
     // This must match what is done in annotate.xpl
-    val BindTemplateAttributesToNamespace =
-      Set(MipName.Relevant, MipName.Readonly, MipName.Constraint, MipName.Calculate, MipName.Default).map(_.aName)
+    val BindTemplateAttributesToNamespace: Set[QName] =
+      Set(MipName.Relevant, MipName.Readonly, MipName.Constraint, MipName.Calculate, MipName.Default).map(_.aName) +
+        org.orbeon.oxf.fr.XMLNames.FRPersistQName
 
     def possibleAppearancesWithBindings(
       virtualName: QName,

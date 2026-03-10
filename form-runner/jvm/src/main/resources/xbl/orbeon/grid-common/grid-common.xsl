@@ -142,7 +142,8 @@
                 (
                     concat('{''fb-selected''[xxf:get-variable(''fr-form-model'', ''selected-cell'') = ''', $id, ''']}'),
                     'xforms-activable'
-                )[$is-editable and $th-td-tr = 'td'] (: for cell selection :)
+                )[$is-editable and $th-td-tr = 'td'], (: for cell selection :)
+                '{''fr-grid-empty-row''[$fr-empty-row]}'[$th-td-tr = 'td']
             "/>
     </xsl:function>
 
@@ -209,6 +210,33 @@
 
             <xsl:variable name="static-row-pos" select="."/>
             <xsl:variable name="cells"          select="array:get($rows-array, $static-row-pos)"/>
+
+            <xsl:variable
+                name="empty-row-xpath"
+                select="
+                    if ($use-css-grids-output) then
+                        concat(
+                            'not(',
+                            string-join(
+                                (
+                                    for $c in $root/fr:c
+                                    let $cy := (xs:integer($c/@y), 1)[1]
+                                    let $ch := (xs:integer($c/@h), 1)[1]
+                                    return
+                                        if ($cy le $static-row-pos and $cy + $ch - 1 ge $static-row-pos) then
+                                            for $id in $c/(* except fr:hidden)/@id/string()
+                                            return concat('xxf:relevant(xxf:binding(''', $id, '''))')
+                                        else
+                                            (),
+                                    'false()'
+                                ),
+                                ' or '
+                            ),
+                            ')'
+                        )
+                    else
+                        ()
+                "/>
 
             <xsl:variable name="cells-content">
                 <xsl:for-each select="$cells">
@@ -316,6 +344,9 @@
                 </xsl:when>
                 <xsl:otherwise>
                     <!-- CSS grids output -->
+                    <xf:var name="fr-empty-row">
+                        <xxf:value xxbl:scope="outer" value="{$empty-row-xpath}"/>
+                    </xf:var>
                     <xsl:copy-of select="$cells-content"/>
                 </xsl:otherwise>
             </xsl:choose>

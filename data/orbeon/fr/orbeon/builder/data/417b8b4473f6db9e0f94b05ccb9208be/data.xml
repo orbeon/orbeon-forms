@@ -1,6 +1,6 @@
 <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms">
     <xh:head>
-        <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="fr-form-model">
+        <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="fr-form-model" xxf:custom-mips="fr:persist">
             <xf:instance id="fr-form-instance" xxf:index="id">
                 <form>
                     <text-controls>
@@ -294,14 +294,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                 </xf:bind>
                 <xf:bind id="buttons-bind" ref="buttons" name="buttons" relevant="$fr-mode = ('new', 'edit', 'test')">
                     <xf:bind id="grid-8-bind" ref="grid-8" name="grid-8">
-                        <xf:bind id="standard-button-bind" ref="standard-button" name="standard-button"></xf:bind>
-                        <xf:bind id="inverse-button-bind" ref="inverse-button" name="inverse-button"></xf:bind>
-                        <xf:bind id="success-button-bind" ref="success-button" name="success-button"></xf:bind>
-                        <xf:bind id="link-button-bind" ref="link-button" name="link-button"></xf:bind>
-                        <xf:bind id="danger-button-bind" ref="danger-button" name="danger-button"></xf:bind>
-                        <xf:bind id="warning-button-bind" ref="warning-button" name="warning-button"></xf:bind>
-                        <xf:bind id="primary-button-bind" ref="primary-button" name="primary-button"></xf:bind>
-                        <xf:bind id="info-button-bind" ref="info-button" name="info-button"></xf:bind>
+                        <xf:bind id="standard-button-bind" ref="standard-button" name="standard-button" fr:persist="false()"></xf:bind>
+                        <xf:bind id="inverse-button-bind" ref="inverse-button" name="inverse-button" fr:persist="false()"></xf:bind>
+                        <xf:bind id="success-button-bind" ref="success-button" name="success-button" fr:persist="false()"></xf:bind>
+                        <xf:bind id="link-button-bind" ref="link-button" name="link-button" fr:persist="false()"></xf:bind>
+                        <xf:bind id="danger-button-bind" ref="danger-button" name="danger-button" fr:persist="false()"></xf:bind>
+                        <xf:bind id="warning-button-bind" ref="warning-button" name="warning-button" fr:persist="false()"></xf:bind>
+                        <xf:bind id="primary-button-bind" ref="primary-button" name="primary-button" fr:persist="false()"></xf:bind>
+                        <xf:bind id="info-button-bind" ref="info-button" name="info-button" fr:persist="false()"></xf:bind>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind name="typed-controls" id="typed-controls-bind" ref="typed-controls">
@@ -320,7 +320,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind ref="currency-right" id="currency-right-bind" type="xf:decimal" name="currency-right"></xf:bind>
                         <xf:bind ref="number-right" id="number-right-bind" name="number-right" type="xf:decimal"></xf:bind>
                         <xf:bind id="control-2-bind" ref="control-2" name="control-2" type="fr:us-ein"></xf:bind>
-                        <xf:bind id="ssn-explanation-bind" ref="ssn-explanation" name="ssn-explanation"></xf:bind>
+                        <xf:bind id="ssn-explanation-bind" ref="ssn-explanation" name="ssn-explanation" fr:persist="false()"></xf:bind>
                         <xf:bind id="legal-entity-identifier-lei-bind" ref="legal-entity-identifier-lei" name="legal-entity-identifier-lei" type="fr:lei"></xf:bind>
                         <xf:bind id="international-securities-identification-number-isin-bind" ref="international-securities-identification-number-isin" name="international-securities-identification-number-isin" type="fr:isin"></xf:bind><xf:bind id="iban-bind" ref="iban" name="iban" type="fr:iban"></xf:bind>
                     </xf:bind>
@@ -330,7 +330,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                 <xf:bind id="utility-controls-bind" ref="utility-controls" name="utility-controls">
                     <xf:bind id="grid-9-bind" ref="grid-9" name="grid-9">
-                        <xf:bind id="explanatory-text-bind" ref="explanatory-text" name="explanatory-text"></xf:bind>
+                        <xf:bind id="explanatory-text-bind" ref="explanatory-text" name="explanatory-text" fr:persist="false()"></xf:bind>
                         <xf:bind ref="calculated-value" id="calculated-value-bind" name="calculated-value"></xf:bind>
                         <xf:bind ref="calculated-value-borderless" id="calculated-value-borderless-bind" name="calculated-value-borderless"></xf:bind>
                         <xf:bind id="hidden-field-bind" ref="hidden-field" name="hidden-field"></xf:bind>

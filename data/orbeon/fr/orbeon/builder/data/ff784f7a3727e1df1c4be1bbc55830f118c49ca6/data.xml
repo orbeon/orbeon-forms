@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:saxon="http://saxon.sf.net/" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
         <xh:title>Orbeon Demo: Consent for Emergency Medical Treatment</xh:title>
-        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true" xxf:custom-mips="fr:persist">
 
             <!-- Main instance -->
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
@@ -52,7 +52,7 @@
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="consent-section-bind" name="consent-section" ref="consent-section">
                     <xf:bind id="consent-grid-bind" ref="consent-grid" name="consent-grid">
-                        <xf:bind id="control-1-bind" ref="control-1" name="control-1"/>
+                        <xf:bind id="control-1-bind" ref="control-1" name="control-1" fr:persist="false()"/>
                         <xf:bind id="organization-name-bind" ref="organization-name" name="organization-name" xxf:whitespace="trim"/>
                         <xf:bind id="allergies-bind" ref="allergies" name="allergies"/>
                         <xf:bind id="minor-name-bind" ref="minor-name" name="minor-name" xxf:whitespace="trim"/>

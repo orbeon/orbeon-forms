@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:saxon="http://saxon.sf.net/" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
-        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true" xxf:custom-mips="fr:persist">
 
             <!-- Main instance -->
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
@@ -222,7 +222,7 @@
                 </xf:bind>
                 <xf:bind id="medications-bind" ref="medications" name="medications">
                     <xf:bind id="grid-7-bind" ref="grid-7" name="grid-7">
-                        <xf:bind id="control-4-bind" ref="control-4" name="control-4"/>
+                        <xf:bind id="control-4-bind" ref="control-4" name="control-4" fr:persist="false()"/>
                     </xf:bind>
                     <xf:bind id="grid-8-bind" ref="grid-8" name="grid-8">
                         <xf:bind id="grid-8-iteration-bind" ref="grid-8-iteration" name="grid-8-iteration">
@@ -235,7 +235,7 @@
                 </xf:bind>
                 <xf:bind id="allergies-bind" ref="allergies" name="allergies">
                     <xf:bind id="grid-9-bind" ref="grid-9" name="grid-9">
-                        <xf:bind id="control-9-bind" ref="control-9" name="control-9"/>
+                        <xf:bind id="control-9-bind" ref="control-9" name="control-9" fr:persist="false()"/>
                     </xf:bind>
                     <xf:bind id="grid-10-bind" ref="grid-10" name="grid-10">
                         <xf:bind id="grid-10-iteration-bind" ref="grid-10-iteration" name="grid-10-iteration">

@@ -15,7 +15,7 @@
          xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
-        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true" xxf:custom-mips="fr:persist">
 
             <!-- Main instance -->
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
@@ -327,7 +327,7 @@
                          name="certification-section">
                     <xf:bind id="grid-5-bind" ref="grid-5" name="grid-5">
                         <xf:bind id="certification-explanation-bind" ref="certification-explanation"
-                                 name="certification-explanation"/>
+                                 name="certification-explanation" fr:persist="false()"/>
                         <xf:bind id="certification-licensed-contractor-authorized-agent-name-bind"
                                  ref="certification-licensed-contractor-authorized-agent-name"
                                  name="certification-licensed-contractor-authorized-agent-name"
@@ -345,7 +345,7 @@
                 <xf:bind id="agreement-section-bind" ref="agreement-section" name="agreement-section">
                     <xf:bind id="grid-7-bind" ref="grid-7" name="grid-7">
                         <xf:bind id="agreement-explanation-bind" ref="agreement-explanation"
-                                 name="agreement-explanation"/>
+                                 name="agreement-explanation" fr:persist="false()"/>
                         <xf:bind id="agreement-licensed-contractor-authorized-agent-name-bind"
                                  ref="agreement-licensed-contractor-authorized-agent-name"
                                  name="agreement-licensed-contractor-authorized-agent-name"
@@ -364,7 +364,7 @@
                          name="declarations-section">
                     <xf:bind id="grid-8-bind" ref="grid-8" name="grid-8">
                         <xf:bind id="declarations-explanation-bind" ref="declarations-explanation"
-                                 name="declarations-explanation"/>
+                                 name="declarations-explanation" fr:persist="false()"/>
                         <xf:bind id="declarations-licensed-contractor-authorized-agent-name-bind"
                                  ref="declarations-licensed-contractor-authorized-agent-name"
                                  name="declarations-licensed-contractor-authorized-agent-name"
@@ -377,11 +377,11 @@
                                  name="declarations-signature"
                                  type="xs:anyURI"
                                  required="true()"/>
-                        <xf:bind id="wc-explanation-1-bind" ref="wc-explanation-1" name="wc-explanation-1"/>
-                        <xf:bind id="wc-explanation-bind" ref="wc-explanation" name="wc-explanation"/>
+                        <xf:bind id="wc-explanation-1-bind" ref="wc-explanation-1" name="wc-explanation-1" fr:persist="false()"/>
+                        <xf:bind id="wc-explanation-bind" ref="wc-explanation" name="wc-explanation" fr:persist="false()"/>
                         <xf:bind id="wc-radio-1-bind" ref="wc-radio-1" name="wc-radio-1"/>
                         <xf:bind id="wc-radio-2-bind" ref="wc-radio-2" name="wc-radio-2"/>
-                        <xf:bind id="wc-explanation-2-bind" ref="wc-explanation-2" name="wc-explanation-2"/>
+                        <xf:bind id="wc-explanation-2-bind" ref="wc-explanation-2" name="wc-explanation-2" fr:persist="false()"/>
                         <xf:bind id="wc-policy-number-1-bind" ref="wc-policy-number-1" name="wc-policy-number-1"
                                  xxf:whitespace="trim"
                                  readonly="not($wc-radio-1/string() = 'true')"
@@ -397,13 +397,13 @@
                                  readonly="not($wc-radio-2/string() = 'true')"
                                  required="$wc-radio-2/string() = 'true'"/>
                         <xf:bind id="wc-radio-3-bind" ref="wc-radio-3" name="wc-radio-3"/>
-                        <xf:bind id="wc-explanation-3-bind" ref="wc-explanation-3" name="wc-explanation-3"/>
+                        <xf:bind id="wc-explanation-3-bind" ref="wc-explanation-3" name="wc-explanation-3" fr:persist="false()"/>
 
                         <xf:bind id="wc-date-bind" ref="wc-date" name="wc-date" type="xs:date" required="true()"/>
                         <xf:bind id="wc-signature-bind" ref="wc-signature" name="wc-signature" type="xs:anyURI"
                                  required="true()"/>
                         <xf:bind id="warning-explanation-bind" ref="warning-explanation"
-                                 name="warning-explanation"/>
+                                 name="warning-explanation" fr:persist="false()"/>
                         <xf:bind id="notes-bind" ref="notes" name="notes"/>
                         <xf:bind id="wc-licensed-contractor-authorized-agent-name-bind"
                                  ref="wc-licensed-contractor-authorized-agent-name"

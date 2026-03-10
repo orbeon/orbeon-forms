@@ -15,7 +15,7 @@
          xmlns:math="http://www.w3.org/2005/xpath-functions/math">
     <xh:head>
         <xh:title>Orbeon Demo: Travel Form with Master-Detail</xh:title>
-        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:custom-mips="fr:persist">
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
                 <form>
                     <master-section>
@@ -84,7 +84,7 @@
                 <xf:bind id="confirmation-bind" ref="confirmation" name="confirmation">
                     <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
                         <xf:bind id="confirmation-message-bind" ref="confirmation-message"
-                                 name="confirmation-message"/>
+                                 name="confirmation-message" fr:persist="false()"/>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>

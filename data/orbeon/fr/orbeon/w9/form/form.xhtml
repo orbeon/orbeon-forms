@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/">
     <xh:head>
         <xh:title>Orbeon Demo: Request for Taxpayer Identification Number and Certification</xh:title>
-        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:custom-mips="fr:persist">
             <xf:instance id="fr-form-instance" xxf:index="id">
                 <form>
                     <applicant>
@@ -99,7 +99,7 @@
                     <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4">
                         <xf:bind name="ssn-or-ein" id="ssn-or-ein-bind" ref="ssn-or-ein" required="true()"/>
 
-                        <xf:bind id="ssn-explanation-bind" ref="ssn-explanation" name="ssn-explanation" relevant="$ssn-or-ein = 'ssn'"/>
+                        <xf:bind id="ssn-explanation-bind" ref="ssn-explanation" name="ssn-explanation" relevant="$ssn-or-ein = 'ssn'" fr:persist="false()"/>
                         <xf:bind name="ssn" id="ssn-bind" ref="ssn" type="fr:us-ssn" relevant="$ssn-or-ein = 'ssn'" xxf:whitespace="trim"/>
                         <xf:bind name="ein" id="ein-bind" ref="ein" type="fr:us-ein" relevant="$ssn-or-ein = 'ein'" xxf:whitespace="trim"/>
                     </xf:bind>

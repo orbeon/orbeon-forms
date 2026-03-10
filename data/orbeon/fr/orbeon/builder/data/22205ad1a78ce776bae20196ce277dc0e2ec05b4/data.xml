@@ -26,7 +26,7 @@
                 background-color: #333;
             }
         </xh:style>
-        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true" xxf:custom-mips="fr:persist">
 
 
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
@@ -141,13 +141,13 @@
                         <xf:bind id="control-4-bind" ref="control-4" name="control-4"
                                  calculate="$number-1 &gt;= $number-2"
                                  readonly="false()"/>
-                        <xf:bind id="control-5-bind" ref="control-5" name="control-5"/>
+                        <xf:bind id="control-5-bind" ref="control-5" name="control-5" fr:persist="false()"/>
                         <xf:bind id="number-1-bind" ref="number-1" name="number-1" type="xf:decimal"/>
                         <xf:bind id="number-2-bind" ref="number-2" name="number-2" type="xf:decimal"/>
                         <xf:bind id="control-3-bind" ref="control-3" name="control-3"
                                  calculate="$number-1 &gt; $number-2"
                                  readonly="false()"/>
-                        <xf:bind id="control-22-bind" ref="control-22" name="control-22"/>
+                        <xf:bind id="control-22-bind" ref="control-22" name="control-22" fr:persist="false()"/>
                         <xf:bind id="control-32-bind" ref="control-32" name="control-32"
                                  calculate="$number-1 &lt;= $number-2"
                                  readonly="false()"/>
@@ -166,58 +166,58 @@
                     <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
 
 
-                        <xf:bind id="control-7-bind" ref="control-7" name="control-7"/>
+                        <xf:bind id="control-7-bind" ref="control-7" name="control-7" fr:persist="false()"/>
                         <xf:bind id="yes-no-bind" ref="yes-no" name="yes-no" type="xf:boolean"/>
                         <xf:bind id="control-2-bind" ref="control-2" name="control-2"
                                  calculate="$yes-no/string() = 'true'"
                                  readonly="false()"/>
-                        <xf:bind id="control-21-bind" ref="control-21" name="control-21"/>
+                        <xf:bind id="control-21-bind" ref="control-21" name="control-21" fr:persist="false()"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="section-6-bind" ref="section-6" name="section-6">
                     <xf:bind id="grid-6-bind" ref="grid-6" name="grid-6">
-                        <xf:bind id="control-12-bind" ref="control-12" name="control-12"/>
+                        <xf:bind id="control-12-bind" ref="control-12" name="control-12" fr:persist="false()"/>
 
 
-                        <xf:bind id="control-14-bind" ref="control-14" name="control-14"/>
+                        <xf:bind id="control-14-bind" ref="control-14" name="control-14" fr:persist="false()"/>
                         <xf:bind id="checkboxes-bind" ref="checkboxes" name="checkboxes"/>
                         <xf:bind id="control-13-bind" ref="control-13" name="control-13"
                                  calculate="if ($checkboxes/xxf:split() = '2') then 'Yes' else 'No'"
                                  readonly="false()"/>
-                        <xf:bind id="control-29-bind" ref="control-29" name="control-29"/>
+                        <xf:bind id="control-29-bind" ref="control-29" name="control-29" fr:persist="false()"/>
                         <xf:bind id="checkboxes-max-bind" ref="checkboxes-max" name="checkboxes-max">
                             <xf:constraint id="validation-1-validation" value="count(xxf:split($checkboxes-max)) &lt;= 2"/>
                         </xf:bind>
-                        <xf:bind id="control-30-bind" ref="control-30" name="control-30"/>
+                        <xf:bind id="control-30-bind" ref="control-30" name="control-30" fr:persist="false()"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="section-4-bind" ref="section-4" name="section-4">
                     <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4">
-                        <xf:bind id="control-6-bind" ref="control-6" name="control-6"/>
+                        <xf:bind id="control-6-bind" ref="control-6" name="control-6" fr:persist="false()"/>
 
 
 
 
-                        <xf:bind id="control-18-bind" ref="control-18" name="control-18"/>
+                        <xf:bind id="control-18-bind" ref="control-18" name="control-18" fr:persist="false()"/>
 
 
                         <xf:bind id="birthdate-bind" ref="birthdate" name="birthdate" type="xf:date"/>
                         <xf:bind id="age-bind" ref="age" name="age"
                                  calculate="let $date1        := $birthdate,&#xA;    $date2        := current-date(),&#xA;    $months-days1 := substring(xs:string($date1), 6, 11),&#xA;    $months-days2 := substring(xs:string($date2), 6, 11)&#xA;return&#xA;    if ($months-days2 &gt; $months-days1) then&#xA;        year-from-date($date2) - year-from-date($date1)&#xA;    else&#xA;        year-from-date($date2) - year-from-date($date1) - 1"
                                  readonly="false()"/>
-                        <xf:bind id="control-23-bind" ref="control-23" name="control-23"/>
+                        <xf:bind id="control-23-bind" ref="control-23" name="control-23" fr:persist="false()"/>
                         <xf:bind id="current-date-bind" ref="current-date" name="current-date" type="xf:date"
                                  xxf:default="current-date()"/>
-                        <xf:bind id="control-24-bind" ref="control-24" name="control-24"/>
-                        <xf:bind id="control-9-bind" ref="control-9" name="control-9"/>
+                        <xf:bind id="control-24-bind" ref="control-24" name="control-24" fr:persist="false()"/>
+                        <xf:bind id="control-9-bind" ref="control-9" name="control-9" fr:persist="false()"/>
                         <xf:bind id="first-date-bind" ref="first-date" name="first-date" type="xf:date"/>
                         <xf:bind id="second-date-bind" ref="second-date" name="second-date" type="xf:date"/>
                         <xf:bind id="week-days-bind" ref="week-days" name="week-days"
                                  calculate="for&#xA;    $start          in $first-date,&#xA;    $end            in $second-date,&#xA;    $startW         in xs:integer(format-date($start, '[F1]')),&#xA;    $endW           in xs:integer(format-date($end, '[F1]')),&#xA;    $days           in days-from-duration($end - $start),&#xA;    $daysNoWeekends in $days - (floor($days div 7) * 2)&#xA;return&#xA;    if ($days mod 7 != 0 and ($startW = 7 or $endW = 7)) then $daysNoWeekends - 1&#xA;    else if ($endW &lt; $startW) then $daysNoWeekends - 2&#xA;    else $daysNoWeekends"
                                  readonly="false()"/>
-                        <xf:bind id="control-25-bind" ref="control-25" name="control-25"/>
-                        <xf:bind id="control-35-bind" ref="control-35" name="control-35"/>
-                        <xf:bind id="control-36-bind" ref="control-36" name="control-36"/>
+                        <xf:bind id="control-25-bind" ref="control-25" name="control-25" fr:persist="false()"/>
+                        <xf:bind id="control-35-bind" ref="control-35" name="control-35" fr:persist="false()"/>
+                        <xf:bind id="control-36-bind" ref="control-36" name="control-36" fr:persist="false()"/>
                         <xf:bind id="date-5-business-days-bind" ref="date-5-business-days"
                                  name="date-5-business-days"
                                  type="xf:date"
@@ -227,12 +227,12 @@
                 <xf:bind id="section-1-bind" name="section-1" ref="section-1">
                     <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
 
-                        <xf:bind id="control-1-bind" ref="control-1" name="control-1"/>
-                        <xf:bind id="control-11-bind" ref="control-11" name="control-11"/>
+                        <xf:bind id="control-1-bind" ref="control-1" name="control-1" fr:persist="false()"/>
+                        <xf:bind id="control-11-bind" ref="control-11" name="control-11" fr:persist="false()"/>
 
 
 
-                        <xf:bind id="control-19-bind" ref="control-19" name="control-19"/>
+                        <xf:bind id="control-19-bind" ref="control-19" name="control-19" fr:persist="false()"/>
                         <xf:bind id="current-time-bind" ref="current-time" name="current-time" type="xf:time"
                                  xxf:default="current-time()"/>
                         <xf:bind id="start-time-bind" ref="start-time" name="start-time" type="xf:time"/>
@@ -240,7 +240,7 @@
                         <xf:bind id="total-hours-bind" ref="total-hours" name="total-hours"
                                  calculate="hours-from-duration(xs:time($end-time) - xs:time($start-time))"
                                  readonly="false()"/>
-                        <xf:bind id="control-20-bind" ref="control-20" name="control-20"/>
+                        <xf:bind id="control-20-bind" ref="control-20" name="control-20" fr:persist="false()"/>
 
                     </xf:bind>
 
@@ -250,12 +250,12 @@
 
                 <xf:bind id="section-5-bind" ref="section-5" name="section-5">
                     <xf:bind id="grid-5-bind" ref="grid-5" name="grid-5">
-                        <xf:bind id="control-8-bind" ref="control-8" name="control-8"/>
-                        <xf:bind id="control-26-bind" ref="control-26" name="control-26"/>
+                        <xf:bind id="control-8-bind" ref="control-8" name="control-8" fr:persist="false()"/>
+                        <xf:bind id="control-26-bind" ref="control-26" name="control-26" fr:persist="false()"/>
                         <xf:bind id="regex-bind" ref="regex" name="regex" xxf:whitespace="trim"/>
                         <xf:bind id="control-10-bind" ref="control-10" name="control-10" xxf:whitespace="trim"
                                  constraint="matches(., $regex)"/>
-                        <xf:bind id="control-15-bind" ref="control-15" name="control-15"/>
+                        <xf:bind id="control-15-bind" ref="control-15" name="control-15" fr:persist="false()"/>
                         <xf:bind id="lei-bind" ref="lei" name="lei" type="fr:lei"/>
                         <xf:bind id="isin-bind" ref="isin" name="isin" type="fr:isin"/>
                         <xf:bind id="iban-bind" ref="iban" name="iban" type="fr:iban"/>

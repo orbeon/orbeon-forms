@@ -120,9 +120,9 @@
                         </xf:bind>
                     </xf:bind>
                     <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
-                        <xf:bind id="copy-data-button-bind" ref="copy-data-button" name="copy-data-button"/>
+                        <xf:bind id="copy-data-button-bind" ref="copy-data-button" name="copy-data-button" fr:persist="false()"/>
                         <xf:bind id="copy-data-button-no-warning-bind" ref="copy-data-button-no-warning"
-                                 name="copy-data-button-no-warning"/>
+                                 name="copy-data-button-no-warning" fr:persist="false()"/>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>

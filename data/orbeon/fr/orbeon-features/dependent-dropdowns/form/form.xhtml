@@ -10,7 +10,7 @@
                 background-color: #333;
             }
         </xh:style>
-        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true" xxf:custom-mips="fr:persist">
 
 
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
@@ -40,7 +40,7 @@
                 <xf:bind id="dynamic-dropdown-bind" ref="dynamic-dropdown" name="dynamic-dropdown">
                     <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
                         <xf:bind id="country-dropdown-bind" ref="country-dropdown" name="country-dropdown"/>
-                        <xf:bind id="control-2-bind" ref="control-2" name="control-2"/>
+                        <xf:bind id="control-2-bind" ref="control-2" name="control-2" fr:persist="false()"/>
 
                     </xf:bind>
                 </xf:bind>
@@ -50,7 +50,7 @@
                         <xf:bind id="state-bind" ref="state" name="state"/>
                         <xf:bind id="city-bind" ref="city" name="city"/>
                         <xf:bind id="zip-bind" ref="zip" name="zip"/>
-                        <xf:bind id="control-4-bind" ref="control-4" name="control-4"/>
+                        <xf:bind id="control-4-bind" ref="control-4" name="control-4" fr:persist="false()"/>
                     </xf:bind>
 
                 </xf:bind>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/">
     <xh:head>
         <xh:title>Orbeon Demo: Springfield PTA Remittance Form</xh:title>
-        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true" xxf:custom-mips="fr:persist">
 
 
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
@@ -69,15 +69,15 @@
                 </xf:bind>
                 <xf:bind id="dues-bind" ref="dues" name="dues">
                     <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
-                        <xf:bind id="control-4-bind" ref="control-4" name="control-4"/>
+                        <xf:bind id="control-4-bind" ref="control-4" name="control-4" fr:persist="false()"/>
                         <xf:bind id="members-count-bind" ref="members-count" name="members-count" type="xs:integer" required="true()"/>
                         <xf:bind id="per-capita-dues-bind" ref="per-capita-dues" name="per-capita-dues" type="xf:decimal" readonly="true()"/>
                         <xf:bind id="member-dues-bind" ref="member-dues" name="member-dues" type="xf:decimal" calculate="$members-count * $per-capita-dues"/>
-                        <xf:bind id="control-3-bind" ref="control-3" name="control-3"/>
+                        <xf:bind id="control-3-bind" ref="control-3" name="control-3" fr:persist="false()"/>
                         <xf:bind id="include-annual-dues-bind" ref="include-annual-dues" name="include-annual-dues" type="xf:boolean"/>
                         <xf:bind id="annual-dues-bind" ref="annual-dues" name="annual-dues" type="xf:decimal" readonly="true()"/>
                         <xf:bind id="annual-council-dues-bind" ref="annual-council-dues" name="annual-council-dues" type="xf:decimal" constraint="xxf:fraction-digits(2)" calculate="if ($include-annual-dues = true()) then $annual-dues else 0.0"/>
-                        <xf:bind id="control-9-bind" ref="control-9" name="control-9"/>
+                        <xf:bind id="control-9-bind" ref="control-9" name="control-9" fr:persist="false()"/>
                         <xf:bind id="parent-education-donation-bind" ref="parent-education-donation" name="parent-education-donation" type="xf:decimal" constraint="xxf:fraction-digits(2)"/>
                         <xf:bind id="total-check-amount-bind" ref="total-check-amount" name="total-check-amount" type="xf:decimal" constraint="xxf:fraction-digits(2)" calculate="$member-dues + $annual-council-dues + $parent-education-donation"/>
                     </xf:bind>

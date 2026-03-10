@@ -15,7 +15,7 @@
          xmlns:math="http://www.w3.org/2005/xpath-functions/math">
     <xh:head>
         <xh:title>Orbeon Demo: Request for Taxpayer Identification Number and Certification</xh:title>
-        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:custom-mips="fr:persist">
             <xf:instance id="fr-form-instance" xxf:index="id">
                 <form>
                     <applicant>
@@ -127,7 +127,7 @@
                         <xf:bind name="ssn-or-ein" id="ssn-or-ein-bind" ref="ssn-or-ein" required="true()"/>
 
                         <xf:bind id="ssn-explanation-bind" ref="ssn-explanation" name="ssn-explanation"
-                                 relevant="$ssn-or-ein = 'ssn'"/>
+                                 relevant="$ssn-or-ein = 'ssn'" fr:persist="false()"/>
                         <xf:bind name="ssn" id="ssn-bind" ref="ssn" type="fr:us-ssn"
                                  relevant="$ssn-or-ein = 'ssn'"
                                  xxf:whitespace="trim"/>

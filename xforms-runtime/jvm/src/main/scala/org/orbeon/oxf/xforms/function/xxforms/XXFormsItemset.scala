@@ -31,7 +31,8 @@ import shapeless.syntax.typeable.*
 class XXFormsItemset extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): om.Item = {
 
-    implicit val ctx = xpathContext
+
+    implicit val xpc = xpathContext
     implicit val xfc = XFormsFunction.context
 
     val jsonOrXMLOpt =

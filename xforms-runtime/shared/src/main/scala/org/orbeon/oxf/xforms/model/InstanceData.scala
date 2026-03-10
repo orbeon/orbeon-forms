@@ -81,9 +81,9 @@ object InstanceData {
     Option(existingInstanceData) flatMap (_.findCustomMip(mipName))
   }
 
-  def findCustomMip(binding: om.Item, qName: QName): Option[String] =
-    binding match {
-      case nodeInfo: om.NodeInfo => InstanceData.findCustomMip(nodeInfo, MipName.buildInternalCustomMIPName(qName))
+  def findCustomMip(nodeInfo: om.Item, qName: QName): Option[String] =
+    nodeInfo match {
+      case nodeInfo: om.NodeInfo => findCustomMip(nodeInfo, MipName.buildInternalCustomMIPName(qName))
       case _                     => None
     }
 

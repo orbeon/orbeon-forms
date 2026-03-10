@@ -29,7 +29,7 @@ class XXFormsCustomMIP extends XXFormsMIPFunction {
     // so that the prefix is not involved. The limitation for now is that you have to use the same prefix as
     // the one used on the binds. See also https://github.com/orbeon/orbeon-forms/issues/3721.
     InstanceData.findCustomMip(
-      binding = argument(0).iterate(xpathContext).next(),
-      qName   = getQNameFromExpression(argument(1))(xpathContext)
+      nodeInfo = argument(0).iterate(xpathContext).next(),
+      qName    = getQNameFromExpression(argument(1))(xpathContext)
     )
 }

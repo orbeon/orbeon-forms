@@ -130,8 +130,8 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     xfc     : XFormsFunction.Context
   ): Option[String] =
     InstanceData.findCustomMip(
-      binding = binding.headOption.orNull,
-      qName   = XFormsFunction.getQNameFromItem(qName)
+      nodeInfo = binding.headOption.orNull,
+      qName    = XFormsFunction.getQNameFromItem(qName)
     )
 
   @XPathFunction

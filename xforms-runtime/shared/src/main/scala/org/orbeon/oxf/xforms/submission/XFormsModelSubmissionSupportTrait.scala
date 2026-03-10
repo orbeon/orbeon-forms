@@ -82,18 +82,21 @@ trait XFormsModelSubmissionSupportTrait {
           }
 
         val attributeNamesForTokens =
-          annotateWith.iterator map { token =>
-            decodeSimpleQuery(token).headOption match {
-              case Some((name, value)) =>
-                name -> {
-                  value.trimAllToOpt flatMap
-                    (Extensions.resolveQName(namespaceContext.get, _, unprefixedIsNoNamespace = true)) getOrElse
-                    xxfQName(name)
-                }
-              case None =>
-                throw new IllegalArgumentException(s"invalid format for `xxf:annotate` value: `$annotateWith`")
+          annotateWith
+            .iterator
+            .map { token =>
+              decodeSimpleQuery(token).headOption match {
+                case Some((name, value)) =>
+                  name ->
+                    value
+                      .trimAllToOpt
+                      .flatMap(Extensions.resolveQName(namespaceContext.get, _, unprefixedIsNoNamespace = true))
+                      .getOrElse(xxfQName(name))
+                case None =>
+                  throw new IllegalArgumentException(s"invalid format for `xxf:annotate` value: `$annotateWith`")
+              }
             }
-          } toMap
+            .toMap
 
         // Annotate ids before pruning so that it is easier for other code (Form Runner) to infer the same ids
         attributeNamesForTokens.get("id") foreach
@@ -108,7 +111,6 @@ trait XFormsModelSubmissionSupportTrait {
 
         val root = copy.getRootElement
         attributeNamesForTokens.map(_._2.namespace).toSet.foreach { (ns: Namespace) =>
-
           Option(root.getNamespaceForPrefix(ns.prefix)) match {
             case None =>
               root.add(ns)
@@ -122,10 +124,11 @@ trait XFormsModelSubmissionSupportTrait {
           xfcd             = xfcd,
           doc              = copy,
           levelsToAnnotate =
-            attributeNamesForTokens.keySet collect
-              ValidationLevel.LevelByName  map { level =>
-                level -> attributeNamesForTokens(level.entryName)
-            } toMap
+            attributeNamesForTokens
+              .keySet
+              .collect(ValidationLevel.LevelByName)
+              .map { level => level -> attributeNamesForTokens(level.entryName) }
+              .toMap
         )
 
         copy
@@ -145,7 +148,7 @@ trait XFormsModelSubmissionSupportTrait {
     relevantAnnotationAttQNameOpt : Option[QName]
   ): Unit = {
     // If we have `xxf:relevant-attribute="fr:relevant"`, say, then we use that attribute to also determine
-    // the relevance of the element. See https://github.com/orbeon/orbeon-forms/issues/3568.
+    // the relevance of the element. See https://github.com/orbeon/orbeon-forms/issues/3829.
     def isNonRelevantSupportAnnotationIfPresent(node: Node): Boolean = {
       def nonRelevantLocally      : Boolean = ! InstanceData.getLocalRelevant(node)
       def nonRelevantByAnnotation : Boolean =
@@ -229,7 +232,7 @@ trait XFormsModelSubmissionSupportTrait {
             val failedValidationsForLevel = failedValidations.getOrElse(level, Nil)
             if (failedValidationsForLevel.nonEmpty) {
               val map = elementsToAnnotate.getOrElseUpdate(level, mutable.Map[Set[String], Element]())
-              map += (failedValidationsForLevel map (_.id) toSet) -> element
+              map += failedValidationsForLevel.map(_.id).toSet -> element
             }
           }
         }
@@ -324,9 +327,9 @@ trait XFormsModelSubmissionSupportTrait {
       }
 
   def requestedSerialization(submissionParameters: SubmissionParameters): Option[String] =
-      submissionParameters.serializationOpt
-        .flatMap(_.trimAllToOpt)
-        .orElse(defaultSerialization(submissionParameters.xformsMethod, submissionParameters.httpMethod))
+    submissionParameters.serializationOpt
+      .flatMap(_.trimAllToOpt)
+      .orElse(defaultSerialization(submissionParameters.xformsMethod, submissionParameters.httpMethod))
 
   private object Private {
 
@@ -343,12 +346,11 @@ trait XFormsModelSubmissionSupportTrait {
     def pruneNonRelevantNodes(doc: Document, isLocallyNonRelevant: Node => Boolean): Unit = {
 
       def processElement(e: Element): List[Node] =
-        if (isLocallyNonRelevant(e)) {
+        if (isLocallyNonRelevant(e))
           List(e)
-        } else {
+        else
           e.attributes.filter(isLocallyNonRelevant) ++:
             e.elements.toList.flatMap(processElement)
-        }
 
       processElement(doc.getRootElement) foreach (_.detach())
     }

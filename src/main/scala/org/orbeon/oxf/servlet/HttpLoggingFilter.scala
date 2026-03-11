@@ -50,7 +50,7 @@ class HttpLoggingFilterImpl(makeServletInputStream: ByteArrayInputStream => Inpu
     val wrappedRequest     = new HttpLoggingFilter.LoggerRequestWrapper(httpRequest, servletInputStream)
 
     Logger.info(s"request path and query: `$pathQuery`")
-    Logger.info(s"request headers:\n${httpRequest.headersAsString}")
+    Logger.info(s"request headers:\n${httpRequest.headersAsStringForDebug}")
     Logger.info(s"request body:\n`$requestBody`")
 
     chain.doFilter(wrappedRequest, servletResponse)

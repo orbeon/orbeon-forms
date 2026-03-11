@@ -73,6 +73,7 @@ object Headers {
   val ContentLengthLower           = ContentLength.toLowerCase
   val LastModifiedLower            = LastModified.toLowerCase
   val AuthorizationLower           = Authorization.toLowerCase
+  val ProxyAuthorizationLower      = ProxyAuthorization.toLowerCase
   val LocationLower                = Location.toLowerCase
   val OrbeonClientLower            = OrbeonClient.toLowerCase
   val AcceptLanguageLower          = AcceptLanguage.toLowerCase
@@ -158,7 +159,7 @@ object Headers {
     _conv   : ConvertibleToSeq[T, String]
   ): Iterable[(String, String)] =
     headers.map {
-      case (name @ (Authorization | ProxyAuthorization), values) =>
+      case (name, values) if name.toLowerCase == AuthorizationLower || name.toLowerCase == ProxyAuthorizationLower =>
         name ->
           values
             .map {

@@ -1,8 +1,10 @@
 package org.orbeon.oxf.fr.importexport
 
+import org.orbeon.oxf.fr.FormRunner.FalseExpr
 import org.orbeon.oxf.fr.SimpleDataMigration.FormOps
-import org.orbeon.oxf.fr.{FormRunner, InDocFormRunnerDocContext}
+import org.orbeon.oxf.fr.{FormRunner, InDocFormRunnerDocContext, XMLNames}
 import org.orbeon.saxon.om
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsNames.{XFORMS_BIND_QNAME, XFORMS_INSTANCE_QNAME}
 
@@ -33,4 +35,7 @@ class FormDefinitionOps(form: om.NodeInfo) extends FormOps {
 
   def bindNameOpt(bind: BindType): Option[String] =
     bind.attValueOpt("name")
+
+  def bindPersist(bind: om.NodeInfo): Boolean =
+    ! bind.attValueOpt(XMLNames.FRPersistQName).contains(FalseExpr)
 }

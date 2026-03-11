@@ -25,8 +25,9 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, inScopeContainingDocument, insert}
-import org.orbeon.oxf.xforms.analysis.model.StaticBind
+import org.orbeon.oxf.xforms.analysis.model.{MipName, StaticBind}
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsModel}
+import org.orbeon.saxon.expr.StringLiteral
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
@@ -72,10 +73,11 @@ object SimpleDataMigration {
     }
 
     case class Insert(
-      parentElem: om.NodeInfo,
-      after     : Option[String],
-      template  : om.NodeInfo,
-      repeats   : List[String]
+      parentElem : om.NodeInfo,
+      after      : Option[String],
+      template   : om.NodeInfo,
+      repeats    : List[String],
+      bindPersist: Boolean
     ) extends InsertOrDelete {
       def ancestry: Ancestry = template.localname -> repeats
       def findClosestRepeatIteration: Option[NodeInfo] =
@@ -109,6 +111,7 @@ object SimpleDataMigration {
     def templateIterationNamesToRootElems: Map[String, om.NodeInfo]
     def bindChildren(bind: BindType): List[BindType]
     def bindNameOpt(bind: BindType): Option[String]
+    def bindPersist(bind: BindType): Boolean
   }
 
   sealed trait FormDiff[BindType] { val bind: BindType }
@@ -173,7 +176,8 @@ object SimpleDataMigration {
     enclosingModelAbsoluteId : String,
     templateInstanceRootElem : om.NodeInfo,
     dataToMigrateRootElem    : om.NodeInfo,
-    dataMigrationBehavior    : DataMigrationBehavior)(implicit
+    dataMigrationBehavior    : DataMigrationBehavior
+  )(implicit
     formOps                  : FormOps
   ): Option[NonEmptyList[DataMigrationOp] Either om.NodeInfo] = {
 
@@ -181,35 +185,46 @@ object SimpleDataMigration {
     require(templateInstanceRootElem.isElement)
     require(dataToMigrateRootElem.isElement)
 
+    val dataToMigrateRootElemMutable =
+      MigrationSupport.copyDocumentKeepInstanceData(dataToMigrateRootElem.root).rootElement
+
+    val allOps =
+      gatherMigrationOps(
+        enclosingModelAbsoluteId = enclosingModelAbsoluteId,
+        templateInstanceRootElem = templateInstanceRootElem,
+        dataToMigrateRootElem    = dataToMigrateRootElemMutable
+      )
+
     dataMigrationBehavior match {
       case DataMigrationBehavior.Disabled =>
-        None
+
+        // Only process missing elements that have `fr:persist="false()"`
+        NonEmptyList.fromList(
+          allOps.collect {
+            case insert @ DataMigrationOp.Insert(_, _, _, _, bindPersist) if ! bindPersist => insert
+          }
+        )
+        .map { nonPersistedElemsInsertOpsToPerformNel =>
+          performMigrationOps(nonPersistedElemsInsertOpsToPerformNel.toList)
+          Right(dataToMigrateRootElemMutable)
+        }
+
       case DataMigrationBehavior.Enabled | DataMigrationBehavior.HolesOnly =>
 
-        val dataToMigrateRootElemMutable =
-          MigrationSupport.copyDocumentKeepInstanceData(dataToMigrateRootElem.root).rootElement
-
-        val ops =
-          gatherMigrationOps(
-            enclosingModelAbsoluteId = enclosingModelAbsoluteId,
-            templateInstanceRootElem = templateInstanceRootElem,
-            dataToMigrateRootElem    = dataToMigrateRootElemMutable
-          )
-
         lazy val deleteAndMoveOps =
-          ops collect {
+          allOps collect {
             case op: DataMigrationOp.Delete => op
             case op: DataMigrationOp.Move   => op
           }
 
         val mustMigrate =
-          ops.nonEmpty && (
+          allOps.nonEmpty && (
             dataMigrationBehavior == DataMigrationBehavior.Enabled ||
             dataMigrationBehavior == DataMigrationBehavior.HolesOnly && deleteAndMoveOps.isEmpty
           )
 
         if (mustMigrate) {
-          performMigrationOps(ops)
+          performMigrationOps(allOps)
           Some(Right(dataToMigrateRootElemMutable))
         } else {
 
@@ -224,14 +239,20 @@ object SimpleDataMigration {
 
       case DataMigrationBehavior.Error =>
 
-        val ops =
-          gatherMigrationOps(
-            enclosingModelAbsoluteId = enclosingModelAbsoluteId,
-            templateInstanceRootElem = templateInstanceRootElem,
-            dataToMigrateRootElem    = dataToMigrateRootElem
-          )
+        // Only process missing elements that have `fr:persist="false()"`, raise an error if there are any other ops
+        val (nonPersistedElemsInsertOpsToPerform, otherOps) =
+          allOps.partition {
+            case DataMigrationOp.Insert(_, _, _, _, bindPersist) if ! bindPersist => true
+            case _ => false
+          }
 
-        NonEmptyList.fromList(ops).map(Left.apply)
+        if (otherOps.isEmpty)
+          NonEmptyList.fromList(nonPersistedElemsInsertOpsToPerform).map { nonPersistedElemsInsertOpsToPerformNel =>
+            performMigrationOps(nonPersistedElemsInsertOpsToPerformNel.toList)
+            Right(dataToMigrateRootElemMutable)
+          }
+        else
+          NonEmptyList.fromList(otherOps).map(Left.apply)
     }
   }
 
@@ -248,7 +269,7 @@ object SimpleDataMigration {
 
     def gatherMessages(ops: Iterator[DataMigrationOp]): Iterator[String] =
       ops.map {
-        case DataMigrationOp.Insert(parent, _, template, _) =>
+        case DataMigrationOp.Insert(parent, _, template, _, _) =>
           s"missing element with name `${template.name}` within `${parent.name}`"
         case DataMigrationOp.Delete(elem, _) =>
           s"extra element with name `${elem.name}` within `${elem.parentUnsafe.name}`"
@@ -666,10 +687,11 @@ object SimpleDataMigration {
                 // template. We were not making use of the `Insert` in that case anyway.
                 findElementTemplate(templateRootElem, bindName :: path).toList.map { template =>
                   DataMigrationOp.Insert(
-                    parentElem = parent,
-                    after      = prevBindOpt.flatMap(formOps.bindNameOpt),
-                    template   = template,
-                    repeats    = repeats
+                    parentElem  = parent,
+                    after       = prevBindOpt.flatMap(formOps.bindNameOpt),
+                    template    = template,
+                    repeats     = repeats,
+                    bindPersist = formOps.bindPersist(bind)
                   )
                 }
               case nodes =>
@@ -768,7 +790,7 @@ object SimpleDataMigration {
           logger.debug(s"removing element `${elem.localname}` from `${elem.getParent.localname}`")
           delete(elem)
 
-        case DataMigrationOp.Insert(parentElem, after, template, _) =>
+        case DataMigrationOp.Insert(parentElem, after, template, _, _) =>
 
           logger.debug(s"inserting element `${template.localname}` into `${parentElem.localname}` after `$after`")
 
@@ -778,7 +800,7 @@ object SimpleDataMigration {
             origin = template.toList
           )
 
-        case DataMigrationOp.Move(DataMigrationOp.Delete(elem, _), DataMigrationOp.Insert(parentElem, after, _, _)) =>
+        case DataMigrationOp.Move(DataMigrationOp.Delete(elem, _), DataMigrationOp.Insert(parentElem, after, _, _, _)) =>
 
           // TODO: Attributes on moved element should be compatible, somehow. For example, form author might have moved
           //  a form control, and then changed its control type. Ideally, we'd know if the types are compatible.
@@ -824,4 +846,15 @@ class ContainingDocumentOps(doc: XFormsContainingDocument, enclosingModelAbsolut
 
   def bindNameOpt(bind: StaticBind): Option[String] =
     bind.nameOpt
+
+  def bindPersist(bind: StaticBind): Boolean =
+    ! bind
+      .customMipNameToXPathMIP
+      .get(MipName.Custom(XMLNames.FRPersistQName))
+      .flatMap(_.headOption)                                                // there should be at most one such MIP
+      .map(_.compiledExpression.expression.getInternalExpression)
+      .exists {
+        case s: StringLiteral if s.getStringValue == false.toString => true // assumes expression is optimized
+        case _ => false
+      }
 }

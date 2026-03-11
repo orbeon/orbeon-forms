@@ -614,7 +614,8 @@ object SimpleDataMigration {
     }
 
     def scanBinds[T](
-      ops   : FormOps)(
+      ops   : FormOps
+    )(
       binds : Seq[ops.BindType],
       find  : (Option[ops.BindType], ops.BindType, String) => List[T]
     ): List[T] = {
@@ -634,7 +635,8 @@ object SimpleDataMigration {
     def gatherMigrationOps(
       enclosingModelAbsoluteId : String,
       templateInstanceRootElem : om.NodeInfo,
-      dataToMigrateRootElem    : om.NodeInfo)(implicit
+      dataToMigrateRootElem    : om.NodeInfo
+    )(implicit
       formOps                  : FormOps
     ): List[DataMigrationOp] = {
 

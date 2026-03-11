@@ -319,15 +319,15 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     private def xpathOptToEither(opt: Option[String]): Either[Boolean, String] =
       opt match {
-        case Some("true()")         => Left(true)
-        case Some("false()") | None => Left(false)    // normalize missing MIP to false()
+        case Some(TrueExpr)         => Left(true)
+        case Some(FalseExpr) | None => Left(false)    // normalize missing MIP to false()
         case Some(xpath)            => Right(xpath)
       }
 
     private def eitherToXPath(required: Either[Boolean, String]) =
       required match {
-        case Left(true)   => "true()"
-        case Left(false)  => "false()"
+        case Left(true)   => TrueExpr
+        case Left(false)  => FalseExpr
         case Right(xpath) => xpath
       }
   }

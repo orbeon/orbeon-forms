@@ -344,7 +344,7 @@ class AlertsAndConstraintsTest
 
         assertAlertsXML(newValidations, readValidationsAsXML(Control1))
 
-        assert("true()" === (bind att "required" stringValue))
+        assert(TrueExpr === (bind att "required" stringValue))
         assert(bind att "type" isEmpty)
 
         assert(RequiredValidation(None, Left(true), None) === RequiredValidation.fromForm(Control1))
@@ -400,7 +400,7 @@ class AlertsAndConstraintsTest
         writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
         assertAlertsXML(newValidations, readValidationsAsXML(Control1))
 
-        assert("true()"     === (bind att "required" stringValue))
+        assert(TrueExpr     === (bind att "required" stringValue))
         assert("xs:decimal" === (bind att "type" stringValue))
 
         assert(RequiredValidation(None, Left(true), None) === RequiredValidation.fromForm(Control1))
@@ -511,7 +511,7 @@ class AlertsAndConstraintsTest
         writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
         assertAlertsXML(newValidations, readValidationsAsXML(Control1))
 
-        assert("true()"    === (bind att "required" stringValue))
+        assert(TrueExpr    === (bind att "required" stringValue))
         assert("foo:email" === (bind att "type" stringValue))
       }
     }
@@ -547,7 +547,7 @@ class AlertsAndConstraintsTest
         writeAlertsAndValidationsAsXML(Control1, "", globalAlertAsXML, newValidations map elemToNodeInfo)
         assertAlertsXML(newValidations, readValidationsAsXML(Control1))
 
-        assert("true()" === (bind att "required" stringValue))
+        assert(TrueExpr === (bind att "required" stringValue))
         assert("rating" === (bind att "type" stringValue))
       }
     }

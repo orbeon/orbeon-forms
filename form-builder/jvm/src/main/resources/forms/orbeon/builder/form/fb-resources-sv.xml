@@ -543,6 +543,10 @@
         </excel-field-name>
         <options>
             <item>
+                <label todo="true">[Persist control value]</label>
+                <value>fr-persist</value>
+            </item>
+            <item>
                 <label todo="true">[Index control]</label>
                 <value>fr-index</value>
             </item>
@@ -561,10 +565,6 @@
             <item>
                 <label todo="true">[Encrypt data at rest]</label>
                 <value>fr-encrypt</value>
-            </item>
-            <item>
-                <label todo="true">[Persist control value]</label>
-                <value>fr-persist</value>
             </item>
         </options>
         <summary-show>

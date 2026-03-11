@@ -543,6 +543,10 @@
         </excel-field-name>
         <options>
             <item>
+                <label>Persist control value</label>
+                <value>fr-persist</value>
+            </item>
+            <item>
                 <label>Index control</label>
                 <value>fr-index</value>
             </item>
@@ -561,10 +565,6 @@
             <item>
                 <label>Encrypt gegevens in rust</label>
                 <value>fr-encrypt</value>
-            </item>
-            <item>
-                <label>Persist control value</label>
-                <value>fr-persist</value>
             </item>
         </options>
         <summary-show>

@@ -560,6 +560,10 @@
         </excel-field-name>
         <options>
             <item>
+                <label>Persist control value</label>
+                <value>fr-persist</value>
+            </item>
+            <item>
                 <label>Inclure dans l'index</label>
                 <value>fr-index</value>
             </item>
@@ -578,10 +582,6 @@
             <item>
                 <label>Crypter les données au repos</label>
                 <value>fr-encrypt</value>
-            </item>
-            <item>
-                <label>Persist control value</label>
-                <value>fr-persist</value>
             </item>
         </options>
         <summary-show>

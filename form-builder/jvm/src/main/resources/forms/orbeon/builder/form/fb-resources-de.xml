@@ -554,6 +554,10 @@
         </excel-field-name>
         <options>
             <item>
+                <label>Persist control value</label>
+                <value>fr-persist</value>
+            </item>
+            <item>
                 <label>Index-Steuerelement</label>
                 <value>fr-index</value>
             </item>
@@ -572,10 +576,6 @@
             <item>
                 <label>Daten in der Datenbank verschlüsseln</label>
                 <value>fr-encrypt</value>
-            </item>
-            <item>
-                <label>Persist control value</label>
-                <value>fr-persist</value>
             </item>
         </options>
         <summary-show>

@@ -562,6 +562,10 @@
         </excel-field-name>
         <options>
             <item>
+                <label>Persist control value</label>
+                <value>fr-persist</value>
+            </item>
+            <item>
                 <label>インデックスコントロール</label>
                 <value>fr-index</value>
             </item>
@@ -580,10 +584,6 @@
             <item>
                 <label>保存データを暗号化</label>
                 <value>fr-encrypt</value>
-            </item>
-            <item>
-                <label>Persist control value</label>
-                <value>fr-persist</value>
             </item>
         </options>
         <summary-show>

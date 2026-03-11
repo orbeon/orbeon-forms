@@ -827,6 +827,7 @@
 
                         <visible-counts alert="" error="" warning="" info=""/>
 
+                        <fr-persist             enabled=""/>
                         <fr-index               enabled=""/>
                         <fr-summary-show        enabled="" role-required="" require-role-constraint="" legacy="">
                             <!--<require-role/>-->
@@ -836,7 +837,6 @@
                         </fr-allow-bulk-edit>
                         <fr-default-sort-column enabled="" direction=""/>
                         <fr-encrypt             enabled=""/>
-                        <fr-persist             enabled=""/>
 
                         <default-alert
                             global-default-alert-message=""
@@ -1142,33 +1142,85 @@
                     ref="(label | hint | help | text)/value"
                     xxf:whitespace="trim"/>
 
-                <xf:bind ref="$i/fr-index/@enabled" type="xs:boolean"/>
-                <xf:bind ref="$i/*[local-name() = ('fr-summary-show', 'fr-allow-bulk-edit')]" name="summary-setting">
-                    <xf:bind ref="@enabled"         type="xs:boolean"/>
-                    <!-- Always show the 'Restrict to role' checkbox for 'Show on Summary page', only show it for 'Allow bulk edit' if enabled -->
+                <!-- Basic Settings checkboxes -->
+                <xf:var
+                    name="items-to-show"
+                    as="element(item)*"
+                    value="
+                        xxf:resource-elements('dialog-control-settings.options.item', '|fr-form-resources|')[
+                            fr:is-pe() or value != 'fr-encrypt'
+                        ]
+                    "/>
+                <xf:var
+                    name="selected-values"
+                    as="xs:string*"
+                    value="
+                        $i/*[
+                            local-name() = $items-to-show/value and
+                            (data(@enabled) or (exists(@legacy) and xxf:non-blank(@legacy)))
+                        ]/local-name(.)"/>
+
+                <xf:bind
+                    ref="$i/fr-persist/@enabled"
+                    type="xs:boolean"
+                    name="persist"
+                    readonly="$selected-values = ('fr-encrypt', 'fr-index')"/>
+                <xf:bind
+                    ref="$i/fr-index/@enabled"
+                    type="xs:boolean"
+                    readonly="
+                        not($selected-values = 'fr-persist') or
+                        $selected-values = ('fr-encrypt', 'fr-summary-show', 'fr-allow-bulk-edit', 'fr-default-sort-column')"/>
+                <xf:bind
+                    ref="$i/fr-summary-show | $i/fr-allow-bulk-edit"
+                    name="summary-setting"
+                    readonly="
+                        not($selected-values = 'fr-persist') or
+                        $selected-values = 'fr-encrypt'">
+                    <xf:bind
+                        ref="@enabled"
+                        type="xs:boolean"
+                        readonly="
+                            data($summary-setting/@role-required) or
+                            local-name($summary-setting) = 'fr-summary-show' and (
+                                $selected-values = ('fr-allow-bulk-edit', 'fr-default-sort-column') and
+                                xxf:is-blank(../@legacy)
+                            )"/>
                     <xf:bind
                         ref="@role-required"
-                         type="xs:boolean"
-                        relevant="$summary-setting/local-name() = 'fr-summary-show' or $summary-setting/@enabled = true()"
-                        readonly="$i/fr-encrypt/@enabled = true()"/>
+                        type="xs:boolean"
+                        relevant="
+                            local-name($summary-setting) = 'fr-summary-show' or (: always show for 'Show on Summary page' :)
+                            data($summary-setting/@enabled)                     (: only show it for 'Allow bulk edit' if enabled :)"/>
                     <xf:bind
-                            ref="require-role"
-                            relevant="$summary-setting/@enabled = true() and $summary-setting/@role-required = true()"
-                            xxf:whitespace="trim">
+                        ref="require-role"
+                        relevant="
+                            data($summary-setting/@enabled) and
+                            data($summary-setting/@role-required)"
+                        xxf:whitespace="trim">
                         <xf:constraint id="role-non-empty"      value=". != ''"/>
                         <xf:constraint id="role-non-duplicated" value=". = '' or not(. = (../require-role except .))"/>
                     </xf:bind>
                 </xf:bind>
-
-                <xf:bind ref="$i/fr-default-sort-column/@enabled" type="xs:boolean">
+                <xf:bind
+                    ref="$i/fr-default-sort-column/@enabled"
+                    type="xs:boolean"
+                    readonly="
+                        not($selected-values = 'fr-persist') or
+                        $selected-values = 'fr-encrypt'">
                     <!-- Display information if other controls have sorting enabled -->
                     <xf:constraint
                         id="default-sort-column-validation"
                         level="info"
                         value=". = false() or empty(xxf:split(fbf:controlsWithSorting($i/original-control-name)))"/>
                 </xf:bind>
-                <xf:bind ref="$i/fr-encrypt/@enabled"             type="xs:boolean"/>
-                <xf:bind ref="$i/fr-persist/@enabled"             type="xs:boolean"/>
+                <xf:bind
+                    ref="$i/fr-encrypt/@enabled"
+                    type="xs:boolean"
+                    readonly="
+                        not($selected-values = 'fr-persist') or
+                        not(data(.)) and (: Don't disable 'Encrypt data at rest' if checked, for backward compatibility :)
+                        $selected-values = 'fr-index'"/>
 
                 <xf:instance id="processes">
                     <_>
@@ -1288,56 +1340,15 @@
                                         </xh:tr>
                                         <xh:tr>
                                             <xh:td>
-                                                <xf:var
-                                                    name="items-to-show"
-                                                    value="
-                                                        $resources/dialog-control-settings/options/item[
-                                                            (fr:is-pe() or value != 'fr-encrypt') or
-                                                            not(contains(value, 'email'))
-                                                        ]
-                                                    "/>
                                                 <xf:group ref=".[exists($items-to-show)]" class="fb-control-settings-options">
-                                                    <xf:var
-                                                        name="selected-values"
-                                                        value="
-                                                            for $e in $i/*[local-name() = $items-to-show/value and (@enabled = true() or (exists(@legacy) and xxf:non-blank(@legacy)))]
-                                                            return local-name($e)"/>
-
                                                     <xf:repeat ref="$items-to-show" id="items-to-show-repeat">
                                                         <xf:var name="item-to-show"  value="."/>
-                                                        <xf:var name="current-value" value="$item-to-show/value"/>
+                                                        <xf:var name="current-value" value="$item-to-show/value/string()"/>
                                                         <xf:var name="base-binding"  value="$i/*[local-name() = $current-value][1]"/>
 
                                                         <xf:var
                                                             name="checkbox-disabled"
-                                                            value="
-                                                                (
-                                                                    (: Don't disable 'Encrypt data at rest' if checked, for backward compatibility :)
-                                                                    not($current-value = 'fr-encrypt') or not($current-value = $selected-values)
-                                                                ) and
-                                                                (
-                                                                    (
-                                                                        $selected-values   = 'fr-encrypt'
-                                                                        and $current-value = ('fr-index', 'fr-summary-show', 'fr-allow-bulk-edit', 'fr-default-sort-column')
-                                                                    ) or
-                                                                    (
-                                                                        $selected-values   = ('fr-index', 'fr-summary-show', 'fr-allow-bulk-edit', 'fr-default-sort-column')
-                                                                        and $current-value = 'fr-encrypt'
-                                                                    ) or
-                                                                    (
-                                                                        $selected-values   = ('fr-summary-show', 'fr-allow-bulk-edit', 'fr-default-sort-column')
-                                                                        and $current-value = 'fr-index'
-                                                                    ) or
-                                                                    (
-                                                                        $selected-values   = ('fr-allow-bulk-edit', 'fr-default-sort-column')
-                                                                        and $current-value = 'fr-summary-show'
-                                                                        and xxf:is-blank($i/fr-summary-show/@legacy)
-                                                                    ) or
-                                                                    (
-                                                                        $current-value = ('fr-summary-show', 'fr-allow-bulk-edit')
-                                                                        and $base-binding/@role-required = true()
-                                                                    )
-                                                                )"/>
+                                                            value="xxf:readonly($base-binding/@enabled)"/>
 
                                                         <xf:var
                                                             name="checkbox-binding"

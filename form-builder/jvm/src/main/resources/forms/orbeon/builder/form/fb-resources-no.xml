@@ -542,6 +542,10 @@
         </excel-field-name>
         <options>
             <item>
+                <label>Persist control value</label>
+                <value>fr-persist</value>
+            </item>
+            <item>
                 <label>Indekskontroll</label>
                 <value>fr-index</value>
             </item>
@@ -560,10 +564,6 @@
             <item>
                 <label>Krypter data i hvile</label>
                 <value>fr-encrypt</value>
-            </item>
-            <item>
-                <label>Persist control value</label>
-                <value>fr-persist</value>
             </item>
         </options>
         <summary-show>

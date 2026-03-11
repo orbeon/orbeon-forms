@@ -81,7 +81,7 @@ object FormRunnerAuthFilterImpl {
     val httpSession    = new ServletSessionImpl(servletRequest.getSession(createSession))
     val getHttpHeaders = (name: String) => servletRequest.headerValuesList(name)
 
-    logger.debug(s"incoming headers:\n${servletRequest.headersAsString}")
+    logger.debug(s"incoming headers:\n${servletRequest.headersAsStringForDebug}")
 
     // The Form Runner service path is hardcoded but that's ok. When we are filtering a service, we don't retrieve the
     // credentials, which would be provided by the container or by incoming headers. Instead, credentials are provided
@@ -127,7 +127,7 @@ object FormRunnerAuthFilterImpl {
         new HttpServletRequestWrapper(servletRequest) with CustomHeaders
       }
 
-    logger.debug(s"amended headers:\n${requestWithAmendedHeaders.headersAsString}")
+    logger.debug(s"amended headers:\n${requestWithAmendedHeaders.headersAsStringForDebug}")
 
     requestWithAmendedHeaders
   }

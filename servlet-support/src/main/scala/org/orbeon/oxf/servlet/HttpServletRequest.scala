@@ -14,6 +14,7 @@
 package org.orbeon.oxf.servlet
 
 import cats.data.NonEmptyList
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.PathUtils.*
 
 import java.io.BufferedReader
@@ -95,13 +96,15 @@ trait HttpServletRequest extends ServletRequest {
       .collectFirst { case headerName if headerName.equalsIgnoreCase(name) => NonEmptyList.fromList(getHeaders(headerName).asScala.toList) }
       .collect { case Some(valueNel) => valueNel }
 
-  def headersAsString: String = {
-    headerNamesWithValues.flatMap { case (headerName, headerValues) =>
-      headerValues.toList.map { value =>
-        s"$headerName: $value"
+  def headersAsStringForDebug: String =
+    Headers
+      .sanitizeHeadersForDebug(headerNamesWithValues.view.map(kv => kv._1 -> kv._2.toList))
+      .flatMap { case (headerName, headerValues) =>
+        headerValues.toList.map { value =>
+          s"$headerName: $value"
+        }
       }
-    } mkString "\n"
-  }
+      .mkString("\n")
 
   // javax/jakarta.servlet.http.HttpServletRequestWrapper
   def wrappedWith(wrapper: HttpServletRequestWrapper): AnyRef

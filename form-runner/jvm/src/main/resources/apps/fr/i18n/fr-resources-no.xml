@@ -67,7 +67,7 @@
         <submit-dialog-close-window>Lukk vindu</submit-dialog-close-window>
 
         <!-- Warning dialog -->
-        <validation-dialog-review>Evaluer</validation-dialog-review>
+        <validation-dialog-review>Dobbeltsjekk</validation-dialog-review>
         <validation-dialog-continue>Fortsett</validation-dialog-continue>
 
         <!-- Conflict dialog -->

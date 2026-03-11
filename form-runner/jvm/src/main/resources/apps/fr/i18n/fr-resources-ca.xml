@@ -70,7 +70,7 @@
         <submit-dialog-close-window>Tancar finestra</submit-dialog-close-window>
 
         <!-- Warning dialog -->
-        <validation-dialog-review>Revisar</validation-dialog-review>
+        <validation-dialog-review>Verificar de nou</validation-dialog-review>
         <validation-dialog-continue>Continuar</validation-dialog-continue>
 
         <!-- Conflict dialog -->

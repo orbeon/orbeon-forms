@@ -67,7 +67,7 @@
         <submit-dialog-close-window>Pencereyi kapat</submit-dialog-close-window>
 
         <!-- Warning dialog -->
-        <validation-dialog-review>İncele</validation-dialog-review>
+        <validation-dialog-review>Tekrar kontrol et</validation-dialog-review>
         <validation-dialog-continue>Devam Et</validation-dialog-continue>
 
         <!-- Conflict dialog -->

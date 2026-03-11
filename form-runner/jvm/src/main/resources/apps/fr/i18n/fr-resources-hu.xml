@@ -67,7 +67,7 @@
         <submit-dialog-close-window>Ablak bezárása</submit-dialog-close-window>
 
         <!-- Figyelmeztetési párbeszédpanel -->
-        <validation-dialog-review>Áttekintés</validation-dialog-review>
+        <validation-dialog-review>Újraellenőrzés</validation-dialog-review>
         <validation-dialog-continue>Folytatás</validation-dialog-continue>
 
         <!-- Conflict dialog -->

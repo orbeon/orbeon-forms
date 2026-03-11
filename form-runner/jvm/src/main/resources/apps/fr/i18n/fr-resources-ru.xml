@@ -67,7 +67,7 @@
         <submit-dialog-close-window>Закрыть окно</submit-dialog-close-window>
 
         <!-- Warning dialog -->
-        <validation-dialog-review>Просмотреть</validation-dialog-review>
+        <validation-dialog-review>Перепроверить</validation-dialog-review>
         <validation-dialog-continue>Продолжить</validation-dialog-continue>
 
         <!-- Conflict dialog -->

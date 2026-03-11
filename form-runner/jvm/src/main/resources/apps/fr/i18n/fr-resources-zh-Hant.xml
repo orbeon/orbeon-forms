@@ -67,7 +67,7 @@
         <submit-dialog-close-window>關閉窗口</submit-dialog-close-window>
 
         <!-- 警告對話框 -->
-        <validation-dialog-review>審查</validation-dialog-review>
+        <validation-dialog-review>再次檢查</validation-dialog-review>
         <validation-dialog-continue>繼續</validation-dialog-continue>
 
         <!-- Conflict dialog -->

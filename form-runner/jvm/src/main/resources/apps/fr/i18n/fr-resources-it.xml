@@ -67,7 +67,7 @@
         <submit-dialog-close-window>Chiudi finestra</submit-dialog-close-window>
 
         <!-- Warning dialog -->
-        <validation-dialog-review>Recensione</validation-dialog-review>
+        <validation-dialog-review>Ricontrollare</validation-dialog-review>
         <validation-dialog-continue>Continua</validation-dialog-continue>
 
         <!-- Conflict dialog -->

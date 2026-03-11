@@ -67,7 +67,7 @@
         <submit-dialog-close-window>Luk vindue</submit-dialog-close-window>
 
         <!-- Warning dialog -->
-        <validation-dialog-review>Validér</validation-dialog-review>
+        <validation-dialog-review>Dobbelttjek</validation-dialog-review>
         <validation-dialog-continue>Fortsæt</validation-dialog-continue>
 
         <!-- Conflict dialog -->

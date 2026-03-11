@@ -67,7 +67,7 @@
         <submit-dialog-close-window>Fermer la fenêtre</submit-dialog-close-window>
 
         <!-- Warning dialog -->
-        <validation-dialog-review>Revoir</validation-dialog-review>
+        <validation-dialog-review>Revérifier</validation-dialog-review>
         <validation-dialog-continue>Continuer</validation-dialog-continue>
 
         <!-- Conflict dialog -->

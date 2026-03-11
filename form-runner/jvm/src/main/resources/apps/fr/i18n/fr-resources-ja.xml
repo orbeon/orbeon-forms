@@ -67,7 +67,7 @@
         <submit-dialog-close-window>ウィンドウを閉じる</submit-dialog-close-window>
 
         <!-- Warning dialog -->
-        <validation-dialog-review>確認</validation-dialog-review>
+        <validation-dialog-review>再確認</validation-dialog-review>
         <validation-dialog-continue>続行</validation-dialog-continue>
 
         <!-- Conflict dialog -->

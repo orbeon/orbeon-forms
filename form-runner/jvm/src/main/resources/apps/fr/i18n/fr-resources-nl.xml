@@ -67,7 +67,7 @@
         <submit-dialog-close-window>Venster sluiten</submit-dialog-close-window>
 
         <!-- Warning dialog -->
-        <validation-dialog-review>Review</validation-dialog-review>
+        <validation-dialog-review>Nogmaals controleren</validation-dialog-review>
         <validation-dialog-continue>Doorgaan</validation-dialog-continue>
 
         <!-- Conflict dialog -->

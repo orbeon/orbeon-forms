@@ -63,7 +63,7 @@
         <submit-dialog-go>确定</submit-dialog-go>
         <submit-dialog-close-window>关闭窗口</submit-dialog-close-window>
 
-        <validation-dialog-review>审核</validation-dialog-review>
+        <validation-dialog-review>再次检查</validation-dialog-review>
         <validation-dialog-continue>继续</validation-dialog-continue>
 
         <!-- Conflict dialog -->

@@ -67,7 +67,7 @@
         <submit-dialog-close-window>Sulje ikkuna</submit-dialog-close-window>
 
         <!-- Warning dialog -->
-        <validation-dialog-review>Käy läpi</validation-dialog-review>
+        <validation-dialog-review>Tarkista uudelleen</validation-dialog-review>
         <validation-dialog-continue>Jatka</validation-dialog-continue>
 
         <!-- Conflict dialog -->

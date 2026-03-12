@@ -437,7 +437,7 @@
             name="library-name"
             select="ancestor::xbl:binding[1]/frf:findAppFromSectionTemplateUri(namespace-uri-for-prefix('component', .))"/>
         <xf:var name="{concat(@id, '-resource')}">
-            <xsl:value-of select="frf:replaceVarReferencesWithFunctionCallsForAction(@resource, @resource, true(), $library-name, $fr-form-model-vars)"/>
+            <xsl:value-of select="frf:replaceVarReferencesWithFunctionCallsFromString(@resource, @resource, true(), $library-name, $fr-form-model-vars)"/>
         </xf:var>
         <xsl:variable name="resource" select="concat('$', @id, '-resource')"/>
         <xsl:copy>

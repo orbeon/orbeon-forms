@@ -70,8 +70,9 @@
 
                     <xf:instance id="local" xxf:exclude-result-prefixes="#all">
                         <_>
-                            <allow-download default="true"/>
-                            <show-size      default="true"/>
+                            <allow-download            default="true"/>
+                            <show-size                 default="true"/>
+                            <upload-error-appearance   default=""/>
                         </_>
                     </xf:instance>
 
@@ -86,58 +87,142 @@
                             <resource xml:lang="en">
                                 <allow-download>Allow download</allow-download>
                                 <show-size>Show size</show-size>
+                                <upload-error-appearance>
+                                    <label>Upload error appearance</label>
+                                    <item id="0">Use default</item>
+                                    <item id="1">Dialog</item>
+                                    <item id="2">Inline</item>
+                                </upload-error-appearance>
                             </resource>
                             <resource xml:lang="fr">
                                 <allow-download>Permettre le téléchargement</allow-download>
                                 <show-size>Montrer la taille</show-size>
+                                <upload-error-appearance>
+                                    <label>Apparence de l'erreur de téléversement</label>
+                                    <item id="0">Utiliser le défaut</item>
+                                    <item id="1">Dialogue</item>
+                                    <item id="2">En ligne</item>
+                                </upload-error-appearance>
                             </resource>
                             <resource xml:lang="no">
                                 <allow-download>Tillat nedlasting</allow-download>
                                 <show-size>Vis størrelse</show-size>
+                                <upload-error-appearance>
+                                    <label>Utseende for opplastingsfeil</label>
+                                    <item id="0">Bruk standard</item>
+                                    <item id="1">Dialog</item>
+                                    <item id="2">Innebygd</item>
+                                </upload-error-appearance>
                             </resource>
                             <resource xml:lang="ru">
                                 <allow-download>Разрешить скачивание</allow-download>
                                 <show-size>Показывать размер</show-size>
+                                <upload-error-appearance>
+                                    <label>Отображение ошибки загрузки</label>
+                                    <item id="0">По умолчанию</item>
+                                    <item id="1">Диалог</item>
+                                    <item id="2">Встроенное</item>
+                                </upload-error-appearance>
                             </resource>
                             <resource xml:lang="it">
                                 <allow-download>Consenti download</allow-download>
                                 <show-size>Mostra dimensione</show-size>
+                                <upload-error-appearance>
+                                    <label>Aspetto errore di caricamento</label>
+                                    <item id="0">Usa predefinito</item>
+                                    <item id="1">Dialogo</item>
+                                    <item id="2">In linea</item>
+                                </upload-error-appearance>
                             </resource>
                             <resource xml:lang="de">
                                 <allow-download>Download erlauben</allow-download>
                                 <show-size>Größe anzeigen</show-size>
+                                <upload-error-appearance>
+                                    <label>Darstellung des Upload-Fehlers</label>
+                                    <item id="0">Standard verwenden</item>
+                                    <item id="1">Dialog</item>
+                                    <item id="2">Inline</item>
+                                </upload-error-appearance>
                             </resource>
                             <resource xml:lang="fi">
                                 <allow-download>Salli lataus</allow-download>
                                 <show-size>Näytä koko</show-size>
+                                <upload-error-appearance>
+                                    <label>Latausvirheen ulkoasu</label>
+                                    <item id="0">Käytä oletusta</item>
+                                    <item id="1">Dialogi</item>
+                                    <item id="2">Rivinsisäinen</item>
+                                </upload-error-appearance>
                             </resource>
                             <resource xml:lang="es">
                                 <allow-download>Permitir descarga</allow-download>
                                 <show-size>Mostrar tamaño</show-size>
+                                <upload-error-appearance>
+                                    <label>Apariencia del error de carga</label>
+                                    <item id="0">Usar predeterminado</item>
+                                    <item id="1">Diálogo</item>
+                                    <item id="2">En línea</item>
+                                </upload-error-appearance>
                             </resource>
                             <resource xml:lang="nl">
                                 <allow-download>Download toestaan</allow-download>
                                 <show-size>Grootte tonen</show-size>
+                                <upload-error-appearance>
+                                    <label>Weergave uploadfout</label>
+                                    <item id="0">Standaard gebruiken</item>
+                                    <item id="1">Dialoog</item>
+                                    <item id="2">Inline</item>
+                                </upload-error-appearance>
                             </resource>
                             <resource xml:lang="pt">
                                 <allow-download>Permitir download</allow-download>
                                 <show-size>Mostrar tamanho</show-size>
+                                <upload-error-appearance>
+                                    <label>Aparência do erro de upload</label>
+                                    <item id="0">Usar padrão</item>
+                                    <item id="1">Diálogo</item>
+                                    <item id="2">Em linha</item>
+                                </upload-error-appearance>
                             </resource>
                             <resource xml:lang="sv">
                                 <allow-download>Tillåt nedladdning</allow-download>
                                 <show-size>Visa storlek</show-size>
+                                <upload-error-appearance>
+                                    <label>Utseende för uppladdningsfel</label>
+                                    <item id="0">Använd standard</item>
+                                    <item id="1">Dialog</item>
+                                    <item id="2">Inline</item>
+                                </upload-error-appearance>
                             </resource>
                             <resource xml:lang="ar">
                                 <allow-download>السماح بالتنزيل</allow-download>
                                 <show-size>إظهار الحجم</show-size>
+                                <upload-error-appearance>
+                                    <label>مظهر خطأ التحميل</label>
+                                    <item id="0">استخدام الافتراضي</item>
+                                    <item id="1">حوار</item>
+                                    <item id="2">مضمّن</item>
+                                </upload-error-appearance>
                             </resource>
                             <resource xml:lang="pl">
                                 <allow-download>Zezwól na pobieranie</allow-download>
                                 <show-size>Pokaż rozmiar</show-size>
+                                <upload-error-appearance>
+                                    <label>Wygląd błędu przesyłania</label>
+                                    <item id="0">Użyj domyślnego</item>
+                                    <item id="1">Dialog</item>
+                                    <item id="2">W wierszu</item>
+                                </upload-error-appearance>
                             </resource>
                             <resource xml:lang="ja">
                                 <allow-download>ダウンロードを許可</allow-download>
                                 <show-size>サイズを表示</show-size>
+                                <upload-error-appearance>
+                                    <label>アップロードエラーの表示</label>
+                                    <item id="0">デフォルトを使用</item>
+                                    <item id="1">ダイアログ</item>
+                                    <item id="2">インライン</item>
+                                </upload-error-appearance>
                             </resource>
                         </_>
                     </xf:instance>
@@ -148,6 +233,24 @@
                         <fr:checkbox-input ref="instance('local')/allow-download" id="allow-download-control">
                             <xf:label ref="xxf:r('allow-download')"/>
                         </fr:checkbox-input>
+                    </fr:c>
+                    <fr:c x="1" y="2" w="12">
+                        <xf:select1 ref="instance('local')/upload-error-appearance" appearance="full xxf:horizontal" id="upload-error-appearance-control">
+                            <xf:label ref="xxf:r('upload-error-appearance.label')"/>
+                            <xf:itemset ref="xxf:resource-elements('upload-error-appearance.item')">
+                                <xf:label ref="."/>
+                                <xf:value
+                                    ref="
+                                        if (@id = 0) then
+                                            ''
+                                        else if (@id = 1) then
+                                            'dialog'
+                                        else if (@id = 2) then
+                                            'inline'
+                                        else
+                                            error()"/>
+                            </xf:itemset>
+                        </xf:select1>
                     </fr:c>
                     <!-- For now, don't support this, see comments in #4414.
                     <fr:c x="1" y="2" w="12">
@@ -162,7 +265,8 @@
                     event="xforms-value-changed"
                     observer="
                         allow-download-control
-                        show-size-control">
+                        show-size-control
+                        upload-error-appearance-control">
 
                     <xf:var
                         name="name"

@@ -98,6 +98,7 @@ val PlaywrightVersion                = "1.65.0"
 // Only on PE for now
 val ApachePOIVersion                 = "5.5.1"
 val SendGridVersion                  = "4.10.3"
+val JolVersion                       = "0.17"
 
 // Force patched version (PDFBOX-6220 backport)
 ThisBuild / dependencyOverrides += "org.apache.pdfbox" % "pdfbox"  % PdfBoxVersion
@@ -199,6 +200,7 @@ val CoreLibraryDependencies = Seq(
   "net.coobird"                 % "thumbnailator"                   % ThumbnailatorVersion,
   "com.adobe.xmp"               % "xmpcore"                         % "6.1.11",
   "org.orbeon"                  % "kaptcha"                         % "2.3.3-SNAPSHOT",
+  "org.openjdk.jol"             % "jol-core"                        % JolVersion,
 
   "javax.servlet"               % "javax.servlet-api"               % JavaxServletApiVersion   % Provided,
   "jakarta.servlet"             % "jakarta.servlet-api"             % JakartaServletApiVersion % Provided,

@@ -3,22 +3,22 @@ package org.orbeon.oxf.cache
 import cats.data.NonEmptyList
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.properties.PropertyLoader
-import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.TryUtils.*
 
 import java.io
 import java.net.URI
 import javax.cache.configuration.MutableConfiguration
 import javax.cache.{CacheManager, Caching}
 import scala.jdk.CollectionConverters.*
+import scala.util.Try
 import scala.util.chaining.*
-import scala.util.{Success, Try}
 
 
 class JCacheProvider(store: Boolean) extends CacheProviderApi {
 
   import CacheSupport.*
   import CacheSupport.Logger.*
+
+  val ProviderName = "jcache"
 
   def get(cacheName: String): Option[CacheApi] = {
     val cacheOpt = Option(cacheManager.getCache[io.Serializable, io.Serializable](cacheName))
@@ -27,7 +27,7 @@ class JCacheProvider(store: Boolean) extends CacheProviderApi {
         [io.Serializable, io.Serializable, MutableConfiguration[io.Serializable, io.Serializable]]
         (
           cacheName,
-          new MutableConfiguration[io.Serializable, io.Serializable]() |!> { config =>
+          new MutableConfiguration[io.Serializable, io.Serializable]().tap { config =>
             // Force storing by reference if we are a plain cache, otherwise leave it to the default. It doesn't seem
             // that this can be configured in the declarative XML configuration file for Ehcache 3, so we do it here.
             if (! store)
@@ -60,8 +60,10 @@ class JCacheProvider(store: Boolean) extends CacheProviderApi {
     try {
 
       val properties =
-        PropertyLoader.getPropertyStore(None).globalPropertySet |!> // we are in the boot phase here
-          (CacheSupport.logProperties(_, CacheSupport.Logger.debug))
+        PropertyLoader
+          .getPropertyStore(None) // we are typically in the boot phase here so there is no request
+          .globalPropertySet
+          .tap(CacheSupport.logProperties(_, CacheSupport.Logger.debug))
 
       // For debugging only, indicate the default provider set using the Java system property
       Try(System.getProperty(Caching.JAVAX_CACHE_CACHING_PROVIDER)).toOption.flatMap(Option.apply).foreach { provider =>
@@ -81,7 +83,7 @@ class JCacheProvider(store: Boolean) extends CacheProviderApi {
               debug(s"  ${index + 1}: `${provider.getClass.getName}`")
             }
 
-            nonBlankString(store, classnameRePropertyName)(properties) match {
+            nonBlankString(store, classnameRePropertyName(_, ProviderName))(properties) match {
               case Some((_, re)) =>
                 providers.find(_.getClass.getName.matches(re)) match {
                   case Some(provider) =>
@@ -94,9 +96,9 @@ class JCacheProvider(store: Boolean) extends CacheProviderApi {
                 }
               case None =>
                 if (store)
-                  debug(s"No `${classnameRePropertyName(true)}` or `${classnameRePropertyName(false)}` property set")
+                  debug(s"No `${classnameRePropertyName(store = true, ProviderName)}` or `${classnameRePropertyName(store = false, ProviderName)}` property set")
                 else
-                  debug(s"No `${classnameRePropertyName(false)}` property set")
+                  debug(s"No `${classnameRePropertyName(store = false, ProviderName)}` property set")
                 if (providers.size > 1)
                   debug(s"  picking first provider found out of ${providers.size} providers")
                 else
@@ -107,25 +109,20 @@ class JCacheProvider(store: Boolean) extends CacheProviderApi {
 
       info(s"Using the JCache provider found in the classpath with class name: `${provider.getClass.getName}`")
 
-      val resourcePropertyOpt: Option[String] =
-        nonBlankString(store, CacheSupport.resourcePropertyName)(properties).map(_._2)
+      def fromResource: Option[URI] =
+        nonBlankString(store, CacheSupport.resourcePropertyName(_, ProviderName))(properties)
+          .flatMap { case (_, p) => Option(getClass.getResource(p)) }
+          .map(_.toURI)
 
-      val functions: LazyList[() => Option[URI]] = LazyList(
-        () => resourcePropertyOpt.flatMap(p => Option(getClass.getResource(p))).map(_.toURI),
-        () => nonBlankString(store, CacheSupport.uriPropertyName)(properties).map { case (_, p) => URI.create(p) },
-        () => Some(provider.getDefaultURI)
-      )
+      def fromUri: Option[URI] =
+        nonBlankString(store, CacheSupport.uriPropertyName(_, ProviderName))(properties)
+          .map { case (_, p) => URI.create(p) }
 
-      def tryCreateCacheManager(uri: URI): Try[CacheManager] =
-        Try(provider.getCacheManager(uri, getClass.getClassLoader, System.getProperties))
-          .onFailure(t => CacheSupport.Logger.error(s"failed to create `CacheManager`: ${t.getMessage}"))
+      val configUri =
+        fromResource.orElse(fromUri).getOrElse(provider.getDefaultURI)
 
-      functions
-        .flatMap(_.apply().map(uri => uri -> tryCreateCacheManager(uri)))
-        .collectFirst { case (uri, Success(cacheManager)) => uri -> cacheManager }
-        .get
-        .tap(t => debug(s"initialized JCache cache manager with URI `${t._1}`"))
-        ._2
+      provider.getCacheManager(configUri, getClass.getClassLoader)
+        .tap(_ => debug(s"initialized JCache cache manager with URI `$configUri`"))
     } catch {
       case t: Throwable => // don't use `NonFatal()` here as we want to catch all for example `NoClassDefFoundError`
         Try(PropertyLoader.getPropertyStore(None).globalPropertySet)

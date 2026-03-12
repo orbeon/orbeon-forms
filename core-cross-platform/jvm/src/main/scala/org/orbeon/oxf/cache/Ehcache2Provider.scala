@@ -26,6 +26,8 @@ import scala.util.control.NonFatal
 @deprecated("Use JCacheProvider instead", ";Orbeon Forms 2025.1")
 object Ehcache2Provider extends CacheProviderApi {
 
+  val ProviderName: String = "ehcache2"
+
   import CacheSupport.Logger.*
   import Private.*
 

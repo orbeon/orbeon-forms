@@ -26,9 +26,14 @@ object XFormsStaticStateCache {
     def staticStateStatus(read: Boolean, found: Boolean, digest: String): Unit
   }
 
-  def storeDocument(staticState: XFormsStaticState): Unit =
+  def storeDocument(staticState: XFormsStaticState): Unit = {
+
+//    pprint.pprintln("xxx staticState footprint")
+//    pprint.pprintln(org.openjdk.jol.info.GraphLayout.parseInstance(staticState).toFootprint)
+
     if (! (staticState.singleUseStaticState && staticState.isInlineResources)) // https://github.com/orbeon/orbeon-forms/issues/1730
       cache.add(createCacheKey(staticState.digest), System.currentTimeMillis, staticState)
+  }
 
   def findDocument(digest: String): Option[(XFormsStaticState, Long)] =
     cache.findValidWithValidity(createCacheKey(digest), ConstantValidity) map { case (o, validity) =>

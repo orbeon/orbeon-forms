@@ -220,6 +220,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
                       )
                     )
                   cacheTracer.staticStateStatus(read = true, found = false, staticState.digest)
+
                   XFormsStaticStateCache.storeDocument(staticState)
                   staticState
               }

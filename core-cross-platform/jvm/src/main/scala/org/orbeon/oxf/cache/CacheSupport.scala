@@ -7,6 +7,7 @@ import java.io
 
 
 trait CacheProviderApi {
+  val ProviderName: String
   def get(cacheName: String): Option[CacheApi]
   def close(): Unit
 }
@@ -32,9 +33,9 @@ object CacheSupport {
   private def propertyPrefix (store: Boolean) = s"oxf.xforms.${if (store) "store" else "cache"}"
 
   private[cache] def providerPropertyName   (store: Boolean) = s"${propertyPrefix(store)}.provider"
-  private[cache] def classnameRePropertyName(store: Boolean) = s"${propertyPrefix(store)}.jcache.classname"
-  private[cache] def resourcePropertyName   (store: Boolean) = s"${propertyPrefix(store)}.jcache.resource"
-  private[cache] def uriPropertyName        (store: Boolean) = s"${propertyPrefix(store)}.jcache.uri"
+  private[cache] def classnameRePropertyName(store: Boolean, provider: String) = s"${propertyPrefix(store)}.$provider.classname"
+  private[cache] def resourcePropertyName   (store: Boolean, provider: String) = s"${propertyPrefix(store)}.$provider.resource"
+  private[cache] def uriPropertyName        (store: Boolean, provider: String) = s"${propertyPrefix(store)}.$provider.uri"
 
   private[cache] def nonBlankString(store: Boolean, name: Boolean => String)(properties: PropertySet): Option[(String, String)] =
     (if (store) properties.getNonBlankString(name = name(true)).map(name(true) -> _) else None)
@@ -42,9 +43,9 @@ object CacheSupport {
 
   private val AllPropertyNames = List(
     providerPropertyName   (store = false), providerPropertyName   (store = true),
-    resourcePropertyName   (store = false), resourcePropertyName   (store = true),
-    uriPropertyName        (store = false), uriPropertyName        (store = true),
-    classnameRePropertyName(store = false), classnameRePropertyName(store = true),
+    resourcePropertyName   (store = false, "jcache"), resourcePropertyName   (store = true, "jcache"),
+    uriPropertyName        (store = false, "jcache"), uriPropertyName        (store = true, "jcache"),
+    classnameRePropertyName(store = false, "jcache"), classnameRePropertyName(store = true, "jcache"),
   )
 
   private[cache]
@@ -60,7 +61,7 @@ object CacheSupport {
 
   private def loadProvider(store: Boolean, propertySet: PropertySet): CacheProviderApi =
     nonBlankString(store, providerPropertyName)(propertySet) match {
-      case None | Some((_, "infinispan")) => InfinispanProvider
+      case None | Some((_, "infinispan")) => new InfinispanProvider(store)
       case        Some((_, "jcache"))     => new JCacheProvider(store)
       case        Some((_, "ehcache2"))   => Ehcache2Provider
       case        Some((name, other))     => throw new IllegalArgumentException(s"invalid value for `$name`: `$other` (must be one of `ehcache2`, `jcache`, or `infinispan`)")

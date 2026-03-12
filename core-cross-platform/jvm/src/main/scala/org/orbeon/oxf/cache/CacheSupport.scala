@@ -58,14 +58,13 @@ object CacheSupport {
     }
   }
 
-  private def loadProvider(store: Boolean, propertySet: PropertySet): CacheProviderApi = {
+  private def loadProvider(store: Boolean, propertySet: PropertySet): CacheProviderApi =
     nonBlankString(store, providerPropertyName)(propertySet) match {
       case None | Some((_, "infinispan")) => InfinispanProvider
       case        Some((_, "jcache"))     => new JCacheProvider(store)
       case        Some((_, "ehcache2"))   => Ehcache2Provider
       case        Some((name, other))     => throw new IllegalArgumentException(s"invalid value for `$name`: `$other` (must be one of `ehcache2`, `jcache`, or `infinispan`)")
     }
-  }
 
   // We thought about implementing provider deduplication, but it's unneeded: `Eh2CacheSupport` and `InfinispanProvider`
   // are `object`s, and so we get the same reference anyway. `JCacheSupport` is a class, but it finds a JCache provider

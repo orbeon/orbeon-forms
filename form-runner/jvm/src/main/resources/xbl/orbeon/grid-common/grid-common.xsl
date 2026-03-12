@@ -131,9 +131,10 @@
     </xsl:function>
 
     <xsl:function name="fr:th-td-tr-classes-attr">
-        <xsl:param name="th-td-tr"  as="xs:string"/> <!-- 'th' | 'td' | 'tr' -->
-        <xsl:param name="use-class" as="xs:boolean"/>
-        <xsl:param name="id"        as="xs:string?"/>
+        <xsl:param name="th-td-tr"       as="xs:string"/>   <!-- 'th' | 'td' | 'tr' -->
+        <xsl:param name="use-class"      as="xs:boolean"/>
+        <xsl:param name="id"             as="xs:string?"/>
+        <xsl:param name="static-row-pos" as="xs:integer?"/> <!-- Passed only for the 'td' case -->
         <xsl:attribute
             name="class"
             select="
@@ -143,7 +144,7 @@
                     concat('{''fb-selected''[xxf:get-variable(''fr-form-model'', ''selected-cell'') = ''', $id, ''']}'),
                     'xforms-activable'
                 )[$is-editable and $th-td-tr = 'td'], (: for cell selection :)
-                '{''fr-grid-empty-row''[$fr-empty-row]}'[$use-css-grids-output and $th-td-tr = 'td']
+                concat('{''fr-grid-empty-row''[$fr-empty-row-', $static-row-pos, ']}')[$use-css-grids-output and $th-td-tr = 'td']
             "/>
     </xsl:function>
 
@@ -269,7 +270,7 @@
 
                         <!-- Attributes -->
                         <xsl:attribute name="xxf:control">true</xsl:attribute><!-- for cell selection -->
-                        <xsl:copy-of select="fr:th-td-tr-classes-attr('td', exists($c/@class), $c/@id)"/>
+                        <xsl:copy-of select="fr:th-td-tr-classes-attr('td', exists($c/@class), $c/@id, $static-row-pos)"/>
 
                         <xsl:if test="$h > 1"><xsl:attribute name="{fr:rowspan-attribute()}" select="$h"/></xsl:if>
                         <xsl:if test="$w > 1"><xsl:attribute name="{fr:colspan-attribute()}" select="$w"/></xsl:if>
@@ -326,7 +327,7 @@
 
                         <xsl:choose>
                             <xsl:when test="exists($tr)">
-                                <xsl:copy-of select="fr:th-td-tr-classes-attr('tr', exists($tr/@class), ())"/>
+                                <xsl:copy-of select="fr:th-td-tr-classes-attr('tr', exists($tr/@class), (), ())"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:attribute name="class">fr-grid-tr</xsl:attribute>
@@ -344,7 +345,7 @@
                 </xsl:when>
                 <xsl:otherwise>
                     <!-- CSS grids output -->
-                    <xf:var name="fr-empty-row">
+                    <xf:var name="fr-empty-row-{$static-row-pos}">
                         <xxf:value xxbl:scope="outer" value="{$empty-row-xpath}"/>
                     </xf:var>
                     <xsl:copy-of select="$cells-content"/>

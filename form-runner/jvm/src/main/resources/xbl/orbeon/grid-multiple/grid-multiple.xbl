@@ -358,7 +358,7 @@
                                         <xsl:copy-of select="fr:scope-outer-avt-class(($c/@class, $align-class-opt))"/>
                                         <xsl:element name="{$th-elem}">
 
-                                            <xsl:copy-of select="fr:th-td-tr-classes-attr('th', exists(($c/@class, $align-class-opt)), $c/@id)"/>
+                                            <xsl:copy-of select="fr:th-td-tr-classes-attr('th', exists(($c/@class, $align-class-opt)), $c/@id, ())"/>
 
                                             <xsl:if test="$w gt 1">
                                                 <xsl:attribute name="{fr:colspan-attribute()}" select="$w"/>

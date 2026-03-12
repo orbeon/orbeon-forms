@@ -45,7 +45,7 @@ import java.time.temporal.ChronoUnit
 // probably do this in-memory, but at the time it's easier to write to a file and reload the properties, especially
 // since we're including (xi:include) existing test properties defined in a file.
 case class ActiveProviderResourceManagerSupport(
-  var activeProviderOpt: Option[Provider] = None,
+  activeProvider: Provider,
   applicationCounts: Int
 ) extends WithResourceManagerSupport {
 
@@ -68,38 +68,17 @@ case class ActiveProviderResourceManagerSupport(
   }
 
   override lazy val propertiesUrl: String = {
-    writePropertiesFile(reloadProperties = false)
-
-    s"oxf:/$propertiesFilename"
-  }
-
-  def setActiveProvider(provider: Provider): Unit = {
-    activeProviderOpt = provider.some
-    writePropertiesFile(reloadProperties = true)
-  }
-
-  private def writePropertiesFile(reloadProperties: Boolean): Unit = {
     Files.write(Paths.get(s"$propertiesDirectory/$propertiesFilename"), propertiesAsString().getBytes)
-
-    if (reloadProperties) {
-      // Force reload of properties
-      org.orbeon.oxf.properties.Properties.initialize(propertiesUrl)
-    }
+    s"oxf:/$propertiesFilename"
   }
 
   private def propertiesAsString(): String = {
 
     // Application name to provider mapping
     val providerSpecificApplicationsProperties =
-      activeProviderOpt match {
-        case Some(activeProvider) =>
-          applicationNames.map { applicationName =>
-            s"""<property as="xs:string" name="oxf.fr.persistence.provider.$applicationName.*.*" value="${activeProvider.entryName}"/>"""
-          }.mkString("\n")
-
-        case None =>
-          ""
-      }
+      applicationNames.map { applicationName =>
+        s"""<property as="xs:string" name="oxf.fr.persistence.provider.$applicationName.*.*" value="${activeProvider.entryName}"/>"""
+      }.mkString("\n")
 
     // TODO: We should list all possible providers from property files here instead of hardcoding them, but this is
     //       made complicated by the fact that the properties are global and we're currently initializing test
@@ -111,7 +90,7 @@ case class ActiveProviderResourceManagerSupport(
 
     // Active and inactive providers (we test one provider at a time)
     val activeProvidersProperties = providersToMakeInactive.map { providerEntryName =>
-      val active = activeProviderOpt.map(_.entryName).forall(_ == providerEntryName)
+      val active = providerEntryName == activeProvider.entryName
       s"""<property as="xs:boolean" name="oxf.fr.persistence.$providerEntryName.active" value="$active"/>"""
     }.mkString("\n")
 
@@ -127,10 +106,7 @@ case class ActiveProviderResourceManagerSupport(
   }
 
   def applicationNames: Seq[String] =
-    for {
-      activeProvider <- activeProviderOpt.toSeq
-      index          <- 1 to applicationCounts
-    } yield s"${activeProvider.entryName}-$index"
+    (1 to applicationCounts).map(index => s"${activeProvider.entryName}-$index")
 }
 
 /*
@@ -150,9 +126,6 @@ class FormMetadataApiTest
   // Number of application names that will be generated and associated with the active provider
   private val applicationCounts = 4
 
-  override def resourceManagerSupportInitializer: ActiveProviderResourceManagerSupport =
-    ActiveProviderResourceManagerSupport(applicationCounts = applicationCounts)
-
   private implicit val Logger: IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(classOf[SearchTest]), true)
 
   val FormMetadataPostApiURL = "form"
@@ -161,7 +134,15 @@ class FormMetadataApiTest
     withTestExternalContext { implicit externalContext =>
       Connect.withOrbeonTables("form definition") { (connection, provider) =>
 
-        resourceManagerSupportInitializer.setActiveProvider(provider)
+        // TODO: We should find a way to have dynamic in-memory properties for tests. Here we write an actual XML file
+        //  which includes the default properties (oxf:/ops/unit-tests/properties.xml) and override them with new
+        //  properties. We had a bug (#7547) where we wrote different properties to the same file and then read the
+        //  properties in less than 50 ms, which led to the wrong properties being read, because of how ExpirationMap
+        //  and ObjectCache work. This approach works here because we usually only have one value for activeProvider
+        //  per JVM/sbt run. And up to this point, ResourceManagerSupportInitializer is "active", pointing to the
+        //  default oxf:/ops/unit-tests/properties.xml properties.
+        ActiveProviderResourceManagerSupport(activeProvider = provider, applicationCounts = applicationCounts)
+
         test(provider)(externalContext)
       }
     }

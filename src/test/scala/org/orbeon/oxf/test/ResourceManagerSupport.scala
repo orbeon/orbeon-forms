@@ -26,9 +26,7 @@ object ResourceManagerSupportInitializer extends WithResourceManagerSupport {
 
 trait ResourceManagerSupport extends Suite with BeforeAndAfter {
 
-  def resourceManagerSupportInitializer: WithResourceManagerSupport = ResourceManagerSupportInitializer
-
-  protected val _resourceManagerSupportInitializer: WithResourceManagerSupport = resourceManagerSupportInitializer
+  ResourceManagerSupportInitializer
 
   locally {
     var pipelineContext: Option[PipelineContext] = None

@@ -1398,18 +1398,6 @@
 
     </xsl:template>
 
-    <!-- Optional standard explanation message for view mode -->
-    <!-- TODO: is this still used? -->
-    <xsl:template name="fr-explanation">
-        <xf:group
-                xxf:element="div"
-                model="fr-form-model"
-                ref=".[$fr-mode = 'view' and xxf:property(string-join(('oxf.fr.detail.view.show-explanation', fr:app-name(), fr:form-name()), '.')) = true()]"
-                class="fr-explanation">
-            <xf:output value="$fr-resources/detail/view/explanation"/>
-        </xf:group>
-    </xsl:template>
-
     <xsl:template match="fr:status-icons" name="fr-status-icons">
         <!-- Status icons for detail page -->
 

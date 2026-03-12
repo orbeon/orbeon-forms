@@ -99,10 +99,8 @@ trait HttpServletRequest extends ServletRequest {
   def headersAsStringForDebug: String =
     Headers
       .sanitizeHeadersForDebug(headerNamesWithValues.view.map(kv => kv._1 -> kv._2.toList))
-      .flatMap { case (headerName, headerValues) =>
-        headerValues.toList.map { value =>
-          s"$headerName: $value"
-        }
+      .map { case (headerName, headerValues) =>
+        s"$headerName: $headerValues"
       }
       .mkString("\n")
 

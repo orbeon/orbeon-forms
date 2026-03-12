@@ -621,7 +621,15 @@
                     <xsl:choose>
                         <xsl:when test="exists($iterate-control-name-var)">
                             <xsl:copy-of select="$iterate-control-name-var"/>
-                            <xf:action iterate="frf:findRepeatedControlsForTarget(event('action-source'), event('xxf:absolute-targetid'))[1], $iterate-control-name)">
+                            <xf:action
+                                iterate="
+                                    frf:findRepeatedControlsForTarget(
+                                        (
+                                            event('action-source'),
+                                            event('xxf:absolute-targetid')
+                                        )[1],
+                                        $iterate-control-name
+                                    )">
                                 <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-source', string(.))</xf:action>
                             </xf:action>
                         </xsl:when>

@@ -598,7 +598,15 @@
                     <xsl:if test="exists($action/@if)">
                         <xsl:attribute
                             name="if"
-                            select="frf:replaceVarReferencesWithFunctionCallsForAction($action/@if, $action/@if, false(), $library-name, $fr-form-model-vars)"/>
+                            select="
+                                frf:replaceVarReferencesWithFunctionCallsForAction(
+                                    $action/@if,
+                                    $action/@if,
+                                    false(),
+                                    $library-name,
+                                    $fr-form-model-vars,
+                                    '(event(''action-source''), event(''xxf:absolute-targetid''))[1]'
+                                )"/>
                     </xsl:if>
 
                     <!-- Create action id compatible with `actions-20182.xsl` -->
@@ -685,7 +693,8 @@
                                                             *:var[@name = 'source-path']/@value,
                                                             false(),
                                                             $library-name,
-                                                            $fr-form-model-vars
+                                                            $fr-form-model-vars,
+                                                            ()
                                                         )
                                                     }"/>
                                             </xsl:when>
@@ -781,7 +790,7 @@
                                         <xsl:for-each select="(*:variable | *:var)[@name = 'control-value']">
                                             <xf:var
                                                 name="{@name}"
-                                                value="{frf:replaceVarReferencesWithFunctionCallsForAction((@value | @select)[1], (@value | @select)[1], false(), $library-name, $fr-form-model-vars)}"/>
+                                                value="{frf:replaceVarReferencesWithFunctionCallsForAction((@value | @select)[1], (@value | @select)[1], false(), $library-name, $fr-form-model-vars, ())}"/>
                                         </xsl:for-each>
 
                                         <!-- Set values (we choose to set all targets returned) -->
@@ -832,7 +841,7 @@
                                             <xf:var
                                                 name="response-items"
                                                 context="xxf:instance('fr-service-response-instance')"
-                                                value="{frf:replaceVarReferencesWithFunctionCallsForAction($resource-items-value, $resource-items-value, false(), $library-name, $fr-form-model-vars)}"/>
+                                                value="{frf:replaceVarReferencesWithFunctionCallsForAction($resource-items-value, $resource-items-value, false(), $library-name, $fr-form-model-vars, ())}"/>
 
                                             <xf:insert
                                                 context="$new-itemset-holder"
@@ -856,12 +865,12 @@
                                                 select=".//(*:variable | *:var)[@name = ('item-hint')]/(@value | @select)[1]"/>
                                             <xf:action iterate="$response-items">
 
-                                                <xf:var name="item-label" value="{frf:replaceVarReferencesWithFunctionCallsForAction($item-label, $item-label, false(), $library-name, $fr-form-model-vars)}"/>
-                                                <xf:var name="item-value" value="{frf:replaceVarReferencesWithFunctionCallsForAction($item-value, $item-value, false(), $library-name, $fr-form-model-vars)}"/>
+                                                <xf:var name="item-label" value="{frf:replaceVarReferencesWithFunctionCallsForAction($item-label, $item-label, false(), $library-name, $fr-form-model-vars, ())}"/>
+                                                <xf:var name="item-value" value="{frf:replaceVarReferencesWithFunctionCallsForAction($item-value, $item-value, false(), $library-name, $fr-form-model-vars, ())}"/>
 
                                                 <xsl:choose>
                                                     <xsl:when test="exists($item-hint) and $item-hint != ''">
-                                                        <xf:var name="item-hint"    value="{frf:replaceVarReferencesWithFunctionCallsForAction($item-hint, $item-hint, false(), $library-name, $fr-form-model-vars)}"/>
+                                                        <xf:var name="item-hint"    value="{frf:replaceVarReferencesWithFunctionCallsForAction($item-hint, $item-hint, false(), $library-name, $fr-form-model-vars, ())}"/>
                                                         <xf:var name="element-hint" value="xf:element('hint', xs:string($item-hint))"/>
                                                     </xsl:when>
                                                     <xsl:otherwise>

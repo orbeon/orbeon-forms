@@ -134,11 +134,12 @@ trait FormRunnerComponentsCompileTime {
   // https://github.com/orbeon/orbeon-forms/issues/6837
   //@XPathFunction
   def replaceVarReferencesWithFunctionCallsForAction(
-    elemOrAtt   : NodeInfo,
-    xpathString : String,
-    avt         : Boolean,
-    libraryName : String,
-    norewrite   : Array[String]
+    elemOrAtt             : NodeInfo,
+    xpathString           : String,
+    avt                   : Boolean,
+    libraryName           : String,
+    norewrite             : Array[String],
+    actionSourceExprOrNull: String
   ): String =
     FormRunnerRename.replaceVarReferencesWithFunctionCallsForAction(
       xpathString      = xpathString,
@@ -146,7 +147,8 @@ trait FormRunnerComponentsCompileTime {
       library          = componentsFunctionLibrary,
       avt              = avt,
       libraryNameOpt   = libraryName.trimAllToOpt,
-      norewrite        = norewrite.toSet
+      norewrite        = norewrite.toSet,
+      actionSourceExpr = actionSourceExprOrNull.trimAllToOpt.getOrElse("xxf:get-document-attribute($current-action-id, 'action-source')")
     )(newIndentedLogger)
 
   // Called from XSLT only

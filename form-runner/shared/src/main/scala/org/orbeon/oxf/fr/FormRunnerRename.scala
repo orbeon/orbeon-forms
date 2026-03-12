@@ -224,7 +224,8 @@ object FormRunnerRename {
       library         : FunctionLibrary,
       avt             : Boolean,
       libraryNameOpt  : Option[String],
-      norewrite       : Set[String]
+      norewrite       : Set[String],
+      actionSourceExpr: String
     )(implicit
       logger          : IndentedLogger
     ): String = {
@@ -233,7 +234,7 @@ object FormRunnerRename {
         if (combinedNorewrite.contains(name))
           s"$$$name"
         else
-          s"frf:controlVariableValueForAction(xxf:get-document-attribute($$current-action-id, 'action-source'), '$name', ${libraryNameOpt.flatMap(_.trimAllToOpt).map("'" + _ + "'").getOrElse("()")})"
+          s"frf:controlVariableValueForAction($actionSourceExpr, '$name', ${libraryNameOpt.flatMap(_.trimAllToOpt).map("'" + _ + "'").getOrElse("()")})"
 
       replaceVarReferencesWithFunctionCallsFromString(
         xpathString,

@@ -31,8 +31,9 @@ object FormRunnerActionApi {
       namespaceMapping = namespaceMapping,
       library          = process.SimpleProcess.xpathFunctionLibrary,
       avt              = false,
-      libraryNameOpt   = None,     // TODO
-      norewrite        = Set.empty // TODO: `$fr-form-model-vars`
+      libraryNameOpt   = None,      // TODO
+      norewrite        = Set.empty, // TODO: `$fr-form-model-vars`
+      actionSourceExpr = FormRunnerRename.DefaultActionSourceExpr
     )
 
     val value =
@@ -42,7 +43,7 @@ object FormRunnerActionApi {
         mapping         = namespaceMapping,
         functionContext = xfc
       )
-    
+
     val modelAbsoluteId: String = XFormsId.effectiveIdToAbsoluteId(Names.FormModel)
 
     val selectedItems =

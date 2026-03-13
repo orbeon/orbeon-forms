@@ -217,6 +217,8 @@ object FormRunnerRename {
       )
     }
 
+  val DefaultActionSourceExpr = "xxf:get-document-attribute($current-action-id, 'action-source')"
+
     // https://github.com/orbeon/orbeon-forms/issues/6837
     def replaceVarReferencesWithFunctionCallsForAction(
       xpathString     : String,
@@ -235,6 +237,7 @@ object FormRunnerRename {
           s"$$$name"
         else
           s"frf:controlVariableValueForAction($actionSourceExpr, '$name', ${libraryNameOpt.flatMap(_.trimAllToOpt).map("'" + _ + "'").getOrElse("()")})"
+  val DefaultActionSourceExpr = "xxf:get-document-attribute($current-action-id, 'action-source')"
 
       replaceVarReferencesWithFunctionCallsFromString(
         xpathString,

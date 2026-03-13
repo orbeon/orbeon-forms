@@ -148,7 +148,7 @@ trait FormRunnerComponentsCompileTime {
       avt              = avt,
       libraryNameOpt   = libraryName.trimAllToOpt,
       norewrite        = norewrite.toSet,
-      actionSourceExpr = actionSourceExprOrNull.trimAllToOpt.getOrElse("xxf:get-document-attribute($current-action-id, 'action-source')")
+      actionSourceExpr = actionSourceExprOrNull.trimAllToOpt.getOrElse(FormRunnerRename.DefaultActionSourceExpr)
     )(newIndentedLogger)
 
   // Called from XSLT only

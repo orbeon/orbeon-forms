@@ -502,7 +502,7 @@
                                 <xf:var name="fr-search-value"/>
                                 <xf:var name="fr-search-page"/>
                                 <xf:var name="resource-attr"  ><xxf:value xxbl:scope="inner" value="instance('local')/resource-attr"/></xf:var>
-                                <xf:var name="resource"                                      value="xxf:evaluate-avt($resource-attr)">
+                                <xf:var name="resource"                                      value="if (fr:is-design-time()) then () else xxf:evaluate-avt($resource-attr)">
                                     <xf:action event="xforms-value-changed xforms-enabled">
 
                                         <!-- We don't support having an item associated with a blank value. "Blank" means that no value is selected.

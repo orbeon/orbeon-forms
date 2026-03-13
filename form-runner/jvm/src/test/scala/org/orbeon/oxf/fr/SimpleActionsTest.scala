@@ -4,6 +4,7 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport
+import org.scalatest.Assertion
 import org.scalatest.funspec.AnyFunSpecLike
 
 
@@ -101,6 +102,47 @@ class SimpleActionsTest
 
             assert(resolveObject[XFormsValueControl]("destination-control").map(_.getValue(EventCollector.Throw)).contains(testValue))
           }
+        }
+      }
+    }
+  }
+
+  describe("#7550: Service with variable in URL AVT fails") {
+
+    val (processorService, docOpt, _) =
+      runFormRunner("issue", "7550", "new", initialize = true)
+
+    val doc = docOpt.get
+
+    it("must conditionally run the action and set the result in the correct iteration") {
+      withTestExternalContext { implicit ec =>
+        withFormRunnerDocument(processorService, doc) {
+
+          def makeEffectiveServiceUrl(v: String) =
+            s"http://localhost:8080/orbeon/fr/service/custom/orbeon/echo?foo=$v"
+
+          def assertOne(index1: Int, inputValue: String, other: String): Assertion = {
+
+            val button1    = resolveObject[XFormsControl]     ("my-button-control",    indexes = List(index1)).get
+            val condition1 = resolveObject[XFormsValueControl]("my-condition-control", indexes = List(index1)).get
+            val input1     = resolveObject[XFormsValueControl]("my-value-control",     indexes = List(index1)).get
+
+            // This must not run the action
+            activateControlWithEvent(button1.effectiveId)
+            assert(resolveObject[XFormsValueControl]("out-control", indexes = List(index1)).map(_.getValue(EventCollector.Throw)).contains(""))
+
+            setControlValue(input1.effectiveId, inputValue)
+            setControlValue(condition1.effectiveId, "true")
+
+            activateControlWithEvent(button1.effectiveId)
+            // TODO: This is incorrect: the value of the control should be the one matching the iteration, not the combination of both.
+            //  See: https://github.com/orbeon/orbeon-forms/issues/7551
+            assert(resolveObject[XFormsValueControl]("out-control", indexes = List(index1))                  .map(_.getValue(EventCollector.Throw)).contains(makeEffectiveServiceUrl("bar%20baz")))
+            assert(resolveObject[XFormsValueControl]("out-control", indexes = List((index1 - 1 + 1) % 2 + 1)).map(_.getValue(EventCollector.Throw)).contains(other))
+          }
+
+          assertOne(1, "bar", "")
+          assertOne(2, "baz", makeEffectiveServiceUrl("bar%20baz"))
         }
       }
     }

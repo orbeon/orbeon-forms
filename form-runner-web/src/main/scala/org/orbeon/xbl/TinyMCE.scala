@@ -76,74 +76,69 @@ object TinyMCE {
 
     override def init(): Unit = {
 
-      val isStaticReadonly = containerElem.querySelector(".xbl-fr-tinymce-div .xforms-output-output") ne null
+      if (! baseUrlInitialized) {
+        // Tell TinyMCE about base URL, which it can't guess in combined resources
 
-      if (! isStaticReadonly) {
+        val href = containerElem.querySelector(".tinymce-base-url").getAttribute("href")
+        // Remove the magic number and extension at the end of the URL. The magic number was added to allow for
+        // URL post-processing for portlets. The extension is added so that the version number is added to the URL.
+        val baseURL = href.substring(0, href.length - "1b713b2e6d7fd45753f4b8a6270b776e.js".length)
+        GlobalTinyMce.baseURL = baseURL
 
-        if (! baseUrlInitialized) {
-          // Tell TinyMCE about base URL, which it can't guess in combined resources
-
-          val href = containerElem.querySelector(".tinymce-base-url").getAttribute("href")
-          // Remove the magic number and extension at the end of the URL. The magic number was added to allow for
-          // URL post-processing for portlets. The extension is added so that the version number is added to the URL.
-          val baseURL = href.substring(0, href.length - "1b713b2e6d7fd45753f4b8a6270b776e.js".length)
-          GlobalTinyMce.baseURL = baseURL
-
-          baseUrlInitialized = true
-        }
-
-        def fromDataAtt: Option[TinyMceConfig] =
-          containerElem.querySelectorT(".tinymce-base-url")
-            .dataset
-            .get("tinymceConfig")
-            .flatMap(_.trimAllToOpt)
-            .map(js.JSON.parse(_).asInstanceOf[TinyMceConfig])
-
-        val tinyMceConfig =
-          GlobalJsTinyMceCustomConfig
-            .orElse(fromDataAtt)
-            .getOrElse(TinyMceDefaultConfig)
-
-        // Without this, with `combine-resources` set to `false`, instead of `silver/theme.min.js`,
-        // TinyMCE tried to load `silver/theme.js`, which doesn't exist
-        tinyMceConfig.suffix      = ".min"
-
-        val tinyMceDiv = containerElem.querySelector(".xbl-fr-tinymce-div")
-        val tinyMceObject = new TinyMceEditor(tinyMceDiv.id, tinyMceConfig, GlobalTinyMce.EditorManager)
-        tinyMceObjectOpt = Some(tinyMceObject)
-
-        val isReadonly = containerElem.classList.contains("xforms-readonly")
-        xformsUpdateReadonly(isReadonly)
-
-        withInitializedTinyMce { tinyMceObject =>
-
-          // Send value to the server on blur, as well as on Ctrl+Enter or Cmd+Enter
-          tinyMceObject.on("blur", _ => clientToServer())
-          EventSupport.addListener[dom.KeyboardEvent](
-            tinyMceObject.getBody(),
-            DomEventNames.KeyDown,
-            (e: dom.KeyboardEvent) => if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) clientToServer()
-          )
-          // Remove an anchor added by TinyMCE to handle key, as it grabs the focus and breaks tabbing between fields
-          $(containerElem).find("a[accesskey]").detach()
-          tinyMceInitialized = true
-          Events.componentChangedLayoutEvent.fire()
-        }
-
-        // - Unfortunately, we need to use polling; we can't rely on an Ajax response, e.g. if in Bootstrap tab as in
-        //   the Form Builder Control Settings dialog
-        // - As `destroy()` isn't called when the component is a repeat, which is the case for the Form Builder Control
-        //   Settings dialog, we stop trying to render if we notice `containerElem` isn't in the document anymore
-        def renderIfVisible(): Unit =
-          if (document.getElementById(containerElem.id) == containerElem)
-            if ($(tinyMceDiv).is(":visible")) {
-              tinyMceObject.render()
-            } else {
-              val shortDelay = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.internalShortDelay
-              js.timers.setTimeout(shortDelay)(renderIfVisible())
-            }
-        renderIfVisible()
+        baseUrlInitialized = true
       }
+
+      def fromDataAtt: Option[TinyMceConfig] =
+        containerElem.querySelectorT(".tinymce-base-url")
+          .dataset
+          .get("tinymceConfig")
+          .flatMap(_.trimAllToOpt)
+          .map(js.JSON.parse(_).asInstanceOf[TinyMceConfig])
+
+      val tinyMceConfig =
+        GlobalJsTinyMceCustomConfig
+          .orElse(fromDataAtt)
+          .getOrElse(TinyMceDefaultConfig)
+
+      // Without this, with `combine-resources` set to `false`, instead of `silver/theme.min.js`,
+      // TinyMCE tried to load `silver/theme.js`, which doesn't exist
+      tinyMceConfig.suffix = ".min"
+
+      val tinyMceDiv = containerElem.querySelector(".xbl-fr-tinymce-div")
+      val tinyMceObject = new TinyMceEditor(tinyMceDiv.id, tinyMceConfig, GlobalTinyMce.EditorManager)
+      tinyMceObjectOpt = Some(tinyMceObject)
+
+      val isReadonly = containerElem.classList.contains("xforms-readonly")
+      xformsUpdateReadonly(isReadonly)
+
+      withInitializedTinyMce { tinyMceObject =>
+
+        // Send value to the server on blur, as well as on Ctrl+Enter or Cmd+Enter
+        tinyMceObject.on("blur", _ => clientToServer())
+        EventSupport.addListener[dom.KeyboardEvent](
+          tinyMceObject.getBody(),
+          DomEventNames.KeyDown,
+          (e: dom.KeyboardEvent) => if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) clientToServer()
+        )
+        // Remove an anchor added by TinyMCE to handle key, as it grabs the focus and breaks tabbing between fields
+        $(containerElem).find("a[accesskey]").detach()
+        tinyMceInitialized = true
+        Events.componentChangedLayoutEvent.fire()
+      }
+
+      // - Unfortunately, we need to use polling; we can't rely on an Ajax response, e.g. if in Bootstrap tab as in
+      //   the Form Builder Control Settings dialog
+      // - As `destroy()` isn't called when the component is a repeat, which is the case for the Form Builder Control
+      //   Settings dialog, we stop trying to render if we notice `containerElem` isn't in the document anymore
+      def renderIfVisible(): Unit =
+        if (document.getElementById(containerElem.id) == containerElem)
+          if ($(tinyMceDiv).is(":visible")) {
+            tinyMceObject.render()
+          } else {
+            val shortDelay = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.internalShortDelay
+            js.timers.setTimeout(shortDelay)(renderIfVisible())
+          }
+      renderIfVisible()
     }
 
     override def destroy(): Unit = {

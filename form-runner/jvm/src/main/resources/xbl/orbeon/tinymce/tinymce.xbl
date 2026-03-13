@@ -96,10 +96,6 @@
             <xbl:style src="/webjars/tinymce/6.8.6/skins/ui/oxide/skin.min.css"/>
         </xbl:resources>
         <xbl:template>
-            <xf:var
-                name="binding"
-                value="xxf:binding('fr-tinymce')"/>
-
             <!-- In portlet mode, we want the resource id to be processed into a base URL, and we use a magic value to
                  indicate that. Search for 1b713b2e6d7fd45753f4b8a6270b776e in the code for more details.
                  NOTE: Don't put '/' before 1b713b2e6d7fd45753f4b8a6270b776e because TinyMCE will automatically
@@ -116,7 +112,7 @@
                 class="tinymce-base-url xforms-hidden"/>
 
             <xh:div id="tinymce-div" class="xbl-fr-tinymce-div xbl-html-input" role="textbox">
-                <xf:output mediatype="text/html" ref="$binding"/>
+                <xf:output mediatype="text/html" ref="xxf:binding('fr-tinymce')"/>
             </xh:div>
         </xbl:template>
     </xbl:binding>

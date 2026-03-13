@@ -66,7 +66,7 @@ object DatasourceDescriptor {
     DatasourceDescriptor(
       name      = Provider.SQLite.entryName,
       driver    = driver,
-      url       = s"jdbc:sqlite:$file",
+      url       = s"jdbc:sqlite:$file?busy_timeout=60000",
       username  = "",
       password  = "",
       switchDB  = None

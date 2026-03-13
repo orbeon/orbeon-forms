@@ -57,7 +57,7 @@ trait FormRunnerSupport extends DocumentTestBase {
     val sqliteFile = java.nio.file.Files.createTempFile("orbeon-bg-sqlite-", ".sqlite")
     System.setProperty("orbeon.test.sqlite.path", sqliteFile.toAbsolutePath.toString)
     Class.forName("org.sqlite.JDBC")
-    useAndClose(DriverManager.getConnection(s"jdbc:sqlite:${sqliteFile.toAbsolutePath}")) { connection =>
+    useAndClose(DriverManager.getConnection(s"jdbc:sqlite:${sqliteFile.toAbsolutePath}?busy_timeout=60000")) { connection =>
       val stringStatements = SqlReader.read("2026.1/sqlite-2026_1.sql")
       useAndClose(connection.createStatement()) { sqlStatement =>
         stringStatements.foreach(sqlStatement.executeUpdate)

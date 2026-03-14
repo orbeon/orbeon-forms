@@ -121,9 +121,7 @@
         id="fr-tinymce-output"
         element="
             fr|tinymce[fr|static-readonly = true],
-            fr|tinymce[fr|pdf-template = true],
-            xf|textarea[mediatype = 'text/html'][fr|static-readonly = true],
-            xf|textarea[mediatype = 'text/html'][fr|pdf-template = true]"
+            fr|tinymce[fr|pdf-template = true]"
         xxbl:mode="lhha binding value"
         xxbl:label-for="output"
     >

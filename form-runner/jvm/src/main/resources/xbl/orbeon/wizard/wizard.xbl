@@ -447,6 +447,10 @@
                             <xxf:value xxbl:scope="inner" value="xs:string(fr:component-param-value('allow-url-param')) = 'true'"/>
                         </xf:var>
 
+                        <xf:var name="update-url-param">
+                            <xxf:value xxbl:scope="inner" value="xs:string(fr:component-param-value('update-url-param')) = 'true'"/>
+                        </xf:var>
+
                         <!-- NOTE: Initially, current-case-id might be empty, so default to the first relevant case id. -->
                         <xf:var
                             name="current-nav-case-id"
@@ -501,7 +505,7 @@
                             <xf:action
                                     type="javascript"
                                     event="xforms-enabled xforms-value-changed"
-                                    if="$current-page-name-with-index">
+                                    if="$current-page-name-with-index and $update-url-param">
                                 <xf:param name="pageNameWithIndex" value="$current-page-name-with-index"/>
                                 <xf:body>ORBEON.fr.private.API.updateWizardPageName(event.form, pageNameWithIndex)</xf:body>
                             </xf:action>

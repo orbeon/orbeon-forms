@@ -184,7 +184,7 @@ case class AbstractBinding(
       transformQName <- transformQNameOption
       templateRoot   <- templateRootOption
     } yield
-      Transform.createPipelineConfig(transformQName, lastModified) ->
+      Transform.createPipelineConfig(transformQName, lastModified, List("data")) ->
         AbstractBinding.createTransformDomGenerator(templateRoot, lastModified)
 
   // A transform cannot be reused, so this creates a new one when called, based on the config

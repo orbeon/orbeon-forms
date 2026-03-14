@@ -85,7 +85,7 @@ object Transform {
     }
   }
 
-  def createPipelineConfig(transformQName: QName, lastModified: Long): PipelineConfig = {
+  def createPipelineConfig(transformQName: QName, lastModified: Long, inputs: Iterable[String]): PipelineConfig = {
 
     val pipelineDoc =
       NodeConversions.elemToOrbeonDom(
@@ -94,12 +94,20 @@ object Transform {
           xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
           <p:param type="input"  name="transform"/>
-          <p:param type="input"  name="data"/>
+          {
+            inputs.map { name =>
+              <p:param type="input"  name={name}/>
+            }
+          }
           <p:param type="output" name="data"/>
 
           <p:processor name={transformQName.qualifiedName}><!-- namespace for QName might not be in scope! -->
             <p:input   name="config" href="#transform"/>
-            <p:input   name="data"   href="#data"/>
+            {
+              inputs.map { name =>
+                <p:input name={name} href={"#" + name}/>
+              }
+            }
             <p:output  name="data"   ref="data"/>
           </p:processor>
 
@@ -174,7 +182,7 @@ object Transform {
 
       // Create pipeline config
       val pipeline =
-        new PipelineProcessor(createPipelineConfig(transformQName, normalizedTransform.lastModified))
+        new PipelineProcessor(createPipelineConfig(transformQName, normalizedTransform.lastModified, inputs.map(_._1)))
 
       val nullDoc =
         NodeConversions.elemToOrbeonDom(

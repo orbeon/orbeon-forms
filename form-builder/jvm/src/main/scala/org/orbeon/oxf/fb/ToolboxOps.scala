@@ -809,14 +809,27 @@ object ToolboxOps {
         new DocumentWrapper(
           Transform.transformDocument(
             Transform.FileReadDocument("/forms/orbeon/builder/form/annotate-xcv.xsl"),
-            Some(
-              Transform.InlineReadDocument(
-                "",
-                TransformerUtils.tinyTreeToOrbeonDom(
-                  elementInfo("xcv", xcvContent map { case (xcvEntry, content) => elementInfo(xcvEntry.entryName, content) })
+            List(
+              "data" ->
+                Some(
+                  Transform.InlineReadDocument(
+                    "",
+                    TransformerUtils.tinyTreeToOrbeonDom(
+                      elementInfo("xcv", xcvContent map { case (xcvEntry, content) => elementInfo(xcvEntry.entryName, content) })
+                    ),
+                    0L
+                  )
                 ),
-                0L
-              )
+              "is-readonly-mode" ->
+                Some(
+                  Transform.InlineReadDocument(
+                    "",
+                    TransformerUtils.tinyTreeToOrbeonDom(
+                      elementInfo("is-readonly-mode", List("false"))
+                    ),
+                    0L
+                  )
+                )
             ),
             XPLConstants.UNSAFE_XSLT_PROCESSOR_QNAME
           ),

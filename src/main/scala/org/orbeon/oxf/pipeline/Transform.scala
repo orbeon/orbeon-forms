@@ -51,12 +51,13 @@ object Transform {
   // Transform a document
   def transformDocument(
     transform      : ReadDocument,
-    data           : Option[ReadDocument],
-    transformQName : QName)(implicit
+    inputs         : Iterable[(String, Option[ReadDocument])],
+    transformQName : QName
+  )(implicit
     logger         : IndentedLogger
   ): Document = {
 
-    val (pipeline, domSerializerData) = createTransformPipeline(transform, data, transformQName)
+    val (pipeline, domSerializerData) = createTransformPipeline(transform, inputs, transformQName)
 
     // Run the transformation
     withNewPipelineContext("Transform.transformDocument()") { newPipelineContext =>
@@ -172,13 +173,17 @@ object Transform {
     // Create a transformation pipeline
     def createTransformPipeline(
       transform      : ReadDocument,
-      dataOpt        : Option[ReadDocument],
-      transformQName : QName)(implicit
+      inputs         : Iterable[(String, Option[ReadDocument])],
+      transformQName : QName
+    )(implicit
       logger         : IndentedLogger
     ): (PipelineProcessor, DOMSerializer) = {
 
       val normalizedTransform = normalizeReadDocument(transform)
-      val normalizedDataOpt   = dataOpt map normalizeReadDocument
+      val normalizedInputs    = inputs.map {
+        case (name, Some(doc)) => (name, Some(normalizeReadDocument(doc)))
+        case (name, None)      => (name, None)
+      }
 
       // Create pipeline config
       val pipeline =
@@ -189,22 +194,28 @@ object Transform {
           <null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         )
 
-      // Create transform generator
-      val domGeneratorTransform =
+      // Connect pipeline
+      normalizedInputs.foreach { case (name, normalizedDataOpt) =>
+        PipelineUtils.connect(
+          createDomGenerator(
+            normalizedDataOpt getOrElse InlineReadDocument("", nullDoc, normalizedTransform.lastModified),
+            s"transform-input-$name"
+          ),
+          "data",
+          pipeline,
+          name
+        )
+      }
+
+      PipelineUtils.connect(
         createDomGenerator(
           normalizedTransform,
           "transform-config"
-        )
-
-      val domGeneratorData =
-        createDomGenerator(
-          normalizedDataOpt getOrElse InlineReadDocument("", nullDoc, normalizedTransform.lastModified),
-          "transform-data"
-        )
-
-      // Connect pipeline
-      PipelineUtils.connect(domGeneratorTransform, "data", pipeline, "transform")
-      PipelineUtils.connect(domGeneratorData,      "data", pipeline, "data")
+        ),
+        "data",
+        pipeline,
+        "transform"
+      )
 
       // Connect a DOM serializer to the processor data output
       val domSerializerData = new DOMSerializer

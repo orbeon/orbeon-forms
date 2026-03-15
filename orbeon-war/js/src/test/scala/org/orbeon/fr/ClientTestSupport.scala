@@ -119,15 +119,21 @@ trait ClientTestSupport {
       await(body)
     }
 
-  def withFormReady[T](app: String, form: String)(body: FormRunnerWindow => Future[T]): Future[T] =
+  def withFormReady[T](
+    app            : String,
+    form           : String,
+    queryStringOpt : Option[String] = None)(
+    body           : FormRunnerWindow => Future[T]
+  ): Future[T] =
     withFormRunnerSession {
       async {
 
         val sessionCookie = await(waitForServerCookie(None, OrbeonServerUrl))
         assert(sessionCookie.isSuccess)
 
+        val path = s"/fr/$app/$form/new" + queryStringOpt.map(qs => s"?$qs").getOrElse("")
         val domWindow =
-          await(loadDocumentViaJSDOM(s"/fr/$app/$form/new", OrbeonServerUrl, sessionCookie.toOption))
+          await(loadDocumentViaJSDOM(path, OrbeonServerUrl, sessionCookie.toOption))
 
         val window = FormRunnerWindow(domWindow)
 

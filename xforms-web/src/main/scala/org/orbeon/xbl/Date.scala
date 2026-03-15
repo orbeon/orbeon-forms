@@ -276,11 +276,12 @@ object Date {
           }
         )
 
-        // When the focus leaves the input going to the date picker, we stop propagation, so our generic code doesn't take this as
-        // the field losing the focus, which might prematurely show the field as invalid, before users got a chance to select a value
-        // in the date picker
+        // When the focus leaves the input going to the date picker or the add-on icon, we stop propagation, so our
+        // generic code doesn't take this as the field losing the focus, which might prematurely show the field as
+        // invalid, before users got a chance to select a value in the date picker
         val inputElement = containerElem.querySelector("input")
         Support.stopFocusOutPropagationUseEventListenerSupport(inputElement, _.relatedTarget, "datepicker-dropdown", EventSupport)
+        Support.stopFocusOutPropagationUseEventListenerSupport(inputElement, _.relatedTarget, "add-on",              EventSupport)
 
         // Set date value
         dateExternalValue.foreach { case DateExternalValue(value, _, _, _) =>

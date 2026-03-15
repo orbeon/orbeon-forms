@@ -14,7 +14,8 @@ class AllClientTest
   with FormRunnerApiTests
   with DynamicDropdownTests
   with NumberControlTests
-  with AttachmentTests {
+  with AttachmentTests
+  with DateTimeTests {
 
   val ServerExternalPort = 8888
   val OrbeonServerUrl    = s"http://localhost:$ServerExternalPort/orbeon"

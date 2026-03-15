@@ -187,7 +187,7 @@ object Transform {
 
       // Create pipeline config
       val pipeline =
-        new PipelineProcessor(createPipelineConfig(transformQName, normalizedTransform.lastModified, inputs.map(_._1)))
+        new PipelineProcessor(createPipelineConfig(transformQName, normalizedTransform.lastModified, List("data")))
 
       val nullDoc =
         NodeConversions.elemToOrbeonDom(

@@ -1168,15 +1168,11 @@
                 <xf:bind
                     ref="$i/fr-index/@enabled"
                     type="xs:boolean"
-                    readonly="
-                        not($selected-values = 'fr-persist') or
-                        $selected-values = ('fr-encrypt', 'fr-summary-show', 'fr-allow-bulk-edit', 'fr-default-sort-column')"/>
+                    readonly="$selected-values = ('fr-encrypt', 'fr-summary-show', 'fr-allow-bulk-edit', 'fr-default-sort-column')"/>
                 <xf:bind
                     ref="$i/fr-summary-show | $i/fr-allow-bulk-edit"
                     name="summary-setting"
-                    readonly="
-                        not($selected-values = 'fr-persist') or
-                        $selected-values = 'fr-encrypt'">
+                    readonly="$selected-values = 'fr-encrypt'">
                     <xf:bind
                         ref="@enabled"
                         type="xs:boolean"
@@ -1218,7 +1214,6 @@
                     ref="$i/fr-encrypt/@enabled"
                     type="xs:boolean"
                     readonly="
-                        not($selected-values = 'fr-persist') or
                         not(data(.)) and (: Don't disable 'Encrypt data at rest' if checked, for backward compatibility :)
                         $selected-values = 'fr-index'"/>
 
@@ -1381,6 +1376,9 @@
                                                                             under the `fr-index` checkbox, which makes it clear to the user what is
                                                                             happening.
                                                                         -->
+                                                                        <xf:action event="xforms-select" if="not($current-value = 'fr-persist')">
+                                                                            <xf:setvalue ref="$i/fr-persist/@enabled" value="true()"/>
+                                                                        </xf:action>
                                                                         <xf:action event="xforms-select" if="$fr-index-sub-values">
                                                                             <xf:setvalue ref="$i/fr-index/@enabled" value="true()"/>
                                                                         </xf:action>
@@ -1436,6 +1434,9 @@
                                                                         <xh:div>
                                                                             <fr:checkbox-input ref="$base-binding/@role-required">
                                                                                 <xf:label ref="$resources/dialog-control-settings/role/restrict"/>
+                                                                                <xf:action event="xforms-select" if="not($current-value = 'fr-persist')">
+                                                                                    <xf:setvalue ref="$i/fr-persist/@enabled" value="true()"/>
+                                                                                </xf:action>
                                                                                 <xf:action event="xforms-select">
                                                                                     <xf:insert
                                                                                         if="count($base-binding/require-role) = 0"

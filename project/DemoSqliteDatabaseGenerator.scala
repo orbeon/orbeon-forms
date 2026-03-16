@@ -8,6 +8,8 @@ object DemoSqliteDatabaseGenerator extends CachedGenerator {
 
   override val cachePath: String = "sqlite-cache"
 
+  override val generateOnlyWhenPackaging: Boolean = false
+
   override val runnerProject: ProjectReference = LocalProject("demoSqliteDatabase")
 
   override def inputFiles(generatorContext: GeneratorContext): Set[File] =

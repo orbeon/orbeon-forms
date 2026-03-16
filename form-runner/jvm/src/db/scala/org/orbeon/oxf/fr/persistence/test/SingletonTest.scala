@@ -81,6 +81,26 @@ class SingletonTest
     }
   }
 
+  describe("Singleton forms with drafts") {
+    it("PUT data should succeed for singleton form even if a draft exists") {
+      withTestSafeRequestContext { implicit safeRequestCtx =>
+        Connect.withOrbeonTables("singleton with draft") { (_, provider) =>
+          val formName = "singleton-with-draft"
+          createSingletonForm(provider, isSingleton = true, formName)
+          val prefix   = HttpCall.crudURLPrefix(provider, formName)
+          val draftURL = prefix + "draft/1/data.xml"
+          val dataURL  = prefix + "data/1/data.xml"
+          val formData = HttpCall.XML(<form/>.toDocument)
+
+          // Simulate autosave: create a draft first
+          HttpAssert.put(draftURL, Specific(1), formData, StatusCode.Created)
+          // Then save the actual data — this should succeed, not 409
+          HttpAssert.put(dataURL, Specific(1), formData, StatusCode.Created)
+        }
+      }
+    }
+  }
+
   describe("Singleton: concurrent attempts to create new form data") {
     it("must only create a single row in the database for each form") {
       withTestSafeRequestContext { implicit safeRequestCtx =>

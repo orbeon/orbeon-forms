@@ -429,7 +429,7 @@ trait CreateUpdateDelete {
                 pageSize            = 1,
                 pageNumber          = 1,
                 queries             = Nil,
-                drafts              = Drafts.IncludeDrafts,
+                drafts              = Drafts.ExcludeDrafts,
                 freeTextSearch      = None,
                 anyOfOperations     = None
               ),

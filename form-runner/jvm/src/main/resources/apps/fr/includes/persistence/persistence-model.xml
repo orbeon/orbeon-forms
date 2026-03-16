@@ -118,15 +118,25 @@
                 <!-- Is there any data for this form that the user can edit? -->
                 <xf:setvalue context="instance('fr-search-request')/drafts" value="'include'"/>
                 <xf:send submission="fr-search-submission"/>
-                <xf:var name="existing-docs" value="instance('fr-search-response')/document"/>
+                <xf:var name="existing-non-draft-docs" value="instance('fr-search-response')/document[@draft = 'false']"/>
+                <xf:var name="existing-draft-docs"     value="instance('fr-search-response')/document[@draft = 'true']"/>
 
-                <xf:action if="count($existing-docs) = 1">
-                    <xf:load resource="edit/{$existing-docs/@name}"/>
+                <xf:action if="count($existing-non-draft-docs) = 1">
+                    <xf:load resource="edit/{$existing-non-draft-docs/@name}"/>
                 </xf:action>
-                <xf:action if="count($existing-docs) > 1">
+                <xf:action if="count($existing-non-draft-docs) > 1">
                     <xf:setvalue
                         ref="instance('fr-persistence-instance')/found-document-message-to-show"
                         value="'found-multiple-docs-for-singleton'"/>
+                </xf:action>
+
+                <!-- Drafts exist: prompt like non-singleton forms -->
+                <xf:action if="count($existing-non-draft-docs) = 0">
+                    <xf:setvalue
+                        ref="instance('fr-persistence-instance')/found-document-message-to-show"
+                        value="if (count($existing-draft-docs) = 1)
+                               then 'found-draft-for-never-saved'
+                               else 'found-drafts-for-never-saved'"/>
                 </xf:action>
 
             </xf:action>

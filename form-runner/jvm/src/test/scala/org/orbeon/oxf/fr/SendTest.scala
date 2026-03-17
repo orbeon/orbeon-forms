@@ -59,10 +59,12 @@ class SendTest
               </grid-1>
             </section-1>
           </form>,
-        (DataFormatVersion.Edge, false, true) ->
+        (DataFormatVersion.V20191, false, true) ->
           <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="2019.1.0">
             <section-1>
-              <control-1.1/>
+              <grid-3>
+                <control-1.1/>
+              </grid-3>
               <grid-1>
                 <grid-1-iteration>
                   <control-1.2/>
@@ -70,7 +72,9 @@ class SendTest
               </grid-1>
             </section-1>
             <section-2>
-              <control-2.1/>
+              <grid-4>
+                <control-2.1/>
+              </grid-4>
               <grid-2>
                 <grid-2-iteration>
                   <control-2.2/>
@@ -78,10 +82,12 @@ class SendTest
               </grid-2>
             </section-2>
           </form>,
-        (DataFormatVersion.Edge, true, true) ->
+        (DataFormatVersion.V20191, true, true) ->
           <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="2019.1.0">
             <section-1>
-              <control-1.1/>
+              <grid-3>
+                <control-1.1/>
+              </grid-3>
               <grid-1>
                 <grid-1-iteration>
                   <control-1.2/>
@@ -115,10 +121,12 @@ class SendTest
             </section-1>
             <fr:metadata/>
           </form>,
-        (DataFormatVersion.Edge, false, false) ->
+        (DataFormatVersion.V20191, false, false) ->
           <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="2019.1.0">
             <section-1>
-              <control-1.1 fr:foo="42"/>
+              <grid-3>
+                <control-1.1 fr:foo="42"/>
+              </grid-3>
               <grid-1>
                 <grid-1-iteration>
                   <control-1.2 fr:foo="43"/>
@@ -126,7 +134,9 @@ class SendTest
               </grid-1>
             </section-1>
             <section-2>
-              <control-2.1 fr:foo="44"/>
+              <grid-4>
+                <control-2.1 fr:foo="44"/>
+              </grid-4>
               <grid-2>
                 <grid-2-iteration>
                   <control-2.2 fr:foo="45"/>
@@ -135,10 +145,12 @@ class SendTest
             </section-2>
             <fr:metadata/>
           </form>,
-        (DataFormatVersion.Edge, true, false) ->
+        (DataFormatVersion.V20191, true, false) ->
           <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="2019.1.0">
             <section-1>
-              <control-1.1 fr:foo="42"/>
+              <grid-3>
+                <control-1.1 fr:foo="42"/>
+              </grid-3>
               <grid-1>
                 <grid-1-iteration>
                   <control-1.2 fr:foo="43"/>
@@ -194,7 +206,7 @@ class SendTest
               <label>Section 1</label>
             </resources>
           </control>
-          <control for="88fe6ff0c038201b4d08bf8ce74314b6ce44d4f1" name="control-1.1" type="input">
+          <control for="d210e0f1334f9a144ff8979ec79987f914f50170" name="control-1.1" type="input">
             <resources lang="en">
               <label>Control 1.1</label>
               <hint/>
@@ -267,7 +279,9 @@ class SendTest
           // 2026-03-16: TODO: This is incorrect, as `"grid-3` should not be present.
           val expectedFormatted = """{
             "section-1": {
-              "control-1.1": "",
+              "grid-3": {
+                "control-1.1": ""
+              },
               "grid-1": [
                 {
                   "control-1.2": ""
@@ -275,7 +289,9 @@ class SendTest
               ]
             },
             "section-2": {
-              "control-2.1": "",
+              "grid-4": {
+                "control-2.1": ""
+              },
               "grid-2": [
                 {
                   "control-2.2": ""

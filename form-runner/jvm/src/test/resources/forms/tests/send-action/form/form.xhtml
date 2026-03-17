@@ -14,6 +14,7 @@
                     <section-1>
                         <grid-3>
                             <control-1.1 fr:foo="42"/>
+                            <my-explanation/>
                         </grid-3>
 
                         <grid-1>
@@ -42,6 +43,7 @@
                 <xf:bind id="section-1-bind" name="section-1" ref="section-1">
                     <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
                         <xf:bind id="control-1.1-bind" name="control-1.1" ref="control-1.1" xxf:whitespace="trim"/>
+                        <xf:bind id="my-explanation-bind" ref="my-explanation" name="my-explanation" fr:persist="false()"/>
                     </xf:bind>
 
                     <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
@@ -83,7 +85,7 @@
                     <updated-with-version>2026.1-SNAPSHOT PE</updated-with-version>
                     <migration version="4.8.0">[{ "path": "section-1/grid-1", "iteration-name": "grid-1-iteration" },{ "path": "section-2/grid-2", "iteration-name": "grid-2-iteration" }]</migration>
                     <migration version="2019.1.0">
-                        {"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"control-1.1"}],"topLevel":true},{"containerPath":[{"value":"section-2"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"control-2.1"}],"topLevel":true}]}
+                        {"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"control-1.1"},{"value":"my-explanation"}],"topLevel":true},{"containerPath":[{"value":"section-2"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"control-2.1"}],"topLevel":true}]}
                     </migration>
                 </metadata>
             </xf:instance>
@@ -123,6 +125,9 @@
                             <label>Control 1.1</label>
                             <hint/>
                         </control-1.1>
+                        <my-explanation>
+                            <text>&lt;div&gt;Explanation&lt;/div&gt;</text>
+                        </my-explanation>
                     </resource>
                 </resources>
             </xf:instance>
@@ -160,7 +165,12 @@
 
                             </xf:input>
                         </fr:c>
-                        <fr:c y="1" x="7" w="6"/>
+                        <fr:c y="1" x="7" w="6">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="my-explanation-control" bind="my-explanation-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:text ref="$form-resources/my-explanation/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
                     </fr:grid>
                     <fr:grid id="grid-1-control" bind="grid-1-bind" repeat="content" min="1" template="instance('grid-1-template')" apply-defaults="true" fb:initial-iterations="first">
                         <fr:c y="1" x="1" w="12">

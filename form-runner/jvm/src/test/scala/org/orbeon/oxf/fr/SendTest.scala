@@ -280,7 +280,8 @@ class SendTest
           val expectedFormatted = """{
             "section-1": {
               "grid-3": {
-                "control-1.1": ""
+                "control-1.1": "",
+                "my-explanation": ""
               },
               "grid-1": [
                 {
@@ -344,6 +345,65 @@ class SendTest
 
           assert(cursor.get[String](firstHeaderName)  == Right(firstHeaderValue))
           assert(cursor.get[String](secondHeaderName) == Right(secondHeaderValue))
+        }
+      }
+    }
+
+    it("must prune or preserve non-persisted values") {
+      val (processorService, docOpt, _) =
+        runFormRunner("tests", "send-action", "new", initialize = true)
+
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, docOpt.get) {
+
+          locally {
+            XFormsAPI.dispatch(
+                name       = "my-run-process",
+                targetId   = Names.FormModel,
+                properties = Map(
+                  "process" -> Some(
+                    s"""
+                      send(
+                        uri     = "/fr/service/custom/orbeon/echo",
+                        content = "xml",
+                        method  = "post",
+                        replace = "instance"
+                      )
+                    """
+                  )
+                )
+            )
+
+            val result = instance("fr-send-submission-response").get.root
+
+            assert(result.descendant("control-1.1").nonEmpty)
+            assert(result.descendant("my-explanation").isEmpty)
+          }
+
+          locally {
+            XFormsAPI.dispatch(
+                name       = "my-run-process",
+                targetId   = Names.FormModel,
+                properties = Map(
+                  "process" -> Some(
+                    s"""
+                      send(
+                        uri                       = "/fr/service/custom/orbeon/echo",
+                        content                   = "xml",
+                        method                    = "post",
+                        replace                   = "instance",
+                        keep-non-persisted-values = "true"
+                      )
+                    """
+                  )
+                )
+            )
+
+            val result = instance("fr-send-submission-response").get.root
+
+            assert(result.descendant("control-1.1").nonEmpty)
+            assert(result.descendant("my-explanation").nonEmpty)
+          }
         }
       }
     }

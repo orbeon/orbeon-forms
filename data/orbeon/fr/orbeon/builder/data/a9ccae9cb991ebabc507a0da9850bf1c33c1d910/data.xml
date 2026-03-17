@@ -15,7 +15,8 @@
          xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
-        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true" xxf:custom-mips="fr:persist">
+        <xf:model xxf:custom-mips="fr:persist" id="fr-form-model" xxf:expose-xpath-types="true"
+                  xxf:analysis.calculate="true">
 
             <!-- Main instance -->
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
@@ -120,12 +121,14 @@
                                  required="$federal-tax-id-or-ssn = 'ein'"
                                  relevant="$federal-tax-id-or-ssn = 'ein'"/>
                         <xf:bind id="ssn-explanation-bind" ref="ssn-explanation" name="ssn-explanation"
-                                 relevant="$federal-tax-id-or-ssn = 'ssn'" fr:persist="false()"/>
+                                 relevant="$federal-tax-id-or-ssn = 'ssn'"
+                                 fr:persist="false()"/>
                         <xf:bind id="ein-or-ssn-combined-bind" ref="ein-or-ssn-combined"
                                  name="ein-or-ssn-combined"
                                  calculate="if ($federal-tax-id-or-ssn/string() = 'ein') then&#xA;    $ein&#xA;else&#xA;    $ssn"
                                  readonly="false()"
-                                 relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"/>
+                                 relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"
+                                 fr:persist="false()"/>
                     </xf:bind>
 
                     <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
@@ -136,7 +139,8 @@
                                  name="service-address-combined"
                                  calculate="if ($service-address-same/string() = 'true') then&#xA;  $mailing-address-combined&#xA;else&#xA;  string-join(&#xA;    (&#xA;      $service-us-address-street-1[. != ''],&#xA;      $service-us-address-street-2[. != ''],&#xA;      $service-us-address-city[. != ''],&#xA;      $service-us-address-state[. != ''],&#xA;      $service-us-address-zip[. != '']&#xA;    ),&#xA;    ' / '&#xA;  )"
                                  readonly="false()"
-                                 relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"/>
+                                 relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"
+                                 fr:persist="false()"/>
                     </xf:bind>
 
                     <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
@@ -159,12 +163,14 @@
                                  name="phone-area-readonly"
                                  relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"
                                  calculate="substring($telephone-number, 1, 3)"
-                                 readonly="false()"/>
+                                 readonly="false()"
+                                 fr:persist="false()"/>
                         <xf:bind id="phone-number-readonly-bind" ref="phone-number-readonly"
                                  name="phone-number-readonly"
                                  calculate="string-join(&#xA;  (&#xA;    substring($telephone-number, 4, 3)[. != ''],&#xA;    substring($telephone-number, 7)[. != '']&#xA;  ),&#xA;  '-'&#xA;)"
                                  readonly="false()"
-                                 relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"/>
+                                 relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"
+                                 fr:persist="false()"/>
                     </xf:bind>
                     <xf:bind id="mailing-address-bind" ref="mailing-address" name="mailing-address">
                         <xf:bind id="mailing-grid-3-bind" ref="mailing-grid-3" name="mailing-grid-3">
@@ -198,7 +204,8 @@
                                      name="mailing-address-combined"
                                      calculate="string-join(&#xA;  (&#xA;    $mailing-us-address-street-1[. != ''],&#xA;    $mailing-us-address-street-2[. != ''],&#xA;    $mailing-us-address-city[. != ''],&#xA;    $mailing-us-address-state[. != ''],&#xA;    $mailing-us-address-zip[. != '']&#xA;  ),&#xA;  ' / '&#xA;)"
                                      readonly="false()"
-                                     relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"/>
+                                     relevant="fr:mode() = 'pdf' and fr:use-pdf-template()"
+                                     fr:persist="false()"/>
 
                         </xf:bind>
                     </xf:bind>
@@ -241,7 +248,8 @@
                          name="certification-section">
                     <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4">
                         <xf:bind id="certification-explanation-bind" ref="certification-explanation"
-                                 name="certification-explanation" fr:persist="false()"/>
+                                 name="certification-explanation"
+                                 fr:persist="false()"/>
                         <xf:bind id="applicant-signature-bind" ref="applicant-signature"
                                  name="applicant-signature"
                                  type="xs:anyURI"
@@ -251,7 +259,8 @@
                 </xf:bind>
                 <xf:bind id="section-4-bind" ref="section-4" name="section-4">
                     <xf:bind id="grid-5-bind" ref="grid-5" name="grid-5">
-                        <xf:bind id="instructions-bind" ref="instructions" name="instructions" fr:persist="false()"/>
+                        <xf:bind id="instructions-bind" ref="instructions" name="instructions"
+                                 fr:persist="false()"/>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
@@ -269,6 +278,7 @@
 
                     <library-versions>
                         <_>1</_>
+                        <orbeon>2</orbeon>
                     </library-versions>
                     <created-with-version>2024.1-SNAPSHOT PE</created-with-version>
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
@@ -276,6 +286,7 @@
 
 
                     <data-migration>enabled</data-migration>
+
                     <email>
                         <templates>
                             <template name="default">
@@ -366,6 +377,8 @@
                         <mailing-address-combined>
                             <label>Mailing address (combined)</label>
                             <hint/>
+
+
                         </mailing-address-combined>
                         <mailing-us-address-state>
                             <label>State, territory, or military post</label>
@@ -429,10 +442,14 @@
                             <hint/>
 
 
+
+
                         </phone-area-readonly>
                         <phone-number-readonly>
                             <label>Phone number (readonly)</label>
                             <hint/>
+
+
 
 
                         </phone-number-readonly>
@@ -463,6 +480,8 @@
                         <service-address-combined>
                             <label>Service address (combined)</label>
                             <hint/>
+
+
 
 
                         </service-address-combined>
@@ -512,6 +531,8 @@
                         <ein-or-ssn-combined>
                             <label>EIN or SSN (combined)</label>
                             <hint/>
+
+
                         </ein-or-ssn-combined>
                         <ssn>
                             <label>SSN</label>
@@ -555,7 +576,7 @@
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+            <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xbl="http://www.w3.org/ns/xbl"
                      xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="main-section-section" bind="main-section-bind">
                     <fr:grid id="grid-1-grid" bind="grid-1-bind">
@@ -635,6 +656,7 @@
                                 <xf:label ref="$form-resources/ein-or-ssn-combined/label"/>
                                 <xf:hint ref="$form-resources/ein-or-ssn-combined/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
 
 
                             </xf:output>
@@ -744,6 +766,7 @@
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
+
                                 </xf:output>
 
                             </fr:c>
@@ -786,6 +809,7 @@
                                     <xf:label ref="$form-resources/service-address-combined/label"/>
                                     <xf:hint ref="$form-resources/service-address-combined/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
 
 
 
@@ -913,6 +937,7 @@
 
 
 
+
                                 </xf:output>
                         </fr:c>
                         <fr:c x="11" y="2" w="2" h="1">
@@ -923,6 +948,7 @@
                                     <xf:label ref="$form-resources/phone-number-readonly/label"/>
                                     <xf:hint ref="$form-resources/phone-number-readonly/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
 
 
 

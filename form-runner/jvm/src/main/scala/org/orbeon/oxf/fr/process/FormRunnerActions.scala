@@ -34,6 +34,7 @@ import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, tinyTreeToOrbeonDom}
 import org.orbeon.oxf.util.StringUtils.*
@@ -75,23 +76,24 @@ trait FormRunnerActions
       ("open-rendered-format"   -> tryOpenRenderedFormat _)
 
   case class SendActionParams(
-    uri                : String,
-    method             : HttpMethod,
-    relevanceHandling  : RelevanceHandling,
-    annotateWith       : Set[String],
-    showProgress       : Boolean,
-    responseIsResource : Boolean, // TODO: Should this be a parameter?
-    formTargetOpt      : Option[String],
-    contentToSend      : ContentToSend,
-    dataFormatVersion  : DataFormatVersion,
-    pruneMetadata      : Boolean,
-    pruneTmpAttMetadata: Boolean,
-    replace            : ReplaceType,
-    headersOpt         : Option[String],
-    serialization      : String, // TODO: type
-    binaryContentUrlOpt: Option[URI],
-    contentTypeOpt     : Option[String],
-    isModeChange       : Boolean
+    uri                   : String,
+    method                : HttpMethod,
+    relevanceHandling     : RelevanceHandling,
+    annotateWith          : Set[String],
+    keepNonPersistedValues: Boolean,
+    showProgress          : Boolean,
+    responseIsResource    : Boolean, // TODO: Should this be a parameter?
+    formTargetOpt         : Option[String],
+    contentToSend         : ContentToSend,
+    dataFormatVersion     : DataFormatVersion,
+    pruneMetadata         : Boolean,
+    pruneTmpAttMetadata   : Boolean,
+    replace               : ReplaceType,
+    headersOpt            : Option[String],
+    serialization         : String, // TODO: type
+    binaryContentUrlOpt   : Option[URI],
+    contentTypeOpt        : Option[String],
+    isModeChange          : Boolean
   ) {
      def toPropertyValues: List[PropertyValue] =
       List(
@@ -99,6 +101,7 @@ trait FormRunnerActions
         PropertyValue("method"                , method.entryName.toUpperCase.some),
         PropertyValue(NonRelevantName         , relevanceHandling.entryName.toLowerCase.some),
         PropertyValue("annotate"              , annotateWith.mkString(" ").some),
+        PropertyValue("persist-mip"           , (! keepNonPersistedValues).option(XMLNames.FRPersistQName.qualifiedName)),
         PropertyValue("show-progress"         , showProgress.toString.some),
         PropertyValue("response-is-resource"  , responseIsResource.toString.some),
         PropertyValue("formtarget"            , formTargetOpt.getOrElse("").some),
@@ -400,6 +403,7 @@ trait FormRunnerActions
     val pruneOpt                    = findParamValue("prune").map(_.toBoolean) // for backward compatibility
     val relevanceHandling           = findParamValue(NonRelevantName).map(RelevanceHandling.withNameInsensitive)                 .getOrElse(RelevanceHandling.Remove)
     val annotateWith                = findParamValue("annotate").map(_.splitTo[Set]())                                           .getOrElse(Set.empty)
+    val keepNonPersistedValues      = booleanParamByNameUseAvt(params, "keep-non-persisted-values", default = false)
     val replace                     = findParamValue("replace")                                                                  .getOrElse(XFORMS_SUBMIT_REPLACE_NONE)
     val contentToSend               = findParamValue("content").map(ContentToken.fromString).map(ContentToSend.fromContentTokens).getOrElse(ContentToSend.Single(ContentToken.Xml))
 
@@ -494,23 +498,24 @@ trait FormRunnerActions
 
     val sendActionParams =
       SendActionParams(
-        uri                 = uri,
-        method              = method,
-        relevanceHandling   = effectiveRelevanceHandling,
-        annotateWith        = annotateWith,
-        showProgress        = showProgress,
-        responseIsResource  = false,
-        formTargetOpt       = formTargetOpt,
-        contentToSend       = contentToSend,
-        dataFormatVersion   = dataFormatVersionNoneIfEdge.getOrElse(DataFormatVersion.Edge),
-        pruneMetadata       = effectivePruneMetadata,
-        pruneTmpAttMetadata = true,
-        replace             = ReplaceType.withName(replace),
-        headersOpt          = headersOpt,
-        serialization       = effectiveSerialization,
-        binaryContentUrlOpt = binaryContentUrlOpt,
-        contentTypeOpt      = multipartContentTypeOpt.orElse(effectiveContentTypeOpt),
-        isModeChange        = false,
+        uri                    = uri,
+        method                 = method,
+        relevanceHandling      = effectiveRelevanceHandling,
+        annotateWith           = annotateWith,
+        keepNonPersistedValues = keepNonPersistedValues,
+        showProgress           = showProgress,
+        responseIsResource     = false,
+        formTargetOpt          = formTargetOpt,
+        contentToSend          = contentToSend,
+        dataFormatVersion      = dataFormatVersionNoneIfEdge.getOrElse(DataFormatVersion.Edge),
+        pruneMetadata          = effectivePruneMetadata,
+        pruneTmpAttMetadata    = true,
+        replace                = ReplaceType.withName(replace),
+        headersOpt             = headersOpt,
+        serialization          = effectiveSerialization,
+        binaryContentUrlOpt    = binaryContentUrlOpt,
+        contentTypeOpt         = multipartContentTypeOpt.orElse(effectiveContentTypeOpt),
+        isModeChange           = false,
       )
 
     debug(s"`send` action sending submission", List("params" -> sendActionParams.toString))
@@ -555,23 +560,24 @@ trait FormRunnerActions
 
     trySendImpl(
       SendActionParams(
-        uri                 = PathUtils.recombineQuery(path, queryParams),
-        method              = HttpMethod.POST,
-        relevanceHandling   = RelevanceHandling.Keep,
-        annotateWith        = Set.empty,
-        showProgress        = showProgress,
-        responseIsResource  = responseIsResource,
-        formTargetOpt       = formTargetOpt,
-        contentToSend       = ContentToSend.Single(ContentToken.Xml),
-        dataFormatVersion   = currentDataFormatVersion,
-        pruneMetadata       = false,
-        pruneTmpAttMetadata = false,
-        replace             = replace,
-        headersOpt          = None,
-        serialization       = ContentTypes.XmlContentType,
-        binaryContentUrlOpt = None,
-        contentTypeOpt      = ContentTypes.XmlContentType.some,
-        isModeChange        = true,
+        uri                    = PathUtils.recombineQuery(path, queryParams),
+        method                 = HttpMethod.POST,
+        relevanceHandling      = RelevanceHandling.Keep,
+        annotateWith           = Set.empty,
+        keepNonPersistedValues = true, // keep non-persisted values for mode change
+        showProgress           = showProgress,
+        responseIsResource     = responseIsResource,
+        formTargetOpt          = formTargetOpt,
+        contentToSend          = ContentToSend.Single(ContentToken.Xml),
+        dataFormatVersion      = currentDataFormatVersion,
+        pruneMetadata          = false,
+        pruneTmpAttMetadata    = false,
+        replace                = replace,
+        headersOpt             = None,
+        serialization          = ContentTypes.XmlContentType,
+        binaryContentUrlOpt    = None,
+        contentTypeOpt         = ContentTypes.XmlContentType.some,
+        isModeChange           = true,
       )
     )
   }

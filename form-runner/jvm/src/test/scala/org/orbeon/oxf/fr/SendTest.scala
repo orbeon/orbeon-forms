@@ -264,6 +264,7 @@ class SendTest
             )
           )
 
+          // 2026-03-16: TODO: This is incorrect, as `"grid-3` should not be present.
           val expectedFormatted = """{
             "section-1": {
               "control-1.1": "",

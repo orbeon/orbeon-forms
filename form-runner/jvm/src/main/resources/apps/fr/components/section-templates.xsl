@@ -115,12 +115,12 @@
 
                 <!-- Annotate section, grid, iteration, and control elements as initially non-relevant. Then, as the controls become
                      relevant, they will remove the annotations. See https://github.com/orbeon/orbeon-forms/issues/3829. -->
-                <xf:action event="xforms-model-construct-done" class="fr-design-time-preserve">
+                <xf:action event="xforms-model-construct-done">
                     <xf:insert
+                        xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration"
                         iterate="migration:iterateBinds(event('xxf:absolute-targetid'), instance())"
                         context= "."
-                        origin= "xf:attribute('fr:relevant', 'false')"
-                        xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration"/>
+                        origin= "xf:attribute('fr:relevant', 'false')"/>
                 </xf:action>
 
                 <!--

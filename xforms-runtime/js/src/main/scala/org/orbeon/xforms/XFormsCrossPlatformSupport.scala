@@ -40,16 +40,25 @@ import scala.scalajs.js.typedarray.Uint8Array
 
 object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
-  // We have no notion of upload progress in the JavaScript environment as we just pass a `File` object.
+  private var uploadProgress: Map[(String, String), UploadProgress[Unit]] = Map.empty
+
+  def setUploadProgress(
+    request   : ExternalContext.Request,
+    uuid      : String,
+    fieldName : String,
+    progress  : UploadProgress[Unit]
+  ): Unit =
+    uploadProgress += (uuid -> fieldName) -> progress
+
   def getUploadProgress(
     request   : ExternalContext.Request,
     uuid      : String,
     fieldName : String
   ): Option[UploadProgress[Unit]] =
-    None
+    uploadProgress.get(uuid -> fieldName)
 
-  // We have no notion of upload progress in the JavaScript environment as we just pass a `File` object.
-  def removeUploadProgress(request: ExternalContext.Request, control: XFormsValueControl): Unit = ()
+  def removeUploadProgress(request: ExternalContext.Request, control: XFormsValueControl): Unit =
+    uploadProgress -= control.containingDocument.uuid -> control.containingDocument.effectiveId
 
   // TODO, although this is probably not called in the JavaScript environment, as that is only called
   // upon `xxforms-state-restored`.

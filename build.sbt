@@ -75,9 +75,7 @@ val Log4j2Version                    = "2.25.3"
 val CommonsIoVersion                 = "2.15.1"
 val OpenHtmlToPdfVersion             = "1.0.10"
 val PdfBoxVersion                    = "2.0.33"
-val TinkVersion                      = "1.6.1"
-val GsonVersionForTink               = "2.9.0"
-val ProtobufJavaVersionForTink       = "3.25.5"
+val TinkVersion                      = "1.20.0"
 val JacksonVersion                   = "2.21.1"
 val JavaMailApiVersion               = "2.1.3"
 val AngusMailVersion                 = "2.0.5"
@@ -154,8 +152,6 @@ val CoreLibraryDependencies = Seq(
   ),
   "com.fasterxml.jackson.core"  % "jackson-databind"                % JacksonVersion, // for Tink, Sendgrid, Infinispan, also pulls `jackson-annotations` and `jackson-core`
   "me.gosimple"                 % "nbvcxz"                          % "1.5.1",
-  "com.google.code.gson"        % "gson"                            % GsonVersionForTink,
-  "com.google.protobuf"         % "protobuf-java"                   % ProtobufJavaVersionForTink,
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,
   "com.icegreen"                % "greenmail"                       % "2.1.3"           % Test,
   "org.apache.commons"          % "commons-exec"                    % "1.3"             % Test,

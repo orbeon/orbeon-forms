@@ -78,6 +78,7 @@ val PdfBoxVersion                    = "2.0.33"
 val TinkVersion                      = "1.6.1"
 val GsonVersionForTink               = "2.9.0"
 val ProtobufJavaVersionForTink       = "3.25.5"
+val JacksonVersion                   = "2.21.1"
 val JavaMailApiVersion               = "2.1.3"
 val AngusMailVersion                 = "2.0.5"
 val JavaActivationVersion            = "2.0.1"
@@ -151,6 +152,7 @@ val CoreLibraryDependencies = Seq(
     ExclusionRule(organization = "com.amazonaws"),
     ExclusionRule(organization = "com.fasterxml.jackson.core")
   ),
+  "com.fasterxml.jackson.core"  % "jackson-databind"                % JacksonVersion, // for Tink, Sendgrid, Infinispan, also pulls `jackson-annotations` and `jackson-core`
   "me.gosimple"                 % "nbvcxz"                          % "1.5.1",
   "com.google.code.gson"        % "gson"                            % GsonVersionForTink,
   "com.google.protobuf"         % "protobuf-java"                   % ProtobufJavaVersionForTink,

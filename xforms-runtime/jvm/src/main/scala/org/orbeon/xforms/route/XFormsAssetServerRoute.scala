@@ -286,11 +286,10 @@ object XFormsAssetServerRoute extends NativeRoute {
           IOUtils.copyStreamAndClose(cxr.content.stream, response.getOutputStream)
         } catch {
           case NonFatal(t) =>
-            if (isConnectionInterruption(t)) {
+            if (isConnectionInterruption(t))
               info(s"connection interrupted: ${getRootThrowable(t).getMessage}")
-            } else {
+            else
               error("exception copying stream", Seq("throwable" -> OrbeonFormatter.format(t)))
-            }
         }
 
       case None =>

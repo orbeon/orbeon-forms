@@ -37,8 +37,8 @@
     // TODO: find a better way to do this: 1) trigger.less shouldn't have to care about dropdowns 2) why do we use
     //  .btn and .btn-link elements in dropdown menus?
 
-    // Dropdowns overrides
-    .dropdown.open {
+    // Dropdowns overrides (BS2 uses .open and BS5 uses .show)
+    .dropdown.open, .dropdown .show {
         .btn {
             color: var(--orbeon-dropdown-menu-color);
             background-color: var(--orbeon-dropdown-menu-background-color);

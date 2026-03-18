@@ -15,6 +15,12 @@
     color: var(--orbeon-link-hover-color);
   }
 
+  .navbar li a.btn-secondary.dropdown-toggle {
+    &:focus, &:hover {
+      color: var(--orbeon-navbar-language-dropdown-hover-color);
+    }
+  }
+
   a.btn-secondary,
   a.btn-secondary:hover,
   a.btn-secondary:focus {
@@ -26,7 +32,17 @@
     display: none;
   }
 
-  .dropdown .btn-secondary {
+  .dropdown:not(:has(.show)) {
+    // Dropdown toggles have btn/btn-secondary classes in BS5 but not in BS2 (see fr-user-nav-dropdown-content in
+    // view.xsl and bootstrap5-select1.xbl). This requires overriding button styling here and in other places.
+    .btn-secondary.dropdown-toggle {
+      &:hover, &:focus, &:active {
+        background-color: transparent;
+      }
+    }
+  }
+
+  .dropdown .btn-secondary:not(.disabled):not([disabled]) {
     background-color: transparent;
     border-color: transparent;
 
@@ -133,17 +149,16 @@
     text-decoration: underline !important;
   }
 
-  // home button
-  .xforms-trigger-appearance-full .btn {
-    color: #000;
-    background-color: #f8f9fa;
-    border-color: #f8f9fa;
-  }
+  .btn-link {
+    color: var(--orbeon-link-color);
+    border-color: transparent;
 
-  .xforms-trigger-appearance-full {
-    .btn:hover, .btn:focus, .btn:active, .btn.active, .open > .dropdown-toggle.btn {
-      background-color: #e6e6e6 !important;
-      border-color: #0a58ca !important;
+    &, &:active, &[disabled] {
+      background-color: transparent;
+    }
+
+    &:hover, &:focus {
+      color: var(--orbeon-link-hover-color);
     }
   }
 

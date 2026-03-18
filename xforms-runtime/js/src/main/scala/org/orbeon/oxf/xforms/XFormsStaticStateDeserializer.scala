@@ -801,8 +801,8 @@ object XFormsStaticStateDeserializer {
                           isCapturePhaseOnly,
                           isTargetPhase,
                           isBubblingPhase,
-                          Propagate.Continue,// propagate,
-                          Perform.Perform,//isPerformDefaultAction,
+                          propagate,
+                          isPerformDefaultAction,
                           isPhantom,
                           isIfNonRelevant,
                           isXBLHandler

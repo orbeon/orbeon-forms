@@ -248,10 +248,6 @@ trait XFormsCrossPlatformSupportTrait {
 
   def writeMultipartFormData(document: dom.Document, os: OutputStream): String
 
-  def getRootThrowable(t : Throwable) : Throwable
-
-  def causesIterator(t : Throwable) : Iterator[Throwable]
-
   def tempFileSize(filePath: String): Long
 
   def deleteFileIfPossible(urlString: String): Unit

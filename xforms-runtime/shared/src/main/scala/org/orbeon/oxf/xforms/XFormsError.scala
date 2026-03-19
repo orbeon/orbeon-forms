@@ -16,12 +16,12 @@ package org.orbeon.oxf.xforms
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.http.{HttpStatusCode, StatusCode}
+import org.orbeon.oxf.util.Exceptions
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
-import org.orbeon.xforms.BindingErrorReason
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.*
 import org.orbeon.saxon.trans.XPathException
-import org.orbeon.xforms.{ServerError, XFormsCrossPlatformSupport, XFormsNames}
+import org.orbeon.xforms.{BindingErrorReason, ServerError, XFormsNames}
 
 
 // What kind of errors get here:
@@ -72,13 +72,13 @@ object XFormsError {
       ServerError(message, None, None),
       throwableOpt,
       isNormallyRecoverableOnInit = ! ( // https://github.com/orbeon/orbeon-forms/issues/5844
-        throwableOpt.iterator.flatMap(XFormsCrossPlatformSupport.causesIterator) exists {
+        throwableOpt.iterator.flatMap(Exceptions.causesIterator) exists {
           case e: XPathException if e.isStaticError => true
           case _                                    => false
         }
       ),
       mustNotRecoverOnInit =
-        throwableOpt.iterator.flatMap(XFormsCrossPlatformSupport.causesIterator) exists {
+        throwableOpt.iterator.flatMap(Exceptions.causesIterator) exists {
           case status: HttpStatusCode if ! StatusCode.isSuccessCode(status.code)  => true
           case _                                                                  => false
         }
@@ -125,7 +125,7 @@ object XFormsError {
   }
 
   private def serverErrorFromThrowable(throwableOpt: Option[Throwable], defaultMessage: => String): ServerError = {
-    val rootThrowableOpt = throwableOpt.map(XFormsCrossPlatformSupport.getRootThrowable)
+    val rootThrowableOpt = throwableOpt.map(Exceptions.getRootThrowable)
     ServerError(
       rootThrowableOpt.map(_.getMessage).getOrElse(defaultMessage),
       rootThrowableOpt.flatMap(OrbeonLocationException.getRootLocationData),

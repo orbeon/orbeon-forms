@@ -13,12 +13,10 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.datatypes.LocationData
 import cats.syntax.option.*
-
-import java.util as ju
+import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
-import org.orbeon.oxf.util.{FunctionContext, XPathCache}
+import org.orbeon.oxf.util.{Exceptions, FunctionContext, XPathCache}
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.XPathErrorDetails
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -28,11 +26,10 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.saxon.om
-import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xml.NamespaceMapping
 
+import java.util as ju
 import scala.jdk.CollectionConverters.*
-import scala.util.control.NonFatal
 
 
 trait ControlXPathSupport {
@@ -108,7 +105,7 @@ trait ControlXPathSupport {
                 target         = this,
                 expression     = xpathString,
                 details        = XPathErrorDetails.ForOther(contextMessage),
-                message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                message        = Exceptions.getRootThrowable(t).getMessage,
                 throwable      = t
               )
             )
@@ -168,7 +165,7 @@ object ControlXPathSupport {
                   target         = eventTarget,
                   expression     = attributeValue,
                   details        = XPathErrorDetails.ForOther("avt"),
-                  message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                  message        = Exceptions.getRootThrowable(t).getMessage,
                   throwable      = t
                 )
               )

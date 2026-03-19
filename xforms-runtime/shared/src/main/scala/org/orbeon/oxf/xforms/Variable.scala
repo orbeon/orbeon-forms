@@ -15,16 +15,14 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
-import org.orbeon.oxf.util.XPathCache
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, XPathErrorDetails}
+import org.orbeon.oxf.util.{Exceptions, XPathCache}
 import org.orbeon.oxf.xforms.analysis.controls.{VariableAnalysis, VariableAnalysisTrait}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, XPathErrorDetails}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
 import org.orbeon.saxon.value.{EmptySequence, StringValue}
-import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
-
-import scala.util.control.NonFatal
+import org.orbeon.xforms.XFormsId
 
 // Represent an xf:var.
 class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument: XFormsContainingDocument) {
@@ -106,7 +104,7 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
                       target         = eventTarget,
                       expression     = expression,
                       details        = XPathErrorDetails.ForVariable(staticVariable.name),
-                      message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                      message        = Exceptions.getRootThrowable(t).getMessage,
                       throwable      = t
                     )
                   )

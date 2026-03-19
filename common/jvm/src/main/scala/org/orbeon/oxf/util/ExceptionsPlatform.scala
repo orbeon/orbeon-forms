@@ -1,14 +1,14 @@
 // Distributed under the MIT license, see: http://www.opensource.org/licenses/MIT
-package org.orbeon.errorified
+package org.orbeon.oxf.util
 
 
-// Exceptions utilities
-// Uses reflection to find nested causes when exceptions don't support Java's getCause
-object Exceptions {
+trait ExceptionsPlatform extends ExceptionsTrait {
+
+  Exceptions =>
 
   // Returns the exception directly nested
   // This first tries reflection and then falls back to the standard getCause
-  def getNestedThrowable(t: Throwable): Option[Throwable] = {
+  def findNestedThrowable(t: Throwable): Option[Throwable] = {
 
     // Create a map of all classes and interfaces implemented by the throwable
     val throwableClasses = {
@@ -33,28 +33,6 @@ object Exceptions {
     Getters find
       { case (clazz, _)      => throwableClasses.contains(clazz) } flatMap
       { case (clazz, getter) => invokeGetter(throwableClasses(clazz), getter) }
-  }
-
-  // Typically for Java callers
-  def getNestedThrowableOrNull(t: Throwable) = getNestedThrowable(t) orNull
-
-  // Iterator down a throwable's causes, always non-empty
-  def causesIterator(t: Throwable): Iterator[Throwable] =
-    Iterator.iterate(t)(getNestedThrowableOrNull).takeWhile(_ ne null)
-
-  // Get the root cause of the throwable
-  def getRootThrowable(t: Throwable): Throwable =
-    causesIterator(t).toList.last
-
-  def isConnectionInterruption(t: Throwable): Boolean = {
-    getRootThrowable(t) match {
-      case _: java.net.SocketException => true
-      case e: java.io.IOException if e.getMessage != null =>
-        e.getMessage.contains("Broken pipe") ||
-        e.getMessage.contains("Connection reset") ||
-        e.getMessage.contains("An established connection was aborted")
-      case _ => false
-    }
   }
 
   val Getters: Seq[(String, String)] = Seq(

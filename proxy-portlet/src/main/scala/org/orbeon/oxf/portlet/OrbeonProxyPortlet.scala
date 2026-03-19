@@ -15,7 +15,6 @@ package org.orbeon.oxf.portlet
 
 import cats.data.NonEmptyList
 import org.orbeon.connection.StreamedContent
-import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.fr.FormRunnerPath
 import org.orbeon.oxf.fr.embedding.*

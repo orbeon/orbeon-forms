@@ -1,6 +1,7 @@
 // Distributed under the MIT license, see: http://www.opensource.org/licenses/MIT
 package org.orbeon.errorified
 
+import org.orbeon.oxf.util.Exceptions
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 
 // Exception formatter

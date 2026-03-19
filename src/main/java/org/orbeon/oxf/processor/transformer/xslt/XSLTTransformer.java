@@ -17,7 +17,7 @@ import org.orbeon.datatypes.BasicLocationData;
 import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Node;
-import org.orbeon.errorified.Exceptions;
+import org.orbeon.oxf.util.Exceptions;
 import org.orbeon.io.StringBuilderWriter;
 import org.orbeon.oxf.cache.CacheKey;
 import org.orbeon.oxf.cache.InternalCacheKey;

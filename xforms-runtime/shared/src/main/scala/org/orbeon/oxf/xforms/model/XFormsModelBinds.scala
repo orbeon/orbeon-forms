@@ -18,18 +18,17 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.XPath.Reporter
-import org.orbeon.oxf.util.{IndentedLogger, XPath}
-import org.orbeon.oxf.xforms.{NonFatalCheckTypedValueException, XFormsContainingDocument}
+import org.orbeon.oxf.util.{Exceptions, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.XPathMIP
 import org.orbeon.oxf.xforms.analysis.model.{MipName, Model, Types}
 import org.orbeon.oxf.xforms.analysis.{XPathDependencies, XPathErrorDetails}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
+import org.orbeon.oxf.xforms.{NonFatalCheckTypedValueException, XFormsContainingDocument}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 import org.orbeon.scaxon.Implicits.*
-import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
 
 import scala.language.postfixOps
@@ -185,7 +184,7 @@ object XFormsModelBinds {
             target         = bindNode.parentBind.model,
             expression     = xpathMIP.compiledExpression.string,
             details        = XPathErrorDetails.ForBindMip(bindNode.staticBind.nameOpt, xpathMIP.name),
-            message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+            message        = Exceptions.getRootThrowable(t).getMessage,
             throwable      = ve
           )
         )

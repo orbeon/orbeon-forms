@@ -20,7 +20,6 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.apache.commons.fileupload.util.Streams
 import org.orbeon.datatypes.MaximumSize.LimitedSize
 import org.orbeon.datatypes.{MaximumSize, Mediatype, MediatypeRange}
-import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils.*
 import org.orbeon.io.{CharsetNames, LimiterInputStream}
 import org.orbeon.oxf.externalcontext.ExternalContext.*

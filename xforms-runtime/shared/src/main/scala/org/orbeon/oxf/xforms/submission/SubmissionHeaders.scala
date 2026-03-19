@@ -15,19 +15,18 @@ package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.{IndentedLogger, XPathCache}
-import org.orbeon.oxf.xforms.XFormsContextStackSupport.*
+import org.orbeon.oxf.util.{Exceptions, IndentedLogger, XPathCache}
 import org.orbeon.oxf.xforms.*
+import org.orbeon.oxf.xforms.XFormsContextStackSupport.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.findChildElem
-import org.orbeon.oxf.xforms.analysis.{WithChildrenTrait, XPathErrorDetails}
 import org.orbeon.oxf.xforms.analysis.controls.{HeaderControl, WithExpressionOrConstantTrait}
+import org.orbeon.oxf.xforms.analysis.{WithChildrenTrait, XPathErrorDetails}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
-import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
+import org.orbeon.xforms.XFormsNames
 
 import scala.collection.mutable
-import scala.util.control.NonFatal
 
 
 object SubmissionHeaders {
@@ -109,7 +108,7 @@ object SubmissionHeaders {
                           target         = eventTarget,
                           expression     = avtCombine,
                           details        = XPathErrorDetails.ForOther("avt"),
-                          message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                          message        = Exceptions.getRootThrowable(t).getMessage,
                           throwable      = t
                         )
                       )

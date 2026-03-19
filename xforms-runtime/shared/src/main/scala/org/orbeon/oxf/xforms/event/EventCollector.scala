@@ -1,10 +1,10 @@
 package org.orbeon.oxf.xforms.event
 
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util.Exceptions
 import org.orbeon.oxf.xforms.event.Dispatch.dispatchEvent
 import org.orbeon.oxf.xforms.event.events.{XXFormsBindingErrorEvent, XXFormsValueChangedEvent, XXFormsXPathErrorEvent}
 import org.orbeon.xforms.BindingErrorReason
-import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.annotation.tailrec
 import scala.collection.mutable
@@ -92,7 +92,7 @@ object EventCollector {
           new XXFormsBindingErrorEvent( // Q: Does this make sense?
             target          = eventTarget,
             locationDataOpt = None,
-            reason          = BindingErrorReason.Other(Option(XFormsCrossPlatformSupport.getRootThrowable(t).getMessage).getOrElse(contextMessage))
+            reason          = BindingErrorReason.Other(Option(Exceptions.getRootThrowable(t).getMessage).getOrElse(contextMessage))
           )
         )
         default

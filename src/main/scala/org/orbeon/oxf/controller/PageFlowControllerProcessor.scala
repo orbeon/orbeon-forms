@@ -18,7 +18,7 @@ import org.log4s
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document, Element, QName}
-import org.orbeon.errorified.Exceptions.*
+import org.orbeon.oxf.util.Exceptions.*
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request

@@ -18,7 +18,6 @@ import org.orbeon.saxon.tree.iter.ManualIterator
 import org.orbeon.saxon.utils.Configuration
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.Implicits
-import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xml.NamespaceMapping
 
 import java.util as ju
@@ -183,12 +182,13 @@ object XPath extends XPathTrait {
       } else
         body(expression.expression)
     } catch {
-      case t if XFormsCrossPlatformSupport.getRootThrowable(t).isInstanceOf[TypedValueException] =>
+      case t if Exceptions.getRootThrowable(t).isInstanceOf[TypedValueException] =>
         throw handleXPathException(t, expression.string, "evaluating XPath expression", expression.locationData)
       case NonFatal(t) =>
 
         if (LogAndExplainErrors) {
           import org.orbeon.saxon.lib.StandardLogger
+
           import _root_.java.io.PrintStream
           expression.expression.getInternalExpression.explain(new StandardLogger(new PrintStream(System.out)))
         }

@@ -16,7 +16,6 @@ package org.orbeon.oxf.test
 import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.ExternalContext.Session
 import org.orbeon.oxf.pipeline.InitUtils
@@ -27,7 +26,7 @@ import org.orbeon.oxf.processor.{DOMSerializer, Processor}
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.XPathCache.XPathContext
-import org.orbeon.oxf.util.{PipelineUtils, XPath, XPathCache}
+import org.orbeon.oxf.util.{Exceptions, PipelineUtils, XPath, XPathCache}
 import org.orbeon.oxf.xml.dom.Comparator
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*

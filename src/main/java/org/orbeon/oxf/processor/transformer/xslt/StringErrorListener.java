@@ -15,7 +15,7 @@ package org.orbeon.oxf.processor.transformer.xslt;
 
 import org.orbeon.datatypes.ExtendedLocationData;
 import org.orbeon.datatypes.LocationData;
-import org.orbeon.errorified.Exceptions;
+import org.orbeon.oxf.util.Exceptions;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData;

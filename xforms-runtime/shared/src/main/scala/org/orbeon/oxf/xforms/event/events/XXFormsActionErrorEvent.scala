@@ -16,9 +16,9 @@ package org.orbeon.oxf.xforms.event.events
 import org.orbeon.datatypes.ExtendedLocationData
 import org.orbeon.exception.*
 import org.orbeon.oxf.common.OrbeonLocationException.getRootLocationData
+import org.orbeon.oxf.util.Exceptions
 import org.orbeon.oxf.xforms.event.XFormsEvent.*
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget, XFormsEvents}
-import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 class XXFormsActionErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XFormsEvents.XXFORMS_ACTION_ERROR, target, properties, bubbles = true, cancelable = true) {
@@ -45,7 +45,7 @@ private object XXFormsActionErrorEvent {
     "system-id" -> (e => e.rootLocationOpt flatMap (l => Option(l.file))),
     "line"      -> (e => e.rootLocationOpt flatMap (l => Option(l.line))),
     "column"    -> (e => e.rootLocationOpt flatMap (l => Option(l.col))),
-    "message"   -> (e => e.throwableOpt map XFormsCrossPlatformSupport.getRootThrowable flatMap (t => Option(t.getMessage))),
+    "message"   -> (e => e.throwableOpt map Exceptions.getRootThrowable flatMap (t => Option(t.getMessage))),
     "throwable" -> (e => e.throwableOpt map OrbeonFormatter.format)
   )
 }

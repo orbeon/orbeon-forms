@@ -18,7 +18,6 @@ import java.security.SignatureException
 
 import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
-import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.pipeline.InitUtils.withNewPipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl.{INPUT_DATA, OUTPUT_DATA}
@@ -28,7 +27,7 @@ import org.orbeon.oxf.resources.{ResourceManagerWrapper, ResourceNotFoundExcepti
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.PipelineUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{DateUtils, DateUtilsUsingSaxon}
+import org.orbeon.oxf.util.{DateUtils, DateUtilsUsingSaxon, Exceptions}
 import org.orbeon.oxf.xml.ParserConfiguration
 import org.orbeon.oxf.xml.dom.IOSupport
 

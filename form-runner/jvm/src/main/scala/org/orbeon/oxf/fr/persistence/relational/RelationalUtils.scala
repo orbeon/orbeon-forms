@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fr.persistence.relational
 
 import org.log4s
-import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -24,7 +23,7 @@ import org.orbeon.oxf.processor.DatabaseContext
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtilsUsingSaxon, IndentedLogger, LoggerFactory, Logging}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtilsUsingSaxon, Exceptions, IndentedLogger, LoggerFactory, Logging}
 
 import java.sql.{Connection, ResultSet}
 import java.time.Instant

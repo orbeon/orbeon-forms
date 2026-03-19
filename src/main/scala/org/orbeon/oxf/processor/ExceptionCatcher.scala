@@ -13,11 +13,10 @@
  */
 package org.orbeon.oxf.processor
 
-import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.ExceptionGenerator
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.{Exceptions, XPath}
 import org.orbeon.oxf.util.XPathCache.evaluateSingleKeepItems
 import org.orbeon.oxf.xml.{SAXStore, XMLReceiver, XMLReceiverHelper}
 import org.orbeon.saxon.om

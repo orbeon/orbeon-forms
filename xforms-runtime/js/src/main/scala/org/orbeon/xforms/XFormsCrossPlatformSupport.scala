@@ -324,9 +324,6 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def writeMultipartFormData(document: orbeon.dom.Document, os: OutputStream): String = throw new NotImplementedError("writeMultipartFormData")
 
-  def getRootThrowable(t : Throwable): Throwable = Exceptions.getRootThrowable(t).orNull
-  def causesIterator(t : Throwable): Iterator[Throwable] = Exceptions.causesIterator(t)
-
   def tempFileSize(filePath: String): Long = throw new NotImplementedError("tempFileSize")
 
   def deleteFileIfPossible(urlString: String): Unit = {

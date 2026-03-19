@@ -2,16 +2,15 @@ package org.orbeon.oxf.xforms
 
 import cats.syntax.option.*
 import org.orbeon.dom.saxon.TypedNodeWrapper
-import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.debug
-import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.orbeon.oxf.util.{Exceptions, IndentedLogger}
 
 import scala.util.control.NonFatal
 
 
 object NonFatalCheckTypedValueException {
   def unapply(throwable: Throwable)(implicit logger: IndentedLogger): Option[(Throwable, Boolean)] =
-    XFormsCrossPlatformSupport.getRootThrowable(throwable) match {
+    Exceptions.getRootThrowable(throwable) match {
       case t: TypedNodeWrapper.TypedValueException =>
         // Consider type validation errors as ignorable. The rationale is that if the function (the XPath
         // expression) works on inputs that are not valid (hence the validation error), then the function cannot
@@ -33,7 +32,7 @@ object NonFatalCheckTypedValueException {
 
 object NonFatalCheckTypedValueExceptionNoLogging {
   def unapply(throwable: Throwable): Option[(Throwable, Boolean)] =
-    XFormsCrossPlatformSupport.getRootThrowable(throwable) match {
+    Exceptions.getRootThrowable(throwable) match {
       case _: TypedNodeWrapper.TypedValueException =>
         // Consider type validation errors as ignorable. The rationale is that if the function (the XPath
         // expression) works on inputs that are not valid (hence the validation error), then the function cannot

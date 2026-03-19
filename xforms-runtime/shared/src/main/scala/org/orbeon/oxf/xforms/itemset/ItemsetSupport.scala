@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{IndentedLogger, StaticXPath, XPath, XPathCache}
+import org.orbeon.oxf.util.{Exceptions, IndentedLogger, StaticXPath, XPath, XPathCache}
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.XFormsContextStackSupport.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.findChildElem
@@ -43,7 +43,6 @@ import org.orbeon.xforms.{BindingErrorReason, XFormsCrossPlatformSupport, XForms
 import org.xml.sax.SAXException
 
 import scala.jdk.CollectionConverters.*
-import scala.util.control.NonFatal
 
 
 object ItemsetSupport {
@@ -387,7 +386,7 @@ object ItemsetSupport {
                                 target         = select1Control,
                                 expression     = attributeValue,
                                 details        = XPathErrorDetails.ForAttribute(attributeName.localName),
-                                message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                                message        = Exceptions.getRootThrowable(t).getMessage,
                                 throwable      = t
                               )
                             )

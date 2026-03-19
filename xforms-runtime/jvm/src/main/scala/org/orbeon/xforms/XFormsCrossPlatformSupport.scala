@@ -18,7 +18,6 @@ import org.apache.http.entity.ContentType
 import org.apache.http.entity.mime.MultipartEntityBuilder
 import org.orbeon.dom
 import org.orbeon.dom.{Document, Element, VisitorSupport}
-import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.io.{CharsetNames, FileUtils, IOUtils}
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
@@ -363,12 +362,6 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     val contentType = mediatype.map(ContentType.parse).getOrElse(ContentType.DEFAULT_BINARY)
     builder.addBinaryBody(element.getName, inputStream, contentType, filename.orNull)
   }
-
-  def getRootThrowable(t: Throwable): Throwable =
-    Exceptions.getRootThrowable(t)
-
-  def causesIterator(t: Throwable): Iterator[Throwable] =
-    Exceptions.causesIterator(t)
 
   def tempFileSize(filePath: String): Long =
     new File(filePath).length

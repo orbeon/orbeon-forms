@@ -19,7 +19,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
-import org.orbeon.oxf.util.{StaticXPath, XPathCache}
+import org.orbeon.oxf.util.{Exceptions, StaticXPath, XPathCache}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
 import org.orbeon.oxf.xforms.analysis.{BindSingleItemBinding, RefSingleItemBinding, SingleItemBinding, XPathErrorDetails}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -32,7 +32,7 @@ import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xforms.{BindingErrorReason, XFormsCrossPlatformSupport, XFormsNames}
+import org.orbeon.xforms.{BindingErrorReason, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
 import java.util
@@ -571,7 +571,7 @@ class XFormsContextStack {
                       target         = eventTarget,
                       expression     = expression,
                       details        = XPathErrorDetails.ForAttribute("ref"),
-                      message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                      message        = Exceptions.getRootThrowable(t).getMessage,
                       throwable      = t
                     )
                   )

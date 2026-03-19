@@ -15,7 +15,6 @@ package org.orbeon.oxf.pipeline
 
 import org.log4s
 import org.orbeon.dom.{Document, Element}
-import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.cache.ObjectCache
 import org.orbeon.oxf.common.OrbeonLocationException.getRootLocationData
@@ -28,7 +27,7 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.ResourceNotFoundException
 import org.orbeon.oxf.servlet.{HttpServletRequest, HttpSession, ServletContext}
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{AttributesToMap, CoreCrossPlatformSupport, PipelineUtils}
+import org.orbeon.oxf.util.{AttributesToMap, CoreCrossPlatformSupport, Exceptions, PipelineUtils}
 import org.orbeon.saxon.om.NodeInfo
 
 import java.util

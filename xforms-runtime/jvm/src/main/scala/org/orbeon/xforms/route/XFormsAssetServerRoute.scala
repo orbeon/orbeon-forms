@@ -14,7 +14,7 @@
 package org.orbeon.xforms.route
 
 import cats.syntax.option.*
-import org.orbeon.errorified.Exceptions.{getRootThrowable, isConnectionInterruption}
+import org.orbeon.oxf.util.Exceptions.{getRootThrowable, isConnectionInterruption}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.controller.NativeRoute

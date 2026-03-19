@@ -16,15 +16,15 @@ package org.orbeon.oxf.xforms
 import cats.syntax.option.*
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.{IndentedLogger, XPathCache}
+import org.orbeon.oxf.util.{Exceptions, IndentedLogger, XPathCache}
 import org.orbeon.oxf.xforms.analysis.controls.WithExpressionOrConstantTrait
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, XPathErrorDetails}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent
 import org.orbeon.saxon.om
+import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.orbeon.xml.NamespaceMapping
 
 
@@ -129,7 +129,7 @@ object XFormsContextStackSupport {
                   target         = eventTarget,
                   expression     = expr,
                   details        = XPathErrorDetails.ForOther("expression-or-constant"),
-                  message        = XFormsCrossPlatformSupport.getRootThrowable(t).getMessage,
+                  message        = Exceptions.getRootThrowable(t).getMessage,
                   throwable      = t
                 )
               )

@@ -17,7 +17,7 @@ import java.util as ju
 
 import javax.xml.transform.TransformerException
 import org.orbeon.datatypes.{BasicLocationData, LocationData}
-import org.orbeon.errorified.Exceptions
+import org.orbeon.oxf.util.Exceptions
 import org.xml.sax.SAXParseException
 
 import scala.jdk.CollectionConverters.*

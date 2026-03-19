@@ -137,8 +137,8 @@ class SimpleActionsTest
             activateControlWithEvent(button1.effectiveId)
             // TODO: This is incorrect: the value of the control should be the one matching the iteration, not the combination of both.
             //  See: https://github.com/orbeon/orbeon-forms/issues/7551
-            assert(resolveObject[XFormsValueControl]("out-control", indexes = List(index1))                  .map(_.getValue(EventCollector.Throw)).contains(makeEffectiveServiceUrl("bar%20baz")))
-            assert(resolveObject[XFormsValueControl]("out-control", indexes = List((index1 - 1 + 1) % 2 + 1)).map(_.getValue(EventCollector.Throw)).contains(other))
+            assert(resolveObject[XFormsValueControl]("out-control", indexes = List(index1))                   .map(_.getValue(EventCollector.Throw)).contains(makeEffectiveServiceUrl("bar%20baz")))
+            assert(resolveObject[XFormsValueControl]("out-control", indexes = List(if (index1 == 1) 2 else 1)).map(_.getValue(EventCollector.Throw)).contains(other))
           }
 
           assertOne(1, "bar", "")

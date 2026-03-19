@@ -225,59 +225,73 @@ class PageFlowControllerProcessor extends ProcessorImpl {
           if method.isEmpty || method.exists(route.routeElement.supportedMethods) => rm
       }
 
-    def withConnectionInterruption[T](thunk: => T): T =
+    def withConnectionInterruption[T](thunk: => T)(implicit logger: IndentedLogger): Option[T] =
       try
-        thunk
-      catch { case NonFatal(t) if isConnectionInterruption(t) =>
-        info(s"connection interrupted: ${getRootThrowable(t).getMessage}", logParams)
-        throw t
+        thunk.some
+      catch {
+        case NonFatal(t) if isConnectionInterruption(t) =>
+          info(s"connection interrupted: ${getRootThrowable(t).getMessage}", logParams)
+          None
       }
 
-    if (! pageFlow.interceptor.exists(withConnectionInterruption(_.process()(pc, ec))))
-      findRoute(path, request.getMethod.some) match {
-        case Some((route: FileRoute, matchResult)) =>
-          // Run the given route and let the caller handle errors (except connection interruptions)
-          debug("processing file", logParams)
-          withConnectionInterruption {
-            route.process(pc, ec, matchResult)
-          }
+    // Try the interceptor first
+    val interceptorResult =
+      pageFlow.interceptor match {
+        case Some(interceptor) =>
+          withConnectionInterruption(interceptor.process()(pc, ec))
+            .getOrElse(InterceptorResult.ConnectionInterrupted)
+        case None =>
+          InterceptorResult.NotHandled
+      }
 
-        case Some((route: PageOrServiceRoute, matchResult)) =>
-          debug("processing page/service", logParams)
-
-          // The path type, `page` or `service`, can be used by the serializer to determine the appropriate `Cache-Control` header
-          pc.setAttribute(PathTypeKey, if (route.isPage) PathType.Page else PathType.Service)
-          // Run the given route and handle "not found" and error conditions
-          try
-            route.process(pc, ec, matchResult)
-          catch { case NonFatal(t) =>
-            getRootThrowable(t) match {
-              case e: HttpRedirectException =>
-                ec.getResponse.sendRedirect(e.location, e.serverSide, e.exitPortal)
-              // We don't have a "deleted" route at this point, and thus run the not found route when we
-              // found a "resource" to be deleted
-              case e: HttpStatusCodeException =>
-                e.code match {
-                  case code @ (StatusCode.NotFound | StatusCode.Gone) =>
-                    if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t), code) // preserve status code for service at least
-                  case StatusCode.Unauthorized | StatusCode.Forbidden =>
-                    if (route.isPage) runUnauthorizedRoute(e)   else sendHttpStatusCode(e)
-                  case _ =>
-                    sendHttpStatusCode(e)
-                }
-              case _: ResourceNotFoundException =>
-                if (route.isPage)     runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
-              case _ if isConnectionInterruption(t) =>
-                info(s"connection interrupted: ${getRootThrowable(t).getMessage}", logParams)
-              case _ =>
-                if (route.isPage)     runErrorRoute(t)          else sendError(t)
+    interceptorResult match {
+      case InterceptorResult.NotHandled =>
+        findRoute(path, request.getMethod.some) match {
+          case Some((route: FileRoute, matchResult)) =>
+            // Run the given route and let the caller handle errors (except connection interruptions)
+            debug("processing file", logParams)
+            withConnectionInterruption {
+              route.process(pc, ec, matchResult)
             }
-          }
-        case None if findRoute(path, None).isDefined =>
-          sendMethodNotAllowed()
-        case _ =>
-          runNotFoundRoute(None)
-      }
+          case Some((route: PageOrServiceRoute, matchResult)) =>
+            debug("processing page/service", logParams)
+
+            // The path type, `page` or `service`, can be used by the serializer to determine the appropriate `Cache-Control` header
+            pc.setAttribute(PathTypeKey, if (route.isPage) PathType.Page else PathType.Service)
+            // Run the given route and handle "not found" and error conditions
+            try
+              route.process(pc, ec, matchResult)
+            catch { case NonFatal(t) =>
+              getRootThrowable(t) match {
+                case e: HttpRedirectException =>
+                  ec.getResponse.sendRedirect(e.location, e.serverSide, e.exitPortal)
+                // We don't have a "deleted" route at this point, and thus run the not found route when we
+                // found a "resource" to be deleted
+                case e: HttpStatusCodeException =>
+                  e.code match {
+                    case code @ (StatusCode.NotFound | StatusCode.Gone) =>
+                      if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t), code) // preserve status code for service at least
+                    case StatusCode.Unauthorized | StatusCode.Forbidden =>
+                      if (route.isPage) runUnauthorizedRoute(e)   else sendHttpStatusCode(e)
+                    case _ =>
+                      sendHttpStatusCode(e)
+                  }
+                case _: ResourceNotFoundException =>
+                  if (route.isPage)     runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
+                case _ if isConnectionInterruption(t) =>
+                  info(s"connection interrupted: ${getRootThrowable(t).getMessage}", logParams)
+                case _ =>
+                  if (route.isPage)     runErrorRoute(t)          else sendError(t)
+              }
+            }
+          case None if findRoute(path, None).isDefined =>
+            sendMethodNotAllowed()
+          case _ =>
+            runNotFoundRoute(None)
+        }
+      case InterceptorResult.Handled | InterceptorResult.ConnectionInterrupted =>
+        // Nothing else to do
+    }
   }
 
   // Compile a controller file

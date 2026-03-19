@@ -1,6 +1,6 @@
 package org.orbeon.xforms.route
 
-import org.orbeon.oxf.controller.PageFlowInterceptor
+import org.orbeon.oxf.controller.{InterceptorResult, PageFlowInterceptor}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.{HttpMethod, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -15,7 +15,7 @@ object XFormsServerInterceptor extends PageFlowInterceptor {
 
   private val XFormsServerRegex = "/xforms-server(/.*)?".r
 
-  def process()(implicit pc: PipelineContext, ec: ExternalContext): Boolean = {
+  def process()(implicit pc: PipelineContext, ec: ExternalContext): InterceptorResult.HandledOrNotHandled = {
 
     implicit val indentedLogger: IndentedLogger = Loggers.newIndentedLogger("server")
 
@@ -45,7 +45,7 @@ object XFormsServerInterceptor extends PageFlowInterceptor {
           case _ =>
             ec.getResponse.setStatus(StatusCode.MethodNotAllowed)
         }
-        true
+        InterceptorResult.Handled
       case (_, HttpMethod.POST) if matchesMediatypes && containsSubmissionParams =>
         XFormsServer.processEvents(
           logRequestResponse      = Loggers.isDebugEnabled("server-body"),
@@ -64,9 +64,9 @@ object XFormsServerInterceptor extends PageFlowInterceptor {
           extractWireEvents       = _ => Nil,
           trustEvents             = false
         )
-        true
+        InterceptorResult.Handled
       case _ =>
-        false
+        InterceptorResult.NotHandled
     }
   }
 }

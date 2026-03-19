@@ -41,10 +41,8 @@ object Mediatypes extends MediatypesTrait {
 
       private val buffer = ListBuffer[Mapping]()
 
-      def resultAsList: List[Mapping] = {
-        pprint.pprintln(buffer.result(), height = 10000)
+      def resultAsList: List[Mapping] =
         buffer.result()
-      }
 
       private def extensionFromPattern(pattern: String) =
         pattern.toLowerCase.trimAllToOpt flatMap findExtension getOrElse ""

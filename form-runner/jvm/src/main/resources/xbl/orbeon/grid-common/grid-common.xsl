@@ -131,10 +131,9 @@
     </xsl:function>
 
     <xsl:function name="fr:th-td-tr-classes-attr">
-        <xsl:param name="th-td-tr"       as="xs:string"/>   <!-- 'th' | 'td' | 'tr' -->
-        <xsl:param name="use-class"      as="xs:boolean"/>
-        <xsl:param name="id"             as="xs:string?"/>
-        <xsl:param name="static-row-pos" as="xs:integer?"/> <!-- Passed only for the 'td' case -->
+        <xsl:param name="th-td-tr"  as="xs:string"/> <!-- 'th' | 'td' | 'tr' -->
+        <xsl:param name="use-class" as="xs:boolean"/>
+        <xsl:param name="id"        as="xs:string?"/>
         <xsl:attribute
             name="class"
             select="
@@ -143,8 +142,7 @@
                 (
                     concat('{''fb-selected''[xxf:get-variable(''fr-form-model'', ''selected-cell'') = ''', $id, ''']}'),
                     'xforms-activable'
-                )[$is-editable and $th-td-tr = 'td'], (: for cell selection :)
-                concat('{''fr-grid-empty-row''[$fr-empty-row-', $static-row-pos, ']}')[$use-css-grids-output and $th-td-tr = 'td']
+                )[$is-editable and $th-td-tr = 'td'] (: for cell selection :)
             "/>
     </xsl:function>
 
@@ -212,33 +210,6 @@
             <xsl:variable name="static-row-pos" select="."/>
             <xsl:variable name="cells"          select="array:get($rows-array, $static-row-pos)"/>
 
-            <xsl:variable
-                name="empty-row-xpath"
-                select="
-                    if ($use-css-grids-output) then
-                        concat(
-                            'not(',
-                            string-join(
-                                (
-                                    for $c in $root/fr:c
-                                    let $cy := (xs:integer($c/@y), 1)[1]
-                                    let $ch := (xs:integer($c/@h), 1)[1]
-                                    return
-                                        if ($cy le $static-row-pos and $cy + $ch - 1 ge $static-row-pos) then
-                                            for $id in $c/(* except fr:hidden)/@id/string()
-                                            return concat('xxf:relevant(xxf:binding(''', $id, '''))')
-                                        else
-                                            (),
-                                    'false()'
-                                ),
-                                ' or '
-                            ),
-                            ')'
-                        )
-                    else
-                        ()
-                "/>
-
             <xsl:variable name="cells-content">
                 <xsl:for-each select="$cells">
                     <xsl:variable name="map" select="."/>
@@ -270,7 +241,7 @@
 
                         <!-- Attributes -->
                         <xsl:attribute name="xxf:control">true</xsl:attribute><!-- for cell selection -->
-                        <xsl:copy-of select="fr:th-td-tr-classes-attr('td', exists($c/@class), $c/@id, $static-row-pos)"/>
+                        <xsl:copy-of select="fr:th-td-tr-classes-attr('td', exists($c/@class), $c/@id)"/>
 
                         <xsl:if test="$h > 1"><xsl:attribute name="{fr:rowspan-attribute()}" select="$h"/></xsl:if>
                         <xsl:if test="$w > 1"><xsl:attribute name="{fr:colspan-attribute()}" select="$w"/></xsl:if>
@@ -327,7 +298,7 @@
 
                         <xsl:choose>
                             <xsl:when test="exists($tr)">
-                                <xsl:copy-of select="fr:th-td-tr-classes-attr('tr', exists($tr/@class), (), ())"/>
+                                <xsl:copy-of select="fr:th-td-tr-classes-attr('tr', exists($tr/@class), ())"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:attribute name="class">fr-grid-tr</xsl:attribute>
@@ -345,9 +316,6 @@
                 </xsl:when>
                 <xsl:otherwise>
                     <!-- CSS grids output -->
-                    <xf:var name="fr-empty-row-{$static-row-pos}">
-                        <xxf:value xxbl:scope="outer" value="{$empty-row-xpath}"/>
-                    </xf:var>
                     <xsl:copy-of select="$cells-content"/>
                 </xsl:otherwise>
             </xsl:choose>

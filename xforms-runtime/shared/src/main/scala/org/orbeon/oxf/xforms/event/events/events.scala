@@ -196,22 +196,28 @@ class XXFormsUploadErrorEvent(target: XFormsEventTarget, properties: PropertyGet
 
 object XXFormsUploadErrorEvent {
   // Attempt to retrieve a reason if any
-  def reasonToProperties(target: XFormsEventTarget): List[(String, Option[Any])] =
-    target.cast[XFormsUploadControl].to(List) flatMap
-      FileMetadata.progress                   flatMap {
+  private def reasonToProperties(target: XFormsEventTarget): List[(String, Option[Any])] =
+    target
+      .cast[XFormsUploadControl]
+      .toList
+      .flatMap(FileMetadata.progress)
+      .flatMap(progressToProperties)
+
+  def progressToProperties[T](progress: UploadProgress[T]): List[(String, Option[String])] =
+    progress match {
       case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.EmptyFile))) =>
         List("error-type" -> Some("empty-file-error"))
       case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.SizeTooLarge(permitted, actual)))) =>
         List(
           "error-type" -> Some("size-error"),
-          "permitted"  -> Some(permitted),
-          "actual"     -> Some(actual)
+          "permitted"  -> Some(ByteSizeUtils.byteCountToCompactDisplaySize(permitted)),
+          "actual"     -> Some(ByteSizeUtils.byteCountToCompactDisplaySize(actual))
         )
       case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.DisallowedMediatype(clientFilenameOpt, permitted, actual)))) =>
         List(
           "error-type" -> Some("mediatype-error"),
           "filename"   -> clientFilenameOpt,
-          "permitted"  -> Some(permitted.to(List) map (_.toString)),
+          "permitted"  -> Some(permitted.to(List).map(_.toString).mkString(", ")), // combine into a single string
           "actual"     -> (actual map (_.toString))
         )
       case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.FailedFileScan(_, message)))) =>
@@ -222,6 +228,7 @@ object XXFormsUploadErrorEvent {
       case _ =>
         List("error-type" -> Some("upload-error"))
     }
+
 }
 
 class XXFormsInstanceInvalidate(target: XFormsEventTarget, properties: PropertyGetter)

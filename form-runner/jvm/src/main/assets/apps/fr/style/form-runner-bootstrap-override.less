@@ -103,6 +103,7 @@ body.orbeon {
 
     font-family: var(--orbeon-base-font-family);
     font-size: var(--orbeon-base-font-size);
+    font-weight: var(--orbeon-base-font-weight);
     line-height: @fixedLineHeight;
     @media screen {
         line-height: @fluidLineHeight;
@@ -567,7 +568,7 @@ body.orbeon {
     .table {
         margin: 0;                          // Bootstrap adds a bottom margin of 20px
         th {
-            font-weight: normal;            // Set to bold in Bootstrap
+            font-weight: var(--orbeon-base-font-weight);            // Set to bold in Bootstrap
         }
     }
 
@@ -705,7 +706,7 @@ body.orbeon {
             padding: 3px 20px;
             clear: both;
             font-size: var(--orbeon-button-font-size);
-            font-weight: normal;
+            font-weight: var(--orbeon-base-font-weight);
             line-height: @fluidLineHeight;
             color: var(--orbeon-dropdown-menu-color);
             white-space: nowrap;

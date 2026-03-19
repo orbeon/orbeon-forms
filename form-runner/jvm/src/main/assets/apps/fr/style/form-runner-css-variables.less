@@ -21,6 +21,7 @@
   // Base font
   --orbeon-base-font-size  : 13px;
   --orbeon-base-font-family: @frBaseFontFamily;
+  --orbeon-base-font-weight: normal;
   --orbeon-base-color      : #333; // @grayDark, darker than Bootstrap default of #555
 
   // Links
@@ -31,13 +32,13 @@
   --orbeon-label-font-size      : 1.00em; // label and .xforms-label
   --orbeon-label-font-family    : @frBaseFontFamily;
   --orbeon-label-font-weight    : 600; // Help label stand out
-  --orbeon-label-color          : inherit;
+  --orbeon-label-color          : var(--orbeon-base-color);
   --orbeon-label-read-only-color: @minGrayText;
 
   // Hints
   --orbeon-hint-font-size  : smaller;
   --orbeon-hint-font-family: @frBaseFontFamily;
-  --orbeon-hint-font-weight: inherit;
+  --orbeon-hint-font-weight: var(--orbeon-base-font-weight);
   --orbeon-hint-color      : @minGrayText;
 
   // Help
@@ -47,20 +48,20 @@
   --orbeon-help-background-color       : white;
   --orbeon-help-border-color           : rgba(0, 0, 0, 0.2);
   --orbeon-help-content-font-size      : 1.00em;
-  --orbeon-help-content-font-weight    : inherit;
-  --orbeon-help-content-color          : inherit;
+  --orbeon-help-content-font-weight    : var(--orbeon-base-font-weight);
+  --orbeon-help-content-color          : var(--orbeon-base-color);
   --orbeon-help-title-font-size        : 1.08em;
-  --orbeon-help-title-font-weight      : inherit;
-  --orbeon-help-title-color            : inherit;
+  --orbeon-help-title-font-weight      : var(--orbeon-base-font-weight);
+  --orbeon-help-title-color            : var(--orbeon-base-color);
   --orbeon-help-title-background-color : #f7f7f7;
   --orbeon-help-title-border-color     : #ebebeb;
   --orbeon-help-close-color            : black;
   --orbeon-help-close-text-shadow-color: rgba(255,255,255,1);
 
   // Controls
-  --orbeon-control-font-size                 : inherit;
+  --orbeon-control-font-size                 : 1em;
   --orbeon-control-font-family               : @frBaseFontFamily;
-  --orbeon-control-font-weight               : inherit;
+  --orbeon-control-font-weight               : var(--orbeon-base-font-weight);
   --orbeon-control-color                     : black;   // Make text inside the fields stand out, as this is the most important information
   --orbeon-control-background-color          : white;
   --orbeon-control-read-only-background-color: #f2f2f2; // darken(@inputBackground, 5%);
@@ -70,7 +71,7 @@
   }
 
   // Specific controls
-  --orbeon-add-on-color                                    : inherit;
+  --orbeon-add-on-color                                    : var(--orbeon-base-color);
   --orbeon-add-on-background-color                         : #eee;
   --orbeon-add-on-text-shadow-color                        : white;
   --orbeon-dropdown-caret-color                            : #333;
@@ -90,7 +91,7 @@
   --orbeon-button-font-size                         : 1.00em; // button and .btn
   --orbeon-button-font-family                       : @frBaseFontFamily;
   --orbeon-button-font-weight                       : normal;
-  --orbeon-button-color                             : inherit;
+  --orbeon-button-color                             : var(--orbeon-base-color);
   --orbeon-button-background-color                  : #e8e8e8; // darken(@wellBackground, 5%)
   --orbeon-button-highlight-background-color        : #e6e6e6;
   --orbeon-button-disabled-color                    : var(--orbeon-button-color);
@@ -152,14 +153,14 @@
   --orbeon-section-color                        : #555;
   --orbeon-section-background-color             : #eee;    // @grayLighter;
   --orbeon-repeater-add-button-font-size        : 1.00em;
-  --orbeon-repeater-add-button-font-family      : inherit;
-  --orbeon-repeater-add-button-font-weight      : inherit;
-  --orbeon-repeater-add-button-color            : inherit;
+  --orbeon-repeater-add-button-font-family      : var(--orbeon-base-font-family);
+  --orbeon-repeater-add-button-font-weight      : var(--orbeon-base-font-weight);
+  --orbeon-repeater-add-button-color            : var(--orbeon-base-color);
   --orbeon-repeat-menu-background-color         : #f5f5f5; // @wellBackground
 
   // Grids
   --orbeon-repetition-number-font-size         : smaller;
-  --orbeon-repetition-number-font-family       : inherit;
+  --orbeon-repetition-number-font-family       : var(--orbeon-base-font-family);
   --orbeon-repetition-number-font-weight       : bold;
   --orbeon-repetition-number-color             : white;
   --orbeon-repetition-number-background-color  : #999;
@@ -203,17 +204,17 @@
 
   // HTML elements
   --orbeon-blockquote-font-size  : 1.35em; // 18px
-  --orbeon-blockquote-font-family: inherit;
+  --orbeon-blockquote-font-family: var(--orbeon-base-font-family);
   --orbeon-blockquote-font-weight: 300;
-  --orbeon-blockquote-color      : inherit;
+  --orbeon-blockquote-color      : var(--orbeon-base-color);
   --orbeon-code-font-size        : 0.92em; // 12px; code and CodeMirror
   --orbeon-code-font-family      : monospace;
-  --orbeon-code-font-weight      : inherit;
-  --orbeon-code-color            : inherit;
+  --orbeon-code-font-weight      : var(--orbeon-base-font-weight);
+  --orbeon-code-color            : var(--orbeon-base-color);
   --orbeon-pre-font-size         : 1.00em;
   --orbeon-pre-font-family       : monospace;
-  --orbeon-pre-font-weight       : inherit;
-  --orbeon-pre-color             : inherit;
+  --orbeon-pre-font-weight       : var(--orbeon-base-font-weight);
+  --orbeon-pre-color             : var(--orbeon-base-color);
   --orbeon-sub-sup-font-size     : 0.75em;
 
   // Icons
@@ -226,7 +227,7 @@
   // Alerts
   --orbeon-active-alert-font-size        : 1em; // TODO: overridden by "inherit" when visited => useless?
   --orbeon-active-alert-font-family      : sans-serif;
-  --orbeon-active-alert-font-weight      : inherit;
+  --orbeon-active-alert-font-weight      : var(--orbeon-base-font-weight);
   --orbeon-active-alert-color            : white;
   --orbeon-alert-color                   : #555;    // @gray
   --orbeon-alert-background-color        : white;

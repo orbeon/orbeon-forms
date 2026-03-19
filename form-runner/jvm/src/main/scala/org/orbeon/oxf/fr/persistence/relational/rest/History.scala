@@ -122,8 +122,8 @@ private object History {
 
   private case class CommonMetadata(
     formVersion    : Int,
-    createdTime    : Instant,
-    createdUsername: String
+    createdTime    : Instant
+    //createdUsername: String // See #5734
   )
 
   private def historyWithoutDiffsFromDatabase(
@@ -259,8 +259,8 @@ private object History {
       if (position == 0) {
         commonMetadataOpt = CommonMetadata(
           formVersion     = rs.getInt("form_version"),
-          createdTime     = rs.getTimestamp("created").toInstant,
-          createdUsername = "TODO" // xxx
+          createdTime     = rs.getTimestamp("created").toInstant
+          //createdUsername = rs.getString("created_by") // See #5734
         ).some
       }
 
@@ -311,8 +311,8 @@ private object History {
           historyWithoutDiffs.commonMetadataOpt.toList.flatMap { commonMetadata =>
             List(
               "form-version"     -> commonMetadata.formVersion.toString,
-              "created-time"     -> DateUtils.formatIsoDateTimeUtc(commonMetadata.createdTime),
-              "created-username" -> commonMetadata.createdUsername
+              "created-time"     -> DateUtils.formatIsoDateTimeUtc(commonMetadata.createdTime)
+              //"created-username" -> commonMetadata.createdUsername // TODO: #5734 Add created_by column
             )
           }
       ) {

@@ -745,8 +745,10 @@
                                         value="Wizard:gatherTopLevelSectionStatusJava($relevant-top-level-section-ids)"/>
 
                                     <!-- Update available sections instance -->
-                                    <!-- We do this because we don't want to run `Wizard:gatherSectionStatusJava` at each refresh, and we want to
-                                         depend on instance values, although in practice it might not make much of a difference. -->
+                                    <!-- We do this because we don't want to run `Wizard:gatherTopLevelSectionStatusJava` at each refresh, and we want to
+                                         depend on instance values, although in practice it might not make much of a difference.
+                                         2026-03-19: `fr-update-section-status` runs at each `xxforms-refresh-done` now.
+                                     -->
                                     <xf:setvalue
                                         ref="xxf:instance('available-top-level-sections')"
                                         value="

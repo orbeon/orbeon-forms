@@ -192,7 +192,7 @@ object Wizard {
 
     def gatherTopLevelSectionStatus(relevantTopLevelSectionIds: List[String]): List[SectionStatus] = {
 
-      val sectionNames = relevantTopLevelSectionIds flatMap controlNameFromIdOpt toSet
+      val sectionNames = relevantTopLevelSectionIds.flatMap(controlNameFromIdOpt).toSet
 
       val topLevelSectionNamesWithErrorsMap =
         ErrorSummary.topLevelSectionsWithErrors(sectionNamesSet = sectionNames, onlyVisible = false)

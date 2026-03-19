@@ -2,9 +2,8 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.controller.XmlNativeRoute
-import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
+import org.orbeon.oxf.externalcontext.{ExternalContext, Organization, UserAndGroup}
 import org.orbeon.oxf.fr.AppForm
-import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.api.{Diffs, HistoryDiff, PersistenceApi}
 import org.orbeon.oxf.fr.persistence.relational.Statement.*
@@ -17,7 +16,6 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, DateUtils, IndentedLogger}
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.oxf.xml.{DeferredXMLReceiver, XMLReceiver}
-import org.xml.sax.Attributes
 
 import java.sql.{Connection, ResultSet}
 import java.time.Instant
@@ -44,8 +42,7 @@ object HistoryRoute extends XmlNativeRoute {
           implicit val receiver: DeferredXMLReceiver = getResponseXmlReceiverSetContentType
           returnHistory(
             Request(httpRequest.getFirstParamAsString, provider),
-            app,
-            form,
+            AppForm(app, form),
             documentId,
             Option(filenameOrNull),
             PersistenceMetadataSupport.isInternalAdminUser(httpRequest.getFirstParamAsString)
@@ -87,8 +84,7 @@ private object History {
 
   def returnHistory(
     request            : Request,
-    app                : String,
-    form               : String,
+    appForm            : AppForm,
     documentId         : String,
     filenameOpt        : Option[String],
     isInternalAdminUser: Boolean // 2024-07-18: Unused, see https://github.com/orbeon/orbeon-forms/issues/6416
@@ -97,192 +93,244 @@ private object History {
     externalContext    : ExternalContext,
     indentedLogger     : IndentedLogger
   ): Unit = {
-    RelationalUtils.withConnection { connection =>
 
-      val startOffsetZeroBased = (request.pageNumber - 1) * request.pageSize
-      val rowNumSQL            = Provider.rowNumSQL(
-        provider       = request.provider,
-        connection     = connection,
-        orderBy        = "d.last_modified_time DESC"
-      )
-      val rowNumCol            = rowNumSQL.col
-      val rowNumOrderBy        = rowNumSQL.orderBy
-      val rowNumTable          = rowNumSQL.table match {
-        case Some(table) => table + ","
-        case None        => ""
+    val historyWithoutDiffs =
+      RelationalUtils.withConnection { connection =>
+        historyWithoutDiffsFromDatabase(connection, request, appForm, documentId, filenameOpt)
       }
 
-      val tableName =
-        filenameOpt match {
-          case None                 => "orbeon_form_data"
-          case Some(NonAllBlank(_)) => "orbeon_form_data_attach" // TODO: use constants for table names
-          case Some(_)              => throw HttpStatusCodeException(StatusCode.BadRequest)
-        }
-
-      val hasStage = filenameOpt.isDefined
-
-      val innerSQL =
-        s"""|SELECT  t.last_modified_time, t.last_modified_by, t.created
-            |        , t.username, t.groupname, t.organization_id
-            |        ${if (hasStage) ", t.stage" else ""}
-            |        , t.form_version, t.deleted
-            |FROM    $tableName t
-            |WHERE   t.app  = ?
-            |        and t.form = ?
-            |        and t.document_id = ?
-            |        and t.draft = ?
-            |        ${if (filenameOpt.isDefined) "and t.file_name = ?" else ""}
-            |""".stripMargin
-
-      // Boilerplate for cross-database paging, see also `SearchLogic`
-      val sql =
-        s"""SELECT
-           |    c.*
-           |FROM
-           |    (
-           |        SELECT
-           |            d.*,
-           |            $rowNumCol
-           |        FROM
-           |             $rowNumTable
-           |             (
-           |                 $innerSQL
-           |             ) d
-           |        $rowNumOrderBy
-           |    ) c
-           | WHERE
-           |    row_num
-           |        BETWEEN ${startOffsetZeroBased + 1}
-           |        AND     ${startOffsetZeroBased + request.pageSize + (if (request.includeDiffs) 1 else 0)}
-           |""".stripMargin
-
-      val setters =
-        List[Setter](
-          (ps, i) => ps.setString(i, app),
-          (ps, i) => ps.setString(i, form),
-          (ps, i) => ps.setString(i, documentId),
-          (ps, i) => ps.setString(i, "N"),
-        ) :::
-        filenameOpt.toList.map { filename =>
-          ((ps, i) => ps.setString(i, filename)): Setter
-        }
-
-      val (searchTotal, minLastModifiedTime, maxLastModifiedTime) = {
-
-        val sql =
-          s"""SELECT count(*) total,
-             |       min(a.last_modified_time) min_last_modified_time,
-             |       max(a.last_modified_time) max_last_modified_time
-             |  FROM (
-             |       $innerSQL
-             |       ) a
-           """.stripMargin
-
-        debug(s"search total query:\n$sql")
-        executeQuery(connection, sql, List(StatementPart("", setters))) { rs =>
-          rs.next()
-
-          (
-            rs.getInt("total"),
-            Option(rs.getTimestamp("min_last_modified_time")).map(_.toInstant),
-            Option(rs.getTimestamp("max_last_modified_time")).map(_.toInstant)
-          )
-        }
-      }
-
-      executeQuery(connection, sql, List(StatementPart("", setters))) { rs =>
-
-        withDocument {
-          withElement(
-            "documents",
-            atts =
-              List(
-                "application-name"         -> app,
-                "form-name"                -> form,
-                "document-id"              -> documentId,
-                "total"                    -> searchTotal.toString
-              ) :::
-              (searchTotal > 0).flatList(
-                List(
-                  "min-last-modified-time" -> minLastModifiedTime.map(DateUtils.formatIsoDateTimeUtc).getOrElse(throw new IllegalArgumentException),
-                  "max-last-modified-time" -> maxLastModifiedTime.map(DateUtils.formatIsoDateTimeUtc).getOrElse(throw new IllegalArgumentException)
-                )
-              ) :::
-              List(
-                "page-size"                -> request.pageSize.toString,
-                "page-number"              -> request.pageNumber.toString,
-              )
-          ) {
-
-            // Read all documents from the database first, as we might need to compute the revision history diffs
-            // based on the modification time of the documents
-            val (documents, formVersionOpt) = documentsAndFormVersionOpt(connection, rs, hasStage = hasStage)
-
-            val formVersion    = formVersionOpt.getOrElse(throw HttpStatusCodeException(StatusCode.InternalServerError))
-            val appFormVersion = (AppForm(app, form), formVersion)
-
-            emitDocumentsWithDiffsIfRequested(request, documents, appFormVersion, documentId)
-          }
-        }
-      }
-    }
+    // #7561: call this outside of the RelationalUtils.withConnection above to avoid nested connections
+    emitDocumentsWithDiffsIfRequested(request, appForm, documentId, historyWithoutDiffs)
   }
 
-  private case class DocumentMetadata(atts: Attributes, modifiedTime: Instant)
+  private case class HistoryWithoutDiffs(
+    searchTotal           : Int,
+    minLastModifiedTimeOpt: Option[Instant],
+    maxLastModifiedTimeOpt: Option[Instant],
+    documentsMetadata     : List[DocumentMetadata],
+    commonMetadataOpt     : Option[CommonMetadata]
+  )
 
-  private def documentsAndFormVersionOpt(
+  private case class DocumentMetadata(
+    modifiedTime        : Instant,
+    modifiedUsername    : String,
+    ownerUserAndGroupOpt: Option[UserAndGroup],
+    organizationOpt     : Option[Organization],
+    deleted             : Boolean,
+    stageOpt            : Option[String]
+  )
+
+  private case class CommonMetadata(
+    formVersion    : Int,
+    createdTime    : Instant,
+    createdUsername: String
+  )
+
+  private def historyWithoutDiffsFromDatabase(
+    connection    : Connection,
+    request       : Request,
+    appForm       : AppForm,
+    documentId    : String,
+    filenameOpt   : Option[String]
+  )(implicit
+    indentedLogger: IndentedLogger
+  ): HistoryWithoutDiffs = {
+
+    val startOffsetZeroBased = (request.pageNumber - 1) * request.pageSize
+    val rowNumSQL            = Provider.rowNumSQL(
+      provider   = request.provider,
+      connection = connection,
+      orderBy    = "d.last_modified_time DESC"
+    )
+    val rowNumCol            = rowNumSQL.col
+    val rowNumOrderBy        = rowNumSQL.orderBy
+    val rowNumTable          = rowNumSQL.table match {
+      case Some(table) => table + ","
+      case None        => ""
+    }
+
+    val tableName =
+      filenameOpt match {
+        case None                 => "orbeon_form_data"
+        case Some(NonAllBlank(_)) => "orbeon_form_data_attach" // TODO: use constants for table names
+        case Some(_)              => throw HttpStatusCodeException(StatusCode.BadRequest)
+      }
+
+    val hasStage = filenameOpt.isDefined
+
+    val innerSQL =
+      s"""|SELECT  t.last_modified_time, t.last_modified_by, t.created
+          |        , t.username, t.groupname, t.organization_id
+          |        ${if (hasStage) ", t.stage" else ""}
+          |        , t.form_version, t.deleted
+          |FROM    $tableName t
+          |WHERE   t.app  = ?
+          |        and t.form = ?
+          |        and t.document_id = ?
+          |        and t.draft = ?
+          |        ${if (filenameOpt.isDefined) "and t.file_name = ?" else ""}
+          |""".stripMargin
+
+    // Boilerplate for cross-database paging, see also `SearchLogic`
+    val sql =
+      s"""SELECT
+         |    c.*
+         |FROM
+         |    (
+         |        SELECT
+         |            d.*,
+         |            $rowNumCol
+         |        FROM
+         |             $rowNumTable
+         |             (
+         |                 $innerSQL
+         |             ) d
+         |        $rowNumOrderBy
+         |    ) c
+         | WHERE
+         |    row_num
+         |        BETWEEN ${startOffsetZeroBased + 1}
+         |        AND     ${startOffsetZeroBased + request.pageSize + (if (request.includeDiffs) 1 else 0)}
+         |""".stripMargin
+
+    val setters =
+      List[Setter](
+        (ps, i) => ps.setString(i, appForm.app),
+        (ps, i) => ps.setString(i, appForm.form),
+        (ps, i) => ps.setString(i, documentId),
+        (ps, i) => ps.setString(i, "N"),
+      ) :::
+      filenameOpt.toList.map { filename =>
+        ((ps, i) => ps.setString(i, filename)): Setter
+      }
+
+    val (searchTotal, minLastModifiedTimeOpt, maxLastModifiedTimeOpt) = {
+
+      val sql =
+        s"""SELECT count(*) total,
+           |       min(a.last_modified_time) min_last_modified_time,
+           |       max(a.last_modified_time) max_last_modified_time
+           |  FROM (
+           |       $innerSQL
+           |       ) a
+         """.stripMargin
+
+      debug(s"search total query:\n$sql")
+      executeQuery(connection, sql, List(StatementPart("", setters))) { rs =>
+        rs.next()
+
+        (
+          rs.getInt("total"),
+          Option(rs.getTimestamp("min_last_modified_time")).map(_.toInstant),
+          Option(rs.getTimestamp("max_last_modified_time")).map(_.toInstant)
+        )
+      }
+    }
+
+    // Read all documents from the database, as we might need to compute the revision history diffs based on the
+    // modification time of the documents
+    val (documentsMetadata, commonMetadataOpt) =
+      executeQuery(connection, sql, List(StatementPart("", setters))) { rs =>
+        documentsMetadataFromResultSet(connection, rs, hasStage = hasStage)
+      }
+
+    HistoryWithoutDiffs(
+      searchTotal            = searchTotal,
+      minLastModifiedTimeOpt = minLastModifiedTimeOpt,
+      maxLastModifiedTimeOpt = maxLastModifiedTimeOpt,
+      documentsMetadata      = documentsMetadata,
+      commonMetadataOpt      = commonMetadataOpt
+    )
+  }
+
+  private def documentsMetadataFromResultSet(
     connection: Connection,
     rs        : ResultSet,
     hasStage  : Boolean
-  )(implicit
-    receiver  : DeferredXMLReceiver
-  ): (List[DocumentMetadata], Option[Int]) = {
+  ): (List[DocumentMetadata], Option[CommonMetadata]) = {
 
-    val documents                   = mutable.ListBuffer[DocumentMetadata]()
-    var formVersionOpt: Option[Int] = None
+    val documents = mutable.ListBuffer[DocumentMetadata]()
+    var position  = 0
 
-    var position = 0
+    var commonMetadataOpt: Option[CommonMetadata] = None
 
     while (rs.next()) {
 
       if (position == 0) {
-        val formVersion = rs.getInt("form_version")
-
-        formVersionOpt = formVersion.some
-
-        receiver.addAttribute("", "form-version", "form-version", formVersion.toString)
-        receiver.addAttribute("", "created-time", "created-time", DateUtils.formatIsoDateTimeUtc(rs.getTimestamp("created").toInstant))
-        receiver.addAttribute("", "created-username", "created-username", "TODO") // xxx
+        commonMetadataOpt = CommonMetadata(
+          formVersion     = rs.getInt("form_version"),
+          createdTime     = rs.getTimestamp("created").toInstant,
+          createdUsername = "TODO" // xxx
+        ).some
       }
 
-      val userAndGroup = UserAndGroup.fromStrings(rs.getString("username"), rs.getString("groupname"))
-      val organization = OrganizationSupport.readFromResultSet(connection, rs).map(_._2)
-
-      val modifiedTime = rs.getTimestamp("last_modified_time").toInstant
-
       documents += DocumentMetadata(
-        atts =
-          (hasStage list ("stage" -> rs.getString("stage").trimAllToEmpty)) :::
-            List(
-              "modified-time"     -> DateUtils.formatIsoDateTimeUtc(modifiedTime),
-              "modified-username" -> rs.getString("last_modified_by").trimAllToEmpty,
-              "owner-username"    -> userAndGroup.map(_.username).getOrElse(""),
-              "owner-group"       -> userAndGroup.flatMap(_.groupname).getOrElse(""),
-              "deleted"           -> (rs.getString("deleted") == "Y").toString,
-            ),
-        modifiedTime = modifiedTime
+        modifiedTime         = rs.getTimestamp("last_modified_time").toInstant,
+        modifiedUsername     = rs.getString("last_modified_by").trimAllToEmpty,
+        ownerUserAndGroupOpt = UserAndGroup.fromStrings(rs.getString("username"), rs.getString("groupname")),
+        organizationOpt      = OrganizationSupport.readFromResultSet(connection, rs).map(_._2),
+        deleted              = rs.getString("deleted") == "Y",
+        stageOpt             = hasStage.option(rs.getString("stage").trimAllToEmpty)
       )
 
       position += 1
     }
 
-    (documents.toList, formVersionOpt)
+    (documents.toList, commonMetadataOpt)
   }
+
+  private def emitDocumentsWithDiffsIfRequested(
+    request            : Request,
+    appForm            : AppForm,
+    documentId         : String,
+    historyWithoutDiffs: HistoryWithoutDiffs
+  )(implicit
+    receiver           : DeferredXMLReceiver,
+    indentedLogger     : IndentedLogger
+  ): Unit =
+    withDocument {
+      withElement(
+        "documents",
+        atts =
+          List(
+            "application-name"         -> appForm.app,
+            "form-name"                -> appForm.form,
+            "document-id"              -> documentId,
+            "total"                    -> historyWithoutDiffs.searchTotal.toString
+          ) :::
+          (historyWithoutDiffs.searchTotal > 0).flatList(
+            List(
+              "min-last-modified-time" -> historyWithoutDiffs.minLastModifiedTimeOpt.map(DateUtils.formatIsoDateTimeUtc).getOrElse(throw new IllegalArgumentException),
+              "max-last-modified-time" -> historyWithoutDiffs.maxLastModifiedTimeOpt.map(DateUtils.formatIsoDateTimeUtc).getOrElse(throw new IllegalArgumentException)
+            )
+          ) :::
+          List(
+            "page-size"                -> request.pageSize.toString,
+            "page-number"              -> request.pageNumber.toString,
+          ) :::
+          historyWithoutDiffs.commonMetadataOpt.toList.flatMap { commonMetadata =>
+            List(
+              "form-version"     -> commonMetadata.formVersion.toString,
+              "created-time"     -> DateUtils.formatIsoDateTimeUtc(commonMetadata.createdTime),
+              "created-username" -> commonMetadata.createdUsername
+            )
+          }
+      ) {
+        emitDocumentsWithDiffsIfRequested(
+          request        = request,
+          documents      = historyWithoutDiffs.documentsMetadata,
+          appForm        = appForm,
+          formVersionOpt = historyWithoutDiffs.commonMetadataOpt.map(_.formVersion),
+          documentId     = documentId
+        )
+      }
+    }
 
   private def emitDocumentsWithDiffsIfRequested(
     request       : Request,
     documents     : List[DocumentMetadata],
-    appFormVersion: AppFormVersion,
+    appForm       : AppForm,
+    formVersionOpt: Option[Int],
     documentId    : String
   )(implicit
     receiver      : XMLReceiver,
@@ -292,9 +340,19 @@ private object History {
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
 
     // This will be computed only if diffs are requested
-    lazy val formDefinitionAndDiffsTry =
+    lazy val formDefinitionAndDiffsTry = locally {
+
+      val appFormVersion = (
+        appForm,
+        // If we retrieve the diffs, this means the form version has been retrieved as well (non-empty list of documents)
+        formVersionOpt.getOrElse(throw HttpStatusCodeException(StatusCode.InternalServerError))
+      )
+
       for {
-        formDefinition <- HistoryDiff.formDefinition(appFormVersion, request.langOpt)
+        formDefinition <- HistoryDiff.formDefinition(
+          appFormVersion   = appFormVersion,
+          requestedLangOpt = request.langOpt
+        )
         formDiffs      <- HistoryDiff.formDiffs(
           appFormVersion = appFormVersion,
           documentId     = documentId,
@@ -302,13 +360,24 @@ private object History {
           formDefinition = formDefinition
         )
       } yield (formDefinition, formDiffs)
+    }
 
     for {
       // If diffs are requested, we've retrieved pageSize + 1 documents from the database to get the modification
       // date of the previous document for the last document in the page; always return pageSize documents at the most
       (document, previousLastModifiedOpt) <- documents.zip(documents.tail.map(_.modifiedTime.some) :+ None).take(request.pageSize)
     } {
-      withElement("document", atts = document.atts) {
+      val atts =
+        document.stageOpt.map("stage" -> _).toList :::
+        List(
+          "modified-time"     -> DateUtils.formatIsoDateTimeUtc(document.modifiedTime),
+          "modified-username" -> document.modifiedUsername,
+          "owner-username"    -> document.ownerUserAndGroupOpt.map(_.username).getOrElse(""),
+          "owner-group"       -> document.ownerUserAndGroupOpt.flatMap(_.groupname).getOrElse(""),
+          "deleted"           -> document.deleted.toString,
+        )
+
+      withElement("document", atts = atts) {
         previousLastModifiedOpt match {
           case Some(olderModifiedTime) if request.includeDiffs =>
 

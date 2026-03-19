@@ -233,13 +233,13 @@
                                     <!-- NOTE: Hide labels when not in `separate-toc` mode as they take a lot of space -->
                                     <xh:span class="fr-toc-status {{'sr-only'[not(xxf:instance('local')/section-status/data(.))]}} label{{
                                         if ($top-level-section-tokens = 'invalid') then
-                                            ' label-important'
+                                            ' label-important fr-section-status-errors'
                                         else if ($top-level-section-tokens = 'incomplete') then
-                                            ' label-warning'
+                                            ' label-warning fr-section-status-incomplete'
                                         else if ($top-level-section-visited) then
-                                            ' label-success'
+                                            ' label-success fr-section-status-complete'
                                         else
-                                            ''
+                                            ' fr-section-status-not-started'
                                     }}"><xf:output value="
                                             xxf:r(
                                                 if ($top-level-section-tokens = 'invalid') then

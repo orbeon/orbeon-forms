@@ -202,9 +202,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     existingFileURI  : URI
   )(implicit
     logger           : IndentedLogger
-  ): URI = {
+  ): URI =
     existingFileURI
-  }
 
   def inputStreamToRequestUri(
     inputStream      : InputStream

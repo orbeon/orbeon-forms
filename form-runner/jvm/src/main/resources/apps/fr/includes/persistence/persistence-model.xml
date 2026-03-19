@@ -83,6 +83,10 @@
                     $form
                 )
             )                                                                   and
+            not(
+                $mode = 'new' and
+                xxf:instance('fr-form-metadata')/singleton = 'true'
+            )                                                                   and
             $mode = ('new', 'edit')                                             and
             not($is-fb)"/>
 
@@ -115,11 +119,10 @@
 
             <xf:action if="$is-singleton">
 
-                <!-- Is there any data for this form that the user can edit? -->
-                <xf:setvalue context="instance('fr-search-request')/drafts" value="'include'"/>
+                <!-- Is there any non-draft data for this form that the user can edit? -->
+                <xf:setvalue context="instance('fr-search-request')/drafts" value="'exclude'"/>
                 <xf:send submission="fr-search-submission"/>
-                <xf:var name="existing-non-draft-docs" value="instance('fr-search-response')/document[@draft = 'false']"/>
-                <xf:var name="existing-draft-docs"     value="instance('fr-search-response')/document[@draft = 'true']"/>
+                <xf:var name="existing-non-draft-docs" value="instance('fr-search-response')/document"/>
 
                 <xf:action if="count($existing-non-draft-docs) = 1">
                     <xf:load resource="edit/{$existing-non-draft-docs/@name}"/>
@@ -128,15 +131,6 @@
                     <xf:setvalue
                         ref="instance('fr-persistence-instance')/found-document-message-to-show"
                         value="'found-multiple-docs-for-singleton'"/>
-                </xf:action>
-
-                <!-- Drafts exist: prompt like non-singleton forms -->
-                <xf:action if="count($existing-non-draft-docs) = 0">
-                    <xf:setvalue
-                        ref="instance('fr-persistence-instance')/found-document-message-to-show"
-                        value="if (count($existing-draft-docs) = 1)
-                               then 'found-draft-for-never-saved'
-                               else 'found-drafts-for-never-saved'"/>
                 </xf:action>
 
             </xf:action>

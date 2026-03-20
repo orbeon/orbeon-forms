@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr.library
 
+import cats.syntax.option.*
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.common.Version
@@ -21,6 +22,7 @@ import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.definitions.ModeType
 import org.orbeon.oxf.fr.email.{EmailMetadataParsing, EvaluatedParams}
 import org.orbeon.oxf.fr.process.{SimpleProcess, *}
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
@@ -213,6 +215,8 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 
     Fun("rendered-format-url", classOf[FRRenderedFormatUrl], op = 0, min = 0, STRING, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE),
+      Arg(BOOLEAN, EXACTLY_ONE),
+      Arg(STRING, ALLOWS_ZERO_OR_ONE),
     )
 
     Fun("rendered-format-filename", classOf[FRRenderedFormatFilename], op = 0, min = 0, STRING, EXACTLY_ONE,
@@ -793,8 +797,16 @@ class FRRenderedFormatUrl extends FunctionSupport with RuntimeDependentFunction 
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
     implicit val xpc             : XPathContext     = xpathContext
     implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
+
+    val usePdfTemplate     = booleanArgument(1, default = true)
+    val pdfTemplateNameOpt = stringArgumentOpt(2).flatMap(_.trimAllToOpt)
+
+    val renderedFormatParams =
+      (! usePdfTemplate).list(FormRunnerRenderedFormat.UsePdfTemplateParam.some -> usePdfTemplate.toString) :::
+      pdfTemplateNameOpt.map(FormRunnerRenderedFormat.PdfTemplateNameParam.some -> _).toList
+
     SimpleProcess.tryCreateRenderedFormatIfNeeded(
-      params         = Map.empty, // TODO: add ability to pass `use-pdf-template`/`pdf-template-name`
+      params         = renderedFormatParams.toMap,
       renderedFormat = RenderedFormat.withName(stringArgument(0))
     ).toOption.map(_._1.toString)
   }

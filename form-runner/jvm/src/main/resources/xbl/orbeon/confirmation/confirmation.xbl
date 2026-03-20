@@ -50,7 +50,12 @@
                 <xf:action if="$template/attach/@pdf = 'true'">
                     <xf:setvalue
                         ref="instance()/pdf-attachment"
-                        value="fr:rendered-format-url('pdf')"/>
+                        value="
+                            fr:rendered-format-url(
+                                'pdf',
+                                not($template/attach/@use-pdf-template/string() = 'false'),
+                                $template/attach/@pdf-template-name/string()
+                            )"/>
                     <xf:setvalue
                         ref="instance()/pdf-attachment/@filename"
                         value="fr:rendered-format-filename('pdf')"/>

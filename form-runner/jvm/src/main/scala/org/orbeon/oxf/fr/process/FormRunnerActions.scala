@@ -600,7 +600,7 @@ trait FormRunnerActions
       // - `pdf` is explicitly excluded by symmetry with `tiff`
 
       if (! isSupportedDetailMode(modePublicNameString, excludeSecondaryModes = true) || modePublicNameString == FormRunnerDetailMode.Pdf.publicName)
-        throw new IllegalArgumentException(s"Unsupported detail mode navigation for moe: `$modePublicNameString`")
+        throw new IllegalArgumentException(s"Unsupported detail mode navigation for mode: `$modePublicNameString`")
 
       tryChangeModeImpl(ReplaceType.All, s"/fr/$app/$form/$modePublicNameString/$document" -> Nil, formRunnerParams.modeType(frc.customModes))
     }

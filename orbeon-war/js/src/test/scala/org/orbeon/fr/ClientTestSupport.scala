@@ -1,6 +1,7 @@
 package org.orbeon.fr
 
 import org.orbeon.fr.DockerSupport.{removeContainerByImage, runContainer}
+import org.orbeon.node.OS
 import org.orbeon.oxf.util.FutureUtils.{eventually, eventuallyAsTry}
 import org.orbeon.web
 import org.scalajs.dom
@@ -150,28 +151,48 @@ trait ClientTestSupport {
       }
     }
 
+  private val LicensePath = s"${OS.homedir()}/.orbeon/license.xml"
+
+  private def licenseFileExists: Boolean = {
+    val fs = g.require("fs")
+    fs.existsSync(LicensePath).asInstanceOf[Boolean]
+  }
+
+  private def mount(src: String, dst: String, ro: Boolean = true): String =
+    s"--mount type=bind,src=$src,dst=$dst${if (ro) ",ro" else ""}"
+
   protected def runTomcatContainer(
     containerName    : String,
     port             : Int,
     checkImageRunning: Boolean,
     network          : Option[String],
     configDirectory  : String
-  ): Future[Try[List[String]]] =
+  ): Future[Try[List[String]]] = {
+
+    val mounts =
+      List(
+        mount(s"$$BASE_DIRECTORY/orbeon-war/jvm/target/webapp"                      , s"$ImageTomcatDir/webapps/orbeon", ro = false),
+        mount(s"$$BASE_DIRECTORY/orbeon-war/js/src/test/resources/tomcat/orbeon.xml", s"$ImageTomcatDir/conf/Catalina/localhost/orbeon.xml"),
+        mount(s"$LocalOrbeonResourcesDir/forms"                                     , s"$ImageTomcatDir/webapps/orbeon/WEB-INF/test-resources/forms"),
+        mount(s"$LocalOrbeonResourcesDir/$configDirectory"                          , s"$ImageTomcatDir/webapps/orbeon/WEB-INF/test-resources/config"),
+        mount(s"$LocalResourcesDir/tomcat/server.xml"                               , s"$ImageTomcatDir/conf/server.xml"),
+        mount(s"$LocalResourcesDir/tomcat/setenv.sh"                                , s"$ImageTomcatDir/bin/setenv.sh"),
+      ) ::: (if (licenseFileExists) List(mount(LicensePath, "/root/.orbeon/license.xml")) else Nil)
+
+    val args = (
+      network.map(n => s"--network=$n").toList :::
+      List("-it")                              :::
+      mounts                                   :::
+      List(s"-p $port:8080")
+    ).mkString(" ")
+
     runContainer(
       TomcatImageName,
       containerName,
-      s"""
-        |${network.map(n => s"--network=$n ").getOrElse("")}-it
-        |--mount type=bind,src=$$BASE_DIRECTORY/orbeon-war/jvm/target/webapp,dst=$ImageTomcatDir/webapps/orbeon
-        |--mount type=bind,src=$$HOME/.orbeon/license.xml,dst=/root/.orbeon/license.xml,ro
-        |--mount type=bind,src=$$BASE_DIRECTORY/orbeon-war/js/src/test/resources/tomcat/orbeon.xml,dst=$ImageTomcatDir/conf/Catalina/localhost/orbeon.xml,ro
-        |--mount type=bind,src=$LocalOrbeonResourcesDir/forms,dst=$ImageTomcatDir/webapps/orbeon/WEB-INF/test-resources/forms,ro
-        |--mount type=bind,src=$LocalOrbeonResourcesDir/$configDirectory,dst=$ImageTomcatDir/webapps/orbeon/WEB-INF/test-resources/config,ro
-        |--mount type=bind,src=$LocalResourcesDir/tomcat/server.xml,dst=$ImageTomcatDir/conf/server.xml,ro
-        |--mount type=bind,src=$LocalResourcesDir/tomcat/setenv.sh,dst=$ImageTomcatDir/bin/setenv.sh,ro
-        |-p $port:8080""".stripMargin,
+      args,
       checkImageRunning
     )
+  }
 
   def withRunTomcatContainer[T](containerName: String, port: Int, checkImageRunning: Boolean, network: Option[String])(block: => Future[T]): Future[T] = async {
     val r = await(runTomcatContainer(containerName, port, checkImageRunning, network, configDirectory = DefaultConfigDirectory))

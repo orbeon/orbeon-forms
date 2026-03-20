@@ -174,7 +174,7 @@
             -dontwarn scala.AnyKind
             -dontwarn scala.tools.nsc.**
             -dontwarn cats.effect.Signal**
-            -dontwarn fs2.io.net.unixsocket.**
+            -dontwarn fs2.io.net.**
             -dontwarn sun.misc.Unsafe
 
             -dontwarn org.osgi.annotation.**
@@ -300,7 +300,7 @@
             -dontwarn scala.AnyKind
             -dontwarn scala.tools.nsc.**
             -dontwarn cats.effect.Signal**
-            -dontwarn fs2.io.net.unixsocket.**
+            -dontwarn fs2.io.net.**
             -dontwarn sun.misc.Unsafe
 
             -dontwarn org.osgi.annotation.**

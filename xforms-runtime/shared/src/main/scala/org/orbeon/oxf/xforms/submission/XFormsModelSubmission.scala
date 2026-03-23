@@ -656,11 +656,8 @@ class XFormsModelSubmission(
                 ),
                 cxr.some
               )
-            case ConnectResultT.Failure(_, throwable, _) =>
-              (
-                ReplaceResult.SendError(throwable, Left(None), submissionParameters.tunnelProperties),
-                None
-              )
+            case ConnectResultT.Failure(_, throwable, cxrOpt) =>
+              (ReplaceResult.SendError(throwable, Left(cxrOpt), submissionParameters.tunnelProperties), cxrOpt)
           }
         }
       } catch {

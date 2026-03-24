@@ -98,11 +98,15 @@
                 </xsl:choose>
             </xf:var>
 
-            <!-- FIXME: `exists(@fr:section-status)` no longer works, while `exists(@*:section-status)` and
-                  `exists(@fr:section-status/string())` work! -->
+            <!--
+                TODO:
+                    - `exists(@fr:section-status)` does not work!
+                    - `exists(@fr:section-status/string())` works partially (see #7494)
+                    - the workaround below works
+            -->
             <xf:var
                 name="top-level-section-visited"
-                value="exists(@fr:section-status/string())"/>
+                value="exists(@*[namespace-uri() = 'http://orbeon.org/oxf/xml/form-runner' and local-name() = 'section-status'])"/>
 
             <xf:var
                 name="top-level-section-tokens"

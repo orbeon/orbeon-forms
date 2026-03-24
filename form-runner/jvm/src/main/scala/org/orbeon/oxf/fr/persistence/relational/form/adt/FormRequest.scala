@@ -23,6 +23,7 @@ import org.orbeon.oxf.fr.persistence.relational.form.adt.LocalRemoteOrCombinator
 import org.orbeon.oxf.fr.{AppFormOpt, FormDefinitionVersion}
 import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xml.dom.IOSupport.readOrbeonDom
 import org.orbeon.saxon.om.NodeInfo
@@ -97,7 +98,16 @@ case class FormRequest(
     exactFormQueryOpt.map(_.value)
 
   // Compatibility mode: GET request with parameters encoded in URL; otherwise, POST request with parameters in body
-  val pathSuffix: String            = PublishedFormMetadataRoute.pathSuffix(compatibilityMode.flatOption(AppFormOpt(exactAppOpt, exactFormOpt)))
+  val pathSuffix: String = {
+    if (compatibilityMode) {
+      val appFormOpt       = AppFormOpt(exactAppOpt, exactFormOpt)
+      val baseWithAppForm  = PublishedFormMetadataRoute.pathSuffix(appFormOpt)
+      val allVersionsValue = latestFormVersionQueryOpt.isEmpty
+      PathUtils.appendQueryString(baseWithAppForm, s"all-versions=$allVersionsValue")
+    } else
+      PublishedFormMetadataRoute.pathSuffix(None)
+  }
+
   val httpMethod: HttpMethod        = if (compatibilityMode) HttpMethod.GET else HttpMethod.POST
   val httpBodyOpt: Option[NodeInfo] = (! compatibilityMode).option(toXML)
 
@@ -110,7 +120,7 @@ case class FormRequest(
   def formRequestForRemoteServer: FormRequest =
     copy(
       remoteServerCredentials = Map.empty,
-      filterQueries           = Seq(exactAppQueryOpt, exactFormQueryOpt).flatten,
+      filterQueries           = Seq(exactAppQueryOpt, exactFormQueryOpt, latestFormVersionQueryOpt).flatten,
       paginationOpt           = None
     )
 }

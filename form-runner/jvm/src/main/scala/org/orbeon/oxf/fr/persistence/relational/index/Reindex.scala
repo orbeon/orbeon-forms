@@ -39,6 +39,25 @@ import scala.util.{Failure, Success}
 
 trait Reindex extends FormDefinition {
 
+  def indexedControlsXPaths(
+    appForm : AppForm,
+    version : Int
+  )(implicit
+    indentedLogger: IndentedLogger,
+    propertySet   : PropertySet
+  ): List[String] = {
+    val formDetailsTry =
+      PersistenceMetadataSupport.readPublishedFormStorageDetails(
+        appForm, FormDefinitionVersion.Specific(version))
+    formDetailsTry match {
+      case Failure(_) =>
+        error(s"Can't index documents for ${appForm.app}/${appForm.form} as form definition can't be found")
+        Nil
+      case Success(FormStorageDetails(_, indexedFields, _)) =>
+        indexedFields.value
+    }
+  }
+
   // Reindexing is a 3-step process:
   //   1. Clear the index
   //   2. Get the documents to index
@@ -46,10 +65,10 @@ trait Reindex extends FormDefinition {
   //      - add 1 row to orbeon_i_current
   //      - add as many as necessary to orbeon_i_control_text
   def reindex(
-    provider       : Provider,
-    whatToReindex  : WhatToReindex,
-    clearOnly      : Boolean,
-    connectionOpt  : Option[java.sql.Connection] = None
+    provider             : Provider,
+    whatToReindex        : WhatToReindex,
+    clearOnly            : Boolean,
+    reindexConnectionOpt : Option[ReindexConnection] = None
   )(implicit
     externalContext: ExternalContext,
     indentedLogger : IndentedLogger,
@@ -104,6 +123,8 @@ trait Reindex extends FormDefinition {
           |     d.id      = l.id AND
           |     d.deleted = 'N'
           |""".stripMargin
+
+    val connectionOpt = reindexConnectionOpt.map(_.connection)
 
     val distinctForms: List[AppFormVersion] = RelationalUtils.withConnection(connectionOpt) { connection =>
 
@@ -215,19 +236,10 @@ trait Reindex extends FormDefinition {
     }
 
     val formsToIndexedControlsXPaths: Map[AppFormVersion, List[String]] =
-      distinctForms.map { case appFormVersion@(appForm@AppForm(app, form), version) =>
-        val formDetailsTry =
-          PersistenceMetadataSupport.readPublishedFormStorageDetails(
-            appForm, FormDefinitionVersion.Specific(version))
-        val indexedControlsXPaths = formDetailsTry match {
-          case Failure(_) =>
-            error(s"Can't index documents for $app/$form as form definition can't be found")
-            Nil
-          case Success(FormStorageDetails(_, indexedFields, _)) =>
-            indexedFields.value
-        }
-        appFormVersion -> indexedControlsXPaths
-      }.toMap
+      reindexConnectionOpt.map(_.indexedControlsXPaths).getOrElse {distinctForms.map { case appFormVersion@(appForm, version) =>
+          appFormVersion -> indexedControlsXPaths(appForm, version)
+        }.toMap
+      }
 
     RelationalUtils.withConnection(connectionOpt) { connection =>
       // Get all the rows from `orbeon_form_data` that are "latest" and not deleted

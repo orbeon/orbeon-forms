@@ -18,13 +18,14 @@ import org.orbeon.io.IOUtils.*
 import org.orbeon.io.{IOUtils, StringBuilderWriter}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunnerMetadataSupport.*
+import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.Version.*
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport.*
 import org.orbeon.oxf.fr.persistence.relational.search.SearchLogic
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{Drafts, SearchRequest}
-import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils, WhatToReindex}
+import org.orbeon.oxf.fr.persistence.relational.*
 import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, Names}
 import org.orbeon.oxf.http.{EmptyInputStream, Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
@@ -378,12 +379,16 @@ trait CreateUpdateDelete {
       }
     }
 
-    def reindex(connectionOpt: Option[java.sql.Connection])(implicit propertySet: PropertySet): Unit =
-      // Update index if needed
-      if (
-        ! req.forAttachment &&               // https://github.com/orbeon/orbeon-forms/issues/6913
-        ! req.dataPart.exists(_.forceDelete) // no need to reindex as we only `DELETE` historical data, which is not indexed
-      ) {
+    val doReindex: Boolean =
+      ! req.forAttachment &&               // https://github.com/orbeon/orbeon-forms/issues/6913
+      ! req.dataPart.exists(_.forceDelete) // no need to reindex as we only `DELETE` historical data, which is not indexed
+
+    def reindex(
+      reindexConnectionOpt: Option[ReindexConnection]
+    )(implicit
+      propertySet         : PropertySet
+    ): Unit =
+      if (doReindex) {
         val whatToReindex = req.dataPart match {
           case Some(dataPart) =>
             // Data: update index for this document id
@@ -399,7 +404,7 @@ trait CreateUpdateDelete {
           delete && req.forForm // we know it's not for an attachment as that's tested above
 
         withDebug("CRUD: reindexing", List("what" -> whatToReindex.toString)) {
-          Index.reindex(req.provider, whatToReindex, clearOnly = clearOnly, connectionOpt)
+          Index.reindex(req.provider, whatToReindex, clearOnly = clearOnly, reindexConnectionOpt)
         }
       }
 
@@ -409,6 +414,15 @@ trait CreateUpdateDelete {
       ! delete                &&
       req.existingRow.isEmpty &&
       req.singleton.getOrElse(false)
+
+    // Pre-fetch the indexed controls XPaths before opening a database connection, to avoid nested
+    // connections when calling `readPublishedFormStorageDetails` during reindex.
+    // https://github.com/orbeon/orbeon-forms/issues/7564
+    val preComputedIndexedControlsXPaths: Map[AppFormVersion, List[String]] =
+      if (req.forData && doReindex)
+        Map((req.appForm, versionToSet) -> Index.indexedControlsXPaths(req.appForm, versionToSet))
+      else
+        Map.empty
 
     // Update database
     val storeResult =
@@ -439,7 +453,7 @@ trait CreateUpdateDelete {
               throw HttpStatusCodeException(StatusCode.Conflict)
 
             val storeResult = store(connection, req, reqBodyOpt, delete, versionToSet)
-            reindex(Some(connection))
+            reindex(Some(ReindexConnection(connection, preComputedIndexedControlsXPaths)))
             storeResult
           }
         } catch {
@@ -453,7 +467,7 @@ trait CreateUpdateDelete {
         // We must reindex only the data for a single document, so do it in the same transaction
         RelationalUtils.withConnection { connection =>
           val storeResult = store(connection, req, reqBodyOpt, delete, versionToSet)
-          reindex(Some(connection))
+          reindex(Some(ReindexConnection(connection, preComputedIndexedControlsXPaths)))
           storeResult
         }
       } else {

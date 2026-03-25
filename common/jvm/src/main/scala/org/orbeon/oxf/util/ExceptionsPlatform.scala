@@ -1,4 +1,3 @@
-// Distributed under the MIT license, see: http://www.opensource.org/licenses/MIT
 package org.orbeon.oxf.util
 
 

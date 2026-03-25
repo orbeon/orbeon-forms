@@ -3,6 +3,7 @@ package org.orbeon.oxf.fr
 import cats.syntax.option.*
 import org.orbeon.oxf.fr.process.FormRunnerActionApi
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport}
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.event.EventCollector
@@ -22,6 +23,7 @@ class SectionTemplatesTest
   describe("#7492: form with repeated section templates with dependent values") {
 
     it("must update the top-level and section template controls when the workflow stage changes") {
+      assume(Version.isPE) // cross-model dependency analysis requires PE
 
       val (processorService, Some(xfcd), _) =
         runFormRunner("issue", "7492", "new", initialize = true)
@@ -55,6 +57,7 @@ class SectionTemplatesTest
   describe("#7427: Section templates: value dependencies") {
 
     it("must update control values in all top-level and section template dependencies") {
+      assume(Version.isPE) // cross-model dependency analysis requires PE
 
       val (processorService, Some(xfcd), _) =
         runFormRunner("issue", "7427", "new", initialize = true)

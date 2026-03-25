@@ -21,7 +21,7 @@ object Main {
 
   private def initResourceManager(): Unit = {
     val props = new java.util.HashMap[String, AnyRef]
-    // Mediatypes accesses mime-types.xml using an oxf: URL
+    // Was for  `mime-types.xml`, not sure if still needed now that they are in `Mediatypes.scala`
     props.put("oxf.resources.factory", "org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory")
     ResourceManagerWrapper.init(props)
   }

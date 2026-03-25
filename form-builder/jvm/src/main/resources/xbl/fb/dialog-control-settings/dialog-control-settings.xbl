@@ -1201,9 +1201,7 @@
                 <xf:bind
                     ref="$i/fr-default-sort-column/@enabled"
                     type="xs:boolean"
-                    readonly="
-                        not($selected-values = 'fr-persist') or
-                        $selected-values = 'fr-encrypt'">
+                    readonly="$selected-values = 'fr-encrypt'">
                     <!-- Display information if other controls have sorting enabled -->
                     <xf:constraint
                         id="default-sort-column-validation"

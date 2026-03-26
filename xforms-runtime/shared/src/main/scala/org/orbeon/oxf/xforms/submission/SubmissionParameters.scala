@@ -41,7 +41,7 @@ case class SubmissionParameters(
   xxfCalculate                   : Boolean,
   xxfUploads                     : Boolean,
   xxfRelevantAttOpt              : Option[QName],
-  xxfPersistMipQNameOpt          : Option[QName],
+  xxfKeepMipQNameOpt             : Option[QName],
   xxfAnnotate                    : Set[String],
   isHandlingClientGetAll         : Boolean,
   isDeferredSubmission           : Boolean,
@@ -210,9 +210,9 @@ object SubmissionParameters {
       else
         None
 
-    val resolvedXxfPersistMipQNameOpt: Option[QName] =
+    val resolvedXxfKeepMipQNameOpt: Option[QName] =
       if (serialize)
-        resolveQNameAvt(staticSubmission.avtXxfPersistMipQNameOpt)
+        resolveQNameAvt(staticSubmission.avtXxfKeepMipQNameOpt)
       else
         None
 
@@ -363,7 +363,7 @@ object SubmissionParameters {
       xxfCalculate                   = resolvedXxfCalculate,
       xxfUploads                     = resolvedXxfUploads,
       xxfRelevantAttOpt              = resolvedXxfRelevantAtt,
-      xxfPersistMipQNameOpt          = resolvedXxfPersistMipQNameOpt,
+      xxfKeepMipQNameOpt             = resolvedXxfKeepMipQNameOpt,
       xxfAnnotate                    = resolvedXxfAnnotate,
       isHandlingClientGetAll         = isHandlingClientGetAll,
       isDeferredSubmission           = isDeferredSubmission,

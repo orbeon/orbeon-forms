@@ -29,7 +29,7 @@
         validate="false"
         xxf:relevant-attribute="fr:relevant"
         xxf:annotate="{event('annotate')}"
-        xxf:persist-mip="{event('persist-mip')}"
+        xxf:keep-mip="{event('keep-mip')}"
         method="{event('method')}"
         serialization="{event('serialization')}"
         mediatype="{event('mediatype')}"

@@ -2694,7 +2694,7 @@ az4K</document>
                         <xf:bind ref=".//with-persist-true"  fr:persist="true()"/>
                         <xf:bind ref="nested-non-relevant"  relevant="false()"/>
 
-                        <xf:submission id="test-submission" method="post" action="echo:" replace="instance" xxf:persist-mip="fr:persist" nonrelevant="empty"/>
+                        <xf:submission id="test-submission" method="post" action="echo:" replace="instance" xxf:keep-mip="fr:persist" nonrelevant="empty"/>
                         <xf:send event="xforms-ready" submission="test-submission"/>
                     </xf:model>
                 </xh:head>

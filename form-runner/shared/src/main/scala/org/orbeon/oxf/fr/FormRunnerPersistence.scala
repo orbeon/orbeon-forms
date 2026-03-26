@@ -1102,7 +1102,7 @@ trait FormRunnerPersistence {
         namespaceContext   = formModel.staticModel.namespaceMapping.mapping,
         annotateWith       = Set("relevant=fr:relevant"),
         relevantAttOpt     = Some(XMLNames.FRRelevantQName),
-        persistMipQNameOpt = (! FormRunner.isFormBuilder).option(XMLNames.FRPersistQName)
+        keepMipQNameOpt    = (! FormRunner.isFormBuilder).option(XMLNames.FRPersistQName)
       )
 
     val preparedDataDocumentInfo =

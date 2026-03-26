@@ -68,7 +68,7 @@ trait XFormsModelSubmissionSupportTrait {
     namespaceContext  : Map[String, String],
     annotateWith      : Set[String],
     relevantAttOpt    : Option[QName],
-    persistMipQNameOpt: Option[QName]
+    keepMipQNameOpt   : Option[QName]
   ): Document =
     ref match {
       case virtualNode: VirtualNodeType =>
@@ -109,7 +109,7 @@ trait XFormsModelSubmissionSupportTrait {
           relevanceHandling             = relevanceHandling,
           relevantAttOpt                = relevantAttOpt,
           relevantAnnotationAttQNameOpt = attributeNamesForTokens.get(Relevant.name),
-          persistMipQNameOpt            = persistMipQNameOpt
+          keepMipQNameOpt               = keepMipQNameOpt
         )
 
         val root = copy.getRootElement
@@ -145,11 +145,11 @@ trait XFormsModelSubmissionSupportTrait {
     }
 
   def processRelevant(
-    doc                           : Document,
-    relevanceHandling             : RelevanceHandling,
-    relevantAttOpt                : Option[QName],
-    relevantAnnotationAttQNameOpt : Option[QName],
-    persistMipQNameOpt            : Option[QName]
+    doc                          : Document,
+    relevanceHandling            : RelevanceHandling,
+    relevantAttOpt               : Option[QName],
+    relevantAnnotationAttQNameOpt: Option[QName],
+    keepMipQNameOpt              : Option[QName]
   ): Unit = {
 
     // If we have `xxf:relevant-attribute="fr:relevant"`, say, then we use that attribute to also determine
@@ -197,8 +197,8 @@ trait XFormsModelSubmissionSupportTrait {
       }
 
     // Independently of relevance, a custom MIP can be used to determine whether nodes should be pruned
-    persistMipQNameOpt.foreach { persistMipQName =>
-      pruneNonRelevantNodes(doc, InstanceData.findCustomMip(_, persistMipQName).contains(false.toString))
+    keepMipQNameOpt.foreach { keepMipQName =>
+      pruneNonRelevantNodes(doc, InstanceData.findCustomMip(_, keepMipQName).contains(false.toString))
     }
 
     attsToRemoveFromRelevance.foreach { attQName =>

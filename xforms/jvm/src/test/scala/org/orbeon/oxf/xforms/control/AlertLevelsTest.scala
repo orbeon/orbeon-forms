@@ -90,13 +90,13 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
 
       def copyAndAnnotate(tokens: Set[String]) =
         XFormsModelSubmissionSupport.prepareXML(
-          xfcd               = document,
-          ref                = instance("fr-form-instance").get.root,
-          relevanceHandling  = RelevanceHandling.Keep,
-          namespaceContext   = Map.empty,
-          annotateWith       = tokens,
-          relevantAttOpt     = None,
-          persistMipQNameOpt = None
+          xfcd              = document,
+          ref               = instance("fr-form-instance").get.root,
+          relevanceHandling = RelevanceHandling.Keep,
+          namespaceContext  = Map.empty,
+          annotateWith      = tokens,
+          relevantAttOpt    = None,
+          keepMipQNameOpt   = None
         )
 
       // Cause warnings and info

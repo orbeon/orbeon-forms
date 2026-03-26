@@ -101,7 +101,7 @@ trait FormRunnerActions
         PropertyValue("method"                , method.entryName.toUpperCase.some),
         PropertyValue(NonRelevantName         , relevanceHandling.entryName.toLowerCase.some),
         PropertyValue("annotate"              , annotateWith.mkString(" ").some),
-        PropertyValue("persist-mip"           , (! keepNonPersistedValues).option(XMLNames.FRPersistQName.qualifiedName)),
+        PropertyValue("keep-mip"              , (! keepNonPersistedValues).option(XMLNames.FRPersistQName.qualifiedName)),
         PropertyValue("show-progress"         , showProgress.toString.some),
         PropertyValue("response-is-resource"  , responseIsResource.toString.some),
         PropertyValue("formtarget"            , formTargetOpt.getOrElse("").some),

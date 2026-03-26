@@ -97,7 +97,7 @@ class SubmissionRelevanceTest extends AnyFunSpec with XMLSupport {
           relevanceHandling             = relevanceHandling,
           relevantAttOpt                = Some(XFRelevantQName),
           relevantAnnotationAttQNameOpt = Some(XXFRelevantQName),
-          persistMipQNameOpt            = None
+          keepMipQNameOpt               = None
         )
         assertXMLDocumentsIgnoreNamespacesInScope(expected(relevanceHandling), doc)
       }

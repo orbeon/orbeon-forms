@@ -566,7 +566,7 @@ class XFormsModelSubmission(
             submissionParameters.relevanceHandling,
             submissionParameters.xxfAnnotate,
             submissionParameters.xxfRelevantAttOpt,
-            submissionParameters.xxfPersistMipQNameOpt,
+            submissionParameters.xxfKeepMipQNameOpt,
             submissionParameters.tunnelProperties
           )
         )
@@ -578,7 +578,7 @@ class XFormsModelSubmission(
       relevanceHandling : RelevanceHandling,
       annotateWith      : Set[String],
       relevantAttOpt    : Option[QName],
-      persistMipQNameOpt: Option[QName],
+      keepMipQNameOpt   : Option[QName],
       tunnelProperties  : Option[TunnelProperties]
     )(implicit
       indentedLogger    : IndentedLogger
@@ -604,7 +604,7 @@ class XFormsModelSubmission(
           namespaceContext   = staticSubmission.namespaceMapping.mapping,
           annotateWith       = annotateWith,
           relevantAttOpt     = relevantAttOpt,
-          persistMipQNameOpt = persistMipQNameOpt
+          keepMipQNameOpt    = keepMipQNameOpt
         )
 
       // Check that there are no validation errors

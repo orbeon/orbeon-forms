@@ -959,11 +959,11 @@
                 <!--</fr:header>-->
                 <fr:body>
 
-                    <xf:var name="show-created"          value="xxf:property(string-join(('oxf.fr.summary.show-created'       ,   $app, $form), '.'))"/>
-                    <xf:var name="show-last-modified"    value="xxf:property(string-join(('oxf.fr.summary.show-last-modified' ,   $app, $form), '.'))"/>
-                    <xf:var name="show-workflow-stage"   value="xxf:property(string-join(('oxf.fr.summary.show-workflow-stage',   $app, $form), '.'))"/>
-                    <xf:var name="show-created-by"       value="xxf:property(string-join(('oxf.fr.summary.show-created-by',       $app, $form), '.'))"/>
-                    <xf:var name="show-last-modified-by" value="xxf:property(string-join(('oxf.fr.summary.show-last-modified-by', $app, $form), '.'))"/>
+                    <xf:var name="show-created"          value="frf:showSummaryMetadataColumn($source-form-metadata, 'created',          $app, $form)"/>
+                    <xf:var name="show-last-modified"    value="frf:showSummaryMetadataColumn($source-form-metadata, 'last-modified',    $app, $form)"/>
+                    <xf:var name="show-workflow-stage"   value="frf:showSummaryMetadataColumn($source-form-metadata, 'workflow-stage',   $app, $form)"/>
+                    <xf:var name="show-created-by"       value="frf:showSummaryMetadataColumn($source-form-metadata, 'created-by',       $app, $form)"/>
+                    <xf:var name="show-last-modified-by" value="frf:showSummaryMetadataColumn($source-form-metadata, 'last-modified-by', $app, $form)"/>
 
                     <xf:group class="fr-top-fields">
 

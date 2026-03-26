@@ -520,6 +520,21 @@
             <hint>Используется для шаблонов форм и главной страницы</hint>
         </thumbnail>
         <default-template>Шаблон по умолчанию</default-template>
+        <summary-tab>
+            <label>Сводная страница</label>
+        </summary-tab>
+        <summary-metadata-columns>
+            <created><label>Дата создания</label></created>
+            <last-modified><label>Дата изменения</label></last-modified>
+            <workflow-stage><label>Стадия рабочего процесса</label></workflow-stage>
+            <created-by><label>Создано</label></created-by>
+            <last-modified-by><label>Кем изменено</label></last-modified-by>
+            <show>
+                <item id="0">Использовать свойство</item>
+                <item id="1">Показать</item>
+                <item id="2">Скрыть</item>
+            </show>
+        </summary-metadata-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Настройки элемента: "{1}" / "{0}" ({2})</label>
@@ -600,14 +615,6 @@
             <column-only>Показывать только столбец</column-only>
             <search-only>Показывать только поиск</search-only>
         </summary-show>
-        <role>
-            <restrict>Ограничить по роли</restrict>
-            <all>Все</all>
-            <any>Любая</any>
-            <of-the-following>из следующих:</of-the-following>
-            <empty>Пустая роль</empty>
-            <duplicate>Дублирующаяся роль</duplicate>
-        </role>
         <bulk-edit-actions>
             <save-data>Сохранить данные</save-data>
             <run-process>Выполнить процесс</run-process>
@@ -1713,4 +1720,12 @@
             </item>
         </items>
     </template>
+    <role-restriction>
+        <restrict>Ограничить по роли</restrict>
+        <all>Все</all>
+        <any>Любая</any>
+        <of-the-following>из следующих:</of-the-following>
+        <empty>Пустая роль</empty>
+        <duplicate>Дублирующаяся роль</duplicate>
+    </role-restriction>
 </resource>

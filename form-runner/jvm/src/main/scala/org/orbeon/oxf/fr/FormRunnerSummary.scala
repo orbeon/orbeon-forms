@@ -17,7 +17,9 @@ import org.orbeon.connection.ConnectionContextSupport
 import org.orbeon.connection.ConnectionContextSupport.ConnectionContexts
 import org.orbeon.oxf.externalcontext.SafeRequestContext
 import org.orbeon.oxf.fr.FormRunner.*
+import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataFormatVersionName, DataXml}
+import org.orbeon.oxf.fr.permission.SimpleConstraint
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.properties.PropertySet
@@ -97,6 +99,36 @@ trait FormRunnerSummary {
       FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
       Option(resourcesRootElem)
     ).toXML
+  }
+
+  //@XPathFunction
+  def showSummaryMetadataColumn(metadataElem: NodeInfo, columnName: String, app: String, form: String): Boolean = {
+
+    val columnOpt =
+      Option(metadataElem)
+        .flatMap(m => (m / "summary-metadata-columns" / "column").find(_.attValue("name") == columnName))
+
+    columnOpt match {
+      case Some(column) =>
+
+        // Use form metadata
+        if (column.attValue("show") == "true") {
+
+          // Check against role constraint, if any
+          SimpleConstraint.satisfiedForUserRolesFromCurrentSession(
+            rolesOpt      = column.attValueNonBlankOpt("require-role"),
+            constraintOpt = column.attValueNonBlankOpt("require-role-constraint")
+          )
+        } else {
+          // Explicitly do not show column
+          false
+        }
+
+      case None =>
+        // Fall back to property
+        implicit val formRunnerParams: FormRunnerParams = FormRunnerParams(AppForm(app, form), "summary")
+        frc.booleanFormRunnerProperty(s"oxf.fr.summary.show-$columnName")
+    }
   }
 
   //@XPathFunction

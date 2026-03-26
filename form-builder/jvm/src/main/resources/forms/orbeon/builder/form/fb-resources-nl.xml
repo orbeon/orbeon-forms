@@ -521,6 +521,21 @@
             <hint>Gebruikt voor formuliersjablonen en de landingspagina</hint>
         </thumbnail>
         <default-template>Standaardsjabloon</default-template>
+        <summary-tab>
+            <label>Overzichtspagina</label>
+        </summary-tab>
+        <summary-metadata-columns>
+            <created><label>Aangemaakt</label></created>
+            <last-modified><label>Bewerkt</label></last-modified>
+            <workflow-stage><label>Workflowfase</label></workflow-stage>
+            <created-by><label>Gemaakt door</label></created-by>
+            <last-modified-by><label>Gewijzigd door</label></last-modified-by>
+            <show>
+                <item id="0">Gebruik property</item>
+                <item id="1">Tonen</item>
+                <item id="2">Verbergen</item>
+            </show>
+        </summary-metadata-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Control-instellingen: "{1}" / "{0}" ({2})</label>
@@ -601,14 +616,6 @@
             <column-only>Alleen kolom tonen</column-only>
             <search-only>Alleen zoeken tonen</search-only>
         </summary-show>
-        <role>
-            <restrict>Beperk tot rol</restrict>
-            <all>Alle</all>
-            <any>Elke</any>
-            <of-the-following>van de volgende:</of-the-following>
-            <empty>Lege rol</empty>
-            <duplicate>Dubbele rol</duplicate>
-        </role>
         <bulk-edit-actions>
             <save-data>Gegevens opslaan</save-data>
             <run-process>Proces uitvoeren</run-process>
@@ -1686,4 +1693,12 @@
             </item>
         </items>
     </template>
+    <role-restriction>
+        <restrict>Beperk tot rol</restrict>
+        <all>Alle</all>
+        <any>Elke</any>
+        <of-the-following>van de volgende:</of-the-following>
+        <empty>Lege rol</empty>
+        <duplicate>Dubbele rol</duplicate>
+    </role-restriction>
 </resource>

@@ -500,6 +500,7 @@
                     <xf:bind id="density-bind"                    ref="density"/>
                     <xf:bind id="readonly-disable-calculate-bind" ref="readonly-disable-calculate"/>
                     <xf:bind id="xbl-bind"                        ref="xbl"/>
+                    <xf:bind id="summary-metadata-columns-bind"   ref="summary-metadata-columns"/>
                     <xf:bind id="library-versions-bind"           ref="library-versions">
                         <xf:bind
                             ref="_ | orbeon | app"

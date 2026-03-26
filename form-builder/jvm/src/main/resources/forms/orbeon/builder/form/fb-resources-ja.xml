@@ -540,6 +540,21 @@
             <hint>フォームテンプレートやランディングページで使用</hint>
         </thumbnail>
         <default-template>デフォルトテンプレート</default-template>
+        <summary-tab>
+            <label>サマリーページ</label>
+        </summary-tab>
+        <summary-metadata-columns>
+            <created><label>作成日</label></created>
+            <last-modified><label>更新日</label></last-modified>
+            <workflow-stage><label>ワークフロー段階</label></workflow-stage>
+            <created-by><label>作成者</label></created-by>
+            <last-modified-by><label>更新者</label></last-modified-by>
+            <show>
+                <item id="0">プロパティを使う</item>
+                <item id="1">表示</item>
+                <item id="2">非表示</item>
+            </show>
+        </summary-metadata-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>コントロール設定: "{1}" / "{0}" ({2})</label>
@@ -620,14 +635,6 @@
             <column-only>列のみ表示</column-only>
             <search-only>検索のみ表示</search-only>
         </summary-show>
-        <role>
-            <restrict>ロールで制限</restrict>
-            <all>すべて</all>
-            <any>いずれか</any>
-            <of-the-following>次のいずれか:</of-the-following>
-            <empty>ロール未指定</empty>
-            <duplicate>ロールが重複しています</duplicate>
-        </role>
         <bulk-edit-actions>
             <save-data>データを保存</save-data>
             <run-process>プロセスを実行</run-process>
@@ -1697,4 +1704,12 @@
             </item>
         </items>
     </template>
+    <role-restriction>
+        <restrict>ロールで制限</restrict>
+        <all>すべて</all>
+        <any>いずれか</any>
+        <of-the-following>次のいずれか:</of-the-following>
+        <empty>ロール未指定</empty>
+        <duplicate>ロールが重複しています</duplicate>
+    </role-restriction>
 </resource>

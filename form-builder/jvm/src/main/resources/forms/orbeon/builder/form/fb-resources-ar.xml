@@ -540,6 +540,21 @@
             <hint>تستخدم لقوالب النماذج وصفحة البداية</hint>
         </thumbnail>
         <default-template>القالب الافتراضي</default-template>
+        <summary-tab>
+            <label>صفحة الملخص</label>
+        </summary-tab>
+        <summary-metadata-columns>
+            <created><label>تم الإنشاء</label></created>
+            <last-modified><label>تم التعديل</label></last-modified>
+            <workflow-stage><label>مرحلة سير العمل</label></workflow-stage>
+            <created-by><label>أنشئ بواسطة</label></created-by>
+            <last-modified-by><label>آخر تعديل بواسطة</label></last-modified-by>
+            <show>
+                <item id="0">استخدام الخاصية</item>
+                <item id="1">إظهار</item>
+                <item id="2">إخفاء</item>
+            </show>
+        </summary-metadata-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>إعدادات عنصر التحكم: "{1}" / "{0}" ({2})</label>
@@ -620,14 +635,6 @@
             <column-only>عرض العمود فقط</column-only>
             <search-only>عرض البحث فقط</search-only>
         </summary-show>
-        <role>
-            <restrict>تقييد الدور</restrict>
-            <all>الكل</all>
-            <any>أي</any>
-            <of-the-following>من التالي:</of-the-following>
-            <empty>دور فارغ</empty>
-            <duplicate>دور مكرر</duplicate>
-        </role>
         <bulk-edit-actions>
             <save-data>حفظ البيانات</save-data>
             <run-process>تنفيذ العملية</run-process>
@@ -1705,4 +1712,12 @@
             </item>
         </items>
     </template>
+    <role-restriction>
+        <restrict>تقييد الدور</restrict>
+        <all>الكل</all>
+        <any>أي</any>
+        <of-the-following>من التالي:</of-the-following>
+        <empty>دور فارغ</empty>
+        <duplicate>دور مكرر</duplicate>
+    </role-restriction>
 </resource>

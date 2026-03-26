@@ -532,6 +532,21 @@
             <hint>Wird für Formularvorlagen und die Startseite verwendet</hint>
         </thumbnail>
         <default-template>Standardvorlage</default-template>
+        <summary-tab>
+            <label>Übersichtsseite</label>
+        </summary-tab>
+        <summary-metadata-columns>
+            <created><label>Erstellt</label></created>
+            <last-modified><label>Geändert am</label></last-modified>
+            <workflow-stage><label>Workflow-Stufe</label></workflow-stage>
+            <created-by><label>Erstellt von</label></created-by>
+            <last-modified-by><label>Geändert von</label></last-modified-by>
+            <show>
+                <item id="0">Eigenschaft verwenden</item>
+                <item id="1">Anzeigen</item>
+                <item id="2">Ausblenden</item>
+            </show>
+        </summary-metadata-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Einstellungen Steuerelemente: "{1}" / "{0}" ({2})</label>
@@ -612,14 +627,6 @@
             <column-only>Nur Spalte anzeigen</column-only>
             <search-only>Nur in der Suche anzeigen</search-only>
         </summary-show>
-        <role>
-            <restrict>Auf Rolle beschränken</restrict>
-            <all>Alle</all>
-            <any>Beliebig</any>
-            <of-the-following>der folgenden:</of-the-following>
-            <empty>Leere Rolle</empty>
-            <duplicate>Rolle duplizieren</duplicate>
-        </role>
         <bulk-edit-actions>
             <save-data>Daten speichern</save-data>
             <run-process>Prozess ausführen</run-process>
@@ -1656,4 +1663,12 @@
             </item>
         </items>
     </template>
+    <role-restriction>
+        <restrict>Auf Rolle beschränken</restrict>
+        <all>Alle</all>
+        <any>Beliebig</any>
+        <of-the-following>der folgenden:</of-the-following>
+        <empty>Leere Rolle</empty>
+        <duplicate>Rolle duplizieren</duplicate>
+    </role-restriction>
 </resource>

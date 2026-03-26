@@ -520,6 +520,21 @@
             <hint>Se usa para plantillas de formulario y la página de inicio</hint>
         </thumbnail>
         <default-template>Plantilla predeterminada</default-template>
+        <summary-tab>
+            <label>Página de resumen</label>
+        </summary-tab>
+        <summary-metadata-columns>
+            <created><label>Creado</label></created>
+            <last-modified><label>Modificado</label></last-modified>
+            <workflow-stage><label>Estado del flujo</label></workflow-stage>
+            <created-by><label>Creado por</label></created-by>
+            <last-modified-by><label>Modificado por</label></last-modified-by>
+            <show>
+                <item id="0">Usar propiedad</item>
+                <item id="1">Mostrar</item>
+                <item id="2">Ocultar</item>
+            </show>
+        </summary-metadata-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Configuración de Controles: "{1}" / "{0}" ({2})</label>
@@ -600,14 +615,6 @@
             <column-only>Mostrar solo la columna</column-only>
             <search-only>Mostrar solo la búsqueda</search-only>
         </summary-show>
-        <role>
-            <restrict>Restringir al rol</restrict>
-            <all>Todos</all>
-            <any>Cualquiera</any>
-            <of-the-following>de los siguientes:</of-the-following>
-            <empty>Rol vacío</empty>
-            <duplicate>Rol duplicado</duplicate>
-        </role>
         <bulk-edit-actions>
             <save-data>Guardar datos</save-data>
             <run-process>Ejecutar proceso</run-process>
@@ -1699,4 +1706,12 @@
             </item>
         </items>
     </template>
+    <role-restriction>
+        <restrict>Restringir al rol</restrict>
+        <all>Todos</all>
+        <any>Cualquiera</any>
+        <of-the-following>de los siguientes:</of-the-following>
+        <empty>Rol vacío</empty>
+        <duplicate>Rol duplicado</duplicate>
+    </role-restriction>
 </resource>

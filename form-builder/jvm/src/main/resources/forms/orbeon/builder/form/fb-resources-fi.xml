@@ -541,6 +541,21 @@
             <hint>Käytetään lomakemalleissa ja aloitussivulla</hint>
         </thumbnail>
         <default-template>Oletusmalli</default-template>
+        <summary-tab>
+            <label>Yhteenvetosivu</label>
+        </summary-tab>
+        <summary-metadata-columns>
+            <created><label>Luotu</label></created>
+            <last-modified><label>Muokattu</label></last-modified>
+            <workflow-stage><label>Työvaihe</label></workflow-stage>
+            <created-by><label>Luonut</label></created-by>
+            <last-modified-by><label>Muokannut</label></last-modified-by>
+            <show>
+                <item id="0">Käytä ominaisuutta</item>
+                <item id="1">Näytä</item>
+                <item id="2">Piilota</item>
+            </show>
+        </summary-metadata-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Kontrolliyksityiskohdat: "{1}" / "{0}" ({2})</label>
@@ -621,14 +636,6 @@
             <column-only>Näytä vain sarake</column-only>
             <search-only>Näytä vain haku</search-only>
         </summary-show>
-        <role>
-            <restrict>Rajoita rooliin</restrict>
-            <all>Kaikki</all>
-            <any>Mikä tahansa</any>
-            <of-the-following>seuraavista:]</of-the-following>
-            <empty>Tyhjä rooli</empty>
-            <duplicate>Kaksoisrooli</duplicate>
-        </role>
         <bulk-edit-actions>
             <save-data>Tallenna tiedot</save-data>
             <run-process>Suorita prosessi</run-process>
@@ -1699,4 +1706,12 @@
             </item>
         </items>
     </template>
+    <role-restriction>
+        <restrict>Rajoita rooliin</restrict>
+        <all>Kaikki</all>
+        <any>Mikä tahansa</any>
+        <of-the-following>seuraavista:]</of-the-following>
+        <empty>Tyhjä rooli</empty>
+        <duplicate>Kaksoisrooli</duplicate>
+    </role-restriction>
 </resource>

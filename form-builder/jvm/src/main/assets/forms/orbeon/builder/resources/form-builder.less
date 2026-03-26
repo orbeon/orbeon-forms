@@ -1504,40 +1504,6 @@ body.orbeon {
                 }
             }
 
-            .fb-role-required-checkbox {
-                display: grid;
-                grid-template-columns: auto 1fr;
-
-                span.xforms-switch.fb-roles-any-or-all {
-                    margin-left: 0;
-
-                    select {
-                        width: min-content;
-                        margin-right: 5px;
-                    }
-
-                    div.xforms-case-selected {
-                        padding-bottom: 5px;
-                    }
-                }
-
-                .fb-role-row {
-                    display: grid;
-                    grid-template-columns: auto max-content;
-                    column-gap: 10px;
-                    padding-bottom: 5px;
-
-                    .fb-param-grab {
-                        display: inline-block;
-                        opacity: 0.1;
-                    }
-
-                    &.xforms-dnd-moves .fb-param-grab {
-                        cursor: move;
-                        opacity: 0.5;
-                    }
-                }
-            }
         }
 
         .fb-validations-tab {
@@ -1552,6 +1518,79 @@ body.orbeon {
             width: 750px;
             max-width: none;
             .xforms-group .xforms-label { display: none } // Hide parameters editor legend, as we already have this in the dialog title
+        }
+    }
+
+    .fb-dialog-form-settings-summary {
+        .fb-dialog-form-settings-summary-row {
+            display: grid;
+            grid-template-columns: max-content 1fr;
+            grid-template-rows: auto auto;
+            gap: 10px 20px;
+            width: 100%;
+
+            & > .fb-summary-metadata-show-hide {
+                display: contents;
+
+                .xforms-label {
+                    grid-row: 1;
+                    grid-column: 1;
+                }
+
+                .xforms-items {
+                    grid-row: 2;
+                    grid-column: 1;
+
+                    white-space: nowrap;
+                }
+            }
+
+            & > .xforms-switch {
+                grid-row: 2;
+            }
+
+            // TODO: workaround for the help icon appearing above the checkbox
+            .fb-role-required-checkbox .xforms-help {
+                display: none;
+            }
+        }
+    }
+
+    .fb-dialog-control-settings,
+    .fb-dialog-form-settings {
+        .fb-role-required-checkbox {
+            display: grid;
+            grid-template-columns: auto 1fr;
+
+            span.xforms-switch.fb-roles-any-or-all {
+                margin-left: 0;
+
+                select {
+                    width: min-content;
+                    margin-right: 5px;
+                }
+
+                div.xforms-case-selected {
+                    padding-bottom: 5px;
+                }
+            }
+
+            .fb-role-row {
+                display: grid;
+                grid-template-columns: auto max-content;
+                column-gap: 10px;
+                padding-bottom: 5px;
+
+                .fb-param-grab {
+                    display: inline-block;
+                    opacity: 0.1;
+                }
+
+                &.xforms-dnd-moves .fb-param-grab {
+                    cursor: move;
+                    opacity: 0.5;
+                }
+            }
         }
     }
 

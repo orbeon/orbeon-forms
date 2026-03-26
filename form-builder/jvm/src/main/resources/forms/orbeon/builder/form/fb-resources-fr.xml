@@ -538,6 +538,21 @@
             <hint>Pour les modèles et la page d'accueil</hint>
         </thumbnail>
         <default-template>Modèle par défaut</default-template>
+        <summary-tab>
+            <label>Page de sommaire</label>
+        </summary-tab>
+        <summary-metadata-columns>
+            <created><label>Date de création</label></created>
+            <last-modified><label>Dernière modification</label></last-modified>
+            <workflow-stage><label>Étape du processus</label></workflow-stage>
+            <created-by><label>Créé par</label></created-by>
+            <last-modified-by><label>Modifié par</label></last-modified-by>
+            <show>
+                <item id="0">Utiliser la propriété</item>
+                <item id="1">Afficher</item>
+                <item id="2">Masquer</item>
+            </show>
+        </summary-metadata-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Paramètres du contrôle: "{1}" / "{0}" ({2})</label>
@@ -636,14 +651,6 @@
             <column-only>Afficher la colonne uniquement</column-only>
             <search-only>Afficher la recherche uniquement</search-only>
         </summary-show>
-        <role>
-            <restrict>Restreindre au rôle</restrict>
-            <all>Tous les</all>
-            <any>Au moins un des</any>
-            <of-the-following>rôles suivants:</of-the-following>
-            <empty>Rôle vide</empty>
-            <duplicate>Rôle à double</duplicate>
-        </role>
         <bulk-edit-actions>
             <save-data>Sauvegarder les données</save-data>
             <run-process>Exécuter le processus</run-process>
@@ -1724,4 +1731,12 @@
             </item>
         </items>
     </template>
+    <role-restriction>
+        <restrict>Restreindre au rôle</restrict>
+        <all>Tous les</all>
+        <any>Au moins un des</any>
+        <of-the-following>rôles suivants:</of-the-following>
+        <empty>Rôle vide</empty>
+        <duplicate>Rôle à double</duplicate>
+    </role-restriction>
 </resource>

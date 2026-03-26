@@ -521,6 +521,21 @@
             <hint todo="true">Used for form templates and the landing page</hint>
         </thumbnail>
         <default-template todo="true">Default Template</default-template>
+        <summary-tab>
+            <label>Sammanfattningssida</label>
+        </summary-tab>
+        <summary-metadata-columns>
+            <created><label>Skapad</label></created>
+            <last-modified><label>Senast ändrad</label></last-modified>
+            <workflow-stage><label>Arbetsflödessteg</label></workflow-stage>
+            <created-by><label>Skapad av</label></created-by>
+            <last-modified-by><label>Ändrad av</label></last-modified-by>
+            <show>
+                <item id="0">Använd egenskap</item>
+                <item id="1">Visa</item>
+                <item id="2">Dölj</item>
+            </show>
+        </summary-metadata-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Inställningar för kontroll: "{1}" / "{0}" ({2})</label>
@@ -601,14 +616,6 @@
             <column-only todo="true">[Show column only]</column-only>
             <search-only todo="true">[Show search only]</search-only>
         </summary-show>
-        <role>
-            <restrict todo="true">[Restrict to role]</restrict>
-            <all todo="true">[All]</all>
-            <any todo="true">[Any]</any>
-            <of-the-following todo="true">[of the following:]</of-the-following>
-            <empty todo="true">[Empty role]</empty>
-            <duplicate todo="true">[Duplicate role]</duplicate>
-        </role>
         <bulk-edit-actions>
             <save-data todo="true">[Save data]</save-data>
             <run-process todo="true">[Run Process]</run-process>
@@ -1714,4 +1721,12 @@
             </item>
         </items>
     </template>
+    <role-restriction>
+        <restrict todo="true">[Restrict to role]</restrict>
+        <all todo="true">[All]</all>
+        <any todo="true">[Any]</any>
+        <of-the-following todo="true">[of the following:]</of-the-following>
+        <empty todo="true">[Empty role]</empty>
+        <duplicate todo="true">[Duplicate role]</duplicate>
+    </role-restriction>
 </resource>

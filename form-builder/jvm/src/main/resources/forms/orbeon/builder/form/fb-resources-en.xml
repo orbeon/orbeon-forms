@@ -540,6 +540,21 @@
             <hint>Used for form templates and the landing page</hint>
         </thumbnail>
         <default-template>Default Template</default-template>
+        <summary-tab>
+            <label>Summary Page</label>
+        </summary-tab>
+        <summary-metadata-columns>
+            <created><label>Created</label></created>
+            <last-modified><label>Last Modified</label></last-modified>
+            <workflow-stage><label>Workflow Stage</label></workflow-stage>
+            <created-by><label>Created By</label></created-by>
+            <last-modified-by><label>Last Modified By</label></last-modified-by>
+            <show>
+                <item id="0">Use property</item>
+                <item id="1">Show</item>
+                <item id="2">Hide</item>
+            </show>
+        </summary-metadata-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Control Settings: "{1}" / "{0}" ({2})</label>
@@ -638,14 +653,6 @@
             <column-only>Show column only</column-only>
             <search-only>Show search only</search-only>
         </summary-show>
-        <role>
-            <restrict>Restrict to role</restrict>
-            <all>All</all>
-            <any>Any</any>
-            <of-the-following>of the following:</of-the-following>
-            <empty>Empty role</empty>
-            <duplicate>Duplicate role</duplicate>
-        </role>
         <bulk-edit-actions>
             <save-data>Save data</save-data>
             <run-process>Run Process</run-process>
@@ -1723,4 +1730,12 @@
             </item>
         </items>
     </template>
+    <role-restriction>
+        <restrict>Restrict to role</restrict>
+        <all>All</all>
+        <any>Any</any>
+        <of-the-following>of the following:</of-the-following>
+        <empty>Empty role</empty>
+        <duplicate>Duplicate role</duplicate>
+    </role-restriction>
 </resource>

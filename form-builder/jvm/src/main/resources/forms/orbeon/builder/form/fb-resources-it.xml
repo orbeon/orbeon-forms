@@ -528,6 +528,21 @@
             <hint>Usata per i modelli di modulo e la pagina di destinazione</hint>
         </thumbnail>
         <default-template>Modello predefinito</default-template>
+        <summary-tab>
+            <label>Pagina Sommario</label>
+        </summary-tab>
+        <summary-metadata-columns>
+            <created><label>Creato</label></created>
+            <last-modified><label>Modificato</label></last-modified>
+            <workflow-stage><label>Fase del workflow</label></workflow-stage>
+            <created-by><label>Creato da</label></created-by>
+            <last-modified-by><label>Modificato da</label></last-modified-by>
+            <show>
+                <item id="0">Usa proprietà</item>
+                <item id="1">Mostra</item>
+                <item id="2">Nascondi</item>
+            </show>
+        </summary-metadata-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Impostazioni di controllo: "{1}" / "{0}" ({2})</label>
@@ -608,14 +623,6 @@
             <column-only>Mostra solo colonna</column-only>
             <search-only>Mostra solo ricerca</search-only>
         </summary-show>
-        <role>
-            <restrict>Limita al ruolo</restrict>
-            <all>Tutti</all>
-            <any>Qualsiasi</any>
-            <of-the-following>dei seguenti:</of-the-following>
-            <empty>Ruolo vuoto</empty>
-            <duplicate>Ruolo duplicato</duplicate>
-        </role>
         <bulk-edit-actions>
             <save-data>Salva dati</save-data>
             <run-process>Esegui processo</run-process>
@@ -1658,4 +1665,12 @@
             </item>
         </items>
     </template>
+    <role-restriction>
+        <restrict>Limita al ruolo</restrict>
+        <all>Tutti</all>
+        <any>Qualsiasi</any>
+        <of-the-following>dei seguenti:</of-the-following>
+        <empty>Ruolo vuoto</empty>
+        <duplicate>Ruolo duplicato</duplicate>
+    </role-restriction>
 </resource>

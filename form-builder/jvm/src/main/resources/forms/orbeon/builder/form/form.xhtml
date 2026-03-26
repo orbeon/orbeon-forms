@@ -833,7 +833,36 @@
                                     $control-settings-elems-to-preserve
                                 )
                             )"/>
+
+                    <!-- Summary metadata columns (#7553) -->
+                    <xf:delete
+                        bind="summary-metadata-columns-bind"/>
+                    <xf:insert
+                        if="exists(event('summary-metadata-columns')/column[@show != 'default'])"
+                        context="bind('metadata-bind')"
+                        ref="*"
+                        origin="
+                            xf:element(
+                                'summary-metadata-columns',
+                                for $c in event('summary-metadata-columns')/column[@show != 'default']
+                                return
+                                    xf:element(
+                                        'column',
+                                        (
+                                            $c/@name,
+                                            $c/@show,
+                                            if (data($c/@role-required) and exists($c/require-role[xxf:non-blank(.)])) then
+                                                (
+                                                    xf:attribute('require-role'           , string-join($c/require-role[xxf:non-blank(.)], ' ')),
+                                                    xf:attribute('require-role-constraint', ($c/@require-role-constraint/string()[. != ''], 'all')[1])
+                                                )
+                                            else
+                                                ()
+                                        )
+                                    )
+                            )"/>
                 </xf:action>
+
                 <xf:action
                         event="fb-update-metadata"
                         if="event('mode') = 'new' and xxf:non-blank(event('template-url'))">

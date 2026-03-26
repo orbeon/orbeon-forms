@@ -1194,8 +1194,8 @@
                             data($summary-setting/@enabled) and
                             data($summary-setting/@role-required)"
                         xxf:whitespace="trim">
-                        <xf:constraint id="role-non-empty"      value=". != ''"/>
-                        <xf:constraint id="role-non-duplicated" value=". = '' or not(. = (../require-role except .))"/>
+                        <xf:constraint id="role-non-empty"      value="xxf:non-blank()"/>
+                        <xf:constraint id="role-non-duplicated" value="xxf:is-blank() or (for $v in normalize-space(.) return not((../require-role except .)[normalize-space(.) = $v]))"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind
@@ -1433,7 +1433,7 @@
                                                                     <xh:div class="fb-role-required-checkbox">
                                                                         <xh:div>
                                                                             <fr:checkbox-input ref="$base-binding/@role-required">
-                                                                                <xf:label ref="$resources/dialog-control-settings/role/restrict"/>
+                                                                                <xf:label ref="$resources/role-restriction/restrict"/>
                                                                                 <xf:action event="xforms-select" if="not($current-value = 'fr-persist')">
                                                                                     <xf:setvalue ref="$i/fr-persist/@enabled" value="true()"/>
                                                                                 </xf:action>
@@ -1460,15 +1460,15 @@
                                                                                     <xh:div>
                                                                                         <xf:select1 ref="$base-binding/@require-role-constraint">
                                                                                             <xf:item>
-                                                                                                <xf:label ref="$resources/dialog-control-settings/role/all"/>
+                                                                                                <xf:label ref="$resources/role-restriction/all"/>
                                                                                                 <xf:value>all</xf:value>
                                                                                             </xf:item>
                                                                                             <xf:item>
-                                                                                                <xf:label ref="$resources/dialog-control-settings/role/any"/>
+                                                                                                <xf:label ref="$resources/role-restriction/any"/>
                                                                                                 <xf:value>any</xf:value>
                                                                                             </xf:item>
                                                                                         </xf:select1>
-                                                                                        <xf:output ref="$resources/dialog-control-settings/role/of-the-following"/>
+                                                                                        <xf:output ref="$resources/role-restriction/of-the-following"/>
                                                                                     </xh:div>
                                                                                 </xf:case>
                                                                                 <xf:case value="false()"/>
@@ -1485,8 +1485,8 @@
                                                                                 <xh:div class="{{'fb-role-row', 'xforms-dnd-item', 'xforms-dnd-moves'[$can-move]}}">
                                                                                     <xh:div>
                                                                                         <xf:input ref="$current-role" class="fb-control-settings-summary-role">
-                                                                                            <xf:alert validation="role-non-empty" ref="$resources/dialog-control-settings/role/empty"/>
-                                                                                            <xf:alert validation="role-non-duplicated" ref="$resources/dialog-control-settings/role/duplicate"/>
+                                                                                            <xf:alert validation="role-non-empty" ref="$resources/role-restriction/empty"/>
+                                                                                            <xf:alert validation="role-non-duplicated" ref="$resources/role-restriction/duplicate"/>
                                                                                         </xf:input>
                                                                                     </xh:div>
                                                                                     <xh:div class="fb-param-buttons">

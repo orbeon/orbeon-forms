@@ -520,6 +520,21 @@
             <hint>Brukes for skjemamaler og landingssiden</hint>
         </thumbnail>
         <default-template>Standard mal</default-template>
+        <summary-tab>
+            <label>Oppsummeringsside</label>
+        </summary-tab>
+        <summary-metadata-columns>
+            <created><label>Opprettet</label></created>
+            <last-modified><label>Endret</label></last-modified>
+            <workflow-stage><label>Arbeidsflytstadium</label></workflow-stage>
+            <created-by><label>Opprettet av</label></created-by>
+            <last-modified-by><label>Endret av</label></last-modified-by>
+            <show>
+                <item id="0">Bruk egenskap</item>
+                <item id="1">Vis</item>
+                <item id="2">Skjul</item>
+            </show>
+        </summary-metadata-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Rediger elementdetaljer: "{1}" / "{0}" ({2})</label>
@@ -600,14 +615,6 @@
             <column-only>Vis kun kolonne</column-only>
             <search-only>Vis kun søk</search-only>
         </summary-show>
-        <role>
-            <restrict>Begrens til rolle</restrict>
-            <all>Alle</all>
-            <any>Hvilken som helst</any>
-            <of-the-following>av følgende:</of-the-following>
-            <empty>Tom rolle</empty>
-            <duplicate>Duplikat rolle</duplicate>
-        </role>
         <bulk-edit-actions>
             <save-data>Lagre data</save-data>
             <run-process>Kjør prosess</run-process>
@@ -1714,4 +1721,12 @@
             </item>
         </items>
     </template>
+    <role-restriction>
+        <restrict>Begrens til rolle</restrict>
+        <all>Alle</all>
+        <any>Hvilken som helst</any>
+        <of-the-following>av følgende:</of-the-following>
+        <empty>Tom rolle</empty>
+        <duplicate>Duplikat rolle</duplicate>
+    </role-restriction>
 </resource>

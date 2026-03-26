@@ -540,6 +540,21 @@
             <hint>Używana dla szablonów formularzy i strony startowej</hint>
         </thumbnail>
         <default-template>Domyślny szablon</default-template>
+        <summary-tab>
+            <label>Strona podsumowania</label>
+        </summary-tab>
+        <summary-metadata-columns>
+            <created><label>Utworzony</label></created>
+            <last-modified><label>Zmodyfikowany</label></last-modified>
+            <workflow-stage><label>Etap przepływu pracy</label></workflow-stage>
+            <created-by><label>Utworzony przez</label></created-by>
+            <last-modified-by><label>Zmodyfikowany przez</label></last-modified-by>
+            <show>
+                <item id="0">Użyj właściwości</item>
+                <item id="1">Pokaż</item>
+                <item id="2">Ukryj</item>
+            </show>
+        </summary-metadata-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Ustawienia kontrolki: "{1}" / "{0}" ({2})</label>
@@ -620,14 +635,6 @@
             <column-only>Tylko kolumna</column-only>
             <search-only>Tylko wyszukiwanie</search-only>
         </summary-show>
-        <role>
-            <restrict>Ogranicz do roli</restrict>
-            <all>Wszystkie</all>
-            <any>Dowolna</any>
-            <of-the-following>z poniższych:</of-the-following>
-            <empty>Pusta rola</empty>
-            <duplicate>Zduplikowana rola</duplicate>
-        </role>
         <bulk-edit-actions>
             <save-data>Zapisz dane</save-data>
             <run-process>Uruchom proces</run-process>
@@ -1702,4 +1709,12 @@
             </item>
         </items>
     </template>
+    <role-restriction>
+        <restrict>Ogranicz do roli</restrict>
+        <all>Wszystkie</all>
+        <any>Dowolna</any>
+        <of-the-following>z poniższych:</of-the-following>
+        <empty>Pusta rola</empty>
+        <duplicate>Zduplikowana rola</duplicate>
+    </role-restriction>
 </resource>

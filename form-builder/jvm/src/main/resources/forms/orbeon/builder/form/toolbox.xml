@@ -86,6 +86,7 @@
                             <xf:property name="analysis-calculate"                        value="bind('analysis-calculate-bind')"/>
                             <xf:property name="email"                                     value="bind('email-bind')"/>
                             <xf:property name="xbl"                                       value="bind('xbl-bind')"/>
+                            <xf:property name="summary-metadata-columns"                  value="bind('metadata-bind')/summary-metadata-columns"/>
                             <xf:property name="component-bindings"                        value="$component-bindings"/>
                         </xxf:show>
                     </xf:action>

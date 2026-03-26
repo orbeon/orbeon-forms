@@ -19,11 +19,10 @@ import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.fr.importexport.ImportExportSupport.isBindRequired
+import org.orbeon.oxf.fr.permission.SimpleConstraint
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.relational.{IndexedControl, SearchableValues, SummarySettings}
-import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo
@@ -169,66 +168,18 @@ trait FormDefinition {
     else
       "exact"
 
-  // Re-use existing Condition trait, which already has RolesAnyOf, but is more complex?
-  protected object SimpleConstraint {
-    sealed trait SimpleConstraint {
-      def satisfiedFor(currentRoles: List[String]): Boolean
-    }
-
-    case class All(roles: List[String]) extends SimpleConstraint {
-      override def satisfiedFor(currentRoles: List[String]): Boolean = roles.forall(currentRoles.contains)
-    }
-
-    case class Any(roles: List[String]) extends SimpleConstraint {
-      override def satisfiedFor(currentRoles: List[String]): Boolean = roles.exists(currentRoles.contains)
-    }
-
-    case object AlwaysSatisfied extends SimpleConstraint {
-      def satisfiedFor(currentRoles: List[String]): Boolean = true
-    }
-
-    def apply(rolesOpt: Option[String], constraintOpt: Option[String]): SimpleConstraint =
-      rolesOpt match {
-        case None =>
-          AlwaysSatisfied
-
-        case Some(roles) =>
-          val rolesAsList = roles.splitTo[List]().map(_.trimAllToEmpty)
-          val constraint  = constraintOpt.map(_.toLowerCase.trimAllToEmpty).getOrElse("all")
-
-          constraint match {
-            case "all" | "and" => All(rolesAsList)
-            case "any" | "or"  => Any(rolesAsList)
-            case _             => throw new IllegalArgumentException(s"Illegal roles constraint: $constraint")
-          }
-      }
-  }
-
   def summarySettings(control: NodeInfo): SummarySettings = {
-
-    // Retrieve user roles from current session, if any
-    val currentUserRolesOpt =
-      Option(CoreCrossPlatformSupport.externalContext)
-        .map(_.getRequest.credentials)
-        .map(_.toList.flatMap(_.roles.map(_.roleName)))
 
     // Check the presence/absence of a given sub-element for a given control
     def setting(control: NodeInfo, elementName: String, attOpt: Option[String] = None): Boolean =
       (control / elementName).headOption match {
         // An optional attribute is checked (default value: true)
         case Some(element) if attOpt.forall(element.attValueNonBlankOpt(_).forall(_ == "true")) =>
-          val rolesOpt      = element.attValueNonBlankOpt("require-role")
-          val constraintOpt = element.attValueNonBlankOpt("require-role-constraint")
 
-          currentUserRolesOpt match {
-            case Some(currentUserRoles) =>
-              val simpleConstraint = SimpleConstraint(rolesOpt = rolesOpt, constraintOpt = constraintOpt)
-              simpleConstraint.satisfiedFor(currentUserRoles)
-
-            case None =>
-              // Current user roles not specified (see readPublishedFormStorageDetails case and tests)
-              true
-          }
+          SimpleConstraint.satisfiedForUserRolesFromCurrentSession(
+            rolesOpt      = element.attValueNonBlankOpt("require-role"),
+            constraintOpt = element.attValueNonBlankOpt("require-role-constraint")
+          )
 
         case _ =>
           false

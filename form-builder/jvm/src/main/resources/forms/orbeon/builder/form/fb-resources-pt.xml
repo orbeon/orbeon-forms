@@ -521,6 +521,21 @@
             <hint>Usada para modelos de formulário e a página de destino</hint>
         </thumbnail>
         <default-template>Modelo Predefinido</default-template>
+        <summary-tab>
+            <label>Página de sumário</label>
+        </summary-tab>
+        <summary-metadata-columns>
+            <created><label>Criado</label></created>
+            <last-modified><label>Modificado</label></last-modified>
+            <workflow-stage><label>Estado do fluxo de trabalho</label></workflow-stage>
+            <created-by><label>Criado por</label></created-by>
+            <last-modified-by><label>Modificado por</label></last-modified-by>
+            <show>
+                <item id="0">Usar propriedade</item>
+                <item id="1">Mostrar</item>
+                <item id="2">Ocultar</item>
+            </show>
+        </summary-metadata-columns>
     </dialog-form-settings>
     <dialog-control-settings>
         <label>Configurações do Controlo: "{1}" / "{0}" ({2})</label>
@@ -601,14 +616,6 @@
             <column-only>Mostrar apenas coluna</column-only>
             <search-only>Mostrar apenas pesquisa</search-only>
         </summary-show>
-        <role>
-            <restrict>Restringir a papel</restrict>
-            <all>Todos</all>
-            <any>Qualquer</any>
-            <of-the-following>dos seguintes:</of-the-following>
-            <empty>Papel vazio</empty>
-            <duplicate>Papel duplicado</duplicate>
-        </role>
         <bulk-edit-actions>
             <save-data>Guardar dados</save-data>
             <run-process>Executar Processo</run-process>
@@ -1713,4 +1720,12 @@
             </item>
         </items>
     </template>
+    <role-restriction>
+        <restrict>Restringir a papel</restrict>
+        <all>Todos</all>
+        <any>Qualquer</any>
+        <of-the-following>dos seguintes:</of-the-following>
+        <empty>Papel vazio</empty>
+        <duplicate>Papel duplicado</duplicate>
+    </role-restriction>
 </resource>

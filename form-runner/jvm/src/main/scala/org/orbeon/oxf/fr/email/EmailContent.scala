@@ -26,6 +26,8 @@ import org.orbeon.oxf.processor.XPLConstants.OXF_PROCESSORS_NAMESPACE
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.oxf.util.{CoreCrossPlatformSupportTrait, IndentedLogger, NetUtils, TryUtils, URLRewriterUtils}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps, *}
 import org.orbeon.xml.NamespaceMapping
@@ -63,7 +65,8 @@ object EmailContent {
     indentedLogger          : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     formRunnerParams        : FormRunnerParams,
-    ctx                     : FormRunnerDocContext
+    ctx                     : FormRunnerDocContext,
+    xfcd                    : XFormsContainingDocument,
   ): EmailContent = {
 
     val attachments =
@@ -71,7 +74,9 @@ object EmailContent {
       urisByRenderedFormat.get(RenderedFormat.Pdf).flatMap(Attachment.pdfAttachment(_, template)).toList ++
       Attachment.fileAttachments(template)
 
-    val evaluatedParams = EvaluatedParams.fromEmailMetadata(parameters, template.controlsToExcludeFromAllControlValues)
+    implicit val xfc: XFormsFunction.Context = FormRunner.functionContextForFormRunnerContainingDocument(xfcd)
+
+    val evaluatedParams = EvaluatedParams.fromEmailMetadataUsingContainingDocument(parameters, template.controlsToExcludeFromAllControlValues)
 
     EmailContent(
       headers        = headers       (template),
@@ -151,7 +156,8 @@ object EmailContent {
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
     formRunnerParams        : FormRunnerParams,
-    ctx                     : FormRunnerDocContext
+    ctx                     : FormRunnerDocContext,
+    xfcd                    : XFormsContainingDocument,
   ): List[EmailContent] = {
 
     // For evaluating expressions

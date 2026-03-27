@@ -150,13 +150,7 @@ trait FormRunnerEmailBackend {
 
     val doc = inScopeContainingDocument
 
-    val functionContext = XFormsFunction.Context(
-      container         = doc,
-      bindingContext    = frc.formModelOpt.get.getDefaultEvaluationContext,
-      sourceEffectiveId = doc.effectiveId,
-      modelOpt          = frc.formModelOpt,
-      bindNodeOpt       = None
-    )
+    val functionContext = FormRunner.functionContextForFormRunnerContainingDocument(doc)
 
     XPathCache.evaluate(
       contextItem        = frc.formInstance.rootElement,

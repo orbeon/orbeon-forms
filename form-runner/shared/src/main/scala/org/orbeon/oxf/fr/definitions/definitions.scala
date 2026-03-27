@@ -7,6 +7,13 @@ import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.xml.SaxonUtils
 
 
+sealed trait ControlValue { val storageValue: String }
+object ControlValue {
+  case class SingleControlValue  (storageValue: String, formattedValue: Option[String]) extends ControlValue
+  case class MultipleControlValue(storageValue: String, formattedValues: List[String])  extends ControlValue
+}
+
+// xxx rename to `DetailModeType` or `FormRunnerDetailModeType` in separate commit
 sealed trait ModeType
 
 object ModeType {

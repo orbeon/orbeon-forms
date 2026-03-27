@@ -770,13 +770,7 @@ class FRProcessTemplate extends FunctionSupport with RuntimeDependentFunction {
 
     // Create new function context based on the containing document, because that's what `EvaluatedParams` needs to
     // resolve binds
-    implicit val xfc: XFormsFunction.Context = XFormsFunction.Context(
-      container         = xfcd,
-      bindingContext    = frc.formModelOpt.get.getDefaultEvaluationContext,
-      sourceEffectiveId = xfcd.effectiveId,
-      modelOpt          = frc.formModelOpt,
-      bindNodeOpt       = None
-    )
+    implicit val xfc: XFormsFunction.Context = FormRunner.functionContextForFormRunnerContainingDocument(xfcd)
 
     val templateString =  stringArgument(0)
 

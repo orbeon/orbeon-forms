@@ -121,7 +121,8 @@ trait FormRunnerActions
   def trySendEmail(params: ActionParams): ActionResult =
     ActionResult.trySync {
 
-      implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
+      implicit val formRunnerParams: FormRunnerParams         = FormRunnerParams()
+      implicit val xfcd            : XFormsContainingDocument = inScopeContainingDocument
 
       // https://github.com/orbeon/orbeon-forms/issues/5911
       val emailDataFormatVersion =
@@ -157,13 +158,14 @@ trait FormRunnerActions
     }
 
   def emailsToSend(
-    emailDataFormatVersion  : DataFormatVersion,
-    templateMatch           : TemplateMatch,
-    language                : String,
-    templateNameOpt         : Option[String],
-    pdfParams               : ActionParams
+    emailDataFormatVersion: DataFormatVersion,
+    templateMatch         : TemplateMatch,
+    language              : String,
+    templateNameOpt       : Option[String],
+    pdfParams             : ActionParams
   )(implicit
-    formRunnerParams        : FormRunnerParams
+    formRunnerParams      : FormRunnerParams,
+    xfcd                  : XFormsContainingDocument,
   ): List[EmailContent] = {
 
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport

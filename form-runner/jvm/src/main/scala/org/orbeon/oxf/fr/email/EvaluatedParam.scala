@@ -15,13 +15,16 @@ package org.orbeon.oxf.fr.email
 
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
+import org.orbeon.oxf.fr.definitions.ControlValue
 import org.orbeon.oxf.fr.email.EmailMetadata.TemplateValue
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.function.ProcessTemplateSupport
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
-import org.orbeon.xforms.{Constants, XFormsId}
+import org.orbeon.xforms.Constants
 import org.orbeon.xml.NamespaceMapping
 
 
@@ -100,15 +103,17 @@ object EvaluatedParam {
         // TODO: add way to configure values separator
         // TODO: add support for section templates in Email Settings UI (Control Value dropdown)
 
+        // The following uses the live form controls
         EvaluatedParam(
-          FormRunner.resolveTargetRelativeToActionSourceOpt(
-            actionSourceAbsoluteId  = XFormsId.effectiveIdToAbsoluteId(Constants.DocumentId),
-            targetControlName       = controlName,
-            followIndexes           = false,
-            libraryOrSectionNameOpt = None
-          )
-          .map(_.map(_.getStringValue).mkString(", "))
-          .getOrElse("")
+          xfcd
+            .resolveObjectsById(Constants.DocumentId, s"$controlName-control", contextItemOpt = None, followIndexes = false)
+            .collect { case c: XFormsControl => FormRunner.findControlValue(c, EventCollector.Throw) }
+            .flatten
+            .flatMap {
+              case ControlValue.SingleControlValue  (_, value)  => value.toList
+              case ControlValue.MultipleControlValue(_, values) => values
+            }
+            .mkString(", ")
         )
 
       case EmailMetadata.Param.AllControlValuesParam(_) =>
@@ -133,17 +138,6 @@ case class EvaluatedParams(parameters: List[(String, EvaluatedParam)]) {
 }
 
 object EvaluatedParams {
-  def fromEmailMetadata(
-    parameters                           : List[EmailMetadata.Param],
-    controlsToExcludeFromAllControlValues: List[TemplateValue.Control],
-  )(implicit
-    ctx                                  : FormRunnerDocContext,
-    indentedLogger                       : IndentedLogger
-): EvaluatedParams =
-    EvaluatedParams(
-      parameters = parameters.map(param => (param.name, EvaluatedParam(param, controlsToExcludeFromAllControlValues)))
-    )
-
   def fromEmailMetadataUsingContainingDocument(
     parameters                           : List[EmailMetadata.Param],
     controlsToExcludeFromAllControlValues: List[TemplateValue.Control],

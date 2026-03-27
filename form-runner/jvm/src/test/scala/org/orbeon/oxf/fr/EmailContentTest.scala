@@ -96,7 +96,7 @@ class EmailContentTest
               content = """^Email body:
 param1: Control: param1
 param2: Control: param2-suffix
-param3: <ul><li>Email 1: email1@from\.control</li><li>Email 2: email2@from\.control</li><li>Email 3: email3@from\.control</li><li>Email 4: email4@from\.control</li><li>Email 5: email5@from\.control</li><li>Custom 1: Control: custom1</li><li>Custom 2: Control: custom2</li><li>Param 1: Control: param1</li><li>Param 2: Control: param2</li></ul>
+param3: <ul><li>Email 1: email1@from\.control</li><li>Email 2: email2@from\.control</li><li>Email 3: email3@from\.control</li><li>Email 4: email4@from\.control</li><li>Email 5: email5@from\.control</li><li>Custom 1: Control: custom1</li><li>Custom 2: Control: custom2</li><li>Param 1: Control: param1</li><li>Param 2: Control: param2</li><li>Dropdown 1: Second choice</li><li>Checkboxes 1: ☒ First choice, ☒ Third choice</li></ul>
 param4: http://localhost:8080/orbeon/fr/issue/6848/edit/([a-zA-Z0-9]+)\?form-version=1
 param5: http://localhost:8080/orbeon/fr/issue/6848/edit/([a-zA-Z0-9]+)\?form-version=1&fr-access-token=(.+?)
 param6: http://localhost:8080/orbeon/fr/issue/6848/view/([a-zA-Z0-9]+)\?form-version=1
@@ -141,7 +141,9 @@ param14: http://localhost:8080/orbeon/fr/issue/6848/pdf/([a-zA-Z0-9]+)\?form-ver
                 """<li>Email 3: email3@from\.control</li><li>Email 4: email4@from\.control</li>""" +
                 """<li>Email 5: email5@from\.control</li><li>Custom 1: Control: custom1</li>""" +
                 """<li>Custom 2: Control: custom2</li><li>Param 1: Control: param1</li>""" +
-                """<li>Param 2: Control: param2</li></ul><br>""" +
+                """<li>Param 2: Control: param2</li>""" +
+                """<li>Dropdown 1: Second choice</li>""" +
+                """<li>Checkboxes 1: ☒ First choice, ☒ Third choice</li></ul><br>""" +
                 """param4: http://localhost:8080/orbeon/fr/issue/6848/edit/([a-zA-Z0-9]+)\?form-version=1<br>""" +
                 """param5: http://localhost:8080/orbeon/fr/issue/6848/edit/([a-zA-Z0-9]+)\?form-version=1&fr-access-token=(.+?)<br>""" +
                 """param6: http://localhost:8080/orbeon/fr/issue/6848/view/([a-zA-Z0-9]+)\?form-version=1<br>""" +
@@ -166,7 +168,7 @@ param14: http://localhost:8080/orbeon/fr/issue/6848/pdf/([a-zA-Z0-9]+)\?form-ver
             subject               = "Orbeon Forms Confirmation",
             messageContentAsRegex = MessageContent(
               content = """^Email body:
-param3: <ul><li>Email 1: email1@from\.control</li><li>Email 3: email3@from\.control</li><li>Email 4: email4@from\.control</li><li>Email 5: email5@from\.control</li><li>Custom 1: Control: custom1</li><li>Param 2: Control: param2</li></ul>$""",
+param3: <ul><li>Email 1: email1@from\.control</li><li>Email 3: email3@from\.control</li><li>Email 4: email4@from\.control</li><li>Email 5: email5@from\.control</li><li>Custom 1: Control: custom1</li><li>Param 2: Control: param2</li><li>Dropdown 1: Second choice</li><li>Checkboxes 1: ☒ First choice, ☒ Third choice</li></ul>$""",
               html    = false
             )
           )

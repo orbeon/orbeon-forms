@@ -1417,13 +1417,26 @@ body.orbeon {
 
         .fb-control-settings-options {
 
-            .xforms-items {
-                margin-bottom: 5px; // otherwise they are too close from each other
-            }
-
             .fb-control-settings-index-checkbox, .fb-control-settings-encrypt-checkbox {
                 .xforms-items {
                     margin-left: 20px;
+                }
+            }
+
+            .fb-control-settings-persist-checkbox,
+            .fb-control-settings-index-checkbox,
+            .fb-control-settings-summary-show-checkbox,
+            .fb-control-settings-allow-bulk-edit-checkbox,
+            .fb-control-settings-encrypt-checkbox {
+                .xforms-select-appearance-full {
+                    display: flex;
+                    flex-direction: row-reverse;
+                    align-items: center;
+                    justify-content: flex-end;
+
+                    .xforms-items {
+                        flex-basis: fit-content;
+                    }
                 }
             }
 

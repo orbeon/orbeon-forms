@@ -563,18 +563,53 @@
         <options>
             <item>
                 <label>Persist control value</label>
+                <help>
+                    &lt;p&gt;
+                        If enabled, which is the default for most form controls, the value of this control will be saved in the database. This is disabled by default for:
+                    &lt;/p&gt;
+                    &lt;ul&gt;
+                        &lt;li&gt;Explanatory Text&lt;/li&gt;
+                        &lt;li&gt;Button&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;For other form controls, you need to  explicitly mark them as non-persisted if you want to avoid saving their associated data. Common use cases include:&lt;/p&gt;
+                    &lt;ul&gt;
+                      &lt;li&gt;&lt;strong&gt;Calculated Value:&lt;/strong&gt; This form control presents a readonly value typically calculated from other form controls.&lt;/li&gt;
+                      &lt;li&gt;&lt;strong&gt;Hidden:&lt;/strong&gt; This form control is not visible to the user, but can be used to store data that is not meant to be edited by the user.&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;
+                        For more see &lt;a target="_blank" href="https://www.orbeon.com/2026/03/non-persisted-control-values"&gt;Non-persisted control values&lt;/a&gt;.
+                    &lt;/p&gt;
+                </help>
                 <value>fr-persist</value>
             </item>
             <item>
                 <label>Index control</label>
+                <help>
+                    &lt;p&gt;
+                        If enabled, the value of this control will be indexed in the database.
+                    &lt;/p&gt;
+                </help>
                 <value>fr-index</value>
             </item>
             <item>
                 <label>Show on Summary page</label>
+                <help>
+                    &lt;p&gt;
+                        If enabled, this control will be shown on the Summary page. It will also be available for searching on the Summary Page.
+                    &lt;/p&gt;
+                </help>
                 <value>fr-summary-show</value>
             </item>
             <item>
                 <label>Allow bulk edit</label>
+                <help>
+                    &lt;p&gt;
+                        If enabled, this control will be available for bulk edit on the Summary page.
+                    &lt;/p&gt;
+                    &lt;p&gt;
+                        For more, see &lt;a target="_blank" href="https://doc.orbeon.com/form-runner/form-runner-pages/summary-page#bulk-edit"&gt;Bulk edit&lt;/a&gt;.
+                    &lt;/p&gt;
+                </help>
                 <value>fr-allow-bulk-edit</value>
             </item>
             <item>
@@ -583,6 +618,17 @@
             </item>
             <item>
                 <label>Encrypt data at rest</label>
+                <help>
+                    &lt;p&gt;
+                        If enabled, the value of this control will be encrypted in the database.
+                    &lt;/p&gt;
+                    &lt;p&gt;
+                        This is typically useful for fields used to capture personal information, also referred to as "personally identifiable information" (PII), "sensitive personal information" (SPI), or "personal information," depending on the context. Encrypting such information can help you with compliance with privacy laws, such as GDPR.
+                    &lt;/p&gt;
+                    &lt;p&gt;
+                        For more, see &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/advanced/field-level-encryption"&gt;Field-level encryption&lt;/a&gt;.
+                    &lt;/p&gt;
+                </help>
                 <value>fr-encrypt</value>
             </item>
         </options>

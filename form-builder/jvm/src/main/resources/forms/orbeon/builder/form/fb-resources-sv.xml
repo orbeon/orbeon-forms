@@ -544,18 +544,41 @@
         <options>
             <item>
                 <label todo="true">[Persist control value]</label>
+                <help>
+                    &lt;p&gt;Om det är aktiverat, vilket är standard för de flesta formulärkontroller, kommer värdet för denna kontroll att sparas i databasen. Detta är inaktiverat som standard för:&lt;/p&gt;
+                    &lt;ul&gt;
+                        &lt;li&gt;Förklarande text&lt;/li&gt;
+                        &lt;li&gt;Knapp&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;För andra formulärkontroller måste du uttryckligen markera dem som icke-beständiga om du vill undvika att spara tillhörande data. Vanliga användningsfall inkluderar:&lt;/p&gt;
+                    &lt;ul&gt;
+                      &lt;li&gt;&lt;strong&gt;Beräknat värde:&lt;/strong&gt;Denna formulärkontroll presenterar ett skrivskyddat värde som vanligtvis beräknas från andra formulärkontroller.&lt;/li&gt;
+                      &lt;li&gt;&lt;strong&gt;Dold:&lt;/strong&gt;Denna formulärkontroll är inte synlig för användaren, men kan användas för att lagra data som inte är avsedd att redigeras av användaren.&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;För mer se&lt;a target="_blank" href="https://www.orbeon.com/2026/03/non-persisted-control-values"&gt;Icke-beständiga kontrollvärden&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-persist</value>
             </item>
             <item>
                 <label todo="true">[Index control]</label>
+                <help>
+                    &lt;p&gt;Om den är aktiverad kommer värdet på denna kontroll att indexeras i databasen.&lt;/p&gt;
+                </help>
                 <value>fr-index</value>
             </item>
             <item>
                 <label>Visa i sammanställningen</label>
+                <help>
+                    &lt;p&gt;Om den är aktiverad kommer denna kontroll att visas på sidan Sammanfattning. Den kommer också att vara tillgänglig för sökning på sammanfattningssidan.&lt;/p&gt;
+                </help>
                 <value>fr-summary-show</value>
             </item>
             <item>
                 <label todo="true">[Allow bulk edit]</label>
+                <help>
+                    &lt;p&gt;Om den är aktiverad kommer den här kontrollen att vara tillgänglig för massredigering på sidan Sammanfattning.&lt;/p&gt;
+                    &lt;p&gt;För mer, se&lt;a target="_blank" href="https://doc.orbeon.com/form-runner/form-runner-pages/summary-page#bulk-edit"&gt;Massredigering&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-allow-bulk-edit</value>
             </item>
             <item>
@@ -564,6 +587,11 @@
             </item>
             <item>
                 <label todo="true">[Encrypt data at rest]</label>
+                <help>
+                    &lt;p&gt;Om den är aktiverad kommer värdet på denna kontroll att krypteras i databasen.&lt;/p&gt;
+                    &lt;p&gt;Detta är vanligtvis användbart för fält som används för att samla in personlig information, även kallad "personligt identifierbar information" (PII), "känslig personlig information" (SPI) eller "personlig information", beroende på sammanhanget. Kryptering av sådan information kan hjälpa dig att följa integritetslagar, såsom GDPR.&lt;/p&gt;
+                    &lt;p&gt;För mer, se&lt;a target="_blank" href="https://doc.orbeon.com/form-builder/advanced/field-level-encryption"&gt;Kryptering på fältnivå&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-encrypt</value>
             </item>
         </options>

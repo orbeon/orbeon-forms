@@ -563,18 +563,41 @@
         <options>
             <item>
                 <label>Persist control value</label>
+                <help>
+                    &lt;p&gt;有効にすると (ほとんどのフォーム コントロールのデフォルト)、このコントロールの値がデータベースに保存されます。これは、次の場合はデフォルトで無効になっています。&lt;/p&gt;
+                    &lt;ul&gt;
+                        &lt;li&gt;説明文&lt;/li&gt;
+                        &lt;li&gt;ボタン&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;他のフォーム コントロールの場合、関連データの保存を回避するには、明示的に非永続としてマークする必要があります。一般的な使用例は次のとおりです。&lt;/p&gt;
+                    &lt;ul&gt;
+                      &lt;li&gt;&lt;strong&gt;計算値:&lt;/strong&gt;このフォーム コントロールは、通常は他のフォーム コントロールから計算される読み取り専用の値を示します。&lt;/li&gt;
+                      &lt;li&gt;&lt;strong&gt;隠れた：&lt;/strong&gt;このフォーム コントロールはユーザーには表示されませんが、ユーザーによる編集を意図していないデータを保存するために使用できます。&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;詳細については、を参照してください&lt;a target="_blank" href="https://www.orbeon.com/2026/03/non-persisted-control-values"&gt;非永続的な制御値&lt;/a&gt;。&lt;/p&gt;
+                </help>
                 <value>fr-persist</value>
             </item>
             <item>
                 <label>インデックスコントロール</label>
+                <help>
+                    &lt;p&gt;有効にすると、このコントロールの値がデータベース内でインデックス付けされます。&lt;/p&gt;
+                </help>
                 <value>fr-index</value>
             </item>
             <item>
                 <label>サマリーページに表示</label>
+                <help>
+                    &lt;p&gt;有効にすると、このコントロールは [概要] ページに表示されます。概要ページからも検索できるようになります。&lt;/p&gt;
+                </help>
                 <value>fr-summary-show</value>
             </item>
             <item>
                 <label>一括編集を許可</label>
+                <help>
+                    &lt;p&gt;有効にすると、このコントロールは [概要] ページで一括編集できるようになります。&lt;/p&gt;
+                    &lt;p&gt;詳細については、を参照してください。&lt;a target="_blank" href="https://doc.orbeon.com/form-runner/form-runner-pages/summary-page#bulk-edit"&gt;一括編集&lt;/a&gt;。&lt;/p&gt;
+                </help>
                 <value>fr-allow-bulk-edit</value>
             </item>
             <item>
@@ -583,6 +606,11 @@
             </item>
             <item>
                 <label>保存データを暗号化</label>
+                <help>
+                    &lt;p&gt;有効にすると、このコントロールの値がデータベース内で暗号化されます。&lt;/p&gt;
+                    &lt;p&gt;これは通常、コンテキストに応じて「個人を特定できる情報」(PII)、「機密個人情報」(SPI)、または「個人情報」とも呼ばれる個人情報を取得するために使用されるフィールドに役立ちます。このような情報を暗号化すると、GDPR などのプライバシー法の遵守に役立ちます。&lt;/p&gt;
+                    &lt;p&gt;詳細については、を参照してください。&lt;a target="_blank" href="https://doc.orbeon.com/form-builder/advanced/field-level-encryption"&gt;フィールドレベルの暗号化&lt;/a&gt;。&lt;/p&gt;
+                </help>
                 <value>fr-encrypt</value>
             </item>
         </options>

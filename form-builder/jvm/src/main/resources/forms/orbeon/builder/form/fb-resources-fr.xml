@@ -561,18 +561,53 @@
         <options>
             <item>
                 <label>Persist control value</label>
+                <help>
+                    &lt;p&gt;
+                        Si activé, ce qui est le cas par défaut pour la plupart des contrôles, la valeur de ce contrôle sera sauvegardée dans la base de données. Ceci est désactivé par défaut pour :
+                    &lt;/p&gt;
+                    &lt;ul&gt;
+                        &lt;li&gt;Texte explicatif&lt;/li&gt;
+                        &lt;li&gt;Bouton&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;Pour les autres contrôles, vous devez explicitement les marquer comme non-persistés si vous voulez éviter de sauvegarder leurs données associées. Les cas d'utilisation courants incluent :&lt;/p&gt;
+                    &lt;ul&gt;
+                      &lt;li&gt;&lt;strong&gt;Valeur calculée :&lt;/strong&gt; Ce contrôle présente une valeur en lecture seule généralement calculée à partir d'autres contrôles.&lt;/li&gt;
+                      &lt;li&gt;&lt;strong&gt;Caché :&lt;/strong&gt; Ce contrôle n'est pas visible par l'utilisateur, mais peut être utilisé pour stocker des données qui ne sont pas censées être modifiées par l'utilisateur.&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;
+                        Pour en savoir plus, voir &lt;a target="_blank" href="https://www.orbeon.com/2026/03/non-persisted-control-values"&gt;Valeurs de contrôle non persistées&lt;/a&gt;.
+                    &lt;/p&gt;
+                </help>
                 <value>fr-persist</value>
             </item>
             <item>
                 <label>Inclure dans l'index</label>
+                <help>
+                    &lt;p&gt;
+                        Si activé, la valeur de ce contrôle sera indexée dans la base de données.
+                    &lt;/p&gt;
+                </help>
                 <value>fr-index</value>
             </item>
             <item>
                 <label>Inclure dans le sommaire</label>
+                <help>
+                    &lt;p&gt;
+                        Si activé, ce contrôle sera affiché sur la page de sommaire. Il sera également disponible pour la recherche sur la page de sommaire.
+                    &lt;/p&gt;
+                </help>
                 <value>fr-summary-show</value>
             </item>
             <item>
                 <label>Permettre la modification groupée</label>
+                <help>
+                    &lt;p&gt;
+                        Si activé, ce contrôle sera disponible pour la modification groupée sur la page de sommaire.
+                    &lt;/p&gt;
+                    &lt;p&gt;
+                        Pour en savoir plus, voir &lt;a target="_blank" href="https://doc.orbeon.com/form-runner/form-runner-pages/summary-page#bulk-edit"&gt;Modification groupée&lt;/a&gt;.
+                    &lt;/p&gt;
+                </help>
                 <value>fr-allow-bulk-edit</value>
             </item>
             <item>
@@ -581,6 +616,17 @@
             </item>
             <item>
                 <label>Crypter les données au repos</label>
+                <help>
+                    &lt;p&gt;
+                        Si activé, la valeur de ce contrôle sera cryptée dans la base de données.
+                    &lt;/p&gt;
+                    &lt;p&gt;
+                        Ceci est généralement utile pour les champs utilisés pour capturer des informations personnelles, également appelées "informations personnellement identifiables" (PII) ou "informations personnelles sensibles" (SPI), selon le contexte. Le cryptage de ces informations peut vous aider à vous conformer aux lois sur la confidentialité, telles que le RGPD.
+                    &lt;/p&gt;
+                    &lt;p&gt;
+                        Pour en savoir plus, voir &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/advanced/field-level-encryption"&gt;Cryptage au niveau du champ&lt;/a&gt;.
+                    &lt;/p&gt;
+                </help>
                 <value>fr-encrypt</value>
             </item>
         </options>

@@ -1368,6 +1368,8 @@
                                                                                  )"
                                                                             validation="default-sort-column-validation"/>
 
+                                                                        <xf:help ref="$item-to-show/help" mediatype="text/html"/>
+
                                                                         <!--
                                                                             We don't like to update values of another checkbox when one is selected, but
                                                                             we accept this way of doing things here as we indent the Summary checkboxes

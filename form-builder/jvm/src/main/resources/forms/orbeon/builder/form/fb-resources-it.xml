@@ -551,18 +551,41 @@
         <options>
             <item>
                 <label>Persist control value</label>
+                <help>
+                    &lt;p&gt;Se abilitato, che è l'impostazione predefinita per la maggior parte dei controlli del modulo, il valore di questo controllo verrà salvato nel database. Questo è disabilitato per impostazione predefinita per:&lt;/p&gt;
+                    &lt;ul&gt;
+                        &lt;li&gt;Testo esplicativo&lt;/li&gt;
+                        &lt;li&gt;Pulsante&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;Per altri controlli del modulo, devi contrassegnarli esplicitamente come non persistenti se desideri evitare di salvare i dati associati. I casi d'uso comuni includono:&lt;/p&gt;
+                    &lt;ul&gt;
+                      &lt;li&gt;&lt;strong&gt;Valore calcolato:&lt;/strong&gt;Questo controllo del modulo presenta un valore di sola lettura in genere calcolato da altri controlli del modulo.&lt;/li&gt;
+                      &lt;li&gt;&lt;strong&gt;Nascosto:&lt;/strong&gt;Questo controllo del modulo non è visibile all'utente, ma può essere utilizzato per archiviare dati che non devono essere modificati dall'utente.&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;Per ulteriori informazioni vedere&lt;a target="_blank" href="https://www.orbeon.com/2026/03/non-persisted-control-values"&gt;Valori di controllo non persistenti&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-persist</value>
             </item>
             <item>
                 <label>Controllo indice</label>
+                <help>
+                    &lt;p&gt;Se abilitato, il valore di questo controllo verrà indicizzato nel database.&lt;/p&gt;
+                </help>
                 <value>fr-index</value>
             </item>
             <item>
                 <label>Mostra nel sommario</label>
+                <help>
+                    &lt;p&gt;Se abilitato, questo controllo verrà mostrato nella pagina Riepilogo. Sarà inoltre disponibile per la ricerca nella pagina di riepilogo.&lt;/p&gt;
+                </help>
                 <value>fr-summary-show</value>
             </item>
             <item>
                 <label>Consenti modifica in blocco</label>
+                <help>
+                    &lt;p&gt;Se abilitato, questo controllo sarà disponibile per la modifica collettiva nella pagina Riepilogo.&lt;/p&gt;
+                    &lt;p&gt;Per saperne di più, vedi&lt;a target="_blank" href="https://doc.orbeon.com/form-runner/form-runner-pages/summary-page#bulk-edit"&gt;Modifica collettiva&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-allow-bulk-edit</value>
             </item>
             <item>
@@ -571,6 +594,11 @@
             </item>
             <item>
                 <label>Cifra i dati a riposo</label>
+                <help>
+                    &lt;p&gt;Se abilitato, il valore di questo controllo verrà crittografato nel database.&lt;/p&gt;
+                    &lt;p&gt;Ciò è in genere utile per i campi utilizzati per acquisire informazioni personali, denominate anche "informazioni di identificazione personale" (PII), "informazioni personali sensibili" (SPI) o "informazioni personali", a seconda del contesto. La crittografia di tali informazioni può aiutarti a rispettare le leggi sulla privacy, come il GDPR.&lt;/p&gt;
+                    &lt;p&gt;Per saperne di più, vedi&lt;a target="_blank" href="https://doc.orbeon.com/form-builder/advanced/field-level-encryption"&gt;Crittografia a livello di campo&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-encrypt</value>
             </item>
         </options>

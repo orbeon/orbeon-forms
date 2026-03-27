@@ -543,18 +543,41 @@
         <options>
             <item>
                 <label>Persist control value</label>
+                <help>
+                    &lt;p&gt;Si está habilitado, que es el valor predeterminado para la mayoría de los controles de formulario, el valor de este control se guardará en la base de datos. Esto está deshabilitado de forma predeterminada para:&lt;/p&gt;
+                    &lt;ul&gt;
+                        &lt;li&gt;Texto explicativo&lt;/li&gt;
+                        &lt;li&gt;Botón&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;Para otros controles de formulario, debe marcarlos explícitamente como no persistentes si desea evitar guardar sus datos asociados. Los casos de uso comunes incluyen:&lt;/p&gt;
+                    &lt;ul&gt;
+                      &lt;li&gt;&lt;strong&gt;Valor calculado:&lt;/strong&gt;Este control de formulario presenta un valor de solo lectura que normalmente se calcula a partir de otros controles de formulario.&lt;/li&gt;
+                      &lt;li&gt;&lt;strong&gt;Oculto:&lt;/strong&gt;Este control de formulario no es visible para el usuario, pero se puede utilizar para almacenar datos que el usuario no debe editar.&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;Para más ver&lt;a target="_blank" href="https://www.orbeon.com/2026/03/non-persisted-control-values"&gt;Valores de control no persistentes&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-persist</value>
             </item>
             <item>
                 <label>Control de índice</label>
+                <help>
+                    &lt;p&gt;Si está habilitado, el valor de este control se indexará en la base de datos.&lt;/p&gt;
+                </help>
                 <value>fr-index</value>
             </item>
             <item>
                 <label>Mostar en el Resumen</label>
+                <help>
+                    &lt;p&gt;Si está habilitado, este control se mostrará en la página Resumen. También estará disponible para realizar búsquedas en la página de resumen.&lt;/p&gt;
+                </help>
                 <value>fr-summary-show</value>
             </item>
             <item>
                 <label>Permitir edición en lote</label>
+                <help>
+                    &lt;p&gt;Si está habilitado, este control estará disponible para edición masiva en la página Resumen.&lt;/p&gt;
+                    &lt;p&gt;Para más, ver&lt;a target="_blank" href="https://doc.orbeon.com/form-runner/form-runner-pages/summary-page#bulk-edit"&gt;Edición masiva&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-allow-bulk-edit</value>
             </item>
             <item>
@@ -563,6 +586,11 @@
             </item>
             <item>
                 <label>Cifrar datos en reposo</label>
+                <help>
+                    &lt;p&gt;Si está habilitado, el valor de este control se cifrará en la base de datos.&lt;/p&gt;
+                    &lt;p&gt;Esto suele ser útil para los campos utilizados para capturar información personal, también denominada "información de identificación personal" (PII), "información personal confidencial" (SPI) o "información personal", según el contexto. Cifrar dicha información puede ayudarle a cumplir con las leyes de privacidad, como el RGPD.&lt;/p&gt;
+                    &lt;p&gt;Para más, ver&lt;a target="_blank" href="https://doc.orbeon.com/form-builder/advanced/field-level-encryption"&gt;Cifrado a nivel de campo&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-encrypt</value>
             </item>
         </options>

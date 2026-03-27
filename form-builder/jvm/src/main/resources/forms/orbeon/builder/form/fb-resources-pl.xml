@@ -563,18 +563,41 @@
         <options>
             <item>
                 <label>Persist control value</label>
+                <help>
+                    &lt;p&gt;Jeśli jest włączona, co jest ustawieniem domyślnym dla większości kontrolek formularzy, wartość tej kontrolki zostanie zapisana w bazie danych. Opcja ta jest domyślnie wyłączona dla:&lt;/p&gt;
+                    &lt;ul&gt;
+                        &lt;li&gt;Tekst wyjaśniający&lt;/li&gt;
+                        &lt;li&gt;Przycisk&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;W przypadku innych kontrolek formularzy musisz wyraźnie oznaczyć je jako nieutrwalone, jeśli chcesz uniknąć zapisywania powiązanych z nimi danych. Typowe przypadki użycia obejmują:&lt;/p&gt;
+                    &lt;ul&gt;
+                      &lt;li&gt;&lt;strong&gt;Obliczona wartość:&lt;/strong&gt;Ta kontrolka formularza przedstawia wartość tylko do odczytu, zwykle obliczaną na podstawie innych kontrolek formularza.&lt;/li&gt;
+                      &lt;li&gt;&lt;strong&gt;Ukryty:&lt;/strong&gt;Ta kontrolka formularza nie jest widoczna dla użytkownika, ale może służyć do przechowywania danych, które nie są przeznaczone do edycji przez użytkownika.&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;Więcej informacji znajdziesz w artykule&lt;a target="_blank" href="https://www.orbeon.com/2026/03/non-persisted-control-values"&gt;Nieutrwalone wartości kontrolne&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-persist</value>
             </item>
             <item>
                 <label>Indeksuj kontrolkę</label>
+                <help>
+                    &lt;p&gt;Jeśli jest włączona, wartość tej kontrolki będzie indeksowana w bazie danych.&lt;/p&gt;
+                </help>
                 <value>fr-index</value>
             </item>
             <item>
                 <label>Pokaż na stronie podsumowania</label>
+                <help>
+                    &lt;p&gt;Jeśli ta opcja jest włączona, opcja ta będzie wyświetlana na stronie Podsumowanie. Będzie on także dostępny do wyszukiwania na Stronie Podsumowanie.&lt;/p&gt;
+                </help>
                 <value>fr-summary-show</value>
             </item>
             <item>
                 <label>Zezwalaj na edycję zbiorczą</label>
+                <help>
+                    &lt;p&gt;Jeśli ta opcja jest włączona, ta kontrolka będzie dostępna do edycji zbiorczej na stronie Podsumowanie.&lt;/p&gt;
+                    &lt;p&gt;Więcej informacji znajdziesz w artykule&lt;a target="_blank" href="https://doc.orbeon.com/form-runner/form-runner-pages/summary-page#bulk-edit"&gt;Edycja zbiorcza&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-allow-bulk-edit</value>
             </item>
             <item>
@@ -583,6 +606,11 @@
             </item>
             <item>
                 <label>Szyfruj dane w spoczynku</label>
+                <help>
+                    &lt;p&gt;Jeśli ta opcja jest włączona, wartość tej kontroli będzie szyfrowana w bazie danych.&lt;/p&gt;
+                    &lt;p&gt;Jest to zazwyczaj przydatne w przypadku pól używanych do przechwytywania danych osobowych, zwanych także „informacjami umożliwiającymi identyfikację” (PII), „wrażliwymi danymi osobowymi” (SPI) lub „danymi osobowymi”, w zależności od kontekstu. Szyfrowanie takich informacji może pomóc w zapewnieniu zgodności z przepisami dotyczącymi prywatności, takimi jak RODO.&lt;/p&gt;
+                    &lt;p&gt;Więcej informacji znajdziesz w artykule&lt;a target="_blank" href="https://doc.orbeon.com/form-builder/advanced/field-level-encryption"&gt;Szyfrowanie na poziomie pola&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-encrypt</value>
             </item>
         </options>

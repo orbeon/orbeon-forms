@@ -564,18 +564,41 @@
         <options>
             <item>
                 <label>Persist control value</label>
+                <help>
+                    &lt;p&gt;Jos tämä on käytössä, mikä on oletusarvo useimmille lomakekomponenteille, tämän ohjausobjektin arvo tallennetaan tietokantaan. Tämä on oletusarvoisesti poissa käytöstä:&lt;/p&gt;
+                    &lt;ul&gt;
+                        &lt;li&gt;Selittävä teksti&lt;/li&gt;
+                        &lt;li&gt;Painike&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;Jos haluat välttää niihin liittyvien tietojen tallentamisen, muista lomakeohjausobjekteista on merkittävä ne ei-pysymättömiksi. Yleisiä käyttötapauksia ovat:&lt;/p&gt;
+                    &lt;ul&gt;
+                      &lt;li&gt;&lt;strong&gt;Laskettu arvo:&lt;/strong&gt;Tämä lomakeohjausobjekti esittää vain luku -arvon, joka lasketaan tyypillisesti muista lomakeohjausobjekteista.&lt;/li&gt;
+                      &lt;li&gt;&lt;strong&gt;Piilotettu:&lt;/strong&gt;Tämä lomakeohjaus ei näy käyttäjälle, mutta sitä voidaan käyttää sellaisten tietojen tallentamiseen, joita ei ole tarkoitettu käyttäjän muokattavaksi.&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;Katso lisää&lt;a target="_blank" href="https://www.orbeon.com/2026/03/non-persisted-control-values"&gt;Ei-pysyvät kontrolliarvot&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-persist</value>
             </item>
             <item>
                 <label>Indeksoi kontrolli</label>
+                <help>
+                    &lt;p&gt;Jos tämä on käytössä, tämän ohjausobjektin arvo indeksoidaan tietokantaan.&lt;/p&gt;
+                </help>
                 <value>fr-index</value>
             </item>
             <item>
                 <label>Näytä tiivistelmänä</label>
+                <help>
+                    &lt;p&gt;Jos tämä säädin on käytössä, se näkyy Yhteenveto-sivulla. Se on myös haettavissa yhteenvetosivulla.&lt;/p&gt;
+                </help>
                 <value>fr-summary-show</value>
             </item>
             <item>
                 <label>Salli joukkomuokkaus</label>
+                <help>
+                    &lt;p&gt;Jos tämä ohjausobjekti on käytössä, se on käytettävissä joukkomuokkausta varten Yhteenveto-sivulla.&lt;/p&gt;
+                    &lt;p&gt;Katso lisää&lt;a target="_blank" href="https://doc.orbeon.com/form-runner/form-runner-pages/summary-page#bulk-edit"&gt;Joukkomuokkaus&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-allow-bulk-edit</value>
             </item>
             <item>
@@ -584,6 +607,11 @@
             </item>
             <item>
                 <label>Salaa tallennetut tiedot</label>
+                <help>
+                    &lt;p&gt;Jos tämä on käytössä, tämän ohjausobjektin arvo salataan tietokannassa.&lt;/p&gt;
+                    &lt;p&gt;Tämä on tyypillisesti hyödyllistä kentissä, joita käytetään henkilökohtaisten tietojen keräämiseen, joita kutsutaan myös "henkilökohtaisiksi tunnistetiedoksi" (PII), "arkaluonteisiksi henkilötiedoiksi" (SPI) tai "henkilökohtaisiksi tiedoiksi" kontekstista riippuen. Tällaisten tietojen salaaminen voi auttaa sinua noudattamaan tietosuojalakeja, kuten GDPR:ää.&lt;/p&gt;
+                    &lt;p&gt;Katso lisää&lt;a target="_blank" href="https://doc.orbeon.com/form-builder/advanced/field-level-encryption"&gt;Kenttätason salaus&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-encrypt</value>
             </item>
         </options>

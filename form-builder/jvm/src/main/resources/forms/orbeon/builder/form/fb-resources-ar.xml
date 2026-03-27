@@ -563,18 +563,41 @@
         <options>
             <item>
                 <label>Persist control value</label>
+                <help>
+                    &lt;p&gt;إذا تم تمكينه، وهو الإعداد الافتراضي لمعظم عناصر التحكم في النماذج، فسيتم حفظ قيمة عنصر التحكم هذا في قاعدة البيانات. يتم تعطيل هذا افتراضيًا لـ:&lt;/p&gt;
+                    &lt;ul&gt;
+                        &lt;li&gt;نص توضيحي&lt;/li&gt;
+                        &lt;li&gt;زر&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;بالنسبة لعناصر التحكم الأخرى في النماذج، تحتاج إلى وضع علامة عليها بشكل صريح على أنها غير مستمرة إذا كنت تريد تجنب حفظ البيانات المرتبطة بها. تشمل حالات الاستخدام الشائعة ما يلي:&lt;/p&gt;
+                    &lt;ul&gt;
+                      &lt;li&gt;&lt;strong&gt;القيمة المحسوبة:&lt;/strong&gt;يقدم عنصر تحكم النموذج هذا قيمة للقراءة فقط يتم حسابها عادةً من عناصر تحكم النموذج الأخرى.&lt;/li&gt;
+                      &lt;li&gt;&lt;strong&gt;مختفي:&lt;/strong&gt;عنصر تحكم النموذج هذا غير مرئي للمستخدم، ولكن يمكن استخدامه لتخزين البيانات التي ليس من المفترض أن يقوم المستخدم بتحريرها.&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;للمزيد انظر&lt;a target="_blank" href="https://www.orbeon.com/2026/03/non-persisted-control-values"&gt;قيم التحكم غير المستمرة&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-persist</value>
             </item>
             <item>
                 <label>عنصر تحكم للفهرسة</label>
+                <help>
+                    &lt;p&gt;إذا تم تمكينه، سيتم فهرسة قيمة عنصر التحكم هذا في قاعدة البيانات.&lt;/p&gt;
+                </help>
                 <value>fr-index</value>
             </item>
             <item>
                 <label>عرض في صفحة الملخص</label>
+                <help>
+                    &lt;p&gt;إذا تم تمكينه، فسيتم عرض عنصر التحكم هذا في صفحة الملخص. وسيكون متاحًا أيضًا للبحث في صفحة الملخص.&lt;/p&gt;
+                </help>
                 <value>fr-summary-show</value>
             </item>
             <item>
                 <label>السماح بالتحرير الجماعي</label>
+                <help>
+                    &lt;p&gt;إذا تم تمكينه، فسيكون عنصر التحكم هذا متاحًا للتحرير المجمع في صفحة الملخص.&lt;/p&gt;
+                    &lt;p&gt;للمزيد راجع&lt;a target="_blank" href="https://doc.orbeon.com/form-runner/form-runner-pages/summary-page#bulk-edit"&gt;تحرير بالجملة&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-allow-bulk-edit</value>
             </item>
             <item>
@@ -583,6 +606,11 @@
             </item>
             <item>
                 <label>تشفير البيانات أثناء التخزين</label>
+                <help>
+                    &lt;p&gt;إذا تم تمكينه، سيتم تشفير قيمة عنصر التحكم هذا في قاعدة البيانات.&lt;/p&gt;
+                    &lt;p&gt;يعد هذا مفيدًا عادةً للحقول المستخدمة لالتقاط المعلومات الشخصية، والتي يشار إليها أيضًا باسم "معلومات التعريف الشخصية" (PII)، أو "المعلومات الشخصية الحساسة" (SPI)، أو "المعلومات الشخصية"، اعتمادًا على السياق. يمكن أن يساعدك تشفير هذه المعلومات في الالتزام بقوانين الخصوصية، مثل اللائحة العامة لحماية البيانات.&lt;/p&gt;
+                    &lt;p&gt;للمزيد راجع&lt;a target="_blank" href="https://doc.orbeon.com/form-builder/advanced/field-level-encryption"&gt;التشفير على مستوى المجال&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-encrypt</value>
             </item>
         </options>

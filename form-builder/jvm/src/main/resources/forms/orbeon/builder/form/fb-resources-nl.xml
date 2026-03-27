@@ -544,18 +544,41 @@
         <options>
             <item>
                 <label>Persist control value</label>
+                <help>
+                    &lt;p&gt;Indien ingeschakeld, wat de standaard is voor de meeste formulierbesturingselementen, wordt de waarde van dit besturingselement opgeslagen in de database. Dit is standaard uitgeschakeld voor:&lt;/p&gt;
+                    &lt;ul&gt;
+                        &lt;li&gt;Verklarende tekst&lt;/li&gt;
+                        &lt;li&gt;Knop&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;Voor andere formulierbesturingselementen moet u deze expliciet als niet-persistent markeren als u wilt voorkomen dat de bijbehorende gegevens worden opgeslagen. Veel voorkomende gebruiksscenario's zijn onder meer:&lt;/p&gt;
+                    &lt;ul&gt;
+                      &lt;li&gt;&lt;strong&gt;Berekende waarde:&lt;/strong&gt;Dit formulierbesturingselement presenteert een alleen-lezen waarde die doorgaans wordt berekend op basis van andere formulierbesturingselementen.&lt;/li&gt;
+                      &lt;li&gt;&lt;strong&gt;Verborgen:&lt;/strong&gt;Dit formulierbesturingselement is niet zichtbaar voor de gebruiker, maar kan worden gebruikt om gegevens op te slaan die niet bedoeld zijn om door de gebruiker te worden bewerkt.&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;p&gt;Voor meer zie&lt;a target="_blank" href="https://www.orbeon.com/2026/03/non-persisted-control-values"&gt;Niet-persistente controlewaarden&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-persist</value>
             </item>
             <item>
                 <label>Index control</label>
+                <help>
+                    &lt;p&gt;Indien ingeschakeld, wordt de waarde van dit besturingselement geïndexeerd in de database.&lt;/p&gt;
+                </help>
                 <value>fr-index</value>
             </item>
             <item>
                 <label>Toon in samenvatting</label>
+                <help>
+                    &lt;p&gt;Indien ingeschakeld, wordt dit besturingselement weergegeven op de overzichtspagina. Het zal ook beschikbaar zijn voor zoeken op de Samenvattingspagina.&lt;/p&gt;
+                </help>
                 <value>fr-summary-show</value>
             </item>
             <item>
                 <label>Sta bulkbewerking toe</label>
+                <help>
+                    &lt;p&gt;Indien ingeschakeld, is dit besturingselement beschikbaar voor bulkbewerking op de pagina Samenvatting.&lt;/p&gt;
+                    &lt;p&gt;Voor meer informatie, zie&lt;a target="_blank" href="https://doc.orbeon.com/form-runner/form-runner-pages/summary-page#bulk-edit"&gt;Bulkbewerking&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-allow-bulk-edit</value>
             </item>
             <item>
@@ -564,6 +587,11 @@
             </item>
             <item>
                 <label>Encrypt gegevens in rust</label>
+                <help>
+                    &lt;p&gt;Indien ingeschakeld, wordt de waarde van dit besturingselement gecodeerd in de database.&lt;/p&gt;
+                    &lt;p&gt;Dit is doorgaans handig voor velden die worden gebruikt om persoonlijke informatie vast te leggen, ook wel 'persoonlijk identificeerbare informatie' (PII), 'gevoelige persoonlijke informatie' (SPI) of 'persoonlijke informatie' genoemd, afhankelijk van de context. Het versleutelen van dergelijke informatie kan u helpen bij het naleven van de privacywetgeving, zoals de AVG.&lt;/p&gt;
+                    &lt;p&gt;Voor meer informatie, zie&lt;a target="_blank" href="https://doc.orbeon.com/form-builder/advanced/field-level-encryption"&gt;Versleuteling op veldniveau&lt;/a&gt;.&lt;/p&gt;
+                </help>
                 <value>fr-encrypt</value>
             </item>
         </options>

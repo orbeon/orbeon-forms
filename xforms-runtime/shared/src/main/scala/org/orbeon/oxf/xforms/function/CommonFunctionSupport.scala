@@ -63,7 +63,7 @@ trait CommonFunctionSupport {
   }
 
   object Context {
-    def apply(xformsObject: XFormsObject): Context = {
+    def apply(xformsObject: XFormsObject): Context =
       Context(
         container         = xformsObject.container,
         bindingContext    = BindingContext.empty(xformsObject.elementAnalysis.element, xformsObject.elementAnalysis.scope),
@@ -71,7 +71,6 @@ trait CommonFunctionSupport {
         modelOpt          = xformsObject.modelOpt,
         bindNodeOpt       = None
       )
-    }
   }
 
   def context: Context =

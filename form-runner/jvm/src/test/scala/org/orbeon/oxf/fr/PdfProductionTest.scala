@@ -219,7 +219,6 @@ class PdfProductionTest
     }
 
     it("#7214: automatic PDF must contain correct Unicode diacritics") {
-      assume(Version.isPE) // simple data migration (4.0.0 → current format) requires PE
 
       // Form data:         U+0054 U+0068 U+006F U+006D U+0061 U+0073 U+030C U+0063 U+0068 U+000A ("Thomašch")
       // Normalized output: U+0054 U+0068 U+006F U+006D U+0061 U+0161        U+0063 U+0068 U+000A ("Thomašch")

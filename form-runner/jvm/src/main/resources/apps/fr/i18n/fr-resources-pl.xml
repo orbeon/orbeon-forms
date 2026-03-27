@@ -275,7 +275,7 @@
             <form-validation-error>Występują błędy walidacji. Proszę sprawdzić, czy wszystkie pola zostały wypełnione poprawnie.</form-validation-error>
             <database-error>Wystąpił błąd komunikacji z bazą danych. Skontaktuj się się z administratorem aplikacji.</database-error>
             <service-error>Wystąpił błąd komunikacji z serwisem. Skontaktuj się się z administratorem aplikacji.</service-error>
-            <action-error>Wystąpił błąd podczas komunikacji z usługą zaplecza. Skontaktuj się z administratorem aplikacji.</action-error>
+            <action-error>Wystąpił błąd podczas wykonywania operacji. Skontaktuj się z administratorem aplikacji.</action-error>
             <process-error>W trakcie wykonywania procesu wystąpił błąd. Skontaktuj się się z administratorem aplikacji.</process-error>
             <wizard-prev-error>Popraw błędy przed przejściem do poprzedniego kroku</wizard-prev-error>
             <wizard-next-error>Popraw błędy przed przejściem do następnego kroku</wizard-next-error>

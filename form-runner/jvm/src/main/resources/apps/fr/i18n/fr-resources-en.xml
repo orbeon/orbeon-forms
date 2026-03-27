@@ -275,7 +275,7 @@
             <form-validation-error>There are validation errors. Please retry once all fields have been properly filled-out.</form-validation-error>
             <database-error>There was an error communicating with the database. Please contact the application administrator.</database-error>
             <service-error>There was an error communicating with a backend service. Please contact the application administrator.</service-error>
-            <action-error>There was an error communicating with a backend service. Please contact the application administrator.</action-error>
+            <action-error>There was an error running an operation. Please contact the application administrator.</action-error>
             <process-error>There was an error running the process. Please contact the application administrator.</process-error>
             <wizard-prev-error>Please fix errors before moving backward</wizard-prev-error>
             <wizard-next-error>Please fix errors before moving forward</wizard-next-error>

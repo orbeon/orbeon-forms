@@ -275,7 +275,7 @@
             <form-validation-error>Validierungsfehler! Bitte füllen Sie alle Felder richtig aus und versuchen Sie es erneut.</form-validation-error>
             <database-error>Bei der Kommunikation mit der Datenbank ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Administrator.</database-error>
             <service-error>Bei der Kommunikation mit einem Backend-Dienst ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Anwendungsadministrator.</service-error>
-            <action-error>Bei der Kommunikation mit einem Backend-Dienst ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Anwendungsadministrator.</action-error>
+            <action-error>Beim Ausführen einer Operation ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Anwendungsadministrator.</action-error>
             <process-error>Beim Ausführen dieses Prozesses ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Administrator.</process-error>
             <wizard-prev-error>Bitte beheben Sie Fehler, bevor Sie zurückgehen</wizard-prev-error>
             <wizard-next-error>Bitte beheben Sie Fehler, bevor Sie fortfahren</wizard-next-error>

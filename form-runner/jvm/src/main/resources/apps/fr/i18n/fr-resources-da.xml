@@ -269,7 +269,7 @@
             <form-validation-error>Blanketten er ikke sendt. Ret venligst fejlene før du prøver at sende igen.</form-validation-error>
             <database-error>Fejl i forbindelse til server. Kontakt systemadministrator.</database-error>
             <service-error>Der opstod en fejl under kommunikation med en backend-tjeneste. Kontakt systemadministratoren.</service-error>
-            <action-error>Der opstod en fejl under kommunikation med en backend-tjeneste. Kontakt systemadministratoren.</action-error>
+            <action-error>Der opstod en fejl under udførelsen af en operation. Kontakt systemadministratoren.</action-error>
             <process-error>Der var en fejl i afvikling af programmer. Kontakt systemadministrator.</process-error>
             <wizard-prev-error>Ret venligst fejlene, før du går tilbage</wizard-prev-error>
             <wizard-next-error>Ret venligst fejlene, før du går videre</wizard-next-error>

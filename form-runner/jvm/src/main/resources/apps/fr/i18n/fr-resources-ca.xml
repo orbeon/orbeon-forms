@@ -279,7 +279,7 @@
             <form-validation-error>Hi ha errors de validació. Corregeixi els errors i intenti novament.</form-validation-error>
             <database-error>Error de comunicació amb la base de dades. Contacti amb els administradors de la aplicació.</database-error>
             <service-error>Error de comunicació amb el servei. Contacti amb els administradors de la aplicació.</service-error>
-            <action-error>Hi ha un error amb la comunicació del servei de backend. Si us plau contacteu amb els administradors [There was an error communicating with a backend service. Please contact the application administrator.]</action-error>
+            <action-error>S'ha produït un error en executar una operació. Si us plau, contacteu amb l'administrador de l'aplicació.</action-error>
             <process-error>Error amb el procés. Contacti amb els administradors de la aplicació.</process-error>
             <wizard-prev-error>Per favor, corregeix els errors abans d'anar enrere</wizard-prev-error>
             <wizard-next-error>Per favor, corregeix els errors abans d'anar endavant</wizard-next-error>

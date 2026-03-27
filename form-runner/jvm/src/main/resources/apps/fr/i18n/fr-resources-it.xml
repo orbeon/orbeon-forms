@@ -275,7 +275,7 @@
             <form-validation-error>Ci sono errori di validazione. Prego controllare che tutti i spazi sono compilati in modo corretto.</form-validation-error>
             <database-error>Nella communicazione con la database è apparso un errore. Si prega di contattare l'amministratore.</database-error>
             <service-error>Si è verificato un errore durante la comunicazione con un servizio di backend. Contatta l'amministratore dell'applicazione.</service-error>
-            <action-error>Si è verificato un errore durante la comunicazione con un servizio di backend. Contatta l'amministratore dell'applicazione.</action-error>
+            <action-error>Si è verificato un errore durante l'esecuzione di un'operazione. Contatta l'amministratore dell'applicazione.</action-error>
             <process-error>È apparso un errore durante l'esecuzione del processo. Si prega di contattare l'amministratore.</process-error>
             <wizard-prev-error>Correggi gli errori prima di tornare indietro</wizard-prev-error>
             <wizard-next-error>Correggi gli errori prima di procedere</wizard-next-error>

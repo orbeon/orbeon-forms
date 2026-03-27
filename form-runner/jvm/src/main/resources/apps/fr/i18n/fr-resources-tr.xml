@@ -275,7 +275,7 @@
             <form-validation-error>Doğrulama hataları var. Lütfen tüm alanlar doğru şekilde doldurulduktan sonra tekrar deneyin.</form-validation-error>
             <database-error>Veritabanı ile iletişim kurulurken bir hata oluştu. Lütfen uygulama yöneticisiyle iletişime geçin.</database-error>
             <service-error>Bir arka uç hizmetiyle iletişim kurulurken bir hata oluştu. Lütfen uygulama yöneticisiyle iletişime geçin.</service-error>
-            <action-error>Bir arka uç hizmetiyle iletişim kurulurken bir hata oluştu. Lütfen uygulama yöneticisiyle iletişime geçin.</action-error>
+            <action-error>Bir işlem çalıştırılırken bir hata oluştu. Lütfen uygulama yöneticisiyle iletişime geçin.</action-error>
             <process-error>İşlem çalıştırılırken bir hata oluştu. Lütfen uygulama yöneticisiyle iletişime geçin.</process-error>
             <wizard-prev-error>Geriye gitmeden önce lütfen hataları düzeltin</wizard-prev-error>
             <wizard-next-error>İleriye gitmeden önce lütfen hataları düzeltin</wizard-next-error>

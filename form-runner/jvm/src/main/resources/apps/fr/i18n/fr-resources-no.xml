@@ -275,7 +275,7 @@
             <form-validation-error>Skjemaet er ikke innsendt. Vennligst rett opp feilene i skjemaet før du sender inn på nytt.</form-validation-error>
             <database-error>Feil i kommunikasjon med tjener. Vennligst kontakt din systemadministrator.</database-error>
             <service-error>Feil i kommunikasjon med backend. Vennligst kontakt din systemadministrator.</service-error>
-            <action-error>Feil i kommunikasjon med en backend-tjeneste. Vennligst kontakt din systemadministrator.</action-error>
+            <action-error>Det oppstod en feil under kjøring av en operasjon. Vennligst kontakt din systemadministrator.</action-error>
             <process-error>Feil ved kjøring av prosessen. Vennligst kontakt din systemadministrator.</process-error>
             <wizard-prev-error>Vennligst rett opp feilene før du går tilbake</wizard-prev-error>
             <wizard-next-error>Vennligst rett opp feilene før du går videre</wizard-next-error>

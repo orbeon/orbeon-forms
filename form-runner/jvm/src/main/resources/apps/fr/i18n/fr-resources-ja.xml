@@ -275,7 +275,7 @@
             <form-validation-error>入力に不備があります。すべての項目を正しく入力してから再試行してください。</form-validation-error>
             <database-error>データベースとの通信でエラーが発生しました。管理者に連絡してください。</database-error>
             <service-error>バックエンドサービスとの通信でエラーが発生しました。管理者に連絡してください。</service-error>
-            <action-error>バックエンドサービスとの通信でエラーが発生しました。管理者に連絡してください。</action-error>
+            <action-error>操作の実行中にエラーが発生しました。管理者に連絡してください。</action-error>
             <process-error>処理の実行中にエラーが発生しました。管理者に連絡してください。</process-error>
             <wizard-prev-error>戻る前にエラーを修正してください</wizard-prev-error>
             <wizard-next-error>進む前にエラーを修正してください</wizard-next-error>

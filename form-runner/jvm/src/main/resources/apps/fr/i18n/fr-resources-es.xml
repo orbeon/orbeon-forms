@@ -290,7 +290,7 @@
             <database-error>Error de comunicación con la base de datos. Contacte al administrador de
                 la aplicación.</database-error>
             <service-error>Se produjo un error al comunicarse con un servicio backend. Contacte con el administrador de la aplicación.</service-error>
-            <action-error>Se produjo un error al comunicarse con un servicio backend. Contacte con el administrador de la aplicación.</action-error>
+            <action-error>Se produjo un error al ejecutar una operación. Contacte con el administrador de la aplicación.</action-error>
             <process-error>Error ejecutando el proceso. Contacte al administrador de la aplicación.</process-error>
             <wizard-prev-error>Corrija los errores antes de retroceder</wizard-prev-error>
             <wizard-next-error>Corrija los errores antes de avanzar.</wizard-next-error>

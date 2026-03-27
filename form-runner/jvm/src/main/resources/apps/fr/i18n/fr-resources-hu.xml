@@ -275,7 +275,7 @@
             <form-validation-error>Érvényesítési hibák vannak. Kérjük, próbálja újra, miután minden mezőt megfelelően kitöltött.</form-validation-error>
             <database-error>Hiba történt az adatbázissal való kommunikáció során. Kérjük, forduljon az alkalmazás rendszergazdájához.</database-error>
             <service-error>Hiba történt egy háttérszolgáltatással való kommunikáció során. Kérjük, forduljon az alkalmazás rendszergazdájához.</service-error>
-            <action-error>Hiba történt egy háttérszolgáltatással való kommunikáció során. Kérjük, forduljon az alkalmazás rendszergazdájához.</action-error>
+            <action-error>Hiba történt egy művelet végrehajtása során. Kérjük, forduljon az alkalmazás rendszergazdájához.</action-error>
             <process-error>Hiba történt a folyamat futtatása közben. Kérjük, forduljon az alkalmazás rendszergazdájához.</process-error>
             <wizard-prev-error>A visszalépés előtt javítsa a hibákat</wizard-prev-error>
             <wizard-next-error>A továbblépés előtt javítsa a hibákat</wizard-next-error>

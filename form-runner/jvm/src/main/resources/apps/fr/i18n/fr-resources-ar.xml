@@ -275,7 +275,7 @@
             <form-validation-error>هناك أخطاء في التحقق. يرجى المحاولة مرة أخرى بعد ملء جميع الحقول بشكل صحيح.</form-validation-error>
             <database-error>حدث خطأ في الاتصال بقاعدة البيانات. يرجى الاتصال بمسؤول التطبيق.</database-error>
             <service-error>حدث خطأ في الاتصال بخدمة الخلفية. يرجى الاتصال بمسؤول التطبيق.</service-error>
-            <action-error>حدث خطأ في الاتصال بخدمة الخلفية. يرجى الاتصال بمسؤول التطبيق.</action-error>
+            <action-error>حدث خطأ أثناء تنفيذ عملية. يرجى الاتصال بمسؤول التطبيق.</action-error>
             <process-error>حدث خطأ أثناء تشغيل العملية. يرجى الاتصال بمسؤول التطبيق.</process-error>
             <wizard-prev-error>يرجى إصلاح الأخطاء قبل الانتقال للخلف</wizard-prev-error>
             <wizard-next-error>يرجى إصلاح الأخطاء قبل الانتقال للأمام</wizard-next-error>

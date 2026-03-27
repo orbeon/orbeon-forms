@@ -275,7 +275,7 @@
             <form-validation-error>Alla värden är inte giltiga. Gå igenom ifyllda värden och försök igen.</form-validation-error>
             <database-error>Databasfel. Vänligen kontakta administratör.</database-error>
             <service-error>Det uppstod ett fel vid kommunikation med en backend-tjänst. Kontakta applikationsadministratören.</service-error>
-            <action-error>Det uppstod ett fel vid kommunikation med en backend-tjänst. Kontakta applikationsadministratören.</action-error>
+            <action-error>Det uppstod ett fel vid körning av en operation. Kontakta applikationsadministratören.</action-error>
             <process-error>Processen kunde inte köras. Vänligen kontakta administratör.</process-error>
             <wizard-prev-error>Åtgärda felen innan du går tillbaka.</wizard-prev-error>
             <wizard-next-error>Åtgärda felen innan du går vidare.</wizard-next-error>

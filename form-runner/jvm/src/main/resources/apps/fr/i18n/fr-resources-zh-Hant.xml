@@ -275,7 +275,7 @@
             <form-validation-error>存在驗證錯誤。請在所有字段正確填寫後重試。</form-validation-error>
             <database-error>與數據庫通信時出錯。請聯繫應用程序管理員。</database-error>
             <service-error>與後端服務通信時出錯。請聯繫應用程序管理員。</service-error>
-            <action-error>與後端服務通信時出錯。請聯繫應用程序管理員。</action-error>
+            <action-error>執行操作時發生錯誤。請聯繫應用程式管理員。</action-error>
             <process-error>運行流程時出錯。請聯繫應用程序管理員。</process-error>
             <wizard-prev-error>請在向後移動之前修復錯誤</wizard-prev-error>
             <wizard-next-error>請在向前移動之前修復錯誤</wizard-next-error>

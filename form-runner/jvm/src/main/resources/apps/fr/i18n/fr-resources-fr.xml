@@ -278,7 +278,7 @@
             <form-validation-error>Le document contient des erreurs de validation. Veuillez ressayer après les avoir corrigées.</form-validation-error>
             <database-error>Une erreur s'est produite en communiquant avec la base de données. Veuillez contacter votre administrateur système.</database-error>
             <service-error>Une erreur s'est produite en communiquant avec un service. Veuillez contacter votre administrateur système.</service-error>
-            <action-error>Une erreur s'est produite en exécutant une action. Veuillez contacter votre administrateur système.</action-error>
+            <action-error>Une erreur s'est produite en exécutant une opération. Veuillez contacter votre administrateur système.</action-error>
             <process-error>Une erreur s'est produite en exécutant le processus. Veuillez contacter votre administrateur système.</process-error>
             <wizard-prev-error>Veuillez corriger les erreurs avant de revenir en arrière</wizard-prev-error>
             <wizard-next-error>Veuillez corriger les erreurs avant d'avancer</wizard-next-error>

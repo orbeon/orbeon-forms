@@ -275,7 +275,7 @@
             <form-validation-error>Er waren validatieproblemen. Probeer het opnieuw als alle velden correct zijn gevuld.</form-validation-error>
             <database-error>Er was een probleem in de databasecommunicatie. Neem contact op met de databasebeheerder.</database-error>
             <service-error>Er is een fout opgetreden bij de communicatie met een backendservice. Neem contact op met de applicatiebeheerder.</service-error>
-            <action-error>Er is een fout opgetreden bij het uitvoeren van een actie. Neem contact op met de applicatiebeheerder.</action-error>
+            <action-error>Er is een fout opgetreden bij het uitvoeren van een operatie. Neem contact op met de applicatiebeheerder.</action-error>
             <process-error>Er was een probleem bij het starten van het proces. Neem contact op met de databasebeheerder.</process-error>
             <wizard-prev-error>Corrigeer de fouten voordat u teruggaat.</wizard-prev-error>
             <wizard-next-error>Corrigeer de fouten voordat u verdergaat.</wizard-next-error>

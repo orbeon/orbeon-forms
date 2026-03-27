@@ -275,7 +275,7 @@
             <form-validation-error>Existem erros de validação. Por favor, tente novamente quando todos os campos forem devidamente preenchidos.</form-validation-error>
             <database-error>Houve um erro na comunicação com a base de dados. Entre em contacto com o administrador da aplicação.</database-error>
             <service-error>Houve um erro na comunicação com um serviço de back-end. Entre em contacto com o administrador da aplicação.</service-error>
-            <action-error>Houve um erro na comunicação com um serviço de back-end. Entre em contacto com o administrador da aplicação.</action-error>
+            <action-error>Ocorreu um erro ao executar uma operação. Entre em contacto com o administrador da aplicação.</action-error>
             <process-error>Houve um erro na execução do processo. Entre em contacto com o administrador da aplicação.</process-error>
             <wizard-prev-error>Por favor, corrija os erros antes de voltar</wizard-prev-error>
             <wizard-next-error>Por favor, corrija os erros antes de avançar</wizard-next-error>

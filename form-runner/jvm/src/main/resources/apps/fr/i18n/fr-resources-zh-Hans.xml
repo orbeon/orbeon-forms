@@ -270,7 +270,7 @@
             <form-validation-error>存在验证错误。请在所有字段正确填写后重试。</form-validation-error>
             <database-error>与数据库通信时出错。请联系应用程序管理员。</database-error>
             <service-error>与后端服务通信时出错。请联系应用程序管理员。</service-error>
-            <action-error>与后端服务通信时出错。请联系应用程序管理员。</action-error>
+            <action-error>运行操作时出错。请联系应用程序管理员。</action-error>
             <process-error>运行流程时出错。请联系应用程序管理员。</process-error>
             <wizard-prev-error>请在向后移动前修复错误</wizard-prev-error>
             <wizard-next-error>请在向前移动前修复错误</wizard-next-error>

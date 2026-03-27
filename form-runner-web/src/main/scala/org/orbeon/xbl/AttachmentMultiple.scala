@@ -76,6 +76,8 @@ object AttachmentMultiple {
 
       object EventSupport extends EventListenerSupport
 
+      private def isMultiple: Boolean = uploadInputOpt.exists(_.hasAttribute("multiple"))
+
       def browserSupportsFileDrop: Boolean =
         ! Bowser.msie.contains(true)
 
@@ -98,6 +100,9 @@ object AttachmentMultiple {
         def addListenerOnDropElem(name: String, fn: dom.DragEvent => Unit): Unit =
           EventSupport.addListener(dropElem, name, fn)
 
+        def acceptDrop(ev: dom.DragEvent): Boolean =
+          isMultiple || ev.dataTransfer.items.length == 1
+
         addListenerOnDropElem(
           DomEventNames.Drop,
           ev => {
@@ -105,7 +110,8 @@ object AttachmentMultiple {
             if (ev.dataTransfer.types.toList contains "Files") {
               logger.debug(s"${ev.`type`} with files")
               ev.preventDefault()
-              Upload.processFileList(ev.dataTransfer.files, Page.getUploadControl(uploadControlElem))
+              if (acceptDrop(ev))
+                Upload.processFileList(ev.dataTransfer.files, Page.getUploadControl(uploadControlElem))
             }
           }
         )
@@ -117,7 +123,9 @@ object AttachmentMultiple {
             // "add an entry to L consisting of the string "Files""
             if (ev.dataTransfer.types.toList contains "Files") {
               logger.debug(s"${ev.`type`} with files")
-              addClass()
+              val accept = acceptDrop(ev)
+              ev.dataTransfer.dropEffect = if (accept) dom.DataTransferDropEffectKind.copy else dom.DataTransferDropEffectKind.none
+              if (accept) addClass() else removeClass()
             }
           }
         )

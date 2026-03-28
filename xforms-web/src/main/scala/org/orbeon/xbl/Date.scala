@@ -79,8 +79,7 @@ object Date {
         EventSupport.addListener(visibleInputElem, DomEventNames.Change, (_: dom.Event) => onDateSelectedUpdateStateAndSendValueToServer())
       } else {
 
-        // 2024-12-06: Use `focusout` like for `fr:time`
-        EventSupport.addListener(visibleInputElem, DomEventNames.FocusOut,
+        EventSupport.addListener(visibleInputElem, DomEventNames.Change,
           (e: dom.Event) => {
             if (! isMarkedReadonly) {
               logger.debug(s"reacting to event ${e.`type`}")

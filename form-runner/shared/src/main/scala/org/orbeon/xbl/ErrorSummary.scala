@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.NodeInfoFactory.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
-import org.orbeon.oxf.xforms.control.{VisitableTrait, XFormsComponentControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.control.{Focus, VisitableTrait, XFormsComponentControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent.xxfName
 import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xforms.model.InstanceData
@@ -35,6 +35,7 @@ import org.orbeon.scaxon.NodeInfoConversions.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.analysis.model.ValidationLevel
+import shapeless.syntax.typeable.typeableOps
 
 import scala.collection.Searching.*
 import scala.collection.Searching.*
@@ -183,11 +184,13 @@ object ErrorSummary {
 
     // https://github.com/orbeon/orbeon-forms/issues/5934
     def markVisited(): Unit =
-      event.targetObject match {
-        case valueControl: XFormsValueControl with VisitableTrait
-          if valueControl.visible => valueControl.visited = true
-        case _ =>
-      }
+      event.targetObject
+        .narrowTo[XFormsValueControl & VisitableTrait]
+        .filter(valueControl =>
+          valueControl.visible &&
+          // User might still be editing the control
+          ! Focus.isFocusWithinControl(valueControl))
+        .foreach(_.visited = true)
 
     (event, currentErrorOpt, eventLevelOpt, alertOpt) match {
       case (_: XFormsValueChangedEvent, currentErrorOpt, _, alertOpt) =>

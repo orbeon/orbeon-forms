@@ -289,7 +289,7 @@ class XFormsRepeatControl(
                 // focus before deindexing the iteration. The idea here is that we don't want to dispatch
                 // events to controls that have been removed from the index. So we dispatch all the
                 // possible focus out events here.
-                if (partialFocusRepeatOption.isEmpty && Focus.isFocusWithinContainer(movedOrRemovedIteration)) {
+                if (partialFocusRepeatOption.isEmpty && Focus.isFocusWithinControl(movedOrRemovedIteration)) {
                   partialFocusRepeatOption = Some(XFormsRepeatControl.this)
                   Focus.removeFocusPartially(containingDocument, boundary = partialFocusRepeatOption)
                 }
@@ -451,7 +451,7 @@ class XFormsRepeatControl(
         // New repeat sequence is now empty
 
         // If focused control is in removed iterations, remove focus first
-        if (Focus.isFocusWithinContainer(XFormsRepeatControl.this))
+        if (Focus.isFocusWithinControl(XFormsRepeatControl.this))
           Focus.removeFocus(containingDocument)
 
         // Remove control information for iterations that disappear

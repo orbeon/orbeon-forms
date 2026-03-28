@@ -146,7 +146,7 @@ object Focus {
     }
 
   // Whether focus is currently within the given container
-  def isFocusWithinContainer(container: XFormsContainerControl): Boolean =
+  def isFocusWithinControl(container: XFormsControl): Boolean =
     container.containingDocument.controls.getFocusedControl match {
       case Some(control) if new AncestorOrSelfIterator(control.parent) exists (_ eq container) => true
       case _ => false

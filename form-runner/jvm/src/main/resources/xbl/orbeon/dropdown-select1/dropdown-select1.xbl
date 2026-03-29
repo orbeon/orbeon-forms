@@ -200,13 +200,13 @@
                 id="select1"
                 xbl:attr="xxf:encrypt-item-values autocomplete xxf:readonly-appearance">
                 <!-- Title item -->
-                <!-- Always present, but blank if the control is readonly OR if a value is already selected -->
+                <!-- Always present, but blank if the control is readonly -->
                 <!-- Alternate behavior: remove title item if a value is selected -->
                 <!--<xf:itemset ref=".[not(exf:required() and xxf:non-blank())]">-->
                 <xf:itemset ref=".">
                     <xf:label
                         value="
-                            if (xxf:readonly() or xxf:non-blank()) then
+                            if (xxf:readonly()) then
                                 ''
                             else if (xxf:label-appearance('select1') = 'minimal') then
                                 xxf:label('select1')

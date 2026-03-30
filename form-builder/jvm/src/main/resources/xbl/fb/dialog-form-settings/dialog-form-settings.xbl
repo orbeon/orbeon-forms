@@ -1750,7 +1750,7 @@
                                 <xf:var name="smc-resources" value="$resources/dialog-form-settings/summary-metadata-columns"/>
 
                                 <xh:div class="fb-dialog-form-settings-summary-grid">
-                                    <xf:repeat ref="('created', 'last-modified', 'workflow-stage', 'created-by', 'last-modified-by')">
+                                    <xf:repeat ref="('created', 'last-modified', 'created-by', 'last-modified-by', 'workflow-stage')">
                                         <xf:var name="column-name" value="."/>
                                         <xf:var name="column"      value="$smc/column[@name = $column-name]"/>
 

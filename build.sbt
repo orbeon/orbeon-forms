@@ -48,13 +48,13 @@ val ScalaLoggingVersion              = "3.9.4"
 
 // Shared Scala libraries
 val CatsVersion                      = "2.13.0"
-val CatsFs2Version                   = "3.12.2"
+val CatsFs2Version                   = "3.13.0"
 val ScalaTestVersion                 = "3.2.19"
 val CirceVersion                     = "0.14.15"
-val EnumeratumVersion                = "1.9.2"
-val EnumeratumCirceVersion           = "1.9.2"
+val EnumeratumVersion                = "1.9.6"
+val EnumeratumCirceVersion           = "1.9.6"
 val ShapelessVersion                 = "2.3.7"
-val ScalaXmlVersion                  = "2.4.0"  // see https://github.com/orbeon/orbeon-forms/issues/4927
+val ScalaXmlVersion                  = "2.4.0"
 val ScalaParallelCollectionsVersion  = "1.2.0"
 val ScalaAsyncVersion                = "1.0.1"
 val Parboiled2Version                = "2.5.1"

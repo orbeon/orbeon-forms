@@ -91,7 +91,6 @@ class Upload {
     if (findDescendantElem(UploadProgressClass).isEmpty) {
 
       // Add markup to the DOM
-      // TODO: i18n of "Cancel" link
 
       val markup =
         s"""
@@ -111,6 +110,14 @@ class Upload {
       // Register listener on the cancel link
       findDescendantElem(UploadCancelClass) foreach { cancelAnchor =>
         cancelAnchor.addEventListener(DomEventNames.Click, cancelButtonActivated _)
+        if (_container.dataset.contains("rCancel")) {
+          // Missing: mechanism for deregistering the listener, see comment on #7562.
+          updateCancelMessage()
+          Language.onLangChange(
+            listenerId = container.id,
+            listener   = _ => updateCancelMessage()
+          )
+        }
       }
     }
   }
@@ -197,10 +204,17 @@ class Upload {
   private def findDescendantElem(className: String): Option[html.Element] =
     _container.querySelectorOpt(s".$className")
 
+  private def updateCancelMessage(): Unit =
+    for (message <- _container.dataset.get("rCancel"))
+      findDescendantElem(UploadCancelClass).foreach(_.textContent = message)
+
   private def updateProgressMessage(): Unit = {
     val message = _container.dataset.get("rUploading").getOrElse("")
     _container.querySelectorAllT(s".$UploadProgressMessageClass").foreach(_.textContent = message)
   }
+
+  private def cancelLangListenerId: String =
+    s"${_container.id}-$UploadCancelClass"
 
   // Make progress start at 5%, so the bar is visible right away, providing feedback the upload started.
   private def adjustedReceived(received: Long, expected: Long): Long =

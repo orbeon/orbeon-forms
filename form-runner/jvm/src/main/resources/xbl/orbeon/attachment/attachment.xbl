@@ -393,6 +393,7 @@
                 <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                     <_>
                         <resource xml:lang="en">
+                            <cancel>Cancel</cancel>
                             <drag-single>Drag file here or {0}select file{1}.</drag-single>
                             <drag-multiple>Drag files here or {0}select files{1}.</drag-multiple>
                             <download>Download</download>
@@ -401,6 +402,7 @@
                             <uploading>Uploading…</uploading>
                         </resource>
                         <resource xml:lang="es">
+                            <cancel>Cancelar</cancel>
                             <drag-single>Arrastra el archivo aquí o {0}selecciona el archivo{1}.</drag-single>
                             <drag-multiple>Arrastra los archivos aquí o {0}selecciona los archivos{1}.</drag-multiple>
                             <download>Descargar</download>
@@ -409,6 +411,7 @@
                             <uploading>Subiendo…</uploading>
                         </resource>
                         <resource xml:lang="fi">
+                            <cancel>Peruuta</cancel>
                             <drag-single>Raahaa tiedosto tähän tai {0}valitse tiedosto{1}.</drag-single>
                             <drag-multiple>Raahaa tiedostot tähän tai {0}valitse tiedostot{1}.</drag-multiple>
                             <download>Lataa</download>
@@ -417,6 +420,7 @@
                             <uploading>Lähetetään…</uploading>
                         </resource>
                         <resource xml:lang="fr">
+                            <cancel>Annuler</cancel>
                             <drag-single>Déposer le fichier ici ou {0}sélectionner le fichier{1}.</drag-single>
                             <drag-multiple>Déposer les fichiers ici ou {0}sélectionner les fichiers{1}.</drag-multiple>
                             <download>Télécharger</download>
@@ -425,6 +429,7 @@
                             <uploading>Téléchargement…</uploading>
                         </resource>
                         <resource xml:lang="ru">
+                            <cancel>Отменить</cancel>
                             <drag-single>Перетащите файл сюда или {0}выберите файл{1}.</drag-single>
                             <drag-multiple>Перетащите файлы сюда или {0}выберите файлы{1}.</drag-multiple>
                             <download>Скачать</download>
@@ -433,6 +438,7 @@
                             <uploading>Загрузка…</uploading>
                         </resource>
                         <resource xml:lang="it">
+                            <cancel>Cancella</cancel>
                             <drag-single>Trascina qui il file o {0}seleziona il file{1}.</drag-single>
                             <drag-multiple>Trascina qui i file o {0}seleziona i file{1}.</drag-multiple>
                             <download>Scaricare</download>
@@ -441,6 +447,7 @@
                             <uploading>Caricamento…</uploading>
                         </resource>
                         <resource xml:lang="de">
+                            <cancel>Abbrechen</cancel>
                             <drag-single>Ziehen Sie die Datei hierher oder {0}wählen Sie eine Datei aus{1}.</drag-single>
                             <drag-multiple>Ziehen Sie Dateien hierher oder {0}wählen Sie Dateien aus{1}.</drag-multiple>
                             <download>Herunterladen</download>
@@ -449,6 +456,7 @@
                             <uploading>Hochladen…</uploading>
                         </resource>
                         <resource xml:lang="sv">
+                            <cancel>Avbryt</cancel>
                             <drag-single>Dra filen hit eller {0}välj fil{1}.</drag-single>
                             <drag-multiple>Dra filerna hit eller {0}välj filer{1}.</drag-multiple>
                             <download>Ladda ner</download>
@@ -457,6 +465,7 @@
                             <uploading>Laddar upp…</uploading>
                         </resource>
                         <resource xml:lang="nl">
+                            <cancel>Annuleren</cancel>
                             <drag-single>Sleep bestand hierheen of {0}selecteer bestand{1}.</drag-single>
                             <drag-multiple>Sleep bestanden hierheen of {0}selecteer bestanden{1}.</drag-multiple>
                             <download>Downloaden</download>
@@ -465,6 +474,7 @@
                             <uploading>Uploaden…</uploading>
                         </resource>
                         <resource xml:lang="pt">
+                            <cancel>Cancelar</cancel>
                             <drag-single>Arraste o arquivo aqui ou {0}selecione o arquivo{1}.</drag-single>
                             <drag-multiple>Arraste os arquivos aqui ou {0}selecione os arquivos{1}.</drag-multiple>
                             <download>Baixar</download>
@@ -473,6 +483,7 @@
                             <uploading>Enviando…</uploading>
                         </resource>
                         <resource xml:lang="lt">
+                            <cancel>Atšaukti</cancel>
                             <drag-single>Nuvilkite failą čia arba {0}pasirinkite failą{1}.</drag-single>
                             <drag-multiple>Nuvilkite failus čia arba {0}pasirinkite failus{1}.</drag-multiple>
                             <download>Parsisiųsti</download>
@@ -481,6 +492,7 @@
                             <uploading>Įkeliama…</uploading>
                         </resource>
                         <resource xml:lang="da">
+                            <cancel>Afbryd</cancel>
                             <drag-single>Træk fil her eller {0}vælg fil{1}.</drag-single>
                             <drag-multiple>Træk filer her eller {0}vælg filer{1}.</drag-multiple>
                             <download>Hent</download>
@@ -643,6 +655,7 @@
                             mediatype="text/html"/>
                     </xh:div>
                     <xf:upload
+                        data-r-cancel="{xxf:r('cancel')}"
                         data-r-uploading="{xxf:r('uploading')}"
                         id="xf-upload"
                         class="fr-attachment-upload"

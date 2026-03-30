@@ -448,7 +448,7 @@
                         </xf:var>
 
                         <xf:var name="update-url-param">
-                            <xxf:value xxbl:scope="inner" value="xs:string(fr:component-param-value('update-url-param')) = 'true'"/>
+                            <xxf:value xxbl:scope="inner" value="$allow-url-param and xs:string(fr:component-param-value('update-url-param')) = 'true'"/>
                         </xf:var>
 
                         <!-- NOTE: Initially, current-case-id might be empty, so default to the first relevant case id. -->

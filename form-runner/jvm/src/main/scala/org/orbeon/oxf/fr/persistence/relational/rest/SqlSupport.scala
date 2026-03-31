@@ -75,7 +75,6 @@ object SqlSupport {
     currentUserOrganization: => Option[OrganizationId]
   )(implicit
     propertySet            : PropertySet
-
   ): List[Col]  = {
 
     val xmlCol = Provider.xmlColUpdate(req.provider)

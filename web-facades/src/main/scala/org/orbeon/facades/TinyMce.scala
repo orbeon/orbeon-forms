@@ -13,6 +13,7 @@
  */
 package org.orbeon.facades
 
+import org.orbeon.oxf.util.StringUtils.*
 import org.scalajs.dom
 import org.scalajs.dom.html
 
@@ -23,6 +24,8 @@ import scala.scalajs.js.annotation.JSGlobal
 
 object TinyMce {
 
+  import Private.*
+
   // Since Scala.js 1.0, the method we used before didn't work when `TINYMCE_CUSTOM_CONFIG` is missing
   lazy val GlobalJsTinyMceCustomConfig: Option[TinyMceConfig] =
     if (js.typeOf(g.TINYMCE_CUSTOM_CONFIG) != "undefined")
@@ -30,11 +33,34 @@ object TinyMce {
     else
       None
 
+  def setLanguage(
+    tinyMceConfig        : TinyMceConfig,
+    requestedLanguageOpt : Option[String]
+  ): Unit = {
+
+    val resolvedLanguage =
+      tinyMceConfig.language.toOption
+        .orElse(requestedLanguageOpt.map(l => LanguageCodeMap.getOrElse(l, l)))
+        .getOrElse(DefaultLanguage)
+
+    tinyMceConfig.language = resolvedLanguage
+
+    if (tinyMceConfig.language_url.getOrElse("").trimAllToOpt.isEmpty && resolvedLanguage != DefaultLanguage)
+      findResourceBasePath(GlobalTinyMce.baseURL)
+        .foreach { resourceBasePath =>
+          tinyMceConfig.language_url = s"$resourceBasePath/webjars/tinymce-i18n/$TinyMceI18nVersion/langs6/$resolvedLanguage.js": String
+        }
+  }
+
+  def clonedConfig(config: TinyMceConfig): TinyMceConfig =
+    js.JSON.parse(js.JSON.stringify(config)).asInstanceOf[TinyMceConfig]
+
   @js.native
   @JSGlobal("tinymce")
   object GlobalTinyMce extends js.Object {
     var baseURL: String = js.native
     val EditorManager: TinyMceEditorManager = js.native
+    def remove(editor: TinyMceEditor): TinyMceEditor = js.native
   }
 
   @js.native
@@ -69,6 +95,7 @@ object TinyMce {
     var inline                   : js.UndefOr[Boolean] = js.undefined
     var hidden_input             : js.UndefOr[Boolean] = js.undefined
     var language                 : js.UndefOr[String]  = js.undefined
+    var language_url             : js.UndefOr[String]  = js.undefined
     var statusbar                : js.UndefOr[Boolean] = js.undefined
     var menubar                  : js.UndefOr[Boolean] = js.undefined
     var toolbar                  : js.UndefOr[String]  = js.undefined
@@ -92,7 +119,6 @@ object TinyMce {
   object TinyMceDefaultConfig extends TinyMceConfig {
     inline                = true
     hidden_input          = false
-    language              = "en"
     statusbar             = false
     menubar               = false
     plugins               = "lists link"
@@ -108,5 +134,31 @@ object TinyMce {
     convert_urls          = false              // Don't convert an absolute URL to a relative path, which might not work after publish
     sandbox_iframes       = true
     convert_unsafe_embeds = true
+  }
+
+  private object Private {
+    val DefaultLanguage    = "en"
+    val TinyMceI18nVersion = "25.6.2"
+
+    val LanguageCodeMap: Map[String, String] = Map(
+      "fr"    -> "fr_FR",
+      "hu"    -> "hu_HU",
+      "nb"    -> "nb_NO",
+      "no"    -> "nb_NO",
+      "pt"    -> "pt_BR",
+      "sv"    -> "sv_SE",
+      "th"    -> "th_TH",
+      "zh"    -> "zh-Hans",
+      "zh_CN" -> "zh-Hans",
+      "zh-CN" -> "zh-Hans",
+      "zh_TW" -> "zh-Hant",
+      "zh-TW" -> "zh-Hant"
+    )
+
+    def findResourceBasePath(tinyMceBaseUrl: String): Option[String] =
+      tinyMceBaseUrl.trimAllToOpt.flatMap { url =>
+        val markerIndex = url.indexOf("/webjars/tinymce/")
+        Option.when(markerIndex >= 0)(url.substring(0, markerIndex))
+      }
   }
 }

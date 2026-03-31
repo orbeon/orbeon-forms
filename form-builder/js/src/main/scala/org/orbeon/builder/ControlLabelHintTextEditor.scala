@@ -22,6 +22,7 @@ import io.udash.wrappers.jquery.{JQuery, JQueryCallbacks}
 import org.orbeon.builder.facade.*
 import org.orbeon.builder.facade.JQueryTooltip.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
+import org.orbeon.facades.TinyMce
 import org.orbeon.facades.TinyMce.{GlobalTinyMce, TinyMceConfig, TinyMceDefaultConfig, TinyMceEditor}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.HtmlParsing
@@ -275,11 +276,9 @@ object ControlLabelHintTextEditor {
         tinyMceContainerDiv.show()
         tinyMceContainerDiv.attr("id", anchorId)
 
-        // Initialize baseURL
         locally {
           val href = $(".tinymce-base-url").attr("href").getOrElse(throw new IllegalStateException("missing `.tinymce-base-url`"))
-          val baseURL = href.substring(0, href.length - s"$URLBaseMagic.js".length)
-          GlobalTinyMce.baseURL = baseURL
+          GlobalTinyMce.baseURL = href.substring(0, href.length - s"$URLBaseMagic.js".length)
         }
 
         // TinyMCE config from property, if defined
@@ -294,6 +293,7 @@ object ControlLabelHintTextEditor {
         tinyMceConfig.plugins                  = tinyMceConfig.plugins.map(_ + ",autoresize") // Auto-size MCE height based on the content
         tinyMceConfig.autoresize_min_height    =  100.0                                       // Min height of 100px
         tinyMceConfig.autoresize_bottom_margin =  16.0                                        // Default padding for autoresize adds too much empty space at the bottom
+        TinyMce.setLanguage(tinyMceConfig, Option(document.documentElement.getAttribute("lang")))
         tinyMceConfig.suffix                   =  ".min"
 
         val tinyMceObject = new TinyMceEditor(anchorId, tinyMceConfig, GlobalTinyMce.EditorManager)

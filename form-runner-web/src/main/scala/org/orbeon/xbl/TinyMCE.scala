@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomSupport.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade.{Events, XBL, XBLCompanion}
-import org.orbeon.xforms.{$, DocumentAPI, Page, EventListenerSupport}
+import org.orbeon.xforms.{$, DocumentAPI, EventListenerSupport, Language, Page}
 import org.scalajs.dom
 import org.scalajs.dom.*
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -82,8 +82,7 @@ object TinyMCE {
         val href = containerElem.querySelector(".tinymce-base-url").getAttribute("href")
         // Remove the magic number and extension at the end of the URL. The magic number was added to allow for
         // URL post-processing for portlets. The extension is added so that the version number is added to the URL.
-        val baseURL = href.substring(0, href.length - "1b713b2e6d7fd45753f4b8a6270b776e.js".length)
-        GlobalTinyMce.baseURL = baseURL
+        GlobalTinyMce.baseURL = href.substring(0, href.length - "1b713b2e6d7fd45753f4b8a6270b776e.js".length)
 
         baseUrlInitialized = true
       }
@@ -95,57 +94,85 @@ object TinyMCE {
           .flatMap(_.trimAllToOpt)
           .map(js.JSON.parse(_).asInstanceOf[TinyMceConfig])
 
-      val tinyMceConfig =
-        GlobalJsTinyMceCustomConfig
-          .orElse(fromDataAtt)
-          .getOrElse(TinyMceDefaultConfig)
-
-      // Without this, with `combine-resources` set to `false`, instead of `silver/theme.min.js`,
-      // TinyMCE tried to load `silver/theme.js`, which doesn't exist
-      tinyMceConfig.suffix = ".min"
-
       val tinyMceDiv = containerElem.querySelector(".xbl-fr-tinymce-div")
-      val tinyMceObject = new TinyMceEditor(tinyMceDiv.id, tinyMceConfig, GlobalTinyMce.EditorManager)
-      tinyMceObjectOpt = Some(tinyMceObject)
-
-      val isReadonly = containerElem.classList.contains("xforms-readonly")
-      xformsUpdateReadonly(isReadonly)
-
-      withInitializedTinyMce { tinyMceObject =>
-
-        // Send value to the server on blur, as well as on Ctrl+Enter or Cmd+Enter
-        tinyMceObject.on("blur", _ => clientToServer())
-        EventSupport.addListener[dom.KeyboardEvent](
-          tinyMceObject.getBody(),
-          DomEventNames.KeyDown,
-          (e: dom.KeyboardEvent) => if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) clientToServer()
+      def newTinyMceConfig() =
+        clonedConfig(
+          GlobalJsTinyMceCustomConfig
+            .orElse(fromDataAtt)
+            .getOrElse(TinyMceDefaultConfig)
         )
-        // Remove an anchor added by TinyMCE to handle key, as it grabs the focus and breaks tabbing between fields
-        $(containerElem).find("a[accesskey]").detach()
-        tinyMceInitialized = true
-        Events.componentChangedLayoutEvent.fire()
+
+      def createTinyMce(currentValueOpt: Option[String] = None, focusAfterInit: Boolean = false): Unit = {
+
+        val tinyMceConfig = newTinyMceConfig()
+        setLanguage(tinyMceConfig, WebSupport.findHtmlLang)
+
+        // Without this, with `combine-resources` set to `false`, instead of `silver/theme.min.js`,
+        // TinyMCE tried to load `silver/theme.js`, which doesn't exist
+        tinyMceConfig.suffix = ".min"
+
+        val tinyMceObject = new TinyMceEditor(tinyMceDiv.id, tinyMceConfig, GlobalTinyMce.EditorManager)
+        tinyMceObjectOpt = Some(tinyMceObject)
+        tinyMceInitialized = false
+
+        val isReadonly = containerElem.classList.contains("xforms-readonly")
+        xformsUpdateReadonly(isReadonly)
+
+        withInitializedTinyMce { tinyMceObject =>
+
+          // Send value to the server on blur, as well as on Ctrl+Enter or Cmd+Enter
+          tinyMceObject.on("blur", _ => clientToServer())
+          EventSupport.addListener[dom.KeyboardEvent](
+            tinyMceObject.getBody(),
+            DomEventNames.KeyDown,
+            (e: dom.KeyboardEvent) => if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) clientToServer()
+          )
+          // Remove an anchor added by TinyMCE to handle key, as it grabs the focus and breaks tabbing between fields
+          $(containerElem).find("a[accesskey]").detach()
+          currentValueOpt.foreach(tinyMceObject.setContent)
+          if (focusAfterInit)
+            tinyMceObject.focus()
+          tinyMceInitialized = true
+          Events.componentChangedLayoutEvent.fire()
+        }
+
+        // - Unfortunately, we need to use polling; we can't rely on an Ajax response, e.g. if in Bootstrap tab as in
+        //   the Form Builder Control Settings dialog
+        // - As `destroy()` isn't called when the component is a repeat, which is the case for the Form Builder Control
+        //   Settings dialog, we stop trying to render if we notice `containerElem` isn't in the document anymore
+        def renderIfVisible(): Unit =
+          if (document.getElementById(containerElem.id) == containerElem && tinyMceObjectOpt.contains(tinyMceObject))
+            if ($(tinyMceDiv).is(":visible")) {
+              tinyMceObject.render()
+            } else {
+              val shortDelay = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.internalShortDelay
+              js.timers.setTimeout(shortDelay)(renderIfVisible())
+            }
+
+        renderIfVisible()
       }
 
-      // - Unfortunately, we need to use polling; we can't rely on an Ajax response, e.g. if in Bootstrap tab as in
-      //   the Form Builder Control Settings dialog
-      // - As `destroy()` isn't called when the component is a repeat, which is the case for the Form Builder Control
-      //   Settings dialog, we stop trying to render if we notice `containerElem` isn't in the document anymore
-      def renderIfVisible(): Unit =
-        if (document.getElementById(containerElem.id) == containerElem)
-          if ($(tinyMceDiv).is(":visible")) {
-            tinyMceObject.render()
-          } else {
-            val shortDelay = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.internalShortDelay
-            js.timers.setTimeout(shortDelay)(renderIfVisible())
-          }
-      renderIfVisible()
+      def recreateTinyMceForLanguageChange(): Unit = {
+        val currentValue = xformsGetValue()
+        val hadFocus     = hasFocus()
+        destroyTinyMce()
+        createTinyMce(currentValueOpt = Some(currentValue), focusAfterInit = hadFocus)
+      }
+
+      createTinyMce()
+      Language.onLangChange(containerElem.id, _ => recreateTinyMceForLanguageChange())
     }
 
     override def destroy(): Unit = {
+      Language.offLangChange(containerElem.id)
+      destroyTinyMce()
+    }
+
+    private def destroyTinyMce(): Unit = {
       EventSupport.clearAllListeners()
-      tinyMceObjectOpt foreach { _ =>
-        // TODO: How to clean-up? API is unclear. `remove()`?
-      }
+      tinyMceObjectOpt.foreach(GlobalTinyMce.remove)
+      tinyMceObjectOpt   = None
+      tinyMceInitialized = false
     }
 
     // Send value in MCE to server

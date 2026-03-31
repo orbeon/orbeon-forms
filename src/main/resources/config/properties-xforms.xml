@@ -269,7 +269,6 @@
         {{
             "inline"               : true,
             "hidden_input"         : false,
-            "language"             : "en",
             "statusbar"            : false,
             "menubar"              : false,
             "plugins"              : "lists link",

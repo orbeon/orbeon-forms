@@ -325,7 +325,6 @@ trait ClientTestSupport {
           Future.failed(new NoSuchElementException(s"No `$HeaderStart` header found"))
       }
     }
-  }
 
   private def swapGlobalsToWindow(targetWindow: dom.Window): Map[String, js.UndefOr[js.Dynamic]] = {
     val JsObject        = js.Dynamic.global.Object

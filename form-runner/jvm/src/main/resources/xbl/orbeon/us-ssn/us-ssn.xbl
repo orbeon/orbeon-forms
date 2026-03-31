@@ -80,7 +80,7 @@
                         </_>
                     </xf:instance>
                 </xf:model>
-                <xf:group>
+                <xf:group id="fb-editor-us-snn-group">
                     <xf:label ref="xxf:r('xbl-control-settings.field-value-visibility.label', '|fr-form-resources|')"/>
                     <fr:grid xmlns="" id="fb-editor-us-snn-grid">
                         <xh:tr>

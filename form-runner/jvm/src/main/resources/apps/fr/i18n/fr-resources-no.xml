@@ -330,8 +330,8 @@
             <view-drafts>Se automatisk lagret utkast</view-drafts>
             <start-new>Start på nytt</start-new>
             <multiple-docs-title>Fant eksisterende skjemadata</multiple-docs-title>
-            <multiple-docs-explanation>Du kan ikke opprette nye data for denne skjemadefinisjonene, men du kan muligens redigere eksisterende skjemadata.</multiple-docs-explanation>
-            <multiple-docs-view-data>Se eksisterende skjemadata</multiple-docs-view-data>
+            <multiple-docs-explanation>Oppretting av nye data er deaktivert for dette skjemaet, men du kan få tilgang til eksisterende skjemadata.</multiple-docs-explanation>
+            <multiple-docs-view-data>Få tilgang til eksisterende skjemadata</multiple-docs-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Språk</language-choice>

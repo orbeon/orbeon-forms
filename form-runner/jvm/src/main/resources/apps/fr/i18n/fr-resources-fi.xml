@@ -330,8 +330,8 @@
             <view-drafts>Näytä automaattisesti tallennetut luonnokset</view-drafts>
             <start-new>Aloita tyhjästä</start-new>
             <multiple-docs-title>Olemassa olevia lomaketietoja löytyi</multiple-docs-title>
-            <multiple-docs-explanation>Et voi luoda uusia tietoja tälle lomakemääritykselle, mutta voit mahdollisesti muokata olemassa olevia tietoja.</multiple-docs-explanation>
-            <multiple-docs-view-data>Näytä olemassa olevat lomaketiedot</multiple-docs-view-data>
+            <multiple-docs-explanation>Uusien tietojen luominen on poistettu käytöstä tässä lomakkeessa, mutta voit käyttää olemassa olevia lomaketietoja.</multiple-docs-explanation>
+            <multiple-docs-view-data>Käytä olemassa olevia lomaketietoja</multiple-docs-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Kieli</language-choice>

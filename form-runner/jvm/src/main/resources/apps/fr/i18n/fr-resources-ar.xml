@@ -330,8 +330,8 @@
             <view-drafts>عرض المستندات المحفوظة تلقائيًا</view-drafts>
             <start-new>البدء من الصفر</start-new>
             <multiple-docs-title>تم العثور على بيانات نموذج موجودة</multiple-docs-title>
-            <multiple-docs-explanation>لا يمكنك إنشاء بيانات جديدة لتعريف هذا النموذج، ولكن قد تتمكن من تعديل بيانات النموذج الموجودة.</multiple-docs-explanation>
-            <multiple-docs-view-data>عرض بيانات النموذج الموجودة</multiple-docs-view-data>
+            <multiple-docs-explanation>إنشاء بيانات جديدة معطّل لهذا النموذج، غير أنه يمكنك الوصول إلى بيانات النموذج الموجودة.</multiple-docs-explanation>
+            <multiple-docs-view-data>الوصول إلى بيانات النموذج الموجودة</multiple-docs-view-data>
         </draft-singleton>
         <labels>
             <language-choice>اللغة</language-choice>

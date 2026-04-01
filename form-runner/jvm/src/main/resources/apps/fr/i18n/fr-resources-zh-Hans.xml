@@ -325,8 +325,8 @@
             <view-drafts>查看自动保存的文档</view-drafts>
             <start-new>从头开始</start-new>
             <multiple-docs-title>找到现有表单数据</multiple-docs-title>
-            <multiple-docs-explanation>您无法为此表单定义创建新数据，但您可能可以编辑现有表单数据。</multiple-docs-explanation>
-            <multiple-docs-view-data>查看现有表单数据</multiple-docs-view-data>
+            <multiple-docs-explanation>此表单已禁用创建新数据，但您可以访问现有表单数据。</multiple-docs-explanation>
+            <multiple-docs-view-data>访问现有表单数据</multiple-docs-view-data>
         </draft-singleton>
         <labels>
             <language-choice>语言</language-choice>

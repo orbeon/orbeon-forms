@@ -330,8 +330,8 @@
             <view-drafts>Ver rascunhos guardados automaticamente</view-drafts>
             <start-new>Começar do zero</start-new>
             <multiple-docs-title>Dados de formulário existentes encontrados</multiple-docs-title>
-            <multiple-docs-explanation>Não pode criar novos dados para esta definição de formulário, mas poderá editar dados de formulário existentes.</multiple-docs-explanation>
-            <multiple-docs-view-data>Ver dados de formulário existentes</multiple-docs-view-data>
+            <multiple-docs-explanation>A criação de novos dados está desativada para este formulário, no entanto pode aceder aos dados de formulário existentes.</multiple-docs-explanation>
+            <multiple-docs-view-data>Aceder aos dados de formulário existentes</multiple-docs-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Idioma</language-choice>

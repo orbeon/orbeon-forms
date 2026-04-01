@@ -330,8 +330,8 @@
             <view-drafts>View autosaved documents</view-drafts>
             <start-new>Start from scratch</start-new>
             <multiple-docs-title>Existing form data found</multiple-docs-title>
-            <multiple-docs-explanation>You cannot create new data for this form definition, however you might be able to edit existing form data.</multiple-docs-explanation>
-            <multiple-docs-view-data>View existing form data</multiple-docs-view-data>
+            <multiple-docs-explanation>Creating new data is disabled for this form, however you can access existing form data.</multiple-docs-explanation>
+            <multiple-docs-view-data>Access existing form data</multiple-docs-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Language</language-choice>

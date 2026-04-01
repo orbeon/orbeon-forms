@@ -330,8 +330,8 @@
             <view-drafts>Visa automatiskt sparat utkast</view-drafts>
             <start-new>Börja från början</start-new>
             <multiple-docs-title>Existerande formulärdata finns</multiple-docs-title>
-            <multiple-docs-explanation>Nya ifyllda formulär kan inte skapas från detta formulär, men det kan gå att ändra existerande ifyllda formulär.</multiple-docs-explanation>
-            <multiple-docs-view-data>Visa existerande ifyllda formulär</multiple-docs-view-data>
+            <multiple-docs-explanation>Skapande av nya data är inaktiverat för detta formulär, men du kan komma åt befintliga formulärdata.</multiple-docs-explanation>
+            <multiple-docs-view-data>Öppna befintliga formulärdata</multiple-docs-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Språk</language-choice>

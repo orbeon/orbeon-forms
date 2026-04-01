@@ -330,8 +330,8 @@
             <view-drafts>Toon auto-bewaarde concepten</view-drafts>
             <start-new>Start opnieuw</start-new>
             <multiple-docs-title>Bestaande formgegevens gevonden</multiple-docs-title>
-            <multiple-docs-explanation>U kunt geen nieuwe gegevens maken voor deze formdefinitie, maar u kunt mogelijk wel de bestaande formgegevens aanpassen.</multiple-docs-explanation>
-            <multiple-docs-view-data>Bestaande formgegevens tonen</multiple-docs-view-data>
+            <multiple-docs-explanation>Het aanmaken van nieuwe gegevens is uitgeschakeld voor dit formulier, maar u kunt de bestaande formuliergegevens openen.</multiple-docs-explanation>
+            <multiple-docs-view-data>Bestaande formuliergegevens openen</multiple-docs-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Taal</language-choice>

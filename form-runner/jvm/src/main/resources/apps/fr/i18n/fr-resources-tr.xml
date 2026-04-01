@@ -328,8 +328,8 @@
             <view-drafts>Otomatik kaydedilen belgeleri görüntüle</view-drafts>
             <start-new>Sıfırdan başla</start-new>
             <multiple-docs-title>Mevcut form verisi bulundu</multiple-docs-title>
-            <multiple-docs-explanation>Bu form tanımı için yeni veri oluşturamazsınız, ancak mevcut form verilerini düzenleyebilirsiniz.</multiple-docs-explanation>
-            <multiple-docs-view-data>Mevcut form verilerini görüntüle</multiple-docs-view-data>
+            <multiple-docs-explanation>Bu form için yeni veri oluşturma devre dışı bırakılmıştır, ancak mevcut form verilerine erişebilirsiniz.</multiple-docs-explanation>
+            <multiple-docs-view-data>Mevcut form verilerine eriş</multiple-docs-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Dil</language-choice>

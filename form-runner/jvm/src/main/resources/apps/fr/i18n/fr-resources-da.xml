@@ -324,8 +324,8 @@
             <view-drafts>Vis gemt kladde</view-drafts>
             <start-new>Start forfra</start-new>
             <multiple-docs-title>Eksisterende blanketdata fundet</multiple-docs-title>
-            <multiple-docs-explanation>Du kan ikke lave nye data for denne blanket definition, det burde dog være muligt at ændre eksisterende blanketdata.</multiple-docs-explanation>
-            <multiple-docs-view-data>Vis eksisterende blanketdata</multiple-docs-view-data>
+            <multiple-docs-explanation>Oprettelse af nye data er deaktiveret for denne blanket, men du kan tilgå eksisterende blanketdata.</multiple-docs-explanation>
+            <multiple-docs-view-data>Tilgå eksisterende blanketdata</multiple-docs-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Sprog</language-choice>

@@ -323,8 +323,8 @@
             <view-drafts>Просмотреть автоматически сохраненные черновики</view-drafts>
             <start-new>Начать с нуля</start-new>
             <multiple-docs-title>Обнаружены существующие данные формы</multiple-docs-title>
-            <multiple-docs-explanation>Вы не можете создать новые данные для данного определения формы, однако можете редактировать существующие данные формы.</multiple-docs-explanation>
-            <multiple-docs-view-data>Просмотреть существующие данные формы</multiple-docs-view-data>
+            <multiple-docs-explanation>Создание новых данных для этой формы отключено, однако вы можете получить доступ к существующим данным формы.</multiple-docs-explanation>
+            <multiple-docs-view-data>Перейти к существующим данным формы</multiple-docs-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Язык</language-choice>

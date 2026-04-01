@@ -330,8 +330,8 @@
             <view-drafts>Przeglądaj automatycznie zapisane szkice</view-drafts>
             <start-new>Zacznij wypełnianie od początku</start-new>
             <multiple-docs-title>Znaleziono istniejące dane formularza</multiple-docs-title>
-            <multiple-docs-explanation>Nie możesz utworzyć nowego formularza dla tej definicji, ale możesz wyedytować istniejący.</multiple-docs-explanation>
-            <multiple-docs-view-data>Podgląd istniejącej zawartości formularza</multiple-docs-view-data>
+            <multiple-docs-explanation>Tworzenie nowych danych jest wyłączone dla tego formularza, jednak masz dostęp do istniejących danych formularza.</multiple-docs-explanation>
+            <multiple-docs-view-data>Przejdź do istniejących danych formularza</multiple-docs-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Język</language-choice>

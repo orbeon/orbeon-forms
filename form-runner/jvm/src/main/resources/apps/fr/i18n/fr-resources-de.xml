@@ -330,8 +330,8 @@
             <view-drafts>Automatisch gespeicherte Entwürfe ansehen</view-drafts>
             <start-new>Von vorne beginnen</start-new>
             <multiple-docs-title>Vorhandene Formulardaten gefunden</multiple-docs-title>
-            <multiple-docs-explanation>Sie können für diese Formulardefinition keine neuen Daten erstellen, möglicherweise können Sie jedoch vorhandene Formulardaten bearbeiten.</multiple-docs-explanation>
-            <multiple-docs-view-data>Vorhandene Formulardaten anzeigen</multiple-docs-view-data>
+            <multiple-docs-explanation>Das Erstellen neuer Daten ist für dieses Formular deaktiviert, Sie können jedoch auf vorhandene Formulardaten zugreifen.</multiple-docs-explanation>
+            <multiple-docs-view-data>Auf vorhandene Formulardaten zugreifen</multiple-docs-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Sprache</language-choice>

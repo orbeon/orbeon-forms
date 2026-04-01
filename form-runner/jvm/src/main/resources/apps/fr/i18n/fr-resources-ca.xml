@@ -347,9 +347,8 @@
             <view-drafts>Veure esborrany auto-guardat</view-drafts>
             <start-new>Començar amb un formulari en blanc</start-new>
             <multiple-docs-title>S'ha trobat un formulari amb aquestes dades</multiple-docs-title>
-            <multiple-docs-explanation>No és poden crear noves dades per aquest Formulari, de totes
-                maneres pot editar els existents.</multiple-docs-explanation>
-            <multiple-docs-view-data>Veure dades existents</multiple-docs-view-data>
+            <multiple-docs-explanation>La creació de noves dades està desactivada per a aquest formulari, però podeu accedir a les dades existents.</multiple-docs-explanation>
+            <multiple-docs-view-data>Accedir a les dades existents</multiple-docs-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Idioma</language-choice>

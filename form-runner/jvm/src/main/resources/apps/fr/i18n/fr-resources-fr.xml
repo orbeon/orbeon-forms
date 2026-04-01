@@ -333,8 +333,8 @@
             <view-drafts>Voir les documents enregistrés automatiquement</view-drafts>
             <start-new>Recommencer à zéro</start-new>
             <multiple-docs-title>Données de formulaire existantes</multiple-docs-title>
-            <multiple-docs-explanation>Vous ne pouvez pas créer de nouvelles données, mais vous pourriez être en mesure de modifier les données de formulaire existantes.</multiple-docs-explanation>
-            <multiple-docs-view-data>Voir les données de formulaire existantes</multiple-docs-view-data>
+            <multiple-docs-explanation>La création de nouvelles données est désactivée pour ce formulaire, mais vous pouvez accéder aux données de formulaire existantes.</multiple-docs-explanation>
+            <multiple-docs-view-data>Accéder aux données de formulaire existantes</multiple-docs-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Langue</language-choice>

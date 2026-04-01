@@ -1546,8 +1546,17 @@ body.orbeon {
                 }
             }
 
-            & > .xforms-switch {
+            & > .fb-role-required-checkbox {
                 grid-row: 2;
+                column-gap: 10px;
+
+                .xbl-fr-checkbox-input label {
+                    margin-right: 0; // Use the column gap instead
+                }
+
+                .fb-param-buttons {
+                    margin-right: 5px;
+                }
             }
 
             // TODO: workaround for the help icon appearing above the checkbox

@@ -198,7 +198,8 @@
                                 xf:attribute('show',                    ($column/@show/string(), 'default')[1]),
                                 xf:attribute('role-required',           xxf:non-blank($column/@require-role)),
                                 xf:attribute('require-role-constraint', ($column/@require-role-constraint/string()[. != ''], 'all')[1]),
-                                for $r in xxf:split($column/@require-role) return xf:element('require-role', string($r))
+                                for $r in xxf:split($column/@require-role)
+                                return xf:element('require-role', string($r))
                             )
                         )"/>
                 </xf:action>
@@ -754,7 +755,7 @@
                     required="false()"/>
 
                 <xf:bind ref="summary-metadata-columns/column">
-                    <xf:bind ref="@role-required"           type="xs:boolean"/>
+                    <xf:bind ref="@role-required"           type="xs:boolean" readonly="../@show != 'true'"/>
                     <xf:bind ref="@require-role-constraint" relevant="data(../@role-required) and ../@show = 'true'"/>
                     <xf:bind ref="require-role"             relevant="data(../@role-required) and ../@show = 'true'">
                         <xf:constraint id="role-non-empty"      value="xxf:non-blank()"/>
@@ -779,6 +780,10 @@
                         </xh:head>
                         <xh:body/>
                     </xh:html>
+                </xf:instance>
+
+                <xf:instance id="require-role-template" xxf:readonly="true">
+                    <_><require-role/></_>
                 </xf:instance>
 
                 <xf:instance id="modified">
@@ -1769,66 +1774,63 @@
                                                 </xf:action>
                                             </xf:select1>
 
-                                            <xf:switch caseref="$column/@show = 'true'">
-                                                <xf:case value="true()">
-                                                    <xh:div class="fb-role-required-checkbox">
-                                                        <xh:div>
-                                                            <fr:checkbox-input ref="$column/@role-required">
-                                                                <xf:label ref="$resources/role-restriction/restrict"/>
-                                                                <xf:action event="xforms-select">
-                                                                    <xf:insert if="count($column/require-role) = 0" context="$column" origin="xf:element('require-role')"/>
-                                                                </xf:action>
-                                                                <xf:action event="xforms-deselect">
-                                                                    <xf:setvalue ref="$column/@require-role-constraint" value="'all'"/>
-                                                                    <xf:delete ref="$column/require-role"/>
-                                                                </xf:action>
-                                                            </fr:checkbox-input>
-                                                        </xh:div>
-                                                        <xh:div>
-                                                            <xf:switch caseref="count($column/require-role) gt 1" class="fb-roles-any-or-all">
-                                                                <xf:case value="true()">
-                                                                    <xh:div>
-                                                                        <xf:select1 ref="$column/@require-role-constraint">
-                                                                            <xf:item><xf:label ref="$resources/role-restriction/all"/><xf:value>all</xf:value></xf:item>
-                                                                            <xf:item><xf:label ref="$resources/role-restriction/any"/><xf:value>any</xf:value></xf:item>
-                                                                        </xf:select1>
-                                                                        <xf:output ref="$resources/role-restriction/of-the-following"/>
-                                                                    </xh:div>
-                                                                </xf:case>
-                                                                <xf:case value="false()"/>
-                                                            </xf:switch>
+                                            <xh:div class="fb-role-required-checkbox">
+                                                <xh:div>
+                                                    <fr:checkbox-input ref="$column/@role-required">
+                                                        <xf:label ref="$resources/role-restriction/restrict"/>
+                                                        <xf:action event="xforms-select">
+                                                            <xf:insert if="count($column/require-role) = 0" context="$column" origin="xf:element('require-role')"/>
+                                                        </xf:action>
+                                                        <xf:action event="xforms-deselect">
+                                                            <xf:setvalue ref="$column/@require-role-constraint" value="'all'"/>
+                                                            <xf:delete ref="$column/require-role"/>
+                                                        </xf:action>
+                                                    </fr:checkbox-input>
+                                                </xh:div>
+                                                <xh:div>
+                                                    <xf:switch caseref="count($column/require-role) gt 1" class="fb-roles-any-or-all">
+                                                        <xf:case value="true()">
+                                                            <xh:div>
+                                                                <xf:select1 ref="$column/@require-role-constraint">
+                                                                    <xf:item><xf:label ref="$resources/role-restriction/all"/><xf:value>all</xf:value></xf:item>
+                                                                    <xf:item><xf:label ref="$resources/role-restriction/any"/><xf:value>any</xf:value></xf:item>
+                                                                </xf:select1>
+                                                                <xf:output ref="$resources/role-restriction/of-the-following"/>
+                                                            </xh:div>
+                                                        </xf:case>
+                                                        <xf:case value="false()"/>
+                                                    </xf:switch>
 
-                                                            <xf:var name="can-remove" value="count($column/require-role) gt 1"/>
+                                                    <xf:var name="can-remove" value="count($column/require-role) gt 1"/>
 
-                                                            <fr:dnd-repeat ref="if (count($column/require-role) gt 0) then $column/require-role else ()">
-                                                                <xf:var name="current-role" value="."/>
-                                                                <xf:var name="can-move"     value="count($column/require-role) gt 1"/>
+                                                    <fr:dnd-repeat ref="if (count($column/require-role) gt 0) then $column/require-role else instance('require-role-template')/require-role">
+                                                        <xf:var name="current-role" value="."/>
+                                                        <xf:var name="can-move"     value="count($column/require-role) gt 1"/>
 
-                                                                <xh:div class="{{'fb-role-row', 'xforms-dnd-item', 'xforms-dnd-moves'[$can-move]}}">
-                                                                    <xh:div><xf:input ref="$current-role" class="fb-control-settings-summary-role">
-                                                                        <xf:alert validation="role-non-empty"      ref="$resources/role-restriction/empty"/>
-                                                                        <xf:alert validation="role-non-duplicated" ref="$resources/role-restriction/duplicate"/>
-                                                                    </xf:input></xh:div>
-                                                                    <xh:div class="fb-param-buttons">
-                                                                        <xh:i class="fa fa-fw fa-bars fb-param-grab"/>
-                                                                        <xf:trigger appearance="minimal" ref="if ($can-remove) then $current-role else ''">
-                                                                            <xf:label><xh:i class="fa fa-fw fa-minus-circle"/></xf:label>
-                                                                            <xf:action event="DOMActivate"><xf:delete ref="$current-role"/></xf:action>
-                                                                        </xf:trigger>
-                                                                        <xf:trigger appearance="minimal">
-                                                                            <xf:label><xh:i class="fa fa-fw fa-plus-circle"/></xf:label>
-                                                                            <xf:action event="DOMActivate">
-                                                                                <xf:insert context="$column" ref="$current-role[parent::* is $column]" position="after" origin="xf:element('require-role')"/>
-                                                                            </xf:action>
-                                                                        </xf:trigger>
-                                                                    </xh:div>
+                                                        <xh:div class="{{'fb-role-row', 'xforms-dnd-item', 'xforms-dnd-moves'[$can-move]}}">
+                                                            <xh:div><xf:input ref="$current-role" class="fb-control-settings-summary-role">
+                                                                <xf:alert validation="role-non-empty"      ref="$resources/role-restriction/empty"/>
+                                                                <xf:alert validation="role-non-duplicated" ref="$resources/role-restriction/duplicate"/>
+                                                            </xf:input></xh:div>
+                                                            <xf:group ref=".[count($column/require-role) gt 0]">
+                                                                <xh:div class="fb-param-buttons">
+                                                                    <xh:i class="fa fa-fw fa-bars fb-param-grab"/>
+                                                                    <xf:trigger appearance="minimal" ref="if ($can-remove) then $current-role else ''">
+                                                                        <xf:label><xh:i class="fa fa-fw fa-minus-circle"/></xf:label>
+                                                                        <xf:action event="DOMActivate"><xf:delete ref="$current-role"/></xf:action>
+                                                                    </xf:trigger>
+                                                                    <xf:trigger appearance="minimal">
+                                                                        <xf:label><xh:i class="fa fa-fw fa-plus-circle"/></xf:label>
+                                                                        <xf:action event="DOMActivate">
+                                                                            <xf:insert context="$column" ref="$current-role[parent::* is $column]" position="after" origin="xf:element('require-role')"/>
+                                                                        </xf:action>
+                                                                    </xf:trigger>
                                                                 </xh:div>
-                                                            </fr:dnd-repeat>
+                                                            </xf:group>
                                                         </xh:div>
-                                                    </xh:div>
-                                                </xf:case>
-                                                <xf:case value="false()"/>
-                                            </xf:switch>
+                                                    </fr:dnd-repeat>
+                                                </xh:div>
+                                            </xh:div>
                                         </xh:div>
                                     </xf:repeat>
                                 </xh:div>

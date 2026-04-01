@@ -854,7 +854,10 @@
                                             if (data($c/@role-required) and exists($c/require-role[xxf:non-blank(.)])) then
                                                 (
                                                     xf:attribute('require-role'           , string-join($c/require-role[xxf:non-blank(.)], ' ')),
-                                                    xf:attribute('require-role-constraint', ($c/@require-role-constraint/string()[. != ''], 'all')[1])
+                                                    if (count($c/require-role[xxf:non-blank(.)]) gt 1) then
+                                                        xf:attribute('require-role-constraint', ($c/@require-role-constraint/string()[. != ''], 'all')[1])
+                                                    else
+                                                        ()
                                                 )
                                             else
                                                 ()

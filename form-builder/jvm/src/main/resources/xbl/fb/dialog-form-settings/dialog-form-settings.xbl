@@ -757,9 +757,9 @@
                 <xf:bind ref="summary-metadata-columns/column">
                     <xf:bind ref="@role-required"           type="xs:boolean" readonly="../@show != 'true'"/>
                     <xf:bind ref="@require-role-constraint" relevant="data(../@role-required) and ../@show = 'true'"/>
-                    <xf:bind ref="require-role"             relevant="data(../@role-required) and ../@show = 'true'">
+                    <xf:bind ref="require-role"             relevant="data(../@role-required) and ../@show = 'true'" xxf:whitespace="trim">
                         <xf:constraint id="role-non-empty"      value="xxf:non-blank()"/>
-                        <xf:constraint id="role-non-duplicated" value="xxf:is-blank() or (for $v in normalize-space(.) return not((../require-role except .)[normalize-space(.) = $v]))"/>
+                        <xf:constraint id="role-non-duplicated" value="xxf:is-blank() or not(. = (../require-role except .))"/>
                     </xf:bind>
                 </xf:bind>
 

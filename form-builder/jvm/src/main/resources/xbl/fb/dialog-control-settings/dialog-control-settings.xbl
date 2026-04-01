@@ -1195,7 +1195,7 @@
                             data($summary-setting/@role-required)"
                         xxf:whitespace="trim">
                         <xf:constraint id="role-non-empty"      value="xxf:non-blank()"/>
-                        <xf:constraint id="role-non-duplicated" value="xxf:is-blank() or (for $v in normalize-space(.) return not((../require-role except .)[normalize-space(.) = $v]))"/>
+                        <xf:constraint id="role-non-duplicated" value="xxf:is-blank() or not(. = (../require-role except .))"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind

@@ -108,17 +108,19 @@ class Upload {
       getInput.insertAdjacentHTML("afterend", markup)
 
       // Register listener on the cancel link
-      findDescendantElem(UploadCancelClass) foreach { cancelAnchor =>
-        cancelAnchor.addEventListener(DomEventNames.Click, cancelButtonActivated _)
-        if (_container.dataset.contains("rCancel")) {
-          // Missing: mechanism for deregistering the listener, see comment on #7562.
+      findDescendantElem(UploadCancelClass)
+        .foreach(_.addEventListener(DomEventNames.Click, cancelButtonActivated _))
+      updateProgressMessage()
+      updateCancelMessage()
+
+      // Missing: mechanism for deregistering the listener, see comment on #7562.
+      Language.onLangChange(
+        listenerId = container.id,
+        listener   = _ => {
+          updateProgressMessage()
           updateCancelMessage()
-          Language.onLangChange(
-            listenerId = container.id,
-            listener   = _ => updateCancelMessage()
-          )
         }
-      }
+      )
     }
   }
 
@@ -173,10 +175,8 @@ class Upload {
       _container.classList.remove(StateClassPrefix + s)
     _container.classList.add(StateClassPrefix + state)
 
-    if (state == "progress") {
+    if (state == "progress")
       setProgressWidth(Support.computePercentStringToOneDecimal(adjustedReceived(0, 1000), 1000)) // https://github.com/orbeon/orbeon-forms/issues/6666
-      updateProgressMessage()
-    }
   }
 
   // Clears the upload field by recreating it.

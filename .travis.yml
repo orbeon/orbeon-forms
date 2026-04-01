@@ -70,4 +70,4 @@ before_script:
 script:
 - if [ "$TARGET" == "orbeon-dist"                            ]; then ant orbeon-dist ; fi
 - if [ "$TARGET" == "test-unit"                              ]; then sbt Test/compile ; sbt Test/test ; fi
-- if [ "$TARGET" == "test-db"                                ]; then sbt Test/compile ; sbt dbToS3AttachmentMigration/proguard ; sbt Db/test ; fi
+- if [ "$TARGET" == "test-db"                                ]; then export SBT_OPTS="$SBT_OPTS -Dorbeon.skip-offline" ; sbt Test/compile ; sbt dbToS3AttachmentMigration/proguard ; sbt Db/test ; fi

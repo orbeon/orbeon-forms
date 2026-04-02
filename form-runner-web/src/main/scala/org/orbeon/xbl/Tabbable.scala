@@ -220,14 +220,17 @@ object Tabbable {
 
       // Switch tab
       val newLi = allLis(tabPosition)
-      if (! newLi.matches(ActiveSelector)) {
-        val allTabPanes = newLi.closestT(NavTabsSelector).nextElementSiblings.flatMap(_.childrenT(TabPaneSelector)).filter(_.matches(ExcludeNotVisible)).toList
-        val newTabPane  = allTabPanes(tabPosition)
-        allLis.foreach(_.classList.remove(ActiveClass))
-        allTabPanes.foreach(_.classList.remove(ActiveClass))
-        newLi.classList.add(ActiveClass)
-        newTabPane.classList.add(ActiveClass)
-      }
+      val allTabPanes = newLi
+        .closestT(NavTabsSelector)
+        .nextElementSiblings
+        .flatMap(_.childrenT(TabPaneSelector))
+        .filter(_.matches(ExcludeNotVisible))
+        .toList
+      val newTabPane = allTabPanes(tabPosition)
+      allLis.foreach(_.classList.remove(ActiveClass))
+      allTabPanes.foreach(_.classList.remove(ActiveClass))
+      newLi.classList.add(ActiveClass)
+      newTabPane.classList.add(ActiveClass)
     }
 
     // noinspection ScalaWeakerAccess (called from `tabbable.xbl`)

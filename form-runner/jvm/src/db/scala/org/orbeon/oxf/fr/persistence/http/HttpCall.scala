@@ -19,19 +19,19 @@ import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils.useAndClose
-import org.orbeon.oxf.externalcontext.{Credentials, SafeRequestContext}
+import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext, SafeRequestContext}
 import org.orbeon.oxf.fr.Version.Unspecified
 import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.PersistenceBase
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader}
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
-import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunnerPersistence, SearchVersion, Version}
+import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.http.HttpMethod.*
 import org.orbeon.oxf.test.TestHttpClient
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.PathUtils.*
-import org.orbeon.oxf.util.{Connection, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger}
 import org.orbeon.oxf.xml.dom.{Comparator, IOSupport}
 import org.scalatest.Assertions.*
 
@@ -43,8 +43,9 @@ import scala.util.Try
 private[persistence] object HttpCall {
 
   sealed trait Body
-  case class XML   (doc : Document   ) extends Body
-  case class Binary(file: Array[Byte]) extends Body
+  case class XML        (doc   : Document             ) extends Body
+  case class Binary     (file  : Array[Byte]          ) extends Body
+  case class FormEncoded(params: Seq[(String, String)]) extends Body
 
   sealed trait Check[+T]
   object Check {
@@ -227,13 +228,15 @@ private[persistence] object HttpCall {
     }
 
     val contentType = body.map {
-      case XML   (_) => ContentTypes.XmlContentType
-      case Binary(_) => ContentTypes.OctetStreamContentType
+      case XML        (_) => ContentTypes.XmlContentType
+      case Binary     (_) => ContentTypes.OctetStreamContentType
+      case FormEncoded(_) => ContentTypes.ApplicationXWwwFormUrlencoded
     }
 
     val messageBody = body map {
-      case XML   (doc ) => doc.getRootElement.serializeToString().getBytes
-      case Binary(file) => file
+      case XML        (doc   ) => doc.getRootElement.serializeToString().getBytes
+      case Binary     (file  ) => file
+      case FormEncoded(params) => PathUtils.encodeSimpleQuery(params).getBytes(ExternalContext.StandardFormCharacterEncoding)
     }
 
     val content = messageBody map

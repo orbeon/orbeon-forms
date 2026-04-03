@@ -155,4 +155,29 @@ class IsoTimeTest extends AnyFunSpec {
         assert(timeFormat.generateFormatString == timeFormatString)
       }
   }
+
+  describe("Time format parsing equivalence") {
+    val formats = List(
+      "[h]:[m]:[s] [P]",
+      "[h]:[m] [P]",
+      "[h]:[m]:[s] [P,*-2]",
+      "[h]:[m] [P,*-2]",
+      "[h]:[m]:[s] [PN]",
+      "[h]:[m] [PN]",
+      "[h]:[m]:[s] [PN,*-2]",
+      "[h]:[m] [PN,*-2]",
+      "[H]:[m]:[s]",
+      "[H]:[m]",
+      "[H01]:[m]:[s]",
+      "[H01]:[m]"
+    )
+
+    it("must parse TimeFormat strings equivalently with both parsers") {
+      for (f <- formats) {
+        val original = IsoTime.parseFormatOrig(f)
+        val parboiled = IsoTime.parseFormat(f)
+        assert(original == parboiled, s"Mismatch for $f: $original != $parboiled")
+      }
+    }
+  }
 }

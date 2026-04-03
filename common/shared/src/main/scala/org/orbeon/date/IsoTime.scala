@@ -4,6 +4,7 @@ import cats.syntax.option.*
 import org.orbeon.date.IsoTime.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
+import org.parboiled2.*
 
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoField
@@ -142,7 +143,53 @@ object IsoTime {
     ((hoursString :: minutesString :: secondsOpt.toList).mkString(":") :: amPmOpt.toList).mkString(" ")
   }
 
-  def parseFormat(formatInputTime: String): TimeFormat = {
+  class TimeFormatParser(val input: ParserInput) extends Parser {
+    def InputLine: Rule1[TimeFormat] = rule { FormatRule ~ EOI }
+
+    def FormatRule: Rule1[TimeFormat] = rule {
+      HourRule ~ ":[m]" ~ SecondsRule ~ AmPmRule ~> {
+        (is24Hour: Boolean, isPadHourDigits: Boolean, hasSeconds: Boolean, amPm: AmPmFormat) =>
+          TimeFormat(
+            is24Hour = is24Hour,
+            isPadHourDigits = isPadHourDigits,
+            hasSeconds = hasSeconds,
+            amPmFormat = amPm
+          )
+      }
+    }
+
+    def HourRule: Rule2[Boolean, Boolean] = rule {
+      "[h01]" ~ push(false) ~ push(true) |
+      "[H01]" ~ push(true) ~ push(true) |
+      "[H1]"  ~ push(true) ~ push(false) |
+      "[h]"   ~ push(false) ~ push(false) |
+      "[H]"   ~ push(true) ~ push(false)
+    }
+
+    def SecondsRule: Rule1[Boolean] = rule {
+      (":[s]" ~ push(true)) | push(false)
+    }
+
+    def AmPmRule: Rule1[AmPmFormat] = rule {
+      (
+        " " ~ (
+          "[PN," ~ ("*-2" | "2-2") ~ "]" ~ push(AmPmFormat.Upper) |
+          "[P,"  ~ ("*-2" | "2-2") ~ "]" ~ push(AmPmFormat.Lower) |
+          "[PN," ~ ("*-1" | "1-1") ~ "]" ~ push(AmPmFormat.UpperShort) |
+          "[P,"  ~ ("*-1" | "1-1") ~ "]" ~ push(AmPmFormat.LowerShort) |
+          "[PN]"                         ~ push(AmPmFormat.UpperDots) |
+          "[P]"                          ~ push(AmPmFormat.LowerDots)
+        )
+      ) | push(AmPmFormat.None)
+    }
+  }
+
+  def parseFormat(formatInputTime: String): TimeFormat =
+    new TimeFormatParser(formatInputTime).InputLine.run().getOrElse {
+      throw new IllegalArgumentException(s"Invalid format: `$formatInputTime`")
+    }
+
+  def parseFormatOrig(formatInputTime: String): TimeFormat = {
 
     val is24Hour =
       formatInputTime.contains("[H]") || formatInputTime.contains("[H1]") || formatInputTime.contains("[H01]")

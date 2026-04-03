@@ -563,6 +563,7 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
     libraryDependencies +=  "com.beachape"           %%% "enumeratum"        % EnumeratumVersion,
     libraryDependencies +=  "com.beachape"           %%% "enumeratum-circe"  % EnumeratumCirceVersion,
     libraryDependencies +=  "org.log4s"              %%% "log4s"             % Log4sVersion,
+    libraryDependencies +=  "org.parboiled"          %%% "parboiled"         % Parboiled2Version,
     libraryDependencies +=  "com.lihaoyi"            %%% "pprint"            % PPrintVersion,
     crossScalaVersions := supportedScalaVersions
   )

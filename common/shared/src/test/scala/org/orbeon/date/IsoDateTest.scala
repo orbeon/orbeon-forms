@@ -65,4 +65,25 @@ class IsoDateTest extends AnyFunSpec {
       ))
     }
   }
+
+  describe("`DateFormat` parsing") {
+
+    it("must parse DateFormat strings equivalently with both parsers") {
+
+      val formats = List(
+        "[M]/[D]/[Y]",
+        "[D]/[M]/[Y]",
+        "[D].[M].[Y]",
+        "[D]-[M]-[Y]",
+        "[M01]/[D01]/[Y]",
+        "[Y]-[M01]-[D01]"
+      )
+
+      for (f <- formats) {
+        val original = IsoDate.parseFormatOld(f)
+        val parboiled = IsoDate.parseFormat(f)
+        assert(original == parboiled, s"Mismatch for $f: $original != $parboiled")
+      }
+    }
+  }
 }

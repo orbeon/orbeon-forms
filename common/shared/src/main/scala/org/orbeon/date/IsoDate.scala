@@ -4,11 +4,12 @@ import cats.implicits.catsSyntaxOptionId
 import org.orbeon.date.IsoDate.*
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StringUtils.*
+import org.parboiled2.*
 
 import java.time.LocalDate
 import java.time.chrono.IsoChronology
 import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder, ResolverStyle, SignStyle}
-import java.time.temporal.ChronoField
+import java.time.temporal.{ChronoField, TemporalAccessor}
 import java.time.temporal.ChronoField.{DAY_OF_MONTH, MONTH_OF_YEAR, YEAR}
 import scala.util.Try
 
@@ -183,19 +184,36 @@ object IsoDate {
     }
   }
 
-  def parseFormat(formatInputDate: String): DateFormat =
+  class DateFormatParser(val input: ParserInput) extends Parser {
+    def InputLine: Rule1[DateFormat] = rule { FormatRule ~ EOI }
+    def FormatRule: Rule1[DateFormat] = rule {
+      "[M]"   ~ capture("/") ~ "[D]"   ~ "/" ~ "[Y]"   ~> ((sep: String) => DateFormat(DateFormatComponent.Month, sep, isPadDayMonthDigits = false)) |
+      "[D]"   ~ capture("/") ~ "[M]"   ~ "/" ~ "[Y]"   ~> ((sep: String) => DateFormat(DateFormatComponent.Day,   sep, isPadDayMonthDigits = false)) |
+      "[D]"   ~ capture(".") ~ "[M]"   ~ "." ~ "[Y]"   ~> ((sep: String) => DateFormat(DateFormatComponent.Day,   sep, isPadDayMonthDigits = false)) |
+      "[D]"   ~ capture("-") ~ "[M]"   ~ "-" ~ "[Y]"   ~> ((sep: String) => DateFormat(DateFormatComponent.Day,   sep, isPadDayMonthDigits = false)) |
+      "[M01]" ~ capture("/") ~ "[D01]" ~ "/" ~ "[Y]"   ~> ((sep: String) => DateFormat(DateFormatComponent.Month, sep, isPadDayMonthDigits = true )) |
+      "[Y]"   ~ capture("-") ~ "[M01]" ~ "-" ~ "[D01]" ~> ((sep: String) => DateFormat(DateFormatComponent.Year,  sep, isPadDayMonthDigits = true ))
+    }
+  }
+
+  def parseFormat(dateFormat: String): DateFormat =
+    new DateFormatParser(dateFormat).InputLine.run().getOrElse {
+      throw new IllegalArgumentException(s"Invalid format: `$dateFormat`")
+    }
+
+  def parseFormatOld(dateFormat: String): DateFormat =
     DateFormat(
       firstComponent      =
-        if (formatInputDate.startsWith("[D"))
+        if (dateFormat.startsWith("[D"))
           DateFormatComponent.Day
-        else if (formatInputDate.startsWith("[M"))
+        else if (dateFormat.startsWith("[M"))
           DateFormatComponent.Month
-        else if (formatInputDate.startsWith("[Y"))
+        else if (dateFormat.startsWith("[Y"))
           DateFormatComponent.Year
         else
-          throw new IllegalArgumentException(s"Invalid format: `$formatInputDate`"),
-      separator           = formatInputDate.dropWhile(_ != ']').slice(1, 2), // first character after the first `]`
-      isPadDayMonthDigits = formatInputDate.contains("[D01]") || formatInputDate.contains("[M01]")
+          throw new IllegalArgumentException(s"Invalid format: `$dateFormat`"),
+      separator           = dateFormat.dropWhile(_ != ']').slice(1, 2), // first character after the first `]`
+      isPadDayMonthDigits = dateFormat.contains("[D01]") || dateFormat.contains("[M01]")
     )
 
   def findMagicDateAsIsoDateWithNow(dateFormat: DateFormat, magicDate: String, currentDate: => IsoDate): Option[IsoDate] = {
@@ -213,23 +231,16 @@ object IsoDate {
   private def parseUserDateValue(dateFormat: DateFormat, dateValue: String): Option[IsoDate] =
     Try(dateFormat.ParseFormat.parse(dateValue))
       .toOption
-      .map { accessor =>
-        IsoDate(
-          year  = accessor.get(ChronoField.YEAR),
-          month = accessor.get(ChronoField.MONTH_OF_YEAR),
-          day   = accessor.get(ChronoField.DAY_OF_MONTH)
-        )
-      }
+      .map(fromAccessor)
 
   // Date can be local or with a timezone offset, which is ignored
   def tryParseLocalIsoDate(value: String): Try[IsoDate] =
-    Try {
-      // Parse with a non-local date, but only extract the local components
-      val accessor = DateTimeFormatter.ISO_DATE.parse(value)
-      IsoDate(
-        year  = accessor.get(ChronoField.YEAR),
-        month = accessor.get(ChronoField.MONTH_OF_YEAR),
-        day   = accessor.get(ChronoField.DAY_OF_MONTH)
-      )
-    }
+    Try(fromAccessor(DateTimeFormatter.ISO_DATE.parse(value))) // parse possibly non-local date but only extract local components
+
+  private def fromAccessor(accessor: TemporalAccessor): IsoDate =
+    IsoDate(
+      year  = accessor.get(ChronoField.YEAR),
+      month = accessor.get(ChronoField.MONTH_OF_YEAR),
+      day   = accessor.get(ChronoField.DAY_OF_MONTH)
+    )
 }

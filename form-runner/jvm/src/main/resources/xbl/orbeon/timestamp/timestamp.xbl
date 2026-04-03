@@ -34,10 +34,10 @@
             <display-name lang="ja">タイムスタンプ</display-name>
 
             <icon>
-                <icon-class>fa fa-fw fa-time</icon-class>
+                <icon-class>fa fa-fw fa-user-clock</icon-class>
             </icon>
             <templates>
-                <bind type="xf:dateTime"/>
+                <bind type="xf:dateTime" xxf:default="current-dateTime()"/>
                 <view>
                     <fr:timestamp>
                         <xf:label ref=""/>

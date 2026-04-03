@@ -69,6 +69,9 @@
                     <xsl:choose>
                         <xsl:when test="$is-static-readonly and ($is-pdf-mode or not($date-native-picker = 'always'))">
                             <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                            <xsl:if test="$is-pdf-mode">
+                                <xsl:attribute name="fr:pdf-automatic">true</xsl:attribute>
+                            </xsl:if>
                         </xsl:when>
                         <xsl:when test="$use-pdf-template">
                             <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
@@ -92,6 +95,9 @@
                     <xsl:choose>
                         <xsl:when test="$is-static-readonly and ($is-pdf-mode or not($time-native-picker = 'always'))">
                             <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                            <xsl:if test="$is-pdf-mode">
+                                <xsl:attribute name="fr:pdf-automatic">true</xsl:attribute>
+                            </xsl:if>
                         </xsl:when>
                         <xsl:when test="$use-pdf-template">
                             <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
@@ -122,6 +128,9 @@
             <xsl:choose>
                 <xsl:when test="$is-static-readonly">
                     <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                    <xsl:if test="$is-pdf-mode">
+                        <xsl:attribute name="fr:pdf-automatic">true</xsl:attribute>
+                    </xsl:if>
                 </xsl:when>
                 <xsl:when test="$use-pdf-template">
                     <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
@@ -164,6 +173,9 @@
                     <xsl:choose>
                         <xsl:when test="$is-static-readonly">
                             <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                            <xsl:if test="$is-pdf-mode">
+                                <xsl:attribute name="fr:pdf-automatic">true</xsl:attribute>
+                            </xsl:if>
                         </xsl:when>
                         <xsl:when test="$use-pdf-template">
                             <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
@@ -224,6 +236,9 @@
             <xsl:choose>
                 <xsl:when test="$is-static-readonly">
                     <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                    <xsl:if test="$is-pdf-mode">
+                        <xsl:attribute name="fr:pdf-automatic">true</xsl:attribute>
+                    </xsl:if>
                 </xsl:when>
                 <xsl:when test="$use-pdf-template">
                     <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
@@ -245,6 +260,9 @@
             <xsl:choose>
                 <xsl:when test="$is-static-readonly">
                     <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                    <xsl:if test="$is-pdf-mode">
+                        <xsl:attribute name="fr:pdf-automatic">true</xsl:attribute>
+                    </xsl:if>
                 </xsl:when>
                 <xsl:when test="$use-pdf-template">
                     <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
@@ -266,6 +284,9 @@
             <xsl:choose>
                 <xsl:when test="$is-static-readonly">
                     <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                    <xsl:if test="$is-pdf-mode">
+                        <xsl:attribute name="fr:pdf-automatic">true</xsl:attribute>
+                    </xsl:if>
                 </xsl:when>
                 <xsl:when test="$use-pdf-template">
                     <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
@@ -423,6 +444,9 @@
                     )
                 ">
                     <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                    <xsl:if test="$is-pdf-mode">
+                        <xsl:attribute name="fr:pdf-automatic">true</xsl:attribute>
+                    </xsl:if>
                 </xsl:when>
                 <xsl:when test="$use-pdf-template">
                     <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
@@ -443,6 +467,9 @@
             <xsl:choose>
                 <xsl:when test="$is-static-readonly">
                     <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                    <xsl:if test="$is-pdf-mode">
+                        <xsl:attribute name="fr:pdf-automatic">true</xsl:attribute>
+                    </xsl:if>
                 </xsl:when>
                 <xsl:when test="$use-pdf-template">
                     <xsl:attribute name="fr:pdf-template">true</xsl:attribute>

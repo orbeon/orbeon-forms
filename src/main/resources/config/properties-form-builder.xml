@@ -55,6 +55,7 @@
         oxf:/xbl/orbeon/datetime/datetime.xbl
         oxf:/xbl/orbeon/dropdown-date/dropdown-date.xbl
         oxf:/xbl/orbeon/fields-date/fields-date.xbl
+        oxf:/xbl/orbeon/timestamp/timestamp.xbl
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.selection.uri.*.*">

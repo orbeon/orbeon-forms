@@ -14,8 +14,11 @@
 package org.orbeon.xbl
 
 import cats.syntax.option.*
-import org.orbeon.date.{IsoDate, IsoTime}
+import org.orbeon.date.{IsoDate, IsoDateTime, IsoTime}
 import org.orbeon.dom.QName
+import org.orbeon.oxf.fr.FormRunnerDateTimeSupport
+import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.saxon.om
@@ -111,4 +114,31 @@ object TimeSupportJava {
   //@XPathFunction
   def generatePlaceholder(formatString: String, hmsEn: String, hms: String): String =
     IsoTime.parseFormat(formatString).generatePlaceholder(hmsEn, hms)
+}
+
+object DateTimeSupportJava {
+
+  //@XPathFunction
+  def formatReadonlyModeDateTime(
+    binding: om.Item,
+    format : String
+  ): String = {
+
+    implicit val properties: PropertySet = CoreCrossPlatformSupport.properties
+
+    val timezoneFormatter = FormRunnerDateTimeSupport.timezoneFormatter
+
+    for {
+      dateTime      <- IsoDateTime.tryParseIsoDateTime(binding.getStringValue).toOption
+      instant       <- dateTime.toInstant
+      zoneId        = timezoneFormatter._1
+      offsetMinutes = zoneId.getRules.getOffset(instant).getTotalSeconds / 60
+    } yield
+      IsoDateTime.formatDateTime(
+        dateTime     = dateTime.adjustTo(offsetMinutes), // xxx
+        format       = IsoDateTime.parseFormat(format),
+        timezoneName = Some(timezoneFormatter._2(instant))
+      )
+  }
+  .getOrElse(binding.getStringValue)
 }

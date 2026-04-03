@@ -14,20 +14,19 @@
 package org.orbeon.fr
 
 import org.orbeon.facades.{HTMLDialogElement, Ladda, ResizeObserver}
-import org.orbeon.web.{DomEventNames, DomSupport}
 import org.orbeon.web.DomSupport.*
+import org.orbeon.web.{DomEventNames, DomSupport}
 import org.orbeon.xbl
 import org.orbeon.xforms.*
 import org.orbeon.xforms.Constants.InitiallyHiddenClass
 import org.orbeon.xforms.Session.SessionUpdate
-import org.orbeon.xforms.facade.{Bootstrap, Events}
 import org.scalajs.dom
 import org.scalajs.dom.*
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global as g
 import scala.scalajs.js.timers
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 
 // Scala.js starting point for Form Runner
@@ -80,6 +79,7 @@ object FormRunnerApp extends App {
     xbl.Trigger
     xbl.Pager
     xbl.FrWizard
+    xbl.Timestamp
 
     DomSupport.atLeastDomReadyStateF(document, DomSupport.DomReadyState.Interactive) foreach { _ =>
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .navbar-fixed-top"            , addScrollPadding(_, "scroll-padding-top"))

@@ -82,7 +82,7 @@ val AngusMailVersion                 = "2.0.5"
 val JavaActivationVersion            = "2.0.1"
 val AntVersion                       = "1.10.11"
 val ThumbnailatorVersion             = "0.4.16"
-val AwsSdkVersion                    = "2.42.25"
+val AwsSdkVersion                    = "2.42.28"
 
 // "Provided" Java libraries
 val JavaxServletApiVersion           = "4.0.1"

@@ -39,6 +39,7 @@
                             <calculated-value>Great love and great achievements involve great risk.</calculated-value>
                             <calculated-value-borderless>Great love and great achievements involve great risk.</calculated-value-borderless>
                             <calculated-value-clipboard>Great love and great achievements involve great risk.</calculated-value-clipboard>
+                            <timestamp/>
 
 
 
@@ -110,6 +111,8 @@
                         <xf:bind ref="currency-with-prefix" id="currency-with-prefix-bind" type="xf:decimal"
                                  name="currency-with-prefix"/>
                         <xf:bind name="dynamic-dropdown" id="dynamic-dropdown-bind" ref="dynamic-dropdown"/>
+                        <xf:bind id="timestamp-bind" ref="timestamp" name="timestamp" type="xf:dateTime"
+                                 xxf:default="current-dateTime()"/>
 
                     </xf:bind>
                 </xf:bind>
@@ -351,6 +354,10 @@
 
 
                         </calculated-value-clipboard>
+                        <timestamp>
+                            <label>Timestamp</label>
+                            <hint/>
+                        </timestamp>
 
 
 
@@ -659,6 +666,21 @@
 
                             </xf:output>
                         </fr:c>
+                        <fr:c x="1" y="8" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                          xmlns:DateTimeSupport="java:org.orbeon.xbl.DateTimeSupportJava"
+                                          id="timestamp-control"
+                                          bind="timestamp-bind">
+                                <xf:label ref="$form-resources/timestamp/label"/>
+                                <xf:hint ref="$form-resources/timestamp/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="5" y="8" w="4"/>
+                        <fr:c x="9" y="8" w="4"/>
                     </fr:grid>
                 </fr:section>
 

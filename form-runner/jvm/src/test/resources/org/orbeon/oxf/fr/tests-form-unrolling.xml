@@ -30,6 +30,7 @@
                 <xf:output            bind="calculated-value-bind" id="calculated-value-control"/>
                 <xf:output            bind="calculated-value-borderless-bind" id="calculated-value-borderless-control" appearance="minimal"/>
                 <xf:output            bind="calculated-value-clipboard-bind" id="calculated-value-clipboard-control" appearance="clipboard-copy"/>
+                <fr:timestamp         bind="timestamp-bind" id="timestamp-control"/>
             </_>
         </output>
     </test>
@@ -60,6 +61,7 @@
                 <xf:output             fr:static-readonly="true" bind="calculated-value-bind" id="calculated-value-control"/>
                 <xf:output             fr:static-readonly="true" bind="calculated-value-borderless-bind" id="calculated-value-borderless-control" appearance="minimal"/>
                 <xf:output             fr:static-readonly="true" bind="calculated-value-clipboard-bind" id="calculated-value-clipboard-control" appearance="clipboard-copy"/>
+                <fr:timestamp          fr:static-readonly="true" bind="timestamp-bind" id="timestamp-control"/>
             </_>
         </output>
     </test>
@@ -90,6 +92,7 @@
                 <xf:output            fr:pdf-template="true" bind="calculated-value-bind" id="calculated-value-control"/>
                 <xf:output            fr:pdf-template="true" bind="calculated-value-borderless-bind" id="calculated-value-borderless-control" appearance="minimal"/>
                 <xf:output            fr:pdf-template="true" bind="calculated-value-clipboard-bind" id="calculated-value-clipboard-control" appearance="clipboard-copy"/>
+                <fr:timestamp         fr:pdf-template="true" bind="timestamp-bind" id="timestamp-control"/>
             </_>
         </output>
     </test>
@@ -120,6 +123,7 @@
                 <xf:output            fr:static-readonly="true" fr:pdf-automatic="true" bind="calculated-value-bind" id="calculated-value-control"/>
                 <xf:output            fr:static-readonly="true" fr:pdf-automatic="true" bind="calculated-value-borderless-bind" id="calculated-value-borderless-control" appearance="minimal"/>
                 <xf:output            fr:static-readonly="true" fr:pdf-automatic="true" bind="calculated-value-clipboard-bind" id="calculated-value-clipboard-control" appearance="clipboard-copy"/>
+                <fr:timestamp         fr:static-readonly="true" fr:pdf-automatic="true" bind="timestamp-bind" id="timestamp-control"/>
             </_>
         </output>
     </test>

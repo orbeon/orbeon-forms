@@ -28,16 +28,14 @@ class CacheTest
 
   describe("Form Runner static cache") {
 
-    val AppName  = "tests"
-    val FormName = "noscript-false-pdf-template-wizard-true"
-
     val DocumentId1 = "6578e2e0e7911fd9ba284aefaea671cbfb814851"
     val DocumentId2 = "15c4a18428496faa1212d86f58c62d9d3c51cf0d"
 
     def runAndAssert(
+      app                : String,
       form               : String,
       mode               : String,
-      query              : IterableOnce[(String, String)] = Nil,
+      query              : IterableOnce[(String, String)],
       background         : Boolean                        = false,
     )(
       expectedInitialHit : Boolean,
@@ -48,7 +46,7 @@ class CacheTest
 
         val (_, _, events) =
           runFormRunner(
-            AppName,
+            app,
             form,
             mode,
             documentId = documentIdOpt,
@@ -71,7 +69,7 @@ class CacheTest
             .flatMap(XFormsStaticStateCache.findDocument)
             .map(_._1.template.isDefined)
 
-        val path = buildFormRunnerPath(AppName, form, mode, documentIdOpt, query, background)
+        val path = buildFormRunnerPath(app, form, mode, documentIdOpt, query, background)
 
         describe(s"$path") {
           it(s"initial hit `$expectedInitialHit`") {
@@ -79,10 +77,6 @@ class CacheTest
           }
 
           it(s"initial read `$expectedInitialRead`") {
-            if (documentInputRead != expectedInitialRead) {
-              pprint.pprintln(s"xxx failed, events:")
-              pprint.pprintln(events)
-            }
             assert(documentInputRead == expectedInitialRead)
           }
 
@@ -100,25 +94,31 @@ class CacheTest
       }
     }
 
-    runAndAssert(FormName, "new")(
-      expectedInitialHit = false,
-      expectedInitialRead = true
+    val Expected = List(
+      ("tests" -> "noscript-false-pdf-template-wizard-true") -> List(
+        (("new" , Nil,                                    false), false, true ),
+        (("edit", Nil,                                    false), true,  false), // no differences in compiled forms between `new` and `edit` unless for example TOC settings are different
+        (("view", Nil,                                    false), false, true ), // for `view`, the compiled form is different
+        (("pdf" , List("fr-use-pdf-template" -> "false"), true ), true,  true ), // it happens that when not using PDF templates, the compiled form is the same as in `view`
+        (("pdf" , Nil,                                    false), false, true ), // when using PDF templates, the compiled form is different
+      ),
+      ("issue" -> "7519") -> List(
+        (("new" , Nil,                                    false), false, true ), // same as other form
+        (("edit", Nil,                                    false), true,  false), // same as other form
+        (("view", Nil,                                    false), false, true ), // same as other form
+        (("pdf" , List("fr-use-pdf-template" -> "false"), true ), false, true ), // PDF automatic is different as there is an `fr:pdf-automatic` binding
+        (("pdf" , Nil,                                    false), true,  false), // no PDF template
+      )
     )
-    runAndAssert(FormName, "edit")(
-      expectedInitialHit = true,  // there should not be any differences in compiled forms between `new` and `edit`
-      expectedInitialRead = false // and this is also reflected in `FormRunnerConfig`, unless for example TOC settings are different
-    )
-    runAndAssert(FormName, "view")(
-      expectedInitialHit = false, // for `view`, the compiled form is different
-      expectedInitialRead = true
-    )
-    runAndAssert(FormName, "pdf", query = List("fr-use-pdf-template" -> "false"), background = true)(
-      expectedInitialHit = true,  // it happens that when not using PDF templates, the compiled form is the same as in `view`
-      expectedInitialRead = true  // but `FormRunnerConfig` is different, so we read the input again
-    )
-    runAndAssert(FormName, "pdf")(
-      expectedInitialHit = false, // when using PDF templates, the compiled form is different
-      expectedInitialRead = true
-    )
+
+    for {
+      ((app, form), cases) <- Expected
+      ((mode, query, background), expectedInitialHit, expectedInitialRead) <- cases
+    } locally {
+      runAndAssert(app, form, mode, query, background)(
+        expectedInitialHit  = expectedInitialHit,
+        expectedInitialRead = expectedInitialRead
+      )
+    }
   }
 }

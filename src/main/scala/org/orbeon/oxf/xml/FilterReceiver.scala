@@ -17,7 +17,7 @@ import org.xml.sax.Attributes
 import org.orbeon.scaxon.SAXEvents.*
 
 // Receiver which produces a subtree rooted at the first element matching the predicate provided.
-class FilterReceiver(receiver: XMLReceiver, matches: List[StartElement] => Boolean)
+class FilterReceiver(receiver: XMLReceiver, matches: List[StartElement] => Boolean, multiple: Boolean = false)
     extends ForwardingXMLReceiver(receiver) {
 
   super.setForward(false)
@@ -62,7 +62,8 @@ class FilterReceiver(receiver: XMLReceiver, matches: List[StartElement] => Boole
 
         super.endDocument()
         super.setForward(false)
-        done = true
+        if (! multiple)
+          done = true
       }
 
       namespaceContext.endElement()

@@ -1,0 +1,866 @@
+<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/">
+    <xh:head>
+        <xf:model xxf:custom-mips="fr:persist" id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <grid-1>
+                            <input-dateTime/>
+                            <computed-dateTime/><control-1/>
+
+
+
+
+
+
+                        </grid-1>
+
+                    </section-1>
+                    <section-2>
+                        <grid-2>
+                            <control-4/>
+                            <control-5/>
+                            <control-6/>
+                            <control-7/>
+                            <control-8/>
+                            <control-9/>
+                            <control-10/>
+                            <control-11/>
+                            <control-12/>
+                            <control-13/>
+                            <control-14/>
+                            <control-15/>
+                        </grid-2>
+                    </section-2>
+                    <section-3>
+                        <grid-3>
+                            <control-16/>
+                            <control-17/>
+                            <control-18/>
+                            <control-19/>
+                            <control-20/>
+                            <control-21/>
+                            <control-22/>
+                            <control-23/>
+                            <control-24/>
+                            <control-25/>
+                            <control-26/>
+                            <control-27/>
+                        </grid-3>
+                    </section-3>
+                    <section-4>
+                        <grid-4>
+                            <control-28/>
+                            <control-29/>
+                            <control-30/>
+                            <control-31/>
+                            <control-32/>
+                            <control-33/>
+                            <control-34/>
+                            <control-35/>
+                            <control-36/>
+                            <control-37/>
+                            <control-38/>
+                            <control-39/>
+                        </grid-4>
+                    </section-4>
+                </form>
+            </xf:instance>
+
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1"><xf:bind id="input-dateTime-bind" ref="input-dateTime" name="input-dateTime" type="xf:dateTime" xxf:default="'2026-01-01T11:17:46.635'"/><xf:bind id="computed-dateTime-bind" ref="computed-dateTime" name="computed-dateTime" calculate="concat($input-dateTime/string(), '-07:00')" readonly="false()"/><xf:bind id="control-1-bind" ref="control-1" name="control-1" calculate="concat($input-dateTime/string(), '-07:00')" readonly="false()" type="xf:dateTime"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    </xf:bind>
+
+                </xf:bind>
+                <xf:bind id="section-2-bind" ref="section-2" name="section-2">
+                    <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
+                        <xf:bind id="control-4-bind" ref="control-4" name="control-4" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-5-bind" ref="control-5" name="control-5" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-6-bind" ref="control-6" name="control-6" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-7-bind" ref="control-7" name="control-7" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-8-bind" ref="control-8" name="control-8" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-9-bind" ref="control-9" name="control-9" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-10-bind" ref="control-10" name="control-10" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-11-bind" ref="control-11" name="control-11" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-12-bind" ref="control-12" name="control-12" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-13-bind" ref="control-13" name="control-13" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-14-bind" ref="control-14" name="control-14" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-15-bind" ref="control-15" name="control-15" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="section-3-bind" ref="section-3" name="section-3">
+                    <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
+                        <xf:bind id="control-16-bind" ref="control-16" name="control-16" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-17-bind" ref="control-17" name="control-17" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-18-bind" ref="control-18" name="control-18" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-19-bind" ref="control-19" name="control-19" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-20-bind" ref="control-20" name="control-20" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-21-bind" ref="control-21" name="control-21" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-22-bind" ref="control-22" name="control-22" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-23-bind" ref="control-23" name="control-23" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-24-bind" ref="control-24" name="control-24" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-25-bind" ref="control-25" name="control-25" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-26-bind" ref="control-26" name="control-26" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-27-bind" ref="control-27" name="control-27" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="section-4-bind" ref="section-4" name="section-4">
+                    <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4">
+                        <xf:bind id="control-28-bind" ref="control-28" name="control-28" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-29-bind" ref="control-29" name="control-29" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-30-bind" ref="control-30" name="control-30" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-31-bind" ref="control-31" name="control-31" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-32-bind" ref="control-32" name="control-32" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-33-bind" ref="control-33" name="control-33" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-34-bind" ref="control-34" name="control-34" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-35-bind" ref="control-35" name="control-35" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-36-bind" ref="control-36" name="control-36" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-37-bind" ref="control-37" name="control-37" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-38-bind" ref="control-38" name="control-38" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                        <xf:bind id="control-39-bind" ref="control-39" name="control-39" type="xf:dateTime" calculate="$computed-dateTime" readonly="false()"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+
+
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>7519</form-name>
+                    <title xml:lang="en">Option to adjust date/time to JavaScript timezone #7519</title>
+                    <description xml:lang="en"/>
+
+                    <library-versions>
+
+                        <orbeon>2</orbeon>
+                        <app>2</app>
+                    </library-versions>
+                    <created-with-version>2026.1-SNAPSHOT PE</created-with-version>
+
+
+
+
+
+
+
+
+
+
+                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2026.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"input-dateTime"},{"value":"computed-dateTime"},{"value":"control-1"}],"topLevel":true},{"containerPath":[{"value":"section-2"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"control-4"},{"value":"control-5"},{"value":"control-6"},{"value":"control-7"},{"value":"control-8"},{"value":"control-9"},{"value":"control-10"},{"value":"control-11"},{"value":"control-12"},{"value":"control-13"},{"value":"control-14"},{"value":"control-15"}],"topLevel":true},{"containerPath":[{"value":"section-3"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"control-16"},{"value":"control-17"},{"value":"control-18"},{"value":"control-19"},{"value":"control-20"},{"value":"control-21"},{"value":"control-22"},{"value":"control-23"},{"value":"control-24"},{"value":"control-25"},{"value":"control-26"},{"value":"control-27"}],"topLevel":true},{"containerPath":[{"value":"section-4"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"control-28"},{"value":"control-29"},{"value":"control-30"},{"value":"control-31"},{"value":"control-32"},{"value":"control-33"},{"value":"control-34"},{"value":"control-35"},{"value":"control-36"},{"value":"control-37"},{"value":"control-38"},{"value":"control-39"}],"topLevel":true}]}</migration></metadata>
+            </xf:instance>
+
+
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <input-dateTime><label>Date and time (no timezone)</label><hint/>
+
+
+                        </input-dateTime>
+                        <computed-dateTime><label>Date and time (with timezone)</label><hint/>
+
+
+                        </computed-dateTime><control-1><label>Date and time (formatted on the server)</label><hint/>
+
+
+                        </control-1>
+                        <control-4>
+                            <label>[M]/[D]/[Y] [h]:[m]:[s] [P,*-2]</label>
+                            <hint/>
+
+
+                        </control-4>
+                        <control-5>
+                            <label>[M]/[D]/[Y] [h]:[m] [P,*-2]</label>
+                            <hint/>
+
+
+                        </control-5>
+                        <control-6>
+                            <label>[M]/[D]/[Y] [H]:[m]:[s]</label>
+                            <hint/>
+
+
+                        </control-6>
+                        <control-7>
+                            <label>[M]/[D]/[Y] [H]:[m]</label>
+                            <hint/>
+
+
+                        </control-7>
+                        <control-8>
+                            <label>[M]/[D]/[Y] [H01]:[m]:[s]</label>
+                            <hint/>
+
+
+                        </control-8>
+                        <control-9>
+                            <label>[M]/[D]/[Y] [H01]:[m]</label>
+                            <hint/>
+
+
+                        </control-9>
+                        <control-10>
+                            <label>[M01]/[D01]/[Y] [h]:[m]:[s] [P,*-2]</label>
+                            <hint/>
+
+
+                        </control-10>
+                        <control-11>
+                            <label>[M01]/[D01]/[Y] [h]:[m] [P,*-2]</label>
+                            <hint/>
+
+
+                        </control-11>
+                        <control-12>
+                            <label>[M01]/[D01]/[Y] [H]:[m]:[s]</label>
+                            <hint/>
+
+
+                        </control-12>
+                        <control-13>
+                            <label>[M01]/[D01]/[Y] [H]:[m]</label>
+                            <hint/>
+
+
+                        </control-13>
+                        <control-14>
+                            <label>[M01]/[D01]/[Y] [H01]:[m]:[s]</label>
+                            <hint/>
+
+
+                        </control-14>
+                        <control-15>
+                            <label>[M01]/[D01]/[Y] [H01]:[m]</label>
+                            <hint/>
+
+
+                        </control-15>
+
+
+
+
+
+
+                        <section-1>
+                            <label/>
+                        </section-1>
+                        <section-2>
+                            <label>Format without timezone</label>
+                            <help/>
+                        </section-2>
+                        <section-3>
+                            <label>Format with timezone offset</label>
+                            <help/>
+                        </section-3>
+                        <section-4>
+                            <label>Format with timezone name</label>
+                            <help/>
+                        </section-4>
+                        <control-28>
+                            <label>[M]/[D]/[Y] [h]:[m]:[s] [P,*-2] [ZN]</label>
+                            <hint/>
+
+
+                        </control-28>
+                        <control-29>
+                            <label>[M]/[D]/[Y] [h]:[m] [P,*-2] [ZN]</label>
+                            <hint/>
+
+
+                        </control-29>
+                        <control-30>
+                            <label>[M]/[D]/[Y] [H]:[m]:[s] [ZN]</label>
+                            <hint/>
+
+
+                        </control-30>
+                        <control-31>
+                            <label>[M]/[D]/[Y] [H]:[m] [ZN]</label>
+                            <hint/>
+
+
+                        </control-31>
+                        <control-32>
+                            <label>[M]/[D]/[Y] [H01]:[m]:[s] [ZN]</label>
+                            <hint/>
+
+
+                        </control-32>
+                        <control-33>
+                            <label>[M]/[D]/[Y] [H01]:[m] [ZN]</label>
+                            <hint/>
+
+
+                        </control-33>
+                        <control-34>
+                            <label>[M01]/[D01]/[Y] [h]:[m]:[s] [P,*-2] [ZN]</label>
+                            <hint/>
+
+
+                        </control-34>
+                        <control-35>
+                            <label>[M01]/[D01]/[Y] [h]:[m] [P,*-2] [ZN]</label>
+                            <hint/>
+
+
+                        </control-35>
+                        <control-36>
+                            <label>[M01]/[D01]/[Y] [H]:[m]:[s] [ZN]</label>
+                            <hint/>
+
+
+                        </control-36>
+                        <control-37>
+                            <label>[M01]/[D01]/[Y] [H]:[m] [ZN]</label>
+                            <hint/>
+
+
+                        </control-37>
+                        <control-38>
+                            <label>[M01]/[D01]/[Y] [H01]:[m]:[s] [ZN]</label>
+                            <hint/>
+
+
+                        </control-38>
+                        <control-39>
+                            <label>[M01]/[D01]/[Y] [H01]:[m] [ZN]</label>
+                            <hint/>
+
+
+                        </control-39>
+                        <control-16>
+                            <label>[M]/[D]/[Y] [h]:[m]:[s] [P,*-2] [Z]</label>
+                            <hint/>
+
+
+                        </control-16>
+                        <control-17>
+                            <label>[M]/[D]/[Y] [h]:[m] [P,*-2] [Z]</label>
+                            <hint/>
+
+
+                        </control-17>
+                        <control-18>
+                            <label>[M]/[D]/[Y] [H]:[m]:[s] [Z]</label>
+                            <hint/>
+
+
+                        </control-18>
+                        <control-19>
+                            <label>[M]/[D]/[Y] [H]:[m] [Z]</label>
+                            <hint/>
+
+
+                        </control-19>
+                        <control-20>
+                            <label>[M]/[D]/[Y] [H01]:[m]:[s] [Z]</label>
+                            <hint/>
+
+
+                        </control-20>
+                        <control-21>
+                            <label>[M]/[D]/[Y] [H01]:[m] [Z]</label>
+                            <hint/>
+
+
+                        </control-21>
+                        <control-22>
+                            <label>[M01]/[D01]/[Y] [h]:[m]:[s] [P,*-2] [Z]</label>
+                            <hint/>
+
+
+                        </control-22>
+                        <control-23>
+                            <label>[M01]/[D01]/[Y] [h]:[m] [P,*-2] [Z]</label>
+                            <hint/>
+
+
+                        </control-23>
+                        <control-24>
+                            <label>[M01]/[D01]/[Y] [H]:[m]:[s] [Z]</label>
+                            <hint/>
+
+
+                        </control-24>
+                        <control-25>
+                            <label>[M01]/[D01]/[Y] [H]:[m] [Z]</label>
+                            <hint/>
+
+
+                        </control-25>
+                        <control-26>
+                            <label>[M01]/[D01]/[Y] [H01]:[m]:[s] [Z]</label>
+                            <hint/>
+
+
+                        </control-26>
+                        <control-27>
+                            <label>[M01]/[D01]/[Y] [H01]:[m] [Z]</label>
+                            <hint/>
+
+
+                        </control-27>
+
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="6">
+                            <fr:datetime xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="input-dateTime-control" bind="input-dateTime-bind">
+                                <xf:label ref="$form-resources/input-dateTime/label"/>
+                                <xf:hint ref="$form-resources/input-dateTime/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:datetime>
+
+
+                            </fr:c>
+                        <fr:c y="1" x="7" w="6">
+
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="computed-dateTime-control" bind="computed-dateTime-bind">
+                                <xf:label ref="$form-resources/computed-dateTime/label"/>
+                                <xf:hint ref="$form-resources/computed-dateTime/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6"><xf:output xmlns="http://orbeon.org/oxf/xml/form-builder" id="control-1-control" bind="control-1-bind" appearance="minimal">
+                                <xf:label ref="$form-resources/control-1/label"/>
+                                <xf:hint ref="$form-resources/control-1/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:output></fr:c>
+
+
+
+
+
+
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-2-section" bind="section-2-bind">
+                    <xf:label ref="$form-resources/section-2/label"/>
+                    <fr:grid id="grid-2-grid" bind="grid-2-bind">
+                        <fr:c x="1" y="1" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-4-control" bind="control-4-bind" output-format="[M]/[D]/[Y] [h]:[m]:[s] [P,*-2]">
+                                <xf:label ref="$form-resources/control-4/label"/>
+                                <xf:hint ref="$form-resources/control-4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="5" y="1" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-5-control" bind="control-5-bind" output-format="[M]/[D]/[Y] [h]:[m] [P,*-2]">
+                                <xf:label ref="$form-resources/control-5/label"/>
+                                <xf:hint ref="$form-resources/control-5/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="9" y="1" w="4" h="1">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-6-control" bind="control-6-bind" output-format="[M]/[D]/[Y] [H]:[m]:[s]">
+                                <xf:label ref="$form-resources/control-6/label"/>
+                                <xf:hint ref="$form-resources/control-6/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-7-control" bind="control-7-bind" output-format="[M]/[D]/[Y] [H]:[m]">
+                                <xf:label ref="$form-resources/control-7/label"/>
+                                <xf:hint ref="$form-resources/control-7/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="5" y="2" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-8-control" bind="control-8-bind" output-format="[M]/[D]/[Y] [H01]:[m]:[s]">
+                                <xf:label ref="$form-resources/control-8/label"/>
+                                <xf:hint ref="$form-resources/control-8/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="9" y="2" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-9-control" bind="control-9-bind" output-format="[M]/[D]/[Y] [H01]:[m]">
+                                <xf:label ref="$form-resources/control-9/label"/>
+                                <xf:hint ref="$form-resources/control-9/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-10-control" bind="control-10-bind" output-format="[M01]/[D01]/[Y] [h]:[m]:[s] [P,*-2]">
+                                <xf:label ref="$form-resources/control-10/label"/>
+                                <xf:hint ref="$form-resources/control-10/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="5" y="3" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-11-control" bind="control-11-bind" output-format="[M01]/[D01]/[Y] [h]:[m] [P,*-2]">
+                                <xf:label ref="$form-resources/control-11/label"/>
+                                <xf:hint ref="$form-resources/control-11/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="9" y="3" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-12-control" bind="control-12-bind" output-format="[M01]/[D01]/[Y] [H]:[m]:[s]">
+                                <xf:label ref="$form-resources/control-12/label"/>
+                                <xf:hint ref="$form-resources/control-12/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="1" y="4" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-13-control" bind="control-13-bind" output-format="[M01]/[D01]/[Y] [H]:[m]">
+                                <xf:label ref="$form-resources/control-13/label"/>
+                                <xf:hint ref="$form-resources/control-13/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="5" y="4" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-14-control" bind="control-14-bind" output-format="[M01]/[D01]/[Y] [H01]:[m]:[s]">
+                                <xf:label ref="$form-resources/control-14/label"/>
+                                <xf:hint ref="$form-resources/control-14/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="9" y="4" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-15-control" bind="control-15-bind" output-format="[M01]/[D01]/[Y] [H01]:[m]">
+                                <xf:label ref="$form-resources/control-15/label"/>
+                                <xf:hint ref="$form-resources/control-15/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-3-section" bind="section-3-bind">
+                    <xf:label ref="$form-resources/section-3/label"/>
+
+                    <fr:grid id="grid-3-grid" bind="grid-3-bind">
+                        <fr:c x="1" y="1" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-16-control" bind="control-16-bind" output-format="[M]/[D]/[Y] [h]:[m]:[s] [P,*-2] [Z]">
+                                <xf:label ref="$form-resources/control-16/label"/>
+                                <xf:hint ref="$form-resources/control-16/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="5" y="1" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-17-control" bind="control-17-bind" output-format="[M]/[D]/[Y] [h]:[m] [P,*-2] [Z]">
+                                <xf:label ref="$form-resources/control-17/label"/>
+                                <xf:hint ref="$form-resources/control-17/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="9" y="1" w="4" h="1">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-18-control" bind="control-18-bind" output-format="[M]/[D]/[Y] [H]:[m]:[s] [Z]">
+                                <xf:label ref="$form-resources/control-18/label"/>
+                                <xf:hint ref="$form-resources/control-18/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-19-control" bind="control-19-bind" output-format="[M]/[D]/[Y] [H]:[m] [Z]">
+                                <xf:label ref="$form-resources/control-19/label"/>
+                                <xf:hint ref="$form-resources/control-19/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="5" y="2" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-20-control" bind="control-20-bind" output-format="[M]/[D]/[Y] [H01]:[m]:[s] [Z]">
+                                <xf:label ref="$form-resources/control-20/label"/>
+                                <xf:hint ref="$form-resources/control-20/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="9" y="2" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-21-control" bind="control-21-bind" output-format="[M]/[D]/[Y] [H01]:[m] [Z]">
+                                <xf:label ref="$form-resources/control-21/label"/>
+                                <xf:hint ref="$form-resources/control-21/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-22-control" bind="control-22-bind" output-format="[M01]/[D01]/[Y] [h]:[m]:[s] [P,*-2] [Z]">
+                                <xf:label ref="$form-resources/control-22/label"/>
+                                <xf:hint ref="$form-resources/control-22/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="5" y="3" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-23-control" bind="control-23-bind" output-format="[M01]/[D01]/[Y] [h]:[m] [P,*-2] [Z]">
+                                <xf:label ref="$form-resources/control-23/label"/>
+                                <xf:hint ref="$form-resources/control-23/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="9" y="3" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-24-control" bind="control-24-bind" output-format="[M01]/[D01]/[Y] [H]:[m]:[s] [Z]">
+                                <xf:label ref="$form-resources/control-24/label"/>
+                                <xf:hint ref="$form-resources/control-24/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="1" y="4" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-25-control" bind="control-25-bind" output-format="[M01]/[D01]/[Y] [H]:[m] [Z]">
+                                <xf:label ref="$form-resources/control-25/label"/>
+                                <xf:hint ref="$form-resources/control-25/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="5" y="4" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-26-control" bind="control-26-bind" output-format="[M01]/[D01]/[Y] [H01]:[m]:[s] [Z]">
+                                <xf:label ref="$form-resources/control-26/label"/>
+                                <xf:hint ref="$form-resources/control-26/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="9" y="4" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-27-control" bind="control-27-bind" output-format="[M01]/[D01]/[Y] [H01]:[m] [Z]">
+                                <xf:label ref="$form-resources/control-27/label"/>
+                                <xf:hint ref="$form-resources/control-27/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section-4-section" bind="section-4-bind">
+                    <xf:label ref="$form-resources/section-4/label"/>
+
+
+                    <fr:grid id="grid-4-grid" bind="grid-4-bind">
+                        <fr:c x="1" y="1" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-28-control" bind="control-28-bind" output-format="[M]/[D]/[Y] [h]:[m]:[s] [P,*-2] [ZN]">
+                                <xf:label ref="$form-resources/control-28/label"/>
+                                <xf:hint ref="$form-resources/control-28/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="5" y="1" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-29-control" bind="control-29-bind" output-format="[M]/[D]/[Y] [h]:[m] [P,*-2] [ZN]">
+                                <xf:label ref="$form-resources/control-29/label"/>
+                                <xf:hint ref="$form-resources/control-29/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="9" y="1" w="4" h="1">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-30-control" bind="control-30-bind" output-format="[M]/[D]/[Y] [H]:[m]:[s] [ZN]">
+                                <xf:label ref="$form-resources/control-30/label"/>
+                                <xf:hint ref="$form-resources/control-30/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-31-control" bind="control-31-bind" output-format="[M]/[D]/[Y] [H]:[m] [ZN]">
+                                <xf:label ref="$form-resources/control-31/label"/>
+                                <xf:hint ref="$form-resources/control-31/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="5" y="2" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-32-control" bind="control-32-bind" output-format="[M]/[D]/[Y] [H01]:[m]:[s] [ZN]">
+                                <xf:label ref="$form-resources/control-32/label"/>
+                                <xf:hint ref="$form-resources/control-32/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="9" y="2" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-33-control" bind="control-33-bind" output-format="[M]/[D]/[Y] [H01]:[m] [ZN]">
+                                <xf:label ref="$form-resources/control-33/label"/>
+                                <xf:hint ref="$form-resources/control-33/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-34-control" bind="control-34-bind" output-format="[M01]/[D01]/[Y] [h]:[m]:[s] [P,*-2] [ZN]">
+                                <xf:label ref="$form-resources/control-34/label"/>
+                                <xf:hint ref="$form-resources/control-34/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="5" y="3" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-35-control" bind="control-35-bind" output-format="[M01]/[D01]/[Y] [h]:[m] [P,*-2] [ZN]">
+                                <xf:label ref="$form-resources/control-35/label"/>
+                                <xf:hint ref="$form-resources/control-35/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="9" y="3" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-36-control" bind="control-36-bind" output-format="[M01]/[D01]/[Y] [H]:[m]:[s] [ZN]">
+                                <xf:label ref="$form-resources/control-36/label"/>
+                                <xf:hint ref="$form-resources/control-36/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="1" y="4" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-37-control" bind="control-37-bind" output-format="[M01]/[D01]/[Y] [H]:[m] [ZN]">
+                                <xf:label ref="$form-resources/control-37/label"/>
+                                <xf:hint ref="$form-resources/control-37/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="5" y="4" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-38-control" bind="control-38-bind" output-format="[M01]/[D01]/[Y] [H01]:[m]:[s] [ZN]">
+                                <xf:label ref="$form-resources/control-38/label"/>
+                                <xf:hint ref="$form-resources/control-38/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                        <fr:c x="9" y="4" w="4">
+                            <fr:timestamp xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-39-control" bind="control-39-bind" output-format="[M01]/[D01]/[Y] [H01]:[m] [ZN]">
+                                <xf:label ref="$form-resources/control-39/label"/>
+                                <xf:hint ref="$form-resources/control-39/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </fr:timestamp>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

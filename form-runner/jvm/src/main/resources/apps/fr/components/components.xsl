@@ -91,6 +91,11 @@
         as="xs:boolean"/>
 
     <xsl:variable
+        name="has-pdf-automatic-binding"
+        select="exists(doc('input:form-runner-config')/*/has-pdf-automatic-binding[. = 'true'])"
+        as="xs:boolean"/>
+
+    <xsl:variable
         name="is-static-readonly"
         select="exists(doc('input:form-runner-config')/*/is-static-readonly[. = 'true'])"
         as="xs:boolean"/>

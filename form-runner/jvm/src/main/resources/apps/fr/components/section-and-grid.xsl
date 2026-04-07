@@ -140,7 +140,7 @@
              <xsl:choose>
                 <xsl:when test="$is-static-readonly">
                     <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
-                    <xsl:if test="$is-pdf-mode">
+                    <xsl:if test="$is-pdf-mode and $has-pdf-automatic-binding">
                         <xsl:attribute name="fr:pdf-automatic">true</xsl:attribute>
                     </xsl:if>
                 </xsl:when>

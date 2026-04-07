@@ -264,6 +264,7 @@
         fr:datetime
         fr:number
         fr:handwritten-signature
+        fr:timestamp
     </property>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.tinymce.config">

@@ -5,6 +5,7 @@ import cats.syntax.option.*
 import org.orbeon.dom.QName
 import org.orbeon.oxf.cache.*
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner.{InternalValidateSelectionControlsChoicesParam, UsePdfTemplateParam}
 import org.orbeon.oxf.fr.FormRunnerMetadataSupport.*
 import org.orbeon.oxf.fr.XMLNames.{FR, FRNamespace}
@@ -17,6 +18,7 @@ import org.orbeon.oxf.processor.ProcessorImpl.INPUT_DATA
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.oxf.xforms.xbl.{BindingAttributeDescriptor, BindingDescriptor, BindingLoader, GlobalBindingIndex}
 import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.scaxon.SimplePath.*
@@ -98,6 +100,8 @@ class FormRunnerConfigProcessor extends ProcessorImpl {
       // Reading forwards the `data` input to the output, while also extracting and caching the form metadata
       def read(state: StateType)(implicit pc: PipelineContext, ec: ExternalContext, rcv: XMLReceiver): Unit = {
 
+        implicit val indentedLogger: IndentedLogger  = new IndentedLogger(Logger)
+
         def readInputToReceiver(receiver: XMLReceiver): Unit =
           readInputAsSAX(pc, outputName, receiver)
 
@@ -121,6 +125,7 @@ class FormRunnerConfigProcessor extends ProcessorImpl {
                 useWizard                        = false.some,
                 readonlyDisableCalculate         = false.some,
                 validateSelectionControlsChoices = false.some,
+                hasPdfAutomaticBinding           = false,
               )
             } else {
 
@@ -131,14 +136,35 @@ class FormRunnerConfigProcessor extends ProcessorImpl {
               val attachmentsFilter = newInstanceFilter(attachmentsRcv, isAttachmentsElement, _ => true)
 
               var sectionCount = 0
-              val bodyFilter        = newBodyFilter(new XMLReceiverAdapter {
+              var hasPdfAutomaticBinding = false
+
+              val namesWithPdfAutomaticBinding =
+                BindingLoader
+                  .getUpToDateLibraryAndBaseline(GlobalBindingIndex.currentIndex, checkUpToDate = true)
+                  ._1
+                  .iterateDescriptors
+                  .collect {
+                    case BindingDescriptor(Some(name), _, _, Some(BindingAttributeDescriptor(fr.XMLNames.FRPdfAutomaticQName, _))) =>
+                      name.namespace.uri -> name.localName
+                  }
+                  .toSet
+
+              val bodyFilter = newBodyFilter(new XMLReceiverAdapter {
                 override def startElement(namespaceURI: String, localName: String, qName: String, atts: Attributes): Unit = {
                   if (namespaceURI == FR && localName == "section")
                     sectionCount += 1
+                  else if (! hasPdfAutomaticBinding)
+                    hasPdfAutomaticBinding = namesWithPdfAutomaticBinding(namespaceURI -> localName)
                 }
               })
 
-              readInputToReceiver(new TeeXMLReceiver(List(rcv, metadataFilter, attachmentsFilter, bodyFilter)))
+              val sectionTemplateFilter = newXblTemplateFilter(new XMLReceiverAdapter {
+                override def startElement(namespaceURI: String, localName: String, qName: String, atts: Attributes): Unit =
+                  if (! hasPdfAutomaticBinding)
+                    hasPdfAutomaticBinding = namesWithPdfAutomaticBinding(namespaceURI -> localName)
+              })
+
+              readInputToReceiver(new TeeXMLReceiver(List(rcv, metadataFilter, attachmentsFilter, bodyFilter, sectionTemplateFilter)))
 
               val metadataRootElemOpt    = Option(metadataResult()).flatMap(_.rootElementOpt)
               val attachmentsRootElemOpt = Option(attachmentsResult()).flatMap(_.rootElementOpt)
@@ -154,6 +180,7 @@ class FormRunnerConfigProcessor extends ProcessorImpl {
                 useWizard                        = metadataRootElemOpt.flatMap(_ elemValueOpt "wizard").map(_.toBoolean),
                 readonlyDisableCalculate         = metadataRootElemOpt.flatMap(_ elemValueOpt "readonly-disable-calculate").map(_.toBoolean),
                 validateSelectionControlsChoices = metadataRootElemOpt.flatMap(_ elemValueOpt "validate-selection-controls-choices").map(_.toBoolean),
+                hasPdfAutomaticBinding           = hasPdfAutomaticBinding,
               )
             }
           }
@@ -197,6 +224,9 @@ class FormRunnerConfigProcessor extends ProcessorImpl {
           state.formRunnerConfigOpt
             .getOrElse(throw new IllegalStateException("Form metadata should have been found in cache at this point"))
 
+        pprint.pprintln(s"Computed FormRunnerConfig:")
+        pprint.pprintln(formRunnerConfig)
+
         withDocument {
           withElement("_") {
             element("app",                 text = formRunnerConfig.app)
@@ -210,13 +240,14 @@ class FormRunnerConfigProcessor extends ProcessorImpl {
                 element("mode-namespace-uri-opt", text = v.namespace.uri)
               }
 
-            element("use-wizard-in-new-edit", text = formRunnerConfig.useWizardInNewEdit.toString)
+            element("use-wizard-in-new-edit",     text = formRunnerConfig.useWizardInNewEdit.toString)
 
-            element("is-pdf",              text = formRunnerConfig.isPdf.toString)
-            element("is-readonly-mode",    text = formRunnerConfig.isReadonlyMode.toString)
-            element("use-pdf-template",    text = formRunnerConfig.usePdfTemplate.toString)
-            element("is-static-readonly",  text = formRunnerConfig.isStaticReadonly.toString)
-            element("is-test",             text = formRunnerConfig.isTest.toString)
+            element("is-pdf",                     text = formRunnerConfig.isPdf.toString)
+            element("is-readonly-mode",           text = formRunnerConfig.isReadonlyMode.toString)
+            element("use-pdf-template",           text = formRunnerConfig.usePdfTemplate.toString)
+            element("has-pdf-automatic-binding",  text = formRunnerConfig.hasPdfAutomaticBinding.toString)
+            element("is-static-readonly",         text = formRunnerConfig.isStaticReadonly.toString)
+            element("is-test",                    text = formRunnerConfig.isTest.toString)
 
             formRunnerConfig.tocPositionOpt
               .foreach(v => element("toc-position", text = v))
@@ -282,6 +313,7 @@ private object FormRunnerConfigProcessor {
     useWizard                       : Option[Boolean],
     readonlyDisableCalculate        : Option[Boolean],
     validateSelectionControlsChoices: Option[Boolean],
+    hasPdfAutomaticBinding          : Boolean,
   )
 
   // This contains all the information which, in addition to the form definition (app/form/version)'s last modification
@@ -299,6 +331,7 @@ private object FormRunnerConfigProcessor {
     isPdf                           : Boolean,
     isReadonlyMode                  : Boolean,
     usePdfTemplate                  : Boolean,
+    hasPdfAutomaticBinding          : Boolean,
     isStaticReadonly                : Boolean,
     isTest                          : Boolean,
     tocPositionOpt                  : Option[String],
@@ -318,6 +351,7 @@ private object FormRunnerConfigProcessor {
         .tap(_.update(isPdf.toString.getBytes(StandardCharsets.UTF_8)))
         .tap(_.update(isReadonlyMode.toString.getBytes(StandardCharsets.UTF_8)))
         .tap(_.update(usePdfTemplate.toString.getBytes(StandardCharsets.UTF_8)))
+        .tap(_.update(hasPdfAutomaticBinding.toString.getBytes(StandardCharsets.UTF_8)))
         .tap(_.update(isStaticReadonly.toString.getBytes(StandardCharsets.UTF_8)))
         .tap(_.update(isTest.toString.getBytes(StandardCharsets.UTF_8)))
         .tap(_.update(tocPositionOpt.getOrElse("").getBytes(StandardCharsets.UTF_8)))
@@ -545,6 +579,7 @@ private object FormRunnerConfigProcessor {
       isPdf                            = isPdf,
       isReadonlyMode                   = isReadonlyMode,
       usePdfTemplate                   = usePdfTemplate,
+      hasPdfAutomaticBinding           = metadata.hasPdfAutomaticBinding,
       isStaticReadonly                 = isStaticReadonly,
       isTest                           = TestModes(updatedParams.mode),
       tocPositionOpt                   = if (hasToc) tocPositionOpt else None,

@@ -1,6 +1,6 @@
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.XMLNames.{XF, XH}
+import org.orbeon.oxf.fr.XMLNames.{XBL, XF, XH}
 import org.orbeon.oxf.util.Whitespace
 import org.orbeon.oxf.xml.*
 import org.orbeon.scaxon.SAXEvents.{Atts, StartElement}
@@ -77,5 +77,22 @@ object FormRunnerMetadataSupport {
           Nil => true
         case _ => false
       }
+    )
+
+  def newXblTemplateFilter(
+    bodyReceiver: XMLReceiver
+  ): FilterReceiver =
+    new FilterReceiver(
+      bodyReceiver,
+      {
+        case
+          StartElement(JXQName(XBL, "template"), _) ::
+          StartElement(JXQName(XBL, "xbl"), _) ::
+          StartElement(JXQName(XH, "head"), _) ::
+          StartElement(JXQName(XH, "html"), _) ::
+          Nil => true
+        case _ => false
+      },
+      multiple = true
     )
 }

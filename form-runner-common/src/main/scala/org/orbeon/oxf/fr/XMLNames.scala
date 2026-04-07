@@ -121,4 +121,7 @@ object XMLNames {
   val FRCheckboxInputQName          : QName = QName("checkbox-input",           FRNamespace)
   val FRDataboundSelect1QName       : QName = QName("databound-select1",        FRNamespace)
   val FRDataboundSelect1SearchQName : QName = QName("databound-select1-search", FRNamespace)
+
+  val FRPdfAutomaticQName           : QName  = QName("pdf-automatic",           FRNamespace)
+  val FRPdfTemplateQName            : QName  = QName("pdf-template",            FRNamespace)
 }

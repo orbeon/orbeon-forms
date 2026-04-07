@@ -24,7 +24,7 @@ object Timestamp {
 
     override def init(): Unit = ()
 
-    override def xformsGetValue(): String = ""
+    override def xformsGetValue(): String = findNonBlankValue.getOrElse("")
 
     override def xformsUpdateValue(newValue: String): js.UndefOr[js.Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]] =
       findFormat.foreach(updateVisibleValue(newValue, _))
@@ -33,6 +33,17 @@ object Timestamp {
       outputSpan
         .flatMap(_.dataset.get("orbeonOutputFormat"))
         .map(IsoDateTime.parseFormat)
+
+    // Store and retrieve the ISO value or blank in a dataset. This is just so we can return it when asked with
+    // `xformsGetValue()`. We could also decide to remove the value when it is blank.
+    private def storeValue(isoDateTime: String): Unit =
+      outputSpan
+        .foreach(_.dataset += "orbeonValue" -> isoDateTime)
+
+    private def findNonBlankValue: Option[String] =
+      outputSpan
+        .flatMap(_.dataset.get("orbeonValue"))
+        .flatMap(_.trimAllToOpt)
 
     private def updateVisibleValue(isoDateTime: String, dateTimeFormat: DateTimeFormat): Unit =
       isoDateTime.trimAllToOpt match {
@@ -59,8 +70,10 @@ object Timestamp {
 
           val formattedDateTime = new dom.intl.DateTimeFormat(js.undefined, opts).format(new js.Date(isoDateTime))
           outputSpan.foreach(_.textContent = formattedDateTime)
+          storeValue(isoDateTime)
         case None =>
           outputSpan.foreach(_.textContent = "")
+          storeValue("")
       }
   }
 }

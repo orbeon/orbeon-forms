@@ -224,9 +224,6 @@ class FormRunnerConfigProcessor extends ProcessorImpl {
           state.formRunnerConfigOpt
             .getOrElse(throw new IllegalStateException("Form metadata should have been found in cache at this point"))
 
-        pprint.pprintln(s"Computed FormRunnerConfig:")
-        pprint.pprintln(formRunnerConfig)
-
         withDocument {
           withElement("_") {
             element("app",                 text = formRunnerConfig.app)

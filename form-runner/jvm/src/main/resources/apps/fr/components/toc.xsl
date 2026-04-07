@@ -263,9 +263,22 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xf:label>
-                    <xf:hint value="{$section-label-expr}">
-                        <xsl:if test="$static-section-has-html-label"><xsl:attribute name="mediatype">text/html</xsl:attribute></xsl:if>
-                    </xf:hint>
+
+                    <!-- The hint shows the full label, which is useful when we have a short label, or when full label
+                         gets truncated by ellipses. We remove the markup as hint ends on `<button title="…">`,
+                         which doesn't support HTML. -->
+                    <xf:hint
+                        value="{
+                            if ($static-section-has-html-label) then
+                                concat(
+                                    'frf:removeHtmlTags(',
+                                    $section-label-expr,
+                                    ')'
+                                )
+                            else
+                                $section-label-expr
+                        }"/>
+
                     <!-- DOMActivate handler which depends on `$static-validation-mode` -->
                     <xf:action event="DOMActivate">
                         <xf:dispatch

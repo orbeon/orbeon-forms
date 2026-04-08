@@ -13,7 +13,8 @@
  */
 package org.orbeon.fr
 
-import org.orbeon.facades.{HTMLDialogElement, Ladda, ResizeObserver}
+import org.orbeon.facades.{HTMLDialogElement, Ladda}
+import org.scalajs.dom.ResizeObserver
 import org.orbeon.web.DomSupport.*
 import org.orbeon.web.{DomEventNames, DomSupport}
 import org.orbeon.xbl
@@ -95,7 +96,7 @@ object FormRunnerApp extends App {
     val position = window.getComputedStyle(htmlElement).position
     if (position == "fixed" || position == "sticky") {
       if (js.typeOf(g.ResizeObserver) != "undefined") { // ResizeObserver isn't implemented in jsdom, used in tests
-        val resizeObserver = new ResizeObserver(() => {
+        val resizeObserver = new ResizeObserver((_, _) => {
           val documentElement = document.documentElementT
           val scrollPaddingWithMargin = htmlElement.clientHeight + 5;
           documentElement.style.setProperty(cssClass, s"${scrollPaddingWithMargin}px")

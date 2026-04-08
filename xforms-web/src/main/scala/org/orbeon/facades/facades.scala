@@ -68,16 +68,3 @@ object HTMLFacades {
     }
   }
 }
-
-@JSGlobalScope
-@js.native
-private object ResizeObserverGlobalScope extends js.Object {
-  val ResizeObserver: js.UndefOr[js.Any] = js.native
-}
-
-@js.native
-@JSGlobal
-class ResizeObserver(observer: js.Function0[Unit]) extends js.Object {
-  def observe  (element: dom.Element): Unit = js.native
-  def unobserve(element: dom.Element): Unit = js.native
-}

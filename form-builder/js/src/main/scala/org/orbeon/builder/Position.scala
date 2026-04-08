@@ -15,7 +15,7 @@ package org.orbeon.builder
 
 import io.udash.wrappers.jquery.JQuery
 import org.orbeon.datatypes.Orientation
-import org.orbeon.facades.ResizeObserver
+import org.scalajs.dom.ResizeObserver
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport
@@ -67,7 +67,7 @@ object Position {
       ".fb-main",       // Especially with embedding, when Form Builder is moved or resized
       ".xbl-fr-tinymce" // TinyMCE is rendered asynchronously
     )
-    val resizeObserver = new ResizeObserver(fn)
+    val resizeObserver = new ResizeObserver((_, _) => fn())
     DomSupport.onElementFoundOrAdded(
       container = document.body,
       selector  = ElementWhichChangeDynamically.mkString(", "),

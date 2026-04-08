@@ -24,16 +24,7 @@ import org.scalajs.dom.{KeyboardEvent, document, html}
 import scala.scalajs.js
 
 
-trait GridSectionMenus {
-
-  import Util.*
-
-  def componentName: String
-
-  // Keep pointing to menu so we can move it around as needed
-  // Old comment: NOTE: When scripts are in the head, this returns undefined. Should be fixed!
-  private val globalMenuElem: html.Element = document.querySelectorT(s".fr-$componentName-dropdown-menu")
-
+object GridSectionMenus {
   sealed trait Operation extends EnumEntry with Hyphencase
   object Operation extends Enum[Operation] {
     val values = findValues
@@ -44,7 +35,19 @@ trait GridSectionMenus {
     case object Clear       extends Operation
     case object Remove      extends Operation
   }
+}
 
+trait GridSectionMenus {
+
+  import Util.*
+  import GridSectionMenus.*
+
+  def componentName: String
+
+  // Keep pointing to menu so we can move it around as needed
+  // Old comment: NOTE: When scripts are in the head, this returns undefined. Should be fixed!
+  private val globalMenuElem: html.Element = document.querySelectorT(s".fr-$componentName-dropdown-menu")
+  
   case class CurrentComponent(currentComponentId: String, currentIteration: Int)
 
   // This transiently holds information between a click on the menu and a subsequent action in the menu.

@@ -106,7 +106,7 @@ val WebJarDependencies = Seq(
   "org.webjars.npm" % "select2"          % "4.0.13",
   "org.webjars.npm" % "tinymce"          % "6.8.6",
   "org.webjars.npm" % "tinymce-i18n"     % "25.6.2",
-  "org.webjars.npm" % "whatwg-fetch"     % "3.0.0",
+  "org.webjars.npm" % "whatwg-fetch"     % "3.6.20",
 )
 
 val CoreLibraryDependencies = Seq(

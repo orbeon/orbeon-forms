@@ -391,12 +391,12 @@ lazy val baseCommonSettings = Seq(
 
   jsEnv                         := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(),
 
-  javacOptions                  ++= Seq(
+  javacOptions ++= Seq(
     "-encoding", "utf8",
     "--release", "11"
   ),
 
-  scalacOptions                 ++= Seq(
+  scalacOptions ++= Seq(
     "-encoding", "utf8",
     "-feature",
     "-language:postfixOps",
@@ -581,7 +581,7 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
   )
   .jsSettings(commonScalaJsSettings)
   .jsSettings(
-    libraryDependencies += "org.scala-lang.modules" %%%  "scala-async"          % ScalaAsyncVersion,
+    libraryDependencies += "org.scala-lang.modules" %%% "scala-async"           % ScalaAsyncVersion,
     libraryDependencies += "io.github.cquiroz"      %%% "scala-java-time"       % ScalaJsTimeVersion % Test,
     libraryDependencies += "io.github.cquiroz"      %%% "scala-java-time-tzdb"  % ScalaJsTimeVersion % Test,
     Compile / unmanagedJars := Nil

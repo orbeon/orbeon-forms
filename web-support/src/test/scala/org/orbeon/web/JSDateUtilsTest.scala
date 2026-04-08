@@ -1,25 +1,11 @@
-/**
-  * Copyright (C) 2019 Orbeon, Inc.
-  *
-  * This program is free software; you can redistribute it and/or modify it under the terms of the
-  * GNU Lesser General Public License as published by the Free Software Foundation; either version
-  *  2.1 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  * See the GNU Lesser General Public License for more details.
-  *
-  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
-  */
-package org.orbeon.date
+package org.orbeon.web
 
-import org.orbeon.date.JSDateUtils.*
-import org.scalatest.funspec.AnyFunSpec
+import org.orbeon.web.JSDateUtils.*
+import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.scalajs.js
 
-
-class JSDateUtilsTest extends AnyFunSpec {
+class JSDateUtilsTest extends AnyFunSpecLike {
 
   // In the list of strings, the first strings is the canonical form, that is the one we expect when
   // the `js.Date` is converted to a string.
@@ -36,12 +22,13 @@ class JSDateUtilsTest extends AnyFunSpec {
     for {
       (isoStrings, expectedDate) <- StringsToDates
       isoString                  <- isoStrings
-    }
+    } locally {
       it(s"must pass for `$isoString`") {
         val actual   = parseIsoDateUsingLocalTimezone(isoString).map(_.getTime())
         val expected = expectedDate.map(_.getTime())
         assert(actual === expected)
       }
+    }
   }
 
   describe("JavaScript date conversion to ISO string") {
@@ -49,10 +36,11 @@ class JSDateUtilsTest extends AnyFunSpec {
       (isoStrings, dateOpt) <- StringsToDates
       expectedString        = isoStrings.head
       date                  <- dateOpt
-    }
+    } locally {
       it(s"must pass for `$expectedString`") {
         assert(dateToIsoStringUsingLocalTimezone(date) === expectedString)
       }
+    }
   }
 
   describe("Roundtrip with current date") {

@@ -16,12 +16,12 @@ package org.orbeon.xbl
 import cats.syntax.option.*
 import io.udash.wrappers.jquery.JQueryPromise
 import org.log4s.Logger
-import org.orbeon.date.JSDateUtils.todayAsIsoDate
-import org.orbeon.date.{IsoDate, JSDateUtils}
+import org.orbeon.web.JSDateUtils.todayAsIsoDate
+import org.orbeon.date.IsoDate
 import org.orbeon.facades.BoostrapDatepicker.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.web.DomEventNames
+import org.orbeon.web.{DomEventNames, JSDateUtils}
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.XBL

@@ -11,9 +11,10 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.date
+package org.orbeon.web
 
 import cats.syntax.option.*
+import org.orbeon.date.{IsoDate, IsoTime}
 import org.orbeon.oxf.util.StringUtils.*
 
 import scala.scalajs.js

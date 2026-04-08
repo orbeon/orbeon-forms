@@ -16,7 +16,7 @@ package org.orbeon.xbl
 import io.udash.wrappers.jquery.JQueryPromise
 import org.log4s.Logger
 import org.orbeon.date.IsoTime
-import org.orbeon.date.JSDateUtils.nowAsIsoTime
+import org.orbeon.web.JSDateUtils.nowAsIsoTime
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.*

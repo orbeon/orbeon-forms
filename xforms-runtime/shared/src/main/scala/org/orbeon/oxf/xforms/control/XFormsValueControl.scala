@@ -124,7 +124,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     result
   }
 
-  // This usually doesn't need to be overridden (only XFormsUploadControl as of 2012-08-15; 2019-09-04)
+  // This usually doesn't need to be overridden
   def storeExternalValue(externalValue: String, collector: ErrorEventCollector): Unit =
     if (handleExternalValue)
       doStoreExternalValue(externalValue, collector)

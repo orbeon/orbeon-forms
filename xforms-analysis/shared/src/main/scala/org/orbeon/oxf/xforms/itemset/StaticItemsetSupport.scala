@@ -79,7 +79,7 @@ object StaticItemsetSupport {
             excludeWhitespaceTextNodes = excludeWhitespaceTextNodes
           )
 
-        (attItems forall compareAtt) && compareContent
+        attItems.forall(compareAtt) && compareContent
 
       case _ =>
         // Mixing and matching `xf:copy` and `xf:value` is not supported for now

@@ -107,8 +107,8 @@ trait XFormsSupport extends MockitoSugar {
   def instanceToString(instance: XFormsInstance) =
     TransformerUtils.tinyTreeToString(instance.documentInfo)
 
-  def getControlValue(controlEffectiveId: String) = getValueControl(controlEffectiveId).getValue(EventCollector.Throw)
-  def getControlExternalValue(controlEffectiveId: String) = getValueControl(controlEffectiveId).getExternalValue(EventCollector.Throw)
+  def getControlValue(controlEffectiveId: String): String = getValueControl(controlEffectiveId).getValue(EventCollector.Throw)
+  def getControlExternalValue(controlEffectiveId: String): String = getValueControl(controlEffectiveId).getExternalValue(EventCollector.Throw)
 
   // This stores the value without testing for readonly
   def setControlValue(controlEffectiveId: String, value: String): Unit =

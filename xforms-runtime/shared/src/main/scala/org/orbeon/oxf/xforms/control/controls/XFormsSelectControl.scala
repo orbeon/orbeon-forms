@@ -69,9 +69,9 @@ class XFormsSelectControl(
     val dataItemValues =
       getCurrentItemValueFromData(boundItem, collector) match {
         case Left(dataValue) =>
-          valueAsLinkedSet(dataValue).toList map Left.apply
+          valueAsLinkedSet(dataValue).toList.map(Left.apply)
         case Right(allDataItems) =>
-          allDataItems map (dataItem => Right(List(dataItem)))
+          allDataItems.map(dataItem => Right(List(dataItem)))
       }
 
     val itemsetItemValues = filterItemsReturnValues(_ => true)

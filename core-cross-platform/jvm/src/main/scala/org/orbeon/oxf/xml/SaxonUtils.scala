@@ -282,7 +282,7 @@ object SaxonUtils extends SaxonUtilsTrait {
   }
 
   def attCompare(boundNodeOpt: Option[om.NodeInfo], att: om.NodeInfo): Boolean =
-    boundNodeOpt exists (_.getAttributeValue(att.getFingerprint) == att.getStringValue)
+    boundNodeOpt.exists(_.getAttributeValue(att.getFingerprint) == att.getStringValue)
 
   def xsiType(elem: om.NodeInfo): Option[QName] = {
     // NOTE: Saxon 9 has new code to resolve such QNames

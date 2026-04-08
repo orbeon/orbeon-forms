@@ -622,8 +622,8 @@
                             name="is-last-nav"
                             value="empty($next-nav-case-ids)"/>
 
-                        <xf:var name="prev-button-ref" value="if (not($is-first-nav)) then xxf:instance('local')/readwrite else ''"/>
-                        <xf:var name="next-button-ref" value="if (not($is-last-nav))  then xxf:instance('local')/readwrite else ''"/>
+                        <xf:var name="prev-button-ref" value="if ($allow-prev) then xxf:instance('local')/readwrite else ''"/>
+                        <xf:var name="next-button-ref" value="if ($allow-next) then xxf:instance('local')/readwrite else ''"/>
 
                         <xf:group
                             xxbl:scope="inner"

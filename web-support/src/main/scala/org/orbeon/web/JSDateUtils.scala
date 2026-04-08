@@ -72,24 +72,20 @@ object JSDateUtils {
     new js.Date(year = date.year, month = date.month - 1, date = date.day)
 
   def findTimezoneShortName(date: js.Date): Option[String] =
+    findFormattedTimezonePart("short", date)
+
+  def findDateOffsetInMinutes(date: js.Date): Option[Int] =
+    findFormattedTimezonePart("shortOffset", date)
+      .flatMap(DateUtils.parseIsoZoneOffset)
+      .map(_.getTotalSeconds / 60)
+
+  private def findFormattedTimezonePart(timeZoneNameFormat: String, date: js.Date): Option[String] =
     new dom.intl.DateTimeFormat(
       locales = js.undefined,
       options = new dom.intl.DateTimeFormatOptions {
-        timeZoneName = "short"
+        timeZoneName = timeZoneNameFormat
       }
     )
     .formatToParts(date)
     .collectFirst { case part if part.`type` == "timeZoneName" => part.value }
-
-  def findDateOffsetInMinutes(date: js.Date): Option[Int] =
-    new dom.intl.DateTimeFormat(
-      locales = js.undefined,
-      options = new dom.intl.DateTimeFormatOptions {
-        timeZoneName = "shortOffset"
-      }
-    )
-    .formatToParts(date)
-    .collectFirst { case part if part.`type` == "timeZoneName" => DateUtils.parseIsoZoneOffset(part.value) }
-    .flatten
-    .map(_.getTotalSeconds / 60)
 }

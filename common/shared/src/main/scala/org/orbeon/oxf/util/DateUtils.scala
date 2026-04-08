@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import java.time.chrono.IsoChronology
-import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder, ResolverStyle}
+import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder, ResolverStyle, TextStyle}
 import java.time.temporal.ChronoField
 import java.time.{Instant, ZoneOffset}
 import java.util.Locale
@@ -85,6 +85,18 @@ object DateUtils extends DateUtilsPlatform {
       .toFormatter
       .withResolverStyle(ResolverStyle.STRICT)
       .withChronology(IsoChronology.INSTANCE)
+
+  private val IsoZoneOffset =
+    new DateTimeFormatterBuilder()
+      .parseLenient
+      .appendLocalizedOffset(TextStyle.SHORT)
+      .toFormatter
+      .withResolverStyle(ResolverStyle.STRICT)
+      .withChronology(IsoChronology.INSTANCE)
+
+  // Examples: `Europe/London`, `Z`, `UT`, `UTC`, `GMT`, `+01:30`, `UT+01:30`, `UTC+01:30`, `GMT+01:30`
+  def parseIsoZoneOffset(offset: String): Option[ZoneOffset] =
+    Try(ZoneOffset.from(IsoZoneOffset.parse(offset))).toOption
 
   // ISO 8601 `xs:dateTime` formats with timezone, which we should always use when serializing a date
   private[util] val DateTime = IsoDateTimeWIthMillis.withZone(ZoneOffset.UTC)

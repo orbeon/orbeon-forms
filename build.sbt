@@ -1,5 +1,6 @@
 import org.orbeon.sbt.OrbeonSupport.*
 import org.orbeon.sbt.{OrbeonSupport, OrbeonWebappPlugin, WebJarPatcher}
+import org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv
 import org.scalajs.linker.interface.ESVersion
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
@@ -389,7 +390,7 @@ lazy val unmanagedJarsSettings = Seq(
 
 lazy val baseCommonSettings = Seq(
 
-  jsEnv                         := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(),
+  jsEnv := new JSDOMNodeJSEnv(JSDOMNodeJSEnv.Config().withEnv(Map("TZ" -> "America/Los_Angeles"))), // env for Scala.js tests which depend on the timezone
 
   javacOptions ++= Seq(
     "-encoding", "utf8",

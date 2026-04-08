@@ -174,4 +174,7 @@ object IsoDateTime {
         offsetMinutes = accessor.isSupported(ChronoField.OFFSET_SECONDS).option(accessor.get(ChronoField.OFFSET_SECONDS) / 60)
       )
     }
+
+  def unapply(s: String): Option[IsoDateTime] =
+    tryParseIsoDateTime(s).toOption
 }

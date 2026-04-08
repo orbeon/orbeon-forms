@@ -56,4 +56,28 @@ class JSDateUtilsTest extends AnyFunSpecLike {
       assert(parseIsoDateUsingLocalTimezone(dateToIsoStringUsingLocalTimezone(current)) map (_.getTime()) contains current.getTime())
     }
   }
+
+  describe("findTimezoneShortName()/findDateOffsetInMinutes()") {
+
+    // This test relies on the fact that we pass a `TZ` environment variable set to "America/Los_Angeles" to
+    // `JSDOMNodeJSEnv` in build.sbt. The offsets in the date determine an instant, but do not influence the
+    // short timezone name or the offset of the result.
+    val Expected = List(
+      ("2026-11-05T12:00:00Z",      "PST", -480),
+      ("2026-06-01T12:00:00Z",      "PDT", -420),
+      ("2026-01-01T11:17:46-08:00", "PST", -480),
+      ("2026-06-01T11:17:46-08:00", "PDT", -420),
+    )
+
+    for ((isoDateTimeString, expectedShortName, expectedOffset) <- Expected) {
+      it(s"must return the short timezone name for a given date for $isoDateTimeString") {
+        val date = new js.Date(isoDateTimeString)
+        val shortName = JSDateUtils.findTimezoneShortName(date)
+        assert(shortName.contains(expectedShortName))
+
+        val offsetMinutes = JSDateUtils.findDateOffsetInMinutes(date)
+        assert(offsetMinutes.contains(expectedOffset))
+      }
+    }
+  }
 }

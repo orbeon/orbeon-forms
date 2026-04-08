@@ -157,6 +157,17 @@ object DomSupport {
       doc.createElement("optgroup").asInstanceOf[html.OptGroup]
   }
 
+  trait DateTimeFormatPart extends js.Object {
+    val `type`: String
+    val value : String
+  }
+
+  implicit class DateTimeFormatOps(private val dateTimeFormat: dom.intl.DateTimeFormat) extends AnyVal {
+
+    def formatToParts(date: js.Date): js.Array[DateTimeFormatPart] =
+      dateTimeFormat.asInstanceOf[js.Dynamic].formatToParts(date).asInstanceOf[js.Array[DateTimeFormatPart]]
+  }
+
   implicit class DomEventOps(private val event: dom.Event) extends AnyVal {
 
     def targetT: html.Element =

@@ -2,13 +2,15 @@ package org.orbeon.xbl
 
 import io.udash.wrappers.jquery.JQueryPromise
 import org.orbeon.date.{DateTimeFormat, IsoDateTime, TimezoneFormat}
-import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
-import org.orbeon.web.DomSupport.DomElemOps
+import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.web.DomSupport.*
+import org.orbeon.web.JSDateUtils
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.scalajs.dom
 
 import scala.scalajs.js
 import scala.scalajs.js.|
+import scala.util.chaining.scalaUtilChainingOps
 
 
 object Timestamp {
@@ -19,61 +21,74 @@ object Timestamp {
 
     companion =>
 
-    private lazy val outputSpan: Option[dom.html.Element] =
-      containerElem.querySelectorOpt("span[data-orbeon-output-format]")
+    private lazy val outputSpan: dom.html.Element =
+      containerElem.querySelectorT("span[data-orbeon-output-format]")
 
-    override def init(): Unit = ()
+    // The format is immutable for now
+    private lazy val dateTimeFormat: DateTimeFormat =
+        outputSpan.dataset.get("orbeonOutputFormat")
+          .map(IsoDateTime.parseFormat)
+          .getOrElse(throw new IllegalStateException("Missing `data-orbeon-output-format` attribute on `span`"))
 
-    override def xformsGetValue(): String = findNonBlankValue.getOrElse("")
+    // Keep the ISO value so we can return it when asked with `xformsGetValue()`.
+    private var isoDateTimeValue: Option[String] = None
+
+    override def xformsGetValue(): String = isoDateTimeValue.getOrElse("") // Q: Return `null` instead of ""?
 
     override def xformsUpdateValue(newValue: String): js.UndefOr[js.Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]] =
-      findFormat.foreach(updateVisibleValue(newValue, _))
+      outputSpan.textContent =
+        newValue.trimAllToOpt
+          .tap(isoDateTimeValue = _)
+          match {
+            case Some(IsoDateTime(isoDateTime)) =>
+              formatWithOrbeonApi(isoDateTime, dateTimeFormat)
+            case someOrNone =>
+              someOrNone.getOrElse("")
+          }
 
-    private def findFormat: Option[DateTimeFormat] =
-      outputSpan
-        .flatMap(_.dataset.get("orbeonOutputFormat"))
-        .map(IsoDateTime.parseFormat)
+    private def formatWithOrbeonApi(isoDateTime: IsoDateTime, dateTimeFormat: DateTimeFormat): String = {
 
-    // Store and retrieve the ISO value or blank in a dataset. This is just so we can return it when asked with
-    // `xformsGetValue()`. We could also decide to remove the value when it is blank.
-    private def storeValue(isoDateTime: String): Unit =
-      outputSpan
-        .foreach(_.dataset += "orbeonValue" -> isoDateTime)
+      val jsDate = new js.Date(isoDateTime.toIsoString)
 
-    private def findNonBlankValue: Option[String] =
-      outputSpan
-        .flatMap(_.dataset.get("orbeonValue"))
-        .flatMap(_.trimAllToOpt)
+      val offsetMinutes =
+        JSDateUtils.findDateOffsetInMinutes(jsDate)
+          .getOrElse(throw new IllegalArgumentException(isoDateTime.toIsoString))
 
-    private def updateVisibleValue(isoDateTime: String, dateTimeFormat: DateTimeFormat): Unit =
-      isoDateTime.trimAllToOpt match {
-        case Some(isoDateTime) =>
-          // There is no format/pattern string, so we cannot actually use this to control the entire format. Instead, we
-          // use the options we can.
-          val opts =
-            new dom.intl.DateTimeFormatOptions {
-              hour12       = ! dateTimeFormat.timeFormat.is24Hour
-              year         = "numeric"
-              month        = if (dateTimeFormat.dateFormat.isPadDayMonthDigits) "2-digit" else "numeric"
-              day          = if (dateTimeFormat.dateFormat.isPadDayMonthDigits) "2-digit" else "numeric"
-              hour         = if (dateTimeFormat.timeFormat.isPadHourDigits)     "2-digit" else "numeric"
-              minute       = "2-digit"
-              second       = if (dateTimeFormat.timeFormat.hasSeconds)          "2-digit" else js.undefined
-              timeZoneName =
-                dateTimeFormat.timezoneFormat match {
-                  case Some(TimezoneFormat.OffsetWithGmt) => "longOffset"
-                  case Some(TimezoneFormat.ShortName)     => "short"
-                  case Some(TimezoneFormat.Offset)        => "longOffset"
-                  case _                                  => js.undefined
-                }
+      val timeZoneName =
+        JSDateUtils.findTimezoneShortName(jsDate)
+          .getOrElse(throw new IllegalArgumentException(isoDateTime.toIsoString))
+
+        IsoDateTime.formatDateTime(
+          dateTime     = isoDateTime.adjustTo(offsetMinutes),
+          format       = dateTimeFormat,
+          timezoneName = Some(timeZoneName)
+        )
+    }
+
+    // Experiment with the JavaScript Intl API, which does not allow us to control the format entirely
+    private def formatWithJsApi(isoDateTimeString: String, dateTimeFormat: DateTimeFormat): String = {
+
+      // Try to match the options that make sense
+      val opts =
+        new dom.intl.DateTimeFormatOptions {
+          hour12       = ! dateTimeFormat.timeFormat.is24Hour
+          year         = "numeric"
+          month        = if (dateTimeFormat.dateFormat.isPadDayMonthDigits) "2-digit" else "numeric"
+          day          = if (dateTimeFormat.dateFormat.isPadDayMonthDigits) "2-digit" else "numeric"
+          hour         = if (dateTimeFormat.timeFormat.isPadHourDigits)     "2-digit" else "numeric"
+          minute       = "2-digit"
+          second       = if (dateTimeFormat.timeFormat.hasSeconds)          "2-digit" else js.undefined
+          timeZoneName =
+            dateTimeFormat.timezoneFormat match {
+              case Some(TimezoneFormat.OffsetWithGmt) => "longOffset"
+              case Some(TimezoneFormat.ShortName)     => "short"
+              case Some(TimezoneFormat.Offset)        => "longOffset"
+              case _                                  => js.undefined
             }
+        }
 
-          val formattedDateTime = new dom.intl.DateTimeFormat(js.undefined, opts).format(new js.Date(isoDateTime))
-          outputSpan.foreach(_.textContent = formattedDateTime)
-          storeValue(isoDateTime)
-        case None =>
-          outputSpan.foreach(_.textContent = "")
-          storeValue("")
-      }
+      new dom.intl.DateTimeFormat(js.undefined, opts)
+        .format(new js.Date(isoDateTimeString))
+    }
   }
 }

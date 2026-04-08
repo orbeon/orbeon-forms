@@ -15,7 +15,10 @@ package org.orbeon.web
 
 import cats.syntax.option.*
 import org.orbeon.date.{IsoDate, IsoTime}
+import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.web.DomSupport.*
+import org.scalajs.dom
 
 import scala.scalajs.js
 import scala.util.Try
@@ -67,4 +70,26 @@ object JSDateUtils {
 
   def isoDateToJsDate(date: IsoDate): js.Date =
     new js.Date(year = date.year, month = date.month - 1, date = date.day)
+
+  def findTimezoneShortName(date: js.Date): Option[String] =
+    new dom.intl.DateTimeFormat(
+      locales = js.undefined,
+      options = new dom.intl.DateTimeFormatOptions {
+        timeZoneName = "short"
+      }
+    )
+    .formatToParts(date)
+    .collectFirst { case part if part.`type` == "timeZoneName" => part.value }
+
+  def findDateOffsetInMinutes(date: js.Date): Option[Int] =
+    new dom.intl.DateTimeFormat(
+      locales = js.undefined,
+      options = new dom.intl.DateTimeFormatOptions {
+        timeZoneName = "shortOffset"
+      }
+    )
+    .formatToParts(date)
+    .collectFirst { case part if part.`type` == "timeZoneName" => DateUtils.parseIsoZoneOffset(part.value) }
+    .flatten
+    .map(_.getTotalSeconds / 60)
 }

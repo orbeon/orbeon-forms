@@ -301,18 +301,7 @@ object FormRunnerPersistence {
     require(augmentString(appForm.app).nonEmpty) // Q: why `augmentString`?
     require(augmentString(appForm.form).nonEmpty)
 
-    getPersistenceURLHeadersFromProvider({
-      val r = findProvider(appForm, formOrData)
-      if (r.isEmpty) {
-        // xxx check again
-        val req = CoreCrossPlatformSupport.requestOpt
-        println(s"xxx no provider found for ${appForm.app}/${appForm.form} ${formOrData.entryName} (request: ${req.map(_.getRequestURI).getOrElse("no request")})")
-        val ps = PropertyLoader.getPropertyStore(req)
-        println(s"xxx getPropertyStore class: ${ps.getClass.getName}")
-        println(s"xxx properties: ${ps.globalPropertySet.allPropertiesAsJson}")
-      }
-      r
-    }.get)
+    getPersistenceURLHeadersFromProvider(findProvider(appForm, formOrData).get)
   }
 
   def getPersistenceURLHeadersFromProvider(provider: String)(implicit propertySet: PropertySet): (String, Map[String, String]) = {

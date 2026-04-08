@@ -16,12 +16,12 @@ package org.orbeon.oxf.util
 import java.time.chrono.IsoChronology
 import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder, ResolverStyle}
 import java.time.temporal.ChronoField
-import java.time.{Instant, OffsetDateTime, ZoneOffset}
+import java.time.{Instant, ZoneOffset}
 import java.util.Locale
 import scala.util.Try
 
 
-object DateUtils {
+object DateUtils extends DateUtilsPlatform {
 
   def formatIsoDateTimeUtc(instant: Instant): String =
     DateTime.format(instant)
@@ -46,12 +46,6 @@ object DateUtils {
 
   def tryParseRFC1123ToInstant(date: String): Option[Instant] =
     Try(parseRFC1123ToInstant(date)).toOption
-
-  // Default timezone offset in minutes
-  // This is obtained once at the time the current object initializes. This searches `user.timezone`, the JDK timezone,
-  // and then UTC in order. This is ony used for setting an absolute point in time before subtracting.
-  val DefaultOffsetMinutes: Int =
-    OffsetDateTime.now.getOffset.getTotalSeconds / 60
 
   // Do our own since we want `.000` in all cases
   private val IsoLocalTimeWithMillis =

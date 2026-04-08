@@ -300,8 +300,8 @@ object DomSupport {
     val observer = new MutationObserver((mutations, _) => {
       mutations.foreach { mutation =>
         mutation.addedNodes.foreach {
-          case element: html.Element if element.matches(selector) =>
-            listener(element)
+          case element: html.Element =>
+            element.queryNestedElems(selector, includeSelf = true).foreach(listener)
           case _ =>
         }
       }

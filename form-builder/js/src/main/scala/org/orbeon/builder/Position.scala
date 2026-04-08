@@ -62,27 +62,17 @@ object Position {
     AjaxClient.ajaxResponseProcessed.add(_ => fn())
     Events.componentChangedLayoutEvent.subscribe(fn)
 
-    // Can be removed once we only support Safari 14, which implements the `ResizeObserver`
-    dom.window.addEventListener("resize", (_: dom.Event) => fn)
-
-    DomSupport.onElementFoundOrAdded(document.body, "img", (elem: html.Element) => {
-      val image = elem.asInstanceOf[html.Image]
-      // Calling the listener before all the CSS has been loaded can cause errors
-      val fnIfComplete = () => if (document.readyState == DocumentReadyState.complete) fn()
-      if (image.complete) {
-        fnIfComplete()
-      } else {
-        image.addEventListener("load",  (_: dom.Event) => fnIfComplete())
-        image.addEventListener("error", (_: dom.Event) => fnIfComplete())
-      }
-    })
-
-    // `ResizeObserver` catches window resizes, but also Form Builder being moved or resized by the embedding app
-    Events.orbeonLoadedEvent.subscribe(() => {
-      val resizeObserver = new ResizeObserver(fn)
-      val fbMainOpt      = Option(document.querySelector(".fb-main"))
-      fbMainOpt.foreach(resizeObserver.observe)
-    })
+    val ElementWhichChangeDynamically = List(
+      "img", "video", "canvas", // Changes when the media is loaded
+      ".fb-main",       // Especially with embedding, when Form Builder is moved or resized
+      ".xbl-fr-tinymce" // TinyMCE is rendered asynchronously
+    )
+    val resizeObserver = new ResizeObserver(fn)
+    DomSupport.onElementFoundOrAdded(
+      container = document.body,
+      selector  = ElementWhichChangeDynamically.mkString(", "),
+      listener  = (elem: html.Element) => resizeObserver.observe(elem)
+    )
   }
 
   // Finds the container, if any, based on a vertical position

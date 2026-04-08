@@ -126,7 +126,7 @@ object DateTimeSupportJava {
 
     implicit val properties: PropertySet = CoreCrossPlatformSupport.properties
 
-    val timezoneFormatter = FormRunnerDateTimeSupport.timezoneFormatter
+    val timezoneFormatter = FormRunnerDateTimeSupport.timezoneFormatter(zoneIdStringOpt = None)
 
     for {
       dateTime      <- IsoDateTime.tryParseIsoDateTime(binding.getStringValue).toOption

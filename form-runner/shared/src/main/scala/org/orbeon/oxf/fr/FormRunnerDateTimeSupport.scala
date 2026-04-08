@@ -9,8 +9,9 @@ import java.time.temporal.TemporalAccessor
 object FormRunnerDateTimeSupport {
 
   // Get a timezone formatter based on configured properties
-  def timezoneFormatter(implicit properties: PropertySet): (ZoneId, TemporalAccessor => String) =
-    timezoneFormatterForProperty("user.timezone")
+  def timezoneFormatter(zoneIdStringOpt: Option[String])(implicit properties: PropertySet): (ZoneId, TemporalAccessor => String) =
+    zoneIdStringOpt.map(timezoneFormatterForZoneId)
+      .orElse(timezoneFormatterForProperty("user.timezone"))
       .orElse(timezoneFormatterForProperty("oxf.fr.default-timezone"))
       .getOrElse(UtcTimezoneFormatter)
 

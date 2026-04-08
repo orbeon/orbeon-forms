@@ -2,12 +2,11 @@ package org.orbeon.oxf.util
 
 import cats.syntax.option.*
 import org.orbeon.date.{IsoDate, IsoTime}
-import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.funspec.AnyFunSpecLike
 
-import java.time.Instant
+import java.time.{Instant, ZoneOffset}
 
-
-class DateUtilsTest extends AnyFunSpec {
+class DateUtilsTest extends AnyFunSpecLike {
 
   describe("RFC1123 date parsing") {
     for (value <- List("Tue, 29 May 2012 19:35:04 GMT")) // "Tuesday, 29-May-12 19:35:04 GMT", "Tue May 29 19:35:04 2012"
@@ -76,4 +75,28 @@ class DateUtilsTest extends AnyFunSpec {
         assert(IsoTime.tryParseLocalIsoTime(value).toOption == expected)
       }
   }
+
+  describe("parseIsoZoneOffset parsing") {
+
+    val data = List(
+      "GMT"       -> Some(ZoneOffset.UTC),
+      "GMT+01:30" -> Some(ZoneOffset.ofHoursMinutes(1, 30)),
+      "GMT-08:00" -> Some(ZoneOffset.ofHoursMinutes(-8, 0)),
+      "GMT-8"     -> Some(ZoneOffset.ofHoursMinutes(-8, 0)),
+      "UTC"       -> Some(ZoneOffset.UTC),
+      "UTC+01:30" -> Some(ZoneOffset.ofHoursMinutes(1, 30)),
+      "UTC-08:00" -> Some(ZoneOffset.ofHoursMinutes(-8, 0)),
+      "Z"         -> Some(ZoneOffset.UTC),
+      "+01:30"    -> Some(ZoneOffset.ofHoursMinutes(1, 30)),
+      "-08:00"    -> Some(ZoneOffset.ofHoursMinutes(-8, 0)),
+      "-8"        -> Some(ZoneOffset.ofHoursMinutes(-8, 0)),
+      "invalid"   -> None,
+    )
+
+    for ((value, expected) <- data)
+      it(s"must parse `$value`") {
+        assert(DateUtils.parseIsoZoneOffset(value) == expected)
+      }
+  }
 }
+

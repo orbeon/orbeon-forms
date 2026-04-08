@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import java.time.chrono.IsoChronology
-import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder, ResolverStyle, TextStyle}
+import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder, ResolverStyle}
 import java.time.temporal.ChronoField
 import java.time.{Instant, ZoneOffset}
 import java.util.Locale
@@ -86,17 +86,24 @@ object DateUtils extends DateUtilsPlatform {
       .withResolverStyle(ResolverStyle.STRICT)
       .withChronology(IsoChronology.INSTANCE)
 
-  private val IsoZoneOffset =
-    new DateTimeFormatterBuilder()
-      .parseLenient
-      .appendLocalizedOffset(TextStyle.SHORT)
-      .toFormatter
-      .withResolverStyle(ResolverStyle.STRICT)
-      .withChronology(IsoChronology.INSTANCE)
-
-  // Examples: `Europe/London`, `Z`, `UT`, `UTC`, `GMT`, `+01:30`, `UT+01:30`, `UTC+01:30`, `GMT+01:30`
+  // Use our own parsing as it's difficult to find the right incantation with `DateTimeFormatterBuilder` which would
+  // match what we need for parsing the output of `DateTimeFormat.formatToParts()`'s `timeZoneName`. This is not a
+  // strict parser.
+  // See tests for examples.
   def parseIsoZoneOffset(offset: String): Option[ZoneOffset] =
-    Try(ZoneOffset.from(IsoZoneOffset.parse(offset))).toOption
+    Try {
+      val offsetStr = offset.stripPrefix("GMT").stripPrefix("UTC").stripPrefix("Z")
+      if (offsetStr.isEmpty)
+        ZoneOffset.UTC
+      else {
+        val sign    = if (offsetStr.startsWith("-")) -1 else 1
+        val parts   = offsetStr.drop(1).split(":")
+        val hours   = parts.lift(0).map(_.toInt).getOrElse(0)
+        val minutes = parts.lift(1).map(_.toInt).getOrElse(0)
+        ZoneOffset.ofHoursMinutes(sign * hours, sign * minutes)
+      }
+    }
+    .toOption
 
   // ISO 8601 `xs:dateTime` formats with timezone, which we should always use when serializing a date
   private[util] val DateTime = IsoDateTimeWIthMillis.withZone(ZoneOffset.UTC)

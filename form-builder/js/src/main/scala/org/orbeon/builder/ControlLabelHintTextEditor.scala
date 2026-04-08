@@ -61,8 +61,8 @@ object ControlLabelHintTextEditor {
     var resourceEditorCurrentControlOpt: Option[JQuery] = None
     var jResourceEditorCurrentLabelHint: JQuery = null
 
-    // Heuristic to close the editor based on click and focus events
-    def clickOrFocus(event: dom.Event): Unit = {
+    // Heuristic to close the editor based on mousedown and focus events
+    def mousedownOrFocus(event: dom.Event): Unit = {
       val target = event.targetT
       val eventOnEditor        = target.closestOpt(".fb-label-editor").isDefined
       val eventOnMceDialog     = target.closestOpt(".tox-dialog").isDefined
@@ -70,7 +70,7 @@ object ControlLabelHintTextEditor {
       val eventOnMceToolbarOvf = target.closestOpt(".tox-toolbar__overflow").isDefined // https://github.com/orbeon/orbeon-forms/issues/6315
       val eventOnMceMenu       = target.closestOpt(".tox-menu").isDefined
       val eventOnControlLabel  =
-          // Click on label or element inside label
+          // Event on label or element inside label
           target.ancestorOrSelfElem(LabelHintSelector).nonEmpty &&
           // Only interested in labels in the "editor" portion of FB
           target.ancestorOrSelfElem(".fb-main").nonEmpty
@@ -79,9 +79,9 @@ object ControlLabelHintTextEditor {
     }
 
     locally {
-      // Use capture so we know about the event and send the value to the server before someone else reacting to a `click`
-      document.addEventListener("click"  , clickOrFocus _, useCapture = true)
-      document.addEventListener("focusin", clickOrFocus _, useCapture = true)
+      // Use capture so we know about the event and send the value to the server before someone else reacting to a `mousedown`
+      document.addEventListener("mousedown", mousedownOrFocus _, useCapture = true)
+      document.addEventListener("focusin"  , mousedownOrFocus _, useCapture = true)
 
       // Click on label/hint
       document.addEventListener(DomEventNames.Click, (event: dom.Event) => {

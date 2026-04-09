@@ -52,6 +52,7 @@
         <xbl:template>
             <xh:span
                 id="span"
+                class="xforms-field"
                 data-orbeon-output-format="{fr:component-param-value('output-format')}"/>
         </xbl:template>
     </xbl:binding>

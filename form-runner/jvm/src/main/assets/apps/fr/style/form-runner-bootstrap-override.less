@@ -133,7 +133,7 @@ body.orbeon {
         cursor: default;
     }
 
-    label:not(.checkbox):not(.radio), .xforms-label {
+    .label-styles() {
         font-size  : var(--orbeon-label-font-size);
         font-family: var(--orbeon-label-font-family);
         font-weight: var(--orbeon-label-font-weight);
@@ -143,6 +143,11 @@ body.orbeon {
         }
         color: var(--orbeon-label-color);
     }
+
+    // Keep the two following selectors separate, so that Open HTML to PDF will not ignore the first one because of the
+    // second one (it doesn't support :not) (#7590))
+    .xforms-label                     { .label-styles(); }
+    label:not(.checkbox):not(.radio)  { .label-styles(); }
 
     a {
         text-decoration: underline; // Don't remove the underline for anchors; this is an important web convention

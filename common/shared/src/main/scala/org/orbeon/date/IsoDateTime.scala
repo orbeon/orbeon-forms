@@ -99,10 +99,10 @@ object IsoDateTime {
             tzFormat match {
               case TimezoneFormat.Offset =>
                 if (offset == 0) "Z" else dateTime.offsetToString
-              case TimezoneFormat.ShortName =>
-                timezoneName.getOrElse(dateTime.offsetToString)
               case TimezoneFormat.OffsetWithGmt =>
                 if (offset == 0) "UTC" else s"GMT${dateTime.offsetToString}"
+              case TimezoneFormat.ShortName =>
+                timezoneName.getOrElse(dateTime.offsetToString)
             }
           case None => ""
         }
@@ -144,9 +144,9 @@ object IsoDateTime {
     def OptionalTimezoneRule: Rule1[Option[TimezoneFormat]] = rule {
       optional(
         zeroOrMore(' ') ~ (
-          "[z]" ~ push(TimezoneFormat.OffsetWithGmt) |
-          "[ZN]" ~ push(TimezoneFormat.ShortName) |
-          "[Z]" ~ push(TimezoneFormat.Offset)
+          "[Z]"  ~ push(TimezoneFormat.Offset)        |
+          "[z]"  ~ push(TimezoneFormat.OffsetWithGmt) |
+          "[ZN]" ~ push(TimezoneFormat.ShortName)
         )
       )
     }

@@ -15,9 +15,11 @@ package org.orbeon.oxf.fr
 
 import cats.implicits.catsSyntaxOptionId
 import org.apache.commons.io.FilenameUtils
+import org.log4s.Logger
 import org.orbeon.oxf.fr.Names.ResourcesModel
 import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.topLevelModel
 import org.scalatest.Tag
@@ -32,6 +34,9 @@ import scala.util.Failure
 object S3Tag extends Tag("S3")
 
 object S3Test {
+
+  implicit val logger: Logger = LoggerFactory.createLogger(classOf[S3Test])
+
   def withTestS3ConfigAndPath(
     configName: String,
     pathOpt   : Option[String] = None)(
@@ -55,6 +60,8 @@ object S3Test {
 
       // Make sure the test path is empty
       emptyPath()
+
+      logger.info(s"S3 test running with bucket '${s3Config.bucket}' and base path '$s3Path'")
 
       try {
         body(s3Config)(s3Path)

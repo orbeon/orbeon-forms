@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.persistence.attachments
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.{AppForm, FormOrData, FormRunnerPersistence}
 import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.saxon.function.Property.evaluateAsAvt
 import org.orbeon.xml.NamespaceMapping
 
 
@@ -55,6 +56,17 @@ trait CRUDConfig {
         throw new OXFException(s"Could not find $property property for provider `$provider`")
       }
     }
+
+  def providerPropertyEvaluatedWithAvt(
+    provider   : String,
+    property   : String,
+    defaultOpt : Option[String]
+  )(implicit
+    propertySet: PropertySet
+  ): String = {
+    val (rawPropertyValue, namespaceMapping) = providerPropertyWithNs(provider, property, defaultOpt)
+    evaluateAsAvt(rawPropertyValue, namespaceMapping)
+  }
 
   def providerProperty(
     provider   : String,

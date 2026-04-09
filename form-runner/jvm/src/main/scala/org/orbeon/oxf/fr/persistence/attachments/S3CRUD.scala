@@ -23,7 +23,6 @@ import org.orbeon.oxf.http.{Headers, HttpRange, HttpRanges, StatusCode}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
-import org.orbeon.saxon.function.Property.evaluateAsAvt
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.{NoSuchBucketException, NoSuchKeyException, S3Exception}
 
@@ -193,12 +192,11 @@ object S3CRUD extends CRUDConfig {
       .mkString("/")
 
   override def config(appForm: AppForm, formOrData: FormOrData)(implicit propertySet: PropertySet): Config = {
-    val provider                          = this.provider(appForm, formOrData)
-    val s3ConfigName                      = providerProperty(provider, "s3-config", defaultOpt = "default".some)
-    val s3Config                          = S3Config.fromProperties(s3ConfigName).get
-    val (rawBasePath, basePathNamespaces) = providerPropertyWithNs(provider, "base-path", defaultOpt = "".some)
+    val provider     = this.provider(appForm, formOrData)
+    val s3ConfigName = providerProperty(provider, "s3-config", defaultOpt = "default".some)
+    val s3Config     = S3Config.fromProperties(s3ConfigName).get
+    val basePath     = providerPropertyEvaluatedWithAvt(provider, "base-path", defaultOpt = "".some)
 
-    // Evaluate the base path as an AVT
-    Config(provider, s3Config, evaluateAsAvt(rawBasePath, basePathNamespaces))
+    Config(provider, s3Config, basePath)
   }
 }

@@ -21,7 +21,6 @@ import org.orbeon.oxf.fr.{AppForm, FormOrData}
 import org.orbeon.oxf.http.{FileRangeInputStream, HttpRange, HttpRanges, StatusCode}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.saxon.function.Property.evaluateAsAvt
 
 import java.io.*
 import java.nio.file.{Files, Path, Paths}
@@ -190,14 +189,11 @@ object FilesystemCRUD extends CRUDConfig {
   override def config(appForm: AppForm, formOrData: FormOrData)(implicit propertySet: PropertySet): Config = {
     val provider = this.provider(appForm, formOrData)
 
-    val (rawBasePath, basePathNamespaces) =
-      Try(providerPropertyWithNs(provider, "base-path", defaultOpt = None)).getOrElse {
-        // Compatibility property
-        providerPropertyWithNs(provider, "directory", defaultOpt = None)
-      }
+    def prop(name: String): Try[String] =
+      Try(providerPropertyEvaluatedWithAvt(provider, name, defaultOpt = None))
 
-    // Evaluate the base path as an AVT
-    Config(provider, evaluateAsAvt(rawBasePath, basePathNamespaces))
+    // Try "base-path" first, fallback to "directory" (for compatibility)
+    Config(provider, basePath = prop("base-path").getOrElse(prop("directory").get))
   }
 
   def basePath(appForm: AppForm, formOrData: FormOrData)(implicit propertySet: PropertySet): Path = {

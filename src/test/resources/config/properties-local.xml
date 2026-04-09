@@ -24,7 +24,12 @@
 
     <property as="xs:string"  name="oxf.fr.persistence.provider.*.s3-attachments-form.*.attachments" value="s3"/>
     <property as="xs:string"  name="oxf.fr.persistence.s3.s3-config"                                 value="test-s3-config"/>
-    <property as="xs:string"  name="oxf.fr.persistence.s3.base-path"                                 value="attachments-tests"/>
+
+    <!-- #7585: make base paths unique per job so that jobs can be run concurrently on Travis -->
+    <property
+        as="xs:string"
+        name="oxf.fr.persistence.s3.base-path"
+        value="attachments-tests/{(environment-variable('TRAVIS_JOB_NUMBER')[. != ''], 'local')[1]}"/>
 
     <!-- Tests for AVTs in oxf.fr.persistence.*.directory property -->
     <property as="xs:string" name="oxf.fr.persistence.provider.fs-app.fs-form-1.*.attachments" value="fs-attachments-1"/>

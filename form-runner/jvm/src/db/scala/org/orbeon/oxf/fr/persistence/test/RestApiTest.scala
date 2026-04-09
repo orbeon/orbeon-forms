@@ -23,7 +23,7 @@ import org.orbeon.oxf.fr.Version.*
 import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.fr.persistence.attachments.FilesystemCRUD
-import org.orbeon.oxf.fr.persistence.attachments.S3CRUD.providerProperty
+import org.orbeon.oxf.fr.persistence.attachments.S3CRUD.providerPropertyEvaluatedWithAvt
 import org.orbeon.oxf.fr.persistence.db.*
 import org.orbeon.oxf.fr.persistence.http.HttpCall.DefaultFormName
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
@@ -90,8 +90,8 @@ class RestApiTest
   // Read filesystem/S3 base paths from the `oxf.fr.persistence.[provider].base-path` properties,
   // defined in `src/test/resources/config/properties-local.xml`.
   private implicit lazy val propertySet: PropertySet = CoreCrossPlatformSupport.properties
-  private lazy val filesystemBasePath = Paths.get(providerProperty(provider = "filesystem", "base-path", defaultOpt = None))
-  private lazy val s3BasePath         =           providerProperty(provider = "s3",         "base-path", defaultOpt = None)
+  private lazy val filesystemBasePath = Paths.get(providerPropertyEvaluatedWithAvt(provider = "filesystem", "base-path", defaultOpt = None))
+  private lazy val s3BasePath         =           providerPropertyEvaluatedWithAvt(provider = "s3",         "base-path", defaultOpt = None)
 
   private def filesystemInit(): Unit =
     if (Files.exists(filesystemBasePath)) {

@@ -1,0 +1,218 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+    -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+
+    <xbl:binding
+        id="fr-found-document"
+        element="fr|found-document"
+        xxbl:mode="binding">
+
+        <xbl:implementation>
+            <xf:model>
+                <xf:var name="fr-persistence-instance" as="element(_)"  value="xxf:instance('fr-persistence-instance')"/>
+                <xf:var name="message-to-show"         as="xs:string"   value="$fr-persistence-instance/found-document-message-to-show/string()"/>
+                <xf:var name="has-message"             as="xs:boolean"  value="xxf:non-blank($message-to-show)"/>
+                <xf:var name="is-fb"                   as="xs:boolean"  value="fr:is-form-builder()"/>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:handlers>
+            <xbl:handler event="xforms-enabled">
+                <xxf:show
+                    if="$is-fb and $has-message"
+                    dialog="fr-found-document-dialog"/>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+            <xsl:transform version="2.0">
+                <xsl:template match="/*">
+                    <xf:group appearance="xxf:internal">
+                        <xf:var name="fr-resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=fr-resources-ref"/></xf:var>
+
+                        <!-- Modal dialog (Form Builder only) -->
+                        <xxf:dialog id="fr-found-document-dialog" level="modal" close="false" draggable="true" class="fr-dialog">
+                            <xf:label value="
+                                if ($message-to-show = ('found-draft-for-document', 'found-draft-for-never-saved'))
+                                then $fr-resources/detail/draft-singleton/found-draft
+                                else if ($message-to-show = 'found-drafts-for-never-saved')
+                                then $fr-resources/detail/draft-singleton/found-drafts
+                                else if ($message-to-show = 'found-multiple-docs-for-singleton')
+                                then $fr-resources/detail/draft-singleton/multiple-docs-title
+                                else ''
+                            "/>
+
+                            <xh:div class="fr-dialog-message">
+                                <xsl:call-template name="fr-found-document-message"/>
+                            </xh:div>
+
+                            <xh:div class="fr-dialog-buttons">
+                                <xf:group>
+                                    <xsl:call-template name="fr-found-document-buttons"/>
+                                </xf:group>
+                            </xh:div>
+                        </xxf:dialog>
+
+                        <!-- Top banner (Form Runner, not Form Builder) -->
+                        <xf:group
+                            ref="if (not($is-fb) and $has-message) then xf:element('_') else ()"
+                            class="alert alert-info fr-top-alert"
+                            xxf:element="div">
+
+                            <xh:div class="fr-top-icon">
+                                <xh:i class="fa fa-file-o" aria-hidden="true"/>
+                            </xh:div>
+
+                            <xsl:call-template name="fr-found-document-message"/>
+                            <xsl:call-template name="fr-found-document-buttons"/>
+                        </xf:group>
+                    </xf:group>
+                </xsl:template>
+
+                <!-- Message text, shared between dialog and banner -->
+                <xsl:template name="fr-found-document-message">
+                    <xf:switch caseref="$message-to-show" xxf:element="div" class="fr-top-text">
+                        <xf:case value="'found-draft-for-document'">
+                            <xf:output value="$fr-resources/detail/draft-singleton/found-draft-for-document"/>
+                        </xf:case>
+                        <xf:case value="'found-draft-for-never-saved'">
+                            <xf:output value="$fr-resources/detail/draft-singleton/found-draft-for-never-saved"/>
+                        </xf:case>
+                        <xf:case value="'found-drafts-for-never-saved'">
+                            <xf:output value="$fr-resources/detail/draft-singleton/found-drafts-for-never-saved"/>
+                        </xf:case>
+                        <xf:case value="'found-multiple-docs-for-singleton'">
+                            <xf:output value="$fr-resources/detail/draft-singleton/multiple-docs-explanation"/>
+                        </xf:case>
+                    </xf:switch>
+                </xsl:template>
+
+                <!-- Buttons, shared between dialog and banner -->
+                <xsl:template name="fr-found-document-buttons">
+                    <xf:switch caseref="$message-to-show" xxf:element="div" class="fr-top-alert-buttons">
+                        <xf:case value="'found-draft-for-document'">
+                            <xf:action event="DOMActivate">
+                                <xf:dispatch xxbl:scope="outer" targetid="fr-form-model" name="fr-run-form-load-action-before-data"/>
+                                <xf:dispatch xxbl:scope="outer" targetid="fr-form-model" name="fr-run-form-load-action-after-data"/>
+                                <xf:dispatch xxbl:scope="outer" targetid="fr-form-model" name="fr-run-form-load-action-after-controls"/>
+                                <xf:setvalue ref="xxf:instance('fr-persistence-instance')/found-document-message-to-show"/>
+                                <xxf:hide dialog="fr-found-document-dialog"/>
+                            </xf:action>
+                            <xf:trigger>
+                                <xf:label value="$fr-resources/detail/draft-singleton/open-saved"/>
+                                <xf:action event="DOMActivate">
+                                    <xf:send xxbl:scope="outer" submission="fr-get-document-submission">
+                                        <xf:property name="data-or-draft"       value="'data'"/>
+                                        <xf:property name="fr-data-ready-needed" value="true()" xxf:tunnel="true"/>
+                                    </xf:send>
+                                </xf:action>
+                            </xf:trigger>
+                            <xsl:text> </xsl:text>
+                            <xf:trigger>
+                                <xf:label value="$fr-resources/detail/draft-singleton/open-draft"/>
+                                <xf:action event="DOMActivate">
+                                    <xf:send xxbl:scope="outer" submission="fr-get-document-submission">
+                                        <xf:property name="data-or-draft"       value="'draft'"/>
+                                        <xf:property name="fr-data-ready-needed" value="true()" xxf:tunnel="true"/>
+                                    </xf:send>
+                                </xf:action>
+                            </xf:trigger>
+                        </xf:case>
+
+                        <xf:case value="'found-draft-for-never-saved'">
+                            <xf:action event="DOMActivate">
+                                <xf:dispatch xxbl:scope="outer" targetid="fr-form-model" name="fr-run-form-load-action-before-data"/>
+                                <xf:dispatch xxbl:scope="outer" targetid="fr-form-model" name="fr-run-form-load-action-after-data"/>
+                                <xf:dispatch xxbl:scope="outer" targetid="fr-form-model" name="fr-run-form-load-action-after-controls"/>
+                                <xf:setvalue ref="xxf:instance('fr-persistence-instance')/found-document-message-to-show"/>
+                                <xxf:hide dialog="fr-found-document-dialog"/>
+                            </xf:action>
+                            <xf:trigger>
+                                <xf:label value="$fr-resources/detail/draft-singleton/start-new"/>
+                                <xf:action event="DOMActivate">
+                                    <xf:setvalue
+                                        xxbl:scope="outer"
+                                        ref="instance('fr-authorized-operations')"
+                                        value="
+                                            frf:authorizedOperationsForDetailModeOrThrow(
+                                                '',
+                                                (),
+                                                xxf:instance('fr-form-metadata')/permissions,
+                                                false()
+                                            )"/>
+                                </xf:action>
+                            </xf:trigger>
+                            <xsl:text> </xsl:text>
+                            <xf:trigger>
+                                <xf:label value="$fr-resources/detail/draft-singleton/open-draft"/>
+                                <xf:action event="DOMActivate">
+                                    <xf:setvalue xxbl:scope="outer" ref="xxf:instance('fr-parameters-instance')/document" value="xxf:instance('fr-search-response')/document/@name"/>
+                                    <xf:setvalue xxbl:scope="outer" ref="xxf:instance('fr-parameters-instance')/draft">true</xf:setvalue>
+                                    <xf:send xxbl:scope="outer" submission="fr-get-document-submission">
+                                        <xf:property name="data-or-draft"       value="'draft'"/>
+                                        <xf:property name="fr-data-ready-needed" value="true()" xxf:tunnel="true"/>
+                                    </xf:send>
+                                    <xf:action xxbl:scope="outer" type="xpath">fr:run-process-by-name('oxf.fr.detail.process', 'new-to-edit')</xf:action>
+                                </xf:action>
+                            </xf:trigger>
+                        </xf:case>
+
+                        <xf:case value="'found-drafts-for-never-saved'">
+                            <xf:trigger>
+                                <xf:label value="$fr-resources/detail/draft-singleton/start-new"/>
+                                <xf:action event="DOMActivate">
+                                    <xf:dispatch xxbl:scope="outer" targetid="fr-form-model" name="fr-run-form-load-action-before-data"/>
+                                    <xf:dispatch xxbl:scope="outer" targetid="fr-form-model" name="fr-run-form-load-action-after-data"/>
+                                    <xf:dispatch xxbl:scope="outer" targetid="fr-form-model" name="fr-run-form-load-action-after-controls"/>
+                                    <xf:setvalue ref="xxf:instance('fr-persistence-instance')/found-document-message-to-show"/>
+                                    <xxf:hide dialog="fr-found-document-dialog"/>
+                                </xf:action>
+                            </xf:trigger>
+                            <xsl:text> </xsl:text>
+                            <xf:trigger xxf:modal="true">
+                                <xf:label value="$fr-resources/detail/draft-singleton/view-drafts"/>
+                                <xf:action event="DOMActivate">
+                                    <xf:load
+                                        xxbl:scope="outer"
+                                        resource="/fr/{{fr:app-name()}}/{{fr:form-name()}}/summary?drafts-for-never-saved-document=true&amp;form-version={{fr:form-version()}}"/>
+                                </xf:action>
+                            </xf:trigger>
+                        </xf:case>
+
+                        <xf:case value="'found-multiple-docs-for-singleton'">
+                            <xf:trigger xxf:modal="true">
+                                <xf:label value="$fr-resources/detail/draft-singleton/multiple-docs-view-data"/>
+                                <xf:action event="DOMActivate">
+                                    <xf:load
+                                        xxbl:scope="outer"
+                                        resource="/fr/{{fr:app-name()}}/{{fr:form-name()}}/summary?form-version={{fr:form-version()}}"/>
+                                </xf:action>
+                            </xf:trigger>
+                        </xf:case>
+                    </xf:switch>
+                </xsl:template>
+
+            </xsl:transform>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

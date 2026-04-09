@@ -142,124 +142,14 @@
         </xf:group>
 
         <!-- Found document messages -->
-        <xf:group
+        <fr:found-document
             ref="
                 .[
                     not($_fr-document-available-too-early-or-late) and
                     xxf:non-blank($_fr-persistence-instance/found-document-message-to-show)
                 ]"
-            class="alert alert-info fr-top-alert"
-            xxf:element="div">
-
-            <xh:div class="fr-top-icon">
-                <xh:i class="fa fa-file-o" aria-hidden="true"/>
-            </xh:div>
-            <xf:var
-                name="form-version-param"
-                model="fr-persistence-model"
-                value="concat('form-version=', $form-version)"/>
-
-            <xf:group ref=".[$_fr-persistence-instance/found-document-message-to-show = 'found-draft-for-document']" appearance="xxf:internal">
-                <xf:output class="fr-top-text" value="$fr-resources/detail/draft-singleton/found-draft-for-document" />
-                <xf:group class="fr-top-alert-buttons">
-                    <xf:action event="DOMActivate">
-                        <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-before-data"/>
-                        <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-data"/>
-                        <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-controls"/>
-                        <xf:setvalue ref="$_fr-persistence-instance/found-document-message-to-show"/>
-                    </xf:action>
-                    <xf:trigger>
-                        <xf:label value="$fr-resources/detail/draft-singleton/open-saved"/>
-                        <xf:send event="DOMActivate" submission="fr-get-document-submission">
-                            <xf:property name="data-or-draft" value="'data'"/>
-                        </xf:send>
-                    </xf:trigger>
-                    <xf:trigger>
-                        <xf:label value="$fr-resources/detail/draft-singleton/open-draft"/>
-                        <xf:send event="DOMActivate" submission="fr-get-document-submission">
-                            <xf:property name="data-or-draft" value="'draft'"/>
-                        </xf:send>
-                    </xf:trigger>
-                </xf:group>
-            </xf:group>
-
-            <xf:group ref=".[$_fr-persistence-instance/found-document-message-to-show = 'found-draft-for-never-saved']" appearance="xxf:internal">
-                <xf:output class="fr-top-text" value="$fr-resources/detail/draft-singleton/found-draft-for-never-saved"/>
-                <xf:group class="fr-top-alert-buttons">
-                    <xf:action event="DOMActivate">
-                        <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-before-data"/>
-                        <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-data"/>
-                        <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-controls"/>
-                        <xf:setvalue ref="$_fr-persistence-instance/found-document-message-to-show"/>
-                    </xf:action>
-                    <xf:trigger>
-                        <xf:label value="$fr-resources/detail/draft-singleton/start-new"/>
-                        <xf:action event="DOMActivate">
-                            <xf:setvalue
-                                ref="instance('fr-authorized-operations')"
-                                value="
-                                    frf:authorizedOperationsForDetailModeOrThrow(
-                                        '', (: No permissions from data :)
-                                        (), (: No mode change to `new`  :)
-                                        xxf:instance('fr-form-metadata')/permissions,
-                                        false()
-                                    )"/>
-                        </xf:action>
-                    </xf:trigger>
-                    <xf:trigger>
-                        <xf:label value="$fr-resources/detail/draft-singleton/open-draft"/>
-                        <xf:action event="DOMActivate">
-                            <xf:setvalue ref="xxf:instance('fr-parameters-instance')/document" value="xxf:instance('fr-search-response')/document/@name"/>
-                            <xf:setvalue ref="xxf:instance('fr-parameters-instance')/draft">true</xf:setvalue>
-                            <xf:send submission="fr-get-document-submission">
-                                <xf:property name="data-or-draft" value="'draft'"/>
-                            </xf:send>
-                            <xf:action type="xpath">fr:run-process-by-name('oxf.fr.detail.process', 'new-to-edit')</xf:action>
-                        </xf:action>
-                    </xf:trigger>
-                </xf:group>
-            </xf:group>
-
-            <xf:group ref=".[$_fr-persistence-instance/found-document-message-to-show = 'found-drafts-for-never-saved']" appearance="xxf:internal">
-                <xf:output class="fr-top-text" value="$fr-resources/detail/draft-singleton/found-drafts-for-never-saved"/>
-                <xf:group class="fr-top-alert-buttons">
-                    <xf:trigger>
-                        <xf:label value="$fr-resources/detail/draft-singleton/start-new"/>
-                        <xf:action event="DOMActivate">
-                            <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-before-data"/>
-                            <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-data"/>
-                            <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-controls"/>
-                            <xf:setvalue ref="$_fr-persistence-instance/found-document-message-to-show"/>
-                        </xf:action>
-                    </xf:trigger>
-                    <xf:trigger xxf:modal="true">
-                        <xf:label value="$fr-resources/detail/draft-singleton/view-drafts"/>
-                        <xf:load
-                            event="DOMActivate"
-                            model="fr-persistence-model"
-                            resource="/fr/{$app}/{$form}/summary?drafts-for-never-saved-document=true{{
-                                if (xxf:non-blank($form-version-param)) then '&amp;' else ''}}{{
-                                $form-version-param}}"/>
-                    </xf:trigger>
-                </xf:group>
-            </xf:group>
-
-            <xf:group ref=".[$_fr-persistence-instance/found-document-message-to-show = 'found-multiple-docs-for-singleton']" appearance="xxf:internal">
-                <xf:output class="fr-top-text" value="$fr-resources/detail/draft-singleton/multiple-docs-explanation"/>
-                <xf:group class="fr-top-alert-buttons">
-                    <xf:trigger xxf:modal="true">
-                        <xf:label value="$fr-resources/detail/draft-singleton/multiple-docs-view-data"/>
-                        <xf:load
-                            event="DOMActivate"
-                            model="fr-persistence-model"
-                            resource="/fr/{$app}/{$form}/summary{{
-                                if (xxf:non-blank($form-version-param)) then '?' else ''}}{{
-                                $form-version-param}}"/>
-                    </xf:trigger>
-                </xf:group>
-            </xf:group>
-
-        </xf:group>
+            fr-resources-ref="$fr-resources"
+        />
 
         <!-- Lease message -->
         <fr:lease

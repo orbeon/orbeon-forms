@@ -87,8 +87,7 @@
                 $mode = 'new' and
                 xxf:instance('fr-form-metadata')/singleton = 'true'
             )                                                                   and
-            $mode = ('new', 'edit')                                             and
-            not($is-fb)"/>
+            $mode = ('new', 'edit')"/>
 
     <!-- NOTE: This value is only valid during form initialization, because the request attribute won't be present in
          subsequent updates. -->
@@ -403,6 +402,7 @@
                     $lease-state-elem = 'other-user' or
                     instance('fr-persistence-instance')/found-document-message-to-show = (
                         'found-multiple-docs-for-singleton',
+                        'found-draft-for-document',
                         'found-draft-for-never-saved',
                         'found-drafts-for-never-saved'
                     )"/>

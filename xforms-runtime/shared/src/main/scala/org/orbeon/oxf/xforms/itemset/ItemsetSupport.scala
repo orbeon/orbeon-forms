@@ -71,7 +71,7 @@ object ItemsetSupport {
     select1Control: XFormsSelect1Control,
     collector     : ErrorEventCollector
   )(implicit
-    indentedLogger     : IndentedLogger
+    indentedLogger: IndentedLogger
   ): Itemset = {
 
     val staticControl = select1Control.staticControl

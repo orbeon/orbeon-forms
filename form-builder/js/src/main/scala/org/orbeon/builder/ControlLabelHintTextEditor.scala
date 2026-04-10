@@ -333,6 +333,7 @@ object ControlLabelHintTextEditor {
               // Workaround for resize not happening with empty values, see
               // https://twitter.com/avernet/status/580798585291177984
               tinyMceObject.execCommand("mceAutoResize")
+              tinyMceObject.focus()
             }
           case EditorType.Label | EditorType.Hint =>
             textInput.value(newValue)
@@ -357,7 +358,6 @@ object ControlLabelHintTextEditor {
               makeSpaceForTinyMce()
               setTinyMceWidth()
               tinyMceObject.show()
-              tinyMceObject.focus()
             }
           case EditorType.Label | EditorType.Hint =>
             textInput.show()

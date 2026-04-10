@@ -82,7 +82,7 @@
                     <xf:delete ref="$instance-element/require-role"/>
                     <xf:action iterate="xxf:split(normalize-space($control-element/@require-role))">
                         <xf:var    name="role"                 value="."/>
-                        <xf:insert context="$instance-element" origin="xf:element('require-role', $role)"/>
+                        <xf:insert context="$instance-element" ref="require-role" origin="xf:element('require-role', $role)"/>
                     </xf:action>
 
                     <xf:setvalue ref="$instance-element/@role-required" value="count($instance-element/require-role) gt 0"/>

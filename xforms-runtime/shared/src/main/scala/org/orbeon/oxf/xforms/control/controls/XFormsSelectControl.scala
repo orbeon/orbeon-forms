@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.Element
+import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -22,9 +22,10 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.events.{XFormsDeselectEvent, XFormsSelectEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.itemset
-import org.orbeon.oxf.xforms.itemset.{Item, ItemsetSupport, StaticItemsetSupport}
+import org.orbeon.oxf.xforms.itemset.{Item, StaticItemsetSupport}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
@@ -61,9 +62,9 @@ class XFormsSelectControl(
   ): Option[String] = {
 
     def filterItemsReturnValues(
-      f:
-      itemset.Item.ValueNode => Boolean): List[Item.Value[om.Item]] =
-      (getItemset(collector).allItemsWithValueIterator(reverse = false) filter (t => f(t._1)) map (_._2)).to(List)
+      p: itemset.Item.ValueNode => Boolean
+    ): List[Item.Value[om.Item]] =
+      (getItemset(collector).allItemsWithValueIterator(reverse = false) filter (t => p(t._1)) map (_._2)).to(List)
 
     val dataItemValues =
       getCurrentItemValueFromData(boundItem, collector) match {
@@ -81,7 +82,13 @@ class XFormsSelectControl(
     }
 
     val (newlySelectedValues, newlyDeselectedValues, _) =
-      updateSelection(dataItemValues, itemsetItemValues, incomingItemValues, staticControl.excludeWhitespaceTextNodesForCopy)
+      XFormsSelectControl.updateSelection(
+        dataItemValues,
+        itemsetItemValues,
+        incomingItemValues,
+        SaxonUtils.attCompare(boundNodeOpt, _),
+        staticControl.excludeWhitespaceTextNodesForCopy
+      )
 
     // 2016-01-29: Switching order of event dispatch as `xf:select1` does it this way and XForms 1.1 says: "Newly
     // selected items receive the event xforms-select immediately after all newly deselected items receive the
@@ -128,7 +135,12 @@ class XFormsSelectControl(
   override def findSelectedItems(collector: ErrorEventCollector): List[Item.ValueNode] =
     boundItemOpt match {
       case Some(boundItem) =>
-        getItemset(collector).iterateSelectedItems(getCurrentItemValueFromData(boundItem, collector), _ => true, staticControl.excludeWhitespaceTextNodesForCopy).to(List)
+        getItemset(collector)
+          .iterateSelectedItems(
+            getCurrentItemValueFromData(boundItem, collector),
+            SaxonUtils.attCompare(boundNodeOpt, _),
+            staticControl.excludeWhitespaceTextNodesForCopy
+          ).toList
       case None =>
         Nil
     }
@@ -149,9 +161,15 @@ class XFormsSelectControl(
                   isCalculate  = false,
                   collector    = collector
                 )
-              case r @ Right(_) =>
+              case Right(v) =>
                 XFormsAPI.delete(
-                  ref = ItemsetSupport.findMultipleItemValues(getCurrentItemValueFromData(boundNode, collector), r)
+                  ref =
+                    StaticItemsetSupport.findMatchingItemsInData( // find nodes in the data matching the nodes in the item
+                      dataXPathItems             = getCurrentItemValueFromData(boundNode, collector).getOrElse(throw new IllegalStateException),
+                      itemXPathItems             = v,
+                      findAttribute              = att => boundNodeOpt.flatMap(_.attOpt(QName(att.localname, att.prefix, att.getURI))),
+                      excludeWhitespaceTextNodes = staticControl.excludeWhitespaceTextNodesForCopy
+                    )
                 )
             }
           case None =>
@@ -172,8 +190,15 @@ class XFormsSelectControl(
                   collector    = collector
                 )
               case Right(v) =>
+                // Handle attributes separately because otherwise we insert "after", which doesn't work for attributes
+                val (atts, other) = StaticItemsetSupport.partitionAttributes(v)
+                if (atts.nonEmpty)
+                  XFormsAPI.insert(
+                    origin = atts,
+                    into   = List(boundNode),
+                  )
                 XFormsAPI.insert(
-                  origin = v,
+                  origin = other,
                   into   = List(boundNode),
                   after  = boundNode child *
                 )
@@ -196,11 +221,12 @@ object XFormsSelectControl {
     dataValues                 : List[Item.Value[om.NodeInfo]],
     itemsetValues              : List[Item.Value[om.Item]],
     incomingValues             : List[Item.Value[om.Item]],
+    compareAtt                 : om.NodeInfo => Boolean,
     excludeWhitespaceTextNodes : Boolean
   ): (List[Item.Value[om.Item]], List[Item.Value[om.Item]], List[Item.Value[om.Item]]) = {
 
     def belongsTo(values: List[Item.Value[om.Item]])(value: Item.Value[om.Item]): Boolean =
-      values exists (StaticItemsetSupport.compareSingleItemValues(_, value, _ => true, excludeWhitespaceTextNodes))
+      values.exists(StaticItemsetSupport.compareMultipleItemValues(_, value, compareAtt, excludeWhitespaceTextNodes))
 
     val newlySelectedValues   = incomingValues filterNot belongsTo(dataValues)
     val newlyDeselectedValues = itemsetValues filterNot belongsTo(incomingValues) filter belongsTo(dataValues)

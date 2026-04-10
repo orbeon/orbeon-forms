@@ -13,12 +13,11 @@
  */
 package org.orbeon.oxf.xforms.itemset
 
-import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.StaticXPath
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath.*
-import org.orbeon.xforms.XFormsId
 
 import scala.collection.mutable.ListBuffer
 
@@ -33,7 +32,7 @@ object StaticItemsetSupport {
     excludeWhitespaceTextNodes : Boolean
   ): Boolean =
     if (isMultiple)
-      compareMultipleItemValues(dataValue, itemValue)
+      compareMultipleItemValues(dataValue, itemValue, compareAtt, excludeWhitespaceTextNodes)
     else
       compareSingleItemValues(dataValue, itemValue, compareAtt, excludeWhitespaceTextNodes)
 
@@ -87,9 +86,11 @@ object StaticItemsetSupport {
         false
     }
 
-  private def compareMultipleItemValues(
-    dataValue : Item.Value[om.NodeInfo],
-    itemValue : Item.Value[om.Item]
+  def compareMultipleItemValues(
+    dataValue                 : Item.Value[om.Item],
+    itemValue                 : Item.Value[om.Item],
+    compareAtt                : om.NodeInfo => Boolean,
+    excludeWhitespaceTextNodes: Boolean
   ): Boolean =
     (dataValue, itemValue) match {
       case (Left(dataValue), Left(trimmedItemValue)) =>
@@ -98,21 +99,52 @@ object StaticItemsetSupport {
         if (trimmedControlValue.isEmpty)
           trimmedItemValue.isEmpty // special case
         else
-          trimmedControlValue.splitTo[scala.Iterator]() contains trimmedItemValue
-      case (Right(allDataItems), Right(firstItemXPathItem :: _)) =>
-        allDataItems exists { oneDataXPathItem =>
-          SaxonUtils.deepCompare(
-            config                     = StaticXPath.GlobalConfiguration,
-            it1                        = Iterator.single(oneDataXPathItem),
-            it2                        = Iterator.single(firstItemXPathItem),
-            excludeWhitespaceTextNodes = false
+          trimmedControlValue.splitTo[scala.Iterator]().contains(trimmedItemValue)
+      case (Right(dataXPathItems), Right(itemXPathItems @ _ :: _)) =>
+
+        val (attItems, otherItems) = partitionAttributes(itemXPathItems)
+
+        def compareContent(item: om.Item): Boolean =
+          dataXPathItems.exists(dataItem =>
+            SaxonUtils.deepCompare(
+              config                     = StaticXPath.GlobalConfiguration,
+              it1                        = Iterator(dataItem),
+              it2                        = Iterator(item),
+              excludeWhitespaceTextNodes = excludeWhitespaceTextNodes
+            )
           )
-        }
+
+        attItems.forall(compareAtt) && otherItems.forall(compareContent)
+
       case (Right(_), Right(Nil)) =>
         // Itemset construction doesn't ever produce an empty `List[om.Item]` for multiple selection
+        // 2026-04-07: Then we should use `NonEmptyList` instead of `List`
         false
       case _ =>
         // Mixing and matching `xf:copy` and `xf:value` is not supported
         false
     }
+
+  def findMatchingItemsInData(
+    dataXPathItems            : List[om.Item],
+    itemXPathItems            : List[om.Item],
+    findAttribute             : om.NodeInfo => Option[om.NodeInfo],
+    excludeWhitespaceTextNodes: Boolean
+  ): List[om.NodeInfo] = {
+
+      val (attItems, otherItems) = partitionAttributes(itemXPathItems)
+
+      def compareContent(item: om.Item): List[om.Item] =
+        dataXPathItems.filter(dataItem =>
+          SaxonUtils.deepCompare(
+            config                     = StaticXPath.GlobalConfiguration,
+            it1                        = Iterator(dataItem),
+            it2                        = Iterator(item),
+            excludeWhitespaceTextNodes = excludeWhitespaceTextNodes
+          )
+        )
+
+    (attItems.flatMap(findAttribute) ++ otherItems.flatMap(compareContent))
+      .collect { case node: om.NodeInfo => node }
+  }
 }

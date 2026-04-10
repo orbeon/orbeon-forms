@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{Exceptions, IndentedLogger, StaticXPath, XPath, XPathCache}
+import org.orbeon.oxf.util.{Exceptions, IndentedLogger, StaticXPath, XPathCache}
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.XFormsContextStackSupport.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.findChildElem
@@ -65,24 +65,6 @@ object ItemsetSupport {
       "xxforms-" + name.localName
     else
       throw new IllegalStateException("Invalid attribute on item: " + name.localName)
-
-  def findMultipleItemValues(
-    dataValue : Item.Value[om.NodeInfo],
-    itemValue : Item.Value[om.Item]
-  ): List[om.NodeInfo] =
-    (dataValue, itemValue) match {
-      case (Right(allDataItems), Right(firstItemXPathItem :: _)) =>
-        allDataItems collect { case oneDataXPathItem if
-          SaxonUtils.deepCompare(
-            config                     = XPath.GlobalConfiguration,
-            it1                        = Iterator.single(oneDataXPathItem),
-            it2                        = Iterator.single(firstItemXPathItem),
-            excludeWhitespaceTextNodes = false
-          ) => oneDataXPathItem
-        }
-      case _ =>
-        Nil
-    }
 
   // Evaluate the itemset for a given `xf:select` or `xf:select1` control.
   def evaluateItemset(

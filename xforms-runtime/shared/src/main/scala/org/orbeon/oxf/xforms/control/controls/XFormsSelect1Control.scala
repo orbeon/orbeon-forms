@@ -146,7 +146,7 @@ class XFormsSelect1Control(
     if (staticControl.useCopy)
       Right(
         boundItem match {
-          case node: om.NodeInfo => (node child Node).toList
+          case node: om.NodeInfo => (node.child(Node) ++ node.att(@*)).toList
           case _ => Nil
         }
       )

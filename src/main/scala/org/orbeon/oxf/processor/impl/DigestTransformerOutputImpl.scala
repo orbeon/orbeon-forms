@@ -35,7 +35,6 @@ abstract class DigestTransformerOutputImpl(processor: ProcessorImpl, name: Strin
   override final protected def supportsLocalKeyValidity = true
 
   override protected def getLocalKey(pipelineContext: PipelineContext): CacheKey = {
-
     for (inputName <- getProcessor(pipelineContext).getInputNames.asScala)
       if (! getProcessor(pipelineContext).isInputInCache(pipelineContext, inputName)) // NOTE: We don't really support multiple inputs with the same name.
         return null
@@ -46,7 +45,6 @@ abstract class DigestTransformerOutputImpl(processor: ProcessorImpl, name: Strin
     for (inputName <- getProcessor(pipelineContext).getInputNames.asScala)
       if (! getProcessor(pipelineContext).isInputInCache(pipelineContext, inputName)) // NOTE: We don't really support multiple inputs with the same name.
         return null
-
     getFilledOutState(pipelineContext).validity
   }
 
@@ -96,13 +94,15 @@ abstract class DigestTransformerOutputImpl(processor: ProcessorImpl, name: Strin
             state.validity = digestValidity.lastModified
           else {
             val currentValidity = System.currentTimeMillis: java.lang.Long
-            cache.add(outputCacheKey, DigestTransformerOutputImpl.DEFAULT_VALIDITY, new DigestValidity(state.digest, currentValidity))
+            cache.add(outputCacheKey, DigestTransformerOutputImpl.DEFAULT_VALIDITY, DigestValidity(state.digest, currentValidity))
             state.validity = currentValidity
           }
-        }
-        else state.validity = null // HACK restore
+        } else
+          state.validity = null // HACK restore
       }
     }
     state
   }
 }
+
+case class DigestValidity(digest: Array[Byte], lastModified: Long)

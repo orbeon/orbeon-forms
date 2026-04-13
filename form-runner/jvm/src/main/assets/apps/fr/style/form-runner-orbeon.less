@@ -343,6 +343,9 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
             column-gap: 1em;
             row-gap: 1em;
             text-align: center;
+            .xforms-case-selected:empty {
+                display: none;
+            }
             & > * {
                 flex-grow: 1;
                 width: 100%;
@@ -445,7 +448,7 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
                 color: var(--orbeon-navbar-heading-color);
                 a, button.btn-link { color: @navbarInverseLinkColor }
             }
-            
+
             .brand, .nav > li > a {
                 text-shadow: none; // remove Bootstrap text shadow
             }

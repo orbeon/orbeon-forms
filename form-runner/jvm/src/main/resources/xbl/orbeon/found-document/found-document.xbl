@@ -127,7 +127,6 @@
                                     </xf:send>
                                 </xf:action>
                             </xf:trigger>
-                            <xsl:text> </xsl:text>
                             <xf:trigger>
                                 <xf:label value="$fr-resources/detail/draft-singleton/open-draft"/>
                                 <xf:action event="DOMActivate">
@@ -162,7 +161,6 @@
                                             )"/>
                                 </xf:action>
                             </xf:trigger>
-                            <xsl:text> </xsl:text>
                             <xf:trigger>
                                 <xf:label value="$fr-resources/detail/draft-singleton/open-draft"/>
                                 <xf:action event="DOMActivate">
@@ -188,7 +186,6 @@
                                     <xxf:hide dialog="fr-found-document-dialog"/>
                                 </xf:action>
                             </xf:trigger>
-                            <xsl:text> </xsl:text>
                             <xf:trigger xxf:modal="true">
                                 <xf:label value="$fr-resources/detail/draft-singleton/view-drafts"/>
                                 <xf:action event="DOMActivate">

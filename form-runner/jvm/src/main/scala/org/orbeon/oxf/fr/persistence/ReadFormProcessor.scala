@@ -114,7 +114,7 @@ class ReadFormProcessor extends ProcessorImpl {
 
         (
           new SimpleOutputCacheKey(getProcessorClass, outputName, NumberUtils.toHexString(md.digest())),
-          0L: ValidityType // TODO: do we need to use the object cache and indirection?validity
+          0L: ValidityType
         )
       }
       .tap(kv => debugLog(s"Computed key and validity for `$outputName` output: `$kv`"))

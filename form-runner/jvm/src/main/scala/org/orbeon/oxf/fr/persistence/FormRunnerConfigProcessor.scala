@@ -213,7 +213,6 @@ class FormRunnerConfigProcessor extends ProcessorImpl {
             (
               new SimpleOutputCacheKey(getProcessorClass, outputName, formRunnerConfig.digest),
               0L: ValidityType
-    //          state.lastModifiedFromPersistenceOpt.map(_.toEpochMilli: ValidityType).orNull
             )
           )
           .tap(kv => debugLog(s"Computed key and validity for `$outputName` output: `$kv`"))

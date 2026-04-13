@@ -776,7 +776,7 @@
         <xf:setvalue
             iterate="($persistence-instance/data-status, $autosave-elem/status)"
             ref="."
-            value="../initial-data-status"/>
+            value="$persistence-instance/initial-data-status"/>
     </xf:action>
 
     <!-- Clear operation -->
@@ -1031,18 +1031,25 @@
         <!-- Force-`<xf:rebuild>` unneeded: structural changes above and `<xf:recalculate>` rebuilds if needed. -->
         <xf:recalculate model="fr-form-model"/>
 
-        <!-- During initialization, when `fr-get-document-submission` is called, we dispatch directly `fr-data-ready`.
-             Here, we dispatch it upon request by the user, at a later time. `fr-data-ready` is also dispatched
-             explicitly by Form Builder after loading a template. This should be improved. -->
-        <xf:dispatch
-            if="event('fr-data-ready-needed') = true()"
+        <xf:action if="event('fr-data-ready-needed') = true()">
 
-            name="fr-data-ready"
-            targetid="fr-form-model">
-            <xf:property
-                name="data-source"
-                value="'persistence'"/>
-        </xf:dispatch>
+            <!-- During initialization, when `fr-get-document-submission` is called, we dispatch directly `fr-data-ready`.
+                 Here, we dispatch it upon request by the user, at a later time. `fr-data-ready` is also dispatched
+                 explicitly by Form Builder after loading a template. This should be improved. -->
+            <xf:dispatch
+                name="fr-data-ready"
+                targetid="fr-form-model">
+                <xf:property
+                    name="data-source"
+                    value="'persistence'"/>
+            </xf:dispatch>
+
+            <xf:setvalue
+                if="event('fr-data-ready-needed') = true()"
+                iterate="($persistence-instance/data-status, $autosave-elem/status)"
+                ref="."
+                value="$persistence-instance/initial-data-status"/>
+        </xf:action>
     </xf:action>
 
     <xf:action

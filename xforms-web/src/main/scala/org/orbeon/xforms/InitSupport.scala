@@ -516,7 +516,7 @@ object InitSupport {
       listeners foreach { case rpc.KeyListener(eventNames, observer, keyText, modifiers) =>
 
         // NOTE: 2019-01-07: We don't handle dialogs yet.
-        //if (dom.document.getElementById(observer).classList.contains("xforms-dialog"))
+        //if (dom.document.getElementById(observer).hasClass("xforms-dialog"))
 
         // TODO: destruction
         val mousetrap =

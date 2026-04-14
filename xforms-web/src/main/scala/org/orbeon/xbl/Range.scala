@@ -30,7 +30,7 @@ object Range {
       val inputElem = containerElem.querySelector("input[type = range]").asInstanceOf[dom.html.Input]
       companion.inputElemOpt = Some(inputElem)
 
-      xformsUpdateReadonly(containerElem.classList.contains("xforms-readonly"))
+      xformsUpdateReadonly(isMarkedReadonly)
 
       EventSupport.addListener[dom.Event](inputElem, DomEventNames.Input, e => {
         if (XFormsUI.modalProgressPanelShown) {

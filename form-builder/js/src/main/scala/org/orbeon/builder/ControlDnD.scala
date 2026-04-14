@@ -49,10 +49,10 @@ private object ControlDnD {
       new DragulaOptions {
 
         override def isContainer(el: html.Element) =
-          el.classList.contains("fr-grid-td")
+          el.hasClass("fr-grid-td")
 
         override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element) =
-          handle.classList.contains("fb-control-handle")
+          handle.hasClass("fb-control-handle")
 
         // Can only drop into an empty cell
         override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) =
@@ -71,7 +71,7 @@ private object ControlDnD {
     controlMoverCopier.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) => {
       // It seems Dragula calls `onDrop` even if the target doesn't accept a drop, but in that case `target` is `null`
       if (target ne null)
-        RpcClient[FormBuilderRpcApi].controlDnD(el.id, target.id, el.classList.contains(CopyClass)).call()
+        RpcClient[FormBuilderRpcApi].controlDnD(el.id, target.id, el.hasClass(CopyClass)).call()
     })
 
     val controlInserter = Dragula(
@@ -80,10 +80,10 @@ private object ControlDnD {
 
         override def isContainer(el: html.Element) =
           (
-            (el ne null)                                                 &&
-            el.parentElementOpt.exists(_.classList.contains("fb-tools")) &&
-            el.classList.contains("xforms-group")
-          ) || el.classList.contains("fr-grid-td")
+            (el ne null)                                       &&
+            el.parentElementOpt.exists(_.hasClass("fb-tools")) &&
+            el.hasClass("xforms-group")
+          ) || el.hasClass("fr-grid-td")
 
         override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element) =
             (handle ne null)                                   &&

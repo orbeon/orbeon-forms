@@ -33,7 +33,7 @@ object FormSettings {
 
         val CardsOnRow = 4 // this is what the CSS allows right now; could we determine it dynamically?
 
-        Some(cards.indexWhere(_.classList.contains("xforms-repeat-selected-item-1")))
+        Some(cards.indexWhere(_.hasClass("xforms-repeat-selected-item-1")))
           .filter(_ >= 0)
           .flatMap { index =>
 

@@ -13,15 +13,16 @@
   */
 package org.orbeon.xbl
 
+import io.udash.wrappers.jquery.JQueryPromise
 import org.log4s.Logger
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.facade.XBL
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Constants, EventListenerSupport}
+import org.orbeon.xforms.*
 import org.scalajs.dom
 import org.scalajs.dom.html
-import io.udash.wrappers.jquery.{JQueryEvent, JQueryPromise}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.concurrent.duration.*
@@ -215,7 +216,7 @@ object Number {
             TestNum.asInstanceOf[js.Dynamic].toLocaleString().substring(1, 2).asInstanceOf[String] == separator.toString
 
         val changeType =
-          dom.document.body.classList.contains(Constants.XFormsMobileClass) &&
+          dom.document.body.hasClass(Constants.XFormsMobileClass) &&
             companion.stateOpt.exists(state => hasNativeDecimalSeparator(state.decimalSeparator))
 
         if (changeType) {

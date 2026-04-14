@@ -15,10 +15,10 @@ package org.orbeon.xbl
 
 import io.udash.wrappers.jquery.JQueryEvent
 import org.orbeon.facades.{Fancytree, FancytreeEventData, FancytreeJsonNode}
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
 import org.orbeon.xforms.$
 import org.orbeon.xforms.facade.{Item, XBL, XBLCompanion}
-import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -41,7 +41,7 @@ object TreeSelect1 {
 
     override def init(): Unit = {
       logDebug("init")
-      this.isReadonly        = containerElem.classList.contains("xforms-readonly")
+      this.isReadonly        = isMarkedReadonly
       this.hasJavaScriptTree = ! $(containerElem).find(".xbl-fr-tree-select1-container-static-readonly").is(":not('.xforms-disabled')")
     }
 

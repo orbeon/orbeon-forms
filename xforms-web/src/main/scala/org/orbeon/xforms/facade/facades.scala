@@ -18,6 +18,7 @@ import org.scalajs
 import org.scalajs.dom
 import org.scalajs.dom.{Element, FocusEvent, MouseEvent, UIEvent, html}
 import io.udash.wrappers.jquery.JQueryPromise
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
 
 import scala.scalajs.js
@@ -57,7 +58,7 @@ class XBLCompanion extends js.Object {
 
   // Helpers
   private def containerElem: html.Element = this.asInstanceOf[js.Dynamic].container.asInstanceOf[html.Element]
-  def isMarkedReadonly: Boolean = containerElem.classList.contains("xforms-readonly")
+  def isMarkedReadonly: Boolean = containerElem.hasClass("xforms-readonly")
 
   def getXFormsFormOrThrow: xforms.Form =
     Page.findXFormsForm(containerElem)

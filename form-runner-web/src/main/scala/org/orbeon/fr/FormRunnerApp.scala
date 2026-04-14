@@ -115,7 +115,7 @@ object FormRunnerApp extends App {
     var dialogShown: Boolean = false
     var didExpireTimerOpt: Option[timers.SetTimeoutHandle] = None
 
-    if (dialog.classList.contains("fr-feature-enabled")) {
+    if (dialog.hasClass("fr-feature-enabled")) {
       // Remove XForms-level dialog we're replacing
       dom.document.querySelectorAllT(s".xforms-login-detected-dialog").foreach(_.remove())
 

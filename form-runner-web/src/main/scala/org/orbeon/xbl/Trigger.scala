@@ -23,7 +23,7 @@ object Trigger {
 
     private var observerOpt: Option[dom.MutationObserver] = None
 
-    private val isMinimal = containerElem.classList.contains("xforms-trigger-appearance-minimal")
+    private val isMinimal = containerElem.hasClass("xforms-trigger-appearance-minimal")
 
     private def buttonOrAnchor: Element =
       containerElem.querySelectorT("button, a")

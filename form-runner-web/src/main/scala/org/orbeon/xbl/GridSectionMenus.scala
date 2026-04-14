@@ -47,7 +47,7 @@ trait GridSectionMenus {
   // Keep pointing to menu so we can move it around as needed
   // Old comment: NOTE: When scripts are in the head, this returns undefined. Should be fixed!
   private val globalMenuElem: html.Element = document.querySelectorT(s".fr-$componentName-dropdown-menu")
-  
+
   case class CurrentComponent(currentComponentId: String, currentIteration: Int)
 
   // This transiently holds information between a click on the menu and a subsequent action in the menu.
@@ -129,7 +129,7 @@ trait GridSectionMenus {
     Operation.values foreach { op =>
       val menuItems = globalMenuElem.querySelectorAllT(s".dropdown-menu .fr-${op.entryName}").toList
       menuItems.foreach { item =>
-        val canDo       = iteration(e).classList.contains(s"can-${op.entryName}")
+        val canDo       = iteration(e).hasClass(s"can-${op.entryName}")
         val toggleClass = if (canDo) item.classList.remove _ else item.classList.add _
         toggleClass("disabled")
       }

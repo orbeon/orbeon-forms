@@ -18,13 +18,13 @@ trait FormRunnerApiTests {
 
           val form = formRunnerApi.getForm(js.undefined)
 
-          assert(form.findControlsByName("first-name").head.classList.contains("xforms-control"))
+          assert(form.findControlsByName("first-name").head.hasClass("xforms-control"))
 
-          assert(form.findControlsByName("last-name").head.classList.contains("xforms-control"))
+          assert(form.findControlsByName("last-name").head.hasClass("xforms-control"))
           assert(form.findControlsByName("i-dont-exist").isEmpty)
 
           assert(form.findControlsByName("comments").length == 1)
-          assert(form.findControlsByName("comments").forall(_.classList.contains("xforms-textarea")))
+          assert(form.findControlsByName("comments").forall(_.hasClass("xforms-textarea")))
 
           await(form.setControlValue("comments", "Hello world!").map(_.toFuture).get)
 
@@ -40,7 +40,7 @@ trait FormRunnerApiTests {
           assert(form.activateControl("add-comment", 1).isEmpty)
 
           assert(form.findControlsByName("comments").length == 2)
-          assert(form.findControlsByName("comments").forall(_.classList.contains("xforms-textarea")))
+          assert(form.findControlsByName("comments").forall(_.hasClass("xforms-textarea")))
 
           await(form.setControlValue("comments", "Hello world, again!", 1).map(_.toFuture).get)
           assert(form.getControlValue("comments", 1).contains("Hello world, again!"))

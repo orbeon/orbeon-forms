@@ -1,5 +1,6 @@
 package org.orbeon.xforms
 
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom.html
 
@@ -18,15 +19,15 @@ object XFormsXbl {
 
   @JSExport
   def isComponent(control: html.Element): Boolean =
-    control.classList.contains("xbl-component")
+    control.hasClass("xbl-component")
 
   @JSExport
   def isJavaScriptLifecycle(control: html.Element): Boolean =
-    isComponent(control) && control.classList.contains("xbl-javascript-lifecycle")
+    isComponent(control) && control.hasClass("xbl-javascript-lifecycle")
 
   @JSExport
   def isFocusable(control: html.Element): Boolean =
-    isComponent(control) && control.classList.contains("xbl-focusable")
+    isComponent(control) && control.hasClass("xbl-focusable")
 
   // See:
   //

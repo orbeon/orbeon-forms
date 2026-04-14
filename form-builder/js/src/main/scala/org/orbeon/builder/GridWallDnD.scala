@@ -25,9 +25,9 @@ import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
 import io.udash.wrappers.jquery.JQuery
 import org.scalajs.dom
- 
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import org.orbeon.fr.FormRunnerUtils
+import org.orbeon.web.DomSupport.*
 
 import scala.collection.mutable
 import scala.scalajs.js
@@ -278,13 +278,13 @@ object GridWallDnD {
         js.Array(),
         new DragulaOptions {
           override def isContainer(el: html.Element) =
-            el.classList.contains(WallContainerClass)
+            el.hasClass(WallContainerClass)
 
           override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element) =
-            handle.classList.contains(WallHandleClass)
+            handle.hasClass(WallHandleClass)
 
           override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) =
-            target.classList.contains(WallContainerClass)
+            target.hasClass(WallContainerClass)
         }
       )
 
@@ -292,7 +292,7 @@ object GridWallDnD {
         currentCellOpt.foreach { currentCell =>
           val startSide = {
             val wallIndex = source.getAttribute("data-index").toInt
-            val isVertical = source.classList.contains(WallVerticalClass)
+            val isVertical = source.hasClass(WallVerticalClass)
             if (isVertical) if (wallIndex == currentCell.x - 1) Direction.Left else Direction.Right
             else            if (wallIndex == currentCell.y - 1) Direction.Up   else Direction.Down
           }

@@ -115,8 +115,7 @@ object TinyMCE {
         tinyMceObjectOpt = Some(tinyMceObject)
         tinyMceInitialized = false
 
-        val isReadonly = containerElem.classList.contains("xforms-readonly")
-        xformsUpdateReadonly(isReadonly)
+        xformsUpdateReadonly(isMarkedReadonly)
 
         withInitializedTinyMce { tinyMceObject =>
 

@@ -71,8 +71,7 @@ object Date {
       companion.visibleInputElemOpt = Some(visibleInputElem)
 
       // Add `readonly` attribute on the input if the control is readonly
-      val isReadonly = containerElem.classList.contains("xforms-readonly")
-      updateReadonly(isReadonly)
+      updateReadonly(isMarkedReadonly)
 
       if (isNativePicker) {
         visibleInputElem.`type` = "date"

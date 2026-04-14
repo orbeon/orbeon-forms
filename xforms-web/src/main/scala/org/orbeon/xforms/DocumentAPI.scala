@@ -95,7 +95,7 @@ object DocumentAPI extends js.Object {
 
     // https://github.com/orbeon/orbeon-forms/issues/7319
     for ((clazz, error) <- disallowedClassesToError)
-      if (control.classList.contains(clazz))
+      if (control.hasClass(clazz))
         return js.Promise.reject(new js.Error(s"Cannot set the value of $error for id `${control.id}`"))
 
     def fireValueEvent(): Unit =

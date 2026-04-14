@@ -17,6 +17,7 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.Constants.FormClass
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -33,7 +34,7 @@ object Support {
     dom.document.forms collect { case f: html.Form if isXFormsFormElem(f) => f }
 
   def isXFormsFormElem(formElem: html.Form): Boolean =
-    formElem.classList.contains(FormClass) && formElem.id.nonAllBlank
+    formElem.hasClass(FormClass) && formElem.id.nonAllBlank
 
   def adjustIdNamespace(
     elem    : js.UndefOr[html.Element],
@@ -141,7 +142,7 @@ object Support {
       // Not sure why, but protecting against crash here with pattern match.
       eventToTarget(event) match {
         case relatedTarget: dom.html.Element =>
-          if (relatedTarget.classList.contains(targetClass))
+          if (relatedTarget.hasClass(targetClass))
             event.stopPropagation()
         case _ =>
       }

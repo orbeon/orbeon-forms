@@ -155,8 +155,7 @@ object XFormsResponse {
           def isEndElem(n: dom.Node): Boolean =
             n match {
               case e: dom.Element
-                if e.classList.contains("xforms-repeat-delimiter") ||
-                   e.classList.contains("xforms-repeat-begin-end") => true
+                if e.hasAnyClass("xforms-repeat-delimiter", "xforms-repeat-begin-end") => true
               case _ => false
             }
 
@@ -370,7 +369,7 @@ object XFormsResponse {
 
                 // We also need to check this on the "root", as the `getElementsByClassName()` function only returns
                 // sub-elements of the specified root and doesn't include the root in its search.
-                if (lastElemToDelete.classList.contains("xforms-control"))
+                if (lastElemToDelete.hasClass("xforms-control"))
                   ServerValueStore.remove(lastElemToDelete.id)
 
               case _ => ()
@@ -428,9 +427,11 @@ object XFormsResponse {
     groupName      : Option[String]
   ): Unit =
     if (
-      documentElement.classList.contains("xforms-select1-appearance-compact") ||
-      documentElement.classList.contains("xforms-select-appearance-compact")  ||
-      documentElement.classList.contains("xforms-select1-appearance-minimal")
+      documentElement.hasAnyClass(
+        "xforms-select1-appearance-compact",
+        "xforms-select-appearance-compact",
+        "xforms-select1-appearance-minimal"
+      )
     )
       updateSelectItemset(documentElement, itemsetTree)
     else
@@ -440,7 +441,7 @@ object XFormsResponse {
         afterOpt         = None,
         controlId        = controlId,
         itemsetTree      = itemsetTree,
-        isSelect         = documentElement.classList.contains("xforms-select"),
+        isSelect         = documentElement.hasClass("xforms-select"),
         groupNameOpt     = groupName,
         clearChildrenOpt = Some(_.replaceChildren())
       )
@@ -479,10 +480,10 @@ object XFormsResponse {
       }
     }
 
-    val isLeafControl = documentElement.classList.contains("xforms-control")
+    val isLeafControl = documentElement.hasClass("xforms-control")
 
     // TODO: 2024-05-27: Unsure if this should ever kick in or if the logic is up to date!
-    var isStaticReadonly = documentElement.classList.contains("xforms-static")
+    var isStaticReadonly = documentElement.hasClass("xforms-static")
     val newDocumentElement =
       maybeMigrateToStatic(
         documentElement,
@@ -746,7 +747,7 @@ object XFormsResponse {
     staticReadonlyOpt: Option[String],
     isLeafControl    : Boolean
   ): html.Element =
-    if (! documentElement.classList.contains("xforms-static") && staticReadonlyOpt.exists(_.toBoolean)) {
+    if (! documentElement.hasClass("xforms-static") && staticReadonlyOpt.exists(_.toBoolean)) {
       if (isLeafControl) {
         val parentElement = documentElement.parentElement
         val newDocumentElement = dom.document.createElementT("span")
@@ -794,8 +795,8 @@ object XFormsResponse {
           case false => firstInput.removeAttribute("aria-required")
         }
 
-        val visited = newVisitedOpt.getOrElse(documentElement.classList.contains("xforms-visited"))
-        val invalid = newLevelOpt.map(_ == "error").getOrElse(documentElement.classList.contains("xforms-invalid"))
+        val visited = newVisitedOpt.getOrElse(documentElement.hasClass("xforms-visited"))
+        val invalid = newLevelOpt.map(_ == "error").getOrElse(documentElement.hasClass("xforms-invalid"))
 
         if (invalid && visited)
           firstInput.setAttribute("aria-invalid", true.toString)
@@ -804,7 +805,7 @@ object XFormsResponse {
       }
     }
 
-    if (documentElement.classList.contains("xforms-upload")) {
+    if (documentElement.hasClass("xforms-upload")) {
       // Additional attributes for xf:upload
       // <xxf:control id="xforms-control-id"
       //    state="empty|file"
@@ -832,25 +833,25 @@ object XFormsResponse {
       // NOTE: Server can send a space-separated value but `accept` expects a comma-separated value
       acceptOpt.foreach(a => uploadSelect.accept = a.splitTo[List]().mkString(","))
 
-    } else if (documentElement.classList.contains("xforms-output") || documentElement.classList.contains("xforms-static")) {
+    } else if (documentElement.hasAnyClass("xforms-output", "xforms-static")) {
 
       elem.attValueOpt("alt").foreach { alt =>
-        if (documentElement.classList.contains("xforms-mediatype-image")) {
+        if (documentElement.hasClass("xforms-mediatype-image")) {
           val img = documentElement.querySelector(":scope > img").asInstanceOf[html.Image]
           img.alt = alt
         }
       }
 
-      if (documentElement.classList.contains("xforms-output-appearance-xxforms-download")) {
+      if (documentElement.hasClass("xforms-output-appearance-xxforms-download")) {
         elem.attValueOpt("download").foreach { download =>
           val aElem = documentElement.querySelector(".xforms-output-output").asInstanceOf[html.Anchor]
           aElem.asInstanceOf[js.Dynamic].download = download
         }
       }
-    } else if (documentElement.classList.contains("xforms-trigger") || documentElement.classList.contains("xforms-submit")) {
+    } else if (documentElement.hasAnyClass("xforms-trigger", "xforms-submit")) {
         // It isn't a control that can hold a value (e.g. trigger) and there is no point in trying to update it
         // NOP
-    } else if (documentElement.classList.contains("xforms-input") || documentElement.classList.contains("xforms-secret")) {
+    } else if (documentElement.hasAnyClass("xforms-input", "xforms-secret")) {
         // Additional attributes for xf:input and xf:secret
 
       val inputSizeOpt         = elem.attValueOpt("size")
@@ -886,7 +887,7 @@ object XFormsResponse {
           input.autocomplete = inputAutocomplete
       }
 
-    } else if (documentElement.classList.contains("xforms-textarea")) {
+    } else if (documentElement.hasClass("xforms-textarea")) {
       // Additional attributes for xf:textarea
 
       val maxlengthOpt    = elem.attValueOpt("maxlength")
@@ -963,11 +964,11 @@ object XFormsResponse {
 
         lazy val existingInputType =
           TypeCssClassToInputType
-            .collectFirst { case (className, inputType) if documentElement.classList.contains(className) => inputType }
+            .collectFirst { case (className, inputType) if documentElement.hasClass(className) => inputType }
             .getOrElse(InputType.String)
 
         val mustUpdateInputType =
-          documentElement.classList.contains("xforms-input") && existingInputType != newInputType
+          documentElement.hasClass("xforms-input") && existingInputType != newInputType
 
         if (mustUpdateInputType)
           updateInputType(documentElement, controlId, newInputType, formId)
@@ -1349,7 +1350,7 @@ object XFormsResponse {
                 // - either the control was already readonly, so `currentValue != newControlValue` was `true`
                 //   as server wouldn't send a value otherwise
                 // - or it was readwrite and became readonly, in which case we test for this below
-                documentElement.classList.contains("xforms-readonly")
+                documentElement.hasClass("xforms-readonly")
               )
             )
 

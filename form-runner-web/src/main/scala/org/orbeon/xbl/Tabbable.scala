@@ -55,7 +55,7 @@ object Tabbable {
       eventListenerSupport.addListener(dom.document , "keydown", onDOMKeydown)
       eventListenerSupport.addListener(containerElem, "focus"  , onDOMFocus, useCapture = true)
 
-      if (containerElem.classList.contains("fr-tabbable-dnd")) {
+      if (containerElem.hasClass("fr-tabbable-dnd")) {
 
         val firstRepeatContainer = containerElem.querySelectorT(NavTabsSelector)
 

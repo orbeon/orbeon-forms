@@ -58,9 +58,9 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   override def init(): Unit = {
     val isStaticReadonly = containerElem.querySelector(".xforms-static") != null
     val elementWithData  = queryElementWithData
-    if (! isStaticReadonly && ! elementWithData.classList.contains("xforms-disabled"))
+    if (! isStaticReadonly && ! elementWithData.hasClass("xforms-disabled"))
       for (select <- Option(querySelect)) {
-        val isDatabound     = containerElem.classList.contains(DataboundClass)
+        val isDatabound     = containerElem.hasClass(DataboundClass)
 
         // Prevent the propagation of `focusout` so the client doesn't send an `xxforms-value` event when users click on the dropdown,
         // as at that point the `<span class="select2-selection--single">` looses the focus, and since Select2 places that element inside
@@ -162,7 +162,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         if (isDatabound) {
           updateFromSelectedItems()
           updateOpenSelection()
-          updateReadonly(containerElem.classList.contains("xforms-readonly"))
+          updateReadonly(isMarkedReadonly)
           mutationObservers = DomSupport.onAttributeChange(elementWithData, DataSelectedItems  , updateFromSelectedItems) :: mutationObservers
           mutationObservers = DomSupport.onAttributeChange(elementWithData, DataIsOpenSelection, updateOpenSelection     ) :: mutationObservers
         } else {

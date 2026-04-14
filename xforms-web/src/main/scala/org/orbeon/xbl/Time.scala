@@ -16,9 +16,9 @@ package org.orbeon.xbl
 import io.udash.wrappers.jquery.JQueryPromise
 import org.log4s.Logger
 import org.orbeon.date.IsoTime
-import org.orbeon.web.JSDateUtils.nowAsIsoTime
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
+import org.orbeon.web.JSDateUtils.nowAsIsoTime
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
@@ -61,8 +61,7 @@ object Time {
       companion.visibleInputElemOpt = Some(visibleInputElem)
 
       // Add `readonly` attribute on the input if the control is readonly
-      val isReadonly = containerElem.classList.contains("xforms-readonly")
-      updateReadonly(isReadonly)
+      updateReadonly(isMarkedReadonly)
 
       if (isNativePicker) {
         visibleInputElem.`type` = "time"

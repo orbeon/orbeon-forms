@@ -14,7 +14,7 @@
 package org.orbeon.builder
 
 import org.orbeon.oxf.fr.{CellOps, ClientNames}
-import org.orbeon.web.DomSupport.DomElemOps
+import org.orbeon.web.DomSupport.*
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
 
@@ -35,7 +35,7 @@ object HtmlElementCell {
 
     def maxGridWidth   (u: Element): Int = {
       val grid  = u.closestT(".xbl-fr-grid")
-      if (grid.firstElementChild.classList.contains("fr-grid-24")) 24 else 12
+      if (grid.firstElementChild.hasClass("fr-grid-24")) 24 else 12
     }
 
     def x(u: html.Element): Option[Int] = attValueOpt(u, ClientNames.AttX) map (_.toInt)

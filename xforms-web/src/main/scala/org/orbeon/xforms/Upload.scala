@@ -45,7 +45,7 @@ object Upload {
 
   logger.debug("init object")
 
-  Page.registerControlConstructor(() => new Upload, (e: html.Element) => e.classList.contains("xforms-upload"))
+  Page.registerControlConstructor(() => new Upload, (e: html.Element) => e.hasClass("xforms-upload"))
 
   // Sequence the sending of a list of files, see:
   // https://github.com/orbeon/orbeon-forms/issues/6167
@@ -156,7 +156,7 @@ class Upload {
     AjaxClient.allEventsProcessedF("upload") foreach { _ =>
       // If progress indicator is still shown, this means some XForms reset the file name
       // NOTE: This is incorrect, see: https://github.com/orbeon/orbeon-forms/issues/2318
-      if (_container.classList.contains(StateClassPrefix + "progress"))
+      if (_container.hasClass(StateClassPrefix + "progress"))
         setState("empty") // switch back to the file selector, as we won't get a file name anymore
     }
   }

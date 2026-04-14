@@ -81,9 +81,9 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
     findControlsByName(controlName).lift(index.getOrElse(0)).map { e =>
 
       val elemToClickOpt =
-        if (e.classList.contains("xforms-trigger"))
+        if (e.hasClass("xforms-trigger"))
           e.querySelectorOpt("button")
-        else if (e.classList.contains("xforms-input"))
+        else if (e.hasClass("xforms-input"))
           e.querySelectorOpt("input")
         else
           None
@@ -110,7 +110,7 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
     index      : js.UndefOr[Int] = js.undefined
   ): Option[Element] =
     findControlsByName(controlName).lift(index.getOrElse(0)).flatMap {
-      case e if e.classList.contains("xbl-fr-dropdown-select1") =>
+      case e if e.hasClass("xbl-fr-dropdown-select1") =>
         e.querySelectorOpt(".xforms-select1")
       case e if XFormsXbl.isJavaScriptLifecycle(e) =>
         Some(e)

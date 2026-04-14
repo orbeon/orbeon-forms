@@ -27,6 +27,7 @@ import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.{Element, html}
 import io.udash.wrappers.jquery.JQuery
 import org.orbeon.fr.FormRunnerUtils
+import org.orbeon.web.DomSupport.DomElemOps
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
@@ -94,7 +95,7 @@ object ControlEditor {
       for {
         elem <- cell.el.children().elems
         if ! controlEditors.contains(elem)
-        if ! elem.classList.contains("gu-transit")
+        if ! elem.hasClass("gu-transit")
         if elem.hasAttribute("id")
         name <- ControlOps.controlNameFromIdOpt(elem.id)
       } yield
@@ -114,7 +115,7 @@ object ControlEditor {
 
       // Show/hide itemset icon
       val itemsetIcon = controlEditorRight().find(".fb-control-edit-items")
-      itemsetIcon.toggleClass("xforms-disabled", ! controlEl.classList.contains("fb-itemset"))
+      itemsetIcon.toggleClass("xforms-disabled", ! controlEl.hasClass("fb-itemset"))
 
       if (isViewMode)
         controlEditorRight().find(".fb-control-delete, .fb-control-handle").hide()

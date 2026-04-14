@@ -1190,6 +1190,11 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
                         }
                     }
 
+                    if (! $(target).is('.xforms-static') &&
+                        $(target).is('.xforms-select1-appearance-full, .xforms-select-appearance-full, .xforms-input.xforms-type-boolean')) {
+                        ORBEON.xforms.XFormsUi.setRadioCheckboxClasses(target);
+                    }
+
                     // Fire change event if the control has a value
                     var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(target);
                     if (! _.isUndefined(controlCurrentValue)) {
@@ -1379,11 +1384,11 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
                 // Click on checkbox or radio button
 
                 // Update classes right away to give user visual feedback
-                ORBEON.xforms.XFormsUi.setRadioCheckboxClasses(controlTarget);
                 ORBEON.xforms.XFormsUi.handleShiftSelection(event, controlTarget);
-                var event = new ORBEON.xforms.AjaxEvent(null, controlTarget.id, ORBEON.xforms.Controls.getCurrentValue(controlTarget), "xxforms-value");
 
-                ORBEON.xforms.AjaxClient.fireEvent(event);
+                // #7607: We don't fire an `xxforms-value` event here, because the new value of the `<input>` is not
+                // ready at this point, and there are other handlers for that anyway: `change`, and/or `input`.
+
                 handled = true;
             } else if (controlTarget != null && $(controlTarget).is('.xforms-upload') && $(originalTarget).is('.xforms-upload-remove')) {
                 // Click on remove icon in upload control

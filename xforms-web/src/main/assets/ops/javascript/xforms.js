@@ -1259,32 +1259,6 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
             }
         },
 
-        input: function (event) {
-
-            if (ORBEON.xforms.XFormsUi.modalProgressPanelShown) {
-               event.preventDefault();
-               return;
-            }
-
-            var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
-            if (target != null) {
-                ORBEON.xforms.XFormsUi.fieldValueChanged(target);
-                // Incremental control: treat keypress as a value change event
-                if ($(target).is('.xforms-incremental')) {
-                    ORBEON.xforms.AjaxClient.fireEvent(
-                        new ORBEON.xforms.AjaxEvent(
-                            {
-                                "targetId"   : target.id,
-                                "eventName"  : "xxforms-value",
-                                "value"      : ORBEON.xforms.Controls.getCurrentValue(target),
-                                "incremental": true
-                            }
-                        )
-                    );
-                }
-            }
-        },
-
         _showToolTip: function (tooltipForControl, control, target, toolTipSuffix, message, event) {
 
             // Cases where we don't want to reuse an existing tooltip for this control

@@ -441,7 +441,7 @@ object InitSupport {
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusOut,  Events.blur)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyPress,  Events.keypress)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyDown,   Events.keydown)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Input,     Events.input)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Input,     XFormsUiEventHandlers.input)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOver, XFormsUI.mouseover)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOut,  XFormsUI.mouseout)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Click,     Events.click)

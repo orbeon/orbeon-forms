@@ -121,7 +121,6 @@ object Events extends js.Object {
   val change                      : js.Function1[UIEvent, Unit]    = js.native
   val keypress                    : js.Function1[UIEvent, Unit]    = js.native
   val keydown                     : js.Function1[UIEvent, Unit]    = js.native
-  val input                       : js.Function1[UIEvent, Unit]    = js.native
   val mouseout                    : js.Function1[UIEvent, Unit]    = js.native
   val click                       : js.Function1[UIEvent, Unit]    = js.native
 

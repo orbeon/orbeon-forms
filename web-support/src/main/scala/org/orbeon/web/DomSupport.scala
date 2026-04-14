@@ -24,6 +24,15 @@ object DomSupport {
     def querySelectorOpt(selectors: String): Option[T] =
       Option(elem.querySelector(selectors).asInstanceOf[T])
 
+    def hasClass(cls: String): Boolean =
+      elem.classList.contains(cls)
+
+    def hasAllClasses(classes: String*): Boolean =
+      classes.forall(elem.classList.contains)
+
+    def hasAnyClass(classes: String*): Boolean =
+      classes.exists(elem.classList.contains)
+
     def previousElementSiblings: Iterator[T] =
       Iterator.iterate(elem.previousElementSibling.asInstanceOf[T])(_.previousElementSibling.asInstanceOf[T]).takeWhile(_ ne null)
 

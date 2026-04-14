@@ -50,7 +50,7 @@ object XFormsUI {
   // This matches what GMail does AFAICT.
   @JSExport
   def handleShiftSelection(clickEvent: dom.MouseEvent, controlElem: html.Element): Unit =
-    if (controlElem.classList.contains("xforms-select-appearance-full")) {
+    if (controlElem.hasClass("xforms-select-appearance-full")) {
       // Only for "checkbox" controls
       val checkboxInputs = controlElem.queryNestedElems[html.Input]("input", includeSelf = false)
       if (XFormsId.hasEffectiveIdSuffix(controlElem.id) && checkboxInputs.length == 1) {
@@ -209,14 +209,14 @@ object XFormsUI {
     elem
       .ancestorOrSelfElem(s".xforms-disable-$lhha-as-tooltip, .xforms-enable-$lhha-as-tooltip")
       .nextOption()
-      .exists(e => e.classList.contains(s"xforms-disable-$lhha-as-tooltip"))
+      .exists(e => e.hasClass(s"xforms-disable-$lhha-as-tooltip"))
 
   def mouseover(event: MouseEvent): Unit =
     event.targetOpt.foreach { target =>
 
       val controlOpt = Option(Events._findParentXFormsControl(target))
 
-      if (target.classList.contains("xforms-alert") && target.classList.contains("xforms-active")) {
+      if (target.hasAllClasses("xforms-alert", "xforms-active")) {
         // Alert tooltip
 
         // NOTE: control may be `null` if we have `<div for="">`. Using `control.getAttribute("for")` returns a proper
@@ -231,7 +231,7 @@ object XFormsUI {
             }
           }
         }
-      } else if (target.classList.contains("xforms-help")) {
+      } else if (target.hasClass("xforms-help")) {
         // Help tooltip
         controlOpt.foreach { control =>
           if (Page.getXFormsFormFromHtmlElemOrThrow(control).helpTooltip()) {
@@ -255,7 +255,7 @@ object XFormsUI {
             }
 
             // Clear any `title`, to avoid having both the YUI tooltip and the browser tooltip based on the title showing up
-            if (control.classList.contains("xforms-trigger") || control.classList.contains("xforms-submit"))
+            if (control.hasAnyClass("xforms-trigger", "xforms-submit"))
               control.querySelectorAllT("a, button").foreach(_.title = "")
             Events._showToolTip(Globals.hintTooltipForControl, control, target, "-orbeon-hint-tooltip", candidateMessage, event)
           }
@@ -277,7 +277,7 @@ object XFormsUI {
     }
 
   def isIOS: Boolean =
-    dom.document.body.classList.contains("xforms-ios")
+    dom.document.body.hasClass("xforms-ios")
 
   def getZoomLevel: Double =
     dom.document.documentElement.clientWidth.toDouble / dom.window.innerWidth
@@ -394,7 +394,7 @@ object XFormsUI {
       event.targetT.closestOpt("dialog").foreach { dialogElem =>
 
         // Prevent Esc from closing the dialog if the `xxf:dialog` has `close="false"` or if a help popover is open
-        val supportsClose      = dialogElem.classList.contains("xforms-dialog-close-true")
+        val supportsClose      = dialogElem.hasClass("xforms-dialog-close-true")
         val hasHelpPopoverOpen = dialogElem.querySelectorOpt(".xforms-help-popover").isDefined
         if (event.key == "Escape" && (! supportsClose || hasHelpPopoverOpen)) {
           event.preventDefault()

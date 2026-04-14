@@ -118,7 +118,6 @@ object Events extends js.Object {
 
   val focus                       : js.Function1[FocusEvent, Unit] = js.native
   val blur                        : js.Function1[FocusEvent, Unit] = js.native
-  val change                      : js.Function1[UIEvent, Unit]    = js.native
   val keypress                    : js.Function1[UIEvent, Unit]    = js.native
   val keydown                     : js.Function1[UIEvent, Unit]    = js.native
   val mouseout                    : js.Function1[UIEvent, Unit]    = js.native

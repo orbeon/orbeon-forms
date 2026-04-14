@@ -436,7 +436,7 @@ object InitSupport {
     private def initializeGlobalEventListenersIfNeeded(): Unit =
       if (! topLevelListenerRegistered) {
 
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Change,    Events.change)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Change,    XFormsUiEventHandlers.change)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusIn,   Events.focus)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusOut,  Events.blur)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyPress,  Events.keypress)

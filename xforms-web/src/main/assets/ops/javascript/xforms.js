@@ -1159,52 +1159,6 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
             }
         },
 
-        change: function (event) {
-            var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
-            if (target != null) {
-                if ($(target).is('.xbl-component.xbl-javascript-lifecycle')) {
-                    // We might exclude *all* changes under `.xbl-component` but for now, to be conservative, we
-                    // exclude those that support the JavaScript lifecycle.
-                    // https://github.com/orbeon/orbeon-forms/issues/4169
-                } else if ($(target).is('.xforms-upload')) {
-                    // Dispatch change event to upload control
-                    ORBEON.xforms.Page.getUploadControl(target).change();
-                } else {
-
-                    if ($(target).is('.xforms-select1-appearance-compact')) {
-                        // For select1 list, make sure we have exactly one value selected
-                        var select = ORBEON.util.Dom.getElementByTagName(target, "select");
-                        if (select.value == "") {
-                            // Stop end-user from deselecting last selected value
-                            select.options[0].selected = true;
-                        } else {
-                            // Deselect options other than the first one
-                            var foundSelected = false;
-                            for (var optionIndex = 0; optionIndex < select.options.length; optionIndex++) {
-                                var option = select.options[optionIndex];
-                                if (option.selected) {
-                                    if (foundSelected) option.selected = false;
-                                    else foundSelected = true;
-                                }
-                            }
-                        }
-                    }
-
-                    if (! $(target).is('.xforms-static') &&
-                        $(target).is('.xforms-select1-appearance-full, .xforms-select-appearance-full, .xforms-input.xforms-type-boolean')) {
-                        ORBEON.xforms.XFormsUi.setRadioCheckboxClasses(target);
-                    }
-
-                    // Fire change event if the control has a value
-                    var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(target);
-                    if (! _.isUndefined(controlCurrentValue)) {
-                        var event = new ORBEON.xforms.AjaxEvent(null, target.id, controlCurrentValue, "xxforms-value");
-                        ORBEON.xforms.AjaxClient.fireEvent(event);
-                    }
-                }
-            }
-        },
-
         // TODO: 2020-06-04: Only used by the IE 11 `preventDefault()` below.
         //   2022-06-14: Unclear, check again!
         keydownEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),

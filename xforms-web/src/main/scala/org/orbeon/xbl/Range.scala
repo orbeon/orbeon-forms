@@ -38,7 +38,7 @@ object Range {
         } else {
           AjaxClient.fireEvent(
             AjaxEvent(
-              eventName   = "xxforms-value",
+              eventName   = "xxforms-value", // TODO: no access to `EventNames`?
               targetId    = containerElem.id,
               properties  = Map("value" -> xformsGetValue()),
               incremental = true

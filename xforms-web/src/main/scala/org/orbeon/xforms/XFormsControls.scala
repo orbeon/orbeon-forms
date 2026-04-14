@@ -13,7 +13,7 @@ import scala.scalajs.js.|
 object XFormsControls {
 
   def isReadonly(control: html.Element): Boolean =
-    control.classList.contains("xforms-readonly")
+    control.hasClass("xforms-readonly")
 
   def setCurrentValue(
     control        : html.Element,
@@ -33,12 +33,12 @@ object XFormsControls {
     Controls.beforeValueChange.fire(customEvent)
     Controls.valueChange.fire(customEvent)
 
-    val isStaticReadonly = control.classList.contains("xforms-static")
+    val isStaticReadonly = control.hasClass("xforms-static")
 
     // Can be set below by an XBL component's `xformsUpdateValue()` result
     var result: js.UndefOr[js.Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]] = js.undefined
 
-    if (control.classList.contains("xforms-output-appearance-xxforms-download")) {
+    if (control.hasClass("xforms-output-appearance-xxforms-download")) {
       // XForms output with `xxf:download` appearance
       val anchor = control.getElementsByTagName("a").head
       if (newControlValue == "") {
@@ -48,10 +48,10 @@ object XFormsControls {
           anchor.setAttribute("href", newControlValue)
           anchor.classList.remove("xforms-readonly")
       }
-    } else if (isStaticReadonly && control.classList.contains("xforms-textarea")) {
+    } else if (isStaticReadonly && control.hasClass("xforms-textarea")) {
       // textarea in "static readonly" mode
       control.childrenT("pre").head.innerText = newControlValue
-    } else if (isStaticReadonly && control.classList.contains("xforms-select1-appearance-full")) {
+    } else if (isStaticReadonly && control.hasClass("xforms-select1-appearance-full")) {
       // Radio buttons in "static readonly" mode
       control.querySelectorAllT(".xforms-selected, .xforms-deselected").foreach { item =>
         val selected = item.querySelector(".radio > span").innerText == newControlValue
@@ -65,16 +65,16 @@ object XFormsControls {
       }
     } else if (control.matches(".xforms-label, .xforms-hint, .xforms-help, .xforms-alert")) {
       // External LHH
-      if (control.classList.contains("xforms-mediatype-text-html"))
+      if (control.hasClass("xforms-mediatype-text-html"))
         control.innerHTML = newControlValue
       else
         control.textContent = newControlValue
-    } else if (control.classList.contains("xforms-output") || isStaticReadonly) {
+    } else if (control.hasClass("xforms-output") || isStaticReadonly) {
       // XForms output or other field in "static readonly" mode
       control.childrenT(".xforms-output-output, .xforms-field").headOption.foreach {
-        case img: html.Image if control.classList.contains("xforms-mediatype-image") =>
+        case img: html.Image if control.hasClass("xforms-mediatype-image") =>
           img.src = newControlValue
-        case video: html.Video if control.classList.contains("xforms-mediatype-video") =>
+        case video: html.Video if control.hasClass("xforms-mediatype-video") =>
           video.queryNestedElems[html.Source]("source", includeSelf = false).headOption.foreach { source =>
             source.src = newControlValue
             if (newControlValue == "")
@@ -83,7 +83,7 @@ object XFormsControls {
               video.classList.remove("empty-source")
             video.load()
           }
-        case elem if control.classList.contains("xforms-mediatype-text-html") =>
+        case elem if control.hasClass("xforms-mediatype-text-html") =>
           elem.innerHTML = newControlValue
         case elem =>
           // We want to use `textContent`, not `innerText`, as we don't want the browser to add any `<br>`.
@@ -95,7 +95,7 @@ object XFormsControls {
       // weren't sure we wanted to fully disable the test on `changedIdsRequest`.
     } else if (control.matches(".xforms-trigger, .xforms-submit, .xforms-upload")) {
         // No value
-    } else if ((control.classList.contains("xforms-input") && ! control.classList.contains("xforms-type-boolean")) || control.classList.contains("xforms-secret")) {
+    } else if ((control.hasClass("xforms-input") && ! control.hasClass("xforms-type-boolean")) || control.hasClass("xforms-secret")) {
       // Regular XForms input (not boolean, date, time or dateTime) or secret
       control
         .queryNestedElems[html.Input]("input", includeSelf = true)
@@ -130,7 +130,7 @@ object XFormsControls {
         .options.foreach { option =>
         option.selected = selectedValues(option.value)
       }
-    } else if (control.classList.contains("xforms-textarea")) {
+    } else if (control.hasClass("xforms-textarea")) {
       // Text area
       control
         .queryNestedElems[html.TextArea]("textarea", includeSelf = false)

@@ -19,13 +19,13 @@ object XFormsUiEventHandlers {
       XFormsUI.fieldValueChanged(target)
 
       // Incremental control: treat keypress as a value change event
-      if (target.classList.contains("xforms-incremental"))
+      if (target.hasClass("xforms-incremental"))
         AjaxClient.fireEvent(
           AjaxEvent(
             eventName   = EventNames.XXFormsValue,
             targetId    = target.id,
-            properties  = Map("value" -> Controls.getCurrentValue(target)),
-            incremental = true,
+            properties  = Map("value" -> Controls.getCurrentValue(target)), // Q: What if `getCurrentValue` is undefined?
+            incremental = true
           )
         )
     }

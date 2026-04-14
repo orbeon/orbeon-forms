@@ -431,8 +431,7 @@ object XFormsUI {
 
     def hideModalProgressPanelRaw(): Unit =
       findLoaderElem foreach { elem =>
-        val cl = elem.classList
-        cl.remove("is-active")
+        elem.classList.remove("is-active")
       }
 
     def hideModalProgressPanel(

@@ -407,6 +407,7 @@
                         <xsd:element ref="xforms:choices"/>
                         <xsd:element ref="xforms:item"/>
                         <xsd:element ref="xforms:itemset"/>
+                        <xsd:any namespace="##other" processContents="lax"/>
                     </xsd:choice>
                 </xsd:sequence>
             </xsd:sequence>

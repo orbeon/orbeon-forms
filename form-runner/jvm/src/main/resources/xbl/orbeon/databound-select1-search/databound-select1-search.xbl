@@ -666,7 +666,14 @@
                             <xh:select id="select1"/>
 
                         </xf:group>
-                        <xf:input ref="if ($view) then instance('local')/label/string() else ()"/>
+                        <xsl:choose>
+                            <xsl:when test="$is-multiple-selection">
+                                <xf:input ref="if ($view) then string-join(for $v in xxf:split($binding) return xxf:itemset('internal-select1', 'xml')//item[value = $v]/label/string(), ', ') else ()"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xf:input ref="if ($view) then instance('local')/label/string() else ()"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xf:group>
                 </xsl:template>
             </xsl:transform>

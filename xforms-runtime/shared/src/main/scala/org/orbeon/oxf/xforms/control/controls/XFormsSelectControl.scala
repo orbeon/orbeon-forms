@@ -132,7 +132,7 @@ class XFormsSelectControl(
     setExternalValue(updatedValue)
   }
 
-  override def findSelectedItems(collector: ErrorEventCollector): List[Item.ValueNode] =
+  def findSelectedItems(collector: ErrorEventCollector): List[Item.ValueNode] =
     boundItemOpt match {
       case Some(boundItem) =>
         getItemset(collector)

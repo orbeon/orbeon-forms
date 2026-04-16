@@ -125,10 +125,6 @@ class XFormsSelect1Control(
     )
   }
 
-  // Q: In theory, multiple items could have the same value and therefore be selected, right?
-  def findSelectedItems(collector: ErrorEventCollector): List[Item.ValueNode] =
-    findSelectedItem(collector).toList
-
   def findSelectedItem(collector: ErrorEventCollector): Option[Item.ValueNode] =
     boundItemOpt.map(getCurrentItemValueFromData(_, collector)).flatMap { current =>
       getItemset(collector).ensuring(_ ne null).allItemsWithValueIterator(reverse = false) collectFirst {

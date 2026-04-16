@@ -59,23 +59,24 @@ object StaticItemsetSupport {
   }
 
   def compareSingleItemValues(
-    dataValue                  : Item.Value[om.Item],
-    itemValue                  : Item.Value[om.Item],
-    compareAtt                 : om.NodeInfo => Boolean,
-    excludeWhitespaceTextNodes : Boolean
+    dataValue                 : Item.Value[om.Item],
+    itemValue                 : Item.Value[om.Item],
+    compareAtt                : om.NodeInfo => Boolean,
+    excludeWhitespaceTextNodes: Boolean
   ): Boolean =
     (dataValue, itemValue) match {
       case (Left(dataValue), Left(itemValue)) =>
         dataValue == itemValue
       case (Right(dataXPathItems), Right(itemXPathItems)) =>
 
-        val (attItems, otherItems) = partitionAttributes(itemXPathItems)
+        val (_,        otherDataItems) = partitionAttributes(dataXPathItems)
+        val (attItems, otherItemItems) = partitionAttributes(itemXPathItems)
 
         def compareContent =
           SaxonUtils.deepCompare(
             config                     = StaticXPath.GlobalConfiguration,
-            it1                        = dataXPathItems.iterator,
-            it2                        = otherItems.iterator,
+            it1                        = otherDataItems.iterator,
+            it2                        = otherItemItems.iterator,
             excludeWhitespaceTextNodes = excludeWhitespaceTextNodes
           )
 

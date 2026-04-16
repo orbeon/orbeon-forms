@@ -329,4 +329,12 @@ object DomSupport {
       case e: Throwable =>
         dom.console.log(s"error replacing state with url `$url`: ${e.getMessage}")
     }
+
+  def dispatchChange(target: dom.EventTarget): Unit =
+    target.dispatchEvent(
+      new dom.Event("change", new dom.EventInit {
+        bubbles    = true
+        cancelable = true
+      })
+    )
 }

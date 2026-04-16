@@ -1,6 +1,7 @@
 package org.orbeon.xbl
 
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.web.DomSupport
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{AjaxClient, AjaxEvent, DocumentAPI, EventListenerSupport}
 import org.scalajs.dom
@@ -68,10 +69,7 @@ object XPathCompletion {
           } else if (stoppedChangeEvent) {
             // If we stopped the change event earlier and the field value hasn't changed since then, the browser
             // dispatch a `change` event on focus out, so we need to dispatch one manually here.
-            inputField.dispatchEvent(new dom.Event("change", new dom.EventInit {
-              bubbles = true
-              cancelable = true
-            }))
+            DomSupport.dispatchChange(inputField)
             stoppedChangeEvent = false
           }
         },

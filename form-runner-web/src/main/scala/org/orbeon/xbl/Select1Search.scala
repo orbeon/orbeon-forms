@@ -24,6 +24,7 @@ import org.orbeon.xforms.facade.{Controls, XBL, XBLCompanion}
 import org.scalajs.dom
 import org.scalajs.dom.{MutationObserver, document, html}
 
+import scala.annotation.unused
 import scala.collection.mutable
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.JSRichOption
@@ -97,10 +98,10 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         // Register event listeners
         // Listen on `select2:close` instead of `change` as the latter is not triggered the first time an open value is selected
         if (isDatabound)
-          jSelect.asInstanceOf[js.Dynamic].on("select2:close", ((_: js.Any, _: JQueryEvent) => onChangeDispatchFrChange())     : js.Function2[js.Any, JQueryEvent, Unit])
-        jSelect.asInstanceOf[js.Dynamic].on("select2:close",   ((_: js.Any, _: JQueryEvent) => dispatchDomChangeEvent(select)) : js.Function2[js.Any, JQueryEvent, Unit])
-        jSelect.asInstanceOf[js.Dynamic].on("select2:open",    ((_: js.Any, e: JQueryEvent) => onOpen(e))                      : js.Function2[js.Any, JQueryEvent, Unit])
-        jSelect.asInstanceOf[js.Dynamic].on("results:focus",   ((_: js.Any, e: JQueryEvent) => onResultsFocus(e))              : js.Function2[js.Any, JQueryEvent, Unit])
+          jSelect.asInstanceOf[js.Dynamic].on("select2:close", ((_: js.Any, _: JQueryEvent) => onChangeDispatchFrChange())       : js.Function2[js.Any, JQueryEvent, Unit])
+        jSelect.asInstanceOf[js.Dynamic].on("select2:close",   ((_: js.Any, _: JQueryEvent) => DomSupport.dispatchChange(select)): js.Function2[js.Any, JQueryEvent, Unit])
+        jSelect.asInstanceOf[js.Dynamic].on("select2:open",    ((_: js.Any, _: JQueryEvent) => onOpen())                         : js.Function2[js.Any, JQueryEvent, Unit])
+        jSelect.asInstanceOf[js.Dynamic].on("results:focus",   ((_: js.Any, e: JQueryEvent) => onResultsFocus(e))                : js.Function2[js.Any, JQueryEvent, Unit])
 
         // Add `aria-labelledby` pointing to the label, `aria-describedby` pointing to the help and hint
         val comboboxElement = containerElem.querySelector(".select2-selection")
@@ -205,6 +206,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     containerElem.querySelector("[tabindex]").asInstanceOf[dom.html.Element].focus()
   }
 
+  @unused // Called from `databound-select1-search.xbl` when the service responds to the user typing in the search box
   def updateSuggestions(results: String, isLastPage: String): Unit = {
     val parsedResults = js.JSON.parse(results).asInstanceOf[js.Array[Select2.Option]]
     val (searchValue, success) = select2SuccessCallbacks.dequeue()
@@ -309,7 +311,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       $(containerElem).find("select").trigger("change")
   }
 
-  private def onOpen(event: JQueryEvent): Unit = {
+  private def onOpen(): Unit = {
     val dropdownElement = document.querySelector(".select2-dropdown")
     val listboxElement  = dropdownElement.querySelector("[role=listbox]")
     val comboboxElement = containerElem.querySelector(".select2-selection")
@@ -357,15 +359,6 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     }
   }
 
-  // `InitSupport.scala` listens to DOM, not jQuery-only, events
-  private def dispatchDomChangeEvent(select: html.Select): Unit =
-    select.dispatchEvent(
-      new dom.Event("change", new dom.EventInit {
-        bubbles    = true
-        cancelable = true
-      })
-    )
-
   private def dispatchFrChange(
     label : String,
     value : String
@@ -389,7 +382,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     val transport: js.Function3[Select2.Params, Success, js.Function0[Unit], Unit] = (
       params  : Select2.Params,
       success : Select2.Success,
-      failure : js.Function0[Unit]
+      _       : js.Function0[Unit]
     ) => {
 
       val searchValue = params.data.term.getOrElse("")

@@ -91,13 +91,16 @@ trait DynamicDropdownTests {
             val controls = form.findControlsByName(controlName)
             assert(controls.nonEmpty, s"Expected controls for `$controlName`")
 
-            // Check the initial label value as set into the `data-label` attribute
+            // Check the initial label value as set into the `data-selected-items` attribute
+            val selectedItemsElem = controls.head.querySelectorT("[data-selected-items]")
+            val selectedItemsAttr = selectedItemsElem.getAttribute("data-selected-items")
+            val selectedItems     = js.JSON.parse(selectedItemsAttr).asInstanceOf[js.Array[js.Dynamic]]
             assert(
               labelToFind match {
-                case Some(label) => controls.head.querySelectorT("[data-label]").dataset("label") == label
-                case None        => controls.head.querySelectorT("[data-label]").dataset("label").isEmpty
+                case Some(label) => selectedItems.nonEmpty && selectedItems(0).text.asInstanceOf[String] == label
+                case None        => selectedItems.isEmpty
               },
-              s"Unexpected data-label for `$controlName`"
+              s"Unexpected data-selected-items for `$controlName`"
             )
 
             // Check the initial label value as set into the `label` attribute on the server, as reflected by the

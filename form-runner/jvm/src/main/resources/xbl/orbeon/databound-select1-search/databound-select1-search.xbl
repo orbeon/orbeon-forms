@@ -139,16 +139,16 @@
                             <fr:yesno-input ref="
                                     if (@service-performs-search/string() = 'true' or @store-label/string() = 'true')
                                     then 'false'
-                                    else xf:element('_', (@multiple-selection/string(), 'false')[1])">
+                                    else xf:element('_', (@multiple/string(), 'false')[1])">
                                 <xf:label ref="xxf:r('dialog-control-settings.multiple-selection.label', '|fr-form-resources|')"/>
                                 <xf:action event="xforms-select">
                                     <xf:insert
                                         if="event('xxf:item-value') = 'true'"
                                         context="$control"
-                                        origin="xf:attribute('multiple-selection', 'true')"/>
+                                        origin="xf:attribute('multiple', 'true')"/>
                                     <xf:delete
                                         if="event('xxf:item-value') = 'false'"
-                                        ref="$control/@multiple-selection"/>
+                                        ref="$control/@multiple"/>
                                 </xf:action>
                             </fr:yesno-input>
                         </xh:td>
@@ -192,7 +192,7 @@
                     <xh:tr>
                         <xh:td>
                             <fr:yesno-input ref="
-                                    if (@multiple-selection/string() = 'true')
+                                    if (@multiple/string() = 'true')
                                     then 'false'
                                     else @service-performs-search">
                                 <xf:label ref="xxf:r('dialog-http-services.service-performs-search.label', '|fr-form-resources|')"/>
@@ -279,7 +279,7 @@
                             <fr:yesno-input ref="
                                     if (@service-performs-search/string() = 'true')
                                     then 'true'
-                                    else if (@multiple-selection/string() = 'true')
+                                    else if (@multiple/string() = 'true')
                                     then 'false'
                                     else xf:element('_', (@store-label/string(), 'false')[1])">
                                 <xf:label ref="xxf:r('dialog-control-settings.store-label.label', '|fr-form-resources|')"/>
@@ -376,7 +376,7 @@
                             <xf:var name="auto-select-unique-choice" value="xxf:component-param-value('auto-select-unique-choice') = 'true'"/>
                             <xf:var name="open-selection"            value="xxf:component-param-value('selection')"/>
                             <xf:var name="is-open-selection"         value="$open-selection = 'open'"/>
-                            <xf:var name="is-multiple-selection"     value="xxf:component-param-value('multiple-selection') = 'true'"/>
+                            <xf:var name="is-multiple"     value="xxf:component-param-value('multiple') = 'true'"/>
 
                             <xf:submission
                                     id="get-result"
@@ -416,7 +416,7 @@
                                     <xf:var name="items-values"        value="$items/xxf:evaluate(instance('local')/value-ref)"/>
                                     <xf:var name="current-item"        value="$items[xxf:evaluate(instance('local')/value-ref) = $binding]"/>
                                     <xf:var name="current-impossible"  value="not($is-open-selection) and
-                                                                              not($is-multiple-selection) and
+                                                                              not($is-multiple) and
                                                                               xxf:non-blank($binding) and
                                                                               empty($current-item)"/>
                                     <xf:var name="current-label"       value="$current-item/xxf:evaluate(instance('local')/label-ref)"/>
@@ -427,7 +427,7 @@
                                     <xf:var name="unique-choice-value" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/value-ref) else ()"/>
                                     <xf:var name="unique-choice-label" value="if ($unique-choice) then $items/xxf:evaluate(instance('local')/label-ref) else ()"/>
 
-                                    <xf:action if="$label-from = 'service' and not($is-multiple-selection)">
+                                    <xf:action if="$label-from = 'service' and not($is-multiple)">
                                         <xf:setvalue ref="$binding/@label"         value="$current-label" if="not(xxf:readonly($binding))"/><!-- don't touch `@label` in readonly mode -->
                                         <xf:setvalue ref="instance('local')/label" value="$current-label"/>
                                     </xf:action>
@@ -586,7 +586,7 @@
                         </xf:action>
 
                         <xsl:variable name="service-performs-search"  select="@service-performs-search/string() = 'true'"/>
-                        <xsl:variable name="is-multiple-selection"    select="@multiple-selection/string() = 'true'"/>
+                        <xsl:variable name="is-multiple"    select="@multiple/string() = 'true'"/>
                         <xf:var       name="binding"                 value="xxf:binding('fr-databound-select1-search')"/>
                         <xf:var       name="view"                    value="fr:mode() = ('view', 'pdf')"/>
                         <xf:var       name="min-input-length"        value="fr:component-param-value('min-input-length')"/>
@@ -596,7 +596,7 @@
                                 xxf:xml-to-json(
                                     xf:element('_', (
                                         xf:attribute('type', 'array'),
-                                        if ($is-multiple-selection) then (
+                                        if ($is-multiple) then (
                                             let $result-items := instance('result-raw')/xxf:evaluate(instance('local')/itemset-ref)
                                             for $v in xxf:split($binding)
                                             let $matched := $result-items[xxf:evaluate(instance('local')/value-ref) = $v]
@@ -627,7 +627,7 @@
                             <xf:action event="xforms-value-changed" propagate="stop"/>
                             <xxf:value value="instance('result-raw')" xxbl:scope="inner"/>
                         </xf:var>
-                        <xsl:element name="{if ($is-multiple-selection) then 'xf:select' else 'xf:select1'}">
+                        <xsl:element name="{if ($is-multiple) then 'xf:select' else 'xf:select1'}">
                             <xsl:attribute name="id">internal-select1</xsl:attribute>
                             <xsl:attribute name="ref">$binding</xsl:attribute>
                             <xsl:attribute name="appearance">xxf:internal</xsl:attribute>
@@ -658,7 +658,7 @@
                                     xxf:r('components.labels.please-select', '|fr-fr-resources|')
                             }}"
                             data-service-performs-search="{$service-performs-search}"
-                            data-is-multiple-selection="{$is-multiple-selection}"
+                            data-is-multiple="{$is-multiple}"
                             data-min-input-length="{{$min-input-length}}"
                             data-selected-items="{{$selected-items-json}}"
                             data-is-open-selection="{{$is-open-selection}}">
@@ -667,7 +667,7 @@
 
                         </xf:group>
                         <xsl:choose>
-                            <xsl:when test="$is-multiple-selection">
+                            <xsl:when test="$is-multiple">
                                 <xf:input ref="if ($view) then string-join(for $v in xxf:split($binding) return xxf:itemset('internal-select1', 'xml')//item[value = $v]/label/string(), ', ') else ()"/>
                             </xsl:when>
                             <xsl:otherwise>

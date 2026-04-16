@@ -45,6 +45,50 @@
                 background-color: var(--orbeon-control-read-only-background-color);
             }
 
+            .select2-selection--multiple {
+                background-color: var(--orbeon-control-background-color);
+                min-height: @fixedControlsHeight;
+                .select2-selection__rendered {
+                    display: flex;        // For content to be vertically centered
+                    flex-wrap: wrap;
+                    align-items: center;
+                    gap: 4px;
+                    padding: 4px 5px;     // Equal to gap so spacing above, below, and between rows is uniform
+                    .select2-selection__choice {
+                        margin: 0;
+                        border-color: var(--orbeon-control-border-color);
+                        background-color: var(--orbeon-control-read-only-background-color);
+                    }
+                    .select2-selection__clear {
+                        order: 9999;       // Select2 uses float: right, which flex ignores; push to last position
+                        margin-top: 0;
+                        margin-left: auto; // Push to the right end of the flex line
+                    }
+                    .select2-search__field {
+                        height: auto;
+                        margin-top: 0;
+                        padding-left: 4px;
+                        color: var(--orbeon-control-color);
+                        border: none;
+                        box-shadow: none;
+                        outline: none;
+                        &::placeholder {
+                            color: @controlPlaceholderColor;
+                        }
+                    }
+                }
+            }
+
+            &.select2-container--focus .select2-selection--multiple {
+                border-color: var(--orbeon-focus-border-color);
+                .focusDecorations();
+            }
+
+            &.select2-container--disabled .select2-selection--multiple {
+                background-color: var(--orbeon-control-read-only-background-color);
+                .select2-selection__clear { display: none; }
+            }
+
             .select2-results__option[aria-selected=true] {
                 background-color: var(--orbeon-dropdown-selected-background-color);
             }

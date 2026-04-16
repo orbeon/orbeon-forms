@@ -904,6 +904,10 @@
             <label>自動ヒントを使う</label>
             <hint>「検証とアラート」で指定した最大ファイルサイズと対応タイプからヒントを自動追加</hint>
         </automatic-hint>
+        <multiple-selection>
+            <label>複数選択</label>
+            <hint>有効にすると、ユーザーは複数の値を選択できます</hint>
+        </multiple-selection>
         <open-selection>
             <label>自由入力を許可</label>
             <hint>有効にするとユーザー独自の値を入力でき、その値がデータと表示ラベルの両方に使われます</hint>

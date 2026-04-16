@@ -888,6 +888,10 @@
             <label>Usar dica automática</label>
             <hint>Adiciona uma dica baseada no Tamanho Máximo de Ficheiro e Tipos de Ficheiro Suportados que possa ter especificado no separador Validações e Alertas</hint>
         </automatic-hint>
+        <multiple-selection>
+            <label>Selecção múltipla</label>
+            <hint>Se activado, os utilizadores podem seleccionar múltiplos valores</hint>
+        </multiple-selection>
         <open-selection>
             <label>Selecção aberta</label>
             <hint>Se activado, os utilizadores podem introduzir o seu próprio valor, e o valor (texto armazenado nos dados) é também usado como etiqueta (texto apresentado na lista pendente)</hint>

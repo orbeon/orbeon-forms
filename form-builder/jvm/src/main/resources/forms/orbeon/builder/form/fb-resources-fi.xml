@@ -908,6 +908,10 @@
             <label>Käytä automaattista vihjettä</label>
             <hint>Lisää vihjetekstin, joka perustuu enimmäistiedostokokoon ja tuettuihin tiedostotyyppeihin, jotka olet saattanut määrittää Validoinnit ja hälytykset -välilehdellä</hint>
         </automatic-hint>
+        <multiple-selection>
+            <label>Monivalinta</label>
+            <hint>Jos käytössä, käyttäjät voivat valita useita arvoja</hint>
+        </multiple-selection>
         <open-selection>
             <label>Avoin valinta</label>
             <hint>Jos käytössä, käyttäjät voivat syöttää oman arvonsa, ja arvo (data on tallennettu teksti) käytetään myös nimikkeenä (teksti näytetään pudotusvalikossa)</hint>

@@ -906,6 +906,10 @@
             <label>Użyj automatycznej podpowiedzi</label>
             <hint>Dodaje podpowiedź na podstawie Maksymalnego rozmiaru plików i Obsługiwanych typów plików ustawionych w zakładce Walidacje i alerty</hint>
         </automatic-hint>
+        <multiple-selection>
+            <label>Wybór wielokrotny</label>
+            <hint>Jeśli włączone, użytkownicy mogą wybrać wiele wartości</hint>
+        </multiple-selection>
         <open-selection>
             <label>Otwarty wybór</label>
             <hint>Jeśli włączone, użytkownik może wprowadzić własną wartość, a wartość ta jest również używana jako etykieta na liście</hint>

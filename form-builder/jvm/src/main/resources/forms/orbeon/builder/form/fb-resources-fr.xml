@@ -925,6 +925,10 @@
             <label>Utiliser une suggestion automatique</label>
             <hint>Ajoute une suggestion en fonction de la Taille Maximale et des Types de fichiers pris en charge que vous pourriez avoir spécifiés dans l'onglet Validations et alertes</hint>
         </automatic-hint>
+        <multiple-selection>
+            <label>Sélection multiple</label>
+            <hint>Si cette option est activée, les utilisateurs peuvent sélectionner plusieurs valeurs</hint>
+        </multiple-selection>
         <open-selection>
             <label>Sélection libre</label>
             <hint>Si cette option est activée, les utilisateurs peuvent saisir leur propre valeur, et la valeur (texte stocké dans les données) est également utilisée comme libellé (texte affiché dans la liste déroulante)</hint>

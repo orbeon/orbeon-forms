@@ -880,6 +880,10 @@
             <label>Usar ayuda automática</label>
             <hint>Añade una ayuda basada en el Tamaño máximo de archivo y los Tipos de archivo admitidos que pueda haber especificado en la pestaña Validaciones y alertas</hint>
         </automatic-hint>
+        <multiple-selection>
+            <label>Selección múltiple</label>
+            <hint>Si está habilitado, los usuarios pueden seleccionar múltiples valores</hint>
+        </multiple-selection>
         <open-selection>
             <label>Selección abierta</label>
             <hint>Si está habilitado, los usuarios pueden introducir su propio valor, y ese valor (texto almacenado en los datos) también se usa como etiqueta (texto mostrado en la lista desplegable)</hint>

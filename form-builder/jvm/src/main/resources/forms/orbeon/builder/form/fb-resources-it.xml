@@ -868,6 +868,10 @@
             <label>Usa suggerimento automatico</label>
             <hint>Aggiunge un suggerimento basato sulla dimensione massima del file e sui tipi di file supportati specificati nella scheda Convalide e avvisi</hint>
         </automatic-hint>
+        <multiple-selection>
+            <label>Selezione multipla</label>
+            <hint>Se abilitato, gli utenti possono selezionare più valori</hint>
+        </multiple-selection>
         <open-selection>
             <label>Selezione aperta</label>
             <hint>Se abilitato, gli utenti possono inserire un proprio valore che verrà anche usato come etichetta mostrata nell'elenco</hint>

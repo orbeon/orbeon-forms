@@ -888,6 +888,10 @@
             <label>Bruk automatisk hint</label>
             <hint>Legger til et hint basert på maksimal filstørrelse og støttede filtyper du kan ha spesifisert i fanen Valideringer og varsler</hint>
         </automatic-hint>
+        <multiple-selection>
+            <label>Flervalg</label>
+            <hint>Hvis aktivert, kan brukere velge flere verdier</hint>
+        </multiple-selection>
         <open-selection>
             <label>Åpen valg</label>
             <hint>Hvis aktivert, kan brukere skrive inn sin egen verdi, og verdien (tekst lagret i dataene) brukes også som etikett (tekst vist i rullegardinlisten)</hint>

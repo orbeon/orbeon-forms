@@ -888,6 +888,10 @@
             <label>Gebruik automatische hint</label>
             <hint>Voegt een hint toe op basis van de maximale bestandsgrootte en ondersteunde bestandstypen die u mogelijk hebt opgegeven in het tabblad Validaties en waarschuwingen</hint>
         </automatic-hint>
+        <multiple-selection>
+            <label>Meervoudige selectie</label>
+            <hint>Indien ingeschakeld, kunnen gebruikers meerdere waarden selecteren</hint>
+        </multiple-selection>
         <open-selection>
             <label>Open selectie</label>
             <hint>Indien ingeschakeld, kunnen gebruikers hun eigen waarde invoeren, en de waarde (tekst opgeslagen in de gegevens) wordt ook gebruikt als het label (tekst weergegeven in de vervolgkeuzelijst)</hint>

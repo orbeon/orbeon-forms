@@ -888,6 +888,10 @@
             <label todo="true">[Use automatic hint]</label>
             <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
         </automatic-hint>
+        <multiple-selection>
+            <label todo="true">[Multiple selection]</label>
+            <hint todo="true">[If enabled, users can select multiple values]</hint>
+        </multiple-selection>
         <open-selection>
             <label todo="true">[Open selection]</label>
             <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>

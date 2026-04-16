@@ -864,6 +864,10 @@
             <label>Automatischen Hinweis verwenden</label>
             <hint>Fügt basierend auf „Maximale Dateigröße“ und „Erlaubte Dateitypen“ automatisch einen Hinweis hinzu (siehe Registerkarte „Validierungen und Benachrichtigungen“)</hint>
         </automatic-hint>
+        <multiple-selection>
+            <label>Mehrfachauswahl</label>
+            <hint>Wenn aktiviert, können Benutzer mehrere Werte auswählen</hint>
+        </multiple-selection>
         <open-selection>
             <label>Offene Auswahl</label>
             <hint>Wenn aktiviert, können Benutzer eigene Werte eingeben; der eingegebene Wert wird als Datenwert und als Beschriftung in der Auswahlliste verwendet</hint>

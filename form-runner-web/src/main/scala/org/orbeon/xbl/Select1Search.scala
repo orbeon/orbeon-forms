@@ -22,7 +22,7 @@ import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.{Controls, XBL, XBLCompanion}
 import org.scalajs.dom
-import org.scalajs.dom.{MutationObserver, MutationObserverInit, document, html}
+import org.scalajs.dom.{MutationObserver, document, html}
 
 import scala.collection.mutable
 import scala.scalajs.js
@@ -38,9 +38,9 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
 
   private val    DataPlaceholder           = "data-placeholder"
   private val    DataServicePerformsSearch = "data-service-performs-search"
-  private val    DataValue                 = "data-value"
-  private val    DataLabel                 = "data-label"
+  private val    DataSelectedItems         = "data-selected-items"
   private val    DataIsOpenSelection       = "data-is-open-selection"
+  private val    DataIsMultipleSelection   = "data-is-multiple-selection"
   private val    DataMinimumInputLength    = "data-min-input-length"
   private val    DataboundClass            = "xbl-fr-databound-select1-search"
   private object EventSupport              extends EventListenerSupport
@@ -51,6 +51,8 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   private var inputElementOpt              : Option[dom.Element]              = None
   private var optionsOpt                   : Option[Select2.Options]          = None
   private var isOpenSelection              : Boolean                          = false
+
+  private def isMultiple: Boolean = Option(queryElementWithData.getAttribute(DataIsMultipleSelection)).contains("true")
 
   override def init(): Unit = {
     val isStaticReadonly = containerElem.querySelector(".xforms-static") != null
@@ -63,7 +65,8 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         // as at that point the `<span class="select2-selection--single">` looses the focus, and since Select2 places that element inside
         // the element that represents the `<xf:select1>`, if that event is left to propagate, the XForms code takes that event as the
         // `<xf:select1>` having lost the focus
-        Support.stopFocusOutPropagation(select.parentElement, _.target, "select2-selection--single")
+        val selectionClass = if (isMultiple) "select2-selection--multiple" else "select2-selection--single"
+        Support.stopFocusOutPropagation(select.parentElement, _.target, selectionClass)
 
         locally {
           val placeholderOpt = Option(elementWithData.getAttribute(DataPlaceholder)).filter(_.nonEmpty).map { placeholder =>
@@ -88,6 +91,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
 
         // Init Select2
         val jSelect = $(select)
+        if (isMultiple) select.setAttribute("multiple", "multiple")
         optionsOpt.foreach(jSelect.select2)
 
         // Register event listeners
@@ -155,12 +159,11 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         }
 
         if (isDatabound) {
-          updateValueLabel()
+          updateFromSelectedItems()
           updateOpenSelection()
           updateReadonly(containerElem.classList.contains("xforms-readonly"))
-          mutationObservers = DomSupport.onAttributeChange(elementWithData, DataValue          , updateValueLabel)    :: mutationObservers
-          mutationObservers = DomSupport.onAttributeChange(elementWithData, DataLabel          , updateValueLabel)    :: mutationObservers
-          mutationObservers = DomSupport.onAttributeChange(elementWithData, DataIsOpenSelection, updateOpenSelection) :: mutationObservers
+          mutationObservers = DomSupport.onAttributeChange(elementWithData, DataSelectedItems  , updateFromSelectedItems) :: mutationObservers
+          mutationObservers = DomSupport.onAttributeChange(elementWithData, DataIsOpenSelection, updateOpenSelection     ) :: mutationObservers
         } else {
           // Register and remember listener on value change
           val listener: js.Function = onXFormsSelect1ValueChange _
@@ -196,7 +199,6 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     // Disconnect mutation observers
     mutationObservers.foreach(_.disconnect())
     mutationObservers = Nil
-
   }
 
   override def xformsFocus(): Unit = {
@@ -217,20 +219,20 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   override def xformsUpdateReadonly(readonly: Boolean): Unit =
     updateReadonly(readonly)
 
-  // Keep current item in sync with `data-value`/`data-label`
-  private def updateValueLabel(): Unit = {
-    val select = querySelect
+  // Keep current selection in sync with `data-selected-items`
+  private def updateFromSelectedItems(): Unit = {
+    val jsonItems   : String                   = queryElementWithData.getAttribute(DataSelectedItems)
+    val parsedItems : js.Array[Select2.Option] = js.JSON.parse(jsonItems).asInstanceOf[js.Array[Select2.Option]]
+    val select      : html.Select              = querySelect
     while (select.hasChildNodes())
       select.removeChild(select.firstChild)
-    val value = queryElementWithData.getAttribute(DataValue)
-    if (value.nonEmpty) {
-      val initialOption =
-        dom.document
-          .createOptionElement
-          .kestrel(_.value    = value)
-          .kestrel(_.text     = queryElementWithData.getAttribute(DataLabel))
+    parsedItems.foreach { item =>
+      select.appendChild(
+        dom.document.createOptionElement
+          .kestrel(_.value    = item.id)
+          .kestrel(_.text     = item.text)
           .kestrel(_.selected = true)
-      select.appendChild(initialOption)
+      )
     }
   }
 
@@ -309,10 +311,12 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
 
   private def onOpen(event: JQueryEvent): Unit = {
     val dropdownElement = document.querySelector(".select2-dropdown")
-    val inputElement    = dropdownElement.querySelector("input")
     val listboxElement  = dropdownElement.querySelector("[role=listbox]")
     val comboboxElement = containerElem.querySelector(".select2-selection")
     val labelledBy      = comboboxElement.getAttribute("aria-labelledby")
+    val inputElement    =
+      Option(dropdownElement.querySelector("input"))       // In single mode, the search input is inside `.select2-dropdown`
+        .getOrElse(comboboxElement.querySelector("input")) // In multiple mode, it is inside `.select2-selection--multiple`
     inputElement   .setAttribute("aria-owns"      , listboxElement.id)
     inputElement   .setAttribute("aria-haspopup"  , "listbox")
     inputElement   .setAttribute("aria-labelledby", labelledBy)
@@ -328,7 +332,17 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
 
   private def onChangeDispatchFrChange(): Unit = {
     val selectEl = querySelect
-    if (selectEl.selectedIndex == -1) {
+    if (isMultiple) {
+      val selectedValues =
+        (0 until selectEl.options.length)
+          .map(selectEl.options(_))
+          .filter(_.selected)
+          .map(_.value)
+      dispatchFrChange(
+        label = "", // We don't store the label for multiple selection
+        value = selectedValues.mkString(" ")
+      )
+    } else if (selectEl.selectedIndex == -1) {
       // `selectedIndex` is -1 when the value was cleared
       dispatchFrChange(
         label = "",

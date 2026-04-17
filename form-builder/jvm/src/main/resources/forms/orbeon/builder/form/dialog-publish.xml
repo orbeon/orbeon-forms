@@ -229,7 +229,7 @@
                                 then concat('?form-version=', $published-version-opt)
                                 else ''"/>
                     <xh:div class="btn-group dropup">
-                        <xh:button class="btn fb-publish-open-new" data-href="{concat(xxf:get-request-context-path(), '/fr/', $app, '/', $form, '/new', $version-param)}">
+                        <xh:button class="btn fb-publish-open-new" data-href="{xxf:rewrite-render-url(concat('/fr/', $app, '/', $form, '/new', $version-param))}">
                             <xf:output value="$form-resources/dialog-publish/open-new"/>
                         </xh:button>
                         <xh:button class="btn dropdown-toggle" data-toggle="dropdown">

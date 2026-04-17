@@ -102,6 +102,13 @@ object RewriteResourceURI {
   }
 }
 
+class RewriteRenderURL extends DefaultFunctionSupport {
+  override def evaluateItem(xpathContext: XPathContext): StringValue = {
+    implicit val ctx = xpathContext
+    CoreCrossPlatformSupport.externalContext.getResponse.rewriteRenderURL(stringArgument(0))
+  }
+}
+
 trait EnvironmentVariable extends DefaultFunctionSupport with RuntimeDependentFunction {
   def enabled: Boolean
 

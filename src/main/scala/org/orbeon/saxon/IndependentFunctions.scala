@@ -148,6 +148,10 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
       Arg(BOOLEAN, EXACTLY_ONE)
     )
 
+    Fun("rewrite-render-url", classOf[RewriteRenderURL], op = 0, min = 1, STRING, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
+
     Fun("rewrite-service-uri", classOf[RewriteServiceURI], op = 0, min = 1, STRING, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE),
       Arg(BOOLEAN, EXACTLY_ONE)

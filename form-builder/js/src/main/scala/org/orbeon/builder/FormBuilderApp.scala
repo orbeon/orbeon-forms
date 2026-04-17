@@ -52,6 +52,7 @@ object FormBuilderApp extends App {
     BlockCache
 
     DialogItemset
+    DialogPublish
     ControlDnD
     SectionGridEditor
     RowEditor

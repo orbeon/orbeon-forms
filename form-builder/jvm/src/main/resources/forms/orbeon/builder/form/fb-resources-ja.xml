@@ -1058,6 +1058,8 @@
         </overwrite-version-help>
         <open-summary>公開フォームのサマリーを開く</open-summary>
         <open-new>公開フォームの新規ページを開く</open-new>
+        <view-admin>管理ページで表示</view-admin>
+        <view-form-builder-summary>Form Builderサマリーページで表示</view-form-builder-summary>
         <version>バージョン</version>
         <available>公開フォームを利用可能にする</available>
         <comment>コメント</comment>

@@ -1016,6 +1016,8 @@
         </overwrite-version-help>
         <open-summary>Übersicht an veröffentlichten Formularen anzeigen</open-summary>
         <open-new>Öffne neue Seite des veröffentlichten Formulars </open-new>
+        <view-admin>In der Admin-Seite anzeigen</view-admin>
+        <view-form-builder-summary>In der Form Builder-Übersichtsseite anzeigen</view-form-builder-summary>
         <version>Version</version>
         <available>Veröffentlichtes Formular verfügbar machen</available>
         <comment>Kommentar</comment>

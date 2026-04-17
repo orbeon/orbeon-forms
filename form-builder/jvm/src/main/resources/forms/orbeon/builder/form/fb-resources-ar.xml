@@ -1066,6 +1066,8 @@
         </overwrite-version-help>
         <open-summary>فتح صفحة ملخص النموذج المنشور</open-summary>
         <open-new>فتح صفحة النموذج المنشور الجديدة</open-new>
+        <view-admin>عرض في صفحة الإدارة</view-admin>
+        <view-form-builder-summary>عرض في صفحة ملخص منشئ النماذج</view-form-builder-summary>
         <version>الإصدار</version>
         <available>جعل النموذج المنشور متاحاً</available>
         <comment>تعليق</comment>

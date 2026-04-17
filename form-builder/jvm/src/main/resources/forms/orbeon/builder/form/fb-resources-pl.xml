@@ -1063,6 +1063,8 @@
         </overwrite-version-help>
         <open-summary>Otwórz stronę podsumowania opublikowanego formularza</open-summary>
         <open-new>Otwórz stronę wypełniania opublikowanego formularza</open-new>
+        <view-admin>Wyświetl na stronie administracyjnej</view-admin>
+        <view-form-builder-summary>Wyświetl na stronie podsumowania Form Builder</view-form-builder-summary>
         <version>Wersja</version>
         <available>Udostępnij opublikowany formularz</available>
         <comment>Komentarz</comment>

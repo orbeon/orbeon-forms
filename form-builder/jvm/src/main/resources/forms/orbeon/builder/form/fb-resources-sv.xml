@@ -1047,6 +1047,8 @@
         </overwrite-version-help>
         <open-summary>Öppna översikten över publicerade formulär</open-summary>
         <open-new>Öppna ny sida med publicerade formulär</open-new>
+        <view-admin>Visa på administrationssidan</view-admin>
+        <view-form-builder-summary>Visa på Form Builder-sammanfattningssidan</view-form-builder-summary>
         <version>Version</version>
         <available>Gör publicerat formulär tillgängligt</available>
         <comment>Kommentar</comment>

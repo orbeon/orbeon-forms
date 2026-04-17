@@ -1047,6 +1047,8 @@
         </overwrite-version-help>
         <open-summary>Open Samenvattingpagina van gepubliceerd form</open-summary>
         <open-new>Open Nieuw pagina van gepubliceerd form</open-new>
+        <view-admin>Bekijken op de beheerderspagina</view-admin>
+        <view-form-builder-summary>Bekijken op de Form Builder-overzichtspagina</view-form-builder-summary>
         <version>Versie</version>
         <available>Maak gepubliceerd form beschikbaar</available>
         <comment>Opmerking</comment>

@@ -1060,6 +1060,8 @@
         </overwrite-version-help>
         <open-summary>Avaa julkaistun lomakkeen tiivistelmäsivu</open-summary>
         <open-new>Avaa julkaistun lomakkeen uusi sivu</open-new>
+        <view-admin>Näytä hallintasivulla</view-admin>
+        <view-form-builder-summary>Näytä Form Builder -yhteenvetosivulla</view-form-builder-summary>
         <version>Versio</version>
         <available>Tee julkaistusta lomakkeesta saatavilla</available>
         <comment>Kommentti</comment>

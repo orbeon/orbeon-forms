@@ -1062,8 +1062,10 @@
             ref="xxf:instance('fb-publish-instance')/published-version"
             value="instance('fb-publish-response-instance')/published-version"/>
 
-        <xf:toggle   case="fb-publish-dialog-success"/>
-        <xf:setfocus control="fb-publish-dialog"/>
+        <xf:toggle case="fb-publish-dialog-success"/>
+        <xf:action type="javascript">
+            <xf:body>ORBEON.builder.private.API.focusPublishOpenNewButton();</xf:body>
+        </xf:action>
     </xf:action>
     <xf:action observer="fb-publish-submission" event="xforms-submit-error">
         <xf:toggle   case="fb-publish-dialog-error"/>

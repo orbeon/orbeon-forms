@@ -18,6 +18,7 @@ import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Support}
 import org.scalajs.dom
 
+import scala.annotation.unused
 import scala.scalajs.js
 
 
@@ -58,6 +59,10 @@ object FormBuilderPrivateAPI extends js.Object {
       )
     )
   }
+
+  @unused("Used by Form Builder's publish dialog")
+  def focusPublishOpenNewButton(): Unit =
+    dom.document.querySelectorOpt(".fb-publish-open-new").foreach(_.focus())
 
   // Here we implement our own `scrollIntoView()` in order to handle positioning better. For example if a control is
   // below the Form Builder main area, we scroll enough to make it visible at the bottom, and vice-versa if the

@@ -1085,6 +1085,8 @@
         </overwrite-version-help>
         <open-summary>Ouvrir la page d'accueil du formulaire publié</open-summary>
         <open-new>Ouvrir le formulaire publié en création</open-new>
+        <view-admin>Voir dans la page d'administration</view-admin>
+        <view-form-builder-summary>Voir dans la page d'accueil de Form Builder</view-form-builder-summary>
         <version>Version</version>
         <available>Rendre le formulaire publié disponible</available>
         <comment>Commentaire</comment>

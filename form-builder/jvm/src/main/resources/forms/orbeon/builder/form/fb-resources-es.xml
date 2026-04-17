@@ -1032,6 +1032,8 @@
         </overwrite-version-help>
         <open-summary>Abrir Página de Resumen del Formulario Publicado</open-summary>
         <open-new>Abrir nueva instancia del Formulario</open-new>
+        <view-admin>Ver en la página de administración</view-admin>
+        <view-form-builder-summary>Ver en la página de resumen de Form Builder</view-form-builder-summary>
         <version>Versión</version>
         <available>Hacer disponible el formulario publicado</available>
         <comment>Comentario</comment>

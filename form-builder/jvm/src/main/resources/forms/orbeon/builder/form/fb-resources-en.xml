@@ -1084,6 +1084,8 @@
         </overwrite-version-help>
         <open-summary>Open Published Form Summary Page</open-summary>
         <open-new>Open Published Form New Page</open-new>
+        <view-admin>View in the Admin Page</view-admin>
+        <view-form-builder-summary>View in the Form Builder Summary Page</view-form-builder-summary>
         <version>Version</version>
         <available>Make published form available</available>
         <comment>Comment</comment>

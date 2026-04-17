@@ -1047,6 +1047,8 @@
         </overwrite-version-help>
         <open-summary>Åpne oppsummeringsside for det publiserte skjema</open-summary>
         <open-new>Åpne publisert skjema i sluttbrukermodus</open-new>
+        <view-admin>Vis på administrasjonssiden</view-admin>
+        <view-form-builder-summary>Vis på Form Builder-sammendragssiden</view-form-builder-summary>
         <version>Versjon</version>
         <available>Gjør publisert skjema tilgjengelig</available>
         <comment>Kommentar</comment>

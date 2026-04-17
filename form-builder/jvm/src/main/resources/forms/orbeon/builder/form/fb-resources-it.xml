@@ -1019,6 +1019,8 @@
             NOTA: Questo sovrascriverà la definizione di modulo esistente. Se le modifiche apportate alla definizione di modulo sono piccole, come cambiare le etichette di controllo, la definizione del modulo sarà compatibile con i dati del modulo esistente. Ma se sono state apportate modifiche strutturali, come l'aggiunta, la rimozione, la ridenominazione, o il movimento dei controlli, la definizione di modulo potrebbe essere incompatibile con i dati esistenti. Si consiglia di essere attentiti quando sovrascrive una versione della definizione di modulo esistente. </overwrite-version-help>
         <open-summary>Elenca moduli già pubblicati</open-summary>
         <open-new>Compila nuovo modulo</open-new>
+        <view-admin>Visualizza nella pagina di amministrazione</view-admin>
+        <view-form-builder-summary>Visualizza nella pagina di riepilogo di Form Builder</view-form-builder-summary>
         <version>Versione</version>
         <available>Rendi disponibile il modulo pubblicato</available>
         <comment>Commento</comment>

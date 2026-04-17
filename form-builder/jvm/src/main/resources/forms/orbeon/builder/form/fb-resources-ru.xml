@@ -1046,6 +1046,8 @@
         </overwrite-version-help>
         <open-summary>Открыть информацию об опубликованной форме</open-summary>
         <open-new>Открыть страницу заполнения опубликованной формы</open-new>
+        <view-admin>Просмотр на странице администрирования</view-admin>
+        <view-form-builder-summary>Просмотр на странице сводки Form Builder</view-form-builder-summary>
         <version>Версия</version>
         <available>Сделать опубликованную форму доступной</available>
         <comment>Комментарий</comment>

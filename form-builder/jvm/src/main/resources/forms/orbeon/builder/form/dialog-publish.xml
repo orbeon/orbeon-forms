@@ -208,7 +208,6 @@
         <xf:case id="fb-publish-dialog-success">
             <xh:div class="fb-publish-dialog-body">
                 <xf:output
-                    class="alert alert-success"
                     value="
                         xxf:format-message(
                             $form-resources/dialog-publish/publish-success,
@@ -217,35 +216,44 @@
                                 instance()/published-version/data(.)
                             )
                         )"/>
-                <xf:var name="buttons" value="xxf:split(xxf:property('oxf.fb.publish.buttons'))[. = ('new', 'summary')]"/>
-                <xf:group
-                    ref=".[
-                        exists($buttons) and
-                        instance()/available = 'true'
-                    ]"
-                    class="fb-publish-message"
-                >
-                    <xh:ul>
-                        <xf:repeat ref="$buttons">
-                            <xh:li>
-                                <xf:var
-                                    name="version-param"
-                                    value="
-                                        let $published-version-string := instance()/published-version/string(),
-                                            $published-version-opt    := if ($published-version-string castable as xs:integer) then xs:integer($published-version-string)[. gt 0] else ()
-                                        return
-                                            if (exists($published-version-opt))
-                                            then concat('?form-version=', $published-version-opt)
-                                            else ''"/>
-                                <xh:a href="/fr/{$app}/{$form}/{.}{$version-param}" target="_blank">
-                                    <xf:output value="$form-resources/dialog-publish/*[name() = concat('open-', current())]"/>
-                                </xh:a>
-                            </xh:li>
-                        </xf:repeat>
-                    </xh:ul>
-                </xf:group>
             </xh:div>
             <xh:div class="fr-dialog-buttons">
+                <xf:group ref=".[instance()/available = 'true']" class="xbl-fr-drop-trigger">
+                    <xf:var
+                        name="version-param"
+                        value="
+                            let $published-version-string := instance()/published-version/string(),
+                                $published-version-opt    := if ($published-version-string castable as xs:integer) then xs:integer($published-version-string)[. gt 0] else ()
+                            return
+                                if (exists($published-version-opt))
+                                then concat('?form-version=', $published-version-opt)
+                                else ''"/>
+                    <xh:div class="btn-group dropup">
+                        <xh:button class="btn fb-publish-open-new" data-href="{concat(xxf:get-request-context-path(), '/fr/', $app, '/', $form, '/new', $version-param)}">
+                            <xf:output value="$form-resources/dialog-publish/open-new"/>
+                        </xh:button>
+                        <xh:button class="btn dropdown-toggle" data-toggle="dropdown">
+                            <xh:span class="caret"/>
+                        </xh:button>
+                        <xh:ul class="dropdown-menu">
+                            <xh:li>
+                                <xh:a href="/fr/{$app}/{$form}/summary{$version-param}" target="_blank">
+                                    <xf:output value="$form-resources/dialog-publish/open-summary"/>
+                                </xh:a>
+                            </xh:li>
+                            <xh:li>
+                                <xh:a href="/fr/admin?fr-search-app=exact:{$app}&amp;fr-search-form=exact:{$form}" target="_blank">
+                                    <xf:output value="$form-resources/dialog-publish/view-admin"/>
+                                </xh:a>
+                            </xh:li>
+                            <xh:li>
+                                <xh:a href="/fr/orbeon/builder/summary?fr-search-app=exact:{$app}&amp;fr-search-form=exact:{$form}" target="_blank">
+                                    <xf:output value="$form-resources/dialog-publish/view-form-builder-summary"/>
+                                </xh:a>
+                            </xh:li>
+                        </xh:ul>
+                    </xh:div>
+                </xf:group>
                 <xf:trigger appearance="xxf:primary" id="fb-publish-close">
                     <xf:label value="$form-resources/close/label"/>
                     <xxf:hide event="DOMActivate" dialog="fb-publish-dialog"/>

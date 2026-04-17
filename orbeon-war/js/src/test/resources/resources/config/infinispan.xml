@@ -19,6 +19,7 @@
 
         <!-- XForms state store -->
         <local-cache name="xforms.state">
+            <expiration max-idle="18000000" interval="120000"/>
             <persistence passivation="true">
                 <file-store purge="true" path="xforms.state">
                     <write-behind modification-queue-size="1024" />

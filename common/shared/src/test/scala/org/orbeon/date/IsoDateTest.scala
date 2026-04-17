@@ -85,5 +85,17 @@ class IsoDateTest extends AnyFunSpec {
         assert(original == parboiled, s"Mismatch for $f: $original != $parboiled")
       }
     }
+
+    it("must parse DateFormat with different separators") {
+      val separators = List("/", ".", "-", " ")
+      for (sep <- separators) {
+        assert(IsoDate.parseFormat(s"[M]$sep[D]$sep[Y]") == DateFormat(DateFormatComponent.Month, sep, isPadDayMonthDigits = false))
+        assert(IsoDate.parseFormat(s"[D]$sep[M]$sep[Y]") == DateFormat(DateFormatComponent.Day, sep, isPadDayMonthDigits = false))
+        assert(IsoDate.parseFormat(s"[Y]$sep[M]$sep[D]") == DateFormat(DateFormatComponent.Year, sep, isPadDayMonthDigits = false))
+        assert(IsoDate.parseFormat(s"[M01]$sep[D01]$sep[Y]") == DateFormat(DateFormatComponent.Month, sep, isPadDayMonthDigits = true))
+        assert(IsoDate.parseFormat(s"[D01]$sep[M01]$sep[Y]") == DateFormat(DateFormatComponent.Day, sep, isPadDayMonthDigits = true))
+        assert(IsoDate.parseFormat(s"[Y]$sep[M01]$sep[D01]") == DateFormat(DateFormatComponent.Year, sep, isPadDayMonthDigits = true))
+      }
+    }
   }
 }

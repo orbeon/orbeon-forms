@@ -186,13 +186,14 @@ object IsoDate {
 
   class DateFormatParser(val input: ParserInput) extends Parser {
     def InputLine: Rule1[DateFormat] = rule { FormatRule ~ EOI }
+    def Sep: Rule0 = rule { anyOf("/.- ") }
     def FormatRule: Rule1[DateFormat] = rule {
-      "[M]"   ~ capture("/") ~ "[D]"   ~ "/" ~ "[Y]"   ~> ((sep: String) => DateFormat(DateFormatComponent.Month, sep, isPadDayMonthDigits = false)) |
-      "[D]"   ~ capture("/") ~ "[M]"   ~ "/" ~ "[Y]"   ~> ((sep: String) => DateFormat(DateFormatComponent.Day,   sep, isPadDayMonthDigits = false)) |
-      "[D]"   ~ capture(".") ~ "[M]"   ~ "." ~ "[Y]"   ~> ((sep: String) => DateFormat(DateFormatComponent.Day,   sep, isPadDayMonthDigits = false)) |
-      "[D]"   ~ capture("-") ~ "[M]"   ~ "-" ~ "[Y]"   ~> ((sep: String) => DateFormat(DateFormatComponent.Day,   sep, isPadDayMonthDigits = false)) |
-      "[M01]" ~ capture("/") ~ "[D01]" ~ "/" ~ "[Y]"   ~> ((sep: String) => DateFormat(DateFormatComponent.Month, sep, isPadDayMonthDigits = true )) |
-      "[Y]"   ~ capture("-") ~ "[M01]" ~ "-" ~ "[D01]" ~> ((sep: String) => DateFormat(DateFormatComponent.Year,  sep, isPadDayMonthDigits = true ))
+      "[M]"   ~ capture(Sep) ~ "[D]"   ~ Sep ~ "[Y]"   ~> ((sep: String) => DateFormat(DateFormatComponent.Month, sep, isPadDayMonthDigits = false)) |
+      "[D]"   ~ capture(Sep) ~ "[M]"   ~ Sep ~ "[Y]"   ~> ((sep: String) => DateFormat(DateFormatComponent.Day,   sep, isPadDayMonthDigits = false)) |
+      "[Y]"   ~ capture(Sep) ~ "[M]"   ~ Sep ~ "[D]"   ~> ((sep: String) => DateFormat(DateFormatComponent.Year,  sep, isPadDayMonthDigits = false)) |
+      "[M01]" ~ capture(Sep) ~ "[D01]" ~ Sep ~ "[Y]"   ~> ((sep: String) => DateFormat(DateFormatComponent.Month, sep, isPadDayMonthDigits = true )) |
+      "[D01]" ~ capture(Sep) ~ "[M01]" ~ Sep ~ "[Y]"   ~> ((sep: String) => DateFormat(DateFormatComponent.Day,   sep, isPadDayMonthDigits = true )) |
+      "[Y]"   ~ capture(Sep) ~ "[M01]" ~ Sep ~ "[D01]" ~> ((sep: String) => DateFormat(DateFormatComponent.Year,  sep, isPadDayMonthDigits = true ))
     }
   }
 

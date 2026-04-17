@@ -7,11 +7,11 @@ import scala.compiletime.uninitialized
 
 object QName {
 
-  private val ClarkNamePattern        = """\{(.*)}(.*)""".r
+  private val ClarkNamePattern        = """(?:\{(.*)})?(.*)""".r
   private val UriQualifiedNamePattern = """Q\{(.*)}(.*)""".r
 
-  def fromClarkName(clarkName: String): Option[QName] = clarkName match {
-    case ClarkNamePattern(uri, localName) => Some(QName(localName, Namespace("", uri)))
+  def fromMaybeWellFormedClarkName(clarkName: String): Option[QName] = clarkName match {
+    case ClarkNamePattern(uri, localName) => Some(QName(localName, Namespace("", Option(uri).getOrElse(""))))
     case _                                => None
   }
 

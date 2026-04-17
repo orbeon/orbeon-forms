@@ -644,7 +644,7 @@ object XFormsStaticStateDeserializer {
 
               // This will lose the prefix, is that ok?
               implicit val decodeCustomMipNameKey: KeyDecoder[MipName.Custom] =
-                (a: String) => dom.QName.fromClarkName(a).map(qName => MipName.Custom(qName))
+                (a: String) => dom.QName.fromMaybeWellFormedClarkName(a).map(qName => MipName.Custom(qName))
 
               val staticBind =
                 for {

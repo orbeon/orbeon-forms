@@ -953,7 +953,7 @@ object XFormsResponse {
         val newSchemaTypeQName =
           newSchemaType.trimAllToOpt match {
             case None    => Names.XsString
-            case Some(s) => QName.fromClarkName(s).getOrElse(throw new IllegalArgumentException(s"Invalid schema type: `$s`"))
+            case Some(s) => QName.fromMaybeWellFormedClarkName(s).getOrElse(throw new IllegalArgumentException(s"Invalid schema type: `$s`"))
           }
 
         lazy val newInputType =

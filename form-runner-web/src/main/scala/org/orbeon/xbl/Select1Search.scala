@@ -41,7 +41,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   private val    DataServicePerformsSearch = "data-service-performs-search"
   private val    DataSelectedItems         = "data-selected-items"
   private val    DataIsOpenSelection       = "data-is-open-selection"
-  private val    DataIsMultipleSelection   = "data-is-multiple-selection"
+  private val    DataIsMultipleSelection   = "data-is-multiple"
   private val    DataMinimumInputLength    = "data-min-input-length"
   private val    DataboundClass            = "xbl-fr-databound-select1-search"
   private object EventSupport              extends EventListenerSupport

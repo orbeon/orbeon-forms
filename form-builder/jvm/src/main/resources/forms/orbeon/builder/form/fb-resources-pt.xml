@@ -891,10 +891,11 @@
         <multiple-selection>
             <label>Selecção múltipla</label>
             <hint>Se activado, os utilizadores podem seleccionar múltiplos valores</hint>
+            <help>A "Selecção múltipla" só pode ser activada se "O serviço realiza pesquisa" e "Armazenar etiqueta" estiverem ambos desactivados.</help>
         </multiple-selection>
         <open-selection>
             <label>Selecção aberta</label>
-            <hint>Se activado, os utilizadores podem introduzir o seu próprio valor, e o valor (texto armazenado nos dados) é também usado como etiqueta (texto apresentado na lista pendente)</hint>
+            <help>Quando a opção "Selecção aberta" está activada, os utilizadores podem introduzir o seu próprio valor neste campo ao preencher o formulário. Este valor é armazenado nos dados e usado como etiqueta apresentada na lista pendente.</help>
         </open-selection>
         <store-label>
             <label>Armazenar etiqueta</label>

@@ -867,10 +867,11 @@
         <multiple-selection>
             <label>Mehrfachauswahl</label>
             <hint>Wenn aktiviert, können Benutzer mehrere Werte auswählen</hint>
+            <help>„Mehrfachauswahl" kann nur aktiviert werden, wenn „Dienst führt Suche durch" und „Beschriftung speichern" beide deaktiviert sind.</help>
         </multiple-selection>
         <open-selection>
             <label>Offene Auswahl</label>
-            <hint>Wenn aktiviert, können Benutzer eigene Werte eingeben; der eingegebene Wert wird als Datenwert und als Beschriftung in der Auswahlliste verwendet</hint>
+            <help>Wenn die Option „Offene Auswahl" aktiviert ist, können Benutzer beim Ausfüllen des Formulars einen eigenen Wert in dieses Feld eingeben. Dieser Wert wird in den Daten gespeichert und als Beschriftung in der Auswahlliste verwendet.</help>
         </open-selection>
         <store-label>
             <label>Beschriftung speichern</label>

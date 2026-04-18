@@ -891,10 +891,11 @@
         <multiple-selection>
             <label todo="true">[Multiple selection]</label>
             <hint todo="true">[If enabled, users can select multiple values]</hint>
+            <help todo="true">["Multiple selection" can only be enabled if "Service performs search" and "Store label" are both disabled.]</help>
         </multiple-selection>
         <open-selection>
             <label todo="true">[Open selection]</label>
-            <hint todo="true">[If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)]</hint>
+            <help todo="true">[When the "Open selection" option is enabled, users can enter their own value in this control when filling out the form. This value is stored in the data and used as the label shown in the drop-down list.]</help>
         </open-selection>
         <store-label>
             <label todo="true">[Store label]</label>

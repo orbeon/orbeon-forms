@@ -928,10 +928,11 @@
         <multiple-selection>
             <label>Sélection multiple</label>
             <hint>Si cette option est activée, les utilisateurs peuvent sélectionner plusieurs valeurs</hint>
+            <help>La « Sélection multiple » ne peut être activée que si « Le service effectue la recherche » et « Stocker le libellé » sont tous les deux désactivés.</help>
         </multiple-selection>
         <open-selection>
             <label>Sélection libre</label>
-            <hint>Si cette option est activée, les utilisateurs peuvent saisir leur propre valeur, et la valeur (texte stocké dans les données) est également utilisée comme libellé (texte affiché dans la liste déroulante)</hint>
+            <help>Lorsque l'option « Sélection libre » est activée, les utilisateurs peuvent saisir leur propre valeur dans ce contrôle lors du remplissage du formulaire. Cette valeur est stockée dans les données et utilisée comme libellé affiché dans la liste déroulante.</help>
         </open-selection>
         <store-label>
             <label>Stocker le libellé</label>

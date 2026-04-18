@@ -911,10 +911,11 @@
         <multiple-selection>
             <label>Monivalinta</label>
             <hint>Jos käytössä, käyttäjät voivat valita useita arvoja</hint>
+            <help>„Monivalinta" voidaan ottaa käyttöön vain, jos „Palvelu suorittaa haun" ja „Tallenna teksti" ovat molemmat poissa käytöstä.</help>
         </multiple-selection>
         <open-selection>
             <label>Avoin valinta</label>
-            <hint>Jos käytössä, käyttäjät voivat syöttää oman arvonsa, ja arvo (data on tallennettu teksti) käytetään myös nimikkeenä (teksti näytetään pudotusvalikossa)</hint>
+            <help>Kun „Avoin valinta" -asetus on käytössä, käyttäjät voivat syöttää oman arvonsa tähän kenttään lomaketta täyttäessään. Tämä arvo tallennetaan dataan ja näytetään pudotusvalikon nimikkeenä.</help>
         </open-selection>
         <store-label>
             <label>Tallenna nimike</label>

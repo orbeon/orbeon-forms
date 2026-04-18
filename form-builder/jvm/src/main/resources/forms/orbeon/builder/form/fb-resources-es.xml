@@ -883,10 +883,11 @@
         <multiple-selection>
             <label>Selección múltiple</label>
             <hint>Si está habilitado, los usuarios pueden seleccionar múltiples valores</hint>
+            <help>La "Selección múltiple" solo puede activarse si "El servicio realiza la búsqueda" y "Almacenar etiqueta" están ambos desactivados.</help>
         </multiple-selection>
         <open-selection>
             <label>Selección abierta</label>
-            <hint>Si está habilitado, los usuarios pueden introducir su propio valor, y ese valor (texto almacenado en los datos) también se usa como etiqueta (texto mostrado en la lista desplegable)</hint>
+            <help>Cuando la opción "Selección abierta" está habilitada, los usuarios pueden introducir su propio valor en este control al rellenar el formulario. Este valor se almacena en los datos y se usa como etiqueta mostrada en la lista desplegable.</help>
         </open-selection>
         <store-label>
             <label>Almacenar etiqueta</label>

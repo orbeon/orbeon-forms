@@ -141,6 +141,7 @@
                                     then 'false'
                                     else xf:element('_', (@multiple/string(), 'false')[1])">
                                 <xf:label ref="xxf:r('dialog-control-settings.multiple-selection.label', '|fr-form-resources|')"/>
+                                <xf:help  ref="xxf:r('dialog-control-settings.multiple-selection.help',  '|fr-form-resources|')"/>
                                 <xf:action event="xforms-select">
                                     <xf:insert
                                         if="event('xxf:item-value') = 'true'"
@@ -165,7 +166,7 @@
                                 id="fb-open-selection">
 
                                 <xf:label ref="xxf:r('dialog-control-settings.open-selection.label', '|fr-form-resources|')"/>
-                                <xf:hint  ref="xxf:r('dialog-control-settings.open-selection.hint',  '|fr-form-resources|')"/>
+                                <xf:help  ref="xxf:r('dialog-control-settings.open-selection.help',  '|fr-form-resources|')"/>
                                 <xf:action event="xforms-value-changed">
                                     <xf:delete ref="$control/@fb:selection"/>
                                     <xf:action if="event('xxf:value') != 'false()'">

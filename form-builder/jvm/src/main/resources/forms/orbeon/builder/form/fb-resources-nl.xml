@@ -891,10 +891,11 @@
         <multiple-selection>
             <label>Meervoudige selectie</label>
             <hint>Indien ingeschakeld, kunnen gebruikers meerdere waarden selecteren</hint>
+            <help>"Meervoudige selectie" kan alleen worden ingeschakeld als "Service voert zoekopdracht uit" en "Label opslaan" beide zijn uitgeschakeld.</help>
         </multiple-selection>
         <open-selection>
             <label>Open selectie</label>
-            <hint>Indien ingeschakeld, kunnen gebruikers hun eigen waarde invoeren, en de waarde (tekst opgeslagen in de gegevens) wordt ook gebruikt als het label (tekst weergegeven in de vervolgkeuzelijst)</hint>
+            <help>Wanneer de optie "Open selectie" is ingeschakeld, kunnen gebruikers bij het invullen van het formulier een eigen waarde invoeren in dit veld. Deze waarde wordt opgeslagen in de gegevens en gebruikt als het label dat in de vervolgkeuzelijst wordt weergegeven.</help>
         </open-selection>
         <store-label>
             <label>Label opslaan</label>

@@ -891,10 +891,11 @@
         <multiple-selection>
             <label>Flervalg</label>
             <hint>Hvis aktivert, kan brukere velge flere verdier</hint>
+            <help>«Flervalg» kan bare aktiveres hvis «Tjenesten utfører søk» og «Lagre etikett» begge er deaktivert.</help>
         </multiple-selection>
         <open-selection>
             <label>Åpen valg</label>
-            <hint>Hvis aktivert, kan brukere skrive inn sin egen verdi, og verdien (tekst lagret i dataene) brukes også som etikett (tekst vist i rullegardinlisten)</hint>
+            <help>Når alternativet «Åpen valg» er aktivert, kan brukere skrive inn sin egen verdi i dette feltet når de fyller ut skjemaet. Denne verdien lagres i dataene og brukes som etikett vist i rullegardinlisten.</help>
         </open-selection>
         <store-label>
             <label>Lagre etikett</label>

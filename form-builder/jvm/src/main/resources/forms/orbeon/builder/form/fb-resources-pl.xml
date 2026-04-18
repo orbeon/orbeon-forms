@@ -909,10 +909,11 @@
         <multiple-selection>
             <label>Wybór wielokrotny</label>
             <hint>Jeśli włączone, użytkownicy mogą wybrać wiele wartości</hint>
+            <help>„Wybór wielokrotny" można włączyć tylko wtedy, gdy opcje „Usługa wykonuje wyszukiwanie" i „Przechowaj etykietę" są obie wyłączone.</help>
         </multiple-selection>
         <open-selection>
             <label>Otwarty wybór</label>
-            <hint>Jeśli włączone, użytkownik może wprowadzić własną wartość, a wartość ta jest również używana jako etykieta na liście</hint>
+            <help>Gdy opcja „Otwarty wybór" jest włączona, użytkownicy mogą wpisać własną wartość w tym polu podczas wypełniania formularza. Wartość ta jest zapisywana w danych i używana jako etykieta wyświetlana na liście.</help>
         </open-selection>
         <store-label>
             <label>Zapisz etykietę</label>

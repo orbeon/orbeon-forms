@@ -907,10 +907,11 @@
         <multiple-selection>
             <label>複数選択</label>
             <hint>有効にすると、ユーザーは複数の値を選択できます</hint>
+            <help>「複数選択」は、「サービスが検索を実行」と「ラベルを保存」がともに無効の場合にのみ有効にできます。</help>
         </multiple-selection>
         <open-selection>
             <label>自由入力を許可</label>
-            <hint>有効にするとユーザー独自の値を入力でき、その値がデータと表示ラベルの両方に使われます</hint>
+            <help>「自由入力を許可」オプションが有効な場合、ユーザーはフォーム入力時にこのフィールドに独自の値を入力できます。この値はデータに保存され、ドロップダウンリストに表示されるラベルとして使用されます。</help>
         </open-selection>
         <store-label>
             <label>ラベルを保存</label>

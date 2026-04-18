@@ -928,10 +928,11 @@
         <multiple-selection>
             <label>Multiple selection</label>
             <hint>If enabled, users can select multiple values</hint>
+            <help>"Multiple selection" can only be enabled if "Service performs search" and "Store label" are both disabled.</help>
         </multiple-selection>
         <open-selection>
             <label>Open selection</label>
-            <hint>If enabled, users can enter their own value, and the value (text stored in the data) is also used as the label (text displayed in the drop-down list)</hint>
+            <help>When the "Open selection" option is enabled, users can enter their own value in this control when filling out the form. This value is stored in the data and used as the label shown in the drop-down list.</help>
         </open-selection>
         <store-label>
             <label>Store label</label>

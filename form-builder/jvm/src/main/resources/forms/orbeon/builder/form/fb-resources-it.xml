@@ -871,10 +871,11 @@
         <multiple-selection>
             <label>Selezione multipla</label>
             <hint>Se abilitato, gli utenti possono selezionare più valori</hint>
+            <help>La "Selezione multipla" può essere abilitata solo se "Il servizio esegue la ricerca" e "Memorizza etichetta" sono entrambi disabilitati.</help>
         </multiple-selection>
         <open-selection>
             <label>Selezione aperta</label>
-            <hint>Se abilitato, gli utenti possono inserire un proprio valore che verrà anche usato come etichetta mostrata nell'elenco</hint>
+            <help>Quando l'opzione "Selezione aperta" è abilitata, gli utenti possono inserire un proprio valore in questo controllo durante la compilazione del modulo. Questo valore viene memorizzato nei dati e utilizzato come etichetta mostrata nell'elenco a discesa.</help>
         </open-selection>
         <store-label>
             <label>Memorizza etichetta</label>

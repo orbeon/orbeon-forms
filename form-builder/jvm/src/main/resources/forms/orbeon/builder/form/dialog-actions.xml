@@ -595,7 +595,7 @@
             <xf:label ref="$form-resources/dialog-actions/service-response-actions"/>
 
             <!--
-                2025-03-24: Consistent with `actions.xsl`:
+                2025-03-24: Consistent with `services-and-actions-xf.xsl`:
 
                 - include single and multiple selection controls
                 - don't exclude open selection controls since we want them as source/destination of actions
@@ -1045,7 +1045,7 @@
         </xf:instance>
 
         <!-- Template for actions -->
-        <!-- NOTE: The implementation of individual actions is now in actions.xsl. -->
+        <!-- NOTE: The implementation of individual actions is now in services-and-actions-fr.xsl. -->
         <xf:instance id="fb-binding-action-template" xxf:readonly="true">
             <action>
                 <!-- Set service value with path -->

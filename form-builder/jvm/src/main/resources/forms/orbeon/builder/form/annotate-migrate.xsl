@@ -386,7 +386,7 @@
     <!--
         Remove actions implementations as they are unneeded (and can be out of date). See also:
 
-        - actions.xsl
+        - services-and-actions-xf.xsl
         - https://github.com/orbeon/orbeon-forms/issues/1019
     -->
     <xsl:template

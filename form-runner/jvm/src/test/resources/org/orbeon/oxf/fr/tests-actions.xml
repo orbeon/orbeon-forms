@@ -287,7 +287,7 @@
                         </fr:action>
                     </xf:model>
                 </xh:head>
-                <!-- Keep for actions-20182.xsl -->
+                <!-- Keep for services-and-actions-fr.xsl -->
                 <xh:body>
                     <fr:view>
                         <fr:body/>
@@ -377,7 +377,7 @@
                         </fr:action>
                     </xf:model>
                 </xh:head>
-                <!-- Keep for actions-20182.xsl -->
+                <!-- Keep for services-and-actions-fr.xsl -->
                 <xh:body>
                     <fr:view>
                         <fr:body/>

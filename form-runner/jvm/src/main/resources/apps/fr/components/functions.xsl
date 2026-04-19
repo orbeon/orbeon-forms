@@ -38,14 +38,9 @@
         <xsl:param name="model" as="element(xf:model)"/>
         <xsl:sequence select="
             distinct-values(
-                (
-                    for $e in fr:action-bindings($model)/fr:itemset-actions-elements(.)
-                    return
-                        replace($e/(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1], '^''(.+)''$', '$1'),
-                    for $e in fr:action-bindings-2018.2($model)/fr:itemset-actions-elements-2018.2(.)
-                    return
-                        $e/@control/string()
-                )
+                for $e in fr:action-bindings-2018.2($model)/fr:itemset-actions-elements-2018.2(.)
+                return
+                    $e/@control/string()
             )"/>
     </xsl:function>
 

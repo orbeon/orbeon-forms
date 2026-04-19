@@ -28,8 +28,8 @@
         xmlns:Wizard="java:org.orbeon.xbl.Wizard">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
-    <xsl:import href="actions.xsl"/>
-    <xsl:import href="actions-20182.xsl"/>
+    <xsl:import href="services-and-actions-xf.xsl"/>
+    <xsl:import href="services-and-actions-fr.xsl"/>
 
     <!-- Import components -->
     <xsl:import href="view.xsl"/>

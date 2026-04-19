@@ -130,8 +130,15 @@
         <!-- This must be in scope in the case of `<xbl:handlers>` content -->
         <xsl:param tunnel="yes" name="library-name" as="xs:string?"/>
 
-        <xsl:variable name="is-handler" select="exists(parent::xbl:handlers)" as="xs:boolean"/>
-        <xsl:variable name="model-id"   select="(if ($is-handler) then ../../xbl:implementation/xf:model else ..)/@id/string()" as="xs:string"/>
+        <xsl:variable name="is-handler"  select="exists(parent::xbl:handlers)" as="xs:boolean"/>
+        <xsl:variable name="model-id"    select="(if ($is-handler) then ../../xbl:implementation/xf:model else ..)/@id/string()" as="xs:string"/>
+        <xsl:variable name="is-xbl-model" as="xs:boolean"
+            select="
+                if ($is-handler) then
+                    true()
+                else
+                    generate-id(..) = $xbl-models-ids
+            "/>
 
         <xsl:variable name="modes"          select="p:split(@modes)"/>
         <xsl:variable name="events"         select="p:split(@events)"/>
@@ -142,12 +149,22 @@
         <xsl:variable name="control-events" select="$events[. = $controls-2018.2-action-names]"/>
 
         <xsl:if test="exists($model-events)">
-            <xf:action
-                target="{$model-id}"
-                event="{
-                    for $e in $model-events
-                    return $form-load-fr-action-names[index-of($form-load-2018.2-action-names, $e)]
-                }">
+            <xf:action>
+
+                <xsl:choose>
+                    <xsl:when test="$is-xbl-model">
+                        <xsl:attribute name="event" select="
+                            for $e in $model-events
+                            return $form-load-xforms-action-names[index-of($form-load-2018.2-action-names, $e)]"/>
+                        <xsl:attribute name="observer" select="$model-id"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:attribute name="event" select="
+                            for $e in $model-events
+                            return $form-load-fr-action-names[index-of($form-load-2018.2-action-names, $e)]"/>
+                        <xsl:attribute name="target" select="$model-id"/>
+                    </xsl:otherwise>
+                </xsl:choose>
 
                 <xsl:if test="exists($modes)">
                     <xsl:attribute name="if">fr:mode() = (<xsl:value-of
@@ -500,8 +517,11 @@
         <xf:insert
             ref="xxf:instance('fr-service-request-instance')"
             origin="xf:parse(xxf:instance('{$service-name}-instance'))"/>
+        <xsl:if test="exists(fr:header)">
+            <xf:delete ref="xxf:instance('fr-service-headers-instance')/header"/>
+        </xsl:if>
 
-        <xsl:variable name="request-actions" select="fr:value | fr:url-param | fr:sql-param"/>
+        <xsl:variable name="request-actions" select="fr:value | fr:url-param | fr:sql-param | fr:header"/>
 
         <xsl:if test="exists($request-actions)">
 
@@ -561,6 +581,12 @@
                                 <xf:setvalue
                                     ref="(//*[@name = $name], //*[local-name() = $name])[1]"
                                     value="$value"/>
+                            </xsl:when>
+                            <xsl:when test="./self::fr:header">
+                                <xsl:variable name="header-name" select="@name/string()"/>
+                                <xf:insert
+                                    context="xxf:instance('fr-service-headers-instance')"
+                                    origin="xf:element('header', (xf:attribute('name', '{$header-name}'), string($value)))"/>
                             </xsl:when>
                         </xsl:choose>
                     </xf:action>

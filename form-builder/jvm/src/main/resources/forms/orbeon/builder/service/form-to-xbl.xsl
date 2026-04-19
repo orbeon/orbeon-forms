@@ -234,7 +234,7 @@
     </xsl:template>
 
     <!-- When copying actions, update references to fr-form-model (which gets a new id) -->
-    <!-- The action implementation is handled in actions.xsl. -->
+    <!-- The action implementation is handled in services-and-actions-xf.xsl. -->
     <xsl:template match="@*:observer[p:split() = 'fr-form-model']" mode="filter-actions">
         <xsl:param name="model-id" tunnel="yes"/>
         <xsl:attribute

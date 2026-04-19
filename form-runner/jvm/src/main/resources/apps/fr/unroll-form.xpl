@@ -60,8 +60,14 @@
     </p:processor>
 
     <p:processor name="oxf:unsafe-xslt">
-        <p:input  name="config"             href="components/components.xsl"/>
+        <p:input  name="config"             href="components/actions-legacy-to-20182.xsl"/>
         <p:input  name="data"               href="#after-section-templates"/>
+        <p:output name="data"               id="after-legacy-to-20182"/>
+    </p:processor>
+
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input  name="config"             href="components/components.xsl"/>
+        <p:input  name="data"               href="#after-legacy-to-20182"/>
         <p:input  name="form-runner-config" href="#form-runner-config"/>
         <p:output name="data"               id="after-components"/>
 

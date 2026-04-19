@@ -368,7 +368,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
     val container = xfc.container
 
-    {
+    val result = {
       libraryOrSectionNameOpt match {
         case Some(Left(libraryName)) =>
           resolveTargetRelativeToActionSourceFromControlsUseLibraryOpt(
@@ -408,6 +408,8 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
         actionSourceAbsoluteId,
         targetControlName
       )
+
+    result
   }
 
   // Find the node which must store itemset map information

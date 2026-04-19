@@ -703,19 +703,20 @@
         <xsd:attribute name="if" type="xsd:string" use="optional"/>
         <xsd:attribute name="while" type="xsd:string" use="optional"/>
         <xsd:attribute name="model" type="xsd:NMTOKEN" use="optional"/>
+        <xsd:attribute name="target" type="xsd:NMTOKEN" use="optional"/>
+        <xsd:attribute name="propagate" type="xsd:NMTOKEN" use="optional"/>
         <xsd:attribute name="event" type="xsd:NMTOKEN" use="optional"/>
         <xsd:attribute name="observer" type="xsd:NMTOKEN" use="optional"/>
-        <xsd:attribute name="target" ref="ev:target"/>
-        <xsd:attribute name="handler" ref="ev:handler"/>
-        <xsd:attribute name="phase" ref="ev:phase"/>
-        <xsd:attribute name="propagate" ref="ev:propagate"/>
-        <xsd:attribute name="defaultAction" ref="ev:defaultAction"/>
+        <xsd:attribute ref="ev:target"/>
+        <xsd:attribute ref="ev:handler"/>
+        <xsd:attribute ref="ev:phase"/>
+        <xsd:attribute ref="ev:propagate"/>
+        <xsd:attribute ref="ev:defaultAction"/>
         <xsd:attribute ref="ev:event"/>
         <xsd:attribute ref="ev:observer"/>
         <xsd:attribute ref="ev:target"/>
         <xsd:attribute ref="ev:handler"/>
         <xsd:attribute ref="ev:phase"/>
-        <xsd:attribute ref="ev:propagate"/>
         <xsd:attribute ref="ev:defaultAction"/>
     </xsd:attributeGroup>
     <xsd:group name="Action">

@@ -42,7 +42,7 @@ object XFormsStateManager extends XFormsStateManagerTrait {
     Loggers.newIndentedLogger("state")
 
   def getDocumentLock(uuid: String): Option[ReentrantLock] =
-    getSessionDocument(uuid) map (_.lock)
+    getSessionDocument(uuid).map(_.lock)
 
   def addDocumentToSession(uuid: String): Unit =
     Private.addDocumentToSession(uuid)
@@ -59,30 +59,28 @@ object XFormsStateManager extends XFormsStateManagerTrait {
 
   // This must be called once exactly when the session is created
   def sessionCreated(session: ExternalContext.Session): Unit =
-    session.getAttribute(XFormsStateManagerUUIDListKey) getOrElse {
+    session.getAttribute(XFormsStateManagerUUIDListKey).getOrElse {
       session.setAttribute(XFormsStateManagerUUIDListKey, new ConcurrentLinkedQueue[String])
     }
 
   // This must be called once exactly when the session is destroyed
-  def sessionDestroyed(session: ExternalContext.Session): Unit = {
+  def sessionDestroyed(session: ExternalContext.Session): Unit =
     if (session.getAttributeNames(ExternalContext.SessionScope.Application).contains(XFormsStateManagerUUIDListKey))
-      getUuidListInSession(session).iterator.asScala foreach { uuid =>
+      getUuidListInSession(session).iterator.asScala.foreach { uuid =>
         XFormsDocumentCache.remove(uuid)
         XFormsStateStore.removeDynamicState(uuid)
       }
-  }
 
   // Information about a document tied to the session.
   case class SessionDocument(uuid: String) {
     val lock = new ReentrantLock
   }
 
-  // Keep public and static for unit tests and submission processor (called from XSLT)
-  def removeSessionDocument(uuid: String): Unit =
-    getSession(false) foreach
-      (_.removeAttribute(getUUIDSessionKey(uuid), ExternalContext.SessionScope.Application))
+  private def removeSessionDocument(uuid: String): Unit =
+    getSession(false)
+      .foreach(_.removeAttribute(getUUIDSessionKey(uuid), ExternalContext.SessionScope.Application))
 
-  def onAddedToCache(uuid: String): Unit = addUuidToSession(uuid)
+  def onAddedToCache(uuid: String): Unit = addToUuidListInSession(uuid)
 
   /**
     * This is called indirectly when:
@@ -126,7 +124,7 @@ object XFormsStateManager extends XFormsStateManagerTrait {
       debug("Not keeping document in cache following error.")
       // Remove all information about this document from the session
       val uuid = containingDocument.uuid
-      removeUuidFromSession(uuid)
+      removeFromUuidListInSession(uuid, "! keepDocument")
       removeSessionDocument(uuid)
     }
   }
@@ -281,21 +279,21 @@ object XFormsStateManager extends XFormsStateManagerTrait {
         (_.setAttribute(getUUIDSessionKey(uuid), SessionDocument(uuid), ExternalContext.SessionScope.Application))
 
     def getSessionDocument(uuid: String): Option[SessionDocument] =
-      getSession(false) flatMap { session =>
-        session.getAttribute(getUUIDSessionKey(uuid), ExternalContext.SessionScope.Application)
-      } collect {
-        case value: SessionDocument => value
-      }
+      getSession(false)
+        .flatMap(_.getAttribute(getUUIDSessionKey(uuid), ExternalContext.SessionScope.Application))
+        .collect { case value: SessionDocument => value }
 
     def getUUIDSessionKey(uuid: String): String =
-      XFormsStateManagerUuidKeyPrefix + uuid
+      s"$XFormsStateManagerUuidKeyPrefix$uuid"
 
     // Tricky: if `onRemove()` is called upon session expiration, there might not be an `ExternalContext`. But it's fine,
     // because the session goes away -> all of its attributes go away so we don't have to remove them below.
-    def removeUuidFromSession(uuid: String): Unit =
-      getSession(ForceSessionCreation) map // support missing session for tests
-        getUuidListInSession           foreach
-        (_.remove(uuid))
+    def removeFromUuidListInSession(uuid: String, reason: String): Unit =
+      getSession(ForceSessionCreation) // support missing session for tests
+        .map(getUuidListInSession)
+        .foreach { uuidList =>
+          uuidList.remove(uuid)
+        }
 
     def cacheOrStore(
       containingDocument   : XFormsContainingDocument,
@@ -332,8 +330,9 @@ object XFormsStateManager extends XFormsStateManagerTrait {
       )
     }
 
-    def addUuidToSession(uuid: String): Unit =
-      getSession(ForceSessionCreation) foreach (session => getUuidListInSession(session).add(uuid))
+    def addToUuidListInSession(uuid: String): Unit =
+      getSession(ForceSessionCreation)
+        .foreach(session => getUuidListInSession(session).add(uuid))
 
     def storeDocumentState(containingDocument: XFormsContainingDocument, isInitialState: Boolean): Unit = {
       require(containingDocument.staticState.isServerStateHandling)

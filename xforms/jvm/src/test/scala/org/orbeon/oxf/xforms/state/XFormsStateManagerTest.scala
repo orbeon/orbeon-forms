@@ -86,7 +86,7 @@ class XFormsStateManagerTest
 
         val docs = List(createDoc(), createDoc())
 
-        docs foreach { doc =>
+        docs.foreach { doc =>
           assert(XFormsStateManager.getUuidListInSession(session).contains(doc.uuid))
           assert(doc eq XFormsDocumentCache.peekForTests(doc.uuid).get)
         }
@@ -95,7 +95,7 @@ class XFormsStateManagerTest
         XFormsStateManager.sessionDestroyed(session)
 
         // Test that the document is no longer in cache
-        docs foreach { doc =>
+        docs.foreach { doc =>
           assert(XFormsDocumentCache.take(doc.uuid).isEmpty)
         }
       }

@@ -160,6 +160,7 @@ object Multipart {
     servletFileUpload.setSizeMax(adjustedMaxSize)
     servletFileUpload.setFileSizeMax(adjustedMaxSize)
     servletFileUpload.setFileCountMax(maxFiles.getOrElse(-1))
+    servletFileUpload.setPartHeaderSizeMax(FileUploadBase.DEFAULT_PART_HEADER_SIZE_MAX * 4) // Support long filename with deeply nested controls
 
     // Parse the request and add file information
     useAndClose(uploadContext.getInputStream) { _ =>

@@ -1181,6 +1181,9 @@
                                 class="fr-search-free-input">
                                 <xf:label appearance="minimal" ref="$fr-resources/summary/labels/free-search"/>
                             </xf:input>
+                            <fr:trigger ref="." name="summary.search" class="xforms-disabled">
+                                <xf:setfocus event="DOMActivate" control="fr-search-free-input"/>
+                            </fr:trigger>
 
                             <xf:trigger class="fr-search-button">
                                 <xf:label mediatype="text/html" value="$fr-resources/home-summary/search/search-forms"/>

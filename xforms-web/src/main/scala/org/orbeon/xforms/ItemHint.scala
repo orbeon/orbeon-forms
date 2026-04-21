@@ -55,11 +55,10 @@ object ItemHint {
           tooltipData.options.placement = placement
           jHintRegionElDyn.tooltip("show")
         case (true, false) =>
-          // Avoid super-narrow tooltip in Form Builder [1]
           val containerEl =
             hintRegionEl.closestOpt(".fb-hover") match {
-              case Some(parentFbHover) => parentFbHover.parentElement
-              case None                => hintRegionEl
+              case Some(parentFbHover) => parentFbHover.parentElement // Avoid super-narrow tooltip in Form Builder
+              case None                => hintRegionEl.parentElement  // Parent for `mouseleave` to trigger when over tooltip
             }
 
           // Create tooltip and show right away

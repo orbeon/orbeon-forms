@@ -66,8 +66,19 @@ object PersistenceMetadataSupport {
       implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
       withDebug("reading published form for storage details") {
         PersistenceApi.readPublishedFormDefinition(appForm.app, appForm.form, version) map { case ((_, formDefinitionDoc), _) =>
-          val docContext  = new InDocFormRunnerDocContext(formDefinitionDoc)
-          val formIsSingleton = docContext.metadataRootElemOpt.flatMap(_.firstChildOpt("singleton")).exists(_.stringValue == "true")
+          val formIsSingleton = {
+            def singletonFromFormDefinition: Option[Boolean] =
+              new InDocFormRunnerDocContext(formDefinitionDoc).metadataRootElemOpt
+                .flatMap(_.firstChildOpt("singleton"))
+                .map(_.stringValue == "true")
+            def singletonFromProperty: Boolean =
+              propertySet.getBoolean(
+                name    = s"oxf.fr.detail.singleton.enabled.${appForm.app}.${appForm.form}",
+                default = false
+              )
+            singletonFromFormDefinition
+              .getOrElse(singletonFromProperty)
+          }
 
           FormStorageDetails(
             encryptedControlsPaths = Eval.later(FieldEncryption.getControlsToEncrypt(formDefinitionDoc, appForm).map(_.path)),

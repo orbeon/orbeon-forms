@@ -64,6 +64,16 @@
             )
         "/>
 
+    <xf:var
+        name="is-singleton"
+        value="
+            let $singleton-meta := xxf:instance('fr-form-metadata')/singleton
+            return
+                if (exists($singleton-meta))
+                then $singleton-meta = 'true'
+                else xxf:property(string-join(('oxf.fr.detail.singleton.enabled', $app, $form), '.'))
+        "/>
+
     <!-- Autosave disabled with Form Builder, see https://github.com/orbeon/orbeon-forms/issues/1169 -->
     <xf:var
         name="autosave-enabled"
@@ -83,10 +93,7 @@
                     $form
                 )
             )                                                                   and
-            not(
-                $mode = 'new' and
-                xxf:instance('fr-form-metadata')/singleton = 'true'
-            )                                                                   and
+            not($mode = 'new' and $is-singleton)                                and
             $mode = ('new', 'edit')"/>
 
     <!-- NOTE: This value is only valid during form initialization, because the request attribute won't be present in
@@ -113,8 +120,6 @@
 
         <!-- For new documents, see if we have drafts -->
         <xf:action if="$mode = 'new'">
-
-            <xf:var name="is-singleton" value="xxf:instance('fr-form-metadata')/singleton = 'true'"/>
 
             <xf:action if="$is-singleton">
 

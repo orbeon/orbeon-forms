@@ -44,9 +44,13 @@
                 <xf:setvalue
                     iterate="
                         'for-button-name', 'app', 'form', 'thumbnail', 'allow-template-use',
-                        'singleton', 'mode', 'created-with-version'"
+                        'mode', 'created-with-version'"
                     ref="$i/*[name() = context()]"
                     value="event(context())"/>
+
+                <xf:setvalue
+                    ref="$i/singleton"
+                    value="(event('singleton')[. = ('true', 'false')], 'default')[1]"/>
 
                 <!-- There can be multiple title/descriptions in different languages -->
                 <!-- https://github.com/orbeon/orbeon-forms/issues/3613 -->
@@ -715,11 +719,6 @@
                         id="form-in-progress-constraint"/>
                 </xf:bind>
                 <xf:bind
-                    ref="singleton"
-                    calculate="if (string() = '') then 'false' else ."
-                    readonly="false()"
-                    type="xs:boolean"/>
-                <xf:bind
                     ref="allow-template-use"
                     calculate="if (string() = '') then 'false' else ."
                     readonly="false()"
@@ -1342,10 +1341,14 @@
                                 <fr:grid>
                                     <xh:tr>
                                         <xh:td>
-                                            <fr:checkbox-input ref="singleton" id="fb-singleton-input">
+                                            <xf:select1 ref="singleton" appearance="full xxf:horizontal">
                                                 <xf:label ref="$resources/dialog-form-settings/singleton/label"/>
                                                 <xf:hint  ref="$resources/dialog-form-settings/singleton/hint"/>
-                                            </fr:checkbox-input>
+                                                <xf:itemset ref="$resources/property-yes-no/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
                                         </xh:td>
                                         <xh:td>
                                             <fr:checkbox-input ref="allow-template-use" id="fb-allow-template-use-input">

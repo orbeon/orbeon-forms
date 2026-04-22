@@ -31,7 +31,7 @@ import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
-import scala.collection.mutable.LinkedHashSet
+import scala.collection.mutable
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
@@ -173,20 +173,17 @@ object PathMapXPathAnalysisBuilder {
           // Try to reduce ancestor axis before anything else
           reduceAncestorAxis(pathmap)
 
-          // DEBUG
-//                    dumpPathMap(XPath.GlobalConfiguration, xpathString, pathmap)
-
           // We use LinkedHashMap/LinkedHashSet in part to keep unit tests reproducible
           val valueDependentPaths = new MapSet[String, InstancePath]
           val returnablePaths     = new MapSet[String, InstancePath]
 
-          val dependentModels     = new LinkedHashSet[String]
-          val dependentInstances  = new LinkedHashSet[String]
+          val dependentModels     = new mutable.LinkedHashSet[String]
+          val dependentInstances  = new mutable.LinkedHashSet[String]
 
           // Process the pathmap to extract paths and other information useful for handling dependencies.
           def processPaths(): Boolean = {
 
-            var stack = List[Expression]()
+            var stack: List[Expression] = Nil
 
             def createInstancePathFromStack: String Either Option[InstancePath] = {
 
@@ -201,6 +198,7 @@ object PathMapXPathAnalysisBuilder {
                   val model =
                     partAnalysisCtx.findModelByInstancePrefixedId(instancePrefixedId)
                       .getOrElse(throw new IllegalStateException(s"Reference to invalid instance: `$instancePrefixedId`"))
+
                   buildPath(expressions.tail) match {
                     case Right(path)  => Right(Some(InstancePath(model.prefixedId, instancePrefixedId, path)))
                     case Left(reason) => Left(reason)
@@ -230,8 +228,12 @@ object PathMapXPathAnalysisBuilder {
                       returnablePaths.put(instancePath.instancePrefixedId, instancePath)
                     if (node.isAtomized)
                       valueDependentPaths.put(instancePath.instancePrefixedId, instancePath)
-                  case Right(None) => // NOP: don't add the path as this is not considered a dependency
-                  case Left(_) => return false // we can't deal with this path so stop here
+
+                  case Right(None) =>
+                    // NOP: don't add the path as this is not considered a dependency
+                  case Left(_) =>
+                    // We can't deal with this path so stop here
+                    return false
                 }
 
               // Process children nodes if any
@@ -247,10 +249,10 @@ object PathMapXPathAnalysisBuilder {
             }
 
             for (root <- pathmap.getPathMapRoots) {
-              stack ::= root.getRootExpression
+              stack = List(root.getRootExpression)
               if (! processNode(root))
                 return false
-              stack = stack.tail
+              stack = Nil
             }
             true
           }
@@ -377,7 +379,8 @@ object PathMapXPathAnalysisBuilder {
     val sb = new StringBuilder
     for (expression <- expressions) expression match {
       case axisExpression: AxisExpression => axisExpression.getAxis match {
-        case Axis.SELF => // NOP
+        case Axis.SELF =>
+          // NOP
         case axis @ (Axis.CHILD | Axis.ATTRIBUTE) =>
           // Child or attribute axis
           if (sb.nonEmpty)
@@ -389,9 +392,11 @@ object PathMapXPathAnalysisBuilder {
             sb.append(fingerprint)
           } else
             return Left("Can't handle path because of unnamed node: *")
-        case axis => return Left("Can't handle path because of unhandled axis: " + Axis.axisName(axis))
+        case axis =>
+          return Left("Can't handle path because of unhandled axis: " + Axis.axisName(axis))
       }
-      case expression: Expression => return Left("Can't handle path because of unhandled expression: " + expression.getClass.getName)
+      case expression: Expression =>
+        return Left("Can't handle path because of unhandled expression: " + expression.getClass.getName)
     }
     Right(sb.toString)
   }
@@ -402,9 +407,9 @@ object PathMapXPathAnalysisBuilder {
   private def reduceAncestorAxis(pathmap: PathMap): Boolean = {
 
     // Utility class to hold node and ark as otherwise we can't go back to the node from an arc
-    class NodeArc(val node: PathMap.PathMapNode, val arc: PathMap.PathMapArc)
+    case class NodeArc(node: PathMap.PathMapNode, arc: PathMap.PathMapArc)
 
-    var stack = List[NodeArc]()
+    var stack: List[NodeArc] = Nil
 
     // Return true if we moved an arc
     def reduceAncestorAxis(node: PathMap.PathMapNode): Boolean = {
@@ -428,62 +433,65 @@ object PathMapXPathAnalysisBuilder {
         }
       }
 
-      def ancestorsWithFingerprint(nodeName: Int): Seq[PathMapArc] = {
+      def ancestorsWithFingerprint(nodeName: Int): Seq[PathMapArc] =
         for {
           nodeArc <- stack.tail   // go from parent to root
           e = nodeArc.arc.getStep
           if e.getAxis == Axis.CHILD && e.getNodeTest.getFingerprint == nodeName
-        } yield nodeArc.arc
-      }
+        } yield
+          nodeArc.arc
 
       // Process children nodes
       for (arc <- node.getArcs) {
 
-        val newNodeArc = new NodeArc(node, arc)
+        val newNodeArc = NodeArc(node, arc)
         val step = arc.getStep
 
         // TODO: handle ANCESTOR_OR_SELF axis
         if (stack.nonEmpty) // all tests below assume at least a parent
-        step.getAxis match {
-          case Axis.ANCESTOR if step.getNodeTest.getFingerprint != -1 =>
-            // Found ancestor::foobar
-            val nodeName = step.getNodeTest.getFingerprint
-            val ancestorArcs = ancestorsWithFingerprint(nodeName)
-            if (ancestorArcs.nonEmpty) {
-              // There can be more than one ancestor with that fingerprint
-              for (ancestorArc <- ancestorArcs)
-                moveArc(newNodeArc, ancestorArc.getTarget)
-              return true
-            } else {
-              // E.g.: /a/b/ancestor::c
-              // TODO
-            }
-          case Axis.PARENT => // don't test fingerprint as we could handle /a/*/..
-            // Parent axis
-              if (stack.nonEmpty) {
-              val parentNodeArc = stack.head
-              moveArc(newNodeArc, parentNodeArc.node)
-              return true
-            } else {
-              // TODO: is this possible?
-            }
-          case Axis.FOLLOWING_SIBLING | Axis.PRECEDING_SIBLING =>
-            // Simplify preceding-sibling::foobar / following-sibling::foobar
-            val parentNodeArc = stack.head
-              if (stack.size > 2) {
-              val grandparentNodeArc = stack.tail.head
+          step.getAxis match {
+            case Axis.ANCESTOR_OR_SELF =>
 
-              val newStep = new AxisExpression(parentNodeArc.arc.getStep.getAxis, step.getNodeTest)
-              newStep.setContainer(step.getContainer)
-              grandparentNodeArc.node.createArc(newStep, arc.getTarget)
-              node.removeArc(arc)
-            } else {
-              val newStep = new AxisExpression(Axis.CHILD, step.getNodeTest)
-              newStep.setContainer(step.getContainer)
-              parentNodeArc.node.createArc(newStep, arc.getTarget)
-              node.removeArc(arc)
-            }
-          case _ => // NOP
+            case Axis.ANCESTOR if step.getNodeTest.getFingerprint != -1 =>
+              // Found ancestor::foobar
+              val nodeName = step.getNodeTest.getFingerprint
+              val ancestorArcs = ancestorsWithFingerprint(nodeName)
+              if (ancestorArcs.nonEmpty) {
+                // There can be more than one ancestor with that fingerprint
+                for (ancestorArc <- ancestorArcs)
+                  moveArc(newNodeArc, ancestorArc.getTarget)
+                return true
+              } else {
+                // E.g.: /a/b/ancestor::c
+                // TODO
+              }
+            case Axis.PARENT => // don't test fingerprint as we could handle /a/*/..
+              // Parent axis
+              if (stack.nonEmpty) {
+                val parentNodeArc = stack.head
+                moveArc(newNodeArc, parentNodeArc.node)
+                return true
+              } else {
+                // TODO: is this possible?
+              }
+            case Axis.FOLLOWING_SIBLING | Axis.PRECEDING_SIBLING =>
+              // Simplify preceding-sibling::foobar / following-sibling::foobar
+              val parentNodeArc = stack.head
+              if (stack.size > 2) {
+                val grandparentNodeArc = stack.tail.head
+
+                val newStep = new AxisExpression(parentNodeArc.arc.getStep.getAxis, step.getNodeTest)
+                newStep.setContainer(step.getContainer)
+                grandparentNodeArc.node.createArc(newStep, arc.getTarget)
+                node.removeArc(arc)
+              } else {
+                val newStep = new AxisExpression(Axis.CHILD, step.getNodeTest)
+                newStep.setContainer(step.getContainer)
+                parentNodeArc.node.createArc(newStep, arc.getTarget)
+                node.removeArc(arc)
+              }
+            case _ => // NOP
+          }
         else {
           step.getAxis match {
             case Axis.ANCESTOR_OR_SELF =>
@@ -530,7 +538,7 @@ object PathMapXPathAnalysisBuilder {
 //  import org.orbeon.saxon.Configuration
 //  import org.orbeon.saxon.expr.PathMap.PathMapNode
 //  import org.orbeon.saxon.trace.ExpressionPresenter
-//  import scala.xml._
+//  import scala.xml.*
 //
 //  /**
 //   * Output the structure of the given pathmap to the standard output.
@@ -541,7 +549,7 @@ object PathMapXPathAnalysisBuilder {
 //      <pathmap>
 //        <xpath>{xpathString}</xpath>
 //        {
-//          def explainAsXML(expression: Expression) = {
+//          def explainAsXML(expression: Expression): scala.xml.Elem = {
 //            // Use Saxon explain() and convert back to native XML
 //            val out = new ByteArrayOutputStream
 //            val presenter = new ExpressionPresenter(configuration, out)
@@ -550,13 +558,13 @@ object PathMapXPathAnalysisBuilder {
 //            XML.loadString(out.toString(CharsetNames.Utf8))
 //          }
 //
-//          def getStep(step: Expression, targetNode: PathMapNode) =
+//          def getStep(step: Expression, targetNode: PathMapNode): scala.xml.Elem =
 //            <step atomized={targetNode.isAtomized.toString}
 //                returnable={targetNode.isReturnable.toString}
 //                unknown-dependencies={targetNode.hasUnknownDependencies.toString}>{step.toString}</step>
 //
-//          def getArcs(node: PathMapNode): Node =
-//            <arcs>{ Seq(node.getArcs*) map (arc => <arc>{ Seq(getStep(arc.getStep, arc.getTarget), getArcs(arc.getTarget)) }</arc>) }</arcs>
+//          def getArcs(node: PathMapNode): scala.xml.Node =
+//            <arcs>{ node.getArcs.view.map(arc => <arc>{ Seq(getStep(arc.getStep, arc.getTarget), getArcs(arc.getTarget)) }</arc>) }</arcs>
 //
 //          for (root <- pathmap.getPathMapRoots) yield
 //            <root>{ Seq(explainAsXML(root.getRootExpression), getStep(root.getRootExpression, root), getArcs(root)) }</root>

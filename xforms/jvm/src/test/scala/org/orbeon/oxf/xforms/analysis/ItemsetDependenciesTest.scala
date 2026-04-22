@@ -85,4 +85,137 @@ class ItemsetDependenciesTest
       }
     }
   }
+
+  describe("#7401: Label of the dynamic dropdown doesn't update on language change") {
+
+    // The following form reproduces a scenario similar to what `databound-select1-search.xbl` does, but in a simplified
+    // way to test most of the parts involved:
+    //
+    // - XBL component
+    // - itemset included with `xbl:content`
+    // - hidden internal select1 to provide the itemset to the main select1
+    // - use of the `xxf:itemset()` function to get the itemset
+    // - language change
+    // - variable (here an `xf:output` field) holding the current label
+    val TestDoc =
+      <xh:html
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+          xmlns:xbl="http://www.w3.org/ns/xbl"
+          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+      >
+          <xh:head>
+              <xf:model
+                  xxf:xpath-analysis="true"
+                  xxf:expose-xpath-types="true"
+                  xxf:analysis.calculate="true"
+                  id="model"
+              >
+                  <xf:instance id="instance">
+                      <_/>
+                  </xf:instance>
+                  <xf:instance id="lang">
+                      <_>en</_>
+                  </xf:instance>
+              </xf:model>
+              <xbl:xbl>
+                  <xbl:binding
+                      id="fr-foo"
+                      element="fr|foo"
+                      xxbl:mode="binding"
+                  >
+                      <xbl:implementation>
+                          <xf:model id="model-fr-foo">
+                              <xf:instance id="_">
+                                  <_/>
+                              </xf:instance>
+                              <xf:instance id="itemset">
+                                  <items>
+                                      <item>
+                                          <label xml:lang="en">Item label 1</label>
+                                          <label xml:lang="fr">Libellé d'entrée 1</label>
+                                          <value>v1</value>
+                                      </item>
+                                      <item>
+                                          <label xml:lang="en">Item label 2</label>
+                                          <label xml:lang="fr">Libellé d'entrée 2</label>
+                                          <value>v2</value>
+                                      </item>
+                                  </items>
+                              </xf:instance>
+                          </xf:model>
+                      </xbl:implementation>
+                      <xbl:template>
+
+                          <xf:var name="itemset" value="instance('itemset')"/>
+                          <xf:var name="itemset" xxbl:scope="outer">
+                              <xxf:value value="$itemset" xxbl:scope="inner"/>
+                          </xf:var>
+
+                          <xf:select1
+                              id="internal-select1"
+                              appearance="xxf:internal"
+                              ref="xf:element('_')"
+                          >
+                              <xf:choices context="$itemset" xxbl:scope="outer">
+                                  <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+                              </xf:choices>
+                          </xf:select1>
+
+                          <xf:output
+                              id="my-output"
+                              value="xxf:itemset('internal-select1', 'xml', false())/itemset/choices/item[value = xxf:binding('fr-foo')]/label/string()"/>
+
+                          <xf:select1
+                              ref="xxf:binding('fr-foo')"
+                              id="select1"
+                          >
+                              <xf:itemset ref="xxf:itemset('internal-select1', 'xml', false())/itemset/choices/item">
+                                  <xf:label ref="label"/>
+                                  <xf:value ref="value"/>
+                              </xf:itemset>
+                          </xf:select1>
+                      </xbl:template>
+                  </xbl:binding>
+              </xbl:xbl>
+          </xh:head>
+          <xh:body>
+              <xf:input id="lang-input" ref="instance('lang')">
+                  <xf:label>Language</xf:label>
+              </xf:input>
+              <fr:foo id="my-foo" ref="instance()">
+                  <xf:itemset ref="/items/item">
+                      <xf:label ref="label[@xml:lang = instance('lang')]"/>
+                      <xf:value ref="value"/>
+                  </xf:itemset>
+              </fr:foo>
+          </xh:body>
+      </xh:html>.toDocument
+
+    it("must test that the label updates when the language changes") {
+      assume(Version.isPE)
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(TestDoc)) {
+
+          setControlValue("my-foo≡select1", "0")
+          assert(getControlExternalValue("my-foo≡my-output") == "Item label 1")
+          setControlValue("my-foo≡select1", "1")
+          assert(getControlExternalValue("my-foo≡my-output") == "Item label 2")
+
+          setControlValue("lang-input", "fr")
+          assert(getControlExternalValue("my-foo≡my-output") == "Libellé d'entrée 2")
+          setControlValue("my-foo≡select1", "0")
+          assert(getControlExternalValue("my-foo≡my-output") == "Libellé d'entrée 1")
+          setControlValue("my-foo≡select1", "1")
+          assert(getControlExternalValue("my-foo≡my-output") == "Libellé d'entrée 2")
+
+          setControlValue("lang-input", "en")
+          assert(getControlExternalValue("my-foo≡my-output") == "Item label 2")
+        }
+      }
+    }
+  }
 }

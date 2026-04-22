@@ -155,7 +155,7 @@ public class PathMap implements Cloneable {
          */
 
         public PathMapArc[] getArcs() {
-            return (PathMapArc[])arcs.toArray(new PathMapArc[arcs.size()]);
+            return arcs.toArray(new PathMapArc[arcs.size()]);
         }
 
         // ORBEON

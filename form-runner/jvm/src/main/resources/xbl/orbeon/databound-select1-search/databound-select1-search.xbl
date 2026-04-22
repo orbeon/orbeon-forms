@@ -639,7 +639,7 @@
                         <!-- Update the label when the itemset changes, e.g. on language change -->
                         <xf:var
                             name="current-label-from-itemset"
-                            value="xxf:itemset('internal-select1', 'xml')//item[value = $binding]/label/string()">
+                            value="xxf:itemset('internal-select1', 'xml')/itemset/choices/item[value = $binding]/label/string()">
                             <xf:action event="xforms-value-changed">
                                 <xf:setvalue if="exists($binding/@label) and not(xxf:readonly($binding))"
                                              ref="$binding/@label"         value="$current-label-from-itemset"/>
@@ -668,7 +668,7 @@
                         </xf:group>
                         <xsl:choose>
                             <xsl:when test="$is-multiple">
-                                <xf:input ref="if ($view) then string-join(for $v in xxf:split($binding) return xxf:itemset('internal-select1', 'xml')//item[value = $v]/label/string(), ', ') else ()"/>
+                                <xf:input ref="if ($view) then string-join(for $v in xxf:split($binding) return xxf:itemset('internal-select1', 'xml')/itemset/choices/item[value = $v]/label/string(), ', ') else ()"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xf:input ref="if ($view) then instance('local')/label/string() else ()"/>

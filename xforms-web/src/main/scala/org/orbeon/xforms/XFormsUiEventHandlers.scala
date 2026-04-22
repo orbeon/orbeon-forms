@@ -65,6 +65,7 @@ object XFormsUiEventHandlers {
             target.hasAnyClass("xforms-select1-appearance-full", "xforms-select-appearance-full") ||
             target.hasAllClasses("xforms-input", "xforms-type-boolean")
           )) {
+          // Update classes right away to give user visual feedback
           XFormsUI.setRadioCheckboxClasses(target)
         }
 

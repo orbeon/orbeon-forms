@@ -1311,7 +1311,6 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
                     $(controlTarget).is('.xforms-select1-appearance-full, .xforms-select-appearance-full, .xforms-input.xforms-type-boolean')) {
                 // Click on checkbox or radio button
 
-                // Update classes right away to give user visual feedback
                 ORBEON.xforms.XFormsUi.handleShiftSelection(event, controlTarget);
 
                 // #7607: We don't fire an `xxforms-value` event here, because the new value of the `<input>` is not

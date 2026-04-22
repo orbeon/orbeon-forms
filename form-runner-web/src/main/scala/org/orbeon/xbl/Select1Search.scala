@@ -206,7 +206,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     containerElem.querySelector("[tabindex]").asInstanceOf[dom.html.Element].focus()
   }
 
-  @unused // Called from `databound-select1-search.xbl` when the service responds to the user typing in the search box
+  @unused("Called from `databound-select1-search.xbl` when the service responds to the user typing in the search box")
   def updateSuggestions(results: String, isLastPage: String): Unit = {
     val parsedResults = js.JSON.parse(results).asInstanceOf[js.Array[Select2.Option]]
     val (searchValue, success) = select2SuccessCallbacks.dequeue()

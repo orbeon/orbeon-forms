@@ -126,7 +126,7 @@
         <xf:action if="$mode = 'new'">
 
             <!-- Force re-evaluation of `$is-singleton`, as it depends on `xxf:instance('fr-form-metadata')` -->
-            <xf:rebuild/>
+            <xf:recalculate/>
             <xf:action if="$is-singleton">
 
                 <!-- Is there any non-draft data for this form that the user can edit? -->

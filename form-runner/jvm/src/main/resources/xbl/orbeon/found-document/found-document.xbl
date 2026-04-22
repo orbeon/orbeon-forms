@@ -57,8 +57,8 @@
                                 then $fr-resources/detail/draft-singleton/found-draft
                                 else if ($message-to-show = 'found-drafts-for-never-saved')
                                 then $fr-resources/detail/draft-singleton/found-drafts
-                                else if ($message-to-show = 'found-multiple-docs-for-singleton')
-                                then $fr-resources/detail/draft-singleton/multiple-docs-title
+                                else if ($message-to-show = 'found-singleton')
+                                then $fr-resources/detail/draft-singleton/found-singleton-title
                                 else ''
                             "/>
 
@@ -101,8 +101,8 @@
                         <xf:case value="'found-drafts-for-never-saved'">
                             <xf:output value="$fr-resources/detail/draft-singleton/found-drafts-for-never-saved"/>
                         </xf:case>
-                        <xf:case value="'found-multiple-docs-for-singleton'">
-                            <xf:output value="$fr-resources/detail/draft-singleton/multiple-docs-explanation"/>
+                        <xf:case value="'found-singleton'">
+                            <xf:output value="$fr-resources/detail/draft-singleton/found-singleton-explanation"/>
                         </xf:case>
                     </xf:switch>
                 </xsl:template>
@@ -196,13 +196,17 @@
                             </xf:trigger>
                         </xf:case>
 
-                        <xf:case value="'found-multiple-docs-for-singleton'">
+                        <xf:case value="'found-singleton'">
                             <xf:trigger xxf:modal="true">
-                                <xf:label value="$fr-resources/detail/draft-singleton/multiple-docs-view-data"/>
+                                <xf:label value="$fr-resources/detail/draft-singleton/found-singleton-view-data"/>
                                 <xf:action event="DOMActivate">
                                     <xf:load
                                         xxbl:scope="outer"
-                                        resource="/fr/{{fr:app-name()}}/{{fr:form-name()}}/summary?form-version={{fr:form-version()}}"/>
+                                        resource="{{
+                                            if (count(xxf:instance('fr-search-response')/document) = 1)
+                                            then concat('/fr/', fr:app-name(), '/', fr:form-name(), '/edit/', xxf:instance('fr-search-response')/document[1]/@name)
+                                            else concat('/fr/', fr:app-name(), '/', fr:form-name(), '/summary?form-version=', fr:form-version())
+                                        }}"/>
                                 </xf:action>
                             </xf:trigger>
                         </xf:case>

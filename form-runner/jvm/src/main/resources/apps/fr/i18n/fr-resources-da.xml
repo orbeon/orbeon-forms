@@ -323,9 +323,9 @@
             <open-draft>Åben auto-gemt kladde</open-draft>
             <view-drafts>Vis gemt kladde</view-drafts>
             <start-new>Start forfra</start-new>
-            <multiple-docs-title>Eksisterende blanketdata fundet</multiple-docs-title>
-            <multiple-docs-explanation>Oprettelse af nye data er deaktiveret for denne blanket, men du kan tilgå eksisterende blanketdata.</multiple-docs-explanation>
-            <multiple-docs-view-data>Tilgå eksisterende blanketdata</multiple-docs-view-data>
+            <found-singleton-title>Eksisterende blanketdata fundet</found-singleton-title>
+            <found-singleton-explanation>Oprettelse af nye data er deaktiveret for denne blanket, men du kan tilgå eksisterende blanketdata.</found-singleton-explanation>
+            <found-singleton-view-data>Tilgå eksisterende blanketdata</found-singleton-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Sprog</language-choice>

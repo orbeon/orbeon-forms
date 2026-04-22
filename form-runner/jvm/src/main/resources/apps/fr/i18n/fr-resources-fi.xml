@@ -329,9 +329,9 @@
             <open-draft>Avaa automaattisesti tallennettu luonnos</open-draft>
             <view-drafts>Näytä automaattisesti tallennetut luonnokset</view-drafts>
             <start-new>Aloita tyhjästä</start-new>
-            <multiple-docs-title>Olemassa olevia lomaketietoja löytyi</multiple-docs-title>
-            <multiple-docs-explanation>Uusien tietojen luominen on poistettu käytöstä tässä lomakkeessa, mutta voit käyttää olemassa olevia lomaketietoja.</multiple-docs-explanation>
-            <multiple-docs-view-data>Käytä olemassa olevia lomaketietoja</multiple-docs-view-data>
+            <found-singleton-title>Olemassa olevia lomaketietoja löytyi</found-singleton-title>
+            <found-singleton-explanation>Uusien tietojen luominen on poistettu käytöstä tässä lomakkeessa, mutta voit käyttää olemassa olevia lomaketietoja.</found-singleton-explanation>
+            <found-singleton-view-data>Käytä olemassa olevia lomaketietoja</found-singleton-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Kieli</language-choice>

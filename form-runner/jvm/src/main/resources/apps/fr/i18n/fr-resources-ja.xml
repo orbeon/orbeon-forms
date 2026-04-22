@@ -329,9 +329,9 @@
             <open-draft>自動保存を開く</open-draft>
             <view-drafts>自動保存を表示</view-drafts>
             <start-new>新規に開始</start-new>
-            <multiple-docs-title>既存のフォームデータがあります</multiple-docs-title>
-            <multiple-docs-explanation>このフォームへの新規データの作成は無効になっていますが、既存のフォームデータにアクセスできます。</multiple-docs-explanation>
-            <multiple-docs-view-data>既存のフォームデータにアクセス</multiple-docs-view-data>
+            <found-singleton-title>既存のフォームデータがあります</found-singleton-title>
+            <found-singleton-explanation>このフォームへの新規データの作成は無効になっていますが、既存のフォームデータにアクセスできます。</found-singleton-explanation>
+            <found-singleton-view-data>既存のフォームデータにアクセス</found-singleton-view-data>
         </draft-singleton>
         <labels>
             <language-choice>言語</language-choice>

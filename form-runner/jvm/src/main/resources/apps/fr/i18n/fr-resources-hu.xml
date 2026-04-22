@@ -329,9 +329,9 @@
             <open-draft>Automatikusan mentett dokumentum megnyitása</open-draft>
             <view-drafts>Automatikusan mentett dokumentumok megtekintése</view-drafts>
             <start-new>Kezdés elölről</start-new>
-            <multiple-docs-title>Létező űrlapadatok találhatók</multiple-docs-title>
-            <multiple-docs-explanation>Új adatok létrehozása letiltva ennél az űrlapnál, azonban hozzáférhet a meglévő űrlapadatokhoz.</multiple-docs-explanation>
-            <multiple-docs-view-data>Meglévő űrlapadatok elérése</multiple-docs-view-data>
+            <found-singleton-title>Létező űrlapadatok találhatók</found-singleton-title>
+            <found-singleton-explanation>Új adatok létrehozása letiltva ennél az űrlapnál, azonban hozzáférhet a meglévő űrlapadatokhoz.</found-singleton-explanation>
+            <found-singleton-view-data>Meglévő űrlapadatok elérése</found-singleton-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Nyelv</language-choice>

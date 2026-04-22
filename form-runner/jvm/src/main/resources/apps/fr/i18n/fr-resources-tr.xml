@@ -327,9 +327,9 @@
             <open-draft>Otomatik kaydedilen belgeyi aç</open-draft>
             <view-drafts>Otomatik kaydedilen belgeleri görüntüle</view-drafts>
             <start-new>Sıfırdan başla</start-new>
-            <multiple-docs-title>Mevcut form verisi bulundu</multiple-docs-title>
-            <multiple-docs-explanation>Bu form için yeni veri oluşturma devre dışı bırakılmıştır, ancak mevcut form verilerine erişebilirsiniz.</multiple-docs-explanation>
-            <multiple-docs-view-data>Mevcut form verilerine eriş</multiple-docs-view-data>
+            <found-singleton-title>Mevcut form verisi bulundu</found-singleton-title>
+            <found-singleton-explanation>Bu form için yeni veri oluşturma devre dışı bırakılmıştır, ancak mevcut form verilerine erişebilirsiniz.</found-singleton-explanation>
+            <found-singleton-view-data>Mevcut form verilerine eriş</found-singleton-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Dil</language-choice>

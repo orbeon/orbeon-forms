@@ -329,9 +329,9 @@
             <open-draft>Open auto-bewaard concept</open-draft>
             <view-drafts>Toon auto-bewaarde concepten</view-drafts>
             <start-new>Start opnieuw</start-new>
-            <multiple-docs-title>Bestaande formgegevens gevonden</multiple-docs-title>
-            <multiple-docs-explanation>Het aanmaken van nieuwe gegevens is uitgeschakeld voor dit formulier, maar u kunt de bestaande formuliergegevens openen.</multiple-docs-explanation>
-            <multiple-docs-view-data>Bestaande formuliergegevens openen</multiple-docs-view-data>
+            <found-singleton-title>Bestaande formgegevens gevonden</found-singleton-title>
+            <found-singleton-explanation>Het aanmaken van nieuwe gegevens is uitgeschakeld voor dit formulier, maar u kunt de bestaande formuliergegevens openen.</found-singleton-explanation>
+            <found-singleton-view-data>Bestaande formuliergegevens openen</found-singleton-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Taal</language-choice>

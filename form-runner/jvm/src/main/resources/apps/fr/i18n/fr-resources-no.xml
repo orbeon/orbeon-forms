@@ -329,9 +329,9 @@
             <open-draft>Åpne automatisk lagret utkast</open-draft>
             <view-drafts>Se automatisk lagret utkast</view-drafts>
             <start-new>Start på nytt</start-new>
-            <multiple-docs-title>Fant eksisterende skjemadata</multiple-docs-title>
-            <multiple-docs-explanation>Oppretting av nye data er deaktivert for dette skjemaet, men du kan få tilgang til eksisterende skjemadata.</multiple-docs-explanation>
-            <multiple-docs-view-data>Få tilgang til eksisterende skjemadata</multiple-docs-view-data>
+            <found-singleton-title>Fant eksisterende skjemadata</found-singleton-title>
+            <found-singleton-explanation>Oppretting av nye data er deaktivert for dette skjemaet, men du kan få tilgang til eksisterende skjemadata.</found-singleton-explanation>
+            <found-singleton-view-data>Få tilgang til eksisterende skjemadata</found-singleton-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Språk</language-choice>

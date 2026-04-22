@@ -67,12 +67,16 @@
     <xf:var
         name="is-singleton"
         value="
-            let $singleton-meta := xxf:instance('fr-form-metadata')/singleton
+            let $metadata-singleton := xxf:instance('fr-form-metadata')/singleton
             return
-                if (exists($singleton-meta))
-                then $singleton-meta = 'true'
+                if (exists($metadata-singleton))
+                then $metadata-singleton = 'true'
                 else xxf:property(string-join(('oxf.fr.detail.singleton.enabled', $app, $form), '.'))
         "/>
+
+    <xf:var
+        name="singleton-if-one-exists"
+        value="xxf:property(string-join(('oxf.fr.detail.singleton.if-one-exists', $app, $form), '.'))"/>
 
     <!-- Autosave disabled with Form Builder, see https://github.com/orbeon/orbeon-forms/issues/1169 -->
     <xf:var
@@ -121,6 +125,8 @@
         <!-- For new documents, see if we have drafts -->
         <xf:action if="$mode = 'new'">
 
+            <!-- Force re-evaluation of `$is-singleton`, as it depends on `xxf:instance('fr-form-metadata')` -->
+            <xf:rebuild/>
             <xf:action if="$is-singleton">
 
                 <!-- Is there any non-draft data for this form that the user can edit? -->
@@ -129,12 +135,19 @@
                 <xf:var name="existing-non-draft-docs" value="instance('fr-search-response')/document"/>
 
                 <xf:action if="count($existing-non-draft-docs) = 1">
-                    <xf:load resource="edit/{$existing-non-draft-docs/@name}"/>
+                    <xf:action if="$singleton-if-one-exists = 'prompt'">
+                        <xf:setvalue
+                            ref="instance('fr-persistence-instance')/found-document-message-to-show"
+                            value="'found-singleton'"/>
+                    </xf:action>
+                    <xf:action if="not($singleton-if-one-exists = 'prompt')">
+                        <xf:load resource="edit/{$existing-non-draft-docs/@name}"/>
+                    </xf:action>
                 </xf:action>
                 <xf:action if="count($existing-non-draft-docs) > 1">
                     <xf:setvalue
                         ref="instance('fr-persistence-instance')/found-document-message-to-show"
-                        value="'found-multiple-docs-for-singleton'"/>
+                        value="'found-singleton'"/>
                 </xf:action>
 
             </xf:action>
@@ -406,7 +419,7 @@
                 value="
                     $lease-state-elem = 'other-user' or
                     instance('fr-persistence-instance')/found-document-message-to-show = (
-                        'found-multiple-docs-for-singleton',
+                        'found-singleton',
                         'found-draft-for-document',
                         'found-draft-for-never-saved',
                         'found-drafts-for-never-saved'

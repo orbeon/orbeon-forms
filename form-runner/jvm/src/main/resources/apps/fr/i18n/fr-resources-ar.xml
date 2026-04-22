@@ -329,9 +329,9 @@
             <open-draft>فتح المستند المحفوظ تلقائيًا</open-draft>
             <view-drafts>عرض المستندات المحفوظة تلقائيًا</view-drafts>
             <start-new>البدء من الصفر</start-new>
-            <multiple-docs-title>تم العثور على بيانات نموذج موجودة</multiple-docs-title>
-            <multiple-docs-explanation>إنشاء بيانات جديدة معطّل لهذا النموذج، غير أنه يمكنك الوصول إلى بيانات النموذج الموجودة.</multiple-docs-explanation>
-            <multiple-docs-view-data>الوصول إلى بيانات النموذج الموجودة</multiple-docs-view-data>
+            <found-singleton-title>تم العثور على بيانات نموذج موجودة</found-singleton-title>
+            <found-singleton-explanation>إنشاء بيانات جديدة معطّل لهذا النموذج، غير أنه يمكنك الوصول إلى بيانات النموذج الموجودة.</found-singleton-explanation>
+            <found-singleton-view-data>الوصول إلى بيانات النموذج الموجودة</found-singleton-view-data>
         </draft-singleton>
         <labels>
             <language-choice>اللغة</language-choice>

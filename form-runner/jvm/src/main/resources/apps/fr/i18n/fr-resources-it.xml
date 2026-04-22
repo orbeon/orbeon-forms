@@ -329,9 +329,9 @@
             <open-draft>Apri bozza auto-salvata</open-draft>
             <view-drafts>Visualizza le bozze auto-salvate</view-drafts>
             <start-new>Riparti da zero</start-new>
-            <multiple-docs-title>Dati di modulo esistenti trovati</multiple-docs-title>
-            <multiple-docs-explanation>La creazione di nuovi dati è disabilitata per questo modulo; tuttavia puoi accedere ai dati di modulo esistenti.</multiple-docs-explanation>
-            <multiple-docs-view-data>Accedi ai dati di modulo esistenti</multiple-docs-view-data>
+            <found-singleton-title>Dati di modulo esistenti trovati</found-singleton-title>
+            <found-singleton-explanation>La creazione di nuovi dati è disabilitata per questo modulo; tuttavia puoi accedere ai dati di modulo esistenti.</found-singleton-explanation>
+            <found-singleton-view-data>Accedi ai dati di modulo esistenti</found-singleton-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Lingua</language-choice>

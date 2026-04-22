@@ -324,9 +324,9 @@
             <open-draft>打开自动保存的文档</open-draft>
             <view-drafts>查看自动保存的文档</view-drafts>
             <start-new>从头开始</start-new>
-            <multiple-docs-title>找到现有表单数据</multiple-docs-title>
-            <multiple-docs-explanation>此表单已禁用创建新数据，但您可以访问现有表单数据。</multiple-docs-explanation>
-            <multiple-docs-view-data>访问现有表单数据</multiple-docs-view-data>
+            <found-singleton-title>找到现有表单数据</found-singleton-title>
+            <found-singleton-explanation>此表单已禁用创建新数据，但您可以访问现有表单数据。</found-singleton-explanation>
+            <found-singleton-view-data>访问现有表单数据</found-singleton-view-data>
         </draft-singleton>
         <labels>
             <language-choice>语言</language-choice>

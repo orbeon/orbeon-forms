@@ -329,9 +329,9 @@
             <open-draft>Automatisch gespeicherten Entwurf öffnen</open-draft>
             <view-drafts>Automatisch gespeicherte Entwürfe ansehen</view-drafts>
             <start-new>Von vorne beginnen</start-new>
-            <multiple-docs-title>Vorhandene Formulardaten gefunden</multiple-docs-title>
-            <multiple-docs-explanation>Das Erstellen neuer Daten ist für dieses Formular deaktiviert, Sie können jedoch auf vorhandene Formulardaten zugreifen.</multiple-docs-explanation>
-            <multiple-docs-view-data>Auf vorhandene Formulardaten zugreifen</multiple-docs-view-data>
+            <found-singleton-title>Vorhandene Formulardaten gefunden</found-singleton-title>
+            <found-singleton-explanation>Das Erstellen neuer Daten ist für dieses Formular deaktiviert, Sie können jedoch auf vorhandene Formulardaten zugreifen.</found-singleton-explanation>
+            <found-singleton-view-data>Auf vorhandene Formulardaten zugreifen</found-singleton-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Sprache</language-choice>

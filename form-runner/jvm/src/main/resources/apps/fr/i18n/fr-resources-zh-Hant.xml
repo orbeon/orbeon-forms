@@ -329,9 +329,9 @@
             <open-draft>打開自動保存的文檔</open-draft>
             <view-drafts>查看自動保存的文檔</view-drafts>
             <start-new>從頭開始</start-new>
-            <multiple-docs-title>找到現有表單數據</multiple-docs-title>
-            <multiple-docs-explanation>此表單已停用建立新資料，但您可以存取現有表單資料。</multiple-docs-explanation>
-            <multiple-docs-view-data>存取現有表單資料</multiple-docs-view-data>
+            <found-singleton-title>找到現有表單數據</found-singleton-title>
+            <found-singleton-explanation>此表單已停用建立新資料，但您可以存取現有表單資料。</found-singleton-explanation>
+            <found-singleton-view-data>存取現有表單資料</found-singleton-view-data>
         </draft-singleton>
         <labels>
             <language-choice>語言</language-choice>

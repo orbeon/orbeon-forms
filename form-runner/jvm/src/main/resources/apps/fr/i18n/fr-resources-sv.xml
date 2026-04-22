@@ -329,9 +329,9 @@
             <open-draft>Öppna automatiskt sparat utkast</open-draft>
             <view-drafts>Visa automatiskt sparat utkast</view-drafts>
             <start-new>Börja från början</start-new>
-            <multiple-docs-title>Existerande formulärdata finns</multiple-docs-title>
-            <multiple-docs-explanation>Skapande av nya data är inaktiverat för detta formulär, men du kan komma åt befintliga formulärdata.</multiple-docs-explanation>
-            <multiple-docs-view-data>Öppna befintliga formulärdata</multiple-docs-view-data>
+            <found-singleton-title>Existerande formulärdata finns</found-singleton-title>
+            <found-singleton-explanation>Skapande av nya data är inaktiverat för detta formulär, men du kan komma åt befintliga formulärdata.</found-singleton-explanation>
+            <found-singleton-view-data>Öppna befintliga formulärdata</found-singleton-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Språk</language-choice>

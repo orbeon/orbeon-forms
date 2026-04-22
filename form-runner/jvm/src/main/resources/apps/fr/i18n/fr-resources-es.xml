@@ -357,9 +357,9 @@
             <open-draft>Abrir borrador auto-guardado</open-draft>
             <view-drafts>Ver borrador auto-guardado</view-drafts>
             <start-new>Empezar con un formulario en blanco</start-new>
-            <multiple-docs-title>Se ha encontrado un formulario con estos mismos datos</multiple-docs-title>
-            <multiple-docs-explanation>La creación de nuevos datos está desactivada para este formulario, sin embargo puede acceder a los datos existentes.</multiple-docs-explanation>
-            <multiple-docs-view-data>Acceder a los datos existentes</multiple-docs-view-data>
+            <found-singleton-title>Se ha encontrado un formulario con estos mismos datos</found-singleton-title>
+            <found-singleton-explanation>La creación de nuevos datos está desactivada para este formulario, sin embargo puede acceder a los datos existentes.</found-singleton-explanation>
+            <found-singleton-view-data>Acceder a los datos existentes</found-singleton-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Lenguaje</language-choice>

@@ -322,9 +322,9 @@
             <open-draft>Открыть автоматически сохраненный черновик</open-draft>
             <view-drafts>Просмотреть автоматически сохраненные черновики</view-drafts>
             <start-new>Начать с нуля</start-new>
-            <multiple-docs-title>Обнаружены существующие данные формы</multiple-docs-title>
-            <multiple-docs-explanation>Создание новых данных для этой формы отключено, однако вы можете получить доступ к существующим данным формы.</multiple-docs-explanation>
-            <multiple-docs-view-data>Перейти к существующим данным формы</multiple-docs-view-data>
+            <found-singleton-title>Обнаружены существующие данные формы</found-singleton-title>
+            <found-singleton-explanation>Создание новых данных для этой формы отключено, однако вы можете получить доступ к существующим данным формы.</found-singleton-explanation>
+            <found-singleton-view-data>Перейти к существующим данным формы</found-singleton-view-data>
         </draft-singleton>
         <labels>
             <language-choice>Язык</language-choice>

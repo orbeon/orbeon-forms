@@ -698,10 +698,8 @@
                     <!-- Can't analyze w/o schema: e.g. if data is instance('instance')/a/b/a/c/ancestor::a -->
                     <xf:input id="u6" ref="instance('instance')/a//ancestor::a"/>
 
-                    <!-- TODO: This should be supported -->
                     <xf:input id="u7" ref="/a/b"/>
                     <xf:input id="u8" ref="../a/b"/>
-                    <!-- TODO: This should be supported -->
                     <xf:input id="u9" ref="root()/a/b"/>
 
                 </xh:body>
@@ -710,81 +708,127 @@
         <output name="analysis">
             <root scope="" prefixed-id="#document" model-prefixed-id="model" binding="false" value="false">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true">
-                    <instance scope="" prefixed-id="instance" model-prefixed-id="model" binding="false" value="false"/>
-                </model>
-                <input scope="" prefixed-id="u1" model-prefixed-id="model" binding="true" value="true">
-                    <binding>
-                        <analysis expression="instance('instance')/a/*" analyzed="false"/>
-                    </binding>
-                    <value>
-                        <analysis expression="string((.)[1])" analyzed="false"/>
-                    </value>
-                </input>
-                <input scope="" prefixed-id="u2" model-prefixed-id="model" binding="true" value="true">
-                    <binding>
-                        <analysis expression="instance('instance')/*/b" analyzed="false"/>
-                    </binding>
-                    <value>
-                        <analysis expression="string((.)[1])" analyzed="false"/>
-                    </value>
-                </input>
-                <input scope="" prefixed-id="u3" model-prefixed-id="model" binding="true" value="true">
-                    <binding>
-                        <analysis expression="instance('instance')/a/*/parent::a" analyzed="false"/>
-                    </binding>
-                    <value>
-                        <analysis expression="string((.)[1])" analyzed="false"/>
-                    </value>
-                </input>
-                <input scope="" prefixed-id="u4" model-prefixed-id="model" binding="true" value="true">
-                    <binding>
-                        <analysis expression="instance('instance')/a/*/ancestor::a" analyzed="false"/>
-                    </binding>
-                    <value>
-                        <analysis expression="string((.)[1])" analyzed="false"/>
-                    </value>
-                </input>
-                <input scope="" prefixed-id="u5" model-prefixed-id="model" binding="true" value="true">
-                    <binding>
-                        <analysis expression="instance('instance')/a//parent::a" analyzed="false"/>
-                    </binding>
-                    <value>
-                        <analysis expression="string((.)[1])" analyzed="false"/>
-                    </value>
-                </input>
-                <input scope="" prefixed-id="u6" model-prefixed-id="model" binding="true" value="true">
-                    <binding>
-                        <analysis expression="instance('instance')/a//ancestor::a" analyzed="false"/>
-                    </binding>
-                    <value>
-                        <analysis expression="string((.)[1])" analyzed="false"/>
-                    </value>
-                </input>
-                <input scope="" prefixed-id="u7" model-prefixed-id="model" binding="true" value="true">
-                    <binding>
-                        <analysis expression="/a/b" analyzed="false"/>
-                    </binding>
-                    <value>
-                        <analysis expression="string((.)[1])" analyzed="false"/>
-                    </value>
-                </input>
-                <input scope="" prefixed-id="u8" model-prefixed-id="model" binding="true" value="true">
-                    <binding>
-                        <analysis expression="../a/b" analyzed="false"/>
-                    </binding>
-                    <value>
-                        <analysis expression="string((.)[1])" analyzed="false"/>
-                    </value>
-                </input>
-                <input scope="" prefixed-id="u9" model-prefixed-id="model" binding="true" value="true">
-                    <binding>
-                        <analysis expression="root()/a/b" analyzed="false"/>
-                    </binding>
-                    <value>
-                        <analysis expression="string((.)[1])" analyzed="false"/>
-                    </value>
-                </input>
-            </root>
+                   <instance scope="" prefixed-id="instance" model-prefixed-id="model" binding="false" value="false"/>
+               </model>
+               <input scope="" prefixed-id="u1" model-prefixed-id="model" binding="true" value="true">
+                   <binding>
+                       <analysis expression="instance('instance')/a/*" analyzed="false"/>
+                   </binding>
+                   <value>
+                       <analysis expression="string((.)[1])" analyzed="false"/>
+                   </value>
+               </input>
+               <input scope="" prefixed-id="u2" model-prefixed-id="model" binding="true" value="true">
+                   <binding>
+                       <analysis expression="instance('instance')/*/b" analyzed="false"/>
+                   </binding>
+                   <value>
+                       <analysis expression="string((.)[1])" analyzed="false"/>
+                   </value>
+               </input>
+               <input scope="" prefixed-id="u3" model-prefixed-id="model" binding="true" value="true">
+                   <binding>
+                       <analysis expression="instance('instance')/a/*/parent::a" analyzed="false"/>
+                   </binding>
+                   <value>
+                       <analysis expression="string((.)[1])" analyzed="false"/>
+                   </value>
+               </input>
+               <input scope="" prefixed-id="u4" model-prefixed-id="model" binding="true" value="true">
+                   <binding>
+                       <analysis expression="instance('instance')/a/*/ancestor::a" analyzed="false"/>
+                   </binding>
+                   <value>
+                       <analysis expression="string((.)[1])" analyzed="false"/>
+                   </value>
+               </input>
+               <input scope="" prefixed-id="u5" model-prefixed-id="model" binding="true" value="true">
+                   <binding>
+                       <analysis expression="instance('instance')/a//parent::a" analyzed="false"/>
+                   </binding>
+                   <value>
+                       <analysis expression="string((.)[1])" analyzed="false"/>
+                   </value>
+               </input>
+               <input scope="" prefixed-id="u6" model-prefixed-id="model" binding="true" value="true">
+                   <binding>
+                       <analysis expression="instance('instance')/a//ancestor::a" analyzed="false"/>
+                   </binding>
+                   <value>
+                       <analysis expression="string((.)[1])" analyzed="false"/>
+                   </value>
+               </input>
+               <input scope="" prefixed-id="u7" model-prefixed-id="model" binding="true" value="true">
+                   <binding>
+                       <analysis expression="/a/b" analyzed="true">
+                           <returnable>
+                               <path>instance('instance')/b</path>
+                           </returnable>
+                           <dependent-models>
+                               <model>model</model>
+                           </dependent-models>
+                           <dependent-instances>
+                               <instance>instance</instance>
+                           </dependent-instances>
+                           <returnable-instances>
+                               <instance>instance</instance>
+                           </returnable-instances>
+                       </analysis>
+                   </binding>
+                   <value>
+                       <analysis expression="string((.)[1])" analyzed="true">
+                           <value-dependent>
+                               <path>instance('instance')/b</path>
+                           </value-dependent>
+                           <dependent-models>
+                               <model>model</model>
+                           </dependent-models>
+                           <dependent-instances>
+                               <instance>instance</instance>
+                           </dependent-instances>
+                       </analysis>
+                   </value>
+               </input>
+               <input scope="" prefixed-id="u8" model-prefixed-id="model" binding="true" value="true">
+                   <binding>
+                       <analysis expression="../a/b" analyzed="false"/>
+                   </binding>
+                   <value>
+                       <analysis expression="string((.)[1])" analyzed="false"/>
+                   </value>
+               </input>
+               <input scope="" prefixed-id="u9" model-prefixed-id="model" binding="true" value="true">
+                   <binding>
+                       <analysis expression="root()/a/b" analyzed="true">
+                           <returnable>
+                               <path>instance('instance')/b</path>
+                           </returnable>
+                           <dependent-models>
+                               <model>model</model>
+                           </dependent-models>
+                           <dependent-instances>
+                               <instance>instance</instance>
+                           </dependent-instances>
+                           <returnable-instances>
+                               <instance>instance</instance>
+                           </returnable-instances>
+                       </analysis>
+                   </binding>
+                   <value>
+                       <analysis expression="string((.)[1])" analyzed="true">
+                           <value-dependent>
+                               <path>instance('instance')/b</path>
+                           </value-dependent>
+                           <dependent-models>
+                               <model>model</model>
+                           </dependent-models>
+                           <dependent-instances>
+                               <instance>instance</instance>
+                           </dependent-instances>
+                       </analysis>
+                   </value>
+               </input>
+           </root>
         </output>
     </test>
 
@@ -8183,6 +8227,46 @@
                         <analysis expression="string((bind('b-bind'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i')/a/b</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+            </root>
+        </output>
+    </test>
+
+    <test description="With #7401: support for `/foo`" name="oxf:xforms-xpath-analysis">
+        <input name="form">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="m">
+                        <xf:instance id="i">
+                            <_/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="my-output" value="/foo/bar, /baz/qux"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <root scope="" prefixed-id="#document" model-prefixed-id="m" binding="false" value="false">
+                <model scope="" prefixed-id="m" default-instance-prefixed-id="i" analyzed-binds="true">
+                    <instance scope="" prefixed-id="i" model-prefixed-id="m" binding="false" value="false"/>
+                </model>
+                <output scope="" prefixed-id="my-output" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((/foo/bar, /baz/qux)[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i')/bar</path>
+                                <path>instance('i')/qux</path>
                             </value-dependent>
                             <dependent-models>
                                 <model>m</model>

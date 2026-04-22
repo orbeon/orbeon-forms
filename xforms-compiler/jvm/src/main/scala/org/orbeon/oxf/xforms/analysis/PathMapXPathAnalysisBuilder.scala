@@ -484,6 +484,25 @@ object PathMapXPathAnalysisBuilder {
               node.removeArc(arc)
             }
           case _ => // NOP
+        else {
+          step.getAxis match {
+            case Axis.ANCESTOR_OR_SELF =>
+
+              val arcsToMove =
+                arc
+                  .getTarget
+                  .getArcs
+                  .view
+                  .collect { case childArc if childArc.getStep.getAxis == Axis.CHILD => new NodeArc(arc.getTarget, childArc) }
+
+              if (arcsToMove.nonEmpty) {
+                arcsToMove.foreach(moveArc(_, node))
+                node.removeArc(arc)
+                return true
+              }
+
+            case _ => // NOP
+          }
         }
 
         stack ::= newNodeArc

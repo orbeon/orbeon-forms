@@ -37,7 +37,7 @@ val SaxonJsVersion                   = "10.0.0.78-SNAPSHOT"
 val XercesVersion                    = "2.11.0.11-SNAPSHOT"
 val SaxVersion                       = "2.0.2.8-SNAPSHOT"
 val ScalaJsDomVersion                = "2.8.1"
-val ScalaJsJQueryVersion             = "3.3.0"
+val ScalaJsJQueryVersion             = "3.4.0"
 val ScalaJsStubsVersion              = "1.1.0" // can be different from Scala.js version
 val ScalaJsFakeWeakReferencesVersion = "1.0.0" // switch to `scalajs-weakreferences` when browser support is there
 val ScalaJsFakeSecureRandomVersion   = "1.0.0" // switch to `scalajs-java-securerandom` when we upgrade to JSDOM 20+
@@ -49,12 +49,12 @@ val ScalaLoggingVersion              = "3.9.4"
 
 // Shared Scala libraries
 val CatsVersion                      = "2.13.0"
-val CatsFs2Version                   = "3.12.2"
+val CatsFs2Version                   = "3.13.0"
 val CatsRetryVersion                 = "3.1.3"
-val ScalaTestVersion                 = "3.2.19"
+val ScalaTestVersion                 = "3.2.20"
 val CirceVersion                     = "0.14.15"
-val EnumeratumVersion                = "1.9.1"
-val EnumeratumCirceVersion           = "1.9.1"
+val EnumeratumVersion                = "1.9.7"
+val EnumeratumCirceVersion           = "1.9.7"
 val ShapelessVersion                 = "2.3.7"
 val ScalaXmlVersion                  = "2.4.0"  // see https://github.com/orbeon/orbeon-forms/issues/4927
 val ScalaParallelCollectionsVersion  = "1.2.0"
@@ -82,7 +82,7 @@ val AngusMailVersion                 = "2.0.5"
 val JavaActivationVersion            = "2.0.1"
 val AntVersion                       = "1.10.11"
 val ThumbnailatorVersion             = "0.4.16"
-val AwsSdkVersion                    = "2.42.25"
+val AwsSdkVersion                    = "2.42.36"
 
 // "Provided" Java libraries
 val JavaxServletApiVersion           = "4.0.1"
@@ -145,7 +145,7 @@ val CoreLibraryDependencies = Seq(
   "mysql"                       % "mysql-connector-java"            % "8.0.26"          % Test,
   "org.postgresql"              % "postgresql"                      % "42.2.24"         % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
-  "org.xerial"                  % "sqlite-jdbc"                     % "3.44.1.0",
+  "org.xerial"                  % "sqlite-jdbc"                     % "3.53.0.0",
   "com.openhtmltopdf"           % "openhtmltopdf-core"              % OpenHtmlToPdfVersion,
   "com.openhtmltopdf"           % "openhtmltopdf-pdfbox"            % OpenHtmlToPdfVersion,
   "com.openhtmltopdf"           % "openhtmltopdf-java2d"            % OpenHtmlToPdfVersion,
@@ -431,7 +431,7 @@ lazy val scala3CommonSettings = baseCommonSettings ++ Seq(
 
 lazy val commonScalaJvmSettings = Seq(
   libraryDependencies ++= Seq(
-    "org.scalatestplus" %%% "junit-4-13"    % "3.2.19.1" % Test,
+    "org.scalatestplus" %%% "junit-4-13"    % "3.2.20.0" % Test,
     "org.scalatestplus" %%% "mockito-5-12"  % "3.2.19.0" % Test,
     "org.scalatestplus" %%% "selenium-4-21" % "3.2.19.0" % Test,
   )

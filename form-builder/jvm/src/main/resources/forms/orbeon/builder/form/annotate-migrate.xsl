@@ -284,6 +284,9 @@
         </fr:dropdown-select1>
     </xsl:template>
 
+    <xsl:variable name="date-types" select="QName('http://www.w3.org/2002/xforms', 'date'), QName('http://www.w3.org/2001/XMLSchema', 'date')"/>
+    <xsl:variable name="time-types" select="QName('http://www.w3.org/2002/xforms', 'time'), QName('http://www.w3.org/2001/XMLSchema', 'time')"/>
+
     <!-- Convert `xf:input` of type date to `fr:date` -->
     <xsl:template
         mode="within-body"
@@ -293,7 +296,7 @@
                     for $bind-id in @bind return
                     $model//xf:bind[
                         @id = $bind-id and
-                        (@type, xf:type) = ('xf:date', 'xs:date')
+                        (for $a in (@type, xf:type) return resolve-QName($a, .)) = $date-types
                     ]
                 )
             ]">
@@ -311,7 +314,7 @@
                     for $bind-id in @bind return
                     $model//xf:bind[
                         @id = $bind-id and
-                        (@type, xf:type) = ('xf:time', 'xs:time')
+                        (for $a in (@type, xf:type) return resolve-QName($a, .)) = $time-types
                     ]
                 )
             ]">

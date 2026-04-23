@@ -485,7 +485,7 @@
                             fbf:renameControlIfNeeded($old-name, $new-name, false())
                         </xf:action>
                         <!-- Write classes -->
-                        <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
+                        <xf:var name="classes" value="distinct-values(xxf:split($i/standard-classes)), $i/custom-classes"/>
                         <xf:var name="classes-string" value="string-join($classes, ' ')"/>
                         <xf:var name="attribute-name" value="if (xmlutils:maybeAVT($classes-string)) then 'fb:class' else 'class'"/>
                         <xf:delete ref="$control/@fb:class | $control/@class"/>

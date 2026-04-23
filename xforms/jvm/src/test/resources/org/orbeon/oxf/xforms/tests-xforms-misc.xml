@@ -594,9 +594,9 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="dialog-1" label="Potato"/>
-                        <xxf:dialog id="dialog-1" visibility="visible" constrain="true"/>
+                        <xxf:dialog id="dialog-1" visibility="visible" constrain="true" close="true"/>
                         <xxf:control id="dialog-2" label="Strawberry"/>
-                        <xxf:dialog id="dialog-2" visibility="hidden"/>
+                        <xxf:dialog id="dialog-2" visibility="hidden" close="true"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -656,11 +656,11 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="dialog-1⊙1" label="Banana"/>
-                        <xxf:dialog id="dialog-1⊙1" visibility="visible" constrain="true"/>
+                        <xxf:dialog id="dialog-1⊙1" visibility="visible" constrain="true" close="true"/>
                         <xxf:control id="dialog-1⊙2" label="Strawberry"/>
-                        <xxf:dialog id="dialog-1⊙2" visibility="hidden"/>
+                        <xxf:dialog id="dialog-1⊙2" visibility="hidden" close="true"/>
                         <xxf:control id="dialog-1⊙3" label="Vanilla"/>
-                        <xxf:dialog id="dialog-1⊙3" visibility="hidden"/>
+                        <xxf:dialog id="dialog-1⊙3" visibility="hidden" close="true"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1250,7 +1250,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:dialog id="my-dialog" visibility="visible" constrain="true"/>
+                        <xxf:dialog id="my-dialog" visibility="visible" constrain="true" close="true"/>
                         <xxf:control id="my-output">
                             <xxf:value>My message</xxf:value>
                         </xxf:control>

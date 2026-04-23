@@ -1051,10 +1051,10 @@
                     <xxf:control-values>
                         <xxf:control id="my-input-1" visited="true"/>
                         <xxf:control id="my-dialog-1" visited="true"/>
-                        <xxf:dialog id="my-dialog-1" visibility="hidden"/>
+                        <xxf:dialog id="my-dialog-1" visibility="hidden" close="true"/>
                         <xxf:control id="my-input-2" visited="true" relevant="false"/>
                         <xxf:control id="my-dialog-2" visited="true"/>
-                        <xxf:dialog id="my-dialog-2" visibility="hidden"/>
+                        <xxf:dialog id="my-dialog-2" visibility="hidden" close="true"/>
                         <xxf:control id="my-input-3" relevant="false"/>
                         <xxf:control id="my-input-4" visited="true" relevant="false"/>
                     </xxf:control-values>

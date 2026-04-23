@@ -3925,7 +3925,7 @@
                         <xxf:control id="my-foo1≡foo-trigger" label="Open me"/>
                         <xxf:control id="my-foo2≡foo-trigger" label="Open me"/>
                         <xxf:control id="my-dialog" label="My Dialog"/>
-                        <xxf:dialog id="my-dialog" visibility="hidden"/>
+                        <xxf:dialog id="my-dialog" visibility="hidden" close="true"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

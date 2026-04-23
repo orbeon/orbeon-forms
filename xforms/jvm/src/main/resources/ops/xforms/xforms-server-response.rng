@@ -259,6 +259,14 @@
                                                     </choice>
                                                 </attribute>
                                             </optional>
+                                            <optional>
+                                                <attribute name="close">
+                                                    <choice>
+                                                        <value>true</value>
+                                                        <value>false</value>
+                                                    </choice>
+                                                </attribute>
+                                            </optional>
                                         </element>
                                         <element name="xxf:attribute">
                                             <attribute name="name"/>

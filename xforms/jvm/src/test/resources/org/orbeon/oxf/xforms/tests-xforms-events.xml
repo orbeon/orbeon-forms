@@ -1483,8 +1483,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:dialog id="minimal-dialog" visibility="visible" neighbor="show-minimal-dialog" constrain="true"/>
-                        <xxf:dialog id="default-dialog" visibility="visible" constrain="true"/>
+                        <xxf:dialog id="minimal-dialog" visibility="visible" neighbor="show-minimal-dialog" constrain="true" close="true"/>
+                        <xxf:dialog id="default-dialog" visibility="visible" constrain="true" close="true"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1789,7 +1789,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-dialog" visited="true"/>
-                        <xxf:dialog id="my-dialog" visibility="hidden"/>
+                        <xxf:dialog id="my-dialog" visibility="hidden" close="true"/>
                         <xxf:control id="input1" visited="true" relevant="false"/>
                         <xxf:control id="input2" relevant="false"/>
                     </xxf:control-values>

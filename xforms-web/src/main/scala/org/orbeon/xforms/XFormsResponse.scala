@@ -1258,11 +1258,19 @@ object XFormsResponse {
     val id            = controlElem.id
     val visible       = controlElem.getAttribute("visibility") == "visible"
     val neighborIdOpt = controlElem.getAttribute("neighbor").trimAllToOpt
+    val closeOpt      = controlElem.getAttribute("close").trimAllToOpt
 
     if (visible)
       showDialog(id, neighborIdOpt, "handleDialog")
     else
       hideDialog(id, formId)
+
+    closeOpt foreach { closeString =>
+      val dialogElem      = dom.document.getElementById(id)
+      val supportsBoolean = closeString.toBoolean
+      dialogElem.classList.toggle("xforms-dialog-close-true",    supportsBoolean)
+      dialogElem.classList.toggle("xforms-dialog-close-false", ! supportsBoolean)
+    }
   }
 
   private def handleAttribute(controlElem : dom.Element): Unit = {

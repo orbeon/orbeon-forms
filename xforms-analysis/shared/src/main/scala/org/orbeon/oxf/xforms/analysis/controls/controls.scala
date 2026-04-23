@@ -335,6 +335,8 @@ class DialogControl(
 
   override def allowMinimalLabelHint: Boolean = false
 
+  override protected val allowedExtensionAttributes: Set[QName] = Set(CLOSE_QNAME)
+
   override val externalEvents =
     super.externalEvents + XXFORMS_DIALOG_CLOSE // allow xxforms-dialog-close
 }

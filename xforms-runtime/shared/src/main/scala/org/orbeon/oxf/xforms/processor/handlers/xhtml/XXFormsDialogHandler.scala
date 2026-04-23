@@ -61,7 +61,7 @@ class XXFormsDialogHandler(
 
     classes.append(level)
     classes.append(" xforms-dialog-close-")
-    classes.append(!("false" == attributes.getValue("close")))
+    classes.append(! dialogXFormsControl.extensionAttributeValue(XFormsNames.CLOSE_QNAME).contains("false"))
     classes.append(" xforms-dialog-draggable-false")
     classes.append(" xforms-dialog-visible-")
     classes.append(dialogXFormsControl.isDialogVisible)

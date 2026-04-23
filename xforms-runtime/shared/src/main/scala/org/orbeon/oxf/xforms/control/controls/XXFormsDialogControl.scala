@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
-import org.orbeon.xforms.XFormsNames.XXFORMS_NAMESPACE_URI
+import org.orbeon.xforms.XFormsNames.{CLOSE_QNAME, XXFORMS_NAMESPACE_URI}
 import org.xml.sax.helpers.AttributesImpl
 
 import java.{util, util as ju}
@@ -209,6 +209,14 @@ class XXFormsDialogControl(
           doOutputElement = true
         }
       }
+
+      val closeValue            = extensionAttributeValue(CLOSE_QNAME).getOrElse("true")
+      val previousCloseValueOpt = previousDialog.flatMap(_.extensionAttributeValue(CLOSE_QNAME))
+      if (! previousCloseValueOpt.contains(closeValue)) {
+        atts.addAttribute("", "close", "close", CDATA, closeValue)
+        doOutputElement = true
+      }
+
       if (doOutputElement)
         ch.element("xxf", XXFORMS_NAMESPACE_URI, "dialog", atts)
     }

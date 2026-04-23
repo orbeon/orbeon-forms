@@ -74,6 +74,7 @@ object XFormsNames {
   val MEDIATYPE_QNAME  = QName("mediatype")
   val ACCEPT_QNAME     = QName("accept")
   val SRC_QNAME        = QName("src")
+  val CLOSE_QNAME      = QName("close")
 
   val TARGETID_QNAME   = QName("targetid")
   val TARGET_QNAME     = QName("target")
@@ -193,6 +194,7 @@ object XFormsNames {
   val XXFORMS_SIZE_QNAME            = xxformsQName("size")
   val XXFORMS_HASH_ALGORITHM_QNAME  = xxformsQName("hash-algorithm")
   val XXFORMS_HASH_VALUE_QNAME      = xxformsQName("hash-value")
+  val XXFORMS_CLOSE_QNAME           = xxformsQName("close")
   val XXFORMS_TITLE_QNAME           = xxformsQName("title")
   val XXFORMS_ALT_QNAME             = xxformsQName("alt")
   val XXFORMS_MAXLENGTH_QNAME       = xxformsQName("maxlength")

@@ -1079,8 +1079,7 @@
                 <xf:var name="is-app-form"      value="$i/mode = 'app-form'"/>
                 <xf:var name="is-form-settings" value="not($is-new-form or $is-app-form)"/>
 
-                <!-- Once AVTs are supported: close="{not($is-new-form)}"  -->
-                <xxf:dialog id="dialog" close="false" class="fb-dialog-form-settings">
+                <xxf:dialog id="dialog" close="{{not($i/mode = 'new')}}" class="fb-dialog-form-settings">
                     <!-- Dialog title -->
                     <xf:label
                         value="

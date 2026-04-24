@@ -31,8 +31,10 @@ object EventNames {
   val XXFormsValue             = "xxforms-value"
   val XXFormsRpcRequest        = "xxforms-rpc-request"
   val XXFormsDnD               = "xxforms-dnd"
+  val XXFormsRepeatActivate    = "xxforms-repeat-activate"
 
   val XFormsFocus              = "xforms-focus"
+  val XXFormsBlur              = "xxforms-blur"
 
   val KeyTextPropertyName      = "text"
   val KeyModifiersPropertyName = "modifiers"
@@ -40,6 +42,8 @@ object EventNames {
   val KeyPress                 = "keypress"
   val KeyDown                  = "keydown"
   val KeyUp                    = "keyup"
+
+  val DOMActivate              = "DOMActivate"
 
   val KeyboardEvents: Set[String] = Set(KeyPress, KeyDown, KeyUp)
 

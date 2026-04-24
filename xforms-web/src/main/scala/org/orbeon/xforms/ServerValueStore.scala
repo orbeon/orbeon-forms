@@ -41,17 +41,20 @@ object ServerValueStore {
   // Return the value of a control as known by the server or null
   @JSExport
   def get(id: String): String =
+    getOpt(id).orNull
+
+  def getOpt(id: String): Option[String] =
     idToControlValue.get(id) match {
       case None =>
-        // We known nothing about this control
-        null
+        // We know nothing about this control
+        None
       case Some(ControlValue(controlElem, value)) if controlElem eq dom.document.getElementById(id) =>
         // We have the value and it is for the right control
-        value
+        Some(value)
       case Some(_) =>
         // We have a value but it is for an obsolete control
         remove(id)
-        null
+        None
     }
 
   // Remove the value we know for a specific control

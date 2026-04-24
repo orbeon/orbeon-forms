@@ -1328,7 +1328,7 @@ object XFormsResponse {
       logger.error(s"Got value from server for element with class: ${documentElement.getAttribute("class")}")
     } else {
 
-      val normalizedPreviousServerValueOpt = Option(ServerValueStore.get(controlId)).map(_.normalizeSerializedHtml)
+      val normalizedPreviousServerValueOpt = ServerValueStore.getOpt(controlId).map(_.normalizeSerializedHtml)
       val normalizedNewControlValue        = newControlValue.normalizeSerializedHtml
       ServerValueStore.set(controlId, newControlValue)
 

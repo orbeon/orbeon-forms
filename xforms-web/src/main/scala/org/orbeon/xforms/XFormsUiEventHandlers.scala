@@ -2,34 +2,32 @@ package org.orbeon.xforms
 
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.facade.{Controls, Events}
-import org.scalajs.dom.{UIEvent, html}
+import org.scalajs.dom
+import org.scalajs.dom.html.Element
+import org.scalajs.dom.{KeyboardEvent, MouseEvent, UIEvent, html}
 
 
 object XFormsUiEventHandlers {
 
-  def input(event: UIEvent): Unit = {
-
-    if (XFormsUI.modalProgressPanelShown) {
+  def input(event: UIEvent): Unit =
+    if (XFormsUI.modalProgressPanelShown)
       event.preventDefault()
-      return
-    }
+    else
+      Option(Events._findParentXFormsControl(event.target)).foreach { target =>
 
-    Option(Events._findParentXFormsControl(event.target)).foreach { target =>
+        XFormsUI.fieldValueChanged(target)
 
-      XFormsUI.fieldValueChanged(target)
-
-      // Incremental control: treat keypress as a value change event
-      if (target.hasClass("xforms-incremental"))
-        AjaxClient.fireEvent(
-          AjaxEvent(
-            eventName   = EventNames.XXFormsValue,
-            targetId    = target.id,
-            properties  = Map("value" -> Controls.getCurrentValue(target)), // Q: What if `getCurrentValue` is undefined?
-            incremental = true
+        // Incremental control: treat keypress as a value change event
+        if (target.hasClass("xforms-incremental"))
+          AjaxClient.fireEvent(
+            AjaxEvent(
+              eventName   = EventNames.XXFormsValue,
+              targetId    = target.id,
+              properties  = Map("value" -> Controls.getCurrentValue(target)), // Q: What if `getCurrentValue` is undefined?
+              incremental = true
+            )
           )
-        )
-    }
-  }
+      }
 
   def change(event: UIEvent): Unit =
     Option(Events._findParentXFormsControl(event.target)).foreach { target =>
@@ -81,4 +79,277 @@ object XFormsUiEventHandlers {
         }
       }
     }
+
+  private def isFocusableControl(elem: html.Element) =
+    ! elem.hasAnyClass("xforms-group", "xforms-repeat", "xforms-switch", "xforms-case", "xforms-dialog") &&
+    ! (elem.hasClass("xbl-component") && ! elem.hasClass("xbl-focusable"))
+
+  private def findAncestorFocusableControl(target: dom.EventTarget): Option[html.Element] =
+    Option(Events._findParentXFormsControl(target)).filter(isFocusableControl)
+
+  def focus(event: dom.FocusEvent): Unit =
+    if (XFormsUI.modalProgressPanelShown) {
+      event.preventDefault()
+    } else if (! Globals.maskFocusEvents) {
+      findAncestorFocusableControl(event.target).foreach { newFocusControlElement =>
+
+        val currentFocusControlElementOpt =
+          Option(Globals.currentFocusControlId)
+            .flatMap(dom.document.getElementByIdOpt)
+
+        // 2023-01-12: Don't do this for static readonly controls.
+        // Store initial value of control if we don't have a server value already, and if this is not a list
+        // Initial value for lists is set up initialization, as when we receive the focus event the new value is already set.
+        if (! newFocusControlElement.hasClass("xforms-static")         &&
+            ServerValueStore.getOpt(newFocusControlElement.id).isEmpty &&
+            ! newFocusControlElement.hasAnyClass(
+              "xforms-select-appearance-compact",
+              "xforms-select1-appearance-compact"
+            )
+        ) {
+          Controls.getCurrentValue(newFocusControlElement).foreach { controlCurrentValue =>
+            ServerValueStore.set(newFocusControlElement.id, controlCurrentValue)
+          }
+        }
+
+        // The idea here is that we only register focus changes when focus moves between XForms controls. If focus
+        // goes out to nothing, we don't handle it at this point but wait until focus comes back to a control.
+        if (! currentFocusControlElementOpt.contains(newFocusControlElement)) {
+          // Keep track of the id of the last known control which has focus
+          Globals.currentFocusControlId      = newFocusControlElement.id
+          Globals.currentFocusControlElement = newFocusControlElement
+
+          // Fire events
+          AjaxClient.fireEvent(
+            AjaxEvent(
+              eventName   = EventNames.XFormsFocus,
+              targetId    = newFocusControlElement.id,
+              incremental = true
+            )
+          )
+        }
+      }
+    } else {
+      Globals.maskFocusEvents = false
+    }
+
+  // blurEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
+  def blur(event: dom.FocusEvent): Unit =
+    if (XFormsUI.modalProgressPanelShown) {
+      event.preventDefault()
+    } else if (! Globals.maskFocusEvents) {
+      findAncestorFocusableControl(event.target).foreach { control =>
+
+        Globals.currentFocusControlId      = control.id
+        Globals.currentFocusControlElement = control
+
+        // Dispatch `xxforms-blur` event if we're not going to another XForms control (see issue #619)
+        val relatedTarget = Option(event.relatedTarget).getOrElse(dom.document.activeElement)
+        if (findAncestorFocusableControl(relatedTarget).isEmpty) {
+          Globals.currentFocusControlId      = null
+          Globals.currentFocusControlElement = null
+          AjaxClient.fireEvent(
+            AjaxEvent(
+              eventName = EventNames.XXFormsBlur,
+              targetId  = control.id
+            )
+          )
+        }
+      }
+    }
+
+//  // TODO: 2020-06-04: Only used by the IE 11 `preventDefault()` below.
+//  //   2022-06-14: Unclear, check again!
+//  keydownEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
+  def keydown(event: KeyboardEvent): Unit =
+    if (XFormsUI.modalProgressPanelShown)
+      event.preventDefault()
+
+//  //TODO: MDN: "Since this event has been deprecated, you should look to use beforeinput or keydown instead."
+//  keypressEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
+  def keypress(event: KeyboardEvent): Unit =
+    if (XFormsUI.modalProgressPanelShown) {
+      event.preventDefault()
+    } else {
+      val target = event.target.asInstanceOf[html.Element]
+      val control = Events._findParentXFormsControl(target)
+      if (control != null) {
+        // Input field and auto-complete: trigger DOMActive when when enter is pressed
+        val isXFormsInputField = (control.hasClass("xforms-input") && ! control.hasClass("xforms-type-boolean")) ||
+                                  control.hasClass("xforms-secret")
+        val isFocusInOnInput   = target.tagName.toLowerCase == "input"
+
+        if (isXFormsInputField && isFocusInOnInput) {
+          if (event.keyCode == 10 || event.keyCode == 13) {
+            // Force a change event if the value has changed, creating a new "change point", which the
+            // browser will use to dispatch a `change` event in the future. Also see issue #1207.
+            target.blur()
+            target.focus()
+
+            // Send a value change and DOM activate
+            Controls.getCurrentValue(control).foreach { controlCurrentValue =>
+              AjaxClient.fireEvent(
+                AjaxEvent(
+                  eventName  = EventNames.XXFormsValue,
+                  targetId   = control.id,
+                  properties = Map("value" -> controlCurrentValue)
+                )
+              )
+            }
+            AjaxClient.fireEvent(
+              AjaxEvent(
+                eventName = "DOMActivate",
+                targetId = control.id
+              )
+            )
+
+            // This prevents Chrome/Firefox from dispatching a 'change' event on event, making them more
+            // like IE, which in this case is more compliant to the spec.
+            event.preventDefault()
+          }
+        }
+      }
+    }
+
+  // clickEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
+  def click(event: MouseEvent): Unit = {
+
+    if (XFormsUI.modalProgressPanelShown) {
+      event.preventDefault()
+      return
+    }
+
+    // Stop processing if the mouse button that was clicked is not the left button
+    // See: http://www.quirksmode.org/js/events_properties.html#button
+    if (event.button != 0 && event.button != 1)
+      return
+
+    val originalTarget = event.target.asInstanceOf[html.Element]
+    val controlTarget = Events._findParentXFormsControl(originalTarget)
+
+    // Check if the target is disabled.
+    if (originalTarget.hasAttribute("disabled") && originalTarget.getAttribute("disabled") != "false")
+      return
+
+    var handled = false
+
+    if (originalTarget != null && originalTarget.hasClass("xforms-help")) {
+      if (controlTarget != null) {
+        if (Page.getXFormsFormFromHtmlElemOrThrow(controlTarget).helpHandler())
+          AjaxClient.fireEvent(AjaxEvent(eventName = "xforms-help", targetId = controlTarget.id))
+        else
+          Help.showHelp(controlTarget)
+        handled = true
+      }
+    } else {
+      if (controlTarget != null) {
+        if (controlTarget.hasAnyClass("xforms-trigger", "xforms-submit")) {
+          // Click on trigger
+          event.preventDefault()
+          if (! controlTarget.hasClass("xforms-readonly")) {
+            AjaxClient.fireEvent(
+              AjaxEvent(
+                eventName = "DOMActivate",
+                targetId  = controlTarget.id
+              )
+            )
+
+            if (controlTarget.closest(".xforms-trigger-appearance-modal, .xforms-submit-appearance-modal") != null)
+              XFormsUI.displayModalProgressPanel()
+            handled = true
+          }
+        } else if (
+          ! controlTarget.hasClass("xforms-static") &&
+          controlTarget.hasAnyClass(
+            "xforms-select1-appearance-full",
+            "xforms-select-appearance-full",
+            "xforms-type-boolean"
+          )
+        ) {
+          // Update classes right away to give user visual feedback
+          XFormsUI.handleShiftSelection(event, controlTarget)
+          handled = true
+        } else if (controlTarget.hasClass("xforms-upload") && originalTarget.hasClass("xforms-upload-remove")) {
+          // Click on remove icon in upload control
+          AjaxClient.fireEvent(
+            AjaxEvent(
+              eventName  = EventNames.XXFormsValue,
+              targetId   = controlTarget.id,
+              properties = Map("value" -> "")
+            )
+          )
+          handled = true
+        }
+      }
+    }
+
+    if (handled)
+      return
+
+    var node: dom.Node = originalTarget
+
+    // Iterate on ancestors, stop when we don't find ancestors anymore or we arrive at the form element
+    while (node != null && ! (node.isInstanceOf[html.Element] && node.asInstanceOf[html.Element].tagName.toLowerCase == "form")) {
+
+      // First check clickable group
+      node match {
+        case nodeElem: Element if nodeElem.hasClass("xforms-activable") =>
+          val form = Page.getAncestorOrSelfHtmlFormFromHtmlElemOrThrow(nodeElem)
+          AjaxClient.fireEvent(
+            AjaxEvent(
+              eventName = EventNames.DOMActivate,
+              targetId  = nodeElem.id,
+              form      = Some(form)
+            )
+          )
+          // break from loop
+          node = null
+        case _ =>
+
+          // Iterate on previous siblings
+          var delimiterCount = 0
+          var foundRepeatBegin = false
+          var sibling: dom.Node = node
+
+          while (sibling != null) {
+            sibling match {
+              case siblingElem: Element if siblingElem.id.startsWith("repeat-begin-") =>
+
+                val form = Page.getAncestorOrSelfHtmlFormFromHtmlElemOrThrow(siblingElem)
+
+                var targetId = siblingElem.id.substring("repeat-begin-".length)
+                targetId += (
+                  if (targetId.indexOf(Constants.RepeatSeparatorString) == -1)
+                    Constants.RepeatSeparatorString
+                  else
+                    Constants.RepeatIndexSeparator
+                  )
+                targetId += delimiterCount
+                AjaxClient.fireEvent(
+                  AjaxEvent(
+                    eventName = EventNames.XXFormsRepeatActivate,
+                    targetId = targetId,
+                    form = Some(form)
+                  )
+                )
+                foundRepeatBegin = true
+                sibling = null // break
+
+              case siblingElem: Element if siblingElem.hasClass("xforms-repeat-delimiter") =>
+                delimiterCount += 1
+                sibling = siblingElem.previousSibling
+              case _ =>
+                sibling = sibling.previousSibling
+            }
+          }
+
+          // We found what we were looking for, no need to go to parents
+          if (foundRepeatBegin)
+            node = null // break from outer loop
+          else
+            // Explore parent
+            node = node.parentNode
+      }
+    }
+  }
 }

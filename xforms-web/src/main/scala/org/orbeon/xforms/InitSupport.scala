@@ -437,14 +437,14 @@ object InitSupport {
       if (! topLevelListenerRegistered) {
 
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Change,    XFormsUiEventHandlers.change)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusIn,   Events.focus)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusOut,  Events.blur)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyPress,  Events.keypress)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyDown,   Events.keydown)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusIn,   XFormsUiEventHandlers.focus)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusOut,  XFormsUiEventHandlers.blur)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyPress,  XFormsUiEventHandlers.keypress)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyDown,   XFormsUiEventHandlers.keydown)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Input,     XFormsUiEventHandlers.input)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOver, XFormsUI.mouseover)
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOut,  XFormsUI.mouseout)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Click,     Events.click)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Click,     XFormsUiEventHandlers.click)
 
         // Catch logout link clicks to inform other pages on the same session that it is going to be invalidated
         $(".fr-logout-link").get().foreach { logoutAnchor =>

@@ -117,13 +117,6 @@ object Events extends js.Object {
   val orbeonLoadedEvent           : YUICustomEvent                 = js.native
   val componentChangedLayoutEvent : YUICustomEvent                 = js.native
 
-  val focus                       : js.Function1[FocusEvent, Unit] = js.native
-  val blur                        : js.Function1[FocusEvent, Unit] = js.native
-  val keypress                    : js.Function1[UIEvent, Unit]    = js.native
-  val keydown                     : js.Function1[UIEvent, Unit]    = js.native
-  val mouseout                    : js.Function1[UIEvent, Unit]    = js.native
-  val click                       : js.Function1[UIEvent, Unit]    = js.native
-
   def _findParentXFormsControl(t: dom.EventTarget): html.Element = js.native // can return `null`
   def _showToolTip(hintTooltipForControl: js.Dictionary[js.Any], control: html.Element, target: html.Element, toolTipSuffix: String, message: String, event: MouseEvent): Unit = js.native
 }

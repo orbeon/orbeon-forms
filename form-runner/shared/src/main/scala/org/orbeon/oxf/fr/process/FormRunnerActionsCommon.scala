@@ -341,6 +341,8 @@ trait FormRunnerActionsCommon {
     //     synchronizeAndRefreshIfNeeded()
     //
     // before accessing the data, and re-evaluated what is needed thanks to the support added by #7492.
+    // 2026-04-23: Revert the change above because it causes issues. We should dig deeper to figure it out.
+    recalculate(FormModel)
   }
 
   private case class TextOrHtml(string: String, isHtml: Boolean) {

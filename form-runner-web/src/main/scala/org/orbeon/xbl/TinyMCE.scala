@@ -16,10 +16,10 @@ package org.orbeon.xbl
 import io.udash.wrappers.jquery.JQueryPromise
 import org.orbeon.facades.TinyMce.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.web.DomSupport.*
 import org.orbeon.web.DomEventNames
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.facade.{Events, XBL, XBLCompanion}
-import org.orbeon.xforms.{$, DocumentAPI, EventListenerSupport, Language, Page}
+import org.orbeon.xforms.*
 import org.scalajs.dom
 import org.scalajs.dom.*
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -185,14 +185,6 @@ object TinyMCE {
           DocumentAPI.setValue(containerElem, cleanedContent)
         }
       }
-
-    // TinyMCE got the focus
-    private def onFocus(event: js.Dynamic): Unit = {
-      // From the perspective of the XForms engine, the focus is on the XBL component
-      event.target = containerElem
-      // Forward to the "XForms engine"
-      Events.focus.asInstanceOf[js.Function1[js.Dynamic, Unit]](event)
-    }
 
     private def hasFocus(): Boolean = {
       val activeElement                   = dom.document.activeElement

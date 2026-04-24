@@ -38,7 +38,7 @@ object XFormsStateManager
   private val ReplicationEnabled = XFormsGlobalProperties.isReplication
 
   if (ReplicationEnabled)
-     Version.instance.requirePEFeature("State replication")
+    Version.instance.requirePEFeature("State replication")
 
   def newIndentedLogger: IndentedLogger =
     Loggers.newIndentedLogger("state")

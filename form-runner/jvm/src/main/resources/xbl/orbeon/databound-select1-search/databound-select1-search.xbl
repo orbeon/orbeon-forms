@@ -135,25 +135,7 @@
                         </xh:td>
                     </xh:tr>
                     <xh:tr>
-                        <xh:td>
-                            <fr:yesno-input ref="
-                                    if (@service-performs-search/string() = 'true' or @store-label/string() = 'true')
-                                    then 'false'
-                                    else xf:element('_', (@multiple/string(), 'false')[1])">
-                                <xf:label ref="xxf:r('dialog-control-settings.multiple-selection.label', '|fr-form-resources|')"/>
-                                <xf:help  ref="xxf:r('dialog-control-settings.multiple-selection.help',  '|fr-form-resources|')"/>
-                                <xf:action event="xforms-select">
-                                    <xf:insert
-                                        if="event('xxf:item-value') = 'true'"
-                                        context="$control"
-                                        origin="xf:attribute('multiple', 'true')"/>
-                                    <xf:delete
-                                        if="event('xxf:item-value') = 'false'"
-                                        ref="$control/@multiple"/>
-                                </xf:action>
-                            </fr:yesno-input>
-                        </xh:td>
-                        <xh:td>
+                        <xh:td colspan="2">
                             <xf:var name="formula-prefix">{if (</xf:var>
                             <xf:var name="formula-suffix">) then 'open' else ''}</xf:var>
                             <fb:boolean-or-formula
@@ -377,7 +359,7 @@
                             <xf:var name="auto-select-unique-choice" value="xxf:component-param-value('auto-select-unique-choice') = 'true'"/>
                             <xf:var name="open-selection"            value="xxf:component-param-value('selection')"/>
                             <xf:var name="is-open-selection"         value="$open-selection = 'open'"/>
-                            <xf:var name="is-multiple"     value="xxf:component-param-value('multiple') = 'true'"/>
+                            <xf:var name="is-multiple"               value="{if (local-name() = 'databound-select') then 'true()' else 'false()'}"/>
 
                             <xf:submission
                                     id="get-result"
@@ -586,8 +568,8 @@
                             </xf:action>
                         </xf:action>
 
-                        <xsl:variable name="service-performs-search"  select="@service-performs-search/string() = 'true'"/>
-                        <xsl:variable name="is-multiple"    select="@multiple/string() = 'true'"/>
+                        <xsl:variable name="service-performs-search" select="@service-performs-search/string() = 'true'"/>
+                        <xsl:variable name="is-multiple"             select="local-name() = 'databound-select'"/>
                         <xf:var       name="binding"                 value="xxf:binding('fr-databound-select1-search')"/>
                         <xf:var       name="view"                    value="fr:mode() = ('view', 'pdf')"/>
                         <xf:var       name="min-input-length"        value="fr:component-param-value('min-input-length')"/>

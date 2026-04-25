@@ -33,6 +33,7 @@ import scala.scalajs.js.JSConverters.JSRichOption
 object Select1Search {
   XBL.declareCompanion(name = "fr|dropdown-select1-search" , js.constructorOf[Select1SearchCompanion])
   XBL.declareCompanion(name = "fr|databound-select1-search", js.constructorOf[Select1SearchCompanion])
+  XBL.declareCompanion(name = "fr|databound-select-search" , js.constructorOf[Select1SearchCompanion])
 }
 
 private class Select1SearchCompanion(containerElem: html.Element) extends XBLCompanion {
@@ -43,7 +44,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   private val    DataIsOpenSelection       = "data-is-open-selection"
   private val    DataIsMultipleSelection   = "data-is-multiple"
   private val    DataMinimumInputLength    = "data-min-input-length"
-  private val    DataboundClass            = "xbl-fr-databound-select1-search"
+  private val    DataboundClasses          = Set("xbl-fr-databound-select1-search", "xbl-fr-databound-select-search")
   private object EventSupport              extends EventListenerSupport
 
   private val select2SuccessCallbacks      : mutable.Queue[(String, Success)] = new mutable.Queue[(String, Success)]
@@ -60,7 +61,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     val elementWithData  = queryElementWithData
     if (! isStaticReadonly && ! elementWithData.hasClass("xforms-disabled"))
       for (select <- Option(querySelect)) {
-        val isDatabound     = containerElem.hasClass(DataboundClass)
+        val isDatabound     = DataboundClasses.exists(containerElem.hasClass)
 
         // Prevent the propagation of `focusout` so the client doesn't send an `xxforms-value` event when users click on the dropdown,
         // as at that point the `<span class="select2-selection--single">` looses the focus, and since Select2 places that element inside

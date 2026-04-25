@@ -196,6 +196,7 @@
         +fr:image
         +fr:dropdown-select1-search
         +fr:databound-select1-search
+        +fr:databound-select-search
         +fr:autosize-textarea
         +fr:tinymce
         +fr:box-select
@@ -271,6 +272,7 @@
         +fr:dropdown-select1
         +fr:dropdown-select1-search
         +fr:databound-select1-search
+        +fr:databound-select-search
         +fr:autosize-textarea
         +fr:tinymce
         +fr:box-select

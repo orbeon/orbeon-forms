@@ -277,7 +277,7 @@
 
     <!-- See also `fb.ControlOps` for the renaming part -->
     <xsl:template
-        match="fr:databound-select1 | fr:databound-select1-search"
+        match="fr:databound-select1 | fr:databound-select1-search | fr:databound-select | fr:databound-select-search"
         mode="within-grid">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:copy>

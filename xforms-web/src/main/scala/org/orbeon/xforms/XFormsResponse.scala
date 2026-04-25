@@ -1256,14 +1256,14 @@ object XFormsResponse {
   ): Unit = {
 
     val id            = controlElem.id
-    val visible       = controlElem.getAttribute("visibility") == "visible"
+    val visibleOpt    = controlElem.attValueOpt("visibility").map(_ == "visible")
     val neighborIdOpt = controlElem.getAttribute("neighbor").trimAllToOpt
     val closeOpt      = controlElem.getAttribute("close").trimAllToOpt
 
-    if (visible)
-      showDialog(id, neighborIdOpt, "handleDialog")
-    else
-      hideDialog(id, formId)
+    visibleOpt.foreach {
+      case true  => showDialog(id, neighborIdOpt, "handleDialog")
+      case false => hideDialog(id, formId)
+    }
 
     closeOpt foreach { closeString =>
       val dialogElem      = dom.document.getElementById(id)

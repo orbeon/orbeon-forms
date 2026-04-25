@@ -146,17 +146,19 @@
             <xf:setvalue ref="$instance/parameter-names/@count" value="count($parameter-names)"/>
 
             <!-- Upgrade syntax for setting parameter names:
-                 - From : `<xf:var name="path"           value="//my-param"/>`
+                 - From : `<xf:var name="path"           value="//my-param | /*/my-param"/>`
                  - To   : `<xf:var name="parameter-name" value="'my-param'"/>`   -->
             <xf:action iterate="$instance//xf:action[@class = 'fr-set-service-value-action']/xf:var[@name = 'path']">
-                <xf:var name="is-path-to-param"
+                <xf:var name="param-name-from-path"
                     value="
-                        starts-with(@value, '//') and
-                        not(contains(substring-after(@value, '//'), '/')) and
-                        substring-after(@value, '//') = $parameter-names"/>
-                <xf:action if="$is-path-to-param">
+                        if (starts-with(@value, '//') and not(contains(substring-after(@value, '//'), '/')))
+                            then substring-after(@value, '//')
+                        else if (starts-with(@value, '/*/') and not(contains(substring-after(@value, '/*/'), '/')))
+                            then substring-after(@value, '/*/')
+                        else ''"/>
+                <xf:action if="$param-name-from-path != '' and $param-name-from-path = $parameter-names">
                     <xf:setvalue ref="@name"  value="'parameter-name'"/>
-                    <xf:setvalue ref="@value" value="concat('''', substring-after(., '//'), '''')"/>
+                    <xf:setvalue ref="@value" value="concat('''', $param-name-from-path, '''')"/>
                 </xf:action>
             </xf:action>
 

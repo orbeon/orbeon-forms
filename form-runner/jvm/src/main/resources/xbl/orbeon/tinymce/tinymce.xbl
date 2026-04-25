@@ -124,7 +124,12 @@
         xxbl:label-for="output"
     >
         <xbl:template>
-            <xf:output id="output" mediatype="text/html" ref="xxf:binding('fr-tinymce-output')"/>
+            <xh:div class="xbl-fr-tinymce-div">
+                <xf:output
+                    id="output"
+                    mediatype="text/html"
+                    ref="xxf:binding('fr-tinymce-output')"/>
+            </xh:div>
         </xbl:template>
     </xbl:binding>
 

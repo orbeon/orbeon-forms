@@ -1622,6 +1622,10 @@
         <attach-form-as>Liitä lomake muodossa</attach-form-as>
         <pdf>PDF</pdf>
         <xml>XML</xml>
+        <pdf-template-name>Nimi</pdf-template-name>
+        <pdf-template-pick-automatically>Valitse automaattisesti</pdf-template-pick-automatically>
+        <pdf-template-disable>Poista käytöstä ja käytä automaattista PDF-tiedostoa</pdf-template-disable>
+        <pdf-template>Malli: "{0}"</pdf-template>
         <attach-files>
             <label>Liitä tiedostot, jotka käyttäjät latasivat lomakkeeseen</label>
             <choices>

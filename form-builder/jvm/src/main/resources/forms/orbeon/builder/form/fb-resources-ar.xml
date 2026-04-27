@@ -1628,6 +1628,10 @@
         <attach-form-as>إرفاق النموذج كـ</attach-form-as>
         <pdf>PDF</pdf>
         <xml>XML</xml>
+        <pdf-template-name>الاسم</pdf-template-name>
+        <pdf-template-pick-automatically>اختيار تلقائي</pdf-template-pick-automatically>
+        <pdf-template-disable>تعطيل واستخدام PDF تلقائي</pdf-template-disable>
+        <pdf-template>قالب: "{0}"</pdf-template>
         <attach-files>
             <label>إرفاق الملفات التي قام المستخدمون بتحميلها إلى النموذج</label>
             <choices>

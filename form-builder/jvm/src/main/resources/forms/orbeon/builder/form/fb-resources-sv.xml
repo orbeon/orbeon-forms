@@ -1656,6 +1656,10 @@
         <attach-form-as>Bifoga formulär som</attach-form-as>
         <pdf>PDF</pdf>
         <xml>XML</xml>
+        <pdf-template-name>Namn</pdf-template-name>
+        <pdf-template-pick-automatically>Välj automatiskt</pdf-template-pick-automatically>
+        <pdf-template-disable>Inaktivera och använd automatisk PDF</pdf-template-disable>
+        <pdf-template>Mall: "{0}"</pdf-template>
         <attach-files>
             <label>Bifoga filer som användare laddat upp till formuläret</label>
             <choices>

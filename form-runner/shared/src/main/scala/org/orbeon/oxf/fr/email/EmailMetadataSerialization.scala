@@ -13,7 +13,7 @@ import org.orbeon.saxon.value.StringValue
  */
 object EmailMetadataSerialization {
 
-  def serializeMetadata(metadata: EmailMetadata.Metadata): NodeInfo = {
+  def serializeMetadata(metadata: EmailMetadata.Metadata): NodeInfo =
     NodeInfoFactory.elementInfo(
       QName("email"),
       List(
@@ -21,7 +21,6 @@ object EmailMetadataSerialization {
         serializeParams(metadata.params)
       )
     )
-  }
 
   def serializeTemplates(templates: List[EmailMetadata.Template]): NodeInfo =
     NodeInfoFactory.elementInfo(
@@ -66,10 +65,12 @@ object EmailMetadataSerialization {
         (template.attachPdf.isDefined || template.filesToAttach.isDefined || template.controlsToAttach.nonEmpty).option {
           NodeInfoFactory.elementInfo(
             QName("attach"),
-            template.attachPdf.map(attachPdf => NodeInfoFactory.attributeInfo(QName("pdf"), attachPdf.toString)).toList :::
-            template.attachXml.map(attachXml => NodeInfoFactory.attributeInfo(QName("xml"), attachXml.toString)).toList :::
-            template.filesToAttach.map(filesToAttach => NodeInfoFactory.attributeInfo(QName("files"), filesToAttach.entryName)).toList                           :::
-            template.controlsToAttach.map(serializeControl)
+            template.attachPdf         .map(attachPdf       => NodeInfoFactory.attributeInfo(QName("pdf"),               attachPdf.toString)).toList      :::
+            (! template.usePdfTemplate).list(NodeInfoFactory.attributeInfo(QName("use-pdf-template"), false.toString))                                    :::
+            template.pdfTemplateName   .map(pdfTemplateName => NodeInfoFactory.attributeInfo(QName("pdf-template-name"), pdfTemplateName)).toList         :::
+            template.attachXml         .map(attachXml       => NodeInfoFactory.attributeInfo(QName("xml"),               attachXml.toString)).toList      :::
+            template.filesToAttach     .map(filesToAttach   => NodeInfoFactory.attributeInfo(QName("files"),             filesToAttach.entryName)).toList :::
+            template.controlsToAttach  .map(serializeControl)
           )
         },
         Some(NodeInfoFactory.elementInfo(

@@ -141,7 +141,10 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
   }
 
   def findControlValue(control: XFormsControl, collector: ErrorEventCollector): Option[ControlValue] =
-    control.narrowTo[XFormsValueControl].map {
+    control
+      .narrowTo[XFormsValueControl]
+      .filter(_.isRelevant)
+      .map {
       case c: XFormsSelectControl  =>
         val selectedLabels = c.findSelectedItems(collector).map(_.label.label) // TODO: HTML
         ControlValue.MultipleControlValue(c.getValue(collector), selectedLabels) // TODO
@@ -185,7 +188,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
             c.getFormattedValue(collector) orElse Option(c.getValue(collector))
 
         ControlValue.SingleControlValue(c.getValue(collector), formattedValue)
-      case c  if Set("image-attachment", "attachment")(c.staticControl.localName) =>
+      case c if Set("image-attachment", "attachment")(c.staticControl.localName) =>
         ControlValue.SingleControlValue(c.getValue(collector), c.boundNodeOpt flatMap (_.attValueOpt("filename")))
       case c =>
         ControlValue.SingleControlValue(c.getValue(collector), c.getFormattedValue(collector) orElse Option(c.getValue(collector)))

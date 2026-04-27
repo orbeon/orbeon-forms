@@ -1608,6 +1608,10 @@
         <attach-form-as>Anexar formulário como</attach-form-as>
         <pdf>PDF</pdf>
         <xml>XML</xml>
+        <pdf-template-name>Nome</pdf-template-name>
+        <pdf-template-pick-automatically>Escolher automaticamente</pdf-template-pick-automatically>
+        <pdf-template-disable>Desativar e usar PDF automático</pdf-template-disable>
+        <pdf-template>Modelo: "{0}"</pdf-template>
         <attach-files>
             <label>Anexar ficheiros enviados pelos utilizadores ao formulário</label>
             <choices>

@@ -1,8 +1,10 @@
 package org.orbeon.oxf.fr.email
 
+import org.orbeon.oxf.fr.FormRunner.UsePdfTemplateParam
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.XMLNames
 import org.orbeon.oxf.fr.email.EmailMetadata.{FilesToAttach, HeaderName, Legacy, TemplateValue}
+import org.orbeon.oxf.fr.process.FormRunnerRenderedFormat
 import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
@@ -41,6 +43,7 @@ object EmailMetadataParsing {
     )
 
   def parseCurrentTemplate(templateNodeInfo: NodeInfo, formDefinition: NodeInfo): EmailMetadata.Template = {
+
     def templateValuesInRootElement(rootElementName: String): List[(Option[HeaderName], TemplateValue)] =
       templateNodeInfo.child(rootElementName).headOption.toList.flatMap(parseCurrentTemplateValues(_, rootElementName, formDefinition))
 
@@ -58,6 +61,8 @@ object EmailMetadataParsing {
       subject                               = templateNodeInfo.child("subject").headOption.map(parseCurrentPart),
       body                                  = templateNodeInfo.child("body"   ).headOption.map(parseCurrentPart),
       attachPdf                             = templateNodeInfo.child("attach").att("pdf"  ).headOption.map(_.stringValue == "true"),
+      usePdfTemplate                        = ! templateNodeInfo.child("attach").attValue(FormRunnerRenderedFormat.UsePdfTemplateParam).headOption.contains(false.toString),
+      pdfTemplateName                       = templateNodeInfo.child("attach").attValue(FormRunnerRenderedFormat.PdfTemplateNameParam).headOption,
       attachXml                             = templateNodeInfo.child("attach").att("xml"  ).headOption.map(_.stringValue == "true"),
       filesToAttach                         = templateNodeInfo.child("attach").att("files").headOption.map(_.stringValue).map(FilesToAttach.withName),
       controlsToAttach                      = controlsOnly(templateValuesInRootElement("attach")),

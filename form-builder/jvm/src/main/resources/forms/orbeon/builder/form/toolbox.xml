@@ -488,10 +488,11 @@
                                 <xf:output value="$form-resources/dialog-email-settings/label"/>
                             </xf:label>
                             <xf:action event="DOMActivate">
-                                <xf:dispatch if="$is-pe"            name="fb-show-dialog" targetid="dialog-email-settings">
-                                    <xf:property name="lang"        value="$fb-lang"/>
-                                    <xf:property name="config"      value="bind('email-bind')"/>
-                                    <xf:property name="dialog-mode" value="'email'"/>
+                                <xf:dispatch if="$is-pe"              name="fb-show-dialog" targetid="dialog-email-settings">
+                                    <xf:property name="lang"          value="$fb-lang"/>
+                                    <xf:property name="config"        value="bind('email-bind')"/>
+                                    <xf:property name="pdf-templates" value="bind('pdf-attachments-bind')[xxf:non-blank()]"/>
+                                    <xf:property name="dialog-mode"   value="'email'"/>
                                 </xf:dispatch>
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />
                             </xf:action>
@@ -505,10 +506,11 @@
                                 <xf:output value="$form-resources/dialog-confirmation-settings/label"/>
                             </xf:label>
                             <xf:action event="DOMActivate">
-                                <xf:dispatch if="$is-pe"            name="fb-show-dialog" targetid="dialog-email-settings">
-                                    <xf:property name="lang"        value="$fb-lang"/>
-                                    <xf:property name="config"      value="bind('confirmation-bind')"/>
-                                    <xf:property name="dialog-mode" value="'confirmation'"/>
+                                <xf:dispatch if="$is-pe"              name="fb-show-dialog" targetid="dialog-email-settings">
+                                    <xf:property name="lang"          value="$fb-lang"/>
+                                    <xf:property name="config"        value="bind('confirmation-bind')"/>
+                                    <xf:property name="pdf-templates" value="bind('pdf-attachments-bind')[xxf:non-blank()]"/>
+                                    <xf:property name="dialog-mode"   value="'confirmation'"/>
                                 </xf:dispatch>
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />
                             </xf:action>

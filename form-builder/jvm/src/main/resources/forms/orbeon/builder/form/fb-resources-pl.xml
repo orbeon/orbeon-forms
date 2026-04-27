@@ -1625,6 +1625,10 @@
         <attach-form-as>Dołącz formularz jako</attach-form-as>
         <pdf>PDF</pdf>
         <xml>XML</xml>
+        <pdf-template-name>Nazwa</pdf-template-name>
+        <pdf-template-pick-automatically>Wybierz automatycznie</pdf-template-pick-automatically>
+        <pdf-template-disable>Wyłącz i użyj automatycznego pliku PDF</pdf-template-disable>
+        <pdf-template>Szablon: "{0}"</pdf-template>
         <attach-files>
             <label>Dołącz pliki wgrane przez użytkowników</label>
             <choices>

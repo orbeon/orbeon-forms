@@ -1609,6 +1609,10 @@
         <attach-form-as>Legg ved skjema som</attach-form-as>
         <pdf>PDF</pdf>
         <xml>XML</xml>
+        <pdf-template-name>Navn</pdf-template-name>
+        <pdf-template-pick-automatically>Velg automatisk</pdf-template-pick-automatically>
+        <pdf-template-disable>Deaktiver og bruk automatisk PDF</pdf-template-disable>
+        <pdf-template>Mal: "{0}"</pdf-template>
         <attach-files>
             <label>Legg ved filer brukere har lastet opp til skjemaet</label>
             <choices>

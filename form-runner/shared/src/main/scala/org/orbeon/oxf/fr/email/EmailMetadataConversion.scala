@@ -125,6 +125,7 @@ object EmailMetadataConversion {
           legacyBodyOpt.map(legacyBody => EmailMetadata.Part(isHTML = legacyBody.isHTML, text = legacyBody.text))
         }
 
+
         EmailMetadata.Template(
           name                                  = "default",
           lang                                  = langOpt,
@@ -133,6 +134,8 @@ object EmailMetadataConversion {
           subject                               = subject,
           body                                  = body,
           attachPdf                             = None,
+          usePdfTemplate                        = true,
+          pdfTemplateName                       = None,
           attachXml                             = None,
           filesToAttach                         = None,
           controlsToAttach                      = controlsToAttach,
@@ -160,6 +163,8 @@ object EmailMetadataConversion {
           subject                               = template2022.subject,
           body                                  = template2022.body,
           attachPdf                             = template2022.attachPdf,
+          usePdfTemplate                        = true,
+          pdfTemplateName                       = None,
           attachXml                             = None,
           filesToAttach                         = template2022.attachFiles.map(FilesToAttach.withName),
           controlsToAttach                      = controlsToAttach,

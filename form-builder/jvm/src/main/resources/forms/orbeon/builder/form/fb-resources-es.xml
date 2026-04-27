@@ -1622,6 +1622,10 @@
         <attach-form-as>Adjuntar formulario como</attach-form-as>
         <pdf>PDF</pdf>
         <xml>XML</xml>
+        <pdf-template-name>Nombre</pdf-template-name>
+        <pdf-template-pick-automatically>Elegir automáticamente</pdf-template-pick-automatically>
+        <pdf-template-disable>Desactivar y usar PDF automático</pdf-template-disable>
+        <pdf-template>Plantilla: "{0}"</pdf-template>
         <attach-files>
             <label>Adjuntar archivos que los usuarios subieron al formulario</label>
             <choices>

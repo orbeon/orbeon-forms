@@ -1578,6 +1578,10 @@
         <attach-form-as>Formular anhängen als</attach-form-as>
         <pdf>PDF</pdf>
         <xml>XML</xml>
+        <pdf-template-name>Name</pdf-template-name>
+        <pdf-template-pick-automatically>Automatisch auswählen</pdf-template-pick-automatically>
+        <pdf-template-disable>Deaktivieren und automatisches PDF verwenden</pdf-template-disable>
+        <pdf-template>Vorlage: "{0}"</pdf-template>
         <attach-files>
             <label>Dateien anhängen, die Benutzer zum Formular hochgeladen haben</label>
             <choices>

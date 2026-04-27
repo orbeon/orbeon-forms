@@ -20,10 +20,12 @@ object EmailMetadata {
     subject                              : Option[Part],
     body                                 : Option[Part],
     attachPdf                            : Option[Boolean],
+    usePdfTemplate                       : Boolean,
+    pdfTemplateName                      : Option[String],
     attachXml                            : Option[Boolean],
     filesToAttach                        : Option[FilesToAttach],
     controlsToAttach                     : List[TemplateValue.Control],
-    controlsToExcludeFromAllControlValues: List[TemplateValue.Control]
+    controlsToExcludeFromAllControlValues: List[TemplateValue.Control],
   )
 
   sealed trait FilesToAttach extends EnumEntry with Hyphencase

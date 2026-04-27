@@ -1620,6 +1620,10 @@
         <attach-form-as>フォームの添付形式</attach-form-as>
         <pdf>PDF</pdf>
         <xml>XML</xml>
+        <pdf-template-name>名前</pdf-template-name>
+        <pdf-template-pick-automatically>自動的に選択</pdf-template-pick-automatically>
+        <pdf-template-disable>無効にして自動PDFを使用</pdf-template-disable>
+        <pdf-template>テンプレート: "{0}"</pdf-template>
         <attach-files>
             <label>フォームにアップロードされたファイルを添付</label>
             <choices>

@@ -1609,6 +1609,10 @@
         <attach-form-as>Voeg form toe als</attach-form-as>
         <pdf>PDF</pdf>
         <xml>XML</xml>
+        <pdf-template-name>Naam</pdf-template-name>
+        <pdf-template-pick-automatically>Automatisch kiezen</pdf-template-pick-automatically>
+        <pdf-template-disable>Uitschakelen en automatische PDF gebruiken</pdf-template-disable>
+        <pdf-template>Sjabloon: "{0}"</pdf-template>
         <attach-files>
             <label>Voeg bestanden toe die gebruikers naar het form hebben geüpload</label>
             <choices>

@@ -1581,6 +1581,10 @@
         <attach-form-as>Allega modulo come</attach-form-as>
         <pdf>PDF</pdf>
         <xml>XML</xml>
+        <pdf-template-name>Nome</pdf-template-name>
+        <pdf-template-pick-automatically>Scegli automaticamente</pdf-template-pick-automatically>
+        <pdf-template-disable>Disabilita e usa PDF automatico</pdf-template-disable>
+        <pdf-template>Modello: "{0}"</pdf-template>
         <attach-files>
             <label>Allega i file caricati dagli utenti nel modulo</label>
             <choices>

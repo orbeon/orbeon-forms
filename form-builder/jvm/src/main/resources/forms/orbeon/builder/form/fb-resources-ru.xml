@@ -1608,6 +1608,10 @@
         <attach-form-as>Прикрепить форму как</attach-form-as>
         <pdf>PDF</pdf>
         <xml>XML</xml>
+        <pdf-template-name>Имя</pdf-template-name>
+        <pdf-template-pick-automatically>Выбрать автоматически</pdf-template-pick-automatically>
+        <pdf-template-disable>Отключить и использовать автоматический PDF</pdf-template-disable>
+        <pdf-template>Шаблон: "{0}"</pdf-template>
         <attach-files>
             <label>Прикрепить файлы, загруженные пользователями в форму</label>
             <choices>

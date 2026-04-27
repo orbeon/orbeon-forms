@@ -1647,6 +1647,10 @@
         <attach-form-as>Joindre le formulaire au format</attach-form-as>
         <pdf>PDF</pdf>
         <xml>XML</xml>
+        <pdf-template-name>Nom</pdf-template-name>
+        <pdf-template-pick-automatically>Sélectionner automatiquement</pdf-template-pick-automatically>
+        <pdf-template-disable>Désactiver et utiliser le PDF automatique</pdf-template-disable>
+        <pdf-template>Modèle : "{0}"</pdf-template>
         <attach-files>
             <label>Joindre à l'email les fichiers téléchargés par les utilisateurs dans le formulaire</label>
             <choices>

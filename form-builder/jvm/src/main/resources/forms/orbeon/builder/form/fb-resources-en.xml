@@ -1646,6 +1646,10 @@
         <attach-form-as>Attach form as</attach-form-as>
         <pdf>PDF</pdf>
         <xml>XML</xml>
+        <pdf-template-name>Name</pdf-template-name>
+        <pdf-template-pick-automatically>Pick automatically</pdf-template-pick-automatically>
+        <pdf-template-disable>Disable and use automatic PDF</pdf-template-disable>
+        <pdf-template>Template: "{0}"</pdf-template>
         <attach-files>
             <label>Attach files users uploaded to the form</label>
             <choices>

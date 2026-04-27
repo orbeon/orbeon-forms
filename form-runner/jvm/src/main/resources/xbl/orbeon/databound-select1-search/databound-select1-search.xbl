@@ -127,11 +127,12 @@
                 <fr:grid>
                     <xh:tr>
                         <xh:td colspan="2">
-                            <xh:i class="fa fa-fw fa-info-circle" aria-hidden="true"/>
-                            <xh:a
-                                href="https://doc.orbeon.com/form-runner/component/static-dynamic-dropdown"
-                                target="_blank"><xf:output value="xxf:r('xbl-control-settings.learn-settings-below', '|fr-form-resources|')"/>
-                            </xh:a>
+                            <xf:group> <!-- For styling, so has same margin has controls -->
+                                <xh:a
+                                    href="https://doc.orbeon.com/form-runner/component/static-dynamic-dropdown"
+                                    target="_blank"><xf:output value="xxf:r('xbl-control-settings.learn-settings-below', '|fr-form-resources|')"/>
+                                </xh:a>
+                            </xf:group>
                         </xh:td>
                     </xh:tr>
                     <xh:tr>

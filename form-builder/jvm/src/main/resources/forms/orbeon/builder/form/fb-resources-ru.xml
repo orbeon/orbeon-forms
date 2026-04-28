@@ -1339,34 +1339,6 @@
                 <value>fr-run-form-load-action-after-controls</value>
             </item>
         </form-event-type>
-        <!--<event-type>-->
-            <!--<label>Реагировать на</label>-->
-            <!--<hint>Событие (отдельного элемента или всей формы), которое вызывает действие.</hint>-->
-            <!--<item id="0">-->
-                <!--<label>Изменение значения</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-            <!--<item id="1">-->
-                <!--<label todo="true">Изменение значения ИЛИ загрузка формы</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-            <!--<item id="2">-->
-                <!--<label>Активация элемента</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-            <!--<item id="3">-->
-                <!--<label todo="true">Загрузка формы (after controls ready)</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-            <!--<item id="4">-->
-                <!--<label todo="true">Загрузка формы (before data ready)</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-            <!--<item id="5">-->
-                <!--<label todo="true">Загрузка формы (after data ready)</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-        <!--</event-type>-->
         <event-condition>
             <label>Выполнять действие в следующем случае</label>
             <item id="always">Всегда</item>

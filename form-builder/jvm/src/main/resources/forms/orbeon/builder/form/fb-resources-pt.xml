@@ -1339,34 +1339,6 @@
                 <value>fr-run-form-load-action-after-controls</value>
             </item>
         </form-event-type>
-        <!--<event-type>-->
-            <!--<label>Reagir a</label>-->
-            <!--<hint>Evento (num controlo ou global) ao qual reagir</hint>-->
-            <!--<item id="0">-->
-                <!--<label>Mudança de valor</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-            <!--<item id="1">-->
-                <!--<label todo="true">Mudança de valor ou carregamento de formulário</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-            <!--<item id="2">-->
-                <!--<label>Activação</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-            <!--<item id="3">-->
-                <!--<label todo="true">Carregamento de Formulário (after controls ready)</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-            <!--<item id="4">-->
-                <!--<label todo="true">Carregamento de Formulário (before data ready)</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-            <!--<item id="5">-->
-                <!--<label todo="true">Carregamento de Formulário (after data ready)</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-        <!--</event-type>-->
         <event-condition>
             <label>Condição</label>
             <item id="always">Correr sempre</item>

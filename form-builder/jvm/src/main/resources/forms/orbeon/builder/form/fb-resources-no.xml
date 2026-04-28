@@ -1340,34 +1340,6 @@
                 <value>fr-run-form-load-action-after-controls</value>
             </item>
         </form-event-type>
-        <!--<event-type>-->
-            <!--<label>Reager på</label>-->
-            <!--<hint>Hendelse (på en kontroll eller globalt) som det skal reageres på</hint>-->
-            <!--<item id="0">-->
-                <!--<label>Verdiendring</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-            <!--<item id="1">-->
-                <!--<label todo="true">Verdiendring eller skjemainnlasting</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-            <!--<item id="2">-->
-                <!--<label>Aktivering</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-            <!--<item id="3">-->
-                <!--<label todo="true">Skjemainnlasting (after controls ready)</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-            <!--<item id="4">-->
-                <!--<label todo="true">Skjemainnlasting (before data ready)</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-            <!--<item id="5">-->
-                <!--<label todo="true">Skjemainnlasting (after data ready)</label>-->
-                <!--<hint/>-->
-            <!--</item>-->
-        <!--</event-type>-->
         <event-condition>
             <label>Kjør handlingen i følgende tilfelle</label>
             <item id="always">Alltid</item>

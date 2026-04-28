@@ -501,7 +501,7 @@ object XFormsResponse {
 
     // Handle becoming relevant
     if (relevantOpt.contains(true))
-      Controls.setRelevant(documentElement, relevant = true)
+      XFormsUI.setRelevant(documentElement, isRelevant = true)
 
     val recreatedInput = maybeUpdateSchemaType(documentElement, controlId, newSchemaTypeOpt, formId)
     if (recreatedInput)
@@ -516,7 +516,7 @@ object XFormsResponse {
     // Handle readonly
     if (! isStaticReadonly)
       readonlyOpt
-        .foreach(Controls.setReadonly(documentElement, _))
+        .foreach(XFormsUI.setReadonly(documentElement, _))
 
     // Handle updates to custom classes
     classesOpt.foreach { classes =>
@@ -655,7 +655,7 @@ object XFormsResponse {
 
     // Store new label message in control attribute
     elem.attValueOpt("label") foreach { newLabel =>
-      Controls.setLabelMessage(documentElement, newLabel)
+      XFormsUI.setLabelMessage(documentElement, newLabel)
     }
 
     // Store new hint message in control attribute
@@ -671,7 +671,7 @@ object XFormsResponse {
 
     // Store new help message in control attribute
     elem.attValueOpt("help") foreach { newHelp =>
-      Controls.setHelpMessage(documentElement, newHelp)
+      XFormsUI.setHelpMessage(documentElement, newHelp)
     }
 
     // Store new alert message in control attribute
@@ -681,7 +681,7 @@ object XFormsResponse {
 
     // Store validity, label, hint, help in element
     newLevelOpt
-      .foreach(Controls.setConstraintLevel(documentElement, _))
+      .foreach(XFormsUI.setConstraintLevel(documentElement, _))
 
     // Handle progress for upload controls
     // The attribute `progress-expected="…"` could be missing, even if we have a
@@ -716,7 +716,7 @@ object XFormsResponse {
     // Handle becoming non-relevant after everything so that XBL companion class instances
     // are nulled and can be garbage-collected
     if (relevantOpt.contains(false))
-      Controls.setRelevant(documentElement, relevant = false)
+      XFormsUI.setRelevant(documentElement, isRelevant = false)
   }
 
   private def handleItemset(elem: dom.Element, controlId: String, controlsWithUpdatedItemsets : js.Dictionary[Boolean]): Unit = {
@@ -757,11 +757,11 @@ object XFormsResponse {
         newDocumentElement.classList.add("xforms-static")
         parentElement.replaceChild(newDocumentElement, documentElement)
 
-        Controls.getControlLHHA(newDocumentElement, "alert")
-          .foreach(parentElement.removeChild)
+        XFormsUI.findControlLHHA(newDocumentElement, "alert")
+          .foreach(parentElement.removeChild(_))
 
-        Controls.getControlLHHA(newDocumentElement, "hint")
-          .foreach(parentElement.removeChild)
+        XFormsUI.findControlLHHA(newDocumentElement, "hint")
+          .foreach(parentElement.removeChild(_))
 
           newDocumentElement
       } else {
@@ -1008,7 +1008,7 @@ object XFormsResponse {
     documentElement.children.filter(e => ! LhhaClasses.exists(e.classList.contains))
       .foreach(documentElement.removeChild)
 
-    val inputLabelElement = Controls.getControlLHHA(documentElement, "label").asInstanceOf[html.Label]
+    val inputLabelElement = XFormsUI.findControlLHHA(documentElement, "label").orNull.asInstanceOf[html.Label]
 
     newInputType match {
       case InputType.Boolean =>
@@ -1306,7 +1306,7 @@ object XFormsResponse {
     // Remove or add `xforms-disabled` on elements after this delimiter
     relevantOpt
       .map(_.toBoolean)
-      .foreach(Controls.setRepeatIterationRelevance(formId, repeatId, iteration, _))
+      .foreach(XFormsUI.setRepeatIterationRelevance(formId, repeatId, iteration, _))
   }
 
   private def handleValue(
@@ -1335,7 +1335,7 @@ object XFormsResponse {
       if (containsAnyOf(documentElement, HandleValueOutputOnlyControls))
         XFormsControls.setCurrentValue(documentElement, normalizedNewControlValue, force = false)
       else
-        Controls.getCurrentValue(documentElement) foreach { currentValue =>
+        XFormsUI.getCurrentValue(documentElement).foreach { currentValue =>
 
           val normalizedCurrentValue = currentValue.normalizeSerializedHtml
 
@@ -1383,7 +1383,7 @@ object XFormsResponse {
             maybeFutureToScalaFuture(promiseOrUndef) foreach { _ =>
               ServerValueStore.set(
                 controlId,
-                Controls.getCurrentValue(documentElement)
+                XFormsUI.getCurrentValue(documentElement)
               )
             }
           }

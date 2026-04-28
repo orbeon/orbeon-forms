@@ -207,71 +207,6 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
 
     ORBEON.xforms.Controls = {
 
-        getCurrentValue: function (control) {
-            var event = {control: control};
-            var jControl = $(control);
-
-            if (! _.isUndefined(event.result)) {
-                return event.result;
-            } else if ((jControl.is('.xforms-input') && ! jControl.is('.xforms-type-boolean, .xforms-static'))
-                    || jControl.is('.xforms-secret')) {
-                // Simple input
-                var input = control.tagName.toLowerCase() == "input" ? control : control.getElementsByTagName("input")[0];
-                return input.value;
-            } else if (jControl.is('.xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean')) {
-                // Checkboxes, radio buttons, boolean input
-                var inputs = control.getElementsByTagName("input");
-                var spanValue = "";
-                for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
-                    var input = inputs[inputIndex];
-                    if (input.checked) {
-                        if (spanValue != "") spanValue += " ";
-                        spanValue += input.value;
-                    }
-                }
-                // For boolean inputs, if the checkbox isn't checked, then the value is false
-                if (spanValue == "" && jControl.is('.xforms-input') && jControl.is('.xforms-type-boolean'))
-                    spanValue = "false";
-                return spanValue;
-            } else if (jControl.is('.xforms-select-appearance-compact, .xforms-select1-appearance-minimal, .xforms-select1-appearance-compact')) {
-                // Drop-down and list
-                var options = control.getElementsByTagName("select")[0].options;
-                var selectValue = "";
-                for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
-                    var option = options[optionIndex];
-                    if (option.selected) {
-                        if (selectValue != "") selectValue += " ";
-                        selectValue += option.value;
-                    }
-                }
-                return selectValue;
-            } else if (jControl.is('.xforms-textarea') && ! jControl.is('.xforms-static')) {
-                // Text area
-                var textarea = control.tagName.toLowerCase() == "textarea" ? control : control.getElementsByTagName("textarea")[0];
-                return textarea.value
-            } else if (jControl.is('.xforms-output, .xforms-input.xforms-static, .xforms-textarea.xforms-static')) {
-                // Output and static input
-                var output = jControl.children(".xforms-output-output, .xforms-field").first();
-                if (output.length > 0) {
-                    if (jControl.is(".xforms-mediatype-image")) {
-                        return output[0].src;
-                    } else if (jControl.is(".xforms-mediatype-video")) {
-                        return output[0].children[0].src;
-                    } else if (jControl.is(".xforms-output-appearance-xxforms-download")) {
-                        return null;
-                    } else if (jControl.is(".xforms-mediatype-text-html")) {
-                        return output[0].innerHTML;// NOTE: Used to be control.innerHTML, which seems wrong.
-                    } else {
-                        return ORBEON.util.Dom.getStringValue(output[0]);
-                    }
-                }
-            } else if (ORBEON.xforms.XFormsXbl.isComponent(control)) {
-                var instance = ORBEON.xforms.XBL.instanceForControl(control);
-                if (_.isObject(instance) && _.isFunction(instance.xformsGetValue))
-                    return instance.xformsGetValue();
-            }
-        },
-
         /**
          * Updates the value of a control in the UI.
          *
@@ -281,307 +216,17 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
         beforeValueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         valueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         afterValueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
-
-        // Mapping between className (parameter of this method and added after "xforms-") and id of elements
-        // in the case where they are outside of the control element.
-        _classNameToId: {
-            "label": XF_LHHAI_SEPARATOR + "l",
-            "hint": XF_LHHAI_SEPARATOR + "t",
-            "help": XF_LHHAI_SEPARATOR + "p",
-            "alert": XF_LHHAI_SEPARATOR + "a",
-            "control": XF_LHHAI_SEPARATOR + "c"
-        },
-
-        /**
-         * Look for an HTML element corresponding to an XForms LHHA element.
-         * In the HTML generated by the server there is 1 element for each one and 2 for the help.
-         */
-        getControlLHHA: function (control, lhhaType) {
-
-            // Search by id first
-            // See https://github.com/orbeon/orbeon-forms/issues/793
-            var lhhaElementId = ORBEON.util.Utils.appendToEffectiveId(control.id, ORBEON.xforms.Controls._classNameToId[lhhaType]);
-            var byId = document.getElementById(lhhaElementId);
-            if (byId != null)
-                return byId;
-
-            // Search just under the control element, excluding elements with an LHHA id, as they might be for a nested
-            // control if we are a grouping control. Test on XF_LHHAI_SEPARATOR as e.g. portals might add their own id.
-            // See: https://github.com/orbeon/orbeon-forms/issues/1206
-            var lhhaElements = $(control).children('.xforms-' + lhhaType).filter(function () {
-                return this.id.indexOf(XF_LHHAI_SEPARATOR) == -1
-            });
-            if (lhhaElements.length > 0)
-                return lhhaElements.get(0);
-
-            // If the control an LHHA, which happens for LHHA outside of the control, when the control is in a repeat
-            if (control.classList.contains("xforms-" + lhhaType))
-                return control;
-
-            // Nothing found
-            return null;
-        },
-
-        /**
-         * Return the control associated with a given LHHA element and its expected type.
-         */
-        getControlForLHHA: function (element, lhhaType) {
-            var suffix = ORBEON.xforms.Controls._classNameToId[lhhaType];
-            // NOTE: could probably do without lhhaType parameter
-            if (element.classList.contains("xforms-control"))
-                // LHHA element is itself a control, which happens for stand-alone LHHA outside of a repeat
-                return element
-            else if (element.id.indexOf(suffix) != -1)
-                return document.getElementById(element.id.replace(new RegExp(ORBEON.util.Utils.escapeRegex(ORBEON.xforms.Controls._classNameToId[lhhaType]), "g"), ''))
-            else
-                return element.parentNode;
-        },
-
-        _setMessage: function (control, lhhaType, message) {
-            var lhhaElement = ORBEON.xforms.Controls.getControlLHHA(control, lhhaType);
-            if (lhhaElement != null) {
-                lhhaElement.innerHTML = message;
-
-                // https://github.com/orbeon/orbeon-forms/issues/4062
-                if (lhhaType == "help")
-                    $(lhhaElement).toggleClass('xforms-disabled', message.trim() == "");
-            }
-            ORBEON.xforms.Controls.lhhaChangeEvent.fire({control: control, type: lhhaType, message: message});
-        },
-
         lhhaChangeEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
 
-        getLabelMessage: function (control) {
-            if ($(control).is('.xforms-trigger, .xforms-submit')) {
-                // Element is "label" and "control" at the same time so use "control"
-                var labelElement = ORBEON.xforms.Controls.getControlLHHA(control, "control");
-                return labelElement.innerHTML;
-            } else if ($(control).is('.xforms-dialog')) {
-                // Dialog
-                var labelDiv = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-                return labelDiv.innerHTML;
-            } else if ($(control).is('.xforms-group-appearance-xxforms-fieldset')) {
-                // Group with fieldset/legend
-                var legend = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-                if (legend != null)
-                    return legend.innerHTML;
-            } else {
-                var labelElement = ORBEON.xforms.Controls.getControlLHHA(control, "label");
-                return labelElement == null ? "" : labelElement.innerHTML;
-            }
-        },
 
-        setLabelMessage: function (control, message) {
-            if ($(control).is('.xforms-trigger, .xforms-submit')) {
-                // Element is "label" and "control" at the same time so use "control"
-                ORBEON.xforms.Controls._setMessage(control, "control", message);
-            } else if ($(control).is('.xforms-dialog')) {
-                // Dialog
-                var labelDiv = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-                labelDiv.innerHTML = message;
-            } else if ($(control).is('.xforms-group-appearance-xxforms-fieldset')) {
-                // Group with fieldset/legend
-                var legend = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-                if (legend != null)
-                    legend.innerHTML = message;
-            } else if ($(control).is('.xforms-output-appearance-xxforms-download')) {
-                // Download link
-                var anchor = control.children[0];
-                anchor.innerHTML = message;
-            } else {
-                ORBEON.xforms.Controls._setMessage(control, "label", message);
-            }
-        },
-
-        getHelpMessage: function (control) {
-            var helpElement = ORBEON.xforms.Controls.getControlLHHA(control, "help");
-            var helpMessage =
-                helpElement == null ? "" :
-                // When the help is a control (`xf:help` outside of its control), the content is markup, not escaped HTML
-                helpElement.classList.contains("xforms-control") ? helpElement.innerHTML :
-                ORBEON.util.Dom.getStringValue(helpElement);
-            return helpMessage;
-        },
-
-        setHelpMessage: function (control, message) {
-            // We escape the value because the help element is a little special, containing escaped HTML
-            message = ORBEON.common.MarkupUtils.escapeXmlMinimal(message);
-            ORBEON.xforms.Controls._setMessage(control, "help", message); // uses `innerHTML`
-            ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.helpTooltipForControl);
-        },
-
-        setConstraintLevel: function (control, newLevel) {
-
-            var alertActive = newLevel != "";
-
-            function toggleCommonClasses(element) {
-                $(element).toggleClass("xforms-invalid", newLevel == "error");
-                $(element).toggleClass("xforms-warning", newLevel == "warning");
-                $(element).toggleClass("xforms-info",    newLevel == "info");
-            }
-
-            // Classes on control
-            toggleCommonClasses(control);
-
-            // Classes on alert if any
-            var alertElement = ORBEON.xforms.Controls.getControlLHHA(control, "alert");
-            if (alertElement) {
-
-                $(alertElement).toggleClass("xforms-active", alertActive);
-
-                if (! _.isUndefined($(alertElement).attr("id")))
-                    toggleCommonClasses(alertElement);
-            }
-
-            // If the control is now valid and there is an alert tooltip for this control, get rid of it
-            var alertTooltip = ORBEON.xforms.Globals.alertTooltipForControl[control.id];
-            if (alertTooltip != null && alertTooltip != true) {
-                if (! alertActive) {
-                    // Prevent the tooltip from becoming visible on mouseover
-                    alertTooltip.cfg.setProperty("disabled", true);
-                    // If visible, hide the tooltip right away, otherwise it will only be hidden a few seconds later
-                    alertTooltip.hide();
-                } else {
-                    // When a control becomes invalid and it always has a tooltip, this means that the tooltip got disabled
-                    // when the control previously became valid, so now re-enable it
-                    alertTooltip.cfg.setProperty("disabled", false);
-                }
-            }
-        },
-
-        setDisabledOnFormElement: function (element, disabled) {
-            // Q: Could use `element.disabled = disabled`?
-            if (disabled) {
-                element.setAttribute("disabled", "disabled");
-            } else {
-                element.removeAttribute("disabled");
-            }
-        },
-
-        setReadonlyOnFormElement: function (element, readonly) {
-            // Q: Could use `element.readonly = readonly`?
-            if (readonly) {
-                element.setAttribute("readonly", "readonly");
-            } else {
-                element.removeAttribute("readonly");
-            }
-        },
-
-        setRelevant: function (control, isRelevant) {
-            var FN = ORBEON.xforms.FlatNesting;
-
-            var jControl = $(control);
-
-            if (jControl.is('.xforms-group-begin-end')) {
-                // Case of group delimiters
-                FN.setRelevant(control, isRelevant);
-            } else {
-                var elementsToUpdate = [
-                    control,
-                    ORBEON.xforms.Controls.getControlLHHA(control, "label"),
-                    ORBEON.xforms.Controls.getControlLHHA(control, "help"),
-                    ORBEON.xforms.Controls.getControlLHHA(control, "hint"),
-                    ORBEON.xforms.Controls.getControlLHHA(control, "alert")
-                ];
-                // Also show help if message is not empty
-                if (! isRelevant || (isRelevant && ORBEON.xforms.Controls.getHelpMessage(control) != "")) {
-                    elementsToUpdate.push(ORBEON.xforms.Controls.getControlLHHA(control, "help"));
-                }
-                // Also show hint if message is not empty
-                if (! isRelevant || (isRelevant && ORBEON.xforms.Controls.getHintMessage(control) != ""))
-                    elementsToUpdate.push(ORBEON.xforms.Controls.getControlLHHA(control, "hint"));
-
-                // Go through elements to update, and update classes
-                _.each(elementsToUpdate, function(element) {
-                    if (element != null) {
-                        if (isRelevant) {
-                            element.classList.remove("xforms-disabled");
-                        } else {
-                            element.classList.add("xforms-disabled");
-                        }
-                    }
-                });
-            }
-        },
-
-        setRepeatIterationRelevance: function(formID, repeatID, iteration, relevant) {
-            var OU = ORBEON.util.Utils;
-            var FN = ORBEON.xforms.FlatNesting;
-
-            var delimiter = OU.findRepeatDelimiter(formID, repeatID, iteration);
-            FN.setRelevant(delimiter, relevant);
-        },
-
-        setReadonly: function (control, isReadonly) {
-
-            var jControl = $(control);
-
-            // Update class
-            if (isReadonly) {
-                control.classList.add("xforms-readonly");
-            } else {
-                control.classList.remove("xforms-readonly");
-            }
-
-            if (jControl.is('.xforms-group-begin-end')) {
-                // Case of group delimiters
-                // Readonlyness is no inherited by controls inside the group, so we are just updating the class on the begin-marker
-                // to be consistent with the markup generated by the server.
-                // if (isReadonly) {
-                //     YAHOO.util.Dom.addClass(control, "xforms-readonly");
-                // } else {
-                //     YAHOO.util.Dom.removeClass(control, "xforms-readonly");
-                // }
-            } else if (jControl.is('.xforms-input, .xforms-secret')) {
-                // Input fields
-                // Update disabled on input fields
-                var inputs = control.getElementsByTagName("input");
-                for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
-                    var input = inputs[inputIndex];
-                    ORBEON.xforms.Controls.setReadonlyOnFormElement(input, isReadonly);
-                }
-                if (control.tagName.toLowerCase() == "input")
-                    ORBEON.xforms.Controls.setReadonlyOnFormElement(control, isReadonly);
-            } else if (jControl.is('.xforms-select1-appearance-full, .xforms-select-appearance-full')) {
-                // Radio buttons, or checkboxes
-                // Update disabled on input fields
-                // See:
-                // - https://github.com/orbeon/orbeon-forms/issues/5595
-                // - https://github.com/orbeon/orbeon-forms/issues/5427
-                var inputs = control.getElementsByTagName("input");
-                for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
-                    var input = inputs[inputIndex];
-                    ORBEON.xforms.Controls.setDisabledOnFormElement(input, isReadonly);
-                }
-            } else if (jControl.is('.xforms-select-appearance-compact, .xforms-select1-appearance-minimal, .xforms-select1-appearance-compact')) {
-                // Lists
-                var select = control.getElementsByTagName("select")[0];
-                ORBEON.xforms.Controls.setDisabledOnFormElement(select, isReadonly);
-            } else if (jControl.is('.xforms-output, .xforms-group')) {
-                // XForms output and group
-            } else if (jControl.is('.xforms-upload')) {
-                // Upload control
-                ORBEON.xforms.Controls.setDisabledOnFormElement(
-                        control.getElementsByClassName("xforms-upload-select")[0], isReadonly);
-            } else if (jControl.is('.xforms-textarea')) {
-                // Textarea
-                var textarea = control.getElementsByTagName("textarea")[0];
-                ORBEON.xforms.Controls.setReadonlyOnFormElement(textarea, isReadonly);
-            } else if (jControl.is('.xforms-trigger')
-                    || jControl.is('.xforms-submit' )) {
-                // Button
-                var button = ORBEON.util.Dom.getElementByTagName(control, "button");
-                ORBEON.xforms.Controls.setDisabledOnFormElement(button, isReadonly);
-            }
-        },
 
         getAlertMessage: function (control) {
-            var alertElement = ORBEON.xforms.Controls.getControlLHHA(control, "alert");
+            var alertElement = ORBEON.xforms.XFormsUi.getControlLHHA(control, "alert");
             return alertElement.innerHTML;
         },
 
         setAlertMessage: function (control, message) {
-            ORBEON.xforms.Controls._setMessage(control, "alert", message);
+            ORBEON.xforms.XFormsUi.setMessage(control, "alert", message);
             ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.alertTooltipForControl);
         },
 
@@ -591,7 +236,7 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
                 return formElement.title;
             } else {
                 // Element for hint
-                var hintElement = ORBEON.xforms.Controls.getControlLHHA(control, "hint");
+                var hintElement = ORBEON.xforms.XFormsUi.getControlLHHA(control, "hint");
                 return hintElement == null ? "" : hintElement.innerHTML;
             }
         },
@@ -617,7 +262,7 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
                     formElement.title = message;
                 }
             } else {
-                ORBEON.xforms.Controls._setMessage(control, "hint", message);
+                ORBEON.xforms.XFormsUi.setMessage(control, "hint", message);
             }
             // If there is already a YUI hint created for that control, update the message for the YUI widget
             ORBEON.xforms.Controls._setTooltipMessage(control, message, tooltips);
@@ -721,7 +366,7 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
             // with `xf:setfocus`, we still receive the focus event when the value changes, but after the change event
             // (which means we then don't send the new value to the server).
             if (! control.classList.contains("xforms-static") && ORBEON.xforms.ServerValueStore.get(controlId) == null) {
-                var currentValue = ORBEON.xforms.Controls.getCurrentValue(control);
+                var currentValue = ORBEON.xforms.XFormsUi.getCurrentValue(control);
                 ORBEON.xforms.ServerValueStore.set(controlId, currentValue);
             }
         },
@@ -775,7 +420,7 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
 
             // Classes on external alert if any
             // Q: Is this 100% reliable to determine if the alert is external?
-            var alertElement = ORBEON.xforms.Controls.getControlLHHA(control, "alert");
+            var alertElement = ORBEON.xforms.XFormsUi.getControlLHHA(control, "alert");
             if (alertElement && ! _.isUndefined($(alertElement).attr("id")))
                 $(alertElement).toggleClass("xforms-visited", newVisited);
         },

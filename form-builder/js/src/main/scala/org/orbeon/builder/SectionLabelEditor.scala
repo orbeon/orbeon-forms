@@ -16,16 +16,13 @@ package org.orbeon.builder
 import autowire.*
 import io.udash.wrappers.jquery.{JQuery, JQueryCallbacks}
 import org.orbeon.builder.rpc.FormBuilderRpcApi
-import org.orbeon.jquery.{Offset, JqueryOps}
+import org.orbeon.fr.FormRunnerUtils
+import org.orbeon.jquery.Offset
 import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.facade.*
 import org.orbeon.xforms.rpc.RpcClient
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
-import org.orbeon.fr.FormRunnerAPI
-import org.orbeon.fr.FormRunnerUtils
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, XFormsUI}
 import org.scalajs.dom
-import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
@@ -125,7 +122,7 @@ object SectionLabelEditor {
         // Set placeholder, done every time to account for a value change when changing current language
         locally {
           val placeholderOutput = SectionGridEditor.sectionGridEditorContainer.children(".fb-type-section-title-label")
-          val placeholderValue  = Controls.getCurrentValue(placeholderOutput.get(0).get.asInstanceOf[dom.html.Element])
+          val placeholderValue  = XFormsUI.getCurrentValue(placeholderOutput.get(0).get.asInstanceOf[dom.html.Element])
           labelInput.attr("placeholder", placeholderValue.get)
         }
 
@@ -167,7 +164,7 @@ object SectionLabelEditor {
       val labelAnchor = section.el.find(SectionLabelSelector)
       if (labelAnchor.text() == "") {
         val outputWithHintMessage = SectionGridEditor.sectionGridEditorContainer.children(".fb-enter-section-title-label")
-        val hintMessage = Controls.getCurrentValue(outputWithHintMessage.get(0).get.asInstanceOf[dom.html.Element]).get
+        val hintMessage = XFormsUI.getCurrentValue(outputWithHintMessage.get(0).get.asInstanceOf[dom.html.Element]).get
         clickInterceptor.text(hintMessage)
       }
     }

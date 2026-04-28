@@ -30,8 +30,8 @@ object Help {
     val jControlEl    = $(controlEl)
     val jControlElDyn = jControlEl.asInstanceOf[js.Dynamic]
 
-    val labelText = Controls.getLabelMessage(controlEl)
-    val helpText  = Controls.getHelpMessage(controlEl)
+    val labelText = XFormsUI.getLabelMessage(controlEl)
+    val helpText  = XFormsUI.getHelpMessage(controlEl)
 
     def explicitContainerWithClassOpt: Option[dom.Element] = {
       val explicitClassSelector = ".xforms-help-popover-control"
@@ -44,7 +44,7 @@ object Help {
       jCommonAncestor(jControlEl.find(":input:visible:not(.xforms-help), output:visible"))
 
     def labelElementOpt: Option[dom.Element] =
-      Controls.getControlLHHA(controlEl, "label").toOption
+      XFormsUI.findControlLHHA(controlEl, "label")
 
     def hasVisibleDimensions(el: dom.Element): Boolean = {
       val rect = el.getBoundingClientRect()

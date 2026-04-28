@@ -23,7 +23,7 @@ object XFormsUiEventHandlers {
             AjaxEvent(
               eventName   = EventNames.XXFormsValue,
               targetId    = target.id,
-              properties  = Map("value" -> Controls.getCurrentValue(target)), // Q: What if `getCurrentValue` is undefined?
+              properties  = Map("value" -> XFormsUI.getCurrentValue(target)), // Q: What if `getCurrentValue` is undefined?
               incremental = true
             )
           )
@@ -68,7 +68,7 @@ object XFormsUiEventHandlers {
         }
 
         // Fire change event if the control has a value
-        Controls.getCurrentValue(target).foreach { controlCurrentValue =>
+        XFormsUI.getCurrentValue(target).foreach { controlCurrentValue =>
           AjaxClient.fireEvent(
             AjaxEvent(
               eventName  = EventNames.XXFormsValue,
@@ -107,7 +107,7 @@ object XFormsUiEventHandlers {
               "xforms-select1-appearance-compact"
             )
         ) {
-          Controls.getCurrentValue(newFocusControlElement).foreach { controlCurrentValue =>
+          XFormsUI.getCurrentValue(newFocusControlElement).foreach { controlCurrentValue =>
             ServerValueStore.set(newFocusControlElement.id, controlCurrentValue)
           }
         }
@@ -187,7 +187,7 @@ object XFormsUiEventHandlers {
             target.focus()
 
             // Send a value change and DOM activate
-            Controls.getCurrentValue(control).foreach { controlCurrentValue =>
+            XFormsUI.getCurrentValue(control).foreach { controlCurrentValue =>
               AjaxClient.fireEvent(
                 AjaxEvent(
                   eventName  = EventNames.XXFormsValue,

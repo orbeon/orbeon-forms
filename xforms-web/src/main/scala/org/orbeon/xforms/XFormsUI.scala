@@ -16,10 +16,12 @@ package org.orbeon.xforms
 import io.udash.wrappers.jquery.JQueryPromise
 import org.log4s.Logger
 import org.orbeon.facades.HTMLDialogElement
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.facade.{Controls, Events}
+import org.orbeon.xforms.facade.{Controls, Events, FlatNesting, XBL}
 import org.scalajs.dom
 import org.scalajs.dom.{MouseEvent, html}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -48,6 +50,310 @@ object XFormsUI {
   // - if a checked box is clicked with shift, ensure all the checkboxes in the range are checked
   //
   // This matches what GMail does AFAICT.
+
+  private val ClassNameToId: Map[String, String] = Map(
+    "label"   -> (Constants.LhhacSeparator + "l"),
+    "hint"    -> (Constants.LhhacSeparator + "t"),
+    "help"    -> (Constants.LhhacSeparator + "p"),
+    "alert"   -> (Constants.LhhacSeparator + "a"),
+    "control" -> (Constants.LhhacSeparator + "c")
+  )
+
+  @JSExport
+  def getControlLHHA(control: html.Element, lhhaType: String): html.Element =
+    findControlLHHA(control: html.Element, lhhaType: String).orNull
+
+  def findControlLHHA(control: html.Element, lhhaType: String): Option[html.Element] = {
+
+    // Search by id first
+    // See https://github.com/orbeon/orbeon-forms/issues/793
+    def byIdOpt: Option[html.Element] =
+      dom
+        .document
+        .getElementByIdOpt(XFormsId.appendToEffectiveId(control.id, ClassNameToId(lhhaType)))
+
+    // Search just under the control element, excluding elements with an LHHA id, as they might be for a nested
+    // control if we are a grouping control. Test on `LhhacSeparator` as e.g. portals might add their own id.
+    // See: https://github.com/orbeon/orbeon-forms/issues/1206
+    def directChildOpt: Option[html.Element] =
+      control
+        .childrenT
+        .find(c => c.hasClass("xforms-" + lhhaType) && ! c.id.contains(Constants.LhhacSeparator))
+
+    // If the control is an LHHA, which happens for LHHA outside of the control, when the control is in a repeat
+    def isLhhaOpt: Option[html.Element] =
+      control.hasClass("xforms-" + lhhaType).option(control)
+
+    byIdOpt
+      .orElse(directChildOpt)
+      .orElse(isLhhaOpt)
+  }
+
+  private def getControlForLHHA(element: html.Element, lhhaType: String): html.Element = {
+    val suffix = ClassNameToId(lhhaType)
+    if (element.hasClass("xforms-control"))
+      element
+    else if (element.id.contains(suffix))
+      dom.document.getElementByIdT(element.id.replace(suffix, ""))
+    else
+      element.parentElement
+  }
+
+  // lhhaChangeEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
+  @JSExport
+  def setMessage(control: html.Element, lhhaType: String, message: String): Unit =
+    findControlLHHA(control, lhhaType).foreach { lhhaElement =>
+      lhhaElement.innerHTML = message
+      // https://github.com/orbeon/orbeon-forms/issues/4062
+      if (lhhaType == "help") {
+        if (message.isAllBlank)
+          lhhaElement.classList.add("xforms-disabled")
+        else
+          lhhaElement.classList.remove("xforms-disabled")
+      }
+    }
+
+  @JSExport
+  def getLabelMessage(control: html.Element): String =
+    if (control.hasAnyClass("xforms-trigger", "xforms-submit"))
+      findControlLHHA(control, "control").map(_.innerHTML).getOrElse("")
+    else if (control.hasClass("xforms-dialog"))
+      control.childrenT.headOption.map(_.innerHTML).getOrElse("")
+    else if (control.hasClass("xforms-group-appearance-xxforms-fieldset"))
+      control.childrenT.headOption.map(_.innerHTML).getOrElse("")
+    else
+      findControlLHHA(control, "label").map(_.innerHTML).getOrElse("")
+
+  @JSExport
+  def setLabelMessage(control: html.Element, message: String): Unit =
+    if (control.hasAnyClass("xforms-trigger", "xforms-submit"))
+      setMessage(control, "control", message)
+    else if (control.hasClass("xforms-dialog"))
+      control.childrenT.headOption.foreach(_.innerHTML = message)
+    else if (control.hasClass("xforms-group-appearance-xxforms-fieldset"))
+      control.childrenT.headOption.foreach(_.innerHTML = message)
+    else if (control.hasClass("xforms-output-appearance-xxforms-download"))
+      control.childrenT.headOption.foreach(_.innerHTML = message)
+    else
+      setMessage(control, "label", message)
+
+  @JSExport
+  def getHelpMessage(control: html.Element): String =
+    findControlLHHA(control, "help") match {
+      case None => ""
+      case Some(helpElement) =>
+        if (helpElement.hasClass("xforms-control"))
+          helpElement.innerHTML
+        else
+          helpElement.textContent
+    }
+
+  @JSExport
+  def setHelpMessage(control: html.Element, message: String): Unit = {
+    val escapedMessage = message.escapeXmlMinimal
+    setMessage(control, "help", escapedMessage)
+    Controls._setTooltipMessage(control, escapedMessage, Globals.helpTooltipForControl)
+  }
+
+  @JSExport
+  def setConstraintLevel(control: html.Element, newLevel: String): Unit = {
+
+    val alertActive = newLevel != ""
+
+    def toggleCommonClasses(element: html.Element): Unit = {
+      if (newLevel == "error")   element.classList.add("xforms-invalid") else element.classList.remove("xforms-invalid")
+      if (newLevel == "warning") element.classList.add("xforms-warning") else element.classList.remove("xforms-warning")
+      if (newLevel == "info")    element.classList.add("xforms-info")    else element.classList.remove("xforms-info")
+    }
+
+    toggleCommonClasses(control)
+
+    findControlLHHA(control, "alert").foreach { alertElement =>
+      if (alertActive)
+        alertElement.classList.add("xforms-active") else alertElement.classList.remove("xforms-active")
+      if (alertElement.id.nonAllBlank)
+        toggleCommonClasses(alertElement)
+    }
+
+    Globals.alertTooltipForControl.get(control.id).foreach { alertTooltipDyn =>
+      if (alertTooltipDyn != null && ! js.isUndefined(alertTooltipDyn) && alertTooltipDyn.toString != "true") {
+        val alertTooltip = alertTooltipDyn.asInstanceOf[js.Dynamic]
+        if (! alertActive) {
+          // Prevent the tooltip from becoming visible on mouseover
+          alertTooltip.cfg.setProperty("disabled", true)
+          // If visible, hide the tooltip right away, otherwise it will only be hidden a few seconds later
+          if (js.typeOf(alertTooltip.hide) == "function")
+            alertTooltip.hide()
+        } else {
+          alertTooltip.cfg.setProperty("disabled", false)
+        }
+      }
+    }
+  }
+
+  @JSExport
+  def setDisabledOnFormElement(element: html.Element, disabled: Boolean): Unit =
+    if (disabled)
+      element.setAttribute("disabled", "disabled") // Q: Could use `element.disabled = disabled`?
+    else
+      element.removeAttribute("disabled")
+
+  @JSExport
+  def setReadonlyOnFormElement(element: html.Element, readonly: Boolean): Unit =
+    if (readonly)
+      element.setAttribute("readonly", "readonly") // Q: Could use `element.readonly = readonly`?
+    else
+      element.removeAttribute("readonly")
+
+  @JSExport
+  def setRelevant(control: html.Element, isRelevant: Boolean): Unit =
+    if (control.hasClass("xforms-group-begin-end")) {
+      FlatNesting.setRelevant(control, isRelevant)
+    } else {
+
+      val elementsToUpdate =
+        control ::
+        findControlLHHA(control, "label").toList :::
+        findControlLHHA(control, "alert").toList :::
+        (! isRelevant || (isRelevant && getHelpMessage(control).nonAllBlank))
+          .flatList(findControlLHHA(control, "help").toList) :::
+        (! isRelevant || (isRelevant && Controls.getHintMessage(control).nonAllBlank))
+          .flatList(findControlLHHA(control, "hint").toList)
+
+      elementsToUpdate.foreach { element =>
+        if (isRelevant)
+          element.classList.remove("xforms-disabled")
+        else
+          element.classList.add("xforms-disabled")
+      }
+    }
+
+  @JSExport
+  def setRepeatIterationRelevance(formID: String, repeatID: String, iteration: String, relevant: Boolean): Unit =
+    FlatNesting.setRelevant(
+      element  = org.orbeon.xforms.facade.Utils.findRepeatDelimiter(formID, repeatID, iteration.toInt),
+      relevant = relevant
+    )
+
+  @JSExport
+  def setReadonly(control: html.Element, isReadonly: Boolean): Unit = {
+
+    if (isReadonly)
+      control.classList.add("xforms-readonly")
+    else
+      control.classList.remove("xforms-readonly")
+
+    if (control.hasClass("xforms-group-begin-end")) {
+      // Case of group delimiters
+      // Readonliness is not inherited by controls inside the group, so we are just updating the class on the begin-marker
+    } else if (control.hasAnyClass("xforms-input", "xforms-secret")) {
+      control.queryNestedElems[html.Input]("input", includeSelf = true)
+        .foreach(setReadonlyOnFormElement(_, isReadonly))
+    } else if (control.hasAnyClass("xforms-select1-appearance-full", "xforms-select-appearance-full")) {
+      // Radio buttons or checkboxes
+      // Update disabled on input fields
+      // See:
+      // - https://github.com/orbeon/orbeon-forms/issues/5595
+      // - https://github.com/orbeon/orbeon-forms/issues/5427
+      control.queryNestedElems[html.Input]("input", includeSelf = false)
+        .foreach(setDisabledOnFormElement(_, isReadonly))
+    } else if (
+      control.hasAnyClass(
+        "xforms-select-appearance-compact",
+        "xforms-select1-appearance-minimal",
+        "xforms-select1-appearance-compact"
+      )) {
+        control.queryNestedElems[html.Select]("select", includeSelf = false).headOption
+          .foreach(setDisabledOnFormElement(_, isReadonly))
+    } else if (control.hasAnyClass("xforms-output", "xforms-group")) {
+      // NOP
+    } else if (control.hasClass("xforms-upload")) {
+      control.queryNestedElems[html.Element](".xforms-upload-select", includeSelf = false).headOption
+        .foreach(setDisabledOnFormElement(_, isReadonly))
+    } else if (control.hasClass("xforms-textarea")) {
+      control.queryNestedElems[html.TextArea]("textarea", includeSelf = false).headOption
+        .foreach(setReadonlyOnFormElement(_, isReadonly))
+    } else if (control.hasAnyClass("xforms-trigger", "xforms-submit")) {
+      control.queryNestedElems[html.Button]("button", includeSelf = false).headOption
+        .foreach(setDisabledOnFormElement(_, isReadonly))
+    }
+  }
+
+  @JSExport
+  def getCurrentValue(control: html.Element): js.UndefOr[String] =
+    if ((
+      control.hasClass("xforms-input") && ! control.hasAnyClass("xforms-type-boolean", "xforms-static")) ||
+      control.hasClass("xforms-secret")
+    ) {
+      // Simple input
+      control.queryNestedElems[html.Input]("input", includeSelf = true).head.value
+    } else if (
+      control.hasAnyClass(
+        "xforms-select-appearance-full",
+        "xforms-select1-appearance-full",
+        "xforms-type-boolean"
+      ) ||
+        control.hasAllClasses("xforms-input", "xforms-type-boolean")
+    ) {
+      // Checkboxes, radio buttons, boolean input
+      val spanValue =
+        control.queryNestedElems[html.Input]("input", includeSelf = false)
+          .filter(_.checked)
+          .map(_.value)
+          .mkString(" ")
+
+      // For boolean inputs, if the checkbox isn't checked, then the value is false
+      if (spanValue.isEmpty && control.hasAllClasses("xforms-input", "xforms-type-boolean"))
+        false.toString
+      else
+        spanValue
+    } else if (
+      control.hasAnyClass(
+        "xforms-select-appearance-compact",
+        "xforms-select1-appearance-minimal",
+        "xforms-select1-appearance-compact"
+      )
+    ) {
+      // Drop-down and list
+      val selectOpt = control.queryNestedElems[html.Select]("select", includeSelf = false).headOption
+      selectOpt match {
+        case Some(select) =>
+          val selectedValues =
+            for {
+              option <- select.options
+              if option.selected
+            } yield
+              option.value
+          selectedValues.mkString(" ")
+        case None => ""
+      }
+    } else if (control.hasClass("xforms-textarea") && ! control.hasClass("xforms-static")) {
+      // Text area
+      control.queryNestedElems[html.TextArea]("textarea", includeSelf = true).head.value
+    } else if (
+      control.hasClass("xforms-output")                      ||
+      control.hasAllClasses("xforms-input", "xforms-static") ||
+      control.hasAllClasses("xforms-textarea", "xforms-static")
+    ) {
+      // Output and static input
+      control.querySelectorOpt(".xforms-output-output, .xforms-field") match {
+        case Some(output: html.Image) if control.hasClass("xforms-mediatype-image")        => output.src
+        case Some(output: html.Video) if control.hasClass("xforms-mediatype-video")        => output.childrenT.head.getAttribute("src")
+        case Some(_)      if control.hasClass("xforms-output-appearance-xxforms-download") => null
+        case Some(output) if control.hasClass("xforms-mediatype-text-html")                => output.innerHTML
+        case Some(output)                                                                  => output.textContent
+        case None                                                                          => js.undefined
+      }
+    } else if (XFormsXbl.isComponent(control)) {
+      val instance = XBL.instanceForControl(control) // can return `null` but should not be undefined
+      if (! js.isUndefined(instance) && instance != null && js.typeOf(instance.asInstanceOf[js.Dynamic].xformsGetValue) == "function")
+        instance.xformsGetValue()
+      else
+        js.undefined
+    } else {
+      js.undefined
+    }
+
   @JSExport
   def handleShiftSelection(clickEvent: dom.MouseEvent, controlElem: html.Element): Unit =
     if (controlElem.hasClass("xforms-select-appearance-full")) {
@@ -103,7 +409,7 @@ object XFormsUI {
         clickEvent.target.narrowTo[html.Input] foreach { currentCheckboxElem =>
           if (clickEvent.getModifierState("Shift"))
             for {
-              (lastControlElem, lastCheckboxElem) <- lastCheckboxChecked
+              case (lastControlElem, lastCheckboxElem) <- lastCheckboxChecked
               if lastControlElem.id == controlElem.id
               allCheckboxes                       = checkboxInputs.toList
               lastIndex                           = allCheckboxes.indexWhere(_.value == lastCheckboxElem.value)
@@ -222,7 +528,7 @@ object XFormsUI {
         // NOTE: control may be `null` if we have `<div for="">`. Using `control.getAttribute("for")` returns a proper
         // for, but then tooltips sometimes fail later with Ajax portlets in particular. So for now, just don't
         // do anything if there is no control found.
-        Option(Controls.getControlForLHHA(target, "alert")).foreach { formField =>
+        Option(XFormsUI.getControlForLHHA(target, "alert")).foreach { formField =>
           if (! isTooltipDisabled(target, "alert")) {
             // The 'for' typically points to a form field which is inside the element representing the control
             Option(Events._findParentXFormsControl(formField)).foreach { control2 =>
@@ -235,7 +541,7 @@ object XFormsUI {
         // Help tooltip
         controlOpt.foreach { control =>
           if (Page.getXFormsFormFromHtmlElemOrThrow(control).helpTooltip()) {
-            val message = Controls.getHelpMessage(control)
+            val message = XFormsUI.getHelpMessage(control)
             Events._showToolTip(Globals.helpTooltipForControl, control, target, "-orbeon-help-tooltip", message, event)
           }
         }

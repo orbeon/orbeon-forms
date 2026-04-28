@@ -72,7 +72,7 @@ object DocumentAPI extends js.Object {
     controlIdOrElem : String | html.Element,
     formElem        : js.UndefOr[html.Form] = js.undefined
   ): js.UndefOr[String] =
-      Controls.getCurrentValue(findControlOrThrow(controlIdOrElem, formElem))
+      XFormsUI.getCurrentValue(findControlOrThrow(controlIdOrElem, formElem))
 
   private val disallowedClassesToError = List(
     "xforms-output"   -> "an output control",
@@ -99,7 +99,7 @@ object DocumentAPI extends js.Object {
         return js.Promise.reject(new js.Error(s"Cannot set the value of $error for id `${control.id}`"))
 
     def fireValueEvent(): Unit =
-      Controls.getCurrentValue(control).foreach { newValue =>
+      XFormsUI.getCurrentValue(control).foreach { newValue =>
         // Use the value from the control, not the one received (2023-05-18 why?)
         AjaxClient.fireEvent(
           AjaxEvent(

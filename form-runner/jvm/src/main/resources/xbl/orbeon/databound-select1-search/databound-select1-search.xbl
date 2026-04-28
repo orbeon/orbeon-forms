@@ -309,7 +309,7 @@
 
             <!-- Scala.js tells us that a new value was selected, save the label -->
             <xbl:handler event="fr-change">
-                <xf:var name="binding" value="xxf:binding('fr-databound-select1-search')"/>
+                <xf:var name="binding"><xxf:value value="." xxbl:scope="outer"/></xf:var>
                 <!-- Save label and value -->
                 <xf:setvalue ref="$binding/@label"         value="event('fr-label')"/>
                 <xf:setvalue ref="instance('local')/label" value="event('fr-label')"/>
@@ -320,7 +320,7 @@
             <!-- Q: Should we update attributes if the control *becomes* readwrite? -->
             <xbl:handler event="xforms-enabled" if="not(xxf:readonly($binding))">
                 <xf:var name="use-label-attribute" value="xxf:component-param-value('service-performs-search') = 'true' or xxf:component-param-value('store-label') = 'true'"/>
-                <xf:var name="binding"             value="xxf:binding('fr-databound-select1-search')"/>
+                <xf:var name="binding"><xxf:value value="." xxbl:scope="outer"/></xf:var>
                 <xf:insert
                     if="$use-label-attribute and empty($binding/@label)"
                     context="$binding"
@@ -335,6 +335,10 @@
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:template match="/*">
+
+                    <xsl:variable name="is-multiple" select="local-name() = 'databound-select'"/>
+                    <xsl:variable name="binding-id"  select="if ($is-multiple) then 'fr-databound-select-search' else 'fr-databound-select1-search'"/>
+
                     <xf:group appearance="xxf:internal" id="view">
                         <xf:model>
 
@@ -356,7 +360,7 @@
                             <xf:instance id="result-raw" ><_/></xf:instance>
                             <xf:instance id="result-json"><_/></xf:instance>
 
-                            <xf:var name="binding"                   value="xxf:binding('fr-databound-select1-search')"/>
+                            <xf:var name="binding"                   value="xxf:binding('{$binding-id}')"/>
                             <xf:var name="auto-select-unique-choice" value="xxf:component-param-value('auto-select-unique-choice') = 'true'"/>
                             <xf:var name="open-selection"            value="xxf:component-param-value('selection')"/>
                             <xf:var name="is-open-selection"         value="$open-selection = 'open'"/>
@@ -570,8 +574,7 @@
                         </xf:action>
 
                         <xsl:variable name="service-performs-search" select="@service-performs-search/string() = 'true'"/>
-                        <xsl:variable name="is-multiple"             select="local-name() = 'databound-select'"/>
-                        <xf:var       name="binding"                 value="xxf:binding('fr-databound-select1-search')"/>
+                        <xf:var       name="binding"                 value="xxf:binding('{$binding-id}')"/>
                         <xf:var       name="view"                    value="fr:mode() = ('view', 'pdf')"/>
                         <xf:var       name="min-input-length"        value="fr:component-param-value('min-input-length')"/>
                         <xf:var
@@ -636,8 +639,8 @@
                             xxf:element="span"
                             class="{{'fr-service-error'[instance('local')/submission-status = 'failure']}}"
                             data-placeholder="{{
-                                if (xxf:label-appearance('fr-databound-select1-search') = 'minimal') then
-                                    xxf:label('fr-databound-select1-search')
+                                if (xxf:label-appearance('{$binding-id}') = 'minimal') then
+                                    xxf:label('{$binding-id}')
                                 else
                                     xxf:r('components.labels.please-select', '|fr-fr-resources|')
                             }}"

@@ -3,27 +3,46 @@
     <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
     <application-name>
         <label>Område</label>
-        <hint todo="true">Ett namn som håller samman en grupp formulär, med exempelvis gemensam funktionalitet eller organisation (som "försäljning" eller företagsnamn). Detta namn visas i formulärets URL. Därför rekommenderar vi små bokstäver.</hint>
-        <help todo="true" />
-        <alert todo="true">Tillåtna tecken är bokstäver a-z, A-Z, siffror, "-" samt "_"</alert>
+        <hint>Ett namn som håller samman en grupp formulär, med exempelvis gemensam funktionalitet eller organisation (som "försäljning" eller företagsnamn). Detta namn visas i formulärets URL. Därför rekommenderar vi små bokstäver.</hint>
+        <help>
+            &lt;p&gt;
+            Applikationsnamnet är ett namn som gör det möjligt att gruppera formulär. Applikationsnamnet kan till exempel vara:
+            &lt;/p&gt;
+            &lt;ul&gt;
+                &lt;li&gt;ett företagsnamn som "orbeon" eller "acme"&lt;/li&gt;
+                &lt;li&gt;en företagsenhet som "hr", "försäljning" eller "teknik"&lt;/li&gt;
+                &lt;li&gt;ett projektnamn som "mercury" eller "phoenix"&lt;/li&gt;
+            &lt;/ul&gt;
+            &lt;p&gt;
+            Detta namn visas i URL:en för det publicerade formuläret, därför rekommenderar vi att du använder enbart gemener.
+            &lt;/p&gt;
+        </help>
+        <alert>Tillåtna tecken är bokstäver a-z, A-Z, siffror, "-" samt "_"</alert>
     </application-name>
     <form-name>
         <label>Formulär</label>
-        <hint todo="true">Ett namn som identifierar detta formulär inom sitt område. Namnet visas i formulärets URL. Därför rekommenderar vi små bokstäver.</hint>
-        <help todo="true" />
-        <alert todo="true">Tillåtna tecken är bokstäver a-z, A-Z, siffror, "-" samt "_"</alert>
-        <no-form-alert todo="true">
-            No form with this specific application and form name in this system have been found in this system.
+        <hint>Ett namn som identifierar detta formulär inom sitt område. Namnet visas i formulärets URL. Därför rekommenderar vi små bokstäver.</hint>
+        <help>
+            &lt;p&gt;
+            Formulärnamnet är ett namn som är lokalt för ett applikationsnamn, till exempel "adress" eller "ansökan".
+            &lt;/p&gt;
+            &lt;p&gt;
+            Detta namn visas i URL:en, därför rekommenderar vi att du använder enbart gemener.
+            &lt;/p&gt;
+        </help>
+        <alert>Tillåtna tecken är bokstäver a-z, A-Z, siffror, "-" samt "_"</alert>
+        <no-form-alert>
+            Inget formulär med detta specifika applikationsnamn och formulärnamn har hittats i systemet.
         </no-form-alert>
-        <form-published-alert todo="true">
-            {0,choice,1#One form|1&lt;{0,number,integer} forms}
-            with this application name and form name {0,choice,1#is|1&lt;are} published.
-            &lt;a href="{1}" target="_blank"&gt;View in the Admin page.&lt;/a&gt;
+        <form-published-alert>
+            {0,choice,1#Ett formulär|1&lt;{0,number,integer} formulär}
+            med detta applikationsnamn och formulärnamn {0,choice,1#är|1&lt;är} publicerat.
+            &lt;a href="{1}" target="_blank"&gt;Visa på administrationssidan.&lt;/a&gt;
         </form-published-alert>
-        <form-in-progress-alert todo="true">
-            {0,choice,1#One form|1&lt;{0,number,integer} forms}
-            with this application name and form name {0,choice,1#is|1&lt;are} in-progress.
-            &lt;a href="{1}" target="_blank"&gt;View in the Form Builder Summary page.&lt;/a&gt;
+        <form-in-progress-alert>
+            {0,choice,1#Ett formulär|1&lt;{0,number,integer} formulär}
+            med detta applikationsnamn och formulärnamn {0,choice,1#är|1&lt;är} under arbete.
+            &lt;a href="{1}" target="_blank"&gt;Visa på Form Builder-sammanfattningssidan.&lt;/a&gt;
         </form-in-progress-alert>
     </form-name>
     <title>
@@ -55,28 +74,28 @@
         <label>Klistra in</label>
     </paste>
     <undo-redo>
-        <undo todo="true">[Undo {0}]</undo>
-        <redo todo="true">[Redo {0}]</redo>
+        <undo>Ångra {0}</undo>
+        <redo>Gör om {0}</redo>
         <insert>[insert]</insert>
-        <rename todo="true">[rename]</rename>
-        <delete-control todo="true">[delete control]</delete-control>
-        <delete-container todo="true">[delete container]</delete-container>
-        <merge-section-template todo="true">[merge section template]</merge-section-template>
-        <move-control todo="true">[move control]</move-control>
-        <move-container todo="true">[move container]</move-container>
-        <update-settings todo="true">[update settings]</update-settings>
-        <insert-control todo="true">[insert control]</insert-control>
-        <insert-section todo="true">[insert section]</insert-section>
-        <insert-grid todo="true">[insert grid]</insert-grid>
-        <delete-row todo="true">[delete row]</delete-row>
-        <insert-row todo="true">[insert row]</insert-row>
-        <control-settings todo="true">[control settings]</control-settings>
-        <move-wall todo="true">[move wall]</move-wall>
-        <split-cell todo="true">[split cell]</split-cell>
-        <merge-cell todo="true">[merge cell]</merge-cell>
+        <rename>byta namn</rename>
+        <delete-control>ta bort kontroll</delete-control>
+        <delete-container>ta bort behållare</delete-container>
+        <merge-section-template>sammanfoga sektionsmall</merge-section-template>
+        <move-control>flytta kontroll</move-control>
+        <move-container>flytta behållare</move-container>
+        <update-settings>uppdatera inställningar</update-settings>
+        <insert-control>infoga kontroll</insert-control>
+        <insert-section>infoga sektion</insert-section>
+        <insert-grid>infoga rutnät</insert-grid>
+        <delete-row>ta bort rad</delete-row>
+        <insert-row>infoga rad</insert-row>
+        <control-settings>kontrollinställningar</control-settings>
+        <move-wall>flytta avdelare</move-wall>
+        <split-cell>dela cell</split-cell>
+        <merge-cell>sammanfoga cell</merge-cell>
     </undo-redo>
     <merge-section>
-        <label todo="true">[Merge Section Template]</label>
+        <label>Sammanfoga sektionsmall</label>
     </merge-section>
     <form-structure>
         <label>Struktur</label>
@@ -94,7 +113,7 @@
         <label>Avancerat</label>
     </advanced>
     <attachments>
-        <label todo="true">[Attachments]</label>
+        <label>Bilagor</label>
     </attachments>
     <services-actions>
         <label>Funktioner &amp; kommandon</label>
@@ -145,9 +164,9 @@
         <label>Ladda om verktygslådan</label>
     </reload-components>
     <library-version>
-        <label todo="true">Library Version</label>
+        <label>Biblioteksversion</label>
         <item>
-            <label todo="true">Version {0,number,integer}</label>
+            <label>Version {0,number,integer}</label>
         </item>
     </library-version>
     <enter-section-title>
@@ -184,25 +203,25 @@
         <label>Ändra alternativ</label>
     </edit-items>
     <merge-right-icon>
-        <label todo="true">[Expand horizontally]</label>
+        <label>Sammanfoga med cellen till höger</label>
     </merge-right-icon>
     <split-horizontally-icon>
-        <label todo="true">[Split horizontally]</label>
+        <label>Dela horisontellt</label>
     </split-horizontally-icon>
     <merge-below-icon>
-        <label todo="true">[Expand vertically]</label>
+        <label>Sammanfoga med cellen nedanför</label>
     </merge-below-icon>
     <split-vertically-icon>
-        <label todo="true">[Split vertically]</label>
+        <label>Dela vertikalt</label>
     </split-vertically-icon>
     <delete-control-icon>
         <label>Ta bort kontroll</label>
     </delete-control-icon>
     <move-icon>
-        <label todo="true">[Drag &amp; drop to move or copy]</label>
+        <label>Dra och släpp för att flytta eller kopiera</label>
     </move-icon>
     <delete-container-icon>
-        <label todo="true">Ta bort sektion</label>
+        <label>Ta bort sektion eller rutnät</label>
     </delete-container-icon>
     <delete-row-icon>
         <label>Ta bort rad</label>
@@ -263,20 +282,20 @@
         <label>Anpassade CSS-klasser</label>
     </classes>
     <autocomplete>
-        <label todo="true">[Autocomplete attribute]</label>
+        <label>Autocomplete-attribut</label>
         <groups>
-            <general todo="true">[General]</general>
-            <name todo="true">[Name and Title]</name>
-            <credentials todo="true">[Credentials]</credentials>
-            <address todo="true">[Address]</address>
-            <contact todo="true">[Contact]</contact>
-            <payment todo="true">[Payment]</payment>
+            <general>Allmänt</general>
+            <name>Namn och titel</name>
+            <credentials>Inloggningsuppgifter</credentials>
+            <address>Adress</address>
+            <contact>Kontakt</contact>
+            <payment>Betalning</payment>
         </groups>
     </autocomplete>
     <property-yes-no>
-        <item id="0" todo="true">[Use property]</item>
-        <item id="1" todo="true">[Yes]</item>
-        <item id="2" todo="true">[No]</item>
+        <item id="0">Använd egenskap</item>
+        <item id="1">Ja</item>
+        <item id="2">Nej</item>
     </property-yes-no>
     <!-- Dialogs -->
     <continue>
@@ -298,54 +317,54 @@
         <label>eller</label>
     </or>
     <errors>
-        <label todo="true">Errors</label>
+        <label>Fel</label>
     </errors>
     <error-summary>
-        <label todo="true">[{1,choice,
-            0#No message|
-            1#'{0,choice,0#Error|1#Warning|2#Informational message|3#Message}'|
-            1&lt;'{0,choice,0#Errors|1#Warnings|2#Informational messages|3#Messages}'}]</label>
+        <label>{1,choice,
+            0#Inget meddelande|
+            1#'{0,choice,0#Fel|1#Varning|2#Informationsmeddelande|3#Meddelande}'|
+            1&lt;'{0,choice,0#Fel|1#Varningar|2#Informationsmeddelanden|3#Meddelanden}'}</label>
     </error-summary>
     <back-to-summary>
-        <label todo="true">Back to List of Forms</label>
+        <label>Tillbaka till formulärlistan</label>
     </back-to-summary>
     <form-builder-page-layout>
         <item id="0">[Fixed View]</item>
         <item id="1">[Fluid View]</item>
     </form-builder-page-layout>
     <suggestion>
-        <label todo="true">&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Use suggestion: "{0}"</label>
+        <label>&lt;i class="fa-solid fa-w fa-arrow-up"&gt;&lt;/i&gt; Använd förslag: "{0}"</label>
     </suggestion>
     <components>
         <parameters-editor>
             <name>
-                <label todo="true">[Name]</label>
-                <alert todo="true">[Missing or incorrect value]</alert>
+                <label>Namn</label>
+                <alert>Saknat eller felaktigt värde</alert>
             </name>
             <xpath>
-                <label todo="true">[Formula]</label>
-                <alert todo="true">[Missing or incorrect formula]</alert>
+                <label>Formel</label>
+                <alert>Saknad eller felaktig formel</alert>
             </xpath>
             <control>
-                <label todo="true">[Control]</label>
-                <alert todo="true">[Missing value]</alert>
+                <label>Kontroll</label>
+                <alert>Saknat värde</alert>
             </control>
             <token>
-                <label todo="true">Generate token URL parameter</label>
+                <label>Generera token URL-parameter</label>
             </token>
             <type>
-                <item id="0" todo="true">[Control Value]</item>
-                <item id="1" todo="true">[Formula]</item>
-                <item id="2" todo="true">[All Control Values]</item>
-                <choice todo="true" label="[Link]">
-                    <item id="3" todo="true">[Edit page]</item>
-                    <item id="4" todo="true">[View page]</item>
-                    <item id="5" todo="true">[New page]</item>
-                    <item id="6" todo="true">[Summary page]</item>
-                    <item id="7" todo="true">[Home page]</item>
-                    <item id="9" todo="true">[Published forms page]</item>
-                    <item id="10" todo="true">[Forms admin]</item>
-                    <item id="8" todo="true">[PDF file]</item>
+                <item id="0">Kontrollvärde</item>
+                <item id="1">Formel</item>
+                <item id="2">Alla kontrollvärden</item>
+                <choice label="Länk">
+                    <item id="3">Redigeringssida</item>
+                    <item id="4">Visningssida</item>
+                    <item id="5">Ny sida</item>
+                    <item id="6">Sammanfattningssida</item>
+                    <item id="7">Startsida</item>
+                    <item id="9">Sida för publicerade formulär</item>
+                    <item id="10">Formuläradministration</item>
+                    <item id="8">PDF-fil</item>
                 </choice>
             </type>
         </parameters-editor>
@@ -354,12 +373,12 @@
         <label>Inställningar för formulär</label>
         <save-as>Spara som…</save-as>
         <open><label>Inställningar för formulär</label></open>
-        <options todo="true">[Form Options]</options>
-        <view-options todo="true">[Appearance]</view-options>
-        <wizard-options todo="true">[Wizard]</wizard-options>
-        <pdf-options todo="true">[PDF]</pdf-options>
-        <control-settings todo="true">[Control Settings]</control-settings>
-        <about todo="true">[About this Form]</about>
+        <options>Formuläralternativ</options>
+        <view-options>Utseende</view-options>
+        <wizard-options>Guide</wizard-options>
+        <pdf-options>PDF</pdf-options>
+        <control-settings>Kontrollinställningar</control-settings>
+        <about>Om detta formulär</about>
         <stats>Formulärstatistik</stats>
         <sections>Sektioner</sections>
         <repeats>Upprepningar</repeats>
@@ -367,30 +386,30 @@
         <section-templates>Sektionsmallar</section-templates>
         <controls>Kontroller</controls>
         <all>Allt</all>
-        <use-property todo="true">[Use property]</use-property>
+        <use-property>Använd egenskap</use-property>
         <singleton>
             <label>Singulärt formulär</label>
             <hint>Användare kan inte skapa ytterligare ifyllda formulär om de har tillgång något ifyllt formulär av denna typ</hint>
         </singleton>
         <allow-template-use>
-            <label todo="true">Allow use as form template</label>
-            <hint todo="true">If selected, this form will show in the list of form templates</hint>
+            <label>Tillåt användning som formulärmall</label>
+            <hint>Om valt, visas detta formulär i listan över formulärmallar</hint>
         </allow-template-use>
         <wizard>
-            <label todo="true">[Wizard View]</label>
-            <hint todo="true">[Show top-level sections as separate wizard pages]</hint>
+            <label>Guideläge</label>
+            <hint>Visa toppnivåsektioner som separata guidesidor</hint>
         </wizard>
         <wizard-mode>
-            <label todo="true">[Wizard Navigation Validation Mode]</label>
-            <hint todo="true">[How wizard navigation behaves when data is not valid]</hint>
-            <item todo="true" id="0">[Use property]</item>
-            <item todo="true" id="1">[Free]</item>
-            <item todo="true" id="2">[Lax]</item>
-            <item todo="true" id="3">[Strict]</item>
+            <label>Valideringsläge för guidenavigering</label>
+            <hint>Hur guidenavigering beter sig när data inte är giltig</hint>
+            <item id="0">Använd egenskap</item>
+            <item id="1">Fri</item>
+            <item id="2">Lax</item>
+            <item id="3">Strikt</item>
         </wizard-mode>
         <wizard-subsections-nav>
-            <label todo="true">[Wizard Subsections Navigation]</label>
-            <hint todo="true">[Whether the wizard enables navigation for sections and grids within top-level sections]</hint>
+            <label>Navigering i guide-undersektioner</label>
+            <hint>Om guiden aktiverar navigering för sektioner och rutnät inom toppnivåsektioner</hint>
         </wizard-subsections-nav>
         <wizard-subsections-toc>
             <label>Wizard Subsections Table of Contents</label>
@@ -401,18 +420,18 @@
             <item id="3">Don't Show Subsections</item>
         </wizard-subsections-toc>
         <wizard-separate-toc>
-            <label todo="true">Wizard Separate Table of Contents</label>
+            <label>Separat innehållsförteckning för guide</label>
         </wizard-separate-toc>
         <wizard-section-status>
-            <label todo="true">Always Show Wizard Section Status</label>
+            <label>Visa alltid status för guidesektioner</label>
         </wizard-section-status>
         <attachment-max-size-per-file>
-            <label todo="true">[Maximum Attachment Size per File]</label>
-            <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
+            <label>Maximal bilagestorlek per fil</label>
+            <hint>Kan också ställas in per kontroll i Kontrollinställningar</hint>
         </attachment-max-size-per-file>
         <attachment-max-size-aggregate-per-form>
-            <label todo="true">[Maximum Aggregate Attachment Size]</label>
-            <hint todo="true">[Applies to all attachment controls in this form]</hint>
+            <label>Maximal total bilagestorlek</label>
+            <hint>Gäller alla bilagekontroller i detta formulär</hint>
         </attachment-max-size-aggregate-per-form>
         <attachment-max-files-per-control>
             <label>Maximalt antal filer per bilagekontroll</label>
@@ -421,106 +440,106 @@
             <label>Minimalt antal filer per bilagekontroll</label>
         </attachment-min-files-per-control>
         <attachment-mediatypes>
-            <label todo="true">[Allowed File Types]</label>
-            <hint todo="true">[For example "image/* application/pdf"]</hint>
+            <label>Tillåtna filtyper</label>
+            <hint>Till exempel "image/* application/pdf"</hint>
         </attachment-mediatypes>
         <labels>
-            <label todo="true">[Appearance of Control Labels]</label>
+            <label>Utseende på kontrolledtexter</label>
         </labels>
         <hints>
-            <label todo="true">[Appearance of Control Hints]</label>
+            <label>Utseende på kontrollanvisningar</label>
         </hints>
         <automatic-hints>
-            <label todo="true">[Use Automatic Hints]</label>
+            <label>Använd automatiska anvisningar</label>
         </automatic-hints>
         <appearances>
-            <item todo="true" id="0">[Use property]</item>
-            <item todo="true" id="1">[Inline]</item>
-            <item todo="true" id="2">[Tooltip]</item>
+            <item id="0">Använd egenskap</item>
+            <item id="1">Infogad</item>
+            <item id="2">Verktygstips</item>
         </appearances>
         <placeholders>
-            <label todo="true">[Use Placeholder for Fields and Text Areas]</label>
+            <label>Använd platshållare för fält och textrutor</label>
         </placeholders>
         <data-migration>
-            <label todo="true">[Simple Data Migration]</label>
-            <hint todo="true">[Automatically add/remove missing elements in data]</hint>
-            <item id="0" todo="true">[Use property]</item>
-            <item id="1" todo="true">[Enabled]</item>
-            <item id="2" todo="true">[Disabled]</item>
-            <item id="3" todo="true">[Raise an error]</item>
+            <label>Enkel datamigrering</label>
+            <hint>Lägg automatiskt till/ta bort saknade element i data</hint>
+            <item id="0">Använd egenskap</item>
+            <item id="1">Aktiverad</item>
+            <item id="2">Inaktiverad</item>
+            <item id="3">Rapportera fel</item>
         </data-migration>
         <grid-tab-order>
-            <label todo="true">[Grid Tab Order]</label>
-            <item id="0" todo="true">[Use property]</item>
-            <item id="1" todo="true">[Rows]</item>
-            <item id="2" todo="true">[Columns]</item>
+            <label>Tabulatorordning för rutnät</label>
+            <item id="0">Använd egenskap</item>
+            <item id="1">Rader</item>
+            <item id="2">Kolumner</item>
         </grid-tab-order>
         <time-window>
-            <label todo="true">[Time Window]</label>
+            <label>Tidsfönster</label>
             <available>
                 <available-from>
-                    <label todo="true">[Creating only available from specific date]</label>
-                    <date todo="true">[Start date and time]</date>
-                    <message todo="true">[Pending message]</message>
+                    <label>Skapande endast tillgängligt från specifikt datum</label>
+                    <date>Startdatum och -tid</date>
+                    <message>Väntande meddelande</message>
                 </available-from>
                 <available-to>
-                    <label todo="true">[Creating only available until specific date]</label>
-                    <date todo="true">[End date and time]</date>
-                    <message todo="true">[Expired message]</message>
+                    <label>Skapande endast tillgängligt till specifikt datum</label>
+                    <date>Slutdatum och -tid</date>
+                    <message>Utgånget meddelande</message>
                 </available-to>
             </available>
         </time-window>
         <rendered-page-orientation>
-            <label todo="true">[PDF page orientation]</label>
+            <label>PDF-sidorientering</label>
             <hint />
-            <item id="default" todo="true">[Use property]</item>
-            <item id="portrait" todo="true">[Portrait]</item>
-            <item id="landscape" todo="true">[Landscape]</item>
+            <item id="default">Använd egenskap</item>
+            <item id="portrait">Stående</item>
+            <item id="landscape">Liggande</item>
         </rendered-page-orientation>
         <rendered-page-size>
-            <label todo="true">[PDF page size]</label>
+            <label>PDF-sidstorlek</label>
             <hint />
-            <item id="default" todo="true">[Use property]</item>
+            <item id="default">Använd egenskap</item>
             <!-- 'a5', 'a3', 'b4', 'ledger' are not often used so we don't propose them here -->
-            <item id="letter" todo="true">[Letter]</item>
-            <item id="a4" todo="true">[A4]</item>
-            <item id="legal" todo="true">[Legal]</item>
+            <item id="letter">Letter</item>
+            <item id="a4">A4</item>
+            <item id="legal">Legal</item>
         </rendered-page-size>
         <readonly-disable-calculate>
-            <label todo="true">[Calculations in Read-Only Modes (Review, PDF)]</label>
+            <label>Beräkningar i skrivskyddade lägen (granskning, PDF)</label>
             <hint />
-            <item todo="true" id="default">Use property</item>
-            <item todo="true" id="false">Enable</item>
-            <item todo="true" id="true">Disable</item>
+            <item id="default">Använd egenskap</item>
+            <item id="false">Aktivera</item>
+            <item id="true">Inaktivera</item>
         </readonly-disable-calculate>
         <html-page-layout>
-            <label todo="true">[Browser Page Layout]</label>
-            <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
-            <item id="0" todo="true">[Use property]</item>
-            <item id="1" todo="true">[Fixed width]</item>
-            <item id="2" todo="true">[Fluid width]</item>
+            <label>Webbläsarsidelayout</label>
+            <hint>Om formuläret har fast eller flytande bredd</hint>
+            <item id="0">Använd egenskap</item>
+            <item id="1">Fast bredd</item>
+            <item id="2">Flytande bredd</item>
         </html-page-layout>
         <density>
-            <label todo="true">[Density]</label>
-            <hint todo="true">[Spacing between elements in the interface]</hint>
-            <item id="0" todo="true">[Use property]</item>
-            <item id="1" todo="true">[Compact]</item>
-            <item id="2" todo="true">[Comfortable]</item>
-            <item id="3" todo="true">[Roomy]</item>
+            <label>Täthet</label>
+            <hint>Avstånd mellan element i gränssnittet</hint>
+            <item id="0">Använd egenskap</item>
+            <item id="1">Kompakt</item>
+            <item id="2">Bekväm</item>
+            <item id="3">Rymlig</item>
         </density>
         <analysis-calculate>
-            <label todo="true">[Automatic Calculations Dependencies]</label>
-            <hint todo="true">Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>
+            <label>Automatiska beräkningsberoenden</label>
+            <hint>Bestäm automatiskt utvärderingsordning för formler för "Beräknat värde" och "Förvalt värde"</hint>
         </analysis-calculate>
-        <versions todo="true">[Versions]</versions>
-        <current-version todo="true">[Current Version]</current-version>
-        <created-with-version todo="true">[Created with Version]</created-with-version>
-        <updated-with-versions todo="true">[Updated with Versions]</updated-with-versions>
+        <versions>Versioner</versions>
+        <current-version>Aktuell version</current-version>
+        <created-with-version>Skapad med version</created-with-version>
+        <updated-with-versions>Uppdaterad med versioner</updated-with-versions>
         <thumbnail>
-            <label todo="true">Form Thumbnail</label>
-            <hint todo="true">Used for form templates and the landing page</hint>
+            <label>Formulärminiatyr</label>
+            <hint>Används för formulärmallar och landningssidan</hint>
         </thumbnail>
-        <default-template todo="true">Default Template</default-template>
+        <default-template>Standardmall</default-template>
         <summary-tab>
             <label>Sammanfattningssida</label>
         </summary-tab>
@@ -548,17 +567,17 @@
             <hint>Exempel: "efternamn"</hint>
         </control-name>
         <pdf-field-name>
-            <label todo="true">[Name of the PDF field]</label>
-            <alert todo="true">[Unknown PDF field name]</alert>
-            <item id="0" todo="true">Automatic</item>
-            <item id="1" todo="true">Custom</item>
+            <label>Namn på PDF-fältet</label>
+            <alert>Okänt PDF-fältnamn</alert>
+            <item id="0">Automatiskt</item>
+            <item id="1">Anpassat</item>
         </pdf-field-name>
         <excel-field-name>
-            <label todo="true">[Name of the Excel range]</label>
+            <label>Namn på Excel-intervallet</label>
         </excel-field-name>
         <options>
             <item>
-                <label todo="true">[Persist control value]</label>
+                <label>Bevara kontrollvärde</label>
                 <help>
                     &lt;p&gt;Om det är aktiverat, vilket är standard för de flesta formulärkontroller, kommer värdet för denna kontroll att sparas i databasen. Detta är inaktiverat som standard för:&lt;/p&gt;
                     &lt;ul&gt;
@@ -575,7 +594,7 @@
                 <value>fr-persist</value>
             </item>
             <item>
-                <label todo="true">[Index control]</label>
+                <label>Indexera kontroll</label>
                 <help>
                     &lt;p&gt;Om den är aktiverad kommer värdet på denna kontroll att indexeras i databasen.&lt;/p&gt;
                 </help>
@@ -589,7 +608,7 @@
                 <value>fr-summary-show</value>
             </item>
             <item>
-                <label todo="true">[Allow bulk edit]</label>
+                <label>Tillåt massredigering</label>
                 <help>
                     &lt;p&gt;Om den är aktiverad kommer den här kontrollen att vara tillgänglig för massredigering på sidan Sammanfattning.&lt;/p&gt;
                     &lt;p&gt;För mer, se&lt;a target="_blank" href="https://doc.orbeon.com/form-runner/form-runner-pages/summary-page#bulk-edit"&gt;Massredigering&lt;/a&gt;.&lt;/p&gt;
@@ -597,11 +616,11 @@
                 <value>fr-allow-bulk-edit</value>
             </item>
             <item>
-                <label todo="true">[By default, sort by this column]</label>
+                <label>Sortera efter denna kolumn som standard</label>
                 <value>fr-default-sort-column</value>
             </item>
             <item>
-                <label todo="true">[Encrypt data at rest]</label>
+                <label>Kryptera data i vila</label>
                 <help>
                     &lt;p&gt;Om den är aktiverad kommer värdet på denna kontroll att krypteras i databasen.&lt;/p&gt;
                     &lt;p&gt;Detta är vanligtvis användbart för fält som används för att samla in personlig information, även kallad "personligt identifierbar information" (PII), "känslig personlig information" (SPI) eller "personlig information", beroende på sammanhanget. Kryptering av sådan information kan hjälpa dig att följa integritetslagar, såsom GDPR.&lt;/p&gt;
@@ -611,19 +630,19 @@
             </item>
         </options>
         <summary-show>
-            <do-not-show todo="true">[Don't show on Summary page]</do-not-show>
-            <show todo="true">[Show on Summary page]</show>
-            <column-only todo="true">[Show column only]</column-only>
-            <search-only todo="true">[Show search only]</search-only>
+            <do-not-show>Visa inte på sammanfattningssidan</do-not-show>
+            <show>Visa på sammanfattningssidan</show>
+            <column-only>Visa bara kolumn</column-only>
+            <search-only>Visa bara sökning</search-only>
         </summary-show>
         <bulk-edit-actions>
-            <save-data todo="true">[Save data]</save-data>
-            <run-process todo="true">[Run Process]</run-process>
+            <save-data>Spara data</save-data>
+            <run-process>Kör process</run-process>
         </bulk-edit-actions>
         <default-sort-column>
-            <ascending todo="true">[Ascending]</ascending>
-            <descending todo="true">[Descending]</descending>
-            <conflict todo="true">[Enabling sorting on this control will disable it on the following control: {0}]</conflict>
+            <ascending>Stigande</ascending>
+            <descending>Fallande</descending>
+            <conflict>Aktivering av sortering på denna kontroll inaktiverar den på följande kontroll: {0}</conflict>
         </default-sort-column>
         <control-appearance>
             <label>Kontrollens utseende</label>
@@ -642,7 +661,7 @@
             <hint>Inbyggd datatyp</hint>
 
             <use-schema-type>Använd schemats datatyp</use-schema-type>
-            <use-component-type todo="true">[Use predefined type]</use-component-type>
+            <use-component-type>Använd fördefinierad typ</use-component-type>
 
             <choices>
                 <choices>
@@ -840,30 +859,30 @@
             </help>
         </calculate>
         <control-label>
-            <label todo="true">[Label]</label>
+            <label>Ledtext</label>
         </control-label>
         <control-hint>
-            <label todo="true">[Hint]</label>
+            <label>Anvisning</label>
         </control-hint>
         <control-help>
             <label>Hjälpmeddelande</label>
             <hint>Visas när hjälp är aktivt</hint>
         </control-help>
         <control-text>
-            <label todo="true">[Explanatory Text]</label>
+            <label>Förklarande text</label>
             <hint />
         </control-text>
         <control-short-label>
-            <label todo="true">[Short Label]</label>
+            <label>Kortledtext</label>
         </control-short-label>
         <control-iteration-label>
-            <label todo="true">[Iteration Label]</label>
+            <label>Upprepningsledtext</label>
         </control-iteration-label>
         <control-add-iteration-label>
-            <label todo="true">[Add Repetition Label]</label>
+            <label>Ledtext för ny upprepning</label>
         </control-add-iteration-label>
         <control-remove-iteration-label>
-            <label todo="true">[Remove Repetition Text]</label>
+            <label>Text för borttagning av upprepning</label>
         </control-remove-iteration-label>
         <alert>
             <label>Avisering</label>
@@ -885,21 +904,21 @@
         <use-html>Använd HTML</use-html>
         <parameters>Mallparametrar</parameters>
         <automatic-hint>
-            <label todo="true">[Use automatic hint]</label>
-            <hint todo="true">[Adds a hint based on the Maximum File Size and Supported File Types you might have specified in the Validations and Alerts tab]</hint>
+            <label>Använd automatisk anvisning</label>
+            <hint>Lägger till en anvisning baserad på maximal filstorlek och filtyper som du angett i fliken Valideringar och aviseringar</hint>
         </automatic-hint>
         <multiple-selection>
-            <label todo="true">[Multiple selection]</label>
-            <hint todo="true">[If enabled, users can select multiple values]</hint>
-            <help todo="true">["Multiple selection" can only be enabled if "Service performs search" and "Store label" are both disabled.]</help>
+            <label>Flerval</label>
+            <hint>Om aktiverat kan användare välja flera värden</hint>
+            <help>"Flerval" kan bara aktiveras om "Tjänst utför sökning" och "Lagra etikett" båda är inaktiverade.</help>
         </multiple-selection>
         <open-selection>
-            <label todo="true">[Open selection]</label>
-            <help todo="true">[When the "Open selection" option is enabled, users can enter their own value in this control when filling out the form. This value is stored in the data and used as the label shown in the drop-down list.]</help>
+            <label>Öppet val</label>
+            <help>När alternativet "Öppet val" är aktiverat kan användare ange ett eget värde i denna kontroll när de fyller i formuläret. Det här värdet lagras i data och används som etiketten som visas i rullgardinsmenyn.</help>
         </open-selection>
         <store-label>
-            <label todo="true">[Store label]</label>
-            <hint todo="true">[If enabled, the selected label is stored alongside the data]</hint>
+            <label>Lagra etikett</label>
+            <hint>Om aktiverat lagras den valda etiketten tillsammans med data</hint>
         </store-label>
         <default-yes-no>
             <item id="0">Använd standard</item>
@@ -915,10 +934,10 @@
             <hint>Exempel: "adress"</hint>
         </control-name>
         <grid-columns>
-            <label todo="true">[Number of grid columns]</label>
+            <label>Antal rutnätskolumner</label>
         </grid-columns>
         <grid-rows>
-            <label todo="true">Number of grid rows</label>
+            <label>Antal rutnätsrader</label>
         </grid-rows>
         <grid-tab-order>
             <label>Tabulatorordning för rutnät</label>
@@ -954,15 +973,15 @@
             <label>Upprepa</label>
         </repeat>
         <user-can-add-remove>
-            <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
+            <label>Tillåt användaren att lägga till, ta bort eller flytta upprepningar</label>
             <hint />
         </user-can-add-remove>
         <number-rows>
-            <label todo="true">Show repetition number</label>
+            <label>Visa upprepningsnummer</label>
             <hint />
         </number-rows>
         <use-paging>
-            <label todo="true">[Show one repetition at a time in the wizard]</label>
+            <label>Visa en upprepning i taget i guiden</label>
             <hint />
         </use-paging>
         <custom-iteration-name>
@@ -985,14 +1004,14 @@
             <hint>Ett positivt heltal eller ett XPath-uttryck</hint>
         </max>
         <freeze>
-            <label todo="true">[Freeze Repetitions]</label>
-            <alert todo="true">[Incorrect value]</alert>
-            <hint todo="true">[Non-negative number up to the minimum number of repetitions (see above), or an XPath expression]</hint>
+            <label>Frys upprepningar</label>
+            <alert>Felaktigt värde</alert>
+            <hint>Icke-negativt tal upp till det minsta antalet upprepningar (se ovan), eller ett XPath-uttryck</hint>
         </freeze>
-        <no-freeze todo="true">[No freeze]</no-freeze>
+        <no-freeze>Ingen frysning</no-freeze>
         <appearance-minimal>
-            <label todo="true">Simplified appearance</label>
-            <hint todo="true">Show basic add/remove buttons without menu or reordering</hint>
+            <label>Förenklat utseende</label>
+            <hint>Visa grundläggande lägg till/ta bort-knappar utan meny eller omsortering</hint>
         </appearance-minimal>
         <apply-defaults>
             <label>Tillämpa startvärdesformlerna när upprepning läggs till</label>
@@ -1729,11 +1748,11 @@
         </items>
     </template>
     <role-restriction>
-        <restrict todo="true">[Restrict to role]</restrict>
-        <all todo="true">[All]</all>
-        <any todo="true">[Any]</any>
-        <of-the-following todo="true">[of the following:]</of-the-following>
-        <empty todo="true">[Empty role]</empty>
-        <duplicate todo="true">[Duplicate role]</duplicate>
+        <restrict>Begränsa till roll</restrict>
+        <all>Alla</all>
+        <any>Någon</any>
+        <of-the-following>av följande:</of-the-following>
+        <empty>Tom roll</empty>
+        <duplicate>Duplicerad roll</duplicate>
     </role-restriction>
 </resource>

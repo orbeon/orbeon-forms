@@ -24,7 +24,6 @@ import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.{XXFormsUploadProgress, XXFormsValue}
-import org.orbeon.xforms.facade.Events
 import org.orbeon.facades.HTMLDialogElement
 import org.scalajs.dom
 import org.scalajs.dom.{EventListenerOptions, html}
@@ -254,7 +253,7 @@ object AjaxClient {
   // TODO: After cp to 2021.1, `formId` -> `currentForm`
   // Display the error panel and shows the specified detailed message in the detail section of the panel.
   def showError(titleString: String, detailsString: String, formId: String, ignoreErrors: Boolean): Unit = {
-    Events.errorEvent.fire(
+    XFormsUiEvents.errorEvent.fire(
       new js.Object {
         val title  : String = titleString
         val details: String = detailsString

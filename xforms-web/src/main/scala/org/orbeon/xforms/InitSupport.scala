@@ -396,7 +396,7 @@ object InitSupport {
         // better to fire the event asynchronously, although we could maybe use a `0` delay.
         js.timers.setTimeout(configuration.internalShortDelay) {
           logger.debug("dispatching `orbeonLoadedEvent`")
-          Events.orbeonLoadedEvent.fire()
+          XFormsUiEvents.orbeonLoadedEvent.fire()
         }
         orbeonLoadedEventScheduled = true
       }

@@ -14,7 +14,7 @@
 package org.orbeon.xforms
 
 import org.orbeon.web.DomEventNames
-import org.orbeon.xforms.facade.Events
+
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.UIEvent
@@ -41,7 +41,7 @@ object AjaxFieldChangeTracker {
       //
       // 2020-05-29: This event appears to work with `<input>` and `<textarea>` with all modern browsers.
       (ev: UIEvent) =>
-        Option(Events._findParentXFormsControl(ev.target)) foreach { control =>
+        XFormsUiEvents.findParentXFormsControl(ev.target).foreach { control =>
           Page.getXFormsFormFromHtmlElemOrThrow(control).ajaxFieldChangeTracker.onInput(control.id)
         }
     )

@@ -85,8 +85,6 @@ object CollectionUtils {
   }
   implicit def fromIteratorExt(i: Iterator.type): IteratorExt.type = IteratorExt
 
-
-
   implicit class IterableOnceOps[A](private val t: IterableOnce[A]) extends AnyVal {
 
     def groupByKeepOrder[K](f: A => K): List[(K, List[A])] = {

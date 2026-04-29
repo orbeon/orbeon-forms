@@ -157,15 +157,20 @@ object XFormsUI {
   }
 
   @JSExport
-  def getHintMessage(control: html.Element): String =
+  def getNonAllBlankHintMessage(control: html.Element): String =
+    findNonAllBlankHintMessage(control).getOrElse("")
+
+  def findNonAllBlankHintMessage(control: html.Element): Option[String] =
     if (control.hasAnyClass("xforms-trigger", "xforms-submit"))
       control
         .queryNestedElems[html.Element]("button, a")
         .headOption
         .map(_.title)
-        .getOrElse("")
+        .flatMap(_.trimAllToOpt)
     else
-      findControlLHHA(control, "hint").map(_.innerHTML).getOrElse("")
+      findControlLHHA(control, "hint")
+        .map(_.innerHTML)
+        .flatMap(_.trimAllToOpt)
 
   @JSExport
   def setHintMessage(control: html.Element, message: String): Unit = {
@@ -309,15 +314,18 @@ object XFormsUI {
       }
     } else {
 
+      def isVisible(elem: html.Element): Boolean =
+        elem.offsetWidth != 0 || elem.offsetHeight != 0 || elem.getClientRects().length != 0
+
       def fromVisibleHtmlFormField: Option[html.Element] =
         control.queryNestedElems[html.Element](
-          "input:visible, textarea:visible, select:visible, button:visible:not(.xforms-help), a:visible"
-        ).headOption
+          "input, textarea, select, button:not(.xforms-help), a"
+        ).find(isVisible)
 
       def fromVisibleTabindex: Option[Element] =
         control.queryNestedElems[html.Element](
-          "[tabindex]:not([tabindex = '-1']):visible"
-        ).headOption
+          "[tabindex]:not([tabindex = '-1'])"
+        ).find(isVisible)
 
       fromVisibleHtmlFormField.orElse(fromVisibleTabindex) match {
         case Some(elem) => elem.focus()
@@ -425,7 +433,7 @@ object XFormsUI {
         findControlLHHA(control, "alert").toList :::
         (! isRelevant || (isRelevant && getHelpMessage(control).nonAllBlank))
           .flatList(findControlLHHA(control, "help").toList) :::
-        (! isRelevant || (isRelevant && getHintMessage(control).nonAllBlank))
+        (! isRelevant || (isRelevant && findNonAllBlankHintMessage(control).isDefined))
           .flatList(findControlLHHA(control, "hint").toList)
 
       elementsToUpdate.foreach { element =>

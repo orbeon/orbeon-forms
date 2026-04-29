@@ -1,9 +1,11 @@
 package org.orbeon.xforms
 
 import cats.implicits.*
+import org.orbeon.oxf.util.CollectionUtils.fromIteratorExt
+import org.orbeon.oxf.util.Exceptions.findNestedThrowable
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.XFormsUI.ClassNameToId
-import org.orbeon.xforms.facade.{Controls, Events}
+import org.orbeon.xforms.facade.Controls
 import org.scalajs.dom
 import org.scalajs.dom.html.Element
 import org.scalajs.dom.{KeyboardEvent, MouseEvent, UIEvent, html}
@@ -17,7 +19,7 @@ object XFormsUiEventHandlers {
     if (XFormsUI.modalProgressPanelShown)
       event.preventDefault()
     else
-      Option(Events._findParentXFormsControl(event.target)).foreach { target =>
+      XFormsUiEvents.findParentXFormsControl(event.target).foreach { target =>
 
         XFormsUI.fieldValueChanged(target)
 
@@ -34,7 +36,7 @@ object XFormsUiEventHandlers {
       }
 
   def change(event: UIEvent): Unit =
-    Option(Events._findParentXFormsControl(event.target)).foreach { target =>
+    XFormsUiEvents.findParentXFormsControl(event.target).foreach { target =>
       if (target.hasAllClasses("xbl-component", "xbl-javascript-lifecycle")) {
         // We might exclude *all* changes under `.xbl-component` but for now, to be conservative, we
         // exclude those that support the JavaScript lifecycle.
@@ -92,7 +94,7 @@ object XFormsUiEventHandlers {
     ! (elem.hasClass("xbl-component") && ! elem.hasClass("xbl-focusable"))
 
   private def findAncestorFocusableControl(target: dom.EventTarget): Option[html.Element] =
-    Option(Events._findParentXFormsControl(target)).filter(isFocusableControl)
+    XFormsUiEvents.findParentXFormsControl(target).filter(isFocusableControl)
 
   def focus(event: dom.FocusEvent): Unit =
     if (XFormsUI.modalProgressPanelShown) {
@@ -179,8 +181,7 @@ object XFormsUiEventHandlers {
       event.preventDefault()
     } else {
       val target = event.target.asInstanceOf[html.Element]
-      val control = Events._findParentXFormsControl(target)
-      if (control != null) {
+      XFormsUiEvents.findParentXFormsControl(target).foreach { control =>
         // Input field and auto-complete: trigger DOMActive when when enter is pressed
         val isXFormsInputField = (control.hasClass("xforms-input") && ! control.hasClass("xforms-type-boolean")) ||
                                   control.hasClass("xforms-secret")
@@ -224,7 +225,7 @@ object XFormsUiEventHandlers {
       return
 
     val originalTarget = event.target.asInstanceOf[html.Element]
-    val controlTarget = Events._findParentXFormsControl(originalTarget)
+    val controlTargetOpt = XFormsUiEvents.findParentXFormsControl(event.target)
 
     // Check if the target is disabled.
     if (originalTarget.hasAttribute("disabled") && originalTarget.getAttribute("disabled") != "false")
@@ -232,16 +233,14 @@ object XFormsUiEventHandlers {
 
     var handled = false
 
-    if (originalTarget != null && originalTarget.hasClass("xforms-help")) {
-      if (controlTarget != null) {
+    controlTargetOpt.foreach { controlTarget =>
+      if (originalTarget != null && originalTarget.hasClass("xforms-help")) {
         if (Page.getXFormsFormFromHtmlElemOrThrow(controlTarget).helpHandler())
           AjaxClient.fireEvent(AjaxEvent(eventName = "xforms-help", targetId = controlTarget.id))
         else
           Help.showHelp(controlTarget)
         handled = true
-      }
-    } else {
-      if (controlTarget != null) {
+      } else {
         if (controlTarget.hasAnyClass("xforms-trigger", "xforms-submit")) {
           // Click on trigger
           event.preventDefault()
@@ -371,7 +370,7 @@ object XFormsUiEventHandlers {
   def mouseover(event: MouseEvent): Unit =
     event.targetOpt.foreach { target =>
 
-      val controlOpt = Option(Events._findParentXFormsControl(target))
+      val controlOpt = XFormsUiEvents.findParentXFormsControl(target)
 
       if (target.hasAllClasses("xforms-alert", "xforms-active"))
         // Alert tooltip
@@ -381,9 +380,9 @@ object XFormsUiEventHandlers {
         getControlForLHHA(target, "alert").foreach { formField =>
           if (! isTooltipDisabled(target, "alert")) {
             // The 'for' typically points to a form field which is inside the element representing the control
-            Option(Events._findParentXFormsControl(formField)).foreach { control2 =>
+            XFormsUiEvents.findParentXFormsControl(formField).foreach { control2 =>
               val message = XFormsUI.getAlertMessage(control2)
-              Events._showToolTip(Globals.alertTooltipForControl, control2, target, "-orbeon-alert-tooltip", message, event)
+              XFormsUiEvents.showToolTip(Globals.alertTooltipForControl, control2, target, "-orbeon-alert-tooltip", message, event)
             }
           }
         }
@@ -392,7 +391,7 @@ object XFormsUiEventHandlers {
         controlOpt.foreach { control =>
           if (Page.getXFormsFormFromHtmlElemOrThrow(control).helpTooltip()) {
             val message = XFormsUI.getHelpMessage(control)
-            Events._showToolTip(Globals.helpTooltipForControl, control, target, "-orbeon-help-tooltip", message, event)
+            XFormsUiEvents.showToolTip(Globals.helpTooltipForControl, control, target, "-orbeon-help-tooltip", message, event)
           }
         }
       else
@@ -403,24 +402,33 @@ object XFormsUiEventHandlers {
           if (! isTooltipDisabled(control, "hint") && control != target) {
 
             // Find closest ancestor-or-self control with a non-empty hint, for compound control like the datetime
-            var candidateMessageHolder: html.Element = control
-            var candidateMessage      : String       = ""
-            while (candidateMessageHolder != null && candidateMessage == "") {
-              candidateMessage       = XFormsUI.getHintMessage(candidateMessageHolder)
-              candidateMessageHolder = Events._findParentXFormsControl(candidateMessageHolder.parentNode)
-            }
+            val candidateMessage =
+              Iterator
+                .iterateOpt(control)(c => XFormsUiEvents.findParentXFormsControl(c.parentElement))
+                .collectFirst {
+                  case c if XFormsUI.findNonAllBlankHintMessage(c).isDefined => XFormsUI.getNonAllBlankHintMessage(c)
+                }
+                .getOrElse("")
 
             // Clear any `title`, to avoid having both the YUI tooltip and the browser tooltip based on the title showing up
             if (control.hasAnyClass("xforms-trigger", "xforms-submit"))
               control.querySelectorAllT("a, button").foreach(_.title = "")
-            Events._showToolTip(Globals.hintTooltipForControl, control, target, "-orbeon-hint-tooltip", candidateMessage, event)
+
+            XFormsUiEvents.showToolTip(
+              Globals.hintTooltipForControl,
+              control,
+              target,
+              "-orbeon-hint-tooltip",
+              candidateMessage,
+              event
+            )
           }
         }
     }
 
   def mouseout(event: MouseEvent): Unit =
     event.targetOpt.foreach { target =>
-      Option(Events._findParentXFormsControl(target)).foreach { control =>
+      XFormsUiEvents.findParentXFormsControl(target).foreach { control =>
         // Send the `mouseout` event to the YUI tooltip to handle the case where: (1) we get the `mouseover` event, (2) we
         // create a YUI tooltip, (3) the `mouseout` happens before the YUI dialog got a chance to register its listener
         // on `mouseout`, (4) the YUI dialog is only dismissed after `autodismissdelay` (5 seconds) leaving a trail.

@@ -20,7 +20,6 @@ import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport
 import org.orbeon.xforms.*
-import org.orbeon.xforms.facade.Events
 import org.scalajs.dom
 import org.scalajs.dom.{DocumentReadyState, document, html}
 
@@ -58,9 +57,9 @@ object Position {
 
   // Call listener when anything on the page that could change element positions happened
   def onOffsetMayHaveChanged(fn: () => Unit): Unit = {
-    Events.orbeonLoadedEvent.subscribe(fn) // TODO: not great for nth embedding of Form Builder
+    XFormsUiEvents.orbeonLoadedEvent.subscribe(fn) // TODO: not great for nth embedding of Form Builder
     AjaxClient.ajaxResponseProcessed.add(_ => fn())
-    Events.componentChangedLayoutEvent.subscribe(fn)
+    XFormsUiEvents.componentChangedLayoutEvent.subscribe(fn)
 
     val ElementWhichChangeDynamically = List(
       ".fb > *",                // The `<xxf:dynamic id="fb">` content changes during full updates

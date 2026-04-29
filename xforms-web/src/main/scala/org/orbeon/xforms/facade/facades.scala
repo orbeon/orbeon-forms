@@ -86,18 +86,6 @@ object Controls extends js.Object {
 
 class ConnectCallbackArgument(val formId: String, val isUpload: js.UndefOr[Boolean]) extends js.Object
 
-@JSGlobal("ORBEON.xforms.Events")
-@js.native
-object Events extends js.Object {
-
-  val errorEvent                  : YUICustomEvent                 = js.native
-  val orbeonLoadedEvent           : YUICustomEvent                 = js.native
-  val componentChangedLayoutEvent : YUICustomEvent                 = js.native
-
-  def _findParentXFormsControl(t: dom.EventTarget): html.Element = js.native // can return `null`
-  def _showToolTip(hintTooltipForControl: js.Dictionary[js.Any], control: html.Element, target: html.Element, toolTipSuffix: String, message: String, event: MouseEvent): Unit = js.native
-}
-
 @JSGlobal("ORBEON.util.Property")
 @js.native
 class Property[T] extends js.Object {

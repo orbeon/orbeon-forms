@@ -18,7 +18,7 @@ import org.orbeon.facades.TinyMce.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.facade.{Events, XBL, XBLCompanion}
+import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.*
 import org.scalajs.dom
 import org.scalajs.dom.*
@@ -132,7 +132,7 @@ object TinyMCE {
           if (focusAfterInit)
             tinyMceObject.focus()
           tinyMceInitialized = true
-          Events.componentChangedLayoutEvent.fire()
+          XFormsUiEvents.componentChangedLayoutEvent.fire()
         }
 
         // - Unfortunately, we need to use polling; we can't rely on an Ajax response, e.g. if in Bootstrap tab as in

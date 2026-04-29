@@ -444,10 +444,50 @@ object XFormsUI {
       }
     }
 
+  def findRepeatDelimiter(formId: String, repeatId: String, iteration: Int): html.Element = {
+    val form                  = Page.getXFormsFormFromNamespacedIdOrThrow(formId)
+    var parentRepeatIndexes   = ""
+    var currentId             = repeatId
+    var continue              = true
+    while (continue) {
+      form.repeatTreeChildToParent.get(currentId) match {
+        case None         => continue = false
+        case Some(parent) =>
+          val separator =
+            if (form.repeatTreeChildToParent.get(parent).isEmpty)
+              Constants.RepeatSeparatorString
+            else
+              Constants.RepeatIndexSeparatorString
+          parentRepeatIndexes = separator + form.repeatIndexes.getOrElse(parent, 0) + parentRepeatIndexes
+          currentId = parent
+      }
+    }
+    var cursor: dom.Node = dom.document.getElementById(s"repeat-begin-$repeatId$parentRepeatIndexes")
+    if (cursor eq null) return null
+    var cursorPosition = 0
+    var done = false
+    while (!done) {
+      while (!(cursor.isInstanceOf[html.Element] && cursor.asInstanceOf[html.Element].hasClass("xforms-repeat-delimiter"))) {
+        cursor = cursor.nextSibling
+        if (cursor eq null)
+          return null
+      }
+      cursorPosition += 1
+      if (cursorPosition == iteration)
+        done = true
+      else {
+        cursor = cursor.nextSibling
+        if (cursor eq null)
+          return null
+      }
+    }
+    cursor.asInstanceOf[html.Element]
+  }
+
   @JSExport
   def setRepeatIterationRelevance(formID: String, repeatID: String, iteration: String, relevant: Boolean): Unit =
     XFormsUiFlatNesting.setRelevant(
-      node       = org.orbeon.xforms.facade.Utils.findRepeatDelimiter(formID, repeatID, iteration.toInt),
+      node       = findRepeatDelimiter(formID, repeatID, iteration.toInt),
       isRelevant = relevant
     )
 

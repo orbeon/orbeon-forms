@@ -10,7 +10,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.Constants.LhhacSeparator
 import org.orbeon.xforms.XFormsUI.*
-import org.orbeon.xforms.facade.{Utils, XBL}
+import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -181,7 +181,7 @@ object XFormsResponse {
               .get(repeatPrefixedId)
               .filter(_ != 0)
               .foreach { oldIndex =>
-                val oldItemDelimiter = Utils.findRepeatDelimiter(formId, repeatPrefixedId, oldIndex)
+                val oldItemDelimiter = XFormsUI.findRepeatDelimiter(formId, repeatPrefixedId, oldIndex)
                 if (oldItemDelimiter != null) // https://github.com/orbeon/orbeon-forms/issues/3689
                   oldItemDelimiter.nextSiblings.takeWhile(! isEndElem(_)).foreach {
                     case elem: html.Element => elem.classList.remove(getClassForRepeatId(repeatPrefixedId))
@@ -198,7 +198,7 @@ object XFormsResponse {
           // Highlight item at new index
           newRepeatIndexesByPrefixedId.foreach { case (repeatPrefixedId, newIndex) =>
             if (newIndex != 0) {
-              val newItemDelimiter = Utils.findRepeatDelimiter(formId, repeatPrefixedId, newIndex)
+              val newItemDelimiter = XFormsUI.findRepeatDelimiter(formId, repeatPrefixedId, newIndex)
               if (newItemDelimiter != null) // https://github.com/orbeon/orbeon-forms/issues/3689
                 newItemDelimiter.nextSiblings.takeWhile(! isEndElem(_)).foreach {
                   case elem: html.Element => elem.classList.add(getClassForRepeatId(repeatPrefixedId))

@@ -17,7 +17,6 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
 import org.orbeon.xforms.Constants.*
-import org.orbeon.xforms.facade.Utils
 import org.scalajs.dom
 import org.scalajs.dom.html
 
@@ -49,7 +48,7 @@ object ServerAPI {
             id.lastIndexOfOpt(RepeatIndexSeparatorString) map (lastRepeatSeparatorIndex max) getOrElse lastRepeatSeparatorIndex
 
           Option(
-            Utils.findRepeatDelimiter(
+            XFormsUI.findRepeatDelimiter(
               formId    = formId,
               repeatId  = id.substring(0, separatorPosition),
               iteration = id.substring(separatorPosition + 1).toInt

@@ -83,12 +83,6 @@ class Property[T] extends js.Object {
   def get(): T = js.native
 }
 
-@JSGlobal("ORBEON.util.Utils")
-@js.native
-object Utils extends js.Object {
-  def findRepeatDelimiter(formId: String, repeatId: String, iteration: Int) : html.Element = js.native
-}
-
 // Minimal facades for Bootstrap 5 and helpers for Bootstrap 2/5 modal dialogs
 
 @js.native

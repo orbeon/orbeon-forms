@@ -539,7 +539,7 @@ object XFormsResponse {
     // is not specified as the value may have changed
     if (! isStaticReadonly)
       elem.attValueOpt("empty")
-        .foreach(Controls.updateRequiredEmpty(documentElement, _))
+        .foreach(XFormsUI.updateRequiredEmpty(documentElement, _))
 
     // Custom attributes on controls
     if (isLeafControl)
@@ -699,7 +699,7 @@ object XFormsResponse {
 
     // Handle visited flag
     newVisitedOpt
-      .foreach(Controls.updateVisited(documentElement, _))
+      .foreach(XFormsUI.updateVisited(documentElement, _))
 
     // Nested elements
     elem.children.foreach { childNode =>
@@ -738,7 +738,7 @@ object XFormsResponse {
   private def handleSwitchCase(elem: dom.Element): Unit = {
     val id      = elem.attValueOrThrow("id")
     val visible = elem.attValueOrThrow("visibility") == "visible"
-    Controls.toggleCase(id, visible)
+    XFormsUI.toggleCase(id, visible)
   }
 
   private def maybeMigrateToStatic(

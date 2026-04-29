@@ -89,12 +89,6 @@ object Controls extends js.Object {
   def setFocus(controlId: String)                                                                        : Unit                                         = js.native
   def removeFocus(controlId: String)                                                                     : Unit                                         = js.native
 
-  def updateVisited(documentElement: html.Element, newVisited: Boolean)                                  : Unit                                         = js.native
-  def updateRequiredEmpty(documentElement: html.Element, emptyAttr: String)                              : Unit                                         = js.native
-  def _setTooltipMessage(control: html.Element, message: String, tooltips: js.Dictionary[js.Any])        : Unit                                         = js.native
-
-  def toggleCase(id: String, visible: Boolean)                                                           : Unit                                         = js.native
-
   val beforeValueChange                                                                                  : YUICustomEvent                               = js.native
   val valueChange                                                                                        : YUICustomEvent                               = js.native
   val afterValueChange                                                                                   : YUICustomEvent                               = js.native

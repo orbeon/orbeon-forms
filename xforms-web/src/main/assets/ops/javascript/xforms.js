@@ -218,23 +218,6 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
 
 
 
-        _setTooltipMessage: function (control, message, tooltipForControl) {
-            // If we have a YUI tooltip for this control, update the tooltip
-            var currentTooltip = tooltipForControl[control.id];
-            if (currentTooltip) {
-                // Message used not to be empty: we had a YUI tooltip
-                if (message == "") {
-                    // Disable this tooltip, but keep the object tied to the control
-                    currentTooltip.cfg.setProperty("disabled", true);
-                } else {
-                    // Update the tooltip message
-                    currentTooltip.cfg.setProperty("text", message);
-                    currentTooltip.cfg.setProperty("disabled", false);
-                }
-            }
-
-        },
-
         _gotLoad: function() {
             return document.readyState == "complete";
         },
@@ -358,87 +341,6 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
             // Mark that no control has the focus
             ORBEON.xforms.Globals.currentFocusControlId = null;
             ORBEON.xforms.Globals.currentFocusControlElement = null;
-        },
-
-        /**
-         * Update the visited state of a control, including its external alert if any.
-         */
-        updateVisited: function (control, newVisited) {
-
-            // Classes on control
-            $(control).toggleClass("xforms-visited", newVisited);
-
-            // Classes on external alert if any
-            // Q: Is this 100% reliable to determine if the alert is external?
-            var alertElement = ORBEON.xforms.XFormsUi.getControlLHHA(control, "alert");
-            if (alertElement && ! _.isUndefined($(alertElement).attr("id")))
-                $(alertElement).toggleClass("xforms-visited", newVisited);
-        },
-
-        /**
-         * Update the xforms-empty/filled classes as necessary.
-         */
-        updateRequiredEmpty: function (control, emptyAttr) {
-            var isRequired = $(control).hasClass("xforms-required");
-
-            $(control).toggleClass("xforms-empty", isRequired && emptyAttr == "true");
-            $(control).toggleClass("xforms-filled", isRequired && emptyAttr == "false");
-        },
-
-        /**
-         * Find the beginning of a case.
-         */
-        findCaseBegin: function (controlId) {
-            var caseBeginId = "xforms-case-begin-" + controlId;
-            return document.getElementById(caseBeginId);
-        },
-
-        /**
-         * Toggle a single case.
-         *
-         * [1] We disable the open/close animation on IE10 and under. The animation works on IE11, but we've seen problems
-         *     with earlier versions, so, since the animation is only cosmetic, we determine that it isn't worth debugging
-         *     those issues and that we're better off just disabling the animation for those old versions of IE.
-         *     YAHOO.env.ua.ie returns 0 for IE11, as YUI doesn't detect IE11 as being IE.
-         */
-        toggleCase: function (controlId, visible) {
-            var caseBegin = ORBEON.xforms.Controls.findCaseBegin(controlId);
-            var caseBeginParent = caseBegin.parentNode;
-            var foundCaseBegin = false;
-            for (var childIndex = 0; caseBeginParent.childNodes.length; childIndex++) {
-                var cursor = caseBeginParent.childNodes[childIndex];
-                if (! foundCaseBegin) {
-                    if (cursor.id == caseBegin.id) foundCaseBegin = true;
-                    else continue;
-                }
-                if (cursor.nodeType == ELEMENT_TYPE) {
-                    // Change visibility by switching class
-                    if (cursor.id == "xforms-case-end-" + controlId) break;
-                    var doAnimate = cursor.id != "xforms-case-begin-" + controlId &&    // Don't animate case-begin/end
-                            $(cursor).is('.xxforms-animate');                           // Only animate if class present
-
-                    var updateClasses = _.partial(function (el) {
-                        if (visible) {
-                            el.classList.add("xforms-case-selected");
-                            el.classList.remove("xforms-case-deselected");
-                        } else {
-                            el.classList.add("xforms-case-deselected");
-                            el.classList.remove("xforms-case-selected");
-                        }
-                    }, cursor);
-
-                    if (doAnimate) {
-                        if (visible) {
-                            updateClasses();
-                            $(cursor).animate({height: 'show'}, {duration: 200});
-                        } else {
-                            $(cursor).animate({height: 'hide'}, {duration: 200, complete: updateClasses});
-                        }
-                    } else {
-                        updateClasses();
-                    }
-                }
-            }
         }
     };
 

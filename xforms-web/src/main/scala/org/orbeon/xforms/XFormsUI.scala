@@ -142,7 +142,7 @@ object XFormsUI {
   def setHelpMessage(control: html.Element, message: String): Unit = {
     val escapedMessage = message.escapeXmlMinimal
     setMessage(control, "help", escapedMessage)
-    Controls._setTooltipMessage(control, escapedMessage, Globals.helpTooltipForControl)
+    _setTooltipMessage(control, escapedMessage, Globals.helpTooltipForControl)
   }
 
   @JSExport
@@ -152,7 +152,7 @@ object XFormsUI {
   @JSExport
   def setAlertMessage(control: html.Element, message: String): Unit = {
     setMessage(control, "alert", message)
-    Controls._setTooltipMessage(control, message, Globals.alertTooltipForControl)
+    _setTooltipMessage(control, message, Globals.alertTooltipForControl)
   }
 
   @JSExport
@@ -187,7 +187,82 @@ object XFormsUI {
     } else {
       setMessage(control, "hint", message)
     }
-    Controls._setTooltipMessage(control, message, tooltips)
+    _setTooltipMessage(control, message, tooltips)
+  }
+
+  @JSExport
+  def _setTooltipMessage(control: html.Element, message: String, tooltipForControl: js.Dictionary[js.Any]): Unit =
+    tooltipForControl.get(control.id).foreach { currentTooltipDyn =>
+      if (currentTooltipDyn != null && ! js.isUndefined(currentTooltipDyn) && currentTooltipDyn.toString != "true") {
+        val currentTooltip = currentTooltipDyn.asInstanceOf[js.Dynamic]
+        if (message == "") {
+          currentTooltip.cfg.setProperty("disabled", true)
+        } else {
+          currentTooltip.cfg.setProperty("text", message)
+          currentTooltip.cfg.setProperty("disabled", false)
+        }
+      }
+    }
+
+  @JSExport
+  def updateVisited(control: html.Element, newVisited: Boolean): Unit = {
+    if (newVisited)
+      control.classList.add("xforms-visited")
+    else
+      control.classList.remove("xforms-visited")
+    findControlLHHA(control, "alert").foreach { alertElement =>
+      if (alertElement.id.nonAllBlank) {
+        if (newVisited)
+          alertElement.classList.add("xforms-visited")
+        else
+          alertElement.classList.remove("xforms-visited")
+      }
+    }
+  }
+
+  @JSExport
+  def updateRequiredEmpty(control: html.Element, emptyAttr: String): Unit = {
+    val isRequired = control.hasClass("xforms-required")
+    if (isRequired && emptyAttr == "true")  control.classList.add("xforms-empty")  else control.classList.remove("xforms-empty")
+    if (isRequired && emptyAttr == "false") control.classList.add("xforms-filled") else control.classList.remove("xforms-filled")
+  }
+
+  @JSExport
+  def toggleCase(controlId: String, visible: Boolean): Unit = {
+
+    val caseBeginId = s"xforms-case-begin-$controlId"
+    val caseEndId   = s"xforms-case-end-$controlId"
+
+    def updateClasses(el: html.Element): Unit =
+      if (visible) {
+        el.classList.add("xforms-case-selected")
+        el.classList.remove("xforms-case-deselected")
+      } else {
+        el.classList.add("xforms-case-deselected")
+        el.classList.remove("xforms-case-selected")
+      }
+
+    val caseBegin = dom.document.getElementByIdT(caseBeginId)
+
+    (Iterator(caseBegin) ++ caseBegin.nextElementSiblings.takeWhile(_.id != caseEndId))
+      .foreach { el =>
+        if (el.id != caseBeginId && el.hasClass("xxforms-animate")) {
+          if (visible) {
+            updateClasses(el)
+            el.asInstanceOf[js.Dynamic].animate(
+              js.Dynamic.literal(height = "show"),
+              js.Dynamic.literal(duration = 200)
+            )
+          } else {
+            el.asInstanceOf[js.Dynamic].animate(
+              js.Dynamic.literal(height = "hide"),
+              js.Dynamic.literal(duration = 200, complete = (() => updateClasses(el)): js.Function0[Unit])
+            )
+          }
+        } else {
+          updateClasses(el)
+        }
+      }
   }
 
   @JSExport

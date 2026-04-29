@@ -436,15 +436,15 @@ object InitSupport {
     private def initializeGlobalEventListenersIfNeeded(): Unit =
       if (! topLevelListenerRegistered) {
 
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Change,    XFormsUiEventHandlers.change)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusIn,   XFormsUiEventHandlers.focus)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusOut,  XFormsUiEventHandlers.blur)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyPress,  XFormsUiEventHandlers.keypress)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyDown,   XFormsUiEventHandlers.keydown)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Input,     XFormsUiEventHandlers.input)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOver, XFormsUiEventHandlers.mouseover)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOut,  XFormsUiEventHandlers.mouseout)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Click,     XFormsUiEventHandlers.click)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Change,    XFormsUiEventHandlers.change(_))
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusIn,   XFormsUiEventHandlers.focus(_))
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusOut,  XFormsUiEventHandlers.blur(_))
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyPress,  XFormsUiEventHandlers.keypress(_))
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyDown,   XFormsUiEventHandlers.keydown(_))
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Input,     XFormsUiEventHandlers.input(_))
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOver, XFormsUiEventHandlers.mouseover(_))
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOut,  XFormsUiEventHandlers.mouseout(_))
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Click,     XFormsUiEventHandlers.click(_))
 
         // Catch logout link clicks to inform other pages on the same session that it is going to be invalidated
         $(".fr-logout-link").get().foreach { logoutAnchor =>

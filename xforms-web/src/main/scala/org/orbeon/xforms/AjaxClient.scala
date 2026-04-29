@@ -211,6 +211,16 @@ object AjaxClient {
     // https://github.com/orbeon/orbeon-forms/issues/4023
     LiferaySupport.extendSession()
     EventQueue.addEventAndUpdateQueueSchedule(event, event.incremental)
+
+    event
+      .targetIdOpt
+      .flatMap(dom.document.getElementByIdOpt)
+      .foreach { controlElem =>
+        dispatchCustomEvent(
+          target = controlElem,
+          name   = EventQueued
+        )
+      }
   }
 
   private val ErrorMessageTitle = "JavaScript error in Orbeon Forms client"
@@ -341,6 +351,11 @@ object AjaxClient {
       // Notify listeners that we are done processing this request
       ajaxResponseProcessed.fire(details)
 
+      dispatchCustomEvent(
+        target = currentForm.elem,
+        name   = UpdatesApplied
+      )
+
       // Schedule next requests as needed
       EventQueue.updateQueueSchedule()
     }
@@ -350,6 +365,9 @@ object AjaxClient {
   }
 
   private object Private {
+
+    val UpdatesApplied = "orbeon:updates-applied"
+    val EventQueued    = "orbeon:event-queued"
 
     def callbackF[T](cb: CallbackList[T], forCurrentEventQueue: Boolean, debugName: String): Future[T] = {
 

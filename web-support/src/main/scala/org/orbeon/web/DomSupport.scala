@@ -514,4 +514,14 @@ object DomSupport {
         cancelable = true
       })
     )
+
+  def dispatchCustomEvent(
+    target: dom.EventTarget,
+    name  : String
+  ): Unit =
+    target.dispatchEvent(
+      new dom.CustomEvent(name, new dom.CustomEventInit {
+        bubbles = true
+      })
+    )
 }

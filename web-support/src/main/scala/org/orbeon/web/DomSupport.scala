@@ -33,6 +33,9 @@ object DomSupport {
     def hasAnyClass(classes: String*): Boolean =
       classes.exists(elem.classList.contains)
 
+    def previousElementSiblingT: T =
+      elem.previousElementSibling.asInstanceOf[T]
+
     def previousElementSiblings: Iterator[T] =
       Iterator.iterate(elem.previousElementSibling.asInstanceOf[T])(_.previousElementSibling.asInstanceOf[T]).takeWhile(_ ne null)
 
@@ -41,6 +44,9 @@ object DomSupport {
 
     def previousElementOpt: Option[T] =
       elem.previousElementSiblings.nextOption()
+
+    def nextElementSiblingT: T =
+      elem.nextElementSibling.asInstanceOf[T]
 
     def nextElementSiblings: Iterator[T] =
       Iterator.iterate(elem.nextElementSibling.asInstanceOf[T])(_.nextElementSibling.asInstanceOf[T]).takeWhile(_ ne null)

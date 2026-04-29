@@ -76,13 +76,6 @@ object XBL extends js.Object {
   val componentInitialized                                        : YUICustomEvent = js.native
 }
 
-@JSGlobal("ORBEON.xforms.FlatNesting")
-@js.native
-object FlatNesting extends js.Object {
-  def setRelevant(element: html.Element, relevant: Boolean): Unit = js.native
-  def hasAncestor(node: html.Element, f: js.Function1[html.Element, Boolean]): Boolean = js.native
-}
-
 @JSGlobal("ORBEON.xforms.Controls")
 @js.native
 object Controls extends js.Object {

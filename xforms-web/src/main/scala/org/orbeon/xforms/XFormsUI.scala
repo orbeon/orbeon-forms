@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.facade.{FlatNesting, XBL}
+import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
 import org.scalajs.dom.html.Element
 import org.scalajs.dom.{DocumentReadyState, html}
@@ -416,7 +416,7 @@ object XFormsUI {
   @JSExport
   def setRelevant(control: html.Element, isRelevant: Boolean): Unit =
     if (control.hasClass("xforms-group-begin-end")) {
-      FlatNesting.setRelevant(control, isRelevant)
+      XFormsUiFlatNesting.setRelevant(control, isRelevant)
     } else {
 
       val elementsToUpdate =
@@ -438,9 +438,9 @@ object XFormsUI {
 
   @JSExport
   def setRepeatIterationRelevance(formID: String, repeatID: String, iteration: String, relevant: Boolean): Unit =
-    FlatNesting.setRelevant(
-      element  = org.orbeon.xforms.facade.Utils.findRepeatDelimiter(formID, repeatID, iteration.toInt),
-      relevant = relevant
+    XFormsUiFlatNesting.setRelevant(
+      node       = org.orbeon.xforms.facade.Utils.findRepeatDelimiter(formID, repeatID, iteration.toInt),
+      isRelevant = relevant
     )
 
   @JSExport

@@ -56,6 +56,7 @@ object XFormsApp extends App {
     xformsDyn.Language               = js.Dynamic.global.OrbeonLanguage
     xformsDyn.AjaxClient             = js.Dynamic.global.OrbeonAjaxClient
     xformsDyn.Globals                = js.Dynamic.global.OrbeonGlobals
+    xformsDyn.FlatNesting            = js.Dynamic.global.OrbeonXFormsUiFlatNesting
     xformsDyn.XFormsUi               = js.Dynamic.global.OrbeonXFormsUi
     xformsDyn.XFormsXbl              = js.Dynamic.global.OrbeonXFormsXbl
     xformsDyn.Help                   = js.Dynamic.global.OrbeonHelp

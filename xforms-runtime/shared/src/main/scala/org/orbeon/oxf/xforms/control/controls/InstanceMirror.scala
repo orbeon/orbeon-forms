@@ -85,14 +85,16 @@ object InstanceMirror {
     def apply(findMatchingNode: NodeMatcher): MirrorEventListener =
       wrap(mirrorListener(findMatchingNode))
 
-    private def wrap(listener: MirrorEventListener): MirrorEventListener = {
+      private def wrap(listener: MirrorEventListener): MirrorEventListener = {
       event =>
-        if (! inListener) {
+        // Value changes are allowed to re-enter, as they don't create cycles
+        if (! inListener || event.isInstanceOf[XXFormsValueChangedEvent]) {
+          val wasInListener = inListener
           inListener = true
           try
             listener(event)
           finally
-            inListener = false
+            inListener = wasInListener
         } else
           Stop
     }

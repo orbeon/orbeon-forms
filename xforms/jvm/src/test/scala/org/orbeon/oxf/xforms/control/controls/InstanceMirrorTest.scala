@@ -222,6 +222,59 @@ class InstanceMirrorTest
         assert(updates === expected.size * 2)
       }
     }
+
+    it("#7644: must mirror outer value changes caused by inner value changes") {
+      withTestExternalContext { _ =>
+
+        this setupDocument
+          <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+               xmlns:xf="http://www.w3.org/2002/xforms"
+               xmlns:ev="http://www.w3.org/2001/xml-events"
+               xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+               xmlns:xbl="http://www.w3.org/ns/xbl"
+               xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+               xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+            <xh:head>
+              <xf:model id="model">
+                <xf:instance id="outer-instance" xxf:exclude-result-prefixes="#all">
+                  <instance><first/><second/><third/></instance>
+                </xf:instance>
+                <xf:action observer="outer-instance" event="xxforms-value-changed" if="name(event('node')) = 'first'">
+                  <xf:setvalue ref="instance()/second" value="instance()/first"/>
+                  <xf:setvalue ref="instance()/third"  value="instance()/first"/>
+                </xf:action>
+              </xf:model>
+              <xbl:xbl>
+                <xbl:binding id="fr-gaga" element="fr|gaga" xxbl:mode="binding">
+                  <xbl:template>
+                    <xf:model id="gaga-model">
+                      <xf:instance id="gaga-instance" xxbl:mirror="true">
+                        <empty/>
+                      </xf:instance>
+                      <xf:setvalue event="update-inner-first" ref="instance()/first">Homer</xf:setvalue>
+                    </xf:model>
+                  </xbl:template>
+                </xbl:binding>
+              </xbl:xbl>
+            </xh:head>
+            <xh:body>
+              <fr:gaga id="my-gaga" ref="instance()"/>
+            </xh:body>
+          </xh:html>.toDocument
+
+        val outerInstance = document.findInstanceInDescendantOrSelf("outer-instance").get
+        val innerInstance = document.findInstanceInDescendantOrSelf("gaga-instance").get
+        val NestedModelId = "my-gaga" + ComponentSeparator + "gaga-model"
+
+        dispatch(name = "update-inner-first", effectiveId = NestedModelId)
+
+        val expected = """<instance><first>Homer</first><second>Homer</second><third>Homer</third></instance>"""
+
+        assert(instanceToString(outerInstance) == expected)
+        assert(instanceToString(innerInstance) == expected)
+      }
+    }
   }
 
   describe("#1166: XBL with mirror instance doesn't rebind after context change") {

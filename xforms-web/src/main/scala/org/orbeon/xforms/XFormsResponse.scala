@@ -662,10 +662,10 @@ object XFormsResponse {
     // See also https://github.com/orbeon/orbeon-forms/issues/3561
     elem.attValueOpt("hint") match {
       case Some(newHint) =>
-        Controls.setHintMessage(documentElement, newHint)
+        XFormsUI.setHintMessage(documentElement, newHint)
       case None =>
         elem.attValueOpt("title") foreach { newTitle =>
-          Controls.setHintMessage(documentElement, newTitle)
+          XFormsUI.setHintMessage(documentElement, newTitle)
         }
     }
 
@@ -676,7 +676,7 @@ object XFormsResponse {
 
     // Store new alert message in control attribute
     elem.attValueOpt("alert") foreach { newAlert =>
-      Controls.setAlertMessage(documentElement, newAlert)
+      XFormsUI.setAlertMessage(documentElement, newAlert)
     }
 
     // Store validity, label, hint, help in element

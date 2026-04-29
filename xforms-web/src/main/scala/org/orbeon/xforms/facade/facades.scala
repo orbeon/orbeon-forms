@@ -88,11 +88,7 @@ object FlatNesting extends js.Object {
 object Controls extends js.Object {
   def setFocus(controlId: String)                                                                        : Unit                                         = js.native
   def removeFocus(controlId: String)                                                                     : Unit                                         = js.native
-  def getHintMessage(elem: html.Element)                                                                 : String                                       = js.native
-  def getAlertMessage(elem: html.Element)                                                                : String                                       = js.native
 
-  def setHintMessage(documentElement: html.Element, newHint: String)                                     : Unit                                         = js.native
-  def setAlertMessage(documentElement: html.Element, newAlert: String)                                   : Unit                                         = js.native
   def updateVisited(documentElement: html.Element, newVisited: Boolean)                                  : Unit                                         = js.native
   def updateRequiredEmpty(documentElement: html.Element, emptyAttr: String)                              : Unit                                         = js.native
   def _setTooltipMessage(control: html.Element, message: String, tooltips: js.Dictionary[js.Any])        : Unit                                         = js.native

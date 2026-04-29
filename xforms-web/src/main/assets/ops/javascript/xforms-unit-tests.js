@@ -305,10 +305,10 @@ ORBEON.testcases = {
                     ORBEON.xforms.Document.setValue("input-hint", newHint);
                 }, function() {
                     var control = document.getElementById("input-field");
-                    var currentHint = ORBEON.xforms.Controls.getHintMessage(control);
+                    var currentHint = ORBEON.xforms.XFormsUi.getHintMessage(control);
                     YAHOO.util.Assert.areEqual(newHint, currentHint);
                     var control = document.getElementById("input-field-for");
-                    var currentHint = ORBEON.xforms.Controls.getHintMessage(control);
+                    var currentHint = ORBEON.xforms.XFormsUi.getHintMessage(control);
                     YAHOO.util.Assert.areEqual(newHint, currentHint);
                 });
             });
@@ -322,10 +322,10 @@ ORBEON.testcases = {
                     ORBEON.xforms.Document.setValue("input-help", newHelp);
                 }, function() {
                     var control = document.getElementById("input-field");
-                    var currentHelp = ORBEON.xforms.Controls.getHelpMessage(control);
+                    var currentHelp = ORBEON.xforms.XFormsUi.getHelpMessage(control);
                     YAHOO.util.Assert.areEqual(newHelp, currentHelp);
                     var control = document.getElementById("input-field-for");
-                    var currentHelp = ORBEON.xforms.Controls.getHelpMessage(control);
+                    var currentHelp = ORBEON.xforms.XFormsUi.getHelpMessage(control);
                     YAHOO.util.Assert.areEqual(newHelp, currentHelp);
                 });
             });
@@ -339,7 +339,7 @@ ORBEON.testcases = {
                     ORBEON.xforms.Document.setValue("input-alert", newAlert);
                 }, function() {
                     var control = document.getElementById("input-field");
-                    var currentAlert = ORBEON.xforms.Controls.getAlertMessage(control);
+                    var currentAlert = ORBEON.xforms.XFormsUi.getAlertMessage(control);
                     YAHOO.util.Assert.areEqual(newAlert, currentAlert);
                 });
             });

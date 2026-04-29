@@ -1,5 +1,6 @@
 package org.orbeon.xforms
 
+import cats.implicits.*
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.XFormsUI.ClassNameToId
 import org.orbeon.xforms.facade.{Controls, Events}
@@ -351,14 +352,14 @@ object XFormsUiEventHandlers {
     }
   }
 
-  private def getControlForLHHA(element: html.Element, lhhaType: String): html.Element = {
+  private def getControlForLHHA(element: html.Element, lhhaType: String): Option[html.Element] = {
     val suffix = ClassNameToId(lhhaType)
     if (element.hasClass("xforms-control"))
-      element
+      element.some
     else if (element.id.contains(suffix))
-      dom.document.getElementByIdT(element.id.replace(suffix, ""))
+      dom.document.getElementByIdOpt(element.id.replace(suffix, ""))
     else
-      element.parentElement
+      element.parentElement.some
   }
 
   private def isTooltipDisabled(elem: html.Element, lhha: String) =
@@ -372,22 +373,21 @@ object XFormsUiEventHandlers {
 
       val controlOpt = Option(Events._findParentXFormsControl(target))
 
-      if (target.hasAllClasses("xforms-alert", "xforms-active")) {
+      if (target.hasAllClasses("xforms-alert", "xforms-active"))
         // Alert tooltip
-
         // NOTE: control may be `null` if we have `<div for="">`. Using `control.getAttribute("for")` returns a proper
         // for, but then tooltips sometimes fail later with Ajax portlets in particular. So for now, just don't
         // do anything if there is no control found.
-        Option(getControlForLHHA(target, "alert")).foreach { formField =>
+        getControlForLHHA(target, "alert").foreach { formField =>
           if (! isTooltipDisabled(target, "alert")) {
             // The 'for' typically points to a form field which is inside the element representing the control
             Option(Events._findParentXFormsControl(formField)).foreach { control2 =>
-              val message = Controls.getAlertMessage(control2)
+              val message = XFormsUI.getAlertMessage(control2)
               Events._showToolTip(Globals.alertTooltipForControl, control2, target, "-orbeon-alert-tooltip", message, event)
             }
           }
         }
-      } else if (target.hasClass("xforms-help")) {
+      else if (target.hasClass("xforms-help"))
         // Help tooltip
         controlOpt.foreach { control =>
           if (Page.getXFormsFormFromHtmlElemOrThrow(control).helpTooltip()) {
@@ -395,7 +395,7 @@ object XFormsUiEventHandlers {
             Events._showToolTip(Globals.helpTooltipForControl, control, target, "-orbeon-help-tooltip", message, event)
           }
         }
-      } else {
+      else
         // Hint tooltip
         controlOpt.foreach { control =>
 
@@ -406,7 +406,7 @@ object XFormsUiEventHandlers {
             var candidateMessageHolder: html.Element = control
             var candidateMessage      : String       = ""
             while (candidateMessageHolder != null && candidateMessage == "") {
-              candidateMessage       = Controls.getHintMessage(candidateMessageHolder)
+              candidateMessage       = XFormsUI.getHintMessage(candidateMessageHolder)
               candidateMessageHolder = Events._findParentXFormsControl(candidateMessageHolder.parentNode)
             }
 
@@ -416,7 +416,6 @@ object XFormsUiEventHandlers {
             Events._showToolTip(Globals.hintTooltipForControl, control, target, "-orbeon-hint-tooltip", candidateMessage, event)
           }
         }
-      }
     }
 
   def mouseout(event: MouseEvent): Unit =

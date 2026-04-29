@@ -18,8 +18,6 @@
  */
 var XF_REPEAT_SEPARATOR = "\u2299";
 var XF_REPEAT_INDEX_SEPARATOR = "-";
-var XF_COMPONENT_SEPARATOR = "\u2261";
-var XF_LHHAI_SEPARATOR = XF_COMPONENT_SEPARATOR + XF_COMPONENT_SEPARATOR;
 
 var ELEMENT_TYPE = document.createElement("dummy").nodeType;
 
@@ -219,54 +217,6 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
         lhhaChangeEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
 
 
-
-        getAlertMessage: function (control) {
-            var alertElement = ORBEON.xforms.XFormsUi.getControlLHHA(control, "alert");
-            return alertElement.innerHTML;
-        },
-
-        setAlertMessage: function (control, message) {
-            ORBEON.xforms.XFormsUi.setMessage(control, "alert", message);
-            ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.alertTooltipForControl);
-        },
-
-        getHintMessage: function (control) {
-            if ($(control).is('.xforms-trigger, .xforms-submit')) {
-                var formElement = ORBEON.util.Dom.getElementByTagName(control, ["a", "button"]);
-                return formElement.title;
-            } else {
-                // Element for hint
-                var hintElement = ORBEON.xforms.XFormsUi.getControlLHHA(control, "hint");
-                return hintElement == null ? "" : hintElement.innerHTML;
-            }
-        },
-
-        setHintMessage: function (control, message) {
-            // Destroy existing tooltip if it was for a control which isn't anymore in the DOM
-            var tooltips = ORBEON.xforms.Globals.hintTooltipForControl;
-            if (tooltips[control.id] != null) {
-                if (tooltips[control.id].cfg.getProperty('context')[0] != control)
-                    tooltips[control.id] = null
-            }
-
-            if ($(control).is('.xforms-trigger, .xforms-submit')) {
-                // For triggers, the value is stored in the title for the control
-
-
-                if (tooltips[control.id] == null) {
-                    // We only update the title if we don't have already a YUI hint widget.
-                    // If we do, updating the value in the YUI widget is enough. The YUI widget empties the content of the
-                    // title attribute to avoid the text in the title from showing. If we set the title, we might have
-                    // both the title shown by the browser and the YUI hint widget.
-                    var formElement = ORBEON.util.Dom.getElementByTagName(control, ["a", "button"]);
-                    formElement.title = message;
-                }
-            } else {
-                ORBEON.xforms.XFormsUi.setMessage(control, "hint", message);
-            }
-            // If there is already a YUI hint created for that control, update the message for the YUI widget
-            ORBEON.xforms.Controls._setTooltipMessage(control, message, tooltips);
-        },
 
         _setTooltipMessage: function (control, message, tooltipForControl) {
             // If we have a YUI tooltip for this control, update the tooltip

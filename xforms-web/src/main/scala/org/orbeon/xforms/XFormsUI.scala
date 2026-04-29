@@ -146,6 +146,51 @@ object XFormsUI {
   }
 
   @JSExport
+  def getAlertMessage(control: html.Element): String =
+    findControlLHHA(control, "alert").map(_.innerHTML).getOrElse("")
+
+  @JSExport
+  def setAlertMessage(control: html.Element, message: String): Unit = {
+    setMessage(control, "alert", message)
+    Controls._setTooltipMessage(control, message, Globals.alertTooltipForControl)
+  }
+
+  @JSExport
+  def getHintMessage(control: html.Element): String =
+    if (control.hasAnyClass("xforms-trigger", "xforms-submit"))
+      control
+        .queryNestedElems[html.Element]("button, a")
+        .headOption
+        .map(_.title)
+        .getOrElse("")
+    else
+      findControlLHHA(control, "hint").map(_.innerHTML).getOrElse("")
+
+  @JSExport
+  def setHintMessage(control: html.Element, message: String): Unit = {
+    val tooltips = Globals.hintTooltipForControl
+    tooltips.get(control.id).foreach { tooltipDyn =>
+      if (tooltipDyn != null && ! js.isUndefined(tooltipDyn)) {
+        val tooltip = tooltipDyn.asInstanceOf[js.Dynamic]
+        if (tooltip.cfg.getProperty("context").asInstanceOf[js.Array[html.Element]](0) != control)
+          tooltips.put(control.id, null)
+      }
+    }
+    if (control.hasAnyClass("xforms-trigger", "xforms-submit")) {
+      val tooltipDyn = tooltips.get(control.id).orNull
+      if (tooltipDyn == null || js.isUndefined(tooltipDyn)) {
+        control
+          .queryNestedElems[html.Element]("button, a")
+          .headOption
+          .foreach(_.title = message)
+      }
+    } else {
+      setMessage(control, "hint", message)
+    }
+    Controls._setTooltipMessage(control, message, tooltips)
+  }
+
+  @JSExport
   def setConstraintLevel(control: html.Element, newLevel: String): Unit = {
 
     val alertActive = newLevel != ""
@@ -207,7 +252,7 @@ object XFormsUI {
         findControlLHHA(control, "alert").toList :::
         (! isRelevant || (isRelevant && getHelpMessage(control).nonAllBlank))
           .flatList(findControlLHHA(control, "help").toList) :::
-        (! isRelevant || (isRelevant && Controls.getHintMessage(control).nonAllBlank))
+        (! isRelevant || (isRelevant && getHintMessage(control).nonAllBlank))
           .flatList(findControlLHHA(control, "hint").toList)
 
       elementsToUpdate.foreach { element =>

@@ -253,11 +253,11 @@ object XFormsResponse {
 
         // Set focus to a control
         case "focus" =>
-          Controls.setFocus(childElem.attValueOrThrow("control-id"))
+          XFormsUI.setFocus(childElem.attValueOrThrow("control-id"))
 
         // Remove focus from a control
         case "blur" =>
-          Controls.removeFocus(childElem.attValueOrThrow("control-id"))
+          XFormsUI.removeFocus(childElem.attValueOrThrow("control-id"))
 
         // Run JavaScript code
         case "script" =>
@@ -636,7 +636,7 @@ object XFormsResponse {
     if (
       ! dom.document.contains(Globals.currentFocusControlElement) &&
         dom.document.getElementByIdOpt(Globals.currentFocusControlId).isDefined
-    ) Controls.setFocus(Globals.currentFocusControlId)
+    ) XFormsUI.setFocus(Globals.currentFocusControlId)
   }
 
   private def updateControlAttributes(

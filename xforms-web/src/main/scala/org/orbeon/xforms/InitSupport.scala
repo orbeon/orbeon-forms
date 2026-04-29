@@ -357,7 +357,7 @@ object InitSupport {
 
         // Do this after dialogs as focus might be within a dialog
         initializations.focusElementId foreach { focusElementId =>
-          Controls.setFocus(focusElementId)
+          XFormsUI.setFocus(focusElementId)
         }
 
         initializations.errorsToShow foreach { case rpc.Error(title, details, formId) =>

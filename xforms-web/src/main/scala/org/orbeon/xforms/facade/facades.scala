@@ -86,9 +86,6 @@ object FlatNesting extends js.Object {
 @JSGlobal("ORBEON.xforms.Controls")
 @js.native
 object Controls extends js.Object {
-  def setFocus(controlId: String)                                                                        : Unit                                         = js.native
-  def removeFocus(controlId: String)                                                                     : Unit                                         = js.native
-
   val beforeValueChange                                                                                  : YUICustomEvent                               = js.native
   val valueChange                                                                                        : YUICustomEvent                               = js.native
   val afterValueChange                                                                                   : YUICustomEvent                               = js.native

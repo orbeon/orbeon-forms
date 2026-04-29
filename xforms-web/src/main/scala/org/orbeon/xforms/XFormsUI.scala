@@ -15,15 +15,16 @@ package org.orbeon.xforms
 
 import io.udash.wrappers.jquery.JQueryPromise
 import org.log4s.Logger
-import org.orbeon.facades.HTMLDialogElement
+import org.orbeon.facades.{Bowser, HTMLDialogElement}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.facade.{Controls, FlatNesting, XBL}
+import org.orbeon.xforms.facade.{FlatNesting, XBL}
 import org.scalajs.dom
-import org.scalajs.dom.html
+import org.scalajs.dom.html.Element
+import org.scalajs.dom.{DocumentReadyState, html}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import shapeless.syntax.typeable.*
 
@@ -263,6 +264,103 @@ object XFormsUI {
           updateClasses(el)
         }
       }
+  }
+
+  @JSExport
+  def setFocus(controlId: String): Unit = {
+
+    // Wait until `load` event to set focus, as dialog in control the control is present might not be visible until then
+    // And on mobile, don't set the focus on page load, as a heuristic to avoid showing the soft keyboard on page load
+    if (dom.document.readyState != DocumentReadyState.complete) {
+      if (! Bowser.mobile.contains(true))
+        dom.window.addEventListener("load", (_: dom.Event) => setFocus(controlId))
+      return
+    }
+
+    // Don't bother focusing if the control is already focused. This also prevents issues with `maskFocusEvents`,
+    // whereby `maskFocusEvents` could be set to `true` below, but then not cleared back to false if no focus event
+    // is actually dispatched.
+    if (Globals.currentFocusControlId == controlId)
+      return
+
+    val control = dom.document.getElementByIdT(controlId)
+
+    Globals.currentFocusControlId      = controlId
+    Globals.currentFocusControlElement = control
+    Globals.maskFocusEvents            = true
+
+    if (
+      control.hasAnyClass("xforms-select-appearance-full", "xforms-select1-appearance-full") ||
+      control.hasAllClasses("xforms-input", "xforms-type-boolean")
+    ) {
+      val nestedInputs = control.queryNestedElems[html.Input]("input")
+      nestedInputs
+        .find(_.checked)
+        .orElse(nestedInputs.headOption)
+        .foreach(_.focus())
+    } else if (XFormsXbl.isFocusable(control)) {
+      val instance = XBL.instanceForControl(control)
+      if (instance != null && ! js.isUndefined(instance)) {
+        val dyn = instance.asInstanceOf[js.Dynamic]
+        if (XFormsXbl.isObjectWithMethod(instance, "xformsFocus"))
+          dyn.xformsFocus()
+        else if (XFormsXbl.isObjectWithMethod(instance, "setFocus"))
+          dyn.setFocus()
+      }
+    } else {
+
+      def fromVisibleHtmlFormField: Option[html.Element] =
+        control.queryNestedElems[html.Element](
+          "input:visible, textarea:visible, select:visible, button:visible:not(.xforms-help), a:visible"
+        ).headOption
+
+      def fromVisibleTabindex: Option[Element] =
+        control.queryNestedElems[html.Element](
+          "[tabindex]:not([tabindex = '-1']):visible"
+        ).headOption
+
+      fromVisibleHtmlFormField.orElse(fromVisibleTabindex) match {
+        case Some(elem) => elem.focus()
+        case None       => Globals.maskFocusEvents = false // don't mask the focus event since we won't receive it
+      }
+    }
+
+    // 2023-01-12: Don't do this for static readonly controls.
+    // Save current value as server value. We usually do this on focus, but for control where we set the focus
+    // with `xf:setfocus`, we still receive the focus event when the value changes, but after the change event
+    // (which means we then don't send the new value to the server).
+    if (! control.classList.contains("xforms-static") && ServerValueStore.getOpt(controlId).isEmpty)
+      ServerValueStore.set(controlId, getCurrentValue(control))
+  }
+
+  @JSExport
+  def removeFocus(controlId: String): Unit = {
+
+    if (Globals.currentFocusControlId == null)
+      return
+
+    val control = dom.document.getElementByIdT(controlId)
+
+    if (
+      control.hasAnyClass("xforms-select-appearance-full", "xforms-select1-appearance-full") ||
+      control.hasAllClasses("xforms-input", "xforms-type-boolean")
+    ) {
+      control
+        .queryNestedElems[html.Input]("input")
+        .foreach(_.blur())
+    } else if (XFormsXbl.isFocusable(control)) {
+      val instance = XBL.instanceForControl(control)
+      if (instance != null && ! js.isUndefined(instance) && XFormsXbl.isObjectWithMethod(instance, "xformsBlur"))
+        instance.asInstanceOf[js.Dynamic].xformsBlur()
+    } else {
+      control
+        .queryNestedElems[html.Element]("input textarea select button a")
+        .headOption
+        .foreach(_.blur())
+    }
+
+    Globals.currentFocusControlId      = null
+    Globals.currentFocusControlElement = null
   }
 
   @JSExport
@@ -583,7 +681,7 @@ object XFormsUI {
       // See https://github.com/orbeon/orbeon-forms/issues/4511
       val focusControlIdOpt =
         Option(Globals.currentFocusControlId) map { focusControlId =>
-          Controls.removeFocus(focusControlId)
+          removeFocus(focusControlId)
           focusControlId
         }
 
@@ -794,7 +892,7 @@ object XFormsUI {
 
         // Restore focus
         // See https://github.com/orbeon/orbeon-forms/issues/4511
-        focusControlIdOpt foreach Controls.setFocus
+        focusControlIdOpt foreach setFocus
       }
   }
 }

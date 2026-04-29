@@ -147,7 +147,7 @@ object DocumentAPI extends js.Object {
 
     val control = findControlOrThrow(controlIdOrElem, formElem)
 
-    Controls.setFocus(control.id)
+    XFormsUI.setFocus(control.id)
     AjaxClient.fireEvent(
       AjaxEvent(
         eventName = EventNames.XFormsFocus,

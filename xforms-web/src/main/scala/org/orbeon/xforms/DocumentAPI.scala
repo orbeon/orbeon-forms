@@ -98,20 +98,8 @@ object DocumentAPI extends js.Object {
       if (control.hasClass(clazz))
         return js.Promise.reject(new js.Error(s"Cannot set the value of $error for id `${control.id}`"))
 
-    def fireValueEvent(): Unit =
-      XFormsUI.getCurrentValue(control).foreach { newValue =>
-        // Use the value from the control, not the one received (2023-05-18 why?)
-        AjaxClient.fireEvent(
-          AjaxEvent(
-            eventName  = EventNames.XXFormsValue,
-            targetId   = control.id,
-            properties = Map("value" -> newValue)
-          )
-        )
-      }
-
     def fireValueEventMaybeServerF: Future[Unit] = {
-      fireValueEvent()
+      XFormsUiEventHandlers.dispatchValueChange(control)
       if (waitForServer.contains(true))
         AjaxClient.allEventsProcessedF("setValue")
       else

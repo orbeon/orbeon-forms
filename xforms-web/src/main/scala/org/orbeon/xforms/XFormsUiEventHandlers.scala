@@ -71,16 +71,19 @@ object XFormsUiEventHandlers {
         }
 
         // Fire change event if the control has a value
-        XFormsUI.getCurrentValue(target).foreach { controlCurrentValue =>
-          AjaxClient.fireEvent(
-            AjaxEvent(
-              eventName  = EventNames.XXFormsValue,
-              targetId   = target.id,
-              properties = Map("value" -> controlCurrentValue)
-            )
-          )
-        }
+        dispatchValueChange(target)
       }
+    }
+
+  def dispatchValueChange(control: html.Element): Unit =
+    XFormsUI.getCurrentValue(control).foreach { controlCurrentValue =>
+      AjaxClient.fireEvent(
+        AjaxEvent(
+          eventName  = EventNames.XXFormsValue,
+          targetId   = control.id,
+          properties = Map("value" -> controlCurrentValue)
+        )
+      )
     }
 
   private def isFocusableControl(elem: html.Element) =
@@ -190,19 +193,11 @@ object XFormsUiEventHandlers {
             target.focus()
 
             // Send a value change and DOM activate
-            XFormsUI.getCurrentValue(control).foreach { controlCurrentValue =>
-              AjaxClient.fireEvent(
-                AjaxEvent(
-                  eventName  = EventNames.XXFormsValue,
-                  targetId   = control.id,
-                  properties = Map("value" -> controlCurrentValue)
-                )
-              )
-            }
+            dispatchValueChange(control)
             AjaxClient.fireEvent(
               AjaxEvent(
                 eventName = "DOMActivate",
-                targetId = control.id
+                targetId  = control.id
               )
             )
 

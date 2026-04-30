@@ -299,18 +299,15 @@ object XFormsUI {
       }
     } else {
 
-      def isVisible(elem: html.Element): Boolean =
-        elem.offsetWidth != 0 || elem.offsetHeight != 0 || elem.getClientRects().length != 0
-
       def fromVisibleHtmlFormField: Option[html.Element] =
         control.queryNestedElems[html.Element](
           "input, textarea, select, button:not(.xforms-help), a"
-        ).find(isVisible)
+        ).find(_.isVisible)
 
       def fromVisibleTabindex: Option[Element] =
         control.queryNestedElems[html.Element](
           "[tabindex]:not([tabindex = '-1'])"
-        ).find(isVisible)
+        ).find(_.isVisible)
 
       fromVisibleHtmlFormField.orElse(fromVisibleTabindex) match {
         case Some(elem) => elem.focus()

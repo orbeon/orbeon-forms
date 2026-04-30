@@ -99,7 +99,7 @@ object SectionLabelEditor {
         val labelInput = labelInputOpt.getOrElse {
           val labelInput = $("<input class='fb-edit-section-label'/>")
           $(".fb-main").append(labelInput)
-          labelInput.get().foreach(_.addEventListener("blur", (_: dom.Event) => { if (labelInput.is(":visible")) sendNewLabelValue() }))
+          labelInput.get().foreach(_.addEventListener("blur", (_: dom.Event) => { if (labelInput.is(":visible")) sendNewLabelValue() })) // TODO: use `DomSupport.isVisible`
           labelInput.get().foreach(_.addEventListener(DomEventNames.KeyPress, (e: dom.KeyboardEvent) => {
             if (e.code == "Enter") {
               // Avoid "enter" from being dispatched to other control that might get the focus

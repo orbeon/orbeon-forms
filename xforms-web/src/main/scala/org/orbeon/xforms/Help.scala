@@ -38,7 +38,7 @@ object Help {
 
     def fieldsCommonAncestorOpt: Option[dom.Element] =
       // Exclude help button
-      jCommonAncestor(jControlEl.find(":input:visible:not(.xforms-help), output:visible"))
+      jCommonAncestor(jControlEl.find(":input:visible:not(.xforms-help), output:visible")) // TODO: use `DomSupport.isVisible`
 
     def labelElementOpt: Option[dom.Element] =
       XFormsUI.findControlLHHA(controlEl, "label")

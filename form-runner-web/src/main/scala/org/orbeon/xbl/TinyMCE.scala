@@ -18,9 +18,8 @@ import org.orbeon.facades.TinyMce.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.XFormsXbl
-import org.orbeon.xforms.facade.XBLCompanion
 import org.orbeon.xforms.*
+import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom
 import org.scalajs.dom.*
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -95,7 +94,7 @@ object TinyMCE {
           .flatMap(_.trimAllToOpt)
           .map(js.JSON.parse(_).asInstanceOf[TinyMceConfig])
 
-      val tinyMceDiv = containerElem.querySelector(".xbl-fr-tinymce-div")
+      val tinyMceDiv = containerElem.querySelectorT(".xbl-fr-tinymce-div")
       def newTinyMceConfig() =
         clonedConfig(
           GlobalJsTinyMceCustomConfig
@@ -142,7 +141,7 @@ object TinyMCE {
         //   Settings dialog, we stop trying to render if we notice `containerElem` isn't in the document anymore
         def renderIfVisible(): Unit =
           if (document.getElementById(containerElem.id) == containerElem && tinyMceObjectOpt.contains(tinyMceObject))
-            if ($(tinyMceDiv).is(":visible")) {
+            if (tinyMceDiv.isVisible) {
               tinyMceObject.render()
             } else {
               val shortDelay = Page.getXFormsFormFromHtmlElemOrThrow(containerElem).configuration.internalShortDelay

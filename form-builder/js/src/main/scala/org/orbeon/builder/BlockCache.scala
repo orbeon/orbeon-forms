@@ -74,7 +74,7 @@ object BlockCache {
 
         val sectionsIt =
           for {
-            e       <- collectElems(s"$SectionSelector:visible")
+            e       <- collectElems(s"$SectionSelector:visible") // TODO: use `DomSupport.isVisible`
             section <- elemNotInSectionTemplateOpt(e).iterator
             // Mix of jQuery and Option is not pretty
             mostOuterSection =
@@ -98,7 +98,7 @@ object BlockCache {
 
         val gridsIt =
           for {
-            e    <- collectElems(s"$GridSelector:visible")
+            e    <- collectElems(s"$GridSelector:visible") // TODO: use `DomSupport.isVisible`
             grid <- elemNotInSectionTemplateOpt(e).iterator
           } yield
             Block(grid)

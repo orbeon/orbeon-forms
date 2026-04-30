@@ -157,7 +157,7 @@ object ControlLabelHintTextEditor {
     // Called when users press enter or tab out
     def resourceEditorEndEdit(): Unit =
       // If editor is hidden, editing has already been ended (endEdit can be called more than once)
-      if (Private.containerDiv.is(":visible")) {
+      if (Private.containerDiv.is(":visible")) { // TODO: use `DomSupport.isVisible`
         resourceEditorCurrentControlOpt foreach { resourceEditorCurrentControl =>
           // Send value to server, handled in Form Builder's `model.xml`
           val controlId   = resourceEditorCurrentControl.attr("id").get

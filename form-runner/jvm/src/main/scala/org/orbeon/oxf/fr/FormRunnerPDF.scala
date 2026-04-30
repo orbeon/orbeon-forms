@@ -123,27 +123,6 @@ trait FormRunnerPDF {
     fromControlMap.orElse(fromControlName).orNull
   }
 
-  // Used by:
-  //
-  // - `print-pdf-notemplate.xsl`: `rendered-page-orientation`/`rendered-page-size`
-  // - Form Builder: `html-page-layout`
-  // - `view.xsl`: `html-page-layout`
-  //
-  //@XPathFunction
-  def optionFromMetadataOrPropertiesXPath(
-    metadataInstanceRootElemOrNull: NodeInfo,
-    featureName                   : String,
-    app                           : String,
-    form                          : String,
-    mode                          : String
-  ): Option[String] =
-    FormRunner.optionFromMetadataOrProperties(
-      metadataInstanceRootElemOpt = Option(metadataInstanceRootElemOrNull),
-      featureName                 = featureName
-    )(
-      formRunnerParams            = FormRunnerParams(app, form, Some(1), None, None, mode)
-    )
-
   import URLFinder.*
 
   // Add http/https/mailto hyperlinks to a plain string

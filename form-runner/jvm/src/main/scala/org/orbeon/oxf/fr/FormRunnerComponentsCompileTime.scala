@@ -11,6 +11,7 @@ import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.XMLConstants
+import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo
@@ -251,6 +252,45 @@ trait FormRunnerComponentsCompileTime {
         val params = hints.mkString(", ' ', ")
         s"concat($params)"
     }
+  }
+
+  // Used by:
+  //
+  // - `print-pdf-notemplate.xsl`: `rendered-page-orientation`/`rendered-page-size`
+  // - Form Builder: `html-page-layout`
+  // - `view.xsl`: `html-page-layout`
+  //
+  //@XPathFunction
+  def optionFromMetadataOrPropertiesXPath(
+    metadataInstanceRootElemOrNull: NodeInfo,
+    featureName                   : String,
+    app                           : String,
+    form                          : String,
+    mode                          : String
+  ): Option[String] =
+    FormRunner.optionFromMetadataOrProperties(
+      metadataInstanceRootElemOpt = Option(metadataInstanceRootElemOrNull),
+      featureName                 = featureName
+    )(
+      formRunnerParams            = FormRunnerParams(app, form, Some(1), None, None, mode)
+    )
+
+  // Resolve a theme name to its CSS URI via `oxf.fr.theme.css-uri.<name-with-dashes>`, with fallback to a default theme
+  //@XPathFunction
+  def resolveThemeCssUri(themeName: String): String = {
+
+    def propertyNameAndValueOpt(theme: String): (String, Option[String]) = {
+      val propertyName = s"oxf.fr.theme.css-uri.${theme.replace('.', '-')}"
+      (propertyName, Property.propertyAsString(propertyName))
+    }
+
+    val (propertyName, propertyValueOpt) = propertyNameAndValueOpt(themeName)
+
+    propertyValueOpt.orElse {
+      val DefaultTheme = "2025.1"
+      FormRunnerLogger.warn(s"Theme '$themeName' has no '$propertyName' property mapping, falling back to default '$DefaultTheme' theme")
+      propertyNameAndValueOpt(DefaultTheme)._2
+    }.orNull
   }
 
   def componentsFunctionLibrary: FunctionLibrary =

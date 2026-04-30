@@ -192,6 +192,27 @@
         name="js-uri"
         as="xs:string*"
         select="fr:get-uris-from-properties('js.uri'), fr:get-uris-from-properties('js.custom.uri')"/>
+
+    <!-- Theme selection -->
+    <xsl:variable
+        name="theme"
+        as="xs:string"
+        select="
+            (
+                frf:optionFromMetadataOrPropertiesXPath(
+                    frf:metadataInstanceRootOpt($fr-form-model),
+                    'theme',
+                    $app,
+                    $form,
+                    $major-mode
+                ),
+                '2025.1'
+            )[1]"/>
+    <xsl:variable
+        name="theme-css-uri"
+        as="xs:string?"
+        select="frf:resolveThemeCssUri($theme)"/>
+
     <xsl:variable
         name="assets-baseline-updates"
         as="xs:string"
@@ -675,6 +696,11 @@
                                )
                            )"/>
             </xh:title>
+
+            <!-- Theme CSS (selected via `oxf.fr.detail.theme.*.*` -> `oxf.fr.theme.css-uri.<name>`) -->
+            <xsl:if test="exists($theme-css-uri)">
+                <xh:link rel="stylesheet" href="{$theme-css-uri}" type="text/css" media="all"/>
+            </xsl:if>
 
             <!-- Form Runner CSS (standard and custom) -->
             <xsl:for-each select="$css-uri">

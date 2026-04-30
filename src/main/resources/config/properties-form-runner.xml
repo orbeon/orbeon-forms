@@ -195,6 +195,8 @@
 
     <property as="xs:string"  name="oxf.fr.detail.html-page-layout.*.*"                            value="fixed"/>
     <property as="xs:string"  name="oxf.fr.detail.density.*.*"                                     value="{if (fr:created-with-or-newer('2024.1')) then 'comfortable' else 'compact'}"/>
+    <property as="xs:string"  name="oxf.fr.detail.theme.*.*"                                       value="2025.1"/>
+    <property as="xs:string"  name="oxf.fr.detail.theme.orbeon.builder"                            value="2025.1"/>
 
     <property as="xs:string"  name="oxf.fr.detail.error-summary.*.*"                               value="bottom"/>
 

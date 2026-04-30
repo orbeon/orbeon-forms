@@ -46,9 +46,10 @@ object XFormsApp extends App {
     if (js.isUndefined(orbeonDyn.xforms))
       orbeonDyn.xforms = new js.Object
     val xformsDyn = orbeonDyn.xforms
-
+    
     xformsDyn.InitSupport = js.Dynamic.global.OrbeonInitSupport
 
+    // Private API call from JavaScript
     xformsDyn.RpcClient = js.Dynamic.global.OrbeonRpcClient // TODO: move to Form Builder module
 
     // Public API

@@ -12,7 +12,6 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 
-@JSExportTopLevel("OrbeonHelp")
 object Help {
 
   import Private.*
@@ -23,7 +22,6 @@ object Help {
    * We're asked to show the help popover for a control, either because the user clicked on the help icon,
    * or because the server asks us to do so.
    */
-  @JSExport
   def showHelp(controlEl: html.Element): Unit = {
 
     val jControlEl    = $(controlEl)

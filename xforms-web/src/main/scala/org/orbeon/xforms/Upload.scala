@@ -25,7 +25,6 @@ import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.concurrent.Future
 import scala.concurrent.duration.*
-import scala.scalajs.js.annotation.JSExport
 
 
 object Upload {
@@ -126,7 +125,6 @@ class Upload {
 
   // The change event corresponds to a file being selected. This will queue an event to submit files in the
   // background as soon as possible.
-  @JSExport
   def change(): Unit = {
     logger.debug("change -> queueing")
     processFileList(getInput.files, this)
@@ -163,7 +161,6 @@ class Upload {
 
   // Sets the state of the control to either "empty" (no file selected, or upload hasn't started yet), "progress"
   // (file is being uploaded), or "file" (a file has been uploaded).
-  @JSExport
   def setState(state: String): Unit = {
 
     logger.debug(s"setState $state")

@@ -6,10 +6,9 @@ import org.scalajs.dom.html
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{newInstance, global as g}
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.scalajs.js.annotation.JSExport
 
 
-@JSExportTopLevel("OrbeonXFormsUiEvents")
 object XFormsUiEvents {
 
   lazy val orbeonLoadedEvent: YUICustomEvent =

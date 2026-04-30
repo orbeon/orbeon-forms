@@ -31,12 +31,10 @@ import scala.collection.immutable
 import scala.concurrent.duration.{span as _, *}
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExportTopLevel
 import scala.scalajs.js.timers.SetTimeoutHandle
 import scala.scalajs.js.{timers, |}
 
 
-@JSExportTopLevel("OrbeonXFormsUi")
 object XFormsUI {
 
   val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.XFormsUI")

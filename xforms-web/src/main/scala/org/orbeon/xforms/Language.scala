@@ -16,14 +16,12 @@ package org.orbeon.xforms
 import org.orbeon.web.DomSupport
 import org.orbeon.xforms.Constants.HtmlLangAttr
 import org.scalajs.dom
-import org.scalajs.dom.{Element, MutationObserver, MutationRecord}
+import org.scalajs.dom.{Element, MutationObserver}
 
 import scala.collection.mutable as m
-import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 
-@JSExportTopLevel("OrbeonLanguage")
 object Language {
 
   import Private.*
@@ -31,7 +29,6 @@ object Language {
   // noinspection AccessorLikeMethodIsEmptyParen
   // Return the language for the page, defaulting to `en` if none is found
   // See also https://github.com/orbeon/orbeon-forms/issues/3787
-  @JSExport
   def getLang(): String = {
     langElement
       .map(_.getAttribute(HtmlLangAttr).substring(0, 2))

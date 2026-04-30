@@ -4,7 +4,6 @@ import org.orbeon.web.DomSupport.*
 import org.scalajs.dom.html
 
 import scala.collection.mutable
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 
 
@@ -30,7 +29,6 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
  *          ...
  *      <span class="xforms-repeat-delimiter">
  */
-@JSExportTopLevel("OrbeonXFormsUiFlatNesting")
 object XFormsUiFlatNesting {
 
   private def isGroupBeginEnd(node: html.Element): Boolean =
@@ -132,7 +130,6 @@ object XFormsUiFlatNesting {
   private def hasAncestor(startNode: html.Element, conditionFunction: html.Element => Boolean): Boolean =
     foldAncestors(startNode, false, (node, _: Boolean) => conditionFunction(node), true)
 
-  @JSExport
   def setRelevant(node: html.Element, isRelevant: Boolean): Unit = {
 
     if (isRelevant)

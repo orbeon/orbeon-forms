@@ -16,10 +16,8 @@ package org.orbeon.xforms
 import org.scalajs.dom.html
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 
-@JSExportTopLevel("OrbeonGlobals")
-@JSExportAll
+
 object Globals {
 
   // TODO: Most of these should be removed

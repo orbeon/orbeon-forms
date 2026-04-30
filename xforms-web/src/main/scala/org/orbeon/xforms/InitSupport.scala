@@ -225,7 +225,6 @@ object InitSupport {
     }
   }
 
-  @JSExport
   def initializeJavaScriptControlsFromSerialized(initData: String): Unit =
     decode[List[rpc.Control]](initData) match {
       case Left(e) =>
@@ -242,7 +241,6 @@ object InitSupport {
         destroyJavaScriptControls(controls)
     }
 
-  @JSExport
   def processRepeatHierarchyUpdateForm(formId: String, repeatTreeString: String): Unit = {
 
     val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =

@@ -23,7 +23,6 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.|
 
 
-@JSExportTopLevel("OrbeonPage")
 object Page {
 
   import Private.*
@@ -45,8 +44,6 @@ object Page {
   def findFormByUuid(uuid: String): Option[xforms.Form] =
     formsByUuid.get(uuid)
 
-  // 2023-08-15: 4 callers in JavaScript, rest in Scala
-  @JSExport
   def getXFormsFormFromNamespacedIdOrThrow(namespacedFormId: String): xforms.Form =
     findXFormsFormFromNamespacedId(namespacedFormId).getOrElse(throw new IllegalArgumentException(s"form `$namespacedFormId` not found"))
 
@@ -103,15 +100,12 @@ object Page {
   // Handle the case where the id is already prefixed. As of 2019-01-09 this can be a problem only
   // for one caller of this API. Short namespaces are removed as of Orbeon Forms 2019.2 so the potential
   // for conflict is lowered.
-  @JSExport
   def namespaceIdIfNeeded(namespacedFormId: String, id: String): String =
     getXFormsFormFromNamespacedIdOrThrow(namespacedFormId).namespaceIdIfNeeded(id)
 
-  @JSExport
   def deNamespaceIdIfNeeded(namespacedFormId: String, id: String): String =
     getXFormsFormFromNamespacedIdOrThrow(namespacedFormId).deNamespaceIdIfNeeded(id)
 
-  @JSExport
   def getUploadControl(container: html.Element): Upload = {
 
     def getControlConstructor(container: html.Element): () => Upload =

@@ -16,6 +16,7 @@ package org.orbeon.xforms
 import cats.data.NonEmptyList
 import cats.syntax.option.*
 import org.log4s.Logger
+import org.orbeon.facades.HTMLDialogElement
 import org.orbeon.liferay.LiferaySupport
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
@@ -24,7 +25,6 @@ import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.{XXFormsUploadProgress, XXFormsValue}
-import org.orbeon.facades.HTMLDialogElement
 import org.scalajs.dom
 import org.scalajs.dom.{EventListenerOptions, html}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -67,21 +67,13 @@ object AjaxClient {
   def allEventsProcessedP(): js.Promise[Unit] =
     allEventsProcessedF("response processed as `js.Promise`").toJSPromise
 
-  // 2020-05-05: Used by dialog centering only.
-  @JSExport
-  def currentAjaxResponseProcessedOrImmediatelyP(): js.Promise[Unit] =
-    if (EventQueue.ajaxRequestInProgress)
-      callbackF(ajaxResponseProcessed, forCurrentEventQueue = false, "current response processed as `js.Promise`").map(_ => ()).toJSPromise
-    else
-      Future.unit.toJSPromise
-
   def allEventsProcessedF(debugName: String): Future[Unit] =
     if (EventQueue.ajaxRequestInProgress || ! EventQueue.isEmpty)
       callbackF(ajaxResponseProcessed, forCurrentEventQueue = ! EventQueue.isEmpty, debugName).map(_ => ())
     else
       Future.unit
 
-  // 2020-04-28: Only used by legacy autocomplete
+  // 2026-04-30: Only used by legacy autocomplete
   @JSExport
   def addAjaxResponseProcessed(fn: js.Function0[js.Any]): Unit =
     ajaxResponseProcessed.add(_ => fn.apply())
@@ -225,7 +217,6 @@ object AjaxClient {
 
   // When an exception happens while we communicate with the server, we catch it and show an error in the UI.
   // This is to prevent the UI from becoming totally unusable after an error.
-  @JSExport
   def logAndShowError(e: AnyRef, formId: String, ignoreErrors: Boolean): Unit = {
 
     // Because we catch errors in JavaScript right now in AjaxServer.js, and in JavaScript any object can be thrown,

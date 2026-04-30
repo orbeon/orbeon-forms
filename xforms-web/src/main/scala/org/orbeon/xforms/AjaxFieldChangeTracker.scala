@@ -14,12 +14,8 @@
 package org.orbeon.xforms
 
 import org.orbeon.web.DomEventNames
-
 import org.scalajs.dom
-import org.scalajs.dom.html
-import org.scalajs.dom.UIEvent
-
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import org.scalajs.dom.{UIEvent, html}
 
 //
 // This tracks changes to fields so that user-modified fields do not get overwritten by
@@ -27,7 +23,6 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 //
 // See https://github.com/orbeon/orbeon-forms/issues/1732
 //
-@JSExportTopLevel("OrbeonAjaxFieldChangeTracker")
 object AjaxFieldChangeTracker {
 
   def initialize(): Unit =
@@ -46,7 +41,6 @@ object AjaxFieldChangeTracker {
         }
     )
 
-  @JSExport
   def hasChangedIdsRequest(control: html.Element): Boolean =
     Page.getXFormsFormFromHtmlElemOrThrow(control).ajaxFieldChangeTracker.hasChangedIdsRequest(control.id)
 }

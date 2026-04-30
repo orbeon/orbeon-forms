@@ -8,13 +8,15 @@ import org.scalajs.dom.html
 import scala.collection.mutable
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global as g, newInstance as newJsInstance}
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel, JSGlobal}
 
 
 @JSExportTopLevel("OrbeonXFormsXbl")
 object XFormsXbl {
 
   private val cssClassesToConstructors: mutable.Map[String, html.Element => js.Any] = mutable.Map.empty
+
+  private val XblObjectKeyName = "xforms-xbl-object"
 
   @JSExport
   lazy val componentInitialized: YUICustomEvent =
@@ -91,41 +93,40 @@ object XFormsXbl {
           doNothingSingleton
         case Some(containerElem) =>
 
-          val existingInst =
-            $(containerElem).asInstanceOf[js.Dynamic].data("xforms-xbl-object")
+          val existingInstanceOpt =
+            getData(containerElem, XblObjectKeyName).map(_.asInstanceOf[js.Dynamic])
 
-          if (
-            js.isUndefined(existingInst) ||
-              existingInst == null       ||
-              existingInst.container.asInstanceOf[html.Element] != containerElem
-          ) {
+          def createAndSetNewInstance(): js.Dynamic = {
 
-            // Q: Under what circumstances can this happen?
-            // Q: In this case, should we call `destroy()` on the class?
-            if (! js.isUndefined(existingInst) && existingInst != null &&
-                existingInst.container.asInstanceOf[html.Element] != containerElem)
-              dom.console.debug(
-                "instanceForControl: instance found in data but for different container: `" +
-                existingInst.container.id +
-                "` and `" + containerElem.id + "`"
-              )
-            val inst = js.Dynamic.newInstance(subclass)(containerElem)
-            inst.init()
+            val newInstance = js.Dynamic.newInstance(subclass)(containerElem)
+            newInstance.init()
 
             // TODO: We remove those in `Form.destroy()`, but should we do it when the instance is destroyed
             //  here too?
-            Page
-              .getXFormsFormFromHtmlElemOrThrow(inst.container.asInstanceOf[html.Element])
-              .xblInstances.push(inst.asInstanceOf[XBLCompanion])
-            $(containerElem).asInstanceOf[js.Dynamic].data("xforms-xbl-object", inst)
-            inst
-          } else {
-            existingInst
+            Page.getXFormsFormFromHtmlElemOrThrow(containerElem)
+              .xblInstances.push(newInstance.asInstanceOf[XBLCompanion])
+            setData(containerElem, XblObjectKeyName, newInstance)
+            newInstance
+          }
+
+          existingInstanceOpt match {
+            case Some(existingInstance) if existingInstance.container.asInstanceOf[html.Element] == containerElem =>
+              existingInstance
+            case Some(existingInstance) =>
+              // Q: Under what circumstances can this happen?
+              // Q: In this case, should we call `destroy()`?
+              dom.console.debug(
+                "instanceForControl: instance found in data but for different container: `" +
+                existingInstance.container.id +
+                "` and `" + containerElem.id + "`"
+              )
+              createAndSetNewInstance()
+            case None =>
+              createAndSetNewInstance()
           }
       }
     }
   }
-
 
   def isObjectWithMethod(obj: js.Any, method: String): Boolean =
     obj.isInstanceOf[js.Object] && {
@@ -142,6 +143,31 @@ object XFormsXbl {
   def isFocusable(control: html.Element): Boolean =
     isComponent(control) && control.hasClass("xbl-focusable")
 
+  @js.native
+  @JSGlobal("WeakMap")
+  class WeakMap[K <: js.Object, V] extends js.Object {
+    def delete(key: K): Boolean = js.native
+    def get(key: K): js.UndefOr[V] = js.native
+    def has(key: K): Boolean = js.native
+    def set(key: K, value: V): this.type = js.native
+  }
+
+  private val elementData: WeakMap[html.Element, js.Dictionary[js.Any]] =
+    new WeakMap()
+
+  def setData(elem: html.Element, key: String, value: js.Any): Unit = {
+    if (! elementData.has(elem))
+      elementData.set(elem, js.Dictionary.empty)
+    elementData.get(elem).foreach(_.update(key, value))
+  }
+
+  def getData(elem: html.Element, key: String): Option[js.Any] =
+    elementData.get(elem).toOption.flatMap(_.get(key))
+
+  def removeData(elem: html.Element, key: String): Unit =
+    elementData.get(elem).foreach(_.remove(key))
+
+  // TODO: Check this is actually a workaround, and move to correct solution if possible.
   // See:
   //
   // - https://github.com/orbeon/orbeon-forms/issues/5635
@@ -201,7 +227,7 @@ object XFormsXbl {
             super.destroy()
           // We can debate whether the following clean-up should happen here or next to the caller of `destroy()`.
           // However, legacy users might call `destroy()` manually, in which case it's better to clean-up here.
-          $(containerElem).removeData("xforms-xbl-object")
+          removeData(containerElem, XblObjectKeyName)
         }
       }
     }

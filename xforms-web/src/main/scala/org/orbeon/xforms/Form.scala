@@ -117,10 +117,8 @@ class Form(
     else
       id
 
-  // 2022-09-07: Keep `()` for JavaScript callers
-  def helpHandler(): Boolean = configuration.helpHandler
-  def helpTooltip(): Boolean = configuration.helpTooltip
-  def useARIA    (): Boolean = configuration.useAria
+  def helpHandler: Boolean = configuration.helpHandler
+  def helpTooltip: Boolean = configuration.helpTooltip
 }
 
 private object Form {

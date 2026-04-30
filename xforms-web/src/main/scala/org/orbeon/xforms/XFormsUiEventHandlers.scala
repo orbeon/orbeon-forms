@@ -233,7 +233,7 @@ object XFormsUiEventHandlers {
 
     controlTargetOpt.foreach { controlTarget =>
       if (originalTarget != null && originalTarget.hasClass("xforms-help")) {
-        if (Page.getXFormsFormFromHtmlElemOrThrow(controlTarget).helpHandler())
+        if (Page.getXFormsFormFromHtmlElemOrThrow(controlTarget).helpHandler)
           AjaxClient.fireEvent(AjaxEvent(eventName = "xforms-help", targetId = controlTarget.id))
         else
           Help.showHelp(controlTarget)
@@ -387,10 +387,15 @@ object XFormsUiEventHandlers {
       else if (target.hasClass("xforms-help"))
         // Help tooltip
         controlOpt.foreach { control =>
-          if (Page.getXFormsFormFromHtmlElemOrThrow(control).helpTooltip()) {
-            val message = XFormsUI.getHelpMessage(control)
-            XFormsUiEvents.showToolTip(Globals.helpTooltipForControl, control, target, "-orbeon-help-tooltip", message, event)
-          }
+          if (Page.getXFormsFormFromHtmlElemOrThrow(control).helpTooltip)
+            XFormsUiEvents.showToolTip(
+              tooltipForControl = Globals.helpTooltipForControl,
+              control           = control,
+              target            = target,
+              toolTipSuffix     = "-orbeon-help-tooltip",
+              message           = XFormsUI.getHelpMessage(control),
+              event             = event
+            )
         }
       else
         // Hint tooltip
@@ -413,12 +418,12 @@ object XFormsUiEventHandlers {
               control.querySelectorAllT("a, button").foreach(_.title = "")
 
             XFormsUiEvents.showToolTip(
-              Globals.hintTooltipForControl,
-              control,
-              target,
-              "-orbeon-hint-tooltip",
-              candidateMessage,
-              event
+              tooltipForControl = Globals.hintTooltipForControl,
+              control           = control,
+              target            = target,
+              toolTipSuffix     = "-orbeon-hint-tooltip",
+              message           = candidateMessage,
+              event             = event
             )
           }
         }

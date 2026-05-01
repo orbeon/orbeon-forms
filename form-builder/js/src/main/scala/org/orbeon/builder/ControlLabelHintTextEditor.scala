@@ -33,7 +33,7 @@ import org.orbeon.xforms.*
 import org.orbeon.fr.FormRunnerAPI
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
-import org.scalajs.dom.document
+import org.scalajs.dom.{document, html}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import org.orbeon.fr.FormRunnerUtils
 
@@ -277,7 +277,13 @@ object ControlLabelHintTextEditor {
         tinyMceContainerDiv.attr("id", anchorId)
 
         locally {
-          val href = $(".tinymce-base-url").attr("href").getOrElse(throw new IllegalStateException("missing `.tinymce-base-url`"))
+          val href =
+            dom.window
+              .document
+              .documentElement
+              .queryNestedElems[html.Anchor](".tinymce-base-url")
+              .headOption
+              .map(_.href).getOrElse(throw new IllegalStateException("missing `.tinymce-base-url`"))
           GlobalTinyMce.baseURL = href.substring(0, href.length - s"$URLBaseMagic.js".length)
         }
 

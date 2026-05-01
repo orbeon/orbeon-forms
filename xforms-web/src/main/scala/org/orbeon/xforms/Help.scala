@@ -2,14 +2,14 @@ package org.orbeon.xforms
 
 import io.udash.wrappers.jquery.JQuery
 import org.orbeon.jquery.Offset
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.web.DomSupport
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.Placement.PositionDetails
 import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 
 object Help {
@@ -36,9 +36,13 @@ object Help {
         .orElse(Option(controlEl.querySelector(explicitClassSelector)))
     }
 
-    def fieldsCommonAncestorOpt: Option[dom.Element] =
-      // Exclude help button
-      jCommonAncestor(jControlEl.find(":input:visible:not(.xforms-help), output:visible")) // TODO: use `DomSupport.isVisible`
+    def fieldsCommonAncestorOpt: Option[html.Element] =
+      DomSupport.findCommonAncestor(
+        controlEl.queryNestedElems[html.Element]("input, textarea, select, button, output")
+          .filter(_.isVisible)
+          .filterNot(_.classList.contains("xforms-help")) // exclude help button
+          .toList
+      )
 
     def labelElementOpt: Option[dom.Element] =
       XFormsUI.findControlLHHA(controlEl, "label")
@@ -220,15 +224,6 @@ object Help {
             2 * (if (placement == Placement.Over) padding else newPopoverOffset.left)
           if (popover.width() > altMaxWidth)
             popover.css("max-width", altMaxWidth.toString + "px")
-      }
-    }
-
-    def jCommonAncestor(jElems: JQuery): Option[html.Element] = {
-      val elems: List[html.Element] = jElems.toArray.toList.asInstanceOf[List[html.Element]]
-      elems match {
-        case Nil     => None
-        case List(e) => Some(e)
-        case _       => DomSupport.findCommonAncestor(elems)
       }
     }
   }

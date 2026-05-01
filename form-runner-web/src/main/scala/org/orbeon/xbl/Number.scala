@@ -223,7 +223,7 @@ object Number {
           // With Firefox, changing the type synchronously interferes with the focus
           timers.setTimeout(0.millis) {
             visibleInputElemOpt foreach { visibleInputElem =>
-              $(visibleInputElem).attr("type", typeValue)
+              visibleInputElem.`type` = typeValue
               // Set again the `input.value`, as otherwise we might loose the value (switching the type to `number`
               // if the current value is `1,2`), or be incorrect (switching the type to `text` if the current value
               // is `1.2` and the decimal separator `,`)

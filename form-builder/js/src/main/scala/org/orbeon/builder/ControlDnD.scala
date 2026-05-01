@@ -62,7 +62,7 @@ private object ControlDnD {
 
         override def copy(el: html.Element, source: html.Element) = {
           val cursorClass = if (shiftPressed) CopyClass else MoveClass
-          $(el).addClass(cursorClass)
+          el.classList.add(cursorClass)
           shiftPressed
         }
       }
@@ -97,7 +97,7 @@ private object ControlDnD {
             .length == 0
 
         override def copy(el: html.Element, source: html.Element) = {
-          $(el).addClass(CopyClass)
+          el.classList.add(CopyClass)
           true
         }
       }

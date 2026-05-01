@@ -207,7 +207,7 @@ object TinyMCE {
     private def hasFocus(): Boolean = {
       val activeElement                   = dom.document.activeElement
       val focusInsideComponent            = containerElem.contains(activeElement)
-      val focusOnAbsolutelyPositionedMenu = $(activeElement).parent(".mceListBoxMenu").is("*")
+      val focusOnAbsolutelyPositionedMenu = activeElement.parentElementOpt.exists(_.classList.contains("mceListBoxMenu"))
       focusInsideComponent || focusOnAbsolutelyPositionedMenu
     }
 

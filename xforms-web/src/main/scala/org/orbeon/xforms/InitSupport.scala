@@ -31,7 +31,6 @@ import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.{KeyModifiersPropertyName, KeyTextPropertyName}
 import org.orbeon.xforms.StateHandling.StateResult
-import org.orbeon.xforms.facade.*
 import org.orbeon.xforms.rpc.Initializations
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -445,7 +444,12 @@ object InitSupport {
         GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Click,     XFormsUiEventHandlers.click(_))
 
         // Catch logout link clicks to inform other pages on the same session that it is going to be invalidated
-        $(".fr-logout-link").get().foreach { logoutAnchor =>
+        dom.window
+          .document
+          .documentElement
+          .queryNestedElems[html.Anchor](".fr-logout-link")
+          .headOption
+          .foreach { logoutAnchor =>
           GlobalEventListenerSupport.addJsListener(logoutAnchor, DomEventNames.Click, (_: dom.Event) => {
             Session.logout()
           })

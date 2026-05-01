@@ -1,13 +1,12 @@
 package org.orbeon.xbl
 
-import org.orbeon.facades
-import org.orbeon.xforms.XFormsXbl
-import org.orbeon.xforms.facade.XBLCompanion
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI}
-import org.scalajs.dom.html
 import io.udash.wrappers.jquery.JQueryPromise
+import org.orbeon.facades
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.web.DomSupport.*
+import org.orbeon.xforms.facade.XBLCompanion
+import org.orbeon.xforms.{AjaxClient, AjaxEvent, DocumentAPI, XFormsXbl}
+import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.concurrent.{Future, Promise}
@@ -57,7 +56,7 @@ object CodeMirror {
 
       this.handlers.foreach { case (key, value) => this.editor.on(key, value) }
 
-      this.xformsUpdateReadonly($(containerElem).is(".xforms-readonly"))
+      this.xformsUpdateReadonly(containerElem.hasClass("xforms-readonly"))
     }
 
     override def destroy(): Unit = {
@@ -91,7 +90,7 @@ object CodeMirror {
     }
 
     private def sendValueToXForms(): Future[Unit] = {
-      $(containerElem).addClass("xforms-visited")
+      containerElem.classList.add("xforms-visited")
       DocumentAPI.setValue(
         containerElem.id,
         this.xformsGetValue()

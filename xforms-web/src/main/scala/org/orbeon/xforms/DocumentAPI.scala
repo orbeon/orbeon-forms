@@ -14,7 +14,7 @@
 package org.orbeon.xforms
 
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.facade.{Controls, XBL}
+import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global

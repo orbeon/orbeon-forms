@@ -1,18 +1,6 @@
-/**
- * Copyright (C) 2020 Orbeon, Inc.
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
 package org.orbeon.xforms
 
+import org.orbeon.web.DomSupport.DomElemOps
 import org.scalajs.dom
 import org.scalajs.dom.html
 
@@ -59,32 +47,16 @@ object XFormsUiEvents {
   // Walk up the DOM from `element` to find the first ancestor (or self) that is an XForms control,
   // an XBL component, or an XForms dialog. Returns null if none is found.
   @JSExport
-  def _findParentXFormsControl(element: dom.EventTarget): html.Element = {
-    var current: dom.Node = element.asInstanceOf[dom.Node]
-    while (current ne null) {
-      current match {
-        case elem: html.Element if elem.tagName.toLowerCase == "iframe" =>
-          // This might be an iframe corresponding to a legacy YUI dialog
-          val dialogs = g.ORBEON.xforms.Globals.dialogs
-          if (!js.isUndefined(dialogs) && (dialogs != null)) {
-            val dialogsDict = dialogs.asInstanceOf[js.Dictionary[js.Dynamic]]
-            for ((_, dialog) <- dialogsDict) {
-              if (dialog.iframe.asInstanceOf[dom.Node] eq elem)
-                return dialog.element.asInstanceOf[html.Element]
-            }
-          }
-        case elem: html.Element =>
-          if ($(elem).is(".xforms-control, .xbl-component, .xforms-dialog"))
-            return elem
-        case _ =>
-      }
-      current = current.parentNode
+  def findParentXFormsControl(element: dom.EventTarget): Option[html.Element] =
+    element match {
+      case elem: html.Element =>
+        elem.ancestorOrSelfElem(".xforms-control, .xbl-component, .xforms-dialog").nextOption()
+      case _ =>
+        None
     }
-    null
-  }
 
   @JSExport
-  def _showToolTip(
+  def showToolTip(
     tooltipForControl: js.Dictionary[js.Any],
     control          : html.Element,
     target           : html.Element,
@@ -109,14 +81,18 @@ object XFormsUiEvents {
         // Makes it easier for tests to check that the mouseover did run
         tooltipForControl(control.id) = null
       } else {
-        val yuiTooltip = newInstance(g.YAHOO.widget.Tooltip)(control.id + toolTipSuffix, js.Dynamic.literal(
-          context   = target,
-          text      = message,
-          showDelay = 0,
-          hideDelay = 0,
-          // High zIndex so tooltip is always on top, e.g. above dialogs
-          zIndex    = 10000
-        )).asInstanceOf[js.Dynamic]
+        val yuiTooltip =
+          newInstance(g.YAHOO.widget.Tooltip)(
+            control.id + toolTipSuffix,
+            js.Dynamic.literal(
+              context   = target,
+              text      = message,
+              showDelay = 0,
+              hideDelay = 0,
+              // High zIndex so tooltip is always on top, e.g. above dialogs
+              zIndex    = 10000
+            )
+          ).asInstanceOf[js.Dynamic]
         yuiTooltip.orbeonControl = control
         yuiTooltip.orbeonTarget  = target
         // Position the tooltip by sending the mouse move event

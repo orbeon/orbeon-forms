@@ -2,10 +2,8 @@ package org.orbeon.xforms
 
 import cats.implicits.*
 import org.orbeon.oxf.util.CollectionUtils.fromIteratorExt
-import org.orbeon.oxf.util.Exceptions.findNestedThrowable
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.XFormsUI.ClassNameToId
-import org.orbeon.xforms.facade.Controls
 import org.scalajs.dom
 import org.scalajs.dom.html.Element
 import org.scalajs.dom.{KeyboardEvent, MouseEvent, UIEvent, html}

@@ -10,7 +10,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.Constants.LhhacSeparator
 import org.orbeon.xforms.XFormsUI.*
-import org.orbeon.xforms.facade.{Controls, Utils, XBL}
+import org.orbeon.xforms.facade.{Utils, XBL}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*

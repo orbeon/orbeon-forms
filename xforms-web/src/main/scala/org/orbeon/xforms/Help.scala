@@ -5,7 +5,6 @@ import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.web.DomSupport
 import org.orbeon.xforms.Placement.PositionDetails
-import org.orbeon.xforms.facade.Controls
 import org.scalajs.dom
 import org.scalajs.dom.html
 

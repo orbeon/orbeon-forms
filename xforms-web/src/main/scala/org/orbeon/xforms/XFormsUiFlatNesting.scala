@@ -1,24 +1,35 @@
-/**
- * Copyright (C) 2020 Orbeon, Inc.
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
 package org.orbeon.xforms
 
+import org.orbeon.web.DomSupport.*
 import org.scalajs.dom.html
 
 import scala.collection.mutable
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 
+
+/**
+ * For nested groups:
+ *
+ *      <td id="group-begin-outer-group-flat" class="xforms-group-begin-end">
+ *          ...
+ *          <td id="group-begin-inner-group-flat" class="xforms-group-begin-end">
+ *              ...
+ *          <td id="group-end-inner-group-flat" class="xforms-group-begin-end">
+ *          ...
+ *      <td id="group-end-outer-group-flat" class="xforms-group-begin-end">
+ *
+ * For nested repeats (specific iteration of the outer repeat):
+ *
+ *      <span class="xforms-repeat-delimiter">
+ *          ...
+ *          <span class="xforms-repeat-begin-end" id="repeat-begin-inner-repeat⊙1">
+ *          <span class="xforms-repeat-delimiter">
+ *              ...
+ *          <span class="xforms-repeat-begin-end" id="repeat-end-inner-repeat⊙1"></span>
+ *          ...
+ *      <span class="xforms-repeat-delimiter">
+ */
 @JSExportTopLevel("OrbeonXFormsUiFlatNesting")
 object XFormsUiFlatNesting {
 
@@ -51,16 +62,16 @@ object XFormsUiFlatNesting {
 
   // Folds over ancestors of `startNode` (group begin or repeat delimiter), stopping if `foldFunction` returns `stopValue`.
   private def foldAncestors[A](
-    startNode    : html.Element,
-    startValue   : A,
-    foldFunction : (html.Element, A) => A,
-    stopValue    : A
+    startNode   : html.Element,
+    startValue  : A,
+    foldFunction: (html.Element, A) => A,
+    stopValue   : A
   ): A = {
     val isGroup  = isGroupBegin(startNode)
     val isRepeat = isRepeatDelimiter(startNode)
 
     var depth        = 0
-    var currentNode  = startNode.previousElementSibling.asInstanceOf[html.Element]
+    var currentNode  = startNode.previousElementSiblingT
     var currentValue = startValue
 
     while (currentNode ne null) {
@@ -68,9 +79,10 @@ object XFormsUiFlatNesting {
       if (isBegin(currentNode)) depth -= 1
       if (depth < 0 && ((isGroup && isGroupEnd(currentNode)) || (isRepeat && isRepeatBegin(currentNode)))) {
         currentValue = foldFunction(currentNode, currentValue)
-        if (currentValue == stopValue) return stopValue
+        if (currentValue == stopValue)
+          return stopValue
       }
-      currentNode = currentNode.previousElementSibling.asInstanceOf[html.Element]
+      currentNode = currentNode.previousElementSiblingT
     }
     currentValue
   }
@@ -86,7 +98,7 @@ object XFormsUiFlatNesting {
 
     var depth        = 0
     var stopDepth    = 0
-    var currentNode  = startNode.nextElementSibling.asInstanceOf[html.Element]
+    var currentNode  = startNode.nextElementSiblingT
     val valueStack   = mutable.Stack[A]()
     var currentValue = startValue
 
@@ -112,13 +124,13 @@ object XFormsUiFlatNesting {
       } else {
         if (stopDepth == 0) currentValue = foldFunction(currentNode, currentValue)
       }
-      currentNode = currentNode.nextElementSibling.asInstanceOf[html.Element]
+      currentNode = currentNode.nextElementSiblingT
     }
     currentValue
   }
 
   private def hasAncestor(startNode: html.Element, conditionFunction: html.Element => Boolean): Boolean =
-    foldAncestors(startNode, false, (node, _) => conditionFunction(node), true)
+    foldAncestors(startNode, false, (node, _: Boolean) => conditionFunction(node), true)
 
   @JSExport
   def setRelevant(node: html.Element, isRelevant: Boolean): Unit = {
@@ -133,7 +145,7 @@ object XFormsUiFlatNesting {
     if (isRelevant && hasAncestor(node, _.classList.contains("xforms-disabled")))
       return
 
-    foldDescendants(node, false, (node, _) => {
+    foldDescendants(node, false, (node, _: Boolean) => {
       // Skip sub-tree if we are enabling and this sub-tree is disabled
       if (isRelevant && isBegin(node) && node.classList.contains("xforms-disabled"))
         true

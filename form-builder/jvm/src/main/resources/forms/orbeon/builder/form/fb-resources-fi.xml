@@ -728,6 +728,7 @@
                     <type label="Base64-encoded binary">base64Binary</type>
                     <type label="Hexadecimal-encoded binary">hexBinary</type>
                     <type label="URI">anyURI</type>
+                    <type label="HTML">HTMLFragment</type>
                 </choices>
             </choices>
         </builtin-type>

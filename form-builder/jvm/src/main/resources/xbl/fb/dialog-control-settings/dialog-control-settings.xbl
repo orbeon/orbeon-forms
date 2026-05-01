@@ -1831,7 +1831,7 @@
                                             -->
                                             <xf:var
                                                 name="supported"
-                                                value="'string', 'decimal', 'integer', 'double', 'dateTime', 'date', 'time', 'boolean', 'email', $builtin-type"/>
+                                                value="'string', 'decimal', 'integer', 'double', 'dateTime', 'date', 'time', 'boolean', 'email', 'HTMLFragment', $builtin-type"/>
 
                                             <xf:var
                                                 name="current-builtin-type"

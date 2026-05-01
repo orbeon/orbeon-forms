@@ -743,6 +743,7 @@
                     <type label="Binaire encodé en Base64">base64Binary</type>
                     <type label="Binaire encodé en hexadécimal">hexBinary</type>
                     <type label="URI">anyURI</type>
+                    <type label="HTML">HTMLFragment</type>
                 </choices>
             </choices>
         </builtin-type>

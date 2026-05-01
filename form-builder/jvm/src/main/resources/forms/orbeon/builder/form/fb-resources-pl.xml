@@ -727,6 +727,7 @@
                     <type label="Binarny w kodowaniu Base64">base64Binary</type>
                     <type label="Binarny w kodowaniu szesnastkowym">hexBinary</type>
                     <type label="URI">anyURI</type>
+                    <type label="HTML">HTMLFragment</type>
                 </choices>
             </choices>
         </builtin-type>

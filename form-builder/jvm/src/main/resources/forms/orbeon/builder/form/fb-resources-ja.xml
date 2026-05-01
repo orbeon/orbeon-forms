@@ -727,6 +727,7 @@
                     <type label="Base64エンコードのバイナリ">base64Binary</type>
                     <type label="16進エンコードのバイナリ">hexBinary</type>
                     <type label="URI">anyURI</type>
+                    <type label="HTML">HTMLFragment</type>
                 </choices>
             </choices>
         </builtin-type>

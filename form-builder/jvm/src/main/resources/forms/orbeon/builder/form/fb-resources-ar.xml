@@ -727,6 +727,7 @@
                     <type label="ثنائي مشفر بنظام Base64">base64Binary</type>
                     <type label="ثنائي مشفر بنظام سداسي عشري">hexBinary</type>
                     <type label="عنوان URI">anyURI</type>
+                    <type label="HTML">HTMLFragment</type>
                 </choices>
             </choices>
         </builtin-type>

@@ -708,6 +708,7 @@
                     <type label="Binærfil i base64-format">base64Binary</type>
                     <type label="Binærfil i heksadesimalformat">hexBinary</type>
                     <type label="URI">anyURI</type>
+                    <type label="HTML">HTMLFragment</type>
                 </choices>
             </choices>
         </builtin-type>

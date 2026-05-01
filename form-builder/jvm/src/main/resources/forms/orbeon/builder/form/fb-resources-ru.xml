@@ -707,6 +707,7 @@
                     <type label="Данные в Base64">base64Binary</type>
                     <type label="Данные в Hex">hexBinary</type>
                     <type label="Ссылка">anyURI</type>
+                    <type label="HTML">HTMLFragment</type>
                 </choices>
             </choices>
         </builtin-type>

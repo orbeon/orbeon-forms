@@ -1771,7 +1771,7 @@
                                                     $attachment-constraints
                                                 else if ($is-multiple-attachments) then
                                                     $multiple-attachments-constraints
-                                                else if ($builtin-type = ('string', 'email')) then
+                                                else if ($builtin-type = ('string', 'email', 'HTMLFragment')) then
                                                     $string-constraints
                                                 else if ($builtin-type = 'integer') then
                                                     $integer-constraints

@@ -13,9 +13,11 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.util.DateUtilsUsingSaxon
+import org.orbeon.oxf.util.{DateUtilsUsingSaxon, HtmlParsing}
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.DependsOnContextItem
+import org.orbeon.oxf.xml.ElemFilter
 import org.orbeon.saxon.`type`.ValidationFailure
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr.*
@@ -24,6 +26,7 @@ import org.orbeon.saxon.value.*
 import org.orbeon.scaxon.Implicits
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
+import org.orbeon.xforms.XFormsNames
 
 import scala.jdk.CollectionConverters.*
 
@@ -33,6 +36,7 @@ trait ValidationFunction[T] extends XFormsFunction with DependsOnContextItem {
 
   def argumentOpt(implicit xpathContext: XPathContext): Option[T]
   def evaluate(value: String, constraintOpt: Option[T]): Boolean
+  def valueForEvaluation(item: om.Item): String = item.getStringValue
 
   def toMipValue(constraintOpt: Option[T]): Option[String] =
     constraintOpt map (_.toString) orElse Some("true") // XXX check why "true"?
@@ -41,7 +45,7 @@ trait ValidationFunction[T] extends XFormsFunction with DependsOnContextItem {
 
     implicit val ctx = xpathContext
 
-    val valueOpt      = Option(xpathContext.getContextItem) map (_.getStringValue)
+    val valueOpt      = Option(xpathContext.getContextItem) map valueForEvaluation
     val constraintOpt = argumentOpt
 
     setProperty(propertyName, toMipValue(constraintOpt))
@@ -74,6 +78,24 @@ trait ValidationFunction[T] extends XFormsFunction with DependsOnContextItem {
 
 trait LongValidationFunction extends ValidationFunction[Long] {
   def argumentOpt(implicit xpathContext: XPathContext): Option[Long] = longArgumentOpt(0)
+}
+
+trait MinMaxLengthValidation extends LongValidationFunction {
+
+  override def valueForEvaluation(item: om.Item): String =
+    item match {
+      case nodeInfo: om.NodeInfo
+        if Option(InstanceData.getType(nodeInfo)).exists(nodeType =>
+          nodeType.namespace.uri == XFormsNames.XFORMS_NAMESPACE_URI &&
+            nodeType.localName == "HTMLFragment"
+        ) =>
+        HtmlParsing.sanitizeHtmlString(
+          value           = nodeInfo.getStringValue,
+          extraElemFilter = _ => ElemFilter.Remove
+        )
+      case _ =>
+        item.getStringValue
+    }
 }
 
 trait StringValidationFunction extends ValidationFunction[String] {
@@ -123,7 +145,7 @@ trait DateSeqValidationFunction extends ValidationFunction[Seq[DateValue]] {
     }
 }
 
-class MaxLengthValidation extends LongValidationFunction {
+class MaxLengthValidation extends MinMaxLengthValidation {
 
   val propertyName = "max-length"
 
@@ -133,7 +155,7 @@ class MaxLengthValidation extends LongValidationFunction {
   }
 }
 
-class MinLengthValidation extends LongValidationFunction {
+class MinLengthValidation extends MinMaxLengthValidation {
 
   val propertyName = "min-length"
 

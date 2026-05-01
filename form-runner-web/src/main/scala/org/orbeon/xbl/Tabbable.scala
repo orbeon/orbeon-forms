@@ -138,6 +138,8 @@ object Tabbable {
             }
           }
         })
+
+        drake = Some(newDrake)
       }
 
       // Select first visible tab

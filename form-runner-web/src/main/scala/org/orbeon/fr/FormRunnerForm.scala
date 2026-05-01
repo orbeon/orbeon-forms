@@ -8,7 +8,7 @@ import org.orbeon.xbl.Pager.PagerCompanion
 import org.orbeon.xbl.{FrWizard, Pager}
 import org.orbeon.xforms
 import org.orbeon.xforms.*
-import org.orbeon.xforms.facade.XBL
+import org.orbeon.xforms.XFormsXbl
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
@@ -152,8 +152,8 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
       companionOpt.foreach(_.removePageChangeListener(listener))
 
     private def companionOpt: Option[PagerCompanion] =
-      XBL.instanceForControl(pagerElem) match {
-        case pagerCompanion: PagerCompanion =>
+      XFormsXbl.findInstanceForControl(pagerElem) match {
+        case Some(pagerCompanion: PagerCompanion) =>
           Some(pagerCompanion)
         case _ =>
           logger.error(s"Pager: Couldn't find pager companion for section `${_repeatedSectionName}`")
@@ -209,11 +209,11 @@ class FormRunnerFormWizardAPI(private val form: xforms.Form) extends js.Object {
     companionOpt.foreach(_.removePageChangeListener(listener))
 
   private def companionOpt: Option[WizardCompanion] =
-    XBL.instanceForControl(
+    XFormsXbl.findInstanceForControl(
       form.elem.querySelectorOpt(".xbl-fr-wizard")
         .getOrElse(throw new IllegalArgumentException("no wizard element found"))
     ) match {
-      case pagerCompanion: WizardCompanion =>
+      case Some(pagerCompanion: WizardCompanion) =>
         Some(pagerCompanion)
       case _ =>
         logger.error(s"Wizard: Couldn't find wizard companion")

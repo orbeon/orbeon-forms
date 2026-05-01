@@ -4,7 +4,8 @@ import autowire.*
 import org.orbeon.fr.rpc.{FormRunnerRpcApi, FormRunnerRpcClient}
 import org.orbeon.xforms.Constants.DummyImageUri
 import org.orbeon.xforms.{Page, XFormsApp}
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -13,7 +14,7 @@ import scala.scalajs.js
 
 object ImageAttachment {
 
-  XBL.declareCompanion("fr|image-attachment", js.constructorOf[ImageAttachmentCompanion])
+  XFormsXbl.declareCompanion("fr|image-attachment", js.constructorOf[ImageAttachmentCompanion])
 
   private class ImageAttachmentCompanion(containerElem: html.Element) extends XBLCompanion {
 

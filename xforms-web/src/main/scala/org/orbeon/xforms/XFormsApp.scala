@@ -34,39 +34,27 @@ object XFormsApp extends App {
 
   def onOrbeonApiLoaded(clientServerChannel: ClientServerChannel, isBrowserEnvironment: Boolean): Unit = {
 
-    _clientServerChannel = clientServerChannel
+    _clientServerChannel  = clientServerChannel
     _isBrowserEnvironment = isBrowserEnvironment
 
-    // By this point, `window.ORBEON` is already defined by our jQuery wrapper
+    // By this point, `window.ORBEON` should already be defined by our jQuery wrapper, but we created it if needed
+    // also in anticipation for the time jQuery will be removed.
+    if (js.isUndefined(g.window.ORBEON))
+      g.window.ORBEON = new js.Object
     val orbeonDyn = g.window.ORBEON
 
-    // `window.ORBEON.common` *should not* already exist, but this doesn't hurt
-    if (js.isUndefined(orbeonDyn.common))
-      orbeonDyn.common = new js.Object
-
-    orbeonDyn.common.MarkupUtils = js.Dynamic.global.OrbeonMarkupUtils
-    orbeonDyn.common.StringUtils = js.Dynamic.global.OrbeonStringUtils
-
-    // We know that `window.ORBEON.xforms` already exists
+    if (js.isUndefined(orbeonDyn.xforms))
+      orbeonDyn.xforms = new js.Object
     val xformsDyn = orbeonDyn.xforms
 
-    xformsDyn.Page                   = js.Dynamic.global.OrbeonPage
-    xformsDyn.ServerValueStore       = js.Dynamic.global.OrbeonServerValueStore
-    xformsDyn.AjaxEvent              = js.Dynamic.global.OrbeonAjaxEvent
-    xformsDyn.Language               = js.Dynamic.global.OrbeonLanguage
-    xformsDyn.AjaxClient             = js.Dynamic.global.OrbeonAjaxClient
-    xformsDyn.Globals                = js.Dynamic.global.OrbeonGlobals
-    xformsDyn.Events                 = js.Dynamic.global.OrbeonXFormsUiEvents
-    xformsDyn.FlatNesting            = js.Dynamic.global.OrbeonXFormsUiFlatNesting
-    xformsDyn.XFormsUi               = js.Dynamic.global.OrbeonXFormsUi
-    xformsDyn.XFormsXbl              = js.Dynamic.global.OrbeonXFormsXbl
-    xformsDyn.Help                   = js.Dynamic.global.OrbeonHelp
-    xformsDyn.InitSupport            = js.Dynamic.global.OrbeonInitSupport
-    xformsDyn.RpcClient              = js.Dynamic.global.OrbeonRpcClient
-    xformsDyn.AjaxFieldChangeTracker = js.Dynamic.global.OrbeonAjaxFieldChangeTracker
+    xformsDyn.InitSupport = js.Dynamic.global.OrbeonInitSupport
+
+    xformsDyn.RpcClient = js.Dynamic.global.OrbeonRpcClient // TODO: move to Form Builder module
 
     // Public API
-    xformsDyn.Document               = DocumentAPI
+    xformsDyn.XBL        = js.Dynamic.global.OrbeonXFormsXbl
+    xformsDyn.AjaxClient = js.Dynamic.global.OrbeonAjaxClient
+    xformsDyn.Document   = DocumentAPI
 
     // Configure logging
 //    setLoggerThreshold("org.orbeon.oxf.xforms", LogLevel)

@@ -15,7 +15,8 @@ package org.orbeon.xbl
 
 import org.orbeon.facades.Autosize
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -23,7 +24,7 @@ import scala.scalajs.js
 
 object AutosizeTextarea {
 
-  XBL.declareCompanion("fr|autosize-textarea", js.constructorOf[AutosizeTextareaCompanion])
+  XFormsXbl.declareCompanion("fr|autosize-textarea", js.constructorOf[AutosizeTextareaCompanion])
 
   private class AutosizeTextareaCompanion(containerElem: html.Element) extends XBLCompanion {
 

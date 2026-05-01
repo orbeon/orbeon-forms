@@ -1,6 +1,7 @@
 package org.orbeon.xbl
 
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -8,7 +9,7 @@ import scala.scalajs.js
 
 object FrWizard { // otherwise this conflicts with the server-side `xbl.Wizard`
 
-  XBL.declareCompanion("fr|wizard", js.constructorOf[WizardCompanion])
+  XFormsXbl.declareCompanion("fr|wizard", js.constructorOf[WizardCompanion])
 
   class WizardCompanion(containerElem: html.Element) extends XBLCompanion {
 

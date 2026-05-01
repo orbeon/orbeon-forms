@@ -18,7 +18,8 @@ import org.orbeon.facades.TinyMce.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.orbeon.xforms.*
 import org.scalajs.dom
 import org.scalajs.dom.*
@@ -66,7 +67,7 @@ object TinyMCE {
 
   var baseUrlInitialized = false
 
-  XBL.declareCompanion("fr|tinymce", js.constructorOf[TinyMCECompanion])
+  XFormsXbl.declareCompanion("fr|tinymce", js.constructorOf[TinyMCECompanion])
 
   private class TinyMCECompanion(containerElem: html.Element) extends XBLCompanion {
 

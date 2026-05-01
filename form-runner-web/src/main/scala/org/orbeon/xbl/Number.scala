@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.facade.XBL
+import org.orbeon.xforms.XFormsXbl
 import org.orbeon.xforms.*
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -35,8 +35,8 @@ object Number {
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.Number")
   private val TestNum = 1.1
 
-  XBL.declareCompanion("fr|number",   js.constructorOf[NumberCompanion])
-  XBL.declareCompanion("fr|currency", js.constructorOf[NumberCompanion])
+  XFormsXbl.declareCompanion("fr|number",   js.constructorOf[NumberCompanion])
+  XFormsXbl.declareCompanion("fr|currency", js.constructorOf[NumberCompanion])
 
   private class NumberCompanion(containerElem: html.Element) extends XBLCompanionWithState(containerElem) {
 

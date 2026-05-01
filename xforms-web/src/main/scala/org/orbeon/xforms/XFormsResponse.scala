@@ -10,7 +10,6 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.Constants.LhhacSeparator
 import org.orbeon.xforms.XFormsUI.*
-import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -389,7 +388,7 @@ object XFormsResponse {
     val relevantOpt     = elem.booleanAttValueOpt("relevant")
     val readonlyOpt     = elem.booleanAttValueOpt("readonly")
 
-    Option(XBL.instanceForControl(documentElement)) foreach { companionInstance =>
+    XFormsXbl.findInstanceForControl(documentElement).foreach { companionInstance =>
 
       val becomesRelevant    = relevantOpt.contains(true)
       val becomesNonRelevant = relevantOpt.contains(false)

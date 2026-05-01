@@ -14,7 +14,8 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades.{Dragula, DragulaOptions, Drake}
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames}
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -37,7 +38,7 @@ object DndRepeat {
 
   val FindDndLevelRe           = """^xforms-dnd-level-(\d+)$""".r
 
-  XBL.declareCompanion("fr|dnd-repeat", js.constructorOf[DndRepeatCompanion])
+  XFormsXbl.declareCompanion("fr|dnd-repeat", js.constructorOf[DndRepeatCompanion])
 
   private class DndRepeatCompanion(containerElem: html.Element) extends XBLCompanion {
 

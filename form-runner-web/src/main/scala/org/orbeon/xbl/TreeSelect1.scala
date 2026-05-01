@@ -18,7 +18,8 @@ import org.orbeon.facades.{Fancytree, FancytreeEventData, FancytreeJsonNode}
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
 import org.orbeon.xforms.$
-import org.orbeon.xforms.facade.{Item, XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.{Item, XBLCompanion}
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -26,7 +27,7 @@ import scala.scalajs.js
 
 object TreeSelect1 {
 
-  XBL.declareCompanion("fr|tree-select1", js.constructorOf[TreeSelect1Companion])
+  XFormsXbl.declareCompanion("fr|tree-select1", js.constructorOf[TreeSelect1Companion])
 
   private class TreeSelect1Companion(containerElem: html.Element) extends XBLCompanion {
 

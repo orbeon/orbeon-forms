@@ -3,7 +3,6 @@ package org.orbeon.xforms
 import io.udash.wrappers.jquery.JQueryPromise
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.web.DomSupport.DomElemOps
-import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -137,12 +136,13 @@ object XFormsControls {
         .head
         .value = newControlValue
     } else if (XFormsXbl.isComponent(control)) {
-      val companionInstance = XBL.instanceForControl(control)
+      val companionInstance = XFormsXbl.instanceForControl(control)
       if (XFormsXbl.isObjectWithMethod(companionInstance, "xformsUpdateValue"))
         result = companionInstance.xformsUpdateValue(newControlValue)
     }
 
     // 2025-08-18: Legacy and undocumented
+    // 2026-04-30: But used by `Select1SearchCompanion`
     XFormsUiEvents.afterValueChange.fire(customEvent)
 
     result

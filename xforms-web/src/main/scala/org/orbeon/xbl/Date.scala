@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.{DomEventNames, JSDateUtils}
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.*
-import org.orbeon.xforms.facade.XBL
+import org.orbeon.xforms.XFormsXbl
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -38,7 +38,7 @@ object Date {
 
   val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.Date")
 
-  XBL.declareCompanion("fr|date", js.constructorOf[DateCompanion])
+  XFormsXbl.declareCompanion("fr|date", js.constructorOf[DateCompanion])
 
   // TODO: Can we reduce duplication with `TimeCompanion`
   //  See `XblTDateTimeCompanionSupport` for WIP.
@@ -162,7 +162,7 @@ object Date {
           updateVisibleValue(newState)
       } else {
         if (! previousStateOpt.contains(newState)) {
-          // Don't call `destroy()` directly because that causes the re-initialization of the companion in `xforms.js`!
+          // Don't call `destroy()` directly because that causes the re-initialization of the companion!
           destroyDatePicker()
           companion.visibleInputElemOpt.foreach(createDatePicker(_, dateExternalValue = newState.some))
           updateVisibleValue(newState)

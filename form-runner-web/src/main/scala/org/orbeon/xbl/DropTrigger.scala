@@ -3,7 +3,8 @@ package org.orbeon.xbl
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.orbeon.xforms.{AjaxClient, AjaxEvent, KeyboardShortcuts}
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -14,7 +15,7 @@ import scala.util.chaining.scalaUtilChainingOps
 
 object DropTrigger {
 
-  XBL.declareCompanion("fr|drop-trigger", js.constructorOf[DropTriggerCompanion])
+  XFormsXbl.declareCompanion("fr|drop-trigger", js.constructorOf[DropTriggerCompanion])
 
   private val logger: Logger   = LoggerFactory.createLogger("org.orbeon.xbl.DropTrigger")
   private val ListenerSelector = "button[data-orbeon-value], a[data-orbeon-value]"

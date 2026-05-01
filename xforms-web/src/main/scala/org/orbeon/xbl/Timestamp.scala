@@ -5,7 +5,8 @@ import org.orbeon.date.{DateTimeFormat, IsoDateTime, TimezoneFormat}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
 import org.orbeon.web.JSDateUtils
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -15,7 +16,7 @@ import scala.util.chaining.scalaUtilChainingOps
 
 object Timestamp {
 
-  XBL.declareCompanion("fr|timestamp", js.constructorOf[TimestampCompanion])
+  XFormsXbl.declareCompanion("fr|timestamp", js.constructorOf[TimestampCompanion])
 
   private class TimestampCompanion(containerElem: dom.html.Element) extends XBLCompanion {
 

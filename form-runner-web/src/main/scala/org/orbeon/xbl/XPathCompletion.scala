@@ -2,7 +2,8 @@ package org.orbeon.xbl
 
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.web.DomSupport
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.orbeon.xforms.{AjaxClient, AjaxEvent, DocumentAPI, EventListenerSupport}
 import org.scalajs.dom
 import org.scalajs.dom.{CustomEvent, FocusEvent}
@@ -17,7 +18,7 @@ import scala.scalajs.js.|
 
 object XPathCompletion {
 
-  XBL.declareCompanion("fb|xpath-completion", js.constructorOf[XPathCompletionCompanion])
+  XFormsXbl.declareCompanion("fb|xpath-completion", js.constructorOf[XPathCompletionCompanion])
 
   private class XPathCompletionCompanion(containerElem: dom.html.Element) extends XBLCompanion {
 

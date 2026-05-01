@@ -1,7 +1,8 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades.{ClipboardJS, ClipboardJSConfig}
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -9,7 +10,7 @@ import scala.scalajs.js
 
 object ClipboardCopy {
 
-  XBL.declareCompanion("fr|clipboard-copy", js.constructorOf[ClipboardCopyCompanion])
+  XFormsXbl.declareCompanion("fr|clipboard-copy", js.constructorOf[ClipboardCopyCompanion])
 
   private class ClipboardCopyCompanion(containerElem: html.Element) extends XBLCompanion {
 

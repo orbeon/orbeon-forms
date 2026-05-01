@@ -20,7 +20,8 @@ import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.web.DomSupport
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.*
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom
 import org.scalajs.dom.{MutationObserver, document, html}
 
@@ -31,9 +32,9 @@ import scala.scalajs.js.JSConverters.JSRichOption
 
 
 object Select1Search {
-  XBL.declareCompanion(name = "fr|dropdown-select1-search" , js.constructorOf[Select1SearchCompanion])
-  XBL.declareCompanion(name = "fr|databound-select1-search", js.constructorOf[Select1SearchCompanion])
-  XBL.declareCompanion(name = "fr|databound-select-search" , js.constructorOf[Select1SearchCompanion])
+  XFormsXbl.declareCompanion(name = "fr|dropdown-select1-search" , js.constructorOf[Select1SearchCompanion])
+  XFormsXbl.declareCompanion(name = "fr|databound-select1-search", js.constructorOf[Select1SearchCompanion])
+  XFormsXbl.declareCompanion(name = "fr|databound-select-search" , js.constructorOf[Select1SearchCompanion])
 }
 
 private class Select1SearchCompanion(containerElem: html.Element) extends XBLCompanion {

@@ -6,7 +6,8 @@ import org.log4s.Logger
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.orbeon.xforms.{DocumentAPI, Page}
 import org.orbeon.web.DomSupport.*
 import org.scalajs.dom
@@ -22,7 +23,7 @@ object FriendlyCaptcha {
 
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.FriendlyCaptcha")
 
-  XBL.declareCompanion("fr|friendly-captcha", js.constructorOf[FriendlyCaptchaCompanion])
+  XFormsXbl.declareCompanion("fr|friendly-captcha", js.constructorOf[FriendlyCaptchaCompanion])
 
   private class FriendlyCaptchaCompanion(containerElem: html.Element) extends XBLCompanion {
 

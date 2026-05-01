@@ -16,7 +16,7 @@ package org.orbeon.xforms.facade
 import io.udash.wrappers.jquery.JQueryPromise
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
-import org.orbeon.xforms.{$, Page, YUICustomEvent}
+import org.orbeon.xforms.{$, Page}
 import org.scalajs
 import org.scalajs.dom.{Element, html}
 
@@ -64,15 +64,6 @@ class XBLCompanion extends js.Object {
       .getOrElse(throw new IllegalStateException(
         s"XBL companion for element `${containerElem.id}` is not associated with a form"
       ))
-}
-
-@JSGlobal("ORBEON.xforms.XBL")
-@js.native
-object XBL extends js.Object {
-  def declareCompanion(name: String, prototypeOrClass: js.Dynamic): Unit         = js.native
-  def instanceForControl(control: html.Element)                   : XBLCompanion = js.native
-
-  val componentInitialized                                        : YUICustomEvent = js.native
 }
 
 class ConnectCallbackArgument(val formId: String, val isUpload: js.UndefOr[Boolean]) extends js.Object

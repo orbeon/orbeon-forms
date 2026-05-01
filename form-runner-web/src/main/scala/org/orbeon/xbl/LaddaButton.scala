@@ -15,7 +15,8 @@ package org.orbeon.xbl
 
 import org.orbeon.facades.Ladda
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.orbeon.xforms.{AjaxClient, EventListenerSupport}
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -35,7 +36,7 @@ object LaddaButton {
   val ComponentName  = "ladda-button"
   val ClickEventName = s"click"
 
-  XBL.declareCompanion(s"fr|$ComponentName", js.constructorOf[LaddaButtonCompanion])
+  XFormsXbl.declareCompanion(s"fr|$ComponentName", js.constructorOf[LaddaButtonCompanion])
 
   private class LaddaButtonCompanion(containerElem: html.Element) extends XBLCompanion {
 

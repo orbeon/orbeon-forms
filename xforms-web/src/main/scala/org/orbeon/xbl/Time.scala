@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
 import org.orbeon.web.JSDateUtils.nowAsIsoTime
 import org.orbeon.xforms.*
-import org.orbeon.xforms.facade.XBL
+import org.orbeon.xforms.XFormsXbl
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -33,7 +33,7 @@ object Time {
 
   val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.Time")
 
-  XBL.declareCompanion("fr|time", js.constructorOf[TimeCompanion])
+  XFormsXbl.declareCompanion("fr|time", js.constructorOf[TimeCompanion])
 
   private class TimeCompanion(containerElem: html.Element)
     extends XblDateTimeCompanionSupport(containerElem) {

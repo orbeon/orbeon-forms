@@ -30,6 +30,7 @@ import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
@@ -346,7 +347,7 @@ trait FormRunnerActionsCommon {
   }
 
   private case class TextOrHtml(string: String, isHtml: Boolean) {
-    def asHtml: String = if (isHtml) string else MarkupUtils.escapeXmlMinimal(string)
+    def asHtml: String = if (isHtml) string else string.escapeXmlMinimal
   }
 
   private def messageFromResourceOrParam(params: ActionParams): Option[TextOrHtml] = {

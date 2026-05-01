@@ -474,7 +474,7 @@ object InitSupport {
           if (XFormsXbl.isComponent(control)) {
             // Custom XBL component initialization
             for {
-              _     <- Option(XBL.instanceForControl(control))
+              _     <- XFormsXbl.findInstanceForControl(control)
               value <- valueOpt
             } locally {
               XFormsControls.setCurrentValue(control, value, force = false)
@@ -502,7 +502,7 @@ object InitSupport {
         dom.document.getElementByIdOpt(id) foreach { control =>
           if (XFormsXbl.isComponent(control)) {
             for {
-              companionInstance <- Option(XBL.instanceForControl(control))
+              companionInstance <- XFormsXbl.findInstanceForControl(control)
             } locally {
               companionInstance.destroy()
             }

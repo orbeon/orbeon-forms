@@ -19,7 +19,8 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms
 import org.orbeon.xforms.{EventListenerSupport, Page, Upload}
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.orbeon.web.DomSupport.*
@@ -32,8 +33,8 @@ object AttachmentMultiple {
 
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.AttachmentMultiple")
 
-  XBL.declareCompanion("fr|attachment",          js.constructorOf[AttachmentCompanion])
-  XBL.declareCompanion("fr|attachment-multiple", js.constructorOf[AttachmentCompanion])
+  XFormsXbl.declareCompanion("fr|attachment",          js.constructorOf[AttachmentCompanion])
+  XFormsXbl.declareCompanion("fr|attachment-multiple", js.constructorOf[AttachmentCompanion])
 
   private class AttachmentCompanion(containerElem: html.Element) extends XBLCompanion {
 

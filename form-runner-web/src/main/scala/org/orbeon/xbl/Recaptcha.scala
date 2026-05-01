@@ -3,7 +3,8 @@ package org.orbeon.xbl
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.*
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.orbeon.xforms.{DocumentAPI, Page}
 import org.orbeon.web.DomSupport.*
 import org.scalajs.dom
@@ -16,7 +17,7 @@ object Recaptcha {
 
   private val ReCaptchaScript = "https://www.recaptcha.net/recaptcha/api.js"
 
-  XBL.declareCompanion("fr|recaptcha", js.constructorOf[RecaptchaCompanion])
+  XFormsXbl.declareCompanion("fr|recaptcha", js.constructorOf[RecaptchaCompanion])
 
   private class RecaptchaCompanion(containerElem: html.Element) extends XBLCompanion {
 

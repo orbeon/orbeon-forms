@@ -13,7 +13,8 @@
   */
 package org.orbeon.xbl
 
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -21,7 +22,7 @@ import scala.scalajs.js
 
 object Repeater {
 
-  XBL.declareCompanion("fr|repeater", js.constructorOf[RepeaterCompanion])
+  XFormsXbl.declareCompanion("fr|repeater", js.constructorOf[RepeaterCompanion])
 
   private class RepeaterCompanion(containerElem: html.Element) extends XBLCompanion {
     override def init()   : Unit = RepeaterMenus // initialize menus once

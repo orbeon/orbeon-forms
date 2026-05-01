@@ -14,7 +14,6 @@
 package org.orbeon.xforms
 
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
@@ -112,17 +111,20 @@ object DocumentAPI extends js.Object {
       if (XFormsXbl.isJavaScriptLifecycle(control)) {
         // Handle XBL components with JavaScript lifecycle
 
-        val companionInstance = XBL.instanceForControl(control)
+        XFormsXbl.findInstanceForControl(control) match {
+          case Some(companionInstance) =>
+            val hasXformsUpdateValue = XFormsXbl.isObjectWithMethod(companionInstance, "xformsUpdateValue")
+            val hasSetUserValue      = XFormsXbl.isObjectWithMethod(companionInstance, "setUserValue")
 
-        val hasXformsUpdateValue = XFormsXbl.isObjectWithMethod(companionInstance, "xformsUpdateValue")
-        val hasSetUserValue      = XFormsXbl.isObjectWithMethod(companionInstance, "setUserValue")
-
-        if (hasSetUserValue)
-          companionInstance.setUserValue(newStringValue) // https://github.com/orbeon/orbeon-forms/issues/5383
-        else if (hasXformsUpdateValue)
-          companionInstance.xformsUpdateValue(newStringValue)
-        else
-          js.undefined
+            if (hasSetUserValue)
+              companionInstance.setUserValue(newStringValue) // https://github.com/orbeon/orbeon-forms/issues/5383
+            else if (hasXformsUpdateValue)
+              companionInstance.xformsUpdateValue(newStringValue)
+            else
+              js.undefined
+          case None =>
+            js.undefined
+        }
       } else {
         // This handles the native XForms controls
         XFormsControls.setCurrentValue(control, newStringValue, force = false)

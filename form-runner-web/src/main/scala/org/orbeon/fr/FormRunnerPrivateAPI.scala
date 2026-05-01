@@ -21,7 +21,7 @@ import org.orbeon.web.DomSupport.*
 import org.orbeon.xbl.FrWizard
 import org.orbeon.xforms
 import org.orbeon.xforms.Page
-import org.orbeon.xforms.facade.XBL
+import org.orbeon.xforms.XFormsXbl
 import org.scalajs.dom
 import org.scalajs.dom.{HTMLFormElement, URLSearchParams}
 
@@ -131,7 +131,7 @@ object FormRunnerPrivateAPI extends js.Object {
       parts.head -> parts.lift(1).flatMap(s => s.toIntOption)
     }
 
-    XBL.instanceForControl(form.elem.querySelectorT(".xbl-fr-wizard"))
+    XFormsXbl.instanceForControl(form.elem.querySelectorT(".xbl-fr-wizard"))
       .asInstanceOf[FrWizard.WizardCompanion]
       ._dispatchPageChangeEvent(
         new FrWizard.PageChangeEvent {

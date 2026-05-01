@@ -17,7 +17,8 @@ import io.udash.wrappers.jquery.JQuery
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.Constants.DummyImageUri
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom
 import org.scalajs.dom.{EventListenerOptions, html}
@@ -29,7 +30,7 @@ import scala.scalajs.js.JSConverters.JSRichOption
 
 object WPaint {
 
-  XBL.declareCompanion("fr|wpaint", js.constructorOf[WPaintCompanion])
+  XFormsXbl.declareCompanion("fr|wpaint", js.constructorOf[WPaintCompanion])
 
   private class WPaintCompanion(containerElem: html.Element) extends XBLCompanion {
 

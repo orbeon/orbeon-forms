@@ -12,34 +12,28 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 @JSExportTopLevel("OrbeonXFormsUiEvents")
 object XFormsUiEvents {
 
-  val orbeonLoadedEvent: YUICustomEvent =
+  lazy val orbeonLoadedEvent: YUICustomEvent =
     newInstance(g.YAHOO.util.CustomEvent)(
       "orbeonLoaded", dom.window, false, g.YAHOO.util.CustomEvent.LIST, true
     ).asInstanceOf[YUICustomEvent]
 
-  val errorEvent: YUICustomEvent =
+  lazy val errorEvent: YUICustomEvent =
     newInstance(g.YAHOO.util.CustomEvent)("errorEvent").asInstanceOf[YUICustomEvent]
 
-  val componentChangedLayoutEvent: YUICustomEvent =
+  lazy val componentChangedLayoutEvent: YUICustomEvent =
     newInstance(g.YAHOO.util.CustomEvent)("componentChangedLayout").asInstanceOf[YUICustomEvent]
 
-  val beforeValueChange: YUICustomEvent =
+  lazy val beforeValueChange: YUICustomEvent =
     newInstance(g.YAHOO.util.CustomEvent)(
       null, null, false, g.YAHOO.util.CustomEvent.FLAT
     ).asInstanceOf[YUICustomEvent]
 
-  val valueChange: YUICustomEvent =
+  lazy val valueChange: YUICustomEvent =
     newInstance(g.YAHOO.util.CustomEvent)(
       null, null, false, g.YAHOO.util.CustomEvent.FLAT
     ).asInstanceOf[YUICustomEvent]
 
-  val afterValueChange: YUICustomEvent =
-    newInstance(g.YAHOO.util.CustomEvent)(
-      null, null, false, g.YAHOO.util.CustomEvent.FLAT
-    ).asInstanceOf[YUICustomEvent]
-
-  // TODO: 2026-04-29: Placeholder.js uses this
-  val lhhaChangeEvent: YUICustomEvent =
+  lazy val afterValueChange: YUICustomEvent =
     newInstance(g.YAHOO.util.CustomEvent)(
       null, null, false, g.YAHOO.util.CustomEvent.FLAT
     ).asInstanceOf[YUICustomEvent]

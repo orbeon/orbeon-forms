@@ -3,7 +3,8 @@ package org.orbeon.builder
 import org.orbeon.datatypes.Direction
 import org.orbeon.web.DomSupport.{DomElemOps, moveIntoViewIfNeeded}
 import org.orbeon.xforms.EventListenerSupport
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom.{KeyboardEvent, html}
 
 import scala.scalajs.js
@@ -11,7 +12,7 @@ import scala.scalajs.js
 
 object FormSettings {
 
-  XBL.declareCompanion("fb|dialog-form-settings", js.constructorOf[ControlSettingsCompanion])
+  XFormsXbl.declareCompanion("fb|dialog-form-settings", js.constructorOf[ControlSettingsCompanion])
 
   private class ControlSettingsCompanion(containerElem: html.Element) extends XBLCompanion {
 

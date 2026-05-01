@@ -66,14 +66,10 @@ object Page {
   def findXFormsFormFromHtmlElemOrDefault(elem: js.UndefOr[html.Element]): Option[xforms.Form] =
     findAncestorOrSelfHtmlFormFromHtmlElemOrDefault(elem).flatMap(f => findXFormsFormFromNamespacedId(f.id))
 
-  // 2023-08-15: 4 callers in `xforms.js`, rest in Scala
-  @JSExport
   def getXFormsFormFromHtmlElemOrThrow(elem: html.Element): xforms.Form =
     findXFormsFormFromHtmlElem(elem).getOrElse(throw new IllegalStateException("form not found"))
 
-  // 2023-08-15: 3 callers in `xforms.js` only
   // Caller doesn't pass `undefined` so we don't need to handle it. It is also expected that the form will be found.
-  @JSExport
   def getAncestorOrSelfHtmlFormFromHtmlElemOrThrow(elem: html.Element): html.Form =
     findAncestorOrSelfHtmlFormFromHtmlElem(elem).getOrElse(throw new IllegalStateException("form not found"))
 

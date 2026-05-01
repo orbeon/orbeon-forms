@@ -3,7 +3,8 @@ package org.orbeon.xbl
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.orbeon.xforms.{AjaxClient, AjaxEvent, EventListenerSupport, XFormsUI}
 import org.scalajs.dom
 
@@ -14,7 +15,7 @@ object Range {
 
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.Range")
 
-  XBL.declareCompanion("xf|range", js.constructorOf[RangeCompanion])
+  XFormsXbl.declareCompanion("xf|range", js.constructorOf[RangeCompanion])
 
   private class RangeCompanion(containerElem: dom.html.Element) extends XBLCompanion {
 

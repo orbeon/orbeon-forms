@@ -122,7 +122,7 @@ trait OrbeonFormsOps extends WebBrowser with Matchers {
     assert(result.cast[java.lang.Boolean].contains(java.lang.Boolean.TRUE))
   }
 
-  // Functions from xforms.js we must provide access to:
+  // Functions we must provide access to:
   //
   // - isRelevant
   // - isReadonly

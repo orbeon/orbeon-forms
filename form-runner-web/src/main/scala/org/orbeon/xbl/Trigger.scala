@@ -5,7 +5,8 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.KeyboardShortcuts
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
@@ -17,7 +18,7 @@ object Trigger {
 
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.Trigger")
 
-  XBL.declareCompanion(s"fr|trigger", js.constructorOf[TriggerCompanion])
+  XFormsXbl.declareCompanion(s"fr|trigger", js.constructorOf[TriggerCompanion])
 
   private class TriggerCompanion(containerElem: html.Element) extends XBLCompanion {
 

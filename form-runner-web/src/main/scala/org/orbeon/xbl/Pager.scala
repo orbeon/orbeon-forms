@@ -14,7 +14,8 @@
 package org.orbeon.xbl
 
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -23,7 +24,7 @@ import scala.scalajs.js.JSConverters.JSRichOption
 
 object Pager {
 
-  XBL.declareCompanion("fr|pager", js.constructorOf[PagerCompanion])
+  XFormsXbl.declareCompanion("fr|pager", js.constructorOf[PagerCompanion])
 
   class PagerCompanion(containerElem: html.Element) extends XBLCompanion {
 

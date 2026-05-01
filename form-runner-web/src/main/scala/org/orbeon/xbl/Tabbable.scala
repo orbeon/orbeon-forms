@@ -18,7 +18,8 @@ import org.orbeon.web.DomSupport.*
 import org.orbeon.xbl.DndRepeat.*
 import org.orbeon.xforms.*
 import org.orbeon.xforms.KeyboardShortcuts.KeyBoardIconCharacter
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
@@ -38,7 +39,7 @@ object Tabbable {
   private val TabContentSelector  = ".tab-content"
   private val ActiveSelector      = s".$ActiveClass"
 
-  XBL.declareCompanion("fr|tabbable", js.constructorOf[TabbableCompanion])
+  XFormsXbl.declareCompanion("fr|tabbable", js.constructorOf[TabbableCompanion])
 
   private class TabbableCompanion(containerElem: html.Element) extends XBLCompanion {
 

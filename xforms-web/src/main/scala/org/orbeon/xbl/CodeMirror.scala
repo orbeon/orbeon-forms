@@ -1,7 +1,8 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades
-import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.orbeon.xforms.XFormsXbl
+import org.orbeon.xforms.facade.XBLCompanion
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI}
 import org.scalajs.dom.html
 import io.udash.wrappers.jquery.JQueryPromise
@@ -17,7 +18,7 @@ import scala.scalajs.js.|
 
 object CodeMirror {
 
-  XBL.declareCompanion("fr|code-mirror", js.constructorOf[CodeMirrorCompanion])
+  XFormsXbl.declareCompanion("fr|code-mirror", js.constructorOf[CodeMirrorCompanion])
 
   private class CodeMirrorCompanion(containerElem: html.Element) extends XBLCompanion {
 

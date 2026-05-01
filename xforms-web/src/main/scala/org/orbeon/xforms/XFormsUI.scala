@@ -21,7 +21,6 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
 import org.scalajs.dom.html.Element
 import org.scalajs.dom.{DocumentReadyState, html}
@@ -32,7 +31,7 @@ import scala.collection.immutable
 import scala.concurrent.duration.{span as _, *}
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.scalajs.js.annotation.JSExportTopLevel
 import scala.scalajs.js.timers.SetTimeoutHandle
 import scala.scalajs.js.{timers, |}
 
@@ -60,10 +59,6 @@ object XFormsUI {
     "control" -> (Constants.LhhacSeparator + "c")
   )
 
-  @JSExport
-  def getControlLHHA(control: html.Element, lhhaType: String): html.Element =
-    findControlLHHA(control: html.Element, lhhaType: String).orNull
-
   def findControlLHHA(control: html.Element, lhhaType: String): Option[html.Element] = {
 
     // Search by id first
@@ -90,9 +85,7 @@ object XFormsUI {
       .orElse(isLhhaOpt)
   }
 
-  // lhhaChangeEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
-  @JSExport
-  def setMessage(control: html.Element, lhhaType: String, message: String): Unit =
+  private def setMessage(control: html.Element, lhhaType: String, message: String): Unit =
     findControlLHHA(control, lhhaType).foreach { lhhaElement =>
       lhhaElement.innerHTML = message
       // https://github.com/orbeon/orbeon-forms/issues/4062
@@ -102,9 +95,17 @@ object XFormsUI {
         else
           lhhaElement.classList.remove("xforms-disabled")
       }
+
+      // Handle placeholder
+      if ((lhhaType == "label" || lhhaType == "hint") &&
+          control.hasAnyClass("xforms-input", "xforms-textarea", "xforms-secret"))
+        control.queryNestedElems[html.Element]("input, textarea").headOption match {
+          case Some(e: html.Input)    => e.placeholder = message
+          case Some(e: html.TextArea) => e.placeholder = message
+          case _ =>
+        }
     }
 
-  @JSExport
   def getLabelMessage(control: html.Element): String =
     if (control.hasAnyClass("xforms-trigger", "xforms-submit"))
       findControlLHHA(control, "control").map(_.innerHTML).getOrElse("")
@@ -115,7 +116,6 @@ object XFormsUI {
     else
       findControlLHHA(control, "label").map(_.innerHTML).getOrElse("")
 
-  @JSExport
   def setLabelMessage(control: html.Element, message: String): Unit =
     if (control.hasAnyClass("xforms-trigger", "xforms-submit"))
       setMessage(control, "control", message)
@@ -128,7 +128,6 @@ object XFormsUI {
     else
       setMessage(control, "label", message)
 
-  @JSExport
   def getHelpMessage(control: html.Element): String =
     findControlLHHA(control, "help") match {
       case None => ""
@@ -139,24 +138,20 @@ object XFormsUI {
           helpElement.textContent
     }
 
-  @JSExport
   def setHelpMessage(control: html.Element, message: String): Unit = {
     val escapedMessage = message.escapeXmlMinimal
     setMessage(control, "help", escapedMessage)
-    _setTooltipMessage(control, escapedMessage, Globals.helpTooltipForControl)
+    setTooltipMessage(control, escapedMessage, Globals.helpTooltipForControl)
   }
 
-  @JSExport
   def getAlertMessage(control: html.Element): String =
     findControlLHHA(control, "alert").map(_.innerHTML).getOrElse("")
 
-  @JSExport
   def setAlertMessage(control: html.Element, message: String): Unit = {
     setMessage(control, "alert", message)
-    _setTooltipMessage(control, message, Globals.alertTooltipForControl)
+    setTooltipMessage(control, message, Globals.alertTooltipForControl)
   }
 
-  @JSExport
   def getNonAllBlankHintMessage(control: html.Element): String =
     findNonAllBlankHintMessage(control).getOrElse("")
 
@@ -172,7 +167,6 @@ object XFormsUI {
         .map(_.innerHTML)
         .flatMap(_.trimAllToOpt)
 
-  @JSExport
   def setHintMessage(control: html.Element, message: String): Unit = {
     val tooltips = Globals.hintTooltipForControl
     tooltips.get(control.id).foreach { tooltipDyn =>
@@ -193,11 +187,10 @@ object XFormsUI {
     } else {
       setMessage(control, "hint", message)
     }
-    _setTooltipMessage(control, message, tooltips)
+    setTooltipMessage(control, message, tooltips)
   }
 
-  @JSExport
-  def _setTooltipMessage(control: html.Element, message: String, tooltipForControl: js.Dictionary[js.Any]): Unit =
+  private def setTooltipMessage(control: html.Element, message: String, tooltipForControl: js.Dictionary[js.Any]): Unit =
     tooltipForControl.get(control.id).foreach { currentTooltipDyn =>
       if (currentTooltipDyn != null && ! js.isUndefined(currentTooltipDyn) && currentTooltipDyn.toString != "true") {
         val currentTooltip = currentTooltipDyn.asInstanceOf[js.Dynamic]
@@ -210,7 +203,6 @@ object XFormsUI {
       }
     }
 
-  @JSExport
   def updateVisited(control: html.Element, newVisited: Boolean): Unit = {
     if (newVisited)
       control.classList.add("xforms-visited")
@@ -226,14 +218,12 @@ object XFormsUI {
     }
   }
 
-  @JSExport
   def updateRequiredEmpty(control: html.Element, emptyAttr: String): Unit = {
     val isRequired = control.hasClass("xforms-required")
     if (isRequired && emptyAttr == "true")  control.classList.add("xforms-empty")  else control.classList.remove("xforms-empty")
     if (isRequired && emptyAttr == "false") control.classList.add("xforms-filled") else control.classList.remove("xforms-filled")
   }
 
-  @JSExport
   def toggleCase(controlId: String, visible: Boolean): Unit = {
 
     val caseBeginId = s"xforms-case-begin-$controlId"
@@ -271,7 +261,6 @@ object XFormsUI {
       }
   }
 
-  @JSExport
   def setFocus(controlId: String): Unit = {
 
     // Wait until `load` event to set focus, as dialog in control the control is present might not be visible until then
@@ -304,13 +293,11 @@ object XFormsUI {
         .orElse(nestedInputs.headOption)
         .foreach(_.focus())
     } else if (XFormsXbl.isFocusable(control)) {
-      val instance = XBL.instanceForControl(control)
-      if (instance != null && ! js.isUndefined(instance)) {
-        val dyn = instance.asInstanceOf[js.Dynamic]
+      XFormsXbl.findInstanceForControl(control).foreach { instance =>
         if (XFormsXbl.isObjectWithMethod(instance, "xformsFocus"))
-          dyn.xformsFocus()
+          instance.asInstanceOf[js.Dynamic].xformsFocus()
         else if (XFormsXbl.isObjectWithMethod(instance, "setFocus"))
-          dyn.setFocus()
+          instance.asInstanceOf[js.Dynamic].setFocus()
       }
     } else {
 
@@ -341,7 +328,6 @@ object XFormsUI {
       ServerValueStore.set(controlId, getCurrentValue(control))
   }
 
-  @JSExport
   def removeFocus(controlId: String): Unit = {
 
     if (Globals.currentFocusControlId == null)
@@ -357,9 +343,10 @@ object XFormsUI {
         .queryNestedElems[html.Input]("input")
         .foreach(_.blur())
     } else if (XFormsXbl.isFocusable(control)) {
-      val instance = XBL.instanceForControl(control)
-      if (instance != null && ! js.isUndefined(instance) && XFormsXbl.isObjectWithMethod(instance, "xformsBlur"))
-        instance.asInstanceOf[js.Dynamic].xformsBlur()
+      XFormsXbl.findInstanceForControl(control).foreach { instance =>
+        if (XFormsXbl.isObjectWithMethod(instance, "xformsBlur"))
+          instance.asInstanceOf[js.Dynamic].xformsBlur()
+      }
     } else {
       control
         .queryNestedElems[html.Element]("input textarea select button a")
@@ -371,7 +358,6 @@ object XFormsUI {
     Globals.currentFocusControlElement = null
   }
 
-  @JSExport
   def setConstraintLevel(control: html.Element, newLevel: String): Unit = {
 
     val alertActive = newLevel != ""
@@ -407,21 +393,18 @@ object XFormsUI {
     }
   }
 
-  @JSExport
-  def setDisabledOnFormElement(element: html.Element, disabled: Boolean): Unit =
+  private def setDisabledOnFormElement(element: html.Element, disabled: Boolean): Unit =
     if (disabled)
       element.setAttribute("disabled", "disabled") // Q: Could use `element.disabled = disabled`?
     else
       element.removeAttribute("disabled")
 
-  @JSExport
-  def setReadonlyOnFormElement(element: html.Element, readonly: Boolean): Unit =
+  private def setReadonlyOnFormElement(element: html.Element, readonly: Boolean): Unit =
     if (readonly)
       element.setAttribute("readonly", "readonly") // Q: Could use `element.readonly = readonly`?
     else
       element.removeAttribute("readonly")
 
-  @JSExport
   def setRelevant(control: html.Element, isRelevant: Boolean): Unit =
     if (control.hasClass("xforms-group-begin-end")) {
       XFormsUiFlatNesting.setRelevant(control, isRelevant)
@@ -484,14 +467,12 @@ object XFormsUI {
     cursor.asInstanceOf[html.Element]
   }
 
-  @JSExport
   def setRepeatIterationRelevance(formID: String, repeatID: String, iteration: String, relevant: Boolean): Unit =
     XFormsUiFlatNesting.setRelevant(
       node       = findRepeatDelimiter(formID, repeatID, iteration.toInt),
       isRelevant = relevant
     )
 
-  @JSExport
   def setReadonly(control: html.Element, isReadonly: Boolean): Unit = {
 
     if (isReadonly)
@@ -535,7 +516,6 @@ object XFormsUI {
     }
   }
 
-  @JSExport
   def getCurrentValue(control: html.Element): js.UndefOr[String] =
     if ((
       control.hasClass("xforms-input") && ! control.hasAnyClass("xforms-type-boolean", "xforms-static")) ||
@@ -601,16 +581,16 @@ object XFormsUI {
         case None                                                                          => js.undefined
       }
     } else if (XFormsXbl.isComponent(control)) {
-      val instance = XBL.instanceForControl(control) // can return `null` but should not be undefined
-      if (! js.isUndefined(instance) && instance != null && js.typeOf(instance.asInstanceOf[js.Dynamic].xformsGetValue) == "function")
-        instance.xformsGetValue()
-      else
-        js.undefined
+      XFormsXbl.findInstanceForControl(control) match {
+        case Some(instance) if XFormsXbl.isObjectWithMethod(instance, "xformsGetValue") =>
+          instance.xformsGetValue()
+        case _ =>
+          js.undefined
+      }
     } else {
       js.undefined
     }
 
-  @JSExport
   def handleShiftSelection(clickEvent: dom.MouseEvent, controlElem: html.Element): Unit =
     if (controlElem.hasClass("xforms-select-appearance-full")) {
       // Only for "checkbox" controls
@@ -688,9 +668,7 @@ object XFormsUI {
       lastCheckboxChecked = None
     }
 
-  // TODO: remove once removed from xforms.js.
   // Update `xforms-selected`/`xforms-deselected` classes on the parent `<span>` element
-  @JSExport
   def setRadioCheckboxClasses(target: html.Element): Unit =
     for (checkboxInput <- target.queryNestedElems[html.Input]("input[type = 'checkbox'], input[type = 'radio']", includeSelf = false))
       setOneRadioCheckboxClasses(checkboxInput)
@@ -709,17 +687,14 @@ object XFormsUI {
     }
   }
 
-  @JSExport // 2020-04-27: 6 JavaScript usages from xforms.js
   var modalProgressPanelShown: Boolean = false
 
-  @JSExport
   def fieldValueChanged(targetElem: html.Element): Unit =
     // https://github.com/orbeon/orbeon-forms/issues/6960
     Page.findXFormsFormFromHtmlElem(targetElem)
       .filter(_.allowClientDataStatus)
       .foreach(_.formDataSafe = false)
 
-  @JSExport // 2020-04-27: 1 JavaScript usage
   def displayModalProgressPanel(): Unit =
     if (! modalProgressPanelShown) {
 

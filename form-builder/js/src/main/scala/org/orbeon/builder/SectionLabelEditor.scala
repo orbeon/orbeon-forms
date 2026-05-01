@@ -83,7 +83,7 @@ object SectionLabelEditor {
       val section          = Position.findInCache(BlockCache.sectionGridCache, labelInputOffset.top, labelInputOffset.left).get
       val sectionId        = section.el.attr("id").get
 
-      section.el.find(SectionLabelSelector).text(newLabelValue)
+      section.el.get(0).foreach(_.querySelectorT(SectionLabelSelector).textContent = newLabelValue)
 
       RpcClient[FormBuilderRpcApi].sectionUpdateLabel(sectionId, newLabelValue).call()
 
@@ -115,8 +115,8 @@ object SectionLabelEditor {
 
         // From the section title, get the anchor element, which contains the title
         val labelAnchor = {
-            val section = Position.findInCache(BlockCache.sectionGridCache, interceptorOffset.top, interceptorOffset.left).get
-            section.el.find(SectionLabelSelector)
+          val section = Position.findInCache(BlockCache.sectionGridCache, interceptorOffset.top, interceptorOffset.left).get
+          $(section.el.get(0).get.querySelectorT(SectionLabelSelector))
         }
 
         // Set placeholder, done every time to account for a value change when changing current language
@@ -153,7 +153,7 @@ object SectionLabelEditor {
 
       val offset  = Position.adjustedOffset(clickInterceptor)
       val section = Position.findInCache(BlockCache.sectionGridCache, offset.top, offset.left).get
-      val sectionTitle = section.el.find(SectionTitleSelector)
+      val sectionTitle = $(section.el.get(0).get.querySelectorT(SectionTitleSelector))
       updateClass("hover", sectionTitle)
     }
 
@@ -161,7 +161,7 @@ object SectionLabelEditor {
     def showClickHintIfTitleEmpty(clickInterceptor: JQuery): Unit = {
       val interceptorOffset = Position.adjustedOffset(clickInterceptor)
       val section = Position.findInCache(BlockCache.sectionGridCache, interceptorOffset.top, interceptorOffset.left).get
-      val labelAnchor = section.el.find(SectionLabelSelector)
+      val labelAnchor = $(section.el.get(0).get.querySelectorT(SectionLabelSelector))
       if (labelAnchor.text() == "") {
         val outputWithHintMessage = SectionGridEditor.sectionGridEditorContainer.children(".fb-enter-section-title-label")
         val hintMessage = XFormsUI.getCurrentValue(outputWithHintMessage.get(0).get.asInstanceOf[dom.html.Element]).get
@@ -230,8 +230,8 @@ object SectionLabelEditor {
         // Position interceptor for each section
         for ((section, interceptor) <- sections.iterator.zip(labelClickInterceptors.iterator)) {
 
-          val sectionTitle = section.find(SectionTitleSelector)
-          val sectionLabel = section.find(SectionLabelSelector)
+          val sectionTitle = $(section.get(0).get.querySelectorT(SectionTitleSelector))
+          val sectionLabel = $(section.get(0).get.querySelectorT(SectionLabelSelector))
 
           // Show, as this might be an interceptor that was previously hidden, and is now reused
           interceptor.show()

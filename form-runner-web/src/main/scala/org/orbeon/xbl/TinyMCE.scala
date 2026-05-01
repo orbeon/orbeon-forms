@@ -130,7 +130,7 @@ object TinyMCE {
           if (containerElem.hasClass("xforms-incremental"))
             tinyMceObject.on("input", _ => clientToServer(incremental = true))
           // Remove an anchor added by TinyMCE to handle key, as it grabs the focus and breaks tabbing between fields
-          $(containerElem).find("a[accesskey]").detach()
+          containerElem.querySelectorT("a[accesskey]").remove()
           currentValueOpt.foreach(tinyMceObject.setContent)
           if (focusAfterInit)
             tinyMceObject.focus()

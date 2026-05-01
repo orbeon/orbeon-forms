@@ -45,15 +45,12 @@ class FormRunnerForm(private val form: xforms.Form) extends js.Object {
   }
 
   def findControlsByName(controlName: String): js.Array[Element] =
-    $(form.elem)
-      .find(s".xforms-control[id *= '$controlName-control'], .xbl-component[id *= '$controlName-control']")
-      .toArray collect {
-      // The result must be an `html.Element` already
-      case e: html.Element => e
-    } filter {
-      // Check the id matches the requested name
-      e => (e.id ne null) && (ControlOps.controlNameFromIdOpt(XFormsId.getStaticIdFromId(e.id)) contains controlName)
-    } toJSArray
+    form.elem
+      .queryNestedElems[html.Element](
+        s".xforms-control[id *= '$controlName-control'], .xbl-component[id *= '$controlName-control']"
+      )
+      .filter(e => ControlOps.controlNameFromIdOpt(XFormsId.getStaticIdFromId(e.id)).contains(controlName))
+      .toJSArray
 
   // - returns `undefined` if
   //   - the control is not found

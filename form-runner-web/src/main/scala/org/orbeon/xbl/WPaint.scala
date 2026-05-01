@@ -16,6 +16,7 @@ package org.orbeon.xbl
 import io.udash.wrappers.jquery.JQuery
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.Constants.DummyImageUri
 import org.orbeon.xforms.XFormsXbl
 import org.orbeon.xforms.facade.XBLCompanion
@@ -34,59 +35,58 @@ object WPaint {
 
   private class WPaintCompanion(containerElem: html.Element) extends XBLCompanion {
 
-    def annotationEl : JQuery = $(containerElem).find(".fr-wpaint-annotation img")
-    def imageEl      : JQuery = $(containerElem).find(".fr-wpaint-image img")
-    def wpaintElA    : JQuery = $(containerElem).find(".fr-wpaint-container-a")
-    def wpaintElB    : JQuery = $(containerElem).find(".fr-wpaint-container-b")
-    var wpaintElC    : JQuery = null
+    def annotationEl : html.Image = containerElem.queryNestedElems[html.Image](".fr-wpaint-annotation img").head
+    def imageEl      : html.Image = containerElem.queryNestedElems[html.Image](".fr-wpaint-image img").head
+    def wpaintElA    : html.Div   = containerElem.queryNestedElems[html.Div](".fr-wpaint-container-a").head
+    def wpaintElB    : html.Div   = containerElem.queryNestedElems[html.Div](".fr-wpaint-container-b").head
+    var wpaintElC    : JQuery     = null
 
     override def init(): Unit =
-      imageEl.asInstanceOf[Dynamic].imagesLoaded(backgroundImageChanged _)
+      $(imageEl).asInstanceOf[Dynamic].imagesLoaded(backgroundImageChanged _)
 
     def enabled  () = ()
     def readonly () = ()
     def readwrite() = ()
 
     private def backgroundImageChanged(): Unit = {
-      if (imageEl.attr("src") contains DummyImageUri) {
-        wpaintElA.addClass("xforms-hidden")
+      val imageElJQuery = $(imageEl)
+      if (imageEl.getAttribute("src") contains DummyImageUri) {
+        wpaintElA.classList.add("xforms-hidden")
         if (wpaintElC != null) {
             wpaintElC.detach()
             wpaintElC = null
         }
       } else {
-        wpaintElA.removeClass("xforms-hidden")
-        wpaintElA.css("width" , imageEl.width().toString + "px")
-        wpaintElB.css("padding-top", (imageEl.height() / imageEl.width() * 100).toString + "%")
+        wpaintElA.classList.remove("xforms-hidden")
+        wpaintElA.style.width = imageElJQuery.width().toString + "px"
+        wpaintElB.style.paddingTop = (imageElJQuery.height().toDouble / imageElJQuery.width() * 100).toString + "%"
         // tabindex="-1" allows div to have the focus, used to send change on blur
         wpaintElC = $("""<div class="fr-wpaint-container-c" tabindex="-1"/>""")
-        wpaintElB.append(wpaintElC)
+        $(wpaintElB).append(wpaintElC)
         // When looses focus, send drawing to the server right away (incremental)
         wpaintElC.get().foreach(_.addEventListener(DomEventNames.FocusOut, (_: dom.Event) => sendAnnotationToServer()))
-        wpaintElC.css("width",  imageEl.width() )
-        wpaintElC.css("height", imageEl.height())
-        val annotation = annotationEl.attr("src").get
+        wpaintElC.css("width",  imageElJQuery.width() )
+        wpaintElC.css("height", imageElJQuery.height())
+        val annotationSrcOpt = annotationEl.src.trimAllToOpt
         val startStrokeColor = {
-          val classes = wpaintElA.get(0).get.classList
+          val classes = wpaintElA.classList
           val ClassPrefix = "fr-wpaint-start-stroke-color-"
-          val colorOpt = classes.toList.find(_.startsWith(ClassPrefix)).map(_.substringAfter(ClassPrefix))
+          val colorOpt = classes.find(_.startsWith(ClassPrefix)).map(_.substringAfter(ClassPrefix))
           colorOpt.map("#" + _).orUndefined
         }
         wpaintElC.asInstanceOf[Dynamic].wPaint(new js.Object {
           val drawDown: js.Function = () => wpaintElC.trigger("focus")
-          val imageBg               = imageEl.attr("src")
-          val image                 = if (annotation == "") null else annotation
+          val imageBg               = imageEl.src
+          val image                 = annotationSrcOpt.orNull
           val strokeStyle           = startStrokeColor
         })
       }
 
       // Re-register listener, as imagesLoaded() calls listener only once
-      imageEl.get(0).foreach(el =>
-        el.addEventListener(
-          `type`   = "load",
-          listener = (_: dom.Event) => backgroundImageChanged(),
-          options  = new EventListenerOptions { once = true })
-      )
+      imageEl.addEventListener(
+        `type`   = "load",
+        listener = (_: dom.Event) => backgroundImageChanged(),
+        options  = new EventListenerOptions { once = true })
     }
 
     // Send the image data from wPaint to the server, which will put it in <annotation>

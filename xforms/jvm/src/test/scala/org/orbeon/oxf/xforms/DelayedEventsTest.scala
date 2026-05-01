@@ -25,6 +25,45 @@ class DelayedEventsTest
 
   describe("Delayed events") {
 
+    it("delayed dispatch with string properties") {
+      withTestExternalContext { _ =>
+
+        val doc = this setupDocument
+          <xh:html
+            xmlns:xf="http://www.w3.org/2002/xforms"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xh:head>
+              <xf:model id="model" xxf:xpath-analysis="true">
+
+                <xf:instance id="instance">
+                  <value/>
+                </xf:instance>
+
+                <xf:action event="xforms-ready">
+                  <xf:dispatch name="test-event" targetid="model" delay="0">
+                    <xf:property name="ref"   value="'into-ref'"/>
+                    <xf:property name="value" value="string('into-value')"/>
+                  </xf:dispatch>
+                </xf:action>
+
+                <xf:action event="test-event">
+                  <xf:setvalue ref="." value="concat(event('ref'), ':', event('value'))"/>
+                </xf:action>
+
+              </xf:model>
+            </xh:head>
+            <xh:body>
+              <xf:output id="my-output" ref="."/>
+            </xh:body>
+          </xh:html>.toDocument
+
+        withContainingDocument(doc) {
+          assert("into-ref:into-value" === getControlValue("my-output"))
+        }
+      }
+    }
+
     it ("recursive delayed events") {
       withTestExternalContext { _ =>
 

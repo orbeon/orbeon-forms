@@ -504,10 +504,10 @@ trait FormRunnerActionsCommon {
 object FormRunnerActionsCommon {
 
   def findUrlsInstanceRootElem: Option[NodeInfo] =
-    frc.urlsInstance map (_.rootElement)
+    frc.urlsInstance.map(_.rootElement)
 
   def findFrFormAttachmentsRootElem: Option[NodeInfo] =
-    frc.formAttachmentsInstance map (_.rootElement)
+    frc.formAttachmentsInstance.map(_.rootElement)
 
   def isMessageInHtml(nodeInfo: NodeInfo): Boolean =
     (nodeInfo /@ "html").headOption.exists(_.stringValue == "true")

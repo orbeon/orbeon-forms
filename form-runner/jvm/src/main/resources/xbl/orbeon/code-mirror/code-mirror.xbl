@@ -47,7 +47,7 @@
             <xbl:style src="/webjars/codemirror/5.65.20/addon/search/matchesonscrollbar.css"/>
         </xbl:resources>
         <xbl:template>
-            <xh:div class="xbl-fr-code-mirror-editor"/>
+            <xh:div class="xbl-fr-code-mirror-editor" data-code-mirror-theme="{fr:component-param-value('theme')}"/>
         </xbl:template>
 
     </xbl:binding>

@@ -5,6 +5,7 @@ import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI}
 import org.scalajs.dom.html
 import io.udash.wrappers.jquery.JQueryPromise
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.web.DomSupport.*
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
@@ -26,7 +27,8 @@ object CodeMirror {
     private var userChangedSinceLastBlur : Boolean = false
 
     override def init(): Unit = {
-      val editorElement = containerElem.querySelector(".xbl-fr-code-mirror-editor")
+      val editorElement = containerElem.querySelectorT(".xbl-fr-code-mirror-editor")
+      val theme = editorElement.dataset.get("codeMirrorTheme").flatMap(_.trimAllToOpt).getOrElse("solarized dark")
       this.editor = new facades.CodeMirror(
         editorElement,
         js.Dictionary(
@@ -34,7 +36,7 @@ object CodeMirror {
           "lineNumbers"  -> true,
           "lineWrapping" -> true,
           "indentUnit"   -> 4,
-          "theme"        -> "solarized dark",
+          "theme"        -> theme,
           "foldGutter"   -> true,
           "gutters"      -> js.Array("CodeMirror-linenumbers", "CodeMirror-foldgutter"),
           "extraKeys"    -> js.Dictionary(

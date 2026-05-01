@@ -238,6 +238,8 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.us-ssn.pdf-format"                         value="partial"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.us-ssn.pdf-template-format"                value="partial"/>
 
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.code-mirror.theme"                         value=""/>
+
     <property as="xs:string"  name="oxf.xforms.xbl.library" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
         fr:grid-single
         fr:grid-multiple

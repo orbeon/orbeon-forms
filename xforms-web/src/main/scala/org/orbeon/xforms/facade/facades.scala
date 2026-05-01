@@ -13,13 +13,12 @@
   */
 package org.orbeon.xforms.facade
 
-import org.orbeon.xforms.{$, Page, YUICustomEvent}
-import org.scalajs
-import org.scalajs.dom
-import org.scalajs.dom.{Element, FocusEvent, MouseEvent, UIEvent, html}
 import io.udash.wrappers.jquery.JQueryPromise
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms
+import org.orbeon.xforms.{$, Page, YUICustomEvent}
+import org.scalajs
+import org.scalajs.dom.{Element, html}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobal
@@ -74,14 +73,6 @@ object XBL extends js.Object {
   def instanceForControl(control: html.Element)                   : XBLCompanion = js.native
 
   val componentInitialized                                        : YUICustomEvent = js.native
-}
-
-@JSGlobal("ORBEON.xforms.Controls")
-@js.native
-object Controls extends js.Object {
-  val beforeValueChange                                                                                  : YUICustomEvent                               = js.native
-  val valueChange                                                                                        : YUICustomEvent                               = js.native
-  val afterValueChange                                                                                   : YUICustomEvent                               = js.native
 }
 
 class ConnectCallbackArgument(val formId: String, val isUpload: js.UndefOr[Boolean]) extends js.Object

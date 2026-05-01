@@ -203,20 +203,6 @@ var ELEMENT_TYPE = document.createElement("dummy").nodeType;
     // Define packages
     ORBEON.xforms = ORBEON.xforms || {};
 
-    ORBEON.xforms.Controls = {
-
-        /**
-         * Updates the value of a control in the UI.
-         *
-         * @param control           HTML element for the control we want to update
-         * @param newControlValue   New value
-         */
-        beforeValueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
-        valueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
-        afterValueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
-        lhhaChangeEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT)
-    };
-    
     (function () {
 
         // 2023-01-09: This is only for backward compatibility with old code that doesn't use `javascript-lifecycle`.

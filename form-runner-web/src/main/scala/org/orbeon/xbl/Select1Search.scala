@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.web.DomSupport
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.*
-import org.orbeon.xforms.facade.{Controls, XBL, XBLCompanion}
+import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.scalajs.dom
 import org.scalajs.dom.{MutationObserver, document, html}
 
@@ -170,7 +170,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
           // Register and remember listener on value change
           val listener: js.Function = onXFormsSelect1ValueChange _
           onXFormsSelect1ValueChangeJs = Some(listener)
-          Controls.afterValueChange.subscribe(listener)
+          XFormsUiEvents.afterValueChange.subscribe(listener)
         }
 
         mutationObservers = DomSupport.onAttributeChange    (elementWithData, DataPlaceholder, updatePlaceholder            ) :: mutationObservers
@@ -195,7 +195,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     EventSupport.clearAllListeners()
 
     // Remove after value change listener
-    onXFormsSelect1ValueChangeJs.foreach(Controls.afterValueChange.unsubscribe)
+    onXFormsSelect1ValueChangeJs.foreach(XFormsUiEvents.afterValueChange.unsubscribe)
     onXFormsSelect1ValueChangeJs = None
 
     // Disconnect mutation observers

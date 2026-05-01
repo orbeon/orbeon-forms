@@ -35,6 +35,27 @@ object XFormsUiEvents {
   val componentChangedLayoutEvent: YUICustomEvent =
     newInstance(g.YAHOO.util.CustomEvent)("componentChangedLayout").asInstanceOf[YUICustomEvent]
 
+  val beforeValueChange: YUICustomEvent =
+    newInstance(g.YAHOO.util.CustomEvent)(
+      null, null, false, g.YAHOO.util.CustomEvent.FLAT
+    ).asInstanceOf[YUICustomEvent]
+
+  val valueChange: YUICustomEvent =
+    newInstance(g.YAHOO.util.CustomEvent)(
+      null, null, false, g.YAHOO.util.CustomEvent.FLAT
+    ).asInstanceOf[YUICustomEvent]
+
+  val afterValueChange: YUICustomEvent =
+    newInstance(g.YAHOO.util.CustomEvent)(
+      null, null, false, g.YAHOO.util.CustomEvent.FLAT
+    ).asInstanceOf[YUICustomEvent]
+
+  // TODO: 2026-04-29: Placeholder.js uses this
+  val lhhaChangeEvent: YUICustomEvent =
+    newInstance(g.YAHOO.util.CustomEvent)(
+      null, null, false, g.YAHOO.util.CustomEvent.FLAT
+    ).asInstanceOf[YUICustomEvent]
+
   // Walk up the DOM from `element` to find the first ancestor (or self) that is an XForms control,
   // an XBL component, or an XForms dialog. Returns null if none is found.
   @JSExport

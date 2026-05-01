@@ -3,7 +3,7 @@ package org.orbeon.xforms
 import io.udash.wrappers.jquery.JQueryPromise
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.web.DomSupport.DomElemOps
-import org.orbeon.xforms.facade.{Controls, XBL}
+import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -30,8 +30,8 @@ object XFormsControls {
       }
     }
 
-    Controls.beforeValueChange.fire(customEvent)
-    Controls.valueChange.fire(customEvent)
+    XFormsUiEvents.beforeValueChange.fire(customEvent)
+    XFormsUiEvents.valueChange.fire(customEvent)
 
     val isStaticReadonly = control.hasClass("xforms-static")
 
@@ -143,7 +143,7 @@ object XFormsControls {
     }
 
     // 2025-08-18: Legacy and undocumented
-    Controls.afterValueChange.fire(customEvent)
+    XFormsUiEvents.afterValueChange.fire(customEvent)
 
     result
   }

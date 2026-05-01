@@ -542,13 +542,25 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def optionFromMetadataOrPropertiesDynamicXPath(
     featureName: String,
     default    : String
+  ): String =
+    optionFromMetadataOrPropertiesDynamicXPath(
+      featureName  = featureName,
+      propertyName = s"oxf.fr.detail.$featureName",
+      default      = default
+    )
+
+  //@XPathFunction
+  def optionFromMetadataOrPropertiesDynamicXPath(
+    featureName : String,
+    propertyName: String,
+    default     : String
   ): String = {
     val xfcd = inScopeContainingDocument
     implicit val indentedLogger: IndentedLogger = xfcd.getIndentedLogger("form-runner")
     FRComponentParamSupport.fromMetadataAndPropertiesEvaluateAvt(
       xfcd,
       featureName,
-      s"oxf.fr.detail.$featureName"
+      propertyName
     ).getOrElse(default)
   }
 

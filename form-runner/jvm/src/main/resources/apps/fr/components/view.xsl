@@ -445,7 +445,7 @@
                         not(xxf:property(string-join(('oxf.fr.keyboard-shortcuts.show-hints', fr:app-name(), fr:form-name()), '.')) = true())
                     ]
                 }}{{
-                    let $color-scheme-opt := frf:optionFromMetadataOrPropertiesDynamicXPath('color-scheme', 'light')[. = ('light', 'dark', 'system')]
+                    let $color-scheme-opt := frf:optionFromMetadataOrPropertiesDynamicXPath('color-scheme', 'oxf.fr.style.color-scheme', 'light')[. = ('light', 'dark', 'system')]
                     return
                         if (
                             (

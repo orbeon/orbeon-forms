@@ -134,7 +134,7 @@
                             class="btn"
                             appearance="xxf:download"
                             ref="instance()/pdf-attachment[xxf:non-blank()]"
-                            xxf:download="{@filename}">
+                            xxf:download="{{@filename}}">
                             <xf:label mediatype="text/html" ref="xxf:r('download-pdf')"/>
                             <xf:filename  ref="@filename"/>
                             <xf:mediatype ref="@mediatype"/>

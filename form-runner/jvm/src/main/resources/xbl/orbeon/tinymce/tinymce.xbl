@@ -56,6 +56,7 @@
                 <icon-class>fa fa-fw fa-html5</icon-class>
             </icon>
             <templates>
+                <bind type="xf:HTMLFragment"/>
                 <view>
                     <xf:textarea mediatype="text/html" id="" xmlns="">
                         <xf:label ref=""/>

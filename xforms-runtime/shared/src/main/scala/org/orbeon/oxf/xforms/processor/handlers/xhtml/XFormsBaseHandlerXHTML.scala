@@ -140,7 +140,7 @@ abstract class XFormsBaseHandlerXHTML (
 
     elementAnalysis match {
       case _: ComponentControl =>
-        // Component control doesn't get `xforms-control`, `xforms-[control name]`, `incremental`, `mediatype`, `xforms-static`
+        // Component control doesn't get `xforms-control`, `xforms-[control name]`, `mediatype`, `xforms-static`
       case _ =>
         // We only call `xforms-control` the actual controls as per the spec
         // NOTE: XForms 1.1 has core and container controls but our client depends on having `xforms-control`.
@@ -150,14 +150,6 @@ abstract class XFormsBaseHandlerXHTML (
           appendWithSpace("xforms-")
 
         sb.append(controlName)
-
-        // Class for incremental mode
-        val value = controlAttributes.getValue("incremental")
-
-        // Set the class if the default is non-incremental and the user explicitly set the value to true, or the
-        // default is incremental and the user did not explicitly set it to false
-        if ((! incrementalDefault && value == "true") || (incrementalDefault && value != "false"))
-          appendWithSpace("xforms-incremental")
 
         // Class for mediatype
         Option(controlAttributes.getValue("mediatype")) foreach { mediatypeValue =>
@@ -185,6 +177,12 @@ abstract class XFormsBaseHandlerXHTML (
         if (XFormsBaseHandler.isStaticReadonly(control))
           appendWithSpace("xforms-static")
     }
+
+    // Set the `xforms-incremental` class if the default is non-incremental and the user explicitly set the value to
+    // true, or the default is incremental and the user did not explicitly set it to false
+    val value = controlAttributes.getValue("incremental")
+    if ((! incrementalDefault && value == "true") || (incrementalDefault && value != "false"))
+      appendWithSpace("xforms-incremental")
 
     // Classes for appearances
     elementAnalysis match {

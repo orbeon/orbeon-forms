@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.*
+import org.orbeon.xforms.EventNames
 import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom
 import org.scalajs.dom.*
@@ -120,12 +121,14 @@ object TinyMCE {
         withInitializedTinyMce { tinyMceObject =>
 
           // Send value to the server on blur, as well as on Ctrl+Enter or Cmd+Enter
-          tinyMceObject.on("blur", _ => clientToServer())
+          tinyMceObject.on("blur", _ => clientToServer(incremental = false))
           EventSupport.addListener[dom.KeyboardEvent](
             tinyMceObject.getBody(),
             DomEventNames.KeyDown,
-            (e: dom.KeyboardEvent) => if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) clientToServer()
+            (e: dom.KeyboardEvent) => if (e.key == "Enter" && (e.metaKey || e.ctrlKey)) clientToServer(incremental = false)
           )
+          if (containerElem.hasClass("xforms-incremental"))
+            tinyMceObject.on("input", _ => clientToServer(incremental = true))
           // Remove an anchor added by TinyMCE to handle key, as it grabs the focus and breaks tabbing between fields
           $(containerElem).find("a[accesskey]").detach()
           currentValueOpt.foreach(tinyMceObject.setContent)
@@ -175,14 +178,29 @@ object TinyMCE {
     }
 
     // Send value in MCE to server
-    private def clientToServer(): Unit =
+    private def clientToServer(incremental: Boolean): Unit =
+      withCleanedContent { cleanedContent =>
+        if (incremental)
+          AjaxClient.fireEvent(
+            AjaxEvent(
+              eventName   = EventNames.XXFormsValue,
+              targetId    = containerElem.id,
+              properties  = Map("value" -> cleanedContent),
+              incremental = true
+            )
+          )
+        else
+          DocumentAPI.setValue(containerElem, cleanedContent)
+      }
+
+    private def withCleanedContent[T](thunk: String => T): Unit =
       tinyMceObjectOpt foreach { tinyMceObject =>
         // https://github.com/orbeon/orbeon-forms/issues/5963
         if (containerElem.closestOpt("form").isDefined) {
           val rawContent = tinyMceObject.getContent()
           // Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
           val cleanedContent = if (rawContent == "<div>\u00a0</div>") "" else rawContent
-          DocumentAPI.setValue(containerElem, cleanedContent)
+          thunk(cleanedContent)
         }
       }
 

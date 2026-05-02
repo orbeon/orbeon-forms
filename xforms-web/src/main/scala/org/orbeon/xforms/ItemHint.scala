@@ -84,12 +84,11 @@ object ItemHint {
    * Fixup position of tooltip element to be to the left of the checkbox/radio. Without this fixup, the tooltip is
    * shown to the left of the hint region, so it shows over the checkbox/radio.
    */
-  private def shiftTooltipLeft(containerEl: html.Element, hintRegionEl: JQuery): Unit = {
+  private def shiftTooltipLeft(containerEl: html.Element, hintRegionEl: JQuery): Unit =
     containerEl.children.find(_.matches(".tooltip.left")).foreach { tooltipEl =>
       val jTooltipEl = $(tooltipEl)
       val offset = Offset(jTooltipEl)
       // Add 5px spacing between arrow and checkbox/radio
       Offset.offset(jTooltipEl, offset.copy(left = Offset(hintRegionEl.parent()).left - jTooltipEl.outerWidth().getOrElse(0d) - 5))
     }
-  }
 }

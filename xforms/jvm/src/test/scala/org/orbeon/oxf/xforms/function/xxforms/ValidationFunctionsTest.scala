@@ -24,10 +24,12 @@ class ValidationFunctionsTest
                         <_ xmlns="">
                             <max-html>&lt;p&gt;12345&lt;/p&gt;</max-html>
                             <min-html>&lt;p&gt;12345&lt;/p&gt;</min-html>
+                            <inner-text/>
                         </_>
                     </xf:instance>
                     <xf:bind ref="max-html" type="xf:HTMLFragment" constraint="xxf:max-length(5)"/>
                     <xf:bind ref="min-html" type="xf:HTMLFragment" constraint="xxf:min-length(5)"/>
+                    <xf:bind ref="inner-text" calculate="xxf:inner-text(../max-html)"/>
                 </xf:model>
             </xh:head>
             <xh:body>
@@ -37,6 +39,9 @@ class ValidationFunctionsTest
                 <xf:input id="min-html-input" ref="min-html">
                     <xf:label>HTML</xf:label>
                 </xf:input>
+                <xf:output id="inner-text-output" ref="inner-text">
+                    <xf:label>Inner text</xf:label>
+                </xf:output>
             </xh:body>
         </xh:html>.toDocument
 
@@ -44,6 +49,7 @@ class ValidationFunctionsTest
         withActionAndDoc(setupDocument(doc)) {
           assert(isValid("max-html-input"))
           assert(isValid("min-html-input"))
+          assert(getControlValue("inner-text-output") == "12345")
 
           setControlValue("max-html-input", "<p>123456</p>")
           setControlValue("min-html-input", "<p>1234</p>")

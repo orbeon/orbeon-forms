@@ -78,7 +78,7 @@
 
                 <xf:var
                     name="current"
-                    value="string-length(string($binding))"/>
+                    value="string-length(xxf:inner-text($binding))"/>
 
                 <xf:var
                     name="remaining"

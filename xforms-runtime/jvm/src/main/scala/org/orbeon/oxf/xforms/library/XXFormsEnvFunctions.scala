@@ -81,6 +81,10 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
     )
 
+    Fun("inner-text", classOf[XXFormsInnerText], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE,
+      Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
+    )
+
     Fun("custom-mip", classOf[XXFormsCustomMIP], op = 0, min = 2, STRING, ALLOWS_ZERO_OR_ONE,
       Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
       Arg(STRING, EXACTLY_ONE)

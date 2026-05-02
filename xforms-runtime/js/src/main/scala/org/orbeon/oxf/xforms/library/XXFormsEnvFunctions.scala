@@ -5,7 +5,7 @@ import org.orbeon.dom.QName
 import org.orbeon.io.CharsetNames.Iso88591
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{HtmlParsing, MessageFormatCache, MessageFormatter, XPathCache}
+import org.orbeon.oxf.util.{MessageFormatCache, MessageFormatter, XPathCache}
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
 import org.orbeon.oxf.xforms.control.{XFormsSingleNodeControl, XFormsValueControl}
@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.function.xxforms.XXFormsResourceSupport.{findResour
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xforms.library.XFormsEnvFunctions.findIndexForRepeatId
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFormsModel}
-import org.orbeon.oxf.xml.{ElemFilter, OrbeonFunctionLibrary, SaxonUtils}
+import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.function.{CoreSupport, GetRequestHeaderSupport}
 import org.orbeon.saxon.ma.map.MapItem
@@ -26,7 +26,7 @@ import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{Item, SequenceTool, StandardNames}
 import org.orbeon.saxon.value.{AtomicValue, QNameValue, SequenceExtent, StringValue}
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
-import org.orbeon.xforms.{XFormsId, XFormsNames}
+import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable.*
 
 import scala.jdk.CollectionConverters.*
@@ -546,6 +546,10 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   def bind(bindId: String, searchAncestors: Boolean = false)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] =
     XFormsFunctionLibrary.bindImpl(bindId, searchAncestors)
 
+  @XPathFunction
+  def innerText(itemOpt: Option[om.Item] = null)(implicit xpc: XPathContext): Option[String] =
+    FunctionSupport.itemArgumentOrContextOpt(itemOpt) map XXFormsTextSupport.innerText
+
   // Validation functions
 
   private def evaluateAndSetConstraint[T](
@@ -566,23 +570,6 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     }
   }
 
-  private def minMaxLengthValueForEvaluation(item: om.Item): String =
-    item match {
-      case nodeInfo: om.NodeInfo if isHTMLFragment(nodeInfo) =>
-        HtmlParsing.sanitizeHtmlString(
-          value           = nodeInfo.getStringValue,
-          extraElemFilter = _ => ElemFilter.Remove
-        )
-      case _ =>
-        item.getStringValue
-    }
-
-  private def isHTMLFragment(nodeInfo: om.NodeInfo): Boolean =
-    Option(InstanceData.getType(nodeInfo)).exists { nodeType =>
-      nodeType.namespace.uri == XFormsNames.XFORMS_NAMESPACE_URI &&
-      nodeType.localName     == "HTMLFragment"
-    }
-
   @XPathFunction
   def maxLength(constraintOpt: Option[Long])(implicit xpc: XPathContext): Boolean = {
 
@@ -592,7 +579,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         case None             => true
       }
 
-    evaluateAndSetConstraint("max-length", constraintOpt, evaluate, minMaxLengthValueForEvaluation)
+    evaluateAndSetConstraint("max-length", constraintOpt, evaluate, XXFormsTextSupport.innerText)
   }
 
   @XPathFunction
@@ -604,7 +591,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         case None             => true
       }
 
-    evaluateAndSetConstraint("min-length", constraintOpt, evaluate, minMaxLengthValueForEvaluation)
+    evaluateAndSetConstraint("min-length", constraintOpt, evaluate, XXFormsTextSupport.innerText)
   }
 
   @XPathFunction

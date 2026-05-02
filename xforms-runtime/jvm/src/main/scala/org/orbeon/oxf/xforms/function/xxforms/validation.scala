@@ -13,11 +13,9 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.util.{DateUtilsUsingSaxon, HtmlParsing}
+import org.orbeon.oxf.util.DateUtilsUsingSaxon
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.DependsOnContextItem
-import org.orbeon.oxf.xml.ElemFilter
 import org.orbeon.saxon.`type`.ValidationFailure
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr.*
@@ -26,7 +24,6 @@ import org.orbeon.saxon.value.*
 import org.orbeon.scaxon.Implicits
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
-import org.orbeon.xforms.XFormsNames
 
 import scala.jdk.CollectionConverters.*
 
@@ -83,19 +80,7 @@ trait LongValidationFunction extends ValidationFunction[Long] {
 trait MinMaxLengthValidation extends LongValidationFunction {
 
   override def valueForEvaluation(item: om.Item): String =
-    item match {
-      case nodeInfo: om.NodeInfo
-        if Option(InstanceData.getType(nodeInfo)).exists(nodeType =>
-          nodeType.namespace.uri == XFormsNames.XFORMS_NAMESPACE_URI &&
-            nodeType.localName == "HTMLFragment"
-        ) =>
-        HtmlParsing.sanitizeHtmlString(
-          value           = nodeInfo.getStringValue,
-          extraElemFilter = _ => ElemFilter.Remove
-        )
-      case _ =>
-        item.getStringValue
-    }
+    XXFormsTextSupport.innerText(item)
 }
 
 trait StringValidationFunction extends ValidationFunction[String] {

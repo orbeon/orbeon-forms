@@ -1585,7 +1585,7 @@ lazy val dbToS3AttachmentMigration = (project in file("tools/db-to-s3-attachment
   .settings(
     name                                := "db-to-s3-attachment-migration",
     libraryDependencies                 += "org.typelevel"            %% "cats-core"           % CatsVersion,
-    libraryDependencies                 += "org.postgresql"           % "postgresql"           % "42.7.10",
+    libraryDependencies                 += "org.postgresql"           % "postgresql"           % "42.7.11",
     libraryDependencies                 += "org.xerial"               % "sqlite-jdbc"          % "3.53.0.0",
     libraryDependencies                 += "mysql"                    % "mysql-connector-java" % "8.0.28"       % DatabaseTest,
     libraryDependencies                 += "com.oracle.database.jdbc" % "ojdbc11"              % "23.26.1.0.0" % DatabaseTest,

@@ -535,8 +535,21 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   )(implicit
     formRunnerParams           : FormRunnerParams
   ): Option[String] =
+    optionFromMetadataOrProperties(
+      metadataInstanceRootElemOpt = metadataInstanceRootElemOpt,
+      featureName                 = featureName,
+      propertyName                = s"oxf.fr.detail.$featureName"
+    )
+
+  def optionFromMetadataOrProperties(
+    metadataInstanceRootElemOpt: Option[NodeInfo],
+    featureName                : String,
+    propertyName               : String
+  )(implicit
+    formRunnerParams           : FormRunnerParams
+  ): Option[String] =
     metadataInstanceRootElemOpt.flatMap(_.elemValueOpt(featureName))
-      .orElse(formRunnerProperty(s"oxf.fr.detail.$featureName"))
+      .orElse(formRunnerProperty(propertyName))
 
   //@XPathFunction
   def optionFromMetadataOrPropertiesDynamicXPath(
@@ -558,9 +571,9 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
     val xfcd = inScopeContainingDocument
     implicit val indentedLogger: IndentedLogger = xfcd.getIndentedLogger("form-runner")
     FRComponentParamSupport.fromMetadataAndPropertiesEvaluateAvt(
-      xfcd,
-      featureName,
-      propertyName
+      xfcd         = xfcd,
+      featureName  = featureName,
+      propertyName = propertyName
     ).getOrElse(default)
   }
 

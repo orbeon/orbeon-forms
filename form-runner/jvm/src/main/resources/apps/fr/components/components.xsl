@@ -202,11 +202,12 @@
                 frf:optionFromMetadataOrPropertiesXPath(
                     frf:metadataInstanceRootOpt($fr-form-model),
                     'theme',
+                    'oxf.fr.style.theme',
                     $app,
                     $form,
                     $major-mode
                 ),
-                '2025.1'
+                '2025'
             )[1]"/>
     <xsl:variable
         name="theme-css-uri"
@@ -697,7 +698,7 @@
                            )"/>
             </xh:title>
 
-            <!-- Theme CSS (selected via `oxf.fr.detail.theme.*.*` -> `oxf.fr.theme.css-uri.<name>`) -->
+            <!-- Theme CSS (selected via `oxf.fr.style.theme.*.*` -> `oxf.fr.style.themes.<name>.css-uri`) -->
             <xsl:if test="exists($theme-css-uri)">
                 <xh:link rel="stylesheet" href="{$theme-css-uri}" type="text/css" media="all"/>
             </xsl:if>

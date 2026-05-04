@@ -275,19 +275,40 @@ trait FormRunnerComponentsCompileTime {
       formRunnerParams            = FormRunnerParams(app, form, Some(1), None, None, mode)
     )
 
-  // Resolve a theme name to its CSS URI via `oxf.fr.theme.css-uri.<name-with-dashes>`, with fallback to a default theme
+  // Used by:
+  //
+  // - `components.xsl`: `theme`
+  //
+  //@XPathFunction
+  def optionFromMetadataOrPropertiesXPath(
+    metadataInstanceRootElemOrNull: NodeInfo,
+    featureName                   : String,
+    propertyName                  : String,
+    app                           : String,
+    form                          : String,
+    mode                          : String
+  ): Option[String] =
+    FormRunner.optionFromMetadataOrProperties(
+      metadataInstanceRootElemOpt = Option(metadataInstanceRootElemOrNull),
+      featureName                 = featureName,
+      propertyName                = propertyName
+    )(
+      formRunnerParams            = FormRunnerParams(app, form, Some(1), None, None, mode)
+    )
+
+  // Resolve a theme name to its CSS URI via `oxf.fr.style.themes.<name-with-dashes>.css-uri`, with fallback to a default theme
   //@XPathFunction
   def resolveThemeCssUri(themeName: String): String = {
 
     def propertyNameAndValueOpt(theme: String): (String, Option[String]) = {
-      val propertyName = s"oxf.fr.theme.css-uri.${theme.replace('.', '-')}"
+      val propertyName = s"oxf.fr.style.themes.$theme.css-uri"
       (propertyName, Property.propertyAsString(propertyName))
     }
 
     val (propertyName, propertyValueOpt) = propertyNameAndValueOpt(themeName)
 
     propertyValueOpt.orElse {
-      val DefaultTheme = "2025.1"
+      val DefaultTheme = "2025"
       FormRunnerLogger.warn(s"Theme '$themeName' has no '$propertyName' property mapping, falling back to default '$DefaultTheme' theme")
       propertyNameAndValueOpt(DefaultTheme)._2
     }.orNull

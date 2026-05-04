@@ -153,7 +153,7 @@
         -/forms/orbeon/builder/resources/scalajs/orbeon-form-builder.js
 
         <!-- Form Runner CSS -->
-        +/apps/fr/themes/2025-1/theme.css
+        +/apps/fr/themes/2025/theme.css
         +/apps/fr/style/form-runner-common.css
         +/apps/fr/style/form-runner-base.css
         +/apps/fr/style/form-runner-dialog.css
@@ -225,7 +225,7 @@
     <!-- ==== Internal Form Runner properties ===================================================================== -->
 
     <!-- CSS/JavaScript update to the Form Runner baseline -->
-    <!-- Theme CSS assets are not included in the baseline anymore. See `oxf.fr.detail.theme.*.*` property. -->
+    <!-- Theme CSS assets are not included in the baseline anymore. See `oxf.fr.style.theme.*.*` property. -->
     <property as="xs:string"  name="oxf.xforms.assets.baseline.updates.fr">
         +/apps/fr/style/form-runner-common.css
         +/apps/fr/style/form-runner-base.css
@@ -286,9 +286,9 @@
         +fr:video
     </property>
 
-    <!-- Theme name to CSS URI mapping. Dots ('.') in names are mapped to dashes ('-') in URIs. -->
-    <property as="xs:string"  name="oxf.fr.theme.css-uri.2025-1">
-        /apps/fr/themes/2025-1/theme.css
+    <!-- Theme name to CSS URI mapping -->
+    <property as="xs:string"  name="oxf.fr.style.themes.2025.css-uri">
+        /apps/fr/themes/2025/theme.css
     </property>
 
     <!-- Additional CSS/JavaScript for the detail page -->

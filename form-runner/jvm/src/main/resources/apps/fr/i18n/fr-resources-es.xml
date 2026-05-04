@@ -312,7 +312,7 @@
                 0&lt;Puede optar por revisarlos '{1,choice,1#it|1&lt;them}' primero o ignorar
                 '{1,choice,1#it|1&lt;them}' y continuar la operación}.
             </validation-dialog-message>
-            <buttons-message />
+            <buttons-message/>
             <saved-locally-open>Haga click aquí para abrir el documento. La información ingresada
                 será mostrada por la herramienta de la misma forma que cuando se guardo.</saved-locally-open>
             <upload-in-progress>Hay subida de archivos en progreso. Por favor, intente nuevamente

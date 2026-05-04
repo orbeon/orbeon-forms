@@ -128,7 +128,7 @@ object DomSupport {
 
     // This implements the jQuery way of determining visibility with the `:visible` pseudo-class
     def isVisible(implicit ev: T <:< html.Element): Boolean =
-      ev(elem).offsetWidth != 0 || ev(elem).offsetHeight != 0 || elem.getClientRects().length != 0
+      elem.offsetWidth != 0 || elem.offsetHeight != 0 || elem.getClientRects().length != 0
   }
 
   implicit class DomDocOps(private val doc: html.Document) extends AnyVal {

@@ -28,7 +28,7 @@ object CodeMirror {
 
     override def init(): Unit = {
       val editorElement = containerElem.querySelectorT(".xbl-fr-code-mirror-editor")
-      val theme = editorElement.dataset.get("codeMirrorTheme").flatMap(_.trimAllToOpt).getOrElse("solarized dark")
+      val theme = editorElement.dataset.get("codeMirrorTheme").flatMap(_.trimAllToOpt).getOrElse("default")
       this.editor = new facades.CodeMirror(
         editorElement,
         js.Dictionary(

@@ -30,10 +30,10 @@ object Help {
     val labelText = XFormsUI.getLabelMessage(controlEl)
     val helpText  = XFormsUI.getHelpMessage(controlEl)
 
-    def explicitContainerWithClassOpt: Option[dom.Element] = {
+    def explicitContainerWithClassOpt: Option[html.Element] = {
       val explicitClassSelector = ".xforms-help-popover-control"
       controlEl.matches(explicitClassSelector).option(controlEl)
-        .orElse(Option(controlEl.querySelector(explicitClassSelector)))
+        .orElse(controlEl.querySelectorOpt(explicitClassSelector))
     }
 
     def fieldsCommonAncestorOpt: Option[html.Element] =
@@ -44,13 +44,8 @@ object Help {
           .toList
       )
 
-    def labelElementOpt: Option[dom.Element] =
+    def labelElementOpt: Option[html.Element] =
       XFormsUI.findControlLHHA(controlEl, "label")
-
-    def hasVisibleDimensions(el: dom.Element): Boolean = {
-      val rect = el.getBoundingClientRect()
-      rect.width > 0 && rect.height > 0
-    }
 
     // We want the arrow to point to the form field, not somewhere between the label and the field,
     // hence here we look for the first element which is not an LHHA. If we don't find any such element
@@ -59,7 +54,7 @@ object Help {
       explicitContainerWithClassOpt
         .orElse(fieldsCommonAncestorOpt)
         // If the container has no visible dimensions, point to the label element.
-        .flatMap(c => if (hasVisibleDimensions(c)) Some(c) else labelElementOpt)
+        .flatMap(c => if (c.isVisible) Some(c) else labelElementOpt)
         .getOrElse(controlEl)
 
     val elPos     = Placement.getPositionDetails($(containerOpt))

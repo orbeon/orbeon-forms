@@ -15,13 +15,10 @@ package org.orbeon.xbl
 
 import enumeratum.*
 import enumeratum.EnumEntry.Hyphencase
-import io.udash.wrappers.jquery.JQueryEvent
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, XFormsId}
+import org.orbeon.xforms.{AjaxClient, AjaxEvent, XFormsId}
 import org.scalajs.dom
-import org.scalajs.dom.{KeyboardEvent, document, html}
-
-import scala.scalajs.js
+import org.scalajs.dom.{KeyboardEvent, KeyboardEventInit, html}
 
 
 object GridSectionMenus {
@@ -39,14 +36,14 @@ object GridSectionMenus {
 
 trait GridSectionMenus {
 
-  import Util.*
   import GridSectionMenus.*
+  import Util.*
 
   def componentName: String
 
   // Keep pointing to menu so we can move it around as needed
   // Old comment: NOTE: When scripts are in the head, this returns undefined. Should be fixed!
-  private val globalMenuElem: html.Element = document.querySelectorT(s".fr-$componentName-dropdown-menu")
+  private val globalMenuElem: html.Element = dom.document.querySelectorT(s".fr-$componentName-dropdown-menu")
 
   case class CurrentComponent(currentComponentId: String, currentIteration: Int)
 
@@ -57,12 +54,12 @@ trait GridSectionMenus {
   // Initialization
   if (globalMenuElem != null) {
     // Click on our own button moves and shows the menu
-    document.addEventListener("keydown", (e: dom.Event) =>
+    dom.document.addEventListener("keydown", (e: dom.Event) =>
       if (e.targetT.matches(s".fr-$componentName-dropdown-button"))
         delegateKeyEventToBootstrapButtonHandler(e)
     )
 
-    document.addEventListener("click", (event: dom.Event) => {
+    dom.document.addEventListener("click", (event: dom.Event) => {
 
       val target  = event.targetT
       if (target.closestOpt(s".fr-$componentName-dropdown-button").nonEmpty) moveAndShowMenuHandler(event)
@@ -151,22 +148,20 @@ trait GridSectionMenus {
     if (keyboardEvent.keyCode >= 37 && keyboardEvent.keyCode <= 40)
       e.preventDefault()
 
-    // TODO: jQuery
-    $(globalMenuElem).find(".dropdown-toggle").trigger(
-      $.asInstanceOf[js.Dynamic].Event( // `Event` constructor is not present in the jQuery facade
-        keyboardEvent.`type`,
-        new js.Object {
-          val charCode = keyboardEvent.charCode
+    globalMenuElem.querySelectorT(".dropdown-toggle").dispatchEvent(
+      new KeyboardEvent(keyboardEvent.`type`, new KeyboardEventInit {
+        bubbles    = true
+        cancelable = true
 
-          // Putting these to be complete, but `charCode` above does the trick for the menu
-          val keyCode  = keyboardEvent.keyCode
-          val which    = keyboardEvent.asInstanceOf[js.Dynamic].which
-          val ctrlKey  = keyboardEvent.ctrlKey
-          val shiftKey = keyboardEvent.shiftKey
-          val altKey   = keyboardEvent.altKey
-          val metaKey  = keyboardEvent.metaKey
-        }
-      ).asInstanceOf[JQueryEvent]
+        key      = keyboardEvent.key      // "modern" properties
+        code     = keyboardEvent.code     // "modern" properties
+        charCode = keyboardEvent.charCode // deprecated but seems still needed
+        keyCode  = keyboardEvent.keyCode  // deprecated
+        ctrlKey  = keyboardEvent.ctrlKey
+        shiftKey = keyboardEvent.shiftKey
+        altKey   = keyboardEvent.altKey
+        metaKey  = keyboardEvent.metaKey
+      })
     )
   }
 

@@ -14,18 +14,20 @@
 package org.orbeon.builder
 
 import autowire.*
-import io.udash.wrappers.jquery.{JQuery, JQueryCallbacks}
+import io.udash.wrappers.jquery.JQueryCallbacks
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.fr.FormRunnerUtils
-import org.orbeon.jquery.Offset
-import org.orbeon.web.DomEventNames
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
+import org.orbeon.web.{DomEventNames, DomSupport}
 import org.orbeon.xforms.rpc.RpcClient
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, XFormsUI}
 import org.scalajs.dom
+import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
+import scala.util.chaining.scalaUtilChainingOps
 
 
 object SectionLabelEditor {
@@ -35,11 +37,11 @@ object SectionLabelEditor {
 
   locally {
 
-    val SectionTitleSelector = ".fr-section-title:first"
-    val SectionLabelSelector = ".fr-section-label:first .btn-link, .fr-section-label:first .xforms-output-output"
+    val SectionTitleSelector = ".fr-section-title"
+    val SectionLabelSelector = ".fr-section-label .btn-link, .fr-section-label .xforms-output-output"
 
-    var labelInputOpt         : js.UndefOr[JQuery] = js.undefined
-    var labelClickInterceptors: List[JQuery]       = Nil
+    var labelInputOpt         : js.UndefOr[html.Input] = js.undefined
+    var labelClickInterceptors: List[html.Element]     = Nil
 
     // On click on a trigger inside `.fb-section-grid-editor,` send section id as a property along with the event
     AjaxClient.beforeSendingEvent.add(
@@ -55,7 +57,7 @@ object SectionLabelEditor {
 
           if (eventName == DomEventNames.DOMActivate && inSectionEditor)
             addProperties(js.Dictionary(
-              "section-id" -> SectionGridEditor.currentSectionGridOpt.get.el.attr("id").get
+              "section-id" -> SectionGridEditor.currentSectionGridOpt.get.el.id
             ))
         }
       }
@@ -64,11 +66,11 @@ object SectionLabelEditor {
     sectionAdded.add((sectionNamespacedId: String) => {
       for {
         _           <- AjaxClient.allEventsProcessedF("sectionAdded")
-        sectionEl   <- Option(dom.document.getElementById(sectionNamespacedId))
+        sectionEl   <- dom.document.getElementByIdOpt(sectionNamespacedId)
         interceptor <- labelClickInterceptors.find { interceptor =>
           val offset = Position.adjustedOffset(interceptor)
           Position.findInCache(BlockCache.sectionGridCache, offset.top, offset.left).exists { block =>
-            block.el.get().contains(sectionEl)
+            block.el.contains(sectionEl)
           }
         }
       } locally {
@@ -78,94 +80,102 @@ object SectionLabelEditor {
 
     def sendNewLabelValue(): Unit = {
 
-      val newLabelValue    = labelInputOpt.get.value().asInstanceOf[String]
+      val newLabelValue    = labelInputOpt.get.value
       val labelInputOffset = Position.adjustedOffset(labelInputOpt.get)
       val section          = Position.findInCache(BlockCache.sectionGridCache, labelInputOffset.top, labelInputOffset.left).get
-      val sectionId        = section.el.attr("id").get
+      val sectionId        = section.el.id
 
-      section.el.get(0).foreach(_.querySelectorT(SectionLabelSelector).textContent = newLabelValue)
+      section.el.querySelectorT(SectionLabelSelector).textContent = newLabelValue
 
       RpcClient[FormBuilderRpcApi].sectionUpdateLabel(sectionId, newLabelValue).call()
 
       labelInputOpt.get.hide()
     }
 
-    def showLabelEditor(clickInterceptor: JQuery): Unit =
+    def showLabelEditor(clickInterceptor: html.Element): Unit =
       AjaxClient.allEventsProcessedF("showLabelEditor") foreach { _ =>
+
         // Clear interceptor click hint, if any
-        clickInterceptor.text("")
+        clickInterceptor.innerText = ""
 
         // Create single input element, if we don't have one already
         val labelInput = labelInputOpt.getOrElse {
-          val labelInput = $("<input class='fb-edit-section-label'/>")
-          $(".fb-main").append(labelInput)
-          labelInput.get().foreach(_.addEventListener("blur", (_: dom.Event) => { if (labelInput.is(":visible")) sendNewLabelValue() })) // TODO: use `DomSupport.isVisible`
-          labelInput.get().foreach(_.addEventListener(DomEventNames.KeyPress, (e: dom.KeyboardEvent) => {
+
+          val labelInputElem =
+            dom.document.createInputElement
+              .tap(_.classList.add("fb-edit-section-label"))
+
+          dom.document.querySelectorT(".fb-main").appendChild(labelInputElem)
+
+          labelInputElem.addEventListener("blur", (_: dom.Event) => { if (labelInputElem.isVisible) sendNewLabelValue() })
+          labelInputElem.addEventListener(DomEventNames.KeyPress, (e: dom.KeyboardEvent) => {
             if (e.code == "Enter") {
               // Avoid "enter" from being dispatched to other control that might get the focus
               e.preventDefault()
               sendNewLabelValue()
             }
-          }))
-          labelInputOpt = labelInput
-          labelInput
+          })
+          labelInputOpt = labelInputElem
+          labelInputElem
         }
 
         val interceptorOffset = Position.adjustedOffset(clickInterceptor)
 
         // From the section title, get the anchor element, which contains the title
-        val labelAnchor = {
-          val section = Position.findInCache(BlockCache.sectionGridCache, interceptorOffset.top, interceptorOffset.left).get
-          $(section.el.get(0).get.querySelectorT(SectionLabelSelector))
-        }
+        val labelAnchor =
+          Position
+            .findInCache(BlockCache.sectionGridCache, interceptorOffset.top, interceptorOffset.left)
+            .get
+            .el
+            .querySelectorT(SectionLabelSelector)
 
         // Set placeholder, done every time to account for a value change when changing current language
         locally {
-          val placeholderOutput = SectionGridEditor.sectionGridEditorContainer.children(".fb-type-section-title-label")
-          val placeholderValue  = XFormsUI.getCurrentValue(placeholderOutput.get(0).get.asInstanceOf[dom.html.Element])
-          labelInput.attr("placeholder", placeholderValue.get)
+          val placeholderOutput = SectionGridEditor.sectionGridEditorContainer.childrenT(".fb-type-section-title-label").head
+          val placeholderValue  = XFormsUI.getCurrentValue(placeholderOutput)
+          labelInput.placeholder = placeholderValue.get
         }
 
         // Populate and show input
-        labelInput.value(labelAnchor.text())
+        labelInput.value = labelAnchor.textContent
         labelInput.show()
 
         // Position and size input
-        val inputOffset = Offset(
+        val inputOffset = DomSupport.Offset(
           top = interceptorOffset.top -
             // Interceptor offset is normalized, so we need to remove the scrollTop when setting the offset
-            Position.scrollTop() +
+            Position.scrollTop +
             // Vertically center input inside click interceptor
-            (clickInterceptor.height() - labelInput.outerHeight().getOrElse(0d)) / 2,
+            (clickInterceptor.contentHeightOrZero - labelInput.outerHeight) / 2,
           left = interceptorOffset.left
         )
-        Offset.offset(labelInput, inputOffset)
-        Offset.offset(labelInput, inputOffset) // Workaround for issue on Chrome, see https://github.com/orbeon/orbeon-forms/issues/572
-        labelInput.width(clickInterceptor.width() - 10)
-        labelInput.trigger("focus")
+        labelInput.setOffset(inputOffset)
+        labelInput.setOffset(inputOffset) // Workaround for issue on Chrome, see https://github.com/orbeon/orbeon-forms/issues/572
+        labelInput.setWidth(clickInterceptor.contentWidthOrZero - 10d)
+        labelInput.focus()
       }
 
     // Update highlight of section title, as a hint users can click to edit
     def updateHighlight(
-      updateClass      : (String, JQuery) => Unit,
-      clickInterceptor : JQuery
+      updateClass      : (String, html.Element) => Unit,
+      clickInterceptor : html.Element
     )                  : Unit = {
 
       val offset  = Position.adjustedOffset(clickInterceptor)
       val section = Position.findInCache(BlockCache.sectionGridCache, offset.top, offset.left).get
-      val sectionTitle = $(section.el.get(0).get.querySelectorT(SectionTitleSelector))
+      val sectionTitle = section.el.querySelectorT(SectionTitleSelector)
       updateClass("hover", sectionTitle)
     }
 
     // Show textual indication user can click on empty section title
-    def showClickHintIfTitleEmpty(clickInterceptor: JQuery): Unit = {
+    def showClickHintIfTitleEmpty(clickInterceptor: html.Element): Unit = {
       val interceptorOffset = Position.adjustedOffset(clickInterceptor)
       val section = Position.findInCache(BlockCache.sectionGridCache, interceptorOffset.top, interceptorOffset.left).get
-      val labelAnchor = $(section.el.get(0).get.querySelectorT(SectionLabelSelector))
-      if (labelAnchor.text() == "") {
-        val outputWithHintMessage = SectionGridEditor.sectionGridEditorContainer.children(".fb-enter-section-title-label")
-        val hintMessage = XFormsUI.getCurrentValue(outputWithHintMessage.get(0).get.asInstanceOf[dom.html.Element]).get
-        clickInterceptor.text(hintMessage)
+      val labelAnchor = section.el.querySelectorT(SectionLabelSelector)
+      if (labelAnchor.textContent.isAllBlank) {
+        val outputWithHintMessage = SectionGridEditor.sectionGridEditorContainer.childrenT(".fb-enter-section-title-label").head
+        val hintMessage = XFormsUI.getCurrentValue(outputWithHintMessage).get
+        clickInterceptor.innerText = hintMessage
       }
     }
 
@@ -174,8 +184,8 @@ object SectionLabelEditor {
 
       Position.onOffsetMayHaveChanged(() => {
 
-        val sections = BlockCache.sectionGridCache.elems collect {
-          case block if block.el.is(BlockCache.SectionSelector) => block.el
+        val sections = BlockCache.sectionGridCache.elems.collect {
+          case block if block.el.matches(BlockCache.SectionSelector) => block.el
         }
 
         // Create interceptor divs, so we have enough to cover all the sections
@@ -190,7 +200,7 @@ object SectionLabelEditor {
                 (e: dom.Event) => {
                   val isViewMode = FormRunnerUtils.isViewMode(e.targetT)
                   if (! isViewMode)
-                    showLabelEditor($(e.targetT))
+                    showLabelEditor(e.targetT)
                 }
               )
               container.addEventListener(
@@ -199,26 +209,27 @@ object SectionLabelEditor {
                   val isViewMode = FormRunnerUtils.isViewMode(e.targetT)
                   if (! isViewMode) {
                     updateHighlight(
-                      (cssClass: String, el: JQuery) => { el.addClass(cssClass); () },
-                      $(e.target)
+                      (cssClass: String, el: html.Element) => el.classList.add(cssClass),
+                      e.targetT
                     )
-                    showClickHintIfTitleEmpty($(e.target))
+                    showClickHintIfTitleEmpty(e.targetT)
                   }
                 }
               )
 
               container.addEventListener("mouseout", (e: dom.Event) => {
                 updateHighlight(
-                  (cssClass: String, el: JQuery) => { el.removeClass(cssClass); () },
-                  $(e.target)
+                  (cssClass: String, el: html.Element) => el.classList.remove(cssClass),
+                  e.targetT
                 )
                 e.target.asInstanceOf[dom.Element].textContent = ""
               })
 
-              $(container)
+              container
             }
 
-          $(".fb-main").append(newInterceptors*)
+          val fbMain = dom.document.querySelector(".fb-main")
+          newInterceptors.foreach(fbMain.appendChild)
 
           labelClickInterceptors :::= newInterceptors
         }
@@ -230,22 +241,22 @@ object SectionLabelEditor {
         // Position interceptor for each section
         for ((section, interceptor) <- sections.iterator.zip(labelClickInterceptors.iterator)) {
 
-          val sectionTitle = $(section.get(0).get.querySelectorT(SectionTitleSelector))
-          val sectionLabel = $(section.get(0).get.querySelectorT(SectionLabelSelector))
+          val sectionTitle = section.querySelectorT(SectionTitleSelector)
+          val sectionLabel = section.querySelectorT(SectionLabelSelector)
 
           // Show, as this might be an interceptor that was previously hidden, and is now reused
           interceptor.show()
 
           // Start at the label, but extend all the way to the right to the end of the title
-          val labelOffset = sectionLabel.offset()
-          val titleOffset = sectionTitle.offset()
-          val interceptorOffset = io.udash.wrappers.jquery.Offset(
+          val labelOffset = sectionLabel.getOffset
+          val titleOffset = sectionTitle.getOffset
+          val interceptorOffset = DomSupport.Offset(
             top  = titleOffset.top,
             left = labelOffset.left
           )
-          interceptor.offset(interceptorOffset)
-          interceptor.height(sectionTitle.height())
-          interceptor.width(sectionTitle.width() - (Offset(sectionLabel).left - Offset(sectionTitle).left))
+          interceptor.setOffset(interceptorOffset)
+          interceptor.setHeight(sectionTitle.contentHeightOrZero)
+          interceptor.setWidth(sectionTitle.contentWidthOrZero - (sectionLabel.getOffset.left - sectionTitle.getOffset.left))
         }
       })
     }

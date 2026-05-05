@@ -1,9 +1,8 @@
 package org.orbeon.xforms
 
-import org.orbeon.jquery.*
-import org.scalajs.dom
 import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
 import org.orbeon.web.DomSupport.*
+import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -39,7 +38,7 @@ object ItemHint {
 
       // Compute placement, and don't use "over" since tooltips don"t support it
       val placement: js.Function = () => {
-        val p = Placement.getPlacement(Placement.getPositionDetails(jHintRegionEl))
+        val p = Placement.getPlacement(Placement.getPositionDetails(hintRegionEl))
         if (p == Placement.Over) "bottom" else p.entryName
       }
 
@@ -69,7 +68,7 @@ object ItemHint {
             placement = placement,
             container = $(containerEl)
           ))
-          jHintRegionElDyn.on("shown", (_ => shiftTooltipLeft(containerEl, jHintRegionEl)): js.Function1[JQueryEvent, Unit])
+          jHintRegionElDyn.on("shown", (_ => shiftTooltipLeft(containerEl, hintRegionEl)): js.Function1[JQueryEvent, Unit])
           jHintRegionElDyn.tooltip("show")
         case (false, true) =>
           // We had a tooltip, but we don't have anything for show anymore
@@ -84,11 +83,15 @@ object ItemHint {
    * Fixup position of tooltip element to be to the left of the checkbox/radio. Without this fixup, the tooltip is
    * shown to the left of the hint region, so it shows over the checkbox/radio.
    */
-  private def shiftTooltipLeft(containerEl: html.Element, hintRegionEl: JQuery): Unit =
-    containerEl.children.find(_.matches(".tooltip.left")).foreach { tooltipEl =>
-      val jTooltipEl = $(tooltipEl)
-      val offset = Offset(jTooltipEl)
+  private def shiftTooltipLeft(containerEl: html.Element, hintRegionEl: html.Element): Unit =
+    containerEl.childrenT.find(_.matches(".tooltip.left")).foreach { tooltipEl =>
       // Add 5px spacing between arrow and checkbox/radio
-      Offset.offset(jTooltipEl, offset.copy(left = Offset(hintRegionEl.parent()).left - jTooltipEl.outerWidth().getOrElse(0d) - 5))
+      tooltipEl.setOffset(
+        tooltipEl
+          .getOffset
+          .copy(
+            left = hintRegionEl.parentElementOpt.get.getOffset.left - tooltipEl.offsetWidth - 5.0
+          )
+      )
     }
 }

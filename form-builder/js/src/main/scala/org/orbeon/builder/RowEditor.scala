@@ -18,38 +18,34 @@ import enumeratum.EnumEntry.Hyphencase
 import enumeratum.{Enum, EnumEntry}
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.{AboveBelow, Orientation}
-import org.orbeon.jquery.{JqueryOps, Offset}
-import org.orbeon.oxf.util.CoreUtils.{asUnit, *}
-import org.orbeon.xforms.$
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.xforms.rpc.RpcClient
-import org.scalajs.dom.document
-import io.udash.wrappers.jquery.JQuery
-
-import org.orbeon.web.DomSupport.DomEventOps
+import org.scalajs.dom.html
+import org.orbeon.web.DomSupport.*
 import org.scalajs.dom
 
 import scala.collection.immutable
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import org.orbeon.fr.FormRunnerUtils
+import org.orbeon.web.DomSupport
 
 
 object RowEditor {
 
   private var currentGridBodyOpt  : Option[Block] = None
   private var currentRowPosOpt    : Option[Int]   = None
-  private def rowEditorContainer  : JQuery        = $(".fb-row-editor")
+  private def rowEditorContainer  : html.Element  = dom.document.querySelectorT(".fb-row-editor")
 
   private def withCurrentGridBody[T](f: Block => T): Option[T] =
     currentGridBodyOpt flatMap { currentGridBody =>
       // Check the current grid is still in the document, as we might have an outdated reference in case we read it in
       // `onUnderPointerChange`, since the current grid is also updated in another listener to `onUnderPointerChange`
-      val gridIsInDocument =
-        $.contains(document.documentElement, currentGridBody.el.get(0).get)
-      gridIsInDocument option f(currentGridBody)
+      val gridIsInDocument = currentGridBody.el.isConnected
+      gridIsInDocument.option(f(currentGridBody))
     }
 
   sealed trait RowEditor extends EnumEntry with Hyphencase {
-    def className = s".fb-row-$entryName"
+    def classNameSelector = s".fb-row-$entryName"
   }
   object RowEditor extends Enum[RowEditor] {
     val values: immutable.IndexedSeq[RowEditor] = findValues
@@ -72,7 +68,7 @@ object RowEditor {
 
       case class TopBottom(top: Double, bottom: Double)
 
-      if (! FormRunnerUtils.isViewMode(currentGridBody.el.elem)) {
+      if (! FormRunnerUtils.isViewMode(currentGridBody.el)) {
 
         // For each row track, find its top/bottom
         val rowsTopBottom = {
@@ -88,15 +84,15 @@ object RowEditor {
 
         // Find top/bottom of the row track the pointer is on
         val pointerRowTopBottomIndexOpt = {
-          val pointerTop = Position.pointerPos.top + Position.scrollTop()
+          val pointerTop = Position.pointerPos.top + Position.scrollTop
           rowsTopBottom.zipWithIndex.find { case (topBottom, _) =>
             topBottom.top <= pointerTop && pointerTop <= topBottom.bottom
           }
         }
 
         // Find where to position the row editor on the left
-        val gridEl = currentGridBody.el.closest(BlockCache.GridSelector)
-        val containerLeft = Offset(gridEl).left
+        val gridEl = currentGridBody.el.closestT(BlockCache.GridSelector)
+        val containerLeft = gridEl.getOffset.left
 
         // Position row editor
         pointerRowTopBottomIndexOpt.foreach(pointerRowTopBottom => {
@@ -107,33 +103,31 @@ object RowEditor {
           val rowIndex  = pointerRowTopBottom._2
 
           rowEditorContainer.show()
-          Offset.offset(
-            el     = rowEditorContainer,
-            offset = Offset(
+          rowEditorContainer.setOffset(
+            offset = DomSupport.Offset(
               left = containerLeft,
-              top  = rowTop - Position.scrollTop()
+              top  = rowTop - Position.scrollTop
             )
           )
 
-          rowEditorContainer.children().hide()
+          rowEditorContainer.childrenT.foreach(_.hide())
 
-          def positionElWithClass(selector: String, topOffset: JQuery => Double): Unit = {
-            val elem = rowEditorContainer.children(selector)
+          def positionElWithClass(selector: String, topOffset: html.Element => Double): Unit = {
+            val elem = rowEditorContainer.childrenT(selector).head
             elem.show()
-            Offset.offset(
-              el     = elem,
-              offset = Offset(
+            elem.setOffset(
+              offset = DomSupport.Offset(
                 left = containerLeft,
-                top  = topOffset(elem) - Position.scrollTop()
+                top  = topOffset(elem) - Position.scrollTop
               )
             )
           }
 
           currentRowPosOpt = Some(rowIndex + 1)
-          positionElWithClass(RowEditor.InsertAbove.className, _ => rowTop)
-          if (currentGridBody.el.closest(".fr-grid").is(".fb-can-delete-row"))
-            positionElWithClass(RowEditor.Delete.className, e => rowTop + rowHeight/2 - e.height()/2)
-          positionElWithClass(RowEditor.InsertBelow.className, e => rowBottom - e.height())
+          positionElWithClass(RowEditor.InsertAbove.classNameSelector, _ => rowTop)
+          if (currentGridBody.el.closestT(".fr-grid").matches(".fb-can-delete-row"))
+            positionElWithClass(RowEditor.Delete.classNameSelector, e => rowTop + rowHeight/2 - e.contentHeightOrZero/2)
+          positionElWithClass(RowEditor.InsertBelow.classNameSelector, e => rowBottom - e.contentHeightOrZero)
         })
       }
     }
@@ -144,15 +138,15 @@ object RowEditor {
     currentGridBodyOpt = None
   }
 
-  document.addEventListener("click", (clickEvent: dom.Event) => {
+  dom.document.addEventListener("click", (clickEvent: dom.Event) => {
     RowEditor.values foreach { rowEditor =>
-      val iconEl = rowEditorContainer.children(rowEditor.className)
-      if (iconEl.is(clickEvent.targetT)) {
+      val iconEl = rowEditorContainer.childrenT(rowEditor.classNameSelector)
+      if (iconEl.contains(clickEvent.targetT)) {
         withCurrentGridBody { currentGridBody =>
           currentRowPosOpt foreach { currentRowPos =>
 
-            val gridEl    = currentGridBody.el.closest(BlockCache.GridSelector)
-            val controlId = gridEl.attr("id").get
+            val gridEl    = currentGridBody.el.closestT(BlockCache.GridSelector)
+            val controlId = gridEl.id
             val client    = RpcClient[FormBuilderRpcApi]
 
             rowEditor match {

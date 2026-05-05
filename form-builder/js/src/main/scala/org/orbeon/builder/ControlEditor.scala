@@ -17,19 +17,16 @@ import autowire.*
 import org.orbeon.builder.HtmlElementCell.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.Direction
-import org.orbeon.jquery.{JqueryOps, Offset}
 import org.orbeon.oxf.fr.{Cell, ControlOps}
-import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.xforms.*
-
-import scala.scalajs.js
 import org.orbeon.xforms.rpc.RpcClient
-import org.scalajs.dom.{Element, html}
-import io.udash.wrappers.jquery.JQuery
+import org.scalajs.dom.html
 import org.orbeon.fr.FormRunnerUtils
-import org.orbeon.web.DomSupport.DomElemOps
+import org.orbeon.web.DomSupport
+import org.orbeon.web.DomSupport.*
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
+
+import scala.util.chaining.*
 
 
 object ControlEditor {
@@ -43,10 +40,13 @@ object ControlEditor {
 
   private val ControlActionNames             = List("delete", "edit-details", "edit-items")
   private var currentCellOpt : Option[Block] = None
-  private val controlEditorLeft              = memoizeIfFound(".fb-control-editor-left")
-  private val controlEditorRight             = memoizeIfFound(".fb-control-editor-right")
-  private val controlEditorTop               = memoizeIfFound(".fb-control-editor-top")
-  private def controlEditors                 = controlEditorLeft().get() ++ controlEditorRight().get() ++ controlEditorTop().get()
+
+  private val controlEditorLeft : () => html.Element = memoizeIfFound(".fb-control-editor-left")
+  private val controlEditorRight: () => html.Element = memoizeIfFound(".fb-control-editor-right")
+  private val controlEditorTop  : () => html.Element = memoizeIfFound(".fb-control-editor-top")
+
+  private def controlEditors: List[html.Element] = controlEditorLeft() :: controlEditorRight() :: controlEditorTop() :: Nil
+
   private var masked: Boolean                = false
 
   // Show/hide editor
@@ -75,25 +75,25 @@ object ControlEditor {
 
   private def showEditors(cell: Block): Unit = {
 
-    def positionEditor(editor: JQuery, offsetLeft: Double): Unit = {
+    def positionEditor(editor: html.Element, offsetLeft: Double): Unit = {
       editor.show()
-      Offset.offset(editor, Offset(
+      editor.setOffset(DomSupport.Offset(
         left = cell.left + offsetLeft,
-        top  = cell.top - Position.scrollTop()
+        top  = cell.top - Position.scrollTop
       ))
     }
 
-    def positionTopEditor(editor: JQuery, offsetLeft: Double): Unit = {
+    def positionTopEditor(editor: html.Element, offsetLeft: Double): Unit = {
       editor.show()
-      Offset.offset(editor, Offset(
+      editor.setOffset(DomSupport.Offset(
         left = cell.left + offsetLeft,
-        top  = cell.top - Position.scrollTop() - editor.height()
+        top  = cell.top - Position.scrollTop - editor.contentHeightOrZero
       ))
     }
 
-    val controlElemWithNames: Seq[(html.Element, String)] =
+    val controlElemWithNames: collection.Seq[(html.Element, String)] =
       for {
-        elem <- cell.el.children().elems
+        elem <- cell.el.childrenT
         if ! controlEditors.contains(elem)
         if ! elem.hasClass("gu-transit")
         if elem.hasAttribute("id")
@@ -102,44 +102,44 @@ object ControlEditor {
         elem -> name
 
     val firstControlElemWithNameOpt = controlElemWithNames.headOption
-    val isViewMode                  = FormRunnerUtils.isViewMode(cell.el.elem)
+    val isViewMode                  = FormRunnerUtils.isViewMode(cell.el)
 
     // Control/right editor is only show when the cell isn't empty
     firstControlElemWithNameOpt.foreach { case (controlEl, controlName) =>
 
-      val jControlEl = $(controlEl)
-
       // Right editor
-      jControlEl.append(controlEditorRight())
-      positionEditor(controlEditorRight(), cell.width - controlEditorRight().outerWidth().getOrElse(0d))
+      controlEl.append(controlEditorRight())
+      positionEditor(controlEditorRight(), cell.width - controlEditorRight().outerWidth)
 
       // Show/hide itemset icon
-      val itemsetIcon = controlEditorRight().find(".fb-control-edit-items")
-      itemsetIcon.toggleClass("xforms-disabled", ! controlEl.hasClass("fb-itemset"))
+      controlEditorRight()
+        .querySelectorOpt(".fb-control-edit-items")
+        .foreach(_.toggleClass("xforms-disabled", ! controlEl.hasClass("fb-itemset")))
 
       if (isViewMode)
-        controlEditorRight().find(".fb-control-delete, .fb-control-handle").hide()
+        controlEditorRight()
+          .querySelectorOpt(".fb-control-delete, .fb-control-handle")
+          .foreach(_.hide())
 
       // Top editor
-      jControlEl.append(controlEditorTop())
+      controlEl.append(controlEditorTop())
       positionTopEditor(controlEditorTop(), 0)
 
-      controlEditorTop().children().get(0).get.textContent = controlName
+      controlEditorTop().childrenT.head.textContent = controlName
     }
 
     // Cell/left editor
     if (! isViewMode) {
-      firstControlElemWithNameOpt.map(e => $(e._1)).getOrElse(cell.el).append(controlEditorLeft())
+      firstControlElemWithNameOpt.map(e => e._1).getOrElse(cell.el).append(controlEditorLeft())
       positionEditor(controlEditorLeft(), 0)
 
       // Enable/disable split/merge icons
       val allowedDirections = {
-        val cellEl = cell.el.get(0).get.asInstanceOf[html.Element]
-        Cell.canChangeSize(cellEl)
+        Cell.canChangeSize(cell.el)
       }
       for (((cssClass, direction), _) <- SplitMergeCssClassDirectionOps) {
         val disableIcon = ! allowedDirections.contains(direction)
-        val icon = controlEditorLeft().find(s".$cssClass")
+        val icon = controlEditorLeft().querySelectorT(s".$cssClass")
         icon.toggleClass("disabled", disableIcon)
       }
     }
@@ -153,11 +153,11 @@ object ControlEditor {
 
   // Control actions
   ControlActionNames.foreach { actionName =>
-    val actionEl = controlEditorRight().find(s".fb-control-$actionName")
-    actionEl.get().foreach(_.addEventListener("click", (_: dom.Event) => {
+    val actionEl = controlEditorRight().querySelectorOpt(s".fb-control-$actionName")
+    actionEl.foreach(_.addEventListener("click", (_: dom.Event) => {
       currentCellOpt.foreach { currentCell =>
 
-        val controlId = currentCell.el.children().attr("id").get
+        val controlId = currentCell.el.childrenT.head.id
 
         actionName match {
           case "delete"       => RpcClient[FormBuilderRpcApi].controlDelete     (controlId = controlId).call()
@@ -170,24 +170,25 @@ object ControlEditor {
 
   // Expand/shrink actions
   for (((cssClass, _), ops) <- SplitMergeCssClassDirectionOps) {
-    val iconEl = controlEditorLeft().find(s".$cssClass")
-    iconEl.get().foreach(_.addEventListener("click", (_: dom.Event) => {
-      if (! iconEl.is(".disabled"))
-        currentCellOpt.foreach { currentCell =>
-          val cellId = currentCell.el.attr("id").get
-          ops(cellId)
-        }
-    }))
+    val iconElOpt = controlEditorLeft().querySelectorOpt(s".$cssClass")
+    iconElOpt.foreach { iconEl =>
+      iconEl.addEventListener("click", (_: dom.Event) => {
+        if (! iconEl.hasClass("disabled"))
+          currentCellOpt.foreach { currentCell =>
+            ops(currentCell.el.id)
+          }
+      }
+      )
+    }
   }
 
   // Keep a reference when found, as elements can be removed from the DOM, for instance by full updates
-  private def memoizeIfFound(selector: String): () => JQuery = {
-    var memoOpt: Option[JQuery] = None
-    () => {
+  private def memoizeIfFound(selector: String): () => html.Element = {
+    var memoOpt: Option[html.Element] = None
+    () =>
       memoOpt match {
-        case Some(memo) if memo.is("*") => memo
-        case _                          => $(selector).kestrel(r => memoOpt = Some(r))
+        case Some(memo) => memo
+        case _          => dom.document.querySelectorT(selector).ensuring(_ ne null).tap(r => memoOpt = Some(r))
       }
-    }
   }
 }

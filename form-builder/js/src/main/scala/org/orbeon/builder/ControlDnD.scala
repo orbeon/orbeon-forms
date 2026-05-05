@@ -19,10 +19,9 @@ import org.orbeon.facades.{Dragula, DragulaOptions}
 import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.rpc.RpcClient
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
+import org.orbeon.xforms.{AjaxClient, AjaxEvent}
 import org.scalajs.dom
 import org.scalajs.dom.html
-import org.scalajs.dom.html.Element
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
@@ -36,11 +35,11 @@ private object ControlDnD {
     val MoveClass = "fb-dnd-move"
 
     var shiftPressed = false
-    def updateShiftPressed(event: dom.KeyboardEvent): Unit = {
-      // Surprisingly, `event.shiftKey` can be `undefined`
-      val shiftKeyOpt = event.shiftKey.asInstanceOf[js.UndefOr[Boolean]]
-      shiftPressed    = shiftKeyOpt.getOrElse(false)
-    }
+
+    // Surprisingly, `event.shiftKey` can be `undefined`
+    def updateShiftPressed(event: dom.KeyboardEvent): Unit =
+      shiftPressed = event.shiftKey.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false)
+
     dom.document.addEventListener("keyup"  , updateShiftPressed _)
     dom.document.addEventListener("keydown", updateShiftPressed _)
 
@@ -48,55 +47,50 @@ private object ControlDnD {
       js.Array(),
       new DragulaOptions {
 
-        override def isContainer(el: html.Element) =
+        override def isContainer(el: html.Element): UndefOr[Boolean] =
           el.hasClass("fr-grid-td")
 
-        override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element) =
+        override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): UndefOr[Boolean] =
           handle.hasClass("fb-control-handle")
 
         // Can only drop into an empty cell
-        override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) =
-          $(target)
-            .find("> :not(.gu-mirror, .gu-transit, .fb-control-editor-left)")
-            .length == 0
+        override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): UndefOr[Boolean] =
+          target.querySelectorOpt(":scope > :not(.gu-mirror, .gu-transit, .fb-control-editor-left)").isEmpty
 
-        override def copy(el: html.Element, source: html.Element) = {
-          val cursorClass = if (shiftPressed) CopyClass else MoveClass
-          el.classList.add(cursorClass)
+        override def copy(el: html.Element, source: html.Element): UndefOr[Boolean] = {
+          el.classList.add(if (shiftPressed) CopyClass else MoveClass)
           shiftPressed
         }
       }
     )
 
-    controlMoverCopier.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) => {
-      // It seems Dragula calls `onDrop` even if the target doesn't accept a drop, but in that case `target` is `null`
+    // It seems Dragula calls `onDrop` even if the target doesn't accept a drop, but in that case `target` is `null`
+    controlMoverCopier.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) =>
       if (target ne null)
         RpcClient[FormBuilderRpcApi].controlDnD(el.id, target.id, el.hasClass(CopyClass)).call()
-    })
+    )
 
     val controlInserter = Dragula(
       js.Array(),
       new DragulaOptions {
 
-        override def isContainer(el: html.Element) =
+        override def isContainer(el: html.Element): UndefOr[Boolean] =
           (
             (el ne null)                                       &&
             el.parentElementOpt.exists(_.hasClass("fb-tools")) &&
             el.hasClass("xforms-group")
           ) || el.hasClass("fr-grid-td")
 
-        override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element) =
+        override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): UndefOr[Boolean] =
             (handle ne null)                                   &&
             handle.closestOpt(".btn").nonEmpty                 &&
             handle.closestOpt(".fb-insert-control").nonEmpty
 
         // Can only drop into an empty cell
-        override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) =
-          $(target)
-            .find("> :not(.gu-mirror, .gu-transit, .fb-control-editor-left)")
-            .length == 0
+        override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): UndefOr[Boolean] =
+          target.querySelectorOpt(":scope > :not(.gu-mirror, .gu-transit, .fb-control-editor-left)").isEmpty
 
-        override def copy(el: html.Element, source: html.Element) = {
+        override def copy(el: html.Element, source: html.Element): UndefOr[Boolean] = {
           el.classList.add(CopyClass)
           true
         }

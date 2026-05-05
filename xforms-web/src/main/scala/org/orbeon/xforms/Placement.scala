@@ -1,9 +1,9 @@
 package org.orbeon.xforms
 
-import io.udash.wrappers.jquery.JQuery
 import org.orbeon.jquery.Offset
 import org.orbeon.web.DomSupport.DomElemOps
 import org.scalajs.dom
+import org.scalajs.dom.html
 
 
 sealed trait Placement { val entryName: String }
@@ -40,13 +40,13 @@ object Placement {
    *      offset: { top, left }                   // Position relative to the document
    *      margins: { top, right, bottom, left }   // In a scrollable area (e.g. FB), space around that area
    */
-  def getPositionDetails(el: JQuery): PositionDetails = {
+  def getPositionDetails(el: html.Element): PositionDetails = {
 
-    def getElPosition = {
-      val o = Offset(el)
+    def getElPosition: (Double, Double, Double, Offset) = {
+      val o = el.getOffset
       (
-        el.outerWidth().getOrElse(0d),
-        el.outerHeight().getOrElse(0d),
+        el.outerWidth,
+        el.outerHeight,
         dom.window.pageYOffset, // Will this work if we're in a scrollable area?
         Offset(
           left = o.left,
@@ -56,25 +56,19 @@ object Placement {
     }
 
     val (widthV, heightV, scrollTopV, offsetV) =
-      if (el.is(":hidden")) {
-        val originalStyleOpt = el.attr("style")
-        el.css("display", "inline-block")
+      if (! el.isVisible) {
+        val originalDisplay = el.style.display
+        el.style.display = "inline-block"
 
         val r = getElPosition
-
-        originalStyleOpt match {
-          case None => el.removeAttr("style")
-          case Some(originalStyle) => el.attr("style", originalStyle)
-
-        }
-
+        el.style.display = originalDisplay
         r
       } else {
         getElPosition
       }
 
     val autoOverflowElemOpt =
-      el.get(0).get.ancestorOrSelfElem.find { e =>
+      el.ancestorOrSelfElem().find { e =>
         dom.window.getComputedStyle(e).overflow == "auto"
       }
 

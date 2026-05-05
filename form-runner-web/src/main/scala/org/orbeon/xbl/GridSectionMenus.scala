@@ -27,7 +27,7 @@ import scala.scalajs.js
 object GridSectionMenus {
   sealed trait Operation extends EnumEntry with Hyphencase
   object Operation extends Enum[Operation] {
-    val values = findValues
+    val values: IndexedSeq[Operation] = findValues
     case object MoveUp      extends Operation
     case object MoveDown    extends Operation
     case object InsertAbove extends Operation
@@ -121,7 +121,7 @@ trait GridSectionMenus {
     // Position the menu just below the button
     val buttonRect                = button.getBoundingClientRect()
     val offsetParent              = globalMenuElem.offsetParent
-    val offsetParentRect          = offsetParent.asInstanceOf[html.Element].getBoundingClientRect()
+    val offsetParentRect          = offsetParent.getBoundingClientRect()
     globalMenuElem.style.position = "absolute"
     globalMenuElem.style.left     = s"${buttonRect.left   - offsetParentRect.left + offsetParent.scrollLeft }px"
     globalMenuElem.style.top      = s"${buttonRect.bottom - offsetParentRect.top  + offsetParent.scrollTop  }px"
@@ -151,6 +151,7 @@ trait GridSectionMenus {
     if (keyboardEvent.keyCode >= 37 && keyboardEvent.keyCode <= 40)
       e.preventDefault()
 
+    // TODO: jQuery
     $(globalMenuElem).find(".dropdown-toggle").trigger(
       $.asInstanceOf[js.Dynamic].Event( // `Event` constructor is not present in the jQuery facade
         keyboardEvent.`type`,

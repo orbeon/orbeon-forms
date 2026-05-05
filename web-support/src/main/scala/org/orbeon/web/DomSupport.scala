@@ -1,6 +1,8 @@
 package org.orbeon.web
 
+import cats.syntax.option.*
 import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.web.DomEventNames.*
 import org.scalajs.dom
 import org.scalajs.dom.*
@@ -12,6 +14,8 @@ import scala.scalajs.js
 
 
 object DomSupport {
+
+  case class Offset(left: Double, top: Double)
 
   implicit class DomElemOps[T >: html.Element <: dom.Element](private val elem: T) extends AnyVal {
 
@@ -54,6 +58,9 @@ object DomSupport {
     def nextElementSiblings(selector: String): Iterator[T] =
       elem.nextElementSiblings.filter(_.matches(selector))
 
+    def nextElementOrThrow: T =
+      nextElementOpt.getOrElse(throw new NoSuchElementException("No next element sibling"))
+
     def nextElementOpt: Option[T] =
       elem.nextElementSiblings.nextOption()
 
@@ -72,17 +79,42 @@ object DomSupport {
     def childrenT(selector: String): collection.Seq[T] =
       elem.childrenT.filter(_.matches(selector))
 
+    def parentElement: T =
+      elem.asInstanceOf[js.Dynamic].parentElement.asInstanceOf[T]
+
     def parentElementOpt: Option[T] =
-      Option(elem.asInstanceOf[js.Dynamic].parentElement.asInstanceOf[T])
+      Option(parentElement)
 
-    def ancestorOrSelfElem: Iterator[T] =
-      Iterator.iterate(elem)(_.asInstanceOf[js.Dynamic].parentElement.asInstanceOf[T]).takeWhile(_ ne null)
+    def ancestorOrSelfElem(includeSelf: Boolean = false): Iterator[T] =
+      Iterator.iterate(
+        if (includeSelf)
+          elem
+        else
+          elem.parentElement
+      )(
+        _.parentElement
+      ).takeWhile(_ ne null)
 
-    def ancestorOrSelfElem(selector: String): Iterator[T] =
-      ancestorOrSelfElem.filter(_.matches(selector))
+    def ancestorOrSelfElem(selector: String, includeSelf: Boolean): Iterator[T] =
+      ancestorOrSelfElem(includeSelf).filter(_.matches(selector))
 
     def appendChildT[U <: dom.Node](newChild: U): U =
       elem.appendChild(newChild).asInstanceOf[U]
+
+    def index: Int =
+      parentElementOpt match {
+        case Some(parent) => parent.childrenT.indexOf(elem)
+        case None         => -1
+      }
+
+    def trigger(eventName: String): Unit = {
+      val e = elem.asInstanceOf[html.Element]
+      eventName match {
+        case "focus" => e.focus()
+        case "blur"  => e.blur()
+        case _       => dispatchCustomEvent(e, eventName)
+      }
+    }
 
     def childrenWithLocalName(name: String): Iterator[T] =
       elem.childNodes.iterator collect {
@@ -129,6 +161,130 @@ object DomSupport {
     // This implements the jQuery way of determining visibility with the `:visible` pseudo-class
     def isVisible(implicit ev: T <:< html.Element): Boolean =
       elem.offsetWidth != 0 || elem.offsetHeight != 0 || elem.getClientRects().length != 0
+
+    def getOffset: Offset = {
+      val rect = elem.getBoundingClientRect()
+      Offset(
+        left = rect.left + dom.window.pageXOffset,
+        top  = rect.top  + dom.window.pageYOffset,
+      )
+    }
+
+    // Set an offset following the jQuery `offset()` function, which sets the position of the element relative to the
+    // document, by adjusting its CSS `top` and `left` properties.
+    def setOffset(offset: Offset)(implicit ev: T <:< html.Element): Unit = {
+
+      val curStyle = dom.window.getComputedStyle(elem)
+      val curPosition = curStyle.position
+
+      // 1. If static, make it relative so it can be moved
+      if (curPosition == "static")
+        elem.style.position = "relative"
+
+      // 2. Get current document-relative position
+      val curOffset = getOffset
+
+      // 3. Get current CSS top/left (handling `auto`)
+      def findPosition(cssPos: String): Option[Double] =
+        if ((curPosition == "absolute" || curPosition == "fixed") && cssPos == "auto")
+          0d.some
+        else
+          parseDoubleIgnoreTail(cssPos)
+
+      // 4. Calculate and apply the new values
+      elem.style.top =  s"${(offset.top  - curOffset.top)  + findPosition(curStyle.top) .getOrElse(0d)}px"
+      elem.style.left = s"${(offset.left - curOffset.left) + findPosition(curStyle.left).getOrElse(0d)}px"
+    }
+
+    def setWidth(targetWidth: Double)(implicit ev: T <:< html.Element): Unit = {
+      val style = dom.window.getComputedStyle(elem)
+      if (style.boxSizing == "border-box") {
+        val paddingLeft  = parseDoubleIgnoreTail(style.paddingLeft).getOrElse(0d)
+        val paddingRight = parseDoubleIgnoreTail(style.paddingRight).getOrElse(0d)
+        val borderLeft   = parseDoubleIgnoreTail(style.borderLeftWidth).getOrElse(0d)
+        val borderRight  = parseDoubleIgnoreTail(style.borderRightWidth).getOrElse(0d)
+        elem.style.width = s"${targetWidth + paddingLeft + paddingRight + borderLeft + borderRight}px"
+      } else {
+        elem.style.width = s"${targetWidth}px"
+      }
+    }
+
+    def setHeight(targetHeight: Double)(implicit ev: T <:< html.Element): Unit = {
+      val style = dom.window.getComputedStyle(elem)
+      if (style.boxSizing == "border-box") {
+        val paddingTop    = parseDoubleIgnoreTail(style.paddingTop).getOrElse(0d)
+        val paddingBottom = parseDoubleIgnoreTail(style.paddingBottom).getOrElse(0d)
+        val borderTop     = parseDoubleIgnoreTail(style.borderTopWidth).getOrElse(0d)
+        val borderBottom  = parseDoubleIgnoreTail(style.borderBottomWidth).getOrElse(0d)
+        elem.style.height = s"${targetHeight + paddingTop + paddingBottom + borderTop + borderBottom}px"
+      } else {
+        elem.style.height = s"${targetHeight}px"
+      }
+    }
+
+    def setOuterWidth(targetWidth: Double)(implicit ev: T <:< html.Element): Unit = {
+      val style = dom.window.getComputedStyle(elem)
+      if (style.boxSizing == "border-box") {
+        elem.style.width = s"${targetWidth}px"
+      } else {
+        val paddingLeft  = parseDoubleIgnoreTail(style.paddingLeft).getOrElse(0d)
+        val paddingRight = parseDoubleIgnoreTail(style.paddingRight).getOrElse(0d)
+        val borderLeft   = parseDoubleIgnoreTail(style.borderLeftWidth).getOrElse(0d)
+        val borderRight  = parseDoubleIgnoreTail(style.borderRightWidth).getOrElse(0d)
+        elem.style.width = s"${targetWidth - paddingLeft - paddingRight - borderLeft - borderRight}px"
+      }
+    }
+
+    def setOuterHeight(targetHeight: Double)(implicit ev: T <:< html.Element): Unit = {
+      val style = dom.window.getComputedStyle(elem)
+      if (style.boxSizing == "border-box") {
+        elem.style.height = s"${targetHeight}px"
+      } else {
+        val paddingTop    = parseDoubleIgnoreTail(style.paddingTop).getOrElse(0d)
+        val paddingBottom = parseDoubleIgnoreTail(style.paddingBottom).getOrElse(0d)
+        val borderTop     = parseDoubleIgnoreTail(style.borderTopWidth).getOrElse(0d)
+        val borderBottom  = parseDoubleIgnoreTail(style.borderBottomWidth).getOrElse(0d)
+        elem.style.height = s"${targetHeight - paddingTop - paddingBottom - borderTop - borderBottom}px"
+      }
+    }
+
+    def toggleClass(clazz: String, add: Boolean): Unit =
+      if (add)
+        elem.classList.add(clazz)
+      else
+        elem.classList.remove(clazz)
+
+    def show()(implicit ev: T <:< html.Element): Unit =
+      elem.style.display = "block"
+
+    def hide()(implicit ev: T <:< html.Element): Unit =
+      elem.style.display = "none"
+
+    def contentWidth: Option[Double] =
+      parseDoubleIgnoreTail(dom.window.getComputedStyle(elem).width)
+
+    def contentWidthOrZero: Double =
+      contentWidth.getOrElse(0d)
+
+    def contentHeight: Option[Double] =
+      parseDoubleIgnoreTail(dom.window.getComputedStyle(elem).height)
+
+    def contentHeightOrZero: Double =
+      contentHeight.getOrElse(0d)
+
+    // Includes content + padding + border, should be similar to jQuery's `outerWidth()`
+    def outerWidth: Double =
+      elem.getBoundingClientRect().width
+
+    // Includes content + padding + border, should be similar to jQuery's `outerHeight()`
+    def outerHeight: Double =
+      elem.getBoundingClientRect().height
+  }
+
+  // `parseFloat()` ignores trailing "px" and returns a `NaN` if the value is not parseable as a number
+  def parseDoubleIgnoreTail(s: String): Option[Double] = {
+    val doubleMaybeNaN = dom.window.asInstanceOf[js.Dynamic].parseFloat(s).asInstanceOf[Double]
+    (! doubleMaybeNaN.isNaN).option(doubleMaybeNaN)
   }
 
   implicit class DomDocOps(private val doc: html.Document) extends AnyVal {
@@ -174,6 +330,9 @@ object DomSupport {
 
     def createOptGroupElement: html.OptGroup =
       doc.createElement("optgroup").asInstanceOf[html.OptGroup]
+
+    def createButtonElement: html.Button =
+      doc.createElement("button").asInstanceOf[html.Button]
   }
 
   trait DateTimeFormatPart extends js.Object {
@@ -194,7 +353,6 @@ object DomSupport {
 
     def targetOpt: Option[html.Element] =
       Option(event.targetT)
-
   }
 
   private var lastUsedSuffix: Int = 0
@@ -241,8 +399,8 @@ object DomSupport {
   def findCommonAncestor(elems: List[html.Element]): Option[html.Element] = {
 
     def findFirstCommonAncestorForPair(elem1: html.Element, elem2: html.Element): Option[html.Element] =
-      elem1.ancestorOrSelfElem.toList.reverseIterator
-        .zip(elem2.ancestorOrSelfElem.toList.reverseIterator)
+      elem1.ancestorOrSelfElem(includeSelf = false).toList.reverseIterator
+        .zip(elem2.ancestorOrSelfElem(includeSelf = false).toList.reverseIterator)
         .takeWhile { case (e1, e2) => e1.isSameNode(e2) }
         .lastOption()
         .map(_._1)

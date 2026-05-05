@@ -13,14 +13,14 @@
  */
 package org.orbeon.builder
 
-import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.xforms.$
+import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.web.DomSupport.*
 import org.scalajs.dom
-import io.udash.wrappers.jquery.JQuery
-import org.scalajs.dom.document
+import org.scalajs.dom.html
+
 
 case class Block(
-  el     : JQuery,
+  el     : html.Element,
   left   : Double,
   top    : Double,
   width  : Double,
@@ -28,14 +28,14 @@ case class Block(
 )
 
 object Block {
-  def apply(elem: JQuery): Block = {
+  def apply(elem: html.Element): Block = {
     val elemOffset = Position.adjustedOffset(elem)
     Block(
       el     = elem,
       left   = elemOffset.left,
       top    = elemOffset.top,
-      width  = elem.outerWidth().getOrElse(0d),
-      height = elem.outerHeight().getOrElse(0d)
+      width  = elem.outerWidth,
+      height = elem.outerHeight
     )
   }
 }
@@ -53,8 +53,9 @@ object BlockCache {
 
   val sectionGridCache = new BlockCache
   val gridBodyCache    = new BlockCache
-  val fbMainCache      = new BlockCache
   val cellCache        = new BlockCache
+
+  private val fbMainCache = new BlockCache
 
   def onExitFbMainOrOffsetMayHaveChanged(fn: () => Unit): Unit = {
     Position.onOffsetMayHaveChanged(fn)
@@ -74,66 +75,62 @@ object BlockCache {
 
         val sectionsIt =
           for {
-            e       <- collectElems(s"$SectionSelector:visible") // TODO: use `DomSupport.isVisible`
-            section <- elemNotInSectionTemplateOpt(e).iterator
-            // Mix of jQuery and Option is not pretty
-            mostOuterSection =
-              section.parents(SectionSelector)
-                .last()
-                .pipe(Option(_))
-                .filter(_.is("*"))
+            section <- collectElems(SectionSelector)
+            if section.isVisible && ! isElemInSectionTemplate(section)
+            outermostSection =
+              section.ancestorOrSelfElem(SectionSelector, includeSelf = false)
+                .lastOption()
                 .getOrElse(section)
             // Handle both collapsible and non-collapsible title
             // https://github.com/orbeon/orbeon-forms/issues/3530
-            titleAnchor = section.find(".fr-section-title .fr-section-label")
-            if titleAnchor.length > 0
+            titleAnchor <- section.querySelectorOpt(".fr-section-title .fr-section-label")
           } yield
             Block(
               el     = section,
-              left   = Position.adjustedOffset(mostOuterSection).left,
+              left   = Position.adjustedOffset(outermostSection).left,
               top    = Position.adjustedOffset(section).top,
-              width  = mostOuterSection.width(),
-              height = titleAnchor.height()
+              width  = outermostSection.contentWidthOrZero,
+              height = titleAnchor.contentHeightOrZero
             )
 
         val gridsIt =
           for {
-            e    <- collectElems(s"$GridSelector:visible") // TODO: use `DomSupport.isVisible`
-            grid <- elemNotInSectionTemplateOpt(e).iterator
+            grid <- collectElems(GridSelector).iterator
+            if grid.isVisible && ! isElemInSectionTemplate(grid)
           } yield
             Block(grid)
 
-        sectionGridCache._elems = (gridsIt ++ sectionsIt).to(List)
+        sectionGridCache._elems = (gridsIt ++ sectionsIt).toList
       }
 
       locally {
 
         val gridBodiesIt =
           for (gridBody <- collectElems(s".fr-grid.fr-editable $GridBodySelector"))
-            yield Block($(gridBody))
+            yield Block(gridBody)
 
-        gridBodyCache._elems = gridBodiesIt.to(List)
+        gridBodyCache._elems = gridBodiesIt.toList
       }
-
-      fbMainCache._elems = Block($(".fb-main-inner")) :: Nil
 
       locally {
 
         val cellsIt =
-          for (cell <- collectElems(".fr-grid.fr-editable .fr-grid-td"))
-            yield Block($(cell))
+        for (cell <- collectElems(".fr-grid.fr-editable .fr-grid-td"))
+        yield Block(cell)
 
-        cellCache._elems = cellsIt.to(List)
+        cellCache._elems = cellsIt.toList
       }
+
+      fbMainCache._elems = Block(collectElems(".fb-main-inner").head) :: Nil
     })
 
-    def collectElems(selector: String): List[dom.Element] =
-      $(selector).get().toList collect { case e: dom.Element => e }
+    def collectElems(selector: String): collection.Seq[html.Element] =
+      dom.window.document.querySelectorAllT(selector)
 
-    def elemNotInSectionTemplateOpt(domEl: dom.Element): Option[JQuery] = {
-      val el = $(domEl)
-      val parentSectionTemplate: JQuery = el.parents(".fr-section-component")
-      if (! parentSectionTemplate.is("*")) Some(el) else None
-    }
+    def isElemInSectionTemplate(elem: html.Element): Boolean =
+      elem
+        .ancestorOrSelfElem(".fr-section-component", includeSelf = false)
+        .nextOption()
+        .nonEmpty
   }
 }

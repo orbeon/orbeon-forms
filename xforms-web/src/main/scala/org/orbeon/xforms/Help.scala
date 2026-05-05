@@ -1,7 +1,5 @@
 package org.orbeon.xforms
 
-import io.udash.wrappers.jquery.JQuery
-import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.web.DomSupport
 import org.orbeon.web.DomSupport.*
@@ -10,6 +8,7 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
+import scala.util.chaining.scalaUtilChainingOps
 
 
 object Help {
@@ -50,17 +49,17 @@ object Help {
     // We want the arrow to point to the form field, not somewhere between the label and the field,
     // hence here we look for the first element which is not an LHHA. If we don't find any such element
     // we use the container as a fallback (e.g. `xf:group` that only contains the help and a label).
-    val containerOpt =
+    val containerElem =
       explicitContainerWithClassOpt
         .orElse(fieldsCommonAncestorOpt)
         // If the container has no visible dimensions, point to the label element.
         .flatMap(c => if (c.isVisible) Some(c) else labelElementOpt)
         .getOrElse(controlEl)
 
-    val elPos     = Placement.getPositionDetails($(containerOpt))
+    val elPos     = Placement.getPositionDetails(containerElem)
     val placement = Placement.getPlacement(elPos)
 
-    val popoverAlreadyShown = jControlEl.next().is(".xforms-help-popover")
+    val popoverAlreadyShown = controlEl.nextElementOpt.exists(_.matches(".xforms-help-popover"))
 
     // Hide other help popovers before (maybe) showing this one
     hideAllHelpPopovers()
@@ -71,7 +70,7 @@ object Help {
       // For top placement, popover must be above the label
       val newElPos =
         if (placement == Placement.Top)
-          Placement.getPositionDetails(jControlEl)
+          Placement.getPositionDetails(controlEl)
         else
           elPos
 
@@ -87,9 +86,9 @@ object Help {
       )).popover("show")
 
       // Decorate and position popover
-      val popover = $(controlEl).next()
-      popover.addClass("xforms-help-popover")
-      addClose(jControlEl, popover)
+      val popover = controlEl.nextElementOrThrow
+      popover.classList.add("xforms-help-popover")
+      addCloseButtonIfNeeded(controlEl, popover)
       positionPopover(popover, placement, newElPos)
     }
   }
@@ -104,22 +103,29 @@ object Help {
     }
 
     def hideAllHelpPopovers(): Unit =
-      $("form.xforms-form .xforms-help-popover").toArray.foreach { popover =>
-        $(popover).prev().asInstanceOf[js.Dynamic].popover("destroy")
+      dom.document.querySelectorAllT("form.xforms-form .xforms-help-popover").foreach { popoverElem =>
+        $(popoverElem.previousElementSibling).asInstanceOf[js.Dynamic].popover("destroy")
       }
 
     /**
      * Adds an "x" at the top right of the popover, so users can close it with a click
      */
-    def addClose(jControlEl: JQuery, jPopover: JQuery): Unit =
-      if (! jPopover.children(".close").is("*")) {
-        val close = $("""<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>""")
-        jPopover.prepend(close)
-        close.get().foreach(_.addEventListener(
-          "click",
-          (_: dom.Event) => jControlEl.asInstanceOf[js.Dynamic].popover("destroy")
-        ))
-      }
+    def addCloseButtonIfNeeded(controlElem: html.Element, popoverElem: html.Element): Unit =
+      if (popoverElem.childrenT(".close").isEmpty)
+        popoverElem.prepend(
+          dom.document.createButtonElement
+            .tap(_.`type` = "button")
+            .tap(_.classList.add("close"))
+            .tap(_.dataset += "dismiss" -> "modal")
+            .tap(_.setAttribute("aria-hidden", "true"))
+            .tap(_.textContent = "×")
+            .tap(
+              _.addEventListener(
+                "click",
+                (_: dom.Event) => $(controlElem).asInstanceOf[js.Dynamic].popover("destroy")
+              )
+            )
+        )
 
     /**
      * We re-implement the positioning and sizing done by Bootstrap. Instead of indirectly positioning
@@ -127,13 +133,13 @@ object Help {
      * positioning and sizing, and we then adjust what Bootstrap did. Bootstrap code is in:
      * https://github.com/twbs/bootstrap/blob/v2.3.2/js/bootstrap-tooltip.js
      */
-    def positionPopover(popover: JQuery, placement: Placement, elPos: PositionDetails): Unit = {
+    def positionPopover(popover: html.Element, placement: Placement, elPos: PositionDetails): Unit = {
 
       // [1] It is unclear to me why we need to add the arrow width, as it should be counted in the width
       //     of the popover, which has a margin to reserve space for the arrow.
       val padding     = 2 // space left between popover and document border
-      val arrowWidth  = popover.children(".arrow").outerWidth().getOrElse(0d) // [1]
-      val arrowHeight = popover.children(".arrow").outerHeight().getOrElse(0d)
+      val arrowWidth  = popover.childrenT(".arrow").head.outerWidth
+      val arrowHeight = popover.childrenT(".arrow").head.outerHeight
 
       // 2022-03-18: Not sure to what this comment applies.
       // [2] Bootstrap already positioned the popover mostly correctly, but since we can reduced its
@@ -155,31 +161,31 @@ object Help {
             elPos.offset.top - elPos.scrollTop - padding - arrowHeight
         }
 
-      if (popover.outerHeight().getOrElse(0d) > maxHeight) {
-        val title = popover.children(".popover-title")
-        val content = popover.children(".popover-content")
-        popover.css("height", maxHeight.toString + "px")
-        content.css("height", (maxHeight - title.outerHeight().getOrElse(0d)).toString + "px")
+      if (popover.outerHeight > maxHeight) {
+        val title = popover.childrenT(".popover-title").head
+        val content = popover.childrenT(".popover-content").head
+        popover.setHeight(maxHeight)
+        content.setHeight(maxHeight - title.outerHeight)
       }
 
       // Adjust position
       val newPopoverOffset = {
 
-        val popoverOffset = Offset(popover)
+        val popoverOffset = popover.getOffset
 
         val newPopoverOffsetTop = {
           placement match {
             case Placement.Right | Placement.Left =>
               // Similar to the way Bootstrap would position the popover
-              val bootstrapTop = elPos.offset.top + (elPos.height - popover.outerHeight().getOrElse(0d)) / 2
+              val bootstrapTop = elPos.offset.top + (elPos.height - popover.outerHeight) / 2
               // Top of the popover "against" the top of the viewport (modulo margin and padding)
               val topOfViewportTop = elPos.margins.top + elPos.scrollTop + padding
               Math.max(bootstrapTop, topOfViewportTop)
             case Placement.Top =>
-              elPos.offset.top - popover.outerHeight().getOrElse(0d) - arrowHeight
+              elPos.offset.top - popover.outerHeight - arrowHeight
             case Placement.Over =>
               // Center relative to viewport
-              Math.max(0, ((dom.document.documentElement.clientHeight - popover.outerHeight().getOrElse(0d)) / 2) + dom.window.pageYOffset)
+              Math.max(0, ((dom.document.documentElement.clientHeight - popover.outerHeight) / 2) + dom.window.pageYOffset)
             case Placement.Bottom =>
               popoverOffset.top
           }
@@ -190,35 +196,35 @@ object Help {
             case Placement.Right =>
               elPos.offset.left + elPos.width + arrowWidth
             case Placement.Left =>
-              elPos.offset.left - popover.outerWidth().getOrElse(0d) - arrowWidth
+              elPos.offset.left - popover.outerWidth - arrowWidth
             case Placement.Top | Placement.Bottom =>
               elPos.offset.left
             case Placement.Over =>
               // Center relative to viewport
-              Math.max(0, ((dom.document.documentElement.clientWidth - popover.outerWidth().getOrElse(0d)) / 2) + dom.window.pageXOffset)
+              Math.max(0, ((dom.document.documentElement.clientWidth - popover.outerWidth) / 2) + dom.window.pageXOffset)
           }
         }
 
-        Offset(newPopoverOffsetLeft, newPopoverOffsetTop)
+        DomSupport.Offset(newPopoverOffsetLeft, newPopoverOffsetTop)
       }
 
-      Offset.offset(popover, newPopoverOffset)
+      popover.setOffset(newPopoverOffset)
 
       // Adjust arrow height for right/left
       placement match {
         case Placement.Right | Placement.Left =>
           val controlTopDoc = elPos.offset.top + elPos.height / 2
           val controlTopPopover = controlTopDoc - newPopoverOffset.top
-          val arrowTop = (controlTopPopover / popover.outerHeight().getOrElse(0d)) * 100
-          popover.children(".arrow").css("top", arrowTop.toString + "%")
+          val arrowTop = (controlTopPopover / popover.outerHeight) * 100
+          popover.childrenT(".arrow").foreach(_.style.top = s"$arrowTop%")
         case Placement.Top | Placement.Bottom | Placement.Over =>
           if (placement != Placement.Over)
-            popover.children(".arrow").css("left", "10%")
+            popover.childrenT(".arrow").foreach(_.style.left = "10%")
           val altMaxWidth =
             dom.document.documentElement.clientWidth -
             2 * (if (placement == Placement.Over) padding else newPopoverOffset.left)
-          if (popover.width() > altMaxWidth)
-            popover.css("max-width", altMaxWidth.toString + "px")
+          if (popover.contentWidth.exists(_ > altMaxWidth))
+            popover.style.maxWidth = s"${altMaxWidth}px"
       }
     }
   }

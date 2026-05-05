@@ -18,30 +18,31 @@ import org.orbeon.builder.HtmlElementCell.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.{Direction, Orientation}
 import org.orbeon.facades.{Dragula, DragulaOptions}
-import org.orbeon.jquery.{JqueryOps, Offset}
 import org.orbeon.oxf.fr.{Cell, GridModel, WallPosition}
-import org.orbeon.xforms.*
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
-import io.udash.wrappers.jquery.JQuery
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import org.orbeon.fr.FormRunnerUtils
+import org.orbeon.web.DomSupport
 import org.orbeon.web.DomSupport.*
 
 import scala.collection.mutable
 import scala.scalajs.js
+import scala.util.chaining.*
 
 
 // Allows form authors to move the grid cell walls to resize cells
 object GridWallDnD {
 
+  private val DatasetIndexKey = "index"
+
   private implicit class CellBlockOps(private val cell: Block) extends AnyVal {
-    def x          : Int          = cell.el.attr("data-fr-x").get.toInt
-    def y          : Int          = cell.el.attr("data-fr-y").get.toInt
-    def w          : Int          = cell.el.attr("data-fr-w").map(_.toInt).getOrElse(1)
-    def h          : Int          = cell.el.attr("data-fr-h").map(_.toInt).getOrElse(1)
-    def underlying : html.Element = cell.el.get(0).get.asInstanceOf[html.Element]
+    def x          : Int          = cell.el.dataset.get("frX").get.toInt
+    def y          : Int          = cell.el.dataset.get("frY").get.toInt
+    def w          : Int          = cell.el.dataset.get("frW").map(_.toInt).getOrElse(1)
+    def h          : Int          = cell.el.dataset.get("frH").map(_.toInt).getOrElse(1)
+    def underlying : html.Element = cell.el
   }
 
   locally {
@@ -70,7 +71,7 @@ object GridWallDnD {
         },
         becomesCurrent = (cell: Block) => {
           currentCellOpt = Some(cell)
-          val isViewMode        = FormRunnerUtils.isViewMode(cell.el.elem)
+          val isViewMode = FormRunnerUtils.isViewMode(cell.el)
           if (! DndShadow.isDragging && ! isViewMode)
             DndSides.show(cell)
         }
@@ -103,9 +104,9 @@ object GridWallDnD {
     // Blocks signaling where cell borders can be dragged from and to
     object DndWall {
 
-      private val walls                      = new mutable.ListBuffer[JQuery]
-      private var dropTarget: Option[JQuery] = None
-      private var mouseOnWall                = false
+      private val walls                            = new mutable.ListBuffer[html.Element]
+      private var dropTarget: Option[html.Element] = None
+      private var mouseOnWall                      = false
 
       def show[Underlying](
         gridModel   : GridModel[Underlying],
@@ -114,23 +115,35 @@ object GridWallDnD {
         side        : Option[Direction]
       ): Unit = {
         currentCellOpt.foreach { currentCell =>
+
           val orientationClass =
             orientation match {
               case Orientation.Vertical   => WallVerticalClass
               case Orientation.Horizontal => WallHorizontalClass
             }
-          val frGridBody       = currentCell.el.parents(BlockCache.GridBodySelector).first()
-          val frGrid           = frGridBody.parent()
-          val dndContainer     = $(s"""<div class="$WallContainerClass $orientationClass" data-index="$index">""")
-          val dndHandle        = $(s"""<div class="$WallHandleClass">""")
-          dndContainer.append(dndHandle)
-          frGrid.append(dndContainer)
-          walls.append(dndContainer)
+
+          val frGridBody = currentCell.el.ancestorOrSelfElem(BlockCache.GridBodySelector, includeSelf = false).nextOption().get
+          val frGrid     = frGridBody.parentElement
+
+          val dndHandleElem =
+            dom.document.createElementT("div")
+              .tap(_.classList.add(WallHandleClass))
+
+          val dndContainerElem =
+            dom.document.createElementT("div")
+              .tap(_.classList.add(WallContainerClass))
+              .tap(_.classList.add(orientationClass))
+              .tap(_.dataset += DatasetIndexKey -> index.toString)
+              .tap(_.appendChild(dndHandleElem))
+
+          frGrid.append(dndContainerElem)
+          walls.append(dndContainerElem)
+
           val sideSlide = {
             val wallThickness =
               orientation match {
-                case Orientation.Vertical   => dndContainer.width()
-                case Orientation.Horizontal => dndContainer.height()
+                case Orientation.Vertical   => dndContainerElem.contentWidthOrZero
+                case Orientation.Horizontal => dndContainerElem.contentHeightOrZero
               }
             side match {
               case Some(Direction.Left  | Direction.Up  ) => 0
@@ -139,20 +152,20 @@ object GridWallDnD {
             }
           }
 
-          def trackOffset(orientation: Orientation) = {
+          def trackOffset(orientation: Orientation): Double = {
             val gridSlide = orientation match {
-              case Orientation.Horizontal => Offset(frGridBody).top
-              case Orientation.Vertical   => Offset(frGridBody).left
+              case Orientation.Horizontal => frGridBody.getOffset.top
+              case Orientation.Vertical   => frGridBody.getOffset.left
             }
             val tracksSlide = Position.tracksWidth(frGridBody, orientation).take(index).sum
             val gapSlide = {
-              val rowGapSize  = frGridBody.css("grid-row-gap").split("px")(0).toInt
+              val rowGapSize  = DomSupport.parseDoubleIgnoreTail(dom.window.getComputedStyle(frGridBody).getPropertyValue("row-gap")).getOrElse(0d)
               index * rowGapSize
             }
             gridSlide + tracksSlide - sideSlide + gapSlide
           }
 
-          Offset.offset(dndContainer, Offset(
+          dndContainerElem.setOffset(DomSupport.Offset(
             left = orientation match {
               case Orientation.Vertical =>
                 trackOffset(orientation)
@@ -161,24 +174,24 @@ object GridWallDnD {
             },
             top  = orientation match {
               case Orientation.Vertical =>
-                currentCell.top - Position.scrollTop()
+                currentCell.top - Position.scrollTop
               case Orientation.Horizontal =>
                 trackOffset(orientation)
             }
           ))
           orientation match {
-            case Orientation.Vertical   => dndContainer.height(currentCell.height)
-            case Orientation.Horizontal => dndContainer.width (currentCell.width)
+            case Orientation.Vertical   => dndContainerElem.setHeight(currentCell.height)
+            case Orientation.Horizontal => dndContainerElem.setWidth (currentCell.width)
           }
-          dndContainer.get().foreach(_.addEventListener("mouseenter", (_: dom.Event) => {
+          dndContainerElem.addEventListener("mouseenter", (_: dom.Event) => {
             mouseOnWall = true
             ControlEditor.mask()
-          }))
-          dndContainer.get().foreach(_.addEventListener("mouseleave", (_: dom.Event) => {
+          })
+          dndContainerElem.addEventListener("mouseleave", (_: dom.Event) => {
             mouseOnWall = false
             if (! DndShadow.isDragging)
               ControlEditor.unmask()
-          }))
+          })
         }
       }
 
@@ -195,11 +208,11 @@ object GridWallDnD {
           case Direction.Up   | Direction.Down  => Orientation.Horizontal
         }
 
-      def markClosestAsDropTarget(pointerPosition: Double, position: JQuery => Double): Unit = {
+      def markClosestAsDropTarget(pointerPosition: Double, position: html.Element => Double): Unit = {
 
-        val closestContainer: Option[JQuery] = {
-          def distance(container: JQuery) = Math.abs(position(container) - pointerPosition)
-          case class BestContainer(container: JQuery, distance: Double)
+        val closestContainer: Option[html.Element] = {
+          def distance(container: html.Element): Double = Math.abs(position(container) - pointerPosition)
+          case class BestContainer(container: html.Element, distance: Double)
           walls.foldLeft(None: Option[BestContainer]) { (bestSoFarOpt, container) =>
             val currentDistance = distance(container)
             val keepBestSoFar = bestSoFarOpt.exists(_.distance <= currentDistance)
@@ -207,69 +220,75 @@ object GridWallDnD {
           }.map(_.container)
         }
 
-        dropTarget.foreach(_.removeClass(WallDropClass))
+        dropTarget.foreach(_.classList.remove(WallDropClass))
         dropTarget = closestContainer
-        dropTarget.foreach(_.addClass(WallDropClass))
+        dropTarget.foreach(_.classList.add(WallDropClass))
       }
 
-      def getDropTarget: Option[JQuery] = dropTarget
+      def getDropTarget: Option[html.Element] = dropTarget
     }
 
     // Block showing during the dragging operation
     object DndShadow {
 
-      var dndVeilOpt   : Option[JQuery] = None
-      var dndShadowOpt : Option[JQuery] = None
+      var dndVeilOpt   : Option[html.Element] = None
+      var dndShadowOpt : Option[html.Element] = None
 
       def isDragging: Boolean = dndShadowOpt.isDefined
 
-      def show(containerEl: html.Element): Unit = {
+      def show(containerElem: html.Element): Unit = {
 
-        val container = $(containerEl)
-        val frGrid = container.parent()
+        val frGridElem = containerElem.parentElement
 
         // Create veil
-        val dndVeil = $(s"""<div class="$WallVeilClass">""")
-        dndVeilOpt = Some(dndVeil)
-        frGrid.append(dndVeil)
-        Offset.offset(dndVeil, Offset(frGrid))
-        dndVeil.width(frGrid.width())
-        dndVeil.height(frGrid.height())
+        val dndVeilElem =
+          dom.document.createElementT("div")
+            .tap(_.classList.add(WallVeilClass))
+
+        dndVeilOpt = Some(dndVeilElem)
+        frGridElem.appendChild(dndVeilElem)
+
+        dndVeilElem.setOffset(frGridElem.getOffset)
+        dndVeilElem.setWidth(frGridElem.contentWidthOrZero)
+        dndVeilElem.setHeight(frGridElem.contentHeightOrZero)
 
         // Create shadow element, position and size the shadow over source container
-        val dndShadow = $(s"""<div class="$WallShadowClass">""")
-        dndShadowOpt = Some(dndShadow)
-        frGrid.append(dndShadow)
-        Offset.offset(dndShadow, Offset(container))
-        dndShadow.width(container.width())
-        dndShadow.height(container.height())
+        val dndShadowElem =
+          dom.document.createElementT("div")
+            .tap(_.classList.add(WallShadowClass))
+
+        dndShadowOpt = Some(dndShadowElem)
+        frGridElem.appendChild(dndShadowElem)
+        dndShadowElem.setOffset(containerElem.getOffset)
+        dndShadowElem.setWidth(containerElem.contentWidthOrZero)
+        dndShadowElem.setHeight(containerElem.contentHeightOrZero)
       }
 
       def hide(): Unit = {
-        dndVeilOpt.foreach(_.detach())
+        dndVeilOpt.foreach(_.remove())
         dndVeilOpt = None
-        dndShadowOpt.foreach(_.detach())
+        dndShadowOpt.foreach(_.remove())
         dndShadowOpt = None
       }
 
-      Position.onUnderPointerChange(() => {
-        dndShadowOpt.foreach { dndShadow =>
+      Position.onUnderPointerChange(() =>
+        dndShadowOpt.foreach { dndShadowElem =>
           startCellOpt.foreach { case StartCell(_, startSide, _) =>
             DndWall.wallOrientation(startSide) match {
               case Orientation.Vertical =>
-                val newLeft = Position.pointerPos.left - (dndShadow.width() / 2)
-                val newShadowOffset = Offset(dndShadow).copy(left = newLeft)
-                Offset.offset(dndShadow, newShadowOffset)
-                DndWall.markClosestAsDropTarget(newLeft, (container: JQuery) => Offset(container).left)
+                val newLeft = Position.pointerPos.left - (dndShadowElem.contentWidthOrZero / 2)
+                val newShadowOffset = dndShadowElem.getOffset.copy(left = newLeft)
+                dndShadowElem.setOffset(newShadowOffset)
+                DndWall.markClosestAsDropTarget(newLeft, _.getOffset.left)
               case Orientation.Horizontal =>
-                val newTop = Position.pointerPos.top - (dndShadow.height() / 2)
-                val newShadowOffset = Offset(dndShadow).copy(top = newTop)
-                Offset.offset(dndShadow, newShadowOffset)
-                DndWall.markClosestAsDropTarget(newTop, (container: JQuery) => Offset(container).top)
+                val newTop = Position.pointerPos.top - (dndShadowElem.contentHeightOrZero / 2)
+                val newShadowOffset = dndShadowElem.getOffset.copy(top = newTop)
+                dndShadowElem.setOffset(newShadowOffset)
+                DndWall.markClosestAsDropTarget(newTop, _.getOffset.top)
             }
           }
         }
-      })
+      )
     }
 
     // Handle D&D
@@ -277,13 +296,13 @@ object GridWallDnD {
       val drake = Dragula(
         js.Array(),
         new DragulaOptions {
-          override def isContainer(el: html.Element) =
+          override def isContainer(el: html.Element): js.UndefOr[Boolean] =
             el.hasClass(WallContainerClass)
 
-          override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element) =
+          override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): js.UndefOr[Boolean] =
             handle.hasClass(WallHandleClass)
 
-          override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) =
+          override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): js.UndefOr[Boolean] =
             target.hasClass(WallContainerClass)
         }
       )
@@ -291,7 +310,7 @@ object GridWallDnD {
       drake.onDrag { (_, source) =>
         currentCellOpt.foreach { currentCell =>
           val startSide = {
-            val wallIndex = source.getAttribute("data-index").toInt
+            val wallIndex = source.dataset.get(DatasetIndexKey).get.toInt
             val isVertical = source.hasClass(WallVerticalClass)
             if (isVertical) if (wallIndex == currentCell.x - 1) Direction.Left else Direction.Right
             else            if (wallIndex == currentCell.y - 1) Direction.Up   else Direction.Down
@@ -309,14 +328,12 @@ object GridWallDnD {
         }
       }
 
-      drake.onDragend { el =>
+      drake.onDragend { _ =>
         DndWall.getDropTarget.foreach { dropTarget =>
-          startCellOpt foreach { case StartCell(block, startSide, startIndex) =>
-            val targetIndex  = dropTarget.attr("data-index").get.toInt
-            if (targetIndex != startIndex) {
-              val cellId       = block.el.attr("id").get
-              RpcClient[FormBuilderRpcApi].moveWall(cellId, startSide, targetIndex).call()
-            }
+          startCellOpt.foreach { case StartCell(block, startSide, startIndex) =>
+            val targetIndex  = dropTarget.dataset.get(DatasetIndexKey).get.toInt
+            if (targetIndex != startIndex)
+              RpcClient[FormBuilderRpcApi].moveWall(block.el.id, startSide, targetIndex).call()
           }
         }
         startCellOpt = None

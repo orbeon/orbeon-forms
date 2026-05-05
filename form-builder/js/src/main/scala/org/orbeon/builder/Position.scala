@@ -13,22 +13,22 @@
  */
 package org.orbeon.builder
 
-import io.udash.wrappers.jquery.JQuery
 import org.orbeon.datatypes.Orientation
-import org.scalajs.dom.ResizeObserver
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport
+import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.*
 import org.scalajs.dom
-import org.scalajs.dom.{DocumentReadyState, document, html}
+import org.scalajs.dom.{ResizeObserver, html}
+
 
 object Position {
 
   // Keeps track of pointer position
   var pointerPos: Offset = Offset(0, 0)
 
-  document.addEventListener("mousemove", (event: dom.MouseEvent) => {
+  dom.document.addEventListener("mousemove", (event: dom.MouseEvent) => {
     pointerPos =
       Offset(
         left = event.pageX,
@@ -37,15 +37,15 @@ object Position {
   })
 
   // How much we need to add to offset to account for the form having been scrolled
-  def scrollTop() : Double  = document.querySelector(".fb-main").scrollTop
-  def scrollLeft(): Double  = document.querySelector(".fb-main").scrollLeft
+  def scrollTop : Double  = dom.document.querySelector(".fb-main").scrollTop
+  def scrollLeft: Double  = dom.document.querySelector(".fb-main").scrollLeft
 
   // Gets an element offset, normalizing for scrolling, so the offset can be stored in a cache
-  def adjustedOffset(el: JQuery): Offset = {
-    val rawOffset = Offset(el)
+  def adjustedOffset(el: html.Element): Offset = {
+    val rawOffset = el.getOffset
     Offset(
-      left = rawOffset.left + scrollLeft(),
-      top  = rawOffset.top  + scrollTop()
+      left = rawOffset.left + scrollLeft,
+      top  = rawOffset.top  + scrollTop
     )
   }
 
@@ -69,7 +69,7 @@ object Position {
     )
     val resizeObserver = new ResizeObserver((_, _) => fn())
     DomSupport.onElementFoundOrAdded(
-      container = document.body,
+      container = dom.document.body,
       selector  = ElementWhichChangeDynamically.mkString(", "),
       listener  = (elem: html.Element) => resizeObserver.observe(elem)
     )
@@ -99,9 +99,9 @@ object Position {
 
     val notifyChange = notifyOnChange(wasCurrent, becomesCurrent)
     onUnderPointerChange(() => {
-      val top  = pointerPos.top  + Position.scrollTop()
-      val left = pointerPos.left + Position.scrollLeft()
-      val dialogVisible = document.querySelectorAll("dialog[open]").length > 0
+      val top  = pointerPos.top  + Position.scrollTop
+      val left = pointerPos.left + Position.scrollLeft
+      val dialogVisible = dom.document.querySelectorAll("dialog[open]").length > 0
       val newContainer =
         if (dialogVisible)
           // Ignore container under the pointer if a dialog is visible
@@ -131,7 +131,7 @@ object Position {
               case Some(currentBlock) =>
                 // Typically after an Ajax request, maybe a column/row was added/removed, so we might consequently
                 // need to update the icon position
-                ! newBlock.el.is(currentBlock.el) ||
+                newBlock.el != currentBlock.el ||
                 // The elements could be the same, but their position could have changed, in which case want to
                 // reposition relative icons, so we don't consider the value to be the "same"
                 newBlock.left != currentBlock.left ||
@@ -151,14 +151,14 @@ object Position {
 
   // Get the height of each row track
   def tracksWidth(
-    gridBody    : JQuery,
+    gridBody    : html.Element,
     orientation : Orientation
   ): List[Double] = {
     val cssProperty = orientation match {
       case Orientation.Horizontal => "grid-template-rows"
       case Orientation.Vertical   => "grid-template-columns"
     }
-    val cssValue = gridBody.css(cssProperty)
+    val cssValue = dom.window.getComputedStyle(gridBody).getPropertyValue(cssProperty)
 
     // In the value of the CSS property returned by the browser, replace `repeat(X Ypx)` by `X` times `Ypx`
     // Unlike other browsers, Edge 17 returns values that contains `repeat()`

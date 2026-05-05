@@ -16,35 +16,35 @@ package org.orbeon.builder
 
 import autowire.*
 import cats.Eval
+import cats.implicits.catsSyntaxOptionId
 import enumeratum.*
 import enumeratum.EnumEntry.Lowercase
-import io.udash.wrappers.jquery.{JQuery, JQueryCallbacks}
+import io.udash.wrappers.jquery.JQueryCallbacks
 import org.orbeon.builder.facade.*
 import org.orbeon.builder.facade.JQueryTooltip.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.facades.TinyMce
 import org.orbeon.facades.TinyMce.{GlobalTinyMce, TinyMceConfig, TinyMceDefaultConfig, TinyMceEditor}
-import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.fr.FormRunnerUtils
 import org.orbeon.oxf.util.HtmlParsing
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.*
-import org.orbeon.fr.FormRunnerAPI
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
 import org.scalajs.dom.{document, html}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
-import org.orbeon.fr.FormRunnerUtils
 
 import scala.scalajs.js
+import scala.util.chaining.scalaUtilChainingOps
 
 
 object ControlLabelHintTextEditor {
 
-  sealed trait EditorType extends EnumEntry with Lowercase
-  object EditorType extends Enum[EditorType] {
-    val values = findValues
+  private sealed trait EditorType extends EnumEntry with Lowercase
+  private object EditorType extends Enum[EditorType] {
+    val values: IndexedSeq[EditorType] = findValues
     case object Label extends EditorType
     case object Hint  extends EditorType
     case object Text  extends EditorType
@@ -58,8 +58,8 @@ object ControlLabelHintTextEditor {
     val ControlSelector       = ".xforms-control, .xbl-component"
     val ExplanationSelector   = ".xbl-component.xbl-fr-explanation"
 
-    var resourceEditorCurrentControlOpt: Option[JQuery] = None
-    var jResourceEditorCurrentLabelHint: JQuery = null
+    var resourceEditorCurrentControlOpt  : Option[html.Element] = None
+    var resourceEditorCurrentLabelHintOpt: Option[html.Element] = None
 
     // Heuristic to close the editor based on mousedown and focus events
     def mousedownOrFocus(event: dom.Event): Unit = {
@@ -71,9 +71,9 @@ object ControlLabelHintTextEditor {
       val eventOnMceMenu       = target.closestOpt(".tox-menu").isDefined
       val eventOnControlLabel  =
           // Event on label or element inside label
-          target.ancestorOrSelfElem(LabelHintSelector).nonEmpty &&
+          target.ancestorOrSelfElem(LabelHintSelector, includeSelf = true).nonEmpty &&
           // Only interested in labels in the "editor" portion of FB
-          target.ancestorOrSelfElem(".fb-main").nonEmpty
+          target.ancestorOrSelfElem(".fb-main", includeSelf = true).nonEmpty
       if (! (eventOnEditor || eventOnMceDialog || eventOnMceToolbar || eventOnMceToolbarOvf || eventOnMceMenu || eventOnControlLabel))
         resourceEditorEndEdit()
     }
@@ -90,66 +90,65 @@ object ControlLabelHintTextEditor {
           if (! isViewMode) {
             // Close current editor, if there is one open
             resourceEditorEndEdit()
-            jResourceEditorCurrentLabelHint = $(labelHint)
+            resourceEditorCurrentLabelHintOpt = labelHint.some
             // Find control for this label
             resourceEditorCurrentControlOpt =
-              Some(
-                labelHint.ancestorOrSelfElem(".fr-grid-th").nextOption() match {
-                  case Some(_) =>
-                    // Case of a repeat: we might not have a control, so instead keep track of the LHH editor
-                    jResourceEditorCurrentLabelHint
-                  case None =>
-                    labelHint.closestOpt(ExplanationSelector)
-                      .getOrElse(labelHint.closest(ControlSelector))
-                      .pipe($(_))
-                }
-              )
-            resourceEditorStartEdit(jResourceEditorCurrentLabelHint)
+              labelHint.ancestorOrSelfElem(".fr-grid-th", includeSelf = true).nextOption() match {
+                case Some(_) =>
+                  // Case of a repeat: we might not have a control, so instead keep track of the LHH editor
+                  resourceEditorCurrentLabelHintOpt
+                case None =>
+                  labelHint.closestOpt(ExplanationSelector)
+                    .orElse(labelHint.closestOpt(ControlSelector))
+              }
+            resourceEditorCurrentLabelHintOpt
+              .foreach(resourceEditorStartEdit)
           }
         }
       })
 
       // New control added
       controlAdded.add((containerId: String) => {
-        val container = $(document.getElementById(containerId))
-        resourceEditorCurrentControlOpt = Some(container.find(ControlSelector))
-        val repeat = container.parents(".fr-repeat-single-row").first()
-        jResourceEditorCurrentLabelHint =
-            if (repeat.is("*")) {
-              val column = container.index() + 1
-              repeat.find(s".fr-grid-head .fr-grid-th:nth-child($column) .xforms-label")
-            } else
-              container.find(".xforms-label, .xforms-text .xforms-output-output").first()
-        if (jResourceEditorCurrentLabelHint.is("*"))
-            resourceEditorStartEdit(jResourceEditorCurrentLabelHint)
+        val container = dom.document.getElementByIdT(containerId)
+        resourceEditorCurrentControlOpt = container.querySelectorOpt(ControlSelector)
+        val repeatOpt = container.parentElementOpt.filter(_.matches(".fr-repeat-single-row"))
+        resourceEditorCurrentLabelHintOpt =
+            repeatOpt match {
+              case Some(repeat) =>
+                val column = container.index + 1
+                repeat.querySelectorOpt(s".fr-grid-head .fr-grid-th:nth-child($column) .xforms-label")
+              case None =>
+               container.querySelectorOpt(".xforms-label, .xforms-text .xforms-output-output")
+            }
+        resourceEditorCurrentLabelHintOpt
+          .foreach(resourceEditorStartEdit)
       })
 
     }
 
     // Show editor on click on label
-    def resourceEditorStartEdit(currentLabelHint: JQuery): Unit =
+    def resourceEditorStartEdit(currentLabelHint: html.Element): Unit =
       AjaxClient.allEventsProcessedF("resourceEditorStartEdit") foreach { _ =>
         // Remove `for` so browser doesn't set the focus to the control on click
-        currentLabelHint.removeAttr("for")
+        currentLabelHint.removeAttribute("for")
         // Show, position, and populate editor
         // Get position before showing editor, so showing doesn't move things in the page
-        //val x: Double =
-        Private.containerDiv.width(currentLabelHint.outerWidth().get)
+        Private.containerDivElem.style.width = s"${currentLabelHint.offsetWidth}px"
         // Cannot just use `show()` because we have `display: none` originally, which would default to `display: block`.
         // This is because we can't use an inline `style` attribute anymore, see https://github.com/orbeon/orbeon-forms/issues/3565
-        Private.containerDiv.css("display", "flex")
+        Private.containerDivElem.style.display = "flex"
         Private.startEdit()
-        Private.containerDiv.offset(currentLabelHint.offset())
+        Private.containerDivElem.setOffset(currentLabelHint.getOffset)
         Private.setValue(Private.labelHintValue(currentLabelHint))
-        Private.checkboxInput.prop("checked", Private.isLabelHintHtml)
+        Private.checkboxInputElem.checked = Private.isLabelHintHtml
         // Set tooltip for checkbox and HTML5 placeholders (don't do this once for all, as the language can change)
-        Private.checkboxInput.tooltip(new JQueryTooltipConfig {
-          val title = $(".fb-message-lhha-checkbox").text()
+        $(Private.checkboxInputElem).tooltip(new JQueryTooltipConfig {
+          val title: String = dom.document.querySelectorT(".fb-message-lhha-checkbox").textContent
         })
         val labelTextOrHint = Private.getEditorType.entryName // TODO: pass `resourceEditorCurrentLabelHint`
-        Private.textInput.attr("placeholder", $(s".fb-message-type-$labelTextOrHint").text())
+        Private.textInputElem.placeholder = dom.document.querySelectorT(s".fb-message-type-$labelTextOrHint").innerText
         // Hide setting visibility instead of .hide(), as we still want the label to take space, on which we show the input
-        currentLabelHint.css("visibility", "hidden")
+        currentLabelHint.style.visibility = "hidden"
         // Add class telling if this is a label or hint editor
         Private.annotateWithLhhaClass(true)
       }
@@ -157,10 +156,10 @@ object ControlLabelHintTextEditor {
     // Called when users press enter or tab out
     def resourceEditorEndEdit(): Unit =
       // If editor is hidden, editing has already been ended (endEdit can be called more than once)
-      if (Private.containerDiv.is(":visible")) { // TODO: use `DomSupport.isVisible`
-        resourceEditorCurrentControlOpt foreach { resourceEditorCurrentControl =>
+      if (Private.containerDivElem.isVisible) {
+        resourceEditorCurrentControlOpt.foreach { resourceEditorCurrentControl =>
           // Send value to server, handled in Form Builder's `model.xml`
-          val controlId   = resourceEditorCurrentControl.attr("id").get
+          val controlId   = resourceEditorCurrentControl.id
           val newRawValue = Private.getValue
           val isHTML      = Private.isHTML
           val sanitized   = if (isHTML) HtmlParsing.sanitizeHtmlString(newRawValue) else newRawValue
@@ -172,19 +171,21 @@ object ControlLabelHintTextEditor {
             isHTML    = isHTML
           ).call() // ignoring the `Future` completion
 
-          // Destroy tooltip, or it doesn't get recreated on startEdit()
-          Private.checkboxInput.tooltip("destroy")
-          Private.containerDiv.hide()
+          // Destroy tooltip, or it doesn't get recreated on `startEdit()`
+          $(Private.checkboxInputElem).tooltip("destroy")
+          Private.containerDivElem.hide()
           Private.endEdit()
           Private.annotateWithLhhaClass(false)
-          jResourceEditorCurrentLabelHint.css("visibility", "")
-          // Update values in the DOM, without waiting for the server to send us the value
+          resourceEditorCurrentLabelHintOpt.foreach { labelHint =>
+            labelHint.style.visibility = ""
+            Private.setLabelHintHtml(isHTML)
+            // Update values in the DOM, without waiting for the server to send us the value
+            Private.labelHintValue(labelHint, sanitized)
+          }
 
-          Private.setLabelHintHtml(isHTML)
-          Private.labelHintValue(jResourceEditorCurrentLabelHint, sanitized)
           // Clean state
           resourceEditorCurrentControlOpt = None
-          jResourceEditorCurrentLabelHint = null
+          resourceEditorCurrentLabelHintOpt = None
         }
       }
 
@@ -199,60 +200,86 @@ object ControlLabelHintTextEditor {
       var tinyMceObjectOpt   : Option[TinyMceEditor] = None
       var tinyMceInitialized : Boolean               = false
 
+      val textInputElem: html.Input =
+        document.createInputElement.tap { element =>
+          element.className = "xforms-hidden"
+          element.`type` = "text"
+        }
+
+      val checkboxInputElem: html.Input =
+        document.createInputElement.tap { element =>
+          element.className = "xforms-hidden"
+          element.`type` = "checkbox"
+        }
+
+      val tinyMceContainerDivElem: html.Element =
+        document.createElementT("div")
+          .tap(_.className = "xforms-hidden")
+
       // Create elements for editing
-      val containerDiv       : JQuery = $("""<div   class="xforms-hidden fb-label-editor"/>""")
-      val textInput          : JQuery = $("""<input class="xforms-hidden" type="text">""")
-      val checkboxInput      : JQuery = $("""<input class="xforms-hidden" type="checkbox">""")
-      val tinyMceContainerDiv: JQuery = $("""<div   class="xforms-hidden">""")
+      val containerDivElem: html.Element =
+        document.createElementT("div")
+          .tap(_.className = "xforms-hidden fb-label-editor")
+          .tap(_.append(textInputElem, checkboxInputElem, tinyMceContainerDivElem))
 
       // Add elements to the page
       locally {
+
         val fbMain = document.querySelectorT(".fb-main")
+
         Page.findXFormsFormFromHtmlElemOrDefault(fbMain).foreach { form =>
           // Add `name` to form fields for correctness
-          textInput    .attr("name", form.namespaceIdIfNeeded("fb-label-editor-text"    ))
-          checkboxInput.attr("name", form.namespaceIdIfNeeded("fb-label-editor-checkbox"))
+          textInputElem    .name = form.namespaceIdIfNeeded("fb-label-editor-text"    )
+          checkboxInputElem.name = form.namespaceIdIfNeeded("fb-label-editor-checkbox")
         }
-        // Nest and add to the page
-        containerDiv
-          .append(textInput)
-          .append(checkboxInput)
-          .append(tinyMceContainerDiv)
-        $(fbMain).append(containerDiv)
+
+        fbMain.append(containerDivElem)
 
         // Event handlers
-        textInput.get(0).foreach(_.addEventListener(DomEventNames.KeyPress, (e: dom.KeyboardEvent) => {
-          // End edit when users press enter
-          if (e.keyCode == 13) {
-            e.preventDefault()
-            resourceEditorEndEdit()
+
+        // End edit when users press enter
+        GlobalEventListenerSupport.addJsListener(
+          textInputElem,
+          DomEventNames.KeyPress,
+          (e: dom.KeyboardEvent) => {
+
+            if (e.keyCode == 13) {
+              e.preventDefault()
+              resourceEditorEndEdit()
+            }
           }
-        }))
-        checkboxInput.get(0).foreach(_.addEventListener(DomEventNames.Click, (_: dom.Event) => {
-          // When checkbox clicked, set focus back on the text field, where it was before
-          textInput.trigger("focus")
-        }))
+        )
+
+        // When checkbox clicked, set focus back on the text field, where it was before
+        GlobalEventListenerSupport.addJsListener(
+          checkboxInputElem,
+          DomEventNames.Click,
+          (_: dom.Event) => {
+            textInputElem.focus()
+          }
+        )
       }
 
       // Read/write class telling us if the label/hint/text is in HTML, set in grid.xml
       def getEditorType: EditorType =
-        if      (jResourceEditorCurrentLabelHint.is(".xforms-label"))             EditorType.Label
-        else if (jResourceEditorCurrentLabelHint.parents(".xforms-text").is("*")) EditorType.Text
-        else                                                                     EditorType.Hint
+        if      (resourceEditorCurrentLabelHintOpt.exists(_.matches(".xforms-label")))              EditorType.Label
+        else if (resourceEditorCurrentLabelHintOpt.exists(_.parentElement.matches(".xforms-text"))) EditorType.Text
+        else                                                                                     EditorType.Hint
 
       def htmlClass: String = s"fb-${getEditorType.entryName}-is-html"
-      def isLabelHintHtml: Boolean = resourceEditorCurrentControlOpt exists (_.is("." + htmlClass))
+      def isLabelHintHtml: Boolean = resourceEditorCurrentControlOpt.exists(_.hasClass(htmlClass))
       def setLabelHintHtml(isHtml: Boolean): Unit = resourceEditorCurrentControlOpt foreach (_.toggleClass(htmlClass, isHtml))
-      def annotateWithLhhaClass(add: Boolean): JQuery = containerDiv.toggleClass(s"fb-label-editor-for-${getEditorType.entryName}", add)
+      def annotateWithLhhaClass(add: Boolean): Unit = containerDivElem.toggleClass(s"fb-label-editor-for-${getEditorType.entryName}", add)
 
-      def labelHintValue(labelHint: JQuery): String =
-        if (isLabelHintHtml) labelHint.html()
-        else                 labelHint.text()
+      def labelHintValue(labelHint: html.Element): String =
+        if (isLabelHintHtml) labelHint.innerHTML
+        else                 labelHint.innerText
 
-      def labelHintValue(labelHint: JQuery, value: String): Unit =
-        if (isLabelHintHtml) labelHint.html(value)
-        else                 labelHint.text(value)
+      def labelHintValue(labelHint: html.Element, value: String): Unit =
+        if (isLabelHintHtml) labelHint.innerHTML = value
+        else                 labelHint.innerText = value
 
+      // TODO: duplicate, but needs a `var` to store state
       def withInitializedTinyMce(thunk: TinyMceEditor => Unit): Unit =
         if (tinyMceInitialized)
           tinyMceObjectOpt foreach thunk
@@ -266,15 +293,15 @@ object ControlLabelHintTextEditor {
 
       // Not using tinymceObject.container, as it is not initialized onInit, while editorContainer is
       def makeSpaceForTinyMce(): Unit =
-        Option(jResourceEditorCurrentLabelHint).foreach(_.height(tinyMceContainerDiv.height()))
+        resourceEditorCurrentLabelHintOpt.foreach(_.setHeight(tinyMceContainerDivElem.contentHeightOrZero: Double))
 
       // Function to initialize the TinyMCE, memoized so it runs at most once
       val initTinyMce: Eval[TinyMceEditor] = Eval.later {
 
         val anchorId = Underscore.uniqueId() // TODO: Don't use `Underscore`
 
-        tinyMceContainerDiv.show()
-        tinyMceContainerDiv.attr("id", anchorId)
+        tinyMceContainerDivElem.show()
+        tinyMceContainerDivElem.id = anchorId
 
         locally {
           val href =
@@ -289,7 +316,7 @@ object ControlLabelHintTextEditor {
 
         // TinyMCE config from property, if defined
         val tinyMceConfig = {
-          val customConfigJS = $(".fb-tinymce-config .xforms-output-output").text()
+          val customConfigJS = dom.document.querySelectorT(".fb-tinymce-config .xforms-output-output").textContent
           if (customConfigJS.nonAllBlank)
             js.JSON.parse(customConfigJS).asInstanceOf[TinyMceConfig]
           else
@@ -317,7 +344,7 @@ object ControlLabelHintTextEditor {
 
       // Set width of TinyMCE to the width of the container
       def setTinyMceWidth(): Unit =
-        $(tinyMceContainerDiv).width(containerDiv.outerWidth().get)
+        tinyMceContainerDivElem.style.width = s"${containerDivElem.offsetWidth}px"
 
       def getValue: String =
         getEditorType match {
@@ -328,7 +355,7 @@ object ControlLabelHintTextEditor {
               case None                      => ""
             }
           case EditorType.Label | EditorType.Hint =>
-            textInput.value().asInstanceOf[String]
+            textInputElem.value
         }
 
       def setValue(newValue: String): Unit =
@@ -342,22 +369,22 @@ object ControlLabelHintTextEditor {
               tinyMceObject.focus()
             }
           case EditorType.Label | EditorType.Hint =>
-            textInput.value(newValue)
-            textInput.trigger("focus")
+            textInputElem.value = newValue
+            textInputElem.focus()
         }
 
-      def isHTML: Boolean = getEditorType == EditorType.Text || checkboxInput.is(":checked")
+      def isHTML: Boolean = getEditorType == EditorType.Text || checkboxInputElem.checked
 
       def startEdit(): Unit = {
-        textInput.hide()
-        checkboxInput.hide()
-        tinyMceObjectOpt foreach (_.hide())
-        tinyMceContainerDiv.hide()
+        textInputElem.hide()
+        checkboxInputElem.hide()
+        tinyMceObjectOpt.foreach(_.hide())
+        tinyMceContainerDivElem.hide()
 
         getEditorType match {
           case EditorType.Text =>
             initTinyMce.value
-            tinyMceContainerDiv.show()
+            tinyMceContainerDivElem.show()
             withInitializedTinyMce { tinyMceObject =>
               // Without hiding first, the first time after render the TinyMCE can't get the focus
               tinyMceObject.hide()
@@ -366,15 +393,15 @@ object ControlLabelHintTextEditor {
               tinyMceObject.show()
             }
           case EditorType.Label | EditorType.Hint =>
-            textInput.show()
-            checkboxInput.show()
+            textInputElem.show()
+            checkboxInputElem.show()
         }
       }
 
       def endEdit(): Unit =
         if (getEditorType == EditorType.Text)
           // Reset height we might have placed on the explanation element inside the cell
-          jResourceEditorCurrentLabelHint.css("height", "")
+          resourceEditorCurrentLabelHintOpt.foreach(_.style.height = "")
     }
   }
 }

@@ -26,11 +26,11 @@ object HtmlElementCell {
   implicit object HtmlElementCellOps extends CellOps[html.Element] {
 
     def attValueOpt    (u: html.Element, name: String): Option[String]     = Option(u.getAttribute(name))
-    def children       (u: html.Element, name: String): List[html.Element] = u.childrenT.to(List)
+    def children       (u: html.Element, name: String): List[html.Element] = u.childrenT.toList
     def parent         (u: Element)                   : Element            = u.parentElement
     def hasChildElement(u: Element)                   : Boolean            = u.children.nonEmpty
 
-    def cellsForGrid   (u: Element)                   : List[html.Element] = u.querySelectorAllT(".fr-grid-td").to(List)
+    def cellsForGrid   (u: Element)                   : List[html.Element] = u.querySelectorAllT(".fr-grid-td").toList
     def gridForCell    (u: Element)                   : Element            = u.closestT(".fr-grid-body")
 
     def maxGridWidth   (u: Element): Int = {

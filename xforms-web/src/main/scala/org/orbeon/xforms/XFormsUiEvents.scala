@@ -6,7 +6,6 @@ import org.scalajs.dom.html
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{newInstance, global as g}
-import scala.scalajs.js.annotation.JSExport
 
 
 object XFormsUiEvents {
@@ -39,16 +38,14 @@ object XFormsUiEvents {
 
   // Walk up the DOM from `element` to find the first ancestor (or self) that is an XForms control,
   // an XBL component, or an XForms dialog. Returns null if none is found.
-  @JSExport
   def findParentXFormsControl(element: dom.EventTarget): Option[html.Element] =
     element match {
       case elem: html.Element =>
-        elem.ancestorOrSelfElem(".xforms-control, .xbl-component, .xforms-dialog").nextOption()
+        elem.ancestorOrSelfElem(".xforms-control, .xbl-component, .xforms-dialog", includeSelf = true).nextOption()
       case _ =>
         None
     }
 
-  @JSExport
   def showToolTip(
     tooltipForControl: js.Dictionary[js.Any],
     control          : html.Element,

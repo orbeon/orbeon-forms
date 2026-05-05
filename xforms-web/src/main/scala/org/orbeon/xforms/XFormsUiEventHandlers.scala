@@ -361,7 +361,7 @@ object XFormsUiEventHandlers {
 
   private def isTooltipDisabled(elem: html.Element, lhha: String) =
     elem
-      .ancestorOrSelfElem(s".xforms-disable-$lhha-as-tooltip, .xforms-enable-$lhha-as-tooltip")
+      .ancestorOrSelfElem(s".xforms-disable-$lhha-as-tooltip, .xforms-enable-$lhha-as-tooltip", includeSelf = true)
       .nextOption()
       .exists(e => e.hasClass(s"xforms-disable-$lhha-as-tooltip"))
 

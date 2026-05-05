@@ -18,27 +18,25 @@ import enumeratum.EnumEntry.Hyphencase
 import enumeratum.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.Direction
-import org.orbeon.jquery.{JqueryOps, Offset}
-import org.orbeon.oxf.util.CoreUtils.asUnit
-import org.orbeon.xforms.*
 import org.orbeon.xforms.rpc.RpcClient
-import io.udash.wrappers.jquery.JQuery
-
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import org.orbeon.fr.FormRunnerUtils
+import org.orbeon.web.DomSupport
+import org.orbeon.web.DomSupport.*
+import org.scalajs.dom.html
 
 
 object SectionGridEditor {
 
-  def sectionGridEditorContainer : JQuery        = $(".fb-section-grid-editor")
+  def sectionGridEditorContainer : html.Element  = dom.document.querySelectorT(".fb-section-grid-editor")
   var currentSectionGridOpt      : Option[Block] = None
 
-  private def allIcons =
-    sectionGridEditorContainer.find(".fa")
+  private def allIcons: collection.Seq[html.Element] =
+    sectionGridEditorContainer.querySelectorAllT(".fa")
 
-  private def allIconsWith(selector: String) =
-    sectionGridEditorContainer.find(selector)
+  private def allIconsWith(selector: String): collection.Seq[html.Element] =
+    sectionGridEditorContainer.querySelectorAllT(selector)
 
   locally {
 
@@ -65,60 +63,60 @@ object SectionGridEditor {
     Position.currentContainerChanged(
       containerCache = BlockCache.sectionGridCache,
       wasCurrent = (sectionGridBody: Block) => {
-        if (sectionGridBody.el.is(BlockCache.GridSelector))
-          sectionGridBody.el.children(".fr-grid").removeClass("fb-hover")
+        if (sectionGridBody.el.matches(BlockCache.GridSelector))
+          sectionGridBody.el.childrenT(".fr-grid").foreach(_.classList.remove("fb-hover"))
       },
       becomesCurrent = (sectionGridBody: Block) => {
         currentSectionGridOpt = Some(sectionGridBody)
-        val isViewMode        = FormRunnerUtils.isViewMode(sectionGridBody.el.elem)
+        val isViewMode        = FormRunnerUtils.isViewMode(sectionGridBody.el)
 
         // Position the editor
         sectionGridEditorContainer.show()
-        Offset.offset(
-          sectionGridEditorContainer,
-          Offset(
+        sectionGridEditorContainer.setOffset(
+          DomSupport.Offset(
             // Use `.fr-body` left rather than the section left to account for sub-sections indentation
-            left = Offset($(".fr-body")).left - sectionGridEditorContainer.outerWidth().getOrElse(0d),
-            top  = sectionGridBody.top - Position.scrollTop()
+            left = dom.document.querySelectorT(".fr-body").getOffset.left - sectionGridEditorContainer.outerWidth,
+            top  = sectionGridBody.top - Position.scrollTop
           )
         )
 
         // Start by hiding all the icons
-        allIcons.hide()
+        allIcons.foreach(_.hide())
 
-        def showMoveDeleteIcons(container: JQuery): Unit = {
+        def showMoveDeleteIcons(container: html.Element): Unit = {
 
           Direction.values foreach { direction =>
             val relevant = ! isViewMode && container.hasClass("fb-can-move-" + direction.entryName.toLowerCase)
             val trigger  = allIconsWith(".fb-container-move-" + direction.entryName.toLowerCase)
             if (relevant)
-              trigger.show()
+              trigger.foreach(_.show())
           }
 
-          if (! isViewMode && container.is(".fb-can-delete"))
+          if (! isViewMode && container.matches(".fb-can-delete"))
             Set(ContainerDelete, ContainerCut)
               .map(_.className)
-              .map(allIconsWith)
+              .flatMap(allIconsWith)
               .foreach(_.show())
         }
 
         // Edit and copy icons
-        allIconsWith(ContainerEditDetails.className).show()
-        if (! isViewMode) allIconsWith(ContainerCopy.className).show()
+        allIconsWith(ContainerEditDetails.className).foreach(_.show())
+        if (! isViewMode)
+          allIconsWith(ContainerCopy.className).foreach(_.show())
 
         // Sections
-        if (sectionGridBody.el.is(BlockCache.SectionSelector)) {
-          val container = sectionGridBody.el.children(".fr-section-container")
+        if (sectionGridBody.el.matches(BlockCache.SectionSelector)) {
+          val container = sectionGridBody.el.childrenT(".fr-section-container").head
           showMoveDeleteIcons(container)
-          if (! isViewMode && container.find(".fr-section-component").length > 0)
-            allIconsWith(ContainerMerge.className).show()
+          if (! isViewMode && container.queryNestedElems(".fr-section-component", includeSelf = false).nonEmpty)
+            allIconsWith(ContainerMerge.className).foreach(_.show())
         }
 
         // Grids
-        if (sectionGridBody.el.is(BlockCache.GridSelector)) {
-          val container = sectionGridBody.el.children(".fr-grid")
+        if (sectionGridBody.el.matches(BlockCache.GridSelector)) {
+          val container = sectionGridBody.el.childrenT(".fr-grid").head
           showMoveDeleteIcons(container)
-          container.addClass("fb-hover")
+          container.classList.add("fb-hover")
         }
       }
     )
@@ -131,12 +129,11 @@ object SectionGridEditor {
     // Register listener on editor icons
     ContainerEditor.values foreach { editor =>
 
-      val iconEl = allIconsWith(s".fb-${editor.entryName}")
-
-      iconEl.get().foreach(_.addEventListener("click", (_: dom.Event) => {
+      allIconsWith(s".fb-${editor.entryName}")
+        .foreach(_.addEventListener("click", (_: dom.Event) => {
         currentSectionGridOpt foreach { currentSectionGrid =>
 
-          val sectionGridId = currentSectionGrid.el.attr("id").get
+          val sectionGridId = currentSectionGrid.el.id
           val client        = RpcClient[FormBuilderRpcApi]
 
           editor match {

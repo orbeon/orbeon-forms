@@ -33,17 +33,17 @@ val DefaultOrbeonFormsVersion        = "2026.1-SNAPSHOT"
 val DefaultOrbeonEdition             = "CE"
 
 // Scala libraries for Scala.js only
-val ScalaJsMacrotaskExecutor         = "1.1.1"
-val SaxonJsVersion                   = "10.0.0.78-SNAPSHOT"
-val XercesVersion                    = "2.11.0.11-SNAPSHOT"
-val SaxVersion                       = "2.0.2.8-SNAPSHOT"
-val ScalaJsDomVersion                = "2.8.1"
-val ScalaJsJQueryVersion             = "3.4.0"
-val ScalaJsStubsVersion              = "1.1.0" // can be different from Scala.js version
-val ScalaJsFakeWeakReferencesVersion = "1.0.0" // switch to `scalajs-weakreferences` when browser support is there
-val ScalaJsFakeSecureRandomVersion   = "1.0.0" // switch to `scalajs-java-securerandom` when we upgrade to JSDOM 20+
-val ScalaJsTimeVersion               = "2.6.0"
-val ScalaJsLocalesVersion            = "1.4.1"
+val ScalaJsMacrotaskExecutor     = "1.1.1"
+val SaxonJsVersion               = "10.0.0.78-SNAPSHOT"
+val XercesVersion                = "2.11.0.11-SNAPSHOT"
+val SaxVersion                   = "2.0.2.8-SNAPSHOT"
+val ScalaJsDomVersion            = "2.8.1"
+val ScalaJsJQueryVersion         = "3.4.0"
+val ScalaJsStubsVersion          = "1.1.0" // can be different from Scala.js version
+val ScalaJsWeakReferencesVersion = "1.0.0"
+val ScalaJsSecureRandomVersion   = "1.0.0"
+val ScalaJsTimeVersion           = "2.6.0"
+val ScalaJsLocalesVersion        = "1.4.1"
 
 // Scala libraries for Scala JVM only
 val ScalaLoggingVersion              = "3.9.4"
@@ -461,7 +461,7 @@ lazy val commonScalaJvmSettings = Seq(
 lazy val commonScalaJsSettings = Seq(
 
   libraryDependencies += "org.scala-js" %%% "scala-js-macrotask-executor" % ScalaJsMacrotaskExecutor,
-  libraryDependencies += ("org.scala-js" %%% "scalajs-fake-insecure-java-securerandom" % ScalaJsFakeSecureRandomVersion).cross(CrossVersion.for3Use2_13),
+  libraryDependencies += ("org.scala-js" %%% "scalajs-java-securerandom" % ScalaJsSecureRandomVersion).cross(CrossVersion.for3Use2_13),
 
   packageJSDependencies / skip   := false,
   scalaJSLinkerConfig            ~= (_.withSourceMap(false).withESFeatures(_.withESVersion(ESVersion.ES2018))),
@@ -599,7 +599,7 @@ lazy val dom = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) 
     crossScalaVersions := scala3 :: supportedScalaVersions
   )
   .jsSettings(
-    libraryDependencies += ("org.scala-js" %%% "scalajs-fake-weakreferences" % ScalaJsFakeWeakReferencesVersion).cross(CrossVersion.for3Use2_13)
+    libraryDependencies += ("org.scala-js" %%% "scalajs-weakreferences" % ScalaJsWeakReferencesVersion).cross(CrossVersion.for3Use2_13)
   )
 
 lazy val domJVM = dom.jvm.dependsOn(commonJVM)

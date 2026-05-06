@@ -59,19 +59,25 @@ trait GridSectionMenus {
         delegateKeyEventToBootstrapButtonHandler(e)
     )
 
-    dom.document.addEventListener("click", (event: dom.Event) => {
+    dom.document.addEventListener(
+      "click",
+      (event: dom.Event) => {
 
-      val target  = event.targetT
-      if (target.closestOpt(s".fr-$componentName-dropdown-button").nonEmpty) moveAndShowMenuHandler(event)
-      if (target.closestOpt(s".fr-$componentName-remove-button").nonEmpty  ) removeIterationHandler(event)
+        val target  = event.targetT
+        if (target.closestOpt(s".fr-$componentName-dropdown-button").nonEmpty) moveAndShowMenuHandler(event)
+        if (target.closestOpt(s".fr-$componentName-remove-button").nonEmpty  ) removeIterationHandler(event)
 
-      // Menu actions
-      Operation.values.foreach { op =>
-        target
-          .closestOpt(s".fr-$componentName-dropdown-menu .fr-${op.entryName}")
-          .foreach(_ => actionHandler(op, event))
-      }
-    })
+        // Menu actions
+        Operation.values.foreach { op =>
+          target
+            .closestOpt(s".fr-$componentName-dropdown-menu .fr-${op.entryName}")
+            .foreach(_ => actionHandler(op, event))
+        }
+      },
+      // Use capture to run before Bootstrap's document-level `clearMenus()` handler, otherwise on click
+      // `clearMenus()` closes the menu, and we reopen it immediately afterward.
+      useCapture = true
+    )
   }
 
   private def removeIterationHandler(event: dom.Event): Unit = {

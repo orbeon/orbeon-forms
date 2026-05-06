@@ -197,7 +197,7 @@
 
     </xsl:template>
 
-    <xsl:template match="fr:body[not($is-detail or $is-import)]">
+    <xsl:template match="fr:body[not($is-detail or $is-import or $is-validate)]">
         <xf:group
             id="fr-form-group"
             class="fr-body"
@@ -238,7 +238,7 @@
         </xf:group>
     </xsl:template>
 
-    <xsl:template match="fr:body[$is-detail or $is-import]">
+    <xsl:template match="fr:body[$is-detail or $is-import or $is-validate]">
 
         <!--
             Form content. Set context on form instance and define this group as `#fr-form-group` as observers will refer to it.
@@ -326,7 +326,7 @@
                         <xsl:attribute name="app"             select="$app"/>
                         <xsl:attribute name="form"            select="$form"/>
 
-                        <xsl:for-each select="('strict'[$is-import], $wizard-mode)[1]">
+                        <xsl:for-each select="('strict'[$is-import or $is-validate], $wizard-mode)[1]">
                             <!--
                                 We'd prefer `mode` to match the term used in the documentation, or maybe
                                 `forward-validation-mode`. But `validate` is how the property was named.
@@ -463,7 +463,7 @@
                 role="main"
                 xxf:element="div">
                 <xsl:choose>
-                    <xsl:when test="($is-detail or $is-import) and not($is-form-builder)">
+                    <xsl:when test="($is-detail or $is-import or $is-validate) and not($is-form-builder)">
                         <xsl:call-template name="fr-detail-page-global-variables"/>
                         <xsl:apply-templates select="$default-page-template"/>
                     </xsl:when>
@@ -575,7 +575,7 @@
                         then $property
                         else xxf:evaluate-avt($property) = 'true'
                     "/>
-            <xsl:if test="$is-detail and not($is-import)">
+            <xsl:if test="$is-detail and not($is-import or $is-validate)">
                 <xf:action
                     event    = "xforms-enabled"
                     observer = "fr-data-safe">

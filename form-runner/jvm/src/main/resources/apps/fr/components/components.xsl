@@ -77,6 +77,7 @@
     <xsl:variable name="is-summary"          select="$major-mode = 'summary'"               as="xs:boolean"/>
     <xsl:variable name="is-landing"          select="$major-mode = 'landing'"               as="xs:boolean"/>
     <xsl:variable name="is-import"           select="$major-mode = 'import'"                as="xs:boolean"/>
+    <xsl:variable name="is-validate"         select="$major-mode = 'validate'"              as="xs:boolean"/>
 
     <xsl:variable name="is-form-builder"     select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
 

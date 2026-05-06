@@ -32,9 +32,3 @@ object JQueryTooltip {
 abstract class JQueryTooltipConfig extends js.Object {
   val title: String
 }
-
-@JSGlobal("ORBEON._")
-@js.native
-object Underscore extends js.Object {
-  def clone[T](o: T): T = js.native
-}

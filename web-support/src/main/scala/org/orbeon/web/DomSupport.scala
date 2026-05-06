@@ -360,6 +360,11 @@ object DomSupport {
 
   private var lastUsedSuffix: Int = 0
 
+  def shallowClone[T <: js.Object](obj: T): T = {
+    val newObj = new js.Object()
+    js.Object.assign(newObj, obj).asInstanceOf[T]
+  }
+
   private val AtLeastDomInteractiveStates = Set(DocumentReadyState.interactive, DocumentReadyState.complete)
   private val DomCompleteStates           = Set(DocumentReadyState.complete)
 

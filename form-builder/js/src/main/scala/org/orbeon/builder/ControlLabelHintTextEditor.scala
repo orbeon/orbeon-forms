@@ -317,7 +317,7 @@ object ControlLabelHintTextEditor {
           if (customConfigJS.nonAllBlank)
             js.JSON.parse(customConfigJS).asInstanceOf[TinyMceConfig]
           else
-            Underscore.clone(TinyMceDefaultConfig)
+            DomSupport.shallowClone(TinyMceDefaultConfig)
         }
 
         tinyMceConfig.plugins                  = tinyMceConfig.plugins.map(_ + ",autoresize") // Auto-size MCE height based on the content

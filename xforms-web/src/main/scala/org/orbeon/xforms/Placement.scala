@@ -1,6 +1,6 @@
 package org.orbeon.xforms
 
-import org.orbeon.jquery.Offset
+import org.orbeon.web.DomSupport
 import org.orbeon.web.DomSupport.DomElemOps
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -30,7 +30,7 @@ object Placement {
     width     : Double,
     height    : Double,
     scrollTop : Double,
-    offset    : Offset,
+    offset    : DomSupport.Offset,
     margins   : Margins
   )
 
@@ -42,13 +42,13 @@ object Placement {
    */
   def getPositionDetails(el: html.Element): PositionDetails = {
 
-    def getElPosition: (Double, Double, Double, Offset) = {
+    def getElPosition: (Double, Double, Double, DomSupport.Offset) = {
       val o = el.getOffset
       (
         el.outerWidth,
         el.outerHeight,
         dom.window.pageYOffset, // Will this work if we're in a scrollable area?
-        Offset(
+        DomSupport.Offset(
           left = o.left,
           top  = o.top
         ),
@@ -78,11 +78,9 @@ object Placement {
           (0.0, 0.0, 0.0, 0.0)
         case Some(autoOverflowElem) =>
 
-          val jAutoOverflowElem = $(autoOverflowElem)
-
-          val overflowOffset = Offset(jAutoOverflowElem)
-          val overflowWidth  = jAutoOverflowElem.outerWidth().getOrElse(0d)
-          val overflowHeight = jAutoOverflowElem.outerHeight().getOrElse(0d)
+          val overflowOffset = autoOverflowElem.getOffset
+          val overflowWidth  = autoOverflowElem.outerWidth
+          val overflowHeight = autoOverflowElem.outerHeight
 
           (
             overflowOffset.top,

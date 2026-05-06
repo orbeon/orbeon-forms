@@ -14,9 +14,10 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades.{Dragula, DragulaOptions, Drake}
+import org.orbeon.web.DomSupport.DomElemOps
 import org.orbeon.xforms.XFormsXbl
 import org.orbeon.xforms.facade.XBLCompanion
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames}
+import org.orbeon.xforms.{AjaxClient, AjaxEvent, EventNames}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -64,46 +65,36 @@ object DndRepeat {
               el eq containerElem
 
             override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): UndefOr[Boolean] =
-              $(el).is(IsDndMovesSelector)
+              el.matches(IsDndMovesSelector)
 
-            override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): UndefOr[Boolean] = {
-
-              val jSibling = $(sibling)
-
-              (sibling ne null)                &&
-                jSibling.is(IsNotGuSelector)   && (
-                  jSibling.is(IsDndItemSelector)        || // regular case
-                  jSibling.is(IsRepeatBeginEndSelector)    // at the end of the repeat see https://github.com/orbeon/orbeon-forms/issues/6000
-                )                              &&
+            override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): UndefOr[Boolean] =
+              (sibling ne null)                  &&
+                sibling.matches(IsNotGuSelector) && (
+                  sibling.matches(IsDndItemSelector)        || // regular case
+                  sibling.matches(IsRepeatBeginEndSelector)    // at the end of the repeat see https://github.com/orbeon/orbeon-forms/issues/6000
+                )                                &&
                 (! dragState.exists(_.excludedTargets.exists(_ eq sibling)))
-            }
           }
         )
 
       newDrake.onDrag((el: dom.Element, source: html.Element) => {
 
-        val jEl = $(el)
-
-        def findElemLevel(el: dom.Element) =
+        def findElemLevel(el: dom.Element): Option[Int] =
           el.classList collectFirst { case FindDndLevelRe(level) => level.toInt }
 
         val startLevelOpt = findElemLevel(el)
 
-        val nextAllItems = jEl.nextAll(IsDndItemSelector)
-
-        val nextDndItemIt =
-          for (i <- 0 until nextAllItems.length iterator)
-            yield nextAllItems.get(i)
+        val nextDndItemIt = el.nextElementSiblings(IsDndItemSelector).iterator
 
         val excludedTargets = startLevelOpt match {
-          case Some(startLevel) => nextDndItemIt.flatten.takeWhile(e => findElemLevel(e).exists(_ > startLevel)).to(List)
+          case Some(startLevel) => nextDndItemIt.takeWhile(e => findElemLevel(e).exists(_ > startLevel)).toList
           case None             => Nil
         }
 
         dragState = Some(
           DragState(
-            currentDragStartPrev     = jEl.prev().get(0).get,
-            currentDragStartPosition = jEl.prevAll(IsDndItemSelector).length,
+            currentDragStartPrev     = el.previousElementSiblingT,
+            currentDragStartPosition = el.previousElementSiblings(IsDndItemSelector).length,
             excludedTargets          = excludedTargets
           )
         )
@@ -116,11 +107,11 @@ object DndRepeat {
       newDrake.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) => {
         dragState foreach { dragState =>
 
-          val dndEnd     = $(el).prevAll(IsDndItemSelector).length
-          val repeatId   = $(el).prevAll(IsRepeatBeginEndSelector).attr("id").get.substring("repeat-begin-".length)
+          val dndEnd   = el.previousElementSiblings(IsDndItemSelector).length
+          val repeatId = el.previousElementSiblings(IsRepeatBeginEndSelector).next().id.substring("repeat-begin-".length)
 
-          val beforeEl   = dragState.currentDragStartPrev
-          val dndStart   = dragState.currentDragStartPosition
+          val beforeEl = dragState.currentDragStartPrev
+          val dndStart = dragState.currentDragStartPosition
 
           if (dndStart != dndEnd) {
 
@@ -130,7 +121,7 @@ object DndRepeat {
             // subsequent Ajax response is processed, because it might touch parts of the DOM which have been moved. So
             // doing this is probably the right thing to do.
             AjaxClient.ajaxResponseReceivedForCurrentEventQueueF("dndrepeat") foreach { _ =>
-              $(beforeEl).after(el)
+              beforeEl.insertAdjacentElement("afterend", el)
             }
 
             // Thinking this should instead block input, but only after a while show a modal screen.

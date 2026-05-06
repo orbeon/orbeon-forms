@@ -123,7 +123,6 @@ object ControlLabelHintTextEditor {
         resourceEditorCurrentLabelHintOpt
           .foreach(resourceEditorStartEdit)
       })
-
     }
 
     // Show editor on click on label

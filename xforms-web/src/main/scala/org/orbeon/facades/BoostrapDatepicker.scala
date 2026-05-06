@@ -1,7 +1,7 @@
 package org.orbeon.facades
 
-import org.scalajs.dom.{Element, html}
 import io.udash.wrappers.jquery.JQuery
+import org.scalajs.dom.Element
 
 import scala.scalajs.js
 

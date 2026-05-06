@@ -18,6 +18,7 @@ import org.scalajs.dom.html
 
 import scala.scalajs.js
 
+
 object Select2 {
   implicit def toJQuerySelect2(jQuery: JQuery): JQuerySelect2 =
     jQuery.asInstanceOf[JQuerySelect2]

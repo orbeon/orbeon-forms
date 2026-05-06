@@ -23,9 +23,6 @@ object Help {
    */
   def showHelp(controlEl: html.Element): Unit = {
 
-    val jControlEl    = $(controlEl)
-    val jControlElDyn = jControlEl.asInstanceOf[js.Dynamic]
-
     val labelText = XFormsUI.getLabelMessage(controlEl)
     val helpText  = XFormsUI.getHelpMessage(controlEl)
 
@@ -76,7 +73,7 @@ object Help {
 
       // [1] Using animation unnecessarily complicates things, by creating cases where we have two popovers
       //     in the DOM, when one is being hidden while the other is being shown, so we just disable animations.
-      jControlElDyn.popover(js.Dynamic.literal(
+      $(controlEl).asInstanceOf[js.Dynamic].popover(js.Dynamic.literal(
         placement = placement.entryName,
         trigger   = "manual",
         title     = labelText,
@@ -223,7 +220,7 @@ object Help {
           val altMaxWidth =
             dom.document.documentElement.clientWidth -
             2 * (if (placement == Placement.Over) padding else newPopoverOffset.left)
-          if (popover.contentWidth.exists(_ > altMaxWidth))
+          if (popover.contentWidthOrZero > altMaxWidth)
             popover.style.maxWidth = s"${altMaxWidth}px"
       }
     }

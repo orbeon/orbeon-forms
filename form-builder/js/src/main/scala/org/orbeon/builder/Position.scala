@@ -14,7 +14,6 @@
 package org.orbeon.builder
 
 import org.orbeon.datatypes.Orientation
-import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport
 import org.orbeon.web.DomSupport.*

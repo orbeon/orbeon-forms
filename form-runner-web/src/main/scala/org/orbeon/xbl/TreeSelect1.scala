@@ -15,7 +15,7 @@ package org.orbeon.xbl
 
 import io.udash.wrappers.jquery.JQueryEvent
 import org.orbeon.facades.{Fancytree, FancytreeEventData, FancytreeJsonNode}
-import org.orbeon.web.DomSupport.*
+import org.orbeon.web.DomSupport.DomElemOps
 import org.orbeon.xforms
 import org.orbeon.xforms.$
 import org.orbeon.xforms.XFormsXbl
@@ -31,8 +31,8 @@ object TreeSelect1 {
 
   private class TreeSelect1Companion(containerElem: html.Element) extends XBLCompanion {
 
-    def findTreeContainer         = $(containerElem).find(".xbl-fr-tree-select1-container")
-    def removeListeners()         = findTreeContainer.off()
+    def getTreeContainer          = containerElem.querySelectorT(".xbl-fr-tree-select1-container")
+    def removeListeners()         = $(getTreeContainer).off()
     def logDebug(message: String) = () // println(s"TreeSelect: $message")
 
     var isReadonly        : Boolean           = false
@@ -43,7 +43,7 @@ object TreeSelect1 {
     override def init(): Unit = {
       logDebug("init")
       this.isReadonly        = isMarkedReadonly
-      this.hasJavaScriptTree = ! $(containerElem).find(".xbl-fr-tree-select1-container-static-readonly").is(":not('.xforms-disabled')")
+      this.hasJavaScriptTree = containerElem.querySelectorOpt(".xbl-fr-tree-select1-container-static-readonly.xforms-disabled").nonEmpty
     }
 
     override def destroy(): Unit =
@@ -54,9 +54,8 @@ object TreeSelect1 {
       }
 
     override def xformsUpdateReadonly(readonly: Boolean): Unit =
-      if (this.hasJavaScriptTree) {
+      if (this.hasJavaScriptTree)
         this.isReadonly = readonly
-      }
 
     override def xformsGetValue(): String = this.currentValue
 
@@ -75,9 +74,8 @@ object TreeSelect1 {
     }
 
     override def xformsFocus(): Unit =
-      if (this.hasJavaScriptTree) {
+      if (this.hasJavaScriptTree)
         logDebug("xformsFocus")
-      }
 
     // This is called explicitly from tree-select1.xbl upon `xforms-enabled` and itemset change
     def updateItemset(itemset: String): Unit =
@@ -104,7 +102,7 @@ object TreeSelect1 {
               childrenOrUndef = childrenOrUndef
             )
 
-        val jTreeContainer        = findTreeContainer
+        val jTreeContainer        = $(getTreeContainer)
         val jTreeContainerDynamic = jTreeContainer.asInstanceOf[js.Dynamic]
 
         val items = convertItems(js.JSON.parse(itemset).asInstanceOf[js.Array[Item]])

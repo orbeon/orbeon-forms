@@ -1,6 +1,6 @@
 package org.orbeon.xforms
 
-import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
+import io.udash.wrappers.jquery.JQueryEvent
 import org.orbeon.web.DomSupport.*
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -30,13 +30,13 @@ object ItemHint {
       // `UndefOr` to try to avoid occasional error with fastOptJS but that doesn't seem to work; `.html()` is meant to
       // return a `String` but occasionally returns `undefined`, and that's probably the main problem. Should be ok
       // with `fullOptJS`.
-      val hintHtml: js.UndefOr[String] = jHintRegionEl.nextAll(".xforms-hint").html()
+      val hintHtml: js.UndefOr[String] = hintRegionEl.nextElementSiblings(".xforms-hint").nextOption().get.outerHTML
 
       val tooltipData        = jHintRegionEl.data("tooltip").map(_.asInstanceOf[js.Dynamic]).orNull
       val haveHint           = hintHtml.exists(_.nonEmpty)
       val tooltipInitialized = tooltipData != null
 
-      // Compute placement, and don't use "over" since tooltips don"t support it
+      // Compute placement, and don't use "over" since tooltips don't support it
       val placement: js.Function = () => {
         val p = Placement.getPlacement(Placement.getPositionDetails(hintRegionEl))
         if (p == Placement.Over) "bottom" else p.entryName

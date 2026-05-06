@@ -125,7 +125,7 @@ object DomSupport {
       childrenWithLocalName(name).nextOption()
 
     def firstChildWithLocalNameOrThrow(name: String): dom.Element =
-      firstChildWithLocalNameOpt(name).getOrElse(throw new IllegalArgumentException(name))
+      firstChildWithLocalNameOpt(name).getOrElse(throw new NoSuchElementException(name))
 
     // Just in case, normalize following:
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute#non-existing_attributes
@@ -136,7 +136,7 @@ object DomSupport {
         None
 
     def attValueOrThrow(name: String): String =
-      attValueOpt(name).getOrElse(throw new IllegalArgumentException(name))
+      attValueOpt(name).getOrElse(throw new NoSuchElementException(name))
 
     def booleanAttValueOpt(name: String): Option[Boolean] =
       attValueOpt(name).map(_.toBoolean)
@@ -333,6 +333,9 @@ object DomSupport {
 
     def createButtonElement: html.Button =
       doc.createElement("button").asInstanceOf[html.Button]
+
+    def createDivElement: html.Div =
+      doc.createElement("div").asInstanceOf[html.Div]
   }
 
   trait DateTimeFormatPart extends js.Object {

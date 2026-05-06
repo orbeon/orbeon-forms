@@ -15,8 +15,9 @@ package org.orbeon.builder
 
 import io.udash.wrappers.jquery.JQueryCallbacks
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Support}
+import org.orbeon.xforms.{AjaxClient, AjaxEvent, Support}
 import org.scalajs.dom
+import org.scalajs.dom.html
 
 import scala.annotation.unused
 import scala.scalajs.js
@@ -44,11 +45,12 @@ object FormBuilderPrivateAPI extends js.Object {
   def updateTestIframeAndDispatch(eventName: String): Unit = {
 
     // Reset the displayed page as the iframe might show the result from a previous test
-    val oldIFrame = $(".fb-test-iframe")
-    val newIFrame = $(oldIFrame.get(0).get.outerHTML)
-    val iframeContainer = oldIFrame.parent()
-    oldIFrame.remove()
-    iframeContainer.append(newIFrame)
+    // Before, we were recreating a new element as a copy (through jQuery) of the old one's `outerHTML`. But simply
+    // resetting the `src` to `about:blank` should work, shouldn't it? I am not even sure this is needed at all.
+    dom.document
+      .querySelectorT(".fb-test-iframe")
+      .asInstanceOf[html.IFrame]
+      .src = "about:blank"
 
     // Dispatch the event requested
     AjaxClient.fireEvent(

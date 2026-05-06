@@ -27,8 +27,8 @@ import org.orbeon.facades.TinyMce.{GlobalTinyMce, TinyMceConfig, TinyMceDefaultC
 import org.orbeon.fr.FormRunnerUtils
 import org.orbeon.oxf.util.HtmlParsing
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
+import org.orbeon.web.{DomEventNames, DomSupport}
 import org.orbeon.xforms.*
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
@@ -296,10 +296,9 @@ object ControlLabelHintTextEditor {
       // Function to initialize the TinyMCE, memoized so it runs at most once
       val initTinyMce: Eval[TinyMceEditor] = Eval.later {
 
-        val anchorId = Underscore.uniqueId() // TODO: Don't use `Underscore`
+        val anchorId = DomSupport.generateIdIfNeeded(tinyMceContainerDivElem)
 
         tinyMceContainerDivElem.show()
-        tinyMceContainerDivElem.id = anchorId
 
         locally {
           val href =

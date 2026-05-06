@@ -36,6 +36,5 @@ abstract class JQueryTooltipConfig extends js.Object {
 @JSGlobal("ORBEON._")
 @js.native
 object Underscore extends js.Object {
-  def uniqueId(): String = js.native
   def clone[T](o: T): T = js.native
 }

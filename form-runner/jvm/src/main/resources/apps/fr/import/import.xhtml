@@ -1014,7 +1014,7 @@
                             <fr:c x="1" y="2" w="12">
                                 <xf:group
                                     ref=".[not($format-invalid)]"
-                                    class="alert alert-{if ($some-invalid) then 'warning' else 'success'}">
+                                    class="alert alert-{if (bind('fr-import-invalid-count-bind') gt 0) then 'warning' else 'success'}">
                                     <xf:output
                                         value="
                                             if (bind('file-format-bind') = ('excel-named-ranges', 'xml-form-structure-and-data')) then

@@ -39,6 +39,12 @@
   function isValidDate(d) {
     return d && !isNaN(d.getTime());
   }
+  function intersection(a, b) {
+      var setB = new Set(b);
+      return a.filter(function(x) {
+        return setB.has(x);
+      });
+  }
 
   var filterInt = function(value) {
         if (/^(-|\+)?(\d+|Infinity)$/.test(value))
@@ -1962,8 +1968,8 @@
             // Make sure at least the month and day were set to consider this a valid date
             var month_setters = ['M', 'MM', 'm', 'mm'];
             var day_setters   = ['d', 'dd'];
-            var month_set = ORBEON._.intersection(used_setters, month_setters).length != 0;
-            var day_set   = ORBEON._.intersection(used_setters, day_setters).length   != 0;
+            var month_set = intersection(used_setters, month_setters).length != 0;
+            var day_set   = intersection(used_setters, day_setters).length   != 0;
             if (! month_set || ! day_set)
                 return undefined;
 

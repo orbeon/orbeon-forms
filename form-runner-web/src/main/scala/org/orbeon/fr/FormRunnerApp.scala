@@ -79,6 +79,7 @@ object FormRunnerApp extends App {
     xbl.ClipboardCopy
     xbl.Trigger
     xbl.Pager
+    xbl.Countdown
     xbl.FrWizard
     xbl.Timestamp
 

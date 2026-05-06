@@ -21,7 +21,6 @@
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <xbl:script src="/xbl/orbeon/countdown/countdown.js"/>
     <xbl:binding
             id="fr-countdown"
             element="fr|countdown"

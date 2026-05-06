@@ -558,18 +558,18 @@
                 <xf:group xxf:element="div" class="fb-tools" bind="fb-toolbox-actions-bind">
                     <xf:group class="fb-hide-alert">
                         <xf:label ref="$form-resources/actions/label"/>
-                        <!-- Repeat over existing bindings -->
-                        <xf:var name="actions" value="$model/fb:action[ends-with(@id, '-binding')]"/>
+                        <!-- Repeat over existing 2018.2 actions -->
+                        <xf:var name="actions" value="$model/fb:action[@version = '2018.2']"/>
                         <xf:var name="moves"   value="count($actions) gt 1"/>
                         <fr:dnd-repeat ref="$actions">
                             <xh:div class="{'fb-tool', 'xforms-dnd-item', 'xforms-dnd-moves'[$moves]}">
                                 <xh:i class="fa fa-fw fa-bars fb-action-service-grab"/>
                                 <xf:var name="current-action" value="."/>
-                                <xf:var name="binding-name" value="substring-before(@id, '-binding')"/>
+                                <xf:var name="action-name" value="@name/string()"/>
                                 <xf:trigger>
-                                    <xf:label value="$binding-name"/>
+                                    <xf:label value="$action-name"/>
                                     <xxf:show ev:event="DOMActivate" dialog="fb-action-dialog">
-                                        <xf:property name="binding-name" value="$binding-name"/>
+                                        <xf:property name="action-name" value="$action-name"/>
                                     </xxf:show>
                                 </xf:trigger>
                             </xh:div>

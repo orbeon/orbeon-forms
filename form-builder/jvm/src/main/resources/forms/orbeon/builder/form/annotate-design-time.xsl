@@ -56,7 +56,11 @@
     <!-- NOTE: We disable all event handlers below so this is probably not needed anymore, but Form Builder
          currently (2015-07-06) depends on the fb:* prefixes on the elements. -->
     <xsl:template
-            match="xf:model/xf:*[p:classes() = ('fr-service', 'fr-database-service')] | xf:model/xf:action[ends-with(@id, '-binding')]"
+            match="
+                xf:model/xf:*[p:classes() = ('fr-service', 'fr-database-service')] |
+                xf:model/xf:action[ends-with(@id, '-binding')] |
+                xf:model/fr:action[@version = '2018.2'] |
+                xf:model/fr:listener[@version = '2018.2']"
             mode="within-model">
         <xsl:element name="fb:{local-name()}">
             <xsl:apply-templates select="@* | node()" mode="#current"/>

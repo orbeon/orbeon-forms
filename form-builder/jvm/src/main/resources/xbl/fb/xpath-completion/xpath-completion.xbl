@@ -49,8 +49,8 @@
                     <xsl:element name="{name(/*)}">
                         <xsl:attribute name="id"          select="'field'"/>
                         <xsl:attribute name="ref"         select="'$binding'"/>
-    <!--                    <xsl:attribute name="incremental" select="'true'"/>-->
                         <xsl:attribute name="appearance"  select="tokenize(/*/@appearance, '\s+')[. != 'xpath-completion']"/>
+                        <xsl:copy-of select="/*/@incremental"/>
                         <xsl:copy-of select="/*/@mediatype"/>
                     </xsl:element>
                 </xh:text-expander>

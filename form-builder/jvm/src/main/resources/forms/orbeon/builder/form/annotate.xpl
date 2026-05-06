@@ -85,7 +85,13 @@
     </p:processor>
 
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data"             href="#migrated-to-12-columns"/>
+        <p:input  name="data"   href="#migrated-to-12-columns"/>
+        <p:input  name="config" href="oxf:/apps/fr/components/actions-legacy-to-20182.xsl"/>
+        <p:output name="data"   id="migrated-actions-to-20182"/>
+    </p:processor>
+
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="data"             href="#migrated-actions-to-20182"/>
         <p:input name="bindings"         href="#bindings"/>
         <p:input name="is-readonly-mode" href="#is-readonly-mode"/>
         <p:input name="config">

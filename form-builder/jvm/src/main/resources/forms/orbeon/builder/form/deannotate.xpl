@@ -61,6 +61,13 @@
                     </xsl:element>
                 </xsl:template>
 
+                <!-- Restore namespace on 2018.2 actions and listeners -->
+                <xsl:template match="xf:model/fb:action[@version = '2018.2'] | xf:model/fb:listener[@version = '2018.2']">
+                    <xsl:element name="fr:{local-name()}">
+                        <xsl:apply-templates select="@* | node()"/>
+                    </xsl:element>
+                </xsl:template>
+
                 <!-- Restore event handlers -->
                 <xsl:template match="@fb:event">
                     <xsl:attribute name="{local-name()}" select="."/>

@@ -290,9 +290,7 @@ trait CreateUpdateDelete {
       val colNames     = includedCols.map(_.name).mkString(", ")
       val colValues    =
         includedCols
-          .map(_.value match {
-            case StaticColValue(value)           => value
-            case DynamicColValue(placeholder, _) => placeholder})
+          .map(_.placeholder)
           .mkString(", ")
 
       val insertSql =
@@ -310,8 +308,7 @@ trait CreateUpdateDelete {
 
         // Set parameters in prepared statement for the dynamic values
         includedCols
-          .map(_.value)
-          .collect({ case DynamicColValue(_, paramSetter) => paramSetter })
+          .map(_.paramSetter)
           .zipWithIndex
           .foreach{ case (paramSetter, index) => paramSetter(ps, index + 1)}
       }

@@ -50,20 +50,10 @@ object SqlSupport {
     (ps: PreparedStatement, i: Int) => setter(ps)(i, value)
   }
 
-  sealed abstract class ColValue
-
-  case class StaticColValue (
-    value: String
-  ) extends ColValue
-
-  case class DynamicColValue (
-    placeholder            : String,
-    paramSetter            : ParamSetterFunc
-  ) extends ColValue
-
   case class Col(
     name                   : String,
-    value                  : ColValue
+    placeholder            : String,
+    paramSetter            : ParamSetterFunc
   )
 
   def insertCols(
@@ -95,175 +85,126 @@ object SqlSupport {
         (None, None)
       }
 
-    (
-      Provider.idColGetter(req.provider) match {
-        case Some(getter) if req.forDataNotAttachment =>
-          List(
-            Col(
-              name          = "id",
-              value         = StaticColValue(getter)
-            )
-          )
-        case _ => Nil
-      }
-    ) ::: List(
+    List(
       Col(
         name          = "created",
-        value         = DynamicColValue(
-          placeholder = "?",
-          paramSetter = param(_.setTimestamp, req.existingRow.map(_.createdTime).map(Timestamp.from).getOrElse(currentTimestamp))
-        )
+        placeholder   = "?",
+        paramSetter   = param(_.setTimestamp, req.existingRow.map(_.createdTime).map(Timestamp.from).getOrElse(currentTimestamp))
       ),
       Col(
         name          = "last_modified_time",
-        value         = DynamicColValue(
-          placeholder = "?",
-          paramSetter = param(_.setTimestamp, currentTimestamp)
-        )
+        placeholder   = "?",
+        paramSetter   = param(_.setTimestamp, currentTimestamp)
       ),
       Col(
         name          = "last_modified_by",
-        value         = DynamicColValue(
-          placeholder = "?",
-          paramSetter = param(_.setString, req.username.orNull)
-        )
+        placeholder   = "?",
+        paramSetter   = param(_.setString, req.username.orNull)
       ),
       Col(
         name          = "app",
-        value         = DynamicColValue(
-          placeholder  = "?",
-          paramSetter  = param(_.setString, req.appForm.app)
-        )
+        placeholder   = "?",
+        paramSetter   = param(_.setString, req.appForm.app)
       ),
       Col(
         name          = "form",
-        value         = DynamicColValue(
-          placeholder = "?",
-          paramSetter = param(_.setString, req.appForm.form)
-        )
+        placeholder   = "?",
+        paramSetter   = param(_.setString, req.appForm.form)
       ),
       Col(
         name          = "form_version",
-        value         = DynamicColValue(
-          placeholder = "?",
-          paramSetter = param(_.setInt, versionToSet)
-        )
+        placeholder   = "?",
+        paramSetter   = param(_.setInt, versionToSet)
       )
     ) ::: (
       req.forData && req.dataPart.get.stage.isDefined list
         Col(
           name          = "stage",
-          value         = DynamicColValue(
-            placeholder = "?",
-            paramSetter = param(_.setString, req.dataPart.get.stage.get)
-          )
+          placeholder   = "?",
+          paramSetter   = param(_.setString, req.dataPart.get.stage.get)
         )
     ) ::: (
       req.forData list
         Col(
           name          = "document_id",
-          value         = DynamicColValue(
-            placeholder = "?",
-            paramSetter = param(_.setString, req.dataPart.get.documentId)
-          )
+          placeholder   = "?",
+          paramSetter   = param(_.setString, req.dataPart.get.documentId)
         )
     ) ::: List(
       Col(
         name          = "deleted",
-        value         = DynamicColValue(
-          placeholder = "?",
-          paramSetter = param(_.setString, if (delete) "Y" else "N")
-        )
+        placeholder   = "?",
+        paramSetter   = param(_.setString, if (delete) "Y" else "N")
       )
     ) ::: (
       req.forData list
         Col(
           name          = "draft",
-          value         = DynamicColValue(
-            placeholder = "?",
-            paramSetter = param(_.setString, if (req.dataPart.get.isDraft) "Y" else "N")
-          )
+          placeholder   = "?",
+          paramSetter   = param(_.setString, if (req.dataPart.get.isDraft) "Y" else "N")
         )
     ) ::: (
       req.forAttachment list
         Col(
           name          = "file_name",
-          value         = DynamicColValue(
-            placeholder = "?",
-            paramSetter = param(_.setString, req.filename.get)
-          )
+          placeholder   = "?",
+          paramSetter   = param(_.setString, req.filename.get)
         )
     ) ::: (
       req.forAttachment list
         Col(
           name          = "file_content",
-          value         = DynamicColValue(
-            placeholder = "?",
-            paramSetter = param(_.setBytes, RequestReader.bytes(reqBodyOpt).orNull)
-          )
+          placeholder   = "?",
+          paramSetter   = param(_.setBytes, RequestReader.bytes(reqBodyOpt).orNull)
         )
     ) ::: (
       req.forAttachment list
         Col(
           name          = "hash_algorithm",
-          value         = DynamicColValue(
-            placeholder = "?",
-            paramSetter = param(_.setString, req.hashAlgorithm.orNull)
-          )
+          placeholder   = "?",
+          paramSetter   = param(_.setString, req.hashAlgorithm.orNull)
         )
     ) ::: (
       req.forAttachment list
         Col(
           name          = "hash_value",
-          value         = DynamicColValue(
-            placeholder = "?",
-            paramSetter = param(_.setString, req.hashValue.orNull)
-          )
+          placeholder   = "?",
+          paramSetter   = param(_.setString, req.hashValue.orNull)
         )
     ) ::: (
       isFormDefinition list
         Col(
           name          = "form_metadata",
-          value         = DynamicColValue(
-            placeholder = "?",
-            paramSetter = param(_.setString, metadataOpt.orNull)
-          )
+          placeholder   = "?",
+          paramSetter   = param(_.setString, metadataOpt.orNull)
         )
     ) ::: (
       req.forData list
         Col(
           name          = "username",
-          value         = DynamicColValue(
-            placeholder = "?" ,
-            paramSetter = param(_.setString, req.existingRow.flatMap(_.createdBy).map(_.username).getOrElse(req.username.orNull))
-          )
+          placeholder   = "?",
+          paramSetter   = param(_.setString, req.existingRow.flatMap(_.createdBy).map(_.username).getOrElse(req.username.orNull))
         )
     ) ::: (
       req.forData list
         Col(
           name          = "groupname",
-          value         = DynamicColValue(
-            placeholder = "?",
-            paramSetter = param(_.setString, req.existingRow.flatMap(_.createdBy).flatMap(_.groupname).getOrElse(req.groupname.orNull))
-          )
+          placeholder   = "?",
+          paramSetter   = param(_.setString, req.existingRow.flatMap(_.createdBy).flatMap(_.groupname).getOrElse(req.groupname.orNull))
         )
     ) ::: (
       organizationToSet.isDefined list
         Col(
           name          = "organization_id",
-          value         = DynamicColValue(
-            placeholder = "?",
-            paramSetter = param(_.setInt, organizationToSet.get)
-          )
+          placeholder   = "?",
+          paramSetter   = param(_.setInt, organizationToSet.get)
         )
     ) ::: (
       ! req.forAttachment list
         Col(
           name          = xmlCol,
-          value         = DynamicColValue(
-            placeholder = xmlVal,
-            paramSetter = param(_.setString, xmlOpt.orNull)
-          )
+          placeholder   = xmlVal,
+          paramSetter   = param(_.setString, xmlOpt.orNull)
         )
     ) ::: Nil
   }

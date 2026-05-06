@@ -342,11 +342,6 @@ object Provider extends Enum[Provider] {
 
   val FlatViewSupportedProviders: Set[Provider] = Set(MySQL, PostgreSQL)
 
-  def idColGetter(provider: Provider): Option[String] =
-    provider match {
-      case _      => None
-    }
-
   def concat(provider: Provider, args: String*): String =
     provider match {
       case _ =>

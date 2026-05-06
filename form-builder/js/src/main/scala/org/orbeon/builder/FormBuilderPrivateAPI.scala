@@ -13,9 +13,8 @@
   */
 package org.orbeon.builder
 
-import io.udash.wrappers.jquery.JQueryCallbacks
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.{AjaxClient, AjaxEvent, Support}
+import org.orbeon.xforms.{AjaxClient, AjaxEvent, CallbackList, Support}
 import org.scalajs.dom
 import org.scalajs.dom.html
 
@@ -36,10 +35,10 @@ object FormBuilderPrivateAPI extends js.Object {
     )
   }
 
-  def controlAdded: JQueryCallbacks[js.Function1[String, js.Any], String] =
+  def controlAdded: CallbackList[String] =
     ControlLabelHintTextEditor.controlAdded
 
-  def sectionAdded: JQueryCallbacks[js.Function1[String, js.Any], String] =
+  def sectionAdded: CallbackList[String] =
     SectionLabelEditor.sectionAdded
 
   def updateTestIframeAndDispatch(eventName: String): Unit = {

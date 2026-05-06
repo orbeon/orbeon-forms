@@ -17,6 +17,7 @@ import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
 
 import scala.collection.mutable
+import scala.scalajs.js.annotation.JSExport
 import scala.util.control.NonFatal
 
 
@@ -28,12 +29,15 @@ class CallbackList[T] {
 
   private val fns = mutable.Queue[T => Unit]()
 
+  @JSExport
   def add(fn: T => Unit): Unit =
     fns += fn
 
+  @JSExport
   def remove(fn: T => Unit): Unit =
     fns.dequeueAll(_ eq fn)
 
+  @JSExport
   def fire(v: T): Unit =
     fns.toList foreach { fn => // convert to `List` as `remove()` can be called as side effect!
       try {

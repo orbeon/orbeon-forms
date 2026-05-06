@@ -19,7 +19,6 @@ import cats.Eval
 import cats.implicits.catsSyntaxOptionId
 import enumeratum.*
 import enumeratum.EnumEntry.Lowercase
-import io.udash.wrappers.jquery.JQueryCallbacks
 import org.orbeon.builder.facade.*
 import org.orbeon.builder.facade.JQueryTooltip.*
 import org.orbeon.builder.rpc.FormBuilderRpcApi
@@ -50,7 +49,7 @@ object ControlLabelHintTextEditor {
     case object Text  extends EditorType
   }
 
-  val controlAdded: JQueryCallbacks[js.Function1[String, js.Any], String] = $.callbacks[js.Function1[String, js.Any], String](flags = "")
+  val controlAdded: CallbackList[String] = new CallbackList
 
   locally {
     val LabelHintSelectorList = List(".xforms-label", ".xforms-hint", ".xforms-text .xforms-output-output") map (".fb-main .fr-editable " + _)

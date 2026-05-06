@@ -14,14 +14,13 @@
 package org.orbeon.builder
 
 import autowire.*
-import io.udash.wrappers.jquery.JQueryCallbacks
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.fr.FormRunnerUtils
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
 import org.orbeon.web.{DomEventNames, DomSupport}
 import org.orbeon.xforms.rpc.RpcClient
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, XFormsUI}
+import org.orbeon.xforms.{AjaxClient, AjaxEvent, CallbackList, XFormsUI}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -32,8 +31,7 @@ import scala.util.chaining.scalaUtilChainingOps
 
 object SectionLabelEditor {
 
-  val sectionAdded: JQueryCallbacks[js.Function1[String, js.Any], String] =
-    $.callbacks[js.Function1[String, js.Any], String](flags = "")
+  val sectionAdded: CallbackList[String] = new CallbackList
 
   locally {
 

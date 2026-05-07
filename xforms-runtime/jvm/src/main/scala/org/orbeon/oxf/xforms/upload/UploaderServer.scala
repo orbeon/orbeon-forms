@@ -410,6 +410,12 @@ trait UploaderServer {
           progressOpt = Some(progress)
         }
 
+        // Throw here and not earlier because we need the `UploadProgress` to be set in the session so that we can
+        // report the interrupted upload based on the session. Alternatively, we could maybe just report the error and
+        // create an encoded event with properties in `XFormsUploadRoute`.
+        if (! SecureUtils.checkPasswordForKeyUsage(SecureUtils.KeyUsage.General))
+          throw UploadPasswordNotConfiguredException()
+
         // As of 2017-03-22: part `Content-Length` takes precedence if provided (but browsers don't set it).
         // Browsers do set the outer `Content-Length` though. Again we assume that the overhead of the
         // entire request vs. the part is small so it's ok, for progress purposes, to use the outer size.

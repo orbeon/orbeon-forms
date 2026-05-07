@@ -311,6 +311,7 @@
             <upload-done>Pujada de fitxers completada.</upload-done>
             <upload-error>Hi ha hagut una errada en la pujada de fitxers. Torni a intentar-ho.</upload-error>
             <upload-error-empty-file>El fitxer està buit.</upload-error-empty-file>
+            <upload-error-upload-password-not-configured-error>Les càrregues de fitxers estan desactivades perquè la contrasenya de xifratge d'Orbeon Forms no està establerta o és massa feble.</upload-error-upload-password-not-configured-error>
             <upload-error-size>L'arxiu es massa gran. La mida permesa és {0} i
                 la mida del fitxer pujat és {1}.</upload-error-size>
             <upload-error-max-files-per-control>S''ha superat el nombre màxim de fitxers. No podeu

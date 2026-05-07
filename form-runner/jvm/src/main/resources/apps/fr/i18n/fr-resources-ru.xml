@@ -295,7 +295,8 @@
             <upload-cancel>Загрузка отменена пользователем</upload-cancel>
             <upload-done>Загрузка завершена</upload-done>
             <upload-error>Во время загрузки произошла ошибка. Попробуйте еще раз.</upload-error>
-            <upload-error-empty-file>Загруженный файл пустой.</upload-error-empty-file>
+            <upload-error-empty-file>Загруженный файл пуст.</upload-error-empty-file>
+            <upload-error-upload-password-not-configured-error>Загрузка файлов отключена, так как пароль шифрования Orbeon Forms не установлен или слишком слаб.</upload-error-upload-password-not-configured-error>
             <upload-error-size>Загруженный файл слишком большой. Максимальный допустимый размер {0}, фактический размер {1}.</upload-error-size>
             <upload-error-max-files-per-control>Превышено максимальное количество файлов. Вы не можете прикрепить более {0,number,integer} файлов к этому элементу управления.</upload-error-max-files-per-control>
             <upload-error-mediatype>Загруженный файл имеет неподдерживаемый тип: {0}.</upload-error-mediatype>

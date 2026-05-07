@@ -303,6 +303,7 @@
             <upload-done>Wgrywanie pliku/-ów zostało zakończone</upload-done>
             <upload-error>W trakcie wgrywania pliku/-ów wystąpił błąd. Spróbuj ponownie.</upload-error>
             <upload-error-empty-file>Przesłany plik jest pusty.</upload-error-empty-file>
+            <upload-error-upload-password-not-configured-error>Przesyłanie plików jest wyłączone, ponieważ hasło szyfrowania Orbeon Forms nie zostało ustawione lub jest zbyt słabe.</upload-error-upload-password-not-configured-error>
             <upload-error-size>Wgrany plik jest zbyt duży. Maksymalny dozwolony rozmiar plikuto {0}, a rozmiar otrzymanego pliku to {1}.</upload-error-size>
             <upload-error-max-files-per-control>Przekroczono maksymalną liczbę plików. Nie można dołączyć więcej niż {0,number,integer} plików do tego kontrolki.</upload-error-max-files-per-control>
             <upload-error-mediatype>Wgrany plik jest niewłaściwego typu: {0}</upload-error-mediatype>

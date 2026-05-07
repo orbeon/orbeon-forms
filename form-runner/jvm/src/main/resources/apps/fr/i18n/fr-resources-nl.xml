@@ -303,6 +303,7 @@
             <upload-done>Upload voltooid</upload-done>
             <upload-error>Er was een probleem tijdens de upload. Probeer opnieuw.</upload-error>
             <upload-error-empty-file>Het geüploade bestand is leeg.</upload-error-empty-file>
+            <upload-error-upload-password-not-configured-error>Bestands-uploads zijn uitgeschakeld omdat het encryptiewachtwoord van Orbeon Forms niet is ingesteld of te zwak is.</upload-error-upload-password-not-configured-error>
             <upload-error-size>Het geüploade bestand is te groot. De maximale, toegestane grootte is {0} en de huidige, ontvangen grootte is {1}.</upload-error-size>
             <upload-error-max-files-per-control>Maximaal aantal bestanden overschreden. U kunt niet meer dan {0,number,integer} bestanden aan dit element toevoegen.</upload-error-max-files-per-control>
             <upload-error-mediatype>Het geüploade bestand heeft een onjuist type: {0}</upload-error-mediatype>

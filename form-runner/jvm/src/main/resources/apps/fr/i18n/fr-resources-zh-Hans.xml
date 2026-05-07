@@ -297,7 +297,8 @@
             <upload-cancel>上传被用户取消</upload-cancel>
             <upload-done>上传完成</upload-done>
             <upload-error>上传过程中出错。请重试。</upload-error>
-            <upload-error-empty-file>上传的文件为空。</upload-error-empty-file>
+            <upload-error-empty-file>上传的文件是空的。</upload-error-empty-file>
+            <upload-error-upload-password-not-configured-error>由于 Orbeon Forms 加密密码未设置或太弱，文件上传已被禁用。</upload-error-upload-password-not-configured-error>
             <upload-error-size>上传的文件太大。允许的最大大小为{0}，实际收到的大小为{1}。</upload-error-size>
             <upload-error-max-files-per-control>超过最大文件数。您不能在此控件中附加超过 {0,number,integer} 个文件。</upload-error-max-files-per-control>
             <upload-error-mediatype>上传的文件类型不正确：{0}</upload-error-mediatype>

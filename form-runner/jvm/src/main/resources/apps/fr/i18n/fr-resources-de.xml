@@ -303,6 +303,7 @@
             <upload-done>Datei fertig hochgeladen</upload-done>
             <upload-error>Während dem Hochladen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</upload-error>
             <upload-error-empty-file>Die hochgeladene Datei darf nicht leer sein.</upload-error-empty-file>
+            <upload-error-upload-password-not-configured-error>Datei-Uploads sind deaktiviert, da das Verschlüsselungspasswort von Orbeon Forms nicht festgelegt oder zu schwach ist.</upload-error-upload-password-not-configured-error>
             <upload-error-size>Die hochgeladene Datei ist zu groß. Die maximal zulässige Größe ist {0} und die tatsächlich empfangene Größe ist {1}.</upload-error-size>
             <upload-error-max-files-per-control>Maximale Anzahl von Dateien überschritten. Sie können nicht mehr als {0,number,integer} Dateien an dieses Steuerelement anhängen.</upload-error-max-files-per-control>
             <upload-error-mediatype>Die hochgeladene Datei hat einen falschen Dateityp: {0}</upload-error-mediatype>

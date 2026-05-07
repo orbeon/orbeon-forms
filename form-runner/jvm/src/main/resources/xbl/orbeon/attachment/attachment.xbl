@@ -316,6 +316,14 @@
                                     ),
                                     ()
                                 )
+                            else if (event('error-type') = 'upload-password-not-configured-error') then
+                                xxf:format-message(
+                                    xxf:r(
+                                        'detail.messages.upload-error-upload-password-not-configured-error',
+                                        'fr-fr-resources'
+                                    ),
+                                    ()
+                                )
                             else if (event('error-type') = 'size-error') then
                                 xxf:format-message(
                                     xxf:r(

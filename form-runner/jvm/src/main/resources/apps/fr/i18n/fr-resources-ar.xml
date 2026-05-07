@@ -303,6 +303,7 @@
             <upload-done>اكتمل التحميل</upload-done>
             <upload-error>حدث خطأ أثناء التحميل. يرجى المحاولة مرة أخرى.</upload-error>
             <upload-error-empty-file>الملف الذي تم تحميله فارغ.</upload-error-empty-file>
+            <upload-error-upload-password-not-configured-error>تم تعطيل عمليات تحميل الملفات لأن كلمة مرور تشفير Orbeon Forms غير محددة أو ضعيفة للغاية。</upload-error-upload-password-not-configured-error>
             <upload-error-size>الملف الذي تم تحميله كبير جدًا. الحجم الأقصى المسموح به هو {0} والحجم الفعلي المستلم هو {1}.</upload-error-size>
             <upload-error-max-files-per-control>تم تجاوز الحد الأقصى لعدد الملفات. لا يمكنك إرفاق أكثر من {0,number,integer} ملفات بعنصر التحكم هذا.</upload-error-max-files-per-control>
             <upload-error-mediatype>الملف الذي تم تحميله من نوع غير صحيح: {0}</upload-error-mediatype>

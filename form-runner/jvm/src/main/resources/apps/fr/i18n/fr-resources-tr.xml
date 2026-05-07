@@ -303,6 +303,7 @@
             <upload-done>Yükleme tamamlandı</upload-done>
             <upload-error>Yükleme sırasında bir hata oluştu. Lütfen tekrar deneyin.</upload-error>
             <upload-error-empty-file>Yüklenen dosya boş.</upload-error-empty-file>
+            <upload-error-upload-password-not-configured-error>Dosya yüklemeleri devre dışı bırakıldı çünkü Orbeon Forms şifreleme parolası ayarlanmadı veya çok zayıf.</upload-error-upload-password-not-configured-error>
             <upload-error-size>Yüklenen dosya çok büyük. İzin verilen maksimum boyut {0} ve alınan gerçek boyut {1}.</upload-error-size>
             <upload-error-max-files-per-control>Maksimum dosya sayısı aşıldı. Bu kontrole {0,number,integer} dosyadan fazla ekleyemezsiniz.</upload-error-max-files-per-control>
             <upload-error-mediatype>Yüklenen dosya yanlış türde: {0}</upload-error-mediatype>

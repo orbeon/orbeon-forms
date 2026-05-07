@@ -47,6 +47,7 @@ case class DisallowedMediatypeException(
 ) extends FileUploadException
 
 case class EmptyFileException() extends FileUploadException
+case class UploadPasswordNotConfiguredException() extends FileUploadException
 
 case class FileScanException(
   fieldName      : String,
@@ -311,11 +312,12 @@ object Multipart {
                 UploadState.Interrupted(
                   Option(Exceptions.getRootThrowable(t))
                     .collect {
-                      case _: EmptyFileException => FileRejectionReason.EmptyFile
-                      case root: SizeLimitExceededException => FileRejectionReason.SizeTooLarge(root.getPermittedSize, root.getActualSize)
-                      case TooManyFilesException(permitted) => FileRejectionReason.TooManyFiles(permitted)
+                      case _: EmptyFileException                                              => FileRejectionReason.EmptyFile
+                      case _: UploadPasswordNotConfiguredException                            => FileRejectionReason.UploadPasswordNotConfigured
+                      case root: SizeLimitExceededException                                   => FileRejectionReason.SizeTooLarge(root.getPermittedSize, root.getActualSize)
+                      case TooManyFilesException(permitted)                                   => FileRejectionReason.TooManyFiles(permitted)
                       case DisallowedMediatypeException(clientFilenameOpt, permitted, actual) => FileRejectionReason.DisallowedMediatype(clientFilenameOpt, permitted, actual)
-                      case FileScanException(fieldName, fileScanResult) => FileRejectionReason.FailedFileScan(fieldName, fileScanResult.message)
+                      case FileScanException(fieldName, fileScanResult)                       => FileRejectionReason.FailedFileScan(fieldName, fileScanResult.message)
                     }
                 )
               ))

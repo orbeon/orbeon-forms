@@ -297,6 +297,7 @@
             <upload-done>Indlæsning færdig</upload-done>
             <upload-error>Der skete en fejl under indlæsning. Prøv igen.</upload-error>
             <upload-error-empty-file>Den uploadede fil er tom.</upload-error-empty-file>
+            <upload-error-upload-password-not-configured-error>Filoverførsler er deaktiveret, fordi Orbeon Forms krypteringsadgangskoden ikke er indstillet eller er for svag.</upload-error-upload-password-not-configured-error>
             <upload-error-size>Filen, der indlæses, er for stor. Den maksimale størrelse er {0} og der blev indlæst {1}.]</upload-error-size>
             <upload-error-max-files-per-control>Maksimalt antal filer overskredet. Du kan ikke vedhæfte mere end {0,number,integer} filer til denne kontrol.</upload-error-max-files-per-control>
             <upload-error-mediatype>Den uploadede fil har ikke en tilladt filtype: {0}</upload-error-mediatype>

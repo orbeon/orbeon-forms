@@ -303,6 +303,7 @@
             <upload-done>Överföring klar</upload-done>
             <upload-error>Fel under överföring. Vänligen försök igen.</upload-error>
             <upload-error-empty-file>Den uppladdade filen är tom.</upload-error-empty-file>
+            <upload-error-upload-password-not-configured-error>Filuppladdningar är inaktiverade eftersom lösenordet för Orbeon Forms-kryptering inte är inställt eller är för svagt.</upload-error-upload-password-not-configured-error>
             <upload-error-size>Filen är för stor för att överföras. Största storlek är {0}.</upload-error-size>
             <upload-error-max-files-per-control>Maximalt antal filer överskridet. Du kan inte bifoga mer än {0,number,integer} filer till denna kontroll.</upload-error-max-files-per-control>
             <upload-error-mediatype>Den uppladdade filen har en felaktig typ: {0}</upload-error-mediatype>

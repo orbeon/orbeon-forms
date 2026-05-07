@@ -321,7 +321,8 @@
             <upload-cancel>Subida de archivos cancelada por el usuario</upload-cancel>
             <upload-done>Subida de archivos completada</upload-done>
             <upload-error>Ha habido un error durante la subida de archivos. Intentelo nuevamente.</upload-error>
-            <upload-error-empty-file>El fichero subido está vacío.</upload-error-empty-file>
+            <upload-error-empty-file>El archivo cargado está vacío.</upload-error-empty-file>
+            <upload-error-upload-password-not-configured-error>Las cargas de archivos están desactivadas porque la contraseña de cifrado de Orbeon Forms no está establecida o es demasiado débil.</upload-error-upload-password-not-configured-error>
             <upload-error-size>El archivo subido es demasiado largo. El largo máximo permitido es
                 {0} y el tamaño del archivo subido es {1}.</upload-error-size>
             <upload-error-max-files-per-control>Número máximo de archivos excedido. No puede

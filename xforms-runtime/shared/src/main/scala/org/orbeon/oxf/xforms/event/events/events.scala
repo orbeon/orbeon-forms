@@ -209,6 +209,8 @@ object XXFormsUploadErrorEvent {
     progress match {
       case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.EmptyFile))) =>
         List("error-type" -> Some("empty-file-error"))
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.UploadPasswordNotConfigured))) =>
+        List("error-type" -> Some("upload-password-not-configured-error"))
       case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.SizeTooLarge(permitted, actual)))) =>
         List(
           "error-type" -> Some("size-error"),

@@ -302,7 +302,8 @@
             <upload-cancel>アップロードをキャンセルしました</upload-cancel>
             <upload-done>アップロードが完了しました</upload-done>
             <upload-error>アップロード中にエラーが発生しました。再試行してください。</upload-error>
-            <upload-error-empty-file>アップロードされたファイルが空です。</upload-error-empty-file>
+            <upload-error-empty-file>アップロードされたファイルは空です。</upload-error-empty-file>
+            <upload-error-upload-password-not-configured-error>Orbeon Formsの暗号化パスワードが設定されていないか、弱すぎるため、ファイルのアップロードが無効になっています。</upload-error-upload-password-not-configured-error>
             <upload-error-size>ファイルサイズが大きすぎます。最大 {0}、実際は {1} でした。</upload-error-size>
             <upload-error-max-files-per-control>添付できるファイル数は最大 {0,number,integer} 件です。</upload-error-max-files-per-control>
             <upload-error-mediatype>アップロードしたファイルの種類が正しくありません: {0}</upload-error-mediatype>

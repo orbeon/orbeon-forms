@@ -303,6 +303,7 @@
             <upload-done>Caricamento completato</upload-done>
             <upload-error>È apparso un errore durante il caricamento. Si prega di riprovare.</upload-error>
             <upload-error-empty-file>Il file caricato è vuoto.</upload-error-empty-file>
+            <upload-error-upload-password-not-configured-error>I caricamenti dei file sono disabilitati perché la password di crittografia di Orbeon Forms non è impostata o è troppo debole.</upload-error-upload-password-not-configured-error>
             <upload-error-size>Il file caricato è troppo grande. La dimensione massima consentita è di {0} e la dimensione reale ricevuta è di {1}.</upload-error-size>
             <upload-error-max-files-per-control>Numero massimo di file superato. Non è possibile allegare più di {0,number,integer} file a questo controllo.</upload-error-max-files-per-control>
             <upload-error-mediatype>Il file caricato è di un tipo non consentito: {0}</upload-error-mediatype>

@@ -39,6 +39,8 @@
   function isValidDate(d) {
     return d && !isNaN(d.getTime());
   }
+  // ORBEON: JavaScript now has a native `intersection()` method on `Set`, but it is fairly new as of early 2026. We
+  // can consider moving to that when availability is wide.
   function intersection(a, b) {
       var setB = new Set(b);
       return a.filter(function(x) {

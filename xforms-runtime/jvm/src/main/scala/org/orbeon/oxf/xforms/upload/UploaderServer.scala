@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.upload
 
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.apache.commons.fileupload.{FileItem, FileItemHeaders, UploadContext}
-import org.orbeon.datatypes.{MaximumCurrentFiles, MaximumFiles, MaximumSize}
 import org.orbeon.datatypes.MaximumSize.{LimitedSize, UnlimitedSize}
+import org.orbeon.datatypes.{MaximumCurrentFiles, MaximumSize}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.IOUtils.{runQuietly, useAndClose}
 import org.orbeon.io.LimiterInputStream
@@ -25,21 +25,18 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.processor.generator.RequestGenerator
-import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.FileItemSupport.*
 import org.orbeon.oxf.util.Multipart.UploadItem
-import org.orbeon.oxf.util.SecureUtils
 import org.orbeon.oxf.util.SLF4JLogging.*
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.*
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.control.XFormsValueControl
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.upload.api.java.{FileScan2, FileScanProvider2, FileScanResult as JFileScanResult}
 import org.orbeon.oxf.xforms.upload.api.{FileScan, FileScanProvider, FileScanStatus}
-import org.orbeon.xforms.Constants
+import org.orbeon.xforms.{Constants, EventNames}
 import org.slf4j
 import shapeless.syntax.typeable.*
 
@@ -77,8 +74,8 @@ object UploaderServer extends UploaderServer {
     Version.instance.requirePEFeature("File scan API")
 
   protected lazy val fileScanProviderOpt: Option[Either[FileScanProvider2, FileScanProvider]] =
-      ServiceProviderSupport.loadProvider[FileScanProvider2]("file scan", checkVersion).kestrel(_.init()).map(Left.apply)
-        .orElse(ServiceProviderSupport.loadProvider[FileScanProvider]("file scan", checkVersion).kestrel(_.init()).map(Right.apply))
+    ServiceProviderSupport.loadProvider[FileScanProvider2]("file scan", checkVersion).kestrel(_.init()).map(Left.apply)
+      .orElse(ServiceProviderSupport.loadProvider[FileScanProvider]("file scan", checkVersion).kestrel(_.init()).map(Right.apply))
 }
 
 trait UploaderServer {

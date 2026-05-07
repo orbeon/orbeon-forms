@@ -302,8 +302,7 @@ def resourceManagerProperties(buildBaseDirectory: File, resourceManagerPaths: Li
     for {
       (dir, i)    <- resourceManagerPaths.zipWithIndex
       absoluteDir = buildBaseDirectory / dir
-    }
-      yield
+    } yield
         s"-Doxf.resources.priority.${i + 1}=$pkg.FilesystemResourceManagerFactory"                   ::
         s"-Doxf.resources.priority.${i + 1}.oxf.resources.filesystem.sandbox-directory=$absoluteDir" ::
         Nil

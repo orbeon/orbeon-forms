@@ -39,17 +39,11 @@ object FileItemSupport {
     def nonBlankClientFilenameOpt: Option[String] =
       fileItem.getName.trimAllToOpt
 
-    def hasNonBlankClientFilename: Boolean =
-      nonBlankClientFilenameOpt.isDefined
-
     def nonBlankContentTypeOpt: Option[String] =
       fileItem.getContentType.trimAllToOpt
 
     def fileLocationOpt: Option[File] =
       Option(fileItem.asInstanceOf[DiskFileItem].getStoreLocation)
-
-    def debugFileLocation: String =
-      fileLocationOpt.map(_.getCanonicalPath).getOrElse("[no location]")
   }
 
   import Private.*

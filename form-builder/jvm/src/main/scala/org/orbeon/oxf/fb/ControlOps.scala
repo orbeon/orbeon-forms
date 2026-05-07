@@ -749,7 +749,7 @@ trait ControlOps extends ResourcesOps {
   }
 
   def findNewActions(modelElemOpt: Option[NodeInfo]): NodeColl =
-    modelElemOpt.toList child FRActionTest
+    modelElemOpt.toList child FBActionTest filter (_.attValueOpt("version").contains("2018.2"))
 
   def findLegacyActions(modelElemOpt: Option[NodeInfo]): NodeColl =
     modelElemOpt.toList child FBActionTest filter (_.id.endsWith("-binding"))
@@ -865,7 +865,7 @@ trait ControlOps extends ResourcesOps {
         updateNode(newName)
 
       // `fr:listener/@controls`
-      ctx.modelElemOpt.toList child FRListenerTest att ControlsTest foreach { att =>
+      ctx.modelElemOpt.toList child FBListenerTest att ControlsTest foreach { att =>
 
         val newTokens = att.stringValue.splitTo[List]() map {
           case `oldName` => newName

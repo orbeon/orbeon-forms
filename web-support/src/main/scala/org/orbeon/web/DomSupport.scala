@@ -192,7 +192,7 @@ object DomSupport {
           parseDoubleIgnoreTail(cssPos)
 
       // 4. Calculate and apply the new values
-      elem.style.top =  s"${(offset.top  - curOffset.top)  + findPosition(curStyle.top) .getOrElse(0d)}px"
+      elem.style.top  = s"${(offset.top  - curOffset.top)  + findPosition(curStyle.top) .getOrElse(0d)}px"
       elem.style.left = s"${(offset.left - curOffset.left) + findPosition(curStyle.left).getOrElse(0d)}px"
     }
 

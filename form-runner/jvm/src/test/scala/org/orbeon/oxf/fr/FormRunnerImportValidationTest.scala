@@ -40,7 +40,7 @@ class FormRunnerImportValidationTest
               body =
                 <upload>
                   <file
-                    filename="ACME Contact Form (en).xlsx"
+                    filename={filename}
                     mediatype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     size="12345">oxf:/forms/issue/7660/form/{filename}</file>
                   <file-format>{format}</file-format>

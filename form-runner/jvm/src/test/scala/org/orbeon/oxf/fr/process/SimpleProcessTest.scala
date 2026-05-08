@@ -132,7 +132,7 @@ extends DocumentTestBase
 
     val interpreter = new TestProcessInterpreter {
 
-      override def beforeProcess(): Try[Any] = {
+      override def beforeProcess(isContinuation: Boolean): Try[Any] = {
         _trace.clear()
         Success(())
       }

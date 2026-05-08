@@ -64,7 +64,7 @@ trait ProcessInterpreter extends Logging {
 
   // May be overridden by implementation
   def extensionActions: Iterable[(String, Action)] = Nil
-  def beforeProcess(): Try[Any] = Try(())
+  def beforeProcess(isContinuation: Boolean): Try[Any] = Try(())
 //  def afterProcess():  Try[Any] = Try(())
 
   private object ProcessRuntime {
@@ -174,7 +174,8 @@ trait ProcessInterpreter extends Logging {
                       runProcess(
                         processScope,
                         serializedContinuation._2,
-                        continuation(xfcd, computationResult)
+                        continuation(xfcd, computationResult),
+                        isContinuation = true
                       )
                     }
                   )
@@ -280,32 +281,34 @@ trait ProcessInterpreter extends Logging {
   type ProcessResult = Either[Try[Any], Future[Any]]
 
   // Main entry point for starting a literal process
-  def runProcess(scope: String, process: String, initialTry: Try[Any] = Success(())): ProcessResult =
+  def runProcess(scope: String, process: String, initialTry: Try[Any] = Success(()), isContinuation: Boolean = false): ProcessResult =
     withDebug("process: running", List("process" -> process)) {
       transactionStart()
       // Scope the process (for suspend/resume)
       withEmptyStack(scope) {
-        beforeProcess().map(_ => runSubProcess(process, initialTry)).recoverWith { case t =>
-          // Log and send a user error if there is one
-          // NOTE: In the future, it would be good to provide the user with an error id.
-          error(OrbeonFormatter.format(t))
-          Try(processError(t))
-          Failure(t)
-        } match {
-          case Success(ActionResult.Sync(tried)) =>
-            Left(tried)
-          case Success(ActionResult.Interrupt(message, Left(success @ Success(_)))) =>
-            debug(s"process: process interrupted with `success` action with message `$message`")
-            Left(success)
-          case Success(ActionResult.Interrupt(message, Left(failure @ Failure(_)))) =>
-            debug(s"process: process interrupted with `failure` action with message `$message`")
-            Left(failure)
-          case Success(ActionResult.Interrupt(message, Right(io))) =>
-            debug(s"process: process interrupted due to asynchronous action with message `$message`")
-            Right(io)
-          case f @ Failure(_) =>
-            Left(f)
-        }
+        beforeProcess(isContinuation)
+          .map(_ => runSubProcess(process, initialTry))
+          .recoverWith { case t =>
+            // Log and send a user error if there is one
+            // NOTE: In the future, it would be good to provide the user with an error id.
+            error(OrbeonFormatter.format(t))
+            Try(processError(t))
+            Failure(t)
+          } match {
+            case Success(ActionResult.Sync(tried)) =>
+              Left(tried)
+            case Success(ActionResult.Interrupt(message, Left(success @ Success(_)))) =>
+              debug(s"process: process interrupted with `success` action with message `$message`")
+              Left(success)
+            case Success(ActionResult.Interrupt(message, Left(failure @ Failure(_)))) =>
+              debug(s"process: process interrupted with `failure` action with message `$message`")
+              Left(failure)
+            case Success(ActionResult.Interrupt(message, Right(io))) =>
+              debug(s"process: process interrupted due to asynchronous action with message `$message`")
+              Right(io)
+            case f @ Failure(_) =>
+              Left(f)
+          }
       }
       // TODO: `transactionEnd()` to clean transient state?
     }

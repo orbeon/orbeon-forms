@@ -648,7 +648,7 @@ trait FormRunnerActions
       )
     }
 
-  def clearRenderedFormatsResources(): Try[Any] =
+  def clearRenderedFormatsResources(): Try[Unit] =
     Try {
 
       val childElems = FormRunnerActionsCommon.findUrlsInstanceRootElem.toList child *

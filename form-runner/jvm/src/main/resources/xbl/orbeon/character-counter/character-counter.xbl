@@ -78,6 +78,7 @@
                     </local>
                 </xf:instance>
                 <xf:bind ref="value[../type = 'HTMLFragment']" type="xf:HTMLFragment"/>
+                <xf:bind ref="value" readonly="xxf:readonly(xxf:binding('fr-character-counter'))"/>
             </xf:model>
         </xbl:implementation>
 

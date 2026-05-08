@@ -35,7 +35,7 @@
     <p:processor name="oxf:url-generator">
         <p:input name="config" transform="oxf:xslt" href="#instance">
             <config xsl:version="2.0">
-                <url><xsl:value-of select="/*"/></url>
+                <url><xsl:value-of select="/*/file"/></url>
                 <content-type>multipart/x-zip</content-type>
                 <cache-control><use-local-cache>false</use-local-cache></cache-control>
                 <mode>binary</mode>

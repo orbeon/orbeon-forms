@@ -536,7 +536,7 @@ private object FormRunnerConfigProcessor {
         .map(_.toBoolean)
 
     val validateSelectionControlsChoices =
-      if (majorMode == "detail" && ! isReadonlyMode && ! isFormBuilder) {
+      if ((majorMode == "detail" || majorMode == "validate") && ! isReadonlyMode && ! isFormBuilder)
         validateSelectionControlsChoicesFromEncryptedParamOpt
           .getOrElse(
             metadata.validateSelectionControlsChoices.contains(true) || (
@@ -544,7 +544,7 @@ private object FormRunnerConfigProcessor {
                 FormRunner.booleanFormRunnerProperty("oxf.fr.detail.validate-selection-controls-choices")(updatedParams)
             )
           )
-      } else
+      else
         false
 
     def paramOpts(paramNames: Set[String]): Option[Boolean] =

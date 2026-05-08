@@ -433,19 +433,18 @@ object XFormsAssetServerRoute extends NativeRoute {
   // - if `removeFile == true` and the resource maps to a file, try to remove the file
   // - remove the mapping from the session
   def tryToRemoveDynamicResource(
-    requestPath     : String,
-    removeFile      : Boolean
+    requestPath: String,
+    removeFile : Boolean
   ): Unit = {
 
     implicit val externalContext: ExternalContext = XFormsCrossPlatformSupport.externalContext
 
-    findDynamicResource(requestPath) foreach { resource =>
-      externalContext.getRequest.sessionOpt foreach { session =>
+    findDynamicResource(requestPath).foreach { resource =>
+      externalContext.getRequest.sessionOpt.foreach { session =>
 
         if (removeFile)
-          Try(new File(resource.uri)) foreach { file =>
-            file.delete()
-          }
+          Try(new File(resource.uri))
+            .foreach(_.delete())
 
         session.removeAttribute(DynamicResourcesSessionKey + resource.digest, SessionScope.Application)
       }

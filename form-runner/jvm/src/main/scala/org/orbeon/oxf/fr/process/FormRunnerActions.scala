@@ -654,7 +654,7 @@ trait FormRunnerActions
       val childElems = FormRunnerActionsCommon.findUrlsInstanceRootElem.toList child *
 
       // Remove resource and temporary file if any
-      childElems map (_.stringValue) flatMap trimAllToOpt foreach { path =>
+      childElems.map(_.stringValue).flatMap(trimAllToOpt).foreach { path =>
         XFormsAssetServerRoute.tryToRemoveDynamicResource(path, removeFile = true)
       }
 

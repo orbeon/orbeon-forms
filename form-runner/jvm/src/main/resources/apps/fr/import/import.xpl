@@ -58,13 +58,22 @@
                 <xf:action event="xforms-ready">
 
                     <!-- Remember original empty data -->
+
+                    <xf:var
+                        name="format"
+                        value="if (local-name(instance()) = 'rows') then 'headings' else 'named-ranges'"/>
+
                     <xf:insert
                         ref="instance('fr-empty-data')"
                         origin="xxf:instance('fr-form-instance')"/>
 
                     <xf:setvalue
                         ref="instance('fr-import-stats')/total"
-                        value="count(instance()/row) - 1"/>
+                        value="
+                            if ($format = 'headings') then
+                                count(instance()/row) - 1
+                            else
+                                1"/>
 
                     <xf:action type="xpath">
                         xxf:set-session-attribute('org.orbeon.fr.import.total', xs:integer(instance('fr-import-stats')/total)),

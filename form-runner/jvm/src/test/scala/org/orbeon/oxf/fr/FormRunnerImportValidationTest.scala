@@ -2,10 +2,13 @@ package org.orbeon.oxf.fr
 
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.connection.{BufferedContent, StreamedContent}
+import org.orbeon.oxf.externalcontext.SimpleSession
 import org.orbeon.oxf.fr.FormRunner.InternalValidateSelectionControlsChoicesParam
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.CoreUtils.{BooleanOps, PipeOps}
+import org.orbeon.oxf.util.{SecureUtils, XPath}
+import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.scalatest.funspec.AnyFunSpecLike
@@ -32,7 +35,7 @@ class FormRunnerImportValidationTest
     )
 
     for (((filename, validateSelectionControls, format), (total, processed, succeeded)) <- Expected)
-      it(s"must correctly validate `$filename` in `$format` format, validate selection controls = $validateSelectionControls") {
+      it(s"must correctly validate and import `$filename` in `$format` format, validate selection controls = $validateSelectionControls") {
         withTestExternalContext { _ =>
 
           val requestContent =
@@ -51,32 +54,73 @@ class FormRunnerImportValidationTest
               title       = None
             )
 
-          val (_, _, _, response) =
-            runFormRunnerReturnAll(
-              app         = "issue",
-              form        = "7660",
-              mode        = "validate",
-              documentId  = None,
-              content     = StreamedContent(requestContent).some,
-              background  = true,
-              credentials = None,
-              query       = List(InternalValidateSelectionControlsChoicesParam -> FormRunnerOperationsEncryption.encryptString(validateSelectionControls.toString)),
-            )
+          // Because `validate` stores into the session `org.orbeon.fr.import.invalid-rows`, and `import` relies on this
+          val session =
+            new SimpleSession(SecureUtils.randomHexId) |!>
+              XFormsStateManager.sessionCreated
 
-          val responseRootElem =
-            XFormsCrossPlatformSupport.readTinyTree(
-              XPath.GlobalConfiguration,
-              response.content.stream,
-              systemId       = "",
-              handleXInclude = false,
-              handleLexical  = false
-            ).rootElement
+          locally {
+            val (_, _, _, response) =
+              runFormRunnerReturnAll(
+                app             = "issue",
+                form            = "7660",
+                mode            = "validate",
+                documentId      = None,
+                content         = StreamedContent(requestContent).some,
+                background      = true,
+                credentials     = None,
+                query           = List(InternalValidateSelectionControlsChoicesParam -> FormRunnerOperationsEncryption.encryptString(validateSelectionControls.toString)),
+                providedSession = session.some
+              )
 
-          assert(StatusCode.isSuccessCode(response.statusCode))
+            val responseRootElem =
+              XFormsCrossPlatformSupport.readTinyTree(
+                XPath.GlobalConfiguration,
+                response.content.stream,
+                systemId       = "",
+                handleXInclude = false,
+                handleLexical  = false
+              ).rootElement
 
-          assert(responseRootElem.elemValue("total").toInt == total)
-          assert(responseRootElem.elemValue("processed").toInt == processed)
-          assert(responseRootElem.elemValue("succeeded").toInt == succeeded)
+            assert(StatusCode.isSuccessCode(response.statusCode))
+
+            assert(responseRootElem.elemValue("total").toInt == total)
+            assert(responseRootElem.elemValue("processed").toInt == processed)
+            assert(responseRootElem.elemValue("succeeded").toInt == succeeded)
+          }
+
+          locally {
+            val (_, _, _, response) =
+              runFormRunnerReturnAll(
+                app             = "issue",
+                form            = "7660",
+                mode            = "import",
+                documentId      = None,
+                content         = StreamedContent(requestContent).some,
+                background      = true,
+                credentials     = None,
+                query           = List(
+                  InternalValidateSelectionControlsChoicesParam -> FormRunnerOperationsEncryption.encryptString(validateSelectionControls.toString),
+                  "import-invalid-data" -> false.toString,
+                ),
+                providedSession = session.some
+              )
+
+            val responseRootElem =
+              XFormsCrossPlatformSupport.readTinyTree(
+                XPath.GlobalConfiguration,
+                response.content.stream,
+                systemId       = "",
+                handleXInclude = false,
+                handleLexical  = false
+              ).rootElement
+
+            assert(StatusCode.isSuccessCode(response.statusCode))
+
+            assert(responseRootElem.elemValue("total").toInt == total)
+            assert(responseRootElem.elemValue("processed").toInt == processed)
+            assert(responseRootElem.elemValue("succeeded").toInt == succeeded)
+          }
         }
       }
   }

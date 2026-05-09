@@ -69,12 +69,13 @@ object TestHttpClient {
   }
 
   def connect(
-    url         : String,
-    method      : HttpMethod,
-    headers     : Map[String, List[String]],
-    content     : Option[StreamedContent],
-    credentials : Option[Credentials] = None,
-    attributes  : Map[String, AnyRef] = Map.empty
+    url            : String,
+    method         : HttpMethod,
+    headers        : Map[String, List[String]],
+    content        : Option[StreamedContent],
+    credentials    : Option[Credentials] = None,
+    attributes     : Map[String, AnyRef] = Map.empty,
+    providedSession: Option[Session]     = None
   ): (ProcessorService, HttpResponse, Option[Session], List[CacheEvent]) = {
 
     require(url.startsWith("/"), "TestHttpClient only supports absolute paths")
@@ -105,7 +106,7 @@ object TestHttpClient {
             safeRequestCtx     =
               SafeRequestContext(
                 webAppContext,
-                makeBaseRequest(attributes, credentials)
+                makeBaseRequest(attributes, credentials, providedSession)
               ),
             pathQuery               = url,
             method                  = method,
@@ -159,7 +160,8 @@ object TestHttpClient {
   // Create a request with only the methods used by `LocalRequest.incomingRequest` parameter
   def makeBaseRequest(
     attributes           : Map[String, AnyRef] = Map.empty,
-    connectionCredentials: Option[Credentials] = None
+    connectionCredentials: Option[Credentials] = None,
+    providedSession      : Option[Session]     = None
   ): RequestAdapter = new RequestAdapter {
 
     override val getContextPath                          = ServerState.ContextPath // called indirectly by `getClientContextPath`
@@ -190,8 +192,10 @@ object TestHttpClient {
 
     // Session handling
     private val session: Session =
-      new SimpleSession(SecureUtils.randomHexId) |!>
-        XFormsStateManager.sessionCreated
+      providedSession.getOrElse(
+        new SimpleSession(SecureUtils.randomHexId) |!>
+          XFormsStateManager.sessionCreated
+        )
 
     override def getSession(create: Boolean): Session = session
   }

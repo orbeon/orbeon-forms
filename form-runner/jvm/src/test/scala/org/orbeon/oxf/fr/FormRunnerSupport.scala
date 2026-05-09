@@ -18,6 +18,7 @@ import org.orbeon.connection.{BufferedContent, StreamedContent}
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.Credentials
+import org.orbeon.oxf.externalcontext.ExternalContext.Session
 import org.orbeon.oxf.fr.FormRunnerSupport.*
 import org.orbeon.oxf.fr.persistence.relational.SqlReader
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
@@ -146,28 +147,30 @@ trait FormRunnerSupport extends DocumentTestBase {
   }
 
   def runFormRunnerReturnAll(
-    app        : String,
-    form       : String,
-    mode       : String,
-    formVersion: String                         = "", // not used yet
-    documentId : Option[String]                 = None,
-    query      : IterableOnce[(String, String)] = Nil,
-    initialize : Boolean                        = true,
-    content    : Option[StreamedContent]        = None,
-    attributes : Map[String, AnyRef]            = Map.empty,
-    headers    : Map[String, List[String]]      = Map.empty,
-    credentials: Option[Credentials]            = None,
-    background : Boolean                        = false
+    app            : String,
+    form           : String,
+    mode           : String,
+    formVersion    : String                         = "", // not used yet
+    documentId     : Option[String]                 = None,
+    query          : IterableOnce[(String, String)] = Nil,
+    initialize     : Boolean                        = true,
+    content        : Option[StreamedContent]        = None,
+    attributes     : Map[String, AnyRef]            = Map.empty,
+    headers        : Map[String, List[String]]      = Map.empty,
+    credentials    : Option[Credentials]            = None,
+    background     : Boolean                        = false,
+    providedSession: Option[Session]                = None
   ): (ProcessorService, Option[XFormsContainingDocument], List[CacheEvent], HttpResponse) = {
 
-    val (processorService, response, _, events) =
+    val (processorService, response, sessionOpt, events) =
       TestHttpClient.connect(
-        url         = buildFormRunnerPath(app, form, mode, documentId, query, background),
-        method      = if (content.isDefined) POST else GET,
-        headers     = headers,
-        content     = content,
-        credentials = credentials,
-        attributes  = attributes
+        url             = buildFormRunnerPath(app, form, mode, documentId, query, background),
+        method          = if (content.isDefined) POST else GET,
+        headers         = headers,
+        content         = content,
+        credentials     = credentials,
+        attributes      = attributes,
+        providedSession = providedSession
       )
 
     val responseContent = BufferedContent(response.content)(IOUtils.toByteArray)

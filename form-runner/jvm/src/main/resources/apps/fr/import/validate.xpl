@@ -68,7 +68,7 @@
                     action="echo:"
                     replace="all"/>
 
-                <xf:action event="xforms-ready" xxf:xpath-analysis="true">
+                <xf:action event="xforms-ready">
                     <!-- Remember original empty data -->
 
                     <xf:var
@@ -102,6 +102,7 @@
 
                         <xf:var
                             name="non-empty-headers"
+                            as="element(c)*"
                             value="instance()/row[1]/c[normalize-space(.) and @r]"/>
 
                         <xf:action iterate="instance()/row[position() gt 1]">

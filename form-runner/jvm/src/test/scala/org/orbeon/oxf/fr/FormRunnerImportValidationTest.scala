@@ -59,50 +59,19 @@ class FormRunnerImportValidationTest
             new SimpleSession(SecureUtils.randomHexId) |!>
               XFormsStateManager.sessionCreated
 
-          locally {
+          for (mode <- List("validate", "import")) {
             val (_, _, _, response) =
               runFormRunnerReturnAll(
                 app             = "issue",
                 form            = "7660",
-                mode            = "validate",
+                mode            = mode,
                 documentId      = None,
                 content         = StreamedContent(requestContent).some,
                 background      = true,
                 credentials     = None,
-                query           = List(InternalValidateSelectionControlsChoicesParam -> FormRunnerOperationsEncryption.encryptString(validateSelectionControls.toString)),
-                providedSession = session.some
-              )
-
-            val responseRootElem =
-              XFormsCrossPlatformSupport.readTinyTree(
-                XPath.GlobalConfiguration,
-                response.content.stream,
-                systemId       = "",
-                handleXInclude = false,
-                handleLexical  = false
-              ).rootElement
-
-            assert(StatusCode.isSuccessCode(response.statusCode))
-
-            assert(responseRootElem.elemValue("total").toInt == total)
-            assert(responseRootElem.elemValue("processed").toInt == processed)
-            assert(responseRootElem.elemValue("succeeded").toInt == succeeded)
-          }
-
-          locally {
-            val (_, _, _, response) =
-              runFormRunnerReturnAll(
-                app             = "issue",
-                form            = "7660",
-                mode            = "import",
-                documentId      = None,
-                content         = StreamedContent(requestContent).some,
-                background      = true,
-                credentials     = None,
-                query           = List(
-                  InternalValidateSelectionControlsChoicesParam -> FormRunnerOperationsEncryption.encryptString(validateSelectionControls.toString),
-                  "import-invalid-data" -> false.toString,
-                ),
+                query           =
+                  InternalValidateSelectionControlsChoicesParam -> FormRunnerOperationsEncryption.encryptString(validateSelectionControls.toString) ::
+                  (mode == "import").list("import-invalid-data" -> false.toString),
                 providedSession = session.some
               )
 
@@ -122,6 +91,6 @@ class FormRunnerImportValidationTest
             assert(responseRootElem.elemValue("succeeded").toInt == succeeded)
           }
         }
-      }
+    }
   }
 }

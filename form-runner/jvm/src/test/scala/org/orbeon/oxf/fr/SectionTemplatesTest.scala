@@ -26,7 +26,7 @@ class SectionTemplatesTest
       assume(Version.isPE) // cross-model dependency analysis requires PE
 
       val (processorService, Some(xfcd), _) =
-        runFormRunner("issue", "7492", "new", initialize = true)
+        runFormRunner("issue", "7492", "new")
 
       withTestExternalContext { _ =>
         withFormRunnerDocument(processorService, xfcd) {
@@ -60,7 +60,7 @@ class SectionTemplatesTest
       assume(Version.isPE) // cross-model dependency analysis requires PE
 
       val (processorService, Some(xfcd), _) =
-        runFormRunner("issue", "7427", "new", initialize = true)
+        runFormRunner("issue", "7427", "new")
 
       withTestExternalContext { _ =>
         withFormRunnerDocument(processorService, xfcd) {

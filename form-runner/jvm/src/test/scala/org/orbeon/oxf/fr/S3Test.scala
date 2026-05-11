@@ -86,7 +86,7 @@ class S3Test
         // It's important to use a new document for each test, as URLs to dynamic resources for rendered formats
         // (e.g. PDF) are stored in a document instance, but dynamic resources are tracked in XFormsAssetServerRoute
         // in the session attributes, and a new session is used for each test.
-        val (processorService, docOpt, _) = runFormRunner("issue", form, "new", initialize = true)
+        val (processorService, docOpt, _) = runFormRunner("issue", form, "new")
 
         withFormRunnerDocument(processorService, doc = docOpt.get) {
           S3Test.withTestS3ConfigAndPath(configName) { implicit s3Config => s3Path =>

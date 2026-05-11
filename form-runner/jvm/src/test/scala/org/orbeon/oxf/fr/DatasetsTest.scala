@@ -32,7 +32,7 @@ class DatasetsTest
     it("must call services and actions and return expected dataset values") {
 
       val (processorService, Some(doc), _) =
-        runFormRunner("tests", "datasets", "new", initialize = true)
+        runFormRunner("tests", "datasets", "new")
 
       withTestExternalContext { _ =>
         withFormRunnerDocument(processorService, doc) {

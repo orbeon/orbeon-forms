@@ -21,7 +21,7 @@ class FormRunnerButtonsTest
     describe("#6542: `oxf.fr.detail.button.$button.visible` doesn't support `fr:control-string-value()`") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("issue", "6542", "new", initialize = true)
+        runFormRunner("issue", "6542", "new")
 
       // Before fix for #6544, this throws as the document initialization fails
       val doc = docOpt.get

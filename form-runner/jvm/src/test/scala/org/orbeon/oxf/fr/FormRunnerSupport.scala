@@ -90,7 +90,6 @@ trait FormRunnerSupport extends DocumentTestBase {
     formVersion: String                         = "", // not used yet
     documentId : Option[String]                 = None,
     query      : IterableOnce[(String, String)] = Nil,
-    initialize : Boolean                        = true,
     content    : Option[StreamedContent]        = None,
     attributes : Map[String, AnyRef]            = Map.empty,
     background : Boolean                        = false
@@ -105,7 +104,6 @@ trait FormRunnerSupport extends DocumentTestBase {
         formVersion,
         documentId,
         query,
-        initialize,
         content,
         attributes,
         background = background
@@ -121,7 +119,6 @@ trait FormRunnerSupport extends DocumentTestBase {
     formVersion: String                         = "", // not used yet
     documentId : Option[String]                 = None,
     query      : IterableOnce[(String, String)] = Nil,
-    initialize : Boolean                        = true,
     content    : Option[StreamedContent]        = None,
     attributes : Map[String, AnyRef]            = Map.empty,
     headers    : Map[String, List[String]]      = Map.empty,
@@ -136,7 +133,6 @@ trait FormRunnerSupport extends DocumentTestBase {
         formVersion,
         documentId,
         query,
-        initialize,
         content,
         attributes,
         headers,
@@ -153,7 +149,6 @@ trait FormRunnerSupport extends DocumentTestBase {
     formVersion    : String                         = "", // not used yet
     documentId     : Option[String]                 = None,
     query          : IterableOnce[(String, String)] = Nil,
-    initialize     : Boolean                        = true,
     content        : Option[StreamedContent]        = None,
     attributes     : Map[String, AnyRef]            = Map.empty,
     headers        : Map[String, List[String]]      = Map.empty,

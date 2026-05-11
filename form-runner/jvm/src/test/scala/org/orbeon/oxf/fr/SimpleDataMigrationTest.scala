@@ -55,12 +55,11 @@ class SimpleDataMigrationTest
         app        = appName,
         form       = formName,
         mode       = "new",
-        documentId   = None,
+        documentId = None,
         query      = List(
                        FormRunnerPersistence.DataFormatVersionName     -> incomingData._2.entryName,
                        FormRunnerPersistence.DataMigrationBehaviorName -> dataMigrationBehavior.entryName,
                      ),
-        initialize = true,
         content    = contentToPost(incomingData._1).some
       )
 

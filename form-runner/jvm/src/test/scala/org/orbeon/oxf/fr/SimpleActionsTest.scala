@@ -19,7 +19,7 @@ class SimpleActionsTest
     describe("#6544: Legacy action causes error with `$fr-mode` variable") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("issue", "6544", "new", initialize = true)
+        runFormRunner("issue", "6544", "new")
 
       // Before fix for #6544, this throws as the document initialization fails
       val doc = docOpt.get
@@ -36,7 +36,7 @@ class SimpleActionsTest
     describe("#7053: calling service asynchronously") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("issue", "7053", "new", initialize = true)
+        runFormRunner("issue", "7053", "new")
 
       // Before fix for #6544, this throws as the document initialization fails
       val doc = docOpt.get
@@ -63,7 +63,7 @@ class SimpleActionsTest
     describe("#7464: Action targeting repeated iteration on same line doesn't work") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("issue", "7464", "new", initialize = true)
+        runFormRunner("issue", "7464", "new")
 
       val doc = docOpt.get
 
@@ -86,7 +86,7 @@ class SimpleActionsTest
     describe("#6199: HTTP Service Editor to support HTTP headers") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("issue", "6199", "new", initialize = true)
+        runFormRunner("issue", "6199", "new")
 
       val doc = docOpt.get
 
@@ -110,7 +110,7 @@ class SimpleActionsTest
   describe("#7550: Service with variable in URL AVT fails") {
 
     val (processorService, docOpt, _) =
-      runFormRunner("issue", "7550", "new", initialize = true)
+      runFormRunner("issue", "7550", "new")
 
     val doc = docOpt.get
 

@@ -735,7 +735,6 @@ class FormRunnerFunctionsTest
         "issue",
         "6564",
         "new",
-        initialize = true,
         attributes = Map("my-attribute" -> MyTest("my-value")) // see `MyTest` case class below
       )
 

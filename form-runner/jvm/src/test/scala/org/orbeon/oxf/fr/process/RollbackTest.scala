@@ -66,7 +66,7 @@ class RollbackTest
       it(desc) {
 
         val (processorService, docOpt, _) =
-          runFormRunner("tests", "process-rollback", "new", initialize = true)
+          runFormRunner("tests", "process-rollback", "new")
 
         withTestExternalContext { _ =>
           withFormRunnerDocument(processorService, docOpt.get) {

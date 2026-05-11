@@ -38,7 +38,7 @@ class EmailContentTest
 
   describe("Form Runner email generation") {
 
-    val (processorService, docOpt, _) = runFormRunner("issue", "6848", "new", initialize = true)
+    val (processorService, docOpt, _) = runFormRunner("issue", "6848", "new")
 
     val doc = docOpt.get
 

@@ -33,7 +33,7 @@ class ActionsFormat20182Test
     describe("Binary HTTP service within `fr:data-iterate` conditionally sets attachment") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("issue", "4067", "new", initialize = true)
+        runFormRunner("issue", "4067", "new")
 
       val doc = docOpt.get
 
@@ -61,7 +61,7 @@ class ActionsFormat20182Test
     describe("HTTP service error within `fr:data-iterate`") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("issue", "4075", "new", initialize = true)
+        runFormRunner("issue", "4075", "new")
 
       val doc = docOpt.get
 
@@ -77,7 +77,7 @@ class ActionsFormat20182Test
     describe("#4116: explicit iteration context with `fr:data-iterate`") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("issue", "4116", "new", initialize = true)
+        runFormRunner("issue", "4116", "new")
 
       val doc = docOpt.get
 
@@ -94,7 +94,7 @@ class ActionsFormat20182Test
     describe("#4204: nested `fr:data-iterate`") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("issue", "4204", "new", initialize = true)
+        runFormRunner("issue", "4204", "new")
 
       val doc = docOpt.get
 
@@ -124,7 +124,7 @@ class ActionsFormat20182Test
     describe("#5484: `fr:copy-content`") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("issue", "5484", "new", initialize = true)
+        runFormRunner("issue", "5484", "new")
 
       val doc = docOpt.get
 
@@ -207,7 +207,7 @@ class ActionsFormat20182Test
     describe("#6837/#6943: control resolution using variables") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("issue", "6837", "new", initialize = true)
+        runFormRunner("issue", "6837", "new")
 
       val doc = docOpt.get
 
@@ -228,7 +228,7 @@ class ActionsFormat20182Test
     describe("#7083: initial value depending on service running before initial values are calculated") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("issue", "7083", "new", initialize = true)
+        runFormRunner("issue", "7083", "new")
 
       val doc = docOpt.get
 
@@ -244,7 +244,7 @@ class ActionsFormat20182Test
     describe("#7491: `<fr:repeat-add-iteration>` doesn't handle initial values") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("issue", "7491", "new", initialize = true)
+        runFormRunner("issue", "7491", "new")
 
       it("must follow `apply-defaults`") {
         withTestExternalContext { implicit ec =>

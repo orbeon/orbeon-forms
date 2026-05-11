@@ -16,7 +16,7 @@ class ControlsTest
 
     describe("#5699: Improve radio buttons `xxf:group` support") {
       val (processorService, docOpt, _) =
-        runFormRunner("issue", "5699", "new", initialize = true)
+        runFormRunner("issue", "5699", "new")
 
       val doc = docOpt.get
 

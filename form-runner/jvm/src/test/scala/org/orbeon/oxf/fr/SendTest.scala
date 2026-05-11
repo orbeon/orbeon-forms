@@ -165,7 +165,7 @@ class SendTest
       it(s"""must pass with `$DataFormatVersionName = "${dataFormatVersion.entryName}"`, `prune = "$prune"` and `$PruneMetadataName = "$pruneMetadata"`""") {
 
         val (processorService, docOpt, _) =
-          runFormRunner("tests", "send-action", "new", initialize = true)
+          runFormRunner("tests", "send-action", "new")
 
         withTestExternalContext { _ =>
           withFormRunnerDocument(processorService, docOpt.get) {
@@ -223,7 +223,7 @@ class SendTest
         </metadata>
 
       val (processorService, docOpt, _) =
-        runFormRunner("tests", "send-action", "new", initialize = true)
+        runFormRunner("tests", "send-action", "new")
 
       withTestExternalContext { _ =>
         withFormRunnerDocument(processorService, docOpt.get) {
@@ -254,7 +254,7 @@ class SendTest
     it("must be able to receive JSON") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("tests", "send-action", "new", initialize = true)
+        runFormRunner("tests", "send-action", "new")
 
       withTestExternalContext { _ =>
         withFormRunnerDocument(processorService, docOpt.get) {
@@ -318,7 +318,7 @@ class SendTest
       val secondHeaderValue = "second-header-value"
 
       val (processorService, docOpt, _) =
-        runFormRunner("tests", "send-action", "new", initialize = true)
+        runFormRunner("tests", "send-action", "new")
 
       withTestExternalContext { _ =>
         withFormRunnerDocument(processorService, docOpt.get) {
@@ -351,7 +351,7 @@ class SendTest
 
     it("must prune or preserve non-persisted values") {
       val (processorService, docOpt, _) =
-        runFormRunner("tests", "send-action", "new", initialize = true)
+        runFormRunner("tests", "send-action", "new")
 
       withTestExternalContext { _ =>
         withFormRunnerDocument(processorService, docOpt.get) {

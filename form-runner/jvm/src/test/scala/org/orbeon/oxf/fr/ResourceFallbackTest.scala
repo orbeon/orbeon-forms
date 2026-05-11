@@ -35,7 +35,7 @@ class ResourceFallbackTest
     it("Korean form should fall back to English for Form Runner buttons") {
 
       val (processorService, docOpt, _) =
-        runFormRunner("tests", "resource-fallback", "new", initialize = true)
+        runFormRunner("tests", "resource-fallback", "new")
 
       assert(docOpt.nonEmpty, "Form failed to load")
       val doc = docOpt.get

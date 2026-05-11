@@ -34,7 +34,7 @@ class WizardTest
     it("must control strict navigation") {
 
       val (processorService, Some(doc), _) =
-        runFormRunner("tests", "wizard", "new", initialize = true)
+        runFormRunner("tests", "wizard", "new")
 
       withTestExternalContext { _ =>
         withFormRunnerDocument(processorService, doc) {

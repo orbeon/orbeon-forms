@@ -75,7 +75,10 @@ object ControlEditor {
 
   private def showEditors(cell: Block): Unit = {
 
-    def positionEditor(editor: html.Element, offsetLeft: Double): Unit = {
+    def showAndPositionLeftOrRightEditor(
+      editor    : html.Element,
+      offsetLeft: => Double // by name so that this can be computed after `show()` (#7669)
+    ): Unit = {
       editor.show()
       editor.setOffset(DomSupport.Offset(
         left = cell.left + offsetLeft,
@@ -83,7 +86,10 @@ object ControlEditor {
       ))
     }
 
-    def positionTopEditor(editor: html.Element, offsetLeft: Double): Unit = {
+    def showAndPositionTopEditor(
+      editor    : html.Element,
+      offsetLeft: => Double // by name so that this can be computed after `show()` (#7669)
+    ): Unit = {
       editor.show()
       editor.setOffset(DomSupport.Offset(
         left = cell.left + offsetLeft,
@@ -109,7 +115,7 @@ object ControlEditor {
 
       // Right editor
       controlEl.append(controlEditorRight())
-      positionEditor(controlEditorRight(), cell.width - controlEditorRight().outerWidth)
+      showAndPositionLeftOrRightEditor(controlEditorRight(), cell.width - controlEditorRight().outerWidth)
 
       // Show/hide itemset icon
       controlEditorRight()
@@ -123,7 +129,7 @@ object ControlEditor {
 
       // Top editor
       controlEl.append(controlEditorTop())
-      positionTopEditor(controlEditorTop(), 0)
+      showAndPositionTopEditor(controlEditorTop(), 0)
 
       controlEditorTop().childrenT.head.textContent = controlName
     }
@@ -131,7 +137,7 @@ object ControlEditor {
     // Cell/left editor
     if (! isViewMode) {
       firstControlElemWithNameOpt.map(e => e._1).getOrElse(cell.el).append(controlEditorLeft())
-      positionEditor(controlEditorLeft(), 0)
+      showAndPositionLeftOrRightEditor(controlEditorLeft(), 0)
 
       // Enable/disable split/merge icons
       val allowedDirections = {

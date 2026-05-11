@@ -1,211 +1,90 @@
-Orbeon Forms
-============
+# Orbeon Forms
 
-Manage your web forms' entire lifecycle
----------------------------------------
+Build, run, and manage web forms on-premises or in the cloud.
 
-Last updated for Orbeon Forms 2024.1.5 (April 2026)
+Last updated in April 2026.
 
-[![Build Status](https://travis-ci.org/orbeon/orbeon-forms.svg?branch=master)](https://travis-ci.org/orbeon/orbeon-forms)
+[![Latest release](https://img.shields.io/github/v/release/orbeon/orbeon-forms?label=latest%20release)](https://github.com/orbeon/orbeon-forms/releases)
+[![License](https://img.shields.io/github/license/orbeon/orbeon-forms)](LICENSE.txt)
+[![Stack Overflow](https://img.shields.io/badge/Stack%20Overflow-orbeon-F58025)](https://stackoverflow.com/questions/tagged/orbeon)
 
+<p align="center">
+    <a href="https://www.orbeon.com/">
+        <img src="https://www.orbeon.com/img/home/hero-fb.png" alt="Orbeon Forms Form Builder" width="900">
+    </a>
+</p>
 
-What is Orbeon Forms?
----------------------
+Orbeon Forms CE is an open-source web form builder and runtime for creating, publishing, and managing complex forms. It helps you manage large numbers of forms, control access, collect data and attachments, generate PDF and Excel files, and integrate forms with existing systems.
 
-Orbeon Forms allows you to create, publish, version, and run your forms on-premises or in the cloud.
+- **Build forms visually** with Form Builder, a browser-based form authoring tool.
+- **Run responsive forms** with validation, repeated sections, attachments, multi-page navigation, and PDF output.
+- **Manage the form lifecycle** from design and testing to publishing, data capture, versioning, and submission.
 
-With Orbeon Forms, you can manage large numbers of complex forms, grant access rights to users, produce PDF and Excel files, collect and submit completed file data with attachments, and more.
+[Try Orbeon Forms](https://www.orbeon.com/try) |
+[Download](https://www.orbeon.com/download) |
+[Documentation](https://doc.orbeon.com/) |
+[Professional Edition](https://www.orbeon.com/pricing)
 
-Orbeon Forms is used in government, banking, healthcare, telecommunications, education, and other industries.
+## What You Can Build
 
-Orbeon Forms includes:
+Orbeon Forms is used around the world in government, banking, healthcare, telecom, education, and more. It is designed for teams that need secure, maintainable, compliant, and integrated forms rather than one-off surveys.
 
-- __Form Builder:__ a browser-based visual form authoring tool
-- __Form Runner:__ a runtime environment which facilitates the deployment and integration of large and complex forms
+| Area           | Capabilities                                                                                                                          |
+|----------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| Form authoring | Visual Form Builder, sections, grids, repeated data, validation rules, calculations, visibility rules, and localization               |
+| Data capture   | Responsive Form Runner, attachments, multi-page forms, accessibility, data validation, and error summaries                            |
+| Integration    | HTTP services, database services, actions, Java and JavaScript APIs, React and Angular components                                     |
+| Output         | Automatic PDF generation, PDF templates, Excel export, and submitted data with attachments                                            |
+| Operations     | Access control, form definition versioning, data persistence, deployment on Java servlet containers, and cloud or on-premises hosting |
 
-For more information about Orbeon Forms, please visit [orbeon.com](https://www.orbeon.com/).
+## Editions
 
+Orbeon Forms is open-core and available in two editions:
 
-What's new
-----------
+| Edition                   | Best for                                                                                                                                                     |
+|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Community Edition (CE)    | Open-source use, evaluation, development, and self-supported deployments                                                                                     |
+| Professional Edition (PE) | Production deployments requiring commercial support, subscriptions, regular maintenance releases, performance improvements, and advanced enterprise features |
 
-- [Orbeon Forms 2024.1.5](https://doc.orbeon.com/release-notes/orbeon-forms-2024.1.5)
-- [Orbeon Forms 2024.1.4](https://doc.orbeon.com/release-notes/orbeon-forms-2024.1.4)
-- [Orbeon Forms 2023.1.8](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1.8)
-- [Orbeon Forms 2025.1](https://doc.orbeon.com/release-notes/orbeon-forms-2025.1)
-- [Orbeon Forms 2024.1.3](https://doc.orbeon.com/release-notes/orbeon-forms-2024.1.3)
-- [Orbeon Forms 2024.1.2](https://doc.orbeon.com/release-notes/orbeon-forms-2024.1.2)
-- [Orbeon Forms 2024.1.1](https://doc.orbeon.com/release-notes/orbeon-forms-2024.1.1)
-- [Orbeon Forms 2023.1.7](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1.7)
-- [Orbeon Forms 2024.1](https://doc.orbeon.com/release-notes/orbeon-forms-2024.1)
-- [Orbeon Forms 2023.1.6](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1.6)
-- [Orbeon Forms 2023.1.5](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1.5)
-- [Orbeon Forms 2023.1.4](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1.4)
-- [Orbeon Forms 2023.1.3](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1.3)
-- [Orbeon Forms 2023.1.2](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1.2)
-- [Orbeon Forms 2022.1.7](https://doc.orbeon.com/release-notes/orbeon-forms-2022.1.7)
-- [Orbeon Forms 2023.1.1](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1.1)
-- [Orbeon Forms 2022.1.6](https://doc.orbeon.com/release-notes/orbeon-forms-2022.1.6)
-- [Orbeon Forms 2023.1](https://doc.orbeon.com/release-notes/orbeon-forms-2023.1)
-- [Orbeon Forms 2022.1.5](https://doc.orbeon.com/release-notes/orbeon-forms-2022.1.5)
-- [Orbeon Forms 2021.1.9 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2021.1.9)
-- [Orbeon Forms 2022.1.4](https://doc.orbeon.com/release-notes/orbeon-forms-2022.1.4)
-- [Orbeon Forms 2022.1.3](https://doc.orbeon.com/release-notes/orbeon-forms-2022.1.3)
-- [Orbeon Forms 2021.1.8 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2021.1.8)
-- [Orbeon Forms 2022.1.2](https://doc.orbeon.com/release-notes/orbeon-forms-2022.1.2)
-- [Orbeon Forms 2022.1.1](https://doc.orbeon.com/release-notes/orbeon-forms-2022.1.1)
-- [Orbeon Forms 2022.1](https://doc.orbeon.com/release-notes/orbeon-forms-2022.1)
-- [Orbeon Forms 2021.1.7 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2021.1.7)
-- [Orbeon Forms 2021.1.6 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2021.1.6)
-- [Orbeon Forms 2021.1.5 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2021.1.5)
-- [Orbeon Forms 2021.1.4 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2021.1.4)
-- [Orbeon Forms 2021.1.3 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2021.1.3)
-- [Orbeon Forms 2021.1.2 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2021.1.2)
-- [Orbeon Forms 2021.1.1 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2021.1.1)
-- [Orbeon Forms 2021.1](https://doc.orbeon.com/release-notes/orbeon-forms-2021.1)
-- [Orbeon Forms 2020.1.6 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2020.1.6)
-- [Orbeon Forms 2019.2.4 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2019.2.4)
-- [Orbeon Forms 2019.1.2 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2019.1.2)
-- [Orbeon Forms 2018.2.5 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2018.2.5)
-- [Orbeon Forms 2018.1.4 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2018.1.4)
-- [Orbeon Forms 2020.1.5 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2020.1.5)
-- [Orbeon Forms 2020.1.4 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2020.1.4)
-- [Orbeon Forms 2020.1.3 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2020.1.3)
-- [Orbeon Forms 2020.1.2 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2020.1.2)
-- [Orbeon Forms 2019.2.3 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2019.2.3)
-- [Orbeon Forms 2020.1.1 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2020.1.1)
-- [Orbeon Forms 2020.1](https://doc.orbeon.com/release-notes/orbeon-forms-2020.1)
-- [Orbeon Forms 2019.2.2 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2019.2.2)
-- [Orbeon Forms 2019.2.1 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2019.2.1)
-- [Orbeon Forms 2019.1.1 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2019.1.1)
-- [Orbeon Forms 2019.2](https://doc.orbeon.com/release-notes/orbeon-forms-2019.2)
-- [Orbeon Forms 2018.2.4 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2018.2.4)
-- [Orbeon Forms 2019.1](https://doc.orbeon.com/release-notes/orbeon-forms-2019.1)
-- [Orbeon Forms 2018.2.3 PE](https://blog.orbeon.com/2019/05/orbeon-forms-201823-pe.html)
-- [Orbeon Forms 2018.2.2 PE](https://blog.orbeon.com/2019/03/orbeon-forms-201822-pe.html)
-- [Orbeon Forms 2018.2.1 PE](https://blog.orbeon.com/2019/02/orbeon-forms-201821-pe.html)
-- [Orbeon Forms 2018.2.1 CE](https://blog.orbeon.com/2019/02/orbeon-forms-201821-ce.html)
-- [Orbeon Forms 2018.2](https://blog.orbeon.com/2018/12/orbeon-forms-20182.html)
-- [Orbeon Forms 2018.1.3 PE](https://blog.orbeon.com/2018/11/orbeon-forms-201813-pe.html)
-- [Orbeon Forms 2018.1.2 PE](https://blog.orbeon.com/2018/10/orbeon-forms-201812-pe.html)
-- [Orbeon Forms 2018.1.1 PE](https://blog.orbeon.com/2018/09/orbeon-forms-201811-pe-and-ce.html)
-- [Orbeon Forms 2018.1](https://blog.orbeon.com/2018/09/orbeon-forms-20181.html)
-- [Orbeon Forms 2017.2.2 PE](https://blog.orbeon.com/2018/05/orbeon-forms-201722-pe.html)
-- [Orbeon Forms 2017.2.1 PE](https://blog.orbeon.com/2018/03/orbeon-forms-201721-pe.html)
-- [Orbeon Forms 2017.2](https://blog.orbeon.com/2017/12/orbeon-forms-20172.html)
-- [Orbeon Forms 2017.1.1 PE](https://blog.orbeon.com/2017/09/orbeon-forms-201711-pe.html)
-- [Orbeon Forms 2017.1](https://blog.orbeon.com/2017/06/orbeon-forms-20171.html)
-- [Orbeon Forms 2016.3.1 PE](https://blog.orbeon.com/2017/05/orbeon-forms-201631.html)
-- [Orbeon Forms 2016.3](https://blog.orbeon.com/2016/12/orbeon-forms-20163.html)
-- [Orbeon Forms 2016.2.2 PE](https://blog.orbeon.com/2016/11/orbeon-forms-201622-pe.html)
-- [Orbeon Forms 2016.2.1 PE](https://blog.orbeon.com/2016/09/orbeon-forms-201621.html)
-- [Orbeon Forms 2016.2](https://blog.orbeon.com/2016/08/orbeon-forms-20162.html)
-- [Orbeon Forms 2016.1.1 PE](https://blog.orbeon.com/2016/10/orbeon-forms-201611-pe.html)
-- [Orbeon Forms 2016.1 PE](https://blog.orbeon.com/2016/04/orbeon-forms-20161.html)
-- [Orbeon Forms 4.10.2 PE](https://blog.orbeon.com/2015/12/orbeon-forms-4102.html)
-- [Orbeon Forms 4.10.1 PE](https://blog.orbeon.com/2015/11/orbeon-forms-4101.html)
-- [Orbeon Forms 4.10](https://blog.orbeon.com/2015/08/orbeon-forms-410.html)
-- [Orbeon Forms 4.9](https://blog.orbeon.com/2015/05/orbeon-forms-49.html)
-- [Orbeon Forms 4.8.2 PE](https://blog.orbeon.com/2015/03/orbeon-forms-482.html)
-- [Orbeon Forms 4.8.1 PE](https://blog.orbeon.com/2015/02/orbeon-forms-481.html)
-- [Orbeon Forms 4.8](https://blog.orbeon.com/2015/01/orbeon-forms-48.html)
-- [Orbeon Forms 4.7.1 PE](https://blog.orbeon.com/2014/12/orbeon-forms-471.html)
-- [Orbeon Forms 4.7](https://blog.orbeon.com/2014/09/orbeon-forms-47.html)
-- [Orbeon Forms 4.6.2 PE](https://blog.orbeon.com/2014/08/orbeon-forms-462.html)
-- [Orbeon Forms 4.6.1 PE](https://blog.orbeon.com/2014/07/orbeon-forms-461.html)
-- [Orbeon Forms 4.6](https://blog.orbeon.com/2014/06/orbeon-forms-46.html)
-- [Orbeon Forms 4.5.1 PE](https://blog.orbeon.com/2014/05/orbeon-forms-451.html)
-- [Orbeon Forms 4.5](https://blog.orbeon.com/2014/04/orbeon-forms-45.html)
-- [Orbeon Forms 4.4.1 PE](https://blog.orbeon.com/2014/01/orbeon-forms-441-pe.html)
-- [Orbeon Forms 4.4](https://blog.orbeon.com/2013/11/orbeon-forms-44.html)
-- [Orbeon Forms 4.3.1 PE](https://blog.orbeon.com/2013/08/orbeon-forms-431-pe.html)
-- [Orbeon Forms 4.3](https://blog.orbeon.com/2013/08/orbeon-forms-43.html)
-- [Orbeon Forms 4.2](https://blog.orbeon.com/2013/05/orbeon-forms-42.html)
-- [Orbeon Forms 4.1](https://blog.orbeon.com/2013/04/orbeon-forms-41.html)
-- [Orbeon Forms 4.0.1](https://blog.orbeon.com/2013/03/orbeon-forms-401.html)
-- [Orbeon Forms 4.0](https://blog.orbeon.com/2013/03/announcing-orbeon-forms-40.html)
+Both editions include Form Builder, Form Runner, and the Orbeon Forms XForms processor. See the [download](https://www.orbeon.com/download) and [pricing](https://www.orbeon.com/pricing) pages for current builds and edition details.
 
+## Quick Start
 
-Downloading and installing
---------------------------
+The fastest way to see Orbeon Forms is the [online demo](https://demo.orbeon.com/demo/fr/). The demo is public, so do not enter private information.
 
-Orbeon Forms comes in two editions:
+To run Orbeon Forms locally:
 
-- Community Edition (CE)
-- Professional Edition (PE)
+- Use [Docker](https://www.orbeon.com/try) to try Orbeon Forms PE with a free trial license.
+- Download [Orbeon Forms CE or PE](https://www.orbeon.com/download) and install it in a Java servlet container such as Apache Tomcat.
+- Follow the [installation documentation](https://doc.orbeon.com/installation/) for system requirements, servlet container setup, databases, and production configuration.
+- Check our comprehensive [documentation](https://doc.orbeon.com/).
 
-For more information and downloadable binaries, see the [download](https://www.orbeon.com/download) page.
+## Community and Support
 
-The system requirements and installation procedure are detailed on
-[Installing Orbeon Forms](https://doc.orbeon.com/installation/).
+- Ask technical questions on [Stack Overflow](https://stackoverflow.com/questions/ask?tags=orbeon) with the `orbeon` tag.
+- Follow Orbeon on [X](https://x.com/orbeon), [Bluesky](https://bsky.app/profile/orbeon.bsky.social), [LinkedIn](https://www.linkedin.com/company/orbeon), or [YouTube](https://www.youtube.com/orbeon).
+- Read the [Orbeon Blog](https://www.orbeon.com/blog/).
+- Browse the [forum archive](https://groups.google.com/g/orbeon).
+- For commercial support and licensing, see [PE subscriptions](https://www.orbeon.com/pricing), [services](https://www.orbeon.com/services), or contact [info@orbeon.com](mailto:info@orbeon.com).
 
+## Source and Issues
 
-Community and support
----------------------
+The source code of Orbeon Forms CE is available on [GitHub](https://github.com/orbeon/orbeon-forms/). For known issues and RFEs, check the [issue tracker](https://github.com/orbeon/orbeon-forms/issues).
 
-See the [community](https://www.orbeon.com/community) page. In a nutshell:
+You usually don't have to compile Orbeon Forms yourself. If you want to contribute or build locally, see [Building Orbeon Forms](https://doc.orbeon.com/contributors/building-orbeon-forms).
 
-- Ask short questions directed to Orbeon on [Twitter](https://twitter.com/intent/tweet?in_reply_to=orbeon&in_reply_to_status_id=261900968369729536&source=webclient&text=%40orbeon+).
-- Ask technical questions on [StackOverflow](https://stackoverflow.com/questions/ask?tags=orbeon) (don't forget the "orbeon" tag).
-- Use the [discussion forum](https://groups.google.com/g/orbeon) for discussions and feedback.
-- For commercial support and licensing:
-    - [PE subscriptions](https://www.orbeon.com/pricing)
-    - [Dev Support subscriptions](https://www.orbeon.com/services)
-    - email us at info@orbeon.com for any further questions
-
-
-Documentation
--------------
-
-All documentation is available online:
-
-- [Orbeon Forms documentation](https://doc.orbeon.com/)
-- [Frequently Asked Questions (FAQ)](https://doc.orbeon.com/faq/)
-
-
-What's happening?
------------------
-
-- [Orbeon Blog](https://www.orbeon.com/blog/)
-- [Orbeon on Bluesky](https://bsky.app/profile/orbeon.bsky.social)
-- [Orbeon on Twitter](https://twitter.com/orbeon)
-- [Latest commits on github](https://github.com/orbeon/orbeon-forms/commits)
-- [Forum archive](https://groups.google.com/g/orbeon)
-
-
-Compiling Orbeon Forms
-----------------------
-
-You usually don't have to compile Orbeon Forms yourself. But if you want to, see [Building Orbeon Forms](https://doc.orbeon.com/contributors/building-orbeon-forms).
-
-The source code of Orbeon Forms CE is available on [GitHub](https://github.com/orbeon/orbeon-forms/).
-
-
-Issue tracker
--------------
-
-For a list of known issues and RFEs, check the [issue tracking system](https://github.com/orbeon/orbeon-forms/issues).
-
-
-Third-party software
---------------------
+## Third-Party Software
 
 This product includes:
 
 - software developed by the [Apache Software Foundation](https://www.apache.org/)
-- other third-party software (see [build.sbt](https://github.com/orbeon/orbeon-forms/blob/master/build.sbt)) 
-- Silk Icons (Creative Commons Attribution 2.5 License)
+- other third-party software listed in [build.sbt](https://github.com/orbeon/orbeon-forms/blob/master/build.sbt)
+- Silk Icons, licensed under the Creative Commons Attribution 2.5 License
 - [PixelMixer icons](https://iconarchive.com/artist/pixelmixer.html)
-- schemas for XSLT 2.0 and XForms 1.1 (W3C Software License)
+- schemas for XSLT 2.0 and XForms 1.1, licensed under the W3C Software License
 
 Please consult the `third-party-licenses` directory for more information about individual licenses.
 
-Credits
--------
+## Credits
 
-We would like to thank [YourKit, LLC](https://www.yourkit.com/) for kindly supporting open source projects like Orbeon
-Forms CE with the full-featured [YourKit Java Profiler](https://www.yourkit.com/java/profiler/index.jsp).
-
----
-
-Copyright 1999-2025 (C) Orbeon, Inc. All rights reserved.
+We would like to thank [YourKit, LLC](https://www.yourkit.com/) for kindly supporting open source projects like Orbeon Forms CE with the full-featured [YourKit Java Profiler](https://www.yourkit.com/java/profiler/index.jsp).

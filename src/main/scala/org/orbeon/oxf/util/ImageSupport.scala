@@ -50,7 +50,7 @@ object ImageSupport {
             (_.translate(-width, 0))
         )
       case 3 =>
-        // 180 degree rotation
+        // 180-degree rotation
         Some(
           new AffineTransform            |!>
             (_.translate(width, height)) |!>
@@ -70,7 +70,7 @@ object ImageSupport {
             (_.scale(-1.0, 1.0))
         )
       case 6 =>
-        // 90 degree rotation
+        // 90-degree rotation
         Some(
           new AffineTransform            |!>
             (_.translate(height, 0))     |!>
@@ -85,7 +85,7 @@ object ImageSupport {
             (_.rotate(3 * Math.PI / 2))
         )
       case 8 =>
-        // 270 degree rotation
+        // 270-degree rotation
         Some(
           new AffineTransform            |!>
             (_.translate(0, width))      |!>

@@ -132,10 +132,7 @@ object XFormsUiFlatNesting {
 
   def setRelevant(node: html.Element, isRelevant: Boolean): Unit = {
 
-    if (isRelevant)
-      node.classList.remove("xforms-disabled")
-    else
-      node.classList.add("xforms-disabled")
+    node.toggleClass("xforms-disabled", ! isRelevant)
 
     // If this group/iteration becomes relevant, but has a parent that is non-relevant, we should not
     // remove xforms-disabled otherwise it will incorrectly show, so our job stops here
@@ -147,10 +144,7 @@ object XFormsUiFlatNesting {
       if (isRelevant && isBegin(node) && node.classList.contains("xforms-disabled"))
         true
       else {
-        if (isRelevant)
-          node.classList.remove("xforms-disabled")
-        else
-          node.classList.add("xforms-disabled")
+        node.toggleClass("xforms-disabled", ! isRelevant)
         false
       }
     }, true)

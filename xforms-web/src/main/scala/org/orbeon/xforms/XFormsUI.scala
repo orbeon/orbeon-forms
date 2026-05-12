@@ -87,12 +87,8 @@ object XFormsUI {
     findControlLHHA(control, lhhaType).foreach { lhhaElement =>
       lhhaElement.innerHTML = message
       // https://github.com/orbeon/orbeon-forms/issues/4062
-      if (lhhaType == "help") {
-        if (message.isAllBlank)
-          lhhaElement.classList.add("xforms-disabled")
-        else
-          lhhaElement.classList.remove("xforms-disabled")
-      }
+      if (lhhaType == "help")
+        lhhaElement.toggleClass("xforms-disabled", message.isAllBlank)
 
       // Handle placeholder
       if ((lhhaType == "label" || lhhaType == "hint") &&
@@ -202,24 +198,17 @@ object XFormsUI {
     }
 
   def updateVisited(control: html.Element, newVisited: Boolean): Unit = {
-    if (newVisited)
-      control.classList.add("xforms-visited")
-    else
-      control.classList.remove("xforms-visited")
+    control.toggleClass("xforms-visited", newVisited)
     findControlLHHA(control, "alert").foreach { alertElement =>
-      if (alertElement.id.nonAllBlank) {
-        if (newVisited)
-          alertElement.classList.add("xforms-visited")
-        else
-          alertElement.classList.remove("xforms-visited")
-      }
+      if (alertElement.id.nonAllBlank)
+        alertElement.toggleClass("xforms-visited", newVisited)
     }
   }
 
   def updateRequiredEmpty(control: html.Element, emptyAttr: String): Unit = {
     val isRequired = control.hasClass("xforms-required")
-    if (isRequired && emptyAttr == "true")  control.classList.add("xforms-empty")  else control.classList.remove("xforms-empty")
-    if (isRequired && emptyAttr == "false") control.classList.add("xforms-filled") else control.classList.remove("xforms-filled")
+    control.toggleClass("xforms-empty",  isRequired && emptyAttr == "true")
+    control.toggleClass("xforms-filled", isRequired && emptyAttr == "false")
   }
 
   def toggleCase(controlId: String, visible: Boolean): Unit = {
@@ -227,14 +216,10 @@ object XFormsUI {
     val caseBeginId = s"xforms-case-begin-$controlId"
     val caseEndId   = s"xforms-case-end-$controlId"
 
-    def updateClasses(el: html.Element): Unit =
-      if (visible) {
-        el.classList.add("xforms-case-selected")
-        el.classList.remove("xforms-case-deselected")
-      } else {
-        el.classList.add("xforms-case-deselected")
-        el.classList.remove("xforms-case-selected")
-      }
+    def updateClasses(el: html.Element): Unit = {
+      el.toggleClass("xforms-case-selected",   visible)
+      el.toggleClass("xforms-case-deselected", ! visible)
+    }
 
     val caseBegin = dom.document.getElementByIdT(caseBeginId)
 
@@ -358,16 +343,15 @@ object XFormsUI {
     val alertActive = newLevel != ""
 
     def toggleCommonClasses(element: html.Element): Unit = {
-      if (newLevel == "error")   element.classList.add("xforms-invalid") else element.classList.remove("xforms-invalid")
-      if (newLevel == "warning") element.classList.add("xforms-warning") else element.classList.remove("xforms-warning")
-      if (newLevel == "info")    element.classList.add("xforms-info")    else element.classList.remove("xforms-info")
+      element.toggleClass("xforms-invalid", newLevel == "error")
+      element.toggleClass("xforms-warning", newLevel == "warning")
+      element.toggleClass("xforms-info",    newLevel == "info")
     }
 
     toggleCommonClasses(control)
 
     findControlLHHA(control, "alert").foreach { alertElement =>
-      if (alertActive)
-        alertElement.classList.add("xforms-active") else alertElement.classList.remove("xforms-active")
+      alertElement.toggleClass("xforms-active", alertActive)
       if (alertElement.id.nonAllBlank)
         toggleCommonClasses(alertElement)
     }
@@ -415,10 +399,7 @@ object XFormsUI {
           .flatList(findControlLHHA(control, "hint").toList)
 
       elementsToUpdate.foreach { element =>
-        if (isRelevant)
-          element.classList.remove("xforms-disabled")
-        else
-          element.classList.add("xforms-disabled")
+        element.toggleClass("xforms-disabled", ! isRelevant)
       }
     }
 
@@ -470,10 +451,7 @@ object XFormsUI {
 
   def setReadonly(control: html.Element, isReadonly: Boolean): Unit = {
 
-    if (isReadonly)
-      control.classList.add("xforms-readonly")
-    else
-      control.classList.remove("xforms-readonly")
+    control.toggleClass("xforms-readonly", isReadonly)
 
     if (control.hasClass("xforms-group-begin-end")) {
       // Case of group delimiters
@@ -673,13 +651,8 @@ object XFormsUI {
     if (parentSpan.tagName.equalsIgnoreCase("label"))
       parentSpan = parentSpan.parentElement      // while `xf:select` checkboxes have a `label` in between
 
-    if (checkboxInput.checked) {
-      parentSpan.classList.add("xforms-selected")
-      parentSpan.classList.remove("xforms-deselected")
-    } else {
-      parentSpan.classList.add("xforms-deselected")
-      parentSpan.classList.remove("xforms-selected")
-    }
+    parentSpan.toggleClass("xforms-selected",   checkboxInput.checked)
+    parentSpan.toggleClass("xforms-deselected", ! checkboxInput.checked)
   }
 
   var modalProgressPanelShown: Boolean = false

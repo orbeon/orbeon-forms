@@ -507,10 +507,7 @@ object XFormsResponse {
       recreatedInputs(controlId) = documentElement
 
     // Handle required
-    requiredOpt.foreach {
-      case true  => documentElement.classList.add("xforms-required")
-      case false => documentElement.classList.remove("xforms-required")
-    }
+    requiredOpt.foreach(documentElement.toggleClass("xforms-required", _))
 
     // Handle readonly
     if (! isStaticReadonly)
@@ -1265,10 +1262,10 @@ object XFormsResponse {
     }
 
     closeOpt foreach { closeString =>
-      val dialogElem      = dom.document.getElementById(id)
+      val dialogElem      = dom.document.getElementByIdT(id)
       val supportsBoolean = closeString.toBoolean
-      dialogElem.classList.toggle("xforms-dialog-close-true",    supportsBoolean)
-      dialogElem.classList.toggle("xforms-dialog-close-false", ! supportsBoolean)
+      dialogElem.toggleClass("xforms-dialog-close-true",    supportsBoolean)
+      dialogElem.toggleClass("xforms-dialog-close-false", ! supportsBoolean)
     }
   }
 

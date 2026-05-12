@@ -127,13 +127,9 @@ object ErrorPanel {
 
   private object Private {
 
-    def toggleDetails(errorPanelElem: html.Element, show: Boolean): Unit =
-      if (show) {
-        errorPanelElem.querySelectorT(".xforms-error-panel-details-hidden").classList.add("xforms-disabled")
-        errorPanelElem.querySelectorT(".xforms-error-panel-details-shown").classList.remove("xforms-disabled")
-      } else {
-        errorPanelElem.querySelectorT(".xforms-error-panel-details-hidden").classList.remove("xforms-disabled")
-        errorPanelElem.querySelectorT(".xforms-error-panel-details-shown").classList.add("xforms-disabled")
-      }
+    def toggleDetails(errorPanelElem: html.Element, show: Boolean): Unit = {
+      errorPanelElem.querySelectorT(".xforms-error-panel-details-hidden").toggleClass("xforms-disabled", show)
+      errorPanelElem.querySelectorT(".xforms-error-panel-details-shown").toggleClass("xforms-disabled",  ! show)
+    }
   }
 }

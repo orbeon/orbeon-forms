@@ -40,13 +40,8 @@ object XFormsControls {
     if (control.hasClass("xforms-output-appearance-xxforms-download")) {
       // XForms output with `xxf:download` appearance
       val anchor = control.getElementsByTagName("a").head
-      if (newControlValue == "") {
-          anchor.setAttribute("href", "#")
-          anchor.classList.add("xforms-readonly")
-      } else {
-          anchor.setAttribute("href", newControlValue)
-          anchor.classList.remove("xforms-readonly")
-      }
+      anchor.setAttribute("href", if (newControlValue == "") "#" else newControlValue)
+      anchor.toggleClass("xforms-readonly", newControlValue == "")
     } else if (isStaticReadonly && control.hasClass("xforms-textarea")) {
       // textarea in "static readonly" mode
       control.childrenT("pre").head.innerText = newControlValue
@@ -54,13 +49,8 @@ object XFormsControls {
       // Radio buttons in "static readonly" mode
       control.querySelectorAllT(".xforms-selected, .xforms-deselected").foreach { item =>
         val selected = item.querySelector(".radio > span").innerText == newControlValue
-        if (selected) {
-          item.classList.add("xforms-selected")
-          item.classList.remove("xforms-deselected")
-        } else {
-          item.classList.remove("xforms-selected")
-          item.classList.add("xforms-deselected")
-        }
+        item.toggleClass("xforms-selected",   selected)
+        item.toggleClass("xforms-deselected", ! selected)
       }
     } else if (control.matches(".xforms-label, .xforms-hint, .xforms-help, .xforms-alert")) {
       // External LHH
@@ -76,10 +66,7 @@ object XFormsControls {
         case video: html.Video if control.hasClass("xforms-mediatype-video") =>
           video.queryNestedElems[html.Source]("source", includeSelf = false).headOption.foreach { source =>
             source.src = newControlValue
-            if (newControlValue == "")
-              video.classList.add("empty-source")
-            else
-              video.classList.remove("empty-source")
+            video.toggleClass("empty-source", newControlValue == "")
             video.load()
           }
         case elem if control.hasClass("xforms-mediatype-text-html") =>

@@ -23,8 +23,9 @@ import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.ImageMetadata.AllMetadata
 
+import java.awt.Transparency
 import java.awt.geom.AffineTransform
-import java.awt.image.{AffineTransformOp, BufferedImage}
+import java.awt.image.{AffineTransformOp, BufferedImage, ComponentColorModel, DataBuffer}
 import java.io.{ByteArrayOutputStream, InputStream, OutputStream}
 import java.net.URI
 import javax.imageio.stream.MemoryCacheImageOutputStream
@@ -104,7 +105,10 @@ object ImageSupport {
     val destinationImage =
       op.createCompatibleDestImage(
         sourceImage,
-        if (sourceImage.getType == BufferedImage.TYPE_BYTE_GRAY) sourceImage.getColorModel else null
+        if (sourceImage.getType == BufferedImage.TYPE_BYTE_GRAY)
+          sourceImage.getColorModel
+        else // Force no alpha channel, see https://github.com/orbeon/orbeon-forms/issues/7673
+          new ComponentColorModel(sourceImage.getColorModel.getColorSpace, false, false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE)
       )
 
     op.filter(sourceImage, destinationImage)

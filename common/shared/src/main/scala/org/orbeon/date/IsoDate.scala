@@ -150,6 +150,12 @@ object IsoDate {
 
   private val IsoDateFormat = DateFormat(DateFormatComponent.Year, "-", isPadDayMonthDigits = true)
 
+  private def formatIsoYear(year: Int): String =
+    if (year >= 0 && year < 1000)
+      f"$year%04d"
+    else
+      year.toString
+
   // Supported format only:
   //
   //  | Format            | Example    | Description                          |
@@ -175,7 +181,7 @@ object IsoDate {
       else
         date.month.toString
 
-    val yearString = date.year.toString
+    val yearString = formatIsoYear(date.year)
 
     dateFormat.firstComponent match {
       case DateFormatComponent.Day   => s"$dayString${dateFormat.separator}$monthString${dateFormat.separator}$yearString"

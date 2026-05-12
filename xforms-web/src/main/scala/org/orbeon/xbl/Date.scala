@@ -75,7 +75,17 @@ object Date {
 
       if (isNativePicker) {
         visibleInputElem.`type` = "date"
-        EventSupport.addListener(visibleInputElem, DomEventNames.Change, (_: dom.Event) => onDateSelectedUpdateStateAndSendValueToServer())
+
+        EventSupport.addListener(visibleInputElem, DomEventNames.FocusOut,
+          (e: dom.Event) =>
+            if (! isMarkedReadonly)
+              updateStateAndSendValueToServer(readValue)
+        )
+        EventSupport.addListener(visibleInputElem, DomEventNames.KeyDown,
+          (e: dom.KeyboardEvent) =>
+            if (! isMarkedReadonly && e.key == "Enter")
+              updateStateAndSendValueToServer(readValue)
+        )
       } else {
 
         EventSupport.addListener(visibleInputElem, DomEventNames.Change,

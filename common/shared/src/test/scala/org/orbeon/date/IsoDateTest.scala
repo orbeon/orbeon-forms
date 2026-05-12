@@ -6,6 +6,16 @@ class IsoDateTest extends AnyFunSpec {
 
   case class DateTestCase(format: DateFormat, input: String, expected: Option[IsoDate])
 
+  describe("ISO formatting") {
+
+    it("must pad years to at least four digits") {
+      assert(IsoDate(2, 1, 1).toIsoString == "0002-01-01")
+      assert(IsoDate(999, 12, 31).toIsoString == "0999-12-31")
+      assert(IsoDate(1000, 1, 1).toIsoString == "1000-01-01")
+      assert(IsoDate.formatDate(IsoDate(2, 1, 1), DateFormat(DateFormatComponent.Month, "/", isPadDayMonthDigits = false)) == "1/1/0002")
+    }
+  }
+
   describe("Magic date parsing") {
 
     val testCurrentDate = IsoDate(2024, 1, 15)

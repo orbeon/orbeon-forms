@@ -34,7 +34,7 @@
             xxbl:container="span">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-                    <display-name lang="en">With Character Counter</display-name>
+        <display-name lang="en">With Character Counter</display-name>
         <display-name lang="fr">Avec compteur de charactères</display-name>
         <display-name lang="no">Med tegnantall</display-name>
         <display-name lang="ru">Со счётчиком символов</display-name>
@@ -69,16 +69,31 @@
             <xbl:style src="/xbl/orbeon/character-counter/character-counter.css"/>
         </xbl:resources>
 
+        <xbl:handlers>
+            <xbl:handler event="xforms-enabled xforms-value-changed">
+                <xf:setvalue ref="instance('local')/value" value="xxf:binding('fr-character-counter')"/>
+                <xf:setvalue ref="instance('local')/type"  value="xxf:type(xxf:binding('fr-character-counter'))"/>
+                <xf:rebuild/>
+            </xbl:handler>
+            <xbl:handler event="xforms-readonly">
+                <xf:setvalue ref="instance('local')/readonly">true</xf:setvalue>
+            </xbl:handler>
+            <xbl:handler event="xforms-readwrite">
+                <xf:setvalue ref="instance('local')/readonly">false</xf:setvalue>
+            </xbl:handler>
+        </xbl:handlers>
+
         <xbl:implementation>
             <xf:model id="model">
                 <xf:instance id="local">
                     <local>
                         <value/>
                         <type/>
+                        <readonly/>
                     </local>
                 </xf:instance>
                 <xf:bind ref="value[../type = 'HTMLFragment']" type="xf:HTMLFragment"/>
-                <xf:bind ref="value" readonly="xxf:readonly(xxf:binding('fr-character-counter'))"/>
+                <xf:bind ref="value" readonly="../readonly/string() = 'true'"/>
             </xf:model>
         </xbl:implementation>
 
@@ -90,25 +105,8 @@
                     value="xxf:binding('fr-character-counter')"/>
 
                 <xf:var
-                    name="local"
-                    value="instance('local')/value"/>
-
-                <xf:var
-                    id="external-id"
-                    name="external"
-                    value="string($binding)"/>
-
-                <xf:action
-                    event="xforms-enabled xforms-value-changed"
-                    observer="external-id">
-                    <xf:setvalue ref="$local/../type" value="xxf:type($binding)"/>
-                    <xf:rebuild model="model"/>
-                    <xf:setvalue ref="$local" value="$external"/>
-                </xf:action>
-
-                <xf:var
                     name="current"
-                    value="string-length(xxf:inner-text($local))"/>
+                    value="string-length(xxf:inner-text(instance('local')/value))"/>
 
                 <xf:var
                     name="remaining"
@@ -116,7 +114,7 @@
 
                 <xsl:element name="{name(/*)}">
                     <xsl:attribute name="id"          select="'field'"/>
-                    <xsl:attribute name="ref"         select="'$local'"/>
+                    <xsl:attribute name="ref"         select="'instance(''local'')/value'"/>
                     <xsl:attribute name="incremental" select="'true'"/>
                     <xsl:attribute name="appearance"  select="tokenize(/*/@appearance, '\s+')[. != 'character-counter']"/>
                     <xsl:copy-of select="/*/@mediatype"/>
@@ -128,7 +126,7 @@
                     <xf:setvalue
                         event="DOMActivate DOMFocusOut"
                         ref="$binding"
-                        value="$local"/>
+                        value="instance('local')/value"/>
                 </xsl:element>
 
                 <xh:span class="fr-charcounter-count">

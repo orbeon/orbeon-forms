@@ -38,6 +38,7 @@ import org.xml.sax.helpers.AttributesImpl
 import java.io.{FileInputStream, OutputStream}
 import java.net.URI
 import java.text.Normalizer
+import java.util.logging.Level
 import javax.xml.transform.dom.DOMResult
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -126,7 +127,10 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
     implicit val indentedLogger : IndentedLogger  = new IndentedLogger(XHTMLToPDFProcessor.logger)
 
     val pdfRendererBuilder = new CustomPdfRendererBuilder
-    XRLog.listRegisteredLoggers.forEach(_ => XRLog.setLoggingEnabled(false)) // disable logging
+
+    // So we can see some issues
+    XRLog.listRegisteredLoggers
+      .forEach(XRLog.setLevel(_, Level.WARNING))
 
     pdfRendererBuilder.useDefaultPageSize(8.5f, 11f, PageSizeUnits.INCHES)
 

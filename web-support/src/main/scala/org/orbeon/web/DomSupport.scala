@@ -17,7 +17,7 @@ object DomSupport {
 
   case class Offset(left: Double, top: Double)
 
-  implicit class DomElemOps[T >: html.Element <: dom.Element](private val elem: T) extends AnyVal {
+  implicit class DomElemOps[T <: dom.Element](private val elem: T) extends AnyVal {
 
     def querySelectorAllT(selectors: String): collection.Seq[T] =
       elem.querySelectorAll(selectors).asInstanceOf[dom.NodeList[T]]
@@ -279,6 +279,9 @@ object DomSupport {
     // Includes content + padding + border, should be similar to jQuery's `outerHeight()`
     def outerHeight: Double =
       elem.getBoundingClientRect().height
+
+    def cloneNodeT(deep: Boolean): T =
+      elem.cloneNode(deep).asInstanceOf[T]
   }
 
   // `parseFloat()` ignores trailing "px" and returns a `NaN` if the value is not parseable as a number

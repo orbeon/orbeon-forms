@@ -44,12 +44,14 @@ object FormBuilderPrivateAPI extends js.Object {
   def updateTestIframeAndDispatch(eventName: String): Unit = {
 
     // Reset the displayed page as the iframe might show the result from a previous test
-    // Before, we were recreating a new element as a copy (through jQuery) of the old one's `outerHTML`. But simply
-    // resetting the `src` to `about:blank` should work, shouldn't it? I am not even sure this is needed at all.
-    dom.document
-      .querySelectorT(".fb-test-iframe")
-      .asInstanceOf[html.IFrame]
-      .src = "about:blank"
+    val oldIframe =
+      dom.document
+        .documentElement
+        .queryNestedElems[html.IFrame](".fb-test-iframe")
+        .head
+
+    // Clone the iframe node so that nested event handlers like `onbeforeunload` are removed
+    oldIframe.parentNode.replaceChild(oldIframe.cloneNodeT(false), oldIframe)
 
     // Dispatch the event requested
     AjaxClient.fireEvent(

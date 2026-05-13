@@ -126,7 +126,9 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
     implicit val indentedLogger : IndentedLogger  = new IndentedLogger(XHTMLToPDFProcessor.logger)
 
     val pdfRendererBuilder = new CustomPdfRendererBuilder
-    XRLog.listRegisteredLoggers.forEach(_ => XRLog.setLoggingEnabled(false)) // disable logging
+    // 2026-05-13: We tried to enable the forwarding of `java.util.logging` to SLF4J, but it did not work. So we keep
+    // the logging disabled for now, otherwise the logging ends up in the standard output.
+    XRLog.listRegisteredLoggers.forEach(_ => XRLog.setLoggingEnabled(false))
 
     pdfRendererBuilder.useDefaultPageSize(8.5f, 11f, PageSizeUnits.INCHES)
 

@@ -55,10 +55,11 @@ object Position {
   }
 
   // Call listener when anything on the page that could change element positions happened
+  // 2026-05-13: 4 callers.
   def onOffsetMayHaveChanged(fn: () => Unit): Unit = {
     XFormsUiEvents.orbeonLoadedEvent.subscribe(fn) // TODO: not great for nth embedding of Form Builder
     AjaxClient.ajaxResponseProcessed.add(_ => fn())
-    XFormsUiEvents.componentChangedLayoutEvent.subscribe(fn)
+    XFormsUiEvents.componentChangedLayoutCB.add(_ => fn())
 
     val ElementWhichChangeDynamically = List(
       ".fb > *",                // The `<xxf:dynamic id="fb">` content changes during full updates

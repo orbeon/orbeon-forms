@@ -19,8 +19,8 @@ import org.orbeon.facades.Select2.{Success, toJQuerySelect2}
 import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.web.DomSupport
 import org.orbeon.web.DomSupport.*
+import org.orbeon.xforms.XFormsUiEvents.ValueChangeInternalEvent
 import org.orbeon.xforms.*
-import org.orbeon.xforms.XFormsXbl
 import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom
 import org.scalajs.dom.{MutationObserver, document, html}
@@ -49,7 +49,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   private object EventSupport              extends EventListenerSupport
 
   private val select2SuccessCallbacks      : mutable.Queue[(String, Success)] = new mutable.Queue[(String, Success)]
-  private var onXFormsSelect1ValueChangeJs : Option[js.Function]              = None
+  private var onXFormsSelect1ValueChangeOpt: Option[ValueChangeInternalEvent => Unit] = None
   private var mutationObservers            : List[MutationObserver]           = Nil
   private var inputElementOpt              : Option[dom.Element]              = None
   private var optionsOpt                   : Option[Select2.Options]          = None
@@ -169,9 +169,9 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
           mutationObservers = DomSupport.onAttributeChange(elementWithData, DataIsOpenSelection, updateOpenSelection     ) :: mutationObservers
         } else {
           // Register and remember listener on value change
-          val listener: js.Function = onXFormsSelect1ValueChange _
-          onXFormsSelect1ValueChangeJs = Some(listener)
-          XFormsUiEvents.afterValueChange.subscribe(listener)
+          val listener: ValueChangeInternalEvent => Unit = onXFormsSelect1ValueChange
+          onXFormsSelect1ValueChangeOpt = Some(listener)
+          XFormsUiEvents.afterValueChangeCB.add(listener)
         }
 
         mutationObservers = DomSupport.onAttributeChange    (elementWithData, DataPlaceholder, updatePlaceholder            ) :: mutationObservers
@@ -196,8 +196,8 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     EventSupport.clearAllListeners()
 
     // Remove after value change listener
-    onXFormsSelect1ValueChangeJs.foreach(XFormsUiEvents.afterValueChange.unsubscribe)
-    onXFormsSelect1ValueChangeJs = None
+    onXFormsSelect1ValueChangeOpt.foreach(XFormsUiEvents.afterValueChangeCB.remove)
+    onXFormsSelect1ValueChangeOpt = None
 
     // Disconnect mutation observers
     mutationObservers.foreach(_.disconnect())
@@ -307,11 +307,9 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
 
   // For the non-databound case, when the value of the underlying dropdown changed, typically because it set based
   // on that the server tells the client, tell the Select2 component that the value has changed
-  private def onXFormsSelect1ValueChange(event: js.Dynamic): Unit = {
-    val control  = event.control.asInstanceOf[html.Element]
-    if (containerElem.querySelector(".xforms-select1") == control)
+  private def onXFormsSelect1ValueChange(event: ValueChangeInternalEvent): Unit =
+    if (containerElem.querySelector(".xforms-select1") == event.control)
       $(containerElem).find("select").trigger("change")
-  }
 
   private def onOpen(): Unit = {
     val dropdownElement = document.querySelector(".select2-dropdown")

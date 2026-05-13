@@ -3,6 +3,7 @@ package org.orbeon.xforms
 import io.udash.wrappers.jquery.JQueryPromise
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.web.DomSupport.DomElemOps
+import org.orbeon.xforms.XFormsUiEvents.ValueChangeInternalEvent
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -21,16 +22,7 @@ object XFormsControls {
   ): js.UndefOr[js.Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]] = {
 
     // 2025-08-18: Legacy and undocumented
-    val customEvent: js.Object = {
-      val _control = control
-      new js.Object {
-        val control : html.Element = _control
-        val newValue: String       = newControlValue
-      }
-    }
-
-    XFormsUiEvents.beforeValueChange.fire(customEvent)
-    XFormsUiEvents.valueChange.fire(customEvent)
+    val customEvent = new ValueChangeInternalEvent(control, newControlValue)
 
     val isStaticReadonly = control.hasClass("xforms-static")
 
@@ -128,9 +120,8 @@ object XFormsControls {
         result = companionInstance.xformsUpdateValue(newControlValue)
     }
 
-    // 2025-08-18: Legacy and undocumented
-    // 2026-04-30: But used by `Select1SearchCompanion`
-    XFormsUiEvents.afterValueChange.fire(customEvent)
+    // 2026-04-30: Used by `Select1SearchCompanion`
+    XFormsUiEvents.afterValueChangeCB.fire(customEvent)
 
     result
   }

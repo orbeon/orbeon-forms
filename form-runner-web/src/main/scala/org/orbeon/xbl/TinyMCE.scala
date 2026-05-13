@@ -135,7 +135,7 @@ object TinyMCE {
           if (focusAfterInit)
             tinyMceObject.focus()
           tinyMceInitialized = true
-          XFormsUiEvents.componentChangedLayoutEvent.fire()
+          XFormsUiEvents.componentChangedLayoutCB.fire(())
         }
 
         // - Unfortunately, we need to use polling; we can't rely on an Ajax response, e.g. if in Bootstrap tab as in

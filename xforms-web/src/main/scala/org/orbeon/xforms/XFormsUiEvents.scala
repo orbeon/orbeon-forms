@@ -10,31 +10,26 @@ import scala.scalajs.js.Dynamic.{newInstance, global as g}
 
 object XFormsUiEvents {
 
+  // Public API
   lazy val orbeonLoadedEvent: YUICustomEvent =
     newInstance(g.YAHOO.util.CustomEvent)(
       "orbeonLoaded", dom.window, false, g.YAHOO.util.CustomEvent.LIST, true
     ).asInstanceOf[YUICustomEvent]
 
+  // Public API
   lazy val errorEvent: YUICustomEvent =
     newInstance(g.YAHOO.util.CustomEvent)("errorEvent").asInstanceOf[YUICustomEvent]
 
-  lazy val componentChangedLayoutEvent: YUICustomEvent =
-    newInstance(g.YAHOO.util.CustomEvent)("componentChangedLayout").asInstanceOf[YUICustomEvent]
+  // 2026-05-13: API only used by `TinyMCE`
+  val componentChangedLayoutCB = new CallbackList[Unit]()
 
-  lazy val beforeValueChange: YUICustomEvent =
-    newInstance(g.YAHOO.util.CustomEvent)(
-      null, null, false, g.YAHOO.util.CustomEvent.FLAT
-    ).asInstanceOf[YUICustomEvent]
+  class ValueChangeInternalEvent(
+    val control        : html.Element,
+    val newControlValue: String
+  ) extends js.Object
 
-  lazy val valueChange: YUICustomEvent =
-    newInstance(g.YAHOO.util.CustomEvent)(
-      null, null, false, g.YAHOO.util.CustomEvent.FLAT
-    ).asInstanceOf[YUICustomEvent]
-
-  lazy val afterValueChange: YUICustomEvent =
-    newInstance(g.YAHOO.util.CustomEvent)(
-      null, null, false, g.YAHOO.util.CustomEvent.FLAT
-    ).asInstanceOf[YUICustomEvent]
+  // 2026-05-13: API only used by `Select1SearchCompanion`
+  val afterValueChangeCB = new CallbackList[ValueChangeInternalEvent]()
 
   // Walk up the DOM from `element` to find the first ancestor (or self) that is an XForms control,
   // an XBL component, or an XForms dialog. Returns null if none is found.

@@ -84,6 +84,7 @@ val JavaActivationVersion            = "2.0.1"
 val AntVersion                       = "1.10.11"
 val ThumbnailatorVersion             = "0.4.16"
 val AwsSdkVersion                    = "2.44.4"
+val InfinispanVersion                = "14.0.35.Final"
 
 // "Provided" Java libraries
 val JavaxServletApiVersion           = "4.0.1"
@@ -91,7 +92,7 @@ val JakartaServletApiVersion         = "6.1.0"
 val PortletApiVersion                = "3.0.1"
 val LiferayPortalServiceVersion      = "6.2.5"
 val LiferayPortalKernelVersion       = "166.0.0"
-
+val WildFlyElytronHttpOidcVersion    = "2.8.2.Final"
 
 val WebJarDependencies = Seq(
   "org.webjars.npm" % "bowser"           % "1.9.4",
@@ -120,7 +121,7 @@ val CoreLibraryDependencies = Seq(
   "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
   "org.log4s"                   %% "log4s"                          % Log4sVersion,
   "javax.cache"                 % "cache-api"                       % "1.1.1",
-  "org.infinispan"              % "infinispan-core"                 % "14.0.35.Final",
+  "org.infinispan"              % "infinispan-core"                 % InfinispanVersion,
   "net.sf.ehcache"              % "ehcache"                         % "2.10.9.2" % Provided,
   "org.ehcache"                 % "ehcache"                         % "3.10.8",
 //  "jakarta.xml.bind"            % "jakarta.xml.bind-api"            % "4.0.2",
@@ -820,7 +821,8 @@ lazy val formRunnerJVM = formRunner.jvm
     libraryDependencies += "javax.servlet"        % "javax.servlet-api"         % JavaxServletApiVersion   % Provided,
     libraryDependencies += "jakarta.servlet"      % "jakarta.servlet-api"       % JakartaServletApiVersion % Provided,
     libraryDependencies += "javax.portlet"        % "portlet-api"               % PortletApiVersion        % Provided,
-    libraryDependencies += "org.wildfly.security" % "wildfly-elytron-http-oidc" % "2.8.4.Final"            % Provided,
+
+    libraryDependencies += "org.wildfly.security" % "wildfly-elytron-http-oidc" % WildFlyElytronHttpOidcVersion % Provided,
 
     libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % ScalaParallelCollectionsVersion,
 

@@ -1,6 +1,7 @@
 package org.orbeon.oxf.fb
 
-import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.Loader
+import org.apache.pdfbox.io.RandomAccessReadBuffer
 import org.orbeon.connection.ConnectionResult
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.fr.FormDefinitionVersion
@@ -38,10 +39,10 @@ trait PdfOps {
         closeOnSuccess = true
       ) { is =>
         <_>{
-          useAndClose(PDDocument.load(is)) { pdd =>
+          useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(is))) { pdd =>
             Option(pdd.getDocumentCatalog.getAcroForm) match {
               case Some(acroForm) =>
-                acroForm.getFieldIterator.asScala.map { field =>
+                acroForm.getFieldTree.asScala.map { field =>
                   <field
                     name={field.getPartialName}
                     fully-qualified-name={field.getFullyQualifiedName}

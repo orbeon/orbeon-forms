@@ -15,7 +15,9 @@ package org.orbeon.oxf.processor.pdf
 
 import cats.implicits.catsSyntaxOptionId
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.{FSFontUseCase, FontStyle, PageSizeUnits}
+import com.openhtmltopdf.outputdevice.helper.ExternalResourceType
 import com.openhtmltopdf.pdfboxout.{CustomPdfRendererBuilder, PdfRendererBuilder}
+import com.openhtmltopdf.resource.ImageResource
 import com.openhtmltopdf.util.XRLog
 import org.orbeon.css.CSSParsing.CSSCache
 import org.orbeon.css.{CSSParsing, ResolvedCSSLink, Selector}
@@ -134,7 +136,7 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
 
     val propertySet = Properties.instance.getPropertySet
 
-    pdfRendererBuilder.usePdfUaAccessbility(propertySet.getBoolean("oxf.fr.pdf.accessibility", default = false))
+    pdfRendererBuilder.usePdfUaAccessibility(propertySet.getBoolean("oxf.fr.pdf.accessibility", default = false))
 
     pdfRendererBuilder.usePdfAConformance(
       propertySet.getString("oxf.fr.pdf.pdf/a", default = "none") match {
@@ -236,6 +238,9 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
             resolvedURL = resolveURI(uri),
             inputStream = openStream(uri)
           )
+
+        override def getImageResource(uri: String, `type`: ExternalResourceType): ImageResource =
+          throw new IllegalStateException
       }
 
       val variableDefinitions =

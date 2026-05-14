@@ -1,7 +1,8 @@
 package org.orbeon.oxf.fr
 
 import cats.syntax.option.*
-import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.Loader
+import org.apache.pdfbox.io.RandomAccessReadBuffer
 import org.apache.pdfbox.text.PDFTextStripper
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.common.Version
@@ -51,7 +52,7 @@ class PdfProductionTest
       withTestExternalContext { _ =>
 
         val extractedText =
-          useAndClose(PDDocument.load(content.stream)) { pdd =>
+          useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(content.stream))) { pdd =>
             (new PDFTextStripper)
               .tap(_.setSortByPosition(true))
               .pipe(_.getText(pdd))
@@ -67,9 +68,9 @@ class PdfProductionTest
       val (_, content, _) =
         runFormRunnerReturnContent("tests", "pdf-production", "pdf", documentId = "9eff349bfd95aab8d4d5e048bd25a815".some)
       withTestExternalContext { _ =>
-        useAndClose(PDDocument.load(content.stream)) { pdd =>
+        useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(content.stream))) { pdd =>
           // The test that follows assumes there is only one page
-          assert(pdd.getNumberOfPages == 1)
+          assert(pdd.getPages.getCount == 1)
           // Look for 2 images: the logo and our WebP image
           val imageCount = pdd.getPage(0).getResources.getXObjectNames.asScala.size
           assert(imageCount == 2)
@@ -103,7 +104,7 @@ class PdfProductionTest
       withTestExternalContext { _ =>
 
         val extractedText =
-          useAndClose(PDDocument.load(content.stream)) { pdd =>
+          useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(content.stream))) { pdd =>
             (new PDFTextStripper)
               .tap(_.setSortByPosition(true))
               .pipe(_.getText(pdd))
@@ -206,7 +207,7 @@ class PdfProductionTest
       withTestExternalContext { _ =>
 
         val extractedText =
-          useAndClose(PDDocument.load(content.stream)) { pdd =>
+          useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(content.stream))) { pdd =>
             (new PDFTextStripper)
               .tap(_.setSortByPosition(true))
               .pipe(_.getText(pdd))
@@ -238,7 +239,7 @@ class PdfProductionTest
       withTestExternalContext { _ =>
 
         val extractedText =
-          useAndClose(PDDocument.load(content.stream)) { pdd =>
+          useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(content.stream))) { pdd =>
             (new PDFTextStripper)
               .tap(_.setSortByPosition(true))
               .pipe(_.getText(pdd))

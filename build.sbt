@@ -74,8 +74,8 @@ val Slf4jVersion                     = "2.0.17"
 val HttpComponentsVersion            = "4.5.14"
 val Log4j2Version                    = "2.25.3"
 val CommonsIoVersion                 = "2.15.1"
-val OpenHtmlToPdfVersion             = "1.0.10"
-val PdfBoxVersion                    = "2.0.33"
+val OpenHtmlToPdfVersion             = "1.1.37"
+val PdfBoxVersion                    = "3.0.4"
 val TinkVersion                      = "1.20.0"
 val JacksonVersion                   = "2.21.1"
 val JavaMailApiVersion               = "2.1.3"
@@ -165,9 +165,9 @@ val CoreLibraryDependencies = Seq(
   "org.postgresql"              % "postgresql"                      % "42.2.24"         % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
   "org.xerial"                  % "sqlite-jdbc"                     % "3.53.1.0",
-  "com.openhtmltopdf"           % "openhtmltopdf-core"              % OpenHtmlToPdfVersion,
-  "com.openhtmltopdf"           % "openhtmltopdf-pdfbox"            % OpenHtmlToPdfVersion,
-  "com.openhtmltopdf"           % "openhtmltopdf-java2d"            % OpenHtmlToPdfVersion,
+  "io.github.openhtmltopdf"     % "openhtmltopdf-core"              % OpenHtmlToPdfVersion,
+  "io.github.openhtmltopdf"     % "openhtmltopdf-pdfbox"            % OpenHtmlToPdfVersion,
+  "io.github.openhtmltopdf"     % "openhtmltopdf-java2d"            % OpenHtmlToPdfVersion,
   "org.apache.pdfbox"           % "pdfbox"                          % PdfBoxVersion,
   "com.github.librepdf"         % "openpdf"                         % "1.3.26",
   "org.bouncycastle"            % "bcmail-jdk18on"                  % "1.84", // for `openpdf`, also pulls `bcprov` and `bcpkix`

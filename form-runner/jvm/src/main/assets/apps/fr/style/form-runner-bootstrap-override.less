@@ -125,6 +125,33 @@ body.orbeon {
         color      : var(--orbeon-button-color);
     }
 
+    .btn, .btn-group > .btn {
+        border-radius: var(--orbeon-button-border-radius);
+        padding      : var(--orbeon-button-padding);
+    }
+
+    // Inner (facing) corners of grouped buttons. Outer corners restored by per-side rules below.
+    .btn-group > .btn { border-radius: var(--orbeon-button-inner-border-radius); }
+
+    .btn-group > .btn:first-child {
+        border-top-left-radius   : var(--orbeon-button-border-radius);
+        border-bottom-left-radius: var(--orbeon-button-border-radius);
+    }
+    .btn-group > .btn:last-child,
+    .btn-group > .dropdown-toggle {
+        border-top-right-radius   : var(--orbeon-button-border-radius);
+        border-bottom-right-radius: var(--orbeon-button-border-radius);
+    }
+
+    .btn-group > .btn + .dropdown-toggle {
+        padding: var(--orbeon-button-toggle-padding);
+    }
+
+    .btn:focus-visible {
+        outline   : 0;
+        box-shadow: var(--orbeon-button-focus-ring);
+    }
+
     .btn .fa {
         line-height: inherit;
     }
@@ -558,24 +585,28 @@ body.orbeon {
     .input-prepend {
         input,
         input.xforms-group[role = group][tabindex] {
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
+            border-top-left-radius   : var(--orbeon-add-on-inner-border-radius);
+            border-bottom-left-radius: var(--orbeon-add-on-inner-border-radius);
         }
-        .add-on {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
+        .add-on:first-child {
+            border-radius             : var(--orbeon-add-on-border-radius);
+            border-top-right-radius   : var(--orbeon-add-on-inner-border-radius);
+            border-bottom-right-radius: var(--orbeon-add-on-inner-border-radius);
+            margin-right              : var(--orbeon-add-on-gap);
         }
     }
 
     .input-append {
         input:not([type = "date"], [type = "time"]),
         input.xforms-group[role = group][tabindex]:not([type = "date"]) {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
+            border-top-right-radius   : var(--orbeon-add-on-inner-border-radius);
+            border-bottom-right-radius: var(--orbeon-add-on-inner-border-radius);
         }
-        .add-on {
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
+        .add-on:last-child {
+            border-radius            : var(--orbeon-add-on-border-radius);
+            border-top-left-radius   : var(--orbeon-add-on-inner-border-radius);
+            border-bottom-left-radius: var(--orbeon-add-on-inner-border-radius);
+            margin-left              : var(--orbeon-add-on-gap);
         }
     }
 

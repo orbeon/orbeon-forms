@@ -2,6 +2,9 @@
 
 .xbl-fr-fields-date {
 
+    // Don't let the add-on gap apply here (special case with multi-field control)
+    --orbeon-add-on-gap: 0;
+
     .fr-component-group {
         display: inline-block;
         img { vertical-align: middle; }
@@ -36,8 +39,7 @@
             display: inline-block;
             // No need for a vertical-align here, as .add-on now matches the inputs' height via @fluidControlHeight
             .add-on {
-                // Rounded corners on all sides, not just right side
-                border-radius: @inputBorderRadius;
+                border-radius: var(--orbeon-add-on-border-radius);
             }
         }
     }

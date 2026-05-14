@@ -18,11 +18,17 @@
             // Particularly strong rule for Form Builder, to override its `display: table`
             .fr-view &.xforms-control .xforms-label, // add `.fr-view` because `.fr-density-*` on that same element has a `display` property and we need to override it
             .fb-main .fb &.xforms-control .xforms-label {
-                overflow : hidden;
-                display  : block;
-                height   : 0;
-                width    : 0;
-                margin   : 0;
+                // #7679: same technique used in Bootstrap 5's .visually-hidden class/mixin ("Hide content visually
+                // while keeping it accessible to assistive technologies")
+                width      : 1px;
+                height     : 1px;
+                padding    : 0;
+                margin     : -1px;
+                overflow   : hidden;
+                clip       : rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border     : 0;
+                position   : absolute;
             }
         }
         .xbl-fr-date {

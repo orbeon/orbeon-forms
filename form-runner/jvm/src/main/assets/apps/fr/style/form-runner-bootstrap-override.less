@@ -294,9 +294,9 @@ body.orbeon {
         // https://github.com/orbeon/orbeon-forms/issues/5716
         word-wrap: break-word; // keep also `word-wrap`, even if it's deprecated in favor of `overflow-wrap`, for the PDF renderer
 
-        min-height: @fixedControlsHeight;
+        min-height: @fixedControlMinHeight;
         @media screen {
-            min-height: @fluidControlsHeight;
+            min-height: @fluidControlMinHeight;
         }
         height: auto;
     }
@@ -330,9 +330,9 @@ body.orbeon {
 
         margin-bottom: 0;                           // Override default 9px bottom margin added by Bootstrap
         box-sizing: border-box;                     // So width: 100% works with the padding added by Bootstrap
-        height: @fixedControlsHeight;               // TODO: how to approximate calc(1em + 15px)?
+        height: @fixedControlHeight;
         @media screen {
-            height: calc(1em + 15px);
+            height: @fluidControlHeight;
         }
         background-image: none;                     // Liferay adds background images which don't mix well with Bootstrap
 
@@ -524,20 +524,34 @@ body.orbeon {
         display: flex;
         align-items: stretch;
 
-        margin-bottom: 0;                   // Not sure why Bootstrap adds a @baseLineHeight / 2 margin here
+        margin-bottom: 0; // Not sure why Bootstrap adds a @baseLineHeight / 2 margin here
+
         .add-on {
-            display: flex;
-            align-items: center;
+            display        : flex;
+            align-items    : center;
+            justify-content: center;
+            line-height    : 1;
+            padding        : 0 0.38em; // Match Bootstrap at a font size of 13px (i.e. 5px)
 
-            font-size: var(--orbeon-control-font-size);
-            line-height: 1em;
-            height: auto;
+            // Matching inputs
+            font-size : var(--orbeon-control-font-size);
+            box-sizing: border-box;
+            height    : auto;
+            min-height: @fixedControlHeight;
+            @media screen {
+                min-height: @fluidControlHeight;
+            }
 
-            color: var(--orbeon-add-on-color);
+            color           : var(--orbeon-add-on-color);
             background-color: var(--orbeon-add-on-background-color);
-            text-shadow: 0 1px 0 var(--orbeon-add-on-text-shadow-color);
+            text-shadow     : 0 1px 0 var(--orbeon-add-on-text-shadow-color);
 
             .fieldBorder();
+
+            > .fa {
+                // Make the FA icon vertically aligned (visually); this works with all font sizes (em unit)
+                margin-top: -0.06em;
+            }
         }
     }
 

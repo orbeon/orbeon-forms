@@ -482,9 +482,9 @@
             word-wrap: break-word; // keep also `word-wrap`, even if it's deprecated in favor of `overflow-wrap`, for the PDF renderer
             word-break: normal;             // Bootstrap overrides word-break (`word-break` is generally used for for CJK)
 
-            min-height: @fixedControlsHeight;
+            min-height: @fixedControlMinHeight;
             @media screen {
-                min-height: @fluidControlsHeight;
+                min-height: @fluidControlMinHeight;
             }
             box-sizing: border-box;
             padding: 4px 6px;

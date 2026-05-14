@@ -34,7 +34,7 @@
         .xbl-fr-date {
             input { display: none ; }
             display: inline-block;
-            vertical-align: middle;
+            // No need for a vertical-align here, as .add-on now matches the inputs' height via @fluidControlHeight
             .add-on {
                 // Rounded corners on all sides, not just right side
                 border-radius: @inputBorderRadius;

@@ -84,6 +84,9 @@ val AntVersion                       = "1.10.11"
 val ThumbnailatorVersion             = "0.4.16"
 val AwsSdkVersion                    = "2.44.4"
 val InfinispanVersion                = "14.0.35.Final"
+val SqliteJdbcVersion                = "3.53.1.0"
+val PostgresqlVersion                = "42.7.11"
+val OracleJdbcVersion                = "23.26.1.0.0"
 
 // "Provided" Java libraries
 val JavaxServletApiVersion           = "4.0.1"
@@ -144,9 +147,9 @@ val CoreLibraryDependencies = Seq(
   "com.google.guava"            % "guava"                           % "30.0-jre"        % Test,
   "org.mockito"                 % "mockito-core"                    % "5.12.0"          % Test,
   "mysql"                       % "mysql-connector-java"            % "8.0.26"          % Test,
-  "org.postgresql"              % "postgresql"                      % "42.2.24"         % Test,
+  "org.postgresql"              % "postgresql"                      % PostgresqlVersion % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
-  "org.xerial"                  % "sqlite-jdbc"                     % "3.53.0.0",
+  "org.xerial"                  % "sqlite-jdbc"                     % SqliteJdbcVersion,
   "com.openhtmltopdf"           % "openhtmltopdf-core"              % OpenHtmlToPdfVersion,
   "com.openhtmltopdf"           % "openhtmltopdf-pdfbox"            % OpenHtmlToPdfVersion,
   "com.openhtmltopdf"           % "openhtmltopdf-java2d"            % OpenHtmlToPdfVersion,

@@ -57,7 +57,7 @@ val CirceVersion                     = "0.14.15"
 val EnumeratumVersion                = "1.9.7"
 val EnumeratumCirceVersion           = "1.9.7"
 val ShapelessVersion                 = "2.3.7"
-val ScalaXmlVersion                  = "2.4.0"  // see https://github.com/orbeon/orbeon-forms/issues/4927
+val ScalaXmlVersion                  = "2.4.0"
 val ScalaParallelCollectionsVersion  = "1.2.0"
 val ScalaAsyncVersion                = "1.0.1"
 val Parboiled2Version                = "2.5.1"
@@ -85,6 +85,13 @@ val AntVersion                       = "1.10.11"
 val ThumbnailatorVersion             = "0.4.16"
 val AwsSdkVersion                    = "2.44.4"
 val InfinispanVersion                = "14.0.35.Final"
+val SqliteJdbcVersion                = "3.53.1.0"
+val PostgresqlVersion                = "42.7.11"
+val OracleJdbcVersion                = "23.26.1.0.0"
+
+// Only on PE for now
+val ApachePOIVersion                 = "5.4.1"
+val SendGridVersion                  = "4.10.3"
 
 // "Provided" Java libraries
 val JavaxServletApiVersion           = "4.0.1"
@@ -139,6 +146,7 @@ val CoreLibraryDependencies = Seq(
   "jakarta.mail"                % "jakarta.mail-api"                % JavaMailApiVersion,
   "org.eclipse.angus"           % "angus-mail"                      % AngusMailVersion,
   "com.sun.activation"          % "jakarta.activation"              % JavaActivationVersion,
+  "com.sendgrid"                % "sendgrid-java"                   % SendGridVersion % Provided, // PE only
   "org.apache.httpcomponents"   % "httpclient"                      % HttpComponentsVersion,
   "org.apache.httpcomponents"   % "httpclient-cache"                % HttpComponentsVersion,
   "org.apache.httpcomponents"   % "httpmime"                        % HttpComponentsVersion,
@@ -162,9 +170,9 @@ val CoreLibraryDependencies = Seq(
   "com.google.guava"            % "guava"                           % "30.0-jre"        % Test,
   "org.mockito"                 % "mockito-core"                    % "5.12.0"          % Test,
   "mysql"                       % "mysql-connector-java"            % "8.0.26"          % Test,
-  "org.postgresql"              % "postgresql"                      % "42.2.24"         % Test,
+  "org.postgresql"              % "postgresql"                      % PostgresqlVersion % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
-  "org.xerial"                  % "sqlite-jdbc"                     % "3.53.1.0",
+  "org.xerial"                  % "sqlite-jdbc"                     % SqliteJdbcVersion,
   "io.github.openhtmltopdf"     % "openhtmltopdf-core"              % OpenHtmlToPdfVersion,
   "io.github.openhtmltopdf"     % "openhtmltopdf-pdfbox"            % OpenHtmlToPdfVersion,
   "io.github.openhtmltopdf"     % "openhtmltopdf-java2d"            % OpenHtmlToPdfVersion,
@@ -823,6 +831,10 @@ lazy val formRunnerJVM = formRunner.jvm
     libraryDependencies += "javax.portlet"        % "portlet-api"               % PortletApiVersion        % Provided,
 
     libraryDependencies += "org.wildfly.security" % "wildfly-elytron-http-oidc" % WildFlyElytronHttpOidcVersion % Provided,
+
+    libraryDependencies += "org.apache.poi"     % "poi"              % ApachePOIVersion % Provided, // PE only
+    libraryDependencies += "org.apache.poi"     % "poi-ooxml"        % ApachePOIVersion % Provided, // PE only
+    libraryDependencies += "org.apache.commons" % "commons-compress" % "1.28.0"         % Provided, // for POI, PE only
 
     libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % ScalaParallelCollectionsVersion,
 
@@ -1586,12 +1598,12 @@ lazy val dbToS3AttachmentMigration = (project in file("tools/db-to-s3-attachment
   .settings(
     name                                := "db-to-s3-attachment-migration",
     libraryDependencies                 += "org.typelevel"            %% "cats-core"           % CatsVersion,
-    libraryDependencies                 += "org.postgresql"           % "postgresql"           % "42.7.11",
-    libraryDependencies                 += "org.xerial"               % "sqlite-jdbc"          % "3.53.1.0",
-    libraryDependencies                 += "mysql"                    % "mysql-connector-java" % "8.0.28"       % DatabaseTest,
-    libraryDependencies                 += "com.oracle.database.jdbc" % "ojdbc11"              % "23.26.1.0.0" % DatabaseTest,
-    libraryDependencies                 += "com.ibm.db2"              % "jcc"                  % "11.5.9.0"     % DatabaseTest,
-    libraryDependencies                 += "com.microsoft.sqlserver"  % "mssql-jdbc"           % "12.10.2.jre11" % DatabaseTest,
+    libraryDependencies                 += "org.postgresql"           % "postgresql"           % PostgresqlVersion,
+    libraryDependencies                 += "org.xerial"               % "sqlite-jdbc"          % SqliteJdbcVersion,
+    libraryDependencies                 += "mysql"                    % "mysql-connector-java" % "8.0.28"          % DatabaseTest,
+    libraryDependencies                 += "com.oracle.database.jdbc" % "ojdbc11"              % OracleJdbcVersion % DatabaseTest,
+    libraryDependencies                 += "com.ibm.db2"              % "jcc"                  % "11.5.9.0"        % DatabaseTest,
+    libraryDependencies                 += "com.microsoft.sqlserver"  % "mssql-jdbc"           % "12.10.2.jre11"   % DatabaseTest,
     assembly / mainClass                := Some("org.orbeon.tools.s3migration.Main"),
     assembly / assemblyJarName          := s"db-to-s3-attachment-migration-${version.value}.jar",
     assembly / assemblyMergeStrategy    := {

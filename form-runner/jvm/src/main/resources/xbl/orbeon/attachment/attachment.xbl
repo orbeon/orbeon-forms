@@ -486,6 +486,27 @@
                                 true()
                             )[1]"/>
 
+                 <!-- https://github.com/orbeon/orbeon-forms/issues/7154 -->
+                <xf:instance id="request-download-instance" xxf:exclude-result-prefixes="#all" xxf:readonly="true">
+                    <_>
+                        <action>request-download</action>
+                    </_>
+                </xf:instance>
+
+                <xf:submission
+                    id="request-download"
+                    ref="instance('request-download-instance')"
+                    method="post"
+                    resource="{event('resource')}"
+                    mode="asynchronous"
+                    serialization="application/x-www-form-urlencoded"
+                    replace="none">
+                    <xf:header ref="fr:attachment-form-version()">
+                        <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                        <xf:value value="."/>
+                    </xf:header>
+                </xf:submission>
+
                 <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                     <_>
                         <resource xml:lang="en">
@@ -622,7 +643,7 @@
 
             <xf:var
                 name="disable-download"
-                value="fr:is-browser-environment() or xs:string(fr:component-param-value('allow-download')) = 'false' or fr:mode() = 'pdf'"/>
+                value="xs:string(fr:component-param-value('allow-download')) = 'false' or fr:mode() = 'pdf'"/>
 
             <xh:div id="fr-attachment-elem" xxf:control="true" tabindex="-1">
                 <fr:dnd-repeat
@@ -674,10 +695,14 @@
                             value="@filename"
                             class="fr-attachment-filename"/>
 
+                        <xf:var
+                            name="allow-direct-download"
+                            value="not($disable-download) and (not(fr:is-browser-environment()) or starts-with(string(.), 'upload:'))"/>
+
                         <xf:output
                             appearance="xxf:download"
                             xxf:download="{@filename}"
-                            ref=".[not($disable-download)]"
+                            ref=".[$allow-direct-download]"
                             class="fr-attachment-filename">
 
                             <xf:label           ref="@filename"/>
@@ -694,6 +719,18 @@
                                 <xf:value>true</xf:value>
                             </xf:header>
                         </xf:output>
+
+                        <xf:trigger
+                            appearance="minimal"
+                            ref=".[not($allow-direct-download)]"
+                            class="fr-attachment-filename">
+                            <xf:label ref="@filename"/>
+                            <xf:send
+                                event="DOMActivate"
+                                submission="request-download">
+                                <xf:property name="resource" value="string(.)"/>
+                            </xf:send>
+                        </xf:trigger>
 
                         <xf:output
                             xmlns:filemetadata="java:org.orbeon.oxf.xforms.control.controls.FileMetadata"

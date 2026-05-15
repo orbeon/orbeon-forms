@@ -52,7 +52,7 @@ object Connection extends ConnectionTrait {
     resourceResolver: Option[ResourceResolver]
   ): ConnectionResult = {
     method match {
-      case HttpMethod.PUT =>
+      case HttpMethod.PUT | HttpMethod.POST =>
         fromSubmissionProviderSync(method, url, content, headers)
       case HttpMethod.GET =>
         resourceResolver.flatMap(_.resolve(method, url, None, Map.empty)) orElse
@@ -78,7 +78,7 @@ object Connection extends ConnectionTrait {
     resourceResolver: Option[ResourceResolver]
   ): IO[AsyncConnectionResult] = {
     method match {
-      case HttpMethod.PUT =>
+      case HttpMethod.PUT | HttpMethod.POST =>
         fromSubmissionProviderAsync(method, url, content, headers)(logger = IndentedLogger(logger)) // logger copied
       case HttpMethod.GET =>
         resourceResolver.flatMap(_.resolve(method, url, None, Map.empty))

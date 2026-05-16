@@ -204,9 +204,12 @@
                     <xsl:variable name="ctl"
                         select="fr:xpath-string-value(fr:var-value(xf:var[@name = 'control-name']))"/>
                     <xsl:variable name="items" select="fr:var-value(xf:var[@name = 'response-items'])"/>
-                    <xsl:variable name="label" select="fr:var-value(xf:var[@name = 'item-label'])"/>
-                    <xsl:variable name="value" select="fr:var-value(xf:var[@name = 'item-value'])"/>
-                    <xsl:variable name="hint" select="if (exists(xf:var[@name = 'item-hint'])) then fr:var-value(xf:var[@name = 'item-hint']) else ''"/>
+                    <!-- `test/resources/org/orbeon/oxf/fb/template.xml` has case where the `xf:var` for the item label
+                         and value are inside a nested `xf:action`. 2025.1 doesn't produce that additional nesting,
+                         but it's possible that an earlier version did. -->
+                    <xsl:variable name="label" select="fr:var-value(.//xf:var[@name = 'item-label'])"/>
+                    <xsl:variable name="value" select="fr:var-value(.//xf:var[@name = 'item-value'])"/>
+                    <xsl:variable name="hint" select="if (exists(.//xf:var[@name = 'item-hint'])) then fr:var-value(.//xf:var[@name = 'item-hint']) else ''"/>
                     <fr:control-setitems control="{$ctl}" items="{$items}" label="{$label}" value="{$value}">
                         <xsl:if test="string-length($hint) gt 0">
                             <xsl:attribute name="hint" select="$hint"/>

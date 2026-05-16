@@ -712,8 +712,8 @@ class FormBuilderFunctionsTest
       withActionAndFBDoc(FormulasDoc) { implicit ctx =>
 
         val RenamedListener: NodeInfo =
-          <fb:listener
-            xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+          <fr:listener
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
             version="2018.2"
 
             modes="new"
@@ -723,8 +723,7 @@ class FormBuilderFunctionsTest
             actions="my-action"/>
 
         val RenamedAction: NodeInfo =
-          <fb:action
-            xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+          <fr:action
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
             name="my-action"
             version="2018.2">
@@ -784,7 +783,7 @@ class FormBuilderFunctionsTest
             <fr:navigate location="https://www.bbc.com/news"/>
             <fr:navigate location="https://www.bbc.com/news" target="_blank"/>
 
-          </fb:action>
+          </fr:action>
 
         FormBuilder.renameControlReferences("control-foo", "control-qux",  None)
         FormBuilder.renameControlReferences("control-bar", "control-baz",  None)
@@ -794,14 +793,14 @@ class FormBuilderFunctionsTest
         it("must rename references from listeners") {
           assertXMLElementsIgnoreNamespacesInScope(
             left  = RenamedListener,
-            right = ctx.modelElem child FBListenerTest head
+            right = ctx.modelElem child FRListenerTest head
           )
         }
 
         it("must rename references from actions") {
           assertXMLElementsIgnoreNamespacesInScope(
             left  = RenamedAction,
-            right = ctx.modelElem child FBActionTest filter (_.attValueOpt("version").contains("2018.2")) head
+            right = ctx.modelElem child FRActionTest head
           )
         }
       }
@@ -1036,12 +1035,12 @@ class FormBuilderFunctionsTest
     withActionAndFBDoc("oxf:/forms/issue/6880/form/form.xhtml") { implicit ctx =>
 
       def findValuesContaining(s: String): LazyList[String] =
-        findNewActions(Some(ctx.modelElem)).descendant(FRServiceCallTest).att("service").filter(_.stringValue.contains(s)).map(_.stringValue)
+        findLegacyActions(Some(ctx.modelElem)).descendant(*).att(@*).filter(_.stringValue.contains(s)).map(_.stringValue)
 
       it("must contain non-renamed values") {
         assert(
           findValuesContaining("echo") ==
-            List("echo")
+            List("echo-submission", "echo-submission", "'echo-instance'", "echo-submission")
         )
       }
 
@@ -1049,7 +1048,7 @@ class FormBuilderFunctionsTest
         FormBuilder.renameServiceReferences("echo", "gaga")
          assert(
           findValuesContaining("gaga") ==
-            List("gaga")
+            List("gaga-submission", "gaga-submission", "'gaga-instance'", "gaga-submission")
         )
       }
     }

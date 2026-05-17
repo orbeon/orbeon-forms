@@ -656,42 +656,17 @@ class FormBuilderFunctionsTest
 
         val RenamedLegacyAction: NodeInfo =
           <fb:action
-            xmlns:xf="http://www.w3.org/2002/xforms"
-            xmlns:ev="http://www.w3.org/2001/xml-events"
             xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-            id="my-action-binding">
-            <xf:action fb:event="xforms-value-changed" ev:observer="qux-control" if="true()">
-              <xf:send submission="echo-submission"/>
-            </xf:action>
-            <xf:action fb:event="xforms-submit" ev:observer="echo-submission">
-              <xf:var name="request-instance-name" value="'echo-instance'"/>
-              <xf:action>
-                <xf:action class="fr-set-service-value-action">
-                  <xf:var name="control-name" value="'qux'"/>
-                  <xf:var name="path" value="/*/foo"/>
-                </xf:action>
-                <xf:action class="fr-set-service-value-action">
-                  <xf:var name="control-name" value="'baz'"/>
-                  <xf:var name="path" value="/*/bar"/>
-                </xf:action>
-              </xf:action>
-            </xf:action>
-            <xf:action fb:event="xforms-submit-done" ev:observer="echo-submission">
-              <xf:action class="fr-set-control-value-action">
-                <xf:var name="control-name" value="'xyzzy'"/>
-                <xf:var name="control-value" value="/*/toto"/>
-              </xf:action>
-              <xf:action class="fr-set-control-value-action">
-                <xf:var name="control-name" value="'gaga'"/>
-                <xf:var name="control-value" value="/*/gaga"/>
-              </xf:action>
-              <xf:action class="fr-itemset-action">
-                <xf:var name="control-name" value="'her-dropdown'"/>
-                <xf:var name="response-items" value="/*/values"/>
-                <xf:var name="item-label" value="label"/>
-                <xf:var name="item-value" value="value"/>
-              </xf:action>
-            </xf:action>
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+            name="my-action"
+            version="2018.2">
+            <fr:service-call service="echo">
+              <fr:value control="qux" ref="/*/foo"/>
+              <fr:value control="baz" ref="/*/bar"/>
+            </fr:service-call>
+            <fr:control-setvalue control="xyzzy" value="/*/toto"/>
+            <fr:control-setvalue control="gaga" value="/*/gaga"/>
+            <fr:control-setitems control="her-dropdown" items="/*/values" label="label" value="value"/>
           </fb:action>
 
         FormBuilder.renameControlReferences("foo",         "qux",          "foo-control".some)
@@ -712,8 +687,8 @@ class FormBuilderFunctionsTest
       withActionAndFBDoc(FormulasDoc) { implicit ctx =>
 
         val RenamedListener: NodeInfo =
-          <fr:listener
-            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+          <fb:listener
+            xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
             version="2018.2"
 
             modes="new"
@@ -723,7 +698,8 @@ class FormBuilderFunctionsTest
             actions="my-action"/>
 
         val RenamedAction: NodeInfo =
-          <fr:action
+          <fb:action
+            xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
             name="my-action"
             version="2018.2">
@@ -783,7 +759,7 @@ class FormBuilderFunctionsTest
             <fr:navigate location="https://www.bbc.com/news"/>
             <fr:navigate location="https://www.bbc.com/news" target="_blank"/>
 
-          </fr:action>
+          </fb:action>
 
         FormBuilder.renameControlReferences("control-foo", "control-qux",  None)
         FormBuilder.renameControlReferences("control-bar", "control-baz",  None)
@@ -793,14 +769,18 @@ class FormBuilderFunctionsTest
         it("must rename references from listeners") {
           assertXMLElementsIgnoreNamespacesInScope(
             left  = RenamedListener,
-            right = ctx.modelElem child FRListenerTest head
+            right = findNewListeners(Some(ctx.modelElem)).filter(
+              _.attValueOpt("controls").exists(_.contains("control-gaga"))
+            ) head
           )
         }
 
         it("must rename references from actions") {
           assertXMLElementsIgnoreNamespacesInScope(
             left  = RenamedAction,
-            right = ctx.modelElem child FRActionTest head
+            right = findNewActions(Some(ctx.modelElem)).filter(
+              _ descendant FRServiceCallTest exists (_.attValueOpt("service").contains("my-service-gaga"))
+            ) head
           )
         }
       }
@@ -1035,12 +1015,12 @@ class FormBuilderFunctionsTest
     withActionAndFBDoc("oxf:/forms/issue/6880/form/form.xhtml") { implicit ctx =>
 
       def findValuesContaining(s: String): LazyList[String] =
-        findLegacyActions(Some(ctx.modelElem)).descendant(*).att(@*).filter(_.stringValue.contains(s)).map(_.stringValue)
+        findNewActions(Some(ctx.modelElem)).descendant(*).att(@*).filter(_.stringValue.contains(s)).map(_.stringValue)
 
       it("must contain non-renamed values") {
         assert(
           findValuesContaining("echo") ==
-            List("echo-submission", "echo-submission", "'echo-instance'", "echo-submission")
+            List("echo")
         )
       }
 
@@ -1048,7 +1028,7 @@ class FormBuilderFunctionsTest
         FormBuilder.renameServiceReferences("echo", "gaga")
          assert(
           findValuesContaining("gaga") ==
-            List("gaga-submission", "gaga-submission", "'gaga-instance'", "gaga-submission")
+            List("gaga")
         )
       }
     }

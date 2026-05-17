@@ -45,21 +45,11 @@
          At edit time we keep it normalized for the controls' dropdown. -->
     <xf:var name="observer" value="$instance/observer"/>
 
-    <!-- Services already used by *other* 2018.2 actions, so we hide them from the dropdown -->
-    <xf:var
-        name="services-used-by-other-actions"
-        value="
-            $model/fb:action[
-                @version = '2018.2' and
-                @name != $instance/initial-name
-            ]//fr:service-call/@service"/>
-
     <xf:var
         name="all-available-services"
         value="
             $model/fb:submission[
-                ends-with(@id, '-submission') and
-                not(substring-before(@id, '-submission') = $services-used-by-other-actions)
+                ends-with(@id, '-submission')
             ]"/>
     <xf:var
         name="selected-service"

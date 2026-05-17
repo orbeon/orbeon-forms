@@ -90,7 +90,7 @@ val PostgresqlVersion                = "42.7.11"
 val OracleJdbcVersion                = "23.26.1.0.0"
 
 // Only on PE for now
-val ApachePOIVersion                 = "5.4.1"
+val ApachePOIVersion                 = "5.5.1"
 val SendGridVersion                  = "4.10.3"
 
 // "Provided" Java libraries

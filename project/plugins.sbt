@@ -14,7 +14,7 @@ addSbtPlugin     ("com.scalapenos"      % "sbt-prompt"               % "2.0.0")
 addSbtPlugin     ("com.eed3si9n"        % "sbt-assembly"             % "2.3.1")
 
 libraryDependencies += "org.scala-js"              %% "scalajs-env-jsdom-nodejs" % "1.1.1" // 1.1.0 "drops support for jsdom 9.x"
-libraryDependencies += "io.github.java-diff-utils"  % "java-diff-utils"          % "4.16"
+libraryDependencies += "io.github.java-diff-utils"  % "java-diff-utils"          % "4.17"
 
 // Apparently needed for sbt-web
 resolvers += Resolver.typesafeRepo("releases")

@@ -48,7 +48,7 @@
                                 <!-- XBL non-baseline control must be added -->
                                 <fr:currency ref="."/>
                                 <!-- XBL baseline control must not be added as it's already in the baseline -->
-                                <fr:autocomplete ref="."/>
+                                <fr:date ref="."/>
                             </xh:body>
                         </xh:html>
                     </p:input>
@@ -91,8 +91,6 @@
                 <xh:link href="/xbl/orbeon/date/date.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/css/bootstrap-datepicker.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/number/number.css" class="xforms-baseline"/>
-                <xh:link href="/ops/yui/autocomplete/assets/skins/sam/autocomplete.css"/>
-                <xh:link href="/xbl/orbeon/autocomplete/autocomplete.css"/>
                 <xh:script src="/webjars/jquery/3.6.1/dist/jquery.min.js" class="xforms-baseline"/>
                 <xh:script src="/apps/fr/style/bootstrap/js/bootstrap.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/util/jquery-orbeon.min.js" class="xforms-baseline"/>
@@ -142,9 +140,6 @@
                 <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.da.min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.cs.min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.tr.min.js" class="xforms-baseline"/>
-                <xh:script src="/xbl/orbeon/autocomplete/autocomplete.js"/>
-                <xh:script src="/ops/yui/datasource/datasource.js"/>
-                <xh:script src="/ops/yui/autocomplete/autocomplete.js"/>
             </xh:head>
         </output>
     </test>
@@ -860,69 +855,6 @@
         </input>
         <output name="response">
             <number>1.2</number>
-        </output>
-    </test>
-
-    <test description="xf:setfocus on fr:autocomplete" name="oxf:pipeline">
-        <input name="config" href="oxf:/org/orbeon/oxf/xforms/wrap-xforms-state.xpl"/>
-        <input name="document">
-            <xh:html>
-                <xh:head>
-                    <xf:model id="model">
-                        <xf:instance id="instance">
-                            <instance>
-                                <value>One</value>
-                                <item>One</item>
-                                <item>Two</item>
-                                <item>Three</item>
-                            </instance>
-                        </xf:instance>
-
-                        <xf:action ev:event="xforms-ready">
-                            <xf:setfocus control="my-autocomplete"/>
-                        </xf:action>
-
-                    </xf:model>
-                    <xi:include href="oxf:/xbl/orbeon/autocomplete/autocomplete.xbl" xxi:omit-xml-base="true"/>
-                </xh:head>
-                <xh:body>
-                    <fr:autocomplete id="my-autocomplete" ref="value" incremental="true" dynamic-itemset="true" >
-                        <xf:itemset ref="../item">
-                            <xf:label ref="."/>
-                            <xf:value ref="."/>
-                        </xf:itemset>
-                    </fr:autocomplete>
-                </xh:body>
-            </xh:html>
-        </input>
-        <output name="response">
-            <xxf:event-response>
-                <xxf:dynamic-state>
-                    <dynamic-state/>
-                </xxf:dynamic-state>
-                <xxf:action>
-                    <xxf:control-values>
-                        <xxf:control id="my-autocomplete≡component-inner-group" class="fr-autocomplete-container"/>
-                        <xxf:control id="my-autocomplete≡show-suggestions-button" class="fr-autocomplete-show-suggestions-button" label="&lt;img src=&quot;/orbeon/xbl/orbeon/autocomplete/down-arrow.png&quot; alt=&quot;&quot;&gt;"/>
-                        <xxf:control id="my-autocomplete≡search" class="fr-autocomplete-search"/>
-                        <xxf:control id="my-autocomplete≡itemset" class="fr-autocomplete-dynamic-itemset xforms-hidden">
-                            <xxf:value>true</xxf:value>
-                        </xxf:control>
-                        <xxf:control id="my-autocomplete≡xf-70" class="xbl-fr-autocomplete-max-results-displayed xforms-hidden">
-                            <xxf:value>10</xxf:value>
-                        </xxf:control>
-                        <xxf:control id="my-autocomplete≡select1" class="fr-autocomplete-select1 xforms-hidden">
-                            <xxf:itemset>[{"label":"One","value":"One"},{"label":"Two","value":"Two"},{"label":"Three","value":"Three"},{"label":"One","value":"One"},{"label":"Two","value":"Two"},{"label":"Three","value":"Three"}]</xxf:itemset>
-                            <xxf:value>One</xxf:value>
-                        </xxf:control>
-                        <xxf:control id="my-autocomplete≡external-value" class="fr-autocomplete-external-value xforms-hidden">
-                            <xxf:value>One</xxf:value>
-                        </xxf:control>
-                    </xxf:control-values>
-                    <xxf:script name="xf_d27a25bfb1a3592d68f8c2a9d3f3a59baed0ff1b" target-id="my-autocomplete≡component-inner-group" observer-id="my-autocomplete≡component-inner-group"/>
-                    <xxf:focus control-id="my-autocomplete≡show-suggestions-button"/>
-                </xxf:action>
-            </xxf:event-response>
         </output>
     </test>
 

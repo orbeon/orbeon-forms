@@ -728,8 +728,7 @@
                 value="
                     instance('controls-label-value-itemset')/item[
                         frf:isMultipleSelectionControl(@local-name) or
-                        frf:isSingleSelectionControl(@local-name)   or
-                        @local-name = 'autocomplete'
+                        frf:isSingleSelectionControl(@local-name)
                     ]"/>
 
             <xf:var name="response-actions-container" value="$action"/>

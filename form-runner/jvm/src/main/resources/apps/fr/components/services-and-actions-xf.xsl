@@ -141,8 +141,7 @@
 
             <!-- Filter item values that are out of range -->
             <!-- See: https://github.com/orbeon/orbeon-forms/issues/1019 -->
-            <!-- NOTE: We guess whether the control is a select or select1 based on the element name. One exception is
-                 autocomplete, which is also a single selection control. -->
+            <!-- NOTE: We guess whether the control is a select or select1 based on the element name. -->
             <xf:action>
                 <xf:var
                     name="element-name"
@@ -158,11 +157,7 @@
                             value="string-join(xxf:split($bind)[. = $possible-values], ' ')"/>
                     </xf:action>
                 </xf:action>
-                <xf:action
-                    if="not($element-name = 'open-select1') and (
-                            frf:isSingleSelectionControl($element-name) or
-                            $element-name = 'autocomplete'
-                        )">
+                <xf:action if="not($element-name = 'open-select1') and frf:isSingleSelectionControl($element-name)">
                     <xf:action iterate="$resolved-data-holders">
                         <xf:var name="bind" value="."/>
                         <xf:setvalue

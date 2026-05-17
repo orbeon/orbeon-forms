@@ -77,7 +77,6 @@
         select=
             "
                 'fr-dropdown-select1',
-                'xbl-fr-autocomplete',
                 'fr-yesno-input',
                 'fr-databound-select1',
                 'fr-checkbox-input'

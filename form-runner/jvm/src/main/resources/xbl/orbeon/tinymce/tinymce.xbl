@@ -40,7 +40,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xf="http://www.w3.org/2002/xforms">
             <display-name lang="en">Formatted Text Area</display-name>
             <display-name lang="fr">Texte formatté</display-name>
-            <display-name lang="no">Formatted Text Area</display-name>
+            <display-name lang="no">Formatert tekstområde</display-name>
             <display-name lang="ru">Текст в формате HTML</display-name>
             <display-name lang="it">Testo formattato in HTML</display-name>
             <display-name lang="de">HTML-Formatierter Text</display-name>
@@ -50,7 +50,7 @@
             <display-name lang="pt">Texto Formatado</display-name>
             <display-name lang="sv">Formaterad HTML-text</display-name>
             <display-name lang="ar">منطقة نص منسق</display-name>
-            <display-name lang="pl">Formatted Text Area</display-name>
+            <display-name lang="pl">Obszar tekstu sformatowanego</display-name>
             <display-name lang="ja">書式付きテキストエリア</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-html5</icon-class>

@@ -39,7 +39,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
                     <display-name lang="en">Legal Entity Identifier (LEI)</display-name>
         <display-name lang="fr">Identifiant d’entité juridique (LEI)</display-name>
-        <display-name lang="no">Legal Entity Identifier (LEI)</display-name>
+        <display-name lang="no">Juridisk enhetsidentifikator (LEI)</display-name>
         <display-name lang="ru">Идентификатор юридического лица (LEI)</display-name>
         <display-name lang="it">Identificatore di Entità Legale (LEI)</display-name>
         <display-name lang="de">Rechtsträgerkennung (LEI)</display-name>
@@ -49,7 +49,7 @@
         <display-name lang="pt">Identificador de Entidade Jurídica (LEI)</display-name>
         <display-name lang="sv">Juridisk enhetsidentifierare (LEI)</display-name>
         <display-name lang="ar">معرّف الكيان القانوني (LEI)</display-name>
-        <display-name lang="pl">Legal Entity Identifier (LEI)</display-name>
+        <display-name lang="pl">Identyfikator podmiotu prawnego (LEI)</display-name>
         <display-name lang="ja">法人識別子 (LEI)</display-name>
 
             <icon>

@@ -28,7 +28,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
                     <display-name lang="en">Date Picker</display-name>
         <display-name lang="fr">Sélecteur de date</display-name>
-        <display-name lang="no">Date Picker</display-name>
+        <display-name lang="no">Datovelger</display-name>
         <display-name lang="ru">Дата в строке</display-name>
         <display-name lang="it">Selettore data</display-name>
         <display-name lang="de">Datumsauswahl</display-name>
@@ -38,7 +38,7 @@
         <display-name lang="pt">Escolher data</display-name>
         <display-name lang="sv">Datumväljare</display-name>
         <display-name lang="ar">منتقي التاريخ</display-name>
-        <display-name lang="pl">Date Picker</display-name>
+        <display-name lang="pl">Selektor daty</display-name>
         <display-name lang="ja">日付ピッカー</display-name>
             <icon>
                 <small-icon>/apps/fr/style/images/silk/date.png</small-icon>

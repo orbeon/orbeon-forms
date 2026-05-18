@@ -23,7 +23,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
                     <display-name lang="en">US Employer Identification Number (EIN)</display-name>
         <display-name lang="fr">Numéro d'identifiant employeur US (EIN)</display-name>
-        <display-name lang="no">US Employer Identification Number (EIN)</display-name>
+        <display-name lang="no">Amerikansk arbeidsgiveridentifikasjonsnummer (EIN)</display-name>
         <display-name lang="ru">Идентификационный номер работодателя США (EIN)</display-name>
         <display-name lang="it">Numero di identificazione del datore di lavoro degli Stati Uniti (EIN)</display-name>
         <display-name lang="de">US-Arbeitgeber-Identifikationsnummer (EIN)</display-name>
@@ -33,7 +33,7 @@
         <display-name lang="pt">Número de Identificação do Empregador dos EUA (EIN)</display-name>
         <display-name lang="sv">Amerikanskt arbetsgivaridentifikationsnummer (EIN)</display-name>
         <display-name lang="ar">رقم تعريف صاحب العمل الأمريكي (EIN)</display-name>
-        <display-name lang="pl">US Employer Identification Number (EIN)</display-name>
+        <display-name lang="pl">Amerykański numer identyfikacyjny pracodawcy (EIN)</display-name>
         <display-name lang="ja">米国雇用者識別番号 (EIN)</display-name>
 
             <icon>

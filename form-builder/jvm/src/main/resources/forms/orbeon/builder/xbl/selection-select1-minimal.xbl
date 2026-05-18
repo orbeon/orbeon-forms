@@ -5,7 +5,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
                     <display-name lang="en">Legacy Dropdown</display-name>
         <display-name lang="fr">Menu déroulant (ancien)</display-name>
-        <display-name lang="no">Legacy Dropdown</display-name>
+        <display-name lang="no">Eldre rullegardinmeny</display-name>
         <display-name lang="ru">Устаревший выпадающий список</display-name>
         <display-name lang="it">Menu a tendina legacy</display-name>
         <display-name lang="de">Veraltetes Dropdown-Menü</display-name>
@@ -14,8 +14,8 @@
         <display-name lang="nl">Verouderd uitklapmenu</display-name>
         <display-name lang="pt">Menu Lista de Opções Legado</display-name>
         <display-name lang="sv">Äldre rullgardinsmeny</display-name>
-        <display-name lang="ar">Legacy Dropdown</display-name>
-        <display-name lang="pl">Legacy Dropdown</display-name>
+        <display-name lang="ar">قائمة منسدلة قديمة</display-name>
+        <display-name lang="pl">Starsza lista rozwijana</display-name>
         <display-name lang="ja">旧式ドロップダウン</display-name>
 
             <toolbox show="false" deprecated="true"/>

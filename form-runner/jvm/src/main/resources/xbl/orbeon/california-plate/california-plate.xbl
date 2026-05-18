@@ -30,8 +30,8 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">California Plate</display-name>
             <display-name lang="fr">Plaque californienne</display-name>
-            <display-name lang="no">California Plate</display-name>
-            <display-name lang="ru">California Plate</display-name>
+            <display-name lang="no">Registreringsskilt fra California</display-name>
+            <display-name lang="ru">Номерной знак Калифорнии</display-name>
             <display-name lang="it">Targa california</display-name>
             <display-name lang="de">Kfz-Kennzeichen Kalifornien</display-name>
             <display-name lang="fi">Kalifornian rekisterikilpi</display-name>
@@ -40,7 +40,7 @@
             <display-name lang="pt">Matrícula da Califórnia</display-name>
             <display-name lang="sv">Registreringsskylt från Kalifornien</display-name>
             <display-name lang="ar">لوحة كاليفورنيا</display-name>
-            <display-name lang="pl">California Plate</display-name>
+            <display-name lang="pl">Kalifornijska tablica rejestracyjna</display-name>
             <display-name lang="ja">カリフォルニア州ナンバープレート</display-name>
             <icon>
                 <small-icon>/ops/images/xforms/calendar.png</small-icon>

@@ -18,7 +18,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
                     <display-name lang="en">Plain Text Area</display-name>
         <display-name lang="fr">Zone de texte</display-name>
-        <display-name lang="no">Plain Text Area</display-name>
+        <display-name lang="no">Tekstområde</display-name>
         <display-name lang="ru">Многострочное поле</display-name>
         <display-name lang="it">Area di testo</display-name>
         <display-name lang="de">Textbereich</display-name>
@@ -27,8 +27,8 @@
         <display-name lang="nl">Tekstveld</display-name>
         <display-name lang="pt">Área de Texto</display-name>
         <display-name lang="sv">Textyta</display-name>
-        <display-name lang="ar">Plain Text Area</display-name>
-        <display-name lang="pl">Plain Text Area</display-name>
+        <display-name lang="ar">منطقة نص عادي</display-name>
+        <display-name lang="pl">Obszar zwykłego tekstu</display-name>
         <display-name lang="ja">テキストエリア</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-align-left</icon-class>

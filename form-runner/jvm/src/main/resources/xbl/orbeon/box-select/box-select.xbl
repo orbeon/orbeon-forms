@@ -37,7 +37,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
                     <display-name lang="en">Scrollable Checkboxes</display-name>
         <display-name lang="fr">Cases à cocher défilantes</display-name>
-        <display-name lang="no">Scrollable Checkboxes</display-name>
+        <display-name lang="no">Rullbare avkryssingsbokser</display-name>
         <display-name lang="ru">Контейнер с галочками</display-name>
         <display-name lang="it">Caselle scrollabili</display-name>
         <display-name lang="de">Scrollbare Ankreuzfelder</display-name>
@@ -46,8 +46,8 @@
         <display-name lang="nl">Schuifbare keuzevakjes</display-name>
         <display-name lang="pt">Lista de Caixas de Verificação</display-name>
         <display-name lang="sv">Rullbart multival</display-name>
-        <display-name lang="ar">Scrollable Checkboxes</display-name>
-        <display-name lang="pl">Scrollable Checkboxes</display-name>
+        <display-name lang="ar">خانات اختيار قابلة للتمرير</display-name>
+        <display-name lang="pl">Przewijane pola wyboru</display-name>
         <display-name lang="ja">スクロール付きチェックボックス</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-check-square-o</icon-class>

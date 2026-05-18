@@ -582,15 +582,15 @@
                         margin-top: ~"calc((@{fluidLineHeight} - 14px) / 2 + 1px)";
                     }
 
-                    margin-right: 3px;
+                    margin-right: var(--orbeon-help-icon-gap, 3px);
 
                     .help-icon();
                 }
 
                 .xforms-label {
                     font-weight: var(--orbeon-label-font-weight);
-                    margin-top: 2px; // Nicer to have a bit of space at the top to separate controls a bit more, esp. when outside grid cells
-                    margin-bottom: @frGridCellPadding; // Insert some space between the label / help and the control (we add spacing below the label rather
+                    margin: var(--orbeon-grid-label-margin); // Nicer to have a bit of space at the top to separate controls a bit more, esp. when outside grid cells
+                    // Insert some space between the label / help and the control (we add spacing below the label rather
                     // than above the control to make the CSS more generally applicable to XBL components)
                     overflow: hidden; // So the block area doesn't extend below the floated help, when there is one. Also see http://bit.ly/ruAKSU
                     display: table; // Instead of block, so:

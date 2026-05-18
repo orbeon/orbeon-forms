@@ -176,6 +176,14 @@ body.orbeon {
     .xforms-label                     { .label-styles(); }
     label:not(.checkbox):not(.radio)  { .label-styles(); }
 
+    // Spacing-related properties on .xforms-label only (not Bootstrap-styled <label> elements)
+    .xforms-label {
+        letter-spacing: var(--orbeon-label-letter-spacing);
+        text-transform: var(--orbeon-label-text-transform);
+        margin        : var(--orbeon-label-margin);
+        padding       : var(--orbeon-label-padding);
+    }
+
     a {
         text-decoration: underline; // Don't remove the underline for anchors; this is an important web convention
     }
@@ -357,10 +365,7 @@ body.orbeon {
 
         margin-bottom: 0;                           // Override default 9px bottom margin added by Bootstrap
         box-sizing: border-box;                     // So width: 100% works with the padding added by Bootstrap
-        height: @fixedControlHeight;
-        @media screen {
-            height: @fluidControlHeight;
-        }
+        height: var(--orbeon-control-height);
         background-image: none;                     // Liferay adds background images which don't mix well with Bootstrap
 
         .focusHighlight();
@@ -410,8 +415,19 @@ body.orbeon {
             background-size: contain;
             -webkit-print-color-adjust: exact;
             &:checked {
-                background-color: var(--orbeon-button-primary-background-color);
-                border-color: var(--orbeon-button-primary-background-color);
+                background-color: var(--orbeon-checkable-checked-background-color);
+                border-color    : var(--orbeon-checkable-checked-border-color);
+            }
+            &:disabled {
+                background-color: var(--orbeon-checkable-disabled-background-color);
+                border-color    : var(--orbeon-checkable-disabled-border-color);
+            }
+            &:focus {
+                .focusDecorations();
+            }
+            &:focus-visible {
+                outline   : 0;
+                box-shadow: var(--orbeon-checkable-focus-ring);
             }
         }
 
@@ -432,11 +448,10 @@ body.orbeon {
         }
     }
 
-    // Focus on checkboxes and radio buttons
+    // Focus on selects and file inputs (radio/checkbox handled inside the @media (prefers-contrast)
+    // block above, so high-contrast mode defers to the browser's native focus indicator)
     select:focus,
-    input[type="file"]:focus,
-    input[type="radio"]:focus,
-    input[type="checkbox"]:focus {
+    input[type="file"]:focus {
         .focusDecorations();
     }
 
@@ -472,10 +487,7 @@ body.orbeon {
 
     // Don't set height for textarea
     textarea {
-        height: @fixedTextareaHeight;
-        @media screen {
-            height: @fluidTextareaHeight;
-        }
+        height: var(--orbeon-textarea-height);
     }
 
     label.radio, label.checkbox {
@@ -504,10 +516,7 @@ body.orbeon {
     select[multiple],
     .xforms-select1-appearance-compact select,
     .xforms-select-appearance-compact select {
-        height: @fixedMultipleSelectHeight;
-        @media screen {
-            height: @fluidMultipleSelectHeight;
-        }
+        height: var(--orbeon-multiple-select-height);
     }
 
     // Adapt pagination to use of xf:trigger

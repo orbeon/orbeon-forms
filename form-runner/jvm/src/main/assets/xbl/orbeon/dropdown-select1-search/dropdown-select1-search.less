@@ -102,19 +102,19 @@
 
     // "x" button to clear the dropdown
     .select2-selection__clear {
-        padding: 0 5px;                            // Wider to be easier to activate
-        top: 3px;                                  // For the highlight not to go over or under the dropdown border
-        line-height: 20px;                         // Better alignment of the clear icon with the selection / arrow down icon
-        color: var(--orbeon-dropdown-caret-color); // Use the same shade of grey as the selection / arrow down icon
+        padding: 0 5px;                                   // Wider to be easier to activate
+        top: 3px;                                         // For the highlight not to go over or under the dropdown border
+        line-height: 20px;                                // Better alignment of the clear icon with the selection / arrow down icon
+        color: var(--orbeon-dropdown-search-caret-color); // Use the same shade of grey as the selection / arrow down icon
         .focusHighlightGroup();
     }
 
     // Caret (arrow down/up)
     .select2-container--default .select2-selection--single .select2-selection__arrow b {
-        border-color: var(--orbeon-dropdown-caret-color) transparent transparent transparent;
+        border-color: var(--orbeon-dropdown-search-caret-color) transparent transparent transparent;
     }
     .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
-        border-color: transparent transparent var(--orbeon-dropdown-caret-color) transparent;
+        border-color: transparent transparent var(--orbeon-dropdown-search-caret-color) transparent;
     }
 
     .fr-service-error .select2-container .select2-selection {

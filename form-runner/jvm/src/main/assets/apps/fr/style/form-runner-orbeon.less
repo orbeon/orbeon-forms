@@ -305,6 +305,14 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
 
     // ***** Other *****************************************************************************************************
 
+    .fr-form-description {
+        background-color: var(--orbeon-form-description-background-color);
+        color           : var(--orbeon-form-description-color);
+        border-left     : var(--orbeon-form-description-border-left);
+        padding         : var(--orbeon-form-description-padding);
+        font-weight     : var(--orbeon-form-description-font-weight);
+    }
+
     .fr-top-alert {
         display: flex;
         align-items: flex-start;  // For the box around the buttons to only take the height of the buttons
@@ -374,9 +382,9 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
         font-weight: var(--orbeon-active-alert-font-weight);
         color: var(--orbeon-active-alert-color);
         position: relative;
-        padding: 2px 8px;
-        border-radius: 5px;
-        margin-top: 10px;
+        padding: var(--orbeon-active-alert-padding);
+        border-radius: var(--orbeon-active-alert-border-radius);
+        margin-top: var(--orbeon-active-alert-margin-top);
 
         // https://github.com/orbeon/orbeon-forms/issues/6349
         @media (prefers-contrast: no-preference), (prefers-contrast: less) {
@@ -387,26 +395,30 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
                 top: -10px;
                 border-style: solid;
                 border-width: 0 10px 10px 10px;
-                display: block;
+                display: var(--orbeon-active-alert-pointer-display);
                 width: 0;
             }
         }
     }
 
-    .fr-alert-color(@color) {
-        background: @color;
-        border: @color solid 1px;
-        &:before {
-            border-color: @color transparent;
-        }
+    .fr-active-alert-state(@bg, @border-color, @pointer-color) {
+        background  : @bg;
+        border-color: @border-color;
+        border-width: var(--orbeon-active-alert-border-width);
+        border-style: solid;
+        &:before { border-color: @pointer-color transparent; }
     }
-    .xforms-invalid > .xforms-alert.xforms-active { .fr-alert-color(var(--orbeon-error-color)  ) }
-    .xforms-warning > .xforms-alert.xforms-active { .fr-alert-color(var(--orbeon-warning-color)) }
-    .xforms-info    > .xforms-alert.xforms-active { .fr-alert-color(var(--orbeon-info-color)   ) }
+    .xforms-invalid > .xforms-alert.xforms-active { .fr-active-alert-state(var(--orbeon-invalid-alert-background-color), var(--orbeon-invalid-alert-border-color), var(--orbeon-invalid-alert-pointer-color)); }
+    .xforms-warning > .xforms-alert.xforms-active { .fr-active-alert-state(var(--orbeon-warning-alert-background-color), var(--orbeon-warning-alert-border-color), var(--orbeon-warning-alert-pointer-color)); }
+    .xforms-info    > .xforms-alert.xforms-active { .fr-active-alert-state(var(--orbeon-info-alert-background-color),    var(--orbeon-info-alert-border-color),    var(--orbeon-info-alert-pointer-color)   ); }
 
     .xforms-invalid.xforms-visited {
+        .xforms-label {
+            color: var(--orbeon-invalid-label-color);
+        }
         &> input, &> textarea, &> select {
-            border-color: var(--orbeon-error-color);
+            border-color: var(--orbeon-invalid-control-border-color);
+            border-width: var(--orbeon-invalid-control-border-width);
         }
     }
 
@@ -491,7 +503,8 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
         }
 
         .xforms-required.xforms-empty {
-            .xforms-label:before {
+            .xforms-label:before,
+            .xforms-label:after {
                 color: var(--orbeon-error-color);                      // Error-red when empty
             }
         }

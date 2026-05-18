@@ -34,6 +34,10 @@
   --orbeon-label-font-weight    : 600; // Help label stand out
   --orbeon-label-color          : var(--orbeon-base-color);
   --orbeon-label-read-only-color: @minGrayText;
+  --orbeon-label-letter-spacing : normal;
+  --orbeon-label-text-transform : none;
+  --orbeon-label-margin         : 0;
+  --orbeon-label-padding        : 0;
 
   // Hints
   --orbeon-hint-font-size  : smaller;
@@ -42,21 +46,30 @@
   --orbeon-hint-color      : @minGrayText;
 
   // Help
-  --orbeon-help-icon-font-size         : 0.86em;
-  --orbeon-help-icon-color             : black;
-  --orbeon-help-font-family            : @frBaseFontFamily;
-  --orbeon-help-background-color       : white;
-  --orbeon-help-border-color           : rgba(0, 0, 0, 0.2);
-  --orbeon-help-content-font-size      : 1.00em;
-  --orbeon-help-content-font-weight    : var(--orbeon-base-font-weight);
-  --orbeon-help-content-color          : var(--orbeon-base-color);
-  --orbeon-help-title-font-size        : 1.08em;
-  --orbeon-help-title-font-weight      : var(--orbeon-base-font-weight);
-  --orbeon-help-title-color            : var(--orbeon-base-color);
-  --orbeon-help-title-background-color : #f7f7f7;
-  --orbeon-help-title-border-color     : #ebebeb;
-  --orbeon-help-close-color            : black;
-  --orbeon-help-close-text-shadow-color: rgba(255,255,255,1);
+  --orbeon-help-icon-font-size              : 0.86em;
+  --orbeon-help-icon-color                  : black;
+  --orbeon-help-icon-content                : "\f05a"; // FontAwesome question-circle
+  --orbeon-help-icon-font-family            : FontAwesome;
+  --orbeon-help-icon-font-weight            : normal;
+  --orbeon-help-icon-background-color       : transparent;
+  --orbeon-help-icon-hover-background-color : transparent;
+  --orbeon-help-icon-active-background-color: transparent;
+  --orbeon-help-icon-border-radius          : 0;
+  --orbeon-help-icon-focus-outline          : revert; // Keep native a:focus outline
+  --orbeon-help-icon-focus-ring             : none;
+  --orbeon-help-font-family                 : @frBaseFontFamily;
+  --orbeon-help-background-color            : white;
+  --orbeon-help-border-color                : rgba(0, 0, 0, 0.2);
+  --orbeon-help-content-font-size           : 1.00em;
+  --orbeon-help-content-font-weight         : var(--orbeon-base-font-weight);
+  --orbeon-help-content-color               : var(--orbeon-base-color);
+  --orbeon-help-title-font-size             : 1.08em;
+  --orbeon-help-title-font-weight           : var(--orbeon-base-font-weight);
+  --orbeon-help-title-color                 : var(--orbeon-base-color);
+  --orbeon-help-title-background-color      : #f7f7f7;
+  --orbeon-help-title-border-color          : #ebebeb;
+  --orbeon-help-close-color                 : black;
+  --orbeon-help-close-text-shadow-color     : rgba(255,255,255,1);
 
   // Controls
   --orbeon-control-font-size                 : 1em;
@@ -81,15 +94,34 @@
   --orbeon-attachment-drop-color                           : @minGrayText;
   --orbeon-attachment-dragover-color                       : white;
   --orbeon-attachment-dragover-background-color            : #ccc;
-  --orbeon-dropdown-caret-color                            : #333;
+  --orbeon-dropdown-caret-color                            : var(--orbeon-button-color);
+  --orbeon-dropdown-search-caret-color                     : #888;
   --orbeon-dropdown-selected-background-color              : #ddd;
   --orbeon-handwritten-signature-background-color          : white;
   --orbeon-handwritten-signature-read-only-background-color: #eee;
   --orbeon-image-attachment-background-color               : #eee;
+  --orbeon-textarea-resize                                 : vertical;
+
+  // Control heights
+  --orbeon-control-height          : @fixedControlHeight;
+  --orbeon-textarea-height         : @fixedTextareaHeight;
+  --orbeon-multiple-select-height  : @fixedMultipleSelectHeight;
+  @media screen {
+    --orbeon-control-height        : @fluidControlHeight;
+    --orbeon-textarea-height       : @fluidTextareaHeight;
+    --orbeon-multiple-select-height: @fluidMultipleSelectHeight;
+  }
 
   // Focus
   --orbeon-focus-border-color   : #3396ff; // Blueish
   --orbeon-focus-highlight-color: rgba(0,123,255,.25);
+
+  // Checkable controls (checkbox, radio)
+  --orbeon-checkable-checked-background-color : var(--orbeon-button-primary-background-color);
+  --orbeon-checkable-checked-border-color     : var(--orbeon-button-primary-background-color);
+  --orbeon-checkable-disabled-background-color: white;           // master: same as the enabled fill
+  --orbeon-checkable-disabled-border-color    : rgba(0,0,0,.25); // matches the base border color set on these inputs
+  --orbeon-checkable-focus-ring               : 0 0 0 0.2rem var(--orbeon-focus-highlight-color);
 
   // Buttons
   --orbeon-button-font-size                         : 1.00em; // button and .btn
@@ -141,7 +173,7 @@
   --orbeon-button-disabled-icon-opacity: 0.4;
 
   // Dropdowns (Bootstrap 2 and 5)
-  --orbeon-dropdown-open-toggle-background-color  : #e6e6e6;
+  --orbeon-dropdown-open-toggle-background-color  : var(--orbeon-button-highlight-background-color);
   --orbeon-dropdown-menu-color                    : #333; // @grayDark
   --orbeon-dropdown-menu-background-color         : white;
   --orbeon-dropdown-menu-hover-color              : white;
@@ -168,6 +200,7 @@
   --orbeon-repeat-menu-background-color         : #f5f5f5; // @wellBackground
 
   // Grids
+  --orbeon-grid-label-margin                   : 2px 0 @frGridCellPadding 0;
   --orbeon-repetition-number-font-size         : smaller;
   --orbeon-repetition-number-font-family       : var(--orbeon-base-font-family);
   --orbeon-repetition-number-font-weight       : bold;
@@ -233,11 +266,32 @@
   --orbeon-fa-icon-font-size      : 0.92em; // 12px; with Font Awesome 6, fonts appear larger than with version 4, so make them smaller
   --orbeon-required-icon-font-size: 0.60em; // Font Awesome star is large
 
+  // Form description
+  --orbeon-form-description-background-color: var(--orbeon-alert-background-color);
+  --orbeon-form-description-color           : var(--orbeon-alert-color);
+  --orbeon-form-description-border-left     : 1px solid var(--orbeon-alert-border-color);
+  --orbeon-form-description-padding         : 8px 1em;
+  --orbeon-form-description-font-weight     : var(--orbeon-base-font-weight);
+
   // Alerts
   --orbeon-active-alert-font-size        : 1em; // TODO: overridden by "inherit" when visited => useless?
   --orbeon-active-alert-font-family      : sans-serif;
   --orbeon-active-alert-font-weight      : var(--orbeon-base-font-weight);
   --orbeon-active-alert-color            : white;
+  --orbeon-active-alert-padding          : 2px 8px;
+  --orbeon-active-alert-margin-top       : 10px;
+  --orbeon-active-alert-border-radius    : 5px;
+  --orbeon-active-alert-border-width     : 1px;
+  --orbeon-active-alert-pointer-display  : block;
+  --orbeon-invalid-alert-background-color: var(--orbeon-error-color);
+  --orbeon-invalid-alert-border-color    : var(--orbeon-error-color);
+  --orbeon-invalid-alert-pointer-color   : var(--orbeon-error-color);
+  --orbeon-warning-alert-background-color: var(--orbeon-warning-color);
+  --orbeon-warning-alert-border-color    : var(--orbeon-warning-color);
+  --orbeon-warning-alert-pointer-color   : var(--orbeon-warning-color);
+  --orbeon-info-alert-background-color   : var(--orbeon-info-color);
+  --orbeon-info-alert-border-color       : var(--orbeon-info-color);
+  --orbeon-info-alert-pointer-color      : var(--orbeon-info-color);
   --orbeon-alert-color                   : #555;    // @gray
   --orbeon-alert-background-color        : white;
   --orbeon-alert-border-color            : #e3e3e3; // darken(@wellBackground, 7%);
@@ -253,12 +307,18 @@
   --orbeon-alert-warning-border-color    : #ffecb5;
 
   // Errors and error summary
+  --orbeon-error-summary-display                  : block;
   --orbeon-error-summary-title-color              : white;
   --orbeon-error-summary-title-bottom-border-color: #e5e5e5;
   --orbeon-error-summary-item-background-color    : white;
   --orbeon-info-color                             : @info;
   --orbeon-warning-color                          : @warning;
   --orbeon-error-color                            : @error;
+
+  // Invalid state
+  --orbeon-invalid-label-color         : var(--orbeon-label-color);
+  --orbeon-invalid-control-border-color: var(--orbeon-error-color);
+  --orbeon-invalid-control-border-width: 1px;
 
   // Required icon (left)
   --orbeon-required-icon-display-before: inline;
@@ -278,6 +338,7 @@
 
   // Misc
   --orbeon-header-footer-font-size: 1.10em;
+  --orbeon-kbd-hint-display       : inline-block;
   --orbeon-kbd-hint-font-size     : 0.82em; // 8pt
   --orbeon-version-color          : @minGrayText;
 
@@ -371,6 +432,7 @@
     --orbeon-add-on-background-color                         : @gray-20;
     --orbeon-add-on-text-shadow-color                        : transparent;
     --orbeon-dropdown-caret-color                            : @text-light;
+    --orbeon-dropdown-search-caret-color                     : @text-light;
     --orbeon-dropdown-selected-background-color              : @gray-27;
     --orbeon-attachment-drop-color                           : @gray-53;
     --orbeon-attachment-dragover-color                       : @base-bg;

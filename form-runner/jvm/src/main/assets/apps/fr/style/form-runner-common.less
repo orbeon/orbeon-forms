@@ -82,26 +82,49 @@
 
     &:not(:empty) {
 
-        display: inline-block;
-        font: normal normal normal 14px/1 FontAwesome;
-        color: var(--orbeon-help-icon-color);
-        text-indent: 1px;
-        background: none;
-        max-width : 14px;
-        max-height: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        position: relative;
 
-        margin-top: 3px;                                    // compare with`.xforms-label`, designed to center the icon character in the vertical space
+        width: 14px;
+        height: 14px;
+        font-size: 14px;
+
+        margin-top: 3px;                                      // compare with `.xforms-label`, designed to center the icon character in the vertical space
         margin-bottom: 3px;
         margin-left: 0;
         padding: 0;
 
         overflow: hidden;
+        text-indent: -9999px;                                 // hide element's own text; only the `::before` glyph shows
         cursor: pointer;
 
+        color: var(--orbeon-help-icon-color);
+        background: var(--orbeon-help-icon-background-color); // also clears legacy help.png `background-image` from xforms.less
+        border-radius: var(--orbeon-help-icon-border-radius);
+
         &:before {
-            content: "\f05a";
-            margin-right: 2px;
+            content: var(--orbeon-help-icon-content);
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-indent: 0;
+            font-family: var(--orbeon-help-icon-font-family);
+            font-weight: var(--orbeon-help-icon-font-weight);
             font-size: var(--orbeon-help-icon-font-size);
+            line-height: 1;
+        }
+
+        &:hover  { background-color: var(--orbeon-help-icon-hover-background-color);  }
+        &:active { background-color: var(--orbeon-help-icon-active-background-color); }
+
+        &:focus-visible {
+            outline: var(--orbeon-help-icon-focus-outline);
+            box-shadow: var(--orbeon-help-icon-focus-ring);
         }
     }
 }

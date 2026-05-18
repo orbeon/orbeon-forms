@@ -27,7 +27,7 @@
     }
     .fr-buttons, .fr-dialog-buttons {
         &:hover kbd {
-            & { display: inline-block; }                                    // Show `kbd` on hover
+            & { display: var(--orbeon-kbd-hint-display); }                  // Show `kbd` on hover
             // See https://github.com/orbeon/orbeon-forms/issues/6693
             &:empty, &:has(.xforms-output-output:empty) { display: none; }  // But hide `kbd` is empty
         }

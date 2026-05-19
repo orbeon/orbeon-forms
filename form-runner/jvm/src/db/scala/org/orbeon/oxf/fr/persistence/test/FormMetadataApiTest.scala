@@ -39,6 +39,7 @@ import java.io.ByteArrayInputStream
 import java.nio.file.{Files, Paths}
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import scala.collection.immutable.ListMap
 
 
 // We're writing dynamic properties to a file, to have a single provider active at a time at the proxy level. We could
@@ -999,7 +1000,7 @@ class FormMetadataApiTest
               lastModifiedTime  = Instant.now,
               lastModifiedByOpt = "user-3".some,
               created           = Some(Instant.now.plus(1, ChronoUnit.HOURS)),
-              title             = Map("en" -> "Title"),
+              title             = ListMap("en" -> "Title"),
               available         = true,
               permissionsOpt    = None, // assert won't compare NodeInfo correctly
               operations        = OperationsList(ops = List("list", "read"))
@@ -1008,7 +1009,7 @@ class FormMetadataApiTest
               lastModifiedTime  = Instant.now.plus(2, ChronoUnit.HOURS),
               lastModifiedByOpt = "user-4".some,
               created           = Some(Instant.now.plus(3, ChronoUnit.HOURS)),
-              title             = Map("fr" -> "Titre"),
+              title             = ListMap("fr" -> "Titre"),
               available         = false,
               permissionsOpt    = None, // assert won't compare NodeInfo correctly
               operations        = OperationsList(ops = List("delete", "read"))

@@ -25,6 +25,7 @@ import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
 
 import java.time.Instant
+import scala.collection.immutable.ListMap
 
 
 // Use a case class, so we'll be able to pattern match on it
@@ -34,7 +35,7 @@ case class FormMetadata(
   lastModifiedTime : Instant,
   lastModifiedByOpt: Option[String],
   created          : Option[Instant],
-  title            : Map[String, String],
+  title            : ListMap[String, String],
   available        : Boolean,
   permissionsOpt   : Option[NodeInfo], // Keep permissions as untyped XML for now
   operations       : OperationsList
@@ -107,9 +108,9 @@ object FormMetadata {
         lastModifiedTime  = instantFromString(lastModifiedTimeString),
         lastModifiedByOpt = xml.elemValueOpt("last-modified-by"),
         created           = xml.elemValueOpt("created").map(instantFromString),
-        title             = (xml / "title").map { title =>
+        title             = ListMap.from((xml / "title").map { title =>
           title.attValue("*:lang") -> title.stringValue
-        }.toMap,
+        }),
         available         = xml.elemValueOpt("available").map(_.toBoolean).getOrElse(true),
         permissionsOpt    = xml.child("permissions").headOption,
         operations        = OperationsList(xml.attValue("operations").splitTo[List]())

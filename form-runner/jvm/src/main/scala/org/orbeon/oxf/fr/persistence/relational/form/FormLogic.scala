@@ -24,6 +24,8 @@ import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
+import scala.collection.immutable.ListMap
+
 object FormLogic {
   def forms(
     provider       : Provider,
@@ -98,15 +100,15 @@ object FormLogic {
                   ).rootElement
 
                   // Extract title, availability, and permissions from form metadata
-                  val title       = (xml / "title").map { title =>
+                  val title       = ListMap.from((xml / "title").map { title =>
                     title.attValue("*:lang") -> title.stringValue
-                  }.toMap
+                  })
                   val available   = xml.elemValueOpt("available").map(_.toBoolean).getOrElse(true)
                   val permissions = xml.child("permissions").headOption
 
                   (title, available, permissions)
                 } getOrElse {
-                  (Map.empty[String, String], true, None)
+                  (ListMap.empty[String, String], true, None)
                 }
 
               val appForm = AppForm(

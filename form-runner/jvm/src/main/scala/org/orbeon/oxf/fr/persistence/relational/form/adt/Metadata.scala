@@ -252,7 +252,10 @@ object Metadata {
     override val sqlColumn = "form_metadata"
 
     override def value(formMetadata: FormMetadata, language: => String): StringOption =
-      StringOption(formMetadata.title.get(language))
+      StringOption(
+        formMetadata.title.get(language)                 // Title in the requested language
+          .orElse(formMetadata.title.values.headOption)  // …or first title.
+      )
   }
 
   case object Available extends BooleanMetadata {

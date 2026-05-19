@@ -378,13 +378,29 @@
                 </fr:c>
                 <fr:c x="1" y="3" w="6">
                     <!-- Service to Call -->
-                    <fr:dropdown-select1 ref="$service-call/@service" id="fb-bindings-submission-select">
+                    <fr:dropdown-select1
+                        ref="
+                            if (exists($service-call))
+                            then $service-call/@service
+                            else xf:element('_')"
+                        id="fb-bindings-submission-select">
                         <xf:label ref="$form-resources/dialog-actions/service-to-call/label"/>
                         <xf:hint ref="$form-resources/dialog-actions/service-to-call/hint"/>
                         <xf:itemset ref="$all-available-services">
                             <xf:label value="substring-before(@id, '-submission')"/>
                             <xf:value value="substring-before(@id, '-submission')"/>
                         </xf:itemset>
+                        <xf:action event="xforms-select">
+                            <xf:var name="selected-service-name" value="event('xxf:item-value')"/>
+                            <xf:delete if="xxf:is-blank($selected-service-name)" ref="$service-call"/>
+                            <xf:action if="xxf:non-blank($selected-service-name) and empty($service-call)">
+                                <xf:insert
+                                    context="$action"
+                                    ref="*"
+                                    position="before"
+                                    origin="xf:element('fr:service-call', xf:attribute('service', $selected-service-name))"/>
+                            </xf:action>
+                        </xf:action>
                         <xf:dispatch
                             event="xforms-value-changed"
                             name="fb-update-how-service-value-are-set"
@@ -394,7 +410,7 @@
             </fr:grid>
 
         </fr:tab>
-        <fr:tab>
+        <fr:tab visible="exists($selected-service)">
             <xf:label ref="$form-resources/dialog-actions/service-request-actions"/>
 
             <xf:group ref="$action" appearance="xxf:internal">
@@ -721,7 +737,11 @@
             </xf:group>
         </fr:tab>
         <fr:tab>
-            <xf:label ref="$form-resources/dialog-actions/service-response-actions"/>
+            <xf:label
+                ref="
+                    if (exists($selected-service))
+                    then $form-resources/dialog-actions/service-response-actions
+                    else $form-resources/actions/label"/>
 
             <xf:var
                 name="selection-controls"
@@ -1215,7 +1235,7 @@
             <xf:bind ref="observer" required="true()"/>
 
             <xf:bind ref="fb:listener">
-                <xf:bind name="submission-bind" ref="../fb:action/fr:service-call/@service" required="true()"/>
+                <xf:bind name="submission-bind" ref="../fb:action/fr:service-call/@service"/>
             </xf:bind>
 
             <xf:bind ref="fb:action">

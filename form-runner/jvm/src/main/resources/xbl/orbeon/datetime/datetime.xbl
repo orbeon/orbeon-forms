@@ -189,7 +189,7 @@
                    we need to remove potential 'T's from the date and time.
             -->
             <xf:action
-                    event="xforms-value-changed"
+                    event="DOMActivate DOMFocusOut"
                     observer="date time">
                 <xf:setvalue
                     ref="xxf:binding('fr-datetime')"

@@ -352,9 +352,9 @@
                                         '|fr-fr-resources|'
                                     ),
                                     (
-                                        event('filename'),
+                                        let $a := event('actual') return if (exists($a)) then $a else 'application/octet-stream' (: not ideal but better than blank :),
                                         event('permitted'),
-                                        event('actual')
+                                        event('filename')
                                     )
                                 )
                             else if (event('error-type') = 'file-scan-error') then

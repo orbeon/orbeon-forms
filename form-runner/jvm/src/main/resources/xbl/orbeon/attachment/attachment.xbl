@@ -312,7 +312,7 @@
                                 xxf:format-message(
                                     xxf:r(
                                         'detail.messages.upload-error-empty-file',
-                                        'fr-fr-resources'
+                                        '|fr-fr-resources|'
                                     ),
                                     ()
                                 )
@@ -320,7 +320,7 @@
                                 xxf:format-message(
                                     xxf:r(
                                         'detail.messages.upload-error-upload-password-not-configured-error',
-                                        'fr-fr-resources'
+                                        '|fr-fr-resources|'
                                     ),
                                     ()
                                 )
@@ -328,7 +328,7 @@
                                 xxf:format-message(
                                     xxf:r(
                                         'detail.messages.upload-error-size',
-                                        'fr-fr-resources'
+                                        '|fr-fr-resources|'
                                     ),
                                     (
                                         event('permitted'),
@@ -339,7 +339,7 @@
                                 xxf:format-message(
                                     xxf:r(
                                         'detail.messages.upload-error-max-files-per-control',
-                                        'fr-fr-resources'
+                                        '|fr-fr-resources|'
                                     ),
                                     (
                                         event('permitted')
@@ -349,7 +349,7 @@
                                 xxf:format-message(
                                     xxf:r(
                                         'detail.messages.upload-error-mediatype',
-                                        'fr-fr-resources'
+                                        '|fr-fr-resources|'
                                     ),
                                     (
                                         event('filename'),
@@ -361,7 +361,7 @@
                                 xxf:format-message(
                                     xxf:r(
                                         'detail.messages.upload-error-file-scan',
-                                        'fr-fr-resources'
+                                        '|fr-fr-resources|'
                                     ),
                                     (
                                         event('message')
@@ -370,10 +370,9 @@
                             else
                                 xxf:r(
                                     'detail.messages.upload-error',
-                                    'fr-fr-resources'
+                                    '|fr-fr-resources|'
                                 )
                         "/>
-
 
                     <xf:setvalue
                         ref="xxf:instance('i')/error-message"

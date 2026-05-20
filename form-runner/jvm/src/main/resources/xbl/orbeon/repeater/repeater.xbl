@@ -67,25 +67,25 @@
                 </button>
                 <ul class="dropdown-menu" role="menu">
                     <li role="presentation"  class="fr-insert-above">
-                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-chevron-up"/><xf:output value="xxf:r('components.grid.insert-above', 'fr-fr-resources')"/></a>
+                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-chevron-up"/><xf:output value="xxf:r('components.grid.insert-above', '|fr-fr-resources|')"/></a>
                     </li>
                     <li role="presentation" class="fr-insert-below">
-                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-chevron-down"/><xf:output value="xxf:r('components.grid.insert-below', 'fr-fr-resources')"/></a>
+                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-chevron-down"/><xf:output value="xxf:r('components.grid.insert-below', '|fr-fr-resources|')"/></a>
                     </li>
                     <li role="presentation" class="divider"/>
                     <li role="presentation" class="fr-move-up">
-                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-arrow-up"/><xf:output value="xxf:r('components.grid.move-up', 'fr-fr-resources')"/></a>
+                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-arrow-up"/><xf:output value="xxf:r('components.grid.move-up', '|fr-fr-resources|')"/></a>
                     </li>
                     <li role="presentation" class="fr-move-down">
-                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-arrow-down"/><xf:output value="xxf:r('components.grid.move-down', 'fr-fr-resources')"/></a>
+                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-arrow-down"/><xf:output value="xxf:r('components.grid.move-down', '|fr-fr-resources|')"/></a>
                     </li>
                     <li role="presentation" class="divider"/>
                     <li role="presentation" class="fr-clear">
-                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-remove"/><xf:output value="xxf:r('components.grid.clear.label', 'fr-fr-resources')"/></a>
+                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-remove"/><xf:output value="xxf:r('components.grid.clear.label', '|fr-fr-resources|')"/></a>
                     </li>
                     <li role="presentation" class="divider"/>
                     <li role="presentation" class="fr-remove">
-                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-minus-circle"/><xf:output value="xxf:r('components.grid.remove.label', 'fr-fr-resources')"/></a>
+                        <a role="menuitem" tabindex="-1" href="#"><i class="fa fa-fw fa-minus-circle"/><xf:output value="xxf:r('components.grid.remove.label', '|fr-fr-resources|')"/></a>
                     </li>
                 </ul>
             </div>

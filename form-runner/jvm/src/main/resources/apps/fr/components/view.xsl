@@ -682,7 +682,7 @@
                         value="
                             xxf:r(
                                 'common.messages.incomplete-configuration',
-                                'fr-fr-resources'
+                                '|fr-fr-resources|'
                             )"/>
                 </xf:group>
             </xh:div>
@@ -811,7 +811,7 @@
                         xxf:format-message(
                             xxf:r(
                                 'authentication.menu.logged-in-as',
-                                'fr-fr-resources'
+                                '|fr-fr-resources|'
                             ),
                             fr:username()
                         )"/>
@@ -837,7 +837,7 @@
                     <xf:output value="
                         xxf:r(
                             'authentication.menu.logout',
-                            'fr-fr-resources'
+                            '|fr-fr-resources|'
                         )"/>
                 </xh:a>
             </xh:li>
@@ -858,7 +858,7 @@
                     <xf:output value="
                         xxf:r(
                             'authentication.menu.login',
-                            'fr-fr-resources'
+                            '|fr-fr-resources|'
                         )"/>
                 </xh:a>
             </xh:li>
@@ -879,7 +879,7 @@
                     <xf:output value="
                         xxf:r(
                             'authentication.menu.register',
-                            'fr-fr-resources'
+                            '|fr-fr-resources|'
                         )"/>
                 </xh:a>
             </xh:li>
@@ -1119,7 +1119,7 @@
             frf:successMessage(
                 xxf:r(
                     'detail.messages.upload-done',
-                    'fr-fr-resources'
+                    '|fr-fr-resources|'
                 )
             )
         </xf:action>

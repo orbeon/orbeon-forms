@@ -75,11 +75,10 @@
                 <xf:setvalue ref="instance('local')/type"  value="xxf:type(xxf:binding('fr-character-counter'))"/>
                 <xf:rebuild/>
             </xbl:handler>
-            <xbl:handler event="xforms-readonly">
-                <xf:setvalue ref="instance('local')/readonly">true</xf:setvalue>
-            </xbl:handler>
-            <xbl:handler event="xforms-readwrite">
-                <xf:setvalue ref="instance('local')/readonly">false</xf:setvalue>
+            <xbl:handler event="xforms-enabled xforms-readonly xforms-readwrite" phase="target">
+                <xf:setvalue
+                    ref="instance('local')/readonly"
+                    value="xxf:is-control-readonly('fr-character-counter')"/>
             </xbl:handler>
         </xbl:handlers>
 

@@ -296,7 +296,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind id="single-file-attachment-bind" ref="single-file-attachment" type="xf:anyURI" name="single-file-attachment"/>
                         <xf:bind id="multiple-file-attachment-bind" ref="multiple-file-attachment" type="xf:anyURI" name="multiple-file-attachment"/>
                         <xf:bind id="static-video-bind" ref="static-video" name="static-video" type="xf:anyURI"/>
-                            <xf:bind id="image-attachment-bind" ref="image-attachment" name="image-attachment" type="xf:anyURI"/>
+                        <xf:bind id="image-attachment-bind" ref="image-attachment" name="image-attachment" type="xf:anyURI" constraint="xxf:upload-mediatypes('image/*')"/>
                         <xf:bind id="video-attachment-bind" ref="video-attachment" name="video-attachment" type="xf:anyURI" constraint="xxf:upload-mediatypes('video/*')"/>
 
 

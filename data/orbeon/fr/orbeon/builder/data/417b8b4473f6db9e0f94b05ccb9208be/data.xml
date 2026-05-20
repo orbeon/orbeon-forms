@@ -377,7 +377,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                  name="multiple-file-attachment"/>
                         <xf:bind id="static-video-bind" ref="static-video" name="static-video" type="xf:anyURI"/>
                             <xf:bind id="image-attachment-bind" ref="image-attachment" name="image-attachment"
-                                 type="xf:anyURI"/>
+                                 type="xf:anyURI"
+                                 constraint="xxf:upload-mediatypes('image/*')"/>
                         <xf:bind id="video-attachment-bind" ref="video-attachment" name="video-attachment"
                                  type="xf:anyURI"
                                  constraint="xxf:upload-mediatypes('video/*')"/>

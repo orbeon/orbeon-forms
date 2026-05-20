@@ -328,6 +328,12 @@ object Mediatypes extends MediatypesTrait {
     Mapping(extension = "wbmp",    mediatype = "image/vnd.wap.wbmp",                                                          label = "WAP Bitmap"),
     Mapping(extension = "wml",     mediatype = "text/vnd.wap.wml",                                                            label = "WAP WML"),
     Mapping(extension = "wmls",    mediatype = "text/vnd.wap.wmlscript",                                                      label = "WAP WMLS"),
+    Mapping(extension = "stl",     mediatype = "model/stl",                                                                   label = "StereoLithography (STL)"),
+    Mapping(extension = "3mf",     mediatype = "model/3mf",                                                                   label = "3D Manufacturing Format (3MF)"),
+    Mapping(extension = "stp",     mediatype = "model/step",                                                                  label = "STEP"),
+    Mapping(extension = "step",    mediatype = "model/step",                                                                  label = "STEP"),
+    Mapping(extension = "yml",     mediatype = "application/yaml",                                                            label = "YAML Ain't Markup Language (YAML)"),
+    Mapping(extension = "yaml",    mediatype = "application/yaml",                                                            label = "YAML Ain't Markup Language (YAML)"),
   )
 
   private val (

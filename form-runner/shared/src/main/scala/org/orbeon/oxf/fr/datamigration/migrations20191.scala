@@ -19,15 +19,13 @@ import org.orbeon.oxf.fr.DataFormatVersion.MigrationVersion
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.*
 import org.orbeon.oxf.fr.{DataFormatVersion, InDocFormRunnerDocContext}
-import org.orbeon.oxf.util.CollectionUtils
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.model.InstanceData
-import org.orbeon.scaxon.NodeInfoConversions.unwrapNode
-import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.NodeInfoConversions.unwrapNode
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsNames.*
 import shapeless.syntax.typeable.typeableOps
@@ -115,11 +113,11 @@ object MigrationOps20191 extends MigrationOps {
 
     migrationSet.migrations foreach { case Migration20191(containerPath, newGridElem, _, content, _) =>
 
-      applyPath(dataRootElem, containerPath ::: newGridElem :: Nil) foreach { gridElem =>
+      applyPath(dataRootElem, containerPath ::: newGridElem :: Nil).foreach { gridElem =>
 
         result = MigrationResult.Some
 
-        val gridContent = content flatMap (p => gridElem child p.value)
+        val gridContent = content.flatMap(p => gridElem child p.value)
 
         // Mark non-relevant children of removed grid with `fr:relevant="false"` (#7223)
         for {
@@ -286,9 +284,4 @@ object MigrationOps20191 extends MigrationOps {
     (migrationSet.migrations exists (m => path.startsWith(m.containerPath ::: m.newGridElem :: Nil))) option {
       path.dropRight(2) ::: path.last :: Nil
     }
-
-  private object Private {
-    def applyPath(mutableData: NodeInfo, path: List[PathElem]): collection.Seq[NodeInfo] =
-      path.foldLeft(Seq(mutableData): collection.Seq[NodeInfo]) { case (e, p) => e child p.value }
-  }
 }

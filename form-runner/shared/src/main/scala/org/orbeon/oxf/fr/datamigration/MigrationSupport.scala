@@ -379,6 +379,6 @@ object MigrationSupport {
     (deletedFrElemCount + deletedAttCount + deletedNsCount > 0) option mutableData
   }
 
-  def applyPath(mutableData: NodeInfo, path: List[PathElem]): Seq[NodeInfo] =
-    path.foldLeft(Seq(mutableData)) { case (e, p) => e child p.value }
+  def applyPath(mutableData: NodeInfo, path: List[PathElem]): List[NodeInfo] =
+    path.foldLeft(List(mutableData)) { case (e, p) => e.child(p.value).toList }
 }

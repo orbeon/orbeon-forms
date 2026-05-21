@@ -38,6 +38,7 @@ react-test/dist/
 .DS_Store
 
 # Project-specific
+docker/scout-reports/
 exist-data*
 _exist-data*
 demo-sqlite-database/java.io.tmpdir/

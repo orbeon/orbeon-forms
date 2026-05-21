@@ -1,8 +1,14 @@
 #!/bin/bash
 
 # In case of device space issues, make the "Disk usage limit" higher under "Resource Allocation" (Docker Desktop)
+#
+# After each `docker build` the script runs `docker scout cves` and saves the
+# output under docker/scout-reports/publish/. Set SKIP_SCAN=true to skip the
+# scan step. Pushes are intentionally manual (REMOTE_PUBLISH=false by default):
+# review the scan output, then run `docker push <image>` by hand.
 
 REMOTE_PUBLISH=false
+SKIP_SCAN=${SKIP_SCAN:-false}
 
 VERSION=${1:-'2025.1-pe'}
 RELEASE_TAG=${2:-'tag-release-2025.1-ce'}
@@ -46,6 +52,53 @@ DEMO_FORMS_POSTGRES_IMAGE="orbeon/postgres-demo-forms:$DOCKER_TAG_BASE"
 DEMO_FORMS_POSTGRES_CONTAINER='orbeon-postgres-demo-forms'
 DEMO_FORMS_ORBEON_FORMS_CONTAINER='orbeon-orbeon-forms-demo-forms'
 
+SCAN_REPORT_DIR='scout-reports/publish'
+declare -a SCAN_RESULTS
+
+scan_image() {
+  local image="$1"
+  if $SKIP_SCAN; then
+    echo "[scan] skipped for $image (SKIP_SCAN=true)"
+    return
+  fi
+  mkdir -p "$SCAN_REPORT_DIR"
+  local image_slug="${image//[\/:]/_}"
+  IFS=',' read -ra plat_list <<< "$PLATFORMS"
+  for plat in "${plat_list[@]}"; do
+    local plat_slug="${plat//\//-}"
+    local out="$SCAN_REPORT_DIR/${image_slug}__${plat_slug}.txt"
+    echo "[scan] $image ($plat) -> $out"
+    docker scout cves --platform="$plat" --only-severity critical,high "$image" > "$out" 2>&1 || true
+    local counts
+    counts=$(grep -oE '[0-9]+C[[:space:]]+[0-9]+H' "$out" | head -1 || true)
+    SCAN_RESULTS+=("$image|$plat|$counts")
+  done
+}
+
+print_scan_summary() {
+  if $SKIP_SCAN; then return; fi
+  echo
+  echo '=========================================='
+  echo ' Docker Scout — Critical/High summary'
+  echo '=========================================='
+  printf '%-60s %-15s %s\n' 'Image' 'Platform' 'C/H counts'
+  local any_bad=false
+  for r in "${SCAN_RESULTS[@]}"; do
+    IFS='|' read -r img plat counts <<< "$r"
+    printf '%-60s %-15s %s\n' "$img" "$plat" "${counts:-(see report)}"
+    if [[ -n "$counts" && ! "$counts" =~ ^0C[[:space:]]+0H ]]; then
+      any_bad=true
+    fi
+  done
+  echo '=========================================='
+  if $any_bad; then
+    echo 'Verdict: FAIL — review reports under '"$SCAN_REPORT_DIR/"' before pushing.'
+  else
+    echo 'Verdict: PASS — no Critical/High CVEs detected.'
+  fi
+  echo 'Push command (manual): docker push <image>'
+}
+
 main() {
   trap cleanup EXIT
 
@@ -68,12 +121,14 @@ main() {
 
   # Build Orbeon Forms image (Tomcat, including PostgreSQL JDBC driver)
   docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.tomcat.postgres_driver --build-arg base_image="$ORBEON_FORMS_TOMCAT_BASE_IMAGE" -t "$ORBEON_FORMS_TOMCAT_IMAGE" .
+  scan_image "$ORBEON_FORMS_TOMCAT_IMAGE"
 
   # Build Orbeon Forms image (WildFly, base image)
   docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.wildfly --build-arg tag="$RELEASE_TAG" --build-arg file="$FILE" --build-arg sha256_checksum="$SHA256_CHECKSUM" -t "$ORBEON_FORMS_WILDFLY_BASE_IMAGE" .
 
   # Build Orbeon Forms image (WildFly, including PostgreSQL JDBC driver)
   docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.wildfly.postgres_driver --build-arg base_image="$ORBEON_FORMS_WILDFLY_BASE_IMAGE" -t "$ORBEON_FORMS_WILDFLY_IMAGE" .
+  scan_image "$ORBEON_FORMS_WILDFLY_IMAGE"
 
   # Do not import demo forms into PostgreSQL, just use SQLite
   ## Import demo forms into PostgreSQL database and export them to SQL script
@@ -81,6 +136,9 @@ main() {
 
   # Build PostgreSQL image with demo forms data (as local SQL file)
   docker build --platform="$PLATFORMS" -f Dockerfile.postgres -t "$POSTGRES_IMAGE" .
+  scan_image "$POSTGRES_IMAGE"
+
+  print_scan_summary
 
   if $REMOTE_PUBLISH; then
     docker push "$ORBEON_FORMS_TOMCAT_IMAGE"

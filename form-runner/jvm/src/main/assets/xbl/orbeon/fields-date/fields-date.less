@@ -19,10 +19,12 @@
             }
             // By default, don't show labels, but don't hide to screen readers
             // Particularly strong rule for Form Builder, to override its `display: table`
-            .fr-view &.xforms-control .xforms-label, // add `.fr-view` because `.fr-density-*` on that same element has a `display` property and we need to override it
+            &.xforms-control .xforms-label,
             .fb-main .fb &.xforms-control .xforms-label {
                 // #7679: same technique used in Bootstrap 5's .visually-hidden class/mixin ("Hide content visually
-                // while keeping it accessible to assistive technologies")
+                // while keeping it accessible to assistive technologies") and FontAwesome 6's .sr-only; keep this
+                // styling explicit for now (no external dependency); as of May 21, 2026, toc.xsl is the only place
+                // where .sr-only is used.
                 width      : 1px;
                 height     : 1px;
                 padding    : 0;

@@ -137,6 +137,11 @@
           class="org.orbeon.oxf.fr.route.CallbackRoute"
           methods="GET"/>
 
+    <service
+        path="/fr/mcp/builder"
+        methods="POST"
+        class="org.orbeon.oxf.fb.mcp.FormBuilderMcpRoute"/>
+
     <!-- Test form PDF "inline" (when being edited) with new empty document -->
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(test-pdf)"
              methods="POST"

@@ -24,11 +24,11 @@
         element="
            fr|datetime,
            xf|input:xxf-type('xs:dateTime')"
-        xxbl:mode="lhha binding value"
+        xxbl:mode="lhha binding value focus"
         xxbl:label-for="fr-datetime-elem">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-                    <display-name lang="en">Date and Time</display-name>
+        <display-name lang="en">Date and Time</display-name>
         <display-name lang="fr">Date et heure</display-name>
         <display-name lang="no">Dato og tid</display-name>
         <display-name lang="ru">Дата и время</display-name>
@@ -147,11 +147,40 @@
         </xbl:implementation>
 
         <xbl:handlers>
-            <!-- Propagate readonly -->
-            <xbl:handler event="xforms-enabled xforms-readonly xforms-readwrite" phase="target">
+            <xbl:handler event="xforms-readonly xforms-readwrite" phase="target">
                 <xf:setvalue
                     ref="instance('i')/is-readonly"
                     value="xxf:is-control-readonly('fr-datetime')"/>
+            </xbl:handler>
+            <xbl:handler event="DOMActivate" observer="date time">
+                <xf:dispatch name="DOMActivate" targetid="fr-datetime"/>
+            </xbl:handler>
+            <!--
+                Update bound node from local date and time
+
+                The logic is as follows:
+                1. If both date and time are valid, combine them with the `dateTime()` constructor.
+                   Compared to `concat(date, 'T', time), this ensures the timezone on the date isn't present in the result,
+                   and properly taken into account.
+                2. If both date and time are empty, result is empty.
+                3. Otherwise, try to keep whatever invalid values the user entered, using 'T' as a separator, which means
+                   we need to remove potential 'T's from the date and time.
+            -->
+            <xbl:handler
+                    event="DOMActivate DOMFocusOut"
+                    phase="target">
+                <xf:setvalue
+                    ref="xxf:binding('fr-datetime')"
+                    value="if (instance('i')/date/string() castable as xs:date and
+                               instance('i')/time/string() castable as xs:time)
+                           then dateTime(xs:date(instance('i')/date), xs:time(instance('i')/time))
+                           else if (instance('i')/date/string() = '' and
+                                    instance('i')/time/string() = '')
+                           then ''
+                           else
+                               concat(translate(instance('i')/date/string(), 'T', ''),
+                                      'T',
+                                      translate(instance('i')/time/string(), 'T', ''))"/>
             </xbl:handler>
         </xbl:handlers>
 
@@ -176,34 +205,6 @@
                     </xf:action>
                 </xf:action>
             </xf:var>
-
-            <!--
-                Update bound node from local date and time
-
-                The logic is as follows:
-                1. If both date and time are valid, combine them with the `dateTime()` constructor.
-                   Compared to `concat(date, 'T', time), this ensure the timezone on the date isn't present in the result,
-                   and properly taken into account.
-                2. If both date and time are empty, result is empty.
-                3. Otherwise try to keep whatever invalid values the user entered, using 'T' as a separator, which means
-                   we need to remove potential 'T's from the date and time.
-            -->
-            <xf:action
-                    event="DOMActivate DOMFocusOut"
-                    observer="date time">
-                <xf:setvalue
-                    ref="xxf:binding('fr-datetime')"
-                    value="if ($local-date/string() castable as xs:date and
-                               $local-time/string() castable as xs:time)
-                           then dateTime(xs:date($local-date), xs:time($local-time))
-                           else if ($local-date/string() = '' and
-                                    $local-time/string() = '')
-                           then ''
-                           else
-                               concat(translate($local-date/string(), 'T', ''),
-                                      'T',
-                                      translate($local-time/string(), 'T', ''))"/>
-            </xf:action>
 
             <xh:div id="fr-datetime-elem" class="fr-datetime-fields fr-field-width-{fr:component-param-value('field-width')}" xxf:control="true">
                 <fr:date ref="$local-date" id="date">

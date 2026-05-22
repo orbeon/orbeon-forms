@@ -1,4 +1,4 @@
-FROM postgres:latest
+FROM postgres:17
 
 # SQL scripts to create Orbeon Forms tables and indexes, as well as demo forms data
 COPY *.sql /docker-entrypoint-initdb.d/

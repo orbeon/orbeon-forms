@@ -1,4 +1,4 @@
-FROM tomcat:9.0-jdk21
+FROM tomcat:9.0-jdk21-temurin-noble
 
 LABEL org.opencontainers.image.title="Orbeon Forms" \
       org.opencontainers.image.vendor="Orbeon, Inc." \

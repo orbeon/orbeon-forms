@@ -42,7 +42,7 @@ class CharacterAccumulator {
     _savedCharacters += originalLength - resultCS.length
     _multipleAppends += 0 max appendCount - 1
 
-    val result = if (resultCS.length > 0) resultCS.toString else ""
+    val result = if (resultCS.length > 0) resultCS else ""
     reset()
     result
   }

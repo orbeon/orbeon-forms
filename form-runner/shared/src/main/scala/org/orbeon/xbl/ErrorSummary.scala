@@ -186,10 +186,7 @@ object ErrorSummary {
     def markVisited(): Unit =
       event.targetObject
         .narrowTo[XFormsValueControl & VisitableTrait]
-        .filter(valueControl =>
-          valueControl.visible &&
-          // User might still be editing the control
-          ! Focus.isFocusWithinControl(valueControl))
+        .filter(_.visible)
         .foreach(_.visited = true)
 
     (event, currentErrorOpt, eventLevelOpt, alertOpt) match {

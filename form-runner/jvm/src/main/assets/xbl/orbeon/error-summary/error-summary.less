@@ -33,7 +33,7 @@
         padding: 5px 10px;
         color: var(--orbeon-error-summary-title-color);
         border-bottom: 1px solid var(--orbeon-error-summary-title-bottom-border-color);
-        border-radius: @baseBorderRadius;
+        border-radius: var(--orbeon-error-summary-border-radius);
         &.xforms-label {
             font-weight: inherit;
         }
@@ -58,7 +58,7 @@
 
         &> li {
             border: 2px solid;
-            border-radius: @baseBorderRadius;
+            border-radius: var(--orbeon-error-summary-border-radius);
             padding: 10px;
             margin-bottom: 5px;
             list-style: none; // Don't show list number, instead we output it in the label, otherwise the button with

@@ -18,7 +18,7 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
 
 .fr-body-decorations() {
     border: @frBodyDecorationsBorderWidth solid var(--orbeon-base-border-color);
-    border-radius: @baseBorderRadius;
+    border-radius: var(--orbeon-body-decorations-border-radius);
     background-color: var(--orbeon-base-background-color);
 }
 
@@ -108,7 +108,7 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
 .fr-toc-body-styling() {
     min-height: 20px;
     border: @frBodyDecorationsBorderWidth solid var(--orbeon-base-border-color);
-    border-radius: @baseBorderRadius;
+    border-radius: var(--orbeon-body-decorations-border-radius);
 }
 
 // Reset Liferay styles which impact ours
@@ -257,7 +257,7 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
     // Copied over Bootstrap styles as we can't reuse them simply as mixins
     // Ideally this would be in box-select.less
     .fr-view .xbl-fr-box-select .xforms-select-appearance-full .xforms-items {
-        border-radius: @inputBorderRadius;
+        border-radius: var(--orbeon-control-border-radius);
         background-color: inherit;
         .fieldBorder();
         padding: 4px 6px;
@@ -269,7 +269,7 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
     }
 
     .xforms-trigger-appearance-minimal .btn-link {
-        border-radius: @inputBorderRadius; // for focus highlight
+        border-radius: var(--orbeon-control-border-radius); // for focus highlight
     }
 
     .nav .xforms-trigger-appearance-minimal .btn-link {
@@ -278,7 +278,7 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
 
     .xforms-output-appearance-xxforms-download a {
         .focusHighlightGroup();
-        border-radius: @inputBorderRadius;
+        border-radius: var(--orbeon-control-border-radius);
         margin-left: 3px;
         line-height: (@fixedLineHeight + 2px * 2);
         @media screen {
@@ -291,7 +291,7 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
     .xforms-items[role = group][tabindex = '0'],
     .xforms-items[role = radiogroup][tabindex = '0'] {
         .focusHighlightGroup();
-        border-radius: @inputBorderRadius;
+        border-radius: var(--orbeon-control-border-radius);
     }
 
     // ***** Sections **************************************************************************************************
@@ -299,8 +299,9 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
     // Round the top corners of the first section title to match the container's border-radius
     .fr-view-appearance-full > .xbl-fr-section:first-child h2.fr-section-title,
     .fr-wizard-body .xbl-fr-section:first-child h2.fr-section-title {
-        border-top-left-radius: (@baseBorderRadius - @frBodyDecorationsBorderWidth);
-        border-top-right-radius: (@baseBorderRadius - @frBodyDecorationsBorderWidth);
+        // Should not appear in PDF, so calc is fine
+        border-top-left-radius : calc(var(--orbeon-body-decorations-border-radius) - @frBodyDecorationsBorderWidth);
+        border-top-right-radius: calc(var(--orbeon-body-decorations-border-radius) - @frBodyDecorationsBorderWidth);
     }
 
     // ***** Other *****************************************************************************************************
@@ -405,7 +406,7 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
         background  : @bg;
         border-color: @border-color;
         border-width: var(--orbeon-active-alert-border-width);
-        border-style: solid;
+        border-style: var(--orbeon-active-alert-border-style);
         &:before { border-color: @pointer-color transparent; }
     }
     .xforms-invalid > .xforms-alert.xforms-active { .fr-active-alert-state(var(--orbeon-invalid-alert-background-color), var(--orbeon-invalid-alert-border-color), var(--orbeon-invalid-alert-pointer-color)); }

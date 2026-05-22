@@ -20,7 +20,7 @@
 
         &:has(+ .xbl-fr-section > .fr-section-title, + .xbl-fr-section > .xforms-group > .fr-section-title) { // hoping to remove the nested `.xforms-group` in the future so handling both cases
             // Spacing between section, so the new section doesn't start right after the previous grid
-            padding-bottom: 20px;
+            padding-bottom: var(--orbeon-section-gap);
         }
 
         &:last-of-type { padding-bottom: 0; }
@@ -43,13 +43,13 @@
 
             &.fr-section-iteration-title {
                 margin: 5px 0 0 0;
-                padding: 0 0 0 10px;
+                padding: var(--orbeon-section-iteration-title-padding);
             }
         }
 
         h3, h4, h5, h6 {
             &.fr-section-title, &.fr-section-iteration-title {
-                border-radius: @baseBorderRadius;
+                border-radius: var(--orbeon-section-border-radius);
             }
         }
 
@@ -75,10 +75,11 @@
 
         .fr-section-content {
             display: block;
-            padding-left:  @frSectionTitleLeftPadding - @frGridCellPadding; // To be aligned with the start of the text of the titles
-            padding-right: @frSectionTitleLeftPadding - @frGridCellPadding; // To have the same margin on both side, especially visible with tables
-            padding-top: 10px;                                              // At the top/bottom of a section, less space
-            padding-bottom: 10px;
+            // Original comments:
+            //  - padding-left : to be aligned with the start of the text of the titles
+            //  - padding-right: to have the same margin on both side, especially visible with tables
+            //  - padding-top  : at the top/bottom of a section, less space
+            padding: var(--orbeon-section-content-padding);
         }
 
         // Remove background color so that rounded corners work better and do background at level of `fr-body` or

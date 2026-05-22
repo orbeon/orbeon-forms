@@ -68,10 +68,10 @@
     }
 
     .tab-content {
-        border: 1px solid #ddd;
+        border: var(--orbeon-tab-border-width) solid var(--orbeon-tab-border-color);
         border-top: none;
-        background-color: white;
-        padding: 10px;
+        background-color: var(--orbeon-tab-background-color);
+        padding: var(--orbeon-tab-padding);
     }
 
     .xforms-tabbable-appearance-left > .tabs-left {
@@ -81,7 +81,7 @@
         }
 
         &> .tab-content {
-            border: 1px solid #ddd;
+            border: var(--orbeon-tab-border-width) solid var(--orbeon-tab-border-color);
             border-left: none;
 
             .tab-pane {

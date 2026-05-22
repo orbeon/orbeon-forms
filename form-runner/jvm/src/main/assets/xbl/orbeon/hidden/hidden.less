@@ -32,7 +32,7 @@
         align-items: center; // Center content vertically, which requires the above `display: grid`
         min-height: 64px;    // Match Form Builder min row height to handle case where it's the only control in a row
 
-        border-radius: @inputBorderRadius;
+        border-radius: var(--orbeon-control-border-radius);
         .fieldBorder();
 
         background: repeating-linear-gradient(

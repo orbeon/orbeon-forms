@@ -17,7 +17,7 @@
 
         .xforms-dnd-item {
 
-            border-radius: @inputBorderRadius;
+            border-radius: var(--orbeon-control-border-radius);
             .fieldBorder();
             padding: 4px 6px;
             margin: 2px 0;
@@ -53,7 +53,7 @@
             display: block;
             border-width: 2px;
             border-color: var(--orbeon-control-border-color);
-            border-radius: @inputBorderRadius;
+            border-radius: var(--orbeon-control-border-radius);
             margin: 3px 0;
             padding: 1em;
             color: var(--orbeon-attachment-drop-color);
@@ -62,7 +62,7 @@
 
         .fr-attachment-drop {
 
-            border-style: dashed;
+            border-style: var(--orbeon-attachment-drop-border-style);
 
             &.fr-attachment-dragover {
                 background-color: var(--orbeon-attachment-dragover-background-color);
@@ -71,7 +71,7 @@
         }
 
         .fr-attachment-empty {
-            border-style: solid;
+            border-style: var(--orbeon-attachment-empty-border-style);
         }
 
         .xforms-upload-progress .progress {

@@ -147,6 +147,11 @@ body.orbeon {
         padding: var(--orbeon-button-toggle-padding);
     }
 
+    // .btn-mini used for grid/section/repeater menus
+    .btn-mini  { padding: var(--orbeon-button-compact-padding); }
+    .btn-small { padding: @paddingSmall;  }
+    .btn-large { padding: @paddingLarge;  }
+
     .btn:focus-visible {
         outline   : 0;
         box-shadow: var(--orbeon-button-focus-ring);
@@ -317,7 +322,7 @@ body.orbeon {
         box-sizing: border-box;                  // So width: 100% works with the padding added by Bootstrap
         width: 100%;
 
-        padding: 4px 6px;
+        padding: var(--orbeon-control-padding);
         margin-bottom: 0;                        // Override default 9px bottom margin added by Bootstrap
 
         color: var(--orbeon-control-color);
@@ -363,6 +368,7 @@ body.orbeon {
         color: var(--orbeon-control-color);
         background-color: var(--orbeon-control-background-color);
 
+        padding: var(--orbeon-control-padding);     // Override Bootstrap 2's inherited 4px 6px
         margin-bottom: 0;                           // Override default 9px bottom margin added by Bootstrap
         box-sizing: border-box;                     // So width: 100% works with the padding added by Bootstrap
         height: var(--orbeon-control-height);
@@ -408,8 +414,8 @@ body.orbeon {
             appearance: none;
             width: 1em;
             height: 1em;
-            border: 1px solid rgba(0,0,0,.25);
-            background-color: #fff;
+            border: 1px solid var(--orbeon-checkable-border-color);
+            background-color: var(--orbeon-checkable-background-color);
             background-repeat: no-repeat;
             background-position: center;
             background-size: contain;
@@ -661,7 +667,7 @@ body.orbeon {
             }
 
             .fieldBorder();
-            border-radius: @inputBorderRadius;
+            border-radius: var(--orbeon-control-border-radius);
         }
 
         // See https://github.com/orbeon/orbeon-forms/issues/3988
@@ -749,7 +755,7 @@ body.orbeon {
     .dropdown-menu {
 
         background-color: var(--orbeon-dropdown-menu-background-color);
-        border: 1px solid var(--orbeon-dropdown-menu-border-color);
+        border: var(--orbeon-dropdown-menu-border-width) solid var(--orbeon-dropdown-menu-border-color);
 
         .divider {
             background-color: var(--orbeon-dropdown-menu-divider-color);
@@ -762,7 +768,7 @@ body.orbeon {
         > li > span > a,
         > li > span > .btn-link {
             display: block;
-            padding: 3px 20px;
+            padding: var(--orbeon-dropdown-menu-item-padding);
             clear: both;
             font-size: var(--orbeon-button-font-size);
             font-weight: var(--orbeon-base-font-weight);

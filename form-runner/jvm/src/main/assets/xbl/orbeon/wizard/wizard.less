@@ -41,8 +41,9 @@
         .nav {
 
             & > li:first-of-type + li .btn-link {
-                border-top-left-radius: (@baseBorderRadius - @frBodyDecorationsBorderWidth);
-                border-top-right-radius: (@baseBorderRadius - @frBodyDecorationsBorderWidth);
+                // Should not appear in PDF, so calc is fine
+                border-top-left-radius : calc(var(--orbeon-body-decorations-border-radius) - @frBodyDecorationsBorderWidth);
+                border-top-right-radius: calc(var(--orbeon-body-decorations-border-radius) - @frBodyDecorationsBorderWidth);
             }
 
             ul, li {
@@ -193,7 +194,7 @@
 
             .nav {
                 & > li:first-of-type + li .btn-link {
-                    border-top-right-radius: @baseBorderRadius;
+                    border-top-right-radius: var(--orbeon-body-decorations-border-radius);
                 }
             }
         }

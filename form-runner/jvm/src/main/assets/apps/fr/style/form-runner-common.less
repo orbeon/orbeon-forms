@@ -160,8 +160,8 @@
 }
 
 .fieldBorder() {
-    border-width: 1px;
-    border-style: solid;
+    border-width: var(--orbeon-control-border-width);
+    border-style: var(--orbeon-control-border-style);
     border-color: var(--orbeon-control-border-color);
 }
 
@@ -173,13 +173,14 @@
 
 .focusDecorations() {
     outline: 0;
-    box-shadow: 0 0 0 0.2rem var(--orbeon-focus-highlight-color);
+    box-shadow: var(--orbeon-control-focus-ring);
 }
 
 // Mixin to highlight form controls or groups upon keyboard focus
 .focusHighlight() {
     .fieldDecorations();
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    transition: border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                box-shadow   var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
 
     &:focus {
         border-color: var(--orbeon-focus-border-color);
@@ -189,7 +190,8 @@
 
 .focusHighlightGroup() {
     box-shadow: none;
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    transition: border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                box-shadow   var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
 
     &:focus {
         .focusDecorations();

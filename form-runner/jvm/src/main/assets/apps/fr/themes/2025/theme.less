@@ -15,8 +15,9 @@
 .orbeon {
 
   // General
-  --orbeon-base-background-color: white;
-  --orbeon-base-border-color    : #e3e3e3; // darken(@wellBackground, 7%);
+  --orbeon-base-background-color         : white;
+  --orbeon-base-border-color             : #e3e3e3;           // darken(@wellBackground, 7%);
+  --orbeon-body-decorations-border-radius: @baseBorderRadius; // bordered containers: view, TOC, repeat grid
 
   // Base font
   --orbeon-base-font-size  : 13px;
@@ -83,6 +84,9 @@
     --orbeon-control-border-color            : #949494;
   }
   --orbeon-control-border-radius             : @inputBorderRadius;
+  --orbeon-control-border-width              : 1px;
+  --orbeon-control-border-style              : solid;
+  --orbeon-control-padding                   : 4px 6px;  // Bootstrap 2 default
 
   // Specific controls
   --orbeon-add-on-color                                    : var(--orbeon-base-color);
@@ -92,6 +96,8 @@
   --orbeon-add-on-gap                                      : -1px;  // -1px = fused
   --orbeon-add-on-inner-border-radius                      : 0;
   --orbeon-attachment-drop-color                           : @minGrayText;
+  --orbeon-attachment-drop-border-style                    : dashed;
+  --orbeon-attachment-empty-border-style                   : solid;
   --orbeon-attachment-dragover-color                       : white;
   --orbeon-attachment-dragover-background-color            : #ccc;
   --orbeon-dropdown-caret-color                            : var(--orbeon-button-color);
@@ -115,13 +121,21 @@
   // Focus
   --orbeon-focus-border-color   : #3396ff; // Blueish
   --orbeon-focus-highlight-color: rgba(0,123,255,.25);
+  --orbeon-focus-ring           : 0 0 0 0.2rem var(--orbeon-focus-highlight-color);
+  --orbeon-control-focus-ring   : var(--orbeon-focus-ring);
+
+  // Motion
+  --orbeon-transition-duration       : 0.15s;
+  --orbeon-transition-timing-function: ease-in-out;
 
   // Checkable controls (checkbox, radio)
+  --orbeon-checkable-background-color         : white;           // resting state (unchecked, enabled)
+  --orbeon-checkable-border-color             : rgba(0,0,0,.25); // resting state (unchecked, enabled)
   --orbeon-checkable-checked-background-color : var(--orbeon-button-primary-background-color);
   --orbeon-checkable-checked-border-color     : var(--orbeon-button-primary-background-color);
   --orbeon-checkable-disabled-background-color: white;           // master: same as the enabled fill
   --orbeon-checkable-disabled-border-color    : rgba(0,0,0,.25); // matches the base border color set on these inputs
-  --orbeon-checkable-focus-ring               : 0 0 0 0.2rem var(--orbeon-focus-highlight-color);
+  --orbeon-checkable-focus-ring               : var(--orbeon-focus-ring);
 
   // Buttons
   --orbeon-button-font-size                         : 1.00em; // button and .btn
@@ -129,7 +143,8 @@
   --orbeon-button-inner-border-radius               : 0;        // 0 = fused look
   --orbeon-button-padding                           : 4px 12px; // Bootstrap 2 default
   --orbeon-button-toggle-padding                    : 4px 8px;  // Bootstrap 2 default
-  --orbeon-button-focus-ring                        : 0 0 0 0.2rem var(--orbeon-focus-highlight-color);
+  --orbeon-button-compact-padding                   : 0 6px;    // for compact buttons (e.g. grid/repeater menu carets); Bootstrap 2 .btn-mini default
+  --orbeon-button-focus-ring                        : var(--orbeon-focus-ring);
   --orbeon-button-font-family                       : @frBaseFontFamily;
   --orbeon-button-font-weight                       : normal;
   --orbeon-button-color                             : var(--orbeon-base-color);
@@ -182,22 +197,32 @@
   --orbeon-dropdown-menu-selected-background-color: @btnPrimaryBackground;
   --orbeon-dropdown-menu-disabled-color           : #999;
   --orbeon-dropdown-menu-border-color             : rgba(0, 0, 0, 0.15);
+  --orbeon-dropdown-menu-border-width             : 1px;
   --orbeon-dropdown-menu-divider-color            : #e5e5e5;
+  --orbeon-dropdown-menu-item-padding             : 3px 20px;
 
   // Sections
-  --orbeon-section-title-font-size              : 1.38em;  // 18px
-  --orbeon-section-repetition-label-font-size   : 0.89em;  // 18px * 0.8 * 0.8
-  --orbeon-subsection-title-font-size           : 1.11em;  // 18px * 0.8
-  --orbeon-subsection-repetition-label-font-size: 0.89em;  // 18px * 0.8 * 0.8
+  --orbeon-section-title-font-size              : 1.38em;    // 18px
+  --orbeon-section-repetition-label-font-size   : 0.89em;    // 18px * 0.8 * 0.8
+  --orbeon-subsection-title-font-size           : 1.11em;    // 18px * 0.8
+  --orbeon-subsection-repetition-label-font-size: 0.89em;    // 18px * 0.8 * 0.8
   --orbeon-section-font-family                  : @frBaseFontFamily;
   --orbeon-section-font-weight                  : normal;
   --orbeon-section-color                        : #555;
-  --orbeon-section-background-color             : #eee;    // @grayLighter;
+  --orbeon-section-background-color             : #eee;      // @grayLighter;
+  --orbeon-section-border-radius                : @baseBorderRadius;
+  --orbeon-section-gap                          : 20px;      // between consecutive sections
+  --orbeon-section-content-padding              : 10px 16px; // 16px = @frSectionTitleLeftPadding - @frGridCellPadding (LESS computation not possible here)
+  --orbeon-section-iteration-title-padding      : 0 0 0 10px;
   --orbeon-repeater-add-button-font-size        : 1.00em;
   --orbeon-repeater-add-button-font-family      : var(--orbeon-base-font-family);
   --orbeon-repeater-add-button-font-weight      : var(--orbeon-base-font-weight);
   --orbeon-repeater-add-button-color            : var(--orbeon-base-color);
-  --orbeon-repeat-menu-background-color         : #f5f5f5; // @wellBackground
+  --orbeon-repeat-menu-background-color         : #f5f5f5;   // @wellBackground
+  --orbeon-repeat-border-width                  : 1px;       // full-appearance row/column dividers
+  --orbeon-repeat-border-style                  : solid;
+  --orbeon-repeat-separator-width               : 2px;       // minimal-appearance row separator
+  --orbeon-repeat-separator-style               : solid;
 
   // Grids
   --orbeon-grid-label-margin                   : 2px 0 @frGridCellPadding 0;
@@ -234,6 +259,12 @@
   --orbeon-table-striped-background-color: #f9f9f9;
   --orbeon-table-hover-background-color  : #ededed;
   --orbeon-table-border-color            : #ddd;
+
+  // Tabs
+  --orbeon-tab-background-color: white;
+  --orbeon-tab-border-color    : #ddd;
+  --orbeon-tab-border-width    : 1px;
+  --orbeon-tab-padding         : 10px;
 
   // Search
   --orbeon-search-free-input-read-only-background-color: #e8e8e8; // darken(@wellBackground, 5%);
@@ -274,7 +305,7 @@
   --orbeon-form-description-font-weight     : var(--orbeon-base-font-weight);
 
   // Alerts
-  --orbeon-active-alert-font-size        : 1em; // TODO: overridden by "inherit" when visited => useless?
+  --orbeon-active-alert-font-size        : 1em;
   --orbeon-active-alert-font-family      : sans-serif;
   --orbeon-active-alert-font-weight      : var(--orbeon-base-font-weight);
   --orbeon-active-alert-color            : white;
@@ -282,6 +313,7 @@
   --orbeon-active-alert-margin-top       : 10px;
   --orbeon-active-alert-border-radius    : 5px;
   --orbeon-active-alert-border-width     : 1px;
+  --orbeon-active-alert-border-style     : solid;
   --orbeon-active-alert-pointer-display  : block;
   --orbeon-invalid-alert-background-color: var(--orbeon-error-color);
   --orbeon-invalid-alert-border-color    : var(--orbeon-error-color);
@@ -311,6 +343,7 @@
   --orbeon-error-summary-title-color              : white;
   --orbeon-error-summary-title-bottom-border-color: #e5e5e5;
   --orbeon-error-summary-item-background-color    : white;
+  --orbeon-error-summary-border-radius            : @baseBorderRadius;
   --orbeon-info-color                             : @info;
   --orbeon-warning-color                          : @warning;
   --orbeon-error-color                            : @error;
@@ -508,6 +541,8 @@
     --orbeon-table-striped-background-color                  : @gray-16;
     --orbeon-table-hover-background-color                    : @gray-20;
     --orbeon-table-border-color                              : @gray-27;
+    --orbeon-tab-background-color                            : @base-bg;
+    --orbeon-tab-border-color                                : @gray-27;
     --orbeon-search-free-input-read-only-background-color    : @gray-20;
     --orbeon-revision-history-pane-head-background-color     : @gray-16;
     --orbeon-revision-history-entry-background-color         : @gray-20;

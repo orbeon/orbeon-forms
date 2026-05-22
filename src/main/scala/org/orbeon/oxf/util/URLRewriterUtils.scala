@@ -21,6 +21,7 @@ import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.servlet.OrbeonXFormsFilterImpl
 import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.PathUtils.*
 
 import java.net.URI
 import java.util
@@ -168,7 +169,7 @@ object URLRewriterUtils {
           port         = request.getServerPort,
           contextPath  = request.getClientContextPath(urlString),
           requestPath  = request.getRequestPath,
-          rawUrlString = versionOpt.map("/" + _).getOrElse("") + absoluteURINoContext,
+          rawUrlString = versionOpt.map(_.prependSlash).getOrElse("") + absoluteURINoContext,
           rewriteMode  = rewriteMode
         )
       }

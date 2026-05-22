@@ -114,7 +114,7 @@ trait FormRunnerEmail {
 
     def build(mode: String, documentId: Option[String], params: List[(String, String)] = Nil): String =
       recombineQuery(
-        pathQuery = s"$baseUrlNoSlash/fr/$app/$form/$mode${documentId map ("/" +) getOrElse ""}",
+        pathQuery = s"$baseUrlNoSlash/fr/$app/$form/$mode${documentId map (_.prependSlash) getOrElse ""}",
         params    = (frc.FormVersionParam -> version.toString) :: params
       )
 

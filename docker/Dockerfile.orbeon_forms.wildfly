@@ -1,4 +1,4 @@
-FROM quay.io/wildfly/wildfly:35.0.0.Final-jdk21
+FROM quay.io/wildfly/wildfly:39.0.1.Final-2-jdk21
 
 LABEL org.opencontainers.image.title="Orbeon Forms" \
       org.opencontainers.image.vendor="Orbeon, Inc." \

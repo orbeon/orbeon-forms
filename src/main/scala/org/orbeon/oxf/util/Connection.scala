@@ -389,9 +389,9 @@ object Connection extends ConnectionTrait {
         scheme == UriScheme.Http || scheme == UriScheme.Https
 
       val cookieStore =
-        loadState && isHttpOrHttps(UriScheme.withName(url.getScheme))  flatOption
-          ConnectionState.loadHttpState getOrElse
-          new BasicCookieStore
+        (loadState && isHttpOrHttps(UriScheme.withName(url.getScheme)))
+          .flatOption(ConnectionState.loadHttpState)
+          .getOrElse(new BasicCookieStore)
 
       (
         cookieStore,

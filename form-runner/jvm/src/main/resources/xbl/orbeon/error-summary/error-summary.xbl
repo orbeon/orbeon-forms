@@ -450,7 +450,7 @@
                                                                 concat(
                                                                     '&lt;span class=&quot;fr-error-number&quot;>', position(), '. &lt;/span>',
                                                                     '&lt;div class=&quot;fr-error-label&quot;>',
-                                                                    frf:removeOuterDiv(@label),
+                                                                    frf:removeOuterDiv(frf:removeAnchorTags(@label)),
                                                                     '&lt;/div>'
                                                                 )
                                                             else

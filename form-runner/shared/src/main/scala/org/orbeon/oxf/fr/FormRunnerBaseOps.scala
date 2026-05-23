@@ -720,6 +720,13 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
     )
 
   //@XPathFunction
+  def removeAnchorTags(html: String): String =
+    HtmlParsing.sanitizeHtmlString(
+      value           = html,
+      extraElemFilter = s => if (s == "a") ElemFilter.Remove else ElemFilter.Keep
+    )
+
+  //@XPathFunction
   def removeOuterDiv(html: String): String = {
     val sb = new java.lang.StringBuilder
 

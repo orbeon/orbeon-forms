@@ -37,9 +37,9 @@ case class SafeRequestContext(
 
   def findSessionOrThrow(create: Boolean): Option[ExternalContext.Session] =
     session match {
-      case some @ Some(_)    => some
-      case None if ! create  => None
-      case None              => throw new IllegalStateException("Session creation not supported")
+      case some @ Some(_)   => some
+      case None if ! create => None
+      case None             => throw new IllegalStateException("Session creation not supported")
     }
 }
 

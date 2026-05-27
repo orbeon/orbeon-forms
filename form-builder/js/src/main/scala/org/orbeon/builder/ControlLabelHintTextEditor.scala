@@ -14,14 +14,13 @@
 
 package org.orbeon.builder
 
-import autowire.*
 import cats.Eval
 import cats.implicits.catsSyntaxOptionId
 import enumeratum.*
 import enumeratum.EnumEntry.Lowercase
 import org.orbeon.builder.facade.*
 import org.orbeon.builder.facade.JQueryTooltip.*
-import org.orbeon.builder.rpc.{FormBuilderRpcApi, FormBuilderRpcClient}
+import org.orbeon.builder.rpc.FormBuilderRpcClient
 import org.orbeon.facades.TinyMce
 import org.orbeon.facades.TinyMce.{GlobalTinyMce, TinyMceConfig, TinyMceDefaultConfig, TinyMceEditor}
 import org.orbeon.fr.FormRunnerUtils
@@ -161,12 +160,12 @@ object ControlLabelHintTextEditor {
           val isHTML      = Private.isHTML
           val sanitized   = if (isHTML) HtmlParsing.sanitizeHtmlString(newRawValue) else newRawValue
 
-          FormBuilderRpcClient[FormBuilderRpcApi].controlUpdateLabelOrHintOrText(
+          FormBuilderRpcClient.api.controlUpdateLabelOrHintOrText(
             controlId = controlId,
             lhha      = Private.getEditorType.entryName,
             value     = sanitized,
             isHTML    = isHTML
-          ).call() // ignoring the `Future` completion
+          ) // ignoring the `Future` completion
 
           // Destroy tooltip, or it doesn't get recreated on `startEdit()`
           $(Private.checkboxInputElem).tooltip("destroy")

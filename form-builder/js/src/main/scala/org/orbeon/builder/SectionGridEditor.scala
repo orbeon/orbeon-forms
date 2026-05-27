@@ -13,10 +13,9 @@
  */
 package org.orbeon.builder
 
-import autowire.*
 import enumeratum.EnumEntry.Hyphencase
 import enumeratum.*
-import org.orbeon.builder.rpc.{FormBuilderRpcApi, FormBuilderRpcClient}
+import org.orbeon.builder.rpc.FormBuilderRpcClient
 import org.orbeon.datatypes.Direction
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -133,18 +132,18 @@ object SectionGridEditor {
         currentSectionGridOpt foreach { currentSectionGrid =>
 
           val sectionGridId = currentSectionGrid.el.id
-          val client        = FormBuilderRpcClient[FormBuilderRpcApi]
+          val client        = FormBuilderRpcClient.api
 
           editor match {
-            case ContainerMoveUp      => client.sectionMove         (sectionGridId, Direction.Up.entryName).call()
-            case ContainerMoveDown    => client.sectionMove         (sectionGridId, Direction.Down.entryName).call()
-            case ContainerMoveRight   => client.sectionMove         (sectionGridId, Direction.Right.entryName).call()
-            case ContainerMoveLeft    => client.sectionMove         (sectionGridId, Direction.Left.entryName).call()
-            case ContainerDelete      => client.containerDelete     (sectionGridId).call()
-            case ContainerEditDetails => client.containerEditDetails(sectionGridId).call()
-            case ContainerCopy        => client.containerCopy       (sectionGridId).call()
-            case ContainerCut         => client.containerCut        (sectionGridId).call()
-            case ContainerMerge       => client.containerMerge      (sectionGridId).call()
+            case ContainerMoveUp      => client.sectionMove         (sectionGridId, Direction.Up.entryName)
+            case ContainerMoveDown    => client.sectionMove         (sectionGridId, Direction.Down.entryName)
+            case ContainerMoveRight   => client.sectionMove         (sectionGridId, Direction.Right.entryName)
+            case ContainerMoveLeft    => client.sectionMove         (sectionGridId, Direction.Left.entryName)
+            case ContainerDelete      => client.containerDelete     (sectionGridId)
+            case ContainerEditDetails => client.containerEditDetails(sectionGridId)
+            case ContainerCopy        => client.containerCopy       (sectionGridId)
+            case ContainerCut         => client.containerCut        (sectionGridId)
+            case ContainerMerge       => client.containerMerge      (sectionGridId)
           }
         }
       }))

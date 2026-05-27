@@ -13,8 +13,7 @@
  */
 package org.orbeon.builder
 
-import autowire.*
-import org.orbeon.builder.rpc.{FormBuilderRpcApi, FormBuilderRpcClient}
+import org.orbeon.builder.rpc.FormBuilderRpcClient
 import org.orbeon.facades.{Dragula, DragulaOptions}
 import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
@@ -66,7 +65,7 @@ private object ControlDnD {
     // It seems Dragula calls `onDrop` even if the target doesn't accept a drop, but in that case `target` is `null`
     controlMoverCopier.onDrop((el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) =>
       if (target ne null)
-        FormBuilderRpcClient[FormBuilderRpcApi].controlDnD(el.id, target.id, el.hasClass(CopyClass)).call()
+        FormBuilderRpcClient.api.controlDnD(el.id, target.id, el.hasClass(CopyClass))
     )
 
     val controlInserter = Dragula(

@@ -30,8 +30,7 @@
         fb-test-offline-show-dialog
         fb-test-pdf-show-dialog
         fb-test-pdf-with-data
-        fb-rpc-request
-        xxforms-rpc-request"
+        fb-rpc-request"
     xxf:xpath-analysis="false"
     xxf:expose-xpath-types="true"
 
@@ -74,24 +73,7 @@
     <xf:instance id="fb-form-instance" xxf:index="id"><_/></xf:instance>
     <xf:instance id="fr-form-instance"><_/></xf:instance>
 
-    <!-- RPC request from the client -->
-    <xf:action
-        xmlns:router="java:org.orbeon.builder.rpc.Router"
-        ev:observer="#document"
-        event="xxforms-rpc-request"
-        type="javascript">
-        <xf:param
-            name="id"
-            value="event('id')"/>
-        <xf:param
-            name="response"
-            value="router:processRequest(event('id'), event('path'), event('args'))"/>
-        <xf:body>
-            ORBEON.builder.private.API.processRpcResponse(id, response);
-        </xf:body>
-    </xf:action>
-
-    <!-- New RPC entry point -->
+    <!-- RPC entry point -->
     <xf:action
         xmlns:router="java:org.orbeon.builder.rpc.SlothRouter"
         event="fb-rpc-request"

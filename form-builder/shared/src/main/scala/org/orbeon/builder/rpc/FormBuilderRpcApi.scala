@@ -15,32 +15,35 @@ package org.orbeon.builder.rpc
 
 import org.orbeon.datatypes.Direction
 
+import scala.concurrent.Future
+
+
 trait FormBuilderRpcApi {
 
-  def unsupportedBrowser(browserName: String, browserVersion: Double): Unit
+  def unsupportedBrowser(browserName: String, browserVersion: Double): Future[Unit]
 
-  def controlUpdateLabelOrHintOrText (controlId: String, lhha: String, value: String, isHTML: Boolean): Unit
+  def controlUpdateLabelOrHintOrText (controlId: String, lhha: String, value: String, isHTML: Boolean): Future[Unit]
 
-  def controlDelete       (controlId: String): Unit
-  def controlEditDetails  (controlId: String): Unit
-  def controlEditItems    (controlId: String): Unit
-  def controlDnD          (controlId: String, destCellId: String, copy: Boolean): Unit
+  def controlDelete       (controlId: String): Future[Unit]
+  def controlEditDetails  (controlId: String): Future[Unit]
+  def controlEditItems    (controlId: String): Future[Unit]
+  def controlDnD          (controlId: String, destCellId: String, copy: Boolean): Future[Unit]
 
-  def rowInsert           (controlId: String, position: Int, aboveBelowString: String): Unit // TODO: `AboveBelow` doesn't serialize correctly with Circe.
-  def rowDelete           (controlId: String, position: Int): Unit
+  def rowInsert           (controlId: String, position: Int, aboveBelowString: String): Future[Unit]
+  def rowDelete           (controlId: String, position: Int): Future[Unit]
 
-  def moveWall            (cellId: String, startSide: Direction, target: Int): Unit
-  def splitY              (cellId: String): Unit
-  def mergeRight          (cellId: String): Unit
-  def mergeDown           (cellId: String): Unit
-  def splitX              (cellId: String): Unit
+  def moveWall            (cellId: String, startSide: Direction, target: Int): Future[Unit]
+  def splitY              (cellId: String): Future[Unit]
+  def mergeRight          (cellId: String): Future[Unit]
+  def mergeDown           (cellId: String): Future[Unit]
+  def splitX              (cellId: String): Future[Unit]
 
-  def sectionUpdateLabel  (sectionId: String, label: String): Unit
-  def sectionMove         (sectionId: String, directionString: String): Unit // TODO: `Direction` doesn't serialize correctly with Circe.
+  def sectionUpdateLabel  (sectionId: String, label: String): Future[Unit]
+  def sectionMove         (sectionId: String, directionString: String): Future[Unit]
 
-  def containerDelete     (containerId: String): Unit
-  def containerEditDetails(containerId: String): Unit
-  def containerCopy       (containerId: String): Unit
-  def containerCut        (containerId: String): Unit
-  def containerMerge      (containerId: String): Unit
+  def containerDelete     (containerId: String): Future[Unit]
+  def containerEditDetails(containerId: String): Future[Unit]
+  def containerCopy       (containerId: String): Future[Unit]
+  def containerCut        (containerId: String): Future[Unit]
+  def containerMerge      (containerId: String): Future[Unit]
 }

@@ -12,6 +12,8 @@ import org.orbeon.oxf.util.CoreCrossPlatformSupport.executionContext
 
 
 object SlothRouter extends SlothRouterBase {
-  override val ResponseEventName: String                 = "fb-rpc-response"
-  override protected val router : RouterCo[Json, Future] = ???
+  override val ResponseEventName: String = "fb-rpc-response"
+  override protected val router: RouterCo[Json, Future] =
+    Router[Json, Future]
+      .route[FormBuilderRpcApi](FormBuilderRpcApiImpl)
 }

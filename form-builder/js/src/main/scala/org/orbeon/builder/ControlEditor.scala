@@ -13,9 +13,8 @@
  */
 package org.orbeon.builder
 
-import autowire.*
 import org.orbeon.builder.HtmlElementCell.*
-import org.orbeon.builder.rpc.{FormBuilderRpcApi, FormBuilderRpcClient}
+import org.orbeon.builder.rpc.FormBuilderRpcClient
 import org.orbeon.datatypes.Direction
 import org.orbeon.oxf.fr.{Cell, ControlOps}
 import org.scalajs.dom.html
@@ -31,10 +30,10 @@ import scala.util.chaining.*
 object ControlEditor {
 
   private val SplitMergeCssClassDirectionOps = List(
-    "fb-x-merge" -> Direction.Right -> ((cellId: String) => FormBuilderRpcClient[FormBuilderRpcApi].mergeRight(cellId).call()),
-    "fb-x-split" -> Direction.Left  -> ((cellId: String) => FormBuilderRpcClient[FormBuilderRpcApi].splitX    (cellId).call()),
-    "fb-y-merge" -> Direction.Down  -> ((cellId: String) => FormBuilderRpcClient[FormBuilderRpcApi].mergeDown (cellId).call()),
-    "fb-y-split" -> Direction.Up    -> ((cellId: String) => FormBuilderRpcClient[FormBuilderRpcApi].splitY    (cellId).call())
+    "fb-x-merge" -> Direction.Right -> ((cellId: String) => FormBuilderRpcClient.api.mergeRight(cellId)),
+    "fb-x-split" -> Direction.Left  -> ((cellId: String) => FormBuilderRpcClient.api.splitX    (cellId)),
+    "fb-y-merge" -> Direction.Down  -> ((cellId: String) => FormBuilderRpcClient.api.mergeDown (cellId)),
+    "fb-y-split" -> Direction.Up    -> ((cellId: String) => FormBuilderRpcClient.api.splitY    (cellId))
   )
 
   private val ControlActionNames             = List("delete", "edit-details", "edit-items")
@@ -165,9 +164,9 @@ object ControlEditor {
         val controlId = currentCell.el.childrenT.head.id
 
         actionName match {
-          case "delete"       => FormBuilderRpcClient[FormBuilderRpcApi].controlDelete     (controlId = controlId).call()
-          case "edit-details" => FormBuilderRpcClient[FormBuilderRpcApi].controlEditDetails(controlId = controlId).call()
-          case "edit-items"   => FormBuilderRpcClient[FormBuilderRpcApi].controlEditItems  (controlId = controlId).call()
+          case "delete"       => FormBuilderRpcClient.api.controlDelete     (controlId = controlId)
+          case "edit-details" => FormBuilderRpcClient.api.controlEditDetails(controlId = controlId)
+          case "edit-items"   => FormBuilderRpcClient.api.controlEditItems  (controlId = controlId)
         }
       }
     }))

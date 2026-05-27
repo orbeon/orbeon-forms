@@ -24,13 +24,15 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
 
+import scala.concurrent.Future
+
 
 object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   private val EditorIdPrefix   = "fb-lhh-editor-for-"
   private val EditorIdPrefixes = List(LHHA.Label.entryName, LHHA.Hint.entryName) map (EditorIdPrefix + _ + '-')
 
-  def unsupportedBrowser(browserName: String, browserVersion: Double): Unit = {
+  def unsupportedBrowser(browserName: String, browserVersion: Double): Future[Unit] = Future.successful {
     implicit val ctx = FormBuilderDocContext()
 
     val rootElem = ctx.userAgentInstance.toList map (_.rootElement)
@@ -39,7 +41,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     XFormsAPI.setvalue(rootElem child "is-supported-browser", false.toString)
   }
 
-  def controlUpdateLabelOrHintOrText(controlId: String, lhha: String, value: String, isHTML: Boolean): Unit = {
+  def controlUpdateLabelOrHintOrText(controlId: String, lhha: String, value: String, isHTML: Boolean): Future[Unit] = Future.successful {
 
     implicit val ctx = FormBuilderDocContext()
 
@@ -71,7 +73,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     }
   }
 
-  def controlDelete(controlId: String): Unit = {
+  def controlDelete(controlId: String): Future[Unit] = Future.successful {
     implicit val ctx = FormBuilderDocContext()
     resolveId(controlId) flatMap { controlElem =>
       FormBuilder.deleteControlWithinCell(controlElem.parentUnsafe, updateTemplates = true)
@@ -79,14 +81,15 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
       Undo.pushUserUndoAction
   }
 
-  def controlEditDetails(controlId: String): Unit =
+  def controlEditDetails(controlId: String): Future[Unit] = Future.successful {
     XFormsAPI.dispatch(
       name       = "fb-show-dialog",
       targetId   = "dialog-control-settings",
       properties = Map("control-id" -> Some(XFormsId.getStaticIdFromId(controlId)))
     )
+  }
 
-  def controlEditItems(controlId: String): Unit =
+  def controlEditItems(controlId: String): Future[Unit] = Future.successful {
     XFormsAPI.dispatch(
       name       = "fb-show-dialog",
       targetId   = "dialog-itemsets",
@@ -95,8 +98,9 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
         "control-effective-id" -> Some(controlId)
       )
     )
+  }
 
-  def controlDnD(controlId: String, destCellId: String, copy: Boolean): Unit = {
+  def controlDnD(controlId: String, destCellId: String, copy: Boolean): Future[Unit] = Future.successful {
 
     implicit val ctx              = FormBuilderDocContext()
     implicit val formRunnerParams = FormRunnerParams()
@@ -107,7 +111,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     ToolboxOps.dndControl(sourceCellElem, targetCellElem, copy) foreach Undo.pushUserUndoAction
   }
 
-  def rowInsert(controlId: String, position: Int, aboveBelowString: String): Unit = {
+  def rowInsert(controlId: String, position: Int, aboveBelowString: String): Future[Unit] = Future.successful {
     implicit val ctx = FormBuilderDocContext()
 
     val (_, undoAction) =
@@ -119,38 +123,38 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     undoAction foreach Undo.pushUserUndoAction
   }
 
-  def rowDelete(controlId: String, position: Int): Unit = {
+  def rowDelete(controlId: String, position: Int): Future[Unit] = Future.successful {
     implicit val ctx = FormBuilderDocContext()
     if (FormBuilder.canDeleteRow(controlId, position - 1))
       FormBuilder.rowDelete(controlId, position - 1) foreach Undo.pushUserUndoAction
   }
 
-  def moveWall(cellId: String, startSide: Direction, target: Int): Unit = {
+  def moveWall(cellId: String, startSide: Direction, target: Int): Future[Unit] = Future.successful {
     implicit val ctx = FormBuilderDocContext()
     FormBuilder.moveWall(resolveId(cellId).get, startSide, target) foreach Undo.pushUserUndoAction
   }
 
-  def mergeRight(cellId: String): Unit = {
+  def mergeRight(cellId: String): Future[Unit] = Future.successful {
     implicit val ctx = FormBuilderDocContext()
     FormBuilder.merge(resolveId(cellId).get, Direction.Right) foreach Undo.pushUserUndoAction
   }
 
-  def mergeDown(cellId: String): Unit = {
+  def mergeDown(cellId: String): Future[Unit] = Future.successful {
     implicit val ctx = FormBuilderDocContext()
     FormBuilder.merge(resolveId(cellId).get, Direction.Down) foreach Undo.pushUserUndoAction
   }
 
-  def splitX(cellId: String): Unit = {
+  def splitX(cellId: String): Future[Unit] = Future.successful {
     implicit val ctx = FormBuilderDocContext()
     FormBuilder.split(resolveId(cellId).get, Direction.Left, None) foreach Undo.pushUserUndoAction
   }
 
-  def splitY(cellId: String): Unit = {
+  def splitY(cellId: String): Future[Unit] = Future.successful {
     implicit val ctx = FormBuilderDocContext()
     FormBuilder.split(resolveId(cellId).get, Direction.Up, None) foreach Undo.pushUserUndoAction
   }
 
-  def sectionUpdateLabel(sectionId: String, label: String): Unit = {
+  def sectionUpdateLabel(sectionId: String, label: String): Future[Unit] = Future.successful {
     val controlName = FormRunner.controlNameFromId(sectionId)
     val lhht        = LHHA.Label.entryName
     FormBuilderXPathApi.settingControlLabelHintHelpOrText(controlName, lhht, forceOptional = true) { implicit ctx: FormBuilderDocContext =>
@@ -164,14 +168,15 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     }
   }
 
-  def containerEditDetails(containerId: String): Unit =
+  def containerEditDetails(containerId: String): Future[Unit] = Future.successful {
     XFormsAPI.dispatch(
       name       = "fb-show-dialog",
       targetId   = "dialog-container-settings",
       properties = Map("container" -> Some(FormBuilder.containerById(containerId)(FormBuilderDocContext())))
     )
+  }
 
-  def sectionMove(sectionId: String, directionString: String): Unit = {
+  def sectionMove(sectionId: String, directionString: String): Future[Unit] = Future.successful {
 
     implicit val ctx = FormBuilderDocContext()
 
@@ -182,7 +187,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
       Undo.pushUserUndoAction
   }
 
-  def containerDelete(containerId: String): Unit = {
+  def containerDelete(containerId: String): Future[Unit] = Future.successful {
     implicit val ctx = FormBuilderDocContext()
     containerDeleteImpl(containerId)
   }
@@ -198,7 +203,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     undoAction foreach Undo.pushUserUndoAction
   }
 
-  def containerCopy(containerId: String): Unit = {
+  def containerCopy(containerId: String): Future[Unit] = Future.successful {
     implicit val ctx = FormBuilderDocContext()
     containerCopyImpl(containerId)
     frc.successMessage(frc.currentFormResources / "copy" / "label" stringValue)
@@ -207,7 +212,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   private def containerCopyImpl(containerId: String)(implicit ctx: FormBuilderDocContext): Unit =
     ToolboxOps.controlOrContainerElemToXcv(FormBuilder.containerById(containerId)) foreach ToolboxOps.writeXcvToClipboard
 
-  def containerCut(containerId: String): Unit = {
+  def containerCut(containerId: String): Future[Unit] = Future.successful {
 
     implicit val ctx = FormBuilderDocContext()
 
@@ -220,7 +225,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     }
   }
 
-  def containerMerge(containerId: String): Unit = {
+  def containerMerge(containerId: String): Future[Unit] = Future.successful {
     implicit val ctx = FormBuilderDocContext()
     XFormsAPI.dispatch(
       name       = "fb-show-dialog",

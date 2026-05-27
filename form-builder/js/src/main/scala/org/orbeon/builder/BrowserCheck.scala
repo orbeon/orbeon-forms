@@ -13,8 +13,7 @@
   */
 package org.orbeon.builder
 
-import autowire.*
-import org.orbeon.builder.rpc.{FormBuilderRpcApi, FormBuilderRpcClient}
+import org.orbeon.builder.rpc.FormBuilderRpcClient
 import org.orbeon.facades.Bowser
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
@@ -28,7 +27,7 @@ object BrowserCheck {
     // If we don't delay, `Globals.ns` doesn't appear to be initialized. This is not ideal and the initialization order should be fixed.
     if (Bowser.msie.contains(true) || Bowser.msedge.contains(true) && Bowser.version.toDouble < BrowserVersion.MinimalEdgeVersion)
       timers.setTimeout(100.millis) {
-        FormBuilderRpcClient[FormBuilderRpcApi].unsupportedBrowser(Bowser.name, Bowser.version.toDouble).call()
+        FormBuilderRpcClient.api.unsupportedBrowser(Bowser.name, Bowser.version.toDouble)
       }
   }
 }

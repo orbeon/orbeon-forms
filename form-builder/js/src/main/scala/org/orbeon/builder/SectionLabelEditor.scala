@@ -13,8 +13,7 @@
  */
 package org.orbeon.builder
 
-import autowire.*
-import org.orbeon.builder.rpc.{FormBuilderRpcApi, FormBuilderRpcClient}
+import org.orbeon.builder.rpc.FormBuilderRpcClient
 import org.orbeon.fr.FormRunnerUtils
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
@@ -84,7 +83,7 @@ object SectionLabelEditor {
 
       section.el.querySelectorT(SectionLabelSelector).textContent = newLabelValue
 
-      FormBuilderRpcClient[FormBuilderRpcApi].sectionUpdateLabel(sectionId, newLabelValue).call()
+      FormBuilderRpcClient.api.sectionUpdateLabel(sectionId, newLabelValue)
 
       labelInputOpt.get.hide()
     }

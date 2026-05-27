@@ -1040,8 +1040,9 @@ lazy val formBuilderJS = formBuilder.js
     jsDependencies += "org.webjars" % "jquery" % "3.6.1" / "jquery.js",
 
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom"  % ScalaJsDomVersion,
-      "io.udash"     %%% "udash-jquery" % ScalaJsJQueryVersion
+      "com.github.cornerman" %%% "sloth"        % SlothVersion,
+      "org.scala-js"         %%% "scalajs-dom"  % ScalaJsDomVersion,
+      "io.udash"             %%% "udash-jquery" % ScalaJsJQueryVersion
     ),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(

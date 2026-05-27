@@ -17,6 +17,7 @@ import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.{AjaxClient, AjaxEvent, CallbackList, Support}
 import org.scalajs.dom
 import org.scalajs.dom.html
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 
 import scala.annotation.unused
 import scala.scalajs.js
@@ -51,7 +52,9 @@ object FormBuilderPrivateAPI extends js.Object {
         .head
 
     // Clone the iframe node so that nested event handlers like `onbeforeunload` are removed
-    oldIframe.parentNode.replaceChild(oldIframe.cloneNodeT(false), oldIframe)
+    val newIframe = oldIframe.cloneNodeT(false).asInstanceOf[html.IFrame]
+    oldIframe.parentNode.replaceChild(newIframe, oldIframe)
+    newIframe.addEventListener("load", (_: dom.Event) => installTestIframeEscapeHandler(newIframe))
 
     // Dispatch the event requested
     AjaxClient.fireEvent(
@@ -78,5 +81,22 @@ object FormBuilderPrivateAPI extends js.Object {
       mainElem      <- dom.document.querySelectorOpt(".fb-main")
     } locally {
       moveIntoViewIfNeeded(mainElem, mainInnerElem, selectedElem, margin = 50)
+    }
+
+  private def installTestIframeEscapeHandler(iframe: html.IFrame): Unit =
+    Option(iframe.contentDocument.asInstanceOf[html.Document]).foreach { iframeDocument =>
+      iframeDocument.addEventListener("keydown", (event: dom.KeyboardEvent) => {
+        if (
+          event.key == "Escape"                                   &&
+          ! event.defaultPrevented                                &&
+          iframeDocument.querySelectorOpt("dialog[open]").isEmpty
+        ) {
+          event.preventDefault()
+          AjaxClient.fireEvent(AjaxEvent(eventName = "xxforms-dialog-close", targetId = "fb-test-dialog"))
+          AjaxClient.allEventsProcessedF("testIframeEscapeHandler").foreach { _ =>
+            dom.document.querySelectorOpt(".fr-test-button").foreach(_.focus())
+          }
+        }
+      })
     }
 }

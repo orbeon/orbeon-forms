@@ -1,6 +1,7 @@
 package org.orbeon.fr.rpc
 
 import cats.syntax.option.*
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.runtime
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
@@ -13,7 +14,7 @@ import scala.concurrent.Future
 
 object FormRunnerRpcApiImpl extends FormRunnerRpcApi {
 
-  import Router.logger
+  private implicit def logger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("rpc")
 
   def retrieveResource(clientId: String): Future[Option[URI]] = {
 

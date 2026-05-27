@@ -1,7 +1,6 @@
 package org.orbeon.xbl
 
-import autowire.*
-import org.orbeon.fr.rpc.{FormRunnerRpcApi, FormRunnerRpcClient}
+import org.orbeon.fr.rpc.FormRunnerRpcClient
 import org.orbeon.xforms.Constants.DummyImageUri
 import org.orbeon.xforms.{Page, XFormsApp}
 import org.orbeon.xforms.XFormsXbl
@@ -26,9 +25,8 @@ object ImageAttachment {
     override def init(): Unit =
       if (XFormsApp.isBrowserEnvironment)
         if (imageElOpt.exists(_.src.contains(DummyImageUri)))
-          FormRunnerRpcClient[FormRunnerRpcApi]
+          FormRunnerRpcClient.api
             .retrieveResource(getXFormsFormOrThrow.deNamespaceIdIfNeeded(containerElem.id))
-            .call()
             .foreach { urlOpt =>
               urlOpt.foreach { url =>
                 imageElOpt.foreach { img =>

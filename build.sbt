@@ -61,7 +61,6 @@ val ScalaXmlVersion                  = "2.4.0"
 val ScalaParallelCollectionsVersion  = "1.2.0"
 val ScalaAsyncVersion                = "1.0.1"
 val Parboiled2Version                = "2.5.1"
-val AutowireVersion                  = "0.3.3"
 val SlothVersion                     = "0.8.0"
 val ScalatagsVersion                 = "0.13.1"
 val SbinaryVersion                   = "0.5.1"
@@ -985,9 +984,10 @@ lazy val formRunnerWeb = (project in file("form-runner-web"))
   .settings(
 
     libraryDependencies            ++= Seq(
-      "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
-      "io.udash"               %%% "udash-jquery"    % ScalaJsJQueryVersion,
-      "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion
+      "com.github.cornerman" %%% "sloth"           % SlothVersion,
+      "org.scala-js"         %%% "scalajs-dom"     % ScalaJsDomVersion,
+      "io.udash"             %%% "udash-jquery"    % ScalaJsJQueryVersion,
+      "org.scala-lang.modules" %%% "scala-xml"     % ScalaXmlVersion
     ),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
@@ -1063,8 +1063,6 @@ lazy val xforms = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
   .settings(
     name := "orbeon-xforms",
 
-    libraryDependencies += "com.lihaoyi" %%% "autowire"    % AutowireVersion,
-
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",
       "io.circe" %%% "circe-generic",
@@ -1128,7 +1126,6 @@ lazy val xformsClientServer = (crossProject(JVMPlatform, JSPlatform).crossType(C
   .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-xforms-client-server",
-    libraryDependencies += "com.lihaoyi" %%% "autowire"  % AutowireVersion,
     libraryDependencies += "com.lihaoyi" %%% "scalatags" % ScalatagsVersion,
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",
@@ -1159,7 +1156,6 @@ lazy val xformsCommon = (crossProject(JVMPlatform, JSPlatform).crossType(CrossTy
   .settings(
     name := "orbeon-xforms-common",
     libraryDependencies += "com.chuusai" %% "shapeless" % ShapelessVersion,
-    libraryDependencies += "com.lihaoyi" %%% "autowire" % AutowireVersion
   )
   .settings(
     libraryDependencies ++= Seq(
@@ -1249,7 +1245,6 @@ lazy val xformsRuntime = (crossProject(JVMPlatform, JSPlatform).crossType(CrossT
   .settings(
     name := "orbeon-xforms-runtime",
 
-    libraryDependencies += "com.lihaoyi"            %%% "autowire"  % AutowireVersion,
     libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % ScalaXmlVersion,
     libraryDependencies += "org.parboiled"          %%% "parboiled" % Parboiled2Version,
 
@@ -1304,7 +1299,6 @@ lazy val xformsWeb = (project in file("xforms-web"))
     name := "orbeon-xforms-web",
 
     libraryDependencies            ++= Seq(
-      "com.lihaoyi"            %%% "autowire"         % AutowireVersion,
       "com.lihaoyi"            %%% "scalatags"        % ScalatagsVersion,
       "org.scala-lang.modules" %%% "scala-xml"        % ScalaXmlVersion,
       "org.log4s"              %%% "log4s"            % Log4sVersion,

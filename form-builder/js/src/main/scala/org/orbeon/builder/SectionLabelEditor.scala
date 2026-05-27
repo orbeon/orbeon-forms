@@ -14,12 +14,11 @@
 package org.orbeon.builder
 
 import autowire.*
-import org.orbeon.builder.rpc.FormBuilderRpcApi
+import org.orbeon.builder.rpc.{FormBuilderRpcApi, FormBuilderRpcClient}
 import org.orbeon.fr.FormRunnerUtils
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
 import org.orbeon.web.{DomEventNames, DomSupport}
-import org.orbeon.xforms.rpc.RpcClient
 import org.orbeon.xforms.{AjaxClient, AjaxEvent, CallbackList, XFormsUI}
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -85,7 +84,7 @@ object SectionLabelEditor {
 
       section.el.querySelectorT(SectionLabelSelector).textContent = newLabelValue
 
-      RpcClient[FormBuilderRpcApi].sectionUpdateLabel(sectionId, newLabelValue).call()
+      FormBuilderRpcClient[FormBuilderRpcApi].sectionUpdateLabel(sectionId, newLabelValue).call()
 
       labelInputOpt.get.hide()
     }

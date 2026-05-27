@@ -21,7 +21,7 @@ import enumeratum.*
 import enumeratum.EnumEntry.Lowercase
 import org.orbeon.builder.facade.*
 import org.orbeon.builder.facade.JQueryTooltip.*
-import org.orbeon.builder.rpc.FormBuilderRpcApi
+import org.orbeon.builder.rpc.{FormBuilderRpcApi, FormBuilderRpcClient}
 import org.orbeon.facades.TinyMce
 import org.orbeon.facades.TinyMce.{GlobalTinyMce, TinyMceConfig, TinyMceDefaultConfig, TinyMceEditor}
 import org.orbeon.fr.FormRunnerUtils
@@ -30,7 +30,6 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
 import org.orbeon.web.{DomEventNames, DomSupport}
 import org.orbeon.xforms.*
-import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
 import org.scalajs.dom.{document, html}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -162,7 +161,7 @@ object ControlLabelHintTextEditor {
           val isHTML      = Private.isHTML
           val sanitized   = if (isHTML) HtmlParsing.sanitizeHtmlString(newRawValue) else newRawValue
 
-          RpcClient[FormBuilderRpcApi].controlUpdateLabelOrHintOrText(
+          FormBuilderRpcClient[FormBuilderRpcApi].controlUpdateLabelOrHintOrText(
             controlId = controlId,
             lhha      = Private.getEditorType.entryName,
             value     = sanitized,

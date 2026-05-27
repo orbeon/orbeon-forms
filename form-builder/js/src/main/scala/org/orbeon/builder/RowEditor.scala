@@ -16,10 +16,9 @@ package org.orbeon.builder
 import autowire.*
 import enumeratum.EnumEntry.Hyphencase
 import enumeratum.{Enum, EnumEntry}
-import org.orbeon.builder.rpc.FormBuilderRpcApi
+import org.orbeon.builder.rpc.{FormBuilderRpcApi, FormBuilderRpcClient}
 import org.orbeon.datatypes.{AboveBelow, Orientation}
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
 import org.orbeon.web.DomSupport.*
 import org.scalajs.dom
@@ -147,7 +146,7 @@ object RowEditor {
 
             val gridEl    = currentGridBody.el.closestT(BlockCache.GridSelector)
             val controlId = gridEl.id
-            val client    = RpcClient[FormBuilderRpcApi]
+            val client    = FormBuilderRpcClient[FormBuilderRpcApi]
 
             rowEditor match {
               case InsertAbove => client.rowInsert(controlId, currentRowPos, AboveBelow.Above.entryName).call()

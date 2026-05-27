@@ -15,11 +15,10 @@ package org.orbeon.builder
 
 import autowire.*
 import org.orbeon.builder.HtmlElementCell.*
-import org.orbeon.builder.rpc.FormBuilderRpcApi
+import org.orbeon.builder.rpc.{FormBuilderRpcApi, FormBuilderRpcClient}
 import org.orbeon.datatypes.{Direction, Orientation}
 import org.orbeon.facades.{Dragula, DragulaOptions}
 import org.orbeon.oxf.fr.{Cell, GridModel, WallPosition}
-import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -333,7 +332,7 @@ object GridWallDnD {
           startCellOpt.foreach { case StartCell(block, startSide, startIndex) =>
             val targetIndex  = dropTarget.dataset.get(DatasetIndexKey).get.toInt
             if (targetIndex != startIndex)
-              RpcClient[FormBuilderRpcApi].moveWall(block.el.id, startSide, targetIndex).call()
+              FormBuilderRpcClient[FormBuilderRpcApi].moveWall(block.el.id, startSide, targetIndex).call()
           }
         }
         startCellOpt = None

@@ -11,16 +11,12 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.xforms.rpc
+package org.orbeon.builder.rpc
 
 import org.orbeon.xforms.EventNames
+import org.orbeon.xforms.rpc.RpcClientTrait
 
-import scala.scalajs.js.annotation.JSExportTopLevel
 
-
-// TODO: move to Form Builder module
-// 2023-09-01: This is only used by Form Builder.
-@JSExportTopLevel("OrbeonRpcClient")
-object RpcClient extends RpcClientTrait {
+object FormBuilderRpcClient extends RpcClientTrait {
   val RpcEventName: String = EventNames.XXFormsRpcRequest
 }

@@ -13,6 +13,7 @@
   */
 package org.orbeon.builder
 
+import org.orbeon.builder.rpc.FormBuilderRpcClient
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.{AjaxClient, AjaxEvent, CallbackList, Support}
 import org.scalajs.dom
@@ -99,4 +100,6 @@ object FormBuilderPrivateAPI extends js.Object {
         }
       })
     }
+  def processRpcResponse(id: String, response: String): Unit =
+    FormBuilderRpcClient.processResponse(id, response)
 }

@@ -16,9 +16,8 @@ package org.orbeon.builder
 import autowire.*
 import enumeratum.EnumEntry.Hyphencase
 import enumeratum.*
-import org.orbeon.builder.rpc.FormBuilderRpcApi
+import org.orbeon.builder.rpc.{FormBuilderRpcApi, FormBuilderRpcClient}
 import org.orbeon.datatypes.Direction
-import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import org.orbeon.fr.FormRunnerUtils
@@ -134,7 +133,7 @@ object SectionGridEditor {
         currentSectionGridOpt foreach { currentSectionGrid =>
 
           val sectionGridId = currentSectionGrid.el.id
-          val client        = RpcClient[FormBuilderRpcApi]
+          val client        = FormBuilderRpcClient[FormBuilderRpcApi]
 
           editor match {
             case ContainerMoveUp      => client.sectionMove         (sectionGridId, Direction.Up.entryName).call()

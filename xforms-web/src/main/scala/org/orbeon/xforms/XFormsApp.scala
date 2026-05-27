@@ -49,9 +49,6 @@ object XFormsApp extends App {
     
     xformsDyn.InitSupport = js.Dynamic.global.OrbeonInitSupport
 
-    // Private API call from JavaScript
-    xformsDyn.RpcClient = js.Dynamic.global.OrbeonRpcClient // TODO: move to Form Builder module
-
     // Public API
     xformsDyn.XBL        = js.Dynamic.global.OrbeonXFormsXbl
     xformsDyn.AjaxClient = js.Dynamic.global.OrbeonAjaxClient

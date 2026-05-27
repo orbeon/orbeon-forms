@@ -279,7 +279,9 @@ object DomSupport {
     // Includes content + padding + border, should be similar to jQuery's `outerHeight()`
     def outerHeight: Double =
       elem.getBoundingClientRect().height
+  }
 
+  implicit class SameTypeDomElemOps[T <: dom.Element](private val elem: T) extends AnyVal {
     def cloneNodeT(deep: Boolean): T =
       elem.cloneNode(deep).asInstanceOf[T]
   }

@@ -52,7 +52,7 @@ object FormBuilderPrivateAPI extends js.Object {
         .head
 
     // Clone the iframe node so that nested event handlers like `onbeforeunload` are removed
-    val newIframe = oldIframe.cloneNodeT(false).asInstanceOf[html.IFrame]
+    val newIframe = oldIframe.cloneNodeT(false)
     oldIframe.parentNode.replaceChild(newIframe, oldIframe)
     newIframe.addEventListener("load", (_: dom.Event) => installTestIframeEscapeHandler(newIframe))
 

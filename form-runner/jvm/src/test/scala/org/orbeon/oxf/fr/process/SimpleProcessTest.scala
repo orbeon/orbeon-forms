@@ -180,6 +180,12 @@ extends DocumentTestBase
         assert(trace == interpreter.trace)
       }
     }
+
+    it("must resume a process with a condition containing double quotes") {
+      interpreter.runProcess("", """suspend then if('"reproduce" = "reproduce"') then a1 else a2""")
+      interpreter.runProcess("", "resume")
+      assert(interpreter.trace == "a1")
+    }
   }
 
   describe("Rendered format parameters selection") {

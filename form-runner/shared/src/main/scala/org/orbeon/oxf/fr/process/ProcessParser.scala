@@ -92,7 +92,10 @@ object ProcessParser {
     List(Combinator.Then, Combinator.Recover).map(c => c.name -> c).toMap
 
   private def quote(s: String): String =
-    "\"" + escapeJava(s) + "\""
+    if (s.contains("\"") && ! s.contains("'"))
+      "'" + s + "'"
+    else
+      "\"" + escapeJava(s) + "\""
 
   // XXX TODO
   def escapeJava(s: String): String =

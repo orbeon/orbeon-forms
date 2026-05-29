@@ -501,7 +501,8 @@ trait GridOps extends ContainerOps {
   def split(
     cellElem     : NodeInfo,
     direction    : Direction,
-    size         : Option[Int])(
+    size         : Option[Int]
+  )(
     implicit ctx : FormBuilderDocContext
   ): Option[UndoAction] =
     Cell.canChangeSize(cellElem).contains(direction) flatOption {
@@ -528,7 +529,8 @@ trait GridOps extends ContainerOps {
   def moveWall(
     cellElem     : NodeInfo,
     startSide    : Direction,
-    target       : Int)(
+    target       : Int
+  )(
     implicit ctx : FormBuilderDocContext
   ): Option[UndoAction] = {
     val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false, transpose = false)

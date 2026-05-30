@@ -28,7 +28,7 @@
     <xbl:binding id="fr-link-select1-binding" element="fr|link-select1" xxbl:mode="lhha binding value">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-                    <display-name lang="en">Link Selector</display-name>
+        <display-name lang="en">Link Selector</display-name>
         <display-name lang="fr">Sélection avec liens</display-name>
         <display-name lang="no">Lenkevelger</display-name>
         <display-name lang="ru">Выбор в виде ссылок</display-name>

@@ -149,7 +149,7 @@
 
                 <xh:div class="fr-xforms-inspector-title">Orbeon Forms XForms Inspector</xh:div>
 
-                <xf:trigger class="fr-xforms-inspector-button">
+                <xf:trigger id="inspector-toggle-trigger" class="fr-xforms-inspector-button">
                     <xf:label><xh:i class="fa fa-window-restore"/></xf:label>
                     <xf:action event="DOMActivate">
                         <!-- TODO: don't initialize models if initially closed, and make form controls non-relevant -->
@@ -192,6 +192,14 @@
                             xxbl:scope="inner"
                             name="fr-update-models"
                             targetid="inspector-model"/>
+                    </xf:action>
+
+                    <xf:action
+                        event="keydown"
+                        observer="#document"
+                        xxf:text="f12"
+                        xxf:modifiers="shift">
+                        <xf:dispatch xxbl:scope="inner" name="DOMActivate" targetid="inspector-toggle-trigger"/>
                     </xf:action>
                 </xf:group>
 

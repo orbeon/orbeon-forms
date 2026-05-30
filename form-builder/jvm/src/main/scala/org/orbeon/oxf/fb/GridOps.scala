@@ -29,6 +29,8 @@ import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.*
 
+import scala.util.Try
+
 
 /*
  * Form Builder: operations on grids.
@@ -425,6 +427,105 @@ trait GridOps extends ContainerOps {
         Some(currentCellNode)
     }
 
+  def ensureCellWithPositionAndSize(
+    gridElem: NodeInfo,
+    x       : Int,
+    y       : Int,
+    width   : Int,
+    height  : Int
+  )(implicit
+    ctx     : FormBuilderDocContext
+  ): Try[Cell[NodeInfo]] = Try {
+
+    val gridWidth = NodeInfoCellOps.maxGridWidth(gridElem)
+
+    // TODO: Would be good to have a configurable limit for grid height as well, and maybe total controls, etc.
+    if (x < 1 || y < 1 || width < 1 || height < 1 || x + width - 1 > gridWidth)
+      throw new IllegalArgumentException(s"Position x=$x, y=$y, width=$width, height=$height is out of bounds for grid width $gridWidth")
+
+    // Ensure the grid has enough rows for the requested y + height - 1
+    val targetRowCount = y + height - 1
+
+    var gridModel = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false, transpose = false)
+
+    def reanalizeGrid(): Unit =
+      gridModel = Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false, transpose = false)
+
+    while (gridModel.height < targetRowCount) {
+      FormBuilder.rowInsertBelow(gridElem, gridModel.height - 1)
+      reanalizeGrid()
+    }
+
+    val containsControl =
+      (x until x + width).exists { x =>
+        (y until y + height).exists { y =>
+          gridModel.cellAt(x, y).u.exists(_.hasChildElement)
+        }
+      }
+
+    if (containsControl)
+      throw new IllegalArgumentException(s"Position x=$x, y=$y, width=$width, height=$height overlaps with an existing control")
+
+    val startCellOrigin = Cell.selfCellOrOrigin(gridModel.cellAt(x, y))
+
+    if (startCellOrigin.x == x && startCellOrigin.y == y && startCellOrigin.w == width && startCellOrigin.h == height) {
+      // Cell exists and has right x/y/w/h
+      // Ok, just select cell
+      startCellOrigin
+    } else {
+      // Cell doesn't match so split and merge
+
+      val firstX = x
+      val firstY = y
+      val lastX = x + width - 1
+      val lastY = y + height - 1
+
+      // Create splits along borders and inside
+      // We do the inside as well, otherwise we can have trouble merging the cells
+      for (y <- firstY to lastY) {
+        for (x <- firstX to lastX) {
+          var originCell: Cell[NodeInfo] = Cell.selfCellOrOrigin(gridModel.cellAt(x, y))
+          if (originCell.y != y) {
+            assert(originCell.y < y)
+            split(originCell.td, Direction.Up, Some(y - originCell.y))
+            reanalizeGrid()
+            originCell = Cell.selfCellOrOrigin(gridModel.cellAt(x, y))
+          }
+          if (originCell.lastY != y) {
+            assert(originCell.lastY > y)
+            split(originCell.td, Direction.Up, Some(1))
+            reanalizeGrid()
+            originCell = Cell.selfCellOrOrigin(gridModel.cellAt(x, y))
+          }
+          if (originCell.x != x) {
+            assert(originCell.x < x)
+            split(originCell.td, Direction.Left, Some(x - originCell.x))
+            reanalizeGrid()
+            originCell = Cell.selfCellOrOrigin(gridModel.cellAt(x, y))
+          }
+          if (originCell.lastX != x) {
+            assert(originCell.lastX > x)
+            split(originCell.td, Direction.Left, Some(1))
+            reanalizeGrid()
+          }
+        }
+      }
+
+      // Merge inside area
+      for (y <- firstY to lastY) {
+        val originCell = Cell.selfCellOrOrigin(gridModel.cellAt(firstX, y))
+        (1 until width).foreach { _ =>
+          merge(originCell.td, Direction.Right)
+        }
+      }
+      val originCell = Cell.selfCellOrOrigin(gridModel.cellAt(firstX, firstY))
+      (1 until height).foreach { _ =>
+        merge(originCell.td, Direction.Down)
+      }
+      originCell
+    }
+  }
+
   // @min/@max can be simple AVTs, i.e. AVTs which cover the whole attribute, e.g. "{my-min}"
   // The main reason to do this instead of making @min/@max plain XPath expressions is that @max also supports the
   // literal "none" (and "unbounded" for backward compatibility).
@@ -468,9 +569,10 @@ trait GridOps extends ContainerOps {
   }
 
   def merge(
-    cellElem     : NodeInfo,
-    direction    : Direction)(
-    implicit ctx : FormBuilderDocContext
+    cellElem    : NodeInfo,
+    direction   : Direction
+  )(
+    implicit ctx: FormBuilderDocContext
   ): Option[UndoAction] =
     Cell.canChangeSize(cellElem).contains(direction) flatOption {
       val cells = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false, transpose = false)
@@ -499,11 +601,11 @@ trait GridOps extends ContainerOps {
     }
 
   def split(
-    cellElem     : NodeInfo,
-    direction    : Direction,
-    size         : Option[Int]
+    cellElem    : NodeInfo,
+    direction   : Direction,
+    size        : Option[Int]
   )(
-    implicit ctx : FormBuilderDocContext
+    implicit ctx: FormBuilderDocContext
   ): Option[UndoAction] =
     Cell.canChangeSize(cellElem).contains(direction) flatOption {
       val gridModel = Cell.analyze12ColumnGridAndFillHoles(getContainingGrid(cellElem) , simplify = false, transpose = false)

@@ -28,6 +28,9 @@ case class Cell[Underlying](u: Option[Underlying], origin: Option[Cell[Underlyin
 
   def td: Underlying = u.getOrElse(throw new NoSuchElementException)
   def missing: Boolean = origin.isDefined
+
+  def lastX: Int = x + w - 1
+  def lastY: Int = y + h - 1
 }
 
 case class GridModel[Underlying](cells: List[List[Cell[Underlying]]], maxGridWidth: Int) {

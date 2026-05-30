@@ -162,6 +162,9 @@
                                 instance('inspector-instance')/layout/string()
                             )
                         </xf:action>
+                        <xf:setfocus
+                            if="instance('inspector-instance')/layout = 'open'"
+                            control="inspector-content"/>
                     </xf:action>
                 </xf:trigger>
 
@@ -203,219 +206,223 @@
                     </xf:action>
                 </xf:group>
 
-                <!-- Function selection-->
-                <xh:div class="fr-xforms-inspector-function">
-                    <fr:link-select1 ref="instance('inspector-instance')/function" appearance="full">
-                        <xf:action event="xforms-value-changed">
-                            <xf:setvalue
-                                if=". = 'view-console'"
-                                ref="instance('inspector-instance')/shown-output"/>
-                        </xf:action>
-                        <xf:label>Mode</xf:label>
-                        <xf:item>
-                            <xf:label>View instance</xf:label>
-                            <xf:value>view-instance</xf:value>
-                        </xf:item>
-                        <xf:item>
-                            <xf:label>Evaluate XPath</xf:label>
-                            <xf:value>evaluate-xpath</xf:value>
-                        </xf:item>
-                        <xf:item>
-                            <xf:label>View Console</xf:label>
-                            <xf:value>view-console</xf:value>
-                        </xf:item>
-                    </fr:link-select1>
-                </xh:div>
+                <xf:group id="inspector-content">
 
-                <!-- Model / instance -->
-                <xh:div class="
-                        fr-xforms-inspector-model-instance
-                        fr-xforms-inspector-{if (instance('inspector-instance')/function = ('view-instance', 'evaluate-xpath')) then 'enabled' else 'disabled'}-function">
-                    <xf:group appearance="xxf:internal">
-                        <xf:dispatch event="xforms-value-changed" name="DOMActivate" targetid="inspector-xpath"/>
-                        <!-- Model -->
-                        <xf:var name="models" value="instance('inspector-itemset')/model"/>
-                        <xf:group ref=".[count($models) gt 1]" class="fr-xforms-inspector-model">
-                            <xf:switch xxf:xforms11-switch="true" caseref="xxf:open-dialogs() = 0"><!-- See https://github.com/orbeon/orbeon-forms/issues/7259 -->
-                                <xf:case id="model-case-search" value="true()">
-                                    <xf:select1 ref="instance('inspector-instance')/current-model" appearance="search">
-                                        <xf:label>Model</xf:label>
-                                        <xf:itemset ref="$models">
-                                            <xf:label ref="@id"/>
-                                            <xf:value ref="@id"/>
-                                        </xf:itemset>
-                                        <xf:action event="xforms-value-changed">
-                                            <xf:action type="xpath">
-                                                xxf:set-session-attribute(
-                                                    'fr-orbeon-form-runner-inspector-current-model',
-                                                    instance('inspector-instance')/current-model/string()
-                                                )
+                    <!-- Function selection-->
+                    <xh:div class="fr-xforms-inspector-function">
+                        <fr:link-select1 ref="instance('inspector-instance')/function" appearance="full">
+                            <xf:action event="xforms-value-changed">
+                                <xf:setvalue
+                                    if=". = 'view-console'"
+                                    ref="instance('inspector-instance')/shown-output"/>
+                            </xf:action>
+                            <xf:label>Mode</xf:label>
+                            <xf:item>
+                                <xf:label>View instance</xf:label>
+                                <xf:value>view-instance</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>Evaluate XPath</xf:label>
+                                <xf:value>evaluate-xpath</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>View Console</xf:label>
+                                <xf:value>view-console</xf:value>
+                            </xf:item>
+                        </fr:link-select1>
+                    </xh:div>
+
+                    <!-- Model / instance -->
+                    <xh:div class="
+                            fr-xforms-inspector-model-instance
+                            fr-xforms-inspector-{if (instance('inspector-instance')/function = ('view-instance', 'evaluate-xpath')) then 'enabled' else 'disabled'}-function">
+                        <xf:group appearance="xxf:internal">
+                            <xf:dispatch event="xforms-value-changed" name="DOMActivate" targetid="inspector-xpath"/>
+                            <!-- Model -->
+                            <xf:var name="models" value="instance('inspector-itemset')/model"/>
+                            <xf:group ref=".[count($models) gt 1]" class="fr-xforms-inspector-model">
+                                <xf:switch xxf:xforms11-switch="true" caseref="xxf:open-dialogs() = 0"><!-- See https://github.com/orbeon/orbeon-forms/issues/7259 -->
+                                    <xf:case id="model-case-search" value="true()">
+                                        <xf:select1 ref="instance('inspector-instance')/current-model" appearance="search">
+                                            <xf:label>Model</xf:label>
+                                            <xf:itemset ref="$models">
+                                                <xf:label ref="@id"/>
+                                                <xf:value ref="@id"/>
+                                            </xf:itemset>
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:action type="xpath">
+                                                    xxf:set-session-attribute(
+                                                        'fr-orbeon-form-runner-inspector-current-model',
+                                                        instance('inspector-instance')/current-model/string()
+                                                    )
+                                                </xf:action>
+                                                <xf:setvalue ref="instance('inspector-instance')/current-instance"/>
                                             </xf:action>
-                                            <xf:setvalue ref="instance('inspector-instance')/current-instance"/>
-                                        </xf:action>
-                                    </xf:select1>
-                                </xf:case>
-                                <xf:case id="model-case-minimal" value="false()">
-                                    <xf:select1 ref="instance('inspector-instance')/current-model" appearance="minimal">
-                                        <xf:label>Model</xf:label>
-                                        <xf:itemset ref="$models">
-                                            <xf:label ref="@id"/>
-                                            <xf:value ref="@id"/>
-                                        </xf:itemset>
-                                        <xf:action event="xforms-value-changed">
-                                            <xf:action type="xpath">
-                                                xxf:set-session-attribute(
-                                                    'fr-orbeon-form-runner-inspector-current-model',
-                                                    instance('inspector-instance')/current-model/string()
-                                                )
+                                        </xf:select1>
+                                    </xf:case>
+                                    <xf:case id="model-case-minimal" value="false()">
+                                        <xf:select1 ref="instance('inspector-instance')/current-model" appearance="minimal">
+                                            <xf:label>Model</xf:label>
+                                            <xf:itemset ref="$models">
+                                                <xf:label ref="@id"/>
+                                                <xf:value ref="@id"/>
+                                            </xf:itemset>
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:action type="xpath">
+                                                    xxf:set-session-attribute(
+                                                        'fr-orbeon-form-runner-inspector-current-model',
+                                                        instance('inspector-instance')/current-model/string()
+                                                    )
+                                                </xf:action>
+                                                <xf:setvalue ref="instance('inspector-instance')/current-instance"/>
                                             </xf:action>
-                                            <xf:setvalue ref="instance('inspector-instance')/current-instance"/>
-                                        </xf:action>
-                                    </xf:select1>
-                                </xf:case>
-                            </xf:switch>
-                            <xf:trigger>
-                                <xf:label>Refresh</xf:label>
-                                <xf:dispatch
-                                    event="DOMActivate"
-                                    targetid="inspector-model"
-                                    name="fr-update-models"/>
+                                        </xf:select1>
+                                    </xf:case>
+                                </xf:switch>
+                                <xf:trigger>
+                                    <xf:label>Refresh</xf:label>
+                                    <xf:dispatch
+                                        event="DOMActivate"
+                                        targetid="inspector-model"
+                                        name="fr-update-models"/>
+                                </xf:trigger>
+                            </xf:group>
+                            <xf:group ref=".[count($models) = 1]" class="fr-xforms-inspector-model">
+                                <xf:output value="instance('inspector-instance')/current-model">
+                                    <xf:label>Model</xf:label>
+                                </xf:output>
+                            </xf:group>
+                            <!-- Instance -->
+                            <xf:group ref=".[count(instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance) gt 1]" class="fr-xforms-inspector-instance">
+                                <xf:switch xxf:xforms11-switch="true" caseref="xxf:open-dialogs() = 0"><!-- See https://github.com/orbeon/orbeon-forms/issues/7259 -->
+                                    <xf:case id="instance-case-search" value="true()">
+                                        <xf:select1 ref="instance('inspector-instance')/current-instance" appearance="search">
+                                            <xf:label>Instance</xf:label>
+                                            <xf:itemset ref="instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance">
+                                                <xf:label ref="@id"/>
+                                                <xf:value ref="@id"/>
+                                            </xf:itemset>
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:action type="xpath">
+                                                    xxf:set-session-attribute(
+                                                        'fr-orbeon-form-runner-inspector-current-instance',
+                                                        instance('inspector-instance')/current-instance/string()
+                                                    )
+                                                </xf:action>
+                                            </xf:action>
+                                        </xf:select1>
+                                    </xf:case>
+                                    <xf:case id="instance-case-minimal" value="false()">
+                                        <xf:select1 ref="instance('inspector-instance')/current-instance" appearance="minimal">
+                                            <xf:label>Instance</xf:label>
+                                            <xf:itemset ref="instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance">
+                                                <xf:label ref="@id"/>
+                                                <xf:value ref="@id"/>
+                                            </xf:itemset>
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:action type="xpath">
+                                                    xxf:set-session-attribute(
+                                                        'fr-orbeon-form-runner-inspector-current-instance',
+                                                        instance('inspector-instance')/current-instance/string()
+                                                    )
+                                                </xf:action>
+                                            </xf:action>
+                                        </xf:select1>
+                                    </xf:case>
+                                </xf:switch>
+                            </xf:group>
+                            <xf:group ref=".[count(instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance) = 1]" class="fr-xforms-inspector-instance">
+                                <xf:output value="instance('inspector-instance')/current-instance">
+                                    <xf:label>Instance</xf:label>
+                                </xf:output>
+                            </xf:group>
+                        </xf:group>
+                    </xh:div>
+
+                    <!-- Evaluate XPath -->
+                    <xh:div class="
+                            fr-xforms-inspector-xpath
+                            fr-xforms-inspector-{if (instance('inspector-instance')/function = 'evaluate-xpath') then 'enabled' else 'disabled'}-function">
+                        <xf:group ref="instance('inspector-instance')/xpath" appearance="xxf:internal">
+                            <!-- XPath expression and trigger -->
+                            <xf:action event="DOMActivate">
+                                <xf:delete ref="instance('inspector-instance')/xpath-output/node()"/>
+                                <xf:insert if="instance('inspector-instance')/xpath != ''"
+                                        context="instance('inspector-instance')/xpath-output"
+                                        origin="xxf:instance(instance('inspector-instance')/current-instance)/
+                                            xxf:evaluate(instance('inspector-instance')/xpath)"/>
+                            </xf:action>
+                            <xf:input ref="." id="inspector-xpath">
+                                <xf:label>XPath</xf:label>
+                            </xf:input>
+                            <xf:trigger ref=".">
+                                <xf:label>Evaluate</xf:label>
                             </xf:trigger>
                         </xf:group>
-                        <xf:group ref=".[count($models) = 1]" class="fr-xforms-inspector-model">
-                            <xf:output value="instance('inspector-instance')/current-model">
-                                <xf:label>Model</xf:label>
-                            </xf:output>
-                        </xf:group>
-                        <!-- Instance -->
-                        <xf:group ref=".[count(instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance) gt 1]" class="fr-xforms-inspector-instance">
-                            <xf:switch xxf:xforms11-switch="true" caseref="xxf:open-dialogs() = 0"><!-- See https://github.com/orbeon/orbeon-forms/issues/7259 -->
-                                <xf:case id="instance-case-search" value="true()">
-                                    <xf:select1 ref="instance('inspector-instance')/current-instance" appearance="search">
-                                        <xf:label>Instance</xf:label>
-                                        <xf:itemset ref="instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance">
-                                            <xf:label ref="@id"/>
-                                            <xf:value ref="@id"/>
-                                        </xf:itemset>
-                                        <xf:action event="xforms-value-changed">
-                                            <xf:action type="xpath">
-                                                xxf:set-session-attribute(
-                                                    'fr-orbeon-form-runner-inspector-current-instance',
-                                                    instance('inspector-instance')/current-instance/string()
-                                                )
-                                            </xf:action>
-                                        </xf:action>
-                                    </xf:select1>
-                                </xf:case>
-                                <xf:case id="instance-case-minimal" value="false()">
-                                    <xf:select1 ref="instance('inspector-instance')/current-instance" appearance="minimal">
-                                        <xf:label>Instance</xf:label>
-                                        <xf:itemset ref="instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance">
-                                            <xf:label ref="@id"/>
-                                            <xf:value ref="@id"/>
-                                        </xf:itemset>
-                                        <xf:action event="xforms-value-changed">
-                                            <xf:action type="xpath">
-                                                xxf:set-session-attribute(
-                                                    'fr-orbeon-form-runner-inspector-current-instance',
-                                                    instance('inspector-instance')/current-instance/string()
-                                                )
-                                            </xf:action>
-                                        </xf:action>
-                                    </xf:select1>
-                                </xf:case>
-                            </xf:switch>
-                        </xf:group>
-                        <xf:group ref=".[count(instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance) = 1]" class="fr-xforms-inspector-instance">
-                            <xf:output value="instance('inspector-instance')/current-instance">
-                                <xf:label>Instance</xf:label>
-                            </xf:output>
-                        </xf:group>
-                    </xf:group>
-                </xh:div>
-
-                <!-- Evaluate XPath -->
-                <xh:div class="
-                        fr-xforms-inspector-xpath
-                        fr-xforms-inspector-{if (instance('inspector-instance')/function = 'evaluate-xpath') then 'enabled' else 'disabled'}-function">
-                    <xf:group ref="instance('inspector-instance')/xpath" appearance="xxf:internal">
-                        <!-- XPath expression and trigger -->
-                        <xf:action event="DOMActivate">
-                            <xf:delete ref="instance('inspector-instance')/xpath-output/node()"/>
-                            <xf:insert if="instance('inspector-instance')/xpath != ''"
-                                    context="instance('inspector-instance')/xpath-output"
-                                    origin="xxf:instance(instance('inspector-instance')/current-instance)/
-                                        xxf:evaluate(instance('inspector-instance')/xpath)"/>
-                        </xf:action>
-                        <xf:input ref="." id="inspector-xpath">
-                            <xf:label>XPath</xf:label>
-                        </xf:input>
-                        <xf:trigger ref=".">
-                            <xf:label>Evaluate</xf:label>
-                        </xf:trigger>
-                    </xf:group>
-                </xh:div>
-
-                <!-- Input, only shown if user has an instance 'fr-xforms-inspector-input' -->
-                <xf:var name="external-input"><xxf:value value="xxf:instance('fr-xforms-inspector-input')" xxbl:scope="outer"/></xf:var>
-                <xf:var name="internal-input" value="instance('inspector-instance')/input"/>
-                <xf:group ref=".[exists($external-input)]">
-                    <xh:div class="fr-xforms-inspector-{if (instance('inspector-instance')/function = 'view-console') then 'enabled' else 'disabled'}-function">
-                        <xf:input ref="$internal-input" incremental="true">
-                            <xf:setvalue event="xforms-value-changed" ref="$external-input" value="$internal-input"/>
-                            <xf:label>Input:</xf:label>
-                        </xf:input>
                     </xh:div>
-                </xf:group>
 
-                <!-- Output -->
-                <xh:div class="fr-xforms-inspector-source" id="fr-xforms-inspector">
-                    <xf:group ref="instance('inspector-instance')" appearance="xxf:internal">
-                        <!-- We don't use a `calculate`, as it would only be executed if something in the current model changed -->
-                        <xf:var name="current-instance" value="xxf:instance(current-instance)"/>
-                        <!-- Store in `current-instance-clean` version of the current instance without blank text nodes, for better formatting -->
-                        <xf:var name="current-instance-xml" value="xxf:serialize($current-instance, 'xml')">
-                            <xf:action event="xforms-value-changed" context="instance('inspector-instance')/current-instance-clean">
-                                <xf:delete ref="*"/>
-                                <xf:insert context="." origin="$current-instance"/>
-                                <xf:delete ref=".//text()[xxf:is-blank()]"/>
-                            </xf:action>
-                        </xf:var>
-                        <xf:var name="shown-output" value="
-                                if (function = 'view-instance') then
-                                    if (mode = 'formatted')
-                                        then xxf:serialize(current-instance-clean/*, $xml-indent)
-                                        else xxf:serialize($current-instance, $xml-noindent)
-                                else if (function = 'evaluate-xpath') then
-                                    if (exists(xpath-output/*))
-                                        then string-join(
-                                            if (mode = 'formatted')
-                                                then xpath-output/*/xxf:serialize(., $xml-indent)
-                                                else xpath-output/*/xxf:serialize(., $xml-noindent)
-                                            , '&#x0a;')
-                                        else xpath-output
-                                else shown-output">
-                            <xf:setvalue event="xforms-enabled xforms-value-changed" ref="shown-output" value="$shown-output"/>
-                        </xf:var>
-                        <!-- Non-relevant when closed, as if it initializes when closed, when opened the content is initially empty until we click on it -->
-                        <fr:code-mirror ref="shown-output[instance('inspector-instance')/layout = 'open']"/>
+                    <!-- Input, only shown if user has an instance 'fr-xforms-inspector-input' -->
+                    <xf:var name="external-input"><xxf:value value="xxf:instance('fr-xforms-inspector-input')" xxbl:scope="outer"/></xf:var>
+                    <xf:var name="internal-input" value="instance('inspector-instance')/input"/>
+                    <xf:group ref=".[exists($external-input)]">
+                        <xh:div class="fr-xforms-inspector-{if (instance('inspector-instance')/function = 'view-console') then 'enabled' else 'disabled'}-function">
+                            <xf:input ref="$internal-input" incremental="true">
+                                <xf:setvalue event="xforms-value-changed" ref="$external-input" value="$internal-input"/>
+                                <xf:label>Input:</xf:label>
+                            </xf:input>
+                        </xh:div>
                     </xf:group>
-                </xh:div>
 
-                <!-- Mode for formatting -->
-                <xh:div class="fr-xforms-inspector-mode">
-                    <fr:link-select1 appearance="full" ref="instance('inspector-instance')/mode">
-                        <xf:label>Output</xf:label>
-                        <xf:item>
-                            <xf:label>Pretty</xf:label>
-                            <xf:value>formatted</xf:value>
-                        </xf:item>
-                        <xf:item>
-                            <xf:label>Plain</xf:label>
-                            <xf:value>plain</xf:value>
-                        </xf:item>
-                    </fr:link-select1>
-                </xh:div>
+                    <!-- Output -->
+                    <xh:div class="fr-xforms-inspector-source" id="fr-xforms-inspector">
+                        <xf:group ref="instance('inspector-instance')" appearance="xxf:internal">
+                            <!-- We don't use a `calculate`, as it would only be executed if something in the current model changed -->
+                            <xf:var name="current-instance" value="xxf:instance(current-instance)"/>
+                            <!-- Store in `current-instance-clean` version of the current instance without blank text nodes, for better formatting -->
+                            <xf:var name="current-instance-xml" value="xxf:serialize($current-instance, 'xml')">
+                                <xf:action event="xforms-value-changed" context="instance('inspector-instance')/current-instance-clean">
+                                    <xf:delete ref="*"/>
+                                    <xf:insert context="." origin="$current-instance"/>
+                                    <xf:delete ref=".//text()[xxf:is-blank()]"/>
+                                </xf:action>
+                            </xf:var>
+                            <xf:var name="shown-output" value="
+                                    if (function = 'view-instance') then
+                                        if (mode = 'formatted')
+                                            then xxf:serialize(current-instance-clean/*, $xml-indent)
+                                            else xxf:serialize($current-instance, $xml-noindent)
+                                    else if (function = 'evaluate-xpath') then
+                                        if (exists(xpath-output/*))
+                                            then string-join(
+                                                if (mode = 'formatted')
+                                                    then xpath-output/*/xxf:serialize(., $xml-indent)
+                                                    else xpath-output/*/xxf:serialize(., $xml-noindent)
+                                                , '&#x0a;')
+                                            else xpath-output
+                                    else shown-output">
+                                <xf:setvalue event="xforms-enabled xforms-value-changed" ref="shown-output" value="$shown-output"/>
+                            </xf:var>
+                            <!-- Non-relevant when closed, as if it initializes when closed, when opened the content is initially empty until we click on it -->
+                            <fr:code-mirror ref="shown-output[instance('inspector-instance')/layout = 'open']"/>
+                        </xf:group>
+                    </xh:div>
+
+                    <!-- Mode for formatting -->
+                    <xh:div class="fr-xforms-inspector-mode">
+                        <fr:link-select1 appearance="full" ref="instance('inspector-instance')/mode">
+                            <xf:label>Output</xf:label>
+                            <xf:item>
+                                <xf:label>Pretty</xf:label>
+                                <xf:value>formatted</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>Plain</xf:label>
+                                <xf:value>plain</xf:value>
+                            </xf:item>
+                        </fr:link-select1>
+                    </xh:div>
+
+                </xf:group>
             </xf:group>
         </xbl:template>
     </xbl:binding>

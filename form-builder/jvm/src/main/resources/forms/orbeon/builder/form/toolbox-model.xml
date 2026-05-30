@@ -26,9 +26,9 @@
     <!-- PRECONDITION: the form, whether in `fr-form-instance` or `fb-form-instance`, must have up to date app/form names -->
     <xf:action event="fb-load-toolbox-action">
 
-        <!-- Clear list of versions only -->
-        <xf:delete
-            ref="bind('fb-toolbox-libraries-bind')/*/*"/>
+        <!-- Clear list of versions and `document-id` -->
+        <xf:delete ref="bind('fb-toolbox-libraries-bind')/*/*"/>
+        <xf:delete ref="bind('fb-toolbox-libraries-bind')/*/@document-id"/>
 
         <!-- After this we are sure the form is up to date and de-annotated in `fr-form-instance` -->
         <xf:dispatch
@@ -57,6 +57,9 @@
                 <xf:property name="all-forms"                  value="true()"/>
                 <xf:property name="callback-id"                value="'fb-toolbox-model'"/>
             </xf:dispatch>
+            <xf:send submission="fb-toolbox-library-search-submission">
+                <xf:property name="app" value="." xxf:tunnel="true"/>
+            </xf:send>
         </xf:action>
 
         <xf:dispatch
@@ -197,6 +200,55 @@
             <xf:insert
                 ref="xxf:instance('fr-form-instance')"
                 origin="xf:element('_')"/>
+        </xf:action>
+
+    </xf:submission>
+
+    <xf:instance id="fb-toolbox-library-search-instance">
+        <search xmlns="" return-all-indexed-fields="true">
+            <query/>
+            <query name="application-name"
+                   path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/application-name"
+                   match="exact"/>
+            <query name="form-name"
+                   path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/form-name"
+                   match="exact">library</query>
+            <page-size>1</page-size>
+            <page-number>1</page-number>
+            <lang/>
+        </search>
+    </xf:instance>
+
+    <xf:submission
+        id="fb-toolbox-library-search-submission"
+        ref="instance('fb-toolbox-library-search-instance')"
+        validate="false"
+        method="post"
+        resource="/fr/service/persistence/search/orbeon/builder"
+        replace="none">
+
+        <xf:header>
+            <xf:name>Orbeon-Form-Definition-Version</xf:name>
+            <xf:value value="1"/>
+        </xf:header>
+
+        <xf:action event="xforms-submit">
+            <xf:setvalue
+                ref="query[@name = 'application-name']"
+                value="event('app')"/>
+        </xf:action>
+
+        <xf:action event="xforms-submit-done">
+            <xf:var
+                name="elem-name"
+                value="frf:elemNameForSectionTemplateApp(event('app'))"/>
+            <xf:var
+                name="document-id"
+                value="event('response-body')/*/document[1]/@name/string()"/>
+            <xf:insert
+                if="xxf:non-blank($document-id)"
+                context="bind('fb-toolbox-libraries-bind')/*[name() = $elem-name]"
+                origin="xf:attribute('document-id', $document-id)"/>
         </xf:action>
 
     </xf:submission>

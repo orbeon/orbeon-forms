@@ -149,6 +149,21 @@
             <label>Versión {0,number,integer}</label>
         </item>
     </library-version>
+    <library-empty>
+        <label>La biblioteca está vacía</label>
+    </library-empty>
+    <edit-library>
+        <label>Editar biblioteca</label>
+    </edit-library>
+    <create-library>
+        <label>Crear biblioteca</label>
+    </create-library>
+    <global-library>
+        <label>Biblioteca global</label>
+    </global-library>
+    <app-library>
+        <label>Biblioteca de la aplicación</label>
+    </app-library>
     <enter-section-title>
         <label>Hacer Click para ingresar el nombre de la Sección</label>
     </enter-section-title>

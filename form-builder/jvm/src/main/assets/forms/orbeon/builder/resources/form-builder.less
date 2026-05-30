@@ -521,12 +521,43 @@ body.orbeon {
                     min-inline-size: auto; // otherwise the `fieldset` overflows on the right
                 }
 
-                legend {
+                legend,
+                .fb-tools-title {
+                    display: block;
+                    width: 100%;
                     font-size: 11px;
                     margin-bottom: 4px;
                     line-height: 24px;
                     text-align: left;
                     font-weight: bold;
+                    border-bottom: 1px solid #e5e5e5;
+                }
+
+                .fb-tools-title {
+                    position: relative; // For positioning of the `.fb-library-link` icons
+                    padding-right: 24px;
+                    box-sizing: border-box;
+                }
+
+                .fb-library-link {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    width: 20px;
+                    text-align: center;
+                    color: @grayDark;
+
+                    &:hover {
+                        border-radius: @baseBorderRadius;
+                        #gradient > .vertical(@grayLighter, @grayLighter);
+                    }
+                }
+
+                .fb-library-empty {
+                    padding: 2px 4px;
+                    color: @grayLight;
+                    font-style: italic;
+                    font-size: 85%;
                 }
 
                 .fb-tool {

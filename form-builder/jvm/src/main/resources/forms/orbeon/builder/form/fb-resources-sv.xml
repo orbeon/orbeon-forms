@@ -169,6 +169,21 @@
             <label>Version {0,number,integer}</label>
         </item>
     </library-version>
+    <library-empty>
+        <label>Biblioteket är tomt</label>
+    </library-empty>
+    <edit-library>
+        <label>Redigera bibliotek</label>
+    </edit-library>
+    <create-library>
+        <label>Skapa bibliotek</label>
+    </create-library>
+    <global-library>
+        <label>Globalt bibliotek</label>
+    </global-library>
+    <app-library>
+        <label>Appbibliotek</label>
+    </app-library>
     <enter-section-title>
         <label>Klicka för att ange sektionens titel</label>
     </enter-section-title>

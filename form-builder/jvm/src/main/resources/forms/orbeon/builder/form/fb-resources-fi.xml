@@ -170,6 +170,21 @@
             <label>Versio {0,number,integer}</label>
         </item>
     </library-version>
+    <library-empty>
+        <label>Kirjasto on tyhjä</label>
+    </library-empty>
+    <edit-library>
+        <label>Muokkaa kirjastoa</label>
+    </edit-library>
+    <create-library>
+        <label>Luo kirjasto</label>
+    </create-library>
+    <global-library>
+        <label>Globaali kirjasto</label>
+    </global-library>
+    <app-library>
+        <label>Sovelluskirjasto</label>
+    </app-library>
     <enter-section-title>
         <label>Klikkaa syöttääksesi lohkon otsikko</label>
     </enter-section-title>

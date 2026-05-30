@@ -167,6 +167,21 @@
             <label>Version {0,number,integer}</label>
         </item>
     </library-version>
+    <library-empty>
+        <label>La bibliothèque est vide</label>
+    </library-empty>
+    <edit-library>
+        <label>Modifier la bibliothèque</label>
+    </edit-library>
+    <create-library>
+        <label>Créer une bibliothèque</label>
+    </create-library>
+    <global-library>
+        <label>Bibliothèque globale</label>
+    </global-library>
+    <app-library>
+        <label>Bibliothèque de l'application</label>
+    </app-library>
     <enter-section-title>
         <label>Cliquez pour entrer un titre de section</label>
     </enter-section-title>

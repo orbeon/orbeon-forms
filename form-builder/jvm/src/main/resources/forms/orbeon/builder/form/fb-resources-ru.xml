@@ -149,6 +149,21 @@
             <label>Версия {0,number,integer}</label>
         </item>
     </library-version>
+    <library-empty>
+        <label>Библиотека пуста</label>
+    </library-empty>
+    <edit-library>
+        <label>Редактировать библиотеку</label>
+    </edit-library>
+    <create-library>
+        <label>Создать библиотеку</label>
+    </create-library>
+    <global-library>
+        <label>Глобальная библиотека</label>
+    </global-library>
+    <app-library>
+        <label>Библиотека приложения</label>
+    </app-library>
     <enter-section-title>
         <label>Нажмите чтобы ввести название раздела</label>
     </enter-section-title>

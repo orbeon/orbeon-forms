@@ -150,6 +150,21 @@
             <label>Versie {0,number,integer}</label>
         </item>
     </library-version>
+    <library-empty>
+        <label>Bibliotheek is leeg</label>
+    </library-empty>
+    <edit-library>
+        <label>Bibliotheek bewerken</label>
+    </edit-library>
+    <create-library>
+        <label>Bibliotheek maken</label>
+    </create-library>
+    <global-library>
+        <label>Globale bibliotheek</label>
+    </global-library>
+    <app-library>
+        <label>Applicatiebibliotheek</label>
+    </app-library>
     <enter-section-title>
         <label>Klik om een sectietitel toe te voegen</label>
     </enter-section-title>

@@ -72,22 +72,9 @@
                     </xf:action>
                     <xf:delete context="instance('inspector-itemset')" ref="model[starts-with(@id, 'orbeon-')]"/>
                     <xf:setvalue
-                        ref="instance('inspector-instance')/current-model"
-                        value="
-                            instance('inspector-itemset')/(
-                                (: Default to `fr-form-model` if exists :)
-                                model[@id = '|fr-form-model|'],
-                                model[1]
-                            )[1]/@id"/>
+                        ref="instance('inspector-instance')/current-model"/>
                     <xf:setvalue
-                        ref="instance('inspector-instance')/current-instance"
-                        value="
-                            instance('inspector-itemset')/
-                            model[@id = instance('inspector-instance')/current-model]/(
-                                (: Default to `fr-form-instance` if exists :)
-                                instance[@id = '|fr-form-instance|'],
-                                instance[1]
-                            )/@id"/>
+                        ref="instance('inspector-instance')/current-instance"/>
                 </xf:action>
 
                 <xf:instance id="inspector-itemset">
@@ -123,11 +110,32 @@
                 <xf:var name="xml-noindent" value="instance('inspector-instance')/xsl:output[2]"/>
                 <xf:bind ref="instance('inspector-instance')">
                     <xf:bind
+                        ref="current-model"
+                        readonly="false()"
+                        calculate="
+                            if (. = '') then
+                                let $session-model-id := xxf:get-session-attribute('fr-orbeon-form-runner-inspector-current-model')
+                                return
+                                instance('inspector-itemset')/(
+                                    model[@id = $session-model-id],
+                                    model[@id = '|fr-form-model|'],
+                                    model[1]
+                                )[1]/@id
+                            else
+                                ."/>
+                    <xf:bind
                         ref="current-instance"
                         readonly="false()"
                         calculate="
                             if (. = '') then
-                                instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance[1]/@id
+                                let $session-instance-id := xxf:get-session-attribute('fr-orbeon-form-runner-inspector-current-instance')
+                                return
+                                instance('inspector-itemset')/
+                                model[@id = instance('inspector-instance')/current-model]/(
+                                    instance[@id = $session-instance-id],
+                                    instance[@id = '|fr-form-instance|'],
+                                    instance[1]
+                                )[1]/@id
                             else
                                 ."/>
                     <xf:bind ref="xpath" readonly="../function != 'evaluate-xpath'"/>
@@ -229,6 +237,12 @@
                                             <xf:value ref="@id"/>
                                         </xf:itemset>
                                         <xf:action event="xforms-value-changed">
+                                            <xf:action type="xpath">
+                                                xxf:set-session-attribute(
+                                                    'fr-orbeon-form-runner-inspector-current-model',
+                                                    instance('inspector-instance')/current-model/string()
+                                                )
+                                            </xf:action>
                                             <xf:setvalue ref="instance('inspector-instance')/current-instance"/>
                                         </xf:action>
                                     </xf:select1>
@@ -241,6 +255,12 @@
                                             <xf:value ref="@id"/>
                                         </xf:itemset>
                                         <xf:action event="xforms-value-changed">
+                                            <xf:action type="xpath">
+                                                xxf:set-session-attribute(
+                                                    'fr-orbeon-form-runner-inspector-current-model',
+                                                    instance('inspector-instance')/current-model/string()
+                                                )
+                                            </xf:action>
                                             <xf:setvalue ref="instance('inspector-instance')/current-instance"/>
                                         </xf:action>
                                     </xf:select1>
@@ -269,6 +289,14 @@
                                             <xf:label ref="@id"/>
                                             <xf:value ref="@id"/>
                                         </xf:itemset>
+                                        <xf:action event="xforms-value-changed">
+                                            <xf:action type="xpath">
+                                                xxf:set-session-attribute(
+                                                    'fr-orbeon-form-runner-inspector-current-instance',
+                                                    instance('inspector-instance')/current-instance/string()
+                                                )
+                                            </xf:action>
+                                        </xf:action>
                                     </xf:select1>
                                 </xf:case>
                                 <xf:case id="instance-case-minimal" value="false()">
@@ -278,6 +306,14 @@
                                             <xf:label ref="@id"/>
                                             <xf:value ref="@id"/>
                                         </xf:itemset>
+                                        <xf:action event="xforms-value-changed">
+                                            <xf:action type="xpath">
+                                                xxf:set-session-attribute(
+                                                    'fr-orbeon-form-runner-inspector-current-instance',
+                                                    instance('inspector-instance')/current-instance/string()
+                                                )
+                                            </xf:action>
+                                        </xf:action>
                                     </xf:select1>
                                 </xf:case>
                             </xf:switch>

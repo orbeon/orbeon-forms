@@ -52,6 +52,7 @@ class CodeMirror(
   def setOption(key: String, value: js.Any): Unit = js.native
   def getValue(): String = js.native
   def setValue(value: String): Unit = js.native
+  def refresh(): Unit = js.native
   def focus(): Unit = js.native
   def on(event: String, handler: js.Function): Unit = js.native
   def off(event: String, handler: js.Function): Unit = js.native

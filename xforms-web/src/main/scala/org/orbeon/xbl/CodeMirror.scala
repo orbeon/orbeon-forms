@@ -117,6 +117,7 @@ object CodeMirror {
 
         js.timers.setTimeout(0) {
           editor.setValue(newValue)
+          editor.refresh() // For the gutter with the line numbers not to show over the content
           promise.success(())
         }
 

@@ -67,7 +67,8 @@
     >
         <xbl:template>
             <xf:output
-                id="input"
+                id="output"
+                class="xforms-field"
                 value="DateTimeSupport:formatReadonlyModeDateTime(xxf:binding('fr-timestamp-output'), fr:component-param-value('output-format'))"/>
         </xbl:template>
     </xbl:binding>

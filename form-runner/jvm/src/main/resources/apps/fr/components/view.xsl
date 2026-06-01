@@ -321,7 +321,7 @@
                         name="{$view-appearance-opt}"
                         namespace="{$mode-namespace-uri-opt}">
                         <xsl:attribute name="id"              select="'fr-view-component'"/>
-                        <xsl:attribute name="class"           select="concat('fr-view-appearance-', $view-appearance-opt)"/>
+                        <xsl:attribute name="class"           select="concat('fr-view-appearance-', replace($view-appearance-opt, ':', '-'))"/>
 
                         <xsl:attribute name="app"             select="$app"/>
                         <xsl:attribute name="form"            select="$form"/>

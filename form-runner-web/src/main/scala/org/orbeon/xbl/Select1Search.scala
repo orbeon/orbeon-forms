@@ -96,6 +96,8 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         val jSelect = $(select)
         if (isMultiple) select.setAttribute("multiple", "multiple")
         optionsOpt.foreach(jSelect.select2)
+        Option(containerElem.querySelector(".select2-container"))
+          .foreach(_.classList.add("xforms-help-popover-control"))
 
         // Register event listeners
         // Listen on `select2:close` instead of `change` as the latter is not triggered the first time an open value is selected

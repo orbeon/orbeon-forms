@@ -23,6 +23,8 @@
                 fr|isin[fr|pdf-template = true],
                 fr|lei[fr|static-readonly = true],
                 fr|lei[fr|pdf-template = true],
+                fr|iban[fr|static-readonly = true],
+                fr|iban[fr|pdf-template = true],
                 fr|hidden[fr|pdf-template = true]"
             xxbl:mode="binding lhha"
             xxbl:container="span">

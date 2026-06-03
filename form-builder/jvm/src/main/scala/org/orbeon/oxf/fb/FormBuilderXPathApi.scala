@@ -1165,6 +1165,9 @@ object FormBuilderXPathApi {
       Undo.pushAction(UndoOrRedo.Redo, redoAction, undoAction.name)
     }
 
+  def undoActionWith(undoAction: UndoAction)(implicit ctx: FormBuilderDocContext, formRunnerParams: FormRunnerParams): Unit =
+    processUndoRedoAction(undoAction)
+
   //@XPathFunction
   def redoAction(): Unit = {
     implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()

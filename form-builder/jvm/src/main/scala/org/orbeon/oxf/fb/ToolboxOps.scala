@@ -571,6 +571,16 @@ object ToolboxOps {
     ctx             : FormBuilderDocContext,
     formRunnerParams: FormRunnerParams
   ): Option[UndoAction] = {
+    val (xcvElemOpt, undoDeleteControlOpt) = ToolboxOps.dndControlBefore(sourceCellElem, copy)
+    dndControlAfter(xcvElemOpt, targetCellElem, undoDeleteControlOpt)
+  }
+
+  def dndControlBefore(
+    sourceCellElem  : NodeInfo,
+    copy            : Boolean
+  )(implicit
+    ctx             : FormBuilderDocContext,
+  ): (Option[NodeInfo], Option[UndoAction]) = {
 
     val xcvElemOpt = controlElementsInCellToXcv(sourceCellElem)
 
@@ -581,6 +591,18 @@ object ToolboxOps {
         else
           None
       }
+
+    (xcvElemOpt, undoDeleteControlOpt)
+  }
+
+  def dndControlAfter(
+    xcvElemOpt          : Option[NodeInfo],
+    targetCellElem      : NodeInfo,
+    undoDeleteControlOpt: Option[UndoAction]
+  )(implicit
+    ctx             : FormBuilderDocContext,
+    formRunnerParams: FormRunnerParams
+  ): Option[UndoAction] = {
 
     val undoInsertControlOpt =
       withDebugGridOperation("dnd paste") {

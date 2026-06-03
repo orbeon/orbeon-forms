@@ -28,20 +28,20 @@
         xxbl:label-for="fr-attachment-elem">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-        <display-name lang="en">Single File Attachment</display-name>
-        <display-name lang="fr">Fichier joint unique</display-name>
-        <display-name lang="no">Enkelt filvedlegg</display-name>
-        <display-name lang="ru">Загрузка файла</display-name>
-        <display-name lang="it">File allegato</display-name>
-        <display-name lang="de">Einzelner Dateianhang</display-name>
-        <display-name lang="fi">Tiedoston liittäminen</display-name>
-        <display-name lang="es">Archivos Adjuntos</display-name>
-        <display-name lang="nl">Bestandsbijlage</display-name>
-        <display-name lang="pt">Anexar ficheiro</display-name>
-        <display-name lang="sv">Fil som bilaga</display-name>
-        <display-name lang="ar">مرفق ملف واحد</display-name>
-        <display-name lang="pl">Załącznik pojedynczego pliku</display-name>
-        <display-name lang="ja">単一ファイル添付</display-name>
+            <display-name lang="en">Single File Attachment</display-name>
+            <display-name lang="fr">Fichier joint unique</display-name>
+            <display-name lang="no">Enkelt filvedlegg</display-name>
+            <display-name lang="ru">Загрузка файла</display-name>
+            <display-name lang="it">File allegato</display-name>
+            <display-name lang="de">Einzelner Dateianhang</display-name>
+            <display-name lang="fi">Tiedoston liittäminen</display-name>
+            <display-name lang="es">Archivos Adjuntos</display-name>
+            <display-name lang="nl">Bestandsbijlage</display-name>
+            <display-name lang="pt">Anexar ficheiro</display-name>
+            <display-name lang="sv">Fil som bilaga</display-name>
+            <display-name lang="ar">مرفق ملف واحد</display-name>
+            <display-name lang="pl">Załącznik pojedynczego pliku</display-name>
+            <display-name lang="ja">単一ファイル添付</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-file-o</icon-class>
             </icon>
@@ -615,6 +615,87 @@
                             <empty>Ingen vedhæftning.</empty>
                             <remove>Fjern vedhæftning</remove>
                             <uploading>Uploader…</uploading>
+                        </resource>
+                        <resource xml:lang="ar">
+                            <cancel>إلغاء</cancel>
+                            <drag-single>اسحب الملف هنا أو {0}اختر الملف{1}.</drag-single>
+                            <drag-multiple>اسحب الملفات هنا أو {0}اختر الملفات{1}.</drag-multiple>
+                            <download>تنزيل</download>
+                            <empty>لا يوجد مرفق.</empty>
+                            <remove>إزالة المرفق</remove>
+                            <uploading>جارٍ الرفع…</uploading>
+                        </resource>
+                        <resource xml:lang="ca">
+                            <cancel>Cancel·la</cancel>
+                            <drag-single>Arrossegueu el fitxer aquí o {0}seleccioneu el fitxer{1}.</drag-single>
+                            <drag-multiple>Arrossegueu els fitxers aquí o {0}seleccioneu els fitxers{1}.</drag-multiple>
+                            <download>Baixa</download>
+                            <empty>Sense adjunt.</empty>
+                            <remove>Eliminar adjunt</remove>
+                            <uploading>Pujant…</uploading>
+                        </resource>
+                        <resource xml:lang="hu">
+                            <cancel>Mégse</cancel>
+                            <drag-single>Húzza ide a fájlt, vagy {0}válasszon fájlt{1}.</drag-single>
+                            <drag-multiple>Húzza ide a fájlokat, vagy {0}válasszon fájlokat{1}.</drag-multiple>
+                            <download>Letöltés</download>
+                            <empty>Nincs melléklet.</empty>
+                            <remove>Melléklet eltávolítása</remove>
+                            <uploading>Feltöltés…</uploading>
+                        </resource>
+                        <resource xml:lang="ja">
+                            <cancel>キャンセル</cancel>
+                            <drag-single>ここにファイルをドラッグするか、{0}ファイルを選択{1}してください。</drag-single>
+                            <drag-multiple>ここにファイルをドラッグするか、{0}ファイルを選択{1}してください。</drag-multiple>
+                            <download>ダウンロード</download>
+                            <empty>添付ファイルなし。</empty>
+                            <remove>添付ファイルを削除</remove>
+                            <uploading>アップロード中…</uploading>
+                        </resource>
+                        <resource xml:lang="no">
+                            <cancel>Avbryt</cancel>
+                            <drag-single>Dra filen hit eller {0}velg fil{1}.</drag-single>
+                            <drag-multiple>Dra filene hit eller {0}velg filer{1}.</drag-multiple>
+                            <download>Last ned</download>
+                            <empty>Ingen vedlegg.</empty>
+                            <remove>Fjern vedlegg</remove>
+                            <uploading>Laster opp…</uploading>
+                        </resource>
+                        <resource xml:lang="pl">
+                            <cancel>Anuluj</cancel>
+                            <drag-single>Przeciągnij plik tutaj lub {0}wybierz plik{1}.</drag-single>
+                            <drag-multiple>Przeciągnij pliki tutaj lub {0}wybierz pliki{1}.</drag-multiple>
+                            <download>Pobierz</download>
+                            <empty>Brak załącznika.</empty>
+                            <remove>Usuń załącznik</remove>
+                            <uploading>Przesyłanie…</uploading>
+                        </resource>
+                        <resource xml:lang="tr">
+                            <cancel>İptal</cancel>
+                            <drag-single>Dosyayı buraya sürükleyin veya {0}dosya seçin{1}.</drag-single>
+                            <drag-multiple>Dosyaları buraya sürükleyin veya {0}dosyaları seçin{1}.</drag-multiple>
+                            <download>İndir</download>
+                            <empty>Ek yok.</empty>
+                            <remove>Eki kaldır</remove>
+                            <uploading>Yükleniyor…</uploading>
+                        </resource>
+                        <resource xml:lang="zh-Hans">
+                            <cancel>取消</cancel>
+                            <drag-single>将文件拖到此处或{0}选择文件{1}。</drag-single>
+                            <drag-multiple>将文件拖到此处或{0}选择文件{1}。</drag-multiple>
+                            <download>下载</download>
+                            <empty>无附件。</empty>
+                            <remove>删除附件</remove>
+                            <uploading>上传中…</uploading>
+                        </resource>
+                        <resource xml:lang="zh-Hant">
+                            <cancel>取消</cancel>
+                            <drag-single>將檔案拖到此處或{0}選擇檔案{1}。</drag-single>
+                            <drag-multiple>將檔案拖到此處或{0}選擇檔案{1}。</drag-multiple>
+                            <download>下載</download>
+                            <empty>無附件。</empty>
+                            <remove>刪除附件</remove>
+                            <uploading>上傳中…</uploading>
                         </resource>
                     </_>
                 </xf:instance>

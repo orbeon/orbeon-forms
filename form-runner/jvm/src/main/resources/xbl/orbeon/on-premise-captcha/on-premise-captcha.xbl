@@ -48,6 +48,16 @@
                         <resource xml:lang="nl"><ask-to-type-word>Voer bovenstaand woord in:</ask-to-type-word></resource>
                         <resource xml:lang="pt"><ask-to-type-word>Insira a palavra na imagem:</ask-to-type-word></resource>
                         <resource xml:lang="pl"><ask-to-type-word>Przepisz słowo z obrazka:</ask-to-type-word></resource>
+                        <resource xml:lang="ar"><ask-to-type-word>اكتب الكلمة الظاهرة أعلاه:</ask-to-type-word></resource>
+                        <resource xml:lang="ca"><ask-to-type-word>Escriviu la paraula de dalt:</ask-to-type-word></resource>
+                        <resource xml:lang="da"><ask-to-type-word>Skriv ordet ovenfor:</ask-to-type-word></resource>
+                        <resource xml:lang="hu"><ask-to-type-word>Írja be a fenti szót:</ask-to-type-word></resource>
+                        <resource xml:lang="ja"><ask-to-type-word>上の文字を入力してください：</ask-to-type-word></resource>
+                        <resource xml:lang="no"><ask-to-type-word>Skriv inn ordet ovenfor:</ask-to-type-word></resource>
+                        <resource xml:lang="ru"><ask-to-type-word>Введите слово выше:</ask-to-type-word></resource>
+                        <resource xml:lang="tr"><ask-to-type-word>Yukarıdaki kelimeyi yazın:</ask-to-type-word></resource>
+                        <resource xml:lang="zh-Hans"><ask-to-type-word>请输入上方的文字：</ask-to-type-word></resource>
+                        <resource xml:lang="zh-Hant"><ask-to-type-word>請輸入上方的文字：</ask-to-type-word></resource>
                     </_>
                 </xf:instance>
             </xf:model>

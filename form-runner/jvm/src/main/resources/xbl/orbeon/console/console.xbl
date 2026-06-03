@@ -131,6 +131,118 @@
                             <formula>Formula</formula>
                             <error>Errore</error>
                         </resource>
+                        <resource xml:lang="ar">
+                            <formula-errors>أخطاء الصيغة</formula-errors>
+                            <control-name>اسم عنصر التحكم</control-name>
+                            <context-name>السياق</context-name>
+                            <formula>الصيغة</formula>
+                            <error>خطأ</error>
+                        </resource>
+                        <resource xml:lang="ca">
+                            <formula-errors>Errors de fórmula</formula-errors>
+                            <control-name>Nom del control</control-name>
+                            <context-name>Context</context-name>
+                            <formula>Fórmula</formula>
+                            <error>Error</error>
+                        </resource>
+                        <resource xml:lang="da">
+                            <formula-errors>Formelfejl</formula-errors>
+                            <control-name>Kontrolnavn</control-name>
+                            <context-name>Kontekst</context-name>
+                            <formula>Formel</formula>
+                            <error>Fejl</error>
+                        </resource>
+                        <resource xml:lang="es">
+                            <formula-errors>Errores de Fórmula</formula-errors>
+                            <control-name>Nombre del Control</control-name>
+                            <context-name>Contexto</context-name>
+                            <formula>Fórmula</formula>
+                            <error>Error</error>
+                        </resource>
+                        <resource xml:lang="fi">
+                            <formula-errors>Kaavavirheet</formula-errors>
+                            <control-name>Ohjauselementin nimi</control-name>
+                            <context-name>Konteksti</context-name>
+                            <formula>Kaava</formula>
+                            <error>Virhe</error>
+                        </resource>
+                        <resource xml:lang="hu">
+                            <formula-errors>Képlethibák</formula-errors>
+                            <control-name>Vezérlő neve</control-name>
+                            <context-name>Kontextus</context-name>
+                            <formula>Képlet</formula>
+                            <error>Hiba</error>
+                        </resource>
+                        <resource xml:lang="ja">
+                            <formula-errors>数式エラー</formula-errors>
+                            <control-name>コントロール名</control-name>
+                            <context-name>コンテキスト</context-name>
+                            <formula>数式</formula>
+                            <error>エラー</error>
+                        </resource>
+                        <resource xml:lang="nl">
+                            <formula-errors>Formulefouten</formula-errors>
+                            <control-name>Naam besturingselement</control-name>
+                            <context-name>Context</context-name>
+                            <formula>Formule</formula>
+                            <error>Fout</error>
+                        </resource>
+                        <resource xml:lang="no">
+                            <formula-errors>Formelfeil</formula-errors>
+                            <control-name>Kontrollnavn</control-name>
+                            <context-name>Kontekst</context-name>
+                            <formula>Formel</formula>
+                            <error>Feil</error>
+                        </resource>
+                        <resource xml:lang="pl">
+                            <formula-errors>Błędy formuły</formula-errors>
+                            <control-name>Nazwa kontrolki</control-name>
+                            <context-name>Kontekst</context-name>
+                            <formula>Formuła</formula>
+                            <error>Błąd</error>
+                        </resource>
+                        <resource xml:lang="pt">
+                            <formula-errors>Erros de Fórmula</formula-errors>
+                            <control-name>Nome do Controle</control-name>
+                            <context-name>Contexto</context-name>
+                            <formula>Fórmula</formula>
+                            <error>Erro</error>
+                        </resource>
+                        <resource xml:lang="ru">
+                            <formula-errors>Ошибки формул</formula-errors>
+                            <control-name>Имя элемента управления</control-name>
+                            <context-name>Контекст</context-name>
+                            <formula>Формула</formula>
+                            <error>Ошибка</error>
+                        </resource>
+                        <resource xml:lang="sv">
+                            <formula-errors>Formelfel</formula-errors>
+                            <control-name>Kontrollnamn</control-name>
+                            <context-name>Kontext</context-name>
+                            <formula>Formel</formula>
+                            <error>Fel</error>
+                        </resource>
+                        <resource xml:lang="tr">
+                            <formula-errors>Formül Hataları</formula-errors>
+                            <control-name>Denetim Adı</control-name>
+                            <context-name>Bağlam</context-name>
+                            <formula>Formül</formula>
+                            <error>Hata</error>
+                        </resource>
+                        <resource xml:lang="zh-Hans">
+                            <formula-errors>公式错误</formula-errors>
+                            <control-name>控件名称</control-name>
+                            <context-name>上下文</context-name>
+                            <formula>公式</formula>
+                            <error>错误</error>
+                        </resource>
+                        <resource xml:lang="zh-Hant">
+                            <formula-errors>公式錯誤</formula-errors>
+                            <control-name>控制項名稱</control-name>
+                            <context-name>上下文</context-name>
+                            <formula>公式</formula>
+                            <error>錯誤</error>
+                        </resource>
                     </_>
                 </xf:instance>
             </xf:model>

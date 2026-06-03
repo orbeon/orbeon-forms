@@ -899,6 +899,18 @@
                         <resource xml:lang="da"><format>MDÅ</format></resource>
                         <resource xml:lang="tr"><format>AGY</format></resource>
                         <resource xml:lang="es"><format>MDA</format></resource>
+                        <resource xml:lang="ar"><format>شيس</format></resource>
+                        <resource xml:lang="ca"><format>MDA</format></resource>
+                        <resource xml:lang="fi"><format>KPV</format></resource>
+                        <resource xml:lang="it"><format>MGA</format></resource>
+                        <resource xml:lang="ja"><format>月日年</format></resource>
+                        <resource xml:lang="nl"><format>MDJ</format></resource>
+                        <resource xml:lang="no"><format>MDÅ</format></resource>
+                        <resource xml:lang="pt"><format>MDA</format></resource>
+                        <resource xml:lang="ru"><format>МДГ</format></resource>
+                        <resource xml:lang="sv"><format>MDÅ</format></resource>
+                        <resource xml:lang="zh-Hans"><format>月日年</format></resource>
+                        <resource xml:lang="zh-Hant"><format>月日年</format></resource>
                     </_>
                 </xf:instance>
             </xf:model>

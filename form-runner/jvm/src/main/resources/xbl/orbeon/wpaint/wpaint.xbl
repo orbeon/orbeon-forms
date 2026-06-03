@@ -51,6 +51,10 @@
             <fb:display-name lang="sv">Noteringar till bild</fb:display-name>
             <fb:display-name lang="nl">Afbeelding annotatie</fb:display-name>
             <fb:display-name lang="pt">Anotação da imagem</fb:display-name>
+            <fb:display-name lang="ar">تعليق توضيحي على الصورة</fb:display-name>
+            <fb:display-name lang="ja">画像アノテーション</fb:display-name>
+            <fb:display-name lang="no">Bildekommentar</fb:display-name>
+            <fb:display-name lang="pl">Adnotacja obrazu</fb:display-name>
             <fb:icon>
                 <fb:icon-class>fa fa-fw fa-paint-brush</fb:icon-class>
             </fb:icon>
@@ -114,6 +118,54 @@
                         <resource xml:lang="da">
                             <canvas-not-supported>For at annotere et billede, skal din browser understøtte HTML5 canvas</canvas-not-supported>
                             <annotated-image>Annoteret billede</annotated-image>
+                        </resource>
+                        <resource xml:lang="ar">
+                            <canvas-not-supported>للقيام بالتعليق التوضيحي على الصور، يجب أن يدعم متصفحك عنصر HTML5 canvas</canvas-not-supported>
+                            <annotated-image>صورة معلق عليها</annotated-image>
+                        </resource>
+                        <resource xml:lang="ca">
+                            <canvas-not-supported>Per fer anotacions d'imatge, el vostre navegador ha de suportar el canvas HTML5</canvas-not-supported>
+                            <annotated-image>Imatge anotada</annotated-image>
+                        </resource>
+                        <resource xml:lang="es">
+                            <canvas-not-supported>Para hacer anotaciones de imágenes, su navegador debe admitir el canvas HTML5</canvas-not-supported>
+                            <annotated-image>Imagen anotada</annotated-image>
+                        </resource>
+                        <resource xml:lang="hu">
+                            <canvas-not-supported>A képek megjegyzéséhez a böngészőnek támogatnia kell a HTML5 canvas elemet</canvas-not-supported>
+                            <annotated-image>Megjegyzésekkel ellátott kép</annotated-image>
+                        </resource>
+                        <resource xml:lang="ja">
+                            <canvas-not-supported>画像に注釈を付けるには、ブラウザがHTML5のcanvasをサポートしている必要があります</canvas-not-supported>
+                            <annotated-image>注釈付き画像</annotated-image>
+                        </resource>
+                        <resource xml:lang="no">
+                            <canvas-not-supported>For å gjøre bildemerknader må nettleseren din støtte HTML5 canvas</canvas-not-supported>
+                            <annotated-image>Kommentert bilde</annotated-image>
+                        </resource>
+                        <resource xml:lang="pl">
+                            <canvas-not-supported>Aby dodawać adnotacje do obrazów, przeglądarka musi obsługiwać HTML5 canvas</canvas-not-supported>
+                            <annotated-image>Obraz z adnotacjami</annotated-image>
+                        </resource>
+                        <resource xml:lang="pt">
+                            <canvas-not-supported>Para fazer anotações de imagens, o seu navegador deve suportar o canvas HTML5</canvas-not-supported>
+                            <annotated-image>Imagem anotada</annotated-image>
+                        </resource>
+                        <resource xml:lang="ru">
+                            <canvas-not-supported>Для аннотирования изображений ваш браузер должен поддерживать canvas HTML5</canvas-not-supported>
+                            <annotated-image>Изображение с аннотациями</annotated-image>
+                        </resource>
+                        <resource xml:lang="tr">
+                            <canvas-not-supported>Resim açıklamaları yapabilmek için tarayıcınızın HTML5 canvas'ı desteklemesi gerekir</canvas-not-supported>
+                            <annotated-image>Açıklamalı görüntü</annotated-image>
+                        </resource>
+                        <resource xml:lang="zh-Hans">
+                            <canvas-not-supported>要进行图像标注，您的浏览器需要支持HTML5 canvas</canvas-not-supported>
+                            <annotated-image>带注释的图像</annotated-image>
+                        </resource>
+                        <resource xml:lang="zh-Hant">
+                            <canvas-not-supported>要進行圖像標注，您的瀏覽器需要支援HTML5 canvas</canvas-not-supported>
+                            <annotated-image>帶注釋的圖像</annotated-image>
                         </resource>
                     </_>
                 </xf:instance>

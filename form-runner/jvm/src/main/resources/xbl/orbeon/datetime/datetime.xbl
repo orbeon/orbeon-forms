@@ -129,6 +129,15 @@
                         <resource xml:lang="sv"><date>Datum</date>     <time>Tid</time></resource>
                         <resource xml:lang="pt"><date>Data</date>      <time>Hora</time></resource>
                         <resource xml:lang="pl"><date>Data</date>      <time>Godzina</time></resource>
+                        <resource xml:lang="ar"><date>التاريخ</date>   <time>الوقت</time></resource>
+                        <resource xml:lang="ca"><date>Data</date>      <time>Hora</time></resource>
+                        <resource xml:lang="da"><date>Dato</date>      <time>Klokkeslæt</time></resource>
+                        <resource xml:lang="hu"><date>Dátum</date>     <time>Idő</time></resource>
+                        <resource xml:lang="ja"><date>日付</date>       <time>時刻</time></resource>
+                        <resource xml:lang="no"><date>Dato</date>      <time>Klokkeslett</time></resource>
+                        <resource xml:lang="tr"><date>Tarih</date>     <time>Saat</time></resource>
+                        <resource xml:lang="zh-Hans"><date>日期</date>  <time>时间</time></resource>
+                        <resource xml:lang="zh-Hant"><date>日期</date>  <time>時間</time></resource>
                     </_>
                 </xf:instance>
                 <xf:instance id="i">

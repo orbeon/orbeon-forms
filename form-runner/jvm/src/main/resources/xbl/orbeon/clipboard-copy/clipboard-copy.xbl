@@ -62,6 +62,24 @@
                     <_>
                         <resource xml:lang="en"><copy>Copy to clipboard</copy></resource>
                         <resource xml:lang="fr"><copy>Copier vers le presse-papiers</copy></resource>
+                        <resource xml:lang="ar"><copy>نسخ إلى الحافظة</copy></resource>
+                        <resource xml:lang="ca"><copy>Copia al porta-retalls</copy></resource>
+                        <resource xml:lang="da"><copy>Kopiér til udklipsholder</copy></resource>
+                        <resource xml:lang="de"><copy>In die Zwischenablage kopieren</copy></resource>
+                        <resource xml:lang="es"><copy>Copiar al portapapeles</copy></resource>
+                        <resource xml:lang="fi"><copy>Kopioi leikepöydälle</copy></resource>
+                        <resource xml:lang="hu"><copy>Másolás vágólapra</copy></resource>
+                        <resource xml:lang="it"><copy>Copia negli appunti</copy></resource>
+                        <resource xml:lang="ja"><copy>クリップボードにコピー</copy></resource>
+                        <resource xml:lang="nl"><copy>Kopiëren naar klembord</copy></resource>
+                        <resource xml:lang="no"><copy>Kopier til utklippstavle</copy></resource>
+                        <resource xml:lang="pl"><copy>Kopiuj do schowka</copy></resource>
+                        <resource xml:lang="pt"><copy>Copiar para área de transferência</copy></resource>
+                        <resource xml:lang="ru"><copy>Копировать в буфер обмена</copy></resource>
+                        <resource xml:lang="sv"><copy>Kopiera till urklipp</copy></resource>
+                        <resource xml:lang="tr"><copy>Panoya kopyala</copy></resource>
+                        <resource xml:lang="zh-Hans"><copy>复制到剪贴板</copy></resource>
+                        <resource xml:lang="zh-Hant"><copy>複製到剪貼簿</copy></resource>
                     </_>
                 </xf:instance>
             </xf:model>

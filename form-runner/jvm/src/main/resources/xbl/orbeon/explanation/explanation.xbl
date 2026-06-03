@@ -31,6 +31,11 @@
             <fb:display-name lang="it">Spiegazione</fb:display-name>
             <fb:display-name lang="nl">Uitleg</fb:display-name>
             <fb:display-name lang="sv">Förklaring</fb:display-name>
+            <fb:display-name lang="ar">نص توضيحي</fb:display-name>
+            <fb:display-name lang="ja">説明テキスト</fb:display-name>
+            <fb:display-name lang="no">Forklaringstekst</fb:display-name>
+            <fb:display-name lang="pl">Tekst wyjaśniający</fb:display-name>
+            <fb:display-name lang="pt">Texto explicativo</fb:display-name>
             <fb:icon>
                 <fb:icon-class>fa fa-fw fa-comment</fb:icon-class>
             </fb:icon>

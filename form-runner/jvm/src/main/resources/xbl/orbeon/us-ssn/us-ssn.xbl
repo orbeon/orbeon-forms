@@ -174,6 +174,15 @@
                         <resource xml:lang="sv"><reveal>Avslöja</reveal></resource>
                         <resource xml:lang="pt"><reveal>Revelar</reveal></resource>
                         <resource xml:lang="pl"><reveal>Ujawnić</reveal></resource>
+                        <resource xml:lang="ar"><reveal>كشف</reveal></resource>
+                        <resource xml:lang="ca"><reveal>Revela</reveal></resource>
+                        <resource xml:lang="da"><reveal>Afsløre</reveal></resource>
+                        <resource xml:lang="hu"><reveal>Felfedés</reveal></resource>
+                        <resource xml:lang="ja"><reveal>表示</reveal></resource>
+                        <resource xml:lang="no"><reveal>Vis</reveal></resource>
+                        <resource xml:lang="tr"><reveal>Göster</reveal></resource>
+                        <resource xml:lang="zh-Hans"><reveal>显示</reveal></resource>
+                        <resource xml:lang="zh-Hant"><reveal>顯示</reveal></resource>
                     </_>
                 </xf:instance>
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">

@@ -51,14 +51,23 @@
                         <resource xml:lang="en"><add>Add One</add></resource>
                         <resource xml:lang="fr"><add>Ajouter</add></resource>
                         <resource xml:lang="es"><add>Agregar Uno</add></resource>
-                        <resource xml:lang="no"><add>[Add One]</add></resource>
-                        <resource xml:lang="ru"><add>[Add One]</add></resource>
-                        <resource xml:lang="it"><add>[Add One]</add></resource>
-                        <resource xml:lang="de"><add>[Add One]</add></resource>
-                        <resource xml:lang="fi"><add>[Add One]</add></resource>
-                        <resource xml:lang="nl"><add>[Add One]</add></resource>
-                        <resource xml:lang="pt"><add>[Add One]</add></resource>
-                        <resource xml:lang="sv"><add>[Add One]</add></resource>
+                        <resource xml:lang="no"><add>Legg til én</add></resource>
+                        <resource xml:lang="ru"><add>Добавить один</add></resource>
+                        <resource xml:lang="it"><add>Aggiungi uno</add></resource>
+                        <resource xml:lang="de"><add>Einen hinzufügen</add></resource>
+                        <resource xml:lang="fi"><add>Lisää yksi</add></resource>
+                        <resource xml:lang="nl"><add>Eén toevoegen</add></resource>
+                        <resource xml:lang="pt"><add>Adicionar um</add></resource>
+                        <resource xml:lang="sv"><add>Lägg till en</add></resource>
+                        <resource xml:lang="ar"><add>إضافة واحد</add></resource>
+                        <resource xml:lang="ca"><add>Afegir un</add></resource>
+                        <resource xml:lang="da"><add>Tilføj én</add></resource>
+                        <resource xml:lang="hu"><add>Egy hozzáadása</add></resource>
+                        <resource xml:lang="ja"><add>一つ追加</add></resource>
+                        <resource xml:lang="pl"><add>Dodaj jeden</add></resource>
+                        <resource xml:lang="tr"><add>Bir Ekle</add></resource>
+                        <resource xml:lang="zh-Hans"><add>添加一个</add></resource>
+                        <resource xml:lang="zh-Hant"><add>新增一個</add></resource>
                     </_>
                 </xf:instance>
             </xf:model>

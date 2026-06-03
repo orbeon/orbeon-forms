@@ -80,7 +80,7 @@ object FormRunnerCommonConstraint {
         case _ => false
       }
 
-    def analyze(expr: Expression) =
+    def analyze(expr: Expression): Option[(String, Option[String])] =
       expr match {
         case e: ValidationFunction[_] =>
           e.arguments.headOption match {
@@ -95,5 +95,4 @@ object FormRunnerCommonConstraint {
 
     tryCompile.toOption flatMap analyze
   }
-
 }

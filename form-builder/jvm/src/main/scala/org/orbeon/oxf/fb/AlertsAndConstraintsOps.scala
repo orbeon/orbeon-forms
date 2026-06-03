@@ -121,10 +121,11 @@ trait AlertsAndConstraintsOps extends ControlOps {
   }
 
   private def writeValidations(
-    controlName : String,
-    mip         : MipName.Validate,
-    validations : List[Validation])(implicit
-    ctx         : FormBuilderDocContext
+    controlName: String,
+    mip        : MipName.Validate,
+    validations: List[Validation]
+  )(implicit
+    ctx        : FormBuilderDocContext
   ): Unit = {
 
     val bindElem = findBindByName(controlName).get

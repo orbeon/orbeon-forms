@@ -155,13 +155,7 @@
             <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Revisión actual)}</date>
             <date-format>[FNn,*-3], [D] de [MNn,*-3] de [Y] a las [h]:[m] [P,*-2]</date-format>
 
-            <named-user>Usuario {0}</named-user>
-            <anonymous-user>Usuario anónimo</anonymous-user>
-
-            <unknown-changes>hay cambios.</unknown-changes>
-            <initial-revision>guardada la revisión inicial.</initial-revision>
-            <no-changes>guardado sin cambios detectados.</no-changes>
-            <specific-changes>tiene los cambios siguientes:</specific-changes>
+            <user-action>{1,choice,0#Usuario anónimo|1#Usuario {0}} {2,choice,0#guardada la revisión inicial.|1#guardado sin cambios detectados.|2#hay cambios.|3#tiene los cambios siguientes:}</user-action>
 
             <view-data>Ver esta revisión</view-data>
 

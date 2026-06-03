@@ -151,13 +151,7 @@
             <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initiële revisie)}'|1# (Huidige revisie)}</date>
             <date-format>[FNn,*-3] [D] [MNn,*-3] [Y] om [h]:[m] [P,*-2]</date-format>
 
-            <named-user>Gebruiker {0}</named-user>
-            <anonymous-user>Een anonieme gebruiker</anonymous-user>
-
-            <unknown-changes>heeft enkele wijzigingen aangebracht.</unknown-changes>
-            <initial-revision>heeft de initiële revisie opgeslagen.</initial-revision>
-            <no-changes>heeft opgeslagen zonder wijzigingen.</no-changes>
-            <specific-changes>heeft de volgende wijzigingen aangebracht:</specific-changes>
+            <user-action>{1,choice,0#Een anonieme gebruiker|1#Gebruiker {0}} {2,choice,0#heeft de initiële revisie opgeslagen.|1#heeft opgeslagen zonder wijzigingen.|2#heeft enkele wijzigingen aangebracht.|3#heeft de volgende wijzigingen aangebracht:}</user-action>
 
             <view-data>Deze revisie bekijken</view-data>
 

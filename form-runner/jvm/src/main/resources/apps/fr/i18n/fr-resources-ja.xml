@@ -151,13 +151,7 @@
             <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (初期保存)}'|1# (現在)}</date>
             <date-format>[Y]年[MNn,*-3][D]日 [P,*-2][h]:[m]</date-format>
 
-            <named-user>ユーザー {0}</named-user>
-            <anonymous-user>匿名ユーザー</anonymous-user>
-
-            <unknown-changes>変更を保存。</unknown-changes>
-            <initial-revision>初回バージョンを保存。</initial-revision>
-            <no-changes>変更なしで保存。</no-changes>
-            <specific-changes>次を変更:</specific-changes>
+            <user-action>{1,choice,0#匿名ユーザー|1#ユーザー {0}} {2,choice,0#初回バージョンを保存。|1#変更なしで保存。|2#変更を保存。|3#次を変更:}</user-action>
 
             <view-data>この版を表示</view-data>
 

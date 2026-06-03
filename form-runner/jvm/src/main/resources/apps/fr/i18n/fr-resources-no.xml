@@ -151,13 +151,7 @@
             <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (første revisjon)}'|1# (gjeldende revisjon)}</date>
             <date-format>[FNn,*-3] [D]. [MNn,*-3] [Y] kl. [h]:[m] [P,*-2]</date-format>
 
-            <named-user>Bruker {0}</named-user>
-            <anonymous-user>En anonym bruker</anonymous-user>
-
-            <unknown-changes>gjorde noen endringer.</unknown-changes>
-            <initial-revision>lagret første revisjon.</initial-revision>
-            <no-changes>lagret uten oppdagede endringer.</no-changes>
-            <specific-changes>gjorde følgende endringer:</specific-changes>
+            <user-action>{1,choice,0#En anonym bruker|1#Bruker {0}} {2,choice,0#lagret første revisjon.|1#lagret uten oppdagede endringer.|2#gjorde noen endringer.|3#gjorde følgende endringer:}</user-action>
 
             <view-data>Vis denne revisjonen</view-data>
 

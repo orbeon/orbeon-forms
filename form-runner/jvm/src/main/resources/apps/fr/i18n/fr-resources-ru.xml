@@ -151,13 +151,7 @@
                 <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Первая редакция)}'|1# (Текущая редакция)}</date>
                 <date-format>[FNn,*-3], [MNn,*-3] [D], [Y] в [h]:[m] [P,*-2]</date-format>
 
-                <named-user>Пользователь {0}</named-user>
-                <anonymous-user>Анонимный пользователь</anonymous-user>
-
-                <unknown-changes>внес некоторые изменения.</unknown-changes>
-                <initial-revision>сохранил(а) первоначальную редакцию.</initial-revision>
-                <no-changes>сохранил(а) без обнаруженных изменений.</no-changes>
-                <specific-changes>внес(ла) следующие изменения:</specific-changes>
+                <user-action>{1,choice,0#Анонимный пользователь|1#Пользователь {0}} {2,choice,0#сохранил(а) первоначальную редакцию.|1#сохранил(а) без обнаруженных изменений.|2#внес некоторые изменения.|3#внес(ла) следующие изменения:}</user-action>
 
                 <view-data>Просмотреть эту редакцию</view-data>
 

@@ -151,13 +151,7 @@
             <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (İlk Revizyon)}'|1# (Mevcut Revizyon)}</date>
             <date-format>[FNn,*-3], [MNn,*-3] [D], [Y] saat [h]:[m] [P,*-2]</date-format>
 
-            <named-user>{0} kullanıcısı</named-user>
-            <anonymous-user>Anonim bir kullanıcı</anonymous-user>
-
-            <unknown-changes>bazı değişiklikler yaptı.</unknown-changes>
-            <initial-revision>ilk revizyonu kaydetti.</initial-revision>
-            <no-changes>hiçbir değişiklik tespit edilmeden kaydedildi.</no-changes>
-            <specific-changes>aşağıdaki değişiklikleri yaptı:</specific-changes>
+            <user-action>{1,choice,0#Anonim bir kullanıcı|1#{0} kullanıcısı} {2,choice,0#ilk revizyonu kaydetti.|1#hiçbir değişiklik tespit edilmeden kaydedildi.|2#bazı değişiklikler yaptı.|3#aşağıdaki değişiklikleri yaptı:}</user-action>
 
             <view-data>Bu revizyonu görüntüle</view-data>
 

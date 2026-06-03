@@ -151,13 +151,7 @@
             <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (wersja początkowa)}'|1# (bieżąca wersja)}</date>
             <date-format>[FNn,*-3], [MNn,*-3] [D], [Y] o [h]:[m] [P,*-2]</date-format>
 
-            <named-user>Użytkownik {0}</named-user>
-            <anonymous-user>Anonimowy użytkownik</anonymous-user>
-
-            <unknown-changes>dokonał zmian.</unknown-changes>
-            <initial-revision>zapisał wersję początkową.</initial-revision>
-            <no-changes>zapisano bez wykrytych zmian.</no-changes>
-            <specific-changes>dokonał następujących zmian:</specific-changes>
+            <user-action>{1,choice,0#Anonimowy użytkownik|1#Użytkownik {0}} {2,choice,0#zapisał wersję początkową.|1#zapisano bez wykrytych zmian.|2#dokonał zmian.|3#dokonał następujących zmian:}</user-action>
 
             <view-data>Zobacz tę wersję</view-data>
 

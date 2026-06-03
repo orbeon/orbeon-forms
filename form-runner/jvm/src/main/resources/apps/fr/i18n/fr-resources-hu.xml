@@ -151,13 +151,7 @@
             <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Kezdeti verzió)}'|1# (Jelenlegi verzió)}</date>
             <date-format>[Y]. [MNn,*-3]. [D]. [H01]:[m01]:[s01]</date-format>
 
-            <named-user>{0} felhasználó</named-user>
-            <anonymous-user>Névtelen felhasználó</anonymous-user>
-
-            <unknown-changes>néhány módosítást végzett.</unknown-changes>
-            <initial-revision>mentette a kezdeti verziót.</initial-revision>
-            <no-changes>mentette változtatások nélkül.</no-changes>
-            <specific-changes>a következő módosításokat végezte:</specific-changes>
+            <user-action>{1,choice,0#Névtelen felhasználó|1#{0} felhasználó} {2,choice,0#mentette a kezdeti verziót.|1#mentette változtatások nélkül.|2#néhány módosítást végzett.|3#a következő módosításokat végezte:}</user-action>
 
             <view-data>Verzió megtekintése</view-data>
 

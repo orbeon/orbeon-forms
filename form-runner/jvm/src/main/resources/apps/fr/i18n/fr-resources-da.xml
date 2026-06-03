@@ -151,13 +151,7 @@
             <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (første version)}'|1# (aktuel version)}</date>
             <date-format>[FNn,*-3], [MNn,*-3] [D], [Y] kl. [h]:[m] [P,*-2]</date-format>
 
-            <named-user>Bruger {0}</named-user>
-            <anonymous-user>En anonym bruger</anonymous-user>
-
-            <unknown-changes>foretog nogle ændringer.</unknown-changes>
-            <initial-revision>gemte den første version.</initial-revision>
-            <no-changes>gemte uden registrerede ændringer.</no-changes>
-            <specific-changes>foretog følgende ændringer:</specific-changes>
+            <user-action>{1,choice,0#En anonym bruger|1#Bruger {0}} {2,choice,0#gemte den første version.|1#gemte uden registrerede ændringer.|2#foretog nogle ændringer.|3#foretog følgende ændringer:}</user-action>
 
             <view-data>Vis denne version</view-data>
 

@@ -151,13 +151,7 @@
             <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Ensimmäinen versio)}'|1# (Nykyinen versio)}</date>
             <date-format>[FNn,*-3] [D]. [MNn,*-3] [Y] [h]:[m] [P,*-2]</date-format>
 
-            <named-user>Käyttäjä {0}</named-user>
-            <anonymous-user>Nimetön käyttäjä</anonymous-user>
-
-            <unknown-changes>teki joitakin muutoksia.</unknown-changes>
-            <initial-revision>tallensi ensimmäisen version.</initial-revision>
-            <no-changes>tallensi ilman havaittuja muutoksia.</no-changes>
-            <specific-changes>teki seuraavat muutokset:</specific-changes>
+            <user-action>{1,choice,0#Nimetön käyttäjä|1#Käyttäjä {0}} {2,choice,0#tallensi ensimmäisen version.|1#tallensi ilman havaittuja muutoksia.|2#teki joitakin muutoksia.|3#teki seuraavat muutokset:}</user-action>
 
             <view-data>Näytä tämä versio</view-data>
 

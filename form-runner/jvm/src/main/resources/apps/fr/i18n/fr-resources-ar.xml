@@ -151,13 +151,7 @@
             <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (المراجعة الأولية)}'|1# (المراجعة الحالية)}</date>
             <date-format>[FNn,*-3], [MNn,*-3] [D], [Y] الساعة [h]:[m] [P,*-2]</date-format>
 
-            <named-user>المستخدم {0}</named-user>
-            <anonymous-user>مستخدم مجهول</anonymous-user>
-
-            <unknown-changes>قام ببعض التغييرات.</unknown-changes>
-            <initial-revision>حفظ المراجعة الأولية.</initial-revision>
-            <no-changes>حفظ دون تغييرات ملحوظة.</no-changes>
-            <specific-changes>قام بالتغييرات التالية:</specific-changes>
+            <user-action>{1,choice,0#مستخدم مجهول|1#المستخدم {0}} {2,choice,0#حفظ المراجعة الأولية.|1#حفظ دون تغييرات ملحوظة.|2#قام ببعض التغييرات.|3#قام بالتغييرات التالية:}</user-action>
 
             <view-data>عرض هذه المراجعة</view-data>
 

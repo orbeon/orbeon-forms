@@ -154,13 +154,7 @@
             <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Revisió inicial)}'|1# (Revisió actual)}</date>
             <date-format>[FNn,*-3], [D] de [MNn,*-3] de [Y] a les [h]:[m] [P,*-2]</date-format>
 
-            <named-user>Usuari {0}</named-user>
-            <anonymous-user>Usuari anònim</anonymous-user>
-
-            <unknown-changes>s'han fet alguns canvis.</unknown-changes>
-            <initial-revision>guardada la revisió inicial.</initial-revision>
-            <no-changes>guardat sense canvis detectats.</no-changes>
-            <specific-changes>s'han fet els canvis següents:</specific-changes>
+            <user-action>{1,choice,0#Usuari anònim|1#Usuari {0}} {2,choice,0#guardada la revisió inicial.|1#guardat sense canvis detectats.|2#s'han fet alguns canvis.|3#s'han fet els canvis següents:}</user-action>
 
             <view-data>Veure aquesta revisió:</view-data>
 

@@ -147,13 +147,7 @@
             <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (初始修订)}'|1# (当前修订)}</date>
             <date-format>[FNn,*-3], [MNn,*-3] [D], [Y] 在 [h]:[m] [P,*-2]</date-format>
 
-            <named-user>用户 {0}</named-user>
-            <anonymous-user>一位匿名用户</anonymous-user>
-
-            <unknown-changes>进行了某些更改。</unknown-changes>
-            <initial-revision>保存了初始修订。</initial-revision>
-            <no-changes>保存时未检测到更改。</no-changes>
-            <specific-changes>进行了以下更改：</specific-changes>
+            <user-action>{1,choice,0#一位匿名用户|1#用户 {0}} {2,choice,0#保存了初始修订。|1#保存时未检测到更改。|2#进行了某些更改。|3#进行了以下更改：}</user-action>
 
             <view-data>查看此修订</view-data>
 

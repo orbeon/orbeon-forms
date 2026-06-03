@@ -71,7 +71,7 @@ object FormRunnerCommonConstraint {
         removeEnclosingBracketsIfPresent getOrElse // expected to have an extra level of brackets but if not we ignore it for compatibility
         (throw new IllegalArgumentException)
 
-    // NOTE: In the future, we could handle more types of literals, possibly all of the `AtomicValue` literals. In this case,
+    // NOTE: In the future, we could handle more types of literals, possibly all the `AtomicValue` literals. In this case,
     // we should return the type of the literal, and a correctly-serialized string value of the string. We will also have to
     // support extracting a sequence of items, in particular a sequence of `xs:date`.
     def isSupportedLiteral(l: Literal): Boolean =

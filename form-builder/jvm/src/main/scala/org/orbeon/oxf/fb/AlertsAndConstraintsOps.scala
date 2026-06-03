@@ -723,6 +723,18 @@ trait AlertsAndConstraintsOps extends ControlOps {
     attributeValidations ++ elementValidations toList
   }
 
+  // Write a list of constraint expressions to the bind for the given control, replacing any existing constraints.
+  // Pass an empty list to clear all constraints.
+  def writeConstraintExpressions(
+    controlName: String,
+    expressions: List[String]
+  )(implicit ctx: FormBuilderDocContext): Unit =
+    writeValidations(
+      controlName,
+      MipName.Constraint,
+      expressions.filter(_.nonEmpty).map(ConstraintValidation(None, ValidationLevel.ErrorLevel, _, None))
+    )
+
   private def mipAtts (bind: NodeInfo, mip: MipName) = bind /@ mipToFBMIPQNames(mip)._1
   private def mipElems(bind: NodeInfo, mip: MipName) = bind /  mipToFBMIPQNames(mip)._2
 

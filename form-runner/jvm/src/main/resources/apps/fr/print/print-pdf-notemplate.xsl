@@ -436,14 +436,16 @@
         priority="10"
         match="
             *[
-                p:has-class('xforms-disabled')                   or
-                p:has-class('xforms-case-deselected')            or
-                p:has-class('xforms-case-begin-end')             or
-                p:has-class('xforms-hidden')                     or
-                p:has-class('xforms-dialog')                     or
-                p:has-class('xforms-error-dialogs')              or
-                p:has-class('xforms-help-panel')                 or
-                p:has-class('xforms-template')]"
+                p:has-class('xforms-disabled')        or
+                p:has-class('xforms-case-deselected') or
+                p:has-class('xforms-case-begin-end')  or
+                p:has-class('xforms-hidden')          or
+                p:has-class('xforms-dialog')          or
+                p:has-class('xforms-error-dialogs')   or
+                p:has-class('xforms-help-panel')      or
+                p:has-class('xforms-template')        or
+                p:has-class('xbl-fr-pager')           or
+                p:has-class('fr-repeat-menu')]"
        />
 
     <!-- We could remove the nested `div` but it doesn't seem to make a difference for page breaks -->

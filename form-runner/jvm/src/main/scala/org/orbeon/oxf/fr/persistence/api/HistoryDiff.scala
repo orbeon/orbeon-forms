@@ -23,7 +23,7 @@ import org.orbeon.oxf.fr.importexport.FormDefinitionOps
 import org.orbeon.oxf.http.{HttpStatusCode, StatusCode}
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, StaticXPath, StringUtils, TryUtils}
+import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, StaticXPath, StringUtils}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsResourceSupport
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiver}
@@ -31,6 +31,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.*
 
 import java.time.Instant
+import scala.annotation.tailrec
 import scala.util.{Failure, Success, Try}
 import scala.xml.Elem
 
@@ -127,35 +128,48 @@ object HistoryDiff {
     def dataMigratedIfNeeded(data: DocumentNodeInfoType): Try[DocumentNodeInfoType] =
       if (isFormBuilder) Success(data) else dataMigratedToEdge(data)
 
-    // Read and migrate form data for all modified times
-    val migratedFormDataByModifiedTimeTry =
-      TryUtils.sequenceLazily(modifiedTimes) { modifiedTime =>
-        for {
-          formData         <- readFormData(modifiedTime)
-          migratedFormData <- dataMigratedIfNeeded(formData)
-        } yield modifiedTime -> migratedFormData.rootElement
-      } map {
-        _.toMap
-      }
+    // Read and migrate the form data for a single modified time
+    def readMigratedFormData(modifiedTime: Instant): Try[NodeInfo] =
+      for {
+        formData         <- readFormData(modifiedTime)
+        migratedFormData <- dataMigratedIfNeeded(formData)
+      } yield migratedFormData.rootElement
+
+    def computeDiffs(olderDataMigrated: NodeInfo, newerDataMigrated: NodeInfo): Option[Diffs] =
+      if (isFormBuilder) formDefinitionDiffs(olderDataMigrated, newerDataMigrated)
+      else               formDataDiffs      (olderDataMigrated, newerDataMigrated, formDefinition.formDefinition)
 
     val sortedModifiedTimes = modifiedTimes.sorted
 
-    // Compare all consecutive pairs of form data
-    migratedFormDataByModifiedTimeTry.map { migratedFormDataByModifiedTime =>
-      for {
-        (olderModifiedTime, newerModifiedTime) <- sortedModifiedTimes.zip(sortedModifiedTimes.tail)
-      } yield {
-        val olderDataMigrated = migratedFormDataByModifiedTime(olderModifiedTime)
-        val newerDataMigrated = migratedFormDataByModifiedTime(newerModifiedTime)
-
-        val diffsOpt =
-          if (isFormBuilder) formDefinitionDiffs(olderDataMigrated, newerDataMigrated)
-          else               formDataDiffs      (olderDataMigrated, newerDataMigrated, formDefinition.formDefinition)
-
-        (olderModifiedTime, newerModifiedTime) -> diffsOpt
+    // #7306: compare all consecutive pairs of form data using a sliding window, so we don't load all form data
+    // into memory at the same time
+    @tailrec
+    def loop(
+      olderModifiedTime: Instant,
+      olderDataMigrated: NodeInfo,
+      remaining        : List[Instant],
+      acc              : List[((Instant, Instant), Option[Diffs])]
+    ): Try[List[((Instant, Instant), Option[Diffs])]] =
+      remaining match {
+        case Nil =>
+          Success(acc.reverse)
+        case newerModifiedTime :: tail =>
+          readMigratedFormData(newerModifiedTime) match {
+            case Failure(t) =>
+              Failure(t)
+            case Success(newerDataMigrated) =>
+              val diffsOpt = computeDiffs(olderDataMigrated, newerDataMigrated)
+              loop(newerModifiedTime, newerDataMigrated, tail, ((olderModifiedTime, newerModifiedTime) -> diffsOpt) :: acc)
+          }
       }
-    } map {
-      _.toMap
+
+    sortedModifiedTimes match {
+      case firstModifiedTime :: rest =>
+        readMigratedFormData(firstModifiedTime)
+          .flatMap(firstDataMigrated => loop(firstModifiedTime, firstDataMigrated, rest, Nil))
+          .map(_.toMap)
+      case Nil =>
+        Success(Map.empty)
     }
   }
 

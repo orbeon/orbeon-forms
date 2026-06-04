@@ -141,18 +141,30 @@ object SecureUtils extends SecureUtilsTrait {
     private lazy val hasFallbackPassword = checkPasswordForKeyUsage(KeyUsage.FieldEncryptionFallback)
     private lazy val primaryAead         = createAead(KeyUsage.FieldEncryption)
     private lazy val fallbackAead        = hasFallbackPassword.option(createAead(KeyUsage.FieldEncryptionFallback))
+    private lazy val tokenAead           = createAead(KeyUsage.Token)
 
-    def encrypt(plaintext  : Array[Byte]): Array[Byte] = primaryAead.encrypt(plaintext,  null)
-    def decrypt(ciphertext : Array[Byte]): Array[Byte] =
-      try {
-        primaryAead.decrypt(ciphertext, null)
-      } catch {
-        case _: java.security.GeneralSecurityException if hasFallbackPassword =>
-          fallbackAead.get.decrypt(ciphertext, null)
+    def encrypt(plaintext: Array[Byte], keyUsage: KeyUsage): Array[Byte] =
+      keyUsage match {
+        case KeyUsage.FieldEncryption => primaryAead.encrypt(plaintext,  null)
+        case KeyUsage.Token           => tokenAead.encrypt(plaintext, null)
+        case _                        => throw new IllegalArgumentException(s"Unsupported key usage for Tink encryption: `$keyUsage`")
       }
 
-    def encrypt(plaintext  : String): String = TinkBase64.encode(encrypt(plaintext.getBytes(CharsetNames.Utf8)))
-    def decrypt(ciphertext : String): String = new String(decrypt(TinkBase64.decode(ciphertext)), CharsetNames.Utf8)
+    def decrypt(ciphertext : Array[Byte], keyUsage: KeyUsage): Array[Byte] =
+      keyUsage match {
+        case KeyUsage.FieldEncryption =>
+          try {
+            primaryAead.decrypt(ciphertext, null)
+          } catch {
+            case _: java.security.GeneralSecurityException if hasFallbackPassword =>
+              fallbackAead.get.decrypt(ciphertext, null)
+          }
+        case KeyUsage.Token           => tokenAead.decrypt(ciphertext, null)
+        case _                        => throw new IllegalArgumentException(s"Unsupported key usage for Tink encryption: `$keyUsage`")
+      }
+
+    def encrypt(plaintext : String, keyUsage: KeyUsage): String = TinkBase64.encode(encrypt(plaintext.getBytes(CharsetNames.Utf8), keyUsage))
+    def decrypt(ciphertext: String, keyUsage: KeyUsage): String = new String(decrypt(TinkBase64.decode(ciphertext), keyUsage), CharsetNames.Utf8)
   }
 
   private def checkPasswordStrengthProperty: Boolean =

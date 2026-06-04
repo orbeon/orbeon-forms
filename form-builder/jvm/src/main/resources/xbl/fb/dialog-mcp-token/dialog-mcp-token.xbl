@@ -1,0 +1,93 @@
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+
+    <xbl:binding
+            id="fb-dialog-mcp-token"
+            element="fb|dialog-mcp-token">
+        <xbl:handlers>
+            <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
+                <xf:setvalue
+                    ref="instance('local')/selected-operations"
+                    value="'read'"/>
+                <xxf:show dialog="dialog"/>
+            </xbl:handler>
+            <xbl:handler event="DOMActivate" observer="close-button">
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+            <xbl:handler event="xxforms-dialog-close" observer="dialog">
+                <xf:setvalue
+                    iterate="instance('local')"
+                    ref="."/>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:implementation>
+            <xf:model id="model">
+
+                <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <selected-operations>read</selected-operations>
+                        <token/>
+                    </_>
+                </xf:instance>
+
+            </xf:model>
+        </xbl:implementation>
+        <xbl:template>
+            <xf:group>
+               <xxf:dialog
+                    id="dialog"
+                    class="fr-dialog-share"
+                    level="modal"
+                    close="true"
+                    draggable="true">
+                    <xf:label ref="xxf:r('mcp-token-dialog.label', '|fr-fr-resources|')"/>
+
+                    <fr:grid ref="instance('local')">
+                        <fr:c x="1" w="12" y="1">
+                            <xf:output value="xxf:r('mcp-token-dialog.body', '|fr-fr-resources|')" mediatype="text/html"/>
+                        </fr:c>
+                        <fr:c x="1" w="12" y="2">
+                            <xf:output
+                                id="my-output"
+                                appearance="clipboard-copy"
+                                ref="token">
+                                <xf:label appearance="minimal" ref="xxf:r('mcp-token-dialog.token', '|fr-fr-resources|')"/>
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="1" w="4" y="3">
+                             <xf:select1 appearance="minimal" ref="selected-operations">
+                                <xf:label appearance="minimal" ref="xxf:r('share-dialog.select-operations', '|fr-fr-resources|')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('share-dialog.readonly', '|fr-fr-resources|')"/>
+                                    <xf:value>read</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('share-dialog.readwrite', '|fr-fr-resources|')"/>
+                                    <xf:value>read update</xf:value>
+                                </xf:item>
+                                 <xf:setvalue
+                                    event="xforms-enabled xforms-value-changed"
+                                    ref="instance('local')/token"
+                                    value="frf:createMcpToken(xxf:split(instance('local')/selected-operations) = 'update')"/>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+
+                    <xh:div class="fr-dialog-buttons">
+                        <xf:trigger appearance="xxf:primary" id="close-button">
+                            <xf:label ref="xxf:r('buttons.close', '|fr-fr-resources|')" mediatype="text/html"/>
+                        </xf:trigger>
+                    </xh:div>
+                </xxf:dialog>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

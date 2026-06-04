@@ -16,6 +16,7 @@ package org.orbeon.oxf.http
 import cats.data.NonEmptyList
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.util.NumericUtils
+import org.orbeon.oxf.util.StringUtils.*
 
 import java.net.URLEncoder
 import scala.util.matching.Regex
@@ -177,6 +178,12 @@ object Headers {
             .mkString(",")
       case (name, values)=>
         name -> values.mkString(",")
+    }
+
+  def extractBearerToken(headerValue: String): Option[String] =
+    headerValue match {
+      case AuthRegex("Bearer", token) => Option(token).flatMap(_.trimAllToOpt)
+      case _                          => None
     }
 
   // Capitalize any header

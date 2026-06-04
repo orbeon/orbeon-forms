@@ -96,6 +96,12 @@
                             <fr:language-selector/>
                         </xh:li>
                     </xh:ul>
+                    <xf:trigger appearance="minimal" ref=".[string(xxf:property('oxf.fb.mcp.enable')) = 'true' and string(xxf:property('oxf.fb.mcp.token.enable')) = 'true']">
+                        <xf:label><xh:i class="fa fa-key fa-fw" title="{xxf:r('mcp-token-dialog.label', '|fr-fr-resources|')}"/></xf:label>
+                        <xf:action event="DOMActivate">
+                            <xf:dispatch name="fb-show-dialog" targetid="dialog-mcp-token"/>
+                        </xf:action>
+                    </xf:trigger>
                     <fr:revision-history-icon/>
                     <fr:navbar-home-link/>
                 </xh:div>
@@ -1104,6 +1110,8 @@
                     </xf:action>
                 </xf:action>
             </fb:dialog-test-pdf>
+
+            <fb:dialog-mcp-token id="dialog-mcp-token"/>
 
             <xf:group bind="fb-toolbox-workflow-bind">
                 <fb:workflow20201

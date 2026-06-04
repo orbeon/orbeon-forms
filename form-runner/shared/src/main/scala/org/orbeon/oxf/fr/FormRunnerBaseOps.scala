@@ -184,6 +184,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
         tokens.map {
           case ("password.general"         , _) => "The password for the `oxf.crypto.password` property is missing or not strong enough."
           case ("password.token"           , _) => "The password for the `oxf.fr.access-token.password` property is missing or not strong enough (optional)."
+          case ("password.mcp-token"       , _) => "The password for the `oxf.fb.mcp.token.password` property is missing or not strong enough (optional)."
           case ("password.field-encryption", _) => "The password for the `oxf.fr.field-encryption.password` property is missing or not strong enough (optional)."
           case ("database.configuration"   , _) => "The database configuration is missing or incomplete."
           case (other                      , _) => s"The property `$other` is not defined."

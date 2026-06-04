@@ -425,6 +425,11 @@
         <readonly>Schreibgeschützt</readonly>
         <readwrite>Lese-/Schreibzugriff</readwrite>
     </share-dialog>
+    <mcp-token-dialog>
+        <label>Model Context Protocol (MCP)-Token erstellen</label>
+        <body>Verwenden Sie diesen Token, um auf den Orbeon Form Builder MCP-Server zuzugreifen. Weitere Einzelheiten finden Sie in der Dokumentation.</body>
+        <token>Link</token>
+    </mcp-token-dialog>
     <admin>
         <title>Formularverwaltung</title>
     </admin>

@@ -15,8 +15,9 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.FormRunner.orbeonRolesFromCurrentRequest
+import org.orbeon.oxf.fr.permission.Operation
 import org.orbeon.oxf.resources.ResourceManagerWrapper
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, XPath}
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.*
@@ -85,6 +86,17 @@ trait FormBuilderPermissionsOps {
             app -> forms) toMap
         }
     }
+
+  //@XPathFunction
+  def createMcpToken(
+    readwrite: Boolean
+  ): String = {
+    val validityMinutes = CoreCrossPlatformSupport.properties.getIntOpt("oxf.fb.mcp.token.validity").getOrElse(0)
+    FormRunnerMcpToken.encryptToken(
+      validity   = java.time.Duration.ofMinutes(validityMinutes),
+      operations = if (readwrite) Set(Operation.Read, Operation.Update) else Set(Operation.Read)
+    ).getOrElse(throw new IllegalStateException("could not create MCP token"))
+  }
 
   private def findConfiguredRoles(configurationOpt: Option[NodeInfo]) = configurationOpt match {
     case Some(configuration) => configuration.root / * / "role" toList

@@ -414,6 +414,11 @@
         <readonly>Только чтение</readonly>
         <readwrite>Чтение и запись</readwrite>
     </share-dialog>
+    <mcp-token-dialog>
+        <label>Создать токен Model Context Protocol (MCP)</label>
+        <body>Используйте этот токен для доступа к MCP-серверу Orbeon Form Builder. Подробности см. в документации.</body>
+        <token>Ссылка</token>
+    </mcp-token-dialog>
     <admin>
         <title>Администрирование форм</title>
     </admin>

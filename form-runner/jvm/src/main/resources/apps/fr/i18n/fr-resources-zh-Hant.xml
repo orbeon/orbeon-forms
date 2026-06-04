@@ -425,6 +425,11 @@
         <readonly>只讀</readonly>
         <readwrite>讀寫</readwrite>
     </share-dialog>
+    <mcp-token-dialog>
+        <label>建立模型上下文協定 (MCP) 令牌</label>
+        <body>使用此令牌存取 Orbeon Form Builder MCP 伺服器。有關詳細資訊，請參閱文件。</body>
+        <token>鏈接</token>
+    </mcp-token-dialog>
     <admin>
         <title>表單管理</title>
     </admin>

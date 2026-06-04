@@ -425,6 +425,11 @@
         <readonly>للقراءة فقط</readonly>
         <readwrite>للقراءة والكتابة</readwrite>
     </share-dialog>
+    <mcp-token-dialog>
+        <label>إنشاء رمز بروتوكول سياق النموذج (MCP)</label>
+        <body>استخدم هذا الرمز للوصول إلى خادم MCP الخاص بـ Orbeon Form Builder. راجع الوثائق لمزيد من التفاصيل.</body>
+        <token>رابط</token>
+    </mcp-token-dialog>
     <admin>
         <title>إدارة النماذج</title>
     </admin>

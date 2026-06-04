@@ -412,6 +412,11 @@
         <readonly>読み取り専用</readonly>
         <readwrite>読み書き</readwrite>
     </share-dialog>
+    <mcp-token-dialog>
+        <label>Model Context Protocol (MCP) トークンの作成</label>
+        <body>このトークンを使用して Orbeon Form Builder MCP サーバーにアクセスします。詳細についてはドキュメントを参照してください。</body>
+        <token>リンク</token>
+    </mcp-token-dialog>
     <admin>
         <title>フォーム管理</title>
     </admin>

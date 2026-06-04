@@ -425,6 +425,11 @@
         <readonly>Skrivskyddad</readonly>
         <readwrite>Skrivbar</readwrite>
     </share-dialog>
+    <mcp-token-dialog>
+        <label>Skapa Model Context Protocol (MCP)-token</label>
+        <body>Använd denna token för att komma åt Orbeon Form Builder MCP-servern. Se dokumentationen för detaljer.</body>
+        <token>Länk</token>
+    </mcp-token-dialog>
     <admin>
         <title>Formuläradministration</title>
     </admin>

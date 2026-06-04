@@ -425,6 +425,11 @@
         <readonly>Vain luku</readonly>
         <readwrite>Luku ja kirjoitus</readwrite>
     </share-dialog>
+    <mcp-token-dialog>
+        <label>Luo Model Context Protocol (MCP) -tunnus</label>
+        <body>Käytä tätä tunnusta päästäksesi Orbeon Form Builder MCP-palvelimeen. Katso lisätietoja dokumentaatiosta.</body>
+        <token>Linkki</token>
+    </mcp-token-dialog>
     <admin>
         <title>Lomakehallinta</title>
     </admin>

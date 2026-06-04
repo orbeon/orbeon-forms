@@ -423,6 +423,11 @@
         <readonly>Salt okunur</readonly>
         <readwrite>Okuma-yazma</readwrite>
     </share-dialog>
+    <mcp-token-dialog>
+        <label>Model Context Protocol (MCP) belirteci oluştur</label>
+        <body>Orbeon Form Builder MCP sunucusuna erişmek için bu belirteci kullanın. Detaylar için belgelere bakın.</body>
+        <token>Bağlantı</token>
+    </mcp-token-dialog>
     <admin>
         <title>Form Yönetimi</title>
     </admin>

@@ -430,6 +430,11 @@
         <readonly>Lecture seule</readonly>
         <readwrite>Lecture et écriture</readwrite>
     </share-dialog>
+    <mcp-token-dialog>
+        <label>Créer un jeton MCP (Model Context Protocol)</label>
+        <body>Utilisez ce jeton pour accéder au serveur MCP d'Orbeon Form Builder. Voir la documentation pour plus de détails.</body>
+        <token>Lien</token>
+    </mcp-token-dialog>
     <admin>
         <title>Admin formulaires</title>
     </admin>

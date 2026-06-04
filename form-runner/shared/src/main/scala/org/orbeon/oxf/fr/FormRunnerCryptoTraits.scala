@@ -40,6 +40,16 @@ trait FormRunnerExternalModeTokenTrait extends FormRunnerTokenTrait {
   type TokenPayloadType = Unit
 }
 
+trait FormRunnerMcpTokenTrait extends FormRunnerTokenTrait {
+
+  def encryptToken(
+    validity   : java.time.Duration,
+    operations : Set[Operation],
+  ): Option[String]
+
+  type TokenPayloadType = List[Operation]
+}
+
 trait FormRunnerTokenTrait {
 
   type TokenPayloadType

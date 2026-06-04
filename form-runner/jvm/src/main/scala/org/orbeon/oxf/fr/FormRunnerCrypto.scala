@@ -97,6 +97,29 @@ object FormRunnerExternalModeToken extends FormRunnerExternalModeTokenTrait with
     decryptToken(tokenHmac, token, SecureUtils.KeyUsage.GeneralNoCheck)
 }
 
+object FormRunnerMcpToken extends FormRunnerMcpTokenTrait with FormRunnerTokenJvmTrait {
+
+  import io.circe.generic.auto.*
+
+  type TokenHmac = Unit
+
+  def encryptToken(
+    validity   : java.time.Duration,
+    operations : Set[Operation],
+  ): Option[String] =
+    encryptToken(
+      (),
+      TokenPayload(
+        exp = java.time.Instant.now.plus(validity),
+        ops = Operations.inDefinitionOrder(operations)
+      ),
+      SecureUtils.KeyUsage.McpToken
+    )
+
+  def decryptToken(tokenHmac: TokenHmac, token: String): Try[TokenPayload] =
+    decryptToken(tokenHmac, token, SecureUtils.KeyUsage.McpToken)
+}
+
 trait FormRunnerTokenJvmTrait extends FormRunnerTokenTrait {
 
   type TokenHmac

@@ -33,6 +33,7 @@ object SecureUtils extends SecureUtilsTrait {
     case object GeneralNoCheck          extends KeyUsage
     case object General                 extends KeyUsage
     case object Token                   extends KeyUsage
+    case object McpToken                extends KeyUsage
     case object FieldEncryption         extends KeyUsage
     case object FieldEncryptionFallback extends KeyUsage
   }
@@ -43,6 +44,7 @@ object SecureUtils extends SecureUtilsTrait {
   private val DeprecatedXFormsPasswordProperty        = "oxf.xforms.password"
   private val GeneralPasswordProperty                 = "oxf.crypto.password"
   private val TokenPasswordProperty                   = "oxf.fr.access-token.password"
+  private val McpTokenPasswordProperty                = "oxf.fb.mcp.token.password"
   private val FieldEncryptionPasswordProperty         = "oxf.fr.field-encryption.password"
   private val FieldEncryptionFallbackPasswordProperty = "oxf.fr.field-encryption.password.read-fallback"
 
@@ -73,6 +75,7 @@ object SecureUtils extends SecureUtilsTrait {
       case KeyUsage.GeneralNoCheck          => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
       case KeyUsage.General                 => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
       case KeyUsage.Token                   => List(TokenPasswordProperty)
+      case KeyUsage.McpToken                => List(McpTokenPasswordProperty)
       case KeyUsage.FieldEncryption         => List(FieldEncryptionPasswordProperty)
       case KeyUsage.FieldEncryptionFallback => List(FieldEncryptionFallbackPasswordProperty)
     }
@@ -142,11 +145,13 @@ object SecureUtils extends SecureUtilsTrait {
     private lazy val primaryAead         = createAead(KeyUsage.FieldEncryption)
     private lazy val fallbackAead        = hasFallbackPassword.option(createAead(KeyUsage.FieldEncryptionFallback))
     private lazy val tokenAead           = createAead(KeyUsage.Token)
+    private lazy val mcpTokenAead        = createAead(KeyUsage.McpToken)
 
     def encrypt(plaintext: Array[Byte], keyUsage: KeyUsage): Array[Byte] =
       keyUsage match {
         case KeyUsage.FieldEncryption => primaryAead.encrypt(plaintext,  null)
         case KeyUsage.Token           => tokenAead.encrypt(plaintext, null)
+        case KeyUsage.McpToken        => mcpTokenAead.encrypt(plaintext, null)
         case _                        => throw new IllegalArgumentException(s"Unsupported key usage for Tink encryption: `$keyUsage`")
       }
 
@@ -160,6 +165,7 @@ object SecureUtils extends SecureUtilsTrait {
               fallbackAead.get.decrypt(ciphertext, null)
           }
         case KeyUsage.Token           => tokenAead.decrypt(ciphertext, null)
+        case KeyUsage.McpToken        => mcpTokenAead.decrypt(ciphertext, null)
         case _                        => throw new IllegalArgumentException(s"Unsupported key usage for Tink encryption: `$keyUsage`")
       }
 

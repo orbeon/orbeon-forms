@@ -425,6 +425,11 @@
         <readonly>Só de leitura</readonly>
         <readwrite>Leitura e escrita</readwrite>
     </share-dialog>
+    <mcp-token-dialog>
+        <label>Criar token do Model Context Protocol (MCP)</label>
+        <body>Use este token para aceder ao servidor MCP do Orbeon Form Builder. Consulte a documentação para obter detalhes.</body>
+        <token>Ligação</token>
+    </mcp-token-dialog>
     <admin>
         <title>Administração de formulários</title>
     </admin>

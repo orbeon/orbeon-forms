@@ -420,6 +420,11 @@
         <readonly>只读</readonly>
         <readwrite>读写</readwrite>
     </share-dialog>
+    <mcp-token-dialog>
+        <label>创建模型上下文协议 (MCP) 令牌</label>
+        <body>使用此令牌访问 Orbeon Form Builder MCP 服务器。有关详细信息，请参阅文档。</body>
+        <token>链接</token>
+    </mcp-token-dialog>
     <admin>
         <title>表单管理</title>
     </admin>

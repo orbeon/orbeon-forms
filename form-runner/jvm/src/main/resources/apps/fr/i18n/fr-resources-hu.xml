@@ -425,6 +425,11 @@
         <readonly>Csak olvasható</readonly>
         <readwrite>Olvasás és írás</readwrite>
     </share-dialog>
+    <mcp-token-dialog>
+        <label>Model Context Protocol (MCP) token létrehozása</label>
+        <body>Használja ezt a tokent az Orbeon Form Builder MCP szerver eléréséhez. Részletekért lásd a dokumentációt.</body>
+        <token>Link</token>
+    </mcp-token-dialog>
     <admin>
         <title>Űrlapok adminisztrációja</title>
     </admin>

@@ -443,6 +443,11 @@
         <readonly>Només lectura</readonly>
         <readwrite>Lectura-escriptura</readwrite>
     </share-dialog>
+    <mcp-token-dialog>
+        <label>Crear un token de Model Context Protocol (MCP)</label>
+        <body>Utilitzeu aquest token per accedir al servidor MCP d'Orbeon Form Builder. Vegeu la documentació per a més detalls.</body>
+        <token>Enllaç</token>
+    </mcp-token-dialog>
     <admin>
         <title>Administració de formularis</title>
     </admin>

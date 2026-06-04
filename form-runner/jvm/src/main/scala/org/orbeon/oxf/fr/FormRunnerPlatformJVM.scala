@@ -24,6 +24,7 @@ trait FormRunnerPlatformJVM extends FormRunnerPlatform {
 
     val passwordGeneral         = (! SecureUtils.checkPasswordForKeyUsage(SecureUtils.KeyUsage.General)        ).set("password.general",          log4s.Error)
     val passwordToken           = (! SecureUtils.checkPasswordForKeyUsage(SecureUtils.KeyUsage.Token)          ).set("password.token",            log4s.Info)
+    val passwordMcpToken        = (! SecureUtils.checkPasswordForKeyUsage(SecureUtils.KeyUsage.McpToken)       ).set("password.mcp-token",        log4s.Info)
     val passwordFieldEncryption = (! SecureUtils.checkPasswordForKeyUsage(SecureUtils.KeyUsage.FieldEncryption)).set("password.field-encryption", log4s.Info)
     val databaseConfiguration   = (! RelationalUtils.databaseConfigurationPresent()                            ).set("database.configuration",    log4s.Error)
 

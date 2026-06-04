@@ -416,6 +416,11 @@
         <readonly>Skrivebeskyttet</readonly>
         <readwrite>Læs/skriv</readwrite>
     </share-dialog>
+    <mcp-token-dialog>
+        <label>Opret Model Context Protocol (MCP)-token</label>
+        <body>Brug denne token til at få adgang til Orbeon Form Builder MCP-serveren. Se dokumentationen for detaljer.</body>
+        <token>Link</token>
+    </mcp-token-dialog>
     <admin>
         <title>Blanketadministration</title>
     </admin>

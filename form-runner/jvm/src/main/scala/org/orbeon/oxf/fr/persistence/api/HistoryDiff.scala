@@ -33,7 +33,6 @@ import org.orbeon.scaxon.SimplePath.*
 import java.time.Instant
 import scala.annotation.tailrec
 import scala.util.{Failure, Success, Try}
-import scala.xml.Elem
 
 
 object HistoryDiff {
@@ -227,7 +226,6 @@ case class  FormDataDiffs(formDiffs: List[FormDiff[Option[String]]]) extends Dif
 case object OtherDiffs                                               extends Diffs
 
 object Diffs {
-  def fromXml(elem: Elem): Diffs = ??? // TODO
 
   def serializeToSAX(
     diffsOpt            : Option[Diffs],

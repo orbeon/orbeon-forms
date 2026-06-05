@@ -166,7 +166,6 @@ trait FormRunnerPermissionsOps extends FormRunnerPlatform {
   def createInternalAdminTokenParam(): String =
     PersistenceApi.createInternalAdminUserToken(XFormsFunction.context.containingDocument.getRequestPath).orNull
 
-  //@XPathFunction
   def decryptParameterIfNeeded(parameterValue: String): String =
     parameterValue.trimAllToOpt.flatMap(FormRunnerOperationsEncryption.decryptString).getOrElse("")
 }

@@ -33,9 +33,6 @@ object FormRunnerExternalModeToken extends FormRunnerExternalModeTokenTrait {
 }
 
 object FormRunnerOperationsEncryption extends FormRunnerOperationsEncryptionTrait {
-  def encryptOperations(operationsTokens: Set[String]): String = ???
-  def decryptOperations(permissions: String): Option[Operations] = ???
-
   def encryptString(value: String): String = ???
   def decryptString(value: String): Option[String] = ???
 }

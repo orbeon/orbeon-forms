@@ -76,7 +76,7 @@
                                  <xf:setvalue
                                     event="xforms-enabled xforms-value-changed"
                                     ref="instance('local')/token"
-                                    value="frf:createMcpToken(xxf:split(instance('local')/selected-operations) = 'update')"/>
+                                    value="concat('Bearer ', frf:createMcpToken(xxf:split(instance('local')/selected-operations) = 'update'))"/>
                             </xf:select1>
                         </fr:c>
                     </fr:grid>

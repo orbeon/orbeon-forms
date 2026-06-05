@@ -1,0 +1,35 @@
+---
+name: orbeon-builder
+description: How to use the Orbeon MCP to create Orbeon Form Builder forms
+---
+
+- To create a new form, start with the `form_new` MCP call.
+- To edit an existing form, use the `form_edit` MCP call. You need a document id for that.
+- Before creating/making changes to controls in a form, start by calling `list_available_toolbox_form_controls` to know what form controls are available to use.
+- If editing a form, or as a checkpoint, use the `form_get_structure` MCP call to learn about what's in the form.
+    - A form is structurally made of sections, grids, and form controls.
+    - Sections can be nested within sections.
+        - Simple forms do not require nesting of sections.
+    - Grids are always nested within a section, and cannot be at the top-level.
+    - Within a section, there can be a combination of nested grids and sections.
+    - Controls are always within a grid.
+    - A grid is made or rows (initially one) and columns (12 as a strandard, with an option to change to 24).
+    - Form controls take space in a grid.
+        - Controls naturally take more or less width. 4 or 6 columns width are good defaults.
+        - Normally, all controls fit on a single row and do not need to span multiple rows.
+	    - Taller form controls like textareas will expand the row vertically if needed.
+	    - But if rows are shared by tall form controls an short ones, then it can make sense to have the tall one span rows.
+- `form_new` creates an empty form containing a section called `section-1` and a nested grid called `grid-1`, with a single row.
+    - This means that for the first section and first grid, you must not call `section_insert` and `grid_insert`.
+    - Instead, use `section_grid_control_rename` to rename the first section and first grid appropriately if desired.
+- For subsequent sections and grids, use `section_insert` and `grid_insert`.
+    - The `section_insert` function inserts a section AND a nested grid with a single row. The automatic grid name is returned.
+    - Use `section_grid_control_rename` to rename the nested grid appropriately if desired.
+- For inserting form controls, use `control_insert`.`
+    - For email fields, use the Email form control.
+    - For US phone number fields, use the US Phone Number form control.
+    - For selection controls (Dropdowns, Checkboxes, etc.) set items separately with `control_set_items`.
+    - For simple use cases, just insert form controls without specifying a position/size.
+    - For more complex use cases, you can specify the x, y, width, and height position of the form control to insert. Remember, it must fit in the grid.
+- To persist the form, use `form_save`. This can be called multiple times during the creation/update of the form if desired.
+- When done with a form session, call `form_close`.

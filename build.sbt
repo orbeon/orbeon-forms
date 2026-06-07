@@ -85,7 +85,7 @@ val AntVersion                       = "1.10.11"
 val ThumbnailatorVersion             = "0.4.16"
 val AwsSdkVersion                    = "2.44.14"
 val InfinispanVersion                = "14.0.35.Final"
-val SqliteJdbcVersion                = "3.53.1.0"
+val SqliteJdbcVersion                = "3.53.2.0"
 val PostgresqlVersion                = "42.7.11"
 val OracleJdbcVersion                = "23.26.2.0.0"
 

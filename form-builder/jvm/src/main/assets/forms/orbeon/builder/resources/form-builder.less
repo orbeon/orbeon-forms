@@ -1152,15 +1152,22 @@ body.orbeon {
         .fb-action-phrase {
             display: flex;
             justify-content: flex-start;
-            align-items: center;
+            align-items: start;
         }
 
         .fb-action-observer, .fb-action-event, .fb-action-control {
-            display: inline-block;
             margin-right: 5px;
             select {
                 width: 100% ;
             }
+        }
+
+        .fb-action-control {
+            flex: 0.5 1 auto;
+        }
+
+        .xbl-fr-box-select .xforms-select-appearance-full .xforms-items {
+            height: auto;
         }
 
         .tab-content {

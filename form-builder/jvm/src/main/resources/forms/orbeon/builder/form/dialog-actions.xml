@@ -366,13 +366,13 @@
                                 </xf:itemset>
                                 <xf:alert/>
                             </xf:select1>
-                            <xf:select ref="$event[not($observer = 'fr-form-model')]" appearance="full xxf:horizontal" class="fb-action-event">
+                            <fr:box-select ref="$event[not($observer = 'fr-form-model')]" appearance="full xxf:horizontal" class="fb-action-event">
                                 <xf:itemset ref="$form-resources/dialog-actions/control-event-type/item">
                                     <xf:label ref="label"/>
                                     <xf:value ref="value"/>
                                 </xf:itemset>
                                 <xf:alert/>
-                            </xf:select>
+                            </fr:box-select>
                         </xh:div>
                     </xf:group>
                 </fr:c>

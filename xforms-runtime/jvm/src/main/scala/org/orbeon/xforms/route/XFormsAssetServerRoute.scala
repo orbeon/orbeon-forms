@@ -452,8 +452,9 @@ object XFormsAssetServerRoute extends NativeRoute {
   }
 
   private def findDynamicResource(
-    requestPath     : String)(implicit
-    externalContext : ExternalContext
+    requestPath    : String
+  )(implicit
+    externalContext: ExternalContext
   ): Option[DynamicResource] =
     externalContext.getRequest.sessionOpt flatMap { session =>
       val digestFromPath = filename(requestPath)
@@ -468,23 +469,23 @@ object XFormsAssetServerRoute extends NativeRoute {
 
   // Information about the resource, stored into the session
   case class DynamicResource(
-    digest       : String,
-    uri          : URI,
-    filenameOpt  : Option[String],
-    contentType  : String,
-    mediaType    : String,
-    size         : Long,
-    lastModified : Long,
-    headers      : Map[String, List[String]]
+    digest      : String,
+    uri         : URI,
+    filenameOpt : Option[String],
+    contentType : String,
+    mediaType   : String,
+    size        : Long,
+    lastModified: Long,
+    headers     : Map[String, List[String]]
   )
 
-  object DynamicResource {
+  private object DynamicResource {
     def apply(
-      uri            : URI,
-      filenameOpt    : Option[String],
-      contentTypeOpt : Option[String],
-      lastModified   : Long,
-      headers        : Map[String, List[String]]
+      uri           : URI,
+      filenameOpt   : Option[String],
+      contentTypeOpt: Option[String],
+      lastModified  : Long,
+      headers       : Map[String, List[String]]
     ): DynamicResource = {
 
       // Create a digest, so that for a given URI we always get the same key

@@ -18,7 +18,6 @@ import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
-import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.definitions.ModeType
 import org.orbeon.oxf.fr.email.{EmailMetadataParsing, EvaluatedParams}
 import org.orbeon.oxf.fr.process.{SimpleProcess, *}
@@ -174,7 +173,7 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Arg(STRING, EXACTLY_ONE)
     )
 
-    Fun("evaluate-from-property", classOf[FREvaluateFromProperty], op = saxon.functions.Evaluate.EVALUATE, min = 2, max = 3, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+    Fun("evaluate-from-property", classOf[FREvaluateFromProperty], op = saxon.functions.Evaluate.EVALUATE, min = 2, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
       Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE),
       Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE)

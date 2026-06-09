@@ -1200,7 +1200,7 @@
         </_>
     </xf:instance>
 
-    <!-- Watch data-status and dispatch fr-data-status-changed -->
+    <!-- Watch `data-status` and dispatch `fr-data-status-changed` -->
     <xf:action
         event="xxforms-value-changed"
         observer="fr-persistence-instance"

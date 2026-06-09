@@ -5,6 +5,7 @@ import org.apache.commons.fileupload.disk.{DiskFileItem, DiskFileItemFactory}
 import org.apache.commons.fileupload.{FileItem, FileItemIterator, FileItemStream}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.IOUtils.*
+import org.orbeon.io.UriUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.CoreUtils.*
@@ -13,6 +14,9 @@ import org.orbeon.oxf.util.StringUtils.*
 
 import java.io.{File, IOException, InputStream}
 import java.net.URI
+import java.nio.file.Files
+import java.util.UUID
+import scala.util.chaining.*
 import scala.util.control.NonFatal
 
 
@@ -73,7 +77,7 @@ object FileItemSupport {
 
     scope match {
       case ExpirationScope.Request     => deleteFileOnRequestEnd(fileItem)
-      case ExpirationScope.Session     => deleteFileOnSessionTermination(fileItem.fileLocationOpt.filter(_.exists()))
+      case ExpirationScope.Session     => Private.deleteFileOnSessionTermination(fileItem.fileLocationOpt.filter(_.exists()))
       case ExpirationScope.Application => deleteFileOnApplicationDestroyed(fileItem)
     }
 
@@ -100,7 +104,7 @@ object FileItemSupport {
     }
 
     newFile.deleteOnExit()
-    deleteFileOnSessionTermination(newFile.some)
+    deleteFileOnSessionTermination(newFile)
 
     newFile
   }
@@ -152,6 +156,26 @@ object FileItemSupport {
     def hasNext: Boolean = i.hasNext
     def next(): FileItemStream = i.next()
     override def toString = "Iterator wrapping FileItemIterator" // `super.toString` is dangerous when running in a debugger
+  }
+
+  def deleteFileOnSessionTermination(file: File): Unit =
+    Private.deleteFileOnSessionTermination(file.some)
+
+  private def buildTmpFilenameWithPrefixAndExtension(filename: String): String =
+    s"orbeon-$filename.tmp"
+
+  def createHardLinkForTmpFileExpireWithSession(fileUri: URI): URI = {
+
+    require(fileUri.getScheme == "file", s"expected a `file` URI but got `$fileUri`")
+
+    val path = java.nio.file.Path.of(UriUtils.removeQueryAndFragment(fileUri)) // our `file:` URIs can have query parameters, but `Path.of` does not support them
+
+    Files.createLink(
+      path.resolveSibling(buildTmpFilenameWithPrefixAndExtension(UUID.randomUUID().toString)),
+      path
+    )
+    .tap(_.toFile.tap(deleteFileOnSessionTermination).deleteOnExit())
+    .toUri
   }
 
   private object Private {

@@ -463,7 +463,7 @@ object XFormsAssetServerRoute extends NativeRoute {
     }
   }
 
-  private def findDynamicResource(
+  def findDynamicResource(
     requestPath    : String
   )(implicit
     externalContext: ExternalContext

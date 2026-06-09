@@ -79,8 +79,17 @@ trait FunctionSupport extends SystemFunction {
       case _             => throw new IllegalArgumentException
     }
 
-  def stringArgumentOpt(i: Int)(implicit xpathContext: XPathContext): Option[String] =
-    arguments.lift(i) map (_.evaluateAsString(xpathContext).toString)
+  // Return `None` if:
+  // - the argument is missing, or
+  // - the argument is present and is an empty sequence and `emptySequenceIsNone` is `true
+  def stringArgumentOpt(i: Int, emptySequenceIsNone: Boolean = false)(implicit xpathContext: XPathContext): Option[String] =
+    arguments.lift(i).flatMap { paramExpr =>
+      if (emptySequenceIsNone)
+        Option(evaluateItem(xpathContext)).map(_.getStringValue)
+      else
+        Some(paramExpr.evaluateAsString(xpathContext).toString)
+    }
+
 
   def stringArgumentOrContextOpt(i: Int)(implicit xpathContext: XPathContext): Option[String] =
     stringArgumentOpt(i) orElse (Option(xpathContext.getContextItem) map (_.getStringValue))

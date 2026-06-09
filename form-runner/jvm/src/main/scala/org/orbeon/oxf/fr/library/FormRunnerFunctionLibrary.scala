@@ -17,6 +17,7 @@ import cats.syntax.option.*
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.common.Version
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.definitions.ModeType
@@ -24,10 +25,11 @@ import org.orbeon.oxf.fr.email.{EmailMetadataParsing, EvaluatedParams}
 import org.orbeon.oxf.fr.process.{SimpleProcess, *}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, NetUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, ExternalContextSupport, IndentedLogger}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
 import org.orbeon.oxf.xforms.analysis.ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.oxf.xforms.function.xxforms.EvaluateSupport
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
@@ -203,9 +205,10 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Arg(STRING, ALLOWS_ZERO_OR_MORE)
     )
 
-    Fun("save-state", classOf[FRSaveState], op = 0, min = 0, BOOLEAN, ALLOWS_ZERO_OR_ONE,
+    Fun("save-state", classOf[FRSaveState], op = 0, min = 2, BOOLEAN, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, EXACTLY_ONE),
-      Arg(STRING, EXACTLY_ONE)
+      Arg(STRING, EXACTLY_ONE),
+      Arg(BOOLEAN, EXACTLY_ONE),
     )
 
     Fun("process-template", classOf[FRProcessTemplate], op = 0, min = 0, STRING, EXACTLY_ONE,
@@ -213,10 +216,11 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
     )
 
-    Fun("rendered-format-url", classOf[FRRenderedFormatUrl], op = 0, min = 0, STRING, EXACTLY_ONE,
+    Fun("rendered-format-url", classOf[FRRenderedFormatUrl], op = 0, min = 3, STRING, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE),
       Arg(BOOLEAN, EXACTLY_ONE),
       Arg(STRING, ALLOWS_ZERO_OR_ONE),
+      Arg(BOOLEAN, EXACTLY_ONE),
     )
 
     Fun("rendered-format-filename", classOf[FRRenderedFormatFilename], op = 0, min = 0, STRING, EXACTLY_ONE,
@@ -229,8 +233,8 @@ private object FormRunnerFunctions {
 
   val StringGettersByName: Seq[(String, () => Option[String])] = List(
     "form-title"                  -> (() => FormRunner.formTitleFromMetadata),
-    "username"                    -> (() => NetUtils.getExternalContext.getRequest.credentials map     (_.userAndGroup.username)),
-    "user-group"                  -> (() => NetUtils.getExternalContext.getRequest.credentials flatMap (_.userAndGroup.groupname)),
+    "username"                    -> (() => ExternalContextSupport.externalContext.getRequest.credentials map     (_.userAndGroup.username)),
+    "user-group"                  -> (() => ExternalContextSupport.externalContext.getRequest.credentials flatMap (_.userAndGroup.groupname)),
     "relevant-form-values-string" -> (() => Some(FormRunnerMetadata.findAllControlsWithValues(html = false, Nil))),
     "wizard-current-page-name"    -> (() => Wizard.wizardCurrentPageNameOpt)
   )
@@ -547,7 +551,7 @@ private object FormRunnerFunctions {
 
   class FRUsePdfTemplate extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(context: XPathContext): BooleanValue =
-      FormRunnerRenderedFormat.usePdfTemplate(NetUtils.getExternalContext.getRequest)
+      FormRunnerRenderedFormat.usePdfTemplate(ExternalContextSupport.externalContext.getRequest)
   }
 
   class FRCreatedWithOrNewer extends FunctionSupport with RuntimeDependentFunction {
@@ -745,6 +749,12 @@ private object FormRunnerFunctions {
       val modePublicName =
         stringArgumentOpt(0).getOrElse(formRunnerParams.mode)
 
+      val workflowStageOpt =
+        stringArgumentOpt(1, emptySequenceIsNone = true).flatMap(_.trimAllToOpt)
+
+      val preserveRenderedFormats =
+        booleanArgumentOpt(2).getOrElse(false)
+
       val continuationMode =
         ModeType.modeFromPublicName(
           modePublicName,
@@ -758,7 +768,16 @@ private object FormRunnerFunctions {
         currentLang         = FormRunner.currentLang,
         embeddable          = xfc.containingDocument.isEmbeddedFromUrlParam,
         continuationMode    = continuationMode,
-        privateModeMetadata = SimpleProcess.privateModeMetadataFromCurrent
+        privateModeMetadata = {
+          val privateModeMetadata =
+            SimpleProcess.privateModeMetadataFromCurrent(preserveRenderedFormats)
+          workflowStageOpt match {
+            case Some(workflowStage) =>
+              privateModeMetadata.copy(workflowStage = workflowStage.some)
+            case None =>
+              privateModeMetadata
+          }
+        }
       )
     }
   }
@@ -795,20 +814,27 @@ class FRProcessTemplate extends FunctionSupport with RuntimeDependentFunction {
 
 class FRRenderedFormatUrl extends FunctionSupport with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
+
     implicit val xpc             : XPathContext     = xpathContext
     implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
+    implicit val externalContext : ExternalContext  = ExternalContextSupport.externalContext
 
-    val usePdfTemplate     = booleanArgument(1, default = true)
-    val pdfTemplateNameOpt = stringArgumentOpt(2).flatMap(_.trimAllToOpt)
+    val usePdfTemplate          = booleanArgument(1, default = true)
+    val pdfTemplateNameOpt      = stringArgumentOpt(2).flatMap(_.trimAllToOpt)
+    val createHardLinkIfPresent = booleanArgumentOpt(3).getOrElse(false)
 
     val renderedFormatParams =
       (! usePdfTemplate).list(FormRunnerRenderedFormat.UsePdfTemplateParam.some -> usePdfTemplate.toString) :::
       pdfTemplateNameOpt.map(FormRunnerRenderedFormat.PdfTemplateNameParam.some -> _).toList
 
     SimpleProcess.tryCreateRenderedFormatIfNeeded(
-      params         = renderedFormatParams.toMap,
-      renderedFormat = RenderedFormat.withName(stringArgument(0))
-    ).toOption.map(_._1.toString)
+      params                  = renderedFormatParams.toMap,
+      renderedFormat          = RenderedFormat.withName(stringArgument(0)),
+      createHardLinkIfPresent = createHardLinkIfPresent
+    )
+    .toOption
+    .map(_._1.toString)
+    .map(XFormsUploadControl.hmacURL(_, None, None, None)) // add HMAC so we can allow access via download
   }
 }
 

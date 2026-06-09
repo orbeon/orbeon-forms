@@ -54,7 +54,8 @@
                             fr:rendered-format-url(
                                 'pdf',
                                 not($template/attach/@use-pdf-template/string() = 'false'),
-                                $template/attach/@pdf-template-name/string()
+                                $template/attach/@pdf-template-name/string(),
+                                true() (: create a hard link to the temporary file if present :)
                             )"/>
                     <xf:setvalue
                         ref="instance()/pdf-attachment/@filename"

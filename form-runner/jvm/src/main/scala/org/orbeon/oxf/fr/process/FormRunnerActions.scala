@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.process
 import cats.syntax.option.*
 import org.orbeon.connection.StreamedContent
 import org.orbeon.io.CharsetNames
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
@@ -55,6 +56,7 @@ import software.amazon.awssdk.services.s3.S3Client
 import java.net.URI
 import scala.language.postfixOps
 import scala.util.Try
+import scala.util.chaining.scalaUtilChainingOps
 
 
 trait FormRunnerActions
@@ -178,7 +180,8 @@ trait FormRunnerActions
       version  = FormDefinitionVersion.Specific(formRunnerParams.formVersion)
     ).get._1._2
 
-    implicit val ctx: InDocFormRunnerDocContext = new InDocFormRunnerDocContext(formDefinition)
+    implicit val ctx            : InDocFormRunnerDocContext = new InDocFormRunnerDocContext(formDefinition)
+    implicit val externalContext: ExternalContext           = CoreCrossPlatformSupport.externalContext
 
     val emailMetadataNodeOpt  = frc.metadataInstanceRootOpt(formDefinition).flatMap(metadata => (metadata / "email").headOption)
     val emailMetadata         = parseEmailMetadata(emailMetadataNodeOpt, formDefinition)
@@ -191,7 +194,7 @@ trait FormRunnerActions
       }
 
     selectedRenderFormats foreach
-      (tryCreateRenderedFormatIfNeeded(pdfParams, _).get)
+      (tryCreateRenderedFormatIfNeeded(pdfParams, _, createHardLinkIfPresent = false).get)
 
     val currentFormLang = FormRunner.currentLang
 
@@ -351,8 +354,9 @@ trait FormRunnerActions
     val FormRunnerParams(currentApp, currentForm, _, currentDocumentOpt, currentIsDraft, _) = formRunnerParams
     val currentFormVersion = formRunnerParams.formVersion
 
-    implicit val xfcd       : XFormsContainingDocument = inScopeContainingDocument
-    implicit val propertySet: PropertySet              = CoreCrossPlatformSupport.properties
+    implicit val xfcd           : XFormsContainingDocument = inScopeContainingDocument
+    implicit val propertySet    : PropertySet              = CoreCrossPlatformSupport.properties
+    implicit val externalContext: ExternalContext          = CoreCrossPlatformSupport.externalContext
 
     val propertyPrefixOpt = paramByNameOrDefaultUseAvt(params, "property")
 
@@ -448,7 +452,7 @@ trait FormRunnerActions
     // Create rendered format if needed
     val renderedFormatTmpFileUris =
       distinctRenderedFormats map { format =>
-        tryCreateRenderedFormatIfNeeded(params, format).get._1 -> format
+        tryCreateRenderedFormatIfNeeded(params, format, createHardLinkIfPresent = false).get._1 -> format
       }
 
     // Create multipart if needed
@@ -541,12 +545,13 @@ trait FormRunnerActions
   }
 
   private def tryChangeModeImpl(
-    replace            : ReplaceType,
-    pathQuery          : PathWithParams, // may only include rendered format params
-    sourceModeType     : ModeType,
-    formTargetOpt      : Option[String] = None,
-    showProgress       : Boolean        = true,
-    responseIsResource : Boolean        = false
+    replace                : ReplaceType,
+    pathQuery              : PathWithParams, // may only include rendered format params
+    sourceModeType         : ModeType,
+    formTargetOpt          : Option[String] = None,
+    showProgress           : Boolean        = true,
+    responseIsResource     : Boolean        = false,
+    preserveRenderedFormats: Boolean        = false,
   )(implicit
     formRunnerParams   : FormRunnerParams
   ): Option[XFormsSubmitDoneEvent] = {
@@ -557,7 +562,7 @@ trait FormRunnerActions
 
     val queryParams =
       buildPublicStateParamsFromCurrent :::
-      buildUserAndStandardParamsForModeChangeFromCurrent(currentDataFormatVersion) :::
+      buildUserAndStandardParamsForModeChangeFromCurrent(currentDataFormatVersion, preserveRenderedFormats) :::
       maybeRenderFormatParams
 
     trySendImpl(
@@ -594,7 +599,8 @@ trait FormRunnerActions
     ActionResult.trySync {
       implicit val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
 
-      val modePublicNameString = requiredParamByNameUseAvt(params, "change-mode", "mode")
+      val modePublicNameString    = requiredParamByNameUseAvt(params, "change-mode", "mode")
+      val preserveRenderedFormats = booleanParamByNameUseAvt (params, "preserve-rendered-formats", default = false)
 
       // For now, we don't exclude particular modes, but note:
       // - `new` -> `view` -> `new` should make sense
@@ -604,7 +610,12 @@ trait FormRunnerActions
       if (! isSupportedDetailMode(modePublicNameString, excludeSecondaryModes = true) || modePublicNameString == FormRunnerDetailMode.Pdf.publicName)
         throw new IllegalArgumentException(s"Unsupported detail mode navigation for mode: `$modePublicNameString`")
 
-      tryChangeModeImpl(ReplaceType.All, s"/fr/$app/$form/$modePublicNameString/$document" -> Nil, formRunnerParams.modeType(frc.customModes))
+      tryChangeModeImpl(
+        ReplaceType.All,
+        s"/fr/$app/$form/$modePublicNameString/$document" -> Nil,
+        formRunnerParams.modeType(frc.customModes),
+        preserveRenderedFormats = preserveRenderedFormats
+      )
     }
 
   def tryOpenRenderedFormat(params: ActionParams): ActionResult =
@@ -691,14 +702,17 @@ trait FormRunnerActions
       frc.FormVersionParam -> formVersion.toString
     )
 
-  private def buildUserAndStandardParamsForModeChangeFromCurrent(dataFormatVersion: DataFormatVersion): List[(String, String)] =
+  private def buildUserAndStandardParamsForModeChangeFromCurrent(
+    dataFormatVersion      : DataFormatVersion,
+    preserveRenderedFormats: Boolean
+  ): List[(String, String)] =
     buildUserAndStandardParamsForModeChange(
       userParams          = inScopeContainingDocument.getRequestParameters,
       dataFormatVersion   = dataFormatVersion,
-      privateModeMetadata = privateModeMetadataFromCurrent
+      privateModeMetadata = privateModeMetadataFromCurrent(preserveRenderedFormats)
     )
 
-  def privateModeMetadataFromCurrent =
+  def privateModeMetadataFromCurrent(preserveRenderedFormats: Boolean) =
     PrivateModeMetadata(
       authorizedOperations = Operations.parseFromString(FormRunner.authorizedOperationsString),
       workflowStage        = FormRunner.documentWorkflowStage,
@@ -706,16 +720,16 @@ trait FormRunnerActions
       lastModified         = FormRunner.documentModifiedDateAsInstant,
       eTag                 = FormRunner.documentEtag,
       dataStatus           = if (FormRunner.isFormDataSaved) DataStatus.Clean else DataStatus.Dirty,
-      renderedFormats      = renderedFormatsMap
+      renderedFormats      = if (preserveRenderedFormats) renderedFormatsMap(createHardLinks = true) else Map.empty
     )
 
   def filterParamsToExcludeUponModeChange[T](p: Iterable[(String, T)]): Iterable[(String, T)] =
     p filterNot { case (name, _) => ParamsToExcludeUponModeChange(name) }
 
   def buildUserAndStandardParamsForModeChange(
-    userParams           : Iterable[(String, List[String])],
-    dataFormatVersion    : DataFormatVersion,
-    privateModeMetadata  : PrivateModeMetadata,
+    userParams         : Iterable[(String, List[String])],
+    dataFormatVersion  : DataFormatVersion,
+    privateModeMetadata: PrivateModeMetadata,
   ): List[(String, String)] = {
 
     val standardParams =
@@ -772,20 +786,31 @@ trait FormRunnerActions
     }
   }
 
-  private def renderedFormatsMap: Map[String, URI] =
+  private def renderedFormatsMap(createHardLinks: Boolean): Map[String, URI] =
     FormRunnerActionsCommon
       .findUrlsInstanceRootElem
       .toList
       .child(*)
       .collect { case elem if elem.stringValue.nonAllBlank => elem.localname -> URI.create(elem.stringValue)}
+      .map { case (format, fileUri) =>
+        val fileUriMaybeHardLink =
+          if (createHardLinks)
+            FileItemSupport.createHardLinkForTmpFileExpireWithSession(fileUri)
+          else
+            fileUri
+
+        format -> fileUriMaybeHardLink
+      }
       .toMap
 
   // Create if needed and return the element key name
   def tryCreateRenderedFormatIfNeeded(
-    params        : ActionParams,
-    renderedFormat: RenderedFormat
+    params                 : ActionParams,
+    renderedFormat         : RenderedFormat,
+    createHardLinkIfPresent: Boolean
   )(implicit
-    frParams      : FormRunnerParams
+    frParams               : FormRunnerParams,
+    externalContext        : ExternalContext
   ): Try[(URI, String)] =
     Try {
 
@@ -798,8 +823,14 @@ trait FormRunnerActions
         pdfTemplateOpt       = pdfTemplateOpt,
         defaultLang          = currentFormLang
       ) match {
-        case Some(pathToTmpFileWithKey) => pathToTmpFileWithKey
-        case None =>
+        case Some(pathToTmpFileWithKey) if java.nio.file.Path.of(pathToTmpFileWithKey._1).toFile.exists() && createHardLinkIfPresent =>
+          // The file exists, but we must create a hard link to it and return that instead of the original path/URI
+          FileItemSupport.createHardLinkForTmpFileExpireWithSession(pathToTmpFileWithKey._1) -> pathToTmpFileWithKey._2
+        case Some(pathToTmpFileWithKey) if java.nio.file.Path.of(pathToTmpFileWithKey._1).toFile.exists() =>
+          // The file exists, and we return the original path/URI
+          pathToTmpFileWithKey
+        case Some(_) | None =>
+          // The file doesn't exist, create/update it and return the path/URI
 
           val pathQuery =
             buildRenderedFormatPathWithParams(
@@ -832,7 +863,14 @@ trait FormRunnerActions
                 create               = true
               ).get
 
-            responseInstance.rootElement.stringValue.trimAllToOpt foreach { pathToTmpFile =>
+            responseInstance.rootElement.stringValue.trimAllToOpt.foreach { pathToTmpFileOrDynamic =>
+
+              val pathToTmpFile =
+                XFormsAssetServerRoute
+                  .findDynamicResource(pathToTmpFileOrDynamic)
+                  .map(_.uri.toString.tap(x => println(s"xxx Found dynamic resource for rendered format at path: $x")))
+                  .getOrElse(pathToTmpFileOrDynamic)
+
               setvalue(
                 ref   = node,
                 value = pathToTmpFile

@@ -14,7 +14,6 @@
 package org.orbeon.xforms.route
 
 import cats.syntax.option.*
-import org.orbeon.oxf.util.Exceptions.{getRootThrowable, isConnectionInterruption}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.controller.NativeRoute
@@ -25,6 +24,7 @@ import org.orbeon.oxf.http.{Headers, HttpRanges, SessionExpiredException, Status
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ResourceServer
 import org.orbeon.oxf.util.*
+import org.orbeon.oxf.util.Exceptions.{getRootThrowable, isConnectionInterruption}
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.xforms.*
@@ -425,7 +425,19 @@ object XFormsAssetServerRoute extends NativeRoute {
   // For Java callers
   // 2015-09-21: Only used by FileSerializer.
   def jProxyURI(urlString: String, contentType: String): String =
-    proxyURI(urlString, None, Option(contentType), -1, Map(), Set(), _ => None)(null).map(_.toString).getOrElse("")
+    proxyURI(
+      urlString        = urlString,
+      filename         = None,
+      contentType      = Option(contentType),
+      lastModified     = -1,
+      customHeaders    = Map.empty,
+      headersToForward = Set.empty,
+      getHeader        = _ => None
+    )(
+      logger           = null
+    )
+    .map(_.toString)
+    .getOrElse("")
 
   // Try to remove a dynamic resource
   //
@@ -434,7 +446,7 @@ object XFormsAssetServerRoute extends NativeRoute {
   // - remove the mapping from the session
   def tryToRemoveDynamicResource(
     requestPath: String,
-    removeFile : Boolean
+    removeFile : Boolean // 2026-06-08: always `true`
   ): Unit = {
 
     implicit val externalContext: ExternalContext = XFormsCrossPlatformSupport.externalContext

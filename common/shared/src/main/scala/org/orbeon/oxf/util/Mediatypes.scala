@@ -405,18 +405,21 @@ object Mediatypes extends MediatypesTrait {
     findExtensionForMediatype(mediatype).getOrElse(throw new IllegalArgumentException("mediatype"))
 
   def fromHeadersOrFilename(
-    header  : String => Option[String],
-    filename: => Option[String]
+    header     : String => Option[String],
+    filename   : => Option[String]
   ): Option[Mediatype] = {
 
-    def fromHeaders =
-      header(Headers.ContentType)            flatMap
-        ContentTypes.getContentTypeMediaType filterNot
-        (_ == ContentTypes.OctetStreamContentType)
+    def fromHeaders: Option[String] =
+      header(Headers.ContentType)
+        .flatMap(ContentTypes.getContentTypeMediaType)
+        .filterNot(_ == ContentTypes.OctetStreamContentType)
 
-    def fromFilename =
-      filename flatMap findMediatypeForPath
+    def fromFilename: Option[String] =
+      filename
+        .flatMap(findMediatypeForPath)
 
-    fromHeaders orElse fromFilename flatMap Mediatype.unapply
+    fromHeaders
+      .orElse(fromFilename)
+      .flatMap(Mediatype.unapply)
   }
 }

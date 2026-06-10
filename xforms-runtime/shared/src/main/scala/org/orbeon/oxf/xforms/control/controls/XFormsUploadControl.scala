@@ -317,7 +317,7 @@ object XFormsUploadControl {
     XFormsCrossPlatformSupport.deleteFileIfPossible(urlString)
 
   // XForms 1.1 mediatype is space-separated, XForms 2 accept is comma-separated like in HTML
-  def mediatypeToAccept(s: String): String = s.splitTo() mkString ","
+  def mediatypeToAccept(s: String): String = s.splitTo[List]().mkString(",")
 
   // Append metadata and MAC to the URL
   // The idea is that whenever the upload control stores a local file: URL, that URL contains a MAC (message

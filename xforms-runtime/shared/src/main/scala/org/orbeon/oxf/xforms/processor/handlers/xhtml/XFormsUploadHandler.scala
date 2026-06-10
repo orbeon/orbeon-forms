@@ -91,13 +91,13 @@ class XFormsUploadHandler(
           outputDisabledAttribute(atts)
 
         // @accept
-        uploadControl       flatMap
-          (_.acceptValue)   map
-          mediatypeToAccept foreach
-          (accept => atts.addOrReplace("accept", accept))
+        uploadControl
+          .flatMap(_.acceptValue)
+          .map(mediatypeToAccept)
+          .foreach(accept => atts.addOrReplace("accept", accept))
 
-        uploadControl foreach
-          (_.addExtensionAttributesExceptClassAndAcceptForHandler(atts, XXFORMS_NAMESPACE_URI))
+        uploadControl
+          .foreach(_.addExtensionAttributesExceptClassAndAcceptForHandler(atts, XXFORMS_NAMESPACE_URI))
 
         XFormsBaseHandler.forwardAccessibilityAttributes(attributes, atts, handlerContext)
         handleAriaByAtts(atts, XFormsLHHAHandler.coreControlLhhaByCondition)

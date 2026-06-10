@@ -835,13 +835,20 @@ body.orbeon {
 
         .fb-dialog-form-settings-fields {
 
-            .tab-content:has(.fb-template-cards-container) {
+            .tab-content:has(.fb-template-cards-container) { // `:has(.fb-template-cards-container)` is probably not needed? there is only one `.tab-content`
                 min-height: 234px; // empirically fit one line
                 max-height: 482px; // empirically fit two lines
+
+                & > .tab-pane.active:has(.fb-template-cards-container) {
+                    display: flex;
+                    flex-direction: column;
+                    height: 100%;
+                }
             }
 
             div.fb-template-cards-container {
                 padding: 5px; // so that selection outline/shadow is not clipped
+                overflow-y: auto;
             }
 
             div.fb-template-cards { // try to make stronger
@@ -849,7 +856,7 @@ body.orbeon {
                 flex-wrap: wrap;
                 gap: 1em;
 
-                justify-content: space-around;
+                justify-content: space-between;
 
                 & > span {
                     display: none;

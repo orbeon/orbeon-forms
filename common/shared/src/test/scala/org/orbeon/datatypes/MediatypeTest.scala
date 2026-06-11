@@ -13,8 +13,10 @@
   */
 package org.orbeon.datatypes
 
+import cats.syntax.option.*
 import org.orbeon.datatypes.Mediatype.TypeOrSubtype.SpecificType
 import org.orbeon.datatypes.MediatypeRange.{SingletonMediatypeRange, WildcardMediatypeRange, WildcardTypeMediatypeRange}
+import org.orbeon.oxf.util.{ContentTypes, Mediatypes}
 import org.scalatest.funspec.AnyFunSpec
 
 
@@ -69,4 +71,35 @@ class MediatypeTest extends AnyFunSpec {
       }
   }
 
+  describe("Getting mediatype from headers or file extension") {
+
+    val PdfType     = "application/pdf"
+    val XslxType    = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    val DocxType    = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    val ExcelType   = "application/vnd.ms-excel"
+    val WordType    = "application/msword"
+    val OutlookType = "application/vnd.ms-outlook"
+    val PngType     = "image/png"
+
+    val Expected = List(
+      (PdfType.some,      PdfType.some,                             None),
+      (PdfType.some,      None,                                     "file.pdf".some),
+      (PdfType.some,      ContentTypes.OctetStreamContentType.some, "file.pdf".some),
+      (None,              None,                                     None),
+      (XslxType.some,     None,                                     "file.xlsx".some),
+      (DocxType.some,     None,                                     "file.docx".some),
+      (ExcelType.some,    None,                                     "file.xls".some),
+      (WordType.some,     None,                                     "file.doc".some),
+      (OutlookType.some,  None,                                     "file.msg".some),
+      (PngType.some,      None,                                     "file.png".some),
+    )
+
+    for ((expectedOpt, headerOpt, filenameOpt) <- Expected)
+      it(s"must pass for `$headerOpt` / `$filenameOpt`") {
+        assert(
+          (expectedOpt flatMap Mediatype.unapply) ==
+            Mediatypes.fromHeadersOrFilename(_ => headerOpt, filenameOpt)
+        )
+      }
+  }
 }

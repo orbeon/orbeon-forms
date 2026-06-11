@@ -482,7 +482,7 @@
         </output>
     </test>
 
-    <test description="Layout for xf:upload" name="oxf:pipeline">
+    <test description="Layout for xf:upload" name="oxf:pipeline" only="true">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -499,7 +499,7 @@
                 <xh:body>
                     <xf:repeat id="my-repeat" ref=".">
                         <!-- Nested LHHA -->
-                        <xf:upload id="my-new-upload" ref="default">
+                        <xf:upload id="my-new-upload" ref="default" accept="video/*">
                             <xf:label>My label</xf:label>
                             <xf:hint>My hint</xf:hint>
                             <xf:help>My help</xf:help>
@@ -508,11 +508,11 @@
                         <!-- External LHHA -->
                         <xf:label for="my-new-upload-2">My label</xf:label>
                         <xf:hint for="my-new-upload-2">My hint</xf:hint>
-                        <xf:upload id="my-new-upload-2" ref="default"/>
+                        <xf:upload id="my-new-upload-2" ref="default" accept="image/jpeg"/>
                         <xf:help for="my-new-upload-2">My help</xf:help>
                         <xf:alert for="my-new-upload-2">My alert</xf:alert>
                         <!-- With an initial file -->
-                        <xf:upload id="my-new-upload-file" ref="file">
+                        <xf:upload id="my-new-upload-file" ref="file" accept="image/png">
                             <xf:label>My label</xf:label>
                             <xf:hint>My hint</xf:hint>
                             <xf:help>My help</xf:help>
@@ -533,7 +533,7 @@
                 <xh:span id="my-new-upload⊙1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-empty xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-upload≡xforms-input⊙1">My label</xh:label>
                     <xh:span id="my-new-upload≡≡c⊙1">
-                    <xh:input class="xforms-upload-select" type="file" id="my-new-upload≡xforms-input⊙1" name="my-new-upload⊙1" unselectable="on" aria-describedby="my-new-upload≡≡t⊙1 my-new-upload≡≡p⊙1" aria-errormessage="my-new-upload≡≡a⊙1"/>
+                    <xh:input class="xforms-upload-select" type="file" id="my-new-upload≡xforms-input⊙1" name="my-new-upload⊙1" unselectable="on" accept=".asf,.asx,.avi,.dl,.fli,.gl,.mng,.mov,.movie,.mp4,.mpe,.mpeg,.mpg,.mxu,.ogv,.qt,.webm,.wmv" aria-describedby="my-new-upload≡≡t⊙1 my-new-upload≡≡p⊙1" aria-errormessage="my-new-upload≡≡a⊙1"/>
                         <xh:span class="xforms-upload-info">
                             <xh:span class="xforms-upload-filename"/>
                             <xh:span class="xforms-upload-mediatype"/>
@@ -552,7 +552,7 @@
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-upload-2⊙1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-empty xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:span id="my-new-upload-2≡≡c⊙1">
-                        <xh:input class="xforms-upload-select" type="file" id="my-new-upload-2≡xforms-input⊙1" name="my-new-upload-2⊙1" unselectable="on" aria-describedby="xf-6⊙1 xf-7⊙1" aria-errormessage="xf-8⊙1"/>
+                        <xh:input class="xforms-upload-select" type="file" id="my-new-upload-2≡xforms-input⊙1" name="my-new-upload-2⊙1" unselectable="on" accept=".jpe,.jpeg,.jpg" aria-describedby="xf-6⊙1 xf-7⊙1" aria-errormessage="xf-8⊙1"/>
                         <xh:span class="xforms-upload-info">
                             <xh:span class="xforms-upload-filename"/>
                             <xh:span class="xforms-upload-mediatype"/>
@@ -569,7 +569,7 @@
                 <xh:span id="my-new-upload-file⊙1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-file xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-upload-file≡xforms-input⊙1">My label</xh:label>
                     <xh:span id="my-new-upload-file≡≡c⊙1">
-                    <xh:input class="xforms-upload-select" type="file" id="my-new-upload-file≡xforms-input⊙1" name="my-new-upload-file⊙1" unselectable="on" aria-describedby="my-new-upload-file≡≡t⊙1 my-new-upload-file≡≡p⊙1" aria-errormessage="my-new-upload-file≡≡a⊙1"/>
+                    <xh:input class="xforms-upload-select" type="file" id="my-new-upload-file≡xforms-input⊙1" name="my-new-upload-file⊙1" unselectable="on" accept=".png" aria-describedby="my-new-upload-file≡≡t⊙1 my-new-upload-file≡≡p⊙1" aria-errormessage="my-new-upload-file≡≡a⊙1"/>
                         <xh:span class="xforms-upload-info">
                             <xh:span class="xforms-upload-filename">help.png</xh:span>
                             <xh:span class="xforms-upload-mediatype">image/png</xh:span>

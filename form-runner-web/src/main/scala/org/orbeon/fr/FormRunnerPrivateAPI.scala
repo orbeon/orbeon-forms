@@ -40,9 +40,9 @@ object FormRunnerPrivateAPI extends js.Object {
   private val NewEditViewPathRe = """(.*/fr/)([^/]+)/([^/]+)/(new|edit|view)(?:/([^/]+))?$""".r
 
   // https://github.com/orbeon/orbeon-forms/issues/6960
-  def enableClientDataStatus(uuid: String): Unit =
+  def enableClientDataStatus(uuid: String, enabled: Boolean): Unit =
     Page.findFormByUuid(uuid)
-      .foreach(_.allowClientDataStatus = true)
+      .foreach(_.allowClientDataStatus = enabled)
 
   // https://github.com/orbeon/orbeon-forms/issues/4286
   def setDataStatus(uuid: String, safe: Boolean): Unit =

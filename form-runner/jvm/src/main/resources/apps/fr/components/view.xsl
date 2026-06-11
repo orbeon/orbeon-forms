@@ -577,11 +577,12 @@
                     "/>
             <xsl:if test="$is-detail and not($is-import or $is-validate)">
                 <xf:action
-                    event    = "xforms-enabled"
-                    observer = "fr-data-safe">
+                    event    = "xforms-enabled xforms-value-changed"
+                    observer = "fr-warn-when-data-unsafe">
                     <xf:action type="javascript">
-                        <xf:param name="uuid" value="xxf:document-id()"/>
-                        <xf:body>ORBEON.fr.private.API.enableClientDataStatus(uuid)</xf:body>
+                        <xf:param name="uuid"    value="xxf:document-id()"/>
+                        <xf:param name="enabled" value="$fr-warn-when-data-unsafe"/>
+                        <xf:body>ORBEON.fr.private.API.enableClientDataStatus(uuid, enabled == "true")</xf:body>
                     </xf:action>
                 </xf:action>
             </xsl:if>

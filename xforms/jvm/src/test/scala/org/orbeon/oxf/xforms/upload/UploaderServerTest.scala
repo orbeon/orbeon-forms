@@ -73,10 +73,10 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
           .processUpload(makeContentRequest)
 
         uploadResponses
-          .foreach { case UploadResponse(_, _, mediatypeOpt, filenameOpt, _, actualSize)  =>
+          .foreach { case UploadResponse(_, _, originalMediatypeOpt, _, filenameOpt, _, actualSize)  =>
             assert(filenameOpt.contains("miserables-8000.txt"))
             assert(actualSize == 8000)
-            assert(mediatypeOpt.contains("text/plain"))
+            assert(originalMediatypeOpt.contains("text/plain"))
         }
       }
     }
@@ -120,10 +120,10 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
             .processUpload(makeContentRequest)
 
           uploadResponses
-            .foreach { case UploadResponse(_, _, mediatypeOpt, filenameOpt, _, actualSize) =>
+            .foreach { case UploadResponse(_, _, originalMediatypeOpt, _, filenameOpt, _, actualSize) =>
               assert(filenameOpt.contains("miserables-8000.txt"))
               assert(actualSize == 8000)
-              assert(mediatypeOpt.contains("text/plain"))
+              assert(originalMediatypeOpt.contains("text/plain"))
             }
         }
       }
@@ -168,10 +168,10 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
             .processUpload(makeContentRequest)
 
           items
-            .foreach { case UploadResponse(_, _, mediatypeOpt, filenameOpt, _, actualSize) =>
+            .foreach { case UploadResponse(_, _, originalMediatypeOpt, fileScanMediatypeOpt, filenameOpt, _, actualSize) =>
               assert(filenameOpt.contains("miserables-8000.txt"))
               assert(actualSize == 8000)
-              assert(mediatypeOpt.contains("text/html"))
+              assert(fileScanMediatypeOpt.orElse(originalMediatypeOpt).contains("text/html"))
             }
         }
       }

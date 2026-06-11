@@ -50,13 +50,20 @@ import scala.util.{Failure, Success, Try}
 object UploaderServer extends UploaderServer {
 
   case class UploadResponse(
-    fieldName   : String,
-    messageOpt  : Option[String],
-    mediatypeOpt: Option[String],
-    filenameOpt : Option[String],
-    tmpFileUri  : URI,
-    actualSize  : Long
+    fieldName           : String,
+    messageOpt          : Option[String],
+    originalMediatypeOpt: Option[String],
+    fileScanMediatypeOpt: Option[String],
+    filenameOpt         : Option[String],
+    tmpFileUri          : URI,
+    actualSize          : Long
   )
+
+  // https://github.com/orbeon/orbeon-forms/issues/7698
+  lazy val ignoreContentTypeHeader: Boolean =
+    CoreCrossPlatformSupport
+      .properties
+      .getBoolean("oxf.xforms.upload.ignore-content-type-header", default = true)
 
   protected def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, AllowedMediatypes), URI)] =
     withDocumentAcquireLock(
@@ -172,19 +179,19 @@ trait UploaderServer {
     diskFileItem           : DiskFileItem
   ): UploadResponse = {
 
-    val messageOpt   = fileScanAcceptResultOpt.flatMap(_.message)
-    val mediatypeOpt = fileScanAcceptResultOpt.flatMap(_.mediatype) orElse diskFileItem.nonBlankContentTypeOpt
-    val filenameOpt  = fileScanAcceptResultOpt.flatMap(_.filename ) orElse diskFileItem.nonBlankClientFilenameOpt
+    val messageOpt  = fileScanAcceptResultOpt.flatMap(_.message)
+    val filenameOpt = fileScanAcceptResultOpt.flatMap(_.filename ) orElse diskFileItem.nonBlankClientFilenameOpt
 
     val (tmpFileUri, actualSize) = contentFromFileScanResultOrDiskItem(fileScanAcceptResultOpt, diskFileItem)
 
     UploadResponse(
-      fieldName    = fieldName,
-      messageOpt   = messageOpt,
-      mediatypeOpt = mediatypeOpt,
-      filenameOpt  = filenameOpt,
-      tmpFileUri   = tmpFileUri,
-      actualSize   = actualSize
+      fieldName            = fieldName,
+      messageOpt           = messageOpt,
+      originalMediatypeOpt = diskFileItem.nonBlankContentTypeOpt.flatMap(ContentTypes.getContentTypeMediaType),
+      fileScanMediatypeOpt = fileScanAcceptResultOpt.flatMap(_.mediatype).flatMap(ContentTypes.getContentTypeMediaType),
+      filenameOpt          = filenameOpt,
+      tmpFileUri           = tmpFileUri,
+      actualSize           = actualSize
     )
   }
 
@@ -415,7 +422,7 @@ trait UploaderServer {
       checkMediatypesThrowIfDisallowed(
         allowedMediatypeRanges    = allowedMediatypeRangesForControl,
         nonBlankClientFilenameOpt = fileItem.nonBlankClientFilenameOpt,
-        header                    = findHeaderValue
+        header                    = if (! UploaderServer.ignoreContentTypeHeader) findHeaderValue else _ => None // only pass the original media type if we are not ignoring the content type header
       )
 
       // https://github.com/orbeon/orbeon-forms/issues/5516

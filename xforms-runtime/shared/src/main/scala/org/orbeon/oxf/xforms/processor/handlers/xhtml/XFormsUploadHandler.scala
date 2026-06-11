@@ -18,7 +18,6 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, UploadControl}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.mediatypeToAccept
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.outputDisabledAttribute
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.SaxSupport.*
@@ -92,8 +91,7 @@ class XFormsUploadHandler(
 
         // @accept
         uploadControl
-          .flatMap(_.acceptValue)
-          .map(mediatypeToAccept)
+          .flatMap(_.extensionAttributeValue(ACCEPT_QNAME))
           .foreach(accept => atts.addOrReplace("accept", accept))
 
         uploadControl

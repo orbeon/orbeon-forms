@@ -221,7 +221,7 @@ object XXFormsUploadErrorEvent {
         List(
           "error-type" -> Some("mediatype-error"),
           "filename"   -> clientFilenameOpt,
-          "permitted"  -> Some(permitted.to(List).map(_.toString).mkString(", ")), // combine into a single string
+          "permitted"  -> Some(permitted.toNonEmptyList.toList.map(_.toString).mkString(", ")), // combine into a single string
           "actual"     -> (actual map (_.toString))
         )
       case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.FailedFileScan(_, message)))) =>

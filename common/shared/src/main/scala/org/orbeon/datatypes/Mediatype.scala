@@ -61,6 +61,14 @@ object MediatypeRange {
   case class  WildcardTypeMediatypeRange(typ: SpecificType)    extends MediatypeRange { override def toString = s"$typ/*" }
   case class  SingletonMediatypeRange   (mediatype: Mediatype) extends MediatypeRange { override def toString = mediatype.toString }
 
+  // Orders by specificity (ascending): `*/*` < `type/*` < `type/subtype`.
+  // Within the same tier, orders lexicographically by type then subtype.
+  implicit val ordering: Ordering[MediatypeRange] = Ordering.by {
+    case WildcardMediatypeRange              => (0, "", "")
+    case WildcardTypeMediatypeRange(typ)     => (1, typ.value, "")
+    case SingletonMediatypeRange(m)          => (2, m.typ.value, m.subtype.value)
+  }
+
   def unapply(s: String): Option[MediatypeRange] = {
     s.split("/", -1).to(List) match {
       case TypeOrSubtype(WildcardType)      :: TypeOrSubtype(WildcardType)          :: Nil => Some(WildcardMediatypeRange)

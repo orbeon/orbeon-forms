@@ -1,6 +1,8 @@
 package org.orbeon.oxf.util
 
-import org.orbeon.datatypes.Mediatype
+import org.orbeon.datatypes.Mediatype.TypeOrSubtype.SpecificType
+import org.orbeon.datatypes.MediatypeRange.{SingletonMediatypeRange, WildcardTypeMediatypeRange}
+import org.orbeon.datatypes.{Mediatype, MediatypeRange}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CollectionUtils.combineValues
 import org.orbeon.oxf.util.PathUtils.findExtension
@@ -337,16 +339,25 @@ object Mediatypes extends MediatypesTrait {
   )
 
   private val (
-    mappingsByMediatype: Map[String, List[Mapping]],
-    mappingsByExtension: Map[String, List[Mapping]],
-    labelsByMediatype  : Map[String, String]
+    mappingsByMediatype   : Map[String, List[Mapping]],
+    mappingsByExtension   : Map[String, List[Mapping]],
+    mappingsBySpecificType: Map[SpecificType, List[Mapping]],
+    labelsByMediatype     : Map[String, String],
   ) = {
 
     val mappingsByMediatype = combineValues[String, Mapping, List](AllMappings map { case m @ Mapping(_, mediatype, _)     => mediatype   -> m     }).toMap
     val mappingsByExtension = combineValues[String, Mapping, List](AllMappings map { case m @ Mapping(_, _, _)             => m.extension -> m     }).toMap
     val labelsByMediatype   =                                      AllMappings.map { case     Mapping(_, mediatype, label) => mediatype   -> label } .toMap
 
-    (mappingsByMediatype, mappingsByExtension, labelsByMediatype)
+    val mappingsBySpecificType =
+      AllMappings
+        .collect { case m @ Mapping(_, MediatypeRange(SingletonMediatypeRange(Mediatype(typ, _))), _) => typ -> m }
+        .groupBy(_._1)
+        .view
+        .mapValues(_.map(_._2))
+        .toMap
+
+    (mappingsByMediatype, mappingsByExtension, mappingsBySpecificType, labelsByMediatype)
   }
 
   def findMediatypeForExtension(extension: String): Option[String] =
@@ -370,6 +381,20 @@ object Mediatypes extends MediatypesTrait {
     for {
       mappings  <- mappingsByMediatype.get(mediatype)
       mapping   <- mappings.headOption
+    } yield
+      mapping.extension
+
+  def findExtensionsForMediatype(mediatype: String): List[String] =
+    for {
+      mappings  <- mappingsByMediatype.get(mediatype).toList
+      mapping   <- mappings
+    } yield
+      mapping.extension
+
+  def findExtensionsForSpecificType(typ: SpecificType): List[String] =
+    for {
+      mappings  <- mappingsBySpecificType.get(typ).toList
+      mapping   <- mappings
     } yield
       mapping.extension
 

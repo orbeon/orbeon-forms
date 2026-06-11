@@ -14,20 +14,21 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import cats.syntax.option.*
-import org.orbeon.datatypes.MaximumCurrentFiles
+import org.orbeon.datatypes.{MaximumCurrentFiles, MediatypeRange}
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.io.FileUtils
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.*
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent.*
 import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
-import org.orbeon.oxf.xforms.upload.UploadCheckerLogic
+import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLConstants.*
 import org.orbeon.oxf.xml.XMLReceiverAdapter
@@ -53,10 +54,6 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
   import XFormsUploadControl.*
 
   def supportedFileMetadata: Seq[String] = FileMetadata.AllMetadataNames
-
-  // NOTE: `mediatype` is deprecated as of XForms 2.0, use `accept` instead
-  def acceptValue: Option[String] =
-    extensionAttributeValue(ACCEPT_QNAME) orElse extensionAttributeValue(MEDIATYPE_QNAME)
 
   override def markDirtyImpl(): Unit = {
     super.markDirtyImpl()
@@ -279,6 +276,12 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
       case _ => false
     }
 
+  override def extensionAttributeValue(attributeName: QName): Option[String] =
+    if (attributeName == ACCEPT_QNAME)
+      evaluatedExtensionAttributes.get(attributeName).flatMap(buildExtensionsListAcceptValue)
+    else
+      super.extensionAttributeValue(attributeName)
+
   override def addAjaxExtensionAttributes(
     attributesImpl    : AttributesImpl,
     previousControlOpt: Option[XFormsControl],
@@ -315,9 +318,6 @@ object XFormsUploadControl {
   //@XPathFunction
   def deleteFileIfPossible(urlString: String): Unit =
     XFormsCrossPlatformSupport.deleteFileIfPossible(urlString)
-
-  // XForms 1.1 mediatype is space-separated, XForms 2 accept is comma-separated like in HTML
-  def mediatypeToAccept(s: String): String = s.splitTo[List]().mkString(",")
 
   // Append metadata and MAC to the URL
   // The idea is that whenever the upload control stores a local file: URL, that URL contains a MAC (message
@@ -481,4 +481,20 @@ object XFormsUploadControl {
       )
     }
   }
+
+  def buildExtensionsListAcceptValue(s: String): Option[String] =
+    AllowedMediatypes.unapply(s).flatMap {
+      case AllowedMediatypes.AllowedAnyMediatype => None // no `accept` value if all area allowed
+      case AllowedMediatypes.AllowedSomeMediatypes(mediatypes) =>
+        val extensions =
+          mediatypes
+            .toSortedSet
+            .flatMap {
+              case MediatypeRange.WildcardTypeMediatypeRange(typ)    => Mediatypes.findExtensionsForSpecificType(typ) // for `audio/*`, `video/*`, `image/*`
+              case MediatypeRange.SingletonMediatypeRange(mediatype) => Mediatypes.findExtensionsForMediatype(mediatype.toString)
+              case MediatypeRange.WildcardMediatypeRange             => throw new IllegalStateException
+            }
+
+        extensions.nonEmpty.option(extensions.mkString(".", ",.", ""))
+    }
 }

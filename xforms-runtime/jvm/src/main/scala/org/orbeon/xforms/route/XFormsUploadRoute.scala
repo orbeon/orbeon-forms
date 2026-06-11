@@ -20,6 +20,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.*
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xforms.upload.UploaderServer.UploadResponse
@@ -66,8 +67,15 @@ object XFormsUploadRoute extends XmlNativeRoute {
         outputResponse(
           <xxf:events xmlns:xxf="http://orbeon.org/oxf/xml/xforms">{
             for {
-              UploadResponse(fieldName, messageOpt, mediatypeOpt, filenameOpt, sessionUrl, actualSize, hashAlgorithm, hashValue) <- uploadResponses
-              effectiveMediatypeOpt = Mediatypes.fromHeadersOrFilename(_ => mediatypeOpt, filenameOpt)
+              UploadResponse(fieldName, messageOpt, originalMediatypeOpt, fileScanMediatypeOpt, filenameOpt, sessionUrl, actualSize, hashAlgorithm, hashValue) <- uploadResponses
+              effectiveMediatypeOpt =
+                fileScanMediatypeOpt // priority is given to the file scan result, if any
+                  .orElse(
+                    Mediatypes.fromHeadersOrFilename(
+                      header   = _ => (! UploaderServer.ignoreContentTypeHeader).flatOption(originalMediatypeOpt), // only pass the original media type if we are not ignoring the content type header
+                      filename = filenameOpt
+                    )
+                  )
             } yield
               <xxf:event
                 name              = {EventNames.XXFormsUploadStore}

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.util
 
+import cats.data.NonEmptySet
 import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException
 import org.apache.commons.fileupload.*
 import org.apache.commons.fileupload.disk.{DiskFileItem, DiskFileItemFactory}
@@ -42,7 +43,7 @@ case class TooManyFilesException(
 
 case class DisallowedMediatypeException(
   clientFilenameOpt: Option[String],
-  permitted        : Set[MediatypeRange],
+  permitted        : NonEmptySet[MediatypeRange],
   actual           : Option[Mediatype]
 ) extends FileUploadException
 

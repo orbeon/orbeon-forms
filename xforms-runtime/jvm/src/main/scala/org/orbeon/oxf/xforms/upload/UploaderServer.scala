@@ -63,13 +63,6 @@ object UploaderServer extends UploaderServer {
     hashValue           : String
   )
 
-  // https://github.com/orbeon/orbeon-forms/issues/7698
-  lazy val ignoreContentTypeHeader: Boolean =
-    CoreCrossPlatformSupport
-      .propertyStore
-      .globalPropertySet
-      .getBoolean("oxf.xforms.upload.ignore-content-type-header", default = true)
-
   protected def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, MaximumCurrentFiles, AllowedMediatypes), URI)] =
     withDocumentAcquireLock(
       uuid    = uuid,
@@ -446,7 +439,7 @@ trait UploaderServer {
       checkMediatypesThrowIfDisallowed(
         allowedMediatypeRanges    = allowedMediatypeRangesForControl,
         nonBlankClientFilenameOpt = fileItem.nonBlankClientFilenameOpt,
-        header                    = if (! UploaderServer.ignoreContentTypeHeader) findHeaderValue else _ => None // only pass the original media type if we are not ignoring the content type header
+        header                    = _ => None
       )
 
       // https://github.com/orbeon/orbeon-forms/issues/5516

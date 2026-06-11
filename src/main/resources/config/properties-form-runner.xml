@@ -418,6 +418,10 @@
     <property as="xs:string"  name="oxf.fr.email.smtp.username.*.*"                                value=""/>
     <property as="xs:string"  name="oxf.fr.email.smtp.credentials.*.*"                             value=""/>
     <property as="xs:string"  name="oxf.fr.email.smtp.encryption.*.*"                              value=""/> <!-- Blank, tls, or ssl -->
+    <property as="xs:string"  name="oxf.fr.email.smtp.connection-timeout.*.*"                      value=""/> <!-- Socket connection timeout in milliseconds; blank means infinite -->
+    <property as="xs:string"  name="oxf.fr.email.smtp.timeout.*.*"                                 value=""/> <!-- Socket read timeout in milliseconds; blank means infinite -->
+    <property as="xs:string"  name="oxf.fr.email.smtp.write-timeout.*.*"                           value=""/> <!-- Socket write timeout in milliseconds; blank means infinite -->
+    <property as="xs:boolean" name="oxf.fr.email.smtp.quit-wait.*.*"                               value="true"/> <!-- Whether to wait for the response to the QUIT command -->
     <property as="xs:string"  name="oxf.fr.email.from.*.*"                                         value=""/>
     <property as="xs:string"  name="oxf.fr.email.reply-to.*.*"                                     value=""/>
     <property as="xs:string"  name="oxf.fr.email.to.*.*"                                           value=""/>

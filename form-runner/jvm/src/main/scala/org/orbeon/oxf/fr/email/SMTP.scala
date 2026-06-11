@@ -42,7 +42,11 @@ case object SMTP {
   case class ServerConfig(
     host                     : String,
     port                     : Int,
-    encryptionWithCredentials: EncryptionWithCredentials
+    encryptionWithCredentials: EncryptionWithCredentials,
+    connectionTimeoutMsOpt   : Option[Int]     = None,
+    timeoutMsOpt             : Option[Int]     = None,
+    writeTimeoutMsOpt        : Option[Int]     = None,
+    quitWaitOpt              : Option[Boolean] = None
   ) {
 
     def newSession: Session = {
@@ -51,6 +55,14 @@ case object SMTP {
 
       properties.setProperty("mail.smtp.host", host)
       properties.setProperty("mail.smtp.port", port.toString)
+
+      // Timeouts in milliseconds (Jakarta Mail defaults to infinite)
+      connectionTimeoutMsOpt.foreach(v => properties.setProperty("mail.smtp.connectiontimeout", v.toString))
+      timeoutMsOpt          .foreach(v => properties.setProperty("mail.smtp.timeout"          , v.toString))
+      writeTimeoutMsOpt     .foreach(v => properties.setProperty("mail.smtp.writetimeout"     , v.toString))
+
+      // Whether to wait for the response to the QUIT command (Jakarta Mail defaults to true)
+      quitWaitOpt.foreach(v => properties.setProperty("mail.smtp.quitwait", v.toString))
 
       encryptionWithCredentials match {
         case EncryptionWithCredentials.SSL(_) =>
@@ -89,8 +101,14 @@ case object SMTP {
 
       def prop(name: String): Option[String] = formRunnerProperty(s"oxf.fr.email.smtp.$name").flatMap(trimAllToOpt)
 
+      def intProp(name: String): Option[Int] =
+        prop(name).map(v => Try(v.toInt).getOrElse(throw new OXFException(s"Invalid value `$v` for SMTP property `$name`")))
+
+      def booleanProp(name: String): Option[Boolean] =
+        prop(name).map(v => Try(v.toBoolean).getOrElse(throw new OXFException(s"Invalid value `$v` for SMTP property `$name`")))
+
       val host           = testHostOpt.orElse(prop("host")).getOrElse(throw new OXFException("Could not find SMTP host in properties"))
-      val portOpt        = prop("port").map(p => Try(p.toInt).getOrElse(throw new OXFException(s"Invalid SMTP port $p")))
+      val portOpt        = intProp("port")
       val usernameOpt    = prop("username")
       val encryption     = prop("encryption").getOrElse("")
       val credentialsOpt = usernameOpt.map(SMTP.Credentials(_, prop("credentials").getOrElse("")))
@@ -107,7 +125,11 @@ case object SMTP {
       ServerConfig(
         host                      = host,
         port                      = portOpt.getOrElse(encryptionWithCredentials.defaultPort),
-        encryptionWithCredentials = encryptionWithCredentials
+        encryptionWithCredentials = encryptionWithCredentials,
+        connectionTimeoutMsOpt    = intProp("connection-timeout"),
+        timeoutMsOpt              = intProp("timeout"),
+        writeTimeoutMsOpt         = intProp("write-timeout"),
+        quitWaitOpt               = booleanProp("quit-wait")
       )
     }
   }

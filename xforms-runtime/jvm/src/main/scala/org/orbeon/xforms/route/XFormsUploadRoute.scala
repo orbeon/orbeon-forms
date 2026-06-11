@@ -72,7 +72,7 @@ object XFormsUploadRoute extends XmlNativeRoute {
                 fileScanMediatypeOpt // priority is given to the file scan result, if any
                   .orElse(
                     Mediatypes.fromHeadersOrFilename(
-                      header   = _ => (! UploaderServer.ignoreContentTypeHeader).flatOption(originalMediatypeOpt), // only pass the original media type if we are not ignoring the content type header
+                      header   = _ => None,
                       filename = filenameOpt
                     )
                   )

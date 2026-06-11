@@ -166,6 +166,7 @@
     <property as="xs:string"  name="oxf.xforms.upload.max-size-aggregate-per-form"               value=""/>
     <property as="xs:string"  name="oxf.xforms.upload.mediatypes"                                value="*/*"/>
     <property as="xs:integer" name="oxf.xforms.upload.delay-before-xforms-timeout"               value="45000"/>
+    <property as="xs:boolean" name="oxf.xforms.upload.ignore-content-type-header"                value="true"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-upload-progress-refresh"             value="2000"/>
 
     <property as="xs:string"  name="oxf.xforms.login-page-detection-regexp"                      value=""/>

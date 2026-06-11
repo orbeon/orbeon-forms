@@ -17,7 +17,7 @@ import org.orbeon.facades.Ladda
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.XFormsXbl
 import org.orbeon.xforms.facade.XBLCompanion
-import org.orbeon.xforms.{AjaxClient, EventListenerSupport}
+import org.orbeon.xforms.{AjaxClient, EventListenerSupport, LoadingStatus}
 import org.scalajs.dom
 import org.scalajs.dom.html
 
@@ -64,6 +64,7 @@ object LaddaButton {
         fn     = (_: dom.Event) => {
           if (state == State.Begin)
             js.timers.setTimeout(0) { // defer so we don't prevent other `click` listeners from being called
+              LoadingStatus.show()
               ladda.foreach(_.start())
               state = State.Clicked
             }
@@ -77,7 +78,8 @@ object LaddaButton {
 
       AjaxClient.ajaxResponseReceived.add(_ => {
         if (state == State.Sent) {
-          ladda.foreach (_.stop())
+          ladda.foreach(_.stop())
+          LoadingStatus.hide()
           state = State.Begin
         }
       })

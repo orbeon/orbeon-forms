@@ -280,6 +280,7 @@ object InitSupport {
         // Q: Do this later?
 
         formElem.classList.remove(Constants.InitiallyHiddenClass)
+        LoadingStatus.init()
 
         // NOTE on paths: We switched back and forth between trusting the client or the server. Starting 2010-08-27
         // the server provides the info. Starting 2011-10-05 we revert to using the server values instead of client

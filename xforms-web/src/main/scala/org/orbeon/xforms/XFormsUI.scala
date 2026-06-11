@@ -35,6 +35,44 @@ import scala.scalajs.js.timers.SetTimeoutHandle
 import scala.scalajs.js.{timers, |}
 
 
+object LoadingStatus {
+
+  private val StatusElementId        = "orbeon-loading-status"
+  private val LoadingMessage         = "Loading"
+  private val LoadingCompleteMessage = "Loading complete"
+  private var requestCount           = 0
+
+  def init(): Unit =
+    statusElement
+
+  def show(): Unit = {
+    requestCount += 1
+    if (requestCount == 1)
+      statusElement.textContent = LoadingMessage
+  }
+
+  def hide(): Unit = {
+    requestCount -= 1
+    if (requestCount == 0)
+      statusElement.textContent = LoadingCompleteMessage
+  }
+
+  def message: String =
+    LoadingMessage
+
+  private def statusElement: html.Element =
+    dom.document.getElementByIdOpt(StatusElementId).getOrElse {
+      val div = dom.document.createDivElement
+      div.id = StatusElementId
+      div.setAttribute("role", "status")
+      div.setAttribute("aria-live", "polite")
+      div.setAttribute("aria-atomic", "true")
+      div.classList.add("sr-only")
+      dom.document.body.appendChild(div)
+      div
+    }
+}
+
 object XFormsUI {
 
   val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.XFormsUI")
@@ -860,11 +898,15 @@ object XFormsUI {
         .collectFirst { case dialog: dom.html.Dialog if dialog.open => dialog }
         .getOrElse(dom.document.body)
         .appendChild(loaderElem)
+      if (! loaderElem.hasClass("is-active"))
+        LoadingStatus.show()
       loaderElem.classList.add("is-active")
     }
 
     def hideModalProgressPanelRaw(): Unit =
       findLoaderElem foreach { elem =>
+        if (elem.hasClass("is-active"))
+          LoadingStatus.hide()
         elem.classList.remove("is-active")
       }
 

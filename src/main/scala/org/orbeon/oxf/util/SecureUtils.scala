@@ -139,28 +139,33 @@ object SecureUtils extends SecureUtilsTrait {
 
     // Primary encryption/decryption object
     private lazy val hasFallbackPassword = checkPasswordForKeyUsage(KeyUsage.FieldEncryptionFallback)
-    private lazy val primaryAead         = createAead(KeyUsage.FieldEncryption)
-    private lazy val fallbackAead        = hasFallbackPassword.option(createAead(KeyUsage.FieldEncryptionFallback))
-    private lazy val tokenAead           = createAead(KeyUsage.Token)
+    private lazy val generalAead                 = createAead(KeyUsage.GeneralNoCheck)
+    private lazy val fieldEncryptionAead         = createAead(KeyUsage.FieldEncryption)
+    private lazy val fieldEncryptionFallbackAead = hasFallbackPassword.option(createAead(KeyUsage.FieldEncryptionFallback))
+    private lazy val shareTokenAead              = createAead(KeyUsage.Token)
 
     def encrypt(plaintext: Array[Byte], keyUsage: KeyUsage): Array[Byte] =
       keyUsage match {
-        case KeyUsage.FieldEncryption => primaryAead.encrypt(plaintext,  null)
-        case KeyUsage.Token           => tokenAead.encrypt(plaintext, null)
-        case _                        => throw new IllegalArgumentException(s"Unsupported key usage for Tink encryption: `$keyUsage`")
+        case KeyUsage.GeneralNoCheck          => generalAead.encrypt(plaintext, null) // for external mode and admin tokens
+        case KeyUsage.General                 => throw new IllegalArgumentException(s"Unsupported key usage for Tink encryption: `$keyUsage`")
+        case KeyUsage.Token                   => shareTokenAead.encrypt(plaintext, null)
+        case KeyUsage.FieldEncryption         => fieldEncryptionAead.encrypt(plaintext, null)
+        case KeyUsage.FieldEncryptionFallback => throw new IllegalArgumentException(s"Unsupported key usage for Tink encryption: `$keyUsage`")
       }
 
     def decrypt(ciphertext : Array[Byte], keyUsage: KeyUsage): Array[Byte] =
       keyUsage match {
-        case KeyUsage.FieldEncryption =>
+        case KeyUsage.GeneralNoCheck          => generalAead.decrypt(ciphertext, null) // for external mode and admin tokens
+        case KeyUsage.General                 => throw new IllegalArgumentException(s"Unsupported key usage for Tink encryption: `$keyUsage`")
+        case KeyUsage.Token                   => shareTokenAead.decrypt(ciphertext, null)
+        case KeyUsage.FieldEncryption         =>
           try {
-            primaryAead.decrypt(ciphertext, null)
+            fieldEncryptionAead.decrypt(ciphertext, null)
           } catch {
             case _: java.security.GeneralSecurityException if hasFallbackPassword =>
-              fallbackAead.get.decrypt(ciphertext, null)
+              fieldEncryptionFallbackAead.get.decrypt(ciphertext, null)
           }
-        case KeyUsage.Token           => tokenAead.decrypt(ciphertext, null)
-        case _                        => throw new IllegalArgumentException(s"Unsupported key usage for Tink encryption: `$keyUsage`")
+        case KeyUsage.FieldEncryptionFallback => throw new IllegalArgumentException(s"Unsupported key usage for Tink decryption: `$keyUsage`")
       }
 
     def encrypt(plaintext : String, keyUsage: KeyUsage): String = TinkBase64.encode(encrypt(plaintext.getBytes(CharsetNames.Utf8), keyUsage))

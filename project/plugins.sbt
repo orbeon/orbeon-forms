@@ -8,7 +8,7 @@ addSbtPlugin     ("com.github.sbt"      % "sbt-uglify"               % "3.0.1")
 //addSbtPlugin     ("com.dwijnand"        % "sbt-project-graph"        % "0.4.0")
 addSbtPlugin     ("com.codecommit"      % "sbt-github-packages"      % "0.5.3")
 addCompilerPlugin("org.scalamacros"     % "paradise"                 % "2.1.1" cross CrossVersion.full)
-addSbtPlugin     ("io.github.cquiroz"   % "sbt-tzdb"                 % "2.0.0") // Using older version to avoid cats-effect conflict
+addSbtPlugin     ("io.github.cquiroz"   % "sbt-tzdb"                 % "5.0.0") // Using older version to avoid cats-effect conflict
 //addSbtPlugin     ("io.github.cquiroz"   % "sbt-locales"              % "2.0.1")
 addSbtPlugin     ("com.scalapenos"      % "sbt-prompt"               % "2.0.0")
 addSbtPlugin     ("com.eed3si9n"        % "sbt-assembly"             % "2.3.1")

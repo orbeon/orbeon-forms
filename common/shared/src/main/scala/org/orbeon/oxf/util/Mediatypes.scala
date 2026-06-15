@@ -405,8 +405,8 @@ object Mediatypes extends MediatypesTrait {
     findExtensionForMediatype(mediatype).getOrElse(throw new IllegalArgumentException("mediatype"))
 
   def fromHeadersOrFilename(
-    header     : String => Option[String],
-    filename   : => Option[String]
+    header  : String => Option[String],
+    filename: => Option[String]
   ): Option[Mediatype] = {
 
     def fromHeaders: Option[String] =

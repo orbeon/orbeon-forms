@@ -482,7 +482,7 @@
         </output>
     </test>
 
-    <test description="Layout for xf:upload" name="oxf:pipeline" only="true">
+    <test description="Layout for xf:upload" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema">

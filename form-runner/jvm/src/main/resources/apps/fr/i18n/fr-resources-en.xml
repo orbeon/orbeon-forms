@@ -200,8 +200,8 @@
             <summary-title>Summary</summary-title>
             <delete-confirmation>Confirm Deletion</delete-confirmation>
             <document-id>Document Id</document-id>
-            <workflow-stage>Workflow stage</workflow-stage>
-            <created-by>Created By</created-by>
+            <workflow-stage>Workflow Stage</workflow-stage>
+            <created-by >Created By</created-by>
             <selected>Selected</selected>
             <refresh>This operation will refresh the page</refresh>
             <toc>Table of Contents</toc>

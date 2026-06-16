@@ -479,9 +479,9 @@ object ProcessInterpreter {
   sealed trait ActionResult
   sealed trait InternalActionResult extends ActionResult
   object ActionResult {
-    case class Sync(value: Try[Any])                                                    extends InternalActionResult
-    case class Async[T](value: Try[(IO[T], (XFormsContainingDocument, Try[T]) => Try[Any])])                        extends ActionResult
-    case class Interrupt(message: Option[String], value: Either[Try[Any], Future[Any]]) extends InternalActionResult
+    case class Sync(value: Try[Any])                                                         extends InternalActionResult
+    case class Async[T](value: Try[(IO[T], (XFormsContainingDocument, Try[T]) => Try[Any])]) extends ActionResult
+    case class Interrupt(message: Option[String], value: Either[Try[Any], Future[Any]])      extends InternalActionResult
 
     def trySync(body: => Any): ActionResult = ActionResult.Sync(Try(body))
     def tryAsync[T](body: => (IO[T], (XFormsContainingDocument, Try[T]) => Try[Any])): ActionResult = ActionResult.Async(Try(body))

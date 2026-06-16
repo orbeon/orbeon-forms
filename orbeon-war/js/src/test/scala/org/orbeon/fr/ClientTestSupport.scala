@@ -349,7 +349,13 @@ trait ClientTestSupport {
     val globalObj = js.Dynamic.global.globalThis
 
     saved.foreach { case (name, desc) =>
-      JsObject.defineProperty(globalObj, name, desc)
+      desc.toOption match {
+        case Some(d) => JsObject.defineProperty(globalObj, name, d)
+        case None    =>
+          // The JSDOM window has a constructor that globalThis did not already have as an own property before the swap,
+          // so we delete the JSDOM property had previously added to globalThis.
+          js.special.delete(globalObj, name)
+      }
     }
   }
 }

@@ -430,10 +430,17 @@
                 name="fb-resources"
                 value="instance('fr-form-resources')/(resource[@xml:lang = $fb-lang], resource)[1]"/>
 
-            <!-- If valid app/form were passed, skip showing the dialog -->
+            <!-- Show the new form wizard unless valid app/form were passed, or the wizard has no page to show -->
+            <xf:var
+                name="show-new-form-wizard"
+                value="
+                    not($valid-app-form-params) and
+                    xxf:split(xxf:property('oxf.fb.new-form.wizard-steps')) = ('templates', 'general-settings')"/>
+
+            <!-- Skip showing the dialog and create the form directly -->
             <!-- Reuse existing logic of event handlers on `dialog-form-settings` -->
             <xf:dispatch
-                    if="$valid-app-form-params"
+                    if="not($show-new-form-wizard)"
                     name="fb-update-metadata"
                     targetid="dialog-form-settings">
 
@@ -455,7 +462,7 @@
             </xf:dispatch>
 
             <xxf:show
-                    if="not($valid-app-form-params)"
+                    if="$show-new-form-wizard"
                     dialog="dialog-form-settings">
                 <xf:property name="lang"                                      value="$fb-lang"/>
                 <xf:property name="mode"                                      value="'new'"/>

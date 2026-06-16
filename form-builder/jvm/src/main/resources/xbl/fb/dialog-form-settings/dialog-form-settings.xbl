@@ -360,7 +360,7 @@
 
                 <!-- Load form templates -->
                 <xf:send
-                    if="$is-new-form and $max-templates gt count(instance('template-forms')/*)"
+                    if="$is-new-form and $show-templates and $max-templates gt count(instance('template-forms')/*)"
                     submission="search-form-templates-submission">
                     <!-- Pass a string as we don't support sequences in tunnel parameters yet -->
                     <xf:property
@@ -368,10 +368,17 @@
                         value="if ($app-chooser = ('select1', 'output')) then string-join($allowed-apps-if-has-roles, ' ') else ()"
                         xxf:tunnel="true"/>
                 </xf:send>
+                <!-- Start on the templates page if it is shown, otherwise on the general settings page (#7735) -->
+                <xf:setvalue
+                    ref="instance('navigation')"
+                    value="if ($show-templates) then 'templates' else 'general'"/>
                 <!-- Explicit focus is necessary or the tab might not consistently open -->
                 <xf:setfocus
-                    if="$is-new-form"
+                    if="$is-new-form and $show-templates"
                     control="fb-templates-grid"/>
+                <xf:setfocus
+                    if="$is-new-form and not($show-templates)"
+                    control="fb-general-settings-grid"/>
 
                 <!-- If there are invalid initial app/form values, mark them as visited and focus on first -->
                 <xf:action if="$is-app-form or $is-form-settings">
@@ -408,7 +415,7 @@
             <xbl:handler
                 event="DOMActivate"
                 observer="fb-app-name-input fb-form-name-input fb-title-input fb-continue-button"
-                if="$i/mode != 'new' or instance('navigation') = 'general'">
+                if="$i/mode != 'new' or instance('navigation') = 'general' or not($show-general-settings)">
 
                 <xf:action if="$i/@valid = 'true'">
 
@@ -541,7 +548,11 @@
                             name="template-url"
                             value="
                                 if ($i/mode/string() = 'new') then
-                                    instance('template-forms')/*[index('form-template-repeat')]/url/string()
+                                    if ($show-templates) then
+                                        instance('template-forms')/*[index('form-template-repeat')]/url/string()
+                                    else
+                                        (: Templates page not shown: use the first (default/blank) template :)
+                                        instance('template-forms')/*[1]/url/string()
                                 else
                                     ()
                         "/>
@@ -567,7 +578,7 @@
             <xbl:handler
                 event="DOMActivate"
                 observer="fb-continue-button"
-                if="$i/mode = 'new' and instance('navigation') = 'templates'">
+                if="$i/mode = 'new' and instance('navigation') = 'templates' and $show-general-settings">
                 <xf:setfocus control="fb-general-settings-grid"/>
                 <xf:setvalue ref="instance('navigation')" value="'general'"/>
             </xbl:handler>
@@ -654,6 +665,17 @@
                 <xf:var
                     name="allowed-apps-if-has-roles"
                     value="xxf:instance('fb-permissions')/app/@name/string()"/>
+
+                <!-- Which pages to show in the new form wizard (#7735) -->
+                <xf:var
+                    name="wizard-steps"
+                    value="xxf:split(xxf:property('oxf.fb.new-form.wizard-steps'))"/>
+                <xf:var
+                    name="show-templates"
+                    value="$wizard-steps = 'templates'"/>
+                <xf:var
+                    name="show-general-settings"
+                    value="$wizard-steps = 'general-settings'"/>
 
                 <!-- Control used for choosing the app name; value can be: 'input', 'output', or 'select1' -->
                 <xf:var
@@ -1123,22 +1145,20 @@
                             <a href="mailto:info@orbeon.com?subject=Form Builder Microsoft Browser Version">let us know</a>.
                         </xf:group>
 
-                        <!-- Show a number "icon" in new mode only -->
+                        <!-- Show a number "icon" in new mode only, and only when both wizard pages are shown -->
                         <xf:output
                             class="icon"
+                            ref=".[$is-new-form and $show-templates and $show-general-settings]"
                             value="
-                                if ($is-new-form) then
-                                    if (instance('navigation') = 'templates') then
-                                        1
-                                    else
-                                        2
-                                 else
-                                    ()"/>
+                                if (instance('navigation') = 'templates') then
+                                    1
+                                else
+                                    2"/>
 
                         <fb:language-choice ref="$i/lang[not($is-new-form)]"/>
 
                         <fr:tabbable id="fb-tabbable" class="fb-dialog-form-settings-fields">
-                            <fr:tab visible="$is-new-form">
+                            <fr:tab visible="$is-new-form and $show-templates">
 
                                 <xh:p class="alert alert-info">
                                     <xf:output value="$resources/messages/select-template-output"/>
@@ -1214,7 +1234,7 @@
 
                             </fr:tab>
 
-                            <fr:tab visible="$is-new-form or $is-app-form or $is-form-settings">
+                            <fr:tab visible="($is-new-form and $show-general-settings) or $is-app-form or $is-form-settings">
 <!--                            <fr:tab visible="$is-app-form or $is-form-settings">-->
                                 <fr:label ref="$resources/general-settings[$is-form-settings]/label"/>
 

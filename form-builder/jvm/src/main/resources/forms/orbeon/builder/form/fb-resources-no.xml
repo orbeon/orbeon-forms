@@ -1683,6 +1683,7 @@
         <delete-resources>Er du sikker på at du ønsker å slette alle ressursene for språket</delete-resources>
         <delete-service>Er du sikker på at du ønsker å slette tjenesten "{0}"?{1,choice,0# Ingen handlinger bruker den.|1# 1 handling bruker den.|1&lt; {1,number,integer} handlinger bruker den.}</delete-service>
         <delete-action>Er du sikker på at du ønsker å slette handlingen "{0}"?</delete-action>
+        <delete-pdf-reference>Det er noen e-post- eller bekreftelsessidesmaler som refererer til ett eller flere PDF-malnavn som ikke lenger er til stede ({0}). Vil du fortsette og lagre endringene uansett?</delete-pdf-reference>
         <controls-will-be-deleted>{0,choice,0#Ingen kontroller|1#1 kontroll|1&lt;{0,number,integer} kontroller} vil slettes.</controls-will-be-deleted>
         <metadata-edit-title>Metadata for skjemaet</metadata-edit-title>
         <select-template-output>Velg en skjemamal som skal brukes som utgangspunkt.</select-template-output>

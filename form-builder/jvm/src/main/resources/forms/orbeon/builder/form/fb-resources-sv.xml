@@ -1730,6 +1730,7 @@
         <delete-resources>Bekräfta att du vill ta bort alla resurser för detta språk</delete-resources>
         <delete-service>Bekräfta att du vill ta bort denna tjänst "{0}"?{1,choice,0# Inget kommando använder den.|1# 1 kommando använder den.|1&lt; {1,number,integer} kommandon använder den.}</delete-service>
         <delete-action>Bekräfta att du vill ta bort detta kommando "{0}"?</delete-action>
+        <delete-pdf-reference>Det finns några e-post- eller bekräftelsesidesmallar som refererar till ett eller flera PDF-mallnamn som inte längre finns ({0}). Vill du fortsätta och spara ändringarna ändå?</delete-pdf-reference>
         <controls-will-be-deleted>{0,choice,0#Ingen kontroll|1#1 kontroll|1&lt;{0,number,integer} kontroller} kommer att tas bort.</controls-will-be-deleted>
         <metadata-edit-title>Metadata</metadata-edit-title>
         <select-template-output>Välj en formulärmall att använda som utgångspunkt.</select-template-output>

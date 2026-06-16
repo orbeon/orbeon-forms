@@ -1702,6 +1702,7 @@
         <delete-resources>هل أنت متأكد من أنك تريد حذف كافة الموارد للغة</delete-resources>
         <delete-service>هل أنت متأكد من أنك تريد حذف الخدمة "{0}"؟{1,choice,0# لا يوجد إجراء يستخدمها.|1# يوجد إجراء واحد يستخدمها.|1&lt; {1,number,integer} إجراءات تستخدمها.}</delete-service>
         <delete-action>هل أنت متأكد من أنك تريد حذف الإجراء "{0}"؟</delete-action>
+        <delete-pdf-reference>هناك بعض قوالب البريد الإلكتروني أو صفحة التأكيد التي تشير إلى اسم أو أكثر من أسماء قوالب PDF التي لم تعد موجودة ({0}). هل تريد المتابعة وحفظ التغييرات على أي حال؟</delete-pdf-reference>
         <controls-will-be-deleted>{0,choice,0#لن يتم حذف أي عنصر تحكم|1#سيتم حذف عنصر تحكم واحد|1&lt;سيتم حذف {0,number,integer} عناصر تحكم}.</controls-will-be-deleted>
         <metadata-edit-title>بيانات وصفية للنموذج</metadata-edit-title>
         <select-template-output>الرجاء اختيار قالب نموذج لاستخدامه كنقطة بداية.</select-template-output>

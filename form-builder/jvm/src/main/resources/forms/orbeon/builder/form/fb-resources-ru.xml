@@ -1682,6 +1682,7 @@
         <delete-resources>Вы уверены, что хотите удалить все ресуры для языка</delete-resources>
         <delete-service>Вы уверены, что хотите удалить сервис "{0}"?{1,choice,0# Нет действий, использующих его.|1# 1 действие использует его.|1&lt; {1,number,integer} действий используют его.}</delete-service>
         <delete-action>Вы уверены, что хотите удалить действие "{0}"?</delete-action>
+        <delete-pdf-reference>Некоторые шаблоны писем или страниц подтверждения ссылаются на одно или несколько имен PDF-шаблонов, которые больше не существуют ({0}). Вы хотите продолжить и сохранить изменения в любом случае?</delete-pdf-reference>
         <controls-will-be-deleted>{0,choice,0#Нет элементов для удаления.|1#1 элемент будет удален.|1&lt;{0,number,integer} элемента будут удалены.}</controls-will-be-deleted>
         <metadata-edit-title>Описание формы</metadata-edit-title>
         <select-template-output>Пожалуйста, выберите шаблон формы для использования в качестве отправной точки.</select-template-output>

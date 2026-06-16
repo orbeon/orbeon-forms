@@ -1042,7 +1042,7 @@
             </fb:dialog-search>
 
             <fb:dialog-pdf                id="dialog-pdf"                ref="$form"      resources-ref="$form-resources">
-                <xf:action ev:event="fb-apply">
+                <xf:action event="fb-apply">
                     <xf:delete bind="pdf-attachments-bind"/>
                     <xf:insert
                         context="bind('attachments-bind')"
@@ -1151,6 +1151,24 @@
 
             <xf:action event="fr-positive" observer="dialog-http-services">
                 <xf:dispatch name="fb-confirm-delete-http-service" targetid="dialog-http-services"/>
+            </xf:action>
+
+            <xf:action event="fb-request-apply-pdf-template-changes" observer="dialog-pdf">
+                <xf:var name="pdf-template-names" value="concat('&quot;', string-join(event('pdf-template-names'), '&quot;, &quot;'), '&quot;')"/>
+                <xf:dispatch name="fr-show" targetid="dialog-confirmation">
+                    <xf:property
+                        name="message"
+                        value="
+                            xxf:format-message(
+                                $form-resources/messages/delete-pdf-reference,
+                                (
+                                    $pdf-template-names
+                                )
+                            )"/>
+                    <xf:property
+                        name="positive-targetid"
+                        value="xxf:absolute-id('dialog-pdf')"/>
+                </xf:dispatch>
             </xf:action>
         </xf:group>
 

@@ -1652,6 +1652,7 @@
         <delete-resources>Sind Sie sicher, dass Sie alle Ressourcen löschen wollen für die Sprache</delete-resources>
         <delete-service>Sind Sie sicher, dass Sie den Dienst "{0}" löschen wollen?{1,choice,0# Keine Aktion verwendet ihn.|1# 1 Aktion verwendet ihn.|1&lt; {1,number,integer} Aktionen verwenden ihn.}</delete-service>
         <delete-action>Sind Sie sicher, dass Sie Aktion "{0}" löschen wollen?</delete-action>
+        <delete-pdf-reference>Es gibt einige E-Mail- oder Bestätigungsseitenvorlagen, die sich auf einen oder mehrere PDF-Vorlagennamen beziehen, die nicht mehr vorhanden sind ({0}). Möchten Sie fortfahren und die Änderungen trotzdem speichern?</delete-pdf-reference>
         <controls-will-be-deleted>{0,choice,0#Kein Steuerelement wird|1#1 Steuerelement wird|1&lt;{0,number,integer} Steuerelemente werden} gelöscht werden.</controls-will-be-deleted>
         <metadata-edit-title>Formularmetadaten</metadata-edit-title>
         <select-template-output>Bitte wählen Sie eine Formularvorlage als Ausgangspunkt aus.</select-template-output>

@@ -1696,6 +1696,7 @@
         <delete-resources>Haluatko varmasti poistaa kaikki kieliä varten olevat resurssit</delete-resources>
         <delete-service>Haluatko varmasti poistaa palvelun "{0}"?{1,choice,0# Yksikään toiminto ei käytä sitä.|1# 1 toiminto käyttää sitä.|1&lt; {1,number,integer} toimintoa käyttävät sitä.}</delete-service>
         <delete-action>Haluatko varmasti poistaa toiminnon "{0}"?</delete-action>
+        <delete-pdf-reference>Jotkin sähköposti- tai vahvistussivumallit viittaavat yhteen tai useampaan PDF-mallinimeen, joita ei enää ole ({0}). Haluatko jatkaa ja tallentaa muutokset silti?</delete-pdf-reference>
         <controls-will-be-deleted>{0,choice,0#Ei ohjaimia|1#1 ohjain|1&lt;{0,number,integer} ohjainta} poistetaan.</controls-will-be-deleted>
         <metadata-edit-title>Lomakkeen metatiedot</metadata-edit-title>
         <select-template-output>Valitse lomakemalli käytettäväksi lähtökohtana.</select-template-output>

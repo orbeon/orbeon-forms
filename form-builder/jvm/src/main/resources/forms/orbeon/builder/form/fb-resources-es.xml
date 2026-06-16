@@ -1696,6 +1696,7 @@
         <delete-resources>Está seguro de eliminar todos los recursos para los idiomas</delete-resources>
         <delete-service>¿Está seguro de eliminar el Servicio "{0}"?{1,choice,0# Ninguna acción lo usa.|1# 1 acción lo usa.|1&lt; {1,number,integer} acciones lo usan.}</delete-service>
         <delete-action>¿Está seguro de eliminar la Acción "{0}"?</delete-action>
+        <delete-pdf-reference>Hay algunas plantillas de correo electrónico o página de confirmación que hacen referencia a uno o más nombres de plantilla PDF que ya no están presentes ({0}). ¿Desea continuar y guardar los cambios de todos modos?</delete-pdf-reference>
         <controls-will-be-deleted>{0,choice,0#No controls|1#1 control|1&lt;{0,number,integer} controls} serán eliminados.</controls-will-be-deleted>
         <metadata-edit-title>Metadata del Formulario</metadata-edit-title>
         <select-template-output>Seleccione una plantilla de formulario para usar como punto de partida.</select-template-output>

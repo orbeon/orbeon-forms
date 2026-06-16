@@ -1699,6 +1699,7 @@
         <delete-resources>Czy na pewno chcesz usunąć wszystkie zasoby dla języka</delete-resources>
         <delete-service>Czy na pewno chcesz usunąć usługę "{0}"?{1,choice,0# Żadna akcja z niej nie korzysta.|1# 1 akcja z niej korzysta.|1&lt; {1,number,integer} akcji z niej korzysta.}</delete-service>
         <delete-action>Czy na pewno chcesz usunąć akcję "{0}"?</delete-action>
+        <delete-pdf-reference>Istnieją szablony e-maili lub stron potwierdzenia odwołujące się do jednej lub więcej nazw szablonów PDF, których już nie ma ({0}). Czy chcesz kontynuować i mimo to zapisać zmiany?</delete-pdf-reference>
         <controls-will-be-deleted>{0,choice,0#Żadne kontrolki|1#1 kontrolka|1&lt;{0,number,integer} kontrolek} zostaną usunięte.</controls-will-be-deleted>
         <metadata-edit-title>Metadane formularza</metadata-edit-title>
         <select-template-output>Wybierz szablon formularza jako punkt wyjścia.</select-template-output>

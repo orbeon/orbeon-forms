@@ -1721,6 +1721,7 @@
         <delete-resources>Etes-vous sûr de vouloir supprimer toutes les ressources pour la langue</delete-resources>
         <delete-service>Etes-vous sûr de vouloir supprimer le service "{0}" ?{1,choice,0# Aucune action ne l'utilise.|1# 1 action l''''utilise.|1&lt; {1,number,integer} actions l''''utilisent.}</delete-service>
         <delete-action>Etes-vous sûr de vouloir supprimer l''action "{0}" ?</delete-action>
+        <delete-pdf-reference>Certains modèles de courriels ou de pages de confirmation font référence à un ou plusieurs modèles PDF qui ne sont plus présents ({0}). Voulez-vous continuer et enregistrer les modifications malgré tout ?</delete-pdf-reference>
         <controls-will-be-deleted>{0,choice,0#Aucun contrôle ne sera supprimé.|1#1 contrôle sera supprimé.|1&lt;{0,number,integer} contrôles seront supprimés.}</controls-will-be-deleted>
         <metadata-edit-title>Métadonnées</metadata-edit-title>
         <select-template-output>Veuillez sélectionner un modèle de formulaire comme point de départ.</select-template-output>

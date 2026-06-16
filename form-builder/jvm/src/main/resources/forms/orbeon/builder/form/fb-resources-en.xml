@@ -1720,6 +1720,7 @@
         <delete-resources>Are you sure you want to delete all resources for language</delete-resources>
         <delete-service>Are you sure you want to delete service "{0}"?{1,choice,0# No action is using it.|1# 1 action is using it.|1&lt; {1,number,integer} actions are using it.}</delete-service>
         <delete-action>Are you sure you want to delete action "{0}"?</delete-action>
+        <delete-pdf-reference>There are some email or confirmation page templates referring to one or more PDF template names that are no longer present ({0}). Do you want to proceed and save the changes anyway?</delete-pdf-reference>
         <controls-will-be-deleted>{0,choice,0#No controls|1#1 control|1&lt;{0,number,integer} controls} will be deleted.</controls-will-be-deleted>
         <metadata-edit-title>Form Metadata</metadata-edit-title>
         <select-template-output>Please select a form template to use as a starting point.</select-template-output>

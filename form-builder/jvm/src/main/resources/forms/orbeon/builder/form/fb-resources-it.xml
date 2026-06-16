@@ -1655,6 +1655,7 @@
         <delete-resources>Sei sicuro di voler cancellare tutte le risorse per la lingua</delete-resources>
         <delete-service>Sei sicuro di voler cancellare il servizio "{0}"?{1,choice,0# Nessuna azione lo utilizza.|1# 1 azione lo utilizza.|1&lt; {1,number,integer} azioni lo utilizzano.}</delete-service>
         <delete-action>Sei sicuro di voler cancellare l''azione "{0}"?</delete-action>
+        <delete-pdf-reference>Ci sono alcuni modelli di email o di pagina di conferma che fanno riferimento a uno o più nomi di modelli PDF che non sono più presenti ({0}). Vuoi procedere e salvare comunque le modifiche?</delete-pdf-reference>
         <controls-will-be-deleted>{0,choice,0#Nessun controllo verrà cancellato.|1#1 controllo verrà cancellato.|1&lt;{0,number,integer} controlli verranno cancellati.}</controls-will-be-deleted>
         <metadata-edit-title>metadati del modulo</metadata-edit-title>
         <select-template-output>Seleziona un modello di modulo da usare come punto di partenza.</select-template-output>

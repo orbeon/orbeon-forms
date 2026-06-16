@@ -45,6 +45,10 @@
                                 instance('pdf-template')
                             "/>
 
+                <xf:setvalue
+                    ref="$i/refs"
+                    value="string-join(event('pdf-template-references'), ' ')"/>
+
                 <!--  Add @name/@lang on legacy entries -->
                 <xf:action iterate="$i/pdfs/*">
                     <xf:insert context="." if="empty(@name)" origin="xf:attribute('name')"/>
@@ -53,28 +57,46 @@
 
                 <xxf:show dialog="dialog"/>
 
-            </xbl:handler>
+            </xbl:handler><!-- end fb-show-dialog -->
+            <!-- Cancel without saving -->
             <xbl:handler event="DOMActivate" observer="cancel-trigger" >
                 <xxf:hide dialog="dialog"/>
             </xbl:handler>
-            <xbl:handler event="DOMActivate" observer="save-trigger prefix-input suffix-input" if="valid($i)">
+            <!-- Save changes -->
+            <xbl:handler event="DOMActivate" observer="save-trigger prefix-input suffix-input" if="valid($i) and empty(xxf:split($i/refs)[not(. = $i/pdfs/pdf[xxf:non-blank()]/@name)])">
                 <xf:dispatch name="fb-apply" target="fb-dialog-pdf">
                     <xf:property name="pdf-attachments" value="$i/pdfs/pdf[xxf:non-blank()]"/>
                 </xf:dispatch>
                 <xxf:hide dialog="dialog"/>
             </xbl:handler>
+            ;<!-- Attempt to save changes but there are dangling references to PDF template names, so ask the user to confirm -->
+            <xbl:handler event="DOMActivate" observer="save-trigger prefix-input suffix-input" if="valid($i) and exists(xxf:split($i/refs)[not(. = $i/pdfs/pdf[xxf:non-blank()]/@name)])">
+                <xf:dispatch name="fb-request-apply-pdf-template-changes" target="fb-dialog-pdf">
+                    <xf:property name="pdf-template-names" value="xxf:split($i/refs)[not(. = $i/pdfs/pdf[xxf:non-blank()]/@name)]"/>
+                </xf:dispatch>
+            </xbl:handler>
+            <!-- Attempt to save changes but data is not valid -->
             <xbl:handler event="DOMActivate" observer="save-trigger prefix-input suffix-input" if="not(valid($i))">
-                <xxf:setvisited
-                    control="dialog"
-                    recurse="true"/>
+                <xf:dispatch name="fb-apply" target="fb-dialog-pdf">
+                    <xf:property name="pdf-attachments" value="$i/pdfs/pdf[xxf:non-blank()]"/>
+                </xf:dispatch>
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+            <!-- Callback from confirmation dialog -->
+            <xbl:handler event="fr-positive" phase="target">
+                <xf:dispatch name="fb-apply" target="fb-dialog-pdf">
+                    <xf:property name="pdf-attachments" value="$i/pdfs/pdf[xxf:non-blank()]"/>
+                </xf:dispatch>
+                <xxf:hide dialog="dialog"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <xf:model id="model">
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
-                    <local>
+                    <_>
                         <pdfs/>
-                    </local>
+                        <refs/><!-- PDF template names referenced from other places, like email and confirmation page templates -->
+                    </_>
                 </xf:instance>
 
                 <xf:instance id="ui" xxf:exclude-result-prefixes="#all">

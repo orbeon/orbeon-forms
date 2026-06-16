@@ -1694,6 +1694,7 @@
         <delete-resources>この言語のリソースをすべて削除してよろしいですか</delete-resources>
         <delete-service>サービス "{0}" を削除してよろしいですか?{1,choice,0# 使用中のアクションはありません。|1# 1 件のアクションが使用中です。|1&lt; {1,number,integer} 件のアクションが使用中です。}</delete-service>
         <delete-action>アクション "{0}" を削除してよろしいですか?</delete-action>
+        <delete-pdf-reference>存在しない1つ以上のPDFテンプレート名（{0}）を参照しているメールまたは確認ページのテンプレートがあります。このまま変更を保存しますか？</delete-pdf-reference>
         <controls-will-be-deleted>{0,choice,0#削除されるコントロールはありません|1#1 つのコントロール|1&lt;{0,number,integer} コントロール} が削除されます。</controls-will-be-deleted>
         <metadata-edit-title>フォームメタデータ</metadata-edit-title>
         <select-template-output>開始に使うフォームテンプレートを選択してください。</select-template-output>

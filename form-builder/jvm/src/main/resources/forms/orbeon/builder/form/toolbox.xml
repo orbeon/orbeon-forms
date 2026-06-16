@@ -592,9 +592,19 @@
                                             <xf:output value="$form-resources/pdf-templates/label"/>
                                         </xh:span>
                                     </xf:label>
-                                    <xf:action ev:event="DOMActivate">
+                                    <xf:action event="DOMActivate">
                                         <xf:dispatch if="$is-pe" name="fb-show-dialog" targetid="dialog-pdf">
-                                            <xf:property name="pdf-attachments" value="bind('pdf-attachments-bind')"/>
+                                            <xf:property
+                                                name="pdf-attachments"
+                                                value="bind('pdf-attachments-bind')"/>
+                                            <xf:property
+                                                name="pdf-template-references"
+                                                as="xs:string*"
+                                                value="
+                                                    (
+                                                        bind('email-bind'),
+                                                        bind('confirmation-bind')
+                                                    )/templates/template/attach/@pdf-template-name[xxf:non-blank()]/string()"/>
                                         </xf:dispatch>
                                         <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog"/>
                                     </xf:action>

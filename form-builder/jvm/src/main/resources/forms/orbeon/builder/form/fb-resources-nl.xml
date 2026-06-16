@@ -1683,6 +1683,7 @@
         <delete-resources>Weet u zeker dat u alle resources voor de taal wilt verwijderen</delete-resources>
         <delete-service>Weet u zeker dat u de service wilt verwijderen "{0}"?{1,choice,0# Geen actie gebruikt deze.|1# 1 actie gebruikt deze.|1&lt; {1,number,integer} acties gebruiken deze.}</delete-service>
         <delete-action>Weet u zeker dat u de actie wilt verwijderen "{0}"?</delete-action>
+        <delete-pdf-reference>Er zijn een aantal e-mail- of bevestigingspagina-sjablonen die verwijzen naar een of meer PDF-sjabloonnamen die niet langer aanwezig zijn ({0}). Wilt u doorgaan en de wijzigingen toch opslaan?</delete-pdf-reference>
         <controls-will-be-deleted>Er {0,choice,0#worden geen controls|1#wordt 1 control|1&lt;worden {0,number,integer} controls} verwijderd.</controls-will-be-deleted>
         <metadata-edit-title>Form metagegevens</metadata-edit-title>
         <select-template-output>Selecteer een formsjabloon om als uitgangspunt te gebruiken.</select-template-output>

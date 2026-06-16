@@ -75,6 +75,15 @@
                             else
                                 1"/>
 
+                    <xxf:log
+                        name="orbeon.import"
+                        level="debug"
+                        value="
+                            concat(
+                                'Starting import service with format: ', $format,
+                                ', total: ', instance('fr-import-stats')/total/string()
+                            )"/>
+
                     <xf:action type="xpath">
                         xxf:set-session-attribute('org.orbeon.fr.import.total', xs:integer(instance('fr-import-stats')/total)),
                         xxf:set-session-attribute('org.orbeon.fr.import.processed', 0),
@@ -116,7 +125,18 @@
                     <!-- Check at each iteration whether to stop -->
                     <xf:var
                         name="must-cancel"
-                        value="xxf:get-session-attribute('org.orbeon.fr.import.cancel')"/>
+                        value="xxf:get-session-attribute('org.orbeon.fr.import.cancel') = true()"/>
+
+                    <xxf:log
+                        name="orbeon.import"
+                        level="debug"
+                        value="
+                            concat(
+                                'Processing row: rownum: ', $rownum,
+                                ', must-cancel: ', $must-cancel,
+                                ', import-invalid-data: ', $import-invalid-data,
+                                ', invalid-rows: ', string-join(for $i in $invalid-rows return string($i), ' ')
+                            )"/>
 
                     <xf:action if="$must-cancel">
                         <xf:dispatch name="fr-terminate-import" targetid="fr-batch-import-model"/>
@@ -129,9 +149,19 @@
                             value="not($import-invalid-data or empty(index-of($invalid-rows, $rownum - 1)))"/>
 
                         <xf:action if="$skip-row">
+                            <xxf:log
+                                name="orbeon.import"
+                                level="debug"
+                                value="'Skipping row'"/>
                             <xf:dispatch name="fr-maybe-process-next-row" targetid="fr-batch-import-model"/>
                         </xf:action>
                         <xf:action if="not($skip-row)">
+
+                            <xxf:log
+                                name="orbeon.import"
+                                level="debug"
+                                value="'Filling data'"/>
+
                             <!-- Start with empty data -->
                             <xf:var
                                 name="new"
@@ -158,6 +188,11 @@
                             <xf:insert ref="xxf:instance('fr-form-instance')" origin="$new"/>
                             <xf:rebuild model="fr-form-model"/>
 
+                            <xxf:log
+                                name="orbeon.import"
+                                level="debug"
+                                value="'Running process `save-import`'"/>
+
                             <!-- Save -->
                             <xf:dispatch name="fr-new-document" targetid="fr-persistence-model"/>
                             <xf:action type="xpath">
@@ -174,6 +209,14 @@
                     <xf:setvalue
                         ref="instance('fr-import-stats')/succeeded"
                         value="xs:integer(.) + 1"/>
+                    <xxf:log
+                        name="orbeon.import"
+                        level="debug"
+                        value="
+                            concat(
+                                'Callback `fr-save-import-done`',
+                                ', succeeded: ', instance('fr-import-stats')/succeeded/string()
+                            )"/>
                     <xf:action type="xpath">
                         xxf:set-session-attribute(
                             'org.orbeon.fr.import.succeeded',
@@ -186,6 +229,14 @@
 
                 <!-- Error callback from possibly-async `save-import` process -->
                 <xf:action event="fr-save-import-error">
+                    <xxf:log
+                        name="orbeon.import"
+                        level="debug"
+                        value="
+                            concat(
+                                'Callback `fr-save-import-error`',
+                                ', succeeded: ', instance('fr-import-stats')/succeeded/string()
+                            )"/>
                     <!-- Maybe continue import -->
                     <xf:dispatch name="fr-maybe-process-next-row" targetid="fr-batch-import-model"/>
                 </xf:action><!-- end `fr-save-import-error` -->
@@ -208,12 +259,32 @@
                         as="xs:boolean"
                         value="exists(instance()/row[instance('fr-import-stats')/processed/xs:integer(.) + 2])"/>
 
+                    <xxf:log
+                        name="orbeon.import"
+                        level="debug"
+                        value="
+                            concat(
+                                'Processing `fr-maybe-process-next-row`',
+                                ', succeeded: ', instance('fr-import-stats')/succeeded/string(),
+                                ', processed: ', instance('fr-import-stats')/processed/string(),
+                                ', continue: ', $continue
+                            )"/>
+
                     <xf:dispatch if="$continue"      name="fr-process-row"      targetid="fr-batch-import-model"/>
                     <xf:dispatch if="not($continue)" name="fr-terminate-import" targetid="fr-batch-import-model"/>
                 </xf:action><!-- end `fr-maybe-process-next-row` -->
 
                 <!-- Output resulting instance once done -->
                 <xf:action event="fr-terminate-import">
+                    <xxf:log
+                        name="orbeon.import"
+                        level="debug"
+                        value="
+                            concat(
+                                'Processing `fr-terminate-import`',
+                                ', succeeded: ', instance('fr-import-stats')/succeeded/string(),
+                                ', processed: ', instance('fr-import-stats')/processed/string()
+                            )"/>
                     <xf:send submission="fr-send-stats"/>
                 </xf:action>
             </xf:model>

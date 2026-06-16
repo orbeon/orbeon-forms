@@ -597,9 +597,9 @@ trait ContainingDocumentLogging {
       Loggers.newIndentedLogger(loggingCategory, indentation)
     )
 
-  val indentedLogger = getIndentedLogger("document")
+  val indentedLogger: IndentedLogger = getIndentedLogger("document")
 
-  val loggersMap = mutable.HashMap[String, log4s.Logger]()
+  private val loggersMap = mutable.HashMap[String, log4s.Logger]()
 
   def logMessage(name: String, level: LogLevel, message: String, collector: ErrorEventCollector): Unit = {
 

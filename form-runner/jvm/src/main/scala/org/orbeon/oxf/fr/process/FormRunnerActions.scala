@@ -809,7 +809,15 @@ trait FormRunnerActions
               currentFormLang = currentFormLang
             )
 
-          tryChangeModeImpl(ReplaceType.Instance, pathQuery, sourceModeType = frParams.modeType(frc.customModes)).get
+          tryChangeModeImpl(
+            replace        =
+              renderedFormat match {
+                case RenderedFormat.Pdf | RenderedFormat.Tiff                                     => ReplaceType.Instance
+                case RenderedFormat.ExcelWithNamedRanges | RenderedFormat.XmlFormStructureAndData => ReplaceType.Binary
+              },
+            pathQuery      = pathQuery,
+            sourceModeType = frParams.modeType(frc.customModes)
+          ).get
 
           locally {
 

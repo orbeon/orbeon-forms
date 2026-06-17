@@ -78,7 +78,7 @@ private object ControlDnD {
           (
             (el ne null)                                       &&
             el.parentElementOpt.exists(_.hasClass("fb-tools")) &&
-            el.hasClass("xforms-group")
+            el.hasClass("fb-tool")
           ) || el.hasClass("fr-grid-td")
 
         override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): UndefOr[Boolean] =

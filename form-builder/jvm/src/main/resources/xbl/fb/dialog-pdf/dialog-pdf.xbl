@@ -69,7 +69,7 @@
                 </xf:dispatch>
                 <xxf:hide dialog="dialog"/>
             </xbl:handler>
-            ;<!-- Attempt to save changes but there are dangling references to PDF template names, so ask the user to confirm -->
+            <!-- Attempt to save changes but there are dangling references to PDF template names, so ask the user to confirm -->
             <xbl:handler event="DOMActivate" observer="save-trigger prefix-input suffix-input" if="valid($i) and exists(xxf:split($i/refs)[not(. = $i/pdfs/pdf[xxf:non-blank()]/@name)])">
                 <xf:dispatch name="fb-request-apply-pdf-template-changes" target="fb-dialog-pdf">
                     <xf:property name="pdf-template-names" value="xxf:split($i/refs)[not(. = $i/pdfs/pdf[xxf:non-blank()]/@name)]"/>

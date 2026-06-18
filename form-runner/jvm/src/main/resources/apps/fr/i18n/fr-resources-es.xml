@@ -173,6 +173,8 @@
         </revision-history>
     </components>
     <untitled-form>Formulario sin Título</untitled-form>
+    <loading>Cargando</loading>
+    <loading-complete>Carga completada</loading-complete>
     <errors>
         <summary-title>Su formulario {1,choice,
             0#no tiene ningún mensaje|

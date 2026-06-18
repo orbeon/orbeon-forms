@@ -167,6 +167,8 @@
         </revision-history>
     </components>
     <untitled-form>Nimetön lomake</untitled-form>
+    <loading>Ladataan</loading>
+    <loading-complete>Lataus valmis</loading-complete>
     <errors>
         <summary-title>Lomakkeesi {1,choice,
             0#ei sisällä yhtään viestiä|

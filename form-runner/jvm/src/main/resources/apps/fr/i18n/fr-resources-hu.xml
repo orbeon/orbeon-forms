@@ -167,6 +167,8 @@
         </revision-history>
     </components>
     <untitled-form>Cím nélküli űrlap</untitled-form>
+    <loading>Betöltés</loading>
+    <loading-complete>Betöltés kész</loading-complete>
     <errors>
         <summary-title>Az űrlap {1,choice,
             0#nem tartalmaz üzenetet|

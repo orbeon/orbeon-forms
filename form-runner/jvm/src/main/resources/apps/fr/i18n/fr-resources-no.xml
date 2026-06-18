@@ -167,6 +167,8 @@
         </revision-history>
     </components>
     <untitled-form>Skjema ikke navngitt</untitled-form>
+    <loading>Laster</loading>
+    <loading-complete>Lasting fullført</loading-complete>
     <errors>
         <summary-title>Skjemaet ditt {1,choice,
             0#inneholder ingen meldinger|

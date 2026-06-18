@@ -167,6 +167,8 @@
         </revision-history>
     </components>
     <untitled-form>Başlıksız Form</untitled-form>
+    <loading>Yükleniyor</loading>
+    <loading-complete>Yükleme tamamlandı</loading-complete>
     <errors>
         <summary-title>Formunuz {1,choice,
             0#hiçbir mesaj içermiyor|

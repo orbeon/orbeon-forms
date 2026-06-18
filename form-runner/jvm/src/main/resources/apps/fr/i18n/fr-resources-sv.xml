@@ -167,6 +167,8 @@
         </revision-history>
     </components>
     <untitled-form>Formulär utan titel</untitled-form>
+    <loading>Läser in</loading>
+    <loading-complete>Inläsning klar</loading-complete>
     <errors>
         <summary-title>Formuläret {1,choice,
             0#är fritt från felmeddelanden|

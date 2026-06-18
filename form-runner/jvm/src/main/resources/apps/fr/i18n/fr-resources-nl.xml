@@ -167,6 +167,8 @@
         </revision-history>
     </components>
     <untitled-form>Naamloos form</untitled-form>
+    <loading>Laden</loading>
+    <loading-complete>Laden voltooid</loading-complete>
     <errors>
         <summary-title>Uw form {1,choice,
             0#bevat geen berichten|

@@ -167,6 +167,8 @@
         </revision-history>
     </components>
     <untitled-form>Formulaire sans titre</untitled-form>
+    <loading>Chargement en cours</loading>
+    <loading-complete>Chargement terminé</loading-complete>
     <errors>
         <summary-title>Votre formulaire {1,choice,
             0#ne contient aucun message|

@@ -167,6 +167,8 @@
         </revision-history>
     </components>
     <untitled-form>無題のフォーム</untitled-form>
+    <loading>読み込み中</loading>
+    <loading-complete>読み込み完了</loading-complete>
     <errors>
         <summary-title>このフォームは {1,choice,
             0#メッセージはありません|

@@ -172,6 +172,8 @@
         </revision-history>
     </components>
     <untitled-form>Formulari sense Títol</untitled-form>
+    <loading>S'està carregant</loading>
+    <loading-complete>Càrrega completada</loading-complete>
     <errors>
         <summary-title>El seu formulari {1,choice,0#no te cap missatge|1#té els següents missatges
             '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;té els següents

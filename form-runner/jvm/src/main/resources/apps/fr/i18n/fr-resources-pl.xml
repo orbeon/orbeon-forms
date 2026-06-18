@@ -167,6 +167,8 @@
         </revision-history>
     </components>
     <untitled-form>Bez tytułu</untitled-form>
+    <loading>Ładowanie</loading>
+    <loading-complete>Ładowanie zakończone</loading-complete>
     <errors>
         <summary-title>Twój formularz {1,choice,
             0#nie zawiera komunikatów błędów i ostrzeżeń.|

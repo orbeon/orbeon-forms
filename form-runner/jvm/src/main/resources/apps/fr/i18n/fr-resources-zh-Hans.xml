@@ -163,6 +163,8 @@
         </revision-history>
     </components>
     <untitled-form>无标题表单</untitled-form>
+    <loading>加载中</loading>
+    <loading-complete>加载完成</loading-complete>
     <errors>
         <summary-title>您的表单{1,choice,
             0#不包含任何消息|

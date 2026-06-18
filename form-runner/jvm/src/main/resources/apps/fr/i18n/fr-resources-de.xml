@@ -167,6 +167,8 @@
         </revision-history>
     </components>
     <untitled-form>Formular ohne Namen</untitled-form>
+    <loading>Wird geladen</loading>
+    <loading-complete>Laden abgeschlossen</loading-complete>
     <errors>
         <summary-title>Ihr Formular {1,choice,
             0#enthält keine Meldungen|

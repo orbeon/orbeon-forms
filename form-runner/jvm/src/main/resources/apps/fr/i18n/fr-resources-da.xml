@@ -167,6 +167,8 @@
         </revision-history>
     </components>
     <untitled-form>Blanket uden navn</untitled-form>
+    <loading>Indlæser</loading>
+    <loading-complete>Indlæsning fuldført</loading-complete>
         <errors>
         <summary-title>Din blanket {1,choice,0#indeholder ingen besked|1#indeholder følgende '{0,choice,0#fejl|1#advarsel|2#information|3#besked}'|1&lt;indeholder følgende '{0,choice,0#fejl|1#advarsler|2#informationer|3#beskeder}'}</summary-title>
         <form-title>{1,choice,0#|1#{1,number,integer} '{0,choice,0#fejl|1#advarsel|2#information|3#besked}' - |1&lt;{1,number,integer} '{0,choice,0#fejl|1#advarsler|2#informationer|3#beskeder}' - }{2}</form-title>

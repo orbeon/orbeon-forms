@@ -167,6 +167,8 @@
         </revision-history>
     </components>
     <untitled-form>نموذج بدون عنوان</untitled-form>
+    <loading>جارٍ التحميل</loading>
+    <loading-complete>اكتمل التحميل</loading-complete>
     <errors>
         <summary-title>النموذج الخاص بك {1,choice,
             0#لا يحتوي على أي رسائل|

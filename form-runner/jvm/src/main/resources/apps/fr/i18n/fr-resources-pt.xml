@@ -167,6 +167,8 @@
         </revision-history>
     </components>
     <untitled-form>Formulário sem título</untitled-form>
+    <loading>A carregar</loading>
+    <loading-complete>Carregamento concluído</loading-complete>
     <errors>
         <summary-title>O seu formulário {1,choice,
             0#não contém quaisquer mensagens|

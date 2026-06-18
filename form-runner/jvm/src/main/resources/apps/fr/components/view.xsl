@@ -405,6 +405,8 @@
             <xf:group
                 model="fr-form-model"
                 id="fr-view"
+                data-r-loading="{{xxf:r('loading', '|fr-fr-resources|')}}"
+                data-r-loading-complete="{{xxf:r('loading-complete', '|fr-fr-resources|')}}"
                 class="container{
                     '-fluid'[$fluid]
                 } fr-view fr-mode-{{

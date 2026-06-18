@@ -167,6 +167,8 @@
         </revision-history>
     </components>
     <untitled-form>Untitled Form</untitled-form>
+    <loading>Loading</loading>
+    <loading-complete>Loading complete</loading-complete>
     <errors>
         <summary-title>Your form {1,choice,
             0#does not contain any messages|

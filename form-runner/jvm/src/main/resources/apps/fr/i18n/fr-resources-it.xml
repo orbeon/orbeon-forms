@@ -167,6 +167,8 @@
         </revision-history>
     </components>
     <untitled-form>Modulo senza nome</untitled-form>
+    <loading>Caricamento in corso</loading>
+    <loading-complete>Caricamento completato</loading-complete>
     <errors>
         <summary-title>Il suo modulo {1,choice,
             0#non contiene avvisi|

@@ -42,23 +42,26 @@ object LoadingStatus {
   private val LoadingCompleteMessage = "Loading complete"
   private var requestCount           = 0
 
+  private def loadingMessage        : String = rMessage("data-r-loading"         ).getOrElse(LoadingMessage)
+  private def loadingCompleteMessage: String = rMessage("data-r-loading-complete").getOrElse(LoadingCompleteMessage)
+
+  private def rMessage(attName: String): Option[String] =
+    dom.document.querySelectorOpt(s"[$attName]").flatMap(_.attValueOpt(attName))
+
   def init(): Unit =
     statusElement
 
   def show(): Unit = {
     requestCount += 1
     if (requestCount == 1)
-      statusElement.textContent = LoadingMessage
+      statusElement.textContent = loadingMessage
   }
 
   def hide(): Unit = {
     requestCount -= 1
     if (requestCount == 0)
-      statusElement.textContent = LoadingCompleteMessage
+      statusElement.textContent = loadingCompleteMessage
   }
-
-  def message: String =
-    LoadingMessage
 
   private def statusElement: html.Element =
     dom.document.getElementByIdOpt(StatusElementId).getOrElse {

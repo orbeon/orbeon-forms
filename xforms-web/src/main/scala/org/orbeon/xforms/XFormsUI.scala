@@ -752,7 +752,7 @@ object XFormsUI {
     }
 
   def isIOS: Boolean =
-    dom.document.body.hasClass("xforms-ios")
+    dom.document.body.hasClass(Constants.XFormsIosClass)
 
   def getZoomLevel: Double =
     dom.document.documentElement.clientWidth.toDouble / dom.window.innerWidth

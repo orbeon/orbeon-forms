@@ -246,7 +246,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     // - in repeats
     // - and/or when multiple instances of a same section template are present in the form
 
-    val libraryUri = s"${Controls.SectionTemplateUriPrefix}$libraryName/library"
+    val libraryUri = FormRunner.libraryUriFromName(libraryName)
 
     // All the section template controls from the given library
     val allSectionTemplateControlsForLibrary =

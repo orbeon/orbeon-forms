@@ -84,7 +84,7 @@ trait FormRunnerSectionTemplateOps {
 
     def libraryNameMatches: Boolean = {
 
-      val libraryUri = s"${Controls.SectionTemplateUriPrefix}$libraryName/library"
+      val libraryUri = libraryUriFromName(libraryName)
 
       inScopeContainingDocument.controls.getCurrentControlTree.findControl(XFormsId.absoluteIdToEffectiveId(controlAbsoluteId))
         .exists(
@@ -95,6 +95,9 @@ trait FormRunnerSectionTemplateOps {
 
     nameMatches && libraryNameMatches
   }
+
+  def libraryUriFromName(libraryName: String): String =
+    s"${Controls.SectionTemplateUriPrefix}$libraryName/library"
 
   def sectionTemplateForSection(frSectionComponent: XFormsComponentControl): Option[XFormsComponentControl] = {
 

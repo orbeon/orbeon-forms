@@ -176,6 +176,20 @@
     <app-library>
         <label>Anwendungsbibliothek</label>
     </app-library>
+    <library-dialog>
+        <none>
+            <label>Es wurde noch keine Bibliothek erstellt. Möchten Sie jetzt eine erstellen?</label>
+        </none>
+        <one>
+            <label>Möchten Sie die Bibliothek öffnen?</label>
+        </one>
+        <several>
+            <label>Es wurden mehrere Bibliotheken gefunden. Wählen Sie eine auf der Übersichtsseite aus.</label>
+        </several>
+        <open-summary>
+            <label>Übersicht öffnen</label>
+        </open-summary>
+    </library-dialog>
     <enter-section-title>
         <label>Klicken, um einen Abschnittstitel einzugeben</label>
     </enter-section-title>

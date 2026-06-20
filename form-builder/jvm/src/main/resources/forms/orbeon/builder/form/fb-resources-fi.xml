@@ -185,6 +185,20 @@
     <app-library>
         <label>Sovelluskirjasto</label>
     </app-library>
+    <library-dialog>
+        <none>
+            <label>Kirjastoa ei ole vielä luotu. Haluatko luoda sellaisen nyt?</label>
+        </none>
+        <one>
+            <label>Haluatko avata kirjaston?</label>
+        </one>
+        <several>
+            <label>Useita kirjastoja löytyi. Valitse yksi yhteenvetosivulta.</label>
+        </several>
+        <open-summary>
+            <label>Avaa yhteenveto</label>
+        </open-summary>
+    </library-dialog>
     <enter-section-title>
         <label>Klikkaa syöttääksesi lohkon otsikko</label>
     </enter-section-title>

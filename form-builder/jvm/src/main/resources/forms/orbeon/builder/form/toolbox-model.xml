@@ -26,9 +26,8 @@
     <!-- PRECONDITION: the form, whether in `fr-form-instance` or `fb-form-instance`, must have up to date app/form names -->
     <xf:action event="fb-load-toolbox-action">
 
-        <!-- Clear list of versions and `document-id` -->
+        <!-- Clear list of versions -->
         <xf:delete ref="bind('fb-toolbox-libraries-bind')/*/*"/>
-        <xf:delete ref="bind('fb-toolbox-libraries-bind')/*/@document-id"/>
 
         <!-- After this we are sure the form is up to date and de-annotated in `fr-form-instance` -->
         <xf:dispatch
@@ -57,9 +56,6 @@
                 <xf:property name="all-forms"                  value="true()"/>
                 <xf:property name="callback-id"                value="'fb-toolbox-model'"/>
             </xf:dispatch>
-            <xf:send submission="fb-toolbox-library-search-submission">
-                <xf:property name="app" value="." xxf:tunnel="true"/>
-            </xf:send>
         </xf:action>
 
         <xf:dispatch
@@ -204,6 +200,24 @@
 
     </xf:submission>
 
+    <!-- The library link in the toolbox triggers a search when clicked, the result of which is shown in a dialog -->
+    <xf:action event="fb-library-search">
+        <xf:setvalue ref="instance('fb-library-dialog-instance')/app"          value="event('app')"/>
+        <xf:setvalue ref="instance('fb-library-dialog-instance')/display-name" value="event('display-name')"/>
+        <xf:send submission="fb-toolbox-library-search-submission"/>
+    </xf:action>
+
+    <xf:instance id="fb-library-dialog-instance">
+        <_ xmlns="">
+            <app/>
+            <display-name/>
+        </_>
+    </xf:instance>
+
+    <xf:instance id="fb-library-search-result-instance">
+        <documents xmlns="" search-total="0"/>
+    </xf:instance>
+
     <xf:instance id="fb-toolbox-library-search-instance">
         <search xmlns="" return-all-indexed-fields="true">
             <query/>
@@ -225,7 +239,8 @@
         validate="false"
         method="post"
         resource="/fr/service/persistence/search/orbeon/builder"
-        replace="none">
+        replace="instance"
+        instance="fb-library-search-result-instance">
 
         <xf:header>
             <xf:name>Orbeon-Form-Definition-Version</xf:name>
@@ -235,20 +250,11 @@
         <xf:action event="xforms-submit">
             <xf:setvalue
                 ref="query[@name = 'application-name']"
-                value="event('app')"/>
+                value="instance('fb-library-dialog-instance')/app"/>
         </xf:action>
 
         <xf:action event="xforms-submit-done">
-            <xf:var
-                name="elem-name"
-                value="frf:elemNameForSectionTemplateApp(event('app'))"/>
-            <xf:var
-                name="document-id"
-                value="event('response-body')/*/document[1]/@name/string()"/>
-            <xf:insert
-                if="xxf:non-blank($document-id)"
-                context="bind('fb-toolbox-libraries-bind')/*[name() = $elem-name]"
-                origin="xf:attribute('document-id', $document-id)"/>
+            <xxf:show dialog="fb-library-dialog"/>
         </xf:action>
 
     </xf:submission>

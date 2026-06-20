@@ -164,6 +164,20 @@
     <app-library>
         <label>Библиотека приложения</label>
     </app-library>
+    <library-dialog>
+        <none>
+            <label>Библиотека еще не создана. Хотите создать её сейчас?</label>
+        </none>
+        <one>
+            <label>Хотите открыть библиотеку?</label>
+        </one>
+        <several>
+            <label>Найдено несколько библиотек. Выберите одну на странице сводки.</label>
+        </several>
+        <open-summary>
+            <label>Открыть сводку</label>
+        </open-summary>
+    </library-dialog>
     <enter-section-title>
         <label>Нажмите чтобы ввести название раздела</label>
     </enter-section-title>

@@ -164,6 +164,20 @@
     <app-library>
         <label>Applikasjonsbibliotek</label>
     </app-library>
+    <library-dialog>
+        <none>
+            <label>Det er ikke opprettet noe bibliotek ennå. Vil du opprette ett nå?</label>
+        </none>
+        <one>
+            <label>Vil du åpne biblioteket?</label>
+        </one>
+        <several>
+            <label>Flere biblioteker ble funnet. Velg ett fra oversiktssiden.</label>
+        </several>
+        <open-summary>
+            <label>Åpne oversikt</label>
+        </open-summary>
+    </library-dialog>
     <enter-section-title>
         <label>Klikk for å skrive inn seksjonstittel</label>
     </enter-section-title>

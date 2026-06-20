@@ -182,6 +182,20 @@
     <app-library>
         <label>Bibliothèque de l'application</label>
     </app-library>
+    <library-dialog>
+        <none>
+            <label>Aucune bibliothèque n'a encore été créée. Souhaitez-vous en créer une ?</label>
+        </none>
+        <one>
+            <label>Souhaitez-vous ouvrir la bibliothèque ?</label>
+        </one>
+        <several>
+            <label>Plusieurs bibliothèques ont été trouvées. Choisissez-en une sur la page de résumé.</label>
+        </several>
+        <open-summary>
+            <label>Ouvrir le résumé</label>
+        </open-summary>
+    </library-dialog>
     <enter-section-title>
         <label>Cliquez pour entrer un titre de section</label>
     </enter-section-title>

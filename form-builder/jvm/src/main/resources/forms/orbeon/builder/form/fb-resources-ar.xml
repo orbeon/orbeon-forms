@@ -184,6 +184,20 @@
     <app-library>
         <label>مكتبة التطبيق</label>
     </app-library>
+    <library-dialog>
+        <none>
+            <label>لم يتم إنشاء أي مكتبة بعد. هل ترغب في إنشاء واحدة الآن؟</label>
+        </none>
+        <one>
+            <label>هل ترغب في فتح المكتبة؟</label>
+        </one>
+        <several>
+            <label>تم العثور على عدة مكتبات. اختر واحدة من صفحة الملخص.</label>
+        </several>
+        <open-summary>
+            <label>فتح الملخص</label>
+        </open-summary>
+    </library-dialog>
     <enter-section-title>
         <label>انقر لإدخال عنوان القسم</label>
     </enter-section-title>

@@ -257,19 +257,20 @@
                         as="element()?"
                         value="bind('fb-toolbox-libraries-bind')/*[name() = $library-elem-name]"/>
                     <xf:var
-                        name="library-document-id"
-                        as="xs:string?"
-                        value="$library-entry/@document-id/string()"/>
+                        name="library-published"
+                        as="xs:boolean"
+                        value="exists($library-entry/version)"/>
                     <xf:var
                         name="library-display-name"
                         as="xs:string"
                         value="
-                            if (exists($library-app) and empty($library-document-id) and $library-app = (frf:globalLibraryAppName(), frf:specialLibraryAppName())) then
-                                (: If we don't have a global library in Form Builder, use 'Global Library' as the title :)
-                                $form-resources/global-library/label
-                            else if (exists($library-app) and empty($library-document-id)) then
-                                (: If we don't have an app library in Form Builder, use 'App Library' as the title :)
-                                $form-resources/app-library/label
+                            if (exists($library-app) and not($library-published)) then
+                                if ($library-app = (frf:globalLibraryAppName(), frf:specialLibraryAppName())) then
+                                    (: If we don't have a global library in Form Builder, use 'Global Library' as the title :)
+                                    $form-resources/global-library/label
+                                else
+                                    (: If we don't have an app library in Form Builder, use 'App Library' as the title :)
+                                    $form-resources/app-library/label
                             else
                                 (: Otherwise use the title of the library form :)
                                 (
@@ -278,20 +279,6 @@
                                     'Library'
                                 )[1]
                         "/>
-
-                    <xf:var
-                        name="library-href"
-                        as="xs:string"
-                        value="
-                            if (xxf:non-blank($library-document-id)) then
-                                concat('/fr/orbeon/builder/edit/', encode-for-uri($library-document-id))
-                            else
-                                concat(
-                                    '/fr/orbeon/builder/new?fr-app=',
-                                    encode-for-uri($library-app),
-                                    '&amp;fr-form=library&amp;fr-title=',
-                                    encode-for-uri($library-display-name)
-                                )"/>
 
                     <xf:var
                         name="has-section-component"
@@ -310,23 +297,30 @@
                         xxf:element="div"
                         class="fb-tools"
                         ref=".[
-                            not($library-app = frf:specialLibraryAppName() and empty(($library-entry/version, $library-entry/@document-id))) and
+                            not($library-app = frf:specialLibraryAppName() and not($library-published)) and
                             (xbl:binding or exists($library-app))
                         ]">
                             <xh:div class="fb-tools-title">
                                 <xf:output value="$library-display-name"/>
-                                <xh:a
+                                <xf:trigger
+                                    appearance="minimal"
                                     class="{
                                         string-join(
                                             ('fb-library-link', if (exists($library-app)) then () else 'xforms-hidden'),
                                             ' '
                                         )
-                                    }"
-                                    href="{$library-href}"
-                                    target="_blank"
-                                    title="{if (xxf:non-blank($library-document-id)) then $form-resources/edit-library/label else $form-resources/create-library/label}">
-                                    <xh:i class="fa {if (xxf:non-blank($library-document-id)) then 'fa-pencil' else 'fa-plus'}"/>
-                                </xh:a>
+                                    }">
+                                    <xf:label>
+                                        <xh:i class="fa fa-pencil"/>
+                                    </xf:label>
+                                    <xf:hint ref="$form-resources/edit-library/label"/>
+                                    <xf:action event="DOMActivate">
+                                        <xf:dispatch name="fb-library-search" targetid="fb-toolbox-model">
+                                            <xf:property name="app"          value="$library-app"/>
+                                            <xf:property name="display-name" value="$library-display-name"/>
+                                        </xf:dispatch>
+                                    </xf:action>
+                                </xf:trigger>
                             </xh:div>
 
                             <xf:group ref=".[$has-section-component]">
@@ -742,5 +736,68 @@
         <fr:message value="xxf:serialize($form-resources/dialog-pe/message/*[1], 'html')" mediatype="text/html"/>
         <fr:neutral-choice/>
     </fr:alert-dialog>
+
+    <!-- Dialog shown after searching for a section library -->
+    <xxf:dialog id="fb-library-dialog" level="modal" class="fb-library-dialog">
+
+        <xf:label value="xxf:instance('fb-library-dialog-instance')/display-name"/>
+
+        <xf:var name="app"          value="xxf:instance('fb-library-dialog-instance')/app/string()"/>
+        <xf:var name="display-name" value="xxf:instance('fb-library-dialog-instance')/display-name/string()"/>
+        <xf:var name="search-total" value="xs:integer(xxf:instance('fb-library-search-result-instance')/@search-total)"/>
+        <xf:var name="document-id"  value="xxf:instance('fb-library-search-result-instance')/document[1]/@name/string()"/>
+
+        <xh:div class="fb-library-dialog-body">
+            <xf:output value="
+                $form-resources/library-dialog/(
+                    if ($search-total = 0) then none else if ($search-total = 1) then one else several
+                )/label"/>
+        </xh:div>
+
+        <xh:div class="fr-dialog-buttons">
+            <xf:group appearance="xxf:internal">
+
+                <!-- No library found: link to create one -->
+                <xf:trigger appearance="xxf:primary" ref=".[$search-total = 0]">
+                    <xf:label value="$form-resources/create-library/label"/>
+                    <xf:action event="DOMActivate">
+                        <xxf:hide dialog="fb-library-dialog"/>
+                        <xf:load
+                            show="new"
+                            resource="/fr/orbeon/builder/new?fr-app={encode-for-uri($app)}&amp;fr-form=library&amp;fr-title={encode-for-uri($display-name)}"/>
+                    </xf:action>
+                </xf:trigger>
+
+                <!-- One library found: link to open it -->
+                <xf:trigger appearance="xxf:primary" ref=".[$search-total = 1]">
+                    <xf:label value="$form-resources/edit-library/label"/>
+                    <xf:action event="DOMActivate">
+                        <xxf:hide dialog="fb-library-dialog"/>
+                        <xf:load
+                            show="new"
+                            resource="/fr/orbeon/builder/edit/{encode-for-uri($document-id)}"/>
+                    </xf:action>
+                </xf:trigger>
+
+                <!-- Several libraries found: link to the summary page filtered to libraries for this app -->
+                <xf:trigger appearance="xxf:primary" ref=".[$search-total gt 1]">
+                    <xf:label value="$form-resources/library-dialog/open-summary/label"/>
+                    <xf:action event="DOMActivate">
+                        <xxf:hide dialog="fb-library-dialog"/>
+                        <xf:load
+                            show="new"
+                            resource="/fr/orbeon/builder/summary?fr-search-app=exact:{encode-for-uri($app)}&amp;fr-search-form=exact:library"/>
+                    </xf:action>
+                </xf:trigger>
+
+                <xf:output value="$form-resources/or/label"/>
+                <xf:trigger appearance="minimal">
+                    <xf:label ref="$form-resources/cancel/label"/>
+                    <xxf:hide ev:event="DOMActivate" dialog="fb-library-dialog"/>
+                </xf:trigger>
+            </xf:group>
+        </xh:div>
+
+    </xxf:dialog>
 
 </xh:div>

@@ -172,6 +172,20 @@
     <app-library>
         <label>Libreria dell'applicazione</label>
     </app-library>
+    <library-dialog>
+        <none>
+            <label>Nessuna libreria è ancora stata creata. Vuoi crearne una ora?</label>
+        </none>
+        <one>
+            <label>Vuoi aprire la libreria?</label>
+        </one>
+        <several>
+            <label>Sono state trovate diverse librerie. Scegline una dalla pagina di riepilogo.</label>
+        </several>
+        <open-summary>
+            <label>Apri riepilogo</label>
+        </open-summary>
+    </library-dialog>
     <enter-section-title>
         <label>Clicca per inserire un titolo</label>
     </enter-section-title>

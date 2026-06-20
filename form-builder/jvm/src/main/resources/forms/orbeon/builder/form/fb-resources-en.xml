@@ -184,6 +184,20 @@
     <app-library>
         <label>App Library</label>
     </app-library>
+    <library-dialog>
+        <none>
+            <label>No library has been created yet. Would you like to create one now?</label>
+        </none>
+        <one>
+            <label>Would you like to open the library?</label>
+        </one>
+        <several>
+            <label>Several libraries were found. Choose one from the summary page.</label>
+        </several>
+        <open-summary>
+            <label>Open summary</label>
+        </open-summary>
+    </library-dialog>
     <enter-section-title>
         <label>Click to enter a section title</label>
     </enter-section-title>

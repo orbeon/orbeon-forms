@@ -165,6 +165,20 @@
     <app-library>
         <label>Applicatiebibliotheek</label>
     </app-library>
+    <library-dialog>
+        <none>
+            <label>Er is nog geen bibliotheek aangemaakt. Wilt u er nu een aanmaken?</label>
+        </none>
+        <one>
+            <label>Wilt u de bibliotheek openen?</label>
+        </one>
+        <several>
+            <label>Er zijn meerdere bibliotheken gevonden. Kies er een op de overzichtspagina.</label>
+        </several>
+        <open-summary>
+            <label>Overzicht openen</label>
+        </open-summary>
+    </library-dialog>
     <enter-section-title>
         <label>Klik om een sectietitel toe te voegen</label>
     </enter-section-title>

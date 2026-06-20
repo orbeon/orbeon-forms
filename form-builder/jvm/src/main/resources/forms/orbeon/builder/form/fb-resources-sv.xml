@@ -184,6 +184,20 @@
     <app-library>
         <label>Appbibliotek</label>
     </app-library>
+    <library-dialog>
+        <none>
+            <label>Inget bibliotek har skapats ännu. Vill du skapa ett nu?</label>
+        </none>
+        <one>
+            <label>Vill du öppna biblioteket?</label>
+        </one>
+        <several>
+            <label>Flera bibliotek hittades. Välj ett på sammanfattningssidan.</label>
+        </several>
+        <open-summary>
+            <label>Öppna sammanfattning</label>
+        </open-summary>
+    </library-dialog>
     <enter-section-title>
         <label>Klicka för att ange sektionens titel</label>
     </enter-section-title>

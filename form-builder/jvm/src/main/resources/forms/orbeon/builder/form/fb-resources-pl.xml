@@ -184,6 +184,20 @@
     <app-library>
         <label>Biblioteka aplikacji</label>
     </app-library>
+    <library-dialog>
+        <none>
+            <label>Nie utworzono jeszcze żadnej biblioteki. Czy chcesz teraz utworzyć?</label>
+        </none>
+        <one>
+            <label>Czy chcesz otworzyć bibliotekę?</label>
+        </one>
+        <several>
+            <label>Znaleziono kilka bibliotek. Wybierz jedną na stronie podsumowania.</label>
+        </several>
+        <open-summary>
+            <label>Otwórz podsumowanie</label>
+        </open-summary>
+    </library-dialog>
     <enter-section-title>
         <label>Kliknij, aby wprowadzić tytuł sekcji</label>
     </enter-section-title>

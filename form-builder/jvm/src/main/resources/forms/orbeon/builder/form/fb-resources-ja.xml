@@ -184,6 +184,20 @@
     <app-library>
         <label>アプリライブラリ</label>
     </app-library>
+    <library-dialog>
+        <none>
+            <label>ライブラリはまだ作成されていません。今すぐ作成しますか？</label>
+        </none>
+        <one>
+            <label>ライブラリを開きますか？</label>
+        </one>
+        <several>
+            <label>複数のライブラリが見つかりました。一覧ページから選択してください。</label>
+        </several>
+        <open-summary>
+            <label>一覧を開く</label>
+        </open-summary>
+    </library-dialog>
     <enter-section-title>
         <label>クリックしてセクションタイトルを入力</label>
     </enter-section-title>

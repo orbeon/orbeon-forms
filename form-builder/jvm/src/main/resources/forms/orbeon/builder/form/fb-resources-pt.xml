@@ -165,6 +165,20 @@
     <app-library>
         <label>Biblioteca da aplicação</label>
     </app-library>
+    <library-dialog>
+        <none>
+            <label>Ainda não foi criada nenhuma biblioteca. Deseja criar uma agora?</label>
+        </none>
+        <one>
+            <label>Deseja abrir a biblioteca?</label>
+        </one>
+        <several>
+            <label>Foram encontradas várias bibliotecas. Escolha uma na página de resumo.</label>
+        </several>
+        <open-summary>
+            <label>Abrir resumo</label>
+        </open-summary>
+    </library-dialog>
     <enter-section-title>
         <label>Clique aqui para adicionar um título à secção</label>
     </enter-section-title>

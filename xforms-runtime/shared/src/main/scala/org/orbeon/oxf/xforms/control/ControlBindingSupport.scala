@@ -107,10 +107,10 @@ trait ControlBindingSupport {
       state,
       collector
     )
-    // Commit evaluation of any pending "before" external LHHA
+    // Re-evaluate any "before" external LHHA so it picks up this associated control's freshly-computed state
     findExternalBeforeAssociatedLhha
       .foreach { lhhaControl =>
-        lhhaControl.commitLazyBindingAndValues()
+        lhhaControl.reevaluateForAssociatedControl(collector)
       }
   }
 

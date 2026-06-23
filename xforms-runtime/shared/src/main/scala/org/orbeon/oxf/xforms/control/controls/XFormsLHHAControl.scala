@@ -13,7 +13,6 @@
   */
 package org.orbeon.oxf.xforms.control.controls
 
-import cats.Eval
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.analysis.controls.LHHA.Alert
@@ -58,7 +57,6 @@ class XFormsLHHAControl(
 
   // https://github.com/orbeon/orbeon-forms/issues/6645
   private var _parentBindingContext: BindingContext = null
-  private var lazyEval: Option[Eval[Unit]] = None
 
   // Set as a side effect of calling `computeValue()`
   // This is not great, but we need to store this instead of computing it in `addAjaxAttributes()`, as cannot resolve
@@ -76,10 +74,7 @@ class XFormsLHHAControl(
     collector     : ErrorEventCollector
   ): Unit = {
     _parentBindingContext = parentContext
-    if (staticControl.isExternalBeforeAssociatedControl)
-      lazyEval = Some(Eval.later(super.evaluateBindingAndValues(parentContext, update, restoreState, state, collector)))
-    else
-      super.evaluateBindingAndValues(parentContext, update, restoreState, state, collector)
+    super.evaluateBindingAndValues(parentContext, update, restoreState, state, collector)
   }
 
   override def onDestroy(update: Boolean): Unit = {
@@ -95,16 +90,11 @@ class XFormsLHHAControl(
     collector    : ErrorEventCollector
   ): Unit = {
     _parentBindingContext = parentContext
-    if (staticControl.isExternalBeforeAssociatedControl)
-      lazyEval = Some(Eval.later(super.refreshBindingAndValues(parentContext, collector)))
-    else
-      super.refreshBindingAndValues(parentContext, collector)
+    super.refreshBindingAndValues(parentContext, collector)
   }
 
-  final def commitLazyBindingAndValues(): Unit = {
-    lazyEval.foreach(_.value)
-    lazyEval = None
-  }
+  final def reevaluateForAssociatedControl(collector: ErrorEventCollector): Unit =
+    super.refreshBindingAndValues(_parentBindingContext, collector)
 
   override def bindingContextForFollowing: BindingContext = _parentBindingContext
 
@@ -125,7 +115,7 @@ class XFormsLHHAControl(
     }
 
   override def computeRelevant: Boolean =
-    super.computeRelevant && associatedControls.exists(_.isRelevant) && isActive
+    super.computeRelevant && (associatedControls.isEmpty || associatedControls.exists(_.isRelevant)) && isActive
 
   // Special evaluation function, as in the case of LHHA, the nested content of the element is a way to evaluate
   // the value.

@@ -13,14 +13,9 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import cats.implicits.catsSyntaxOptionId
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.{FSFontUseCase, FontStyle, PageSizeUnits}
-import com.openhtmltopdf.outputdevice.helper.ExternalResourceType
 import com.openhtmltopdf.pdfboxout.{CustomPdfRendererBuilder, PdfRendererBuilder}
-import com.openhtmltopdf.resource.ImageResource
 import com.openhtmltopdf.util.XRLog
-import org.orbeon.css.CSSParsing.CSSCache
-import org.orbeon.css.{CSSParsing, ResolvedCSSLink, Selector}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -32,13 +27,11 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, TransformerUtils, XMLParsing, XMLReceiver}
-import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps, *}
 import org.w3c.dom.Document
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
 import java.io.{FileInputStream, OutputStream}
-import java.net.URI
 import java.text.Normalizer
 import javax.xml.transform.dom.DOMResult
 import scala.util.Try
@@ -203,53 +196,6 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
           }
         )
 
-      // Extract classes from the div element with id="fr-view"
-      val frViewClasses =
-        StaticXPath.orbeonDomToTinyTree(TransformerUtils.domToOrbeonDomDocument(w3cDocument))
-          .descendant(*)
-          .find(_.attValue("id") == "fr-view")
-          .toList
-          .flatMap(div => (div /@ "class").stringValue.splitTo[List]())
-
-      // Look for PDF color mode class inserted in print-pdf-no-template.xsl
-      val pdfColorModeClassOpt = frViewClasses.find(_.startsWith("fr-pdf-color-mode-"))
-
-      // Simple CSS selectors listed by order of priority for static CSS variable lookup
-      val lookupSelectors = List(
-        pdfColorModeClassOpt.map(mode => s".orbeon .$mode"),
-        pdfColorModeClassOpt.map(mode => s".$mode"),
-        ".orbeon".some,
-        ":root".some
-      ).flatten.map(Selector.apply)
-
-      // Cache will be written when variable definitions are parsed and read when variables values are injected
-      implicit val cssCache: CSSCache = new CSSCache()
-
-      val (outerPipelineContext, outerExternalContext, outerIndentedLogger) =
-        (pipelineContext, externalContext, indentedLogger)
-
-      val uriResolver = new URIResolver {
-        override val pipelineContext         : PipelineContext = outerPipelineContext
-        override implicit val externalContext: ExternalContext = outerExternalContext
-        override implicit val indentedLogger : IndentedLogger  = outerIndentedLogger
-
-        def resolveAndOpenStream(uri: String): ResolvedCSSLink =
-          ResolvedCSSLink(
-            resolvedURL = resolveURI(uri),
-            inputStream = openStream(uri)
-          )
-
-        override def getImageResource(uri: String, `type`: ExternalResourceType): ImageResource =
-          throw new IllegalStateException
-      }
-
-      val variableDefinitions =
-        CSSParsing.variableDefinitions(
-          // Retrieve CSS resources from the document (link and style elements)
-          resources            = CSSParsing.cssResources(w3cDocument),
-          resolveAndOpenStream = (uri: URI) => uriResolver.resolveAndOpenStream(uri.toString)
-        )
-
       pdfRendererBuilder.withW3cDocument(
         w3cDocument,
         baseUri.orNull // no base URL if can't get request URL from context
@@ -261,10 +207,7 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
             jpegCompressionLevel,
             outputDevice,
             pipelineContext,
-            DefaultDotsPerPixel,
-            variableDefinitions,
-            lookupSelectors,
-            cssCache
+            DefaultDotsPerPixel
           )
         )
       ) { pdfBoxRenderer =>

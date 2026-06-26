@@ -74,7 +74,7 @@ val Slf4jVersion                     = "2.0.18"
 val HttpComponentsVersion            = "4.5.14"
 val Log4j2Version                    = "2.25.3"
 val CommonsIoVersion                 = "2.15.1"
-val OpenHtmlToPdfVersion             = "1.1.37-orbeon.2"
+val OpenHtmlToPdfVersion             = "1.1.37-orbeon.3"
 val PdfBoxVersion                    = "3.0.4"
 val TinkVersion                      = "1.20.0"
 val JacksonVersion                   = "2.21.1"
@@ -179,7 +179,6 @@ val CoreLibraryDependencies = Seq(
   "org.apache.pdfbox"           % "pdfbox"                          % PdfBoxVersion,
   "com.github.librepdf"         % "openpdf"                         % "1.3.26",
   "org.bouncycastle"            % "bcmail-jdk18on"                  % "1.84", // for `openpdf`, also pulls `bcprov` and `bcpkix`
-  "com.helger"                  % "ph-css"                          % "7.1.0", // more recent versions do not support Java 11
   "com.drewnoakes"              % "metadata-extractor"              % "2.19.0",
   "com.twelvemonkeys.imageio"   % "imageio-webp"                    % "3.12.0",
   "com.twelvemonkeys.imageio"   % "imageio-core"                    % "3.12.0",

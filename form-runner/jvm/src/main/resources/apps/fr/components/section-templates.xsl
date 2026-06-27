@@ -215,7 +215,7 @@
                     <xsl:value-of select="concat($library-name, ' / ',  $section-name, ' / v', $binding/@data-library-version, '')"/>
                 </xh:div>
 
-                <xsl:apply-templates select="xf:group/fr:grid"/>
+                <xsl:apply-templates select="xf:group/(fr:grid | fr:section)"/>
             </xf:group>
         </xsl:copy>
     </xsl:template>

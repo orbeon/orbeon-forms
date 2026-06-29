@@ -205,7 +205,7 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Arg(STRING, ALLOWS_ZERO_OR_MORE)
     )
 
-    Fun("save-state", classOf[FRSaveState], op = 0, min = 2, BOOLEAN, ALLOWS_ZERO_OR_ONE,
+    Fun("save-state", classOf[FRSaveState], op = 0, min = 0, BOOLEAN, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE),
       Arg(BOOLEAN, EXACTLY_ONE),

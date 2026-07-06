@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.function.ProcessTemplateSupport
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
-import org.orbeon.xforms.Constants
+import org.orbeon.xforms.{Constants, XFormsId}
 import org.orbeon.xml.NamespaceMapping
 
 
@@ -104,17 +104,33 @@ object EvaluatedParam {
         // TODO: add support for section templates in Email Settings UI (Control Value dropdown)
 
         // The following uses the live form controls
-        EvaluatedParam(
+        val relevantControlValues =
           xfcd
             .resolveObjectsById(Constants.DocumentId, s"$controlName-control", contextItemOpt = None, followIndexes = false)
-            .collect { case c: XFormsControl => FormRunner.findControlValue(c, EventCollector.Throw) }
+            .collect { case c: XFormsControl if c.isRelevant => FormRunner.findControlValue(c, EventCollector.Throw) }
             .flatten
-            .flatMap {
-              case ControlValue.SingleControlValue  (_, value)  => value.toList
-              case ControlValue.MultipleControlValue(_, values) => values
-            }
-            .mkString(", ")
-        )
+
+        if (relevantControlValues.nonEmpty)
+          EvaluatedParam(
+            relevantControlValues
+              .flatMap {
+                case ControlValue.SingleControlValue  (_, value)  => value.toList
+                case ControlValue.MultipleControlValue(_, values) => values
+              }
+              .mkString(", ")
+          )
+        else
+          // For non-relevant controls, read the value stored in the data
+          EvaluatedParam(
+            FormRunner.resolveTargetRelativeToActionSourceOpt(
+              actionSourceAbsoluteId  = XFormsId.effectiveIdToAbsoluteId(Constants.DocumentId),
+              targetControlName       = controlName,
+              followIndexes           = false,
+              libraryOrSectionNameOpt = None
+            )
+            .map(_.map(_.getStringValue).mkString(", "))
+            .getOrElse("")
+          )
 
       case EmailMetadata.Param.AllControlValuesParam(_) =>
         // Control values from section templates will be included

@@ -19,6 +19,7 @@
                             <checkboxes-1>1 3</checkboxes-1>
                             <my-date>2026-03-27</my-date>
                             <my-time>13:58:56</my-time>
+                            <hidden-1>hidden1</hidden-1>
 						                  </grid-1>
 					               </section-1>
 				            </form>
@@ -40,6 +41,7 @@
                         <xf:bind id="checkboxes-1-bind" ref="checkboxes-1" name="checkboxes-1"/>
                         <xf:bind id="my-date-bind" ref="my-date" name="my-date" type="xf:date"/>
                         <xf:bind id="my-time-bind" ref="my-time" name="my-time" type="xf:time"/>
+                        <xf:bind id="hidden-1-bind" ref="hidden-1" name="hidden-1" relevant="false()"/>
 					               </xf:bind>
 				            </xf:bind>
 			         </xf:bind>
@@ -74,8 +76,8 @@ param12: {$param12}
 param13: {$param13}
 param14: {$param14}
 param15: {$param15}
-param16: {$param16}</body><exclude-from-all-control-values/></template><template name="4"><headers><header name="from" type="control-value">email-1</header><header name="to" type="control-value">email-2</header></headers><body mediatype="text/html">&lt;div&gt;&lt;strong&gt;HTML&lt;/strong&gt; email body&lt;/div&gt;</body><exclude-from-all-control-values/></template><template name="5"><headers><header name="from" type="control-value">email-1</header><header name="to" type="control-value">email-2</header></headers><body mediatype="text/html">&lt;div&gt;&lt;strong&gt;HTML&lt;/strong&gt; email body:&lt;br&gt;param1: {$param1}&lt;br&gt;param2: {$param2}&lt;br&gt;param3: {$param3}&lt;br&gt;param4: {$param4}&lt;br&gt;param5: {$param5}&lt;br&gt;param6: {$param6}&lt;br&gt;param7: {$param7}&lt;br&gt;param8: {$param8}&lt;br&gt;param9: {$param9}&lt;br&gt;param10: {$param10}&lt;br&gt;param11: {$param11}&lt;br&gt;param12: {$param12}&lt;br&gt;param13: {$param13}&lt;br&gt;param14: {$param14}&lt;br&gt;param15: {$param15}&lt;br&gt;param16: {$param16}&lt;br&gt;param17: {$param17}&lt;br&gt;param18: {$param18}&lt;/div&gt;</body><exclude-from-all-control-values/></template><template name="6"><headers><header name="from" type="control-value">email-1</header><header name="to" type="control-value">email-2</header></headers><body>Email body:
-param3: {$param3}</body><exclude-from-all-control-values><control type="control-value">email-2</control><control type="control-value">custom-2</control><control type="control-value">param-1</control></exclude-from-all-control-values></template></templates><parameters><param type="ControlValueParam"><name>param1</name><controlName>param-1</controlName></param><param type="ExpressionParam"><name>param2</name><expr>concat($param-2, '-suffix')</expr></param><param type="AllControlValuesParam"><name>param3</name></param><param type="LinkToEditPageParam"><name>param4</name></param><param type="LinkToEditPageParam"><name>param5</name><token>true</token></param><param type="LinkToViewPageParam"><name>param6</name></param><param type="LinkToViewPageParam"><name>param7</name><token>true</token></param><param type="LinkToNewPageParam"><name>param8</name></param><param type="LinkToSummaryPageParam"><name>param9</name></param><param type="LinkToHomePageParam"><name>param10</name></param><param type="LinkToFormsPageParam"><name>param11</name></param><param type="LinkToAdminPageParam"><name>param12</name></param><param type="LinkToPdfParam"><name>param13</name></param><param type="LinkToPdfParam"><name>param14</name><token>true</token></param><param type="ControlValueParam"><name>param15</name><controlName>dropdown-1</controlName></param><param type="ControlValueParam"><name>param16</name><controlName>checkboxes-1</controlName></param><param type="ControlValueParam"><name>param17</name><controlName>my-date</controlName></param><param type="ControlValueParam"><name>param18</name><controlName>my-time</controlName></param></parameters></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><updated-with-version>2026.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"email-1"},{"value":"email-2"},{"value":"email-3"},{"value":"email-4"},{"value":"email-5"},{"value":"custom-1"},{"value":"custom-2"},{"value":"param-1"},{"value":"param-2"},{"value":"dropdown-1"},{"value":"checkboxes-1"},{"value":"my-date"},{"value":"my-time"}],"topLevel":true}]}</migration></metadata>
+param16: {$param16}</body><exclude-from-all-control-values/></template><template name="4"><headers><header name="from" type="control-value">email-1</header><header name="to" type="control-value">email-2</header></headers><body mediatype="text/html">&lt;div&gt;&lt;strong&gt;HTML&lt;/strong&gt; email body&lt;/div&gt;</body><exclude-from-all-control-values/></template><template name="5"><headers><header name="from" type="control-value">email-1</header><header name="to" type="control-value">email-2</header></headers><body mediatype="text/html">&lt;div&gt;&lt;strong&gt;HTML&lt;/strong&gt; email body:&lt;br&gt;param1: {$param1}&lt;br&gt;param2: {$param2}&lt;br&gt;param3: {$param3}&lt;br&gt;param4: {$param4}&lt;br&gt;param5: {$param5}&lt;br&gt;param6: {$param6}&lt;br&gt;param7: {$param7}&lt;br&gt;param8: {$param8}&lt;br&gt;param9: {$param9}&lt;br&gt;param10: {$param10}&lt;br&gt;param11: {$param11}&lt;br&gt;param12: {$param12}&lt;br&gt;param13: {$param13}&lt;br&gt;param14: {$param14}&lt;br&gt;param15: {$param15}&lt;br&gt;param16: {$param16}&lt;br&gt;param17: {$param17}&lt;br&gt;param18: {$param18}&lt;br&gt;param19: {$param19}&lt;/div&gt;</body><exclude-from-all-control-values/></template><template name="6"><headers><header name="from" type="control-value">email-1</header><header name="to" type="control-value">email-2</header></headers><body>Email body:
+param3: {$param3}</body><exclude-from-all-control-values><control type="control-value">email-2</control><control type="control-value">custom-2</control><control type="control-value">param-1</control></exclude-from-all-control-values></template></templates><parameters><param type="ControlValueParam"><name>param1</name><controlName>param-1</controlName></param><param type="ExpressionParam"><name>param2</name><expr>concat($param-2, '-suffix')</expr></param><param type="AllControlValuesParam"><name>param3</name></param><param type="LinkToEditPageParam"><name>param4</name></param><param type="LinkToEditPageParam"><name>param5</name><token>true</token></param><param type="LinkToViewPageParam"><name>param6</name></param><param type="LinkToViewPageParam"><name>param7</name><token>true</token></param><param type="LinkToNewPageParam"><name>param8</name></param><param type="LinkToSummaryPageParam"><name>param9</name></param><param type="LinkToHomePageParam"><name>param10</name></param><param type="LinkToFormsPageParam"><name>param11</name></param><param type="LinkToAdminPageParam"><name>param12</name></param><param type="LinkToPdfParam"><name>param13</name></param><param type="LinkToPdfParam"><name>param14</name><token>true</token></param><param type="ControlValueParam"><name>param15</name><controlName>dropdown-1</controlName></param><param type="ControlValueParam"><name>param16</name><controlName>checkboxes-1</controlName></param><param type="ControlValueParam"><name>param17</name><controlName>my-date</controlName></param><param type="ControlValueParam"><name>param18</name><controlName>my-time</controlName></param><param type="ControlValueParam"><name>param19</name><controlName>hidden-1</controlName></param></parameters></email><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><updated-with-version>2026.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"email-1"},{"value":"email-2"},{"value":"email-3"},{"value":"email-4"},{"value":"email-5"},{"value":"custom-1"},{"value":"custom-2"},{"value":"param-1"},{"value":"param-2"},{"value":"dropdown-1"},{"value":"checkboxes-1"},{"value":"my-date"},{"value":"my-time"},{"value":"hidden-1"}],"topLevel":true}]}</migration></metadata>
 			         </xf:instance>
 
 			         <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
@@ -167,6 +169,10 @@ param3: {$param3}</body><exclude-from-all-control-values><control type="control-
                             <label>My time</label>
                             <hint/>
                         </my-time>
+                        <hidden-1>
+                            <label>Hidden 1</label>
+                            <hint/>
+                        </hidden-1>
 						                  <section-1>
 							                     <label/>
 						                  </section-1>
@@ -289,6 +295,13 @@ param3: {$param3}</body><exclude-from-all-control-values><control type="control-
 
 
                             </fr:time>
+                        </fr:c>
+                        <fr:c x="1" y="8" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="hidden-1-control" bind="hidden-1-bind">
+                                <xf:label ref="$form-resources/hidden-1/label"/>
+                                <xf:hint ref="$form-resources/hidden-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
                         </fr:c>
 					               </fr:grid>
 				            </fr:section>

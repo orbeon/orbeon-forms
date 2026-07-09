@@ -18,6 +18,8 @@
             return
               xxf:is-blank($lei) or
               string-length($lei) = 20 and
+              (: Check-digit pair (last two characters) must be in [02..98]; ISO 17442 excludes 00, 01 and 99 :)
+              not(substring($lei, 19) = ('00', '01', '99')) and
               xs:decimal(
                 string-join(
                   for $code in string-to-codepoints($lei)

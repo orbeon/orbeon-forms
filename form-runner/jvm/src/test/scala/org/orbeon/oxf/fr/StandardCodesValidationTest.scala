@@ -14,13 +14,14 @@ class StandardCodesValidationTest
     with FormRunnerSupport {
 
   private val ControlValueIsValid = List(
-    ("iban-control", "BE68539007547034"    , true),
+    ("iban-control", "BE68539007547034"    , true ),
     ("iban-control", "BE68539007547035"    , false),
-    ("isin-control", "US35953D1046"        , true),
-    ("isin-control", "US0378331005"        , true),
+    ("isin-control", "US35953D1046"        , true ),
+    ("isin-control", "US0378331005"        , true ),
     ("isin-control", "US0378331006"        , false),
-    ("lei-control" , "F50EOCWSQFAUVO9Q8Z97", true),
-    ("lei-control" , "F50EOCWSQFAUVO9Q8Z98", false)
+    ("lei-control" , "F50EOCWSQFAUVO9Q8Z97", true ),
+    ("lei-control" , "F50EOCWSQFAUVO9Q8Z98", false),
+    ("lei-control" , "00000000000000000001", false) // ISO 17442 excludes check-digit pairs 00, 01 and 99
   )
 
   private val (processorService, docOpt, _) =

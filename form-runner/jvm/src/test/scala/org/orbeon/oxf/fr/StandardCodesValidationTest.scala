@@ -16,6 +16,7 @@ class StandardCodesValidationTest
   private val ControlValueIsValid = List(
     ("iban-control", "BE68539007547034"    , true ),
     ("iban-control", "BE68539007547035"    , false),
+    ("iban-control", "BE010000000081"      , false), // ISO 7064 MOD 97-10 excludes check-digit pairs 00, 01 and 99
     ("isin-control", "US35953D1046"        , true ),
     ("isin-control", "US0378331005"        , true ),
     ("isin-control", "US0378331006"        , false),

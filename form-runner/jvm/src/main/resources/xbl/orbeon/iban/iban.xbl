@@ -19,6 +19,8 @@
               xxf:is-blank($iban) or
               (
                 matches($iban, '^[A-Z]{2}[0-9]{2}[A-Z0-9]+$') and
+                (: Check-digit pair (characters 3-4) must be in [02..98]; ISO 7064 MOD 97-10 excludes 00, 01 and 99 :)
+                not(substring($iban, 3, 2) = ('00', '01', '99')) and
                 (
                   let $rearranged := concat(substring($iban, 5), substring($iban, 1, 4))
                   let $converted :=

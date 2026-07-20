@@ -767,7 +767,7 @@
                                     $previous-builtin-type,
                                     false(), (: doesn't matter as datatype matching handles `xs:`/`xf:` identically :)
                                     $previous-schema-type,
-                                    $current-appearance]
+                                    $current-appearance[xxf:non-blank()]
                                 )"/>
 
                         <xf:var

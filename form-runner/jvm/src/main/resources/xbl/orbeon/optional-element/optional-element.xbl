@@ -34,7 +34,7 @@
                         if="not(exists(xxf:binding('fr-optional-element'))) and $name castable as xs:NCName"
                         context="xxf:component-context()"
                         ref="*"
-                        origin="element($name)"/>
+                        origin="xf:element($name)"/>
                 </xf:action>
 
             </xf:group>

@@ -373,7 +373,7 @@
                                         id="fb-insert-component-trigger"
                                         ref="instance('fb-variables')/(if ($is-section-component) then section-trigger else control-trigger)"
                                         class="fb-{$insert-class-name} {if ($is-section-component) then 'fb-insert-template' else 'fb-insert-control'}"
-                                        name="toolbox.{$insert-class-name}">
+                                        name="toolbox.{$insert-class-name}"
                                     >
                                         <xf:label>
                                             <xf:output mediatype="text/html"
@@ -391,6 +391,7 @@
                                                     )
                                             "/>
                                         </xf:label>
+                                        <xf:hint ref="($metadata/fb:display-name[@lang = $lang], $metadata/fb:display-name[1])[1]"/>
                                         <xf:action ev:event="DOMActivate">
                                             <xf:action if="$is-section-component">
                                                 <xf:var name="section-namespaced-id" value="toolboxOps:insertNewSectionTemplate($binding)"/>

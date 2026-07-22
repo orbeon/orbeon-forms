@@ -82,7 +82,8 @@ val AngusMailVersion                 = "2.0.5"
 val JavaActivationVersion            = "2.0.1"
 val AntVersion                       = "1.10.11"
 val ThumbnailatorVersion             = "0.4.16"
-val AwsSdkVersion                    = "2.46.10"
+val AwsSdkVersion                    = "2.47.6"
+val AwsNettyVersion                  = "4.1.136.Final"
 val InfinispanVersion                = "14.0.35.Final"
 val SqliteJdbcVersion                = "3.53.2.0"
 val PostgresqlVersion                = "42.7.11"
@@ -784,7 +785,11 @@ lazy val formRunnerJVM = formRunner.jvm
 
     libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % ScalaParallelCollectionsVersion,
 
-    libraryDependencies += "software.amazon.awssdk" % "s3" % AwsSdkVersion,
+    libraryDependencies += "software.amazon.awssdk" % "s3"                            % AwsSdkVersion,
+    libraryDependencies += "io.netty"               % "netty-codec-http"              % AwsNettyVersion,
+    libraryDependencies += "io.netty"               % "netty-codec-http2"             % AwsNettyVersion,
+    libraryDependencies += "io.netty"               % "netty-handler"                 % AwsNettyVersion,
+    libraryDependencies += "io.netty"               % "netty-transport-classes-epoll" % AwsNettyVersion,
 
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",

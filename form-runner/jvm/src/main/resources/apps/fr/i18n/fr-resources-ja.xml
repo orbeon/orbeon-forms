@@ -1,12 +1,12 @@
 <resource xml:lang="ja">
     <common>
         <formats>
-            <within-day>[P,*-2][h]:[m01]</within-day>
-            <day-this-year>[M01]月[D]日</day-this-year>
-            <short-date>[Y01]/[M01]/[D01]</short-date>
+            <within-day>[H]:[m01]</within-day>
+            <day-this-year>[M]月[D]日</day-this-year>
+            <short-date>[Y]/[M01]/[D01]</short-date>
         </formats>
         <messages>
-            <incomplete-configuration>Orbeon Forms の設定が不完全です。詳しくはログを確認し、&lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;ドキュメント&lt;/a&gt;を参照してください。</incomplete-configuration>
+            <incomplete-configuration>Orbeon Formsの設定が不完全です。詳細についてはOrbeon Formsのログファイルと&lt;a href="https://doc.orbeon.com/installation/configuration-banner" target="_blank"&gt;ドキュメント&lt;/a&gt;をご確認ください。</incomplete-configuration>
         </messages>
     </common>
     <buttons>
@@ -23,20 +23,20 @@
         <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; 削除</delete>
         <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; インポート</import>
         <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; 新規</new>
-        <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; 新しいデータ</new-long>
+        <new-long>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; 新規データを作成</new-long>
         <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; 複製</duplicate>
         <sign>&lt;i class="fa fa-fw fa-file-signature"&gt;&lt;/i&gt; 署名</sign>
 
         <!-- Standard process buttons -->
         <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; 保存</save>
         <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; 保存</save-final>
-        <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; 途中保存</save-draft>
-        <save-progress>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; 途中保存</save-progress>
+        <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; 進捗を保存</save-draft>
+        <save-progress>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; 進捗を保存</save-progress>
         <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; 編集</edit>
         <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; 送信</send>
         <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; メール</email>
         <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; 検証</validate>
-        <test-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF テスト</test-pdf>
+        <test-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDFテスト</test-pdf>
 
         <!-- Legacy buttons -->
         <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; 送信</submit>
@@ -45,14 +45,14 @@
         <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; 送信</workflow-send>
 
         <!-- Other standard buttons -->
-        <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; サマリー</summary>
-        <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; 閉じる</close>
+        <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; 一覧</summary>
+        <close>&lt;i class="fa fa-fw fa-trash"&gt;&lt;/i&gt; 閉じる</close>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; クリア</clear>
         <cancel>キャンセル</cancel>
         <save-locally>ローカルに保存</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
-        <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Refresh"&gt;&lt;/i&gt;</refresh>
+        <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="更新"&gt;&lt;/i&gt;</refresh>
         <collapse-all-full>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt; すべて折りたたむ</collapse-all-full>
         <expand-all-full>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; すべて展開</expand-all-full>
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; 更新</refresh-full>
@@ -71,21 +71,21 @@
         <validation-dialog-continue>続行</validation-dialog-continue>
 
         <!-- Conflict dialog -->
-        <conflict-dialog-save-overwrite>上書き保存</conflict-dialog-save-overwrite>
+        <conflict-dialog-save-overwrite>保存して上書き</conflict-dialog-save-overwrite>
         <conflict-dialog-discard-reload>破棄して再読み込み</conflict-dialog-discard-reload>
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; テスト</test>
-        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; 式を確認 (ベータ)</test-formulas>
-        <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; オフラインテスト (ベータ)</test-offline>
-        <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel エクスポート</excel-export>
-        <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel エクスポート</excel-export-with-search>
-        <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML エクスポート</xml-export>
-        <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTML エクスポート</form-definition-xhtml-export>
+        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; 数式を検査（ベータ）</test-formulas>
+        <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; オフラインテスト（ベータ）</test-offline>
+        <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excelエクスポート</excel-export>
+        <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excelエクスポート</excel-export-with-search>
+        <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XMLエクスポート</xml-export>
+        <form-definition-xhtml-export>&lt;i class="fa fa-fw fa-code"&gt;&lt;/i&gt; XHTMLエクスポート</form-definition-xhtml-export>
         <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; 公開</publish>
         <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; 公開</save-publish>
 
         <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; はい</yes>
-        <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; いいえ</no>
+        <no>&lt;i class="fa fa-fw fa-trash"&gt;&lt;/i&gt; いいえ</no>
         <ok>OK</ok>
         <previous>前へ</previous>
         <next>次へ</next>
@@ -93,7 +93,7 @@
     <components>
         <labels>
             <open-section>セクションを表示</open-section>
-            <close-section>セクションを隠す</close-section>
+            <close-section>セクションを非表示</close-section>
             <section-name>セクション名</section-name>
             <yes>はい</yes>
             <no>いいえ</no>
@@ -105,8 +105,8 @@
             <menu>メニュー</menu>
             <insert-above>上に挿入</insert-above>
             <insert-below>下に挿入</insert-below>
-            <move-up>上へ移動</move-up>
-            <move-down>下へ移動</move-down>
+            <move-up>上に移動</move-up>
+            <move-down>下に移動</move-down>
             <clear>
                 <label>行をクリア</label>
             </clear>
@@ -143,69 +143,63 @@
             <edit>編集</edit>
         </wizard>
         <error-summary>
-            <show-more>もっと表示</show-more>
-            <show-less>折りたたむ</show-less>
+            <show-more>もっと見る</show-more>
+            <show-less>閉じる</show-less>
         </error-summary>
         <revision-history>
             <label>変更履歴</label>
-            <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (初期保存)}'|1# (現在)}</date>
-            <date-format>[Y]年[MNn,*-3][D]日 [P,*-2][h]:[m]</date-format>
+            <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (初回リビジョン)}'|1# (現在のリビジョン)}</date>
+            <date-format>[Y]年[M]月[D]日 [H01]:[m01]</date-format>
 
-            <user-action>{1,choice,0#匿名ユーザー|1#ユーザー {0}} {2,choice,0#初回バージョンを保存。|1#変更なしで保存。|2#変更を保存。|3#次を変更:}</user-action>
+            <user-action>{1,choice,0#匿名ユーザー|1#ユーザー {0}} {2,choice,0#が初回リビジョンを保存しました。|1#変更なしで保存しました。|2#いくつかの変更を行いました。|3#以下の変更を行いました:}</user-action>
 
-            <view-data>この版を表示</view-data>
+            <view-data>このリビジョンを表示</view-data>
 
-            <value-entered>"{0}" を入力</value-entered>
-            <value-cleared>"{0}" をクリア</value-cleared>
-            <value-changed>"{0}" から "{1}" に変更</value-changed>
-            <iteration-added>{0,number,integer} 件の繰り返しを追加</iteration-added>
-            <iteration-removed>{0,number,integer} 件の繰り返しを削除</iteration-removed>
+            <value-entered>「{0}」を入力</value-entered>
+            <value-cleared>「{0}」をクリア</value-cleared>
+            <value-changed>「{0}」から「{1}」に変更</value-changed>
+            <iteration-added>{0,number,integer}件の繰り返しを追加</iteration-added>
+            <iteration-removed>{0,number,integer}件の繰り返しを削除</iteration-removed>
             <other-changed>内部情報を変更</other-changed>
-            <workflow-stage-changed>ワークフローを "{0}" から "{1}" に変更</workflow-stage-changed>
+            <workflow-stage-changed>ワークフローステージを「{0}」から「{1}」に変更</workflow-stage-changed>
 
-            <load-more>さらに表示</load-more>
+            <load-more>もっと読み込む</load-more>
         </revision-history>
     </components>
     <untitled-form>無題のフォーム</untitled-form>
     <loading>読み込み中</loading>
     <loading-complete>読み込み完了</loading-complete>
     <errors>
-        <summary-title>このフォームは {1,choice,
-            0#メッセージはありません|
-            1#次の「{0,choice,0#エラー|1#警告|2#情報|3#メッセージ}」が含まれます|
-            1&lt;次の「{0,choice,0#エラー|1#警告|2#情報|3#メッセージ}」が含まれます}</summary-title>
-        <form-title>{1,choice,
-            0#|
-            1#{1,number,integer} 件の「{0,choice,0#エラー|1#警告|2#情報|3#メッセージ}」 - |
-            1&lt;{1,number,integer} 件の「{0,choice,0#エラー|1#警告|2#情報|3#メッセージ}」 - }{2}</form-title>
-        <none>エラーはありません</none>
-        <unsaved>未保存の変更があります</unsaved>
-        <canvas-not-supported>画像への注釈にはブラウザーが HTML5 キャンバスをサポートする必要があります</canvas-not-supported>
-        <search>検索時にエラーが発生しました</search>
+        <summary-title>このフォームには {1,choice,0#メッセージはありません|1#'{0,choice,0#エラー|1#警告|2#情報メッセージ|3#メッセージ}'が1件あります|1&lt;'{0,choice,0#エラー|1#警告|2#情報メッセージ|3#メッセージ}'が{1,number,integer}件あります}</summary-title>
+        <form-title>{1,choice,0#|1#{1,number,integer}件の'{0,choice,0#エラー|1#警告|2#情報メッセージ|3#メッセージ}' - |1&lt;{1,number,integer}件の'{0,choice,0#エラー|1#警告|2#情報メッセージ|3#メッセージ}' - }{2}</form-title>
+        <none>フォームにエラーはありません</none>
+        <unsaved>未保存の変更</unsaved>
+        <canvas-not-supported>画像に注釈を付けるには、ブラウザがHTML5 canvasをサポートしている必要があります</canvas-not-supported>
+        <search>検索中にエラーが発生しました</search>
     </errors>
     <email>
         <subject>Orbeon Forms 確認</subject>
-        <body>PDF と XML 形式のフォームを添付しています。</body>
+        <body>PDFおよびXML形式のフォームを添付しています。</body>
         <na>N/A</na>
         <iteration>繰り返し {$iteration}</iteration>
     </email>
     <!-- Formats used for PDF template -->
     <print>
         <formats>
-            <date>[Y]年[M01]月[D]日</date>
+            <date>[Y]年[M]月[D]日</date>
             <time>[H01]:[m01]:[s01]</time>
-            <dateTime>[Y]年[M01]月[D]日 [H01]:[m01]:[s01]</dateTime>
+            <dateTime>[Y]年[M]月[D]日 [H01]:[m01]:[s01]</dateTime>
         </formats>
     </print>
     <summary>
         <titles>
-            <summary-title>サマリー</summary-title>
+            <summary-title>一覧</summary-title>
             <delete-confirmation>削除の確認</delete-confirmation>
-            <document-id>ドキュメント ID</document-id>
-            <workflow-stage>ワークフロー段階</workflow-stage>
+            <document-id>ドキュメントID</document-id>
+            <workflow-stage>ワークフローステージ</workflow-stage>
             <created-by>作成者</created-by>
             <selected>選択済み</selected>
-            <refresh>この操作でページを更新します</refresh>
+            <refresh>この操作でページが更新されます</refresh>
             <toc>目次</toc>
             <description>説明</description>
             <help>ヘルプ</help>
@@ -214,178 +208,171 @@
         </titles>
         <buttons>
             <select-all>すべて選択</select-all>
-            <deselect-all>選択を解除</deselect-all>
-            <select-saved>明示保存のみ</select-saved>
-            <select-drafts>自動保存のみ</select-drafts>
+            <deselect-all>選択解除</deselect-all>
+            <select-saved>明示的に保存されたもののみ選択</select-saved>
+            <select-drafts>自動保存されたもののみ選択</select-drafts>
         </buttons>
         <bulk-edit>
             <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; 一括編集を表示</show-bulk-edit>
-            <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; 一括編集を隠す</close-bulk-edit>
+            <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; 一括編集を非表示</close-bulk-edit>
             <bulk-edit>一括編集</bulk-edit>
             <apply>適用</apply>
-            <value-required>値が必要です</value-required>
-            <submission-error>データ編集中にエラーが発生しました。</submission-error>
+            <value-required>値は必須です</value-required>
+            <submission-error>フォームデータの編集中にエラーが発生しました。</submission-error>
         </bulk-edit>
         <paging>
-            <to>〜</to>
+            <to>～</to>
             <of>/</of>
             <page>ページ</page>
         </paging>
         <messages>
-            <no-form-data-found>フォームデータがありません。</no-form-data-found>
-            <delete-confirmation>フォームを削除しますか？ 保存済みドキュメントを削除すると関連する自動保存も削除されます。</delete-confirmation>
+            <no-form-data-found>フォームデータが見つかりませんでした。</no-form-data-found>
+            <delete-confirmation>1つ以上のフォームを削除してもよろしいですか？保存されたドキュメントを削除すると、対応する自動保存されたドキュメントも削除されます。</delete-confirmation>
             <version>フォームバージョン {0,number,integer}</version>
         </messages>
         <labels>
             <draft>自動保存</draft>
-            <read-only>閲覧のみ</read-only>
+            <read-only>読み取り専用</read-only>
             <language-choice>言語を選択</language-choice>
             <form-choice>フォームを選択</form-choice>
-            <free-search>自由検索</free-search>
+            <free-search>フリー検索</free-search>
             <clear-value>[値をクリア]</clear-value>
-            <script>フル版</script>
+            <script>フルバージョン</script>
             <refresh>更新</refresh>
             <close-box>[閉じる]</close-box>
             <help-back>戻る</help-back>
-            <goto-content>本文へ移動</goto-content>
+            <goto-content>コンテンツへ移動</goto-content>
         </labels>
         <formats>
-            <date>[Y]年[M01]月[D]日</date>
+            <date>[Y]年[M]月[D]日</date>
             <time>[H01]:[m01]:[s01]</time>
-            <dateTime>[Y]年[M01]月[D]日 [H01]:[m01]:[s01]</dateTime>
-            <save-datetime>[Y]年[M01]月[D]日 [H01]:[m01]:[s01]</save-datetime>
+            <dateTime>[Y]年[M]月[D]日 [H01]:[m01]:[s01]</dateTime>
+            <save-datetime>[Y]年[M]月[D]日 [H01]:[m01]:[s01]</save-datetime>
         </formats>
         <export-with-search-dialog>
-            <label>Excel エクスポート設定</label>
+            <label>Excelエクスポートオプション</label>
             <headings-labels>見出しにラベルを使用</headings-labels>
-            <selection-controls-labels>選択肢にラベルを使用</selection-controls-labels>
-            <include-document-id>ドキュメント ID 列を含める</include-document-id>
+            <selection-controls-labels>選択コントロールにラベルを使用</selection-controls-labels>
+            <include-document-id>ドキュメントID列を含める</include-document-id>
         </export-with-search-dialog>
     </summary>
     <detail>
         <messages>
-            <save-success>保存しました。</save-success>
-            <save-draft-success>途中保存しました。</save-draft-success>
-            <save-progress-success>途中保存しました。</save-progress-success>
-            <email-success>メールを送信しました。</email-success>
-            <form-validation-error>入力に不備があります。すべての項目を正しく入力してから再試行してください。</form-validation-error>
-            <database-error>データベースとの通信でエラーが発生しました。管理者に連絡してください。</database-error>
-            <service-error>バックエンドサービスとの通信でエラーが発生しました。管理者に連絡してください。</service-error>
-            <action-error>操作の実行中にエラーが発生しました。管理者に連絡してください。</action-error>
-            <process-error>処理の実行中にエラーが発生しました。管理者に連絡してください。</process-error>
+            <save-success>ドキュメントが正常に保存されました！</save-success>
+            <save-draft-success>進捗が正常に保存されました！</save-draft-success>
+            <save-progress-success>進捗が正常に保存されました！</save-progress-success>
+            <email-success>メールが正常に送信されました！</email-success>
+            <form-validation-error>検証エラーがあります。すべてのフィールドを正しく入力してから再試行してください。</form-validation-error>
+            <database-error>データベースとの通信中にエラーが発生しました。アプリケーション管理者にお問い合わせください。</database-error>
+            <service-error>バックエンドサービスとの通信中にエラーが発生しました。アプリケーション管理者にお問い合わせください。</service-error>
+            <action-error>操作の実行中にエラーが発生しました。アプリケーション管理者にお問い合わせください。</action-error>
+            <process-error>プロセスの実行中にエラーが発生しました。アプリケーション管理者にお問い合わせください。</process-error>
             <wizard-prev-error>戻る前にエラーを修正してください</wizard-prev-error>
             <wizard-next-error>進む前にエラーを修正してください</wizard-next-error>
-            <clear-confirm-message>このページの入力をすべてクリアしますか？ 保存していないデータは失われます。</clear-confirm-message>
-            <error-dialog-title>操作を完了できません</error-dialog-title>
+            <clear-confirm-message>このページのすべてのフィールドをクリアしてもよろしいですか？保存していないデータは失われます。</clear-confirm-message>
+            <error-dialog-title>操作を完了できませんでした</error-dialog-title>
             <confirmation-dialog-title>確認</confirmation-dialog-title>
-            <confirmation-dialog-message>このまま続行しますか？</confirmation-dialog-message>
-            <confirmation-dialog-message-overwrite>この操作でフォームデータが上書きされる可能性があります。続行しますか？</confirmation-dialog-message-overwrite>
-            <submit-dialog-title>送信しました</submit-dialog-title>
-            <submit-dialog-message>送信が完了しました。ありがとうございます。</submit-dialog-message>
-            <validation-dialog-title>検証メッセージの確認</validation-dialog-title>
-            <validation-dialog-message>このフォームには {1,choice,
-                0#メッセージはありません|
-                1#「{0,choice,0#エラー|1#警告|2#情報|3#メッセージ}」が 1 件あります|
-                1&lt;{1,number,integer} 件の「{0,choice,0#エラー|1#警告|2#情報|3#メッセージ}」があります}。
-                {0,choice,
-                    0#すべて正しく入力してから再試行してください|
-                    0&lt;先に内容を確認するか、このまま無視して続行できます}。
-            </validation-dialog-message>
+            <confirmation-dialog-message>続行してもよろしいですか？</confirmation-dialog-message>
+            <confirmation-dialog-message-overwrite>この操作により、一部のフォームデータが上書きされる可能性があります。続行してもよろしいですか？</confirmation-dialog-message-overwrite>
+            <submit-dialog-title>フォームが送信されました</submit-dialog-title>
+            <submit-dialog-message>情報が送信されました。ありがとうございます。</submit-dialog-message>
+            <validation-dialog-title>フォームの検証メッセージを確認</validation-dialog-title>
+            <validation-dialog-message>このフォームには {1,choice,0#メッセージはありません|1#'{0,choice,0#エラー|1#警告|2#情報メッセージ|3#メッセージ}'が1件あります|1&lt;'{0,choice,0#エラー|1#警告|2#情報メッセージ|3#メッセージ}'が{1,number,integer}件あります}。{0,choice,0#すべてのフィールドを正しく入力してから再試行してください|0&lt;確認するか、無視して操作を続行できます}。</validation-dialog-message>
             <buttons-message/>
-            <saved-locally-open>クリックして保存済みドキュメントを開きます。保存時点のデータを表示します。</saved-locally-open>
-            <upload-in-progress>ファイルのアップロード中です。完了またはキャンセル後に再試行してください。</upload-in-progress>
-            <upload-start>アップロードを開始しました</upload-start>
-            <upload-cancel>アップロードをキャンセルしました</upload-cancel>
-            <upload-done>アップロードが完了しました</upload-done>
-            <upload-error>アップロード中にエラーが発生しました。再試行してください。</upload-error>
+            <saved-locally-open>ドキュメントを開くにはここをクリックしてください。保存時のデータが表示されます。</saved-locally-open>
+            <upload-in-progress>ファイルのアップロードが進行中です。アップロードが完了するかキャンセルされるまでお待ちください。</upload-in-progress>
+            <upload-start>アップロードが開始されました</upload-start>
+            <upload-cancel>ユーザーによってアップロードがキャンセルされました</upload-cancel>
+            <upload-done>アップロード完了</upload-done>
+            <upload-error>アップロード中にエラーが発生しました。もう一度お試しください。</upload-error>
             <upload-error-empty-file>アップロードされたファイルは空です。</upload-error-empty-file>
             <upload-error-upload-password-not-configured-error>Orbeon Formsの暗号化パスワードが設定されていないか、弱すぎるため、ファイルのアップロードが無効になっています。</upload-error-upload-password-not-configured-error>
-            <upload-error-size>ファイルサイズが大きすぎます。最大 {0}、実際は {1} でした。</upload-error-size>
-            <upload-error-max-files-per-control>添付できるファイル数は最大 {0,number,integer} 件です。</upload-error-max-files-per-control>
-            <upload-error-mediatype>アップロードしたファイルの種類が正しくありません: {0}</upload-error-mediatype>
-            <upload-error-file-scan>ファイルスキャナーで拒否されました。感染ファイルでないか確認してください。スキャナーのメッセージ: "{0}"。</upload-error-file-scan>
-            <lost-attachments>サーバーの問題で一部添付が失われました。必要に応じて再アップロードしてください。</lost-attachments>
-            <conflict-dialog-title>競合を検出</conflict-dialog-title>
+            <upload-error-size>アップロードされたファイルが大きすぎます。許可される最大サイズは{0}で、実際に受信したサイズは{1}です。</upload-error-size>
+            <upload-error-max-files-per-control>ファイル数の上限を超えました。このコントロールには{0,number,integer}個以上のファイルを添付できません。</upload-error-max-files-per-control>
+            <upload-error-mediatype>アップロードされたファイルの形式が正しくありません: {0}</upload-error-mediatype>
+            <upload-error-file-scan>アップロードされたファイルはファイルスキャナーによって拒否されました。感染したファイルでないことを確認してください。ファイルスキャナーのメッセージ: 「{0}」</upload-error-file-scan>
+            <lost-attachments>サーバーの問題により、一部の添付ファイルが失われました。すべての添付ファイルを確認し、必要に応じて再度アップロードしてください。</lost-attachments>
+            <conflict-dialog-title>競合が検出されました</conflict-dialog-title>
             <conflict-dialog-message>
                 <div>
-                    <p>読み込み後にデータが変更されています。次のいずれかを選べます。</p>
+                    <p>読み込み後にデータが変更されました。以下のいずれかを選択できます:</p>
                     <ul>
-                        <li>現在の内容で保存し、以前のデータを上書きする。</li>
-                        <li>現在の変更を破棄し、保存済みデータを再読み込みする。</li>
+                        <li>今すぐ保存して、以前に保存されたデータを上書きする。</li>
+                        <li>現在の変更を破棄して、以前に保存されたデータを再読み込みする。</li>
                     </ul>
                 </div>
             </conflict-dialog-message>
         </messages>
         <draft-singleton>
-            <found-draft>自動保存されたデータがあります</found-draft>
-            <found-drafts>自動保存されたデータが見つかりました</found-drafts>
-            <found-draft-for-document>保存後に自動保存されたデータがあります。保存済みデータと自動保存、どちらを開きますか？</found-draft-for-document>
-            <found-draft-for-never-saved>このフォームの自動保存データがあります。新規で始めますか、それとも自動保存を開きますか？</found-draft-for-never-saved>
-            <found-drafts-for-never-saved>このフォームには複数の自動保存データがあります。新規で始めるか、自動保存一覧から選択してください。</found-drafts-for-never-saved>
-            <open-saved>保存済みデータを開く</open-saved>
-            <open-draft>自動保存を開く</open-draft>
-            <view-drafts>自動保存を表示</view-drafts>
-            <start-new>新規に開始</start-new>
-            <found-singleton-title>既存のフォームデータがあります</found-singleton-title>
-            <found-singleton-explanation>このフォームへの新規データの作成は無効になっていますが、既存のフォームデータにアクセスできます。</found-singleton-explanation>
+            <found-draft>自動保存されたドキュメントが見つかりました</found-draft>
+            <found-drafts>自動保存されたドキュメントが見つかりました</found-drafts>
+            <found-draft-for-document>このドキュメントが保存された後、追加の作業を含む可能性のあるドキュメントが自動保存されました。保存されたドキュメントを開きますか、それとも自動保存されたドキュメントを開きますか？</found-draft-for-document>
+            <found-draft-for-never-saved>このフォームの自動保存されたドキュメントがあります。最初から始めますか、それとも自動保存されたドキュメントを開きますか？</found-draft-for-never-saved>
+            <found-drafts-for-never-saved>このフォームの自動保存されたドキュメントが複数あります。最初から始めますか、それとも自動保存されたドキュメントを表示しますか（その後、いずれかを編集できます）？</found-drafts-for-never-saved>
+            <open-saved>明示的に保存されたドキュメントを開く</open-saved>
+            <open-draft>自動保存されたドキュメントを開く</open-draft>
+            <view-drafts>自動保存されたドキュメントを表示</view-drafts>
+            <start-new>最初から始める</start-new>
+            <found-singleton-title>既存のフォームデータが見つかりました</found-singleton-title>
+            <found-singleton-explanation>このフォームでは新しいデータの作成は無効になっていますが、既存のフォームデータにアクセスできます。</found-singleton-explanation>
             <found-singleton-view-data>既存のフォームデータにアクセス</found-singleton-view-data>
         </draft-singleton>
         <labels>
             <language-choice>言語</language-choice>
             <errors>エラーの概要</errors>
-            <check-errors-in-form>このフォームにエラーがあります</check-errors-in-form>
-            <error-details>エラー詳細を表示</error-details>
+            <check-errors-in-form>このフォームにはエラーがあります</check-errors-in-form>
+            <error-details>エラーの詳細を表示</error-details>
             <confirm>確認</confirm>
-            <alert>未入力または不正な値です</alert>
-            <alert-out-of-range>範囲外です。利用可能な値を選択してください</alert-out-of-range>
+            <alert>値が不足しているか、誤っています</alert>
+            <alert-out-of-range>範囲外の値です。利用可能な値を選択してください</alert-out-of-range>
             <alert-out-of-range-multiple>範囲外の値があります</alert-out-of-range-multiple>
             <clear-out-of-range>範囲外の値をクリア</clear-out-of-range>
             <captcha-label>CAPTCHA</captcha-label>
-            <captcha-alert>CAPTCHA の回答を確認してください</captcha-alert>
+            <captcha-alert>CAPTCHAの回答を確認してください</captcha-alert>
         </labels>
         <hints>
-            <upload-max-size-per-file>各ファイルは {0} 以内にしてください。</upload-max-size-per-file>
-            <upload-max-size-aggregate-per-control>この項目の総ファイルサイズは {0} 以内です。</upload-max-size-aggregate-per-control>
-            <upload-max-files-per-control>添付できるのは最大 {0} 件です。</upload-max-files-per-control>
-            <upload-min-files-per-control>少なくとも {0} 件添付してください。</upload-min-files-per-control>
-            <upload-mediatypes>{0} のみアップロードできます。</upload-mediatypes>
+            <upload-max-size-per-file>ファイルサイズは{0}以下にしてください。</upload-max-size-per-file>
+            <upload-max-size-aggregate-per-control>このコントロールの合計ファイルサイズは{0}以下にしてください。</upload-max-size-aggregate-per-control>
+            <upload-max-files-per-control>最大{0}個のファイルを添付できます。</upload-max-files-per-control>
+            <upload-min-files-per-control>少なくとも{0}個のファイルを添付する必要があります。</upload-min-files-per-control>
+            <upload-mediatypes>{0}ファイルのみ受け付けます。</upload-mediatypes>
             <upload-image>画像</upload-image>
             <upload-video>動画</upload-video>
-            <upload-audio>音声</upload-audio>`
+            <upload-audio>音声</upload-audio>
         </hints>
         <view>
             <explanation>
-                これはデータの閲覧専用ビューです。
+                これはデータの読み取り専用ビューです。
             </explanation>
         </view>
         <lease>
-            <no-lease-title>ロック</no-lease-title>
-            <renew-lease-title>ロックを延長しますか？</renew-lease-title>
-            <renew-lease-message>ロックがまもなく期限切れです。延長しますか？</renew-lease-message>
-            <current-user-left>このドキュメントのロックをあと </current-user-left>
-            <current-user-right> 保有しています。</current-user-right>
-            <relinquished>このドキュメントのロックはありません。</relinquished>
-            <other-user>現在、ユーザー "{0}" がこのドキュメントをロックしています。</other-user>
-            <relinquish>ロックを解除</relinquish>
-            <renew>ロックを延長</renew>
-            <try-acquire>ロックを取得</try-acquire>
-            <show-in-view-mode>閲覧モードで表示</show-in-view-mode>
+            <no-lease-title>リース</no-lease-title>
+            <renew-lease-title>リースを更新しますか？</renew-lease-title>
+            <renew-lease-message>リースがまもなく期限切れになります。今すぐ更新しますか？</renew-lease-message>
+            <current-user-left>このドキュメントのリースはあと</current-user-left>
+            <current-user-right>です。</current-user-right>
+            <relinquished>このドキュメントのリースを所有していません。</relinquished>
+            <other-user>別のユーザー「{0}」が現在このドキュメントのリースを所有しています。</other-user>
+            <relinquish>リースを放棄</relinquish>
+            <renew>リースを更新</renew>
+            <try-acquire>リースの取得を試みる</try-acquire>
+            <show-in-view-mode>読み取り専用モードで表示</show-in-view-mode>
         </lease>
         <session-expiration>
             <title>
-                <expiring>セッションの有効期限が近づいています</expiring>
-                <expired>セッションの有効期限が切れました</expired>
+                <expiring>セッションがまもなく期限切れになります</expiring>
+                <expired>セッションが期限切れになりました</expired>
             </title>
             <message>
-                <expiring>セッションが間もなく切れます。続ける場合は下のボタンをクリックしてください。</expiring>
-                <expired>フォームを再読み込みする必要があります。ログインページに移動する場合があります。問題が続く場合はサポートに連絡してください。</expired>
+                <expiring>セッションがまもなく期限切れになります。このページを引き続き使用する場合は、下のボタンをクリックしてください。</expiring>
+                <expired>このフォームを再読み込みする必要があります。ログインページに移動する場合があります。このメッセージが表示されるべきでないと思われる場合、または問題が解決しない場合は、サポートにお問い合わせください。</expired>
             </message>
-            <renew-button>セッションを延長</renew-button>
+            <renew-button>セッションを更新</renew-button>
             <reload-button>再読み込み</reload-button>
         </session-expiration>
         <tab-duplication>
-            <title>タブの複製を検出しました</title>
-            <message>このページを複製したようです。元のタブに戻り、このタブを閉じてください。</message>
+            <title>ブラウザタブの重複が検出されました</title>
+            <message>このブラウザタブを複製したようです。このタブを閉じて、元のタブでセッションを続行してください。</message>
         </tab-duplication>
         <available-from>
             <message>このフォームはまだ利用できません</message>
@@ -402,28 +389,28 @@
         <dialog-body>
             <div>
                 <p>
-                    下の「保存」をクリックすると、フォームデータを HTML ファイルとしてパソコンに保存できます。
+                    下の保存ボタンをクリックして、フォームデータをHTMLファイルとしてコンピューターに保存します。
                 </p>
                 <p>
-                    保存したデータを開くには:
+                    フォームデータを再度開くには:
                 </p>
                 <ul>
-                    <li>HTML ファイルをブラウザーで開きます（ファイルをクリックするかブラウザーにドラッグ）。</li>
-                    <li>表示される「開く」ボタンをクリックして読み込みます。</li>
+                    <li>ブラウザでHTMLファイルを開きます（ファイルをクリックするか、ブラウザウィンドウにドロップします）。</li>
+                    <li>表示される開くボタンをクリックして確認します。</li>
                 </ul>
                 <p>
-                    <b>警告:</b> サーバーには保存されません。保存したファイルを削除するとデータも失われます。
+                    <b>警告:</b> データはサーバーに保存されません。保存したファイルを削除すると、データは失われます。
                 </p>
             </div>
         </dialog-body>
     </save-locally>
     <share-dialog>
         <label>共有リンクを作成</label>
-        <body>リンクを知っている人が閲覧または編集できます。</body>
+        <body>リンクを持つ誰でもこのデータを表示または編集できるようにします。</body>
         <link>リンク</link>
-        <select-operations>許可する操作を選択</select-operations>
-        <readonly>閲覧のみ</readonly>
-        <readwrite>閲覧と編集</readwrite>
+        <select-operations>操作を選択</select-operations>
+        <readonly>読み取り専用</readonly>
+        <readwrite>読み書き</readwrite>
     </share-dialog>
     <admin>
         <title>フォーム管理</title>
@@ -431,10 +418,10 @@
     <landing>
         <title>ランディング</title>
         <titles>
-            <published-forms>公開フォーム</published-forms>
-            <form-builder-forms>フォームビルダーのフォーム</form-builder-forms>
-            <form-builder-new>フォームビルダーで新規作成</form-builder-new>
-            <form-builder-summary>フォームビルダー一覧</form-builder-summary>
+            <published-forms>公開済みフォーム</published-forms>
+            <form-builder-forms>Form Builderフォーム</form-builder-forms>
+            <form-builder-new>新規Form Builderフォーム</form-builder-new>
+            <form-builder-summary>Form Builderフォーム</form-builder-summary>
             <demo-forms>デモフォーム</demo-forms>
             <demo-features>デモ機能</demo-features>
             <quick-links>クイックリンク</quick-links>
@@ -442,17 +429,17 @@
         </titles>
         <descriptions>
             <published-forms>公開済みフォームにアクセス</published-forms>
-            <form-builder-forms>Form Builder で作成中のフォームを表示・編集</form-builder-forms>
-            <demo-forms>Orbeon Forms のデモを試す</demo-forms>
-            <demo-features>特定機能のデモを試す</demo-features>
+            <form-builder-forms>Form Builderで作成した作業中のフォームを表示・編集</form-builder-forms>
+            <demo-forms>Orbeon Formsのデモフォームコレクションを試す</demo-forms>
+            <demo-features>Orbeon Formsの特定機能のデモを試す</demo-features>
         </descriptions>
-        <show-more>さらに表示…</show-more>
+        <show-more>もっと見る…</show-more>
     </landing>
     <home>
-        <title>公開フォーム</title>
+        <title>公開済みフォーム</title>
         <buttons>
-            <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; 利用不可にする</unpublish>
-            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; 利用可能にする</publish>
+            <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; 非公開にする</unpublish>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; 公開する</publish>
             <cancel>キャンセル</cancel>
             <connect>接続</connect>
             <select>選択</select>
@@ -461,30 +448,30 @@
             <stop-reindex>再インデックスを停止</stop-reindex>
             <all>すべて</all>
             <none>なし</none>
-            <unpublished-local>ローカル未公開</unpublished-local>
-            <published-local>ローカル公開</published-local>
-            <unpublished-remote>リモート未公開</unpublished-remote>
-            <published-remote>リモート公開</published-remote>
-            <newer-local>ローカルの方が新しい</newer-local>
-            <newer-remote>リモートの方が新しい</newer-remote>
-            <publish-local>ローカルを公開</publish-local>
-            <unpublish-local>ローカルを非公開</unpublish-local>
-            <publish-remote>リモートを公開</publish-remote>
-            <unpublish-remote>リモートを非公開</unpublish-remote>
-            <push-to-remote>リモートへプッシュ</push-to-remote>
+            <unpublished-local>非公開のローカルフォーム</unpublished-local>
+            <published-local>公開済みのローカルフォーム</published-local>
+            <unpublished-remote>非公開のリモートフォーム</unpublished-remote>
+            <published-remote>公開済みのリモートフォーム</published-remote>
+            <newer-local>ローカルの方が新しいフォーム</newer-local>
+            <newer-remote>リモートの方が新しいフォーム</newer-remote>
+            <publish-local>ローカルフォームを公開</publish-local>
+            <unpublish-local>ローカルフォームを非公開</unpublish-local>
+            <publish-remote>リモートフォームを公開</publish-remote>
+            <unpublish-remote>リモートフォームを非公開</unpublish-remote>
+            <push-to-remote>リモートにプッシュ</push-to-remote>
             <pull-from-remote>リモートからプル</pull-from-remote>
-            <navigate-summary>サマリーへ移動</navigate-summary>
-            <navigate-new>新規作成へ移動</navigate-new>
-            <upgrade-local>ローカル定義をアップグレード</upgrade-local>
-            <upgrade-remote>リモート定義をアップグレード</upgrade-remote>
-            <delete-local>ローカルを削除</delete-local>
-            <delete-remote>リモートを削除</delete-remote>
-            <reencrypt>定義を再暗号化</reencrypt>
+            <navigate-summary>一覧に移動</navigate-summary>
+            <navigate-new>新規に移動</navigate-new>
+            <upgrade-local>ローカルフォーム定義をアップグレード</upgrade-local>
+            <upgrade-remote>リモートフォーム定義をアップグレード</upgrade-remote>
+            <delete-local>ローカルフォームを削除</delete-local>
+            <delete-remote>リモートフォームを削除</delete-remote>
+            <reencrypt>フォーム定義を再暗号化</reencrypt>
             <reload-resources>リソースを再読み込み</reload-resources>
         </buttons>
         <titles>
-            <publish-confirmation>公開状態の変更確認</publish-confirmation>
-            <credentials>リモートサーバー資格情報</credentials>
+            <publish-confirmation>フォームの公開状態の変更を確認</publish-confirmation>
+            <credentials>リモートサーバーの認証情報</credentials>
             <status>ステータス</status>
             <view>表示</view>
             <new>新規</new>
@@ -493,17 +480,17 @@
             <form-identification>フォーム識別</form-identification>
             <reindexing-confirmation>再インデックスの確認</reindexing-confirmation>
             <reencrypt-confirmation>再暗号化の確認</reencrypt-confirmation>
-            <purge-confirmation>削除の確認</purge-confirmation>
+            <purge-confirmation>パージの確認</purge-confirmation>
         </titles>
         <messages>
-            <no-form-found>デプロイ済みフォームが見つかりません。</no-form-found>
-            <publish-confirmation>{1,choice,1#1 件のフォーム|1&lt;{1,number,integer} 件のフォーム}を {0,choice,0#利用可能に|1#利用不可に|2#アップグレード|3#削除} します。取り消せません。よろしいですか？</publish-confirmation>
-            <reindexing-confirmation>再インデックス中はサマリーページなどが正しく動作しません。システム停止中の実行を推奨します。続行しますか？</reindexing-confirmation>
-            <reencrypt-confirmation>再暗号化はオフライン中に実施することを推奨します。続行しますか？</reencrypt-confirmation>
-            <purge-confirmation>選択したデータを削除しますか？</purge-confirmation>
+            <no-form-found>デプロイされたフォームが見つかりませんでした。</no-form-found>
+            <publish-confirmation>{1,choice,1#1つのフォーム|1&lt;{1,number,integer}個のフォーム}を{0,choice,0#公開|1#非公開|2#アップグレード|3#削除}してもよろしいですか？この操作は元に戻せません。</publish-confirmation>
+            <reindexing-confirmation>再インデックス中は、Form Runnerの一覧ページなど一部の機能が正常に動作しません。システムがオフラインの間に再インデックスを実行することをお勧めします。再インデックスを続行してもよろしいですか？</reindexing-confirmation>
+            <reencrypt-confirmation>システムがオフラインの間に再暗号化を実行することをお勧めします。再暗号化を続行してもよろしいですか？</reencrypt-confirmation>
+            <purge-confirmation>選択したデータをパージしてもよろしいですか？</purge-confirmation>
         </messages>
         <labels>
-            <available>利用可</available>
+            <available>利用可能</available>
             <unavailable>利用不可</unavailable>
             <library>ライブラリ</library>
             <newer>新しい</newer>
@@ -511,19 +498,19 @@
             <username>ユーザー名</username>
             <password>パスワード</password>
             <reindexing-generic>再インデックス中 &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-generic>
-            <reindexing-provider>再インデックス {0} ({1,number}/{2,number})</reindexing-provider>
-            <reindexing-stopping>再インデックスを停止しています &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
-            <reindexing-finished>再インデックスを完了しました</reindexing-finished>
-            <reencrypt-state>再暗号化 {0,number}/{1,number}</reencrypt-state>
+            <reindexing-provider>{0}を再インデックス中 ({1,number}/{2,number})</reindexing-provider>
+            <reindexing-stopping>再インデックスを停止中 &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;</reindexing-stopping>
+            <reindexing-finished>再インデックスが完了しました</reindexing-finished>
+            <reencrypt-state>再暗号化中 {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>再暗号化を開始しました</reencrypt-started>
             <reencrypt-finished>再暗号化が完了しました</reencrypt-finished>
         </labels>
         <export-purge>
             <export>エクスポート</export>
-            <purge>削除</purge>
+            <purge>パージ</purge>
             <or>または</or>
-            <selected-forms>選択したフォーム ({0,number,integer})</selected-forms>
-            <following-forms>対象フォーム:</following-forms>
+            <selected-forms>選択されたフォーム ({0,number,integer})</selected-forms>
+            <following-forms>以下のフォーム:</following-forms>
             <application>アプリケーション:</application>
             <form>フォーム:</form>
             <version>バージョン:</version>
@@ -532,21 +519,21 @@
             <all-versions>すべてのバージョン</all-versions>
             <latest-version>最新バージョン</latest-version>
             <definitions-data>
-                <label>フォーム定義 / データ:</label>
+                <label>フォーム定義/データ:</label>
                 <definitions>定義のみ</definitions>
                 <data>データのみ</data>
                 <both>定義とデータ</both>
             </definitions-data>
             <current-history>
-                <label>現在データ / 履歴:</label>
-                <current-data>現在データのみ</current-data>
-                <revision-history>履歴のみ</revision-history>
-                <both>現在データと履歴</both>
+                <label>現在のデータ/変更履歴:</label>
+                <current-data>現在のデータのみ</current-data>
+                <revision-history>変更履歴のみ</revision-history>
+                <both>現在のデータと変更履歴</both>
             </current-history>
-            <from-date>開始:</from-date>
-            <until-date>終了:</until-date>
-            <redundant-values>重複データ</redundant-values>
-            <invalid-date>日付が不正です</invalid-date>
+            <from-date>開始日:</from-date>
+            <until-date>終了日:</until-date>
+            <redundant-values>冗長な値</redundant-values>
+            <invalid-date>無効な日付</invalid-date>
             <wrong-date-order>日付の順序が正しくありません</wrong-date-order>
         </export-purge>
     </home>
@@ -569,15 +556,15 @@
         </upload>
         <file>
             <label>インポートするファイル</label>
-            <hint>Excel 2007 形式 (.xlsx) または XML 形式 (.xml) が必要です</hint>
-            <alert>ファイルがないか未対応です</alert>
-            <excel-headings-format>Excel 2007 見出し付き形式 (.xslx)</excel-headings-format>
-            <excel-named-ranges-format>Excel 2007 名前付き範囲形式 (.xslx)</excel-named-ranges-format>
-            <xml-form-structure-and-data-format>Orbeon XML エクスポート形式 (.xml)</xml-form-structure-and-data-format>
+            <hint>ファイルはExcel 2007形式（.xlsx）またはXML形式（.xml）である必要があります</hint>
+            <alert>ファイルがないか、サポートされていません</alert>
+            <excel-headings-format>Excel 2007 名前付き見出し形式（.xlsx）</excel-headings-format>
+            <excel-named-ranges-format>Excel 2007 名前付き範囲形式（.xlsx）</excel-named-ranges-format>
+            <xml-form-structure-and-data-format>Orbeon XMLエクスポート形式（.xml）</xml-form-structure-and-data-format>
         </file>
         <validation>
             <label>検証</label>
-            <alert>インポート前に検証を開始してください</alert>
+            <alert>インポートを続行する前に検証を開始してください</alert>
         </validation>
         <start-validation>
             <label>検証を開始</label>
@@ -585,95 +572,95 @@
         <total>合計</total>
         <valid>有効</valid>
         <invalid>無効</invalid>
-        <imported>取り込み済み</imported>
+        <imported>インポート済み</imported>
         <skipped>スキップ</skipped>
-        <eta>予想時間</eta>
+        <eta>残り時間</eta>
         <cancel-validation>
-            <label>検証を中止</label>
+            <label>検証をキャンセル</label>
         </cancel-validation>
-        <validation-canceled>検証を中止しました。</validation-canceled>
+        <validation-canceled>検証がキャンセルされました。</validation-canceled>
         <import>
             <label>インポート</label>
         </import>
         <existing-records>
-            <label>既存のレコード</label>
+            <label>既存のデータベースレコード</label>
             <item id="0">保持</item>
             <item id="1">削除</item>
         </existing-records>
         <invalid-data>
-            <label>無効なデータのレコード</label>
+            <label>無効なデータを含むレコード</label>
             <item id="0">スキップ</item>
             <item id="1">インポート</item>
         </invalid-data>
         <start-import>
-            <label>インポート開始</label>
+            <label>インポートを開始</label>
         </start-import>
         <cancel-import>
-            <label>インポートを中止</label>
+            <label>インポートをキャンセル</label>
         </cancel-import>
-        <import-canceled>インポートを中止しました。</import-canceled>
+        <import-canceled>インポートがキャンセルされました。</import-canceled>
         <start-over>
-            <label>やり直す</label>
+            <label>最初からやり直す</label>
         </start-over>
         <review-data>
             <label>データを確認</label>
         </review-data>
         <existing-records-message>
-            フォーム {1}/{2} のバージョン {3} には、既に {0,number,integer} 件のドキュメントがあります。
+            フォーム{1}/{2}のバージョン{3}に対して、データベースに{0,number,integer}件の既存ドキュメントがあります。
         </existing-records-message>
         <eta-message>
-            {0,choice,0#|0&lt;{0, number, integer} 時間} {1,choice,0#|0&lt;{1, number, integer} 分} {2,choice,0#|0&lt;{2, number, integer} 秒}
+            {0,choice,0#|0&lt;{0, number, integer}時間} {1,choice,0#|0&lt;{1, number, integer}分} {2,choice,0#|0&lt;{2, number, integer}秒}
         </eta-message>
         <invalid-records-message>
-            {1,number,integer} 件中 {0,number,integer} 件のドキュメントが無効です。
+            {1,number,integer}件中{0,number,integer}件のドキュメントが無効です。
         </invalid-records-message>
         <valid-records-message>
-            {0,number,integer} 件のドキュメントを検証済みでインポートします。
+            {0,number,integer}件のドキュメントが検証され、インポートされます。
         </valid-records-message>
         <invalid-document-message>
-            アップロードしたドキュメントに検証エラーがあります。「データを確認」で修正してから保存してください。
+            アップロードされたドキュメントには検証エラーがあります。「データを確認」ボタンを使用して、保存前にエラーを確認・修正してください。
         </invalid-document-message>
         <valid-document-message>
-            アップロードしたドキュメントは有効です。「データを確認」で内容を確認してから保存できます。
+            アップロードされたドキュメントには有効なデータが含まれています。「データを確認」ボタンを使用して、保存前にフォームデータを確認してください。
         </valid-document-message>
         <import-complete-message>
-            {0,number,integer} 件のインポートが完了しました。無効な {1,number,integer} 件はスキップしました。
+            {0,number,integer}件のドキュメントのインポートが完了しました。{1,number,integer}件の無効なドキュメントがスキップされました。
         </import-complete-message>
-        <na>該当なし</na>
-        <fields-found>検出フィールド</fields-found>
-        <values-found>検出値</values-found>
+        <na>N/A</na>
+        <fields-found>検出されたフィールド</fields-found>
+        <values-found>検出された値</values-found>
         <errors>エラー</errors>
         <warnings>警告</warnings>
         <error-messages>
-            <validating>データ検証中にエラーが発生しました。</validating>
-            <importing>インポート中にエラーが発生しました。</importing>
-            <deleting>削除中にエラーが発生しました。</deleting>
+            <validating>データの検証中にエラーが発生しました。</validating>
+            <importing>データのインポート中にエラーが発生しました。</importing>
+            <deleting>データの削除中にエラーが発生しました。</deleting>
             <unauthorized>このデータにアクセスする権限がありません。</unauthorized>
-            <reading-form-data>フォームデータ取得中にエラーが発生しました。</reading-form-data>
-            <reading-form-metadata>フォームメタデータ読取中にエラーが発生しました。</reading-form-metadata>
-            <reading-form-definition>フォーム定義読取中にエラーが発生しました。</reading-form-definition>
+            <reading-form-data>フォームデータの取得中にエラーが発生しました。</reading-form-data>
+            <reading-form-metadata>フォームメタデータの読み取り中にエラーが発生しました。</reading-form-metadata>
+            <reading-form-definition>フォーム定義の読み取り中にエラーが発生しました。</reading-form-definition>
         </error-messages>
     </import>
     <authentication>
         <menu>
-            <logged-in-as>ログイン中: {0}</logged-in-as>
+            <logged-in-as>{0}としてログイン中</logged-in-as>
             <logout>ログアウト</logout>
             <login>ログイン</login>
             <register>登録</register>
         </menu>
         <login>
-            <title>Form Runner ログイン</title>
+            <title>Form Runnerログイン</title>
             <username>ユーザー名</username>
             <password>パスワード</password>
             <login>ログイン</login>
         </login>
         <logout-done>
-            <title>Form Runner ログアウト</title>
+            <title>Form Runnerログアウト</title>
             <message>ログアウトしました。</message>
         </logout-done>
         <login-error>
-            <title>Form Runner ログインエラー</title>
-            <unrecognized>ユーザー名またはパスワードが正しくありません。</unrecognized>
+            <title>Form Runnerログインエラー</title>
+            <unrecognized>入力されたユーザー名またはパスワードが認識されませんでした。</unrecognized>
             <try-again>もう一度お試しください。</try-again>
         </login-error>
     </authentication>
@@ -690,10 +677,10 @@
         <search>
             <search>検索</search>
             <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; フォームを検索</search-forms>
-            <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; 検索条件を表示</show-search-options>
-            <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; 検索条件を隠す</close-search-options>
+            <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; 検索オプションを表示</show-search-options>
+            <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; 検索オプションを非表示</close-search-options>
             <search-options>検索オプション</search-options>
-            <any>[指定なし]</any>
+            <any>[すべて]</any>
             <dates>
                 <item>
                     <label>今日</label>
@@ -704,15 +691,15 @@
                     <value>yesterday</value>
                 </item>
                 <item>
-                    <label>過去7日</label>
+                    <label>過去7日間</label>
                     <value>last-7-days</value>
                 </item>
                 <item>
-                    <label>過去30日</label>
+                    <label>過去30日間</label>
                     <value>last-30-days</value>
                 </item>
                 <item>
-                    <label>過去90日</label>
+                    <label>過去90日間</label>
                     <value>last-90-days</value>
                 </item>
                 <item>

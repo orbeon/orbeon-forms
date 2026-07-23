@@ -75,7 +75,7 @@ val HttpComponentsVersion            = "4.5.14"
 val Log4j2Version                    = "2.25.4"
 val CommonsIoVersion                 = "2.15.1"
 val OpenHtmlToPdfVersion             = "1.1.37-orbeon.6"
-val PdfBoxVersion                    = "3.0.4"
+val PdfBoxVersion                    = "3.0.4-orbeon.2" // Patched version with PDFBOX-6220 backport
 val TinkVersion                      = "1.20.0"
 val JacksonVersion                   = "2.21.5"
 val JavaMailApiVersion               = "2.1.3"
@@ -92,6 +92,10 @@ val OracleJdbcVersion                = "23.26.2.0.0"
 // Only on PE for now
 val ApachePOIVersion                 = "5.5.1"
 val SendGridVersion                  = "4.10.3"
+
+// Force patched version (PDFBOX-6220 backport)
+ThisBuild / dependencyOverrides += "org.apache.pdfbox" % "pdfbox"  % PdfBoxVersion
+ThisBuild / dependencyOverrides += "org.apache.pdfbox" % "fontbox" % PdfBoxVersion
 
 // "Provided" Java libraries
 val JavaxServletApiVersion           = "4.0.1"

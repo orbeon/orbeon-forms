@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.process
 
 import cats.effect.IO
 import cats.implicits.catsSyntaxOptionId
+import org.log4s
 import org.orbeon.connection.ConnectionContextSupport
 import org.orbeon.connection.ConnectionContextSupport.ConnectionContexts
 import org.orbeon.oxf.common.OXFException
@@ -88,6 +89,7 @@ trait FormRunnerActionsCommon {
     "edit-to-new"            -> tryEditToNew,
     "callback"               -> tryCallback,
     "sleep"                  -> trySleep,
+    "log"                    -> tryLog,
     "control-setvalue"       -> tryControlSetValue,
   )
 
@@ -479,6 +481,18 @@ trait FormRunnerActionsCommon {
         ),
         (_, computationResult) => computationResult
       )
+    }
+
+  def tryLog(params: ActionParams): ActionResult =
+    ActionResult.trySync {
+      val message = paramByNameOrDefaultUseAvt(params, "message").getOrElse("")
+      val level   = paramByNameUseAvt(params, "level") match {
+        case Some("debug") => log4s.Debug
+        case Some("warn")  => log4s.Warn
+        case Some("error") => log4s.Error
+        case _             => log4s.Info
+      }
+      logger.log(level, "process", message)
     }
 
   // https://github.com/orbeon/orbeon-forms/issues/7509

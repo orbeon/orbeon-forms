@@ -1,4 +1,3 @@
-@import (reference) "../../../../../../../../bootstrap-src/less/variables";
 
 @fancy-level-indent: 16px;
 @fancy-line-height: 16px; // height of a nodes selection bar including borders
@@ -135,7 +134,10 @@
         margin-top: 1px;
         line-height: 14px;
         vertical-align: text-top;
-        background-image: url("/apps/fr/style/bootstrap/img/glyphicons-halflings.png"); // absolute fails when resources are not combined but need this for CE vs. PE
+        // The former Bootstrap 2 glyphicons sheet, kept as a plain image asset (under apps/fr/style/ because /xbl/...
+        // paths are not served as individual resources). The absolute path is needed for CE vs. PE, but fails when
+        // resources are not combined.
+        background-image: url("/apps/fr/style/images/other/glyphicons-halflings.png");
         background-repeat: no-repeat;
         background-position: 14px 14px;
     }

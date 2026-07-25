@@ -140,7 +140,7 @@
             padding: 5px 10px;
         }
 
-        .popover-content {
+        .popover-body {
             overflow: auto;         // scrollbars when necessary
             box-sizing: border-box; // so that height we set in JS is correct
             white-space: pre-wrap;  // newlines wrap, see https://github.com/orbeon/orbeon-forms/issues/1618
@@ -356,7 +356,8 @@
                     clip-path: inset(0 calc(100% - var(--xforms-upload-progress-width)) 0 0);
                 }
 
-                .bar {
+                .progress-bar {
+                    // We set the width ourselves as upload progresses, so Bootstrap's width transition would lag
                     transition: none;
                 }
             }

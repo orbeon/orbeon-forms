@@ -20,9 +20,15 @@
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
+    <!-- fr|bootstrap-select1 and appearance ~= bootstrap are aliases so existing forms that used the removed
+         Bootstrap-2-only component get this rendering -->
     <xbl:binding
         id="fr-bootstrap-select1-binding"
-        element="fr|bootstrap5-select1, xf|select1[appearance ~= bootstrap5]"
+        element="
+            fr|bootstrap5-select1,
+            fr|bootstrap-select1,
+            xf|select1[appearance ~= bootstrap5],
+            xf|select1[appearance ~= bootstrap]"
         xxbl:mode="lhha binding value selection"
         xxbl:container="span">
 

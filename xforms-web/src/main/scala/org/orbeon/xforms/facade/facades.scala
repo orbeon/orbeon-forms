@@ -85,41 +85,59 @@ object Bootstrap {
   implicit def windowToBootstrapWindow(window: scalajs.dom.Window): BootstrapWindow =
     window.asInstanceOf[BootstrapWindow]
 
-  implicit class BootstrapOps(private val bootstrap: Bootstrap) extends AnyVal {
-    // Bootstrap 5 modal instantiation
-    def newModal(dialog: Element, configuration: js.Object): Modal =
-      js.Dynamic.newInstance(bootstrap.Modal)(dialog, configuration).asInstanceOf[Modal]
+  // The Bootstrap bundle is part of the XForms asset baseline, so the global is expected to be present.
+  private def bootstrapGlobal: Bootstrap =
+    scalajs.dom.window.bootstrap.getOrElse(throw new IllegalStateException("the `bootstrap` global is missing"))
+
+  // Tooltips and popovers (native Bootstrap classes)
+  def newTooltip(element: Element, configuration: js.Object): BootstrapTip = newTip(element, configuration, _.Tooltip)
+  def newPopover(element: Element, configuration: js.Object): BootstrapTip = newTip(element, configuration, _.Popover)
+  def getTooltip(element: Element): Option[BootstrapTip]                   = getTip(element, _.Tooltip)
+  def getPopover(element: Element): Option[BootstrapTip]                   = getTip(element, _.Popover)
+
+  private def newTip(element: Element, configuration: js.Object, ctor: Bootstrap => js.Dynamic): BootstrapTip = {
+    // Don't sanitize HTML tooltips/popovers: labels/hints/help are form-author content, same trust level as the rest of
+    // the form.
+    val dynConfig = configuration.asInstanceOf[js.Dynamic]
+    if (dynConfig.html.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false) && js.isUndefined(dynConfig.sanitize))
+      dynConfig.updateDynamic("sanitize")(false)
+    val tipCtor = ctor(bootstrapGlobal)
+    val _ = tipCtor.getOrCreateInstance(element, configuration)
+    new BootstrapTip(tipCtor, element)
   }
 
-  def newModal(dialog: Element, configuration: js.Object): GenericModal =
-    scalajs.dom.window.bootstrap.toOption match {
-      case Some(boostrap) => boostrap.newModal(dialog, configuration) // Bootstrap 5
-      case None           => new Modal2(dialog, configuration)        // Bootstrap 2
-    }
+  private def getTip(element: Element, ctor: Bootstrap => js.Dynamic): Option[BootstrapTip] = {
+    val tipCtor  = ctor(bootstrapGlobal)
+    val instance = tipCtor.getInstance(element)
+    if (instance == null || js.isUndefined(instance)) None else Some(new BootstrapTip(tipCtor, element))
+  }
 }
 
 @js.native
 trait Bootstrap extends js.Object {
-  val Modal: js.Dynamic = js.native
+  val Tooltip: js.Dynamic = js.native
+  val Popover: js.Dynamic = js.native
 }
 
-trait GenericModal extends js.Any {
-  def show(): Unit
-  def hide(): Unit
-}
+// Handle on a native bootstrap.Tooltip / bootstrap.Popover (ctor is the Bootstrap class)
+class BootstrapTip private[facade] (ctor: js.Dynamic, element: Element) {
 
-// Bootstrap 2 modal
-class Modal2(val dialog: Element, val configuration: js.Object) extends js.Object with GenericModal {
-  private val jQuery = $(dialog).asInstanceOf[js.Dynamic]
+  private def instanceOpt: Option[js.Dynamic] = {
+    val instance = ctor.getInstance(element)
+    if (instance == null || js.isUndefined(instance)) None else Some(instance.asInstanceOf[js.Dynamic])
+  }
 
-  override def show(): Unit = jQuery.modal(configuration)
-  override def hide(): Unit = jQuery.modal("hide")
-}
+  def show()   : Unit = instanceOpt.foreach(_.show())
+  def hide()   : Unit = instanceOpt.foreach(_.hide())
+  def destroy(): Unit = instanceOpt.foreach(_.dispose())
 
-// Bootstrap 5 modal
-@js.native
-trait Modal extends js.Object with GenericModal {
-  def show(): Unit = js.native
-  def hide(): Unit = js.native
+  // Change the displayed text after creation (e.g. on language change). Bootstrap reads the title from
+  // data-bs-original-title (falling back to the config) on each show.
+  def updateTitle(title: js.Any): Unit =
+    element.setAttribute("data-bs-original-title", title.toString)
+
+  // The tip element in the DOM, once shown: Bootstrap links the trigger to its tip via aria-describedby.
+  def tipElementOpt: Option[Element] =
+    Option(element.getAttribute("aria-describedby")).flatMap(id => Option(scalajs.dom.document.getElementById(id)))
 }
 

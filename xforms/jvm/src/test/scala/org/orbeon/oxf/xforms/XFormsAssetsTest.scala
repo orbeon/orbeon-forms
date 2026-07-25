@@ -31,8 +31,8 @@ class XFormsAssetsTest extends AnyFunSpec{
       {
           "css": [
             { "full": "/ops/yui/container/assets/skins/sam/container.css",                   "min": false },
-            { "full": "/apps/fr/style/bootstrap/css/bootstrap.css",                          "min": true  },
-            { "full": "/apps/fr/style/form-runner-bootstrap-override.css",                   "min": false },
+            { "full": "/apps/fr/style/bootstrap-5.1.3-orbeon/css/bootstrap.css",               "min": true  },
+            { "full": "/apps/fr/style/form-runner-bootstrap5-override.css",                  "min": false },
             { "full": "/apps/fr/style/fontawesome-free-6.7.2-web/css/all.css",               "min": true  },
             { "full": "/apps/fr/style/fontawesome-free-6.7.2-web/css/v4-shims.css",          "min": true  },
             { "full": "/config/theme/xforms.css",                                            "min": false },
@@ -43,7 +43,7 @@ class XFormsAssetsTest extends AnyFunSpec{
 
           "js": [
             { "full": "/webjars/jquery/3.6.1/dist/jquery.js",                                "min": true  },
-            { "full": "/apps/fr/style/bootstrap/js/bootstrap.js",                            "min": true  },
+            { "full": "/apps/fr/style/bootstrap-5.1.3-dist/js/bootstrap.bundle.js",          "min": true  },
             { "full": "/ops/javascript/orbeon/util/jquery-orbeon.js",                        "min": true  },
             { "full": "/webjars/nprogress/0.2.0/nprogress.js",                               "min": false },
             { "full": "/webjars/bowser/1.9.4/bowser.js",                                     "min": false },
@@ -84,8 +84,8 @@ class XFormsAssetsTest extends AnyFunSpec{
     """
       {
           "css": [
-            { "full": "/apps/fr/style/bootstrap/css/bootstrap.css",                          "min": true  },
-            { "full": "/apps/fr/style/form-runner-bootstrap-override.css",                   "min": false },
+            { "full": "/apps/fr/style/bootstrap-5.1.3-orbeon/css/bootstrap.css",               "min": true  },
+            { "full": "/apps/fr/style/form-runner-bootstrap5-override.css",                  "min": false },
             { "full": "/apps/fr/style/fontawesome-free-6.7.2-web/css/all.css",               "min": true  },
             { "full": "/apps/fr/style/fontawesome-free-6.7.2-web/css/v4-shims.css",          "min": true  },
             { "full": "/config/theme/xforms.css",                                            "min": false },
@@ -97,7 +97,7 @@ class XFormsAssetsTest extends AnyFunSpec{
 
           "js": [
             { "full": "/webjars/jquery/3.6.1/dist/jquery.js",                                "min": true  },
-            { "full": "/apps/fr/style/bootstrap/js/bootstrap.js",                            "min": true  },
+            { "full": "/apps/fr/style/bootstrap-5.1.3-dist/js/bootstrap.bundle.js",          "min": true  },
             { "full": "/ops/javascript/orbeon/util/jquery-orbeon.js",                        "min": true  },
             { "full": "/webjars/nprogress/0.2.0/nprogress.js",                               "min": false },
             { "full": "/webjars/bowser/1.9.4/bowser.js",                                     "min": false },

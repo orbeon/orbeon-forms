@@ -74,8 +74,8 @@
         <output name="data">
             <xh:head xmlns:xh="http://www.w3.org/1999/xhtml">
                 <xh:link href="/ops/yui/container/assets/skins/sam/container.css" class="xforms-baseline"/>
-                <xh:link href="/apps/fr/style/bootstrap/css/bootstrap.min.css" class="xforms-baseline"/>
-                <xh:link href="/apps/fr/style/form-runner-bootstrap-override.css" class="xforms-baseline"/>
+                <xh:link href="/apps/fr/style/bootstrap-5.1.3-orbeon/css/bootstrap.min.css" class="xforms-baseline"/>
+                <xh:link href="/apps/fr/style/form-runner-bootstrap5-override.css" class="xforms-baseline"/>
                 <xh:link href="/apps/fr/style/fontawesome-free-6.7.2-web/css/all.min.css" class="xforms-baseline"/>
                 <xh:link href="/apps/fr/style/fontawesome-free-6.7.2-web/css/v4-shims.min.css" class="xforms-baseline"/>
                 <xh:link href="/config/theme/xforms.css" class="xforms-baseline"/>
@@ -92,7 +92,7 @@
                 <xh:link href="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/css/bootstrap-datepicker.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/number/number.css" class="xforms-baseline"/>
                 <xh:script src="/webjars/jquery/3.6.1/dist/jquery.min.js" class="xforms-baseline"/>
-                <xh:script src="/apps/fr/style/bootstrap/js/bootstrap.min.js" class="xforms-baseline"/>
+                <xh:script src="/apps/fr/style/bootstrap-5.1.3-dist/js/bootstrap.bundle.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/util/jquery-orbeon.min.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/nprogress/0.2.0/nprogress.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/bowser/1.9.4/bowser.js" class="xforms-baseline"/>

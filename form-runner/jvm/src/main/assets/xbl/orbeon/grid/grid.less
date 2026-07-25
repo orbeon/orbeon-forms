@@ -10,7 +10,6 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-@import (reference) "../../../../../../../../bootstrap-src/less/variables";
 @import (reference)  "../../../apps/fr/style/form-runner-common";
 
 @minimalRepeatSeparatorSpacing: 5px;
@@ -316,6 +315,8 @@
                     &.fr-grid-table { // use `fr-grid-table` as the PDF renderer doesn't support `:not()`
 
                         border-collapse: separate; // otherwise we cannot have rounded corners
+                        // No cell gaps (Bootstrap 2 reset this globally; the browser default detaches cell borders)
+                        border-spacing: 0;
 
                         // Web: wide layout
                         @media not all and (max-width: 640px) {
@@ -627,7 +628,6 @@
                 input[type="search"],
                 input[type="tel"],
                 input[type="color"],
-                .uneditable-input,
                 .input-append {
                     width: 100%;
                 }
@@ -911,10 +911,8 @@
                 }
             }
 
-            // Values below are empirical
-            .span12 {
-                width: 98%; // unclear why 100% doesn't work
-            }
+            // A Bootstrap-2-era .span12 { width: 98% } hack used to live here; with Bootstrap 2 removed it only
+            // narrowed the PDF content, so it was dropped
 
             .fr-grid {
 

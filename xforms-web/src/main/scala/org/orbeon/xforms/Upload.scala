@@ -95,9 +95,9 @@ class Upload {
         s"""
            |<span class="$UploadProgressClass">
            |  <span class="$UploadProgressBarClass">
-           |    <div class="progress progress-striped active">
+           |    <div class="progress">
            |      <div class="$UploadProgressMessageClass $UploadProgressMessageUnfilledClass"></div>
-           |      <div class="bar"></div>
+           |      <div class="progress-bar progress-bar-striped progress-bar-animated"></div>
            |      <div class="$UploadProgressMessageClass $UploadProgressMessageFilledClass"></div>
            |    </div>
            |  </span>
@@ -229,6 +229,6 @@ class Upload {
 
   private def findProgressBar: Option[html.Element] =
     findDescendantElem(UploadProgressBarClass) map {
-      _.querySelectorT(".bar")
+      _.querySelectorT(".progress-bar")
     }
 }

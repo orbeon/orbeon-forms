@@ -19,6 +19,10 @@
   --orbeon-base-border-color             : #e3e3e3;           // darken(@wellBackground, 7%);
   --orbeon-body-decorations-border-radius: @baseBorderRadius; // bordered containers: view, TOC, repeat grid
 
+  // Max width of the (non-fluid) form view: keep this theme at Bootstrap 2's fixed 940px; a future theme can go wider.
+  // Fluid views remain full-width.
+  --orbeon-view-max-width: 940px;
+
   // Base font
   --orbeon-base-font-size  : 13px;
   --orbeon-base-font-family: @frBaseFontFamily;
@@ -77,6 +81,7 @@
   --orbeon-control-font-family               : @frBaseFontFamily;
   --orbeon-control-font-weight               : var(--orbeon-base-font-weight);
   --orbeon-control-color                     : black;   // Make text inside the fields stand out, as this is the most important information
+  --orbeon-control-placeholder-color         : #999;    // Bootstrap 2 default (the browser default is darker)
   --orbeon-control-background-color          : white;
   --orbeon-control-read-only-background-color: #f2f2f2; // darken(@inputBackground, 5%);
   --orbeon-control-border-color              : #ccc;    // Slightly darker than base border color
@@ -121,7 +126,7 @@
   // Focus
   --orbeon-focus-border-color   : #3396ff; // Blueish
   --orbeon-focus-highlight-color: rgba(0,123,255,.25);
-  --orbeon-focus-ring           : 0 0 0 0.2rem var(--orbeon-focus-highlight-color);
+  --orbeon-focus-ring           : 0 0 0 3px var(--orbeon-focus-highlight-color); // was 0.2rem (16px root), rounded
   --orbeon-control-focus-ring   : var(--orbeon-focus-ring);
 
   // Motion
@@ -187,6 +192,15 @@
   --orbeon-button-disabled-opacity     : 0.65;
   --orbeon-button-disabled-icon-opacity: 0.4;
 
+  // Status pills (the .label class): Bootstrap 2's label palette. Named --orbeon-status-* to avoid clashing with the
+  // form-field --orbeon-label-* vars.
+  --orbeon-status-color                    : white;
+  --orbeon-status-background-color         : #999;     // default (e.g. unavailable)
+  --orbeon-status-success-background-color : #468847;  // e.g. available
+  --orbeon-status-info-background-color    : #3a87ad;
+  --orbeon-status-warning-background-color : #f89406;
+  --orbeon-status-error-background-color   : #b94a48;  // Bootstrap 2 .label-important
+
   // Dropdowns (Bootstrap 2 and 5)
   --orbeon-dropdown-open-toggle-background-color  : var(--orbeon-button-highlight-background-color);
   --orbeon-dropdown-menu-color                    : #333; // @grayDark
@@ -248,6 +262,8 @@
   // Navbar
   --orbeon-navbar-color                                : white;
   --orbeon-navbar-background-color                     : rgb(33, 37, 41);         // temporary, copied from the default Bootstrap 5 theme
+  // Form Builder top header bar (Bootstrap 2's light navbar background)
+  --orbeon-fb-navbar-background-color                  : #fafafa;
   --orbeon-navbar-heading-font-size                    : 1.54em;                  // 20px
   --orbeon-navbar-heading-color                        : #909395;
   --orbeon-navbar-dropdown-open-toggle-background-color: #111;
@@ -387,6 +403,10 @@
   --orbeon-tooltip-font-size       : 0.85em; // 11px
   --orbeon-tooltip-color           : #fff;   // @tooltipColor;
   --orbeon-tooltip-background-color: #000;   // @tooltipBackground;
+
+  // Progress bars (upload, import, reindex): track and filled bar
+  --orbeon-progress-background-color    : #f7f7f7;
+  --orbeon-progress-bar-background-color: #149bdf; // Bootstrap 2's blue
 
   // Landing page
   --orbeon-landing-card-border-color           : #ddd;

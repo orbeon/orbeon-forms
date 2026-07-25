@@ -19,7 +19,6 @@ import cats.implicits.catsSyntaxOptionId
 import enumeratum.*
 import enumeratum.EnumEntry.Lowercase
 import org.orbeon.builder.facade.*
-import org.orbeon.builder.facade.JQueryTooltip.*
 import org.orbeon.builder.rpc.FormBuilderRpcClient
 import org.orbeon.facades.TinyMce
 import org.orbeon.facades.TinyMce.{GlobalTinyMce, TinyMceConfig, TinyMceDefaultConfig, TinyMceEditor}
@@ -29,6 +28,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
 import org.orbeon.web.{DomEventNames, DomSupport}
 import org.orbeon.xforms.*
+import org.orbeon.xforms.facade.Bootstrap
 import org.scalajs.dom
 import org.scalajs.dom.{document, html}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -138,9 +138,10 @@ object ControlLabelHintTextEditor {
         Private.setValue(Private.labelHintValue(currentLabelHint))
         Private.checkboxInputElem.checked = Private.isLabelHintHtml
         // Set tooltip for checkbox and HTML5 placeholders (don't do this once for all, as the language can change)
-        $(Private.checkboxInputElem).tooltip(new JQueryTooltipConfig {
-          val title: String = dom.document.querySelectorT(".fb-message-lhha-checkbox").textContent
-        })
+        Bootstrap.newTooltip(
+          Private.checkboxInputElem,
+          js.Dynamic.literal(title = dom.document.querySelectorT(".fb-message-lhha-checkbox").textContent)
+        )
         val labelTextOrHint = Private.getEditorType.entryName // TODO: pass `resourceEditorCurrentLabelHint`
         Private.textInputElem.placeholder = dom.document.querySelectorT(s".fb-message-type-$labelTextOrHint").innerText
         // Hide setting visibility instead of .hide(), as we still want the label to take space, on which we show the input
@@ -168,7 +169,7 @@ object ControlLabelHintTextEditor {
           ) // ignoring the `Future` completion
 
           // Destroy tooltip, or it doesn't get recreated on `startEdit()`
-          $(Private.checkboxInputElem).tooltip("destroy")
+          Bootstrap.getTooltip(Private.checkboxInputElem).foreach(_.destroy())
           Private.containerDivElem.hide()
           Private.endEdit()
           Private.annotateWithLhhaClass(false)

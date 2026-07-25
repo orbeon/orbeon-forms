@@ -37,7 +37,7 @@ class EmbeddingApiSupportTest extends AnyFunSpec {
       s"/xforms-server/upload",
       s"/xforms-server/dynamic/d921062a9e04c30f098cce5659d3fcd769d161d7",
 
-      s"/${optionalPath1}apps/fr/style/bootstrap/img/glyphicons-halflings.png",
+      s"/${optionalPath1}apps/fr/style/images/other/glyphicons-halflings.png",
       s"/${optionalPath1}apps/fr/style/images/pixelmixer/bubble_64.png",
       s"/${optionalPath1}apps/fr/style/orbeon-navbar-logo.png",
       s"/${optionalPath1}ops/images/xforms/calendar.png",
@@ -46,8 +46,8 @@ class EmbeddingApiSupportTest extends AnyFunSpec {
 
       s"/$Versioned1../xbl/orbeon/california-plate/images/platetahoe_small.jpg",
       s"/$optionalPath1./xbl/orbeon/california-plate/images/platetahoe_small.jpg",
-      s"/$Versioned1../apps/fr/style/bootstrap/img/glyphicons-halflings.png",
-      s"/$Versioned1../${optionalPath1}apps/fr/style/bootstrap/img/glyphicons-halflings.png",
+      s"/$Versioned1../apps/fr/style/images/other/glyphicons-halflings.png",
+      s"/$Versioned1../${optionalPath1}apps/fr/style/images/other/glyphicons-halflings.png",
 
       s"/fr/service/acme/sales/pdf/0f8f0ed8d1b3e24392bffc440feb882cfab53a4c/4a9573727be04cf59662f61f7c1574055c094dbc/abc.pdf",
       s"/fr/service/acme/sales/tiff/0f8f0ed8d1b3e24392bffc440feb882cfab53a4c/4a9573727be04cf59662f61f7c1574055c094dbc/abc.tiff",

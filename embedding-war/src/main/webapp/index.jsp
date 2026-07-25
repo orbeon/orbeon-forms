@@ -54,6 +54,10 @@
     </style>
     <link rel="stylesheet" href="//getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css">
 
+    <%-- This page's own Bootstrap 2 JavaScript, for its navbar dropdown (the Orbeon assets no longer include it) --%>
+    <script type="text/javascript" src="//getbootstrap.com/2.3.2/assets/js/jquery.js"></script>
+    <script type="text/javascript" src="//getbootstrap.com/2.3.2/assets/js/bootstrap.js"></script>
+
     <% if (isEmbeddingApiJS) { %>
     <script type="text/javascript" src="<%= orbeonFormsContext %>/xforms-server/baseline.js?updates=<%= selectedForm.equals("builder") ? "fb" : "fr" %>"></script>
     <% } %>

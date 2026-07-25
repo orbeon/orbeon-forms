@@ -1,10 +1,47 @@
 @import (reference) "form-runner-common";
 
+// The Bootstrap CSS is the .orbeon-scoped, px-valued build (see bootstrap-5.1.3-orbeon/README.md), so no root font-size
+// rescale is needed and nothing here may anchor on html or body.
+
 .orbeon {
 
+  // On &, not body&, so it also applies when embedded, where .orbeon is a wrapper <div>
+  color: var(--orbeon-base-color); // Override Bootstrap's default
+
+  // Anchor the base font on our own vars: the PDF renderer doesn't resolve Bootstrap's :root-defined --bs-* vars
+  font-family: var(--orbeon-base-font-family);
+  font-size: var(--orbeon-base-font-size);
+
   body& {
-    color: var(--orbeon-base-color); // Override Bootstrap's default
+    // Offset content below the fixed navbar (62px, like the Bootstrap 2 pages). Screen only: in PDF the navbar is
+    // collapsed into the running page header. body&: embedded pages have no navbar.
+    @media screen {
+      .container, .container-fluid {
+        &.fr-view {
+          padding-top: 62px;
+        }
+      }
+    }
   }
+
+  // Cap the non-fluid view at the theme width (Bootstrap 2's fixed 940px). content-box because the cap is the legacy
+  // *content* width; screen only because print must fill the page.
+  @media screen {
+    .container.fr-view {
+      box-sizing: content-box;
+      max-width: var(--orbeon-view-max-width, 940px);
+    }
+  }
+
+  // Bootstrap 2 made all images fluid by default; Bootstrap 5 requires the opt-in .img-fluid
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  // Bootstrap 2 float utilities, still emitted by Form Builder dialogs
+  .pull-left  { float: left; }
+  .pull-right { float: right; }
 
   a {
     color: var(--orbeon-link-color);
@@ -32,9 +69,74 @@
     display: none;
   }
 
+  // Bootstrap 2's 15px navbar gutter (Bootstrap 5's is ~9.75px)
+  .navbar .container-fluid {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  // Logo-to-title gap, measured against Bootstrap 2
+  .navbar .navbar-brand {
+    margin-right: 20px;
+  }
+
+  // Home (fa-th) link: Bootstrap 2's navbar icon color and 15px link padding
+  .fr-navbar-home-link a {
+    text-decoration: none;
+    padding: 0 15px;
+
+    i {
+      color: var(--orbeon-navbar-color);
+    }
+  }
+
+  // Navbar status icons: Bootstrap 2's navbar icon color (the default text color is invisible on the dark navbar)
+  .fr-status-icons i {
+    color: var(--orbeon-navbar-color);
+    margin-left: 10px; // Bootstrap 2's total spacing (5px icon margin + its anchor padding)
+  }
+  .fr-status-icons .badge {
+    margin-left: 10px; // same lead spacing as the icons
+  }
+
+  // Workflow stage, share, revision history: Bootstrap 2 styled these via .navbar-inverse-scoped rules that don't match
+  // the Bootstrap 5 navbar markup
+  .fr-workflow-stage {
+    display: flex;
+    align-items: baseline;
+    label.xforms-label { // label.xforms-label to beat the same-specificity label-styles port below
+      color: var(--orbeon-navbar-color);
+      margin: 0 .5em 0 0;
+      &:after { content: ":" }
+    }
+    output {
+      color: var(--orbeon-navbar-color);
+    }
+  }
+  .fr-share-nav, .fr-revision-history {
+    .btn-link {
+      padding: 0 5px; // Bootstrap 2's 5px horizontal footprint
+      .fa {
+        color: var(--orbeon-navbar-color);
+      }
+    }
+  }
+
+  // Same 5px horizontal footprint as under Bootstrap 2
+  .navbar .fr-workflow-stage {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  // Collapse the wrapper <li> of navbar items that hide themselves (xforms-disabled) or render nothing; !important
+  // because the items carry d-flex, which is !important too
+  .navbar .navbar-nav > .nav-item:not(:has(> :not(.xforms-disabled))) {
+    display: none !important;
+  }
+
   .dropdown:not(:has(.show)) {
-    // Dropdown toggles have btn/btn-secondary classes in BS5 but not in BS2 (see fr-user-nav-dropdown-content in
-    // view.xsl and bootstrap5-select1.xbl). This requires overriding button styling here and in other places.
+    // Dropdown toggles carry btn btn-secondary (user nav in view.xsl, bootstrap5-select1.xbl), which the Bootstrap 2
+    // markup did not, so the button styling must be neutralized
     .btn-secondary.dropdown-toggle {
       &:hover, &:focus, &:active {
         background-color: transparent;
@@ -74,7 +176,7 @@
 
     .btn-link {
       font-size: var(--orbeon-base-font-size);
-      padding: 6px 12px;
+      padding: 3px 20px; // Bootstrap 2's dropdown item padding
       margin-bottom: 0;
 
       display: inline-block;
@@ -82,12 +184,9 @@
       text-align: left;
       white-space: nowrap;
       vertical-align: middle;
-      -ms-touch-action: manipulation;
       touch-action: manipulation;
       cursor: pointer;
       -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
       user-select: none;
       background-image: none;
       border: 1px solid transparent;
@@ -123,30 +222,439 @@
       color: var(--orbeon-dropdown-menu-disabled-color);
     }
 
-    .dropdown-divider {
+    // Disabled items keep their colors on hover, like Bootstrap 2 (higher specificity than the hover rule above)
+    .disabled .btn-link:hover,
+    .disabled .btn-link:focus,
+    .dropdown-item.disabled:hover,
+    .dropdown-item:disabled:hover {
+      color: var(--orbeon-dropdown-menu-disabled-color);
+      background-color: var(--orbeon-dropdown-menu-background-color);
+    }
+
+    // .divider is the Bootstrap 2 class, still emitted by some menus (e.g. home.xhtml)
+    .dropdown-divider,
+    .divider {
+      height: 0;
+      margin: 0.5em 0;
+      overflow: hidden;
       border-top: 1px solid var(--orbeon-dropdown-menu-divider-color);
     }
   }
 
-  .fr-summary-selection .dropdown-toggle {
-    background-color: #f8f9fa;
-    color: #000;
+  // Menus still using Bootstrap 2's .dropdown-menu > li > a markup (grid/repeater row menus, drop-trigger): style the
+  // plain <a> items like .btn-link above.
+  .fr-grid-dropdown-menu,
+  .fr-repeater-dropdown-menu,
+  .xbl-fr-drop-trigger {
+    .dropdown-menu {
+      padding: 5px 0;   // Bootstrap 2's menu padding
+      min-width: 160px; // roughly Bootstrap 2's 160px content-box minimum
+    }
+    // Fixed item line height like Bootstrap 2; otherwise it inherits e.g. 54px from .fr-buttons
+    .dropdown-menu > li {
+      line-height: @fixedLineHeight;
+      @media screen {
+        line-height: @fluidLineHeight;
+      }
+    }
+    .dropdown-menu > li > a {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 3px 20px; // match .btn-link above
+      clear: both;
+      font-size: var(--orbeon-base-font-size);
+      font-weight: var(--orbeon-base-font-weight);
+      line-height: @fixedLineHeight;
+      @media screen {
+        line-height: @fluidLineHeight;
+      }
+      text-align: left;
+      white-space: nowrap;
+      text-decoration: none;
+      color: var(--orbeon-dropdown-menu-color);
+      cursor: pointer;
+    }
+    .dropdown-menu > li > a:hover,
+    .dropdown-menu > li > a:focus {
+      color: var(--orbeon-dropdown-menu-hover-color);
+      background-color: var(--orbeon-dropdown-menu-hover-background-color);
+      text-decoration: none;
+    }
+    .dropdown-menu > li.disabled > a,
+    .dropdown-menu > li.disabled > a:hover,
+    .dropdown-menu > li.disabled > a:focus {
+      color: var(--orbeon-dropdown-menu-disabled-color);
+      background-color: transparent;
+      cursor: default;
+    }
   }
 
-  .fr-summary-selection .badge {
-    background-color: #0d6efd;
+  // Restore drop-trigger.less's flex item layout (label + shortcut hint), which display: block above out-specifies
+  .xbl-fr-drop-trigger .dropdown-menu > li > a {
+    display: inline-flex;
   }
+
+  .fr-summary-selection .dropdown-toggle {
+    // Default button background, like Bootstrap 2 (Bootstrap 5's #f8f9fa is lighter)
+    background-color: var(--orbeon-button-background-color);
+    color: var(--orbeon-button-color);
+  }
+
+  // Badges (Summary's "Selected N", the navbar error/warning counts): Bootstrap 2's pills, unstyled in Bootstrap 5.
+  // Colors from the --orbeon-status-* palette, shared with .label as under Bootstrap 2
+  .badge {
+    font-size: 0.9em;
+    font-weight: bold;
+    line-height: 1.2; // about Bootstrap 2's 14px at the 13px base, unitless so it scales with the font
+    padding: 2px 9px;
+    border-radius: 9px;
+    background-color: var(--orbeon-status-background-color);
+  }
+  .badge-info {
+    background-color: var(--orbeon-status-info-background-color);
+  }
+  .badge-important {
+    background-color: var(--orbeon-status-error-background-color);
+  }
+  .badge-warning {
+    background-color: var(--orbeon-status-warning-background-color);
+  }
+
+  // Status pills (.label, dropped by Bootstrap 5): Bootstrap 2 look, colors from the --orbeon-status-* theme vars
+  .label {
+    display: inline-block;
+    padding: 2px 4px;
+    font-size: 0.9em;
+    font-weight: bold;
+    line-height: 1.2; // about Bootstrap 2's 14px at the 13px base, unitless so it scales with the font
+    color: var(--orbeon-status-color);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+    white-space: nowrap;
+    vertical-align: baseline;
+    background-color: var(--orbeon-status-background-color);
+    border-radius: 3px;
+  }
+  .label-success  { background-color: var(--orbeon-status-success-background-color); }
+  .label-info     { background-color: var(--orbeon-status-info-background-color); }
+  .label-warning  { background-color: var(--orbeon-status-warning-background-color); }
+  .label-important { background-color: var(--orbeon-status-error-background-color); }
 
   .fr-summary-selection .dropdown-menu {
-    min-width: 15rem;
+    min-width: 195px; // 15rem at the 13px base
   }
 
-  // button link: show search options
-  .fr-search-show-button .btn-link {
-    border: 1px solid transparent;
-    background-color: #F3F3F3;
-    color: #0d6efd !important;
-    text-decoration: underline !important;
+  // Bare form fields (Bootstrap 5 only styles .form-control): port of the field styling from the former Bootstrap 2
+  // override
+  select,
+  textarea,
+  input[type="text"],             // Like Bootstrap, use all the specific types to exclude checkbox/radio
+  input[type="password"],
+  input[type="datetime"],
+  input[type="datetime-local"],
+  input[type="date"],
+  input[type="month"],
+  input[type="time"],
+  input[type="week"],
+  input[type="number"],
+  input[type="email"],
+  input[type="url"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="color"] {
+    font-size: var(--orbeon-control-font-size); // Use our own preferred font size
+    font-family: var(--orbeon-control-font-family);
+    font-weight: var(--orbeon-control-font-weight);
+    line-height: @fixedLineHeight;
+    @media screen {
+      line-height: @fluidLineHeight;
+    }
+    color: var(--orbeon-control-color);
+    background-color: var(--orbeon-control-background-color);
+
+    padding: var(--orbeon-control-padding);
+    margin-bottom: 0;
+    box-sizing: border-box;                     // So width: 100% works with the padding
+    height: var(--orbeon-control-height);
+    background-image: none;
+
+    .focusHighlight();
+
+    // Bootstrap 2's #999 placeholder (the browser default is darker)
+    &::placeholder {
+      color: var(--orbeon-control-placeholder-color);
+    }
+  }
+
+  // Focus on selects and file inputs (radio/checkbox handled inside the @media (prefers-contrast) block below, so
+  // high-contrast mode defers to the browser's native focus indicator)
+  select:focus,
+  input[type="file"]:focus {
+    .focusDecorations();
+  }
+
+  // Don't set height for textarea
+  textarea {
+    height: var(--orbeon-textarea-height);
+  }
+
+  input, select, textarea {
+    &[readonly], &[disabled] {
+      background-color: var(--orbeon-control-read-only-background-color);
+      opacity: 1;
+    }
+  }
+
+  select[multiple],
+  .xforms-select1-appearance-compact select,
+  .xforms-select-appearance-compact select {
+    height: var(--orbeon-multiple-select-height);
+  }
+
+  // .xforms-field shows a read-only / calculated value as a grey boxed field; port of the former Bootstrap 2 override.
+  // The minimal/static output appearances share the box but not the background/border.
+  .xforms-field {
+    background-color: var(--orbeon-control-read-only-background-color);
+    cursor: not-allowed;
+    .focusHighlight();
+  }
+  .xforms-field,
+  .xforms-output.xforms-output-appearance-minimal output[role = "textbox"],
+  .xforms-output.xforms-static output {
+    display: inline-block;
+    box-sizing: border-box;
+    width: 100%;
+    padding: var(--orbeon-control-padding);
+    margin-bottom: 0;
+    color: var(--orbeon-control-color);
+    background-image: none;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-wrap: break-word; // kept (deprecated) for the PDF renderer
+    min-height: @fixedControlMinHeight;
+    @media screen {
+      min-height: @fluidControlMinHeight;
+    }
+    height: auto;
+    font-size: var(--orbeon-control-font-size);
+    font-family: var(--orbeon-control-font-family);
+    font-weight: var(--orbeon-control-font-weight);
+    line-height: @fixedLineHeight;
+    @media screen {
+      line-height: @fluidLineHeight;
+    }
+  }
+
+  // Theme-driven (--orbeon-label-*) label styling, port of the former Bootstrap 2 override
+  .label-styles() {
+    font-size  : var(--orbeon-label-font-size);
+    font-family: var(--orbeon-label-font-family);
+    font-weight: var(--orbeon-label-font-weight);
+    line-height: @fixedLineHeight;
+    @media screen {
+      line-height: @fluidLineHeight;
+    }
+    color: var(--orbeon-label-color);
+  }
+
+  // Keep the two selectors separate: the PDF renderer doesn't support :not() and would drop a combined group (#7590)
+  .xforms-label                     { .label-styles(); }
+  label:not(.checkbox):not(.radio)  { .label-styles(); }
+
+  // Spacing-related properties on .xforms-label only (not Bootstrap-styled <label> elements)
+  .xforms-label {
+    letter-spacing: var(--orbeon-label-letter-spacing);
+    text-transform: var(--orbeon-label-text-transform);
+    margin        : var(--orbeon-label-margin);
+    padding       : var(--orbeon-label-padding);
+  }
+
+  // Fixed 20px line box like Bootstrap 2; the inherited unitless 1.5 would shrink every hinted control by ~3.8px
+  .xforms-hint {
+    line-height: @fixedLineHeight;
+    @media screen {
+      line-height: @fluidLineHeight;
+    }
+  }
+
+  // Bootstrap 2 itself sets cursor: pointer on these (buttons already get it from the Bootstrap 5 reboot via
+  // :not(:disabled))
+  label,
+  select,
+  input[type="radio"],
+  input[type="checkbox"] {
+    cursor: pointer;
+  }
+
+  // Bootstrap 2 vertical-aligned form fields middle (Reboot uses baseline); keeps the date/time "fields" appearance
+  // aligned with its add-on widget
+  input[type="text"],
+  input[type="password"],
+  input[type="datetime"],
+  input[type="datetime-local"],
+  input[type="date"],
+  input[type="month"],
+  input[type="time"],
+  input[type="week"],
+  input[type="number"],
+  input[type="email"],
+  input[type="url"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="color"],
+  select,
+  textarea {
+    vertical-align: middle;
+  }
+
+  // Field add-ons (.add-on, e.g. the calendar/clock icon, dropped by Bootstrap 5): merged port of the former Bootstrap
+  // 2 override's .input-append/.input-prepend blocks
+  .input-append,
+  .input-prepend {
+    display: flex;
+    align-items: stretch;
+
+    margin-bottom: 0;
+
+    input,
+    select,
+    .dropdown-menu,
+    .popover {
+      font-size: var(--orbeon-base-font-size);
+    }
+
+    // Paint the focus ring above the add-on (port of Bootstrap 2's input:focus { z-index: 2 })
+    input:focus {
+      position: relative;
+      z-index: 2;
+    }
+
+    .add-on {
+      display        : flex;
+      align-items    : center;
+      justify-content: center;
+      text-align     : center;   // inherits into children wider than their content (e.g. a currency output)
+      line-height    : 1;
+      padding        : 0 0.38em; // Match Bootstrap at a font size of 13px (i.e. 5px)
+
+      // Matching inputs
+      font-size : var(--orbeon-control-font-size);
+      box-sizing: border-box;
+      height    : auto;
+      min-height: @fixedControlHeight;
+      @media screen {
+        min-height: @fluidControlHeight;
+      }
+
+      color           : var(--orbeon-add-on-color);
+      background-color: var(--orbeon-add-on-background-color);
+      text-shadow     : 0 1px 0 var(--orbeon-add-on-text-shadow-color);
+
+      .fieldBorder();
+
+      .xforms-output {
+        font-size: 1.08em; // Make texts such as "$" slightly larger
+      }
+
+      > .fa {
+        // Make the FA icon vertically aligned (visually); this works with all font sizes (em unit)
+        margin-top: -0.06em;
+      }
+    }
+  }
+
+  .input-prepend {
+    input,
+    input.xforms-group[role = group][tabindex] {
+      border-top-left-radius   : var(--orbeon-add-on-inner-border-radius);
+      border-bottom-left-radius: var(--orbeon-add-on-inner-border-radius);
+    }
+    .add-on:first-child {
+      border-radius             : var(--orbeon-add-on-border-radius);
+      border-top-right-radius   : var(--orbeon-add-on-inner-border-radius);
+      border-bottom-right-radius: var(--orbeon-add-on-inner-border-radius);
+      margin-right              : var(--orbeon-add-on-gap);
+    }
+  }
+
+  .input-append {
+    input:not([type = "date"], [type = "time"]),
+    input.xforms-group[role = group][tabindex]:not([type = "date"]) {
+      border-top-right-radius   : var(--orbeon-add-on-inner-border-radius);
+      border-bottom-right-radius: var(--orbeon-add-on-inner-border-radius);
+    }
+    .add-on:last-child {
+      border-radius            : var(--orbeon-add-on-border-radius);
+      border-top-left-radius   : var(--orbeon-add-on-inner-border-radius);
+      border-bottom-left-radius: var(--orbeon-add-on-inner-border-radius);
+      margin-left              : var(--orbeon-add-on-gap);
+    }
+  }
+
+  // Bootstrap 2 checkbox/radio box metrics; the search options' bottom-aligned exact-match checkbox depends on them
+  // (form-runner-search.less)
+  .checkbox,
+  .radio {
+    min-height: 20px;
+  }
+  label.checkbox input[type="checkbox"],
+  label.radio input[type="radio"] {
+    margin-top: 3px;
+  }
+
+  // Custom-styled checkboxes/radios (SVG check/dot), port of the former Bootstrap 2 override; high-contrast mode keeps
+  // the native widgets
+  @media (prefers-contrast: no-preference), (prefers-contrast: less) {
+    input[type="radio"],
+    input[type="checkbox"] {
+      appearance: none;
+      width: 1em;
+      height: 1em;
+      border: 1px solid var(--orbeon-checkable-border-color);
+      background-color: var(--orbeon-checkable-background-color);
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      -webkit-print-color-adjust: exact;
+      &:checked {
+        background-color: var(--orbeon-checkable-checked-background-color);
+        border-color    : var(--orbeon-checkable-checked-border-color);
+      }
+      &:disabled {
+        background-color: var(--orbeon-checkable-disabled-background-color);
+        border-color    : var(--orbeon-checkable-disabled-border-color);
+      }
+      &:focus {
+        .focusDecorations();
+      }
+      &:focus-visible {
+        outline   : 0;
+        box-shadow: var(--orbeon-checkable-focus-ring);
+      }
+    }
+
+    input[type="radio"] {
+      border-radius: 50%;
+      &:checked {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2' fill='%23fff'/%3e%3c/svg%3e");
+      }
+    }
+
+    input[type="checkbox"] {
+      border-radius: 25%;
+      &:checked {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+      }
+    }
+  }
+
+  // Base-size legend straddling the fieldset border, like Bootstrap 2 (Reboot floats it inside the fieldset and makes
+  // it huge)
+  fieldset > legend {
+    float: none;
+    width: auto;
+    font-size: var(--orbeon-base-font-size);
+    line-height: inherit;
   }
 
   .btn-link {
@@ -162,19 +670,60 @@
     }
   }
 
-  // new button
-  .fr-new-button .btn {
-    color: #fff !important;
-    background-color: #0d6efd !important;
-    border-color: #0d6efd !important;
+  // No .fr-new-button rules here: forcing it blue also painted the plain "New" button of the empty Summary page; button
+  // colors come from trigger.less
+
+  // Size buttons from the theme's button vars, with Bootstrap 2's fixed 20px line height
+  .btn {
+    padding      : var(--orbeon-button-padding);
+    border-radius: var(--orbeon-button-border-radius);
+    line-height  : @fixedLineHeight;
   }
 
-  .fr-new-button {
-    .btn:hover, .btn:focus, .btn:active, .btn.active, .open > .dropdown-toggle.btn {
-      color: #fff !important;
-      background-color: #0b5ed7 !important;
-      border-color: #0a58ca !important;
+  // Orbeon's focus ring on all buttons, like Bootstrap 2
+  .btn:focus {
+    box-shadow: var(--orbeon-focus-ring);
+  }
+
+  // Bootstrap 2's .btn-mini (row-menu carets); after .btn so it wins the same-specificity tie
+  .btn-mini {
+    padding: var(--orbeon-button-compact-padding);
+  }
+
+  // But navbar toggles keep Bootstrap 5-style metrics, with Bootstrap 2's 15px navbar-link horizontal padding
+  // (.fr-navbar-home-link a above uses the same value)
+  .navbar .btn {
+    padding      : 5px 15px;
+    border-radius: 3px;
+    line-height  : 1.5;
+    margin-top   : 0; // a Bootstrap 2 host adds 5px here, inflating the embedded navbar
+  }
+
+  // Split buttons: fuse the inner corners, round the outer ones, narrower toggle padding, like Bootstrap 2
+  .btn-group > .btn { border-radius: var(--orbeon-button-inner-border-radius); }
+  .btn-group > .btn:first-child {
+    border-top-left-radius   : var(--orbeon-button-border-radius);
+    border-bottom-left-radius: var(--orbeon-button-border-radius);
+  }
+  .btn-group > .btn:last-child,
+  .btn-group > .dropdown-toggle {
+    border-top-right-radius   : var(--orbeon-button-border-radius);
+    border-bottom-right-radius: var(--orbeon-button-border-radius);
+  }
+  .btn-group > .btn + .dropdown-toggle {
+    padding: var(--orbeon-button-toggle-padding);
+  }
+  // Bootstrap 2's subtle light separator between a split button and its caret segment
+  .btn-group > .dropdown-toggle {
+    box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.125), inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+    &:focus {
+      box-shadow: var(--orbeon-focus-ring); // the separator would otherwise mask the focus ring
     }
+  }
+
+  // Bootstrap 2's 5px gap between adjacent button groups (e.g. the search toolbar buttons)
+  .btn-group + .btn-group {
+    margin-left: 5px;
   }
 
   // Use `.btn-link` instead of `.xforms-trigger` to catch cases where used directly in an `<xf:button>`
@@ -190,41 +739,141 @@
     opacity: 0.4;
   }
 
-  // Adapt pagination to use of xf:trigger
-  .pagination li {
-    & > .xforms-trigger {
-      cursor: pointer
+  // Bootstrap 2's .pagination-centered (wizard/TOC navigation), dropped by Bootstrap 5
+  .pagination-centered {
+    text-align: center;
+  }
+
+  // Pagination: fr:pager emits Bootstrap 2's <div class="pagination"><ul><li> structure, which Bootstrap 5 doesn't
+  // style; replicate the Bootstrap 2 layout.
+  .pagination {
+    margin: 0; // as a flex item in the summary toolbar, a margin would inflate the row
+
+    ul {
+      display: inline-block;
+      vertical-align: top; // avoid the inline-block baseline gap, which would misalign the pager with the buttons
+      margin-bottom: 0;
+      margin-left: 0;
+      padding-left: 0;
+      list-style: none;
     }
 
-    & > .xforms-trigger.xforms-readonly {
-      cursor: auto;
+    ul > li {
+      display: inline;
+
+      & > .xforms-trigger {
+        cursor: pointer;
+      }
+
+      & > .xforms-trigger.xforms-readonly {
+        cursor: auto;
+      }
     }
 
-    .btn-link {
+    ul > li > a,
+    ul > li > span {
+      float: left;
+      padding: 5px 8px; // narrower than Bootstrap 2's 12px so the icon-only cells stay roughly square
+      line-height: 20px;
       text-decoration: none;
-      background-color: #fff;
+      background-color: var(--orbeon-base-background-color);
+      border: 1px solid var(--orbeon-base-border-color);
+      border-left-width: 0;
     }
 
-    // NOTE: Updated for Bootstrap 5
-    > .btn-link, > span {
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      background-color: #fff;
+    ul > li:first-child > a,
+    ul > li:first-child > span {
+      border-left-width: 1px;
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
     }
 
-    // Reset rules that can be applied by external Bootstrap .pagination a rule
+    ul > li:last-child > a,
+    ul > li:last-child > span {
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+    }
+
+    // The trigger is a .btn-link inside the wrapping <span>, which carries the cell look; reset it
     span .btn-link {
       padding: 0;
       border: none;
       line-height: normal;
+      text-decoration: none;
+      background-color: transparent;
     }
-  }
 
-  .pagination .disabled {
-    > span {
+    .disabled > span {
       &, & > button {
         background-color: transparent;
       }
+    }
+  }
+
+  // Tables: Bootstrap 2's separated, rounded borders. Bootstrap 5 collapses borders and draws them on the cells;
+  // neutralize that model and re-apply Bootstrap 2's .table/.table-bordered rules.
+  .table > :not(caption) > * > * {
+    border-width: 0;
+    box-shadow: none;
+  }
+
+  // Remove Bootstrap 5's heavy 2px header/body separator (Bootstrap 2's is the light 1px cell border)
+  .table > :not(:first-child) {
+    border-top: 0;
+  }
+
+  // Bootstrap 2's .table-condensed padding (ignored by Bootstrap 5), so the link <a> drives the row height and its text
+  // centers
+  .table-condensed th,
+  .table-condensed td {
+    padding: 4px 5px;
+  }
+
+  .table {
+    th, td {
+      border-top: 1px solid var(--orbeon-table-border-color);
+    }
+
+    // No top border on the first row (it sits directly under the header)
+    thead:first-child tr:first-child > th,
+    thead:first-child tr:first-child > td,
+    tbody:first-child tr:first-child > th,
+    tbody:first-child tr:first-child > td {
+      border-top: 0;
+    }
+  }
+
+  .table-bordered {
+    border: 1px solid var(--orbeon-table-border-color);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-left: 0;
+    border-radius: 4px;
+
+    th, td {
+      border-left: 1px solid var(--orbeon-table-border-color);
+    }
+
+    // Rounded outer corners (first/last cell of first/last row)
+    thead:first-child tr:first-child > th:first-child,
+    tbody:first-child tr:first-child > td:first-child,
+    tbody:first-child tr:first-child > th:first-child {
+      border-top-left-radius: 4px;
+    }
+    thead:first-child tr:first-child > th:last-child,
+    tbody:first-child tr:first-child > td:last-child,
+    tbody:first-child tr:first-child > th:last-child {
+      border-top-right-radius: 4px;
+    }
+    thead:last-child tr:last-child > th:first-child,
+    tbody:last-child tr:last-child > td:first-child,
+    tbody:last-child tr:last-child > th:first-child {
+      border-bottom-left-radius: 4px;
+    }
+    thead:last-child tr:last-child > th:last-child,
+    tbody:last-child tr:last-child > td:last-child,
+    tbody:last-child tr:last-child > th:last-child {
+      border-bottom-right-radius: 4px;
     }
   }
 
@@ -240,13 +889,33 @@
       h1 {
         font-size: var(--orbeon-navbar-heading-font-size);
         font-weight: @frNavBarFontWeight;
+        .text-overflow(); // in narrow mode the title must ellipsize, not wrap, or the fixed navbar gets tall
       }
     }
 
     --orbeon-button-color: var(--orbeon-navbar-color); // For dropdown toggles, which use .btn
   }
 
-  // TODO: use common LESS section for both Bootstrap 2 and 5
+  // Bootstrap 2 alert box: size, fixed line height, and base colors (Bootstrap 5's plain .alert is transparent and
+  // ~10px taller)
+  .alert {
+    margin-bottom: (@fixedLineHeight / 2);
+    @media screen {
+      margin-bottom: ~"calc(@{fluidLineHeight} / 2)";
+    }
+    padding: 8px 1em; // Bootstrap 2 had asymmetric 8px 35px 8px 14px here; unclear why, not reproduced
+    border-radius: 4px;
+
+    line-height: @fixedLineHeight;
+    @media screen {
+      line-height: ~"@{fluidLineHeight}";
+    }
+
+    color            : var(--orbeon-alert-color);
+    background-color : var(--orbeon-alert-background-color);
+    border           : 1px solid var(--orbeon-alert-border-color);
+    text-shadow      : 0 1px 0 var(--orbeon-alert-text-shadow-color);
+  }
 
   .alert-error, .alert-danger {
     color            : var(--orbeon-alert-error-color);
@@ -264,6 +933,30 @@
     color            : var(--orbeon-alert-warning-color);
     background-color : var(--orbeon-alert-warning-background-color);
     border-color     : var(--orbeon-alert-warning-border-color);
+  }
+
+  // Bootstrap 2 sized the progress bar in px; Bootstrap 5 uses rem, so it comes out ~35% shorter at our 13px base
+  .progress {
+    height: 20px;
+    font-size: 12px; // for the percentage shown over the upload progress bar
+    border-radius: 4px;
+    background-color: var(--orbeon-progress-background-color);
+  }
+
+  .progress-bar {
+    background-color: var(--orbeon-progress-bar-background-color);
+    height: 100%;              // Bootstrap 5 sizes the bar as a flex item, so it collapses in a non-flex container
+  }
+
+  // Wizard/TOC: block list with full-width items, like Bootstrap 2 (Bootstrap 5's .nav is flex, so items would shrink
+  // to their content width)
+  .fr-wizard-toc .nav,
+  .fr-toc .nav {
+    display: block;
+  }
+  .fr-wizard-toc .nav > li > span > .btn-link,
+  .fr-toc .nav > li > span > .btn-link {
+    width: 100%;
   }
 
   .dark-mode({

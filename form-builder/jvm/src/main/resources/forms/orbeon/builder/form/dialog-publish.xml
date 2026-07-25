@@ -232,7 +232,9 @@
                         <xh:button class="btn fb-publish-open-new" data-href="{xxf:rewrite-render-url(concat('/fr/', $app, '/', $form, '/new', $version-param))}">
                             <xf:output value="$form-resources/dialog-publish/open-new"/>
                         </xh:button>
-                        <xh:button class="btn dropdown-toggle" data-toggle="dropdown">
+                        <!-- data-bs-reference="parent" anchors the menu to the whole .btn-group; without it Popper
+                             aligns it with the narrow caret button -->
+                        <xh:button class="btn dropdown-toggle" data-bs-toggle="dropdown" data-bs-reference="parent">
                             <xh:span class="caret"/>
                         </xh:button>
                         <xh:ul class="dropdown-menu">

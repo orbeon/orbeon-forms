@@ -10,7 +10,6 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-@import (reference) "../../../../../../../bootstrap-src/less/variables";
 @import (reference) "form-runner-common";
 
 @spacing: 10px; // same as .fr-border
@@ -216,7 +215,7 @@
             box-shadow: none;
             white-space: nowrap;
 
-            // Bold by default in Bootstrap and overridden to "normal" in form-runner-bootstrap-override.less
+            // Not as heavy as Bootstrap's default bold
             font-weight: 500;
 
             div {
@@ -361,6 +360,9 @@
   // TODO: use same styling as in form-runner-home?
   .pagination {
     .fr-paging-numbers > span {
+      // content-box so min-width reserves *content* room for the digits; border-box would fold the padding/border in
+      // and re-introduce the size jump while paging
+      box-sizing: content-box;
       min-width: 105px; // try to allow at least 3 times 3 digits so the size doesn't change too much when paging
       text-align: center;
     }

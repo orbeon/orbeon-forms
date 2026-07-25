@@ -23,6 +23,20 @@
         }
     }
 
+    // wPaint sizes its toolbar buttons expecting content-box; Bootstrap 5's global border-box shrinks them and crops
+    // their icons
+    ._wPaint_menu,
+    ._wPaint_menu * {
+        box-sizing: content-box;
+    }
+
+    // ...except its form controls (e.g. the line-width <select>), which wPaint sizes as border-box
+    ._wPaint_menu select,
+    ._wPaint_menu input,
+    ._wPaint_menu textarea {
+        box-sizing: border-box;
+    }
+
     // Make rules stronger than `.orbeon .fr-density-* .xbl-fr-grid .fr-grid .xforms-mediatype-image`
     .xbl-fr-grid .fr-grid {
         .xbl-fr-wpaint {

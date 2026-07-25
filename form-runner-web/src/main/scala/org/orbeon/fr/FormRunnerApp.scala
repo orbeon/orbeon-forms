@@ -84,10 +84,10 @@ object FormRunnerApp extends App {
     xbl.Timestamp
 
     DomSupport.atLeastDomReadyStateF(document, DomSupport.DomReadyState.Interactive) foreach { _ =>
-      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .navbar-fixed-top"            , addScrollPadding(_, "scroll-padding-top"))
-      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-buttons"                  , addScrollPadding(_, "scroll-padding-bottom"))
-      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-session-expiration-dialog", initSessionExpirationDialog)
-      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-duplicate-tab-dialog",      initDuplicateTabDialog)
+      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .navbar.fixed-top, .orbeon .navbar-fixed-top", addScrollPadding(_, "scroll-padding-top"))
+      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-buttons"                                 , addScrollPadding(_, "scroll-padding-bottom"))
+      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-session-expiration-dialog"               , initSessionExpirationDialog)
+      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-duplicate-tab-dialog"                    , initDuplicateTabDialog)
     }
   }
 

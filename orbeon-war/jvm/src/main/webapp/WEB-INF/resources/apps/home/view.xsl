@@ -25,8 +25,8 @@
         <xh:html>
             <xh:head>
                 <xh:title><xsl:value-of select="@title"/></xh:title>
-                <xh:link rel="stylesheet" type="text/css" href="/fr/style/bootstrap/css/bootstrap.css"/>
-                <xh:link rel="stylesheet" type="text/css" href="/fr/style/form-runner-bootstrap-override.css"/>
+                <xh:link rel="stylesheet" type="text/css" href="/fr/style/bootstrap-5.1.3-orbeon/css/bootstrap.css"/>
+                <xh:link rel="stylesheet" type="text/css" href="/fr/style/form-runner-bootstrap5-override.css"/>
                 <xh:link rel="stylesheet" type="text/css" href="/home/home.css"/>
                 <xh:script type="text/javascript" src="/webjars/jquery/3.6.1/dist/jquery.min.js"/>
             </xh:head>

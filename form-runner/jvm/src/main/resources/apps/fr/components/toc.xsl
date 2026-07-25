@@ -404,14 +404,14 @@
                 <xsl:choose>
                     <xsl:when test="$static-subsections-toc = 'all' and exists(.//fr:section)">
                         <xh:div role="navigation">
-                            <xh:ul class="nav nav-list">
+                            <xh:ul class="nav">
                                 <xsl:apply-templates mode="fr-toc-sections"/>
                             </xh:ul>
                         </xh:div>
                     </xsl:when>
                     <xsl:when test="$static-subsections-toc = 'active' and exists(.//fr:section)">
                         <xh:div role="navigation">
-                            <xh:ul class="nav nav-list{{' xforms-hidden'[not($top-level-section-active)]}}">
+                            <xh:ul class="nav{{' xforms-hidden'[not($top-level-section-active)]}}">
                                 <xsl:apply-templates mode="fr-toc-sections"/>
                             </xh:ul>
                         </xh:div>

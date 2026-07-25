@@ -19,7 +19,7 @@ import org.orbeon.xbl.DndRepeat.*
 import org.orbeon.xforms.*
 import org.orbeon.xforms.KeyboardShortcuts.KeyBoardIconCharacter
 import org.orbeon.xforms.XFormsXbl
-import org.orbeon.xforms.facade.XBLCompanion
+import org.orbeon.xforms.facade.{Bootstrap, XBLCompanion}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.html.Element
@@ -213,10 +213,10 @@ object Tabbable {
         def setTooltip(position: Int, title: String): Unit =
           allLis.lift(position).foreach(_.querySelectorOpt("a").foreach { aElem =>
             aElem.setAttribute("title", title)
-            $(aElem).asInstanceOf[js.Dynamic].tooltip()
+            Bootstrap.newTooltip(aElem, js.Dynamic.literal(title = title))
           })
 
-        allLis.foreach(_.querySelectorAllT("a").foreach($(_).asInstanceOf[js.Dynamic].tooltip("destroy")))
+        allLis.foreach(_.querySelectorAllT("a").foreach(aElem => Bootstrap.getTooltip(aElem).foreach(_.destroy())))
         setTooltip(tabPosition + 1, nextTabShortcut)
         setTooltip(tabPosition - 1, previousTabShortcut)
       }

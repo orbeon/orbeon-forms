@@ -479,41 +479,12 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="fr:navbar[not($bs5)]" name="fr-navbar">
-        <xf:group
-                xxf:element="div"
-                model="fr-form-model"
-                ref=".[not(xxf:property(string-join(('oxf.fr.detail.hide-header', fr:app-name(), fr:form-name()), '.')))]"
-                class="navbar navbar-inverse navbar-fixed-top">
-            <xh:div class="navbar-inner">
-                <xh:div class="container">
-                    <xsl:variable name="default-objects" as="element()+">
-                        <fr:goto-content/>
-                        <!-- These are typically to the left -->
-                        <fr:logo/>
-                        <fr:title/>
-                        <!-- These are typically to the right -->
-                        <fr:language-selector/>
-                        <fr:navbar-workflow-stage/>
-                        <fr:share-icon/>
-                        <fr:revision-history-icon/>
-                        <fr:status-icons/>
-                        <fr:user-nav/>
-                        <fr:navbar-home-link/>
-                    </xsl:variable>
-
-                    <xsl:apply-templates select="$default-objects"/>
-                </xh:div>
-            </xh:div>
-        </xf:group>
-    </xsl:template>
-
-    <xsl:template match="fr:navbar[$bs5]" name="fr-navbar5">
+    <xsl:template match="fr:navbar" name="fr-navbar">
         <xf:group
             xxf:element="nav"
             model="fr-form-model"
             ref=".[not(xxf:property(string-join(('oxf.fr.detail.hide-header', fr:app-name(), fr:form-name()), '.')))]"
-            class="navbar navbar-expand-lg {if ($bs5) then 'fixed-top' else 'position-sticky'}">
+            class="navbar navbar-expand fixed-top">
             <xh:div class="container-fluid">
                 <xsl:variable name="default-objects" as="element()+">
                     <fr:goto-content/>
@@ -524,23 +495,30 @@
                         <xh:span class="navbar-toggler-icon"></xh:span>
                     </xh:button>
                     <xh:div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <xh:ul class="navbar-nav {if ($bs5) then 'ms-auto mt-2 mt-lg-0' else 'me-auto mb-2 mb-lg-0'}">
-                            <xh:li class="nav-item px-0 ps-lg-3 py-1 py-lg-1">
+                        <xh:ul class="navbar-nav ms-auto">
+                            <xh:li class="nav-item px-0 py-1 py-lg-1">
                                 <fr:language-selector appearance="bootstrap5" fr:dropdown-align="right"/>
                             </xh:li>
-                            <xh:li>
+                            <!-- Optional items; each hides itself when disabled/non-relevant, and the CSS collapses
+                                 the then-empty <li> -->
+                            <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
+                                <fr:navbar-workflow-stage/>
+                            </xh:li>
+                            <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
+                                <fr:share-icon/>
+                            </xh:li>
+                            <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
+                                <fr:revision-history-icon/>
+                            </xh:li>
+                            <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
                                 <fr:status-icons/>
                             </xh:li>
-                            <xh:li class="nav-item {if ($bs5) then 'px-0 ps-lg-3 py-1 py-lg-1 d-flex align-items-center' else ''}">
+                            <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
                                 <fr:user-nav/>
                             </xh:li>
-<!--                            <xh:li class="nav-item {if ($bs5) then 'px-3 d-flex align-items-center' else ''}">-->
-<!--                                <xh:div>-->
-<!--                                    <xh:a href="/fr/">-->
-<!--                                        <xh:i class="fa fa-fw fa-th"/>-->
-<!--                                    </xh:a>-->
-<!--                                </xh:div>-->
-<!--                            </xh:li>-->
+                            <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
+                                <fr:navbar-home-link/>
+                            </xh:li>
                         </xh:ul>
                     </xh:div>
                 </xsl:variable>
@@ -672,7 +650,7 @@
 
     <xsl:template match="fr:title" name="fr-title">
         <!-- Q: Why do we need @ref here? -->
-        <xh:h1 class="{if ($bs5) then 'text-white-50 mb-0' else ''}"><xf:output value="{if (exists(@ref)) then @ref else '$title'}"/></xh:h1>
+        <xh:h1 class="text-white-50 mb-0"><xf:output value="{if (exists(@ref)) then @ref else '$title'}"/></xh:h1>
     </xsl:template>
 
     <xsl:template match="fr:config-check" name="fr-config-check">
@@ -793,7 +771,7 @@
     </xsl:template>
 
     <xsl:template name="fr-user-nav-dropdown-content">
-        <xh:a id="menu-button" href="#" class="{if ($bs5) then 'btn btn-secondary' else ''} dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown">
+        <xh:a id="menu-button" href="#" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
             <xh:i class="fa fa-user"/>
         </xh:a>
         <xh:ul class="dropdown-menu dropdown-menu-end" role="menu" aria-labelledBy="menu-button">
@@ -821,8 +799,7 @@
                 </xh:a>
             </xh:li>
 
-            <!-- divider for BS2, dropdown-divider for BS5 -->
-            <xh:li role="presentation" class="divider dropdown-divider {{$logged-in-class}}"/>
+            <xh:li role="presentation" class="dropdown-divider {{$logged-in-class}}"/>
 
             <!-- Logout -->
             <xf:var
@@ -947,20 +924,9 @@
                 xxf:property('oxf.fr.authentication.user-menu.enable') and (: Q: Why is this not by app/form? :)
                 not(fr:is-embedded())
             ]">
-            <xsl:choose>
-                <xsl:when test="$bs5">
-                    <xh:div class="dropdown">
-                        <xsl:call-template name="fr-user-nav-dropdown-content"/>
-                    </xh:div>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xh:ul class="nav pull-right">
-                        <xh:li class="dropdown">
-                            <xsl:call-template name="fr-user-nav-dropdown-content"/>
-                        </xh:li>
-                    </xh:ul>
-                </xsl:otherwise>
-            </xsl:choose>
+            <xh:div class="dropdown">
+                <xsl:call-template name="fr-user-nav-dropdown-content"/>
+            </xh:div>
         </xf:group>
     </xsl:template>
 
@@ -973,11 +939,7 @@
                 xxf:property('oxf.fr.navbar.home-link.enable') and
                 not(fr:is-embedded())">
             <xf:case value="true()">
-                <xh:ul class="nav">
-                    <xh:li class="">
-                        <xh:a href="/fr/" title="{{xxf:r('landing.title', '|fr-fr-resources|')}}"><xh:i class="fa fa-th"/></xh:a>
-                    </xh:li>
-                </xh:ul>
+                <xh:a href="/fr/" title="{{xxf:r('landing.title', '|fr-fr-resources|')}}"><xh:i class="fa fa-th"/></xh:a>
             </xf:case>
             <xf:case value="false()"/>
         </xf:switch>
@@ -1368,7 +1330,7 @@
     <xsl:template match="fr:toc[exists($toc-position-opt)]" name="fr-toc">
         <!-- This is statically built in XSLT instead of using XForms -->
         <xh:div class="fr-toc sidebar-nav">
-            <xh:ul class="nav nav-list">
+            <xh:ul class="nav">
                 <xh:li class="nav-header"><xf:output ref="$fr-resources/summary/titles/toc"/></xh:li>
                 <xsl:apply-templates select="$body" mode="fr-toc-sections">
                     <xsl:with-param name="is-wizard"              select="false()" tunnel="yes"/>

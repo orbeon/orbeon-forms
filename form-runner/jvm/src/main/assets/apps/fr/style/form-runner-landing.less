@@ -30,7 +30,7 @@ html {
     }
 
     .fr-config-check {
-        margin-top: 1rem;
+        margin-top: 13px;  // was 1rem at the 13px base
     }
 
     a {
@@ -85,7 +85,7 @@ html {
             text-overflow: ellipsis;
         }
         &:has(a:focus-visible) {
-            box-shadow: 0 0 0 0.2rem inset var(--orbeon-focus-highlight-color);
+            box-shadow: 0 0 0 3px inset var(--orbeon-focus-highlight-color);
         }
     }
 
@@ -123,12 +123,28 @@ html {
         }
     }
 
-    .card-footer .xforms-label {
-        margin-right: .2rem;
+    // .xforms-output in the selector out-specifies the Bootstrap 5 override's label-styles port, so the Bootstrap 2
+    // card-footer look (bold, muted color) wins
+    .card-footer .xforms-output .xforms-label {
+        margin-right: 3px;
         font-weight: bold;
+        color: inherit;      // muted footer color from the enclosing <small class="text-muted">
         &:after {
             content: ":"
         }
+    }
+
+    // The Created/Modified values are <output class="xforms-field">, which the Bootstrap 5 override boxes like a
+    // read-only field; in the card footer show them as plain inline text, like Bootstrap 2
+    .card-footer .xforms-field {
+        width: auto;
+        min-height: 0;
+        padding: 0;
+        border: 0;
+        background-color: transparent;
+        box-shadow: none;
+        cursor: default;
+        color: inherit; // muted footer color from the enclosing <small class="text-muted">
     }
 
     // 2022-11-28: This will not work with Firefox yet but it's cosmetic
@@ -186,7 +202,7 @@ html {
     }
 
     figure:hover .img-thumbnail {
-        padding: 1rem; // Make image larger on hover by reducing padding
+        padding: 13px; // was 1rem at the 13px base. Make image larger on hover by reducing padding
     }
 
     .card-body {

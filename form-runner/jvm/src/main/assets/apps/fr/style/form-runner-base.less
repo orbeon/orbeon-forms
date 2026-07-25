@@ -41,16 +41,44 @@
 
     .container, .container-fluid {
         padding: 0 0.75em;
-        .row, .row-fluid {
-        }
     }
 
-    // Revert some aspects of `.navbar-fixed-top` when embedded
-    &.orbeon-portlet-div .navbar.navbar-fixed-top {
+    // Embedded: un-fix the navbar so it flows at the top of the embedded area
+    &.orbeon-portlet-div .navbar.fixed-top {
         position: static;
         margin-bottom: 10px;
-        .navbar-inner {
-            border-radius: 4px;
+        border-radius: 4px; // as Bootstrap 2's .navbar-inner
+    }
+
+    // Embedded: undo styles that a host page's CSS may set on these generic names. :where() keeps their specificity
+    // low, so they can't override other Orbeon rules; they still override the host's rules because Orbeon's CSS loads
+    // after the host's.
+    :where(&.orbeon-portlet-div) {
+        .navbar-collapse {
+            height: auto;
+            overflow: visible;
+        }
+        .row > .span12 {
+            float: none;
+            margin-left: 0;
+        }
+        .btn, .btn:hover, .btn:focus, .btn:active {
+            box-shadow: none;
+            background-image: none;
+        }
+        label {
+            font-size: inherit;
+            line-height: inherit;
+        }
+        .input-prepend, .input-append {
+            font-size: inherit;
+        }
+        ul, ol {
+            margin-left: 0;
+        }
+        .caret {
+            display: inline;
+            border: 0;
         }
     }
 
@@ -68,7 +96,7 @@
             margin: 0;
         }
 
-        // Here so that this applies to both BS2 and BS5
+        // Historically here so it applied to both Bootstrap versions
         .navbar-brand {
             img {
                 max-height: 20px;
@@ -369,66 +397,73 @@
             .fr-width-2digits input.xforms-input-input, .fr-width-2digits select  { width: 30px; .xforms-mobile& { width: 32px } }
             .fr-width-4digits input.xforms-input-input, .fr-width-4digits select  { width: 47px; .xforms-mobile& { width: 54px } }
         }
+    }
 
-        .xforms-help-popover {
-            // Reset to Form Runner default, as those properties as otherwise influenced by the place where the popover
-            // is used, e.g. they won't be correct when the popover is for a section title
-            font-size  : var(--orbeon-base-font-size);
-            font-family: var(--orbeon-help-font-family);
-            line-height: @fluidLineHeight;
-            background-color: var(--orbeon-help-background-color);
-            border-color: var(--orbeon-help-border-color);
-            // Override Bootstrap's default z-index (1010) to be above the navbar which is at 1030
-            z-index: 1040;
+    // Bootstrap 5 appends the popover to <body>, outside #fr-view, so scope to .orbeon. Bootstrap 5 class names.
+    .xforms-help-popover {
+        // Reset to Form Runner defaults; these otherwise inherit from where the popover is used (e.g. a section title)
+        font-size  : var(--orbeon-base-font-size);
+        font-family: var(--orbeon-help-font-family);
+        line-height: @fluidLineHeight;
+        background-color: var(--orbeon-help-background-color);
+        border-color: var(--orbeon-help-border-color);
+        // Override Bootstrap's default z-index (1010) to be above the navbar which is at 1030
+        z-index: 1040;
 
-            .popover-title {
-                font-size: var(--orbeon-help-title-font-size);
-                font-weight: var(--orbeon-help-title-font-weight);
-                line-height: 1.3; // Override Bootstrap's value (18px for a font size of 14px)
-                color: var(--orbeon-help-title-color);
-                background-color: var(--orbeon-help-title-background-color);
-                border-bottom-color: var(--orbeon-help-title-border-color);
+        .popover-header {
+            font-size: var(--orbeon-help-title-font-size);
+            font-weight: var(--orbeon-help-title-font-weight);
+            line-height: 1.3; // Override Bootstrap's value (18px for a font size of 14px)
+            color: var(--orbeon-help-title-color);
+            background-color: var(--orbeon-help-title-background-color);
+            border-bottom-color: var(--orbeon-help-title-border-color);
+        }
+
+        .popover-body {
+            font-size: var(--orbeon-help-content-font-size);
+            font-weight: var(--orbeon-help-content-font-weight);
+            color: var(--orbeon-help-content-color);
+        }
+
+        // Bootstrap 5 arrow: ::before is the border triangle, ::after the fill
+        &.bs-popover-top .popover-arrow {
+            &::before { border-top-color: var(--orbeon-help-border-color); }
+            &::after  { border-top-color: var(--orbeon-help-background-color); }
+        }
+
+        &.bs-popover-end .popover-arrow {
+            &::before { border-right-color: var(--orbeon-help-border-color); }
+            &::after  { border-right-color: var(--orbeon-help-background-color); }
+        }
+
+        &.bs-popover-bottom .popover-arrow {
+            &::before { border-bottom-color: var(--orbeon-help-border-color); }
+            &::after  { border-bottom-color: var(--orbeon-help-background-color); }
+        }
+
+        &.bs-popover-start .popover-arrow {
+            &::before { border-left-color: var(--orbeon-help-border-color); }
+            &::after  { border-left-color: var(--orbeon-help-background-color); }
+        }
+
+        // Bootstrap 5 has no .close (now .btn-close), so restyle the '×' button added by Help.scala like Bootstrap 2's
+        .close {
+            float: right;
+            padding: 5px 10px; // also extends the clickable area
+            border: 0;
+            background: transparent;
+            appearance: none;
+            font-size: 20px;
+            font-weight: bold;
+            line-height: 20px;
+            cursor: pointer;
+            opacity: 0.2;
+            text-shadow: 0 1px 0 var(--orbeon-help-close-text-shadow-color);
+            &, &:hover, &:focus {
+                color: var(--orbeon-help-close-color);
             }
-
-            .popover-content {
-                font-size: var(--orbeon-help-content-font-size);
-                font-weight: var(--orbeon-help-content-font-weight);
-                color: var(--orbeon-help-content-color);
-            }
-
-            &.popover.top .arrow {
-                border-top-color: var(--orbeon-help-border-color);
-                &:after {
-                    border-top-color: var(--orbeon-help-background-color);
-                }
-            }
-
-            &.popover.right .arrow {
-                border-right-color: var(--orbeon-help-border-color);
-                &:after {
-                    border-right-color: var(--orbeon-help-background-color);
-                }
-            }
-
-            &.popover.bottom .arrow {
-                border-bottom-color: var(--orbeon-help-border-color);
-                &:after {
-                    border-bottom-color: var(--orbeon-help-background-color);
-                }
-            }
-
-            &.popover.left .arrow {
-                border-left-color: var(--orbeon-help-border-color);
-                &:after {
-                    border-left-color: var(--orbeon-help-background-color);
-                }
-            }
-
-            .close {
-                text-shadow: 0 1px 0 var(--orbeon-help-close-text-shadow-color);
-                &, &:hover, &:focus {
-                    color: var(--orbeon-help-close-color);
-                }
+            &:hover, &:focus {
+                opacity: 0.5;
             }
         }
     }
@@ -496,7 +531,7 @@
         }
 
         .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html {
-            padding: 0; // reset padding added in form-runner-bootstrap-override.less
+            padding: 0; // no field padding for the formatted-text output
         }
     }
 
@@ -524,6 +559,10 @@
 
     .orbeon {
         body& {
+            // Bootstrap 2's inherited 20px body line height; the PDF renderer drops Bootstrap 5's var()-based
+            // equivalent
+            line-height: @fixedLineHeight;
+
             .fr-view {
                 padding-top: 0; // remove padding added above
             }
@@ -532,6 +571,42 @@
         .container {
             width: 100%;
             box-sizing: border-box;
+            max-width: none; // in print the view fills the page (neutralize Bootstrap 5's responsive caps)
+        }
+
+        // Zero Bootstrap 5's row gutters in print: the PDF renderer mishandles the negative-margin/ padding
+        // cancellation and would narrow the content by one gutter
+        .row {
+            margin-left: 0;
+            margin-right: 0;
+            > .span12 {
+                padding-left: 0;
+                padding-right: 0;
+            }
+        }
+
+        // Print metrics of the static readonly textarea pre, ported from the former Bootstrap 2 override with the same
+        // winning specificity (over grid.less's 24px print line height)
+        .fr-mode-view, .fr-mode-pdf {
+            .fr-grid .xforms-static.xforms-readonly.xforms-textarea pre {
+                padding: ((@fixedLineHeight - 1px) / 2);
+                margin: 0 0 (@fixedLineHeight / 2);
+                line-height: @fixedLineHeight;
+            }
+
+            // Fixed line height for the formatted-text output (Bootstrap 2 inherited 20px from the body)
+            .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html > .xforms-output-output {
+                line-height: @fixedLineHeight;
+            }
+
+            // Bootstrap 2's 10px typography margins (Bootstrap 5's 1rem resolves against the renderer's 16px root); the
+            // list indent already matches via Bootstrap 5's padding-left
+            p {
+                margin: 0 0 (@fixedLineHeight / 2);
+            }
+            ul, ol {
+                margin-bottom: (@fixedLineHeight / 2);
+            }
         }
     }
 
@@ -564,9 +639,38 @@
         }
     }
 
+    // In PDF the logo/title move to the running page header, so the in-body navbar must not reserve vertical space (the
+    // Bootstrap 2 navbar was collapsed by its .navbar-inner rules)
+    .orbeon .fr-mode-pdf .navbar {
+        min-height: 0;
+        padding: 10px 0;
+        margin: 0;
+        border: 0;
+
+        // Interactive-only items; the logo/title sit outside the collapse and survive
+        .navbar-toggler, .navbar-collapse { display: none; }
+
+        // No gutter, so the title aligns with the content edge, like Bootstrap 2
+        .container-fluid {
+            padding-left: 0;
+            padding-right: 0;
+        }
+    }
+
+    // Bootstrap 2's 3px .nav-list TOC item padding, on the <li> (the trigger is inline in PDF); [aria-current] skips
+    // the empty placeholder <li>s (the renderer doesn't support :not())
+    .orbeon .fr-toc .nav > li[aria-current] {
+        padding-top: 3px;
+        padding-bottom: 3px;
+    }
+
     // https://github.com/orbeon/orbeon-forms/issues/7255
     .orbeon .fr-mode-pdf .navbar .navbar-brand img {
         max-height: none;
+        // Keep the running-header logo at its intended size: the Bootstrap 5 override's img { height: auto } would
+        // otherwise beat .navbar img below (same specificity, later file)
+        height: @pageTopAndBottomHeight;
+        width: auto;
     }
 
     .navbar img {

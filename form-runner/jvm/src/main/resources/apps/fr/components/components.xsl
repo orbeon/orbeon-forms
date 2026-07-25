@@ -76,13 +76,11 @@
     <xsl:variable name="is-detail"           select="$major-mode = 'detail'"                as="xs:boolean"/>
     <xsl:variable name="is-summary"          select="$major-mode = 'summary'"               as="xs:boolean"/>
     <xsl:variable name="is-landing"          select="$major-mode = 'landing'"               as="xs:boolean"/>
+    <xsl:variable name="is-home"             select="$major-mode = 'home'"                  as="xs:boolean"/>
     <xsl:variable name="is-import"           select="$major-mode = 'import'"                as="xs:boolean"/>
     <xsl:variable name="is-validate"         select="$major-mode = 'validate'"              as="xs:boolean"/>
 
     <xsl:variable name="is-form-builder"     select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
-
-    <!-- For now, only enable Bootstrap 5 for the landing page -->
-    <xsl:variable name="bs5"                 select="$is-landing"                           as="xs:boolean"/>
 
     <xsl:variable name="input-data" select="/*" as="element(xh:html)"/>
 
@@ -222,11 +220,7 @@
             let $updates :=
                 for $update in (
                     'fr',
-                     'fb'[$is-form-builder and $is-detail],
-                     (:  For now let those depend on $bs5 :)
-                     'landing'[$is-landing and $bs5],
-                     'summary'[$is-summary and $bs5], (: 2024-06-13: not used yet :)
-                     'detail'[$is-detail and $bs5]    (: 2024-06-13: not used yet :)
+                     'fb'[$is-form-builder and $is-detail]
                  )
                 return p:property(concat('oxf.xforms.assets.baseline.updates.', $update))
             return string-join($updates, ' ')

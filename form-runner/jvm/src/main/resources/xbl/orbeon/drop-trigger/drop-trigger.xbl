@@ -45,7 +45,9 @@
                       title="Keyboard shortcut"
                       data-orbeon-keyboard-shortcut="{xxf:property(concat('oxf.fr.detail.button.keyboard-shortcut.', $items[1]/value))}"/>
               </xh:button>
-              <xh:button class="btn dropdown-toggle" data-toggle="dropdown">
+              <!-- data-bs-reference="parent" anchors the menu to the whole .btn-group; without it Popper aligns it
+                   with the narrow caret button -->
+              <xh:button class="btn dropdown-toggle" data-bs-toggle="dropdown" data-bs-reference="parent">
                   <xh:span class="caret"/>
               </xh:button>
               <xh:ul class="dropdown-menu">

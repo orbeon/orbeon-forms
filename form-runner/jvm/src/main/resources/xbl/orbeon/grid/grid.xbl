@@ -51,7 +51,7 @@
         <!-- Keep a single global copy of the grid row menu. It is moved around as needed. -->
         <xxbl:global>
             <div class="dropdown fr-grid-dropdown-menu" xmlns="http://www.w3.org/1999/xhtml">
-                <button class="btn btn-mini dropdown-toggle xforms-hidden" data-toggle="dropdown" tabindex="-1" aria-expanded="false">
+                <button class="btn btn-mini dropdown-toggle xforms-hidden" data-bs-toggle="dropdown" data-bs-display="static" tabindex="-1" aria-expanded="false">
                     <span class="caret"/>
                 </button>
                 <ul class="dropdown-menu" role="menu">

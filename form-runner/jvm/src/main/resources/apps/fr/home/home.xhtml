@@ -989,7 +989,7 @@
                                 xxf:element="div">
                                 <div class="btn-group">
 
-                                    <button id="select-button" class="btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <button id="select-button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                         <xf:output value="$fr-resources/summary/titles/selected"/>
                                         <xh:span class="badge badge-info" title="Documents Selected">
                                             <xf:output value="count($selection)"/>
@@ -1138,7 +1138,7 @@
 
                                 <div class="btn-group">
 
-                                    <button id="operations-button" class="btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <button id="operations-button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                         <xf:output value="$fr-resources/home/buttons/operation"/>
                                         <span class="caret"/>
                                     </button>
@@ -1301,8 +1301,8 @@
                                                     )
                                                 )"/>
                                         <xf:var name="percent" value="document-current div document-total * 100"/>
-                                        <xh:div class="progress progress-striped active">
-                                          <xh:div class="bar" style="width: {$percent}%;"/>
+                                        <xh:div class="progress">
+                                          <xh:div class="progress-bar progress-bar-striped progress-bar-animated" style="width: {$percent}%;"/>
                                         </xh:div>
                                     </xf:group>
 

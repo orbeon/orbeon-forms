@@ -10,8 +10,6 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-@import (reference) "../../../../../../../bootstrap-src/less/variables";
-@import (reference) "../../../../../../../bootstrap-src/less/mixins";
 @import (reference) "form-runner-common";
 
 body.orbeon { background-color: var(--orbeon-base-background-color); }
@@ -578,6 +576,7 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
 
                     .checkbox, .radio {
                         display: block; // https://github.com/orbeon/orbeon-forms/issues/5803
+                        padding-left: 1.5em; // offset the label past the glyph (Bootstrap 2's .checkbox/.radio padding)
                     }
                 }
                 .xforms-selected {

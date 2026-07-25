@@ -28,7 +28,7 @@
 
         <xbl:template>
             <xh:a
-                class="btn btn-success btn-large"
+                class="btn btn-success btn-lg"
                 href="#">
                 <xf:output
                     value="xxf:label('fr-output-download')"/>

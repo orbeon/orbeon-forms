@@ -128,6 +128,7 @@
             }
 
             .fr-page-number {
+                box-sizing: content-box; // so min-width reserves *content* room for the "N of M" text
                 min-width: 60px; // https://github.com/orbeon/orbeon-forms/issues/4165
                 .xforms-output-output {
                     white-space: nowrap;

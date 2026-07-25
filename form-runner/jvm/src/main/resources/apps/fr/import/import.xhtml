@@ -976,8 +976,8 @@
                             </xf:output>
                         </fr:c>
                         <fr:c x="1" y="2" w="8">
-                            <xh:div class="progress progress-striped">
-                                <xh:div class="bar" style="width: {format-number(instance('fr-import-batch-stats')/progress, '###%')}"/>
+                            <xh:div class="progress">
+                                <xh:div class="progress-bar progress-bar-striped" style="width: {format-number(instance('fr-import-batch-stats')/progress, '###%')}"/>
                             </xh:div>
                         </fr:c>
                         <fr:c x="9" y="2" w="4">
@@ -1177,9 +1177,9 @@
                             </xf:output>
                         </fr:c>
                         <fr:c x="1" y="2" w="8">
-                            <xh:div class="progress progress-striped">
+                            <xh:div class="progress">
                                 <xh:div
-                                    class="bar"
+                                    class="progress-bar progress-bar-striped"
                                     style="width: {
                                         format-number(
                                             if (instance('fr-import-batch-stats')/total != 0) then

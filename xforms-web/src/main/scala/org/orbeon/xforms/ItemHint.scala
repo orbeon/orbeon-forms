@@ -1,9 +1,8 @@
 package org.orbeon.xforms
 
-import io.udash.wrappers.jquery.JQueryEvent
 import org.orbeon.web.DomSupport.*
+import org.orbeon.xforms.facade.Bootstrap
 import org.scalajs.dom
-import org.scalajs.dom.html
 
 import scala.scalajs.js
 
@@ -24,36 +23,29 @@ object ItemHint {
       .closestOpt(".xforms-form .xforms-items .xforms-hint-region")
       .foreach { hintRegionEl =>
 
-      val jHintRegionEl    = $(hintRegionEl)
-      val jHintRegionElDyn = jHintRegionEl.asInstanceOf[js.Dynamic]
-
       // `UndefOr` to try to avoid occasional error with fastOptJS but that doesn't seem to work; `.html()` is meant to
       // return a `String` but occasionally returns `undefined`, and that's probably the main problem. Should be ok
       // with `fullOptJS`.
       val hintHtml: js.UndefOr[String] = hintRegionEl.nextElementSiblings(".xforms-hint").nextOption().get.outerHTML
 
-      val tooltipData        = jHintRegionEl.data("tooltip").map(_.asInstanceOf[js.Dynamic]).orNull
+      val existingTooltipOpt = Bootstrap.getTooltip(hintRegionEl)
       val haveHint           = hintHtml.exists(_.nonEmpty)
-      val tooltipInitialized = tooltipData != null
 
-      // Compute placement, and don't use "over" since tooltips don't support it
+      // Compute placement, and don't use "over" since tooltips don't support it. As this is a function, it is
+      // re-evaluated on each show (Popper), so the placement stays optimal (e.g. flips from "bottom" to "top" as the
+      // control nears the top of the viewport when scrolling).
       val placement: js.Function = () => {
         val p = Placement.getPlacement(Placement.getPositionDetails(hintRegionEl))
         if (p == Placement.Over) "bottom" else p.entryName
       }
 
-      (haveHint, tooltipInitialized) match {
-        case (true, true) =>
-          // If already initialized:
-          // - Update the message (it might have changed, e.g. if the language changed).
-          // - Update the placement (it might have changed, e.g. the optimal placement might go from "bottom"
-          //   to "top" when the user scrolls down and the control becomes closer to the top of the viewport).
-          //   Also, we need to call `show()`, as the Bootstrap tooltip code gets the even before us, and otherwise
-          //   has it already has shown the tooltip without using the updated placement.
-          tooltipData.options.title = hintHtml
-          tooltipData.options.placement = placement
-          jHintRegionElDyn.tooltip("show")
-        case (true, false) =>
+      (haveHint, existingTooltipOpt) match {
+        case (true, Some(tooltip)) =>
+          // Already initialized: update the message (it might have changed, e.g. if the language changed), then re-show
+          // (the placement function is re-evaluated on show).
+          tooltip.updateTitle(hintHtml)
+          tooltip.show()
+        case (true, None) =>
           val containerEl =
             hintRegionEl.closestOpt(".fb-hover") match {
               case Some(parentFbHover) => parentFbHover.parentElement // Avoid super-narrow tooltip in Form Builder
@@ -61,37 +53,20 @@ object ItemHint {
             }
 
           // Create tooltip and show right away
-          jHintRegionElDyn.tooltip(js.Dynamic.literal(
+          val tooltip = Bootstrap.newTooltip(hintRegionEl, js.Dynamic.literal(
             title     = hintHtml,
             html      = true,
             animation = false,
             placement = placement,
-            container = $(containerEl)
+            container = containerEl
           ))
-          jHintRegionElDyn.on("shown", (_ => shiftTooltipLeft(containerEl, hintRegionEl)): js.Function1[JQueryEvent, Unit])
-          jHintRegionElDyn.tooltip("show")
-        case (false, true) =>
-          // We had a tooltip, but we don't have anything for show anymore
-          jHintRegionElDyn.tooltip("destroy")
-        case (false, false) =>
+          tooltip.show()
+        case (false, Some(tooltip)) =>
+          // We had a tooltip, but we don't have anything to show anymore
+          tooltip.destroy()
+        case (false, None) =>
         // NOP if not initialized and we don't have a tooltip
       }
     }
   )
-
-  /**
-   * Fixup position of tooltip element to be to the left of the checkbox/radio. Without this fixup, the tooltip is
-   * shown to the left of the hint region, so it shows over the checkbox/radio.
-   */
-  private def shiftTooltipLeft(containerEl: html.Element, hintRegionEl: html.Element): Unit =
-    containerEl.childrenT.find(_.matches(".tooltip.left")).foreach { tooltipEl =>
-      // Add 5px spacing between arrow and checkbox/radio
-      tooltipEl.setOffset(
-        tooltipEl
-          .getOffset
-          .copy(
-            left = hintRegionEl.parentElementOpt.get.getOffset.left - tooltipEl.offsetWidth - 5.0
-          )
-      )
-    }
 }

@@ -1067,7 +1067,7 @@
                                     ref="xxf:instance('local')/readwrite[not($validated-mode) or empty($next-top-level-case-ids)]"/>
 
                                 <xh:div role="navigation">
-                                    <xh:ul class="nav nav-list">
+                                    <xh:ul class="nav">
                                         <xsl:apply-templates mode="fr-toc-sections">
                                             <xsl:with-param name="is-wizard"              select="true()"                  tunnel="yes"/>
                                             <xsl:with-param name="static-app"             select="$static-app"             tunnel="yes"/>

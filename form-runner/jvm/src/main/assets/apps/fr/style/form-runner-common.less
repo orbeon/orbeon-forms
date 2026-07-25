@@ -10,11 +10,69 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-@import (reference) "../../../../../../../bootstrap-src/less/variables";
-@import (reference) "../../../../../../../bootstrap-src/less/mixins";
+// Legacy Bootstrap 2 variables and mixins, copied verbatim from its LESS sources when Bootstrap 2 was removed; these
+// values are still the reference for the current look
+@baseBorderRadius              : 4px;
+@baseFontSize                  : 14px;
+@baseLineHeight                : 20px;
+@btnDangerBackground           : #ee5f5b;
+@btnDangerBackgroundHighlight  : #bd362f;
+@btnInfoBackground             : #5bc0de;
+@btnInfoBackgroundHighlight    : #2f96b4;
+@btnInverseBackground          : #444;
+@grayDarker                    : #222;
+@btnInverseBackgroundHighlight : @grayDarker;
+@btnSuccessBackground          : #62c462;
+@btnSuccessBackgroundHighlight : #51a351;
+@orange                        : #f89406;
+@btnWarningBackground          : lighten(@orange, 15%);
+@btnWarningBackgroundHighlight : @orange;
+@grayLight                     : #999;
+@controlPlaceholderColor       : @grayLight;
+@linkColor                     : #08c;
+@dropdownLinkBackgroundActive  : @linkColor;
+@dropdownLinkBackgroundHover   : @dropdownLinkBackgroundActive;
+@white                         : #fff;
+@dropdownLinkColorHover        : @white;
+@gray                          : #555;
+@grayDark                      : #333;
+@grayLighter                   : #eee;
+@infoText                      : #3a87ad;
+@inputBorderRadius             : @baseBorderRadius;
+@inputDisabledBackground       : @grayLighter;
+@monoFontFamily                : Monaco, Menlo, Consolas, "Courier New", monospace;
+@navbarInverseLinkColor        : @grayLight;
+@navbarLinkColor               : #777;
+@navbarLinkColorActive         : @gray;
+@sansFontFamily                : "Helvetica Neue", Helvetica, Arial, sans-serif;
+@tableBackgroundAccent         : #f9f9f9;
+@wellBackground                : #f5f5f5;
+@zindexFixedNavbar             : 1030;
+
+.text-overflow() {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clearfix() {
+  &:before,
+  &:after {
+    display: table;
+    content: "";
+    // Fixes Opera/contenteditable bug:
+    // http://nicolasgallagher.com/micro-clearfix-hack/#comment-36952
+    line-height: 0;
+  }
+  &:after {
+    clear: both;
+  }
+}
 
 @frBaseFontFamily: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-@frPrintBaseFontFamily: "Helvetica Neue";
+// The trailing generic sans-serif keeps the PDF renderer, which has no "Helvetica Neue", from falling through to its
+// serif default
+@frPrintBaseFontFamily: "Helvetica Neue", Helvetica, Arial, sans-serif;
 
 @frRelativeLineHeight: 1.2;
 @frRelativeLineHeightPdf: 1.4; // determined experimentally

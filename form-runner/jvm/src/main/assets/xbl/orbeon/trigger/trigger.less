@@ -37,8 +37,8 @@
     // TODO: find a better way to do this: 1) trigger.less shouldn't have to care about dropdowns 2) why do we use
     //  .btn and .btn-link elements in dropdown menus?
 
-    // Dropdowns overrides (BS2 uses .open and BS5 uses .show)
-    .dropdown.open, .dropdown .show {
+    // Dropdown overrides (.show is set on the open menu; Bootstrap 2 used .open on the parent)
+    .dropdown .show {
         .btn {
             color: var(--orbeon-dropdown-menu-color);
             background-color: var(--orbeon-dropdown-menu-background-color);
@@ -132,7 +132,7 @@
     .xforms-trigger-appearance-xxforms-info .btn, .btn-info {
         .buttonBackgroundOrbeon(var(--orbeon-button-info-background-color), var(--orbeon-button-info-highlight-background-color), var(--orbeon-button-info-color), var(--orbeon-button-info-disabled-background-color), var(--orbeon-button-info-disabled-color));
     }
-    .xforms-trigger-appearance-xxforms-inverse .btn, .btn-inverse {
+    .xforms-trigger-appearance-xxforms-inverse .btn {
         .buttonBackgroundOrbeon(var(--orbeon-button-inverse-background-color), var(--orbeon-button-inverse-highlight-background-color), var(--orbeon-button-inverse-color), var(--orbeon-button-inverse-disabled-background-color), var(--orbeon-button-inverse-disabled-color));
     }
 
@@ -151,7 +151,7 @@
         padding: 0 0 2px 0;
 
         text-decoration-thickness: from-font; // this tends to make the line thinner
-        text-underline-offset: 0.2rem;        // otherwise the line touches the bottom of the characters
+        text-underline-offset: 3px;           // otherwise the line touches the characters
         text-decoration-skip-ink: auto;       // `auto` is the default, but we want to be explicit
     }
 

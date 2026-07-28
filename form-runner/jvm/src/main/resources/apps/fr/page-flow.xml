@@ -239,7 +239,7 @@
           model="detail/detail-model.xpl" view="print/pdf-view.xpl">
     </page>
 
-    <!-- Export published form with form data as Excel or XML -->
+    <!-- Export published form with form data as excel-with-named-ranges/xml-form-structure-and-data/pdf/tiff -->
     <page path="/fr/([^/^.]+)/([^/^.]+)/export(/([^/^.]+))?"
           model="detail/detail-model.xpl"
           view="export/excel-export-with-data.xpl">

@@ -802,7 +802,7 @@
 
                         <xf:trigger
                             appearance="minimal"
-                            ref=".[not($allow-direct-download)]"
+                            ref=".[not($disable-download) and not($allow-direct-download)]"
                             class="fr-attachment-filename">
                             <xf:label ref="@filename"/>
                             <xf:send

@@ -30,7 +30,7 @@ import org.orbeon.xml.NamespaceMapping
 import scala.collection.SeqView
 
 
-// CSS selectors can be very complex but we only support a small subset of them for the purpose of binding controls to
+// CSS selectors can be very complex, but we only support a small subset of them for the purpose of binding controls to
 // elements. Namely, we can bind:
 //
 // - by element name only
@@ -45,7 +45,7 @@ import scala.collection.SeqView
 // more than that, such as:
 //
 // - binding by datatype only
-// - binding via attributes which are not `appearance` (but then excluding `appearance` support itself)
+// - binding via attributes which are not `appearance`
 //   - `xf|textarea[mediatype = 'text/html']`
 //   - `fr|attachment[multiple ~= true]`
 case class BindingDescriptor(

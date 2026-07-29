@@ -32,10 +32,7 @@ case class BindingIndex[+T](
     (nameAndAttSelectors.iterator ++ attOnlySelectors ++ nameOnlySelectors).map(_._1)
 
   def iterateDescriptors2: Iterator[(BindingDescriptor, T)] =
-    (nameAndAttSelectors.iterator ++ attOnlySelectors ++ nameOnlySelectors)
-
-  private def filterAndGroup[U](selectors: List[(BindingDescriptor, U)]): Map[QName, List[(BindingDescriptor, U)]] =
-    selectors filter (_._1.elementName.isDefined) groupBy (_._1.elementName.get)
+    nameAndAttSelectors.iterator ++ attOnlySelectors ++ nameOnlySelectors
 }
 
 // Implementation strategy: all the functions take an immutable index and return a new immutable index. The global index

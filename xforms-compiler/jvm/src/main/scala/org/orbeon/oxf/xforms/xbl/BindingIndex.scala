@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.analysis.model.Types.StringQNames
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor.EmptySet
 
 import scala.collection.mutable
 
@@ -107,7 +108,7 @@ object BindingIndex {
     includeBindingsWithDatatype: Boolean
   ): BindingIndex[T] =
     bindingDescriptor match {
-      case b @ BindingDescriptor(Some(_), datatypeOpt, None, None)
+      case b @ BindingDescriptor(Some(_), datatypeOpt, None, EmptySet())
         if includeBindingsWithDatatype || datatypeOpt.isEmpty =>
           index.copy(nameOnlySelectors   = (b -> value) :: index.nameOnlySelectors)
       case b @ BindingDescriptor(Some(_), datatypeOpt, _, _)

@@ -10,6 +10,7 @@ import org.orbeon.oxf.util.{ByteSizeUtils, IndentedLogger, LoggerFactory, Mediat
 import org.orbeon.oxf.xforms.function.xxforms.ValidationFunctionNames
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor.EmptySet
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
@@ -100,7 +101,7 @@ trait FormRunnerComponentsCompileTime {
             Some(name),
             None,
             None,
-            None
+            EmptySet()
           ) => buildName(name, None, None)
       }
 

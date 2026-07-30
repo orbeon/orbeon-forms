@@ -144,7 +144,11 @@ class FormRunnerConfigProcessor extends ProcessorImpl {
                   ._1
                   .iterateDescriptors
                   .collect {
-                    case BindingDescriptor(Some(name), _, _, Some(BindingAttributeDescriptor(fr.XMLNames.FRPdfAutomaticQName, _))) =>
+                    case BindingDescriptor(Some(name), _, _, otherAtts)
+                     if otherAtts.exists {
+                       case BindingAttributeDescriptor(fr.XMLNames.FRPdfAutomaticQName, _) => true
+                       case _ => false
+                     } =>
                       name.namespace.uri -> name.localName
                   }
                   .toSet

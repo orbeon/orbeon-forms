@@ -303,7 +303,7 @@ trait BindingOps {
       val Datatype1 = datatype
       val Datatype2 = Types.getVariationTypeOrKeep(datatype)
 
-      object FirstAttExtractor extends FirstAttExtractor {
+      object MatchesAllAttDescsExtractor extends MatchesAllAttDescsExtractor {
         def getAtts: Iterable[(QName, String)] = atts
       }
 
@@ -314,25 +314,25 @@ trait BindingOps {
             Some(`virtualName`),
             d @ (None | Some(Datatype1 | Datatype2)),
             None,
-            a @ (None | FirstAttExtractor(_))
+            a @ (EmptySet() | MatchesAllAttDescsExtractor(_))
             ) =>
-            (None, b.binding, d.isDefined, a.isDefined)
+            (None, b.binding, d.isDefined, a.nonEmpty)
           case
             b @ BindingDescriptor(
             Some(`virtualName`),
             d @ (None | Some(Datatype1 | Datatype2)),
             Some(AttributePredicate.Equal(appearance)),
-            a @ (None | FirstAttExtractor(_))
+            a @ (EmptySet() | MatchesAllAttDescsExtractor(_))
             ) =>
-            (Some(appearance), b.binding, d.isDefined, a.isDefined)
+            (Some(appearance), b.binding, d.isDefined, a.nonEmpty)
           case
             b @ BindingDescriptor(
             Some(`virtualName`),
             d @ (None | Some(Datatype1 | Datatype2)),
             Some(AttributePredicate.Token(appearance)),
-            a @ (None | FirstAttExtractor(_))
+            a @ (EmptySet() | MatchesAllAttDescsExtractor(_))
             ) =>
-            (Some(appearance), b.binding, d.isDefined, a.isDefined)
+            (Some(appearance), b.binding, d.isDefined, a.nonEmpty)
         }
 
       // Consider bindings that match an attribute first
@@ -441,7 +441,7 @@ trait BindingOps {
         def getFilterAppearance: AttributePredicate => Boolean = EqualOrTokenAttributePredicateFilter
       }
 
-      object FirstAttExtractor extends FirstAttExtractor {
+      object MatchesAllAttDescsExtractor extends MatchesAllAttDescsExtractor {
         def getAtts: Iterable[(QName, String)] = searchAtts
       }
 
@@ -452,7 +452,7 @@ trait BindingOps {
               Some(`searchElemName`),
               None,
               AppearanceExtractor(appearance),
-              None | FirstAttExtractor(_)
+              EmptySet() | MatchesAllAttDescsExtractor(_)
             ) => searchElemName -> Some(appearance)
         }
 
@@ -463,17 +463,18 @@ trait BindingOps {
               Some(elemName),
               None,
               AppearanceExtractor(appearance),
-              None | FirstAttExtractor(_)
+              EmptySet() | MatchesAllAttDescsExtractor(_)
             ) => elemName -> Some(appearance)
         }
 
       def findDirect: Option[(QName, None.type)] =
         relatedDescriptors.collectFirst {
-          case BindingDescriptor(
+          case
+            BindingDescriptor(
               Some(elemName),
               None,
               None,
-              None
+              EmptySet()
             ) => elemName -> None
         }
 

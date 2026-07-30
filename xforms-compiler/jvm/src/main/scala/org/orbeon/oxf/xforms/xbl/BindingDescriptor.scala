@@ -24,6 +24,7 @@ import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.XFormsNames.{APPEARANCE_QNAME, XFORMS_STRING_QNAME}
 import org.orbeon.xml.NamespaceMapping
 
@@ -38,6 +39,8 @@ import scala.collection.SeqView
 // - by element name and a single `appearance` attribute
 // - by a single `appearance` attribute
 // - by element name, a datatype, and a single `appearance` attribute
+// - with #2479, also by a single attribute in addition to the `appearance` attribute
+// - with #7793, also by multiple attributes in addition to the `appearance` attribute
 //
 // `BindingDescriptor` is a minimal CSS selector descriptor able to hold the combinations above. It can in fact hold
 // more than that, such as:
@@ -50,11 +53,11 @@ case class BindingDescriptor(
   elementName  : Option[QName],
   datatype     : Option[QName],
   appearanceOpt: Option[AttributePredicate],
-  attOpt       : Option[BindingAttributeDescriptor]
+  otherAtts    : Set[BindingAttributeDescriptor]
 )(
   val binding  : Option[NodeInfo] // not part of the case-classiness
 ) {
-  require(! attOpt.exists(_.name == APPEARANCE_QNAME))
+  require(! otherAtts.exists(_.name == APPEARANCE_QNAME))
 }
 
 // Represent a single attribute binding
@@ -76,6 +79,10 @@ object BindingDescriptor {
     case _ => false
   }
 
+  object EmptySet {
+    def unapply[A](s: Set[A]): Boolean = s.isEmpty
+  }
+
   trait AppearanceExtractor {
 
     // Scala 3: trait parameters
@@ -94,30 +101,34 @@ object BindingDescriptor {
         }
   }
 
-  trait FirstAttExtractor {
+  trait MatchesAllAttDescsExtractor {
 
     def getAtts: Iterable[(QName, String)] // Scala 3: trait parameter
 
-    def unapply(attDescOpt: Option[BindingAttributeDescriptor]): Option[BindingAttributeDescriptor] =
-      attDescOpt.flatMap { attDesc =>
-        getAtts.collectFirst {
-          case (attName, attValue)
-            if attName == attDesc.name && attValueMatches(attDesc.predicate, attValue)
-              => attDesc
+    def unapply(attDescs: Set[BindingAttributeDescriptor]): Option[Int] = {
+
+      val matchCount =
+        attDescs.count { attDesc =>
+          getAtts.exists {
+            case (attName, attValue) =>
+              attName == attDesc.name && attValueMatches(attDesc.predicate, attValue)
+          }
         }
-      }
+
+      (matchCount == attDescs.size).option(matchCount)
+    }
   }
 
   // Custom extractor to extract the `appearance` attribute and other attributes. Assumptions:
   // - at most one `appearance` attribute
-  // - at most one other attribute
+  // - other attributes
   // - at most one datatype with `:xxf-type()`
   // - order of attribute filters doesn't matter
   private trait FilterExtractor {
 
     def getNs: NamespaceMapping
 
-    def unapply(attFilters: List[Filter]): Option[(Option[AttributePredicate], Option[BindingAttributeDescriptor], Option[QName])] = {
+    def unapply(attFilters: List[Filter]): Option[(Option[AttributePredicate], Set[BindingAttributeDescriptor], Option[QName])] = {
 
       val appearanceOpt =
         attFilters.collectFirst {
@@ -126,8 +137,8 @@ object BindingDescriptor {
               attPredicate
         }
 
-      val otherOpt =
-        attFilters.collectFirst {
+      val otherAtts =
+        attFilters.collect {
           case Filter.Attribute(attTypeSelector, attPredicate)
             if ! qNameFromElementSelector(Some(attTypeSelector), getNs).contains(APPEARANCE_QNAME) =>
               BindingAttributeDescriptor(
@@ -143,8 +154,8 @@ object BindingDescriptor {
         }
         .flatten
 
-      if (appearanceOpt.isDefined || otherOpt.isDefined || datatypeOpt.isDefined)
-        Some((appearanceOpt, otherOpt, datatypeOpt))
+      if (appearanceOpt.isDefined || otherAtts.nonEmpty || datatypeOpt.isDefined)
+        Some((appearanceOpt, otherAtts.toSet, datatypeOpt))
       else
         None
     }
@@ -190,7 +201,7 @@ object BindingDescriptor {
         }
     }
 
-    object FirstAttExtractor extends FirstAttExtractor {
+    object MatchesAllAttDescsExtractor extends MatchesAllAttDescsExtractor {
       def getAtts: Iterable[(QName, String)] = atts
     }
 
@@ -222,11 +233,11 @@ object BindingDescriptor {
         bd.elementName.contains(qName)
       val otherMatches =
         bd match {
-          case BindingDescriptor(_, TypeExtractor(w), AppearanceExtractor(_), FirstAttExtractor(_)) => Some(2 + w)
-          case BindingDescriptor(_, TypeExtractor(w), AppearanceExtractor(_), None)                 => Some(1 + w)
-          case BindingDescriptor(_, TypeExtractor(w), None, FirstAttExtractor(_))                   => Some(1 + w)
-          case BindingDescriptor(_, TypeExtractor(w), None, None)                                   => Some(0 + w)
-          case _                                                                                    => None
+          case BindingDescriptor(_, TypeExtractor(w1), AppearanceExtractor(_), MatchesAllAttDescsExtractor(w2)) => Some(w1 + 1 + w2)
+          case BindingDescriptor(_, TypeExtractor(w1), AppearanceExtractor(_), EmptySet())                      => Some(w1 + 1)
+          case BindingDescriptor(_, TypeExtractor(w1), None, MatchesAllAttDescsExtractor(w2))                   => Some(w1 + w2)
+          case BindingDescriptor(_, TypeExtractor(w1), None, EmptySet())                                        => Some(w1 + 0)
+          case _                                                                                                => None
         }
 
       (bd.elementName.isEmpty || nameMatch) && otherMatches.isDefined option
@@ -289,7 +300,7 @@ object BindingDescriptor {
         descriptor <- mostSpecificDescriptorOpt
         _ = assert(descriptor.datatype.isEmpty)
         // See comments in https://github.com/orbeon/orbeon-forms/issues/2479
-        if descriptor.attOpt.isEmpty && descriptor.appearanceOpt.isEmpty // only a direct binding can be an alias for another related binding
+        if descriptor.otherAtts.isEmpty && descriptor.appearanceOpt.isEmpty // only a direct binding can be an alias for another related binding
         relatedDescriptors = findRelatedDescriptors(descriptor).filterNot(_ == descriptor)
         BindingDescriptor(elemNameOpt, _, appearanceOpt, _) <- findRelatedVaryNameAndAppearance(searchDatatype, searchAtts, relatedDescriptors)
         elemName <- elemNameOpt
@@ -345,7 +356,7 @@ object BindingDescriptor {
           elementName =  Some(QName(localname, prefix, ns.mapping(prefix))),
           datatype      = None,
           appearanceOpt = None,
-          attOpt        = None
+          otherAtts     = Set.empty
         )(binding)
   }
 
@@ -356,9 +367,10 @@ object BindingDescriptor {
   // - `xf|textarea[mediatype = 'text/html']`
   // - `fr|attachment[multiple ~= true]`
   // - `xf:select1[appearance ~= full][selection = open]`
+  // - `xf:select1[appearance ~= full][selection = open][]`
   def attributeBindingPF(
-    ns     : NamespaceMapping,
-    binding: Option[NodeInfo],
+    ns                         : NamespaceMapping,
+    binding                    : Option[NodeInfo],
     includeBindingsWithDatatype: Boolean
   ): PartialFunction[Selector, BindingDescriptor] = {
 
@@ -371,7 +383,7 @@ object BindingDescriptor {
         Selector(
           ElementWithFiltersSelector(
             elemTypeSelectorOpt,
-            FilterExtractor(appearanceOpt, otherOpt, datatypeOpt),
+            FilterExtractor(appearanceOpt, otherAtts, datatypeOpt),
           ),
           Nil
         ) if includeBindingsWithDatatype || datatypeOpt.isEmpty =>
@@ -379,7 +391,7 @@ object BindingDescriptor {
           elementName   = qNameFromElementSelector(elemTypeSelectorOpt, ns),
           datatype      = datatypeOpt,
           appearanceOpt = appearanceOpt,
-          attOpt        = otherOpt
+          otherAtts     = otherAtts
         )(binding)
     }
   }
@@ -469,7 +481,7 @@ object BindingDescriptor {
             elementName   = Some(QName(localname, prefix, ns.mapping(prefix))),
             datatype      = qNameFromString(datatype, ns),
             appearanceOpt = None,
-            attOpt        = None
+            otherAtts     = Set.empty
           )(binding)
     }
 
@@ -479,28 +491,63 @@ object BindingDescriptor {
       ns     : NamespaceMapping,
       binding: Option[NodeInfo]
     ): PartialFunction[Selector, BindingDescriptor] = {
-      case
-        Selector(
-          ElementWithFiltersSelector(
-            elemTypeSelectorOpt,
-            List(
-              FunctionalPseudoClassFilter("xxf-type", List(Expr.Str(datatype))), // Q: are we sure the functional pseudo-class is always first?
-              Filter.Attribute(attTypeSelector, attPredicate)
+
+      object DatatypeAndAttributesExtractor {
+
+        def unapply(filters: List[Filter]): Option[(String, Option[AttributePredicate], Set[BindingAttributeDescriptor])] = {
+
+          val datatypeFilter = filters.collectFirst {
+            case FunctionalPseudoClassFilter("xxf-type", List(Expr.Str(datatype))) => datatype
+          }
+
+          datatypeFilter.map { datatype =>
+
+            val attFilters =
+              filters
+                .collect {
+                  case Filter.Attribute(attTypeSelector, attPredicate) =>
+                    (attTypeSelector, attPredicate, qNameFromElementSelector(Some(attTypeSelector), ns).contains(APPEARANCE_QNAME))
+                }
+                .toSet
+
+
+            val appearancePredicateOpt = attFilters.collectFirst {
+              case (_, attPredicate, true) => attPredicate
+            }
+
+            val nonAppearanceDescs = attFilters.collect {
+              case (attTypeSelector, attPredicate, false) =>
+                  BindingAttributeDescriptor(
+                    attTypeSelector.toQName(ns),
+                    attPredicate
+                  )
+            }
+
+            (
+              datatype,
+              appearancePredicateOpt,
+              nonAppearanceDescs
             )
-          ),
-          Nil
-        ) =>
-          val isForAppearance = qNameFromElementSelector(Some(attTypeSelector), ns).contains(APPEARANCE_QNAME)
-          BindingDescriptor(
-            elementName   = qNameFromElementSelector(elemTypeSelectorOpt, ns),
-            datatype      = qNameFromString(datatype, ns),
-            appearanceOpt = isForAppearance option attPredicate,
-            attOpt        = ! isForAppearance option
-              BindingAttributeDescriptor(
-                attTypeSelector.toQName(ns),
-                attPredicate
-              )
-          )(binding)
+          }
+        }
+      }
+
+      {
+        case
+          Selector(
+            ElementWithFiltersSelector(
+              elemTypeSelectorOpt,
+              DatatypeAndAttributesExtractor(datatype, appearancePredicateOpt, nonAppearanceDescs)
+            ),
+            Nil
+          ) =>
+            BindingDescriptor(
+              elementName   = qNameFromElementSelector(elemTypeSelectorOpt, ns),
+              datatype      = qNameFromString(datatype, ns),
+              appearanceOpt = appearancePredicateOpt,
+              otherAtts     = nonAppearanceDescs
+            )(binding)
+      }
     }
 
     def getAllSelectorsWithPF(
@@ -545,7 +592,7 @@ object BindingDescriptor {
       val Datatype1 = searchDatatype
       val Datatype2 = Types.getVariationTypeOrKeep(searchDatatype)
 
-      object FirstAttExtractor extends FirstAttExtractor {
+      object MatchesAllAttDescsExtractor extends MatchesAllAttDescsExtractor {
         def getAtts: Iterable[(QName, String)] = atts
       }
 
@@ -556,7 +603,7 @@ object BindingDescriptor {
               Some(_),
               Some(Datatype1 | Datatype2),
               Some(_),
-              FirstAttExtractor(_)
+              MatchesAllAttDescsExtractor(_)
             ) => descriptor
         }
 
@@ -567,7 +614,7 @@ object BindingDescriptor {
               Some(_),
               Some(Datatype1 | Datatype2),
               None,
-              FirstAttExtractor(_)
+              MatchesAllAttDescsExtractor(_)
             ) => descriptor
         }
 
@@ -578,7 +625,7 @@ object BindingDescriptor {
               Some(_),
               Some(Datatype1 | Datatype2),
               Some(_),
-              None
+              EmptySet()
             ) => descriptor
         }
 
@@ -589,7 +636,7 @@ object BindingDescriptor {
               Some(_),
               Some(Datatype1 | Datatype2),
               None,
-              None
+              EmptySet()
             ) => descriptor
         }
 
@@ -600,7 +647,7 @@ object BindingDescriptor {
               Some(_),
               None,
               Some(_),
-              FirstAttExtractor(_)
+              MatchesAllAttDescsExtractor(_)
             ) => descriptor
         }
 
@@ -611,7 +658,7 @@ object BindingDescriptor {
               Some(_),
               None,
               None,
-              FirstAttExtractor(_)
+              MatchesAllAttDescsExtractor(_)
             ) => descriptor
         }
 
@@ -622,7 +669,7 @@ object BindingDescriptor {
               Some(_),
               None,
               Some(_),
-              None
+              EmptySet()
             ) => descriptor
         }
 

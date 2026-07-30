@@ -37,7 +37,7 @@
 
     <xbl:binding
         id="fr-grid-multiple-binding"
-        element="fr|grid-multiple, fr|grid[repeat = content]"
+        element="fr|grid-multiple, fr|grid[repeat = content][ref], fr|grid[repeat = content][nodeset], fr|grid[repeat = content][bind]"
         class="xbl-fr-grid"
         xxbl:mode="binding javascript-lifecycle"
         xxf:external-events="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-clear fr-remove">

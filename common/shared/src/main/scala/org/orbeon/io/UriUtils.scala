@@ -12,4 +12,10 @@ object UriUtils {
       new URI(uri.getScheme, PathUtils.splitQuery(uri.getSchemeSpecificPart)._1, null)
     else
       new URI(uri.getScheme, uri.getAuthority, uri.getPath, null)
+
+  def removeUserInfo(uri: URI): URI =
+    if (uri.isOpaque)
+      uri
+    else
+      new URI(uri.getScheme, null, uri.getHost, uri.getPort, uri.getPath, uri.getQuery, uri.getFragment)
 }

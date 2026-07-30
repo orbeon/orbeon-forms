@@ -13,15 +13,13 @@
  */
 package org.orbeon.oxf.http
 
-import java.io.OutputStream
-import java.net.{HttpURLConnection, URL, URLDecoder}
 import org.apache.http.impl.client.BasicCookieStore
-import org.orbeon.connection.ConnectionContextSupport.EmptyConnectionContexts
-import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.util.StringUtils.*
 
-import scala.jdk.CollectionConverters.*
+import java.io.OutputStream
+import java.net.{HttpURLConnection, URL}
 import scala.collection.mutable
+import scala.jdk.CollectionConverters.*
+
 
 // Expose `ApacheHttpClient` as `HttpURLConnection`
 // 2019-12-13: No longer supports methods which set a body.
@@ -34,34 +32,10 @@ class ApacheHttpUrlConnection(url: URL)(client: PropertiesApacheHttpClient.type)
   def connect(): Unit =
     if (_httpResponse.isEmpty)
       _httpResponse = {
-
-        def credentialsFromURL(url: URL): Option[BasicCredentials] = {
-          url.getUserInfo.trimAllToOpt flatMap { userInfo =>
-            // Set username and optional password specified on URL
-            val separatorPosition = userInfo.indexOf(":")
-
-            val (username, password) =
-              if (separatorPosition == -1)
-                userInfo -> ""
-              else
-                userInfo.substring(0, separatorPosition) -> userInfo.substring(separatorPosition + 1)
-
-            // If the username/password contain special character, those characters will be encoded, since
-            // we are getting this from a URL. Now do the decoding.
-
-            val usernameOpt = username.trimAllToOpt map (URLDecoder.decode(_, CharsetNames.Utf8))
-            val passwordOpt = password.trimAllToOpt map (URLDecoder.decode(_, CharsetNames.Utf8))
-
-            usernameOpt map { username =>
-              BasicCredentials(username, passwordOpt, preemptiveAuth = true, None)
-            }
-          }
-        }
-
         Some(
           client.connect(
             url         = url.toExternalForm,
-            credentials = credentialsFromURL(url),
+            credentials = None,
             cookieStore = new BasicCookieStore,
             method      = HttpMethod.withNameInsensitive(Option(method) getOrElse "GET"),
             headers     = _requestHeaders.view.mapValues(_.toList).toMap,

@@ -33,9 +33,11 @@ import org.apache.http.util.EntityUtils
 import org.apache.http.{ProtocolException as _, *}
 import org.orbeon.connection.StreamedContent
 import org.orbeon.io.IOUtils.*
+import org.orbeon.io.UriUtils
 import org.orbeon.oxf.http.HttpMethod.*
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.slf4j.LoggerFactory
 
 import java.net.{CookieStore as _, *}
@@ -61,7 +63,23 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
     requestCtx : Option[RequestCtx] // unused
   ): org.orbeon.oxf.http.HttpResponse = {
 
-    val uri               = URI.create(url)
+    // https://github.com/orbeon/orbeon-forms/issues/7794
+    val (uriNoUserInfo, uriCredentials) = {
+
+      val rawUri = URI.create(url)
+
+      val uriCredentials =
+        rawUri.getUserInfo.trimAllToOpt.flatMap { userInfo =>
+          val separatorPosition = userInfo.indexOf(":")
+          if (separatorPosition == -1)
+            Some(BasicCredentials(userInfo, None, preemptiveAuth = true, None))
+          else
+            Some(BasicCredentials(userInfo.substring(0, separatorPosition), Some(userInfo.substring(separatorPosition + 1)), preemptiveAuth = true, None))
+        }
+
+      (UriUtils.removeUserInfo(rawUri), uriCredentials)
+    }
+
     val httpContext       = new BasicHttpContext
     val httpClientBuilder = HttpClientBuilder.create()
 
@@ -80,11 +98,10 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
       // Assign route planner for dynamic exclusion of hostnames from proxying
       routePlanner.foreach(httpClientBuilder.setRoutePlanner)
 
-
       newProxyAuthState foreach
         (httpContext.setAttribute(HttpClientContext.PROXY_AUTH_STATE, _)) // Set proxy and host authentication
 
-      credentials foreach { actualCredentials =>
+      credentials.orElse(uriCredentials).foreach { actualCredentials =>
 
         // Make authentication preemptive when needed. Interceptor is added first, as the Authentication header
         // is added by HttpClient's RequestTargetAuthentication which is itself an interceptor, so our
@@ -98,33 +115,32 @@ abstract class ApacheHttpClient(settings: HttpClientSettings)
         httpContext.setAttribute(HttpClientContext.CREDS_PROVIDER, credentialsProvider)
 
         credentialsProvider.setCredentials(
-          new AuthScope(uri.getHost, uri.getPort),
+          new AuthScope(uriNoUserInfo.getHost, uriNoUserInfo.getPort),
           actualCredentials match {
             case BasicCredentials(username, passwordOpt, _, None) =>
               new UsernamePasswordCredentials(username, passwordOpt getOrElse "")
             case BasicCredentials(username, passwordOpt, _, Some(domain)) =>
-              new NTCredentials(username, passwordOpt getOrElse "", uri.getHost, domain)
+              new NTCredentials(username, passwordOpt getOrElse "", uriNoUserInfo.getHost, domain)
           }
         )
       }
 
       // Set the cookie store
       httpClientBuilder.setDefaultCookieStore(cookieStore)
-
     }
 
     val httpClient    = httpClientBuilder.build()
     val requestMethod =
       method match {
-        case GET     => new HttpGet(uri)
-        case POST    => new HttpPost(uri)
-        case HEAD    => new HttpHead(uri)
-        case OPTIONS => new HttpOptions(uri)
-        case PUT     => new HttpPut(uri)
-        case DELETE  => new HttpDelete(uri)
-        case TRACE   => new HttpTrace(uri)
-        case LOCK    => new HttpLock(uri)
-        case UNLOCK  => new HttpUnlock(uri)
+        case GET     => new HttpGet(uriNoUserInfo)
+        case POST    => new HttpPost(uriNoUserInfo)
+        case HEAD    => new HttpHead(uriNoUserInfo)
+        case OPTIONS => new HttpOptions(uriNoUserInfo)
+        case PUT     => new HttpPut(uriNoUserInfo)
+        case DELETE  => new HttpDelete(uriNoUserInfo)
+        case TRACE   => new HttpTrace(uriNoUserInfo)
+        case LOCK    => new HttpLock(uriNoUserInfo)
+        case UNLOCK  => new HttpUnlock(uriNoUserInfo)
       }
 
     val skipAuthorizationHeader = credentials.isDefined

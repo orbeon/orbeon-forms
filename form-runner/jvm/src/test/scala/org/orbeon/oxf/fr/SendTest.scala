@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import io.circe.parser.parse
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.test.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om.NodeInfo
@@ -408,4 +409,37 @@ class SendTest
       }
     }
   }
+
+  it("must pass Authentication header for credentials present in URL") {
+
+      val (processorService, docOpt, _) =
+        runFormRunner("tests", "send-action", "new")
+
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, docOpt.get) {
+
+          XFormsAPI.dispatch(
+            name       = "my-run-process",
+            targetId   = Names.FormModel,
+            properties = Map(
+              "process" -> Some(
+                s"""
+                  send(
+                    uri        = "http://foo:bar@localhost:8084/anything",
+                    method     = "POST",
+                    content    = "xml",
+                    replace    = "text"
+                )
+                """
+              )
+            )
+          )
+
+          val actualJson = instance("fr-send-submission-response").get.root.stringValue
+          val cursor     = parse(actualJson).toOption.get.hcursor.downField("headers")
+
+          assert(cursor.get[String](Headers.Authorization)  == Right("Basic Zm9vOmJhcg=="))
+        }
+      }
+    }
 }

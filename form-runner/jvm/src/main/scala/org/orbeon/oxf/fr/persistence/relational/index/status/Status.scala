@@ -22,12 +22,13 @@ object Status extends Enum[Status] {
 
   val values = findValues
 
+  // #7795: it's important for Starting and Indexing to have an explicit entryName, as they are used in home.xhtml
   case object  Stopped                                  extends Status
-  case class   Starting (providers     : List[String])  extends Status
+  case class   Starting (providers     : List[String])  extends Status { override def entryName: String = "starting" }
   case object  Stopping                                 extends Status
   case class   Indexing (provider      : String,
                          providerCount : Count,
-                         documentCount : Option[Count]) extends Status
+                         documentCount : Option[Count]) extends Status { override def entryName: String = "indexing" }
 }
 
 case class Count(current: Int, total: Int)

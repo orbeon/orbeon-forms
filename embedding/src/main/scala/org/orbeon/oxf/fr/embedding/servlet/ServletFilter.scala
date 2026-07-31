@@ -29,7 +29,7 @@ import scala.util.Try
 class ServletEmbeddingContext(
   val namespace  : String,
   req            : HttpServletRequest,
-  val httpClient : HttpClient[org.apache.http.client.CookieStore]
+  val httpClient : HttpClient[org.apache.hc.client5.http.cookie.CookieStore]
 ) extends EmbeddingContext {
 
   private val session = req.getSession(true)
@@ -46,7 +46,7 @@ class ServletEmbeddingContextWithResponse(
   out          : Writer Either HttpServletResponse,
   namespace    : String,
   orbeonPrefix : String,
-  httpClient   : HttpClient[org.apache.http.client.CookieStore]
+  httpClient   : HttpClient[org.apache.hc.client5.http.cookie.CookieStore]
 ) extends ServletEmbeddingContext(
   namespace,
   req,

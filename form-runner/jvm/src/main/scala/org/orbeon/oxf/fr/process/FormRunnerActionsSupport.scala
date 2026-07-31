@@ -15,9 +15,8 @@ package org.orbeon.oxf.fr.process
 
 import cats.data.NonEmptyList
 import org.apache.commons.fileupload.disk.DiskFileItem
-import org.apache.http.entity.ContentType
-import org.apache.http.entity.mime.content.ByteArrayBody
-import org.apache.http.entity.mime.{FormBodyPartBuilder, HttpMultipartMode, MultipartEntityBuilder}
+import org.apache.hc.core5.http.ContentType
+import org.apache.hc.client5.http.entity.mime.{ByteArrayBody, FormBodyPartBuilder, HttpMultipartMode, MultipartEntityBuilder}
 import org.orbeon.connection.ConnectionResult
 import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper

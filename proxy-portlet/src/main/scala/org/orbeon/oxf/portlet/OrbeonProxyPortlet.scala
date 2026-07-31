@@ -49,7 +49,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     forwardProperties  : Map[String, String], // lowercase name -> original name
     keepParams         : Set[String],
     resourcesRegex     : String,
-    httpClient         : HttpClient[org.apache.http.client.CookieStore]
+    httpClient         : HttpClient[org.apache.hc.client5.http.cookie.CookieStore]
    ) {
     val FormRunnerResourcePathRegex: Regex = resourcesRegex.r
   }
@@ -61,7 +61,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     context            : PortletContext,
     request            : PortletRequest,
     response           : MimeResponse,
-    httpClient         : HttpClient[org.apache.http.client.CookieStore]
+    httpClient         : HttpClient[org.apache.hc.client5.http.cookie.CookieStore]
   ) extends PortletEmbeddingContextWithResponse(
     context,
     request,

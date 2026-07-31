@@ -15,8 +15,7 @@ package org.orbeon.oxf.fr.embedding
 
 import cats.data.NonEmptyList
 import org.apache.commons.io.IOUtils
-import org.apache.http.client.CookieStore
-import org.apache.http.impl.client.BasicCookieStore
+import org.apache.hc.client5.http.cookie.{BasicCookieStore, CookieStore}
 import org.orbeon.connection.ConnectionContextSupport.EmptyConnectionContexts
 import org.orbeon.connection.{BufferedContent, Content, StreamedContent}
 import org.orbeon.fr.FormRunnerPath

@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xforms.upload
 
-import org.apache.http.entity.ContentType
-import org.apache.http.entity.mime.{HttpMultipartMode, MultipartEntityBuilder}
+import org.apache.hc.core5.http.ContentType
+import org.apache.hc.client5.http.entity.mime.{HttpMultipartMode, MultipartEntityBuilder}
 import org.orbeon.connection.StreamedContent
 import org.orbeon.datatypes.{MaximumCurrentFiles, MaximumSize}
 import org.orbeon.oxf.common.Version
@@ -244,7 +244,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
 
     val httpEntity =
       MultipartEntityBuilder.create()
-        .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
+        .setMode(HttpMultipartMode.LEGACY)
         .setMimeSubtype("form-data")
         .setBoundary("WebKitFormBoundaryicZu65oDuNAzes9o")
         .addTextBody(
@@ -261,7 +261,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
 
     StreamedContent(
       inputStream   = httpEntity.getContent,
-      contentType   = Option(httpEntity.getContentType).map(_.getValue),
+      contentType   = Option(httpEntity.getContentType),
       contentLength = Option(httpEntity.getContentLength).filter(_ >= 0),
       title         = None
     )

@@ -14,8 +14,9 @@
 package org.orbeon.xforms
 
 import cats.syntax.option.*
-import org.apache.http.entity.ContentType
-import org.apache.http.entity.mime.MultipartEntityBuilder
+import org.apache.hc.core5.http.ContentType
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder
+
 import org.orbeon.dom
 import org.orbeon.dom.{Document, Element, VisitorSupport}
 import org.orbeon.io.IOUtils.useAndClose
@@ -306,7 +307,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     )
     val entity = builder.build()
     entity.writeTo(os)
-    entity.getContentType.getValue
+    entity.getContentType
   }
 
   private def addPart(

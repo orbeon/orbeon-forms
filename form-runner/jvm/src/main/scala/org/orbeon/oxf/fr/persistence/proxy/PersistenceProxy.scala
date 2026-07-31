@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.proxy
 
-import org.apache.http.HttpStatus
+import org.apache.hc.core5.http.HttpStatus
 import org.log4s
 import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.io.IOUtils

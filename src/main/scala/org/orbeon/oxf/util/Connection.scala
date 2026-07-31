@@ -15,8 +15,7 @@ package org.orbeon.oxf.util
 
 import cats.effect.IO
 import cats.syntax.option.*
-import org.apache.http.client.CookieStore
-import org.apache.http.impl.client.BasicCookieStore
+import org.apache.hc.client5.http.cookie.{BasicCookieStore, CookieStore}
 import org.log4s
 import org.orbeon.connection.*
 import org.orbeon.connection.ConnectionContextSupport.{ConnectionContexts, EmptyConnectionContexts}

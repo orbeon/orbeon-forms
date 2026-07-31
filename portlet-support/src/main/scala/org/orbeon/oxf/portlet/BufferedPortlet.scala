@@ -36,7 +36,7 @@ class PortletEmbeddingContext(
   context            : PortletContext,
   request            : PortletRequest,
   response           : PortletResponse,
-  val httpClient     : HttpClient[org.apache.http.client.CookieStore]
+  val httpClient     : HttpClient[org.apache.hc.client5.http.cookie.CookieStore]
 ) extends EmbeddingContext {
 
   private val session = request.getPortletSession(true) ensuring (_ ne null)
@@ -54,7 +54,7 @@ class PortletEmbeddingContextWithResponse(
   context            : PortletContext,
   request            : PortletRequest,
   response           : MimeResponse,
-  httpClient         : HttpClient[org.apache.http.client.CookieStore]
+  httpClient         : HttpClient[org.apache.hc.client5.http.cookie.CookieStore]
 ) extends PortletEmbeddingContext(
   context,
   request,

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import org.apache.http.client.CookieStore
+import org.apache.hc.client5.http.cookie.CookieStore
 import org.orbeon.connection.StreamedContent
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{Credentials as _, *}

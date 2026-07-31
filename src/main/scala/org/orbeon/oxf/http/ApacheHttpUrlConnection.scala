@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.http
 
-import org.apache.http.impl.client.BasicCookieStore
+import org.apache.hc.client5.http.cookie.BasicCookieStore
 
 import java.io.OutputStream
 import java.net.{HttpURLConnection, URL}

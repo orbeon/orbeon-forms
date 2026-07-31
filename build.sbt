@@ -71,7 +71,7 @@ val PPrintVersion                    = "0.9.6"
 val SaxonJvmVersion                  = "9.1.0.8.4"
 val JUnitInterfaceVersion            = "0.13.3"
 val Slf4jVersion                     = "2.0.18"
-val HttpComponentsVersion            = "4.5.14"
+val HttpComponents5Version           = "5.6.2"
 val Log4j2Version                    = "2.25.4"
 val CommonsIoVersion                 = "2.15.1"
 val OpenHtmlToPdfVersion             = "1.1.37-orbeon.6"
@@ -151,11 +151,9 @@ val CoreLibraryDependencies = Seq(
   "org.eclipse.angus"           % "angus-mail"                      % AngusMailVersion,
   "com.sun.activation"          % "jakarta.activation"              % JavaActivationVersion,
   "com.sendgrid"                % "sendgrid-java"                   % SendGridVersion % Provided, // PE only
-  "org.apache.httpcomponents"   % "httpclient"                      % HttpComponentsVersion,
-  "org.apache.httpcomponents"   % "httpclient-cache"                % HttpComponentsVersion,
-  "org.apache.httpcomponents"   % "httpmime"                        % HttpComponentsVersion,
-  "org.apache.httpcomponents"   % "fluent-hc"                       % HttpComponentsVersion,
-  "org.apache.httpcomponents"   % "httpcore"                        % "4.4.14",
+  "org.apache.httpcomponents.client5" % "httpclient5"               % HttpComponents5Version,
+  "org.apache.httpcomponents.client5" % "httpclient5-cache"         % HttpComponents5Version,
+  "org.apache.httpcomponents.client5" % "httpclient5-fluent"        % HttpComponents5Version,
   "org.slf4j"                   % "jcl-over-slf4j"                  % Slf4jVersion,
   "org.slf4j"                   % "slf4j-api"                       % Slf4jVersion,
   "org.apache.logging.log4j"    % "log4j-slf4j2-impl"               % Log4j2Version,
@@ -587,9 +585,9 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
       (unmanagedJars / includeFilter).value,
       (unmanagedJars / excludeFilter).value
     ),
-    libraryDependencies += "org.scala-js"              %% "scalajs-stubs"   % ScalaJsStubsVersion % Provided,
-    libraryDependencies += "org.slf4j"                 %  "slf4j-api"       % Slf4jVersion,
-    libraryDependencies += "org.apache.httpcomponents" % "httpclient"       % HttpComponentsVersion,
+    libraryDependencies += "org.scala-js"                      %% "scalajs-stubs" % ScalaJsStubsVersion % Provided,
+    libraryDependencies += "org.slf4j"                         %  "slf4j-api"     % Slf4jVersion,
+    libraryDependencies += "org.apache.httpcomponents.client5" % "httpclient5"    % HttpComponents5Version,
   )
   .jsSettings(commonScalaJsSettings)
   .jsSettings(
@@ -644,10 +642,10 @@ lazy val embedding = (project in file("embedding"))
   .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-embedding",
-    libraryDependencies += "javax.servlet"             % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
-    libraryDependencies += "jakarta.servlet"           % "jakarta.servlet-api" % JakartaServletApiVersion % Provided,
-    libraryDependencies += "commons-io"                % "commons-io"          % CommonsIoVersion,
-    libraryDependencies += "org.apache.httpcomponents" % "httpclient"          % HttpComponentsVersion,
+    libraryDependencies += "javax.servlet"                     % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
+    libraryDependencies += "jakarta.servlet"                   % "jakarta.servlet-api" % JakartaServletApiVersion % Provided,
+    libraryDependencies += "commons-io"                        % "commons-io"          % CommonsIoVersion,
+    libraryDependencies += "org.apache.httpcomponents.client5" % "httpclient5"         % HttpComponents5Version,
   )
 
 lazy val embeddingWar = (project in file("embedding-war"))
@@ -685,10 +683,10 @@ lazy val xformsFilter = (project in file("xforms-filter"))
   .settings(scala3CommonSettings*)
   .settings(
     name := "orbeon-xforms-filter",
-    libraryDependencies += "javax.servlet"             % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
-    libraryDependencies += "jakarta.servlet"           % "jakarta.servlet-api" % JakartaServletApiVersion % Provided,
-    libraryDependencies += "commons-io"                % "commons-io"          % CommonsIoVersion,
-    libraryDependencies += "org.apache.httpcomponents" % "httpclient"          % HttpComponentsVersion,
+    libraryDependencies += "javax.servlet"                     % "javax.servlet-api"   % JavaxServletApiVersion   % Provided,
+    libraryDependencies += "jakarta.servlet"                   % "jakarta.servlet-api" % JakartaServletApiVersion % Provided,
+    libraryDependencies += "commons-io"                        % "commons-io"          % CommonsIoVersion,
+    libraryDependencies += "org.apache.httpcomponents.client5" % "httpclient5"         % HttpComponents5Version,
   )
 
 lazy val xformsFilterWar = (project in file("xforms-filter-war"))

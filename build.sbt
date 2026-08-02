@@ -87,7 +87,7 @@ val AwsSdkVersion                    = "2.46.15"
 val InfinispanVersion                = "14.0.35.Final"
 val SqliteJdbcVersion                = "3.53.2.1"
 val PostgresqlVersion                = "42.7.13"
-val OracleJdbcVersion                = "23.26.2.0.0"
+val OracleJdbcVersion                = "23.26.3.0.0"
 
 // Only on PE for now
 val ApachePOIVersion                 = "5.5.1"

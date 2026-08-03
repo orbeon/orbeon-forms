@@ -24,7 +24,6 @@ import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.*
-import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.XFormsNames.{APPEARANCE_QNAME, XFORMS_STRING_QNAME}
 import org.orbeon.xml.NamespaceMapping
 
@@ -517,10 +516,10 @@ object BindingDescriptor {
 
             val nonAppearanceDescs = attFilters.collect {
               case (attTypeSelector, attPredicate, false) =>
-                  BindingAttributeDescriptor(
-                    attTypeSelector.toQName(ns),
-                    attPredicate
-                  )
+                BindingAttributeDescriptor(
+                  attTypeSelector.toQName(ns),
+                  attPredicate
+                )
             }
 
             (

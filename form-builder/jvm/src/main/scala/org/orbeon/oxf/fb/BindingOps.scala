@@ -311,28 +311,28 @@ trait BindingOps {
         index.iterateDescriptors.collect {
           case
             b @ BindingDescriptor(
-            Some(`virtualName`),
-            d @ (None | Some(Datatype1 | Datatype2)),
-            None,
-            a @ (EmptySet() | MatchesAllAttDescsExtractor(_))
+              Some(`virtualName`),
+              d @ (None | Some(Datatype1 | Datatype2)),
+              None,
+              a @ (EmptySet() | MatchesAllAttDescsExtractor(_))
             ) =>
-            (None, b.binding, d.isDefined, a.nonEmpty)
+              (None, b.binding, d.isDefined, a.nonEmpty)
           case
             b @ BindingDescriptor(
-            Some(`virtualName`),
-            d @ (None | Some(Datatype1 | Datatype2)),
-            Some(AttributePredicate.Equal(appearance)),
-            a @ (EmptySet() | MatchesAllAttDescsExtractor(_))
+              Some(`virtualName`),
+              d @ (None | Some(Datatype1 | Datatype2)),
+              Some(AttributePredicate.Equal(appearance)),
+              a @ (EmptySet() | MatchesAllAttDescsExtractor(_))
             ) =>
-            (Some(appearance), b.binding, d.isDefined, a.nonEmpty)
+              (Some(appearance), b.binding, d.isDefined, a.nonEmpty)
           case
             b @ BindingDescriptor(
-            Some(`virtualName`),
-            d @ (None | Some(Datatype1 | Datatype2)),
-            Some(AttributePredicate.Token(appearance)),
-            a @ (EmptySet() | MatchesAllAttDescsExtractor(_))
+              Some(`virtualName`),
+              d @ (None | Some(Datatype1 | Datatype2)),
+              Some(AttributePredicate.Token(appearance)),
+              a @ (EmptySet() | MatchesAllAttDescsExtractor(_))
             ) =>
-            (Some(appearance), b.binding, d.isDefined, a.nonEmpty)
+              (Some(appearance), b.binding, d.isDefined, a.nonEmpty)
         }
 
       // Consider bindings that match an attribute first

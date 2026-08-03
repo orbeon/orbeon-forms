@@ -160,8 +160,8 @@ object CSSSelectorParser {
     def applySelectorAndFilters(selector: SimpleElementSelector, filters: Seq[Filter]): ElementWithFiltersSelector = ElementWithFiltersSelector(Some(selector), filters.toList)
   }
 
-  def parseSelectors(process: String): List[Selector] =
-     new CSSSelectorParser(process).selectorsGroup.run() match {
+  def parseSelectors(selectors: String): List[Selector] =
+     new CSSSelectorParser(selectors).selectorsGroup.run() match {
       case Success(astRoot) => astRoot.toList
       case Failure(t)       => throw t
     }

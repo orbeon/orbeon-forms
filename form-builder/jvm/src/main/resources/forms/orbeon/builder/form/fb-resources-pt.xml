@@ -684,6 +684,9 @@
         <control-appearance>
             <label>Aparência do Controlo</label>
         </control-appearance>
+        <control-conversion>
+            <label todo="true">Change Control To</label>
+        </control-conversion>
         <whitespace>
             <item>
                 <label>Remover espaços iniciais e finais</label>

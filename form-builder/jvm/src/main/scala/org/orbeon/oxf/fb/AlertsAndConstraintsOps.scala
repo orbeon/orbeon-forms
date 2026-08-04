@@ -56,12 +56,13 @@ trait AlertsAndConstraintsOps extends ControlOps {
     (v => elemToNodeInfo(v.toXML))
 
   def writeAlertsAndValidationsAsXML(
-    controlName      : String,
-    newAppearance    : String,
-    defaultAlertElem : NodeInfo,
-    validationElems  : List[NodeInfo]
+    controlName       : String,
+    newAppearance     : String,
+    defaultAlertElem  : NodeInfo,
+    validationElems   : List[NodeInfo],
+    controlElemUpdated: Boolean = false
   )(implicit
-    ctx              : FormBuilderDocContext
+    ctx               : FormBuilderDocContext
   ): Unit = {
 
     // Current resolutions, which could be lifted in the future:
@@ -97,7 +98,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       case v: DatatypeValidation => v
     } foreach { v =>
 
-      v.renameControlIfNeeded(controlName, newAppearance.trimAllToOpt)
+      v.renameControlIfNeeded(controlName, newAppearance.trimAllToOpt, useNewDatatypeAsCurrent = controlElemUpdated)
 
       writeValidations(
         controlName,
@@ -344,18 +345,19 @@ trait AlertsAndConstraintsOps extends ControlOps {
     def level      : ValidationLevel = ValidationLevel.ErrorLevel
     def stringValue: String          = XMLUtils.buildQName(datatypeQName.namespace.prefix, datatypeQName.localName)
 
-    // Rename control element if needed when the datatype changes
+    // Rename control element if needed when the datatype or appearance changes
     def renameControlIfNeeded(
-      controlName     : String,
-      newAppearanceOpt: Option[String]
+      controlName            : String,
+      newAppearanceOpt       : Option[String],
+      useNewDatatypeAsCurrent: Boolean = false
     )(implicit
-      ctx             : FormBuilderDocContext
+      ctx                    : FormBuilderDocContext
     ): Unit = {
       import ctx.bindingIndex
       val newDatatype = datatypeQName
       for {
         controlElem <- findControlByName(controlName)
-        oldDatatype = DatatypeValidation.fromForm(controlName).datatypeQName
+        oldDatatype = if (useNewDatatypeAsCurrent) newDatatype else DatatypeValidation.fromForm(controlName).datatypeQName
         oldAtts     = BindingDescriptor.getAtts(controlElem)
         (newElemName, newAppearanceAttOpt) <-
           FormBuilder.newElementName(

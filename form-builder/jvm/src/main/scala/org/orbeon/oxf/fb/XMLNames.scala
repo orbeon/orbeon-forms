@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.fb
 
-import org.orbeon.dom.QName
+import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_URI as XF
 import org.orbeon.scaxon.SimplePath.Test
 import org.orbeon.xforms.XFormsNames
@@ -22,6 +22,8 @@ object XMLNames {
 
   val FBPrefix = "fb"
   val FB       = "http://orbeon.org/oxf/xml/form-builder"
+
+  val FBNamespace                 : Namespace = Namespace(FBPrefix, FB)
 
   val FBMetadataTest              : Test  = FB -> "metadata"
   val FBTemplateTest              : Test  = FB -> "template"
@@ -32,6 +34,7 @@ object XMLNames {
   val FBDatatypeTest              : Test  = FB -> "datatype"
   val FBBindTest                  : Test  = FB -> "bind"
   val FBSubmissionTest            : Test  = FB -> "submission"
+  val FBConversionsTest           : Test  = FB -> "conversions"
 
   val FBEnclosingSectionTemplatesTest: Test  = FB -> "enclosing-section-templates"
 

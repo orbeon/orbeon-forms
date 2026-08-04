@@ -695,6 +695,9 @@
         <control-appearance>
             <label>Erscheinungsbild der Steuerelemente</label>
         </control-appearance>
+        <control-conversion>
+            <label todo="true">Change Control To</label>
+        </control-conversion>
         <whitespace>
             <item>
                 <label>Leerzeich davor und danach entfernen</label>

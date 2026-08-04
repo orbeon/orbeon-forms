@@ -38,7 +38,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.action.actions.XXFormsInvalidateInstanceAction
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.analysis.model.MipName
+import org.orbeon.oxf.xforms.analysis.model.{MipName, Types}
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor.*
@@ -361,11 +361,28 @@ object FormBuilderXPathApi {
     defaultAlertElem : NodeInfo,
     validationElems  : Array[NodeInfo]
   ): Unit =
+    writeAlertsAndValidationsAsXML(
+      controlName        = controlName,
+      newAppearance      = newAppearance,
+      defaultAlertElem   = defaultAlertElem,
+      validationElems    = validationElems,
+      controlElemUpdated = false
+    )
+
+  //@XPathFunction
+  def writeAlertsAndValidationsAsXML(
+    controlName       : String,
+    newAppearance     : String,
+    defaultAlertElem  : NodeInfo,
+    validationElems   : Array[NodeInfo],
+    controlElemUpdated: Boolean
+  ): Unit =
     FormBuilder.writeAlertsAndValidationsAsXML(
       controlName,
       newAppearance,
       defaultAlertElem,
-      validationElems.to(List)
+      validationElems.to(List),
+      controlElemUpdated
     )(FormBuilderDocContext())
 
   //@XPathFunction
@@ -780,16 +797,19 @@ object FormBuilderXPathApi {
   def possibleAppearancesByControlNameAsXML(
     controlName       : String,
     isInitialLoad     : Boolean,
+    controlElemAtts   : NodeInfo,
     newDatatypeOrEmpty: String,
     desiredAppearance : String // relevant only if `isInitialLoad == false`
   ): Array[NodeInfo] =
     FormBuilder.possibleAppearancesByControlNameAsXML(
       controlName,
       isInitialLoad,
+      controlElemAtts,
       newDatatypeOrEmpty,
       desiredAppearance
     )(FormBuilderDocContext()).to(Array)
 
+  // Used by `dialog-form-settings.xbl`
   //@XPathFunction
   def directNameFromBinding(
     bindingElem: NodeInfo
@@ -803,7 +823,9 @@ object FormBuilderXPathApi {
     val bindingNs = NamespaceMapping(bindingElem.namespaceMappings.toMap)
 
     val directNameOpt =
-      selectors collectFirst BindingDescriptor.directBindingPF(bindingNs, None) flatMap (_.elementName)
+      selectors
+        .collectFirst(BindingDescriptor.directBindingPF(bindingNs, None))
+        .flatMap(_.elementName)
 
     val updatedDirectNameOpt =
       for {
@@ -1089,6 +1111,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def findNewControlBinding(
     controlName        : String,
+    controlElemAtts    : NodeInfo,
     builtinTypeOrBlank : String,
     builtinTypeRequired: Boolean,
     schemaTypeOrBlank  : String,
@@ -1098,9 +1121,7 @@ object FormBuilderXPathApi {
     implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
     import ctx.bindingIndex
 
-    val oldControlElem = findControlByNameOrEmpty(controlName)
-    val oldDatatype    = FormBuilder.DatatypeValidation.fromForm(controlName).datatypeQName
-    val oldAtts        = (oldControlElem /@ @*).view.map(attNode => (attNode.qName, attNode.stringValue))
+    val atts = BindingDescriptor.getAtts(controlElemAtts)
 
     val newDatatype =
       DatatypeValidation.datatypeQNameFromStrings(
@@ -1109,11 +1130,13 @@ object FormBuilderXPathApi {
         schemaTypeOpt  = schemaTypeOrBlank.trimAllToOpt
       ).fold(_._1, identity)
 
+    val searchAtts = updateAttAppearance(atts, appearanceOpt)
+
     val (virtualName, _) =
       findVirtualNameAndAppearance(
-        searchElemName = oldControlElem.uriQualifiedName,
-        searchDatatype = oldDatatype,
-        searchAtts     = oldAtts
+        searchElemName = controlElemAtts.uriQualifiedName,
+        searchDatatype = newDatatype,
+        searchAtts     = searchAtts
       )
 
     for {
@@ -1121,12 +1144,40 @@ object FormBuilderXPathApi {
         findMostSpecificBindingUseEqualOrToken(
           searchElemName = virtualName,
           datatypeMatch  = DatatypeMatch.makeExcludeStringMatch(newDatatype),
-          searchAtts     = updateAttAppearance(oldAtts, appearanceOpt)
+          searchAtts     = searchAtts
         )
       binding    <- descriptor.binding
     } yield
       binding
   }
+
+  //@XPathFunction
+  def updateControlElemAtts(
+    controlName            : String,
+    controlElemAtts        : NodeInfo,
+    previousDatatypeOrEmpty: String,
+    newDatatypeOrEmpty     : String,
+    appearanceOrEmpty      : String
+  ): NodeInfo =
+    FormBuilder.updatedControlElemAtts(
+      controlName             = controlName,
+      controlElemAtts         = controlElemAtts,
+      previousDatatypeOrEmpty = previousDatatypeOrEmpty,
+      newDatatypeOrEmpty      = newDatatypeOrEmpty,
+      appearanceOrEmpty       = appearanceOrEmpty
+    )(FormBuilderDocContext())
+
+  //@XPathFunction
+  def saveControlElemAtts(
+    controlName    : String,
+    controlElemAtts: NodeInfo,
+    keepCurrentAtts: Boolean
+  ): Unit =
+    FormBuilder.saveControlElemAtts(
+      controlName     = controlName,
+      controlElemAtts = controlElemAtts,
+      keepCurrentAtts = keepCurrentAtts
+    )(FormBuilderDocContext())
 
   private def renamingDetailsToXPath(renamingDetails: Option[Seq[(String, String, Boolean)]]): SequenceIterator =
     renamingDetails.toList.flatten map {
@@ -1548,6 +1599,7 @@ object FormBuilderXPathApi {
         elem        <- FormBuilder.possibleAppearancesByControlNameAsXML(
           controlName        = controlName,
           isInitialLoad      = true,
+          controlElemAtts    = controlElem,
           newDatatypeOrEmpty = datatypeStr,
           desiredAppearance  = ""
         )
@@ -1574,6 +1626,26 @@ object FormBuilderXPathApi {
         dt.renameControlIfNeeded(controlName, newAppearance.trimAllToOpt)
       }
     }
+  }
+
+  //@XPathFunction
+  def findPossibleControlConversions(
+    controlName       : String,
+    controlElemAtts   : NodeInfo,
+    newDatatypeOrEmpty: String,
+    desiredAppearance : String,
+    lang              : String
+  ): Array[NodeInfo] = {
+
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+
+    FormBuilder.findPossibleControlConversions(
+      controlName,
+      controlElemAtts,
+      newDatatypeOrEmpty,
+      desiredAppearance,
+      lang
+    ).toArray
   }
 
   private def processUndoRedoAction(

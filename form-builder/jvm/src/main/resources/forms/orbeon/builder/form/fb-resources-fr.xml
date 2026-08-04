@@ -719,6 +719,9 @@
         <control-appearance>
             <label>Apparence du contrôle</label>
         </control-appearance>
+        <control-conversion>
+            <label>Changer le contrôle en</label>
+        </control-conversion>
         <whitespace>
             <item>
                 <label>Supprimer les espaces avant et après la valeur</label>

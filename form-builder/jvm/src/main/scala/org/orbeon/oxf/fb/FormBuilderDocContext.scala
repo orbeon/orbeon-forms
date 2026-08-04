@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.dom.QName
 import org.orbeon.oxf.fb.FormBuilderDocContext.{BindingIndexKey, FormBuilderNs}
 import org.orbeon.oxf.fr.{FormRunnerDocContext, Names}
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.model.XFormsModel
-import org.orbeon.oxf.xforms.xbl.{BindingDescriptor, BindingIndex}
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor.{buildIndexFromBindingDescriptors, getAllRelevantDescriptors}
+import org.orbeon.oxf.xforms.xbl.{BindingDescriptor, BindingIndex}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
@@ -38,15 +39,20 @@ case class FormBuilderDocContext(
 
   lazy val undoRootElem = undoInstance.get.rootElement
 
+  type CachedIndexAndDeps = (BindingIndex[BindingDescriptor], Map[QName, Set[QName]])
+
   // We cache the index against the form definition document
-  lazy implicit val bindingIndex: BindingIndex[BindingDescriptor] =
+  lazy implicit val (bindingIndex: BindingIndex[BindingDescriptor], conversions: Map[QName, Set[QName]]): CachedIndexAndDeps =
     formBuilderModel
       .flatMap(_.containingDocument.getAttribute(FormBuilderNs, BindingIndexKey))
-      .map(_.asInstanceOf[BindingIndex[BindingDescriptor]])
+      .map(_.asInstanceOf[CachedIndexAndDeps])
       .getOrElse {
-        val index = buildIndexFromBindingDescriptors(getAllRelevantDescriptors(componentBindings))
-        formBuilderModel.foreach(_.containingDocument.setAttribute(FormBuilderNs, BindingIndexKey, index))
-        index
+        val index       = buildIndexFromBindingDescriptors(getAllRelevantDescriptors(componentBindings))
+        val conversions = FormBuilder.createConversionsMap(index)
+        val result      = (index, conversions)
+        formBuilderModel.foreach(_.containingDocument.setAttribute(FormBuilderNs, BindingIndexKey, result))
+
+        result
       }
 
   private def componentBindings: Seq[NodeInfo] =

@@ -66,6 +66,7 @@
                     </xf:textarea>
                 </view>
             </templates>
+            <conversions element="xf|textarea"/>
         </metadata>
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/tinymce/tinymce.css"/>

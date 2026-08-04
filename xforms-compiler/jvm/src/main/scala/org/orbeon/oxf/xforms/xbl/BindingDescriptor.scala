@@ -78,8 +78,12 @@ object BindingDescriptor {
     case _ => false
   }
 
-  object EmptySet {
+  object EmptySet { // EmptySetMatcher
     def unapply[A](s: Set[A]): Boolean = s.isEmpty
+  }
+
+  object NonEmptySetMatcher {
+    def unapply[A](s: Set[A]): Boolean = s.nonEmpty
   }
 
   trait AppearanceExtractor {
@@ -164,7 +168,7 @@ object BindingDescriptor {
   def findMostSpecificBinding[T](
     qName           : QName,
     datatypeMatch   : DatatypeMatch,
-    atts            : Iterable[(QName, String)],
+    atts            : Iterable[(QName, String)], // including `appearance` if any
     filterAppearance: AttributePredicate => Boolean = _ => true
   )(implicit
     index           : BindingIndex[T]
@@ -264,7 +268,7 @@ object BindingDescriptor {
   def findMostSpecificBindingUseEqualOrToken(
     searchElemName: QName,
     datatypeMatch : DatatypeMatch,
-    searchAtts    : Iterable[(QName, String)],
+    searchAtts    : Iterable[(QName, String)], // including `appearance` if any
   )(implicit
     index         : BindingIndex[BindingDescriptor]
   ): Option[BindingDescriptor] =
@@ -299,7 +303,7 @@ object BindingDescriptor {
         descriptor <- mostSpecificDescriptorOpt
         _ = assert(descriptor.datatype.isEmpty)
         // See comments in https://github.com/orbeon/orbeon-forms/issues/2479
-        if descriptor.otherAtts.isEmpty && descriptor.appearanceOpt.isEmpty // only a direct binding can be an alias for another related binding
+        if descriptor.otherAtts.isEmpty && descriptor.appearanceOpt.isEmpty // only a direct binding can be an alias for another related binding (when there is no datatype)
         relatedDescriptors = findRelatedDescriptors(descriptor).filterNot(_ == descriptor)
         BindingDescriptor(elemNameOpt, _, appearanceOpt, _) <- findRelatedVaryNameAndAppearance(searchDatatype, searchAtts, relatedDescriptors)
         elemName <- elemNameOpt
@@ -679,6 +683,76 @@ object BindingDescriptor {
         findWithNameAppearanceAndAtt       orElse
         findWithNameAndAtt                 orElse
         findWithNameAndAppearance
+    }
+  }
+
+  // This find a "static" (without datatype) most specific descriptor. The descriptor must have an element name.
+  // We could maybe use a scoring system instead.
+  def findMostSpecificStaticBindingInRelated(
+    relatedDescriptors: Iterable[BindingDescriptor]
+  ): Option[BindingDescriptor] = {
+
+    def findWithNameAppearanceAndAtt: Option[BindingDescriptor] =
+      relatedDescriptors.collectFirst {
+        case
+          descriptor @ BindingDescriptor(
+            Some(_),
+            None,
+            Some(_),
+            NonEmptySetMatcher(),
+          ) => descriptor
+      }
+
+    def findWithNameAndAtt: Option[BindingDescriptor] =
+      relatedDescriptors.collectFirst {
+        case
+          descriptor @ BindingDescriptor(
+            Some(_),
+            None,
+            None,
+            NonEmptySetMatcher(),
+          ) => descriptor
+      }
+
+    def findWithNameAndAppearance: Option[BindingDescriptor] =
+      relatedDescriptors.collectFirst {
+        case
+          descriptor @ BindingDescriptor(
+            Some(_),
+            None,
+            Some(_),
+            EmptySet()
+          ) => descriptor
+      }
+
+    def findWithNameOnly: Option[BindingDescriptor] =
+      relatedDescriptors.collectFirst {
+        case
+          descriptor @ BindingDescriptor(
+            Some(_),
+            None,
+            None,
+            EmptySet()
+          ) => descriptor
+      }
+
+      findWithNameAppearanceAndAtt orElse
+      findWithNameAndAtt           orElse
+      findWithNameAndAppearance    orElse
+      findWithNameOnly
+  }
+
+  def findPossibleDatatypes(
+    relatedDescriptors: Iterable[BindingDescriptor]
+  ): Iterable[QName] = {
+    relatedDescriptors.collect {
+      case
+        BindingDescriptor(
+          Some(_),
+          Some(datatype),
+          _,
+          _
+        ) => datatype
     }
   }
 }

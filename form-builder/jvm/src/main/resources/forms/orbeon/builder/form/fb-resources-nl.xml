@@ -684,6 +684,9 @@
         <control-appearance>
             <label>Control weergave</label>
         </control-appearance>
+        <control-conversion>
+            <label todo="true">Change Control To</label>
+        </control-conversion>
         <whitespace>
             <item>
                 <label>Verwijder start- en eindspaties</label>

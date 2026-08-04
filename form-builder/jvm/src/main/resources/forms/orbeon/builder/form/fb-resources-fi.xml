@@ -704,6 +704,9 @@
         <control-appearance>
             <label>Kontrollin ulkoasu</label>
         </control-appearance>
+        <control-conversion>
+            <label todo="true">Change Control To</label>
+        </control-conversion>
         <whitespace>
             <item>
                 <label>Poista alussa ja lopussa olevat välilyönnit</label>

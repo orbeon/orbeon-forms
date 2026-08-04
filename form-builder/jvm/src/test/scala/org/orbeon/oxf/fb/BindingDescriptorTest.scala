@@ -15,6 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fb.FormBuilder.*
+import org.orbeon.oxf.fr.FormRunner.{findBindByName, findControlByName}
 import org.orbeon.oxf.fr.XMLNames.{XBLBindingTest, XBLXBLTest}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.analysis.model.Types
@@ -27,6 +28,8 @@ import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.Namespaces
 import org.orbeon.xforms.XFormsNames.*
 import org.scalatest.funspec.AnyFunSpecLike
+
+import scala.xml.Elem
 
 
 class BindingDescriptorTest
@@ -52,12 +55,14 @@ class BindingDescriptorTest
         <xbl:binding element="xf|textarea">
           <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Plain Text Area</display-name>
+            <conversions element="xf|input"/>
           </metadata>
         </xbl:binding>
 
         <xbl:binding element="fr|number, xf|input:xxf-type('xs:decimal'), xf|input:xxf-type('xs:integer')">
           <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Number</display-name>
+            <conversions element="xf|input"/>
           </metadata>
         </xbl:binding>
 
@@ -76,6 +81,7 @@ class BindingDescriptorTest
         <xbl:binding element="xf|input:xxf-type('xs:date')">
           <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Date</display-name>
+            <conversions element="xf|input"/>
           </metadata>
         </xbl:binding>
 
@@ -172,6 +178,7 @@ class BindingDescriptorTest
         <xbl:binding element="fr|tinymce, xf|textarea[mediatype = 'text/html']">
           <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Formatted Text Area</display-name>
+            <conversions element="xf|textarea"/>
           </metadata>
         </xbl:binding>
 
@@ -190,6 +197,7 @@ class BindingDescriptorTest
         <xbl:binding element="fr|us-ein">
           <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">US Employer Identification Number (EIN)</display-name>
+            <conversions element="xf|input"/>
           </metadata>
         </xbl:binding>
 
@@ -389,5 +397,323 @@ class BindingDescriptorTest
     assertVaryTypes(FR -> "color",        FR -> "color"       , None, Nil      )("Color")
     assertVaryTypes(FR -> "masked-input", XS -> "string"      , None, Nil      )("Masked Input")
     assertVaryTypes(FR -> "masked-input", FR -> "masked-input", None, Nil      )("Masked Input")
+  }
+
+  describe("createGroups") {
+    it("must group connected QNames into disjoint sets") {
+      val a = QName("a")
+      val b = QName("b")
+      val c = QName("c")
+      val d = QName("d")
+      val e = QName("e")
+
+      val pairs = List(
+        a -> b,
+        b -> c,
+        d -> e
+      )
+
+      val result = BindingOps.createGroups(pairs)
+
+      val group1 = Set(a, b, c)
+      val group2 = Set(d, e)
+
+      assert(result(a) == group1)
+      assert(result(b) == group1)
+      assert(result(c) == group1)
+
+      assert(result(d) == group2)
+      assert(result(e) == group2)
+
+      assert(result(a) eq result(b))
+      assert(result(a) eq result(c))
+
+      assert(result(d) eq result(e))
+
+      assert(result.size == 5)
+    }
+
+    it("must handle empty list") {
+      assert(BindingOps.createGroups(Nil).isEmpty)
+    }
+
+    it("must handle single elements / loops") {
+      val a = QName("a")
+      val result = BindingOps.createGroups(List(a -> a))
+      assert(result(a) == Set(a))
+    }
+  }
+
+  describe("Control conversions") {
+
+    def isSameQName(q1: QName, q2: QName): Boolean = q1 == q2
+
+    def expectedTextConversions(
+      current        : QName,
+      removeMediatype: Boolean = false,
+      numberDatatype : QName   = XF -> "decimal"
+    ): List[ConversionResult] = {
+      val removed = if (removeMediatype) Set(QName("mediatype")) else Set.empty[QName]
+      List(
+        ConversionResult(
+          fullLabelOpt  = Some("Text Field"),
+          value         = XF -> "input",
+          elemName      = XF -> "input",
+          appearanceOpt = None,
+          datatypeOpt   = None,
+          addAtts       = Set.empty,
+          removeAtts    = removed,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-font",
+          isCurrent     = isSameQName(current, XF -> "input")
+        ),
+        ConversionResult(
+          fullLabelOpt  = Some("Plain Text Area"),
+          value         = XF -> "textarea",
+          elemName      = XF -> "textarea",
+          appearanceOpt = None,
+          datatypeOpt   = None,
+          addAtts       = Set.empty,
+          removeAtts    = removed,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-align-left",
+          isCurrent     = isSameQName(current, XF -> "textarea")
+        ),
+        ConversionResult(
+          fullLabelOpt  = Some("Formatted Text Area"),
+          value         = FR -> "tinymce",
+          elemName      = XF -> "textarea",
+          appearanceOpt = None,
+          datatypeOpt   = Some(XF -> "HTMLFragment"),
+          addAtts       = Set(QName("mediatype") -> "text/html"),
+          removeAtts    = Set.empty,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-html5",
+          isCurrent     = isSameQName(current, FR -> "tinymce")
+        ),
+        ConversionResult(
+          fullLabelOpt  = Some("Number"),
+          value         = FR -> "number",
+          elemName      = FR -> "number",
+          appearanceOpt = None,
+          datatypeOpt   = Some(numberDatatype),
+          addAtts       = Set.empty,
+          removeAtts    = removed,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-superscript",
+          isCurrent     = isSameQName(current, FR -> "number")
+        )
+      )
+    }
+
+    def expectedAttachmentConversions(
+      current   : QName,
+      removeAtts: Set[QName] = Set.empty
+    ): List[ConversionResult] =
+      List(
+        ConversionResult(
+          fullLabelOpt    = Some("Single File Attachment"),
+          value           = FR -> "attachment",
+          elemName        = FR -> "attachment",
+          appearanceOpt   = None,
+          datatypeOpt     = Some(XF -> "anyURI"),
+          addAtts         = Set.empty,
+          removeAtts      = removeAtts,
+          standardClasses = "fr-attachment",
+          iconPathOpt     = None,
+          iconClasses     = "fa fa-fw fa-file-o",
+          isCurrent       = isSameQName(current, FR -> "attachment")
+        ),
+        ConversionResult(
+          fullLabelOpt    = Some("Image Attachment"),
+          value           = FR -> "image-attachment",
+          elemName        = FR -> "image-attachment",
+          appearanceOpt   = None,
+          datatypeOpt     = Some(XF -> "anyURI"),
+          addAtts         = Set.empty,
+          removeAtts      = removeAtts,
+          standardClasses = "fr-attachment",
+          iconPathOpt     = None,
+          iconClasses     = "fa fa-fw fa-file-image-o",
+          isCurrent       = isSameQName(current, FR -> "image-attachment")
+        )
+      )
+
+    val testValues: List[(Elem, QName, Option[String], List[ConversionResult])] =
+      List(
+        (<xf:input xmlns:xf="http://www.w3.org/2002/xforms"/>,                        XS -> "string",       Some("minimal"),           expectedTextConversions(XF -> "input")),
+        (<xf:input xmlns:xf="http://www.w3.org/2002/xforms"/>,                        XS -> "string",       Some("character-counter"), expectedTextConversions(XF -> "input")),
+        (<xf:textarea xmlns:xf="http://www.w3.org/2002/xforms"/>,                     XS -> "string",       None,                      expectedTextConversions(XF -> "textarea")),
+        (<xf:textarea xmlns:xf="http://www.w3.org/2002/xforms"/>,                     XS -> "string",       Some("character-counter"), expectedTextConversions(XF -> "textarea")),
+        (<xf:textarea xmlns:xf="http://www.w3.org/2002/xforms" mediatype="text/html"/>, XF -> "HTMLFragment", None,                    expectedTextConversions(FR -> "tinymce", removeMediatype = true)),
+        (<xf:textarea xmlns:xf="http://www.w3.org/2002/xforms" mediatype="text/html"/>, XF -> "HTMLFragment", Some("character-counter"), expectedTextConversions(FR -> "tinymce", removeMediatype = true)),
+        (<fr:tinymce xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,              XF -> "HTMLFragment", None,                      expectedTextConversions(FR -> "tinymce")),
+        (<fr:number xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,               XS -> "decimal",      None,                      expectedTextConversions(FR -> "number")),
+        (<fr:number xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,               XS -> "integer",      None,                      expectedTextConversions(FR -> "number", numberDatatype = XF -> "integer")),
+        (<fr:percentage xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,           XF -> "decimal",      None,                      expectedTextConversions(FR -> "number")),
+        (<xf:input xmlns:xf="http://www.w3.org/2002/xforms"/>,                        XF -> "decimal",      Some("xxf:percentage"),    expectedTextConversions(FR -> "number")),
+        (<fr:number-stepper xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,       XF -> "integer",      None,                      expectedTextConversions(FR -> "number", numberDatatype = XF -> "integer")),
+        (<fr:attachment xmlns:fr="http://orbeon.org/oxf/xml/form-runner" class="fr-attachment"/>,
+          XF -> "anyURI", None, expectedAttachmentConversions(FR -> "attachment")),
+        (<fr:image-attachment xmlns:fr="http://orbeon.org/oxf/xml/form-runner" class="fr-attachment"/>,
+          XF -> "anyURI", None, expectedAttachmentConversions(FR -> "image-attachment")),
+        (<fr:attachment xmlns:fr="http://orbeon.org/oxf/xml/form-runner" class="fr-attachment" allow-download="false"/>,
+          XF -> "anyURI", None, expectedAttachmentConversions(FR -> "attachment", removeAtts = Set(QName("allow-download")))),
+        (<xf:select1 xmlns:xf="http://www.w3.org/2002/xforms" appearance="full"/>,    XS -> "string",       Some("full"),              Nil),
+        (<fr:date xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,                 XS -> "date",         None,                      Nil),
+      )
+
+    for ((controlElem, datatype, appearance, expected) <- testValues) {
+      it(s"must find possible control conversions for $controlElem/$datatype/$appearance") {
+        withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
+          val conversions =
+            FormBuilder.findPossibleControlConversions2(
+              originalControlElemAtts = controlElem,
+              originalDatatype        = datatype,
+              originalAppearanceOpt   = appearance,
+              lang                    = "en"
+            )
+
+          assert(conversions == expected)
+        }
+      }
+    }
+
+    it("must strip incompatible custom attributes in XML conversion elements") {
+      withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
+        val conversionsXml =
+          FormBuilder.findPossibleControlConversions(
+            controlName            = "control-1",
+            controlElemAtts        = <fr:attachment xmlns:fr="http://orbeon.org/oxf/xml/form-runner" allow-download="false"/>,
+            currentDatatypeOrEmpty = "anyURI",
+            desiredAppearance      = "",
+            lang                   = "en"
+          )
+
+        val imageConversionElem =
+          conversionsXml.find(c => (c / "value").stringValue == s"Q{$FR}image-attachment").get / "element" / *
+
+        assert(imageConversionElem.nonEmpty)
+        assert(imageConversionElem.head.name == "fr:image-attachment")
+        assert(imageConversionElem.head.attValueOpt("allow-download").isEmpty)
+      }
+    }
+
+    it("must find target appearances for converted controls before saving") {
+      withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
+        val tinyMceAppearances =
+          FormBuilder.possibleAppearancesByControlNameAsXML(
+            controlName        = "control-1",
+            isInitialLoad      = false,
+            controlElemAtts    = <xf:textarea xmlns:xf="http://www.w3.org/2002/xforms" mediatype="text/html"/>,
+            newDatatypeOrEmpty = "HTMLFragment",
+            desiredAppearance  = ""
+          )
+
+        assert(tinyMceAppearances.find(_.localname == "description").map(_.stringValue).contains("Formatted Text Area"))
+        assert(tinyMceAppearances.filter(_.localname == "appearance").map(a => (a / "value").stringValue -> (a attValue "current")).toSet == Set(
+          ""                  -> "true",
+          "character-counter" -> "false"
+        ))
+
+        val percentageAppearances =
+          FormBuilder.possibleAppearancesByControlNameAsXML(
+            controlName        = "control-1",
+            isInitialLoad      = false,
+            controlElemAtts    = <fr:number xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,
+            newDatatypeOrEmpty = "decimal",
+            desiredAppearance  = "xxf:percentage"
+          )
+
+        assert(percentageAppearances.exists(a => (a / "value").stringValue == "xxf:percentage" && (a attValue "current") == "true"))
+      }
+    }
+
+    it("must save control element, attributes, appearance, and datatype across conversions") {
+      withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
+        val Control1             = "control-1"
+        val globalAlertAsXML: NodeInfo = AlertDetails(None, Nil, global = true, params = Nil).toXML
+
+        def datatypeValidationXml(builtinType: String): NodeInfo =
+          <validation type="datatype" id="" level="error" default-alert="true">
+            <builtin-type>{builtinType}</builtin-type>
+            <builtin-type-required>false</builtin-type-required>
+            <schema-type/>
+            <alert global="true"/>
+          </validation>
+
+        // 1. `xf:input` -> Plain Text Area (`xf:textarea`, same `string` datatype)
+        FormBuilder.saveControlElemAtts(
+          controlName     = Control1,
+          controlElemAtts = <xf:textarea xmlns:xf="http://www.w3.org/2002/xforms"/>,
+          keepCurrentAtts = false
+        )
+        FormBuilder.writeAlertsAndValidationsAsXML(
+          controlName        = Control1,
+          newAppearance      = "",
+          defaultAlertElem   = globalAlertAsXML,
+          validationElems    = List(datatypeValidationXml("string")),
+          controlElemUpdated = true
+        )
+
+        assert(findControlByName(Control1).map(_.name).contains("xf:textarea"))
+        assert(findControlByName(Control1).flatMap(_.attValueOpt("appearance")).isEmpty)
+        assert(findBindByName(Control1).flatMap(_.attValueOpt("type")).isEmpty)
+
+        // 2. `xf:textarea` -> Formatted Text Area (`xf:textarea[@mediatype = 'text/html']` + `xf:HTMLFragment`)
+        FormBuilder.saveControlElemAtts(
+          controlName     = Control1,
+          controlElemAtts = <xf:textarea xmlns:xf="http://www.w3.org/2002/xforms" mediatype="text/html"/>,
+          keepCurrentAtts = false
+        )
+        FormBuilder.writeAlertsAndValidationsAsXML(
+          controlName        = Control1,
+          newAppearance      = "",
+          defaultAlertElem   = globalAlertAsXML,
+          validationElems    = List(datatypeValidationXml("HTMLFragment")),
+          controlElemUpdated = true
+        )
+
+        assert(findControlByName(Control1).map(_.name).contains("xf:textarea"))
+        assert(findControlByName(Control1).flatMap(_.attValueOpt("mediatype")).contains("text/html"))
+        assert(findBindByName(Control1).flatMap(_.attValueOpt("type")).contains("xf:HTMLFragment"))
+
+        // 3. Formatted Text Area -> Text Field (`xf:input` removes `@mediatype` and resets datatype to `string`)
+        FormBuilder.saveControlElemAtts(
+          controlName     = Control1,
+          controlElemAtts = <xf:input xmlns:xf="http://www.w3.org/2002/xforms"/>,
+          keepCurrentAtts = false
+        )
+        FormBuilder.writeAlertsAndValidationsAsXML(
+          controlName        = Control1,
+          newAppearance      = "",
+          defaultAlertElem   = globalAlertAsXML,
+          validationElems    = List(datatypeValidationXml("string")),
+          controlElemUpdated = true
+        )
+
+        assert(findControlByName(Control1).map(_.name).contains("xf:input"))
+        assert(findControlByName(Control1).flatMap(_.attValueOpt("mediatype")).isEmpty)
+        assert(findBindByName(Control1).flatMap(_.attValueOpt("type")).isEmpty)
+
+        // 4. Text Field -> Number with Percentage appearance (`fr:percentage` + `xf:decimal`)
+        FormBuilder.saveControlElemAtts(
+          controlName     = Control1,
+          controlElemAtts = <fr:number xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,
+          keepCurrentAtts = false
+        )
+        FormBuilder.writeAlertsAndValidationsAsXML(
+          controlName        = Control1,
+          newAppearance      = "xxf:percentage",
+          defaultAlertElem   = globalAlertAsXML,
+          validationElems    = List(datatypeValidationXml("decimal")),
+          controlElemUpdated = true
+        )
+
+        assert(findControlByName(Control1).map(_.name).contains("fr:percentage"))
+        assert(findControlByName(Control1).flatMap(_.attValueOpt("appearance")).isEmpty)
+        assert(findBindByName(Control1).flatMap(_.attValueOpt("type")).contains("xf:decimal"))
+      }
+    }
   }
 }

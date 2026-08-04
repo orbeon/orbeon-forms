@@ -64,6 +64,7 @@
                 <setting name="transform-quality" type="xs:integer" min="1" max="100"/>
                 <setting name="transform-format" type="xs:string" values="jpg png"/>
             </custom-settings>
+            <conversions element="fr|attachment"/>
             <control-details>
                 <xf:model xmlns="">
 

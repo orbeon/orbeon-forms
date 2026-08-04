@@ -683,6 +683,9 @@
         <control-appearance>
             <label>Kontrollutseende</label>
         </control-appearance>
+        <control-conversion>
+            <label todo="true">Change Control To</label>
+        </control-conversion>
         <whitespace>
             <item>
                 <label>Fjern innledende og etterfølgende mellomrom</label>

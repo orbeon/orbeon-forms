@@ -691,6 +691,9 @@
         <control-appearance>
             <label>Aspetto del controllo</label>
         </control-appearance>
+        <control-conversion>
+            <label todo="true">Change Control To</label>
+        </control-conversion>
         <whitespace>
             <item>
                 <label>Rimuovi spazi iniziali e finali</label>

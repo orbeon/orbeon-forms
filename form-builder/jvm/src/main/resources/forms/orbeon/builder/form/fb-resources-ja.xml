@@ -703,6 +703,9 @@
         <control-appearance>
             <label>表示形式</label>
         </control-appearance>
+        <control-conversion>
+            <label todo="true">Change Control To</label>
+        </control-conversion>
         <whitespace>
             <item>
                 <label>前後の空白を削除</label>

@@ -43,6 +43,7 @@
                     </xf:textarea>
                 </view>
             </templates>
+            <conversions element="xf|input"/>
         </metadata>
     </xbl:binding>
 

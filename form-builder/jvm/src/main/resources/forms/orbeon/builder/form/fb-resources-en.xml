@@ -721,6 +721,9 @@
         <control-appearance>
             <label>Control Appearance</label>
         </control-appearance>
+        <control-conversion>
+            <label>Change Control To</label>
+        </control-conversion>
         <whitespace>
             <item>
                 <label>Trim leading and trailing spaces</label>

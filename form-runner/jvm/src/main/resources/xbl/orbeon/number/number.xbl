@@ -113,6 +113,7 @@
                 <constraint test="empty(decimal-separator) or empty(grouping-separator) or decimal-separator != grouping-separator"
                             message="Decimal and grouping separators must be different"/>
             </custom-settings>
+            <conversions element="xf|input"/>
             <control-details>
                 <xf:model xmlns="" id="fb-editor-number-model">
 

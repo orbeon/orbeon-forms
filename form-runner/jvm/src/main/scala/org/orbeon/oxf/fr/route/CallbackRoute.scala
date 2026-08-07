@@ -43,7 +43,7 @@ object CallbackRoute extends NativeRoute {
         formVersion = modeState.publicMetadata.appFormVersion._2,
       ) :::
       SimpleProcess.buildUserAndStandardParamsForModeChange(
-        userParams          = Nil, // xxx: anything custom to pass? params should have been saved with `fr:save-state()`
+        userParams          = modeState.publicMetadata.urlParameters,
         dataFormatVersion   = DataFormatVersion.Edge,
         privateModeMetadata = modeState.privateMetadata,
       )
@@ -70,7 +70,7 @@ object CallbackRoute extends NativeRoute {
         hasCredentials   = false,
         mediatypeOpt     = Some(ContentTypes.XmlContentType),
         encodingForSOAP  = CharsetNames.Utf8, // won't be used
-        customHeaders    = Map.empty,         // xxx anything custom to pass? params should have been saved with `fr:save-state()`
+        customHeaders    = Map.empty,         // xxx anything custom to pass? headers should have been saved with `fr:save-state()`
         headersToForward = Connection.headersToForwardFromProperty,
         getHeader        = Connection.getHeaderFromRequest(ec.getRequest)
       )

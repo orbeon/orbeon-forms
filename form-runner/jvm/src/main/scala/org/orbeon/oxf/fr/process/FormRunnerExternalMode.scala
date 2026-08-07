@@ -27,13 +27,14 @@ object FormRunnerExternalMode extends FormRunnerExternalModeTrait {
   import io.circe.syntax.*
 
   def saveState(
-    data                      : DocumentNodeInfoType,
-    currentLang               : String,
-    embeddable                : Boolean,
-    continuationMode          : FormRunnerDetailMode,
-    privateModeMetadata       : PrivateModeMetadata,
+    data               : DocumentNodeInfoType,
+    currentLang        : String,
+    embeddable         : Boolean,
+    continuationMode   : FormRunnerDetailMode,
+    privateModeMetadata: PrivateModeMetadata,
+    urlParameters      : Map[String, List[String]],
   )(implicit
-    formRunnerParams          : FormRunnerParams
+    formRunnerParams   : FormRunnerParams
   ): String =
     createTokenAndStoreState(
        ModeState(
@@ -52,6 +53,7 @@ object FormRunnerExternalMode extends FormRunnerExternalModeTrait {
           mode           = continuationMode,
           lang           = currentLang,
           embeddable     = embeddable,
+          urlParameters  = urlParameters
         ),
         privateMetadata = privateModeMetadata
       ),

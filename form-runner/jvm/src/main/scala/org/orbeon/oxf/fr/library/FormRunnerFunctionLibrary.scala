@@ -777,7 +777,8 @@ private object FormRunnerFunctions {
             case None =>
               privateModeMetadata
           }
-        }
+        },
+        urlParameters       = xfc.containingDocument.getRequestParameters,
       )
     }
   }

@@ -17,6 +17,7 @@ trait FormRunnerExternalModeTrait {
     mode                : FormRunnerDetailMode,
     lang                : String,
     embeddable          : Boolean,
+    urlParameters       : Map[String, List[String]] = Map.empty
   )
 
   case class PrivateModeMetadata(

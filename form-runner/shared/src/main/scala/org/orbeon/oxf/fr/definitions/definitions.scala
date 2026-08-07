@@ -91,7 +91,6 @@ object FormRunnerDetailMode {
     require(! PrimaryModes.exists(_.name == name))
     require(! PrimaryModes.exists(_.publicName == publicName))
     require(name.namespace.prefix.nonEmpty)
-    require(SaxonUtils.isValidNCName(publicName))
     require(PublicNameRe.matches(publicName))
   }
 

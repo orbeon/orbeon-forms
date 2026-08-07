@@ -745,13 +745,13 @@ object FormBuilderXPathApi {
   def possibleAppearancesByControlNameAsXML(
     controlName       : String,
     isInitialLoad     : Boolean,
-    newBuiltinDatatype: String,
+    newDatatypeOrEmpty: String,
     desiredAppearance : String // relevant only if `isInitialLoad == false`
   ): Array[NodeInfo] =
     FormBuilder.possibleAppearancesByControlNameAsXML(
       controlName,
       isInitialLoad,
-      newBuiltinDatatype,
+      newDatatypeOrEmpty,
       desiredAppearance
     )(FormBuilderDocContext()).to(Array)
 

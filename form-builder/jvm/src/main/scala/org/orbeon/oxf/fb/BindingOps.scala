@@ -58,9 +58,9 @@ trait BindingOps {
 
     val detailsOpt =
       for {
-        controlElem                  <- findControlByName(controlName)
-        oldDatatype                  = FormBuilder.DatatypeValidation.fromForm(controlName).datatypeQName
-        oldAtts                      = BindingDescriptor.getAtts(controlElem)
+        controlElem                     <- findControlByName(controlName)
+        oldDatatype                     = FormBuilder.DatatypeValidation.fromForm(controlName).datatypeQName
+        oldAtts                         = BindingDescriptor.getAtts(controlElem)
         (virtualName, oldAppearanceOpt) =
           findVirtualNameAndAppearance(
             searchElemName = controlElem.uriQualifiedName,
@@ -74,10 +74,10 @@ trait BindingOps {
       for {
         (virtualName, oldAppearanceOpt, oldAtts) <- detailsOpt
         description <- findControlDescriptionAsXml(
-          elemName    = virtualName,
+          elemName = virtualName,
           datatype = newDatatype,
-          atts        = updateAttAppearance(oldAtts, if (isInitialLoad) oldAppearanceOpt else Some(desiredAppearance)),
-          lang        = lang
+          atts     = updateAttAppearance(oldAtts, if (isInitialLoad) oldAppearanceOpt else Some(desiredAppearance)),
+          lang     = lang
         )
       } yield
         description

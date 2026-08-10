@@ -162,6 +162,7 @@
 
             -dontwarn org.apache.http.auth.KerberosCredentials
             -dontwarn org.apache.http.impl.auth.**
+            -dontwarn org.apache.hc.**
 
             -dontwarn org.apache.logging.log4j.core.**
             -dontwarn org.apache.logging.log4j.util.**
@@ -288,6 +289,7 @@
 
             -dontwarn org.apache.http.auth.KerberosCredentials
             -dontwarn org.apache.http.impl.auth.**
+            -dontwarn org.apache.hc.**
 
             -dontwarn org.apache.logging.log4j.core.**
             -dontwarn org.apache.logging.log4j.util.**

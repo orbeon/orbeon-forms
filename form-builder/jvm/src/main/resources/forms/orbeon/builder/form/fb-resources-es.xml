@@ -1144,6 +1144,15 @@
         </attachment-language>
     </dialog-pdf>
     <dialog-itemsets>
+        <copy>
+            <label>Copiar al portapapeles</label>
+        </copy>
+        <paste>
+            <label>Pegar desde el portapapeles</label>
+        </paste>
+        <paste-failed>
+            <label>Error al pegar. El formato del portapapeles no se puede analizar.</label>
+        </paste-failed>
         <label>Editar Opciones</label>
         <resources-language>
             <label>Recursos de Idioma</label>

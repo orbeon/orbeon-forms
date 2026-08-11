@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -20,6 +21,7 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.NodeConversions
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
@@ -249,6 +251,61 @@ class ItemsetTest
         XFormsAPI.setvalue(FormBuilder.currentResources /@ "lang", "en")
         assertNewControlResources(Seq("fr" -> itemTemplates("fr"), "en" -> itemTemplates("en")))
       }
+    }
+  }
+
+  describe("Parse TSV to items") {
+
+    def compareItemsElemToNodeInfoElems(expected: Elem, actual: Seq[NodeInfo]): Unit = {
+      expected
+        .child
+        .collect { case e: scala.xml.Elem => NodeConversions.elemToNodeInfo(e) }
+        .zipAll(actual, null, null)
+        .forall { case (expectedNode, actualNode) =>
+          assertXMLElementsIgnoreNamespacesInScope(expectedNode, actualNode)
+          true
+        }
+    }
+
+    it("must parse 2-column TSV") {
+      val tsv = "Label 1\tvalue1\nLabel 2\tvalue2"
+      val result = FormBuilderRpcApiImpl.parseTsvToItems(tsv)
+      val expected = <items>
+        <item>
+          <label>Label 1</label>
+          <value>value1</value>
+        </item>
+        <item>
+          <label>Label 2</label>
+          <value>value2</value>
+        </item>
+      </items>
+
+      compareItemsElemToNodeInfoElems(expected, result.getOrElse(Nil))
+    }
+
+    it("must parse 3-column TSV with hints") {
+      val tsv = "Label 1\tHint 1\tvalue1\nLabel 2\tHint 2\tvalue2"
+      val result = FormBuilderRpcApiImpl.parseTsvToItems(tsv)
+      val expected = <items>
+        <item>
+          <label>Label 1</label>
+          <hint>Hint 1</hint>
+          <value>value1</value>
+        </item>
+        <item>
+          <label>Label 2</label>
+          <hint>Hint 2</hint>
+          <value>value2</value>
+        </item>
+      </items>
+      compareItemsElemToNodeInfoElems(expected, result.getOrElse(Nil))
+    }
+
+    it("must return error element for invalid or empty TSV") {
+      val tsv = "   \n  "
+      val result = FormBuilderRpcApiImpl.parseTsvToItems(tsv)
+      assert(result.isEmpty)
     }
   }
 }

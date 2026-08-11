@@ -84,6 +84,14 @@ object FormBuilderPrivateAPI extends js.Object {
       moveIntoViewIfNeeded(mainElem, mainInnerElem, selectedElem, margin = 50)
     }
 
+  def copyItemsetToClipboard(tsvString: String): Unit =
+    dom.window.navigator.clipboard.writeText(tsvString)
+
+  def pasteItemsetFromClipboard(): Unit =
+    dom.window.navigator.clipboard.readText().toFuture.foreach { tsvString =>
+      FormBuilderRpcClient.api.pasteItemsetFromClipboard(tsvString)
+    }
+
   private def installTestIframeEscapeHandler(iframe: html.IFrame): Unit =
     Option(iframe.contentDocument.asInstanceOf[html.Document]).foreach { iframeDocument =>
       iframeDocument.addEventListener("keydown", (event: dom.KeyboardEvent) => {

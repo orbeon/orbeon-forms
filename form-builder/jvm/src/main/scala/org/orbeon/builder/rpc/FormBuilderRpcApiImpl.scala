@@ -18,9 +18,11 @@ import org.orbeon.oxf.fb.UndoAction.ControlSettings
 import org.orbeon.oxf.fb.*
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerParams}
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.NodeConversions
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
 
@@ -237,4 +239,101 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   def resolveId(id: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
     FormRunner.findInViewTryIndex(XFormsId.getStaticIdFromId(id))
+
+  def pasteItemsetFromClipboard(tsvString: String): Future[Unit] = Future.successful {
+
+    val itemsNodeInfoOpt = parseTsvToItems(tsvString)
+
+    XFormsAPI.dispatch(
+      name       = "fb-paste-itemset-from-clipboard",
+      targetId   = "dialog-itemsets",
+      properties = Map("items" -> itemsNodeInfoOpt)
+    )
+  }
+
+  def parseTsvToItems(
+    tsvString: String,
+  ): Option[Seq[NodeInfo]] = {
+    val rows = parseTsv(tsvString)
+    if (rows.isEmpty) {
+      None
+    } else {
+      val maxCols = rows.map(_.length).max
+      val parsedItems = rows.collect {
+        case row if row.nonEmpty && row.exists(_.trim.nonEmpty) =>
+          val label = row.headOption.getOrElse("")
+          val hint  = if (maxCols >= 3) row.lift(1).getOrElse("") else ""
+          val value = if (maxCols >= 3) row.lift(2).getOrElse("") else row.lift(1).getOrElse("")
+          (label, hint, value)
+      }
+      if (parsedItems.isEmpty) {
+        None
+      } else {
+        val newItems = parsedItems.map { case (label, hint, value) =>
+          <item>
+            <label>{label}</label>
+            {
+              hint.nonEmpty.list(<hint>{hint}</hint>)
+            }
+            <value>{value}</value>
+          </item>
+        }
+        Some(newItems.map(NodeConversions.elemToNodeInfo))
+      }
+    }
+  }
+
+  private def parseTsv(tsv: String): Seq[Seq[String]] = {
+    val rows = collection.mutable.Buffer[Seq[String]]()
+    val currentCell = new StringBuilder()
+    var inQuotes = false
+    var row = collection.mutable.Buffer[String]()
+    var i = 0
+    val len = tsv.length
+
+    while (i < len) {
+      val c = tsv.charAt(i)
+      if (inQuotes) {
+        if (c == '"') {
+          if (i + 1 < len && tsv.charAt(i + 1) == '"') {
+            currentCell.append('"')
+            i += 1
+          } else {
+            inQuotes = false
+          }
+        } else {
+          currentCell.append(c)
+        }
+      } else {
+        c match {
+          case '"' =>
+            inQuotes = true
+          case '\t' =>
+            row += currentCell.toString()
+            currentCell.clear()
+          case '\r' =>
+            if (i + 1 < len && tsv.charAt(i + 1) == '\n') {
+              i += 1
+            }
+            row += currentCell.toString()
+            currentCell.clear()
+            rows += row.toSeq
+            row = collection.mutable.Buffer[String]()
+          case '\n' =>
+            row += currentCell.toString()
+            currentCell.clear()
+            rows += row.toSeq
+            row = collection.mutable.Buffer[String]()
+          case _ =>
+            currentCell.append(c)
+        }
+      }
+      i += 1
+    }
+    if (currentCell.nonEmpty || row.nonEmpty) {
+      row += currentCell.toString()
+      rows += row.toSeq
+    }
+    rows.toSeq
+  }
 }

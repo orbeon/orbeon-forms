@@ -1158,6 +1158,15 @@
         </attachment-language>
     </dialog-pdf>
     <dialog-itemsets>
+        <copy>
+            <label>Copiar para a área de transferência</label>
+        </copy>
+        <paste>
+            <label>Colar da área de transferência</label>
+        </paste>
+        <paste-failed>
+            <label>Falha ao colar. O formato da área de transferência não pode ser analisado.</label>
+        </paste-failed>
         <label>Alterar Escolhas</label>
         <resources-language>
             <label>Línguas dos Recursos</label>

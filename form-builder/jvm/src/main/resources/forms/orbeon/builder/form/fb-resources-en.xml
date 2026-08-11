@@ -1196,6 +1196,15 @@
         </attachment-language>
     </dialog-pdf>
     <dialog-itemsets>
+        <copy>
+            <label>Copy to Clipboard</label>
+        </copy>
+        <paste>
+            <label>Paste from Clipboard</label>
+        </paste>
+        <paste-failed>
+            <label>Paste failed. The clipboard format cannot be parsed.</label>
+        </paste-failed>
         <label>Edit Choices</label>
         <resources-language>
             <label>Resources Language</label>

@@ -1170,6 +1170,15 @@
         </attachment-language>
     </dialog-pdf>
     <dialog-itemsets>
+        <copy>
+            <label>クリップボードにコピー</label>
+        </copy>
+        <paste>
+            <label>クリップボードから貼り付け</label>
+        </paste>
+        <paste-failed>
+            <label>貼り付けに失敗しました。クリップボードの形式を解析できません。</label>
+        </paste-failed>
         <label>選択肢を編集</label>
         <resources-language>
             <label>リソース言語</label>

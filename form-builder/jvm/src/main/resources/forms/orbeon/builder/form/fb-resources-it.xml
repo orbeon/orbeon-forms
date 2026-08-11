@@ -1131,6 +1131,15 @@
         </attachment-language>
     </dialog-pdf>
     <dialog-itemsets>
+        <copy>
+            <label>Copia negli appunti</label>
+        </copy>
+        <paste>
+            <label>Incolla dagli appunti</label>
+        </paste>
+        <paste-failed>
+            <label>Incollaggio non riuscito. Il formato degli appunti non può essere analizzato.</label>
+        </paste-failed>
         <label>Modifica scelte</label>
         <resources-language>
             <label>Lingua della risorsa</label>

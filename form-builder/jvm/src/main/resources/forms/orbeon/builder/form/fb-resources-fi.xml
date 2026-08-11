@@ -1172,6 +1172,15 @@
         </attachment-language>
     </dialog-pdf>
     <dialog-itemsets>
+        <copy>
+            <label>Kopioi leikepöydälle</label>
+        </copy>
+        <paste>
+            <label>Liitä leikepöydältä</label>
+        </paste>
+        <paste-failed>
+            <label>Liittäminen epäonnistui. Leikepöydän muotoa ei voida jäsentää.</label>
+        </paste-failed>
         <label>Itemset-editori</label>
         <resources-language>
             <label>Resurssi-kieli</label>

@@ -1158,6 +1158,15 @@
         </attachment-language>
     </dialog-pdf>
     <dialog-itemsets>
+        <copy>
+            <label>Копировать в буфер обмена</label>
+        </copy>
+        <paste>
+            <label>Вставить из буфера обмена</label>
+        </paste>
+        <paste-failed>
+            <label>Вставка не удалась. Невозможно распознать формат буфера обмена.</label>
+        </paste-failed>
         <label>Редактор элементов</label>
         <resources-language>
             <label>Язык</label>

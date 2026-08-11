@@ -1178,6 +1178,15 @@
         </attachment-language>
     </dialog-pdf>
     <dialog-itemsets>
+        <copy>
+            <label>Kopiera till urklipp</label>
+        </copy>
+        <paste>
+            <label>Klistra in från urklipp</label>
+        </paste>
+        <paste-failed>
+            <label>Klistra in misslyckades. Urklippsformatet kan inte tolkas.</label>
+        </paste-failed>
         <label>Ändra alternativ</label>
         <resources-language>
             <label>Resursspråk</label>

@@ -1128,6 +1128,15 @@
         </attachment-language>
     </dialog-pdf>
     <dialog-itemsets>
+        <copy>
+            <label>In die Zwischenablage kopieren</label>
+        </copy>
+        <paste>
+            <label>Aus der Zwischenablage einfügen</label>
+        </paste>
+        <paste-failed>
+            <label>Einfügen fehlgeschlagen. Das Format der Zwischenablage kann nicht analysiert werden.</label>
+        </paste-failed>
         <label>Auswahlmöglichkeiten bearbeiten</label>
         <resources-language>
             <label>Sprache der Ressourcen</label>

@@ -23,7 +23,7 @@
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
     xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
 
-    <xbl:binding id="fb-dialog-itemsets" element="fb|dialog-itemsets">
+    <xbl:binding id="fb-dialog-itemsets" element="fb|dialog-itemsets" xxf:external-events="fb-paste-itemset-from-clipboard">
         <xbl:resources>
             <xbl:style src="/xbl/fb/dialog-itemsets/dialog-itemsets.css"/>
         </xbl:resources>
@@ -74,6 +74,59 @@
             <!-- Clear Value -->
             <xbl:handler event="DOMActivate" observer="clear-value-trigger">
                 <xf:setvalue ref="$i/control-value" />
+            </xbl:handler>
+
+            <!-- Copy to Clipboard -->
+            <xbl:handler event="DOMActivate" observer="clipboard-copy-trigger">
+                <xf:action type="javascript">
+                    <xf:param name="tsv" value="fbf:getItemsetAsTsv($i/items/item, $i/lang)"/>
+                    <xf:body>ORBEON.builder.private.API.copyItemsetToClipboard(tsv)</xf:body>
+                  </xf:action>
+            </xbl:handler>
+
+            <!-- Paste from Clipboard -->
+            <xbl:handler event="DOMActivate" observer="clipboard-paste-trigger">
+                <xf:action type="javascript">
+                    <xf:body>ORBEON.builder.private.API.pasteItemsetFromClipboard()</xf:body>
+                </xf:action>
+            </xbl:handler>
+
+            <!-- Paste from Clipboard callback -->
+            <xbl:handler event="fb-paste-itemset-from-clipboard" phase="target">
+                <xf:var name="items" value="event('items')"/>
+                <xf:action if="empty($items)">
+                    <xf:message ref="$resources/dialog-itemsets/paste-failed/label"/>
+                </xf:action>
+                <xf:action if="exists($items)">
+                    <xf:action iterate="$items">
+                        <xf:var name="item" value="."/>
+                        <!-- Create item with value if missing -->
+                        <xf:action if="not(exists($i/items/item[value = $item/value]))">
+                            <xf:insert
+                                context="$i/items"
+                                ref="*"
+                                origin="$i/template/item"/>
+                            <xf:setvalue
+                                ref="$i/items/item[last()]/value"
+                                value="$item/value"/>
+                        </xf:action>
+                        <xf:setvalue
+                            ref="$i/items/item[value = $item/value]/label[@lang = $i/lang]"
+                            value="
+                                (
+                                    $item/label[@lang = $i/lang], (: prepare for case where we might have `@lang` :)
+                                    $item/label[empty(@lang)]     (: but for now we don't :)
+                                )[1]"/>
+                        <!-- Note that `hint` might be missing from the template, in which case it won't be set -->
+                        <xf:setvalue
+                            ref="$i/items/item[value = $item/value]/hint[@lang = $i/lang]"
+                            value="
+                                (
+                                    $item/hint[@lang = $i/lang], (: prepare for case where we might have `@lang` :)
+                                    $item/hint[empty(@lang)]     (: but for now we don't :)
+                                )[1]"/>
+                    </xf:action>
+                </xf:action>
             </xbl:handler>
 
             <!-- Save on click on save -->
@@ -272,6 +325,14 @@
                     <xf:trigger id="clear-value-trigger" ref="$i/triggers/(if (fr:is-readonly-mode()) then disabled else enabled)">
                         <xf:label ref="$resources/dialog-itemsets/clear-value/label"/>
                     </xf:trigger>
+                    <xf:trigger id="clipboard-copy-trigger">
+                        <xf:label ref="$resources/dialog-itemsets/copy/label"/>
+                    </xf:trigger>
+                    <xf:trigger id="clipboard-paste-trigger">
+                        <xf:label ref="$resources/dialog-itemsets/paste/label"/>
+                    </xf:trigger>
+                </xh:div>
+                <xh:div class="fr-dialog-buttons">
                     <xf:trigger ref="$i/triggers/(if (valid($i)) then enabled else disabled)" id="save-trigger" appearance="xxf:primary">
                         <xf:label ref="$resources/apply/label"/>
                     </xf:trigger>

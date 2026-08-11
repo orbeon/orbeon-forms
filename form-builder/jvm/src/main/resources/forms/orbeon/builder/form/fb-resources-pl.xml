@@ -1175,6 +1175,15 @@
         </attachment-language>
     </dialog-pdf>
     <dialog-itemsets>
+        <copy>
+            <label>Kopiuj do schowka</label>
+        </copy>
+        <paste>
+            <label>Wklej ze schowka</label>
+        </paste>
+        <paste-failed>
+            <label>Wklejanie nie powiodło się. Nie można zinterpretować formatu schowka.</label>
+        </paste-failed>
         <label>Edytuj wybory</label>
         <resources-language>
             <label>Język zasobów</label>

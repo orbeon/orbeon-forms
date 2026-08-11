@@ -1159,6 +1159,15 @@
         </attachment-language>
     </dialog-pdf>
     <dialog-itemsets>
+        <copy>
+            <label>Kopier til utklippstavlen</label>
+        </copy>
+        <paste>
+            <label>Lim inn fra utklippstavlen</label>
+        </paste>
+        <paste-failed>
+            <label>Lim inn feilet. Formatet på utklippstavlen kan ikke tolkes.</label>
+        </paste-failed>
         <label>Rediger valg</label>
         <resources-language>
             <label>Ressursspråk</label>

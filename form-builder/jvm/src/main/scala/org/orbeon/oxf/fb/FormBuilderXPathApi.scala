@@ -1154,6 +1154,24 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
+  def getItemsetAsTsv(items: Array[NodeInfo], lang: String): String = {
+
+    def escapeTsvCell(s: String): String =
+      if (s.contains('"') || s.contains('\t') || s.contains('\n') || s.contains('\r')) {
+        "\"" + s.replace("\"", "\"\"") + "\""
+      } else {
+        s
+      }
+
+    items.map { itemElem =>
+      val label = itemElem.child("label").find(_.attValue("lang") == lang).map(_.stringValue).getOrElse("")
+      val hint  = itemElem.child("hint").find(_.attValue("lang") == lang).map(_.stringValue).getOrElse("")
+      val value = itemElem.elemValue("value")
+      s"${escapeTsvCell(label)}\t${escapeTsvCell(hint)}\t${escapeTsvCell(value)}"
+    }.mkString("\r\n")
+  }
+
+  //@XPathFunction
   def undoAction(): Unit =
     undoActionImpl()(FormBuilderDocContext(), FormRunnerParams())
 

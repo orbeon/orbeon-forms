@@ -46,4 +46,6 @@ trait FormBuilderRpcApi {
   def containerCopy       (containerId: String): Future[Unit]
   def containerCut        (containerId: String): Future[Unit]
   def containerMerge      (containerId: String): Future[Unit]
+
+  def pasteItemsetFromClipboard(tsvString: String): Future[Unit]
 }

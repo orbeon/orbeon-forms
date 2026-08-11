@@ -1197,6 +1197,15 @@
         </attachment-language>
     </dialog-pdf>
     <dialog-itemsets>
+        <copy>
+            <label>Copier dans le presse-papiers</label>
+        </copy>
+        <paste>
+            <label>Coller depuis le presse-papiers</label>
+        </paste>
+        <paste-failed>
+            <label>Le collage a échoué. Le format du presse-papiers ne peut pas être analysé.</label>
+        </paste-failed>
         <label>Editer liste de choix</label>
         <resources-language>
             <label>Langue des ressources</label>

@@ -1178,6 +1178,15 @@
         </attachment-language>
     </dialog-pdf>
     <dialog-itemsets>
+        <copy>
+            <label>نسخ إلى الحافظة</label>
+        </copy>
+        <paste>
+            <label>لصق من الحافظة</label>
+        </paste>
+        <paste-failed>
+            <label>فشل اللصق. لا يمكن تحليل تنسيق الحافظة.</label>
+        </paste-failed>
         <label>تحرير الخيارات</label>
         <resources-language>
             <label>لغة الموارد</label>

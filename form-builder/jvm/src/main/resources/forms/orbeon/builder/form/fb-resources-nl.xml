@@ -1159,6 +1159,15 @@
         </attachment-language>
     </dialog-pdf>
     <dialog-itemsets>
+        <copy>
+            <label>Kopiëren naar klembord</label>
+        </copy>
+        <paste>
+            <label>Plakken vanaf klembord</label>
+        </paste>
+        <paste-failed>
+            <label>Plakken mislukt. Het klembordformaat kan niet worden geparseerd.</label>
+        </paste-failed>
         <label>Keuze bewerken</label>
         <resources-language>
             <label>Resources taal</label>

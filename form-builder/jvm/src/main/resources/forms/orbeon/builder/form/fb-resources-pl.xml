@@ -1205,6 +1205,27 @@
         </remove-all>
         <filter>
             <label>Formuła filtru</label>
+            <help>
+                &lt;p&gt;
+                    Ta formuła umożliwia filtrowanie wyborów dostępnych w tej kontrolce.
+                    Musi zwracać wartość logiczną (boolean).
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Kontekstem formuły jest pojedynczy element &lt;code&gt;&amp;lt;item&amp;gt;&lt;/code&gt;, który zawiera następujące elementy podrzędne:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;label&amp;gt;&lt;/code&gt;: etykieta wyboru&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;value&amp;gt;&lt;/code&gt;: wartość wyboru&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;hint&amp;gt;&lt;/code&gt;: wskazówka wyboru&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    W formule można odwoływać się do innych kontrolek formularza, używając ich nazwy poprzedzonej znakiem &lt;code&gt;$&lt;/code&gt;.
+                    Po wprowadzeniu znaku &lt;code&gt;$&lt;/code&gt; wyświetlana jest lista dostępnych kontrolek formularza.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Więcej informacji znajdziesz w &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#filtering-items"&gt;dokumentacji Form Builder&lt;/a&gt;.
+                &lt;/p>
+            </help>
         </filter>
         <itemsetid-mode>
             <label>Użyj wyborów z metadanych</label>

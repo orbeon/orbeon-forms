@@ -1226,6 +1226,27 @@
         </remove-all>
         <filter>
             <label>Filter Formula</label>
+            <help>
+                &lt;p&gt;
+                    This formula allows you to filter the choices available in this control.
+                    It must return a boolean value.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    The formula's context is an individual &lt;code&gt;&amp;lt;item&amp;gt;&lt;/code&gt; element, which contains the following children elements
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;label&amp;gt;&lt;/code&gt;: the label of the choice&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;value&amp;gt;&lt;/code&gt;: the value of the choice&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;hint&amp;gt;&lt;/code&gt;: the hint of the choice&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    You can refer to other form controls in the formula using their name preceded by a &lt;code&gt;$&lt;/code&gt; sign.
+                    When entering the &lt;code&gt;$&lt;/code&gt; sign, a list of available form controls is displayed.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    For more, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#filtering-items"&gt;Form Builder documentation&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </filter>
         <itemsetid-mode>
             <label>Use choices from metadata</label>

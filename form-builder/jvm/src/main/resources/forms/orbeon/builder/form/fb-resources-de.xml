@@ -1158,6 +1158,27 @@
         </remove-all>
         <filter>
             <label>Filterformel</label>
+            <help>
+                &lt;p&gt;
+                    Mit dieser Formel können Sie die in diesem Steuerelement verfügbaren Auswahlmöglichkeiten filtern.
+                    Sie muss einen booleschen Wert zurückgeben.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Der Kontext der Formel ist ein einzelnes &lt;code&gt;&amp;lt;item&amp;gt;&lt;/code&gt;-Element, das die folgenden Kindelemente enthält:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;label&amp;gt;&lt;/code&gt;: die Beschriftung der Auswahl&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;value&amp;gt;&lt;/code&gt;: der Wert der Auswahl&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;hint&amp;gt;&lt;/code&gt;: der Hinweis der Auswahl&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    Sie können auf andere Formularsteuerelemente in der Formel verweisen, indem Sie deren Namen mit einem vorangestellten &lt;code&gt;$&lt;/code&gt;-Zeichen verwenden.
+                    Bei der Eingabe des &lt;code&gt;$&lt;/code&gt;-Zeichens wird eine Liste der verfügbaren Formularsteuerelemente angezeigt.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Weitere Informationen finden Sie in der &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#filtering-items"&gt;Form Builder-Dokumentation&lt;/a&gt;.
+                &lt;/p>
+            </help>
         </filter>
         <itemsetid-mode>
             <label>Auswahlen aus Metadaten verwenden</label>

@@ -1161,6 +1161,27 @@
         </remove-all>
         <filter>
             <label>Formula di filtro</label>
+            <help>
+                &lt;p&gt;
+                    Questa formula consente di filtrare le scelte disponibili in questo controllo.
+                    Deve restituire un valore booleano.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Il contesto della formula è un singolo elemento &lt;code&gt;&amp;lt;item&amp;gt;&lt;/code&gt;, che contiene i seguenti elementi figli:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;label&amp;gt;&lt;/code&gt;: l'etichetta della scelta&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;value&amp;gt;&lt;/code&gt;: il valore della scelta&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;hint&amp;gt;&lt;/code&gt;: il suggerimento della scelta&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    È possibile fare riferimento ad altri controlli del modulo nella formula utilizzando il loro nome preceduto dal simbolo &lt;code&gt;$&lt;/code&gt;.
+                    Quando si inserisce il simbolo &lt;code&gt;$&lt;/code&gt;, viene visualizzato un elenco dei controlli del modulo disponibili.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Per saperne di più, consultare la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#filtering-items"&gt;documentazione di Form Builder&lt;/a&gt;.
+                &lt;/p>
+            </help>
         </filter>
         <itemsetid-mode>
             <label>Usa le scelte dai metadati</label>

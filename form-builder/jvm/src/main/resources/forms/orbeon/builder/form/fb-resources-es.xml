@@ -1174,6 +1174,27 @@
         </remove-all>
         <filter>
             <label>Fórmula de filtrado</label>
+            <help>
+                &lt;p&gt;
+                    Esta fórmula le permite filtrar las opciones disponibles en este control.
+                    Debe devolver un valor booleano.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    El contexto de la fórmula es un elemento &lt;code&gt;&amp;lt;item&amp;gt;&lt;/code&gt; individual, que contiene los siguientes elementos secundarios:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;label&amp;gt;&lt;/code&gt;: la etiqueta de la opción&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;value&amp;gt;&lt;/code&gt;: el valor de la opción&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;hint&amp;gt;&lt;/code&gt;: la sugerencia de la opción&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    Puede hacer referencia a otros controles de formulario en la fórmula utilizando su nombre precedido por un signo &lt;code&gt;$&lt;/code&gt;.
+                    Al ingresar el signo &lt;code&gt;$&lt;/code&gt;, se muestra una lista de los controles de formulario disponibles.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Para más información, consulte la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#filtering-items"&gt;documentación de Form Builder&lt;/a&gt;.
+                &lt;/p>
+            </help>
         </filter>
         <itemsetid-mode>
             <label>Usar opciones de los metadatos</label>

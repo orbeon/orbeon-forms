@@ -1208,6 +1208,27 @@
         </remove-all>
         <filter>
             <label>صيغة التصفية</label>
+            <help>
+                &lt;p&gt;
+                    تتيح لك هذه الصيغة تصفية الخيارات المتاحة في هذا العنصر.
+                    يجب أن ترجع قيمة منطقية (boolean).
+                &lt;/p&gt;
+                &lt;p&gt;
+                    سياق الصيغة هو عنصر &lt;code&gt;&amp;lt;item&amp;gt;&lt;/code&gt; فردي، والذي يحتوي على العناصر الفرعية التالية:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;label&amp;gt;&lt;/code&gt;: تسمية الخيار&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;value&amp;gt;&lt;/code&gt;: قيمة الخيار&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;hint&amp;gt;&lt;/code&gt;: تلميح الخيار&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    يمكنك الإشارة إلى عناصر التحكم الأخرى في النموذج باستخدام أسمائها مسبوقة بعلامة &lt;code&gt;$&lt;/code&gt;.
+                    عند إدخال علامة &lt;code&gt;$&lt;/code&gt;، تظهر قائمة بعناصر النموذج المتاحة.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    لمزيد من المعلومات، راجع &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#filtering-items"&gt;توثيق Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </filter>
         <itemsetid-mode>
             <label>استخدام الخيارات من البيانات الوصفية</label>

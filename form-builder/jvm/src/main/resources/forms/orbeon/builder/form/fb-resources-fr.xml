@@ -1227,6 +1227,27 @@
         </remove-all>
         <filter>
             <label>Formule filtre</label>
+            <help>
+                &lt;p&gt;
+                    Cette formule vous permet de filtrer les choix disponibles dans ce contrôle.
+                    Elle doit retourner une valeur booléenne.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Le contexte de la formule est un élément &lt;code&gt;&amp;lt;item&amp;gt;&lt;/code&gt; individuel, qui contient les éléments enfants suivants&#160;:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;label&amp;gt;&lt;/code&gt;&#160;: le libellé du choix&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;value&amp;gt;&lt;/code&gt;&#160;: la valeur du choix&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;hint&amp;gt;&lt;/code&gt;&#160;: l'indication du choix&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    Vous pouvez faire référence à d'autres contrôles du formulaire dans la formule en utilisant leur nom précédé d'un signe &lt;code&gt;$&lt;/code&gt;.
+                    Lorsque vous saisissez le signe &lt;code&gt;$&lt;/code&gt;, la liste des contrôles disponibles s'affiche.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Pour en savoir plus, consultez la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#filtering-items"&gt;documentation de Form Builder&lt;/a&gt;.
+                &lt;/p>
+            </help>
         </filter>
         <itemsetid-mode>
             <label>Utiliser les choix provenant des métadonnées</label>

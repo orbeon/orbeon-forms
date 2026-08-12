@@ -1188,6 +1188,27 @@
         </remove-all>
         <filter>
             <label>Формула фильтра</label>
+            <help>
+                &lt;p&gt;
+                    Эта формула позволяет фильтровать доступные варианты выбора в этом элементе управления.
+                    Она должна возвращать логическое значение (boolean).
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Контекстом формулы является отдельный элемент &lt;code&gt;&amp;lt;item&amp;gt;&lt;/code&gt;, который содержит следующие дочерние элементы:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;label&amp;gt;&lt;/code&gt;: метка выбора&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;value&amp;gt;&lt;/code&gt;: значение выбора&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;hint&amp;gt;&lt;/code&gt;: подсказка выбора&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    Вы можете ссылаться на другие элементы управления формой в формуле, используя их имя, перед которым стоит знак &lt;code&gt;$&lt;/code&gt;.
+                    При вводе знака &lt;code&gt;$&lt;/code&gt; отображается список доступных элементов управления формой.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Для получения дополнительной информации см. &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#filtering-items"&gt;документацию Form Builder&lt;/a&gt;.
+                &lt;/p>
+            </help>
         </filter>
         <itemsetid-mode>
             <label>Использовать варианты из метаданных</label>

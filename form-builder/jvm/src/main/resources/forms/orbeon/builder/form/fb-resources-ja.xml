@@ -1200,6 +1200,27 @@
         </remove-all>
         <filter>
             <label>フィルター式</label>
+            <help>
+                &lt;p&gt;
+                    この数式を使用すると、このコントロールで利用可能な選択肢をフィルターリングできます。
+                    ブール値（真偽値）を返す必要があります。
+                &lt;/p&gt;
+                &lt;p&gt;
+                    数式のコンテキストは個々の &lt;code&gt;&amp;lt;item&amp;gt;&lt;/code&gt; 要素であり、これには次の子要素が含まれます。
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;label&amp;gt;&lt;/code&gt;: 選択肢のラベル&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;value&amp;gt;&lt;/code&gt;: 選択肢の値&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;hint&amp;gt;&lt;/code&gt;: 選択肢のヒント&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    数式内で &lt;code&gt;$&lt;/code&gt; 記号の後にコントロール名を指定することで、他のフォームコントロールを参照できます。
+                    &lt;code&gt;$&lt;/code&gt; 記号を入力すると、利用可能なフォームコントロールのリストが表示されます。
+                &lt;/p&gt;
+                &lt;p&gt;
+                    詳細については、&lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#filtering-items"&gt;Form Builder のドキュメント&lt;/a&gt;を参照してください。
+                &lt;/p>
+            </help>
         </filter>
         <itemsetid-mode>
             <label>メタデータの選択肢を使用</label>

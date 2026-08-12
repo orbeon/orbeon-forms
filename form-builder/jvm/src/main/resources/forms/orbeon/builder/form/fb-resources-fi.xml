@@ -1201,7 +1201,28 @@
             <label>Poista kaikki</label>
         </remove-all>
         <filter>
-            <label>Suodatuskaava</label>
+            <label>Suodatinkaava</label>
+            <help>
+                &lt;p&gt;
+                    Tämän kaavan avulla voit suodattaa tässä säätimessä käytettävissä olevia valintoja.
+                    Sen on palautettava totuusarvo (boolean).
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Kaavan konteksti on yksittäinen &lt;code&gt;&amp;lt;item&amp;gt;&lt;/code&gt;-elementti, joka sisältää seuraavat lapsielementit:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;label&amp;gt;&lt;/code&gt;: valinnan otsikko&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;value&amp;gt;&lt;/code&gt;: valinnan arvo&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;hint&amp;gt;&lt;/code&gt;: valinnan vihje&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    Voit viitata muihin lomakkeen säätimiin kaavassa käyttämällä niiden nimeä, jonka edessä on &lt;code&gt;$&lt;/code&gt;-merkki.
+                    Kun kirjoitat &lt;code&gt;$&lt;/code&gt;-merkin, näyttöön tulee luettelo käytettävissä olevista lomakkeen säätimistä.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Lisätietoja on &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#filtering-items"&gt;Form Builder -dokumentaatiossa&lt;/a&gt;.
+                &lt;/p>
+            </help>
         </filter>
         <itemsetid-mode>
             <label>Käytä valintoja metatiedoista</label>

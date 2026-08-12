@@ -1208,6 +1208,27 @@
         </remove-all>
         <filter>
             <label>Filterformel</label>
+            <help>
+                &lt;p&gt;
+                    Denna formel låter dig filtrera valen som är tillgängliga i denna kontroll.
+                    Den måste returnera ett booleskt värde.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Formelns kontext är ett enskilt &lt;code&gt;&amp;lt;item&amp;gt;&lt;/code&gt;-element, som innehåller följande underliggande element:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;label&amp;gt;&lt;/code&gt;: valets etikett&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;value&amp;gt;&lt;/code&gt;: valets värde&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;hint&amp;gt;&lt;/code&gt;: valets ledtråd&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    Du kan referera till andra formulärkontroller i formeln genom att använda deras namn föregått av ett &lt;code&gt;$&lt;/code&gt;-tecken.
+                    När du anger &lt;code&gt;$&lt;/code&gt;-tecknet visas en lista över tillgängliga formulärkontroller.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    För mer information, se &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#filtering-items"&gt;Form Builder-dokumentationen&lt;/a&gt;.
+                &lt;/p>
+            </help>
         </filter>
         <itemsetid-mode>
             <label>Använd val från metadata</label>

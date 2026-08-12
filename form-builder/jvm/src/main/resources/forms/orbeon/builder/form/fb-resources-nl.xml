@@ -1189,6 +1189,27 @@
         </remove-all>
         <filter>
             <label>Filterformule</label>
+            <help>
+                &lt;p&gt;
+                    Met deze formule kunt u de beschikbare keuzes in dit besturingselement filteren.
+                    Deze moet een boolean waarde retourneren.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    De context van de formule is een individueel &lt;code&gt;&amp;lt;item&amp;gt;&lt;/code&gt;-element, dat de volgende kindelementen bevat:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;label&amp;gt;&lt;/code&gt;: het label van de keuze&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;value&amp;gt;&lt;/code&gt;: de waarde van de keuze&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;hint&amp;gt;&lt;/code&gt;: de hint van de keuze&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    U kunt in de formule naar andere formulierbesturingselementen verwijzen met hun naam voorafgegaan door een &lt;code&gt;$&lt;/code&gt;-teken.
+                    Bij het invoeren van het &lt;code&gt;$&lt;/code&gt;-teken wordt een lijst met beschikbare formulierbesturingselementen weergegeven.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Zie voor meer informatie de &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#filtering-items"&gt;Form Builder-documentatie&lt;/a&gt;.
+                &lt;/p>
+            </help>
         </filter>
         <itemsetid-mode>
             <label>Keuzes uit metadata gebruiken</label>

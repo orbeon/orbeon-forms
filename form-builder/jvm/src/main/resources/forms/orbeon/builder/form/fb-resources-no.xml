@@ -1189,6 +1189,27 @@
         </remove-all>
         <filter>
             <label>Filterformel</label>
+            <help>
+                &lt;p&gt;
+                    Denne formelen lar deg filtrere valgene som er tilgjengelige i denne kontrollen.
+                    Den må returnere en boolsk verdi.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Formelens kontekst er et individuelt &lt;code&gt;&amp;lt;item&amp;gt;&lt;/code&gt;-element, som inneholder følgende barneelementer:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;label&amp;gt;&lt;/code&gt;: etiketten til valget&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;value&amp;gt;&lt;/code&gt;: verdien til valget&lt;/li&gt;
+                    &lt;li&gt;&lt;code&gt;&amp;lt;hint&amp;gt;&lt;/code&gt;: hintet til valget&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    Du kan referere til andre formularkontroller i formelen ved å bruke navnet deres innledet med et &lt;code&gt;$&lt;/code&gt;-tegn.
+                    Når du skriver inn &lt;code&gt;$&lt;/code&gt;-tegnet, vises en liste over tilgjengelige formularkontroller.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    For mer, se &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#filtering-items"&gt;Form Builder-dokumentasjonen&lt;/a&gt;.
+                &lt;/p>
+            </help>
         </filter>
         <itemsetid-mode>
             <label>Bruk valg fra metadata</label>

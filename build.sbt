@@ -62,6 +62,7 @@ val ScalaParallelCollectionsVersion  = "1.2.0"
 val ScalaAsyncVersion                = "1.0.1"
 val Parboiled2Version                = "2.5.1"
 val AutowireVersion                  = "0.3.3"
+val SlothVersion                     = "0.8.0"
 val ScalatagsVersion                 = "0.13.1"
 val SbinaryVersion                   = "0.5.1"
 val Log4sVersion                     = "1.10.0"
@@ -781,7 +782,8 @@ lazy val portletSupport = (project in file("portlet-support"))
 lazy val formRunner = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("form-runner"))
   .settings(scala2CommonSettings*)
   .settings(
-    name := "orbeon-form-runner"
+    name := "orbeon-form-runner",
+    libraryDependencies += "com.github.cornerman" %%% "sloth" % SlothVersion,
   )
 
 lazy val s3TestSettings = Seq(
@@ -1021,9 +1023,8 @@ lazy val formBuilderJVM = formBuilder.jvm
     // Settings here as `.jvmSettings` above causes infinite recursion
     // Package Scala.js output into `orbeon-form-builder.jar`
     // This stores the optimized version. For development, we need something else.
-    (Compile / packageBin / mappings) ++= scalaJsFiles((formBuilderJS / Compile / fastOrFullOptJS).value.data, FormBuilderResourcesPathInWar)
+    (Compile / packageBin / mappings) ++= scalaJsFiles((formBuilderJS / Compile / fastOrFullOptJS).value.data, FormBuilderResourcesPathInWar),
   )
-
 
 lazy val formBuilderJS = formBuilder.js
   .dependsOn(

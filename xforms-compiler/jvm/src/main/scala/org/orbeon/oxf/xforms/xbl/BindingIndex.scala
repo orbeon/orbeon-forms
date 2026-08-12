@@ -65,18 +65,30 @@ object BindingIndex {
     distinctBindings(index) collect { case binding if binding.path == somePath => binding }
   }
 
-  def distinctBindings(index: BindingIndex[IndexableBinding]): List[IndexableBinding] = {
+  def distinctBindings[T <: AnyRef](index: BindingIndex[T]): List[T] = {
 
-    val builder = mutable.ListBuffer[IndexableBinding]()
+    val builder = mutable.ListBuffer[T]()
 
-    val allIterator =
-      index.nameAndAttSelectors.iterator ++
-      index.attOnlySelectors.iterator    ++
-      index.nameOnlySelectors.iterator
+    val allIterator = index.iterateDescriptors2
 
     allIterator foreach {
       case (_, binding) =>
         if (! (builder exists (_ eq binding)))
+          builder += binding
+    }
+
+    builder.result()
+  }
+
+  def distinctBindingsBy[T <: AnyRef, U <: AnyRef](index: BindingIndex[T], fn: T => U): List[T] = {
+
+    val builder = mutable.ListBuffer[T]()
+
+    val allIterator = index.iterateDescriptors2
+
+    allIterator foreach {
+      case (_, binding) =>
+        if (! builder.exists(v => fn(v) == fn(binding)))
           builder += binding
     }
 

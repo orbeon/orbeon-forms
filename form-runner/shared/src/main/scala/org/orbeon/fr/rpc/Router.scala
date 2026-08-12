@@ -18,6 +18,7 @@ import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
 
+// TODO: move this to `SlothRouter`
 object Router
   extends autowire.Server[Json, Decoder, Encoder]
     with JsonSerializers {
@@ -33,7 +34,6 @@ object Router
   // Autowire to route it. This results in an actual method call on the API implementation. Then serialize the result
   // to a string to send back to the client.
   // TODO: Handle failure response so we can tell the client that the call has failed.
-  //@XPathFunction
   def processRequest(id: String, path: String, argsString: String): Unit = {
     val splitPath = path.split("/")
     try {

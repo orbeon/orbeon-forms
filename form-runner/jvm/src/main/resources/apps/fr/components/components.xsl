@@ -771,7 +771,7 @@
                     mode, see https://github.com/orbeon/orbeon-forms/issues/3318, as well as exports.
                     The idea is that all services and exports are non-interactive.
                 :)
-                fr:is-service-path() or
+                (fr:is-service-path() and not(xxf:get-request-parameter('fr-keep-form-session') = 'true')) or
                 fr:mode() = ('pdf', 'tiff') or (: 'tiff' shouldn't be needed due to mode normalization :)
                 (: TODO: logic duplicated with `is-export` in `persistence-model.xml` :)
                 matches(

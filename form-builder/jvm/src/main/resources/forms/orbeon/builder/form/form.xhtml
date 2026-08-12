@@ -196,6 +196,7 @@
                                     </xf:action>
                                     <xf:action ev:event="fb-confirmation-yes">
                                         <!-- Delete resources for this language -->
+                                        <!-- TODO: use native function -->
                                         <xf:delete ref="$resources/resource[@xml:lang = $fb-lang]"/>
                                         <xf:delete ref="$metadata-instance/title[@xml:lang = $fb-lang]"/>
                                         <xf:delete ref="$metadata-instance/description[@xml:lang = $fb-lang]"/>

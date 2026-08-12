@@ -161,6 +161,7 @@ trait HttpResponse {
 object StatusCode {
   val Ok                           = 200
   val Created                      = 201
+  val Accepted                     = 202
   val NoContent                    = 204
   val PartialContent               = 206
   val Found                        = 302

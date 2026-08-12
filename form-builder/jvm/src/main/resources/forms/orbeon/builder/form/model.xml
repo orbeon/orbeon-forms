@@ -30,6 +30,7 @@
         fb-test-offline-show-dialog
         fb-test-pdf-show-dialog
         fb-test-pdf-with-data
+        fb-rpc-request
         xxforms-rpc-request"
     xxf:xpath-analysis="false"
     xxf:expose-xpath-types="true"
@@ -85,6 +86,30 @@
         <xf:param
             name="response"
             value="router:processRequest(event('id'), event('path'), event('args'))"/>
+        <xf:body>
+            ORBEON.builder.private.API.processRpcResponse(id, response);
+        </xf:body>
+    </xf:action>
+
+    <!-- New RPC entry point -->
+    <xf:action
+        xmlns:router="java:org.orbeon.builder.rpc.SlothRouter"
+        event="fb-rpc-request"
+        observer="#document"
+        type="xpath">
+        router:processRequest(event('id'), event('path'), event('args'))
+    </xf:action>
+
+    <xf:action
+        event="fb-rpc-response"
+        observer="#document"
+        type="javascript">
+        <xf:param
+            name="id"
+            value="event('id')"/>
+        <xf:param
+            name="response"
+            value="event('response')"/>
         <xf:body>
             ORBEON.builder.private.API.processRpcResponse(id, response);
         </xf:body>

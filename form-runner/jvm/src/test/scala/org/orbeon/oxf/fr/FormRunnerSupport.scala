@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.apache.commons.io.IOUtils
 import org.orbeon.connection.{BufferedContent, StreamedContent}
+import org.orbeon.fr.FormRunnerPath
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.Credentials
@@ -25,7 +26,6 @@ import org.orbeon.oxf.http.HttpMethod.{GET, POST}
 import org.orbeon.oxf.http.HttpResponse
 import org.orbeon.oxf.test.TestHttpClient.CacheEvent
 import org.orbeon.oxf.test.{DocumentTestBase, TestHttpClient}
-import org.orbeon.oxf.util.*
 import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
@@ -159,7 +159,7 @@ trait FormRunnerSupport extends DocumentTestBase {
 
     val (processorService, response, sessionOpt, events) =
       TestHttpClient.connect(
-        url             = buildFormRunnerPath(app, form, mode, documentId, query, background),
+        url             = FormRunnerPath.formRunnerPath(app, form, mode, documentId, query, background),
         method          = if (content.isDefined) POST else GET,
         headers         = headers,
         content         = content,
@@ -187,15 +187,4 @@ trait FormRunnerSupport extends DocumentTestBase {
       }
     )
   }
-
-  // TODO: add form version parameter
-  def buildFormRunnerPath(
-    app       : String,
-    form      : String,
-    mode      : String,
-    documentId: Option[String]                 = None,
-    query     : IterableOnce[(String, String)] = Nil,
-    background: Boolean                        = false
-  ): String =
-    PathUtils.recombineQuery(s"/fr/${if (background) "service/" else ""}$app/$form/$mode${documentId.map("/" +).getOrElse("")}", query)
 }

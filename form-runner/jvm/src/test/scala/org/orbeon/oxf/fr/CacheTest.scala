@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import cats.syntax.option.*
+import org.orbeon.fr.FormRunnerPath
 import org.orbeon.oxf.test.TestHttpClient.StaticState
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache
@@ -69,7 +70,7 @@ class CacheTest
             .flatMap(XFormsStaticStateCache.findDocument)
             .map(_._1.template.isDefined)
 
-        val path = buildFormRunnerPath(app, form, mode, documentIdOpt, query, background)
+        val path = FormRunnerPath.formRunnerPath(app, form, mode, documentIdOpt, query, background)
 
         describe(s"$path") {
           it(s"initial hit `$expectedInitialHit`") {

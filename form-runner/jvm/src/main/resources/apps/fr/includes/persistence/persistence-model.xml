@@ -498,6 +498,7 @@
         xxf:exclude-result-prefixes="#all">
         <response>
             <document-id/>
+            <form-session-id/>
             <process-success>true</process-success>
         </response>
     </xf:instance>
@@ -505,6 +506,11 @@
     <xf:bind
         ref="instance('fr-background-response-instance')/process-success"
         type="xs:boolean"/>
+
+    <xf:bind
+        ref="instance('fr-background-response-instance')/form-session-id"
+        relevant="xxf:get-request-parameter('fr-keep-form-session') = 'true'"
+        xxf:default="xxf:document-id()"/>
 
     <xf:submission
         id="fr-send-background-response"

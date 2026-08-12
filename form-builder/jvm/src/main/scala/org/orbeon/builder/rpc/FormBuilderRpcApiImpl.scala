@@ -258,18 +258,17 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     if (rows.isEmpty) {
       None
     } else {
-      val maxCols = rows.map(_.length).max
       val parsedItems = rows.collect {
         case row if row.nonEmpty && row.exists(_.trim.nonEmpty) =>
           val label = row.headOption.getOrElse("")
-          val hint  = if (maxCols >= 3) row.lift(1).getOrElse("") else ""
-          val value = if (maxCols >= 3) row.lift(2).getOrElse("") else row.lift(1).getOrElse("")
-          (label, hint, value)
+          val value = row.lift(1).getOrElse("")
+          val hint  = row.lift(2).getOrElse("")
+          (label, value, hint)
       }
       if (parsedItems.isEmpty) {
         None
       } else {
-        val newItems = parsedItems.map { case (label, hint, value) =>
+        val newItems = parsedItems.map { case (label, value, hint) =>
           <item>
             <label>{label}</label>
             {

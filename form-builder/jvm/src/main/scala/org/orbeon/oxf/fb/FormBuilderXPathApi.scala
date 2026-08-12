@@ -1165,9 +1165,9 @@ object FormBuilderXPathApi {
 
     items.map { itemElem =>
       val label = itemElem.child("label").find(_.attValue("lang") == lang).map(_.stringValue).getOrElse("")
-      val hint  = itemElem.child("hint").find(_.attValue("lang") == lang).map(_.stringValue).getOrElse("")
       val value = itemElem.elemValue("value")
-      s"${escapeTsvCell(label)}\t${escapeTsvCell(hint)}\t${escapeTsvCell(value)}"
+      val hint  = itemElem.child("hint").find(_.attValue("lang") == lang).map(_.stringValue).getOrElse("")
+      s"${escapeTsvCell(label)}\t${escapeTsvCell(value)}\t${escapeTsvCell(hint)}"
     }.mkString("\r\n")
   }
 

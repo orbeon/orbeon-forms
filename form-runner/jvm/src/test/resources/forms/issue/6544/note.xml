@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Local copy of the classic w3schools note.xml: the test used to call http://www.w3schools.com/xml/note.xml, but
+     depending on an external site made the test fail when the site started returning 403. -->
+<note>
+    <to>Tove</to>
+    <from>Jani</from>
+    <heading>Reminder</heading>
+    <body>Don't forget me this weekend!</body>
+</note>

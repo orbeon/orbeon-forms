@@ -773,7 +773,7 @@
                             <xh:div class="bd">
                                 <xh:div class="xforms-help-panel-message"/>
                                 <xh:div class="xforms-help-panel-close">
-                                    <xh:button class="btn btn-small">Close</xh:button>
+                                    <xh:button class="btn btn-sm">Close</xh:button>
                                 </xh:div>
                             </xh:div>
                         </xh:div>

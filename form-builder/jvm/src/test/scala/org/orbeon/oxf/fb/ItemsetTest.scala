@@ -285,18 +285,18 @@ class ItemsetTest
     }
 
     it("must parse 3-column TSV with hints") {
-      val tsv = "Label 1\tHint 1\tvalue1\nLabel 2\tHint 2\tvalue2"
+      val tsv = "Label 1\tvalue1\tHint 1\nLabel 2\tvalue2\tHint 2"
       val result = FormBuilderRpcApiImpl.parseTsvToItems(tsv)
       val expected = <items>
         <item>
           <label>Label 1</label>
-          <hint>Hint 1</hint>
           <value>value1</value>
+          <hint>Hint 1</hint>
         </item>
         <item>
           <label>Label 2</label>
-          <hint>Hint 2</hint>
           <value>value2</value>
+          <hint>Hint 2</hint>
         </item>
       </items>
       compareItemsElemToNodeInfoElems(expected, result.getOrElse(Nil))

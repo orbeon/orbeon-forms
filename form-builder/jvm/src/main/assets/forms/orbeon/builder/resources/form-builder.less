@@ -87,7 +87,7 @@ body.orbeon {
         position: absolute;
         top: 48px + @fbGutter;
         right: @fbGutter;
-        left: @fbGutter + @fbToolbarWidth + (@fbGutter/2);                    // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
+        left: @fbGutter + @fbToolbarWidth + (@fbGutter/2); // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
         bottom: @fbBottomHeight + @fbGutter;
         overflow-y: auto;
         border-radius: @baseBorderRadius;
@@ -96,11 +96,11 @@ body.orbeon {
             background-color: @wellBackground;
             box-sizing: border-box;
             margin-bottom: 0;
-            min-width: 740px;                                               // To allow for fluidity but not "too small" (was 980px)
-            flex-grow: 1;                                                   // So the main area takes all the space available (except for the lease banner)
+            min-width: 740px; // To allow for fluidity but not "too small" (was 980px)
+            flex-grow: 1;     // So the main area takes all the space available (except for the lease banner)
 
             .container-fluid {
-                padding: 0 40px;                                            // Additional padding on the sides, to leave space for icons
+                padding: 0 40px; // Additional padding on the sides, to leave space for icons
             }
         }
     }
@@ -138,20 +138,20 @@ body.orbeon {
     }
 
     .fb-bottom {
-        z-index: @zindexFixedNavbar;                                        // put in front like the navbar
+        z-index: @zindexFixedNavbar; // put in front like the navbar
         background-color: @fbButtonsBackground;
     }
 
-    .fb-messages { display: none; }                                         // Section of the HTML we use to output localized text used by client-side code
+    .fb-messages { display: none; } // Section of the HTML we use to output localized text used by client-side code
 
     .fb-section-grid-editor,
     .fb-control-editor-left,
     .fb-control-editor-right,
     .fb-control-editor-top,
     .fb-row-editor {
-        position: absolute; top: 0; left: 0;                                // Its left/right in the browser relative to the current section
-        display: none;                                                      // Shown in code when mouse over section
-        i:not([class ~= 'disabled']) { cursor: pointer }                    // Non-disabled icons are clickable
+        position: absolute; top: 0; left: 0;             // Its left/right in the browser relative to the current section
+        display: none;                                   // Shown in code when mouse over section
+        i:not([class ~= 'disabled']) { cursor: pointer } // Non-disabled icons are clickable
     }
 
     .fb-section-grid-editor,
@@ -199,7 +199,7 @@ body.orbeon {
     }
 
     .fb-section-grid-editor {
-        padding-right: 10px;                                                // Space between icons and section
+        padding-right: 10px; // Space between icons and section
     }
     .fb-control-editor-left {
         padding-left:  4px;
@@ -228,25 +228,25 @@ body.orbeon {
     }
 
     .fb-control-editor-left {
-        .fb-x-split { transform: rotate(135deg) }                           // Default icon is tilted at a 45º angle
+        .fb-x-split { transform: rotate(135deg) }                 // Default icon is tilted at a 45º angle
         .fb-y-split { transform: rotate(45deg)  }
-        .fb-x-split { position: relative; left: -1px; top: -4px }           // Adjustments
+        .fb-x-split { position: relative; left: -1px; top: -4px } // Adjustments
     }
 
     .fb-section-label-editor-click-interceptor {                            // Shown on top of each section label to avoid click → collapse
-        position: absolute;                                                 // Is left/right set in code relative to the current section label
+        position: absolute;             // Is left/right set in code relative to the current section label
         cursor: pointer;
-        font-size: 18px;                                                    // Matching the title font size
-        line-height: 36px;                                                  // So text is vertically centered
-        color: #BBB;                                                        // Light gray denoting hint
-        font-family: @frBaseFontFamily;                                     // Matching font defined by Bootstrap for titles
-        z-index: 1;                                                         // Show on top of the page (default is 0)
+        font-size: 18px;                // Matching the title font size
+        line-height: 36px;              // So text is vertically centered
+        color: #BBB;                    // Light gray denoting hint
+        font-family: @frBaseFontFamily; // Matching font defined by Bootstrap for titles
+        z-index: 1;                     // Show on top of the page (default is 0)
     }
 
     .fb-edit-section-label {                                                // Input created dynamically to edit section label
         position: absolute;
-        z-index: 2;                                                         // Display on top of click interceptor
-        box-sizing: border-box;                                             // Makes relative sizing easier
+        z-index: 2;             // Display on top of click interceptor
+        box-sizing: border-box; // Makes relative sizing easier
         font-size: var(--orbeon-section-title-font-size);
         .focusHighlight();
     }
@@ -256,9 +256,9 @@ body.orbeon {
     }
 
     .fb-delete-grid-trigger {
-        position: absolute;                                                 // Its left/right set in JS relative to the current grid
-        display: none;                                                      // Shown in JS when mouse over grid
-        padding: 0;                                                         // Space between icons and grid, and at top/left in case the mouse moves a bit out
+        position: absolute; // Its left/right set in JS relative to the current grid
+        display: none;      // Shown in JS when mouse over grid
+        padding: 0;         // Space between icons and grid, and at top/left in case the mouse moves a bit out
     }
 
     .fr-view .fr-section-container .fr-grid.fr-editable {                   // Tons of classes to take precedence over FR styling
@@ -271,7 +271,7 @@ body.orbeon {
             // See https://github.com/orbeon/orbeon-forms/issues/3616
             // See grid.xbl comment. We only do this at design-time for now.
             .fr-grid-th, .fr-grid-td {
-                overflow-x: hidden;                                         // We don't want large content to change the size of the cells
+                overflow-x: hidden; // We don't want large content to change the size of the cells
             }
 
             &:hover {
@@ -279,21 +279,21 @@ body.orbeon {
                     &:empty:before {
                         content: attr(placeholder);
                         color: #bbb;
-                        font-size: 100%;                                   // Override the larger size set by Form Runner for the `*`
+                        font-size: 100%; // Override the larger size set by Form Runner for the `*`
                     }
                 }
             }
         }
         .xforms-label {
-            display: block;                                                 // Overrides display: table set by Form Runner
+            display: block; // Overrides display: table set by Form Runner
             .fb-edit-label-html {
-                float: right;                                               // Checkbox to the right of the input
-                width: auto;                                                // Undos the width: 100%
-                margin: 0 0 0 5px;                                          // Space between input and checkbox
+                float: right;      // Checkbox to the right of the input
+                width: auto;       // Undos the width: 100%
+                margin: 0 0 0 5px; // Space between input and checkbox
             }
             .fb-edit-label {
                 display: block;
-                overflow: hidden;                                           // For the box not to go "under" the checkbox, so the input can be width: 100%
+                overflow: hidden; // For the box not to go "under" the checkbox, so the input can be width: 100%
             }
         }
     }
@@ -349,26 +349,26 @@ body.orbeon {
 
         position: absolute;
         background-color: @wallAccentLight;
-        &:hover                 { background-color: @wallAccentBright }         // Cue container can be grabbed
-        &.fb-grid-dnd-wall-drop { background-color: @wallAccentBright }         // On drop, wall will be moved here
+        &:hover                 { background-color: @wallAccentBright } // Cue container can be grabbed
+        &.fb-grid-dnd-wall-drop { background-color: @wallAccentBright } // On drop, wall will be moved here
 
         .fb-grid-dnd-wall-handle {
             height: 100%;
         }
-        z-index: 2;                                                         // For containers to be above the shadow
+        z-index: 2; // For containers to be above the shadow
     }
 
     .fb-grid-dnd-wall-vertical   .fb-grid-dnd-wall-handle { cursor: col-resize }
     .fb-grid-dnd-wall-horizontal .fb-grid-dnd-wall-handle { cursor: row-resize }
 
     .fb-grid-dnd-wall-veil {
-        z-index: 1;                                                         // Veil prevents hover on elements in the grid during D&D
-        position: absolute;                                                 // So it takes no space on the page
+        z-index: 1;         // Veil prevents hover on elements in the grid during D&D
+        position: absolute; // So it takes no space on the page
     }
     .fb-grid-dnd-wall-shadow {
         position: absolute;
         background-color: #ccc;
-        z-index: 1;                                                         // For shadow to be above controls
+        z-index: 1; // For shadow to be above controls
     }
 
     // ***** Toolbox ***************************************************************************************************
@@ -401,7 +401,7 @@ body.orbeon {
         .fb-toolbox-inside {
             width: 100%;
             height: 100%;
-            padding: 0 (@fbGutter / 2) 0 0;         // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
+            padding: 0 (@fbGutter / 2) 0 0; // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
             box-sizing: border-box;
             display: grid;
             grid-template-rows: auto 1fr;
@@ -566,9 +566,9 @@ body.orbeon {
 
                     .xforms-trigger button {
                         padding: 2px 4px;
-                        border: none; background: none; box-shadow: none;                                                   // remove button default styling
-                        font-size: 85%;                                                                                     // smaller text next icon
-                        width: 100%;                 // to increase clicking area
+                        border: none; background: none; box-shadow: none; // remove button default styling
+                        font-size: 85%;                                   // smaller text next icon
+                        width: 100%;                                      // to increase clicking area
                         text-align: left;
                         justify-content: start;
 
@@ -579,10 +579,10 @@ body.orbeon {
                         }
 
                         i {
-                            margin-top: -1px;        // so that Bootstrap icons are better aligned
+                            margin-top: -1px; // so that Bootstrap icons are better aligned
                         }
                         img {
-                            margin-top: -3px;        // so that Bootstrap icons are better aligned
+                            margin-top: -3px; // so that Bootstrap icons are better aligned
                             width: 16px;
                             height: 16px;
                         }
@@ -590,7 +590,7 @@ body.orbeon {
                         i, img { margin-right: 3px } // space between icon and text
 
                         &:hover {
-                            #gradient > .vertical(@grayLighter, @grayLighter);                                                             // effect on hover
+                            #gradient > .vertical(@grayLighter, @grayLighter); // effect on hover
                         }
 
                         i.fa {
@@ -637,7 +637,7 @@ body.orbeon {
 
                         &:hover {
                             border-radius: @baseBorderRadius;
-                            #gradient > .vertical(@grayLighter, @grayLighter);                                                             // effect on hover
+                            #gradient > .vertical(@grayLighter, @grayLighter); // effect on hover
                         }
                     }
                 }
@@ -660,7 +660,7 @@ body.orbeon {
                 }
             }
 
-            .xbl-fr-alert-dialog {display: none }   // because w/ Chrome, a DIV of the dialog remains under the toolbox DIV and causes the toolbox to scroll
+            .xbl-fr-alert-dialog {display: none } // because w/ Chrome, a DIV of the dialog remains under the toolbox DIV and causes the toolbox to scroll
 
             .fr-orbeon-version { color: white; }
         }
@@ -688,7 +688,7 @@ body.orbeon {
                     background-color: transparent;
                     .nav > li > a {
                         padding: 5px 10px;
-                        background-color: var(--orbeon-dialog-title-background-color);  // To show over text of a long label
+                        background-color: var(--orbeon-dialog-title-background-color); // To show over text of a long label
                     }
                 }
             }
@@ -1700,11 +1700,11 @@ body.orbeon {
     .fb-edit-source-dialog {
         width: 900px;
         max-width: none;
-        height: calc(100% - 8rem);  // The `max-height` we have by default isn't enough
+        height: calc(100% - 8rem); // The `max-height` we have by default isn't enough
         .xxforms-dialog-body {
             padding: 0;
-            position: relative;     // So `.CodeMirror` height can be relative to the body height
-            flex-grow: 1;           // Body to take all the space available
+            position: relative; // So `.CodeMirror` height can be relative to the body height
+            flex-grow: 1;       // Body to take all the space available
             .fr-dialog-buttons {
                 padding: 10px;
             }
@@ -1714,9 +1714,9 @@ body.orbeon {
             position: relative;
 
             .CodeMirror {
-                font-size: 12px;        // Pick slightly smaller font size, default being 13px
-                position: absolute;     // So height can be 100%-64px of the dialog body
-                height: auto;           // Override default `300px`
+                font-size: 12px;    // Pick slightly smaller font size, default being 13px
+                position: absolute; // So height can be 100%-64px of the dialog body
+                height: auto;       // Override default `300px`
                 top: 0; bottom: 0;
                 width: 100%;
             }
@@ -1759,13 +1759,13 @@ body.orbeon {
 
     // Test dialog
     .fb-test-dialog {
-        width: 90vw;                                // Try to be very wide
+        width: 90vw; // Try to be very wide
         max-width: none;
         height: calc(100% - 8rem);
 
         .xxforms-dialog-body {
             padding: 0;
-            flex-grow: 1;                           // Body to take all the space available, see `height` for dialog above
+            flex-grow: 1; // Body to take all the space available, see `height` for dialog above
             display: flex;
             flex-direction: column;
 
@@ -1774,9 +1774,9 @@ body.orbeon {
             }
 
             .fb-test-iframe {
-                height: 100%; width: 100%;          // Use all the space available in container (.fb-dialog-form)
-                box-sizing: border-box;             // So the size of this box doesn't get larger than its container, which would add scrollbars to the container
-                border: none;                       // By default, iframes have a particularly ugly border
+                height: 100%; width: 100%; // Use all the space available in container (.fb-dialog-form)
+                box-sizing: border-box;    // So the size of this box doesn't get larger than its container, which would add scrollbars to the container
+                border: none;              // By default, iframes have a particularly ugly border
             }
 
             .fb-test-dialog-console {
@@ -1836,9 +1836,9 @@ body.orbeon {
     }
 
     .fb-label-editor {
-        position: absolute;                         // If not explicitly set, jQuery uses position: relative, which create scrollbars
-        top: 0; left: 0;                            // So the first call to .offset() works when the page is scrolled, see issue #2093
-        z-index: 1;                                 // For the editor to be above control, allowing it to catch clicks, see issue #3410
+        position: absolute; // If not explicitly set, jQuery uses position: relative, which create scrollbars
+        top: 0; left: 0;    // So the first call to .offset() works when the page is scrolled, see issue #2093
+        z-index: 1;         // For the editor to be above control, allowing it to catch clicks, see issue #3410
         display: flex;
         input[type='text'] {
             flex-flow: column;
@@ -1873,7 +1873,7 @@ body.orbeon {
     }
 
     h2 .fr-section-label {
-        height: 36px;                               // So the title takes space even when empty; 36px is line-height in bootstrap.css
+        height: 36px; // So the title takes space even when empty; 36px is line-height in bootstrap.css
                                                     // Defined as height, not max-height, as Firefox doesn't support max-height on
                                                     // tables, table rows, or table cells; the browser will expand it anyway as needed,
                                                     // so in this case height is equivalent to max-height.
@@ -1897,7 +1897,7 @@ body.orbeon {
     .fb {
 
         .xbl-fr-section .fr-section-content {
-            padding: 10px;          // don't need as much padding as usual because grids have extra padding for their icons
+            padding: 10px; // don't need as much padding as usual because grids have extra padding for their icons
         }
 
         .xbl-fr-grid {
@@ -1935,11 +1935,11 @@ body.orbeon {
 
     .fr-grid .fr-grid-td .fb-grid-control-icons img { display: inline }
     .fb-label-hint-placeholder,                                                         // Grey color for placeholder "Click here to edit…" so users can distinguish it from an actual value
-    .fb-label-hint-placeholder .btn { color: #bbb }                                     // To take precedence over color set for button's labels in xforms.css
+    .fb-label-hint-placeholder .btn { color: #bbb } // To take precedence over color set for button's labels in xforms.css
     .fr-grid .fr-grid-td .xforms-trigger .btn input,                                    // Override margin set in form-runner-base.css for buttons in noscript (rendered as input)
-    .btn .xforms-label { margin: 0 }                                                    // Override margin set in form-runner-base.css for regular labels
+    .btn .xforms-label { margin: 0 }                // Override margin set in form-runner-base.css for regular labels
 
-    .fr-grid-td .fb-hover { position: relative }                                        // So elements shown on hover can be absolutely positioned relative to the cell
+    .fr-grid-td .fb-hover { position: relative } // So elements shown on hover can be absolutely positioned relative to the cell
                                                                                         // Necessary as Firefox doesn't support position: relative on table cells (http://goo.gl/Atzi2)
 
 
@@ -2022,7 +2022,7 @@ body.orbeon {
                     display: block;
                     border: 1px solid transparent; // so we can have a visible border when editing without causing resizing
                     border-radius: @baseBorderRadius;
-                    padding: 1px; // so that cursor does not touch border
+                    padding: 1px;                  // so that cursor does not touch border
                 }
 
                 // Even if the label or hint is empty, we still want space for 1 line to be reserved
@@ -2106,7 +2106,7 @@ body.orbeon {
     // ***** Layout ****************************************************************************************************
 
     #fr-view {
-        display: block;                                                     // So we can get its width in `position.coffee`
+        display: block; // So we can get its width in `position.coffee`
         margin-left: 0
     }
 
@@ -2120,7 +2120,7 @@ body.orbeon {
         height: @fbBottomHeight;
         line-height: @fbBottomHeight;
         vertical-align: middle;
-        text-align: right;                                                  // Message and buttons to show on the right
+        text-align: right; // Message and buttons to show on the right
         padding: 0 @fbGutter;
 
         display: flex;
@@ -2128,7 +2128,7 @@ body.orbeon {
         justify-content: end;
         column-gap: .5em;
 
-        .fr-status-icons { display: none }                                  // Don't show valid/invalid icon, as we show XPath errors in .fb-xpath-errors
+        .fr-status-icons { display: none } // Don't show valid/invalid icon, as we show XPath errors in .fb-xpath-errors
 
         .fr-messages {
             white-space: nowrap;
@@ -2136,7 +2136,7 @@ body.orbeon {
 
         // Override Form Runner defaults
         .fr-buttons {
-            display: inline-block;                                          // We have messages shown on the same line
+            display: inline-block; // We have messages shown on the same line
             position: static;
             width: auto;
             margin: 0;
@@ -2147,7 +2147,7 @@ body.orbeon {
         }
     }
 
-    .fr-container { top: 10px }                                             // Override 40px in form-runner-base.css as we don't leave as much as space at the top since the navbar isn't fixed
+    .fr-container { top: 10px } // Override 40px in form-runner-base.css as we don't leave as much as space at the top since the navbar isn't fixed
 
     // Both navbars
     .navbar .navbar-inner {
@@ -2157,8 +2157,8 @@ body.orbeon {
     // Top Form Builder navbar only
     .fb-navbar {
         position: absolute;
-        margin-bottom: 0;                                                   // override 18px in bootstrap.css as the content below the navbar (.fr-top) already as its own padding
-        border-radius: 0;                                                   // override Bootstrap rounded corners
+        margin-bottom: 0; // override 18px in bootstrap.css as the content below the navbar (.fr-top) already as its own padding
+        border-radius: 0; // override Bootstrap rounded corners
         .navbar-inner {
             .container {
                 width: auto;
@@ -2170,8 +2170,8 @@ body.orbeon {
                         padding-top: 0;
                         padding-bottom: 0;
                     }
-                    margin-left: auto;                                          // Show at the end of the line in `flex` layout
-                    margin-right: 0;                                            // Override excessive margin set by Bootstrap
+                    margin-left: auto; // Show at the end of the line in `flex` layout
+                    margin-right: 0;   // Override excessive margin set by Bootstrap
                 }
             }
         }
@@ -2179,7 +2179,7 @@ body.orbeon {
 
     // Form navbar only
     .fb-main .navbar {
-        margin-top: 0;                                                      // Overrides 10px in form-runner-bootstrap-override, as this navbar is not at the top of the page
+        margin-top: 0; // Overrides 10px in form-runner-bootstrap-override, as this navbar is not at the top of the page
 
         .fb-language-triggers {
             i {

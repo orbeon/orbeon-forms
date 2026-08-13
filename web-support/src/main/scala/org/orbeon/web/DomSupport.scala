@@ -85,7 +85,7 @@ object DomSupport {
     def parentElementOpt: Option[T] =
       Option(parentElement)
 
-    def ancestorOrSelfElem(includeSelf: Boolean = false): Iterator[T] =
+    def ancestorOrSelfElem(includeSelf: Boolean = true): Iterator[T] =
       Iterator.iterate(
         if (includeSelf)
           elem

@@ -68,7 +68,7 @@ object Placement {
       }
 
     val autoOverflowElemOpt =
-      el.ancestorOrSelfElem().find { e =>
+      el.ancestorOrSelfElem(includeSelf = false).find { e =>
         dom.window.getComputedStyle(e).overflow == "auto"
       }
 

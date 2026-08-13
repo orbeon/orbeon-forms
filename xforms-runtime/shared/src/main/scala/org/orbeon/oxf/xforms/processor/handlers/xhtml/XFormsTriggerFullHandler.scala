@@ -91,8 +91,19 @@ private object XFormsTriggerFullHandler {
     atts
   }
 
-  // Map appearances to Bootstrap classes, e.g. xxf:primary -> btn-primary
+  // Map appearances to Bootstrap classes, e.g. xxf:primary -> btn-primary. btn-mini and btn-inverse have no Bootstrap 5
+  // equivalent and are styled by our own CSS
   val BootstrapAppearances: Map[QName, String] =
-    Seq("primary", "info", "success", "warning", "danger", "inverse", "mini", "small", "large", "block") map
-      (name => QName(name, XXFORMS_NAMESPACE) -> ("btn-" + name)) toMap
+    Map(
+      "primary" -> "btn-primary",
+      "info"    -> "btn-info",
+      "success" -> "btn-success",
+      "warning" -> "btn-warning",
+      "danger"  -> "btn-danger",
+      "inverse" -> "btn-inverse",
+      "mini"    -> "btn-mini",
+      "small"   -> "btn-sm",
+      "large"   -> "btn-lg",
+      "block"   -> "w-100"
+    ) map { case (appearance, className) => QName(appearance, XXFORMS_NAMESPACE) -> className }
 }

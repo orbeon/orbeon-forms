@@ -78,13 +78,6 @@ object Help {
         html      = true,
         animation = false // [1]
       )
-      // Bootstrap appends the popover to <body> by default. In a native <dialog> shown with showModal() that renders
-      // *behind* the dialog (top layer), so append into the dialog instead. Otherwise append into the .orbeon wrapper:
-      // the Bootstrap CSS is .orbeon-scoped, so the popover must live inside it (standalone, .orbeon is <body>, so this
-      // matches Bootstrap's default).
-      containerElem.closestOpt("dialog")
-        .orElse(containerElem.closestOpt(".orbeon"))
-        .foreach(containerEl => popoverConfig.container = containerEl)
       // Anchor to containerElem: Popper centers the arrow on it, and controlEl would include the LHHA
       val popoverHandle = Bootstrap.newPopover(containerElem, popoverConfig)
       popoverHandle.show()

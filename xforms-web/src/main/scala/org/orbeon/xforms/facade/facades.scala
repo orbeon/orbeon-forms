@@ -101,6 +101,11 @@ object Bootstrap {
     val dynConfig = configuration.asInstanceOf[js.Dynamic]
     if (dynConfig.html.asInstanceOf[js.UndefOr[Boolean]].getOrElse(false) && js.isUndefined(dynConfig.sanitize))
       dynConfig.updateDynamic("sanitize")(false)
+    // Set the container, as tips added to <body> render behind modal dialogs and don't get the .orbeon-scoped CSS
+    if (js.isUndefined(dynConfig.container))
+      element.closestOpt("dialog")
+        .orElse(element.closestOpt(".orbeon"))
+        .foreach(containerEl => dynConfig.container = containerEl)
     val tipCtor = ctor(bootstrapGlobal)
     val _ = tipCtor.getOrCreateInstance(element, configuration)
     new BootstrapTip(tipCtor, element)

@@ -48,7 +48,9 @@ trait Reindex extends FormDefinition {
   ): List[String] = {
     val formDetailsTry =
       PersistenceMetadataSupport.readPublishedFormStorageDetails(
-        appForm, FormDefinitionVersion.Specific(version))
+        appForm,
+        FormDefinitionVersion.Specific(version)
+      )
     formDetailsTry match {
       case Failure(_) =>
         error(s"Can't index documents for ${appForm.app}/${appForm.form} as form definition can't be found")

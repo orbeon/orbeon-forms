@@ -405,7 +405,7 @@ trait CreateUpdateDelete {
         }
       }
 
-    // Is this for a singleton `PUT`?
+    // `true` if request is for a singleton form's XML data creation `PUT`
     val allowCreateOnlyIfSearchEmpty =
       req.forData             &&
       ! delete                &&
@@ -454,7 +454,7 @@ trait CreateUpdateDelete {
             storeResult
           }
         } catch {
-          case _: java.sql.SQLException if allowCreateOnlyIfSearchEmpty =>
+          case _: java.sql.SQLException =>
             // See https://github.com/orbeon/orbeon-forms/issues/7164
             // If we get an error with `allowCreateOnlyIfSearchEmpty == true` we assume that it is a conflict.
             // Can we do better?

@@ -120,6 +120,11 @@ object TinyMCE {
 
         withInitializedTinyMce { tinyMceObject =>
 
+          // Once #7811 is implemented, we will be able to use `xxbl:label-for="tinymce-div"` in `tinymce.xbl`
+          containerElem.querySelectorOpt(".xforms-label").map(_.id).filter(_.nonEmpty).foreach { labelId =>
+            tinyMceObject.getBody().setAttribute("aria-labelledby", labelId)
+          }
+
           // Send value to the server on blur, as well as on Ctrl+Enter or Cmd+Enter
           tinyMceObject.on("blur", _ => clientToServer(incremental = false))
           EventSupport.addListener[dom.KeyboardEvent](

@@ -114,8 +114,7 @@
             <xh:div
                 id="tinymce-div"
                 class="xbl-fr-tinymce-div xbl-html-input"
-                role="textbox"
-                aria-label="{xxf:label('fr-tinymce')}"/>
+                role="textbox"/>
         </xbl:template>
     </xbl:binding>
 

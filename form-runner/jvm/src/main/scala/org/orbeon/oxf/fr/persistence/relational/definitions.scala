@@ -34,7 +34,7 @@ case class FormStorageDetails(
 // connection and risk starving the connection pool.
 case class ReindexConnection(
   connection             : java.sql.Connection,
-  indexedControlsXPaths  : Map[AppFormVersion, List[String]]
+  indexedControlsXPaths  : Option[(AppFormVersion, List[String])]
 )
 
 sealed trait WhatToReindex

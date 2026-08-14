@@ -417,11 +417,9 @@ trait CreateUpdateDelete {
     // Pre-fetch the indexed controls XPaths before opening a database connection, to avoid nested
     // connections when calling `readPublishedFormStorageDetails` during reindex.
     // https://github.com/orbeon/orbeon-forms/issues/7564
-    val preComputedIndexedControlsXPaths: Map[AppFormVersion, List[String]] =
-      if (req.forData && doReindex)
-        Map((req.appForm, versionToSet) -> Index.indexedControlsXPaths(req.appForm, versionToSet))
-      else
-        Map.empty
+    val preComputedIndexedControlsXPaths: Option[(AppFormVersion, List[String])] =
+      (req.forData && doReindex)
+        .option((req.appForm, versionToSet) -> Index.indexedControlsXPaths(req.appForm, versionToSet))
 
     // Update database
     val storeResult =

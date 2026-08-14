@@ -236,11 +236,15 @@ trait Reindex extends FormDefinition {
       }
     }
 
-    val formsToIndexedControlsXPaths: Map[AppFormVersion, List[String]] =
-      reindexConnectionOpt.map(_.indexedControlsXPaths).getOrElse {distinctForms.map { case appFormVersion@(appForm, version) =>
-          appFormVersion -> indexedControlsXPaths(appForm, version)
-        }.toMap
-      }
+    val formsToIndexedControlsXPaths: Map[AppFormVersion, List[String]] = {
+
+      // 2026-08-14: Only 0 or 1 entry in the map at this time. See `CreateUpdateDelete`.
+      val precomputedIndexes = reindexConnectionOpt.flatMap(_.indexedControlsXPaths).toMap
+
+      distinctForms.map { case appFormVersion @ (appForm, version) =>
+        appFormVersion -> precomputedIndexes.getOrElse(appFormVersion, indexedControlsXPaths(appForm, version))
+      }.toMap
+    }
 
     RelationalUtils.withConnection(connectionOpt) { connection =>
       // Get all the rows from `orbeon_form_data` that are "latest" and not deleted

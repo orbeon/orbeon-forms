@@ -76,18 +76,19 @@ class Property[T] extends js.Object {
 
 // Minimal facades for Bootstrap 5 and helpers for Bootstrap 2/5 modal dialogs
 
-@js.native
-trait BootstrapWindow extends scalajs.dom.Window {
-  def bootstrap: js.UndefOr[Bootstrap] = js.native
-}
-
 object Bootstrap {
-  implicit def windowToBootstrapWindow(window: scalajs.dom.Window): BootstrapWindow =
-    window.asInstanceOf[BootstrapWindow]
 
-  // The Bootstrap bundle is part of the XForms asset baseline, so the global is expected to be present.
+  // The Bootstrap bundle is part of the XForms asset baseline; it exposes itself as `ORBEON.bootstrap` instead of
+  // `window.bootstrap`, so it can't clash with a Bootstrap copy loaded by the host page when embedded (#7809)
+  @js.native
+  @JSGlobal("ORBEON")
+  private object OrbeonGlobal extends js.Object {
+    def bootstrap: js.UndefOr[Bootstrap] = js.native
+  }
+
   private def bootstrapGlobal: Bootstrap =
-    scalajs.dom.window.bootstrap.getOrElse(throw new IllegalStateException("the `bootstrap` global is missing"))
+    OrbeonGlobal.bootstrap
+      .getOrElse(throw new IllegalStateException("the `ORBEON.bootstrap` global is missing"))
 
   // Tooltips and popovers (native Bootstrap classes)
   def newTooltip(element: Element, configuration: js.Object): BootstrapTip = newTip(element, configuration, _.Tooltip)
@@ -137,9 +138,9 @@ class BootstrapTip private[facade] (ctor: js.Dynamic, element: Element) {
   def destroy(): Unit = instanceOpt.foreach(_.dispose())
 
   // Change the displayed text after creation (e.g. on language change). Bootstrap reads the title from
-  // data-bs-original-title (falling back to the config) on each show.
+  // data-orbeon-bs-original-title (falling back to the config) on each show.
   def updateTitle(title: js.Any): Unit =
-    element.setAttribute("data-bs-original-title", title.toString)
+    element.setAttribute("data-orbeon-bs-original-title", title.toString)
 
   // The tip element in the DOM, once shown: Bootstrap links the trigger to its tip via aria-describedby.
   def tipElementOpt: Option[Element] =

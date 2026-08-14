@@ -43,7 +43,7 @@ class XFormsAssetsTest extends AnyFunSpec{
 
           "js": [
             { "full": "/webjars/jquery/3.6.1/dist/jquery.js",                                "min": true  },
-            { "full": "/apps/fr/style/bootstrap-5.1.3-dist/js/bootstrap.bundle.js",          "min": true  },
+            { "full": "/apps/fr/style/bootstrap-5.1.3-orbeon/js/bootstrap.bundle.js",        "min": true  },
             { "full": "/ops/javascript/orbeon/util/jquery-orbeon.js",                        "min": true  },
             { "full": "/webjars/nprogress/0.2.0/nprogress.js",                               "min": false },
             { "full": "/webjars/bowser/1.9.4/bowser.js",                                     "min": false },
@@ -97,7 +97,7 @@ class XFormsAssetsTest extends AnyFunSpec{
 
           "js": [
             { "full": "/webjars/jquery/3.6.1/dist/jquery.js",                                "min": true  },
-            { "full": "/apps/fr/style/bootstrap-5.1.3-dist/js/bootstrap.bundle.js",          "min": true  },
+            { "full": "/apps/fr/style/bootstrap-5.1.3-orbeon/js/bootstrap.bundle.js",        "min": true  },
             { "full": "/ops/javascript/orbeon/util/jquery-orbeon.js",                        "min": true  },
             { "full": "/webjars/nprogress/0.2.0/nprogress.js",                               "min": false },
             { "full": "/webjars/bowser/1.9.4/bowser.js",                                     "min": false },

@@ -7,7 +7,10 @@
 //   :root-defined variables);
 // - a selector starting with * also gets a variant for .orbeon itself;
 // - all rem values are converted to px at the legacy 13px base, removing the need to rescale the root font size (which
-//   isn't possible when embedded).
+//   isn't possible when embedded);
+// - data-bs-* attribute selectors become data-orbeon-bs-*, matching the namespaced JS bundle produced by
+//   namespace-bootstrap-js.mjs (#7809);
+// - the sourceMappingURL comment is dropped, as no source map is shipped for the transformed build.
 //
 // Usage: node tools/scope-bootstrap/scope-bootstrap.mjs <in.css> <out.css>
 //
@@ -42,6 +45,10 @@ const scopeClassName = (lead = '') => {
 };
 
 const transformSelector = selectorParser((selectors) => {
+  selectors.walkAttributes((attr) => {
+    if (attr.attribute.startsWith('data-bs-'))
+      attr.attribute = attr.attribute.replace(/^data-bs-/, 'data-orbeon-bs-');
+  });
   selectors.each((selector) => {
     const first = selector.first;
     const lead = first.spaces.before; // keep the dist's one-selector-per-line formatting
@@ -73,6 +80,9 @@ root.walkRules((rule) => {
 });
 root.walkDecls((decl) => {
   decl.value = remToPx(decl.value);
+});
+root.walkComments((comment) => {
+  if (comment.text.startsWith('# sourceMappingURL=')) comment.remove();
 });
 
 fs.writeFileSync(outFile, root.toString());

@@ -491,7 +491,7 @@
                     <!-- These are typically to the left -->
                     <fr:logo/>
                     <fr:title/>
-                    <xh:button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <xh:button class="navbar-toggler" type="button" data-orbeon-bs-toggle="collapse" data-orbeon-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <xh:span class="navbar-toggler-icon"></xh:span>
                     </xh:button>
                     <xh:div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -771,7 +771,7 @@
     </xsl:template>
 
     <xsl:template name="fr-user-nav-dropdown-content">
-        <xh:a id="menu-button" href="#" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+        <xh:a id="menu-button" href="#" class="btn btn-secondary dropdown-toggle" data-orbeon-bs-toggle="dropdown">
             <xh:i class="fa fa-user"/>
         </xh:a>
         <xh:ul class="dropdown-menu dropdown-menu-end" role="menu" aria-labelledBy="menu-button">

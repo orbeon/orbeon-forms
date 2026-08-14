@@ -43,7 +43,7 @@
             <xf:var name="items" value="xxf:itemset('hidden-select', 'xml')//item"/>
 
             <xh:div class="dropdown">
-                <xh:a id="menu-button" href="#" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                <xh:a id="menu-button" href="#" class="btn btn-secondary dropdown-toggle" data-orbeon-bs-toggle="dropdown">
                     <xf:output value="$items[value/string() = $binding]/label/string()"/>
                 </xh:a>
                 <xh:ul class="dropdown-menu{ if ($dropdown-align-attribute = 'right') then ' dropdown-menu-end' else ''}"

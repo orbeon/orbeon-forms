@@ -46,17 +46,16 @@
 <html>
 <head>
     <title>Orbeon Embedding Demo</title>
-    <link rel="stylesheet" href="//getbootstrap.com/2.3.2/assets/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
     <style>
-        body    { padding-top: 50px }
+        body    { padding-top: 60px }
         .navbar { font-size: 13px }
-        .navbar.navbar-fixed-top { z-index: 1040 } <%-- For the dropdown to show above the Form Builder navbar, at 1030 (Bootstrap default) --%>
+        .navbar.fixed-top { z-index: 1040 } <%-- For the dropdown to show above the Form Builder navbar, at 1030 (Bootstrap default) --%>
     </style>
-    <link rel="stylesheet" href="//getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css">
 
-    <%-- This page's own Bootstrap 2 JavaScript, for its navbar dropdown (the Orbeon assets no longer include it) --%>
-    <script type="text/javascript" src="//getbootstrap.com/2.3.2/assets/js/jquery.js"></script>
-    <script type="text/javascript" src="//getbootstrap.com/2.3.2/assets/js/bootstrap.js"></script>
+    <%-- This page's own Bootstrap 5 JavaScript, for its navbar dropdown; Orbeon's copy is namespaced and doesn't
+         handle this page's markup (#7809) --%>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <% if (isEmbeddingApiJS) { %>
     <script type="text/javascript" src="<%= orbeonFormsContext %>/xforms-server/baseline.js?updates=<%= selectedForm.equals("builder") ? "fb" : "fr" %>"></script>
@@ -155,53 +154,48 @@
     </script>
 </head>
 <body>
-<div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="navbar-inner">
-        <div class="container">
-            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="brand" href="#">Orbeon Forms Embedding Demo</a>
-            <div class="nav-collapse collapse">
-                <ul class="nav">
-                    <li><a href="?form=bookshelf">Bookshelf</a></li>
-                    <li><a href="?form=building-permit">Building Permit</a></li>
-                    <li><a href="?form=emergency-medical-consent">Medical Treatment</a></li>
-                    <li><a href="?form=feedback">Feedback</a></li>
-                    <li><a href="?form=dmv-14">DMV-14</a></li>
-                    <li><a href="?form=w9">W-9</a></li>
-                    <% if (!isEmbeddingApiAngular && !isEmbeddingApiReact) { %>
-                    <li><a href="?form=builder">Form Builder</a></li>
-                    <% } %>
-                </ul>
-                <ul class="nav pull-right">
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <%= currentApiName %>
-                            <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li class="<%= disabledIfJava %>">
-                                <a id="switch-to-java-api" tabindex="-1" href="#">Java API</a>
-                            </li>
-                            <li class="<%= disabledIfJS %>">
-                                <a id="switch-to-js-api" tabindex="-1" href="#">JavaScript API</a>
-                            </li>
-                            <li class="<%= disabledIfAngular %>">
-                                <a id="switch-to-angular-api" tabindex="-1" href="#">Angular Component</a>
-                            </li>
-                            <li class="<%= disabledIfReact %>">
-                                <a id="switch-to-react-api" tabindex="-1" href="#">React Component</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">Orbeon Forms Embedding Demo</a>
+        <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#demo-navbar" aria-controls="demo-navbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="demo-navbar" class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="?form=bookshelf">Bookshelf</a></li>
+                <li class="nav-item"><a class="nav-link" href="?form=building-permit">Building Permit</a></li>
+                <li class="nav-item"><a class="nav-link" href="?form=emergency-medical-consent">Medical Treatment</a></li>
+                <li class="nav-item"><a class="nav-link" href="?form=feedback">Feedback</a></li>
+                <li class="nav-item"><a class="nav-link" href="?form=dmv-14">DMV-14</a></li>
+                <li class="nav-item"><a class="nav-link" href="?form=w9">W-9</a></li>
+                <% if (!isEmbeddingApiAngular && !isEmbeddingApiReact) { %>
+                <li class="nav-item"><a class="nav-link" href="?form=builder">Form Builder</a></li>
+                <% } %>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                        <%= currentApiName %>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a id="switch-to-java-api" class="dropdown-item <%= disabledIfJava %>" href="#">Java API</a>
+                        </li>
+                        <li>
+                            <a id="switch-to-js-api" class="dropdown-item <%= disabledIfJS %>" href="#">JavaScript API</a>
+                        </li>
+                        <li>
+                            <a id="switch-to-angular-api" class="dropdown-item <%= disabledIfAngular %>" href="#">Angular Component</a>
+                        </li>
+                        <li>
+                            <a id="switch-to-react-api" class="dropdown-item <%= disabledIfReact %>" href="#">React Component</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
     </div>
-</div>
+</nav>
 
 <div id="my-form" class="container">
     <%

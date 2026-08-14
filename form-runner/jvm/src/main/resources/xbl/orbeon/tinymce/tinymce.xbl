@@ -32,7 +32,6 @@
         id="fr-tinymce"
         element="fr|tinymce, xf|textarea[mediatype = 'text/html']"
         xxbl:mode="lhha binding value external-value focus javascript-lifecycle"
-        xxbl:label-for="tinymce-div"
         xxbl:serialize-external-value="frf:sanitizeHtml(.)"
         xxbl:deserialize-external-value="frf:sanitizeHtml(.)"
     >
@@ -112,7 +111,11 @@
                 href="/webjars/tinymce/6.8.61b713b2e6d7fd45753f4b8a6270b776e.js"
                 class="tinymce-base-url xforms-hidden"/>
 
-            <xh:div id="tinymce-div" class="xbl-fr-tinymce-div xbl-html-input" role="textbox"/>
+            <xh:div
+                id="tinymce-div"
+                class="xbl-fr-tinymce-div xbl-html-input"
+                role="textbox"
+                aria-label="{xxf:label('fr-tinymce')}"/>
         </xbl:template>
     </xbl:binding>
 

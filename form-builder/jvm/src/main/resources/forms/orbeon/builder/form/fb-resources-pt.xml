@@ -1482,6 +1482,11 @@
         <set-control-itemset>Definir Lista de Items do Controlo</set-control-itemset>
         <save-to-dataset>Guardar no Conjunto de Dados</save-to-dataset>
         <dataset-name>Nome do Conjunto de Dados</dataset-name>
+        <show-message>Mostrar mensagem</show-message>
+        <message>
+            <label>Mensagem</label>
+            <hint>Por exemplo, "Nome: {$name}"</hint>
+        </message>
         <set-control-value-unavailable>Definir valor de controle está disponível apenas quando "após os controles estarem prontos" estiver selecionado</set-control-value-unavailable>
 
     </dialog-actions>

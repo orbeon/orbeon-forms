@@ -1494,6 +1494,11 @@
         <set-control-itemset>コントロールの選択肢を設定</set-control-itemset>
         <save-to-dataset>データセットに保存</save-to-dataset>
         <dataset-name>データセット名</dataset-name>
+        <show-message>メッセージを表示</show-message>
+        <message>
+            <label>メッセージ</label>
+            <hint>例: "名前: {$name}"</hint>
+        </message>
         <set-control-value-unavailable>「コントロール準備後」の場合のみコントロール値の設定が可能です</set-control-value-unavailable>
 
     </dialog-actions>

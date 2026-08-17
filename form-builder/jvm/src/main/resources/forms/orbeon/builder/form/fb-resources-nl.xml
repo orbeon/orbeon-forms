@@ -1483,6 +1483,11 @@
         <set-control-itemset>Stel control-keuzes in</set-control-itemset>
         <save-to-dataset>Bewaar in dataset</save-to-dataset>
         <dataset-name>Dataset naam</dataset-name>
+        <show-message>Bericht weergeven</show-message>
+        <message>
+            <label>Bericht</label>
+            <hint>Bijvoorbeeld "Naam: {$name}"</hint>
+        </message>
         <set-control-value-unavailable>Bedieningswaarde instellen is alleen beschikbaar wanneer "nadat de besturingselementen klaar zijn" is geselecteerd</set-control-value-unavailable>
 
     </dialog-actions>

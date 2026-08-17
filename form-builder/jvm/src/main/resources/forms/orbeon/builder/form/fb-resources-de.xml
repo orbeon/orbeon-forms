@@ -1452,6 +1452,11 @@
         <set-control-itemset>Elementemenge des Steuerelements festlegen</set-control-itemset>
         <save-to-dataset>In Dataset speichern</save-to-dataset>
         <dataset-name>Dataset-Name</dataset-name>
+        <show-message>Nachricht anzeigen</show-message>
+        <message>
+            <label>Nachricht</label>
+            <hint>Zum Beispiel "Name: {$name}"</hint>
+        </message>
         <set-control-value-unavailable>Kontrollwert festlegen ist nur verfügbar, wenn "nachdem die Steuerelemente bereit sind" ausgewählt ist</set-control-value-unavailable>
 
     </dialog-actions>

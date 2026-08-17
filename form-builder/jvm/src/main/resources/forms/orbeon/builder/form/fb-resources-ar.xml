@@ -1502,6 +1502,11 @@
         <set-control-itemset>تعيين خيارات عنصر التحكم</set-control-itemset>
         <save-to-dataset>حفظ في مجموعة البيانات</save-to-dataset>
         <dataset-name>اسم مجموعة البيانات</dataset-name>
+        <show-message>إظهار رسالة</show-message>
+        <message>
+            <label>الرسالة</label>
+            <hint>على سبيل المثال، "الاسم: {$name}"</hint>
+        </message>
         <set-control-value-unavailable>تعيين قيمة عنصر التحكم متاح فقط عند اختيار "بعد جاهزية عناصر التحكم"</set-control-value-unavailable>
 
     </dialog-actions>

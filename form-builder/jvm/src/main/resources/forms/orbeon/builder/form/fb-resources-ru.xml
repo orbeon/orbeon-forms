@@ -1482,6 +1482,11 @@
         <set-control-itemset>Установить список вариантов элемента</set-control-itemset>
         <save-to-dataset>Сохранить в набор данных</save-to-dataset>
         <dataset-name>Название набора данных</dataset-name>
+        <show-message>Показать сообщение</show-message>
+        <message>
+            <label>Сообщение</label>
+            <hint>Например, "Имя: {$name}"</hint>
+        </message>
         <set-control-value-unavailable>Установить значение элемента управления доступно только при выборе «после подготовки элементов управления»</set-control-value-unavailable>
 
     </dialog-actions>

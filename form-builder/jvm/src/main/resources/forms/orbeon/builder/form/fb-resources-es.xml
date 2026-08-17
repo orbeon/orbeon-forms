@@ -1496,6 +1496,11 @@
         <set-control-itemset>Establecer conjunto de ítems del control</set-control-itemset>
         <save-to-dataset>Guardar en dataset</save-to-dataset>
         <dataset-name>Nombre del dataset</dataset-name>
+        <show-message>Mostrar mensaje</show-message>
+        <message>
+            <label>Mensaje</label>
+            <hint>Por ejemplo, "Nombre: {$name}"</hint>
+        </message>
         <set-control-value-unavailable>Establecer valor de control solo está disponible cuando se selecciona "después de que los controles estén listos"</set-control-value-unavailable>
 
     </dialog-actions>

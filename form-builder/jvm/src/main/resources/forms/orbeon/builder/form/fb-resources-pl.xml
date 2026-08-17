@@ -1499,6 +1499,11 @@
         <set-control-itemset>Ustaw wybory kontrolki</set-control-itemset>
         <save-to-dataset>Zapisz w zbiorze danych</save-to-dataset>
         <dataset-name>Nazwa zbioru danych</dataset-name>
+        <show-message>Wyświetl komunikat</show-message>
+        <message>
+            <label>Komunikat</label>
+            <hint>Na przykład "Imię: {$name}"</hint>
+        </message>
         <set-control-value-unavailable>Ustaw wartość kontrolki jest dostępne tylko, gdy wybrano opcję "po przygotowaniu kontrolek"</set-control-value-unavailable>
 
     </dialog-actions>

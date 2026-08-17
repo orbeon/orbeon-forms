@@ -1454,7 +1454,12 @@
         <set-control-value>Imposta valore di controllo</set-control-value>
         <set-control-itemset>Imposta l'insieme di elementi del controllo</set-control-itemset>
         <save-to-dataset>Salva nel dataset</save-to-dataset>
-        <dataset-name>Nome dataset</dataset-name>
+        <dataset-name>Nome del dataset</dataset-name>
+        <show-message>Mostra messaggio</show-message>
+        <message>
+            <label>Messaggio</label>
+            <hint>Per esempio, "Nome: {$name}"</hint>
+        </message>
         <set-control-value-unavailable>Imposta valore di controllo è disponibile solo quando è selezionato "dopo che i controlli sono pronti"</set-control-value-unavailable>
 
     </dialog-actions>

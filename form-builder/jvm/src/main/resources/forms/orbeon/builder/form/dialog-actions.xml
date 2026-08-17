@@ -34,7 +34,7 @@
     <xf:var name="action"        value="$instance/fb:action"/>
     <xf:var name="listener"      value="$instance/fb:listener"/>
     <xf:var name="service-call"  value="$action/fr:service-call"/>
-    <xf:var name="response-body" value="$action/(fr:control-setvalue | fr:control-setitems | fr:dataset-write)"/>
+    <xf:var name="response-body" value="$action/(fr:control-setvalue | fr:control-setitems | fr:dataset-write | fr:alert)"/>
 
     <!-- The legacy-style XForms event name held transiently for UI display.
          It is mapped to and from the 2018.2 names stored on `$listener/@events`. -->
@@ -756,7 +756,7 @@
             <xf:group ref="$response-actions-container">
                 <fr:dnd-repeat
                     ref="
-                        let $items := fr:control-setvalue | fr:control-setitems | fr:dataset-write
+                        let $items := fr:control-setvalue | fr:control-setitems | fr:dataset-write | fr:alert
                         return
                             if (exists($items)) then
                                 $items
@@ -769,7 +769,7 @@
                     ">
 
                     <xf:var name="current-action"    value="."/>
-                    <xf:var name="action-count"      value="count($response-actions-container/(fr:control-setvalue | fr:control-setitems | fr:dataset-write))"/>
+                    <xf:var name="action-count"      value="count($response-actions-container/(fr:control-setvalue | fr:control-setitems | fr:dataset-write | fr:alert))"/>
                     <xf:var name="can-remove-action" value="$action-count gt 0"/>
 
                     <xh:div
@@ -807,6 +807,10 @@
                                     <xf:label ref="$form-resources/dialog-actions/save-to-dataset"/>
                                     <xf:value>dataset-write</xf:value>
                                 </xf:item>
+                                <xf:item>
+                                    <xf:label ref="$form-resources/dialog-actions/show-message"/>
+                                    <xf:value>alert</xf:value>
+                                </xf:item>
 
                                 <xf:action event="xforms-select">
                                     <xf:var name="new-name" value="event('xxf:item-value')"/>
@@ -815,7 +819,7 @@
                                         value="
                                             (
                                                 $current-action[parent::* is $response-actions-container],
-                                                $response-actions-container/(fr:control-setvalue | fr:control-setitems | fr:dataset-write)[last()],
+                                                $response-actions-container/(fr:control-setvalue | fr:control-setitems | fr:dataset-write | fr:alert)[last()],
                                                 $response-actions-container/fr:service-call
                                             )[1]"/>
                                     <xf:insert
@@ -910,6 +914,12 @@
                                         <xf:label ref="$form-resources/dialog-actions/dataset-name" appearance="minimal"/>
                                     </xf:input>
                                 </xf:case>
+                                <xf:case value="'alert'">
+                                    <xf:input ref="@message" class="fb-action-option-3-col-span-2">
+                                        <xf:label ref="$form-resources/dialog-actions/message/label" appearance="minimal"/>
+                                        <xf:hint ref="$form-resources/dialog-actions/message/hint"/>
+                                    </xf:input>
+                                </xf:case>
                             </xf:switch>
 
                         </xh:div>
@@ -932,7 +942,7 @@
                                         value="
                                             (
                                                 $current-action[parent::* is $response-actions-container],
-                                                $response-actions-container/(fr:control-setvalue | fr:control-setitems | fr:dataset-write)[last()],
+                                                $response-actions-container/(fr:control-setvalue | fr:control-setitems | fr:dataset-write | fr:alert)[last()],
                                                 $response-actions-container/fr:service-call
                                             )[1]"/>
                                     <xf:insert
@@ -1049,7 +1059,7 @@
                     </xf:action>
 
                     <xf:action if="exists($service-call) and exists($response-body[. &lt;&lt; $service-call])">
-                        <xf:var name="body-actions" value="$action/(fr:service-call | fr:control-setvalue | fr:control-setitems | fr:dataset-write)"/>
+                        <xf:var name="body-actions" value="$action/(fr:service-call | fr:control-setvalue | fr:control-setitems | fr:dataset-write | fr:alert)"/>
                         <xf:insert
                             context="$action"
                             ref="$body-actions[last()]"
@@ -1140,8 +1150,8 @@
                         <xf:var name="if-elem" value="$action/fr:if"/>
                         <xf:insert
                             context="$if-elem"
-                            origin="$action/(fr:service-call | fr:control-setvalue | fr:control-setitems | fr:dataset-write)"/>
-                        <xf:delete ref="$action/(fr:service-call | fr:control-setvalue | fr:control-setitems | fr:dataset-write)"/>
+                            origin="$action/(fr:service-call | fr:control-setvalue | fr:control-setitems | fr:dataset-write | fr:alert)"/>
+                        <xf:delete ref="$action/(fr:service-call | fr:control-setvalue | fr:control-setitems | fr:dataset-write | fr:alert)"/>
                     </xf:action>
 
                     <!-- Replace existing action and listener in the model -->
@@ -1266,6 +1276,9 @@
                 <xf:bind ref="fr:dataset-write">
                     <xf:bind ref="@name" required="true()" xxf:whitespace="trim" type="xs:NCName"/>
                 </xf:bind>
+                <xf:bind ref="fr:alert">
+                    <xf:bind ref="@message" required="true()" xxf:whitespace="trim"/>
+                </xf:bind>
             </xf:bind>
             <xf:bind ref="delete-trigger" relevant="xxf:non-blank(../initial-name)" readonly="fr:is-readonly-mode()"/>
             <xf:bind ref="save-test-trigger" readonly="../@valid = 'false' or fr:is-readonly-mode()"/>
@@ -1303,6 +1316,8 @@
                 <fr:control-setitems control="" items="" label="" value="" hint=""/>
                 <!-- Save to dataset -->
                 <fr:dataset-write name=""/>
+                <!-- Show message -->
+                <fr:alert message=""/>
             </action>
         </xf:instance>
 
@@ -1318,6 +1333,7 @@
                 <value>control-setvalue</value>
                 <value>control-setitems</value>
                 <value>dataset-write</value>
+                <value>alert</value>
             </values>
         </xf:instance>
 

@@ -1520,6 +1520,11 @@
         <set-control-itemset>Set Control Choices</set-control-itemset>
         <save-to-dataset>Save to Dataset</save-to-dataset>
         <dataset-name>Dataset Name</dataset-name>
+        <show-message>Show Message</show-message>
+        <message>
+            <label>Message</label>
+            <hint>For instance, "Name: {$name}"</hint>
+        </message>
         <set-control-value-unavailable>Set Control Value is only available when "after the controls are ready" is selected</set-control-value-unavailable>
 
     </dialog-actions>

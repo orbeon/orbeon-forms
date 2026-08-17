@@ -1530,6 +1530,11 @@
         <set-control-itemset>Ange kontrollval</set-control-itemset>
         <save-to-dataset>Spara till dataset</save-to-dataset>
         <dataset-name>Dataset-namn</dataset-name>
+        <show-message>Visa meddelande</show-message>
+        <message>
+            <label>Meddelande</label>
+            <hint>Till exempel "Namn: {$name}"</hint>
+        </message>
         <set-control-value-unavailable>Ange kontrollvärde är endast tillgängligt när "efter att kontrollerna är klara" har valts</set-control-value-unavailable>
 
     </dialog-actions>

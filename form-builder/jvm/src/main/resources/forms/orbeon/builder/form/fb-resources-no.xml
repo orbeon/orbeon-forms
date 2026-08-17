@@ -1483,6 +1483,11 @@
         <set-control-itemset>Angi kontrollvalg</set-control-itemset>
         <save-to-dataset>Lagre til datasett</save-to-dataset>
         <dataset-name>Datasettnavn</dataset-name>
+        <show-message>Vis melding</show-message>
+        <message>
+            <label>Melding</label>
+            <hint>For eksempel "Navn: {$name}"</hint>
+        </message>
         <set-control-value-unavailable>Angi kontrollverdi er bare tilgjengelig når "etter at kontrollene er klare" er valgt</set-control-value-unavailable>
 
     </dialog-actions>

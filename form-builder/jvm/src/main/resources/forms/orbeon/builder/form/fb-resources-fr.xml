@@ -1521,6 +1521,11 @@
         <set-control-itemset>Définir la liste de choix du contrôle</set-control-itemset>
         <save-to-dataset>Sauvegarder dans un dataset</save-to-dataset>
         <dataset-name>Nom du dataset</dataset-name>
+        <show-message>Afficher un message</show-message>
+        <message>
+            <label>Message</label>
+            <hint>Par exemple, "Nom&#8239;: {$name}"</hint>
+        </message>
         <set-control-value-unavailable>Définir la valeur du contrôle est uniquement disponible lorsque "après la préparation des contrôles" est sélectionné</set-control-value-unavailable>
 
     </dialog-actions>

@@ -1496,6 +1496,11 @@
         <set-control-itemset>Aseta kontrollin kohdejoukko</set-control-itemset>
         <save-to-dataset>Tallenna tietojoukkoon</save-to-dataset>
         <dataset-name>Tietojoukon nimi</dataset-name>
+        <show-message>Näytä viesti</show-message>
+        <message>
+            <label>Viesti</label>
+            <hint>Esimerkiksi "Nimi: {$name}"</hint>
+        </message>
         <set-control-value-unavailable>Aseta kontrollin arvo on käytettävissä vain, kun "kontrollien valmistumisen jälkeen" on valittu</set-control-value-unavailable>
 
     </dialog-actions>

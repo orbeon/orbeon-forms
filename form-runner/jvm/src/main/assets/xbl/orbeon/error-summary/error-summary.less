@@ -85,17 +85,17 @@
             margin: 0;              // probably unneeded
             appearance: none;       // probably unneeded
             display: inline;        // probably unneeded
-        }
 
-        .fr-error-number, .fr-error-label, .fr-error-alert {
-            text-decoration: underline;
+            .fr-error-number, .fr-error-label, .fr-error-alert {
+                text-decoration: underline;
+            }
         }
 
         .fr-error-label:not(:empty):after {
             content: ": "
         }
 
-        .fr-error-label, .fr-error-alert {
+        .fr-error-number, .fr-error-label, .fr-error-alert {
             // The error summary produces a div, instead of a span, so block elements it contains are not moved in
             // the DOM, but, if possible, we still want the message to be shown on the same line as the control label.
             display: inline;

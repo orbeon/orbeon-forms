@@ -57,6 +57,18 @@
         .navbar-collapse {
             height: auto;
             overflow: visible;
+            width: auto; // Bootstrap 5 sizes it with flex-basis, so a host's width would inflate its flex base size
+        }
+        .navbar {
+            padding-left: 0;
+            padding-right: 0;
+            font-size: inherit;
+        }
+        .alert {
+            font-size: inherit;
+        }
+        .popover-header {
+            margin: 0; // Bootstrap 5 only resets margin-bottom, so the host's left and right margins would remain
         }
         .row > .span12 {
             float: none;
@@ -69,6 +81,11 @@
         label {
             font-size: inherit;
             line-height: inherit;
+            font-weight: inherit; // else a host's bold labels reach our radio/checkbox item text
+            color: inherit;
+        }
+        .nav {
+            font-size: inherit;
         }
         .input-prepend, .input-append {
             font-size: inherit;

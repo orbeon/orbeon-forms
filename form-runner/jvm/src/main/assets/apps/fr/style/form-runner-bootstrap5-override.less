@@ -310,6 +310,7 @@
     padding: 2px 9px;
     border-radius: 9px;
     background-color: var(--orbeon-status-background-color);
+    border: 0; // neither Bootstrap version sets one, so a host's .badge border would show through when embedded (e.g. Liferay)
   }
   .badge-info {
     background-color: var(--orbeon-status-info-background-color);
@@ -334,6 +335,7 @@
     vertical-align: baseline;
     background-color: var(--orbeon-status-background-color);
     border-radius: 3px;
+    border: 0; // same as .badge above
   }
   .label-success  { background-color: var(--orbeon-status-success-background-color); }
   .label-info     { background-color: var(--orbeon-status-info-background-color); }

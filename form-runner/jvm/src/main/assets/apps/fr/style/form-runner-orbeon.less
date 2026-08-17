@@ -114,12 +114,8 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
 // 2017-06-09: We had `.aui .orbeon` but it seems like with Liferay 7/DXP at least, the `.aui` class is not present.
 // 2018-10-31: We use more classes so that this only applies to Liferay and not to other embedded use cases.
 // See https://github.com/orbeon/orbeon-forms/issues/3778
+// Nothing for grid, containers, or base text: our .orbeon-scoped Bootstrap 5 outranks Liferay's
 .portlet .portlet-content .portlet-body .orbeon-portlet-div {
-
-    color: var(--orbeon-base-color);
-    font-size: var(--orbeon-base-font-size);
-    font-weight: var(--orbeon-base-font-weight);
-    line-height: @fluidLineHeight;
 
     // Remove icons as content
     [class |= icon]:before {
@@ -144,46 +140,6 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
     #xforms-form { // id because Liferay uses an id too
 
         overflow-x: scroll; // so that we don't go over the portlet boundary (for the Summary page which is not yet responsive)
-
-        .row {
-            margin-left: -20px;
-            margin-right: -20px;
-
-            [class *= span] {
-                min-height: 1px;   // don't allow tall empty rows
-                margin-left: 20px; // restore for Liferay 6.2
-            }
-
-            // See https://github.com/orbeon/orbeon-forms/issues/3251
-            @media(max-width: 980px) {
-                margin-left: 0;
-                margin-right: 0;
-
-                .span12 {
-                    margin-left: 0;
-                    margin-right: 0;
-                }
-            }
-        }
-
-        .container,
-            .input-append .add-on,
-            .input-prepend .add-on {
-            box-sizing: content-box; // Bootstrap 2 default (Liferay uses Bootstrap 3 which changes that)
-        }
-
-        .container, .container-fluid {
-            padding: 0;
-        }
-
-        .navbar-inverse .navbar-inner {
-            width: 100%; // https://github.com/orbeon/orbeon-forms/issues/3959
-        }
-    }
-
-    .radio, .checkbox {
-        margin-top: 0;
-        display: inline-block; // https://github.com/orbeon/orbeon-forms/issues/4165
     }
 
     .checkbox input[type = checkbox], .radio input[type = radio] {
@@ -208,34 +164,6 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
                     border-right: none;
                 }
             }
-        }
-    }
-
-    @media(min-width: 980px) {
-        // Not sure we need this rule anymore, seems fine with Liferay 7/DXP
-        // 2017-06-15: Seems needed for Liferay 6.2.
-        .row .span12 {
-            width: 940px;
-        }
-    }
-
-    .navbar-inverse {
-        border: none;
-        background-color: transparent;
-    }
-}
-
-// For Liferay only
-// See https://github.com/orbeon/orbeon-forms/issues/3251
-@media (max-width: 980px) {
-    #content .portlet .portlet-content .portlet-body .orbeon-portlet-div {
-        .row {
-            margin-left: 0;
-            margin-right: 0;
-        }
-        .span12 {
-            margin-left: 0;
-            margin-right: 0;
         }
     }
 }

@@ -374,26 +374,19 @@
                                 )
                         "/>
 
-                    <xf:setvalue
-                        ref="xxf:instance('i')/error-message"
-                        value="$error-message"/>
-
                     <xf:var name="upload-error-appearance">
                         <xxf:value xxbl:scope="inner" value="fr:component-param-value('upload-error-appearance')"/>
                     </xf:var>
                     <xf:action if="$upload-error-appearance = 'inline'">
-                        <xf:toggle xxbl:scope="inner" case="inline-upload-error-message-shown"/>
+                        <xf:insert
+                            context="xxf:instance('i')/error-messages"
+                            origin="xf:element('error-message', $error-message)"/>
                     </xf:action>
                     <xf:action if="$upload-error-appearance != 'inline'" type="xpath">
                         frf:errorMessage($error-message)
                     </xf:action>
 
                 </xf:action>
-            </xbl:handler>
-
-            <xbl:handler event="xxforms-upload-start xxforms-upload-done" phase="target" xxbl:scope="outer">
-                <xf:setvalue ref="xxf:instance('i')/error-message"/>
-                <xf:toggle case="inline-upload-error-message-hidden"/>
             </xbl:handler>
         </xbl:handlers>
 
@@ -404,7 +397,7 @@
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
                     <_>
                         <file filename="" mediatype="" size="" hash-algorithm="" hash-value=""/>
-                        <error-message/>
+                        <error-messages/>
                     </_>
                 </xf:instance>
 
@@ -982,24 +975,20 @@
 
                     </xf:upload>
 
-                    <xf:switch xxf:element="div">
-                        <xf:case id="inline-upload-error-message-hidden"/>
-                        <xf:case id="inline-upload-error-message-shown">
-                            <xh:div class="alert alert-warning fr-attachment-upload-error-message" role="alert">
-                                <xf:trigger
-                                    appearance="minimal"
-                                    class="close">
-                                    <xf:label>&#215;</xf:label>
-                                    <xf:action event="DOMActivate">
-                                        <xf:setvalue ref="instance()/error-message"/>
-                                        <xf:toggle case="inline-upload-error-message-hidden"/>
-                                    </xf:action>
-                                </xf:trigger>
-                                <xh:i class="fa fa-fw fa-exclamation-triangle" aria-hidden="true"/>
-                                <xf:output ref="instance()/error-message"/>
-                            </xh:div>
-                        </xf:case>
-                    </xf:switch>
+                    <xf:repeat ref="instance()/error-messages/error-message">
+                        <xh:div class="alert alert-warning fr-attachment-upload-error-message" role="alert">
+                            <xf:trigger
+                                appearance="minimal"
+                                class="close">
+                                <xf:label>&#215;</xf:label>
+                                <xf:action event="DOMActivate">
+                                    <xf:delete ref="."/>
+                                </xf:action>
+                            </xf:trigger>
+                            <xh:i class="fa fa-fw fa-exclamation-triangle" aria-hidden="true"/>
+                            <xf:output ref="."/>
+                        </xh:div>
+                    </xf:repeat>
                 </xh:div>
             </xh:div>
 

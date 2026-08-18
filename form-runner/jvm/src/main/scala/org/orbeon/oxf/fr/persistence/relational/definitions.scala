@@ -1,7 +1,6 @@
 package org.orbeon.oxf.fr.persistence.relational
 
 import cats.Eval
-import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.fr.persistence.relational.index.Index.matchForControl

@@ -3,6 +3,7 @@ package org.orbeon.oxf.fr.persistence
 import cats.Eval
 import org.orbeon.oxf.cache.{CacheApi, CacheSupport}
 import org.orbeon.oxf.fr.*
+import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.FormRunnerPersistence.PersistenceProxyPropertyPrefix
 import org.orbeon.oxf.fr.permission.{Operation, Permission, Permissions, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
@@ -44,9 +45,9 @@ object PersistenceMetadataSupport {
 
   // When publishing a form, we need to invalidate the caches. This doesn't cover cases where form definitions are
   // updated directly in the database, but it's the most frequent case.
-  def maybeInvalidateCachesFor(appForm: AppForm, version: Int)(implicit indentedLogger: IndentedLogger): Unit = {
+  def maybeInvalidateCachesFor(appFormVersion: AppFormVersion)(implicit indentedLogger: IndentedLogger): Unit = {
 
-    val cacheKey: CacheKey = (appForm.app, appForm.form, version)
+    val cacheKey: CacheKey = (appFormVersion._1.app, appFormVersion._1.form, appFormVersion._2)
 
     def log(cache: CacheApi)(removed: Boolean): Unit =
       if (removed)

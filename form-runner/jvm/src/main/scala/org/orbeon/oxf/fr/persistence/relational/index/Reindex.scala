@@ -40,20 +40,19 @@ import scala.util.{Failure, Success}
 trait Reindex extends FormDefinition {
 
   def indexedControlsXPaths(
-    appForm : AppForm,
-    version : Int
+    appFormVersion : AppFormVersion
   )(implicit
     indentedLogger: IndentedLogger,
     propertySet   : PropertySet
   ): List[String] = {
     val formDetailsTry =
       PersistenceMetadataSupport.readPublishedFormStorageDetails(
-        appForm,
-        FormDefinitionVersion.Specific(version)
+        appFormVersion._1,
+        FormDefinitionVersion.Specific(appFormVersion._2)
       )
     formDetailsTry match {
       case Failure(_) =>
-        error(s"Can't index documents for ${appForm.app}/${appForm.form} as form definition can't be found")
+        error(s"Can't index documents for ${appFormVersion._1.app}/${appFormVersion._1.form} as form definition can't be found")
         Nil
       case Success(FormStorageDetails(_, indexedFields, _)) =>
         indexedFields.value

@@ -351,8 +351,10 @@ trait CreateUpdateDelete {
     val versionToSet =
       req.version.getOrElse(throw HttpStatusCodeException(StatusCode.BadRequest))
 
+    val appFormVersion = (req.appForm, versionToSet)
+
     if (req.forForm)
-      PersistenceMetadataSupport.maybeInvalidateCachesFor(req.appForm, versionToSet)
+      PersistenceMetadataSupport.maybeInvalidateCachesFor(appFormVersion)
 
     val createFlatView: Boolean =
       req.flatView                                      &&
@@ -376,7 +378,7 @@ trait CreateUpdateDelete {
       }
     }
 
-    val doReindex: Boolean =
+    val doReindex =
       ! req.forAttachment &&               // https://github.com/orbeon/orbeon-forms/issues/6913
       ! req.dataPart.exists(_.forceDelete) // no need to reindex as we only `DELETE` historical data, which is not indexed
 
@@ -389,10 +391,10 @@ trait CreateUpdateDelete {
         val whatToReindex = req.dataPart match {
           case Some(dataPart) =>
             // Data: update index for this document id
-            WhatToReindex.DataForDocumentId(dataPart.documentId, appFormVersion = (req.appForm, versionToSet))
+            WhatToReindex.DataForDocumentId(dataPart.documentId, appFormVersion)
           case None =>
             // Form definition: update index for this form version
-            WhatToReindex.DataForForm((req.appForm, versionToSet))
+            WhatToReindex.DataForForm(appFormVersion)
         }
 
         // If we are deleting a form definition, we should clear the index, but we should not reindex the data after that.

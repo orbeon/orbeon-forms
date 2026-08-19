@@ -306,16 +306,12 @@
             <upload-cancel>Pujada de fitxers cancel·lada per l'usuari</upload-cancel>
             <upload-done>Pujada de fitxers completada.</upload-done>
             <upload-error>Hi ha hagut una errada en la pujada de fitxers. Torni a intentar-ho.</upload-error>
-            <upload-error-empty-file>El fitxer està buit.</upload-error-empty-file>
-            <upload-error-upload-password-not-configured-error>Les càrregues de fitxers estan desactivades perquè la contrasenya de xifratge d'Orbeon Forms no està establerta o és massa feble.</upload-error-upload-password-not-configured-error>
-            <upload-error-size>L'arxiu es massa gran. La mida permesa és {0} i
-                la mida del fitxer pujat és {1}.</upload-error-size>
-            <upload-error-max-files-per-control>S''ha superat el nombre màxim de fitxers. No podeu
-                adjuntar més de {0,number,integer} fitxers a aquest control.</upload-error-max-files-per-control>
-            <upload-error-mediatype>L'arxiu pujat és de tipus incorrecte: {0}</upload-error-mediatype>
-            <upload-error-file-scan>L'arxiu pujat ha estat rebutjat per l'escàner de fitxers.
-                Asseguris que el fitxer no està infectat. Aquest és el missatge de l'escàner de
-                fitxers: "{0}".</upload-error-file-scan>
+            <upload-error-empty-file>El fitxer {0}està buit.</upload-error-empty-file>
+            <upload-error-upload-password-not-configured-error>La càrrega de fitxers està desactivada perquè la contrasenya d''encriptació d''Orbeon Forms no està definida o és massa feble.</upload-error-upload-password-not-configured-error>
+            <upload-error-size>El fitxer {0}és massa gran. La mida màxima permesa és {1} i la mida rebuda és {2}.</upload-error-size>
+            <upload-error-max-files-per-control>Nombre màxim de fitxers superat. No podeu adjuntar més de {0,number,integer} fitxers a aquest control.</upload-error-max-files-per-control>
+            <upload-error-mediatype>El fitxer {0}és d''un tipus incorrecte: {1}</upload-error-mediatype>
+            <upload-error-file-scan>El fitxer {0}ha estat rebutjat per l''escàner de fitxers. Assegureu-vos que el fitxer no està infectat. Aquest és el missatge de l''escàner de fitxers: "{1}".</upload-error-file-scan>
             <lost-attachments>Alguns fitxers s'han perdut per un incident amb el servidor. Verifiqui
                 tots els annexos i puja'ls de nou si és necessari.</lost-attachments>
             <conflict-dialog-title>Conflicte detectat</conflict-dialog-title>

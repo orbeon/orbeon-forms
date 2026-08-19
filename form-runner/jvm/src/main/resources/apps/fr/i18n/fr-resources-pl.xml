@@ -298,12 +298,12 @@
             <upload-cancel>Wgrywanie pliku/-ów zostało anulowane przez użytkownika</upload-cancel>
             <upload-done>Wgrywanie pliku/-ów zostało zakończone</upload-done>
             <upload-error>W trakcie wgrywania pliku/-ów wystąpił błąd. Spróbuj ponownie.</upload-error>
-            <upload-error-empty-file>Przesłany plik jest pusty.</upload-error-empty-file>
-            <upload-error-upload-password-not-configured-error>Przesyłanie plików jest wyłączone, ponieważ hasło szyfrowania Orbeon Forms nie zostało ustawione lub jest zbyt słabe.</upload-error-upload-password-not-configured-error>
-            <upload-error-size>Wgrany plik jest zbyt duży. Maksymalny dozwolony rozmiar plikuto {0}, a rozmiar otrzymanego pliku to {1}.</upload-error-size>
-            <upload-error-max-files-per-control>Przekroczono maksymalną liczbę plików. Nie można dołączyć więcej niż {0,number,integer} plików do tego kontrolki.</upload-error-max-files-per-control>
-            <upload-error-mediatype>Wgrany plik jest niewłaściwego typu: {0}</upload-error-mediatype>
-            <upload-error-file-scan>Przesłany plik został odrzucony przez skaner plików. Upewnij się, że nie jest to zainfekowany plik. Oto komunikat skanera plików: „{0}”.</upload-error-file-scan>
+            <upload-error-empty-file>Plik {0}jest pusty.</upload-error-empty-file>
+            <upload-error-upload-password-not-configured-error>Przesyłanie plików jest wyłączone, ponieważ hasło szyfrowania Orbeon Forms nie jest ustawione lub jest zbyt słabe.</upload-error-upload-password-not-configured-error>
+            <upload-error-size>Plik {0}jest zbyt duży. Maksymalny dozwolony rozmiar to {1}, a rozmiar otrzymanego pliku to {2}.</upload-error-size>
+            <upload-error-max-files-per-control>Przekroczono maksymalną liczbę plików. Nie można dołączyć więcej niż {0,number,integer} plików do tego pola.</upload-error-max-files-per-control>
+            <upload-error-mediatype>Plik {0}jest niewłaściwego typu: {1}</upload-error-mediatype>
+            <upload-error-file-scan>Plik {0}został odrzucony przez skaner plików. Upewnij się, że nie jest to zainfekowany plik. Oto komunikat skanera plików: „{1}”.</upload-error-file-scan>
             <lost-attachments>Niektóre załączniki zostały utracone z powodu problemu z serwerem. Sprawdź wszystkie załączniki i prześlij je ponownie w razie potrzeby.</lost-attachments>
             <conflict-dialog-title>Wykryto konflikt</conflict-dialog-title>
             <conflict-dialog-message>

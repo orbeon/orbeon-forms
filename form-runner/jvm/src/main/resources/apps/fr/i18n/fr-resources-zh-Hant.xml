@@ -298,12 +298,12 @@
             <upload-cancel>上傳被用戶取消</upload-cancel>
             <upload-done>上傳完成</upload-done>
             <upload-error>上傳過程中出錯。請重試。</upload-error>
-            <upload-error-empty-file>上傳的文件為空。</upload-error-empty-file>
+            <upload-error-empty-file>檔案{0}為空。</upload-error-empty-file>
             <upload-error-upload-password-not-configured-error>由於 Orbeon Forms 加密密碼未設置或太弱，文件上傳已被禁用。</upload-error-upload-password-not-configured-error>
-            <upload-error-size>上傳的文件太大。允許的最大大小為 {0}，實際接收大小為 {1}。</upload-error-size>
+            <upload-error-size>檔案{0}太大。允許的最大大小為 {1}，實際接收大小為 {2}。</upload-error-size>
             <upload-error-max-files-per-control>超過最大檔案數。您不能在此控制項中附加超過 {0,number,integer} 個檔案。</upload-error-max-files-per-control>
-            <upload-error-mediatype>上傳的文件類型不正確：{0}</upload-error-mediatype>
-            <upload-error-file-scan>上傳的文件被文件掃描程序拒絕。請確保這不是一個受感染的文件。以下是文件掃描程序的消息："{0}"。</upload-error-file-scan>
+            <upload-error-mediatype>檔案{0}類型不正確：{1}</upload-error-mediatype>
+            <upload-error-file-scan>檔案{0}被文件掃描程序拒絕。請確保這不是一個受感染的文件。以下是文件掃描程序的消息："{1}"。</upload-error-file-scan>
             <lost-attachments>由於服務器問題，一些文件附件丟失。請檢查所有附件並在需要時重新上傳。</lost-attachments>
             <conflict-dialog-title>檢測到衝突</conflict-dialog-title>
             <conflict-dialog-message>

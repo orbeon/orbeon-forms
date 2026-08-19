@@ -291,12 +291,12 @@
             <upload-cancel>Загрузка отменена пользователем</upload-cancel>
             <upload-done>Загрузка завершена</upload-done>
             <upload-error>Во время загрузки произошла ошибка. Попробуйте еще раз.</upload-error>
-            <upload-error-empty-file>Загруженный файл пуст.</upload-error-empty-file>
+            <upload-error-empty-file>Файл {0}пуст.</upload-error-empty-file>
             <upload-error-upload-password-not-configured-error>Загрузка файлов отключена, так как пароль шифрования Orbeon Forms не установлен или слишком слаб.</upload-error-upload-password-not-configured-error>
-            <upload-error-size>Загруженный файл слишком большой. Максимальный допустимый размер {0}, фактический размер {1}.</upload-error-size>
+            <upload-error-size>Файл {0}слишком большой. Максимальный допустимый размер {1}, фактический размер {2}.</upload-error-size>
             <upload-error-max-files-per-control>Превышено максимальное количество файлов. Вы не можете прикрепить более {0,number,integer} файлов к этому элементу управления.</upload-error-max-files-per-control>
-            <upload-error-mediatype>Загруженный файл имеет неподдерживаемый тип: {0}.</upload-error-mediatype>
-            <upload-error-file-scan>Загруженный файл был отклонен сканером файлов. Убедитесь, что файл не заражен. Сообщение сканера файлов: "{0}".</upload-error-file-scan>
+            <upload-error-mediatype>Файл {0}имеет неподдерживаемый тип: {1}.</upload-error-mediatype>
+            <upload-error-file-scan>Файл {0}был отклонен сканером файлов. Убедитесь, что файл не заражен. Сообщение сканера файлов: "{1}".</upload-error-file-scan>
             <lost-attachments>Некоторые вложенные файлы были утеряны из‑за проблемы на сервере. Проверьте все вложения и при необходимости загрузите их снова.</lost-attachments>
             <conflict-dialog-title>Обнаружен конфликт</conflict-dialog-title>
             <conflict-dialog-message>

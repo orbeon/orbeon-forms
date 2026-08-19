@@ -298,12 +298,12 @@
             <upload-cancel>Överföring stoppad av användaren</upload-cancel>
             <upload-done>Överföring klar</upload-done>
             <upload-error>Fel under överföring. Vänligen försök igen.</upload-error>
-            <upload-error-empty-file>Den uppladdade filen är tom.</upload-error-empty-file>
+            <upload-error-empty-file>Filen {0}är tom.</upload-error-empty-file>
             <upload-error-upload-password-not-configured-error>Filuppladdningar är inaktiverade eftersom lösenordet för Orbeon Forms-kryptering inte är inställt eller är för svagt.</upload-error-upload-password-not-configured-error>
-            <upload-error-size>Filen är för stor för att överföras. Största storlek är {0}.</upload-error-size>
+            <upload-error-size>Filen {0}är för stor. Den maximalt tillåtna storleken är {1} och den mottagna storleken är {2}.</upload-error-size>
             <upload-error-max-files-per-control>Maximalt antal filer överskridet. Du kan inte bifoga mer än {0,number,integer} filer till denna kontroll.</upload-error-max-files-per-control>
-            <upload-error-mediatype>Den uppladdade filen har en felaktig typ: {0}</upload-error-mediatype>
-            <upload-error-file-scan>Den uppladdade filen avvisades av filskannern. Kontrollera att filen inte är infekterad. Meddelande från filskannern: "{0}".</upload-error-file-scan>
+            <upload-error-mediatype>Filen {0}har en felaktig typ: {1}</upload-error-mediatype>
+            <upload-error-file-scan>Filen {0}avvisades av filskannern. Kontrollera att filen inte är infekterad. Meddelande från filskannern: "{1}".</upload-error-file-scan>
             <lost-attachments>Vissa filbilagor förlorades på grund av ett serverfel. Kontrollera alla bilagor och ladda upp dem igen vid behov.</lost-attachments>
             <conflict-dialog-title>Konflikt upptäckt</conflict-dialog-title>
             <conflict-dialog-message>

@@ -293,12 +293,12 @@
             <upload-cancel>上传被用户取消</upload-cancel>
             <upload-done>上传完成</upload-done>
             <upload-error>上传过程中出错。请重试。</upload-error>
-            <upload-error-empty-file>上传的文件是空的。</upload-error-empty-file>
+            <upload-error-empty-file>文件{0}是空的。</upload-error-empty-file>
             <upload-error-upload-password-not-configured-error>由于 Orbeon Forms 加密密码未设置或太弱，文件上传已被禁用。</upload-error-upload-password-not-configured-error>
-            <upload-error-size>上传的文件太大。允许的最大大小为{0}，实际收到的大小为{1}。</upload-error-size>
+            <upload-error-size>文件{0}太大。允许的最大大小为{1}，实际收到的大小为{2}。</upload-error-size>
             <upload-error-max-files-per-control>超过最大文件数。您不能在此控件中附加超过 {0,number,integer} 个文件。</upload-error-max-files-per-control>
-            <upload-error-mediatype>上传的文件类型不正确：{0}</upload-error-mediatype>
-            <upload-error-file-scan>上传的文件被文件扫描程序拒绝。请确保这不是受感染的文件。以下是文件扫描程序的消息："{0}"。</upload-error-file-scan>
+            <upload-error-mediatype>文件{0}类型不正确：{1}</upload-error-mediatype>
+            <upload-error-file-scan>文件{0}被文件扫描程序拒绝。请确保这不是受感染的文件。以下是文件扫描程序的消息："{1}"。</upload-error-file-scan>
             <lost-attachments>由于服务器问题，一些文件附件丢失。请检查所有附件，如有需要请重新上传。</lost-attachments>
             <conflict-dialog-title>检测到冲突</conflict-dialog-title>
             <conflict-dialog-message>

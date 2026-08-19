@@ -285,12 +285,12 @@
             <upload-cancel>ユーザーによってアップロードがキャンセルされました</upload-cancel>
             <upload-done>アップロード完了</upload-done>
             <upload-error>アップロード中にエラーが発生しました。もう一度お試しください。</upload-error>
-            <upload-error-empty-file>アップロードされたファイルは空です。</upload-error-empty-file>
-            <upload-error-upload-password-not-configured-error>Orbeon Formsの暗号化パスワードが設定されていないか、弱すぎるため、ファイルのアップロードが無効になっています。</upload-error-upload-password-not-configured-error>
-            <upload-error-size>アップロードされたファイルが大きすぎます。許可される最大サイズは{0}で、実際に受信したサイズは{1}です。</upload-error-size>
-            <upload-error-max-files-per-control>ファイル数の上限を超えました。このコントロールには{0,number,integer}個以上のファイルを添付できません。</upload-error-max-files-per-control>
-            <upload-error-mediatype>アップロードされたファイルの形式が正しくありません: {0}</upload-error-mediatype>
-            <upload-error-file-scan>アップロードされたファイルはファイルスキャナーによって拒否されました。感染したファイルでないことを確認してください。ファイルスキャナーのメッセージ: 「{0}」</upload-error-file-scan>
+            <upload-error-empty-file>ファイル{0}は空です。</upload-error-empty-file>
+            <upload-error-upload-password-not-configured-error>Orbeon Formsの暗号化パスワードが設定されていないか弱すぎるため、ファイルのアップロードが無効になっています。</upload-error-upload-password-not-configured-error>
+            <upload-error-size>ファイル{0}が大きすぎます。許可される最大サイズは{1}で、実際に受信したサイズは{2}です。</upload-error-size>
+            <upload-error-max-files-per-control>最大ファイル数を超えました。このコントロールには{0,number,integer}個を超えるファイルを添付できません。</upload-error-max-files-per-control>
+            <upload-error-mediatype>ファイル{0}の形式が正しくありません: {1}</upload-error-mediatype>
+            <upload-error-file-scan>ファイル{0}はファイルスキャナーによって拒否されました。感染したファイルでないことを確認してください。ファイルスキャナーのメッセージ: 「{1}」</upload-error-file-scan>
             <lost-attachments>サーバーの問題により、一部の添付ファイルが失われました。すべての添付ファイルを確認し、必要に応じて再度アップロードしてください。</lost-attachments>
             <conflict-dialog-title>競合が検出されました</conflict-dialog-title>
             <conflict-dialog-message>

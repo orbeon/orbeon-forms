@@ -292,12 +292,12 @@
             <upload-cancel>Indlæsning afbrudt af bruger</upload-cancel>
             <upload-done>Indlæsning færdig</upload-done>
             <upload-error>Der skete en fejl under indlæsning. Prøv igen.</upload-error>
-            <upload-error-empty-file>Den uploadede fil er tom.</upload-error-empty-file>
+            <upload-error-empty-file>Filen {0}er tom.</upload-error-empty-file>
             <upload-error-upload-password-not-configured-error>Filoverførsler er deaktiveret, fordi Orbeon Forms krypteringsadgangskoden ikke er indstillet eller er for svag.</upload-error-upload-password-not-configured-error>
-            <upload-error-size>Filen, der indlæses, er for stor. Den maksimale størrelse er {0} og der blev indlæst {1}.]</upload-error-size>
+            <upload-error-size>Filen {0}er for stor. Den maksimale tilladte størrelse er {1}, og den modtagne størrelse er {2}.</upload-error-size>
             <upload-error-max-files-per-control>Maksimalt antal filer overskredet. Du kan ikke vedhæfte mere end {0,number,integer} filer til denne kontrol.</upload-error-max-files-per-control>
-            <upload-error-mediatype>Den uploadede fil har ikke en tilladt filtype: {0}</upload-error-mediatype>
-            <upload-error-file-scan>Den uploadede fil blev afvist af filscanneren. Kontroller, at filen ikke er inficeret. Besked fra filscanneren: "{0}".</upload-error-file-scan>
+            <upload-error-mediatype>Filen {0}har ikke en tilladt filtype: {1}</upload-error-mediatype>
+            <upload-error-file-scan>Filen {0}blev afvist af filscanneren. Kontroller, at filen ikke er inficeret. Besked fra filscanneren: "{1}".</upload-error-file-scan>
             <lost-attachments>Nogle vedhæftede filer gik tabt på grund af et serverproblem. Kontroller alle vedhæftninger og upload dem igen om nødvendigt.</lost-attachments>
             <conflict-dialog-title>Konflikt registreret</conflict-dialog-title>
             <conflict-dialog-message>

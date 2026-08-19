@@ -298,12 +298,12 @@
             <upload-cancel>تم إلغاء التحميل من قِبل المستخدم</upload-cancel>
             <upload-done>اكتمل التحميل</upload-done>
             <upload-error>حدث خطأ أثناء التحميل. يرجى المحاولة مرة أخرى.</upload-error>
-            <upload-error-empty-file>الملف الذي تم تحميله فارغ.</upload-error-empty-file>
-            <upload-error-upload-password-not-configured-error>تم تعطيل عمليات تحميل الملفات لأن كلمة مرور تشفير Orbeon Forms غير محددة أو ضعيفة للغاية。</upload-error-upload-password-not-configured-error>
-            <upload-error-size>الملف الذي تم تحميله كبير جدًا. الحجم الأقصى المسموح به هو {0} والحجم الفعلي المستلم هو {1}.</upload-error-size>
-            <upload-error-max-files-per-control>تم تجاوز الحد الأقصى لعدد الملفات. لا يمكنك إرفاق أكثر من {0,number,integer} ملفات بعنصر التحكم هذا.</upload-error-max-files-per-control>
-            <upload-error-mediatype>الملف الذي تم تحميله من نوع غير صحيح: {0}</upload-error-mediatype>
-            <upload-error-file-scan>تم رفض الملف الذي تم تحميله من قبل فاحص الملفات. يرجى التأكد من أن هذا الملف غير مصاب. إليك رسالة فاحص الملفات: "{0}".</upload-error-file-scan>
+            <upload-error-empty-file>الملف {0}فارغ.</upload-error-empty-file>
+            <upload-error-upload-password-not-configured-error>تم تعطيل تحميل الملفات لأن كلمة مرور تشفير Orbeon Forms غير معينة أو ضعيفة جدًا.</upload-error-upload-password-not-configured-error>
+            <upload-error-size>الملف {0}كبير جدًا. الحجم الأقصى المسموح به هو {1} والحجم الفعلي المستلم هو {2}.</upload-error-size>
+            <upload-error-max-files-per-control>تم تجاوز الحد الأقصى لعدد الملفات. لا يمكنك إرفاق أكثر من {0,number,integer} ملفات بهذا العنصر.</upload-error-max-files-per-control>
+            <upload-error-mediatype>الملف {0}من نوع غير صحيح: {1}</upload-error-mediatype>
+            <upload-error-file-scan>تم رفض الملف {0}من قبل فاحص الملفات. يرجى التأكد من أن هذا الملف غير مصاب. إليك رسالة فاحص الملفات: "{1}".</upload-error-file-scan>
             <lost-attachments>تم فقدان بعض مرفقات الملفات بسبب مشكلة في الخادم. يرجى التحقق من جميع مرفقاتك وتحميلها مرة أخرى إذا لزم الأمر.</lost-attachments>
             <conflict-dialog-title>تم اكتشاف تعارض</conflict-dialog-title>
             <conflict-dialog-message>

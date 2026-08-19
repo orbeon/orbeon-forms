@@ -983,22 +983,22 @@
                         </xf:action>
 
                     </xf:upload>
-
-                    <xf:repeat ref="instance()/error-messages/error-message">
-                        <xh:div class="alert alert-warning fr-attachment-upload-error-message" role="alert">
-                            <xf:trigger
-                                appearance="minimal"
-                                class="close">
-                                <xf:label>&#215;</xf:label>
-                                <xf:action event="DOMActivate">
-                                    <xf:delete ref="."/>
-                                </xf:action>
-                            </xf:trigger>
-                            <xh:i class="fa fa-fw fa-exclamation-triangle" aria-hidden="true"/>
-                            <xf:output ref="."/>
-                        </xh:div>
-                    </xf:repeat>
                 </xh:div>
+
+                <xf:repeat ref="instance()/error-messages/error-message">
+                    <xh:div class="alert alert-warning fr-attachment-upload-error-message" role="alert">
+                        <xf:trigger
+                            appearance="minimal"
+                            class="close">
+                            <xf:label>&#215;</xf:label>
+                            <xf:action event="DOMActivate">
+                                <xf:delete ref="."/>
+                            </xf:action>
+                        </xf:trigger>
+                        <xh:i class="fa fa-fw fa-exclamation-triangle" aria-hidden="true"/>
+                        <xf:output ref="."/>
+                    </xh:div>
+                </xf:repeat>
             </xh:div>
 
         </xbl:template>

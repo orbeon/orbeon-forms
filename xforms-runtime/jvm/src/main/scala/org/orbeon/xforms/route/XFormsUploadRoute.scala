@@ -22,6 +22,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
+import org.orbeon.oxf.xforms.event.events.XXFormsUploadErrorEvent
 import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xforms.upload.UploaderServer.UploadResponse
 import org.orbeon.oxf.xml.EncodeDecode
@@ -62,8 +63,9 @@ object XFormsUploadRoute extends XmlNativeRoute {
     // NOTE: As of 2013-05-09, the client only uploads one file per request. We are able to
     // handle more than one here.
     UploaderServer.processUpload(ec.getRequest) match {
-      case (uploadResponses, None) =>
 
+      // Successful upload
+      case (uploadResponses, None, _) =>
         outputResponse(
           <xxf:events xmlns:xxf="http://orbeon.org/oxf/xml/xforms">{
             for {
@@ -90,20 +92,25 @@ object XFormsUploadRoute extends XmlNativeRoute {
           }</xxf:events>
         )
 
-      case (_, Some(FileScanException(fieldName, fileScanResult))) =>
-        // 2022-02-18: We do send a response for a `FileScanException` so we can pass a custom error message.
+      // Known upload rejection / interruption
+      case (_, Some(_), Some(progress @ UploadProgress(fieldName, _, _, UploadState.Interrupted(Some(_))))) =>
+        val properties = XXFormsUploadErrorEvent.progressToProperties(progress)
         outputResponse(
           <xxf:events xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-            <xxf:event name={EventNames.XXFormsUploadError} source-control-id={fieldName}>
-              <xxf:property name="error-type">file-scan-error</xxf:property>
-              <xxf:property name="message">{fileScanResult.message.getOrElse("")}</xxf:property>
-            </xxf:event>
+            <xxf:event name={EventNames.XXFormsUploadError} source-control-id={fieldName}>{
+              for (case (name, Some(value)) <- properties) yield
+                <xxf:property name={name}>{value}</xxf:property>
+            }</xxf:event>
           </xxf:events>
         )
-      case (_, someThrowable @ Some(_: SizeLimitExceededException | _: FileSizeLimitExceededException | _: FileCountLimitExceededException)) =>
+
+      // Fallback for unhandled size/count limit exceptions
+      case (_, someThrowable @ Some(_: SizeLimitExceededException | _: FileSizeLimitExceededException | _: FileCountLimitExceededException), _) =>
         // No point sending a response body: https://github.com/orbeon/orbeon-forms/issues/985
         throw HttpStatusCodeException(StatusCode.RequestEntityTooLarge, throwable = someThrowable)
-      case (_, someThrowable) =>
+
+      // Fallback for unexpected server errors
+      case (_, someThrowable, _) =>
         // No point sending a response body: https://github.com/orbeon/orbeon-forms/issues/985
         throw HttpStatusCodeException(StatusCode.InternalServerError, throwable = someThrowable)
     }

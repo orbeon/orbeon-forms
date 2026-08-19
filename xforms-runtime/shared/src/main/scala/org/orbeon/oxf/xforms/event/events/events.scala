@@ -217,6 +217,11 @@ object XXFormsUploadErrorEvent {
           "permitted"  -> Some(ByteSizeUtils.byteCountToCompactDisplaySize(permitted)),
           "actual"     -> Some(ByteSizeUtils.byteCountToCompactDisplaySize(actual))
         )
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.TooManyFiles(permitted)))) =>
+        List(
+          "error-type" -> Some("max-files-per-control"),
+          "permitted"  -> Some(permitted.toString)
+        )
       case UploadProgress(_, _, _, UploadState.Interrupted(Some(FileRejectionReason.DisallowedMediatype(clientFilenameOpt, permitted, actual)))) =>
         List(
           "error-type" -> Some("mediatype-error"),

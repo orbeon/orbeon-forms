@@ -70,7 +70,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
     it(s"must upload when size constraints are satisfied") {
       withTestExternalContext { _ =>
 
-        val (uploadResponses, None) =
+        val (uploadResponses, None, _) =
           new TestUploaderServer(
             maximumSize       = MaximumSize.UnlimitedSize,
             maximumFiles      = MaximumCurrentFiles.UnlimitedFiles,
@@ -91,7 +91,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
     it(s"must not upload when size constraints are not satisfied") {
       withTestExternalContext { _ =>
 
-        val (items, throwableOpt) =
+        val (items, throwableOpt, _) =
           new TestUploaderServer(
             maximumSize       = MaximumSize.LimitedSize(4000),
             maximumFiles      = MaximumCurrentFiles.UnlimitedFiles,
@@ -119,7 +119,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
       it(s"must upload when mediatype constraints are satisfied: `$mediatype`") {
         withTestExternalContext { _ =>
 
-          val (uploadResponses, None) =
+          val (uploadResponses, None, _) =
             new TestUploaderServer(
               maximumSize       = MaximumSize.UnlimitedSize,
               maximumFiles      = MaximumCurrentFiles.UnlimitedFiles,
@@ -146,7 +146,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
       it(s"must not upload when mediatype constraints are not satisfied: `$mediatype`") {
         withTestExternalContext { _ =>
 
-          val (items, throwableOpt) =
+          val (items, throwableOpt, _) =
             new TestUploaderServer(
               maximumSize       = MaximumSize.UnlimitedSize,
               maximumFiles      = MaximumCurrentFiles.UnlimitedFiles,
@@ -170,7 +170,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
         assume(Version.isPE)
         withTestExternalContext { _ =>
 
-          val (items, None) =
+          val (items, None, _) =
             new TestUploaderServer(
               maximumSize       = MaximumSize.UnlimitedSize,
               maximumFiles      = MaximumCurrentFiles.UnlimitedFiles,
@@ -193,7 +193,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
         assume(Version.isPE)
         withTestExternalContext { _ =>
 
-          val (items, throwableOpt) =
+          val (items, throwableOpt, _) =
             new TestUploaderServer(
               maximumSize       = MaximumSize.UnlimitedSize,
               maximumFiles      = MaximumCurrentFiles.UnlimitedFiles,
@@ -213,7 +213,7 @@ class UploaderServerTest extends ResourceManagerSupport with AnyFunSpecLike {
     it(s"must compute hash") {
       withTestExternalContext { _ =>
 
-        val (uploadResponses, None) =
+        val (uploadResponses, None, _) =
           new TestUploaderServer(
             maximumSize       = MaximumSize.UnlimitedSize,
             maximumFiles      = MaximumCurrentFiles.UnlimitedFiles,

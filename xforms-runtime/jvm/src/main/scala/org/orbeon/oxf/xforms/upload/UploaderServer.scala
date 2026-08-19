@@ -91,7 +91,7 @@ trait UploaderServer {
   protected def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, MaximumCurrentFiles, AllowedMediatypes), URI)]
   protected def fileScanProviderOpt: Option[Either[FileScanProvider2, FileScanProvider]]
 
-  def processUpload(request: Request): (List[UploadResponse], Option[Throwable]) = {
+  def processUpload(request: Request): (List[UploadResponse], Option[Throwable], Option[UploadProgress[DiskFileItem]]) = {
 
     // Session is required to communicate with the XForms document
     val session = request.sessionOpt.getOrElse(throw new IllegalStateException("upload requires a session"))
@@ -116,21 +116,22 @@ trait UploaderServer {
       def getContentLength     = -1 // this won't be used anyway
     }
 
+    val lifecycle =
+      new UploadProgressMultipartLifecycle(
+        requestContentLengthOpt  = request.contentLengthOpt,
+        requestAcceptLanguageOpt = request.getFirstHeaderIgnoreCase(Headers.AcceptLanguage),
+        getMaxBytes              = trustedUploadContext.getMaxBytes,
+        setMaxBytes              = trustedUploadContext.setMaxBytes,
+        session                  = session
+      ) {
+        def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, MaximumCurrentFiles, AllowedMediatypes), URI)] =
+          selfUploaderServer.getUploadConstraintsForControl(uuid, controlEffectiveId)
+      }
+
     val result: (List[(String, UploadItem, Option[(FileScanAcceptResult, AllowedMediatypes)])], Option[Throwable]) =
       Multipart.parseMultipartRequest(
         uploadContext  = trustedUploadContext,
-        lifecycleOpt   = Some(
-          new UploadProgressMultipartLifecycle(
-            requestContentLengthOpt  = request.contentLengthOpt,
-            requestAcceptLanguageOpt = request.getFirstHeaderIgnoreCase(Headers.AcceptLanguage),
-            getMaxBytes              = trustedUploadContext.getMaxBytes,
-            setMaxBytes              = trustedUploadContext.setMaxBytes,
-            session                  = session
-          ) {
-            def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[((MaximumSize, MaximumCurrentFiles, AllowedMediatypes), URI)] =
-              selfUploaderServer.getUploadConstraintsForControl(uuid, controlEffectiveId)
-          }
-        ),
+        lifecycleOpt   = Some(lifecycle),
         maxSize        = MaximumSize.UnlimitedSize, // because we use our own limiter
         maxFiles       = Some(RequestGenerator.getMaxFilesProperty.toLong).filter(_ >= 0), // probably not really needed
         headerEncoding = ExternalContext.StandardHeaderCharacterEncoding,
@@ -147,7 +148,7 @@ trait UploaderServer {
       case (items, t @ Some(_)) =>
         // If there was already an error, don't bother checking for further errors
         quietlyDeleteFileItems(items)
-        Nil -> t // currently, the caller does not need the failed uploads
+        (Nil, t, lifecycle.progressOpt) // currently, the caller does not need the failed uploads
       case (items, None) =>
         // No error so far, check mediatypes possibly updated by the file scan provider
         // https://github.com/orbeon/orbeon-forms/issues/6738
@@ -160,13 +161,24 @@ trait UploaderServer {
         itemsWithThrowableOpt
           .collectFirst { case (_, Some(t)) => t }
           match {
-            case t @ Some(_) =>
+            case t @ Some(throwable) =>
               quietlyDeleteFileItems(items)
-              Nil -> t // currently, the caller does not need the failed uploads
+              val progressOpt = lifecycle.progressOpt.map { p =>
+                throwable match {
+                  case DisallowedMediatypeException(clientFilenameOpt, permitted, actual) =>
+                    // Updating `progress.state` for post-file-scan mediatype rejections
+                    p.state = UploadState.Interrupted(Some(FileRejectionReason.DisallowedMediatype(clientFilenameOpt, permitted, actual)))
+                    p
+                  case _ =>
+                    p
+                }
+              }
+              (Nil, t, progressOpt)
             case None =>
-              itemsWithThrowableOpt.takeWhile(_._2.isEmpty).collect { case ((fieldName, diskFileItem, fileScanAcceptResultTupleOpt), _) =>
+              val responses = itemsWithThrowableOpt.takeWhile(_._2.isEmpty).collect { case ((fieldName, diskFileItem, fileScanAcceptResultTupleOpt), _) =>
                 uploadResponseFromFileScanResultOrDiskItem(fieldName, fileScanAcceptResultTupleOpt, diskFileItem)
-              } -> None
+              }
+              (responses, None, lifecycle.progressOpt)
           }
     }
   }
@@ -355,7 +367,7 @@ trait UploaderServer {
 
     // Mutable state
     private var uuidOpt     : Option[String]                       = None
-    private var progressOpt : Option[UploadProgress[DiskFileItem]] = None
+    var progressOpt         : Option[UploadProgress[DiskFileItem]] = None
     private var fileScanOpt : Option[Either[FileScan2, FileScan]]  = None
 
     def fieldReceived(fieldName: String, value: String): Unit =

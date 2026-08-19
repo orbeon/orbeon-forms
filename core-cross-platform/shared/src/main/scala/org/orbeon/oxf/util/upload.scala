@@ -21,6 +21,7 @@ object UploadState {
 }
 
 // NOTE: Fields don't need to be @volatile as they are accessed via the session, which provides synchronized access.
+// All the `var` need to be after the `val`s for `_.cast[UploadProgress[DiskFileItem]]` to work
 case class UploadProgress[FileItemType](
   fieldName        : String,
   expectedSize     : Option[Long],

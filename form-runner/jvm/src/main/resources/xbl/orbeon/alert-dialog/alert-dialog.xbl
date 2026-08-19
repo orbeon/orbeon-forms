@@ -27,23 +27,39 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-show xxforms-dialog-open" phase="target">
-                <xf:setvalue if="event('message')"           ref="message"         value="event('message')"/>
-                <xf:setvalue                                 ref="message-is-html" value="(xs:boolean(event('message-is-html')), false())[1]"/>
-                <xf:setvalue if="event('context')"           ref="context"         value="event('context')"/>
-                <xf:setvalue if="event('positive-targetid')" ref="positive"        value="event('positive-targetid')"/>
-                <xf:setvalue if="event('negative-targetid')" ref="negative"        value="event('negative-targetid')"/>
-                <xf:setvalue if="event('neutral-targetid')"  ref="neutral"         value="event('neutral-targetid')"/>
+                <xf:var name="message"         value="event('message')"/>
+                <xf:var name="message-is-html" value="(xs:boolean(event('message-is-html')), false())[1]"/>
+                <xf:var name="context"         value="event('context')"/>
+                <xf:var name="positive"        value="event('positive-targetid')"/>
+                <xf:var name="negative"        value="event('negative-targetid')"/>
+                <xf:var name="neutral"         value="event('neutral-targetid')"/>
+                <xf:var name="was-open"        value="exists(instance()/dialogs/dialog)"/>
 
-                <!-- Use an open count because event handlers for buttons can cause a show of this dialog again. See:
-                     https://github.com/orbeon/orbeon-forms/issues/2524 -->
-                <xf:setvalue ref="open-count" value=". + 1"/>
-                <xxf:show dialog="dialog"/>
+                <xf:insert
+                    context="instance()/dialogs"
+                    ref="dialog"
+                    origin="
+                        xf:element(
+                            'dialog',
+                            (
+                                xf:element('message',         string($message)),
+                                xf:element('message-is-html', string($message-is-html)),
+                                xf:element('context',         string($context)),
+                                xf:element('positive',        string($positive)),
+                                xf:element('negative',        string($negative)),
+                                xf:element('neutral',         string($neutral))
+                            )
+                        )
+                    "/>
+
+                <xf:action if="not($was-open)">
+                    <xxf:show dialog="dialog"/>
+                </xf:action>
             </xbl:handler>
             <xbl:handler event="fr-hide" phase="target">
-                <xf:setvalue ref="open-count" value=". - 1"/>
-                <xf:action if="open-count = 0">
+                <xf:delete ref="instance()/dialogs/dialog[1]"/>
+                <xf:action if="not(exists(instance()/dialogs/dialog))">
                     <xxf:hide dialog="dialog"/>
-                    <xf:setvalue iterate="* except open-count" ref="."/>
                 </xf:action>
             </xbl:handler>
         </xbl:handlers>
@@ -51,17 +67,10 @@
             <xf:model>
                 <xf:instance>
                     <_>
-                        <message/>
-                        <message-is-html/>
-                        <context/>
-                        <positive/>
-                        <negative/>
-                        <neutral/>
-                        <open-count/>
+                        <dialogs/>
                     </_>
                 </xf:instance>
-                <xf:bind ref="message-is-html" type="xs:boolean"/>
-                <xf:bind ref="open-count"      type="xs:integer" xxf:default="0"/>
+                <xf:bind ref="dialogs/dialog/message-is-html" type="xs:boolean"/>
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -100,8 +109,8 @@
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <!-- use dynamic message -->
-                                    <xf:output ref="$local/message[$local/message-is-html = false()]"/>
-                                    <xf:output ref="$local/message[$local/message-is-html = true()]" mediatype="text/html"/>
+                                    <xf:output ref="$local/dialogs/dialog[1]/message[$local/dialogs/dialog[1]/message-is-html = false()]"/>
+                                    <xf:output ref="$local/dialogs/dialog[1]/message[$local/dialogs/dialog[1]/message-is-html = true()]" mediatype="text/html"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xh:div>
@@ -166,10 +175,11 @@
                         <!-- If a custom target is provided, dispatch to it -->
                         <xf:action event="DOMActivate">
                             <xf:var name="local"><xxf:value value="$local" xxbl:scope="inner"/></xf:var>
-                            <xf:var name="targetid" value="xxf:trim($local/{$handler})"/>
+                            <xf:var name="current-dialog" value="$local/dialogs/dialog[1]"/>
+                            <xf:var name="targetid" value="xxf:trim($current-dialog/{$handler})"/>
 
                             <xf:dispatch if="$targetid != ''" name="fr-{$handler}" targetid="{{$targetid}}">
-                                <xf:property name="context" value="$local/context/string()"/>
+                                <xf:property name="context" value="$current-dialog/context/string()"/>
                             </xf:dispatch>
                         </xf:action>
                     </xf:trigger>

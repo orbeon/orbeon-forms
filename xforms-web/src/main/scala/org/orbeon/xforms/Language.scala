@@ -19,7 +19,6 @@ import org.scalajs.dom
 import org.scalajs.dom.{Element, MutationObserver}
 
 import scala.collection.mutable as m
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 
 object Language {
@@ -34,6 +33,13 @@ object Language {
       .map(_.getAttribute(HtmlLangAttr).substring(0, 2))
       .getOrElse("en")
   }
+
+  // Like getLang(), but untruncated (e.g. `pt-PT`) and empty when no lang attribute is found
+  def findFullLang: Option[String] =
+    langElement
+      .flatMap(el => Option(el.getAttribute(HtmlLangAttr)))
+      .map(_.trim)
+      .filter(_.nonEmpty)
 
   def onLangChange(listenerId: String, listener: String => Unit): Unit =
     langElement.foreach { elem =>
@@ -54,9 +60,11 @@ object Language {
 
     def langElement: Option[dom.Element] = {
 
+      // Prefer the wrapper: when embedded, it carries the form language, while the root element belongs to the host
+      // page, which can have a lang of its own, as with Liferay
       val langElements: Iterator[() => Option[Element]] = Iterator(
-        () => Option(dom.document.documentElement),
-        () => Option(dom.document.querySelector(s".orbeon-portlet-div[$HtmlLangAttr]"))
+        () => Option(dom.document.querySelector(s".orbeon-portlet-div[$HtmlLangAttr]")),
+        () => Option(dom.document.documentElement)
       )
       langElements
         .map(_.apply())

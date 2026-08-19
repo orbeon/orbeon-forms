@@ -1,12 +1,10 @@
 package org.orbeon.xbl
 
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.*
-import org.orbeon.xforms.XFormsXbl
-import org.orbeon.xforms.facade.XBLCompanion
-import org.orbeon.xforms.{DocumentAPI, Page}
 import org.orbeon.web.DomSupport.*
+import org.orbeon.xforms.facade.XBLCompanion
+import org.orbeon.xforms.{DocumentAPI, Language, Page, XFormsXbl}
 import org.scalajs.dom
 import org.scalajs.dom.{html, window}
 
@@ -36,8 +34,8 @@ object Recaptcha {
       // Load reCAPTCHA script with appropriate language
       if (! WebSupport.isScriptPresent(ReCaptchaScript)) {
 
-        val langParameterSeq = WebSupport.findHtmlLang.map(("hl"    , _)).toSeq
-        val v3SiteKeySeq     = publicKeyV3Opt         .map(("render", _)).toSeq
+        val langParameterSeq = Language.findFullLang.map(("hl"    , _)).toSeq
+        val v3SiteKeySeq     = publicKeyV3Opt       .map(("render", _)).toSeq
 
         containerElem.appendChild(
           dom.document

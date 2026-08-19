@@ -106,7 +106,7 @@ object TinyMCE {
       def createTinyMce(currentValueOpt: Option[String] = None, focusAfterInit: Boolean = false): Unit = {
 
         val tinyMceConfig = newTinyMceConfig()
-        setLanguage(tinyMceConfig, WebSupport.findHtmlLang)
+        setLanguage(tinyMceConfig, Language.findFullLang)
 
         // Without this, with `combine-resources` set to `false`, instead of `silver/theme.min.js`,
         // TinyMCE tried to load `silver/theme.js`, which doesn't exist

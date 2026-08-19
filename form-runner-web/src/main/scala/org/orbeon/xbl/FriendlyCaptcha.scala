@@ -1,20 +1,18 @@
 package org.orbeon.xbl
 
-import enumeratum.EnumEntry.Lowercase
 import enumeratum.*
+import enumeratum.EnumEntry.Lowercase
 import org.log4s.Logger
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.xforms.XFormsXbl
-import org.orbeon.xforms.facade.XBLCompanion
-import org.orbeon.xforms.{DocumentAPI, Page}
 import org.orbeon.web.DomSupport.*
+import org.orbeon.xforms.facade.XBLCompanion
+import org.orbeon.xforms.{DocumentAPI, Language, Page, XFormsXbl}
 import org.scalajs.dom
 import org.scalajs.dom.{html, window}
 
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters.*
 import scala.scalajs.js.annotation.JSGlobal
 import scala.scalajs.js.|
 
@@ -89,7 +87,7 @@ object FriendlyCaptcha {
             new FriendlyCaptchaConfig {
               startMode         = mode.entryName
               sitekey           = publicKey
-              language          = WebSupport.findHtmlLang.getOrElse("en"): String
+              language          = Language.findFullLang.getOrElse("en"): String
               solutionFieldName = "-"
               readyCallback     = js.defined((() => logger.debug("ready callback")): js.Function0[Unit])
               startedCallback   = js.defined((() => logger.debug("started callback")): js.Function0[Unit])

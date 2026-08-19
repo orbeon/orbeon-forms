@@ -46,9 +46,9 @@ object TinyMce {
     tinyMceConfig.language = resolvedLanguage
 
     if (tinyMceConfig.language_url.getOrElse("").trimAllToOpt.isEmpty && resolvedLanguage != DefaultLanguage)
-      findResourceBasePath(GlobalTinyMce.baseURL)
-        .foreach { resourceBasePath =>
-          tinyMceConfig.language_url = s"$resourceBasePath/webjars/tinymce-i18n/$TinyMceI18nVersion/langs6/$resolvedLanguage.js": String
+      findLanguageUrl(GlobalTinyMce.baseURL, resolvedLanguage)
+        .foreach { languageUrl =>
+          tinyMceConfig.language_url = languageUrl: String
         }
   }
 
@@ -155,10 +155,17 @@ object TinyMce {
       "zh-TW" -> "zh-Hant"
     )
 
-    def findResourceBasePath(tinyMceBaseUrl: String): Option[String] =
+    // Language packs are in the tinymce-i18n webjar, next to the tinymce webjar found in the base URL. In a portlet,
+    // the resource path is percent-encoded inside a query parameter, so also match the encoded separator and keep it
+    // for the path we append.
+    def findLanguageUrl(tinyMceBaseUrl: String, language: String): Option[String] =
       tinyMceBaseUrl.trimAllToOpt.flatMap { url =>
-        val markerIndex = url.indexOf("/webjars/tinymce/")
-        Option.when(markerIndex >= 0)(url.substring(0, markerIndex))
+        Iterator("/", "%2F", "%2f")
+          .map(slash => (slash, url.indexOf(s"${slash}webjars${slash}tinymce$slash")))
+          .collectFirst { case (slash, markerIndex) if markerIndex >= 0 =>
+            url.substring(0, markerIndex) +
+              List("webjars", "tinymce-i18n", TinyMceI18nVersion, "langs6", s"$language.js").mkString(slash, slash, "")
+          }
       }
   }
 }

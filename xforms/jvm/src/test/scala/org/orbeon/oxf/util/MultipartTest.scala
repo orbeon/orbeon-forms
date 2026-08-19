@@ -22,10 +22,11 @@ import org.orbeon.io.LimiterInputStream
 import org.orbeon.oxf.externalcontext.ExternalContext.Session
 import org.orbeon.oxf.externalcontext.{ExternalContext, SimpleSession}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
-import org.orbeon.oxf.test.ResourceManagerSupport
+import org.orbeon.oxf.test.{PipelineSupport, ResourceManagerSupport}
 import org.orbeon.oxf.util.FileRejectionReason.SizeTooLarge
 import org.orbeon.oxf.util.Multipart.*
 import org.orbeon.oxf.util.NetUtils.inputStreamToByteArray
+import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.upload.AllowedMediatypes.AllowedAnyMediatype
 import org.orbeon.oxf.xforms.upload.UploaderServer.UploadProgressMultipartLifecycle
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploaderServer}
@@ -137,7 +138,7 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
 
         it("must set completed `UploadProgress` into session") {
           assert(
-            UploadProgress(FieldName, Some(body.length), miserables.length, UploadState.Completed(DummyFileItem)) === // keep `==`, see `uploadProgressEq`
+            UploadProgress(FieldName, Some(body.length), Some("miserables-8000.txt"), miserables.length, UploadState.Completed(DummyFileItem)) === // keep `==`, see `uploadProgressEq`
               UploaderServer.getUploadProgressForTests(session, UUID, FieldName).get
           )
         }
@@ -167,7 +168,7 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
 
         it("must set `Interrupted` `UploadProgress` into session") {
           assert(
-            Some(UploadProgress(FieldName, Some(body.length), 0, UploadState.Interrupted(Some(SizeTooLarge(limit, 8326))))) ==
+            Some(UploadProgress(FieldName, Some(body.length), Some("miserables-8000.txt"), 0, UploadState.Interrupted(Some(SizeTooLarge(limit, 8326))))) ==
               UploaderServer.getUploadProgressForTests(session, UUID, FieldName)
           )
         }

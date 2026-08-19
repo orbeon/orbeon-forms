@@ -42,9 +42,8 @@ case class TooManyFilesException(
 ) extends FileUploadException
 
 case class DisallowedMediatypeException(
-  clientFilenameOpt: Option[String],
-  permitted        : NonEmptySet[MediatypeRange],
-  actual           : Option[Mediatype]
+  permitted: NonEmptySet[MediatypeRange],
+  actual   : Option[Mediatype]
 ) extends FileUploadException
 
 case class EmptyFileException() extends FileUploadException
@@ -313,12 +312,12 @@ object Multipart {
                 UploadState.Interrupted(
                   Option(Exceptions.getRootThrowable(t))
                     .collect {
-                      case _: EmptyFileException                                              => FileRejectionReason.EmptyFile
-                      case _: UploadPasswordNotConfiguredException                            => FileRejectionReason.UploadPasswordNotConfigured
-                      case root: SizeLimitExceededException                                   => FileRejectionReason.SizeTooLarge(root.getPermittedSize, root.getActualSize)
-                      case TooManyFilesException(permitted)                                   => FileRejectionReason.TooManyFiles(permitted)
-                      case DisallowedMediatypeException(clientFilenameOpt, permitted, actual) => FileRejectionReason.DisallowedMediatype(clientFilenameOpt, permitted, actual)
-                      case FileScanException(fieldName, fileScanResult)                       => FileRejectionReason.FailedFileScan(fieldName, fileScanResult.message)
+                      case _: EmptyFileException                           => FileRejectionReason.EmptyFile
+                      case _: UploadPasswordNotConfiguredException         => FileRejectionReason.UploadPasswordNotConfigured
+                      case root: SizeLimitExceededException                => FileRejectionReason.SizeTooLarge(root.getPermittedSize, root.getActualSize)
+                      case TooManyFilesException(permitted)                => FileRejectionReason.TooManyFiles(permitted)
+                      case DisallowedMediatypeException(permitted, actual) => FileRejectionReason.DisallowedMediatype(permitted, actual)
+                      case FileScanException(fieldName, fileScanResult)    => FileRejectionReason.FailedFileScan(fieldName, fileScanResult.message)
                     }
                 )
               ))

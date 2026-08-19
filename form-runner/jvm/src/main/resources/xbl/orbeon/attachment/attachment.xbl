@@ -306,6 +306,13 @@
                 <xf:action>
 
                     <xf:var
+                        name="filename"
+                        value="
+                            let $fn := event('filename')
+                            return if (normalize-space($fn) != '') then concat($fn, ' ') else ''
+                        "/>
+
+                    <xf:var
                         name="error-message"
                         value="
                             if (event('error-type') = 'empty-file-error') then
@@ -314,7 +321,7 @@
                                         'detail.messages.upload-error-empty-file',
                                         '|fr-fr-resources|'
                                     ),
-                                    ()
+                                    $filename
                                 )
                             else if (event('error-type') = 'upload-password-not-configured-error') then
                                 xxf:format-message(
@@ -322,7 +329,7 @@
                                         'detail.messages.upload-error-upload-password-not-configured-error',
                                         '|fr-fr-resources|'
                                     ),
-                                    ()
+                                    $filename
                                 )
                             else if (event('error-type') = 'size-error') then
                                 xxf:format-message(
@@ -331,6 +338,7 @@
                                         '|fr-fr-resources|'
                                     ),
                                     (
+                                        $filename,
                                         event('permitted'),
                                         event('actual')
                                     )
@@ -352,9 +360,9 @@
                                         '|fr-fr-resources|'
                                     ),
                                     (
+                                        $filename,
                                         let $a := event('actual') return if (exists($a)) then $a else 'application/octet-stream' (: not ideal but better than blank :),
-                                        event('permitted'),
-                                        event('filename')
+                                        event('permitted')
                                     )
                                 )
                             else if (event('error-type') = 'file-scan-error') then
@@ -364,6 +372,7 @@
                                         '|fr-fr-resources|'
                                     ),
                                     (
+                                        $filename,
                                         event('message')
                                     )
                                 )

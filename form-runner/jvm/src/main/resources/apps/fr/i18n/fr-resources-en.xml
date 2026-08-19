@@ -298,12 +298,12 @@
             <upload-cancel>Upload canceled by the user</upload-cancel>
             <upload-done>Upload complete</upload-done>
             <upload-error>There was an error during the upload. Please try again.</upload-error>
-            <upload-error-empty-file>The file uploaded is empty.</upload-error-empty-file>
+            <upload-error-empty-file>The file {0}is empty.</upload-error-empty-file>
             <upload-error-upload-password-not-configured-error>File uploads are disabled because the Orbeon Forms encryption password is not set or is too weak.</upload-error-upload-password-not-configured-error>
-            <upload-error-size>The file uploaded is too large. The maximum size allowed is {0} and the actual size received is {1}.</upload-error-size>
+            <upload-error-size>The file {0}is too large. The maximum size allowed is {1} and the actual size received is {2}.</upload-error-size>
             <upload-error-max-files-per-control>Maximum number of files exceeded. You can''t attach more than {0,number,integer} files to this control.</upload-error-max-files-per-control>
-            <upload-error-mediatype>The file uploaded is of an incorrect type: {0}</upload-error-mediatype>
-            <upload-error-file-scan>The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".</upload-error-file-scan>
+            <upload-error-mediatype>The file {0}is of an incorrect type: {1}</upload-error-mediatype>
+            <upload-error-file-scan>The file {0}was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{1}".</upload-error-file-scan>
             <lost-attachments>Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.</lost-attachments>
             <conflict-dialog-title>Conflict Detected</conflict-dialog-title>
             <conflict-dialog-message>

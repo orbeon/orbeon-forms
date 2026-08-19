@@ -5,12 +5,12 @@ import org.orbeon.datatypes.{Mediatype, MediatypeRange}
 
 sealed trait FileRejectionReason
 object FileRejectionReason {
-  case object EmptyFile                                                                                                                 extends FileRejectionReason
-  case object UploadPasswordNotConfigured                                                                                               extends FileRejectionReason
-  case class  SizeTooLarge       (permitted: Long, actual: Long)                                                                        extends FileRejectionReason
-  case class  TooManyFiles       (permitted: Int)                                                                                       extends FileRejectionReason
-  case class  DisallowedMediatype(clientFilenameOpt: Option[String], permitted: NonEmptySet[MediatypeRange], actual: Option[Mediatype]) extends FileRejectionReason
-  case class  FailedFileScan     (fieldName: String, message: Option[String])                                                           extends FileRejectionReason
+  case object EmptyFile                                                                              extends FileRejectionReason
+  case object UploadPasswordNotConfigured                                                            extends FileRejectionReason
+  case class  SizeTooLarge       (permitted: Long, actual: Long)                                     extends FileRejectionReason
+  case class  TooManyFiles       (permitted: Int)                                                    extends FileRejectionReason
+  case class  DisallowedMediatype(permitted: NonEmptySet[MediatypeRange], actual: Option[Mediatype]) extends FileRejectionReason
+  case class  FailedFileScan     (fieldName: String, message: Option[String])                        extends FileRejectionReason
 }
 
 sealed trait UploadState[+FileItemType] { def name: String }
@@ -24,6 +24,7 @@ object UploadState {
 case class UploadProgress[FileItemType](
   fieldName        : String,
   expectedSize     : Option[Long],
+  clientFilenameOpt: Option[String]            = None,
   var receivedSize : Long                      = 0L,
   var state        : UploadState[FileItemType] = UploadState.Started
 )

@@ -93,7 +93,7 @@ object XFormsUploadRoute extends XmlNativeRoute {
         )
 
       // Known upload rejection / interruption
-      case (_, Some(_), Some(progress @ UploadProgress(fieldName, _, _, UploadState.Interrupted(Some(_))))) =>
+      case (_, Some(_), Some(progress @ UploadProgress(fieldName, _, _, _, UploadState.Interrupted(Some(_))))) =>
         val properties = XXFormsUploadErrorEvent.progressToProperties(progress)
         outputResponse(
           <xxf:events xmlns:xxf="http://orbeon.org/oxf/xml/xforms">

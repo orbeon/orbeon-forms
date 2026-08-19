@@ -165,9 +165,9 @@ trait UploaderServer {
               quietlyDeleteFileItems(items)
               val progressOpt = lifecycle.progressOpt.map { p =>
                 throwable match {
-                  case DisallowedMediatypeException(clientFilenameOpt, permitted, actual) =>
+                  case DisallowedMediatypeException(permitted, actual) =>
                     // Updating `progress.state` for post-file-scan mediatype rejections
-                    p.state = UploadState.Interrupted(Some(FileRejectionReason.DisallowedMediatype(clientFilenameOpt, permitted, actual)))
+                    p.state = UploadState.Interrupted(Some(FileRejectionReason.DisallowedMediatype(permitted, actual)))
                     p
                   case _ =>
                     p
@@ -318,7 +318,7 @@ trait UploaderServer {
     expectedSizeOpt: Option[Long],
     fileName       : Option[String]
   ): (String, UploadProgress[DiskFileItem]) = {
-    val progress      = UploadProgress[DiskFileItem](fieldName, expectedSizeOpt)
+    val progress      = UploadProgress[DiskFileItem](fieldName, expectedSizeOpt, clientFilenameOpt = fileName)
     val newSessionKey = getProgressSessionKey(uuid, fieldName)
     session.setAttribute(newSessionKey, progress)
     newSessionKey -> progress
@@ -347,10 +347,10 @@ trait UploaderServer {
       case AllowedMediatypes.AllowedSomeMediatypes(allowedMediatypeRanges) =>
         Mediatypes.fromHeadersOrFilename(header, nonBlankClientFilenameOpt) match {
           case None =>
-            throw DisallowedMediatypeException(nonBlankClientFilenameOpt, allowedMediatypeRanges, None)
+            throw DisallowedMediatypeException(allowedMediatypeRanges, None)
           case Some(untrustedPartMediatype) =>
             if (! (allowedMediatypeRanges exists untrustedPartMediatype.is))
-              throw DisallowedMediatypeException(nonBlankClientFilenameOpt, allowedMediatypeRanges, Some(untrustedPartMediatype))
+              throw DisallowedMediatypeException(allowedMediatypeRanges, Some(untrustedPartMediatype))
         }
     }
 
@@ -526,7 +526,7 @@ trait UploaderServer {
       for (sessionKey <- sessionKeys)
         runQuietly {
           selfUploaderServer.getUploadProgress(session, sessionKey)
-          .collect { case p @ UploadProgress(_, _, _, UploadState.Started | UploadState.Completed(_) ) => p }
+          .collect { case p @ UploadProgress(_, _, _, _, UploadState.Started | UploadState.Completed(_)) => p }
           .foreach (_.state = UploadState.Interrupted(None))
         }
   }

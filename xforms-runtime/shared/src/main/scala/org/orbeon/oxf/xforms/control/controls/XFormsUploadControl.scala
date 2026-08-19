@@ -102,6 +102,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                 this,
                 Map(
                   "error-type" -> Some("max-files-per-control"),
+                  "filename"   -> storeEvent.filename,
                   "permitted"  -> Some(max)
                 )
               ),
@@ -121,6 +122,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                     this,
                     Map(
                       "error-type" -> Some("size-error"),
+                      "filename"   -> storeEvent.filename,
                       "permitted"  -> Some(ByteSizeUtils.byteCountToCompactDisplaySize(maxSize)),
                       "actual"     -> Some(ByteSizeUtils.byteCountToCompactDisplaySize(size))
                     )

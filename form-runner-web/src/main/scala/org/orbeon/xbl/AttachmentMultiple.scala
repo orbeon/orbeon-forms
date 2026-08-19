@@ -135,7 +135,11 @@ object AttachmentMultiple {
           DomEventNames.DragLeave, // doesn't seem like `dragexit` is a thing anymore
           ev => {
             logger.debug(ev.`type`)
-            if (ev.target eq dropElem) {
+            val isLeavingDropElem = ev.relatedTarget match {   // `relatedTarget` is the node we are entering
+              case node: dom.Node => ! dropElem.contains(node) // Check we are not leaving for an element inside the drop element
+              case _              => true                      // Can be null if we are leaving the viewport
+            }
+            if (isLeavingDropElem) {
               ev.preventDefault()
               removeClass()
             }

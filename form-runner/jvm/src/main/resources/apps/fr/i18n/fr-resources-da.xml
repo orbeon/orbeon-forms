@@ -47,7 +47,7 @@
         <!-- Other standard buttons -->
         <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Oversigt</summary>
         <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Luk</close>
-        <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; slet indhold</clear>
+        <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Slet indhold</clear>
         <cancel>Afbryd</cancel>
         <save-locally>Gem lokalt</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
@@ -175,7 +175,7 @@
         <none>Ingen fejl i skema</none>
         <unsaved>Ugemte ændringer</unsaved>
         <canvas-not-supported>To do image annotations, your browser needs to support the HTML5 canvas</canvas-not-supported>
-        <search>Fejl under søgning</search>
+        <search>Fejl ved søgning</search>
     </errors>
     <email>
         <subject>Orbeon blanketbekræftigelse</subject>
@@ -203,8 +203,8 @@
             <toc>Indholdsfortegnelse</toc>
             <description>Beskrivelse</description>
             <help>Hjælp</help>
-            <error-count>ugyldigt eller manglende svar i blanket</error-count>
-            <errors-count>ugyldige eller manglende svar i blanket</errors-count>
+            <error-count>Ugyldigt eller manglende svar i blanket</error-count>
+            <errors-count>Ugyldige eller manglende svar i blanket</errors-count>
         </titles>
         <buttons>
             <select-all>Vælg alle</select-all>
@@ -251,8 +251,8 @@
         </formats>
         <export-with-search-dialog>
             <label>Indstillinger for Excel-eksport</label>
-            <headings-labels>Brug etiketter som overskrifter</headings-labels>
-            <selection-controls-labels>Brug etiketter for valgmuligheder</selection-controls-labels>
+            <headings-labels>Brug labels som overskrifter</headings-labels>
+            <selection-controls-labels>Brug labels som valgmuligheder</selection-controls-labels>
             <include-document-id>Inkludér kolonne med dokument-id</include-document-id>
         </export-with-search-dialog>
     </summary>
@@ -273,17 +273,17 @@
             <error-dialog-title>Kunne ikke afslutte behandling</error-dialog-title>
             <confirmation-dialog-title>Bekræftelse</confirmation-dialog-title>
             <confirmation-dialog-message>Er du sikker på, at du vil fortsætte?</confirmation-dialog-message>
-            <confirmation-dialog-message-overwrite>Denne handling kan medføre, at nogle blanketdata bliver overskrevet. Er du sikker på, at du vil fortsætte?</confirmation-dialog-message-overwrite>
+            <confirmation-dialog-message-overwrite>Denne handling vil muligvis overskrive nogle data. Er du sikker på, at du vil fortsætte?</confirmation-dialog-message-overwrite>
             <submit-dialog-title>Blanket er sendt ind</submit-dialog-title>
             <submit-dialog-message>Tak, informationen er sendt ind.</submit-dialog-message>
-            <validation-dialog-title>Check blanketvalideringer</validation-dialog-title>
+            <validation-dialog-title>Tjek blanketvalideringer</validation-dialog-title>
             <validation-dialog-message>Din blanket {1,choice,
                 0#indeholder ingen beskeder|
                 1#indeholder en '{0,choice,0#fejl|1#advarsel|2#information|3#besked}'|
-                1&lt;indehoder {1,number,integer} '{0,choice,0#fejl|1#advarsler|2#informationer|3#beskeder}'}.
+                1&lt;indeholder {1,number,integer} '{0,choice,0#fejl|1#advarsler|2#informationer|3#beskeder}'}.
                 {0,choice,
                     0#Ret venligst fejlene før du prøver at sende igen|
-                    0&lt;Du kan vælge at checke '{1,choice,1#den|1&lt;dem}' først eller ignorere '{1,choice,1#den|1&lt;dem}' og fortsætte}.
+                    0&lt;Du kan vælge at tjekke '{1,choice,1#den|1&lt;dem}' først eller ignorere '{1,choice,1#den|1&lt;dem}' og fortsætte}.
             </validation-dialog-message>
             <buttons-message/>
             <saved-locally-open>Klik her for at åbne dokument. Informationer du har skrevet i blanketten vil blive vist som da den blev gemt.</saved-locally-open>
@@ -339,7 +339,7 @@
         </labels>
         <hints>
             <upload-max-size-per-file>Filer skal være mindre end {0}.</upload-max-size-per-file>
-            <upload-max-size-aggregate-per-control>Den samlede filstørrelse i kontrollen skal være mindre end {0}.</upload-max-size-aggregate-per-control>
+            <upload-max-size-aggregate-per-control>Den samlede filstørrelse skal være mindre end {0}.</upload-max-size-aggregate-per-control>
             <upload-max-files-per-control>Du kan vedhæfte op til {0} filer.</upload-max-files-per-control>
             <upload-min-files-per-control>Du skal vedhæfte mindst {0} filer.</upload-min-files-per-control>
             <upload-mediatypes>Kun {0}-filer accepteres.</upload-mediatypes>
@@ -382,10 +382,10 @@
             <message>Det ser ud til, at du har duplikeret denne browserfane. Luk venligst denne fane og genoptag din session i den oprindelige fane.</message>
         </tab-duplication>
         <available-from>
-            <message>Denne formular er endnu ikke tilgængelig</message>
+            <message>Denne blanket er endnu ikke tilgængelig</message>
         </available-from>
         <available-to>
-            <message>Denne formular er ikke længere tilgængelig</message>
+            <message>Denne blanket er ikke længere tilgængelig</message>
         </available-to>
         <workflow-stage>
             <label>Arbejdstrin</label>
@@ -492,7 +492,7 @@
             <purge-confirmation>Bekræft sletning</purge-confirmation>
         </titles>
         <messages>
-            <no-form-found>Ingen udrullet blanket blev fundet.</no-form-found>
+            <no-form-found>Ingen publiceret blanket blev fundet.</no-form-found>
             <publish-confirmation>Er du sikker på, at du vil {0,choice,0#offentliggøre|1#afpublisere|2#opgradere|3#slette} {1,choice,1#en blanket|1&lt;{1,number,integer} blanketter}? Denne handling kan ikke fortrydes.</publish-confirmation>
             <reindexing-confirmation>Under genindeksering vil nogle funktioner, som for eksempel Form Runner-oversigtssider, ikke fungere som forventet. Vi anbefaler derfor, at du genindekserer, mens systemet er offline. Er du sikker på, at du vil fortsætte med genindekseringen?</reindexing-confirmation>
             <reencrypt-confirmation>Vi anbefaler, at du udfører genkryptering, mens systemet er offline. Er du sikker på, at du vil fortsætte med genkrypteringen?</reencrypt-confirmation>
@@ -566,7 +566,7 @@
         <file>
             <label>Fil, der skal importeres</label>
             <hint>Filen skal være i Excel 2007-format (.xlsx) eller XML-format (.xml)</hint>
-            <alert>Manglende eller ikke-understøttet fil</alert>
+            <alert>Fil mangler eller er ikke understøttet</alert>
             <excel-headings-format>Excel 2007 med navngivne kolonneoverskrifter (.xslx)</excel-headings-format>
             <excel-named-ranges-format>Excel 2007 med navngivne områder (.xslx)</excel-named-ranges-format>
             <xml-form-structure-and-data-format>Orbeon XML-eksportformat (.xml)</xml-form-structure-and-data-format>
@@ -655,7 +655,7 @@
             <logged-in-as>Logget ind som {0}</logged-in-as>
             <logout>Log ud</logout>
             <login>Log ind</login>
-            <register>Registrér</register>
+            <register>Opret</register>
         </menu>
         <login>
             <title>Form Runner-login</title>
@@ -670,7 +670,7 @@
         <login-error>
             <title>Form Runner-loginfejl</title>
             <unrecognized>Brugernavn eller kodeord blev ikke genkendt.</unrecognized>
-            <try-again>Prøv igen.</try-again>
+            <try-again>Forsøg venligst igen</try-again>
         </login-error>
     </authentication>
     <home-summary>
@@ -700,15 +700,15 @@
                     <value>yesterday</value>
                 </item>
                 <item>
-                    <label>Sidste 7 dage</label>
+                    <label>Seneste 7 dage</label>
                     <value>last-7-days</value>
                 </item>
                 <item>
-                    <label>Sidste 30 dage</label>
+                    <label>Seneste 30 dage</label>
                     <value>last-30-days</value>
                 </item>
                 <item>
-                    <label>Sidste 90 dage</label>
+                    <label>Seneste 90 dage</label>
                     <value>last-90-days</value>
                 </item>
                 <item>

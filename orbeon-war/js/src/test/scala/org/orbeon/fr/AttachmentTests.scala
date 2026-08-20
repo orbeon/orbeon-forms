@@ -63,7 +63,7 @@ trait AttachmentTests {
               val dialogHead = dialog.get.querySelectorT(".xxforms-dialog-head")
               assert(dialogHead.textContent == "Unable to complete action")
               val dialogBody = dialog.get.querySelectorT("div.xforms-output-output")
-              assert(dialogBody.textContent == "The file uploaded is empty.")
+              assert(dialogBody.textContent == "The file test.txt is empty.")
             }
           })
 
@@ -86,7 +86,7 @@ trait AttachmentTests {
             Future {
               val inlineMessage = inlineControl.querySelectorOpt(".fr-attachment-upload-error-message")
               assert(inlineMessage.isDefined, "Inline error message not yet visible")
-              assert(inlineMessage.get.textContent.contains("The file uploaded is empty."))
+              assert(inlineMessage.get.textContent.contains("The file test.txt is empty."))
             }
           })
 

@@ -43,6 +43,7 @@ object BoostrapDatepicker {
     def onShow      (f: js.Function0[Unit]) : Unit              = datePicker.on("show", f)
     def getDate                             : js.Date           = datePicker.datepicker("getDate").asInstanceOf[js.Date]
     def setDate(date: js.Date)              : Unit              = datePicker.datepicker("setDate", date)
+    def setUTCDate(date: js.Date)           : Unit              = datePicker.datepicker("setUTCDate", date)
     def clearDates()                        : Unit              = datePicker.datepicker("clearDates", Nil)
     def update()                            : Unit              = datePicker.datepicker("update")
     def showDatepicker()                    : Unit              = datePicker.datepicker("show")

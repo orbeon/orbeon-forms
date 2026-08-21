@@ -257,7 +257,7 @@ object Date {
             opts.format = format.generateBootstrapFormatString
             weekStart.foreach(opts.weekStart = _)
             if (excludedDates.nonEmpty)
-              opts.datesDisabled = excludedDates.flatMap(JSDateUtils.parseIsoDateUsingLocalTimezone).toJSArray
+              opts.datesDisabled = excludedDates.flatMap(JSDateUtils.parseIsoDateAsUtcDate).toJSArray
           }
 
           opts
@@ -299,7 +299,7 @@ object Date {
         dateExternalValue.foreach { case DateExternalValue(value, _, _, _) =>
           value match {
             case Left(newIsoDate) =>
-              datePicker.setDate(JSDateUtils.isoDateToJsDate(newIsoDate))
+              datePicker.setUTCDate(new js.Date(js.Date.UTC(newIsoDate.year, newIsoDate.month - 1, newIsoDate.day)))
               // TODO: set field value?
             case Right(unrecognizedValue) =>
               disableDatePickerChangeListener(datePicker)

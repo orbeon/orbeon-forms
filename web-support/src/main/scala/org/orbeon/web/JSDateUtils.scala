@@ -26,8 +26,7 @@ import scala.util.Try
 
 object JSDateUtils {
 
-  // Parse as a local date (see https://stackoverflow.com/a/33909265/5295)
-  def parseIsoDateUsingLocalTimezone(dateString: String): Option[js.Date] = {
+  def parseIsoDateAsUtcDate(dateString: String): Option[js.Date] = {
 
     // Use `substring` to trim potential timezone
     val beforeChrist = dateString.startsWith("-")
@@ -36,7 +35,7 @@ object JSDateUtils {
 
     Try {
       val List(yearPart, monthPart, dayPart) = dateTrimmed.splitTo[List]("-")
-      new js.Date(
+      new js.Date(js.Date.UTC(
         year    = yearPart  .toInt * (if (beforeChrist) -1 else 1),
         month   = monthPart .toInt - 1,
         date    = dayPart   .toInt,
@@ -44,12 +43,12 @@ object JSDateUtils {
         minutes = 0,
         seconds = 0,
         ms      = 0
-      )
+      ))
     }.toOption.filter(parsedDate =>
       // We want return `None` for "2021-11-31", as November has 30 days, but instead of failing,
       // `new Date(2021, 10, 31)` returns December 1. To detect this case, we can convert the parsed
       // date back to a string and check that string is the same our input.
-      dateToIsoStringUsingLocalTimezone(parsedDate) == dateTrimmed
+      dateToIsoStringAsUtcDate(parsedDate) == dateTrimmed
     )
   }
 
@@ -59,17 +58,14 @@ object JSDateUtils {
   def todayAsIsoDate: IsoDate =
     jsDateToIsoDateUsingLocalTimezone(new js.Date())
 
-  def dateToIsoStringUsingLocalTimezone(date: js.Date): String =
-    date.getFullYear().toString + '-' + IsoTime.pad2(date.getMonth().toInt + 1) + '-' + IsoTime.pad2(date.getDate().toInt)
+  def dateToIsoStringAsUtcDate(date: js.Date): String =
+    date.getUTCFullYear().toString + '-' + IsoTime.pad2(date.getUTCMonth().toInt + 1) + '-' + IsoTime.pad2(date.getUTCDate().toInt)
 
   def jsDateToIsoTimeUsingLocalTimezone(time: js.Date, millis: Boolean): IsoTime =
     IsoTime(time.getHours().toInt, time.getMinutes().toInt, time.getSeconds().toInt.some) // , millis option time.getMilliseconds.toInt
 
   def jsDateToIsoDateUsingLocalTimezone(time: js.Date): IsoDate =
     IsoDate(year = time.getFullYear().toInt, month = time.getMonth().toInt + 1, day = time.getDate().toInt)
-
-  def isoDateToJsDate(date: IsoDate): js.Date =
-    new js.Date(year = date.year, month = date.month - 1, date = date.day)
 
   def findTimezoneShortName(date: js.Date): Option[String] =
     findFormattedTimezonePart("short", date)

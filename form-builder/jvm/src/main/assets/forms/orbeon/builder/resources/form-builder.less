@@ -680,8 +680,13 @@ body.orbeon {
             margin-top: 0;
             width: fit-content;
 
+            // Not a real navbar: the class was inert under Bootstrap 2, but Bootstrap 5 styles it, so undo that styling
             .navbar {
                 margin: 0;
+                background-color: transparent;
+                padding: 0;
+                --orbeon-button-color: var(--orbeon-base-color);
+                --orbeon-navbar-dropdown-open-toggle-background-color: transparent;
                 .navbar-inner {
                     padding-top: 0;
                     padding-bottom: 0;
@@ -2310,7 +2315,10 @@ body.orbeon {
                 border: 1px solid transparent;
                 border-radius: @baseBorderRadius @baseBorderRadius 0 0;
                 text-decoration: none;
-                color: var(--orbeon-link-color); // Bootstrap 2's inactive-tab link color (these hrefless links would inherit black)
+                // :not([href]) beats Bootstrap 5's base rule for class-less links, which would leave these tab links black
+                &:not([href]) {
+                    color: var(--orbeon-link-color);
+                }
                 &:hover {
                     border-color: #eee #eee #ddd;
                     background-color: #eee;
@@ -2359,7 +2367,8 @@ body.orbeon {
         color: #777;
         text-decoration: none;
         &:hover,
-        &:focus {
+        &:focus,
+        &.show {
             color: #333;
             text-decoration: none;
         }

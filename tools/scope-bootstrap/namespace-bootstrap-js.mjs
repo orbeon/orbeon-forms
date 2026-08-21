@@ -42,6 +42,8 @@ replaceCounted('data-bs- prefix', /data-bs-/g, ATTR_PREFIX, 'many');
 // Manipulator.getDataAttributes reads element.dataset keys, where data-orbeon-bs-* camelCases to orbeonBs*
 replaceCounted('dataset key filter', /startsWith\((['"])bs\1\)/g, `startsWith($1${DATASET_PREFIX}$1)`, 1);
 replaceCounted('dataset key strip', /replace\(\/\^bs\/, ?(['"])\1\)/g, `replace(/^${DATASET_PREFIX}/, $1$1)`, 1);
+// Since 5.2, the filter also excludes the bsConfig key (the data-orbeon-bs-config JSON attribute)
+replaceCounted('dataset config exclusion', /startsWith\((['"])bsConfig\1\)/g, `startsWith($1${DATASET_PREFIX}Config$1)`, 1);
 
 // UMD footer: expose the bundle as ORBEON.bootstrap (full, then minified form)
 if (src.includes('global.bootstrap = factory()'))

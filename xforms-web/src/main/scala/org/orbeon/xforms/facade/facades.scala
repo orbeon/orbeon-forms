@@ -91,12 +91,16 @@ object Bootstrap {
       .getOrElse(throw new IllegalStateException("the `ORBEON.bootstrap` global is missing"))
 
   // Tooltips and popovers (native Bootstrap classes)
-  def newTooltip(element: Element, configuration: js.Object): BootstrapTip = newTip(element, configuration, _.Tooltip)
-  def newPopover(element: Element, configuration: js.Object): BootstrapTip = newTip(element, configuration, _.Popover)
-  def getTooltip(element: Element): Option[BootstrapTip]                   = getTip(element, _.Tooltip)
-  def getPopover(element: Element): Option[BootstrapTip]                   = getTip(element, _.Popover)
+  def newTooltip(element: Element, configuration: js.Object): BootstrapTip = newTip(element, configuration, _.Tooltip, TooltipTitleSelector)
+  def newPopover(element: Element, configuration: js.Object): BootstrapTip = newTip(element, configuration, _.Popover, PopoverTitleSelector)
+  def getTooltip(element: Element): Option[BootstrapTip]                   = getTip(element, _.Tooltip, TooltipTitleSelector)
+  def getPopover(element: Element): Option[BootstrapTip]                   = getTip(element, _.Popover, PopoverTitleSelector)
 
-  private def newTip(element: Element, configuration: js.Object, ctor: Bootstrap => js.Dynamic): BootstrapTip = {
+  // Where each tip kind displays its title, for setContent()
+  private val TooltipTitleSelector = ".tooltip-inner"
+  private val PopoverTitleSelector = ".popover-header"
+
+  private def newTip(element: Element, configuration: js.Object, ctor: Bootstrap => js.Dynamic, titleSelector: String): BootstrapTip = {
     // Don't sanitize HTML tooltips/popovers: labels/hints/help are form-author content, same trust level as the rest of
     // the form.
     val dynConfig = configuration.asInstanceOf[js.Dynamic]
@@ -109,13 +113,13 @@ object Bootstrap {
         .foreach(containerEl => dynConfig.container = containerEl)
     val tipCtor = ctor(bootstrapGlobal)
     val _ = tipCtor.getOrCreateInstance(element, configuration)
-    new BootstrapTip(tipCtor, element)
+    new BootstrapTip(tipCtor, element, titleSelector)
   }
 
-  private def getTip(element: Element, ctor: Bootstrap => js.Dynamic): Option[BootstrapTip] = {
+  private def getTip(element: Element, ctor: Bootstrap => js.Dynamic, titleSelector: String): Option[BootstrapTip] = {
     val tipCtor  = ctor(bootstrapGlobal)
     val instance = tipCtor.getInstance(element)
-    if (instance == null || js.isUndefined(instance)) None else Some(new BootstrapTip(tipCtor, element))
+    if (instance == null || js.isUndefined(instance)) None else Some(new BootstrapTip(tipCtor, element, titleSelector))
   }
 }
 
@@ -126,7 +130,7 @@ trait Bootstrap extends js.Object {
 }
 
 // Handle on a native bootstrap.Tooltip / bootstrap.Popover (ctor is the Bootstrap class)
-class BootstrapTip private[facade] (ctor: js.Dynamic, element: Element) {
+class BootstrapTip private[facade] (ctor: js.Dynamic, element: Element, titleSelector: String) {
 
   private def instanceOpt: Option[js.Dynamic] = {
     val instance = ctor.getInstance(element)
@@ -137,10 +141,9 @@ class BootstrapTip private[facade] (ctor: js.Dynamic, element: Element) {
   def hide()   : Unit = instanceOpt.foreach(_.hide())
   def destroy(): Unit = instanceOpt.foreach(_.dispose())
 
-  // Change the displayed text after creation (e.g. on language change). Bootstrap reads the title from
-  // data-orbeon-bs-original-title (falling back to the config) on each show.
+  // The config title wins over data-orbeon-bs-original-title, so updates must go through setContent()
   def updateTitle(title: js.Any): Unit =
-    element.setAttribute("data-orbeon-bs-original-title", title.toString)
+    instanceOpt.foreach(_.setContent(js.Dictionary(titleSelector -> title)))
 
   // The tip element in the DOM, once shown: Bootstrap links the trigger to its tip via aria-describedby.
   def tipElementOpt: Option[Element] =

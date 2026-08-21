@@ -425,20 +425,20 @@ object FormBuilderXPathApi {
     params      : Array[NodeInfo],
     isHTML      : Boolean,
     automatic   : String
-  ): Unit = settingControlLabelHintHelpOrText(controlName, lhht, forceOptional = false) { implicit ctx: FormBuilderDocContext =>
-
-    val langValues = values.map { nodeInfo =>
-      val lang = nodeInfo.attValue("lang")
-      val value = nodeInfo.getStringValue
-      lang -> Seq(value)
-    }
-
-    FormBuilder.setControlResourcesWithLang(controlName, lhht, langValues)
-    setControlLHHATParams(controlName, lhht, params)
-    val lhhaElems = getControlLhhat(controlName, lhht)
-    setHTMLMediatype(lhhaElems, isHTML)
-    setAutomatic(lhhaElems, automatic.toBooleanOption)
-  }
+  ): Unit =
+    FormBuilder.setControlLabelHintHelpOrTextForAllLangs(
+      controlName   = controlName,
+      lhht          = lhht,
+      langValues    = values.map { nodeInfo =>
+        val lang = nodeInfo.attValue("lang")
+        val value = nodeInfo.getStringValue
+        lang -> Seq(value)
+      },
+      params        = params,
+      isHTML        = isHTML,
+      automatic     = automatic.toBooleanOption,
+      forceOptional = false
+    )
 
   // Set the control's items for all languages
   //@XPathFunction

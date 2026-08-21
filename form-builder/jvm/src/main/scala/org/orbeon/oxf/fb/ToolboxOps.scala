@@ -404,7 +404,15 @@ object ToolboxOps {
             (resourceName, lang, xblHolder.stringValue)
 
         triples.toList.groupByKeepOrder(_._1).foreach { case (resourceName, list) =>
-          setControlResourcesWithLang(formSectionName, resourceName, list.map(t => (t._2, List(t._3))))
+          FormBuilder.setControlLabelHintHelpOrTextForAllLangs(
+            controlName = formSectionName,
+            lhht        = resourceName,
+            langValues  = list.map(t => (t._2, List(t._3))),
+            params      = Nil,
+            isHTML      = false, // TODO: a section title can be HTML, right?
+            automatic   = Some(false),
+            forceOptional = resourceName == LHHA.Label.entryName
+          )
         }
 
         // Propagate bind attributes to the `bind` element if present

@@ -665,6 +665,23 @@ trait ControlOps extends ResourcesOps {
       Nil
   }
 
+  def setControlLabelHintHelpOrTextForAllLangs(
+    controlName  : String,
+    lhht         : String,
+    langValues   : collection.Seq[(String, Seq[String])],
+    params       : collection.Seq[NodeInfo],
+    isHTML       : Boolean,
+    automatic    : Option[Boolean],
+    forceOptional: Boolean
+  ): Unit =
+    FormBuilderXPathApi.settingControlLabelHintHelpOrText(controlName, lhht, forceOptional) { implicit ctx: FormBuilderDocContext =>
+      FormBuilder.setControlResourcesWithLang(controlName, lhht, langValues)
+      setControlLHHATParams(controlName, lhht, params)
+      val lhhaElems = getControlLhhat(controlName, lhht)
+      setHTMLMediatype(lhhaElems, isHTML)
+      setAutomatic(lhhaElems, automatic)
+    }
+
   // Build a namespaced id for a given static id or return null (the empty sequence)
   def buildFormBuilderControlNamespacedIdOrEmpty(staticId: String)(implicit ctx: FormBuilderDocContext): String = {
     val effectiveId  = buildFormBuilderControlEffectiveId(staticId)

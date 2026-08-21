@@ -104,13 +104,9 @@
   .fr-workflow-stage {
     display: flex;
     align-items: baseline;
-    label.xforms-label { // label.xforms-label to beat the same-specificity label-styles port below
-      color: var(--orbeon-navbar-color);
+    label.xforms-label {
       margin: 0 .5em 0 0;
       &:after { content: ":" }
-    }
-    output {
-      color: var(--orbeon-navbar-color);
     }
   }
   .fr-share-nav, .fr-revision-history {
@@ -123,9 +119,13 @@
   }
 
   // Same 5px horizontal footprint as under Bootstrap 2
+  // Without .navbar, the generic label color further down wins and the label is unreadable (#7827)
   .navbar .fr-workflow-stage {
     padding-left: 5px;
     padding-right: 5px;
+    label.xforms-label, output {
+      color: var(--orbeon-navbar-color);
+    }
   }
 
   // Collapse the wrapper <li> of navbar items that hide themselves (xforms-disabled) or render nothing; !important

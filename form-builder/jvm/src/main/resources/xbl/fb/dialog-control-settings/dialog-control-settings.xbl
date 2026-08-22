@@ -1686,7 +1686,7 @@
                                                                         if (exists(icon-path)) then
                                                                             concat('&lt;img src=&quot;', icon-path[1], '&quot; alt=&quot;&quot;/>')
                                                                         else
-                                                                            concat('&lt;i class=&quot;', (icon-class)[1], '&quot;/>'),
+                                                                            concat('&lt;i class=&quot;', (icon-class)[1], '&quot;>&lt;/i>'),
                                                                         ' ',
                                                                         label
                                                                     )
@@ -1705,7 +1705,7 @@
                                                                         if (exists(icon-path)) then
                                                                             concat('&lt;img src=&quot;', icon-path[1], '&quot; alt=&quot;&quot;/>')
                                                                         else
-                                                                            concat('&lt;i class=&quot;', (icon-class)[1], '&quot;/>'),
+                                                                            concat('&lt;i class=&quot;', (icon-class)[1], '&quot;>&lt;/i>'),
                                                                         ' ',
                                                                         label
                                                                     )

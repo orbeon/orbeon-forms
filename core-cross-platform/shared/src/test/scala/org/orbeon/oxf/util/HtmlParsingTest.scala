@@ -27,8 +27,8 @@ class HtmlParsingTest extends AnyFunSpec {
       ("""<i class="fa fa-fw fa-plus"></i> Create"""                , """ Create"""                                             , RemoveFilter),
       ("""Let's <b>remove</b> all the <i>markup</i>!"""             , """Let's remove all the markup!"""                        , RemoveFilter),
 
-      // JVM: TagSoup removes element before we get to it, and keeps its content, so right now we can't make this work correctly cross-environment
-//      ("""This is a totally <custom>element</custom>"""             , """This is a totally element"""                           , KeepFilter),
+      // With jsoup, tagsoup, and the browser, the `<custom>` element is removed. So keep this test.
+      ("""This is a totally <custom>element</custom>"""             , """This is a totally """                                  , KeepFilter),
     )
 
     for ((input, output, filter) <- expected) {

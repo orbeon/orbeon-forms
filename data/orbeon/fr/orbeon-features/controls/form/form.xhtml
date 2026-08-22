@@ -244,7 +244,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind id="time-12hour-noseconds-bind" ref="time-12hour-noseconds" type="xf:time" name="time-12hour-noseconds" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
                         <xf:bind id="time-24hour-noseconds-bind" ref="time-24hour-noseconds" type="xf:time" name="time-24hour-noseconds" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
                         <xf:bind id="time-24hour-bind" ref="time-24hour" type="xf:time" name="time-24hour" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/>
-                        <xf:bind id="date-eu-bind" ref="date-eu" name="date-eu" type="xf:date" xxf:default="adjust-date-to-timezone(current-date(), ())"/>
+                        <xf:bind id="date-eu-bind" ref="date-eu" name="date-eu" type="xf:date" xxf:default="xs:date('2026-08-01')" constraint="xxf:excluded-dates(xs:date('2026-08-20'))"/>
                         <xf:bind id="date-us-bind" ref="date-us" name="date-us" type="xf:date" xxf:default="adjust-date-to-timezone(current-date(), ())"/>
                         <xf:bind id="date-iso-bind" ref="date-iso" name="date-iso" type="xf:date" xxf:default="adjust-date-to-timezone(current-date(), ())"/>
                         <xf:bind id="dropdown-date-bind" ref="dropdown-date" type="xf:date" name="dropdown-date" xxf:default="adjust-date-to-timezone(current-date(), ())"/>

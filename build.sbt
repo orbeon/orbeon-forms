@@ -89,7 +89,7 @@ val InfinispanVersion                = "14.0.35.Final"
 val SqliteJdbcVersion                = "3.53.2.1"
 val PostgresqlVersion                = "42.7.13"
 val OracleJdbcVersion                = "23.26.3.0.0"
-val JsoupVersion                     = "1.21.1"
+val JsoupVersion                     = "1.23.1"
 
 // Only on PE for now
 val ApachePOIVersion                 = "5.5.1"

@@ -9,6 +9,7 @@ tmp/
 scratch.txt
 *~
 build-local.properties
+.playwright-cli
 
 # IDE/editor
 .idea/

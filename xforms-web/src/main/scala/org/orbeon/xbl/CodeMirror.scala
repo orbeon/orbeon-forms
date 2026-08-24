@@ -56,7 +56,7 @@ object CodeMirror {
 
       this.handlers.foreach { case (key, value) => this.editor.on(key, value) }
 
-      this.xformsUpdateReadonly(containerElem.hasClass("xforms-readonly"))
+      this.xformsUpdateReadonly(isMarkedReadonly)
     }
 
     override def destroy(): Unit = {

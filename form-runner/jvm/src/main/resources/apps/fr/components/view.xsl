@@ -650,7 +650,7 @@
 
     <xsl:template match="fr:title" name="fr-title">
         <!-- Q: Why do we need @ref here? -->
-        <xh:h1 class="text-white-50 mb-0"><xf:output value="{if (exists(@ref)) then @ref else '$title'}"/></xh:h1>
+        <xh:h1 class="fr-navbar-title"><xf:output value="{if (exists(@ref)) then @ref else '$title'}"/></xh:h1>
     </xsl:template>
 
     <xsl:template match="fr:config-check" name="fr-config-check">

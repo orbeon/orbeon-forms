@@ -1322,13 +1322,13 @@ object XFormsResponse {
   }
 
   private def handleValue(
-    elem                        : dom.Element,
+    valueElem                   : dom.Element,
     controlId                   : String,
     recreatedInput              : Boolean,
     controlsWithUpdatedItemsets : js.Dictionary[Boolean]
   ): Unit = {
 
-    val newControlValue  = elem.textContent
+    val newControlValue  = valueElem.textContent
     val documentElement  = dom.document.getElementByIdT(controlId)
 
     def containsAnyOf(e: dom.Element, tokens: List[String]) = {

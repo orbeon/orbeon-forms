@@ -40,9 +40,9 @@ object ContentFilter {
           if (m.start >= lastPos && m.start <= text.length && m.end <= text.length && m.end >= m.start) {
             if (m.start > lastPos)
               sb.append(text.substring(lastPos, m.start).escapeXmlMinimal)
-            sb.append("<span class=\"fr-content-filter-highlight\">")
+            sb.append("<mark class=\"fr-content-filter-highlight\">")
             sb.append(text.substring(m.start, m.end).escapeXmlMinimal)
-            sb.append("</span>")
+            sb.append("</mark>")
             lastPos = m.end
           }
         }

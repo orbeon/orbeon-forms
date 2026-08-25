@@ -29,6 +29,7 @@ class HtmlParsingTest extends AnyFunSpec {
 
       // With jsoup, tagsoup, and the browser, the `<custom>` element is removed. So keep this test.
       ("""This is a totally <custom>element</custom>"""             , """This is a totally """                                  , KeepFilter),
+      ("""This is a <mark>highlight</mark>!"""                       , """This is a <mark>highlight</mark>!"""                  , KeepFilter),
     )
 
     for ((input, output, filter) <- expected) {

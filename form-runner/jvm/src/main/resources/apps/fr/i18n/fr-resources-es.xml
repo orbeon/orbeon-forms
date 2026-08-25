@@ -281,6 +281,7 @@
             <save-draft-success>Borrador guardado correctamente!</save-draft-success>
             <save-progress-success>Borrador guardado correctamente!</save-progress-success>
             <email-success>Email enviado correctamente!</email-success>
+            <email-error>Se produjo un error al enviar el email. Contacte con el administrador de la aplicación.</email-error>
             <form-validation-error>Hay errores de validación. Corrija los errores e intente
                 nuevamente.</form-validation-error>
             <database-error>Error de comunicación con la base de datos. Contacte al administrador de

@@ -268,6 +268,7 @@
             <save-draft-success>進度保存成功！</save-draft-success>
             <save-progress-success>進度保存成功！</save-progress-success>
             <email-success>電子郵件發送成功！</email-success>
+            <email-error>發送電子郵件時出錯。請聯繫應用程式管理員。</email-error>
             <form-validation-error>存在驗證錯誤。請在所有字段正確填寫後重試。</form-validation-error>
             <database-error>與數據庫通信時出錯。請聯繫應用程序管理員。</database-error>
             <service-error>與後端服務通信時出錯。請聯繫應用程序管理員。</service-error>

@@ -268,6 +268,7 @@
             <save-draft-success>Concept succesvol bewaard!</save-draft-success>
             <save-progress-success>Concept succesvol bewaard!</save-progress-success>
             <email-success>E-mail succesvol verstuurd!</email-success>
+            <email-error>Er is een fout opgetreden bij het verzenden van de e-mail. Neem contact op met de applicatiebeheerder.</email-error>
             <form-validation-error>Er waren validatieproblemen. Probeer het opnieuw als alle velden correct zijn gevuld.</form-validation-error>
             <database-error>Er was een probleem in de databasecommunicatie. Neem contact op met de databasebeheerder.</database-error>
             <service-error>Er is een fout opgetreden bij de communicatie met een backendservice. Neem contact op met de applicatiebeheerder.</service-error>

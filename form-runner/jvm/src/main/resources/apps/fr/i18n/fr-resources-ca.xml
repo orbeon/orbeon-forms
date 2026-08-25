@@ -272,6 +272,7 @@
             <save-draft-success>Esborrany guardat correctament!</save-draft-success>
             <save-progress-success>Esborrany guardat correctament!</save-progress-success>
             <email-success>Correu enviat correctament!</email-success>
+            <email-error>S'ha produït un error en enviar el correu. Si us plau, contacteu amb l'administrador de l'aplicació.</email-error>
             <form-validation-error>Hi ha errors de validació. Corregeixi els errors i intenti novament.</form-validation-error>
             <database-error>Error de comunicació amb la base de dades. Contacti amb els administradors de la aplicació.</database-error>
             <service-error>Error de comunicació amb el servei. Contacti amb els administradors de la aplicació.</service-error>

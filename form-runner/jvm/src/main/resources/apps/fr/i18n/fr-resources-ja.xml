@@ -262,6 +262,7 @@
             <save-draft-success>進捗が正常に保存されました！</save-draft-success>
             <save-progress-success>進捗が正常に保存されました！</save-progress-success>
             <email-success>メールが正常に送信されました！</email-success>
+            <email-error>メールの送信中にエラーが発生しました。アプリケーション管理者にお問い合わせください。</email-error>
             <form-validation-error>検証エラーがあります。すべてのフィールドを正しく入力してから再試行してください。</form-validation-error>
             <database-error>データベースとの通信中にエラーが発生しました。アプリケーション管理者にお問い合わせください。</database-error>
             <service-error>バックエンドサービスとの通信中にエラーが発生しました。アプリケーション管理者にお問い合わせください。</service-error>

@@ -268,6 +268,7 @@
             <save-draft-success>Az előrehaladás mentése sikeres!</save-draft-success>
             <save-progress-success>Az előrehaladás mentése sikeres!</save-progress-success>
             <email-success>E-mail sikeresen elküldve!</email-success>
+            <email-error>Hiba történt az e-mail elküldése során. Kérjük, forduljon az alkalmazás rendszergazdájához.</email-error>
             <form-validation-error>Érvényesítési hibák vannak. Kérjük, próbálja újra, miután minden mezőt megfelelően kitöltött.</form-validation-error>
             <database-error>Hiba történt az adatbázissal való kommunikáció során. Kérjük, forduljon az alkalmazás rendszergazdájához.</database-error>
             <service-error>Hiba történt egy háttérszolgáltatással való kommunikáció során. Kérjük, forduljon az alkalmazás rendszergazdájához.</service-error>

@@ -268,6 +268,7 @@
             <save-draft-success>تم حفظ التقدم بنجاح!</save-draft-success>
             <save-progress-success>تم حفظ التقدم بنجاح!</save-progress-success>
             <email-success>تم إرسال البريد الإلكتروني بنجاح!</email-success>
+            <email-error>حدث خطأ أثناء إرسال البريد الإلكتروني. يرجى الاتصال بمسؤول التطبيق.</email-error>
             <form-validation-error>هناك أخطاء في التحقق. يرجى المحاولة مرة أخرى بعد ملء جميع الحقول بشكل صحيح.</form-validation-error>
             <database-error>حدث خطأ في الاتصال بقاعدة البيانات. يرجى الاتصال بمسؤول التطبيق.</database-error>
             <service-error>حدث خطأ في الاتصال بخدمة الخلفية. يرجى الاتصال بمسؤول التطبيق.</service-error>

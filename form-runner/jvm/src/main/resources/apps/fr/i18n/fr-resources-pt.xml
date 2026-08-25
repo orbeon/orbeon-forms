@@ -268,6 +268,7 @@
             <save-draft-success>Rascunho guardado com sucesso!</save-draft-success>
             <save-progress-success>Rascunho guardado com sucesso!</save-progress-success>
             <email-success>Email enviado com sucesso!</email-success>
+            <email-error>Ocorreu um erro ao enviar o email. Entre em contacto com o administrador da aplicação.</email-error>
             <form-validation-error>Existem erros de validação. Por favor, tente novamente quando todos os campos forem devidamente preenchidos.</form-validation-error>
             <database-error>Houve um erro na comunicação com a base de dados. Entre em contacto com o administrador da aplicação.</database-error>
             <service-error>Houve um erro na comunicação com um serviço de back-end. Entre em contacto com o administrador da aplicação.</service-error>

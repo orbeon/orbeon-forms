@@ -268,6 +268,7 @@
             <save-draft-success>Entwurf erfolgreich gespeichert!</save-draft-success>
             <save-progress-success>Entwurf erfolgreich gespeichert!</save-progress-success>
             <email-success>Email erfolgreich gesendet!</email-success>
+            <email-error>Beim Senden der E-Mail ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Anwendungsadministrator.</email-error>
             <form-validation-error>Validierungsfehler! Bitte füllen Sie alle Felder richtig aus und versuchen Sie es erneut.</form-validation-error>
             <database-error>Bei der Kommunikation mit der Datenbank ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Administrator.</database-error>
             <service-error>Bei der Kommunikation mit einem Backend-Dienst ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Anwendungsadministrator.</service-error>

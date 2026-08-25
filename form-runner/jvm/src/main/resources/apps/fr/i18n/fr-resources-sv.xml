@@ -268,6 +268,7 @@
             <save-draft-success>Utkast sparat</save-draft-success>
             <save-progress-success>Utkast sparat</save-progress-success>
             <email-success>Mejl skickat</email-success>
+            <email-error>Det uppstod ett fel när mejlet skickades. Kontakta applikationsadministratören.</email-error>
             <form-validation-error>Alla värden är inte giltiga. Gå igenom ifyllda värden och försök igen.</form-validation-error>
             <database-error>Databasfel. Vänligen kontakta administratör.</database-error>
             <service-error>Det uppstod ett fel vid kommunikation med en backend-tjänst. Kontakta applikationsadministratören.</service-error>

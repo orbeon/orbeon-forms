@@ -263,6 +263,7 @@
             <save-draft-success>进度保存成功！</save-draft-success>
             <save-progress-success>进度保存成功！</save-progress-success>
             <email-success>电子邮件发送成功！</email-success>
+            <email-error>发送电子邮件时出错。请联系应用程序管理员。</email-error>
             <form-validation-error>存在验证错误。请在所有字段正确填写后重试。</form-validation-error>
             <database-error>与数据库通信时出错。请联系应用程序管理员。</database-error>
             <service-error>与后端服务通信时出错。请联系应用程序管理员。</service-error>

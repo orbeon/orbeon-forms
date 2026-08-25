@@ -268,6 +268,7 @@
             <save-draft-success>Szkic został pomyślnie zapisany.</save-draft-success>
             <save-progress-success>Postęp został pomyślnie zapisany.</save-progress-success>
             <email-success>Email został pomyślnie wysłany.</email-success>
+            <email-error>Wystąpił błąd podczas wysyłania wiadomości email. Skontaktuj się z administratorem aplikacji.</email-error>
             <form-validation-error>Występują błędy walidacji. Proszę sprawdzić, czy wszystkie pola zostały wypełnione poprawnie.</form-validation-error>
             <database-error>Wystąpił błąd komunikacji z bazą danych. Skontaktuj się się z administratorem aplikacji.</database-error>
             <service-error>Wystąpił błąd komunikacji z serwisem. Skontaktuj się się z administratorem aplikacji.</service-error>

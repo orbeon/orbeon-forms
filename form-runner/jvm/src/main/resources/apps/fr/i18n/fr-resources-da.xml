@@ -262,6 +262,7 @@
             <save-draft-success>Kladde er gemt!</save-draft-success>
             <save-progress-success>Kladde er gemt!</save-progress-success>
             <email-success>Email er sendt!</email-success>
+            <email-error>Der opstod en fejl under afsendelse af email. Kontakt systemadministratoren.</email-error>
             <form-validation-error>Blanketten er ikke sendt. Ret venligst fejlene før du prøver at sende igen.</form-validation-error>
             <database-error>Fejl i forbindelse til server. Kontakt systemadministrator.</database-error>
             <service-error>Der opstod en fejl under kommunikation med en backend-tjeneste. Kontakt systemadministratoren.</service-error>

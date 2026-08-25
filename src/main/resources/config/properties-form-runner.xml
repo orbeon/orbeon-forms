@@ -598,6 +598,7 @@
         then validate-all
         then email
         then success-message("email-success")
+        recover error-message("email-error")
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.pdf.*.*">
         open-rendered-format(format = "pdf")

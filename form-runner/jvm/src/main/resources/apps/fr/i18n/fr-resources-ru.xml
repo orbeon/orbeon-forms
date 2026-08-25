@@ -262,6 +262,7 @@
             <save-draft-success>Черновик успешно сохранен!</save-draft-success>
             <save-progress-success>Прогресс успешно сохранен!</save-progress-success>
             <email-success>Сообщение электронной почты успешно отправлено!</email-success>
+            <email-error>Произошла ошибка при отправке сообщения электронной почты. Обратитесь к администратору приложения.</email-error>
             <form-validation-error>Документ не сохранен! Пожалуйста, исправьте ошибки в форме и сохраните еще раз.</form-validation-error>
             <database-error>Нет соединения с базой данных. Свяжитесь с системным администратором.</database-error>
             <service-error>Произошла ошибка при обмене данными с сервисом. Обратитесь к администратору приложения.</service-error>

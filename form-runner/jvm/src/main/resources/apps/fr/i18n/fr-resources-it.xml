@@ -268,6 +268,7 @@
             <save-draft-success>Avanzamento salvato correttamente!</save-draft-success>
             <save-progress-success>Avanzamento salvato correttamente!</save-progress-success>
             <email-success>Email inviata correttamente!</email-success>
+            <email-error>Si è verificato un errore durante l'invio dell'email. Contatta l'amministratore dell'applicazione.</email-error>
             <form-validation-error>Ci sono errori di validazione. Prego controllare che tutti i spazi sono compilati in modo corretto.</form-validation-error>
             <database-error>Nella communicazione con la database è apparso un errore. Si prega di contattare l'amministratore.</database-error>
             <service-error>Si è verificato un errore durante la comunicazione con un servizio di backend. Contatta l'amministratore dell'applicazione.</service-error>

@@ -248,6 +248,7 @@
         fr:fields-date
         fr:box-select
         fr:character-counter
+        fr:content-filter
         fr:clipboard-copy
         fr:bootstrap5-select1
         fr:boolean-input

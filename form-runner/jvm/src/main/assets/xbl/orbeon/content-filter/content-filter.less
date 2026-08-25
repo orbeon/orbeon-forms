@@ -1,0 +1,57 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+
+    .xbl-fr-content-filter {
+        display: inline-block;
+        width: 100%;
+
+        &> .fr-content-filter-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+
+            &> .fr-content-filter-backdrop {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                overflow: auto;
+                pointer-events: none;
+                z-index: 2;
+                box-sizing: border-box;
+
+                .fr-content-filter-highlights {
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    color: transparent;
+
+                    .fr-content-filter-highlight {
+                        color: transparent;            // override defaults for `<mark>`
+                        background-color: transparent; // override defaults for `<mark>`
+                        padding: 0;                    // override defaults for `<mark>`
+                        text-decoration: underline;
+                        text-decoration-style: wavy;
+                        text-decoration-color: var(--orbeon-error-color);
+                    }
+                }
+            }
+
+            &> .xforms-input, &> .xforms-textarea {
+                position: relative;
+                z-index: 1;
+                background: transparent !important;
+                caret-color: auto;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+        }
+    }
+}

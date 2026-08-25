@@ -19,6 +19,7 @@ object DomEventNames {
   val DragOver                 = "dragover"
   val DragLeave                = "dragleave"
   val PageHide                 = "pagehide"
+  val Scroll                    = "scroll"
 
   val InteractiveReadyState    = "interactive"
   val CompleteReadyState       = "complete"

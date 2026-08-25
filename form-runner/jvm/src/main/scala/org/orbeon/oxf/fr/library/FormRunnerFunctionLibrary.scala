@@ -34,6 +34,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.oxf.xforms.function.xxforms.EvaluateSupport
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
+import org.orbeon.oxf.xforms.contentfilter.ContentFilter
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, function}
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils, XMLUtils}
 import org.orbeon.saxon
@@ -158,6 +159,16 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 
     Fun("created-with-or-newer", classOf[FRCreatedWithOrNewer], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE)
+    )
+
+    Fun("is-content-clean", classOf[FRIsContentClean], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
+      Arg(STRING, ALLOWS_ZERO_OR_ONE),
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
+    )
+
+    Fun("content-filter-highlight-html", classOf[FRContentFilterHighlightHtml], op = 0, min = 1, STRING, EXACTLY_ONE,
+      Arg(STRING, ALLOWS_ZERO_OR_ONE),
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
     )
 
     Fun("transform-uploaded-image", classOf[FRTransformUploadedImage], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
@@ -557,6 +568,22 @@ private object FormRunnerFunctions {
   class FRCreatedWithOrNewer extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(context: XPathContext): BooleanValue =
       FRCreatedWithOrNewerSupport.isCreatedWithOrNewer(XFormsFunction.context.container, stringArgument(0)(context))
+  }
+
+  class FRIsContentClean extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(context: XPathContext): BooleanValue = {
+      val text = stringArgumentOpt(0)(context).getOrElse("")
+      val lang = stringArgumentOpt(1)(context).getOrElse("")
+      ContentFilter.isContentClean(text, lang)
+    }
+  }
+
+  class FRContentFilterHighlightHtml extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(context: XPathContext): StringValue = {
+      val text = stringArgumentOpt(0)(context).getOrElse("")
+      val lang = stringArgumentOpt(1)(context).getOrElse("")
+      ContentFilter.highlightContent(text, lang)
+    }
   }
 
   class FRFormRunnerLink extends FunctionSupport with RuntimeDependentFunction {

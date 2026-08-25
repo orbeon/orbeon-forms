@@ -1,0 +1,146 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <xbl:binding
+            id="fr-content-filter"
+            element="
+                fr|content-filter,
+                xf|input[appearance ~= content-filter],
+                xf|textarea[appearance ~= content-filter]"
+            xxbl:mode="binding lhha value external-value javascript-lifecycle"
+            xxbl:label-for="field"
+            xxbl:container="span">
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">With Content Filter</display-name>
+            <display-name lang="fr">Avec filtre de contenu</display-name>
+            <display-name lang="no">Med innholdsfilter</display-name>
+            <display-name lang="ru">С фильтром содержимого</display-name>
+            <display-name lang="it">Con filtro contenuti</display-name>
+            <display-name lang="de">Mit Inhaltsfilter</display-name>
+            <display-name lang="es">Con filtro de contenido</display-name>
+            <toolbox show="false"/>
+            <icon>
+                <icon-class>fa fa-fw fa-filter</icon-class>
+            </icon>
+            <templates>
+                <view>
+                    <xf:textarea id="" ref="" appearance="content-filter" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </xf:textarea>
+                </view>
+            </templates>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/content-filter/content-filter.css"/>
+        </xbl:resources>
+
+        <xbl:handlers>
+            <xbl:handler event="xforms-enabled xforms-value-changed">
+                <xf:setvalue ref="instance('local')/value" value="xxf:binding('fr-content-filter')"/>
+                <xf:setvalue ref="instance('local')/type"  value="xxf:type(xxf:binding('fr-content-filter'))"/>
+                <xf:rebuild/>
+            </xbl:handler>
+            <xbl:handler event="xforms-enabled xforms-readonly xforms-readwrite" phase="target">
+                <xf:setvalue
+                    ref="instance('local')/readonly"
+                    value="xxf:is-control-readonly('fr-content-filter')"/>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:implementation>
+            <xf:model id="model">
+                <xf:instance id="local">
+                    <local>
+                        <value/>
+                        <type/>
+                        <readonly/>
+                    </local>
+                </xf:instance>
+                <xf:bind
+                    ref="value"
+                    readonly="../readonly/string() = 'true'">
+                    <xf:constraint
+                        id="internal-validation"
+                        value="xxf:is-blank(string(.)) or ../readonly/string() = 'true' or fr:is-content-clean(string(.), fr:lang())"/>
+                </xf:bind>
+                <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <resource xml:lang="en"><alert>This content appears to use inappropriate language. Please make corrections before submitting.</alert></resource>
+                        <resource xml:lang="es"><alert>Este contenido parece utilizar lenguaje inapropiado. Por favor, realice las correcciones antes de enviar.</alert></resource>
+                        <resource xml:lang="fi"><alert>Tämä sisältö näyttää käyttävän sopimatonta kieltä. Tee korjaukset ennen lähettämistä.</alert></resource>
+                        <resource xml:lang="fr"><alert>Ce contenu semble utiliser un langage inapproprié. Veuillez effectuer des corrections avant d'envoyer.</alert></resource>
+                        <resource xml:lang="de"><alert>Dieser Inhalt scheint unangemessene Sprache zu verwenden. Bitte nehmen Sie Korrekturen vor, bevor Sie absenden.</alert></resource>
+                        <resource xml:lang="it"><alert>Questo contenuto sembra utilizzare un linguaggio inappropriato. Si prega di apportare le modifiche prima di inviare.</alert></resource>
+                        <resource xml:lang="sv"><alert>Detta innehåll verkar använda olämpligt språk. Gör korrigeringar innan du skickar in.</alert></resource>
+                        <resource xml:lang="nl"><alert>Deze inhoud lijkt ongepast taalgebruik te bevatten. Breng correcties aan voordat u verzendt.</alert></resource>
+                        <resource xml:lang="pt"><alert>Este conteúdo parece utilizar linguagem inadequada. Por favor, faça as correções antes de enviar.</alert></resource>
+                        <resource xml:lang="pl"><alert>Ta treść wydaje się zawierać niewłaściwy język. Prosimy o dokonanie poprawek przed przesłaniem.</alert></resource>
+                        <resource xml:lang="ar"><alert>يبدو أن هذا المحتوى يستخدم لغة غير لائقة. يرجى إجراء التعديلات قبل الإرسال.</alert></resource>
+                        <resource xml:lang="ca"><alert>Aquest contingut sembla utilitzar un llenguatge inadequat. Feu les correccions abans d'enviar.</alert></resource>
+                        <resource xml:lang="da"><alert>Dette indhold ser ud til at bruge upassende sprog. Foretag venligst rettelser, før du indsender.</alert></resource>
+                        <resource xml:lang="hu"><alert>Ez a tartalom úgy tűnik, nem megfelelő nyelvezetet használ. Kérjük, javítsa elküldés előtt.</alert></resource>
+                        <resource xml:lang="ja"><alert>このコンテンツには不適切な言語が含まれている可能性があります。送信前に修正してください。</alert></resource>
+                        <resource xml:lang="no"><alert>Dette innholdet ser ut til å bruke upassende språk. Vennligst gjør korrigeringer før du sender inn.</alert></resource>
+                        <resource xml:lang="ru"><alert>Этот контент, похоже, использует недопустимую лексику. Пожалуйста, внесите исправления перед отправкой.</alert></resource>
+                        <resource xml:lang="tr"><alert>Bu içerik uygunsuz dil kullanıyor gibi görünüyor. Lütfen göndermeden önce düzeltmeler yapın.</alert></resource>
+                        <resource xml:lang="zh-Hans"><alert>该内容似乎使用了不当语言。请在提交前进行修改。</alert></resource>
+                        <resource xml:lang="zh-Hant"><alert>該內容似乎使用了不當語言。請在提交前進行修改。</alert></resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template xxbl:transform="oxf:xslt">
+            <xh:span xsl:version="2.0" class="fr-content-filter-wrapper">
+                <xf:var
+                    name="binding"
+                    value="xxf:binding('fr-content-filter')"/>
+                <xh:div class="fr-content-filter-backdrop" aria-hidden="true">
+                    <xh:div class="fr-content-filter-highlights"/>
+                </xh:div>
+                <xsl:element name="{name(/*)}">
+                    <xsl:attribute name="id"          select="'field'"/>
+                    <xsl:attribute name="ref"         select="'instance(''local'')/value'"/>
+                    <xsl:attribute name="appearance"  select="tokenize(/*/@appearance, '\s+')[. != 'content-filter']"/>
+                    <xsl:copy-of select="/*/@mediatype"/>
+                    <xsl:if test="/*/@autocomplete">
+                        <xsl:attribute name="autocomplete">
+                            <xsl:value-of select="/*/@autocomplete"/>
+                        </xsl:attribute>
+                    </xsl:if>
+                    <xf:alert validation="internal-validation" ref="xxf:r('alert')"/>
+                    <xf:setvalue
+                        event="DOMActivate DOMFocusOut"
+                        ref="$binding"
+                        value="instance('local')/value"/>
+                </xsl:element>
+            </xh:span>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

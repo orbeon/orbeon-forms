@@ -979,7 +979,8 @@ lazy val formRunnerWeb = (project in file("form-runner-web"))
     commonJS,
     xformsWeb % "test->test;compile->compile",
     webFacades,
-    formRunnerClientServerJS
+    formRunnerClientServerJS,
+    contentFilterJS
   )
   .settings(commonScalaJsSettings)
   .enablePlugins(JSDependenciesPlugin)
@@ -1077,6 +1078,7 @@ lazy val xformsJVM = xforms.jvm
     commonJVM,
     xformsRuntimeJVM,
     xformsCommonJVM,
+    contentFilterJVM,
     core % "test->test;compile->compile"
   )
   .enablePlugins(SbtWeb)
@@ -1348,6 +1350,23 @@ lazy val fileScanExample2 = (project in file("file-scan-v2-example"))
     name := "file-scan-v2-example"
   )
 
+lazy val contentFilter = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("content-filter"))
+  .settings(scala2CommonSettings*)
+  .settings(
+    name := "orbeon-content-filter"
+  )
+
+lazy val contentFilterJVM = contentFilter.jvm
+  .dependsOn(xformsRuntimeJVM)
+
+lazy val contentFilterJS = contentFilter.js
+  .dependsOn(commonJS)
+  .settings(commonScalaJsSettings)
+  .settings(
+    Compile / unmanagedJars      := Nil,
+    Compile / unmanagedClasspath := Nil
+  )
+
 lazy val nodeFacades = (project in file("node-facades"))
   .enablePlugins(ScalaJSPlugin)
   .settings(scala2CommonSettings*)
@@ -1508,7 +1527,8 @@ lazy val orbeonWarJVM = orbeonWar.jvm
     xformsJVM,
     formRunnerJVM,
     formBuilderJVM,
-    servletContainerInitializer
+    servletContainerInitializer,
+    contentFilterJVM,
   )
   .settings(OrbeonWebappPlugin.projectSettings*)
   .settings(scala2CommonSettings*)

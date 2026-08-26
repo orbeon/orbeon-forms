@@ -113,7 +113,7 @@ object ContentFilter {
         updateHighlights(valueOpt)
 
     private def updateHighlights(valueOpt: Option[String]): Unit = {
-      updateSize()
+      updateSizeAndStyles()
       syncScroll()
       highlightsElemOpt.foreach { highlightsElem =>
         val value           = valueOpt.getOrElse(getFieldValue)
@@ -125,7 +125,7 @@ object ContentFilter {
     private def clearHighlights(): Unit =
       highlightsElemOpt.foreach(_.innerHTML = "")
 
-    private def updateSize(): Unit =
+    private def updateSizeAndStyles(): Unit =
       for {
         fieldElem      <- fieldElemOpt
         backdropElem   <- backdropElemOpt

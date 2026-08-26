@@ -16,15 +16,14 @@ package org.orbeon.xbl
 import cats.syntax.option.*
 import io.udash.wrappers.jquery.JQueryPromise
 import org.log4s.Logger
-import org.orbeon.web.JSDateUtils.todayAsIsoDate
 import org.orbeon.date.IsoDate
 import org.orbeon.facades.BoostrapDatepicker.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.web.{DomEventNames, JSDateUtils}
 import org.orbeon.web.DomSupport.*
+import org.orbeon.web.JSDateUtils.todayAsIsoDate
+import org.orbeon.web.{DomEventNames, JSDateUtils}
 import org.orbeon.xforms.*
-import org.orbeon.xforms.XFormsXbl
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -249,7 +248,7 @@ object Date {
           opts.assumeNearbyYear = true
           opts.showOnFocus      = false
           opts.forceParse       = false
-          opts.language         = Language.getLang()
+          opts.language         = Language.fullLangOrDefault
           opts.container        = containerElem.closestT("dialog, .orbeon")
           opts.todayHighlight   = containerElem.querySelector(":scope > .fr-today-highlight-true") != null
 

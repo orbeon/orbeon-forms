@@ -25,25 +25,22 @@ object Language {
 
   import Private.*
 
-  // noinspection AccessorLikeMethodIsEmptyParen
-  // Return the language for the page, defaulting to `en` if none is found
-  // See also https://github.com/orbeon/orbeon-forms/issues/3787
-  def getLang(): String = {
-    langElement
-      .map(_.getAttribute(HtmlLangAttr).substring(0, 2))
-      .getOrElse("en")
-  }
+  val DefaultLang = "en"
 
-  // Like getLang(), but untruncated (e.g. `pt-PT`) and empty when no lang attribute is found
+  // Return the untruncated language for the page (e.g. `pt-PT`), or empty when no lang attribute is found
   def findFullLang: Option[String] =
     langElement
       .flatMap(el => Option(el.getAttribute(HtmlLangAttr)))
       .map(_.trim)
       .filter(_.nonEmpty)
 
-  def onLangChange(listenerId: String, listener: String => Unit): Unit =
+  // See also https://github.com/orbeon/orbeon-forms/issues/3787
+  def fullLangOrDefault: String =
+    findFullLang.getOrElse(DefaultLang)
+
+  def onLangChange(listenerId: String, listener: Option[String] => Unit): Unit =
     langElement.foreach { elem =>
-      val mutationObserver = DomSupport.onAttributeChange(elem, HtmlLangAttr, () => listener(getLang()))
+      val mutationObserver = DomSupport.onAttributeChange(elem, HtmlLangAttr, () => listener(findFullLang))
       langListeners.put(listenerId, mutationObserver)
     }
 

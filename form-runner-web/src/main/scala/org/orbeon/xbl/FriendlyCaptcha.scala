@@ -87,7 +87,7 @@ object FriendlyCaptcha {
             new FriendlyCaptchaConfig {
               startMode         = mode.entryName
               sitekey           = publicKey
-              language          = Language.findFullLang.getOrElse("en"): String
+              language          = Language.fullLangOrDefault
               solutionFieldName = "-"
               readyCallback     = js.defined((() => logger.debug("ready callback")): js.Function0[Unit])
               startedCallback   = js.defined((() => logger.debug("started callback")): js.Function0[Unit])

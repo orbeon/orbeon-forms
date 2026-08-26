@@ -28,7 +28,6 @@ import org.orbeon.oxf.xforms.analysis.model.MipName
 import org.orbeon.oxf.xforms.model.{BasicIdIndex, XFormsInstanceSupport}
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
 import org.orbeon.saxon.om
-import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsId
@@ -492,7 +491,7 @@ object ImportExportSupport {
 
   private val FrResourcesUrl = URI.create("oxf:/apps/fr/i18n/resources.xml")
 
-  def frResourcesForRequestedLang(requestedLang: String): NodeInfo = {
+  def frResourcesForRequestedLang(requestedLang: String): om.NodeInfo = {
 
     val frResources =
       useAndClose(ResourceManagerWrapper.instance.getContentAsStream(FrResourcesUrl.getPath)) { is =>

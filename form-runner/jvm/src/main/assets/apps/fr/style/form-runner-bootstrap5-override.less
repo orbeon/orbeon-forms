@@ -105,11 +105,16 @@
     margin-left: 10px; // same lead spacing as the icons
   }
 
-  // Workflow stage, share, revision history: Bootstrap 2 styled these via .navbar-inverse-scoped rules that don't match
-  // the Bootstrap 5 navbar markup
-  .fr-workflow-stage {
+  // .navbar is required: the Summary table's Workflow Stage column header has the same class, and the label color must
+  // beat the generic label:not(.checkbox):not(.radio) rule further down (#7827)
+  .navbar .fr-workflow-stage {
     display: flex;
     align-items: baseline;
+    padding-left: 5px; // Bootstrap 2's 5px horizontal padding
+    padding-right: 5px;
+    label.xforms-label, output {
+      color: var(--orbeon-navbar-color);
+    }
     label.xforms-label {
       margin: 0 .5em 0 0;
       &:after { content: ":" }
@@ -121,16 +126,6 @@
       .fa {
         color: var(--orbeon-navbar-color);
       }
-    }
-  }
-
-  // Same 5px horizontal padding as under Bootstrap 2; without .navbar, the label:not(.checkbox):not(.radio) rule
-  // further down wins and the label is unreadable on the dark navbar (#7827)
-  .navbar .fr-workflow-stage {
-    padding-left: 5px;
-    padding-right: 5px;
-    label.xforms-label, output {
-      color: var(--orbeon-navbar-color);
     }
   }
 

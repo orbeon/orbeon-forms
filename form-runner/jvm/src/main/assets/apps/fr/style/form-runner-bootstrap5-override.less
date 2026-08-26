@@ -124,8 +124,8 @@
     }
   }
 
-  // Same 5px horizontal footprint as under Bootstrap 2
-  // Without .navbar, the generic label color further down wins and the label is unreadable (#7827)
+  // Same 5px horizontal padding as under Bootstrap 2; without .navbar, the label:not(.checkbox):not(.radio) rule
+  // further down wins and the label is unreadable on the dark navbar (#7827)
   .navbar .fr-workflow-stage {
     padding-left: 5px;
     padding-right: 5px;

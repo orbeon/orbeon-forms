@@ -2315,7 +2315,8 @@ body.orbeon {
                 border: 1px solid transparent;
                 border-radius: @baseBorderRadius @baseBorderRadius 0 0;
                 text-decoration: none;
-                // :not([href]) beats Bootstrap 5's base rule for class-less links, which would leave these tab links black
+                // Tab links have no href and no class, so Bootstrap 5's a:not([href]):not([class]) rule makes them
+                // black; override this here
                 &:not([href]) {
                     color: var(--orbeon-link-color);
                 }

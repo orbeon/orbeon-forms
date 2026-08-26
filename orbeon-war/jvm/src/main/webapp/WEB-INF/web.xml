@@ -258,6 +258,7 @@
             <url-pattern>/fr/error</url-pattern>
             <url-pattern>/fr/login</url-pattern>
             <url-pattern>/fr/login-error</url-pattern>
+            <url-pattern>/fr/mcp/builder</url-pattern>
         </web-resource-collection>
     </security-constraint>
     <!-- This will cause redirect from HTTP to HTTPS -->

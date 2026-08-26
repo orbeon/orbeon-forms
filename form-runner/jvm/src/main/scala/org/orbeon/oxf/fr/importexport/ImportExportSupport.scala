@@ -25,7 +25,7 @@ import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.analysis.model.MipName
-import org.orbeon.oxf.xforms.model.XFormsInstanceSupport
+import org.orbeon.oxf.xforms.model.{BasicIdIndex, XFormsInstanceSupport}
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.NodeInfo
@@ -224,18 +224,19 @@ object ImportExportSupport {
     formDataOpt       : Option[FormDataWithDetails]
   ): NonEmptyList[DataMigrationOp] Either FormRunnerDocContext = {
 
+    lazy val formDocCopy = TransformerUtils.extractAsMutableDocument(form)
+
     val (metadataRootElem, templateDataRootElem, excludeResultPrefixes) = {
 
       val ctx = new FormRunnerDocContext {
 
         // Create a mutable copy if needed so we can extract the nested instance further below while
         // semi-correctly removing in-scope namespaces.
-        val formDefinitionRootElem: om.NodeInfo = {
+        val formDefinitionRootElem: om.NodeInfo =
           if (formDataOpt.isDefined)
             form.rootElement
           else
-            TransformerUtils.extractAsMutableDocument(form.rootElement)
-        }
+            formDocCopy.rootElement
       }
 
       (
@@ -294,8 +295,14 @@ object ImportExportSupport {
 
     dataMaybeMigrated map { effectiveDataRootElem =>
       new FormRunnerDocContext {
-        val formDefinitionRootElem: om.NodeInfo = form.rootElement
-        override lazy val dataRootElem = effectiveDataRootElem
+        val formDefinitionRootElem: om.NodeInfo = {
+            object Index extends BasicIdIndex {
+              def documentInfo: DocumentNodeInfoType = formDocCopy.getDocumentRoot
+            }
+            formDocCopy.setIdGetter(Index.idGetter(formDocCopy))
+            formDocCopy.rootElement
+          }
+        override lazy val dataRootElem: om.NodeInfo = effectiveDataRootElem
       }
     }
   }

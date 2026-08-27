@@ -12,13 +12,14 @@
 //
 @import (reference) "form-runner-common";
 
-html {
-    // The "orbeon" class on the html element in landing.xhtml makes it possible to access the CSS variable here
-    font-size: var(--orbeon-base-font-size); // Bootstrap 5 keeps the 16px browser default
-    font-weight: var(--orbeon-base-font-weight);
-}
-
 .orbeon {
+
+    html& {
+        // The "orbeon" class on the html element in landing.xhtml makes it possible to access the CSS variable here
+        font-size: var(--orbeon-base-font-size); // Bootstrap 5 keeps the 16px browser default
+        font-weight: var(--orbeon-base-font-weight);
+        background-color: var(--orbeon-base-background-color);
+    }
 
     .fr-mode-landing {
         .row {
@@ -91,7 +92,9 @@ html {
 
     .xbl-component {
         .card {
+            color: inherit;
             .card-body {
+                color: inherit;
                 .card-text {
                     margin-bottom: 0;
                 }
@@ -123,28 +126,29 @@ html {
         }
     }
 
-    // .xforms-output in the selector out-specifies the Bootstrap 5 override's label-styles port, so the Bootstrap 2
-    // card-footer look (bold, muted color) wins
-    .card-footer .xforms-output .xforms-label {
-        margin-right: 3px;
-        font-weight: bold;
-        color: inherit;      // muted footer color from the enclosing <small class="text-muted">
-        &:after {
-            content: ":"
-        }
-    }
+    .card-footer {
+        color: var(--orbeon-landing-card-footer-color);
+        background-color: var(--orbeon-landing-card-footer-background-color);
 
-    // The Created/Modified values are <output class="xforms-field">, which the Bootstrap 5 override boxes like a
-    // read-only field; in the card footer show them as plain inline text, like Bootstrap 2
-    .card-footer .xforms-field {
-        width: auto;
-        min-height: 0;
-        padding: 0;
-        border: 0;
-        background-color: transparent;
-        box-shadow: none;
-        cursor: default;
-        color: inherit; // muted footer color from the enclosing <small class="text-muted">
+        .xforms-output .xforms-label {
+            margin-right: 3px;
+            font-weight: bold;
+            color: inherit;
+            &:after {
+                content: ":"
+            }
+        }
+
+        .xforms-field {
+            width: auto;
+            min-height: 0;
+            padding: 0;
+            border: 0;
+            color: inherit;
+            background-color: transparent;
+            box-shadow: none;
+            cursor: default;
+        }
     }
 
     // 2022-11-28: This will not work with Firefox yet but it's cosmetic

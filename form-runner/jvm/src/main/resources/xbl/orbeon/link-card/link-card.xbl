@@ -35,7 +35,7 @@
 
                 <xsl:if test="exists(/*/fr:card-footer)">
                     <xh:div class="card-footer">
-                        <xh:small class="text-muted">
+                        <xh:small>
                             <xbl:content includes=":root > fr|card-footer > *"/>
                         </xh:small>
                     </xh:div>

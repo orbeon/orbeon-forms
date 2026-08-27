@@ -378,16 +378,16 @@ trait CreateUpdateDelete {
       }
     }
 
-    val doReindex =
+    val mightReindex =
       ! req.forAttachment &&               // https://github.com/orbeon/orbeon-forms/issues/6913
       ! req.dataPart.exists(_.forceDelete) // no need to reindex as we only `DELETE` historical data, which is not indexed
 
-    def reindex(
+    def maybeReindexAfterStore(
       reindexConnectionOpt: Option[ReindexConnection]
     )(implicit
       propertySet         : PropertySet
     ): Unit =
-      if (doReindex) {
+      if (mightReindex) {
         val whatToReindex = req.dataPart match {
           case Some(dataPart) =>
             // Data: update index for this document id
@@ -417,8 +417,8 @@ trait CreateUpdateDelete {
     // Pre-fetch the indexed controls XPaths before opening a database connection, to avoid nested
     // connections when calling `readPublishedFormStorageDetails` during reindex.
     // https://github.com/orbeon/orbeon-forms/issues/7564
-    val preComputedIndexedControlsXPaths: Option[(AppFormVersion, List[String])] =
-      (req.forData && doReindex)
+    val preComputedIndexedControlsXPathsIfNeeded: Option[(AppFormVersion, List[String])] =
+      (req.forData && mightReindex)
         .option((req.appForm, versionToSet) -> Index.indexedControlsXPaths(req.appForm, versionToSet))
 
     // Update database
@@ -450,7 +450,7 @@ trait CreateUpdateDelete {
               throw HttpStatusCodeException(StatusCode.Conflict)
 
             val storeResult = store(connection, req, reqBodyOpt, delete, versionToSet)
-            reindex(Some(ReindexConnection(connection, preComputedIndexedControlsXPaths)))
+            maybeReindexAfterStore(Some(ReindexConnection(connection, preComputedIndexedControlsXPathsIfNeeded)))
             storeResult
           }
         } catch {
@@ -464,7 +464,7 @@ trait CreateUpdateDelete {
         // We must reindex only the data for a single document, so do it in the same transaction
         RelationalUtils.withConnection { connection =>
           val storeResult = store(connection, req, reqBodyOpt, delete, versionToSet)
-          reindex(Some(ReindexConnection(connection, preComputedIndexedControlsXPaths)))
+          maybeReindexAfterStore(Some(ReindexConnection(connection, preComputedIndexedControlsXPathsIfNeeded)))
           storeResult
         }
       } else {
@@ -473,7 +473,7 @@ trait CreateUpdateDelete {
           RelationalUtils.withConnection { connection =>
             store(connection, req, reqBodyOpt, delete, versionToSet)
           }
-        reindex(None)
+        maybeReindexAfterStore(None)
         storeResult
     }
 

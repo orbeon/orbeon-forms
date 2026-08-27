@@ -18,7 +18,7 @@
             xxbl:transform="oxf:unsafe-xslt"
         >
             <xh:div class="card h-100" xsl:version="2.0">
-                <xh:h5 class="card-title card-header text-center"><xf:output value="xxf:label('fr-link-card')"/></xh:h5>
+                <xh:h2 class="card-title card-header text-center"><xf:output value="xxf:label('fr-link-card')"/></xh:h2>
                 <xh:img src="{/*/@img-src}" class="card-img-top" alt="{{xxf:label('fr-link-card')}}"/>
 
                 <xsl:if test="exists(/*/fr:card-body)">

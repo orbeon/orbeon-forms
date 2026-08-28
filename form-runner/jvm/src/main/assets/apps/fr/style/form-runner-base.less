@@ -26,6 +26,41 @@
 
     -webkit-text-size-adjust: 100%; // Prevent font scaling in landscape while allowing user zoom
 
+    font-family: var(--orbeon-base-font-family);
+    font-size  : var(--orbeon-base-font-size);
+    color      : var(--orbeon-base-color);
+
+    // Headings
+    h1 { font-size: var(--orbeon-h1-font-size); }
+    h2 { font-size: var(--orbeon-h2-font-size); }
+    h3 { font-size: var(--orbeon-h3-font-size); }
+    h4 { font-size: var(--orbeon-h4-font-size); }
+    h5 { font-size: var(--orbeon-h5-font-size); }
+    h6 { font-size: var(--orbeon-h6-font-size); }
+
+    // Base HTML elements
+    blockquote p {
+        font-family: var(--orbeon-blockquote-font-family);
+        font-size  : var(--orbeon-blockquote-font-size);
+        font-weight: var(--orbeon-blockquote-font-weight);
+        color      : var(--orbeon-blockquote-color);
+    }
+    code {
+        font-family: var(--orbeon-code-font-family);
+        font-size  : var(--orbeon-code-font-size);
+        font-weight: var(--orbeon-code-font-weight);
+        color      : var(--orbeon-code-color);
+    }
+    pre:not([role="textbox"]) {
+        font-family: var(--orbeon-pre-font-family);
+        font-size  : var(--orbeon-pre-font-size);
+        font-weight: var(--orbeon-pre-font-weight);
+        color      : var(--orbeon-pre-color);
+    }
+    sub, sup {
+        font-size: var(--orbeon-sub-sup-font-size);
+    }
+
     body& {
         .fr-view {
             padding-top: 52px;

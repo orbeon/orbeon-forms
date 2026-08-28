@@ -5,13 +5,6 @@
 
 .orbeon {
 
-  // On &, not body&, so it also applies when embedded, where .orbeon is a wrapper <div>
-  color: var(--orbeon-base-color); // Override Bootstrap's default
-
-  // Anchor the base font on our own vars: the PDF renderer doesn't resolve Bootstrap's :root-defined --bs-* vars
-  font-family: var(--orbeon-base-font-family);
-  font-size: var(--orbeon-base-font-size);
-
   body& {
     // Offset content below the fixed navbar (62px, like the Bootstrap 2 pages). Screen only: in PDF the navbar is
     // collapsed into the running page header. body&: embedded pages have no navbar.
@@ -39,10 +32,6 @@
     height: auto;
   }
 
-  // Bootstrap 2 float utilities, still emitted by Form Builder dialogs
-  .pull-left  { float: left; }
-  .pull-right { float: right; }
-
   a {
     color: var(--orbeon-link-color);
   }
@@ -51,6 +40,8 @@
   a:focus {
     color: var(--orbeon-link-hover-color);
   }
+
+  // ***** Navbar ******************************************************************************************************
 
   .navbar li a.btn-secondary.dropdown-toggle {
     &:focus, &:hover {
@@ -62,11 +53,6 @@
   a.btn-secondary:hover,
   a.btn-secondary:focus {
     color: white;
-  }
-
-  // Hide caret for consistency with other pages
-  .fr-user-nav .dropdown-toggle::after {
-    display: none;
   }
 
   // Bootstrap 2's 15px navbar gutter (Bootstrap 5's is ~9.75px)
@@ -135,6 +121,31 @@
     display: none !important;
   }
 
+  .navbar {
+    background-color: var(--orbeon-navbar-background-color);
+
+    .navbar-brand {
+      padding: 0;
+      font-size: 1em;
+    }
+
+    .container, .container-fluid {
+      h1 {
+        font-size: var(--orbeon-navbar-heading-font-size);
+        font-weight: @frNavBarFontWeight;
+        .text-overflow(); // in narrow mode the title must ellipsize, not wrap, or the fixed navbar gets tall
+      }
+    }
+
+    --orbeon-button-color: var(--orbeon-navbar-color); // For dropdown toggles, which use .btn
+  }
+
+  // ***** Dropdowns ***************************************************************************************************
+
+  .fr-user-nav .dropdown-toggle::after {
+    display: none;
+  }
+
   .dropdown:not(:has(.show)) {
     // Dropdown toggles carry btn btn-secondary (user nav in view.xsl, bootstrap5-select1.xbl), which the Bootstrap 2
     // markup did not, so the button styling must be neutralized
@@ -168,7 +179,7 @@
 
   .dropdown-menu {
     background-color: var(--orbeon-dropdown-menu-background-color);
-    border: 1px solid var(--orbeon-dropdown-menu-border-color);
+    border: var(--orbeon-dropdown-menu-border-width) solid var(--orbeon-dropdown-menu-border-color);
 
     .btn {
       // Disable transitions in dropdown menus
@@ -177,7 +188,7 @@
 
     .btn-link {
       font-size: var(--orbeon-base-font-size);
-      padding: 3px 20px; // Bootstrap 2's dropdown item padding
+      padding: var(--orbeon-dropdown-menu-item-padding);
       margin-bottom: 0;
 
       display: inline-block;
@@ -262,7 +273,7 @@
       display: block;
       width: 100%;
       box-sizing: border-box;
-      padding: 3px 20px; // match .btn-link above
+      padding: var(--orbeon-dropdown-menu-item-padding);
       clear: both;
       font-size: var(--orbeon-base-font-size);
       font-weight: var(--orbeon-base-font-weight);
@@ -301,6 +312,12 @@
     background-color: var(--orbeon-button-background-color);
     color: var(--orbeon-button-color);
   }
+
+  .fr-summary-selection .dropdown-menu {
+    min-width: 195px; // 15rem at the 13px base
+  }
+
+  // ***** Badges and labels *******************************************************************************************
 
   // Badges (Summary's "Selected N", the navbar error/warning counts): Bootstrap 2's pills, unstyled in Bootstrap 5.
   // Colors from the --orbeon-status-* palette, shared with .label as under Bootstrap 2
@@ -343,9 +360,7 @@
   .label-warning  { background-color: var(--orbeon-status-warning-background-color); }
   .label-important { background-color: var(--orbeon-status-error-background-color); }
 
-  .fr-summary-selection .dropdown-menu {
-    min-width: 195px; // 15rem at the 13px base
-  }
+  // ***** Controls / fields *******************************************************************************************
 
   // Bare form fields (Bootstrap 5 only styles .form-control): port of the field styling from the former Bootstrap 2
   // override
@@ -544,10 +559,7 @@
       font-size : var(--orbeon-control-font-size);
       box-sizing: border-box;
       height    : auto;
-      min-height: @fixedControlHeight;
-      @media screen {
-        min-height: @fluidControlHeight;
-      }
+      min-height: var(--orbeon-control-height);
 
       color           : var(--orbeon-add-on-color);
       background-color: var(--orbeon-add-on-background-color);
@@ -660,6 +672,8 @@
     line-height: inherit;
   }
 
+  // ***** Buttons *****************************************************************************************************
+
   .btn-link {
     color: var(--orbeon-link-color);
     border-color: transparent;
@@ -673,19 +687,19 @@
     }
   }
 
-  // No .fr-new-button rules here: forcing it blue also painted the plain "New" button of the empty Summary page; button
-  // colors come from trigger.less
-
   // Size buttons from the theme's button vars, with Bootstrap 2's fixed 20px line height
   .btn {
     padding      : var(--orbeon-button-padding);
     border-radius: var(--orbeon-button-border-radius);
     line-height  : @fixedLineHeight;
+    font-family  : var(--orbeon-button-font-family);
+    font-size    : var(--orbeon-button-font-size);
+    font-weight  : var(--orbeon-button-font-weight);
   }
 
   // Orbeon's focus ring on all buttons, like Bootstrap 2
   .btn:focus {
-    box-shadow: var(--orbeon-focus-ring);
+    box-shadow: var(--orbeon-button-focus-ring);
   }
 
   // Bootstrap 2's .btn-mini (row-menu carets); after .btn so it wins the same-specificity tie
@@ -741,6 +755,8 @@
   .fa.disabled {
     opacity: 0.4;
   }
+
+  // ***** Pagination **************************************************************************************************
 
   // Bootstrap 2's .pagination-centered (wizard/TOC navigation), dropped by Bootstrap 5
   .pagination-centered {
@@ -813,6 +829,8 @@
     }
   }
 
+  // ***** Tables ******************************************************************************************************
+
   // Tables: Bootstrap 2's separated, rounded borders. Bootstrap 5 collapses borders and draws them on the cells;
   // neutralize that model and re-apply Bootstrap 2's .table/.table-bordered rules.
   .table > :not(caption) > * > * {
@@ -880,24 +898,7 @@
     }
   }
 
-  .navbar {
-    background-color: var(--orbeon-navbar-background-color);
-
-    .navbar-brand {
-      padding: 0;
-      font-size: 1em;
-    }
-
-    .container, .container-fluid {
-      h1 {
-        font-size: var(--orbeon-navbar-heading-font-size);
-        font-weight: @frNavBarFontWeight;
-        .text-overflow(); // in narrow mode the title must ellipsize, not wrap, or the fixed navbar gets tall
-      }
-    }
-
-    --orbeon-button-color: var(--orbeon-navbar-color); // For dropdown toggles, which use .btn
-  }
+  // ***** Alerts ******************************************************************************************************
 
   // Bootstrap 2 alert box: size, fixed line height, and base colors (Bootstrap 5's plain .alert is transparent and
   // ~10px taller)
@@ -938,6 +939,8 @@
     border-color     : var(--orbeon-alert-warning-border-color);
   }
 
+  // ***** Progress ****************************************************************************************************
+
   // Bootstrap 2 sized the progress bar in px; Bootstrap 5 uses rem, so it comes out ~35% shorter at our 13px base
   .progress {
     height: 20px;
@@ -951,8 +954,10 @@
     height: 100%;              // Bootstrap 5 sizes the bar as a flex item, so it collapses in a non-flex container
   }
 
-  // Wizard/TOC: block list with full-width items, like Bootstrap 2 (Bootstrap 5's .nav is flex, so items would shrink
-  // to their content width)
+  // ***** Wizard/TOC **************************************************************************************************
+
+  // Block list with full-width items, like Bootstrap 2 (Bootstrap 5's .nav is flex, so items would shrink to their
+  // content width)
   .fr-wizard-toc .nav,
   .fr-toc .nav {
     display: block;
@@ -961,6 +966,22 @@
   .fr-toc .nav > li > span > .btn-link {
     width: 100%;
   }
+
+  // ***** Tooltips ****************************************************************************************************
+
+  .tooltip {
+    --bs-tooltip-font-size: var(--orbeon-tooltip-font-size);
+    --bs-tooltip-color    : var(--orbeon-tooltip-color);
+    --bs-tooltip-bg       : var(--orbeon-tooltip-background-color);
+  }
+
+  // ***** Bootstrap 2 compatibility ***********************************************************************************
+
+  // Still emitted by Form Builder dialogs (TODO: style in Form Builder only)
+  .pull-left  { float: left; }
+  .pull-right { float: right; }
+
+  // ***** Dark mode ***************************************************************************************************
 
   .dark-mode({
     .btn-check:focus + .btn-primary, .btn-primary:focus {

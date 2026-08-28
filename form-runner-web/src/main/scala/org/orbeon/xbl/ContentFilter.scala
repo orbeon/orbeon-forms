@@ -48,7 +48,7 @@ object ContentFilter {
     private var fieldElemOpt     : Option[html.Element] = None
     private var backdropElemOpt  : Option[html.Element] = None
     private var highlightsElemOpt: Option[html.Element] = None
-    private var valueOpt          : Option[String]      = None
+    private var valueOpt         : Option[String]       = None
 
     override def init(): Unit = {
 

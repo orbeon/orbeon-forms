@@ -40,7 +40,13 @@ object ReindexRoute extends NativeRoute {
 
     ec.getRequest.getRequestPath match {
       case ReindexPathRegex(providerToken, null, null) =>
-        Index.reindex(Provider.withName(providerToken), WhatToReindex.AllData, clearOnly = false)
+        Index.reindex(
+          provider                 = Provider.withName(providerToken),
+          whatToReindex            = WhatToReindex.AllData,
+          clearOnly                = false,
+          reindexConnectionOpt     = None,
+          indexedControlsXPathsOpt = None
+        )
       case ReindexPathRegex(providerToken, app, form) =>
 
         // Version is required if we pass app/form
@@ -51,7 +57,13 @@ object ReindexRoute extends NativeRoute {
             .map(_.toInt)
             .getOrElse(throw HttpStatusCodeException(StatusCode.BadRequest))
 
-        Index.reindex(Provider.withName(providerToken), WhatToReindex.DataForForm((AppForm(app, form), incomingVersion)), clearOnly = false)
+        Index.reindex(
+          provider                 = Provider.withName(providerToken),
+          whatToReindex            = WhatToReindex.DataForForm((AppForm(app, form), incomingVersion)),
+          clearOnly                = false,
+          reindexConnectionOpt     = None,
+          indexedControlsXPathsOpt = None
+        )
     }
   }
 }

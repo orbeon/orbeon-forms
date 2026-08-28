@@ -29,14 +29,6 @@ case class FormStorageDetails(
   isSingleton            : Boolean
 )
 
-// When we pass a connection to the reindexing code, we should also pass the indexed controls.
-// This allows the code to skip calling the persistence proxy, which might otherwise open another
-// connection and risk starving the connection pool.
-case class ReindexConnection(
-  connection             : java.sql.Connection,
-  indexedControlsXPaths  : Option[(AppFormVersion, List[String])]
-)
-
 sealed trait WhatToReindex
 object WhatToReindex {
   case object AllData                                                               extends WhatToReindex

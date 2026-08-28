@@ -20,8 +20,10 @@ import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.*
 import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 import org.orbeon.oxf.fr.persistence.relational.WhatToReindex.*
+import org.orbeon.oxf.fr.persistence.relational.index.Index.IndexInfo
 import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, Status, StatusStore}
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunner}
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
@@ -37,25 +39,49 @@ import java.sql.PreparedStatement
 import scala.util.{Failure, Success}
 
 
+sealed trait IndexedControlsResult {
+  def getOrThrow: IndexInfo = this match {
+    case IndexedControlsResult.Success(value) => value
+    case IndexedControlsResult.Failure(t)     => throw t
+    case IndexedControlsResult.NotFound       => throw new IllegalStateException("Form definition not found in the persistence layer")
+  }
+  def getOrThrowNilIfNotFound: IndexInfo = this match {
+    case IndexedControlsResult.Success(value) => value
+    case IndexedControlsResult.Failure(t)     => throw t
+    case IndexedControlsResult.NotFound       => Set.empty
+  }
+}
+
+object IndexedControlsResult {
+  case class  Success(value: IndexInfo) extends IndexedControlsResult
+  case class  Failure(t: Throwable)        extends IndexedControlsResult
+  case object NotFound                     extends IndexedControlsResult
+}
+
 trait Reindex extends FormDefinition {
+
+  type IndexInfo = Set[String] // should be top-level with Scala 3
 
   def indexedControlsXPaths(
     appFormVersion : AppFormVersion
   )(implicit
     indentedLogger: IndentedLogger,
     propertySet   : PropertySet
-  ): List[String] = {
+  ): IndexedControlsResult = {
     val formDetailsTry =
       PersistenceMetadataSupport.readPublishedFormStorageDetails(
         appFormVersion._1,
         FormDefinitionVersion.Specific(appFormVersion._2)
       )
     formDetailsTry match {
-      case Failure(_) =>
+      case Failure(HttpStatusCodeException(StatusCode.NotFound | StatusCode.Gone, _, _)) =>
+        // Don't log error if form definition is not present in the persistence layer
+        IndexedControlsResult.NotFound
+      case Failure(t) =>
         error(s"Can't index documents for ${appFormVersion._1.app}/${appFormVersion._1.form} as form definition can't be found")
-        Nil
+        IndexedControlsResult.Failure(t)
       case Success(FormStorageDetails(_, indexedFields, _)) =>
-        indexedFields.value
+        IndexedControlsResult.Success(indexedFields.value.toSet)
     }
   }
 
@@ -66,10 +92,11 @@ trait Reindex extends FormDefinition {
   //      - add 1 row to orbeon_i_current
   //      - add as many as necessary to orbeon_i_control_text
   def reindex(
-    provider             : Provider,
-    whatToReindex        : WhatToReindex,
-    clearOnly            : Boolean,
-    reindexConnectionOpt : Option[ReindexConnection] = None
+    provider                : Provider,
+    whatToReindex           : WhatToReindex,
+    clearOnly               : Boolean,
+    reindexConnectionOpt    : Option[java.sql.Connection],// xxx TODO: check: IF Some(), then indexedControlsXPathsOpt must be Some()?
+    indexedControlsXPathsOpt: Option[(AppFormVersion, IndexInfo)]
   )(implicit
     externalContext: ExternalContext,
     indentedLogger : IndentedLogger,
@@ -125,7 +152,7 @@ trait Reindex extends FormDefinition {
           |     d.deleted = 'N'
           |""".stripMargin
 
-    val connectionOpt = reindexConnectionOpt.map(_.connection)
+    val connectionOpt = reindexConnectionOpt
 
     val distinctForms: List[AppFormVersion] = RelationalUtils.withConnection(connectionOpt) { connection =>
 
@@ -236,14 +263,16 @@ trait Reindex extends FormDefinition {
       }
     }
 
-    val formsToIndexedControlsXPaths: Map[AppFormVersion, List[String]] = {
+    val formsToIndexedControlsXPaths: Map[AppFormVersion, IndexInfo] = {
 
       // 2026-08-14: Only 0 or 1 entry in the map at this time. See `CreateUpdateDelete`.
-      val precomputedIndexes = reindexConnectionOpt.flatMap(_.indexedControlsXPaths).toMap
+      val precomputedIndexesMap = indexedControlsXPathsOpt.toMap
 
-      distinctForms.map { case appFormVersion @ (appForm, version) =>
-        appFormVersion -> precomputedIndexes.getOrElse(appFormVersion, indexedControlsXPaths(appForm, version))
-      }.toMap
+      distinctForms
+        .map { appFormVersion =>
+          appFormVersion -> precomputedIndexesMap.getOrElse(appFormVersion, indexedControlsXPaths(appFormVersion).getOrThrowNilIfNotFound)
+        }
+        .toMap
     }
 
     RelationalUtils.withConnection(connectionOpt) { connection =>
@@ -293,7 +322,7 @@ trait Reindex extends FormDefinition {
                   val formVersion = currentDataRS.getInt   ("form_version")
 
                   // Get indexed controls for current app/form
-                  val indexedControlsXPaths: List[String] = formsToIndexedControlsXPaths(AppForm(app, form), formVersion)
+                  val indexedControlsXPaths: IndexInfo = formsToIndexedControlsXPaths(AppForm(app, form), formVersion)
 
                   // Insert into the "current data" table
                   val position = Iterator.from(1)

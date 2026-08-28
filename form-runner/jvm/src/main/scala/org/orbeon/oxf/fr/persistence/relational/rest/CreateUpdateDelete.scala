@@ -18,14 +18,14 @@ import org.orbeon.io.IOUtils.*
 import org.orbeon.io.{IOUtils, StringBuilderWriter}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunnerMetadataSupport.*
-import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.Version.*
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
-import org.orbeon.oxf.fr.persistence.relational.index.Index
+import org.orbeon.oxf.fr.persistence.relational.index.{Index, IndexedControlsResult}
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport.*
 import org.orbeon.oxf.fr.persistence.relational.search.SearchLogic
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{Drafts, SearchRequest}
 import org.orbeon.oxf.fr.persistence.relational.*
+import org.orbeon.oxf.fr.persistence.relational.index.Index.IndexInfo
 import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, Names}
 import org.orbeon.oxf.http.{EmptyInputStream, Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
@@ -44,6 +44,7 @@ import java.time.Instant
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
+import scala.util.chaining.*
 
 
 object RequestReader {
@@ -353,9 +354,6 @@ trait CreateUpdateDelete {
 
     val appFormVersion = (req.appForm, versionToSet)
 
-    if (req.forForm)
-      PersistenceMetadataSupport.maybeInvalidateCachesFor(appFormVersion)
-
     val createFlatView: Boolean =
       req.flatView                                      &&
       Provider.FlatViewSupportedProviders(req.provider) &&
@@ -382,30 +380,98 @@ trait CreateUpdateDelete {
       ! req.forAttachment &&               // https://github.com/orbeon/orbeon-forms/issues/6913
       ! req.dataPart.exists(_.forceDelete) // no need to reindex as we only `DELETE` historical data, which is not indexed
 
+    val isFormDefinitionPut =
+      req.forForm         &&
+      ! req.forAttachment &&
+      ! delete
+
+    def reindexTasks(beforeIndexInfoOpt: Option[IndexInfo]): Option[(Option[IndexInfo], /* clear: */ Boolean)] = {
+      assert(mightReindex)
+      if (isFormDefinitionPut) {
+        // For `PUT` of form definition, compare the current list of controls to index with the previous list
+        // https://github.com/orbeon/orbeon-forms/issues/6914
+        val afterStoreIndexInfo = Index.indexedControlsXPaths(appFormVersion).getOrThrow
+        if (beforeIndexInfoOpt.contains(afterStoreIndexInfo)) {
+          debug("CRUD: indexed controls XPaths are the same, skipping reindexing for form definition `PUT`")
+          None
+        } else {
+          debug("CRUD: indexed controls XPaths have changed, reindexing for form definition `PUT`")
+          Some(
+            (
+              Some(afterStoreIndexInfo),
+              /* clearOnly = */ false // reindexing of data will be needed
+            )
+          )
+        }
+      } else if (req.forForm) {
+        // Form definition `DELETE`
+        debug("CRUD: reindexing for form definition `DELETE`")
+        Some(
+          (
+            None,
+            /* clearOnly = */ true // don't reindex data, see https://github.com/orbeon/orbeon-forms/issues/6915
+          )
+        )
+      } else {
+        // Data `PUT` or `DELETE` (but not `DELETE` of historical data, see `mightReindex` above)
+        debug("CRUD: reindexing for data `PUT` or `DELETE`")
+        Some(
+          (
+            beforeIndexInfoOpt,
+            /* clearOnly = */ delete // don't reindex data if we `DELETE`
+          )
+        )
+      }
+    }
+
     def maybeReindexAfterStore(
-      reindexConnectionOpt: Option[ReindexConnection]
+      reindexConnectionOpt               : Option[Connection],
+      precomputedIndexedControlsXPathsOpt: Option[IndexInfo],
     )(implicit
       propertySet         : PropertySet
     ): Unit =
-      if (mightReindex) {
-        val whatToReindex = req.dataPart match {
-          case Some(dataPart) =>
-            // Data: update index for this document id
-            WhatToReindex.DataForDocumentId(dataPart.documentId, appFormVersion)
+      if (mightReindex)
+        reindexTasks(precomputedIndexedControlsXPathsOpt) match {
           case None =>
-            // Form definition: update index for this form version
-            WhatToReindex.DataForForm(appFormVersion)
+            // Avoid reindexing if the list of indexed controls haven't changed
+          case Some((newOrPrecomputedIndexedControlsXPathsOpt, clearOnly)) =>
+            // Update the index, whether by clearing it only, or clearing and then reindexing data
+
+            val whatToReindex = req.dataPart match {
+              case Some(dataPart) =>
+                // Data: update index for this document id
+                WhatToReindex.DataForDocumentId(dataPart.documentId, appFormVersion)
+              case None =>
+                // Form definition: update index for this form version
+                WhatToReindex.DataForForm(appFormVersion)
+            }
+
+            withDebug("CRUD: reindexing", List("what" -> whatToReindex.toString)) { // xxx TODO: more logging of params below
+              Index.reindex(
+                provider                 = req.provider,
+                whatToReindex            = whatToReindex,
+                clearOnly                = clearOnly,
+                reindexConnectionOpt     = reindexConnectionOpt,
+                indexedControlsXPathsOpt = newOrPrecomputedIndexedControlsXPathsOpt.map(appFormVersion -> _)
+              )
+            }
         }
 
-        // If we are deleting a form definition, we should clear the index, but we should not reindex the data after that.
-        // https://github.com/orbeon/orbeon-forms/issues/6915
-        val clearOnly =
-          delete && req.forForm // we know it's not for an attachment as that's tested above
+    def findIndexedControlsXPathsIfNeeded: Option[IndexedControlsResult] =
+      (isFormDefinitionPut || (mightReindex && req.forData))
+        .option(Index.indexedControlsXPaths(appFormVersion))
 
-        withDebug("CRUD: reindexing", List("what" -> whatToReindex.toString)) {
-          Index.reindex(req.provider, whatToReindex, clearOnly = clearOnly, reindexConnectionOpt)
+    // Pre-fetch the indexed controls XPaths before opening a database connection, to avoid nested
+    // connections when calling `readPublishedFormStorageDetails` during reindex.
+    // https://github.com/orbeon/orbeon-forms/issues/7564
+    // Also do it for `PUT` of form definition.
+    val precomputedIndexedControlsXPathsIfNeeded: Option[IndexInfo] =
+      findIndexedControlsXPathsIfNeeded
+        .flatMap {
+          case IndexedControlsResult.Success(v) => Some(v)
+          case IndexedControlsResult.Failure(t) => throw t
+          case IndexedControlsResult.NotFound   => None
         }
-      }
 
     // `true` if request is for a singleton form's XML data creation `PUT`
     val allowCreateOnlyIfSearchEmpty =
@@ -413,13 +479,6 @@ trait CreateUpdateDelete {
       ! delete                &&
       req.existingRow.isEmpty &&
       req.singleton.getOrElse(false)
-
-    // Pre-fetch the indexed controls XPaths before opening a database connection, to avoid nested
-    // connections when calling `readPublishedFormStorageDetails` during reindex.
-    // https://github.com/orbeon/orbeon-forms/issues/7564
-    val preComputedIndexedControlsXPathsIfNeeded: Option[(AppFormVersion, List[String])] =
-      (req.forData && mightReindex)
-        .option((req.appForm, versionToSet) -> Index.indexedControlsXPaths(req.appForm, versionToSet))
 
     // Update database
     val storeResult =
@@ -449,8 +508,10 @@ trait CreateUpdateDelete {
             if (count > 0)
               throw HttpStatusCodeException(StatusCode.Conflict)
 
+            if (req.forForm)
+              PersistenceMetadataSupport.maybeInvalidateCachesFor(appFormVersion)
             val storeResult = store(connection, req, reqBodyOpt, delete, versionToSet)
-            maybeReindexAfterStore(Some(ReindexConnection(connection, preComputedIndexedControlsXPathsIfNeeded)))
+            maybeReindexAfterStore(Some(connection), precomputedIndexedControlsXPathsIfNeeded)
             storeResult
           }
         } catch {
@@ -464,16 +525,18 @@ trait CreateUpdateDelete {
         // We must reindex only the data for a single document, so do it in the same transaction
         RelationalUtils.withConnection { connection =>
           val storeResult = store(connection, req, reqBodyOpt, delete, versionToSet)
-          maybeReindexAfterStore(Some(ReindexConnection(connection, preComputedIndexedControlsXPathsIfNeeded)))
+          maybeReindexAfterStore(Some(connection), precomputedIndexedControlsXPathsIfNeeded)
           storeResult
         }
       } else {
         // Other cases, including for the form definition
+        if (req.forForm)
+          PersistenceMetadataSupport.maybeInvalidateCachesFor(appFormVersion)
         val storeResult =
           RelationalUtils.withConnection { connection =>
             store(connection, req, reqBodyOpt, delete, versionToSet)
           }
-        maybeReindexAfterStore(None)
+        maybeReindexAfterStore(None, precomputedIndexedControlsXPathsIfNeeded)
         storeResult
     }
 

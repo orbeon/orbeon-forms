@@ -22,11 +22,12 @@ trait FormRunnerDocContext {
 
   def formDefinitionRootElem: om.NodeInfo // Scala 3: trait parameter
 
-  lazy val modelElem               : om.NodeInfo         = frc.getModelElem(formDefinitionRootElem)
+  lazy val modelElemOpt            : Option[om.NodeInfo] = frc.findModelElem(formDefinitionRootElem)
+  lazy val modelElem               : om.NodeInfo         = modelElemOpt.head
   lazy val dataInstanceElem        : om.NodeInfo         = frc.instanceElemFromModelElem(modelElem, Names.FormInstance).get
-  lazy val metadataInstanceElemOpt : Option[om.NodeInfo] = frc.instanceElemFromModelElem(modelElem, Names.MetadataInstance)
-  lazy val resourcesInstanceElemOpt: Option[om.NodeInfo] = frc.instanceElemFromModelElem(modelElem, Names.FormResources)
-  lazy val topLevelBindElemOpt     : Option[om.NodeInfo] = frc.findTopLevelBindFromModelElem(modelElem)
+  lazy val metadataInstanceElemOpt : Option[om.NodeInfo] = modelElemOpt.flatMap(frc.instanceElemFromModelElem(_, Names.MetadataInstance))
+  lazy val resourcesInstanceElemOpt: Option[om.NodeInfo] = modelElemOpt.flatMap(frc.instanceElemFromModelElem(_, Names.FormResources))
+  lazy val topLevelBindElemOpt     : Option[om.NodeInfo] = modelElemOpt.flatMap(frc.findTopLevelBindFromModelElem(_))
   lazy val bodyElemOpt             : Option[om.NodeInfo] = frc.findFormRunnerBodyElem(formDefinitionRootElem)
 
   lazy val dataRootElem            : om.NodeInfo         = dataInstanceElem.child(*).head

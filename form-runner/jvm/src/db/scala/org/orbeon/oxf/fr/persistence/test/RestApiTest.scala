@@ -35,13 +35,17 @@ import org.orbeon.oxf.fr.{AppForm, FormOrData, S3Tag, S3Test}
 import org.orbeon.oxf.http.{Headers, HttpRange, StatusCode}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
+import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StaticXPath.tinyTreeToOrbeonDom
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, SecureUtils}
 import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.oxf.xml.dom.IOSupport
+import org.orbeon.xforms.XFormsCrossPlatformSupport.readTinyTreeFromUrl
 import org.scalatest.funspec.AnyFunSpecLike
 
 import java.io.ByteArrayInputStream
+import java.net.URI
 import java.nio.file.{Files, Path, Paths}
 import scala.jdk.CollectionConverters.*
 import scala.util.{Random, Using}
@@ -899,6 +903,195 @@ class RestApiTest
           HttpAssert.put(dataURL, Specific(1), data, StatusCode.PreconditionFailed, ifMatch = Some("123")     , expectedETag = None)
           HttpAssert.put(dataURL, Specific(1), data, StatusCode.NoContent         , ifMatch = Some(secondETag), expectedETag = Some("*"))
           HttpAssert.put(dataURL, Specific(1), data, StatusCode.NoContent         , ifMatch = Some("*")       , expectedETag = Some("*"))
+        }
+      }
+    }
+  }
+
+  describe("#6914: don't reindex if indexed controls haven't changed") {
+
+    val UrlPrefix = "oxf:/forms/issue/"
+
+    def xmlBodyForForm(sourceFormName: String): HttpCall.XML = {
+      val formDefinition = readTinyTreeFromUrl(URI.create(s"$UrlPrefix$sourceFormName/form/form.xhtml"))
+      val formDocument   = IOSupport.readOrbeonDom(tinyTreeToOrbeonDom(formDefinition.getRoot).serializeToString())
+      HttpCall.XML(formDocument)
+    }
+
+    def xmlBodyForData(sourceFormName: String, documentId: String): HttpCall.XML = {
+      val dataDefinition = readTinyTreeFromUrl(URI.create(s"$UrlPrefix$sourceFormName/data/$documentId/data.xml"))
+      val dataDocument   = IOSupport.readOrbeonDom(tinyTreeToOrbeonDom(dataDefinition.getRoot).serializeToString())
+      HttpCall.XML(dataDocument)
+    }
+
+    val FormName        = "6914"
+    val DataDocumentId1 = "9c5568e17841d4f4aa56f811d4c4f05b7c87a2f9"
+    val DataDocumentId2 = "c3b7676cfb9f079db204e7ada3687dc2cf3824fe"
+    val DataDocumentId3 = "5eace2b3b7578d3f0bc4755249800a814d3b1e1b"
+
+    case class ControlTextRow(rowNum: Int, dataId: Int, pos: Int, control: String, value: String)
+
+    it("must properly update or retain index rows across form and data lifecycle") {
+      withTestSafeRequestContext { implicit safeRequestCtx =>
+        Connect.withOrbeonTables("indexed controls changes (#6914)") { (connection, provider) =>
+
+          val appForm = AppForm(provider.entryName, FormName)
+          val formURL = HttpCall.crudURLPrefix(appForm) + "form/form.xhtml"
+          val doc1URL = HttpCall.crudURLPrefix(appForm) + s"data/$DataDocumentId1/data.xml"
+          val doc2URL = HttpCall.crudURLPrefix(appForm) + s"data/$DataDocumentId2/data.xml"
+          val doc3URL = HttpCall.crudURLPrefix(appForm) + s"data/$DataDocumentId3/data.xml"
+
+          val rowNumSQL = Provider.rowNumSQL(
+            provider   = provider,
+            connection = connection,
+            orderBy    = "c.data_id, c.pos, c.control"
+          )
+          val rowNumTable = rowNumSQL.table match {
+            case Some(table) => table + ", "
+            case None        => ""
+          }
+
+          def readControlTextRows(): List[ControlTextRow] = {
+            val sql =
+              s"""SELECT ${rowNumSQL.col}, c.data_id, c.pos, c.control, c.val
+                 |  FROM $rowNumTable orbeon_i_control_text c
+                 |  JOIN orbeon_i_current cur ON c.data_id = cur.data_id
+                 | WHERE cur.app  = '${appForm.app}'
+                 |   AND cur.form = '${appForm.form}'
+                 | ${rowNumSQL.orderBy}
+                 |""".stripMargin
+            useAndClose(connection.prepareStatement(sql)) { ps =>
+              useAndClose(ps.executeQuery()) { rs =>
+                Iterator.iterateWhile(rs.next(), ControlTextRow(
+                  rowNum  = rs.getInt("row_num"),
+                  dataId  = rs.getInt("data_id"),
+                  pos     = rs.getInt("pos"),
+                  control = rs.getString("control"),
+                  value   = rs.getString("val")
+                )).toList
+              }
+            }
+          }
+
+          def countControlText(): Int = {
+            val sql =
+              s"""SELECT count(*)
+                 |  FROM orbeon_i_control_text c
+                 |  JOIN orbeon_i_current cur ON c.data_id = cur.data_id
+                 | WHERE cur.app  = '${appForm.app}'
+                 |   AND cur.form = '${appForm.form}'
+                 |""".stripMargin
+            useAndClose(connection.prepareStatement(sql)) { ps =>
+              useAndClose(ps.executeQuery()) { rs =>
+                rs.next()
+                rs.getInt(1)
+              }
+            }
+          }
+
+          def deleteControlTextRows(documentId: String): Int = {
+            val sql =
+              s"""DELETE FROM orbeon_i_control_text
+                 | WHERE data_id IN (
+                 |   SELECT data_id
+                 |     FROM orbeon_i_current
+                 |    WHERE app         = '${appForm.app}'
+                 |      AND form        = '${appForm.form}'
+                 |      AND document_id = ?
+                 | )
+                 |""".stripMargin
+            useAndClose(connection.prepareStatement(sql)) { ps =>
+              ps.setString(1, documentId)
+              ps.executeUpdate()
+            }
+          }
+
+          // `PUT` Form Definition with 2 indexed controls
+          val formWith2ControlsIndexed = xmlBodyForForm(s"$FormName-1")
+          HttpAssert.put(formURL, Unspecified, formWith2ControlsIndexed, StatusCode.Created)
+
+          // `PUT` data for 2 separate documents `data.xml`
+          val data1 = xmlBodyForData(s"$FormName-1", DataDocumentId1)
+          val data2 = xmlBodyForData(s"$FormName-1", DataDocumentId2)
+          HttpAssert.put(doc1URL, Specific(1), data1, StatusCode.Created)
+          HttpAssert.put(doc2URL, Specific(1), data2, StatusCode.Created)
+
+          // Check with SQL that the `orbeon_i_control_text` contains rows
+          val rowsAfterStep2 = readControlTextRows()
+          assert(rowsAfterStep2.size == 4)
+          assert(countControlText() == 4)
+          assert(rowsAfterStep2.map(_.control).toSet == Set("section-1/field-1", "section-1/field-2"))
+
+          // Delete, with SQL, the rows for the 2 data documents, so we can detect whether reindex happens or not
+          deleteControlTextRows(DataDocumentId1)
+          deleteControlTextRows(DataDocumentId2)
+          assert(countControlText() == 0)
+          assert(readControlTextRows().isEmpty)
+
+          // `PUT` Form Definition with same 2 indexed controls, but some other changes
+          val formWith2ControlsIndexedModified = xmlBodyForForm(s"$FormName-2")
+          HttpAssert.put(formURL, Unspecified, formWith2ControlsIndexedModified, StatusCode.NoContent)
+
+          // Check with SQL that the `orbeon_i_control_text` is still empty, because no reindexing happened (because the indexed controls didn't change)
+          assert(countControlText() == 0)
+          assert(readControlTextRows().isEmpty)
+
+          // `PUT` Form Definition with an additional indexed control
+          val formWith3ControlsIndexed = xmlBodyForForm(s"$FormName-3")
+          HttpAssert.put(formURL, Unspecified, formWith3ControlsIndexed, StatusCode.NoContent)
+
+          // Check with SQL that the `orbeon_i_control_text` includes new rows for the new indexed control
+          val rowsAfterStep6 = readControlTextRows()
+          assert(rowsAfterStep6.size == 6)
+          assert(countControlText() == 6)
+          assert(rowsAfterStep6.map(_.control).toSet == Set("section-1/field-1", "section-1/field-2", "section-1/field-3"))
+
+          // Delete, with SQL, the rows for the 2 data documents, so we can detect whether reindex happens or not
+          deleteControlTextRows(DataDocumentId1)
+          deleteControlTextRows(DataDocumentId2)
+          assert(countControlText() == 0)
+          assert(readControlTextRows().isEmpty)
+
+          // `PUT` Form Definition with the same 3 indexed controls, but some other changes
+          val formWith3ControlsIndexedModified = xmlBodyForForm(s"$FormName-4")
+          HttpAssert.put(formURL, Unspecified, formWith3ControlsIndexedModified, StatusCode.NoContent)
+
+          // Check with SQL that the `orbeon_i_control_text` is still empty, because no reindexing happened (because the indexed controls didn't change)
+          assert(countControlText() == 0)
+          assert(readControlTextRows().isEmpty)
+
+          // `PUT` additional data for a 3rd document with the same form definition
+          val data3 = xmlBodyForData(s"$FormName-1", DataDocumentId3)
+          HttpAssert.put(doc3URL, Specific(1), data3, StatusCode.Created)
+
+          // Check with SQL that the `orbeon_i_control_text` has updated rows for the indexed controls
+          val rowsAfterStep10 = readControlTextRows()
+          assert(rowsAfterStep10.size == 3)
+
+          // `DELETE` the last data documents
+          HttpAssert.del(doc3URL, Specific(1), StatusCode.NoContent)
+
+          // Check with SQL that `orbeon_i_control_text` is empty again
+          val rowsAfterStep12 = readControlTextRows()
+          assert(rowsAfterStep12.isEmpty)
+
+          // `PUT` back form definition with 2 indexed controls and check that the `orbeon_i_control_text` is updated with rows for the 2 indexed controls
+          HttpAssert.put(formURL, Unspecified, formWith2ControlsIndexed, StatusCode.NoContent)
+          assert(readControlTextRows() == rowsAfterStep2)
+
+          // `DELETE` form definition
+          HttpAssert.del(formURL, Specific(1), StatusCode.NoContent)
+
+          // Check with SQL that the `orbeon_i_control_text` is empty
+          assert(countControlText() == 0)
+          assert(readControlTextRows().isEmpty)
+
+          // `PUT` some new form data
+          HttpAssert.put(doc1URL, Specific(1), data1, StatusCode.Gone)
+
+          // Check with SQL that the `orbeon_i_control_text` remains empty (because the form definition was deleted)
+          assert(countControlText() == 0)
+          assert(readControlTextRows().isEmpty)
         }
       }
     }

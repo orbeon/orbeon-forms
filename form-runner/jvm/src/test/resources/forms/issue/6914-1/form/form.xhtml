@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/">
+    <xh:head>
+        <xf:model xxf:custom-mips="fr:persist" id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <grid-1>
+                            <field-1/>
+                            <field-2/>
+                            <field-3/>
+                        </grid-1>
+                    </section-1>
+                </form>
+            </xf:instance>
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="field-1-bind" ref="field-1" name="field-1" xxf:whitespace="trim"/>
+                        <xf:bind id="field-2-bind" ref="field-2" name="field-2" xxf:whitespace="trim"/>
+                        <xf:bind id="field-3-bind" ref="field-3" name="field-3" xxf:whitespace="trim"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>6914-1</form-name>
+                    <title xml:lang="en">For #6914: form with three indexed fields</title>
+                    <description xml:lang="en"/>
+                    <library-versions>
+                        <orbeon>2</orbeon>
+                        <app>2</app>
+                    </library-versions>
+                    <created-with-version>2026.1-SNAPSHOT PE</created-with-version>
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <exclude-from-all-control-values/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                    <updated-with-version>2026.1-SNAPSHOT PE</updated-with-version>
+                    <migration version="2019.1.0">
+                        {"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"field-1"},{"value":"field-2"},{"value":"field-3"}],"topLevel":true}]}
+                    </migration>
+                </metadata>
+            </xf:instance>
+
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <field-1>
+                            <label>Field 1</label>
+                            <hint/>
+                        </field-1>
+                        <field-2>
+                            <label>Field 2</label>
+                            <hint/>
+                        </field-2>
+                        <field-3><label>Field 3</label>
+                            <hint/>
+                        </field-3>
+                        <section-1>
+                            <label/>
+                        </section-1>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="field-1-control" bind="field-1-bind" class="">
+                                <fr:index>
+                                    <fr:summary-show/>
+                                </fr:index>
+                                <xf:label ref="$form-resources/field-1/label"/>
+                                <xf:hint ref="$form-resources/field-1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="field-2-control" bind="field-2-bind" class="">
+                                <fr:index>
+                                    <fr:summary-show/>
+                                </fr:index>
+                                <xf:label ref="$form-resources/field-2/label"/>
+                                <xf:hint ref="$form-resources/field-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:input xmlns="http://orbeon.org/oxf/xml/form-builder" id="field-3-control" bind="field-3-bind" class="">
+                                <xf:label ref="$form-resources/field-3/label"/>
+                                <xf:hint ref="$form-resources/field-3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6"/>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

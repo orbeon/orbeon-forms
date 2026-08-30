@@ -1,4 +1,4 @@
-import $ivy.`org.xerial:sqlite-jdbc:3.53.2.1`
+import $ivy.`org.xerial:sqlite-jdbc:3.53.4.0`
 
 import java.sql.{Connection, DriverManager, PreparedStatement}
 import scala.xml._

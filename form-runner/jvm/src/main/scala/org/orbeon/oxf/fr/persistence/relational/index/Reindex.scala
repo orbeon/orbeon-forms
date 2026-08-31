@@ -54,8 +54,8 @@ sealed trait IndexedControlsResult {
 
 object IndexedControlsResult {
   case class  Success(value: IndexInfo) extends IndexedControlsResult
-  case class  Failure(t: Throwable)        extends IndexedControlsResult
-  case object NotFound                     extends IndexedControlsResult
+  case class  Failure(t: Throwable)     extends IndexedControlsResult
+  case object NotFound                  extends IndexedControlsResult
 }
 
 trait Reindex extends FormDefinition {

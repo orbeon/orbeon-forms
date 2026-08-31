@@ -216,26 +216,26 @@
   --orbeon-dropdown-menu-item-padding             : 3px 20px;
 
   // Sections
-  --orbeon-section-title-font-size              : 1.38em;    // 18px
-  --orbeon-section-repetition-label-font-size   : 0.89em;    // 18px * 0.8 * 0.8
-  --orbeon-subsection-title-font-size           : 1.11em;    // 18px * 0.8
-  --orbeon-subsection-repetition-label-font-size: 0.89em;    // 18px * 0.8 * 0.8
-  --orbeon-section-font-family                  : @frBaseFontFamily;
-  --orbeon-section-font-weight                  : normal;
-  --orbeon-section-color                        : #555;
-  --orbeon-section-background-color             : #eee;      // @grayLighter;
-  --orbeon-section-border-radius                : @baseBorderRadius;
-  --orbeon-section-gap                          : 20px;      // between consecutive sections
-  --orbeon-section-content-padding              : 10px 16px; // 16px = @frSectionTitleLeftPadding - @frGridCellPadding (LESS computation not possible here)
+  --orbeon-section-title-font-size              : 1.38em;            // 18px
+  --orbeon-section-repetition-label-font-size   : 0.89em;            // 18px * 0.8 * 0.8
+  --orbeon-subsection-title-font-size           : 1.11em;            // 18px * 0.8
+  --orbeon-subsection-repetition-label-font-size: 0.89em;            // 18px * 0.8 * 0.8
+  --orbeon-section-title-font-family            : @frBaseFontFamily;
+  --orbeon-section-title-font-weight            : normal;
+  --orbeon-section-title-color                  : #555;
+  --orbeon-section-title-background-color       : #eee;              // @grayLighter;
+  --orbeon-section-title-border-radius          : @baseBorderRadius; // used by sub-sections and iteration titles of repeated sections
+  --orbeon-section-gap                          : 20px;              // between consecutive sections
+  --orbeon-section-content-padding              : 10px 16px;         // 16px = @frSectionTitleLeftPadding - @frGridCellPadding (LESS computation not possible here)
   --orbeon-section-iteration-title-padding      : 0 0 0 10px;
   --orbeon-repeater-add-button-font-size        : 1.00em;
   --orbeon-repeater-add-button-font-family      : var(--orbeon-base-font-family);
   --orbeon-repeater-add-button-font-weight      : var(--orbeon-base-font-weight);
   --orbeon-repeater-add-button-color            : var(--orbeon-base-color);
-  --orbeon-repeat-menu-background-color         : #f5f5f5;   // @wellBackground
-  --orbeon-repeat-border-width                  : 1px;       // full-appearance row/column dividers
+  --orbeon-repeat-menu-background-color         : #f5f5f5;           // @wellBackground
+  --orbeon-repeat-border-width                  : 1px;               // full-appearance row/column dividers
   --orbeon-repeat-border-style                  : solid;
-  --orbeon-repeat-separator-width               : 2px;       // minimal-appearance row separator
+  --orbeon-repeat-separator-width               : 2px;               // minimal-appearance row separator
   --orbeon-repeat-separator-style               : solid;
 
   // Grids
@@ -544,8 +544,8 @@
     --orbeon-dropdown-menu-disabled-color                    : @gray-46;
     --orbeon-dropdown-menu-border-color                      : fade(@gray-27, 75%);
     --orbeon-dropdown-menu-divider-color                     : @gray-27;
-    --orbeon-section-color                                   : @gray-80;
-    --orbeon-section-background-color                        : @gray-20;
+    --orbeon-section-title-color                             : @gray-80;
+    --orbeon-section-title-background-color                  : @gray-20;
     --orbeon-repeater-add-button-color                       : @text-light;
     --orbeon-repeat-menu-background-color                    : @gray-16;
     --orbeon-repetition-number-color                         : @base-bg;
@@ -624,8 +624,8 @@
       --orbeon-control-read-only-background-color              : white;
       --orbeon-control-border-color                            : #ccc;
       --orbeon-handwritten-signature-read-only-background-color: white;
-      --orbeon-section-color                                   : black;
-      --orbeon-section-background-color                        : white;
+      --orbeon-section-title-color                             : black;
+      --orbeon-section-title-background-color                  : white;
       --orbeon-repeat-menu-background-color                    : white;
       --orbeon-toc-color                                       : black;
       --orbeon-navbar-background-color                         : white;

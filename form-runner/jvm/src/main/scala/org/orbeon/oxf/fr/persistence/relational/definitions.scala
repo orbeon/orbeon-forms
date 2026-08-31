@@ -3,6 +3,7 @@ package org.orbeon.oxf.fr.persistence.relational
 import cats.Eval
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.datamigration.PathElem
+import org.orbeon.oxf.fr.persistence.relational.FormStorageDetails.IndexInfo
 import org.orbeon.oxf.fr.persistence.relational.index.Index.matchForControl
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.saxon.om.NodeInfo
@@ -25,9 +26,13 @@ object StageHeader {
 // Only keep the information needed, also avoiding pointing to underlying `NodeInfo`
 case class FormStorageDetails(
   encryptedControlsPaths : Eval[List[List[PathElem]]],
-  indexedControlsXPaths  : Eval[List[String]],
+  indexedControlsXPaths  : Eval[IndexInfo],
   isSingleton            : Boolean
 )
+
+object FormStorageDetails {
+  type IndexInfo = Set[String] // should be top-level with Scala 3
+}
 
 sealed trait WhatToReindex
 object WhatToReindex {

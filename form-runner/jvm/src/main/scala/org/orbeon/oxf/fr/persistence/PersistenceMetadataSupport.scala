@@ -13,6 +13,7 @@ import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.TryUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
 import org.orbeon.saxon.om.NodeInfo
@@ -57,44 +58,69 @@ object PersistenceMetadataSupport {
   }
 
   def readPublishedFormStorageDetails(
-    appForm : AppForm,
-    version : FormDefinitionVersion
+    appForm       : AppForm,
+    version       : FormDefinitionVersion
   )(implicit
     indentedLogger: IndentedLogger,
     propertySet   : PropertySet
   ): Try[FormStorageDetails] =
-    readMaybeFromCache(appForm, version, formDefinitionCache) {
+    readMaybeFromCache(appForm, version, formDefinitionCache, forceStore = false) {
       implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
       withDebug("reading published form for storage details") {
         PersistenceApi.readPublishedFormDefinition(appForm.app, appForm.form, version) map { case ((_, formDefinitionDoc), _) =>
-          val formIsSingleton = {
-            def singletonFromFormDefinition: Option[Boolean] =
-              new InDocFormRunnerDocContext(formDefinitionDoc).metadataRootElemOpt
-                .flatMap(_.firstChildOpt("singleton"))
-                .map(_.stringValue == "true")
-            def singletonFromProperty: Boolean =
-              propertySet.getBoolean(
-                name    = s"oxf.fr.detail.singleton.enabled.${appForm.app}.${appForm.form}",
-                default = false
-              )
-            singletonFromFormDefinition
-              .getOrElse(singletonFromProperty)
-          }
-
-          FormStorageDetails(
-            encryptedControlsPaths = Eval.later(FieldEncryption.getControlsToEncrypt(formDefinitionDoc, appForm).map(_.path)),
-            indexedControlsXPaths  = Eval.later(Index.searchableValues(
-              formDefinitionDoc,
-              appForm,
-              // We only need the controls XPaths, no need to specify the version (used to call the distinct values API)
-              searchVersionOpt = None,
-              FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
-            ).controls.toList.map(_.xpath)),
-            isSingleton = formIsSingleton
-          )
+          buildPublishedFormStorageDetails(formDefinitionDoc, appForm)
         }
       }
     }
+
+  def updatePublishedFormStorageDetailsCache(
+    formDefinitionDoc: DocumentNodeInfoType,
+    appForm          : AppForm,
+    version          : FormDefinitionVersion
+  )(implicit
+    indentedLogger   : IndentedLogger,
+    propertySet      : PropertySet
+  ): Try[FormStorageDetails] =
+    readMaybeFromCache(appForm, version, formDefinitionCache, forceStore = true) {
+      withDebug("reading published form for storage details") {
+        Try(buildPublishedFormStorageDetails(formDefinitionDoc, appForm))
+      }
+    }
+
+  private def buildPublishedFormStorageDetails(
+    formDefinitionDoc: DocumentNodeInfoType,
+    appForm          : AppForm,
+  )(implicit
+    indentedLogger   : IndentedLogger,
+    propertySet      : PropertySet
+  ): FormStorageDetails = {
+
+    val formIsSingleton = {
+      def singletonFromFormDefinition: Option[Boolean] =
+        new InDocFormRunnerDocContext(formDefinitionDoc).metadataRootElemOpt
+          .flatMap(_.firstChildOpt("singleton"))
+          .map(_.stringValue == "true")
+      def singletonFromProperty: Boolean =
+        propertySet.getBoolean(
+          name    = s"oxf.fr.detail.singleton.enabled.${appForm.app}.${appForm.form}",
+          default = false
+        )
+      singletonFromFormDefinition
+        .getOrElse(singletonFromProperty)
+    }
+
+    FormStorageDetails(
+      encryptedControlsPaths = Eval.later(FieldEncryption.getControlsToEncrypt(formDefinitionDoc, appForm).map(_.path)),
+      indexedControlsXPaths  = Eval.later(Index.searchableValues(
+        formDefinitionDoc,
+        appForm,
+        // We only need the controls XPaths, no need to specify the version (used to call the distinct values API)
+        searchVersionOpt = None,
+        FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
+      ).controls.view.map(_.xpath).toSet),
+      isSingleton = formIsSingleton
+    )
+  }
 
   def readLatestVersion(appForm: AppForm)(implicit indentedLogger: IndentedLogger): Option[Int] = {
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
@@ -156,11 +182,12 @@ object PersistenceMetadataSupport {
   private object Private {
 
     def readMaybeFromCache[T <: Serializable](
-      appForm       : AppForm,
-      version       : FormDefinitionVersion,
-      cacheOpt      : Option[CacheApi]
+      appForm   : AppForm,
+      version   : FormDefinitionVersion,
+      cacheOpt  : Option[CacheApi],
+      forceStore: Boolean
     )(
-      read          : => Try[T]
+      read      : => Try[T]
     )(implicit
       indentedLogger: IndentedLogger
     ): Try[T] =
@@ -177,13 +204,18 @@ object PersistenceMetadataSupport {
 
           val cacheKey: CacheKey = (appForm.app, appForm.form, versionNumber)
 
-          cache.get(cacheKey) match {
-            case Some(cacheElem) =>
-              debug(s"got elem from cache for `$cacheKey` from `${cache.getName}`")
-              Success(cacheElem.asInstanceOf[T])
-            case None =>
-              debug(s"did not get elem from cache for `$cacheKey` from `${cache.getName}`")
-              read |!> (t => cache.put(cacheKey, t))
+          if (forceStore) {
+            debug(s"skipping reading cache for `$cacheKey` from `${cache.getName}`, reading and updating cache")
+            read |!> (t => cache.put(cacheKey, t))
+          } else {
+            cache.get(cacheKey) match {
+              case Some(cacheElem) =>
+                debug(s"got elem from cache for `$cacheKey` from `${cache.getName}`")
+                Success(cacheElem.asInstanceOf[T])
+              case None =>
+                debug(s"did not get elem from cache for `$cacheKey` from `${cache.getName}`, reading and updating cache")
+                read |!> (t => cache.put(cacheKey, t))
+            }
           }
       }
   }

@@ -18,9 +18,9 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.*
+import org.orbeon.oxf.fr.persistence.relational.FormStorageDetails.IndexInfo
 import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 import org.orbeon.oxf.fr.persistence.relational.WhatToReindex.*
-import org.orbeon.oxf.fr.persistence.relational.index.Index.IndexInfo
 import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, Status, StatusStore}
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunner}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
@@ -60,8 +60,6 @@ object IndexedControlsResult {
 
 trait Reindex extends FormDefinition {
 
-  type IndexInfo = Set[String] // should be top-level with Scala 3
-
   def indexedControlsXPaths(
     appFormVersion : AppFormVersion
   )(implicit
@@ -81,7 +79,7 @@ trait Reindex extends FormDefinition {
         error(s"Can't index documents for ${appFormVersion._1.app}/${appFormVersion._1.form} as form definition can't be found")
         IndexedControlsResult.Failure(t)
       case Success(FormStorageDetails(_, indexedFields, _)) =>
-        IndexedControlsResult.Success(indexedFields.value.toSet)
+        IndexedControlsResult.Success(indexedFields.value)
     }
   }
 

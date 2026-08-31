@@ -61,4 +61,5 @@ case class CrudRequest(
   def forData              : Boolean = dataPart.isDefined
   def forAttachment        : Boolean = filename.isDefined
   def forDataNotAttachment : Boolean = forData && ! forAttachment
+  def forFormNotAttachment : Boolean = forForm && ! forAttachment
 }

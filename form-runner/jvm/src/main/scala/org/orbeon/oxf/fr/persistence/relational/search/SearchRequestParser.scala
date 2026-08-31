@@ -67,7 +67,7 @@ object SearchRequestParser {
       isInternalAdminUser = isInternalAdminUser,
       pageSize            = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-size"),  10),
       pageNumber          = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-number"), 1),
-      queries             = controlQueries(appForm, version, controlQueryEls, allControls) ::: metadataQueries(metadataQueryEls),
+      queries             = controlQueries(appForm, version, controlQueryEls, allControls) ++: metadataQueries(metadataQueryEls),
       drafts              = drafts(draftsElOpt, credentials),
       freeTextSearch      = freeTextElOpt.map(_.stringValue).flatMap(trimAllToOpt), // Blank means no search
       anyOfOperations     = SearchLogic.anyOfOperations(searchElement)
@@ -110,7 +110,7 @@ object SearchRequestParser {
   )(implicit
     indentedLogger : IndentedLogger,
     propertySet    : PropertySet
-  ): List[ControlQuery] = {
+  ): Iterable[ControlQuery] = {
     val specificControls =
       controlQueryEls
         .map { controlQueryEl =>

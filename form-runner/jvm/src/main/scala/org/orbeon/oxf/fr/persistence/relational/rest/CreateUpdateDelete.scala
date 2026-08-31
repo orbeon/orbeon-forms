@@ -20,12 +20,12 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunnerMetadataSupport.*
 import org.orbeon.oxf.fr.Version.*
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
+import org.orbeon.oxf.fr.persistence.relational.*
+import org.orbeon.oxf.fr.persistence.relational.FormStorageDetails.IndexInfo
 import org.orbeon.oxf.fr.persistence.relational.index.{Index, IndexedControlsResult}
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport.*
 import org.orbeon.oxf.fr.persistence.relational.search.SearchLogic
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{Drafts, SearchRequest}
-import org.orbeon.oxf.fr.persistence.relational.*
-import org.orbeon.oxf.fr.persistence.relational.index.Index.IndexInfo
 import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, Names}
 import org.orbeon.oxf.http.{EmptyInputStream, Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
@@ -44,7 +44,6 @@ import java.time.Instant
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
-import scala.util.chaining.*
 
 
 object RequestReader {
@@ -354,20 +353,23 @@ trait CreateUpdateDelete {
 
     val appFormVersion = (req.appForm, versionToSet)
 
+    val isFormDefinitionPut =
+      req.forFormNotAttachment && ! delete
+
     val createFlatView: Boolean =
+      isFormDefinitionPut                               &&
       req.flatView                                      &&
       Provider.FlatViewSupportedProviders(req.provider) &&
-      req.forForm                                       &&
-      ! req.forAttachment                               &&
-      ! delete                                          &&
       req.appForm.form != Names.LibraryFormName
 
-    // Cache the request content if we need it for multiple reads
+    // Cache the request content if we need it for multiple reads. We used to do this only for `createFlatView`, but now
+    // need it for any `PUT` of form definition, because we need to read the request content to compute the indexed
+    // controls XPaths after storing the form definition.
     val reqBodyOpt: Option[RequestReader.Body] = {
-      val inputStreamOpt = Some(externalContext.getRequest.getInputStream).filter(_ != EmptyInputStream)
-      inputStreamOpt.map { is =>
-        if (createFlatView) {
-          val os = new ByteArrayOutputStream
+      val nonEmptyInputStreamOpt = Some(externalContext.getRequest.getInputStream).filter(_ != EmptyInputStream)
+      nonEmptyInputStreamOpt.map { is =>
+        if (isFormDefinitionPut) {
+          val os = new ByteArrayOutputStream // TODO: not efficient! any other way?
           IOUtils.copyStreamAndClose(is, os)
           RequestReader.Body.Cached(os.toByteArray)
         } else {
@@ -380,17 +382,31 @@ trait CreateUpdateDelete {
       ! req.forAttachment &&               // https://github.com/orbeon/orbeon-forms/issues/6913
       ! req.dataPart.exists(_.forceDelete) // no need to reindex as we only `DELETE` historical data, which is not indexed
 
-    val isFormDefinitionPut =
-      req.forForm         &&
-      ! req.forAttachment &&
-      ! delete
-
     def reindexTasks(beforeIndexInfoOpt: Option[IndexInfo]): Option[(Option[IndexInfo], /* clear: */ Boolean)] = {
       assert(mightReindex)
       if (isFormDefinitionPut) {
         // For `PUT` of form definition, compare the current list of controls to index with the previous list
         // https://github.com/orbeon/orbeon-forms/issues/6914
-        val afterStoreIndexInfo = Index.indexedControlsXPaths(appFormVersion).getOrThrow
+
+        // Don't call `Index.indexedControlsXPaths()`, because it opens a connection, and we might already be in a
+        // connection, which can lead to nested connections and deadlocks. So we use the form definition document we
+        // already have, and compute the indexed controls XPaths from it and update the cache.
+
+        val formDefinitionDoc =
+          RequestReader
+            .xmlDocument(reqBodyOpt)
+            .getOrElse(throw HttpStatusCodeException(StatusCode.BadRequest)) // request must contain parsable XML
+
+        val afterStoreIndexInfo =
+          PersistenceMetadataSupport.updatePublishedFormStorageDetailsCache(
+            formDefinitionDoc,
+            appFormVersion._1,
+            FormDefinitionVersion.Specific(appFormVersion._2)
+          )
+          .getOrElse(throw HttpStatusCodeException(StatusCode.BadRequest)) // can fail only if form definition provided in request is not valid
+          .indexedControlsXPaths
+          .value
+
         if (beforeIndexInfoOpt.contains(afterStoreIndexInfo)) {
           debug("CRUD: indexed controls XPaths are the same, skipping reindexing for form definition `PUT`")
           None

@@ -11,13 +11,15 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
-         xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:DateTimeSupport="java:org.orbeon.xbl.DateTimeSupportJava">
 
     <xbl:binding
         id="fr-datetime"
@@ -239,7 +241,34 @@
                 id="input"
                 ref="xxf:binding('fr-datetime-output')"
                 class="fr-field-width-{fr:component-param-value('field-width')}"
-                xbl:attr="xxf:readonly-appearance"/>
+                xbl:attr="xxf:readonly-appearance"
+                xxf:format="
+                    (: See https://github.com/orbeon/orbeon-forms/issues/7850 :)
+                    DateTimeSupport:formatReadonlyModeDateTime(
+                        .,
+                        (: Reminder: empty string property returns the empty sequence :)
+                        (
+                            fr:component-param-value('output-format')[xxf:non-blank()], (: not supported yet for `fr:datetime` :)
+                            let $date-format := (
+                                    (: For now, get from the properties only, since `output-format` is not supported on `fr:datetime` proper :)
+                                    xxf:property(string-join(('oxf.xforms.xbl.fr.date.output-format', fr:app-name(), fr:form-name()), '.'))[xxf:non-blank()],
+                                    xxf:property('oxf.xforms.xbl.fr.date.output-format')[xxf:non-blank()],
+                                    property('xxf:format.input.date')
+                                )[1],
+                                $time-format := (
+                                    (: For now, get from the properties only, since `output-format` is not supported on `fr:datetime` proper :)
+                                    xxf:property(string-join(('oxf.xforms.xbl.fr.time.output-format', fr:app-name(), fr:form-name()), '.'))[xxf:non-blank()],
+                                    xxf:property('oxf.xforms.xbl.fr.time.output-format')[xxf:non-blank()],
+                                    property('xxf:format.input.time')
+                                )[1]
+                            return
+                                concat(
+                                    $date-format,
+                                    ' ',
+                                    $time-format
+                                )
+                        )[1]
+                    )"/>
         </xbl:template>
     </xbl:binding>
 

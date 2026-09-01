@@ -130,14 +130,14 @@ object DateTimeSupportJava {
 
     for {
       dateTime      <- IsoDateTime.tryParseIsoDateTime(binding.getStringValue).toOption
-      instant       <- dateTime.toInstant
+      instantOpt    = dateTime.toInstant
       zoneId        = timezoneFormatter._1
-      offsetMinutes = zoneId.getRules.getOffset(instant).getTotalSeconds / 60
+      offsetMinutes = instantOpt.map(zoneId.getRules.getOffset).map(_.getTotalSeconds / 60).getOrElse(0)
     } yield
       IsoDateTime.formatDateTime(
-        dateTime     = dateTime.adjustTo(offsetMinutes), // xxx
+        dateTime     = dateTime.adjustTo(offsetMinutes),
         format       = IsoDateTime.parseFormat(format),
-        timezoneName = Some(timezoneFormatter._2(instant))
+        timezoneName = instantOpt.map(timezoneFormatter._2)
       )
   }
   .getOrElse(binding.getStringValue)

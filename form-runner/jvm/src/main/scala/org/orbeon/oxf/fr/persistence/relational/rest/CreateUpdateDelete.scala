@@ -460,13 +460,25 @@ trait CreateUpdateDelete {
                 WhatToReindex.DataForForm(appFormVersion)
             }
 
-            withDebug("CRUD: reindexing", List("what" -> whatToReindex.toString)) { // xxx TODO: more logging of params below
+            val newIndexedControlsXPathsWithAppFormVersionOpt =
+              newOrPrecomputedIndexedControlsXPathsOpt.map(appFormVersion -> _)
+
+            withDebug(
+              "CRUD: reindexing",
+              List(
+                "provider"                                 -> req.provider.toString,
+                "what"                                     -> whatToReindex.toString,
+                "clearOnly"                                -> clearOnly.toString,
+                "newOrPrecomputedIndexedControlsXPathsOpt" -> newIndexedControlsXPathsWithAppFormVersionOpt.toString,
+
+              )
+            ) {
               Index.reindex(
                 provider                 = req.provider,
                 whatToReindex            = whatToReindex,
                 clearOnly                = clearOnly,
                 reindexConnectionOpt     = reindexConnectionOpt,
-                indexedControlsXPathsOpt = newOrPrecomputedIndexedControlsXPathsOpt.map(appFormVersion -> _)
+                indexedControlsXPathsOpt = newIndexedControlsXPathsWithAppFormVersionOpt
               )
             }
         }

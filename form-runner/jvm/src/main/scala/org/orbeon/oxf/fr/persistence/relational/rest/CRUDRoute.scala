@@ -17,7 +17,7 @@ import org.orbeon.oxf.controller.{Authorizer, NativeRoute}
 import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
 import org.orbeon.oxf.fr.FormRunnerPersistence.{DataXml, FormXhtml, OrbeonHashAlgorithm, OrbeonHashValue}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
-import org.orbeon.oxf.fr.persistence.relational.{Provider, StageHeader}
+import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils, StageHeader}
 import org.orbeon.oxf.fr.{AppForm, Version}
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -25,7 +25,7 @@ import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, NetUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, NetUtils}
 
 import java.time.Instant
 import scala.util.{Failure, Success}
@@ -37,11 +37,9 @@ object CRUDRoute
   with    CreateUpdateDelete
   with    LockUnlock {
 
-  private val logger = LoggerFactory.createLogger(CRUDRoute.getClass)
-
   def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit = {
 
-    implicit val indentedLogger: IndentedLogger = new IndentedLogger(logger)
+    implicit val indentedLogger: IndentedLogger = RelationalUtils.newIndentedLogger
     implicit val propertySet   : PropertySet    = CoreCrossPlatformSupport.properties
 
     implicit val httpRequest: ExternalContext.Request = ec.getRequest

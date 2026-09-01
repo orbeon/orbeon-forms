@@ -17,6 +17,7 @@ import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.FormRunner.*
+import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.util.CoreUtils.*
@@ -69,26 +70,25 @@ private object FlatView {
     externalContext              : ExternalContext
   ): Unit =
     RequestReader.xmlDocument(reqBodyOpt).foreach { documentInfo =>
-      createFlatViewsForDocument(req, version, connection, documentInfo, prefixesInMainViewColumnNames, maxIdentifierLength)
+      createFlatViewsForDocument(req.provider, (req.appForm, version), connection, documentInfo, prefixesInMainViewColumnNames, maxIdentifierLength)
     }
 
   def createFlatViewsForDocument(
-    req                          : CrudRequest,
-    version                      : Int,
+    provider                     : Provider,
+    appFormVersion               : AppFormVersion,
     connection                   : Connection,
     documentInfo                 : DocumentInfo,
     prefixesInMainViewColumnNames: Boolean,
     maxIdentifierLength          : Int
   ): Unit =
-    FlatView.views(documentInfo, req.provider, req.appForm, version).foreach { view =>
+    FlatView.views(documentInfo, provider, appFormVersion._1, appFormVersion._2).foreach { view =>
       val viewName = view.name(maxIdentifierLength)
 
-      if (Provider.flatViewDelete(req.provider)) {
-        deleteViewIfExists(req.provider, connection, viewName)
-      }
+      if (Provider.flatViewDelete(provider))
+        deleteViewIfExists(provider, connection, viewName)
 
       val viewSelectQuery = view.sql(prefixesInMainViewColumnNames, maxIdentifierLength)
-      val createViewQuery = Provider.flatViewCreateView(req.provider, viewName, viewSelectQuery)
+      val createViewQuery = Provider.flatViewCreateView(provider, viewName, viewSelectQuery)
 
       useAndClose(connection.prepareStatement(createViewQuery))(_.executeUpdate())
     }

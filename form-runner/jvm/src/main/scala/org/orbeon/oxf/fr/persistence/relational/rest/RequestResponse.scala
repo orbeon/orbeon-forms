@@ -18,6 +18,7 @@ import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.http.HttpRanges
 
+import java.io.InputStream
 import java.time.Instant
 
 
@@ -55,7 +56,8 @@ case class CrudRequest(
   existingRow     : Option[ExistingRow],
   singleton       : Option[Boolean],
   hashAlgorithm   : Option[String],
-  hashValue       : Option[String]
+  hashValue       : Option[String],
+  bodyStreamOpt   : Option[InputStream]
 ) {
   def forForm              : Boolean = dataPart.isEmpty
   def forData              : Boolean = dataPart.isDefined

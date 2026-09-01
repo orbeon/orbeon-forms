@@ -22,6 +22,7 @@ import org.orbeon.oxf.fr.{AppForm, Version}
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, NetUtils}
@@ -145,7 +146,8 @@ object CRUDRoute
           existingRow,
           singleton,
           hashAlgorithm,
-          hashValue
+          hashValue,
+          (httpRequest.getMethod == HttpMethod.PUT).option(httpRequest.getInputStream).filter(_ != EmptyInputStream)
         )
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) =>
 
@@ -180,7 +182,8 @@ object CRUDRoute
           existingRow,
           singleton,
           hashAlgorithm,
-          hashValue
+          hashValue,
+          (httpRequest.getMethod == HttpMethod.PUT).option(httpRequest.getInputStream).filter(_ != EmptyInputStream)
         )
       case _ =>
         throw HttpStatusCodeException(StatusCode.BadRequest)

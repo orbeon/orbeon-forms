@@ -365,9 +365,8 @@ trait CreateUpdateDelete {
     // Cache the request content if we need it for multiple reads. We used to do this only for `createFlatView`, but now
     // need it for any `PUT` of form definition, because we need to read the request content to compute the indexed
     // controls XPaths after storing the form definition.
-    val reqBodyOpt: Option[RequestReader.Body] = {
-      val nonEmptyInputStreamOpt = Some(externalContext.getRequest.getInputStream).filter(_ != EmptyInputStream)
-      nonEmptyInputStreamOpt.map { is =>
+    val reqBodyOpt: Option[RequestReader.Body] =
+      req.bodyStreamOpt.map { is =>
         if (isFormDefinitionPut) {
           val os = new ByteArrayOutputStream // TODO: not efficient! any other way?
           IOUtils.copyStreamAndClose(is, os)
@@ -376,7 +375,6 @@ trait CreateUpdateDelete {
           RequestReader.Body.Streamed(is)
         }
       }
-    }
 
     val mightReindex =
       ! req.forAttachment &&               // https://github.com/orbeon/orbeon-forms/issues/6913

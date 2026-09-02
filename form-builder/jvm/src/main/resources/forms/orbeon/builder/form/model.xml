@@ -892,7 +892,8 @@
         <xf:bind ref="control-trigger"  readonly="$fr-mode = 'view' or fbf:getCurrentlySelectedCell()/ancestor::xbl:binding or not(toolboxOps:canInsertControl($body))"/>
 
         <!-- Sum calculate and validate MIP error counts -->
-        <xf:bind ref="xpath-errors" calculate="../calculate-errors + ../validate-errors"/>
+        <xf:bind ref="calculate-errors | validate-errors" type="xs:integer"/>
+        <xf:bind ref="xpath-errors" calculate="data(../calculate-errors) + data(../validate-errors)"/>
     </xf:bind>
 
     <!-- These actions track MIP XPath errors in the edited form's model. We keep track of XPath errors occurring on
@@ -910,7 +911,7 @@
     </xf:action>
 
     <xf:action ev:event="fb-xxforms-xpath-error" context="$variables">
-        <xf:setvalue ref="if (rr = 'calculate') then calculate-errors else validate-errors" value=". + 1"/>
+        <xf:setvalue ref="if (rr = 'calculate') then calculate-errors else validate-errors" value="data(.) + xs:integer(1)"/>
     </xf:action>
 
     <xf:action event="fb-test-form fb-test-formulas fb-test-offline">

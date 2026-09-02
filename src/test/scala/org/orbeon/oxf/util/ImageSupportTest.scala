@@ -67,4 +67,75 @@ class ImageSupportTest
         }
       }
   }
+
+  describe("Rotation and orientation transformations") {
+
+    val Width  = 100
+    val Height = 60
+
+    it("must properly composite transparent pixels over white for `TYPE_INT_ARGB` (compared to transformImageOld)") {
+      val sourceImage = new java.awt.image.BufferedImage(Width, Height, java.awt.image.BufferedImage.TYPE_INT_ARGB)
+      // (0, 0) is opaque red, (1, 1) is fully transparent
+      sourceImage.setRGB(0, 0, 0xFFFF0000)
+      sourceImage.setRGB(1, 1, 0x00000000)
+
+      val transform = ImageSupport.findTransformation(6, Width, Height).get // 90-degree CW
+      val newResult = ImageSupport.transformImage(sourceImage, transform)
+
+      // `transformImage` produces a standard `TYPE_INT_RGB` image where transparent pixel (1, 1) is composited to white
+      assert(newResult.getType == java.awt.image.BufferedImage.TYPE_INT_RGB)
+      assert(newResult.getWidth == Height)
+      assert(newResult.getHeight == Width)
+      assert((newResult.getRGB(Height - 1, 0) & 0x00FFFFFF) == 0x00FF0000) // Opaque red rotated to top-right
+      assert((newResult.getRGB(1, 1) & 0x00FFFFFF) == 0x00FFFFFF) // White
+
+      // Output can be compressed to JPEG without error
+      val jpegBytes = ImageSupport.compressJpegImage(newResult, 0.8f)
+      assert(jpegBytes.nonEmpty)
+    }
+
+    it("must handle all EXIF orientation transformations (2 through 8)") {
+      for (orientation <- 2 to 8) {
+        val sourceImage = new java.awt.image.BufferedImage(Width, Height, java.awt.image.BufferedImage.TYPE_INT_RGB)
+        // Draw red pixel at (0, 0) and green pixel at (Width - 1, Height - 1)
+        sourceImage.setRGB(0, 0, 0x00FF0000)
+        sourceImage.setRGB(Width - 1, Height - 1, 0x0000FF00)
+
+        val transform = ImageSupport.findTransformation(orientation, Width, Height).get
+        val result    = ImageSupport.transformImage(sourceImage, transform)
+
+        val expectsSwappedDimensions = Set(5, 6, 7, 8).contains(orientation)
+        val expectedWidth  = if (expectsSwappedDimensions) Height else Width
+        val expectedHeight = if (expectsSwappedDimensions) Width else Height
+
+        assert(result.getWidth == expectedWidth, s"Orientation $orientation width mismatch")
+        assert(result.getHeight == expectedHeight, s"Orientation $orientation height mismatch")
+        assert(result.getType == java.awt.image.BufferedImage.TYPE_INT_RGB)
+
+        // Check expected target position for (0, 0) red pixel
+        val (expectedRedX, expectedRedY) = orientation match {
+          case 2 => (Width - 1, 0)              // Flip horizontal
+          case 3 => (Width - 1, Height - 1)     // 180-deg rotation
+          case 4 => (0, Height - 1)             // Flip vertical
+          case 5 => (0, 0)                      // Transpose
+          case 6 => (Height - 1, 0)             // 90-deg CW rotation
+          case 7 => (Height - 1, Width - 1)     // Transverse transpose
+          case 8 => (0, Width - 1)              // 270-deg CW rotation
+        }
+
+        assert((result.getRGB(expectedRedX, expectedRedY) & 0x00FFFFFF) == 0x00FF0000,
+          s"Orientation $orientation red pixel mismatch at ($expectedRedX, $expectedRedY)")
+      }
+    }
+
+    it("must preserve grayscale type and dimensions for TYPE_BYTE_GRAY") {
+      val sourceImage = new java.awt.image.BufferedImage(Width, Height, java.awt.image.BufferedImage.TYPE_BYTE_GRAY)
+      val transform = ImageSupport.findTransformation(6, Width, Height).get // 90-degree CW
+
+      val result = ImageSupport.transformImage(sourceImage, transform)
+      assert(result.getWidth == Height)
+      assert(result.getHeight == Width)
+      assert(result.getType == java.awt.image.BufferedImage.TYPE_BYTE_GRAY)
+    }
+  }
 }

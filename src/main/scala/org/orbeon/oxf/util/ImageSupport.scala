@@ -23,9 +23,9 @@ import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.ImageMetadata.AllMetadata
 
-import java.awt.Transparency
 import java.awt.geom.AffineTransform
-import java.awt.image.{AffineTransformOp, BufferedImage, ComponentColorModel, DataBuffer}
+import java.awt.image.{AffineTransformOp, BufferedImage}
+import java.awt.{Color, Rectangle}
 import java.io.{ByteArrayOutputStream, InputStream, OutputStream}
 import java.net.URI
 import javax.imageio.stream.MemoryCacheImageOutputStream
@@ -95,24 +95,34 @@ object ImageSupport {
         None
     }
 
-  def transformImage(sourceImage: BufferedImage, transform: AffineTransform): BufferedImage = {
+  def transformImage(sourceImage: BufferedImage, transform: AffineTransform): BufferedImage =
+    if (sourceImage.getType == BufferedImage.TYPE_BYTE_GRAY) {
 
-    // Use `TYPE_NEAREST_NEIGHBOR` because we use transformations that shouldn't need more, and
-    // if we uwe instead `TYPE_BICUBIC`, we end up with a color model that requires transparency,
-    // and then `ImageIO.write()` cannot encode the image.
-    val op = new AffineTransformOp(transform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR)
+      // Use `TYPE_NEAREST_NEIGHBOR` because we use transformations that shouldn't need more, and
+      // if we use instead `TYPE_BICUBIC`, we end up with a color model that requires transparency,
+      // and then `ImageIO.write()` cannot encode the image.
+      val op = new AffineTransformOp(transform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR)
 
-    val destinationImage =
-      op.createCompatibleDestImage(
+      val destinationImage = op.createCompatibleDestImage(
         sourceImage,
-        if (sourceImage.getType == BufferedImage.TYPE_BYTE_GRAY)
-          sourceImage.getColorModel
-        else // Force no alpha channel, see https://github.com/orbeon/orbeon-forms/issues/7673
-          new ComponentColorModel(sourceImage.getColorModel.getColorSpace, false, false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE)
+        sourceImage.getColorModel
       )
 
-    op.filter(sourceImage, destinationImage)
-  }
+      op.filter(sourceImage, destinationImage)
+    } else {
+      val shape = transform.createTransformedShape(new Rectangle(sourceImage.getWidth, sourceImage.getHeight))
+
+      val destinationImage = new BufferedImage(shape.getBounds.width, shape.getBounds.height, BufferedImage.TYPE_INT_RGB)
+
+      val g = destinationImage.createGraphics
+      g.setColor(Color.WHITE)
+      g.fillRect(0, 0, destinationImage.getWidth, destinationImage.getHeight)
+      g.drawImage(sourceImage, transform, null)
+      g.dispose()
+
+      destinationImage
+    }
+
 
   def compressJpegImage(image: BufferedImage, compressionLevel: Float): Array[Byte] =
     ImageIO.getImageWritersByFormatName("jpg").asScala.nextOption() match {

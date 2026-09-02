@@ -178,21 +178,29 @@
 
     <xsl:function name="fr:bottom-div" as="element(xh:div)">
 
-        <xsl:variable
-            name="grid-has-relevant-control-xpath"
-            select="
-                string-join(
-                    (
-                        for $id
-                            in $root/fr:c/(* except fr:hidden)/@id/string()
-                            return concat('xxf:relevant(xxf:binding(''', $id, '''))'),
-                        'false()'
-                    ),
-                    ' or '
-                )
-            "/>
+        <xsl:choose>
+            <xsl:when test="$is-editable">
+                <!-- In Form Builder grids are already visible, take space, need spacing with what follows -->
+                <xh:div class="fr-grid-non-empty"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:variable
+                    name="grid-has-relevant-control-xpath"
+                    select="
+                        string-join(
+                            (
+                                for $id
+                                    in $root/fr:c/(* except fr:hidden)/@id/string()
+                                    return concat('xxf:relevant(xxf:binding(''', $id, '''))'),
+                                'false()'
+                            ),
+                            ' or '
+                        )
+                    "/>
 
-        <xh:div class="{{'fr-grid-non-empty'[{$grid-has-relevant-control-xpath}]}}" xxbl:scope="outer"/>
+                <xh:div class="{{'fr-grid-non-empty'[{$grid-has-relevant-control-xpath}]}}" xxbl:scope="outer"/>
+            </xsl:otherwise>
+        </xsl:choose>
 
     </xsl:function>
 

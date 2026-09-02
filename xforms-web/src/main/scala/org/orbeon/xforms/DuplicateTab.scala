@@ -30,7 +30,7 @@ object DuplicateTab {
         timeout,
         timeoutContinuation
       )
-      .*>(IO(duplicateTabDetectedP.complete(Success(()))))
+      .flatMap(_ => IO(duplicateTabDetectedP.complete(Success(()))))
 
   def registerPingHandler(namespacedFormId: String, uuid: String): Unit =
     newBroadcastChannel(TabActivityBroadcastChannel).foreach { tabActivityBroadcastChannel =>

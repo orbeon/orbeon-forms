@@ -33,6 +33,7 @@ import java.nio.charset.StandardCharsets
 import java.util.Locale
 import java.util.logging.Level
 import javax.imageio.ImageIO
+import scala.util.control.NonFatal
 
 
 class OrbeonPdfBoxUserAgent(
@@ -86,8 +87,7 @@ class OrbeonPdfBoxUserAgent(
           // _outputDevice.getDotsPerPoint());
           // image.setInitialHeight(rect.getHeight() *
           // resource = new ImageResource(uriStr, image);
-        }
-        else {
+        } else {
           val sourceBytes = readStream(is)
           val isWebP      = ImageMetadata.findImageMediatype(new ByteArrayInputStream(sourceBytes)).contains("image/webp")
           val imgBytes    =
@@ -100,18 +100,23 @@ class OrbeonPdfBoxUserAgent(
               // Handle non-WebP images with existing orientation logic
               findImageOrientation(new ByteArrayInputStream(sourceBytes)) match {
                 case Some(orientation) if orientation >= 2 && orientation <= 8 =>
+                  try {
+                    val sourceImage = ImageIO.read(new ByteArrayInputStream(sourceBytes))
 
-                  val sourceImage = ImageIO.read(new ByteArrayInputStream(sourceBytes))
+                    val rotatedImage =
+                      transformImage(
+                        sourceImage,
+                        findTransformation(orientation, sourceImage.getWidth, sourceImage.getHeight)
+                          .getOrElse(throw new IllegalStateException)
+                      )
 
-                  val rotatedImage =
-                    transformImage(
-                      sourceImage,
-                      findTransformation(orientation, sourceImage.getWidth, sourceImage.getHeight)
-                        .getOrElse(throw new IllegalStateException)
-                    )
-
-                  // https://github.com/orbeon/orbeon-forms/issues/4593
-                  compressJpegImage(rotatedImage, jpegCompressionLevel)
+                    // https://github.com/orbeon/orbeon-forms/issues/4593
+                    compressJpegImage(rotatedImage, jpegCompressionLevel)
+                  } catch {
+                    case NonFatal(t) =>
+                      warn(s"failed to transform image for orientation $orientation for URL `$uriStr`, using original image", t)
+                      sourceBytes
+                  }
                 case _ =>
                   sourceBytes
               }
@@ -125,12 +130,14 @@ class OrbeonPdfBoxUserAgent(
 
       }
     } catch {
-      case e: Exception =>
-        XRLog.log(Level.WARNING, LogMessageId.LogMessageId1Param.EXCEPTION_CANT_READ_IMAGE_FILE_FOR_URI, uriStr, e)
+      case NonFatal(t) =>
+        XRLog.log(Level.WARNING, LogMessageId.LogMessageId1Param.EXCEPTION_CANT_READ_IMAGE_FILE_FOR_URI, uriStr, t)
     }
 
-    if (resource != null) resource = new ImageResource(resource.getImageUri, resource.getImage)
-    else resource = new ImageResource(uriStr, null)
+    if (resource != null)
+      resource = new ImageResource(resource.getImageUri, resource.getImage)
+    else
+      resource = new ImageResource(uriStr, null)
 
     resource
   }

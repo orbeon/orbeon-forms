@@ -1,7 +1,6 @@
 @import (reference) "form-runner-common";
 
 @buttonsAreaHeight: 64px;
-@dialogBorderRadius: 8px;
 
 .yui-panel-container.yui-dialog {
     width: 100%;
@@ -58,8 +57,8 @@
         .xxforms-dialog-head {
             background-image: none; // override YUI default
             background-color: var(--orbeon-dialog-title-background-color);
-            border-top-left-radius: @dialogBorderRadius;
-            border-top-right-radius: @dialogBorderRadius;
+            border-top-left-radius: var(--orbeon-dialog-border-radius);
+            border-top-right-radius: var(--orbeon-dialog-border-radius);
             border: none;
             font-size: var(--orbeon-dialog-title-font-size);
             line-height: 32px;  // was 2rem (16px root)
@@ -76,8 +75,8 @@
 
         .xxforms-dialog-body {
             background-color: var(--orbeon-dialog-background-color);
-            border-bottom-left-radius: @dialogBorderRadius;
-            border-bottom-right-radius: @dialogBorderRadius;
+            border-bottom-left-radius: var(--orbeon-dialog-border-radius);
+            border-bottom-right-radius: var(--orbeon-dialog-border-radius);
             border: none;
             padding: 10px;
 
@@ -90,8 +89,8 @@
         }
 
         .xxforms-dialog-head:empty + .xxforms-dialog-body {
-            border-top-left-radius: @dialogBorderRadius;
-            border-top-right-radius: @dialogBorderRadius;
+            border-top-left-radius: var(--orbeon-dialog-border-radius);
+            border-top-right-radius: var(--orbeon-dialog-border-radius);
         }
 
         // Override YUI default using Boostrap 5 styles
@@ -116,8 +115,8 @@
             flex-direction: column;
 
             .fr-dialog-buttons {
-                border-bottom-left-radius: @dialogBorderRadius;
-                border-bottom-right-radius: @dialogBorderRadius;
+                border-bottom-left-radius: var(--orbeon-dialog-border-radius);
+                border-bottom-right-radius: var(--orbeon-dialog-border-radius);
                 box-sizing: border-box; // So top margin gets include in height
                 background-color: var(--orbeon-dialog-background-color);
             }

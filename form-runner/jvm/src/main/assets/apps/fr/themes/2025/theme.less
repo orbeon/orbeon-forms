@@ -65,6 +65,7 @@
   --orbeon-help-font-family                 : @frBaseFontFamily;
   --orbeon-help-background-color            : white;
   --orbeon-help-border-color                : rgba(0, 0, 0, 0.2);
+  --orbeon-help-border-radius               : 6.5px;
   --orbeon-help-content-font-size           : 1.00em;
   --orbeon-help-content-font-weight         : var(--orbeon-base-font-weight);
   --orbeon-help-content-color               : var(--orbeon-base-color);
@@ -192,16 +193,19 @@
   --orbeon-button-disabled-opacity     : 0.65;
   --orbeon-button-disabled-icon-opacity: 0.4;
 
-  // Status pills (the .label class): Bootstrap 2's label palette. Named --orbeon-status-* to avoid clashing with the
-  // form-field --orbeon-label-* vars.
+  // Status pills (.label), e.g. character counters, draft labels
   --orbeon-status-color                    : white;
   --orbeon-status-background-color         : #999;     // default (e.g. unavailable)
   --orbeon-status-success-background-color : #468847;  // e.g. available
   --orbeon-status-info-background-color    : #3a87ad;
   --orbeon-status-warning-background-color : #f89406;
   --orbeon-status-error-background-color   : #b94a48;  // Bootstrap 2 .label-important
+  --orbeon-status-border-radius            : 3px;
 
-  // Dropdowns (Bootstrap 2 and 5)
+  // Badges (.badge), e.g. selection counts
+  --orbeon-badge-border-radius: 9px;
+
+  // Dropdowns
   --orbeon-dropdown-open-toggle-background-color  : var(--orbeon-button-highlight-background-color);
   --orbeon-dropdown-menu-color                    : #333; // @grayDark
   --orbeon-dropdown-menu-background-color         : white;
@@ -214,6 +218,7 @@
   --orbeon-dropdown-menu-border-width             : 1px;
   --orbeon-dropdown-menu-divider-color            : #e5e5e5;
   --orbeon-dropdown-menu-item-padding             : 3px 20px;
+  --orbeon-dropdown-menu-border-radius            : 4.875px;
 
   // Sections
   --orbeon-section-title-font-size              : 1.38em;            // 18px
@@ -345,6 +350,7 @@
   --orbeon-alert-background-color        : white;
   --orbeon-alert-border-color            : #e3e3e3; // darken(@wellBackground, 7%);
   --orbeon-alert-text-shadow-color       : rgba(255,255,255,.5);
+  --orbeon-alert-border-radius           : 4px;
   --orbeon-alert-error-color             : #842029;
   --orbeon-alert-error-background-color  : #f8d7da;
   --orbeon-alert-error-border-color      : #f5c2c7;
@@ -385,6 +391,7 @@
   --orbeon-dialog-title-font-size       : 1.11em; // 2022-12-11: larger font size for dialog title looks better
   --orbeon-dialog-title-color           : black;
   --orbeon-dialog-title-background-color: #fafafa;
+  --orbeon-dialog-border-radius         : 8px;
 
   // Misc
   --orbeon-header-footer-font-size: 1.10em;
@@ -404,6 +411,7 @@
   --orbeon-tooltip-font-size       : 0.85em; // 11px
   --orbeon-tooltip-color           : #fff;   // @tooltipColor;
   --orbeon-tooltip-background-color: #000;   // @tooltipBackground;
+  --orbeon-tooltip-border-radius   : 4.875px;
 
   // Progress bars (upload, import, reindex): track and filled bar
   --orbeon-progress-background-color    : #f7f7f7;
@@ -411,6 +419,7 @@
 
   // Landing page
   --orbeon-landing-card-border-color           : #ddd;
+  --orbeon-landing-card-border-radius          : 4.875px;
   --orbeon-landing-card-image-border           : #eee;            // @grayLighter
   --orbeon-landing-card-header-color           : #22251f;
   --orbeon-landing-card-header-background-color: #f7f7f7;
@@ -419,6 +428,7 @@
   --orbeon-landing-card-hover-background-color : #f9f9f9;         // @frRowHoverBackground
   --orbeon-landing-card-link-color             : #08c;
   --orbeon-landing-card-link-hover-color       : darken(#08c, 15%);
+  --orbeon-landing-tile-border-radius          : 10px;
 
   // Captcha
   --orbeon-friendly-captcha-font-size    : 1.08em; // 14px

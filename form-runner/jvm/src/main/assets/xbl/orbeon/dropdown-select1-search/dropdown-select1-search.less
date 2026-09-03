@@ -19,6 +19,7 @@
     .select2-container {
         ul                 { margin: initial }
         .select2-selection {
+            border-radius: var(--orbeon-control-border-radius);
             // Select2 sets `line-height: 28px`, which is 2px too much, since the parent also
             // has a `line-height: 28px` and a `border: 1px`, which caused an irregularity in
             // the bottom part of the highlight on Safari
@@ -32,6 +33,7 @@
         }
 
         .select2-dropdown  {
+            border-radius: var(--orbeon-dropdown-menu-border-radius);
             z-index: 9999999; // Dropdown to be always above everything else
             background-color: var(--orbeon-control-background-color);
             border: 1px solid var(--orbeon-control-border-color);

@@ -82,7 +82,7 @@
     &.orbeon-portlet-div .navbar.fixed-top {
         position: static;
         margin-bottom: 10px;
-        border-radius: 4px; // as Bootstrap 2's .navbar-inner
+        border-radius: var(--orbeon-body-decorations-border-radius);
     }
 
     // Embedded: undo styles that a host page's CSS may set on these generic names. :where() keeps their specificity
@@ -459,6 +459,7 @@
         line-height: @fluidLineHeight;
         background-color: var(--orbeon-help-background-color);
         border-color: var(--orbeon-help-border-color);
+        --bs-popover-border-radius: var(--orbeon-help-border-radius);
         // Override Bootstrap's default z-index (1010) to be above the navbar which is at 1030
         z-index: 1040;
 

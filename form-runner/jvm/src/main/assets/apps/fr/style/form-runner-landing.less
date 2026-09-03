@@ -175,10 +175,13 @@
     }
 
     .card {
+        --bs-card-border-radius      : var(--orbeon-landing-card-border-radius);
+        --bs-card-inner-border-radius: calc(var(--orbeon-landing-card-border-radius) - var(--bs-card-border-width));
+
         figure {
             margin-bottom: 0;
             border: 1px solid var(--orbeon-landing-card-border-color);
-            border-radius: 10px;
+            border-radius: var(--orbeon-landing-tile-border-radius);
         }
         figcaption {
             color: var(--orbeon-base-color);
@@ -200,8 +203,8 @@
         .img-thumbnail {
             padding: 15%;
             border: none;
-            border-top-left-radius: 10px; // Avoid stepping over enclosing border
-            border-top-right-radius: 10px;
+            border-top-left-radius : var(--orbeon-landing-tile-border-radius);
+            border-top-right-radius: var(--orbeon-landing-tile-border-radius);
             transition: all ease 100ms;
         }
     }

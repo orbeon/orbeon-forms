@@ -180,6 +180,7 @@
   .dropdown-menu {
     background-color: var(--orbeon-dropdown-menu-background-color);
     border: var(--orbeon-dropdown-menu-border-width) solid var(--orbeon-dropdown-menu-border-color);
+    --bs-dropdown-border-radius: var(--orbeon-dropdown-menu-border-radius);
 
     .btn {
       // Disable transitions in dropdown menus
@@ -326,7 +327,7 @@
     font-weight: bold;
     line-height: 1.2; // about Bootstrap 2's 14px at the 13px base, unitless so it scales with the font
     padding: 2px 9px;
-    border-radius: 9px;
+    border-radius: var(--orbeon-badge-border-radius);
     background-color: var(--orbeon-status-background-color);
     border: 0; // neither Bootstrap version sets one, so a host's .badge border would show through when embedded (e.g. Liferay)
   }
@@ -352,7 +353,7 @@
     white-space: nowrap;
     vertical-align: baseline;
     background-color: var(--orbeon-status-background-color);
-    border-radius: 3px;
+    border-radius: var(--orbeon-status-border-radius);
     border: 0; // same as .badge above
   }
   .label-success  { background-color: var(--orbeon-status-success-background-color); }
@@ -711,7 +712,7 @@
   // (.fr-navbar-home-link a above uses the same value)
   .navbar .btn {
     padding      : 5px 15px;
-    border-radius: 3px;
+    border-radius: var(--orbeon-button-border-radius);
     line-height  : 1.5;
     margin-top   : 0; // a Bootstrap 2 host adds 5px here, inflating the embedded navbar
   }
@@ -803,14 +804,14 @@
     ul > li:first-child > a,
     ul > li:first-child > span {
       border-left-width: 1px;
-      border-top-left-radius: 4px;
-      border-bottom-left-radius: 4px;
+      border-top-left-radius: var(--orbeon-button-border-radius);
+      border-bottom-left-radius: var(--orbeon-button-border-radius);
     }
 
     ul > li:last-child > a,
     ul > li:last-child > span {
-      border-top-right-radius: 4px;
-      border-bottom-right-radius: 4px;
+      border-top-right-radius: var(--orbeon-button-border-radius);
+      border-bottom-right-radius: var(--orbeon-button-border-radius);
     }
 
     // The trigger is a .btn-link inside the wrapping <span>, which carries the cell look; reset it
@@ -869,7 +870,7 @@
     border-collapse: separate;
     border-spacing: 0;
     border-left: 0;
-    border-radius: 4px;
+    border-radius: var(--orbeon-body-decorations-border-radius);
 
     th, td {
       border-left: 1px solid var(--orbeon-table-border-color);
@@ -879,22 +880,22 @@
     thead:first-child tr:first-child > th:first-child,
     tbody:first-child tr:first-child > td:first-child,
     tbody:first-child tr:first-child > th:first-child {
-      border-top-left-radius: 4px;
+      border-top-left-radius: var(--orbeon-body-decorations-border-radius);
     }
     thead:first-child tr:first-child > th:last-child,
     tbody:first-child tr:first-child > td:last-child,
     tbody:first-child tr:first-child > th:last-child {
-      border-top-right-radius: 4px;
+      border-top-right-radius: var(--orbeon-body-decorations-border-radius);
     }
     thead:last-child tr:last-child > th:first-child,
     tbody:last-child tr:last-child > td:first-child,
     tbody:last-child tr:last-child > th:first-child {
-      border-bottom-left-radius: 4px;
+      border-bottom-left-radius: var(--orbeon-body-decorations-border-radius);
     }
     thead:last-child tr:last-child > th:last-child,
     tbody:last-child tr:last-child > td:last-child,
     tbody:last-child tr:last-child > th:last-child {
-      border-bottom-right-radius: 4px;
+      border-bottom-right-radius: var(--orbeon-body-decorations-border-radius);
     }
   }
 
@@ -908,7 +909,7 @@
       margin-bottom: ~"calc(@{fluidLineHeight} / 2)";
     }
     padding: 8px 1em; // Bootstrap 2 had asymmetric 8px 35px 8px 14px here; unclear why, not reproduced
-    border-radius: 4px;
+    border-radius: var(--orbeon-alert-border-radius);
 
     line-height: @fixedLineHeight;
     @media screen {
@@ -970,9 +971,10 @@
   // ***** Tooltips ****************************************************************************************************
 
   .tooltip {
-    --bs-tooltip-font-size: var(--orbeon-tooltip-font-size);
-    --bs-tooltip-color    : var(--orbeon-tooltip-color);
-    --bs-tooltip-bg       : var(--orbeon-tooltip-background-color);
+    --bs-tooltip-font-size    : var(--orbeon-tooltip-font-size);
+    --bs-tooltip-color        : var(--orbeon-tooltip-color);
+    --bs-tooltip-bg           : var(--orbeon-tooltip-background-color);
+    --bs-tooltip-border-radius: var(--orbeon-tooltip-border-radius);
   }
 
   // ***** Bootstrap 2 compatibility ***********************************************************************************

@@ -20,17 +20,16 @@ object DuplicateTab {
 
   def pingAndRegisterAllHandlers(namespacedFormId: String, uuid: String): Option[IO[Unit]] =
     newBroadcastChannel(TabActivityBroadcastChannel).map { broadcastChannel =>
-      IO(postTabOpenPingMessage(broadcastChannel, namespacedFormId: String, uuid: String))
-        .flatMap(_ => registerDuplicatedTabHandlers(broadcastChannel, namespacedFormId, uuid))
+      registerDuplicatedTabHandlers(broadcastChannel, namespacedFormId, uuid)
     }
 
   def waitForReplyWithTimeout[T](tabDuplicationReplyIo: IO[T], timeout: Duration, timeoutContinuation: IO[Unit]): IO[Unit] =
     tabDuplicationReplyIo
+      .flatMap(_ => IO(duplicateTabDetectedP.complete(Success(()))).void)
       .timeoutTo(
         timeout,
         timeoutContinuation
       )
-      .flatMap(_ => IO(duplicateTabDetectedP.complete(Success(()))))
 
   def registerPingHandler(namespacedFormId: String, uuid: String): Unit =
     newBroadcastChannel(TabActivityBroadcastChannel).foreach { tabActivityBroadcastChannel =>
@@ -69,27 +68,32 @@ object DuplicateTab {
     val _namespacedFormId = namespacedFormId
     val _uuid = uuid
 
-    IO.async_[Unit] { callback =>
-      tabActivityBroadcastChannel.onmessage =
-        (event: MessageEvent) => {
-          val tabMessage = event.data.asInstanceOf[TabMessage]
-          if (tabMessage.namespacedFormId == namespacedFormId && tabMessage.uuid == uuid)
-            tabMessage.messageType match {
-              case TabOpenPingMessageType =>
-                // Another tab has opened with the same namespacedFormId and uuid.
-                // We need to send back a message to the channel to indicate that we are the original tab.
-                tabActivityBroadcastChannel.postMessage(new TabMessage {
-                  override val messageType     : String = TabOpenReplyMessageType
-                  override val namespacedFormId: String = _namespacedFormId
-                  override val uuid            : String = _uuid
-                })
-              case TabOpenReplyMessageType =>
-                // Another tab has replied to our ping, meaning that it is the original tab and we are not
-                tabActivityBroadcastChannel.close() // channel is no longer needed
-                callback(Right(()))
-              case _ =>
-            }
-        }
+    IO.async[Unit] { callback =>
+      IO {
+        tabActivityBroadcastChannel.onmessage =
+          (event: MessageEvent) => {
+            val tabMessage = event.data.asInstanceOf[TabMessage]
+            if (tabMessage.namespacedFormId == namespacedFormId && tabMessage.uuid == uuid)
+              tabMessage.messageType match {
+                case TabOpenPingMessageType =>
+                  // Another tab has opened with the same namespacedFormId and uuid.
+                  // We need to send back a message to the channel to indicate that we are the original tab.
+                  tabActivityBroadcastChannel.postMessage(new TabMessage {
+                    override val messageType     : String               = TabOpenReplyMessageType
+                    override val namespacedFormId: String               = _namespacedFormId
+                    override val uuid            : String               = _uuid
+                  })
+                case TabOpenReplyMessageType =>
+                  // Another tab has replied to our ping, meaning that it is the original tab and we are not
+                  tabActivityBroadcastChannel.close() // channel is no longer needed
+                  callback(Right(()))
+                case _ =>
+              }
+          }
+        postTabOpenPingMessage(tabActivityBroadcastChannel, _namespacedFormId, _uuid)
+        // Cancellation finalizer (enabled cancellation, in addition to what it does when canceled)
+        Some(IO(tabActivityBroadcastChannel.close()))
+      }
     }
   }
 

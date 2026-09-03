@@ -316,6 +316,8 @@ object InitSupport {
 
         StateHandling.initializeState(namespacedFormId, stateResult)
 
+        AjaxClient.configureDelays(initializations.configuration) // this is global to all forms, behavior should be clarified
+
         if (allEvents)
           AjaxClient.fireEvent(
             AjaxEvent.withoutTargetId(
@@ -323,8 +325,6 @@ object InitSupport {
               form      = formElem
             )
           )
-
-        AjaxClient.configureDelays(initializations.configuration) // this is global to all forms, behavior should be clarified
         initializeJavaScriptControls(initializations.controls)
         initializeKeyListeners(initializations.listeners, formElem)
         dispatchInitialServerEvents(initializations.pollEvent, namespacedFormId)

@@ -58,45 +58,47 @@
         <!-- Initial case -->
         <xf:case id="fb-publish-dialog-message-start">
             <xh:div class="fb-publish-dialog-body">
-                <xh:table class="table table-bordered">
-                    <xh:tr>
-                        <xh:th>
-                            <xf:output value="$form-resources/application-name/label"/>
-                        </xh:th>
-                        <xh:td>
-                            <xf:output value="$app"/>
-                        </xh:td>
-                    </xh:tr>
-                    <xh:tr>
-                        <xh:th>
-                            <xf:output value="$form-resources/form-name/label"/>
-                        </xh:th>
-                        <xh:td>
-                            <xf:output value="$form"/>
-                        </xh:td>
-                    </xh:tr>
-                    <xf:group ref=".[$versioning-supported]">
+                <xh:div class="fr-table-frame">
+                    <xh:table class="table">
                         <xh:tr>
                             <xh:th>
-                                <xf:output value="$form-resources/dialog-publish/latest-published-version"/>
+                                <xf:output value="$form-resources/application-name/label"/>
                             </xh:th>
                             <xh:td>
-                                <xf:output value="if ($latest-version gt 0) then $latest-version else '-'"/>
+                                <xf:output value="$app"/>
                             </xh:td>
                         </xh:tr>
-                    </xf:group>
-                    <!-- WIP, see comment at bottom of form. -->
-                    <!--
-                    <xh:tr>
-                        <xh:th>
-                            Number of documents for version
-                        </xh:th>
-                        <xh:td>
-                            <xf:output value="instance('fb-publish-search-result-instance')/@total"/>
-                        </xh:td>
-                    </xh:tr>
-                    -->
-                </xh:table>
+                        <xh:tr>
+                            <xh:th>
+                                <xf:output value="$form-resources/form-name/label"/>
+                            </xh:th>
+                            <xh:td>
+                                <xf:output value="$form"/>
+                            </xh:td>
+                        </xh:tr>
+                        <xf:group ref=".[$versioning-supported]">
+                            <xh:tr>
+                                <xh:th>
+                                    <xf:output value="$form-resources/dialog-publish/latest-published-version"/>
+                                </xh:th>
+                                <xh:td>
+                                    <xf:output value="if ($latest-version gt 0) then $latest-version else '-'"/>
+                                </xh:td>
+                            </xh:tr>
+                        </xf:group>
+                        <!-- WIP, see comment at bottom of form. -->
+                        <!--
+                        <xh:tr>
+                            <xh:th>
+                                Number of documents for version
+                            </xh:th>
+                            <xh:td>
+                                <xf:output value="instance('fb-publish-search-result-instance')/@total"/>
+                            </xh:td>
+                        </xh:tr>
+                        -->
+                    </xh:table>
+                </xh:div>
 
 
                 <xf:group ref=".[$versioning-supported]">

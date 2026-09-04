@@ -1680,8 +1680,14 @@ body.orbeon {
             // Additional `div` added to avoid Safari showing a scrollbar when not needed
             display: flex; // Tables next to each other
         }
-        .table {
+        .fr-table-frame {
+            flex: 1 1 0; // make the shortcuts tables have the same width in the dialog
             margin: 10px;
+            > .table {
+                height: 100%; // stretch the shortest table vertically
+            }
+        }
+        .table {
             td:nth-child(1) { width: 30%; } // For both tables to have the same column widths
             td:nth-child(2) { width: 20%; }
             td:nth-child(3) { width: 50%; }
@@ -1745,10 +1751,12 @@ body.orbeon {
             overflow: auto;
         }
 
+        .fr-table-frame {
+            margin-bottom: @fbGutter;
+        }
         .table {
             background-color: white;
             table-layout: auto;
-            margin-bottom: @fbGutter;
             th {
                 font-weight: bold;
                 text-align: right;

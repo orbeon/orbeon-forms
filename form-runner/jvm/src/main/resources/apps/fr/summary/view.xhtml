@@ -1701,7 +1701,7 @@
 
                     <xf:group ref="instance('fr-search-results-instance')" xxf:update="full">
 
-                        <xh:div class="fr-search-results">
+                        <xh:div class="fr-search-results fr-table-frame">
                             <xf:var name="documents"        value="document"/>
                             <xf:var name="have-drafts"      value="exists($documents[@draft = 'true'])"/>
                             <xf:var name="have-read-only"   value="exists($documents[not(xxf:split(@operations) = ('*', 'update'))])"/>
@@ -1719,7 +1719,7 @@
                                     'workflow-stage'  [$show-workflow-stage]
                                 )"/>
 
-                            <xh:table class="table table-bordered table-condensed {'fr-table-no-form-data'[empty($documents)]}">
+                            <xh:table class="table table-condensed {'fr-table-no-form-data'[empty($documents)]}">
                                 <!-- scrollable="horizontal" width="940px" -->
                                 <xh:thead>
                                     <xh:tr>

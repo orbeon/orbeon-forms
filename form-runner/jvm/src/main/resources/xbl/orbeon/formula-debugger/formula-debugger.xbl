@@ -161,7 +161,7 @@
                                     </fr:checkbox-input>
                                 </fr:c>
                                 <fr:c y="3" x="1" w="12">
-                                    <xh:div class="table table-bordered fr-formula-legend">
+                                    <xh:div class="fr-formula-legend">
                                         <xh:div class="fr-transitive-dependency">Transitive dependency</xh:div>
                                         <xh:div class="fr-direct-dependency">Direct dependency</xh:div>
                                         <xh:div class="xforms-repeat-selected-item-1">Current selection</xh:div>

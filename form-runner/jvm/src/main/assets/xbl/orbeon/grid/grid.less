@@ -271,6 +271,7 @@
 
                     border: var(--orbeon-repeat-border-width) var(--orbeon-repeat-border-style) var(--orbeon-base-border-color);
                     border-radius: var(--orbeon-body-decorations-border-radius);
+                    overflow: hidden; // clip cell backgrounds (e.g. the current row highlight) to the rounded corners
 
                     .fr-repeat-column-left, .fr-repeat-column-number {
                         border-right: var(--orbeon-repeat-border-width) var(--orbeon-repeat-border-style) var(--orbeon-base-border-color);

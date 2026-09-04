@@ -832,16 +832,11 @@
 
   // ***** Tables ******************************************************************************************************
 
-  // Tables: Bootstrap 2's separated, rounded borders. Bootstrap 5 collapses borders and draws them on the cells;
-  // neutralize that model and re-apply Bootstrap 2's .table/.table-bordered rules.
+  // Tables: Bootstrap 5 draws borders on the cells; neutralize that model and re-apply Bootstrap 2's .table rules
+  // (horizontal lines only). Framed tables with rounded corners use .fr-table-frame below.
   .table > :not(caption) > * > * {
     border-width: 0;
     box-shadow: none;
-  }
-
-  // Remove Bootstrap 5's heavy 2px header/body separator (Bootstrap 2's is the light 1px cell border)
-  .table > :not(:first-child) {
-    border-top: 0;
   }
 
   // Bootstrap 2's .table-condensed padding (ignored by Bootstrap 5), so the link <a> drives the row height and its text
@@ -865,37 +860,20 @@
     }
   }
 
-  .table-bordered {
+  // Framed tables: the wrapper draws the rounded frame and clips to it; the table collapses its borders and hides its outer border
+  .fr-table-frame {
     border: 1px solid var(--orbeon-table-border-color);
-    border-collapse: separate;
-    border-spacing: 0;
-    border-left: 0;
     border-radius: var(--orbeon-body-decorations-border-radius);
+    overflow: auto;
 
-    th, td {
-      border-left: 1px solid var(--orbeon-table-border-color);
-    }
+    > .table {
+      margin-bottom: 0;
+      border-collapse: collapse;
+      border-style: hidden;
 
-    // Rounded outer corners (first/last cell of first/last row)
-    thead:first-child tr:first-child > th:first-child,
-    tbody:first-child tr:first-child > td:first-child,
-    tbody:first-child tr:first-child > th:first-child {
-      border-top-left-radius: var(--orbeon-body-decorations-border-radius);
-    }
-    thead:first-child tr:first-child > th:last-child,
-    tbody:first-child tr:first-child > td:last-child,
-    tbody:first-child tr:first-child > th:last-child {
-      border-top-right-radius: var(--orbeon-body-decorations-border-radius);
-    }
-    thead:last-child tr:last-child > th:first-child,
-    tbody:last-child tr:last-child > td:first-child,
-    tbody:last-child tr:last-child > th:first-child {
-      border-bottom-left-radius: var(--orbeon-body-decorations-border-radius);
-    }
-    thead:last-child tr:last-child > th:last-child,
-    tbody:last-child tr:last-child > td:last-child,
-    tbody:last-child tr:last-child > th:last-child {
-      border-bottom-right-radius: var(--orbeon-body-decorations-border-radius);
+      th, td {
+        border: 1px solid var(--orbeon-table-border-color);
+      }
     }
   }
 

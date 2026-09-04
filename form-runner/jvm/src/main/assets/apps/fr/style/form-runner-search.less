@@ -155,7 +155,6 @@
   .fr-search-results {
 
     overflow: auto;
-    border-collapse: collapse;
 
     .alert  {
       display: block;
@@ -166,17 +165,6 @@
       background-color: var(--orbeon-table-background-color);
       margin-bottom: 0;
       max-width: none;                                        // Because table can scrolls beyond size of container
-
-      // Override table border color from Bootstrap
-      &.table-bordered {
-        border-color: var(--orbeon-table-border-color);
-        thead tr th {
-          border-color: var(--orbeon-table-border-color);
-        }
-        tbody tr td {
-          border-color: var(--orbeon-table-border-color);
-        }
-      }
     }
 
     thead {

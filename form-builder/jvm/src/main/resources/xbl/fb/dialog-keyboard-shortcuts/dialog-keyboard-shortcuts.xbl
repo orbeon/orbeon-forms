@@ -66,190 +66,194 @@
                                                 ))
                                             else ()
                                     "/>
-                            <xh:table class="table table-condensed table-bordered">
-                                <xh:tbody>
-                                    <xh:tr>
-                                        <xh:td rowspan="2"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.actions', '|fr-form-resources|')"/></xh:td>
-                                        <xh:td>
-                                            <xh:kbd class="fb-for-platform-apple">⌘S</xh:kbd>
-                                            <xh:kbd class="fb-for-platform-other">⌃S</xh:kbd>
-                                        </xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.save-form', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td>
-                                            <xh:kbd class="fb-for-platform-apple">⌘P</xh:kbd>
-                                            <xh:kbd class="fb-for-platform-other">⌃P</xh:kbd>
-                                        </xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-publish', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td rowspan="3"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.cut-copy-paste', '|fr-form-resources|')"/></xh:td>
-                                        <xh:td>
-                                            <xh:kbd class="fb-for-platform-apple">⌘X</xh:kbd>
-                                            <xh:kbd class="fb-for-platform-other">⌃X</xh:kbd>
-                                        </xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.cut-control', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td>
-                                            <xh:kbd class="fb-for-platform-apple">⌘C</xh:kbd>
-                                            <xh:kbd class="fb-for-platform-other">⌃C</xh:kbd>
-                                        </xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.copy-control', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td>
-                                            <xh:kbd class="fb-for-platform-apple">⌘V</xh:kbd>
-                                            <xh:kbd class="fb-for-platform-other">⌃V</xh:kbd>
-                                        </xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.paste-toolbox', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td rowspan="5"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.grid-navigation', '|fr-form-resources|')"/></xh:td>
-                                        <xh:td><xh:kbd>←</xh:kbd>/<xh:kbd>→</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-prev-next-cell', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>⇧←</xh:kbd>/<xh:kbd>⇧→</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-prev-next-skip-empty', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>↑</xh:kbd>/<xh:kbd>↓</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-vertical-cell', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>⌃⇧↑</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-line-up', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>⌃⇧↓</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-line-down', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td rowspan="2"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.undo-redo', '|fr-form-resources|')"/></xh:td>
-                                        <xh:td>
-                                            <xh:kbd class="fb-for-platform-apple">⌘Z</xh:kbd>
-                                            <xh:kbd class="fb-for-platform-other">⌃Z</xh:kbd>
-                                        </xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.undo', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td>
-                                            <xh:kbd class="fb-for-platform-apple">⌘⇧Z</xh:kbd>
-                                            <xh:kbd class="fb-for-platform-other">⌃Y</xh:kbd>
-                                        </xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.redo', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td rowspan="15"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.all-dialogs', '|fr-form-resources|')"/></xh:td>
-                                        <xh:td><xh:kbd>⇧↵</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-control-settings', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td>
-                                            <xh:kbd class="fb-for-platform-apple">⌘↵</xh:kbd>
-                                            <xh:kbd class="fb-for-platform-other">⌃↵</xh:kbd>
-                                        </xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.apply-ok-dialog', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td>
-                                            <xh:kbd class="fb-for-platform-apple">⌘J</xh:kbd>
-                                            <xh:kbd class="fb-for-platform-other">⌃J</xh:kbd>
-                                        </xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-quick-search', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>O F</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-form-settings', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>O P</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-permissions', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>O E</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-email-settings', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>O M</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-messages', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>O S</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-edit-source', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>T W</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.test-web-form', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>T P</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.test-pdf', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>T O</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.test-offline', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>T F</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.inspect-formulas', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                </xh:tbody>
-                            </xh:table>
-                            <xh:table class="table table-condensed table-bordered">
-                                <xh:tbody>
-                                    <xh:tr>
-                                        <xh:td rowspan="2"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.control-settings-dialog', '|fr-form-resources|')"/></xh:td>
-                                        <xh:td><xh:kbd>⌃[</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.go-prev-control', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>⌃]</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.go-next-control', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td rowspan="2"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.tab-navigation', '|fr-form-resources|')"/></xh:td>
-                                        <xh:td><xh:kbd>⌃}</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-next-tab', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>⌃{</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-prev-tab', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td rowspan="3"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.inserting-form-structure', '|fr-form-resources|')"/></xh:td>
-                                        <xh:td><xh:kbd>I F S</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.insert-section', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>I F G</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.insert-grid', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td><xh:kbd>I F R</xh:kbd></xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.insert-repeated-grid', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                    <xf:repeat ref="$controls-with-keyboard-shortcut">
+                            <xh:div class="fr-table-frame">
+                                <xh:table class="table table-condensed">
+                                    <xh:tbody>
                                         <xh:tr>
-                                            <xf:group ref="if (position() = 1) then . else ()">
-                                                <xh:td rowspan="{count($controls-with-keyboard-shortcut)}"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.inserting-form-controls', '|fr-form-resources|')"/></xh:td>
-                                            </xf:group>
-                                            <xh:td><xh:kbd><xf:output value="@keyboard-shortcut"/></xh:kbd></xh:td>
-                                            <xh:td><xf:output value="@display-name"/></xh:td>
+                                            <xh:td rowspan="2"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.actions', '|fr-form-resources|')"/></xh:td>
+                                            <xh:td>
+                                                <xh:kbd class="fb-for-platform-apple">⌘S</xh:kbd>
+                                                <xh:kbd class="fb-for-platform-other">⌃S</xh:kbd>
+                                            </xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.save-form', '|fr-form-resources|')"/></xh:td>
                                         </xh:tr>
-                                    </xf:repeat>
-                                    <xh:tr>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.reloading-toolbox', '|fr-form-resources|')"/></xh:td>
-                                        <xh:td>
-                                            <xh:kbd class="fb-for-platform-apple">⌘⇧R</xh:kbd>
-                                            <xh:kbd class="fb-for-platform-other">⌃⇧R</xh:kbd>
-                                        </xh:td>
-                                        <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.reload-toolbox', '|fr-form-resources|')"/></xh:td>
-                                    </xh:tr>
-                                </xh:tbody>
-                            </xh:table>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <xh:kbd class="fb-for-platform-apple">⌘P</xh:kbd>
+                                                <xh:kbd class="fb-for-platform-other">⌃P</xh:kbd>
+                                            </xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-publish', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td rowspan="3"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.cut-copy-paste', '|fr-form-resources|')"/></xh:td>
+                                            <xh:td>
+                                                <xh:kbd class="fb-for-platform-apple">⌘X</xh:kbd>
+                                                <xh:kbd class="fb-for-platform-other">⌃X</xh:kbd>
+                                            </xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.cut-control', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <xh:kbd class="fb-for-platform-apple">⌘C</xh:kbd>
+                                                <xh:kbd class="fb-for-platform-other">⌃C</xh:kbd>
+                                            </xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.copy-control', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <xh:kbd class="fb-for-platform-apple">⌘V</xh:kbd>
+                                                <xh:kbd class="fb-for-platform-other">⌃V</xh:kbd>
+                                            </xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.paste-toolbox', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td rowspan="5"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.grid-navigation', '|fr-form-resources|')"/></xh:td>
+                                            <xh:td><xh:kbd>←</xh:kbd>/<xh:kbd>→</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-prev-next-cell', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>⇧←</xh:kbd>/<xh:kbd>⇧→</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-prev-next-skip-empty', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>↑</xh:kbd>/<xh:kbd>↓</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-vertical-cell', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>⌃⇧↑</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-line-up', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>⌃⇧↓</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-line-down', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td rowspan="2"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.undo-redo', '|fr-form-resources|')"/></xh:td>
+                                            <xh:td>
+                                                <xh:kbd class="fb-for-platform-apple">⌘Z</xh:kbd>
+                                                <xh:kbd class="fb-for-platform-other">⌃Z</xh:kbd>
+                                            </xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.undo', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <xh:kbd class="fb-for-platform-apple">⌘⇧Z</xh:kbd>
+                                                <xh:kbd class="fb-for-platform-other">⌃Y</xh:kbd>
+                                            </xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.redo', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td rowspan="15"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.all-dialogs', '|fr-form-resources|')"/></xh:td>
+                                            <xh:td><xh:kbd>⇧↵</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-control-settings', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <xh:kbd class="fb-for-platform-apple">⌘↵</xh:kbd>
+                                                <xh:kbd class="fb-for-platform-other">⌃↵</xh:kbd>
+                                            </xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.apply-ok-dialog', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <xh:kbd class="fb-for-platform-apple">⌘J</xh:kbd>
+                                                <xh:kbd class="fb-for-platform-other">⌃J</xh:kbd>
+                                            </xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-quick-search', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>O F</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-form-settings', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>O P</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-permissions', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>O E</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-email-settings', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>O M</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-messages', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>O S</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-edit-source', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>T W</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.test-web-form', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>T P</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.test-pdf', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>T O</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.test-offline', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>T F</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.inspect-formulas', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                    </xh:tbody>
+                                </xh:table>
+                            </xh:div>
+                            <xh:div class="fr-table-frame">
+                                <xh:table class="table table-condensed">
+                                    <xh:tbody>
+                                        <xh:tr>
+                                            <xh:td rowspan="2"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.control-settings-dialog', '|fr-form-resources|')"/></xh:td>
+                                            <xh:td><xh:kbd>⌃[</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.go-prev-control', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>⌃]</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.go-next-control', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td rowspan="2"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.tab-navigation', '|fr-form-resources|')"/></xh:td>
+                                            <xh:td><xh:kbd>⌃}</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-next-tab', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>⌃{</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.move-prev-tab', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td rowspan="3"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.inserting-form-structure', '|fr-form-resources|')"/></xh:td>
+                                            <xh:td><xh:kbd>I F S</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.insert-section', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>I F G</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.insert-grid', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td><xh:kbd>I F R</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.insert-repeated-grid', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xf:repeat ref="$controls-with-keyboard-shortcut">
+                                            <xh:tr>
+                                                <xf:group ref="if (position() = 1) then . else ()">
+                                                    <xh:td rowspan="{count($controls-with-keyboard-shortcut)}"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.inserting-form-controls', '|fr-form-resources|')"/></xh:td>
+                                                </xf:group>
+                                                <xh:td><xh:kbd><xf:output value="@keyboard-shortcut"/></xh:kbd></xh:td>
+                                                <xh:td><xf:output value="@display-name"/></xh:td>
+                                            </xh:tr>
+                                        </xf:repeat>
+                                        <xh:tr>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.reloading-toolbox', '|fr-form-resources|')"/></xh:td>
+                                            <xh:td>
+                                                <xh:kbd class="fb-for-platform-apple">⌘⇧R</xh:kbd>
+                                                <xh:kbd class="fb-for-platform-other">⌃⇧R</xh:kbd>
+                                            </xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.reload-toolbox', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                    </xh:tbody>
+                                </xh:table>
+                            </xh:div>
                         </xh:div>
                     </xh:div>
                     <xh:div class="fr-dialog-buttons">

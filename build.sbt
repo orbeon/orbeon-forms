@@ -50,7 +50,7 @@ val ScalaLoggingVersion              = "3.9.4"
 
 // Shared Scala libraries
 val CatsVersion                      = "2.13.0"
-val CatsFs2Version                   = "3.13.0"
+val CatsFs2Version                   = "3.14.0"
 val CatsRetryVersion                 = "3.1.3"
 val ScalaTestVersion                 = "3.2.20"
 val CirceVersion                     = "0.14.15"

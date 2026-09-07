@@ -18,6 +18,7 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
     border: @frBodyDecorationsBorderWidth solid var(--orbeon-base-border-color);
     border-radius: var(--orbeon-body-decorations-border-radius);
     background-color: var(--orbeon-base-background-color);
+    overflow: clip; // clip to the rounded corners; not hidden, which would stop sticky inner buttons bar from sticking
 }
 
 // This only for the top-level TOC

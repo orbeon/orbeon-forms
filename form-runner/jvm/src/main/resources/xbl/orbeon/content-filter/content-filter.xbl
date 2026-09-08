@@ -90,26 +90,26 @@
                 </xf:bind>
                 <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                     <_>
-                        <resource xml:lang="en"><alert>This content appears to use inappropriate language. Please make corrections before submitting.</alert></resource>
-                        <resource xml:lang="es"><alert>Este contenido parece utilizar lenguaje inapropiado. Por favor, realice las correcciones antes de enviar.</alert></resource>
-                        <resource xml:lang="fi"><alert>Tämä sisältö näyttää käyttävän sopimatonta kieltä. Tee korjaukset ennen lähettämistä.</alert></resource>
-                        <resource xml:lang="fr"><alert>Ce contenu semble utiliser un langage inapproprié. Veuillez effectuer des corrections avant d'envoyer.</alert></resource>
-                        <resource xml:lang="de"><alert>Dieser Inhalt scheint unangemessene Sprache zu verwenden. Bitte nehmen Sie Korrekturen vor, bevor Sie absenden.</alert></resource>
-                        <resource xml:lang="it"><alert>Questo contenuto sembra utilizzare un linguaggio inappropriato. Si prega di apportare le modifiche prima di inviare.</alert></resource>
-                        <resource xml:lang="sv"><alert>Detta innehåll verkar använda olämpligt språk. Gör korrigeringar innan du skickar in.</alert></resource>
-                        <resource xml:lang="nl"><alert>Deze inhoud lijkt ongepast taalgebruik te bevatten. Breng correcties aan voordat u verzendt.</alert></resource>
-                        <resource xml:lang="pt"><alert>Este conteúdo parece utilizar linguagem inadequada. Por favor, faça as correções antes de enviar.</alert></resource>
-                        <resource xml:lang="pl"><alert>Ta treść wydaje się zawierać niewłaściwy język. Prosimy o dokonanie poprawek przed przesłaniem.</alert></resource>
-                        <resource xml:lang="ar"><alert>يبدو أن هذا المحتوى يستخدم لغة غير لائقة. يرجى إجراء التعديلات قبل الإرسال.</alert></resource>
-                        <resource xml:lang="ca"><alert>Aquest contingut sembla utilitzar un llenguatge inadequat. Feu les correccions abans d'enviar.</alert></resource>
-                        <resource xml:lang="da"><alert>Dette indhold ser ud til at bruge upassende sprog. Foretag venligst rettelser, før du indsender.</alert></resource>
-                        <resource xml:lang="hu"><alert>Ez a tartalom úgy tűnik, nem megfelelő nyelvezetet használ. Kérjük, javítsa elküldés előtt.</alert></resource>
-                        <resource xml:lang="ja"><alert>このコンテンツには不適切な言語が含まれている可能性があります。送信前に修正してください。</alert></resource>
-                        <resource xml:lang="no"><alert>Dette innholdet ser ut til å bruke upassende språk. Vennligst gjør korrigeringer før du sender inn.</alert></resource>
-                        <resource xml:lang="ru"><alert>Этот контент, похоже, использует недопустимую лексику. Пожалуйста, внесите исправления перед отправкой.</alert></resource>
-                        <resource xml:lang="tr"><alert>Bu içerik uygunsuz dil kullanıyor gibi görünüyor. Lütfen göndermeden önce düzeltmeler yapın.</alert></resource>
-                        <resource xml:lang="zh-Hans"><alert>该内容似乎使用了不当语言。请在提交前进行修改。</alert></resource>
-                        <resource xml:lang="zh-Hant"><alert>該內容似乎使用了不當語言。請在提交前進行修改。</alert></resource>
+                        <resource xml:lang="en"><alert>This content appears to use inappropriate language.</alert></resource>
+                        <resource xml:lang="es"><alert>Este contenido parece utilizar lenguaje inapropiado.</alert></resource>
+                        <resource xml:lang="fi"><alert>Tämä sisältö näyttää käyttävän sopimatonta kieltä.</alert></resource>
+                        <resource xml:lang="fr"><alert>Ce contenu semble utiliser un langage inapproprié.</alert></resource>
+                        <resource xml:lang="de"><alert>Dieser Inhalt scheint unangemessene Sprache zu verwenden.</alert></resource>
+                        <resource xml:lang="it"><alert>Questo contenuto sembra utilizzare un linguaggio inappropriato.</alert></resource>
+                        <resource xml:lang="sv"><alert>Detta innehåll verkar använda olämpligt språk.</alert></resource>
+                        <resource xml:lang="nl"><alert>Deze inhoud lijkt ongepast taalgebruik te bevatten.</alert></resource>
+                        <resource xml:lang="pt"><alert>Este conteúdo parece utilizar linguagem inadequada.</alert></resource>
+                        <resource xml:lang="pl"><alert>Ta treść wydaje się zawierać niewłaściwy język.</alert></resource>
+                        <resource xml:lang="ar"><alert>يبدو أن هذا المحتوى يستخدم لغة غير لائقة.</alert></resource>
+                        <resource xml:lang="ca"><alert>Aquest contingut sembla utilitzar un llenguatge inadequat.</alert></resource>
+                        <resource xml:lang="da"><alert>Dette indhold ser ud til at bruge upassende sprog.</alert></resource>
+                        <resource xml:lang="hu"><alert>Ez a tartalom úgy tűnik, nem megfelelő nyelvezetet használ.</alert></resource>
+                        <resource xml:lang="ja"><alert>このコンテンツには不適切な言語が含まれている可能性があります。</alert></resource>
+                        <resource xml:lang="no"><alert>Dette innholdet ser ut til å bruke upassende språk.</alert></resource>
+                        <resource xml:lang="ru"><alert>Этот контент, похоже, использует недопустимую лексику.</alert></resource>
+                        <resource xml:lang="tr"><alert>Bu içerik uygunsuz dil kullanıyor gibi görünüyor.</alert></resource>
+                        <resource xml:lang="zh-Hans"><alert>该内容似乎使用了不当语言。</alert></resource>
+                        <resource xml:lang="zh-Hant"><alert>該內容似乎使用了不當語言。</alert></resource>
                     </_>
                 </xf:instance>
             </xf:model>

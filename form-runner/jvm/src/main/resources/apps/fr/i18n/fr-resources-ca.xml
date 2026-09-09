@@ -63,6 +63,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Següent</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Previ</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Contingut</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Tornar a pujar</reupload>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>Netejar i tancar</submit-dialog-clear>
@@ -578,6 +579,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Pujar</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Validar</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Importar</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Enviar</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Enviar amb advertències</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Enviar amb errors</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Tornar a pujar</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Completar</complete>
+        </buttons>
         <form-version>
             <label>Versió del formulari</label>
             <alert>No hi ha versió del formulari</alert>
@@ -593,17 +604,19 @@
         </version-comment>
         <upload>
             <label>Pujar</label>
+            <completed-label>Pujat</completed-label>
         </upload>
         <file>
             <label>Fitxer per importar</label>
-            <hint>El fitxer ha de ser en Excel 2007 (.xlsx) o XML</hint>
+            <hint>{1,choice,1#Tipus de fitxer admès|1&lt;Tipus de fitxers admesos}: {0}</hint>
             <alert>Fitxer no suportat o faltant</alert>
             <excel-headings-format>Excel 2007 amb capçaleres formatades (.xslx)</excel-headings-format>
             <excel-named-ranges-format>Excel 2007 amb intervals formatats (.xslx)</excel-named-ranges-format>
             <xml-form-structure-and-data-format>Orbeon XML Format d'exportació (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label>Validació</label>
+            <label>Validar</label>
+            <completed-label>Validat</completed-label>
             <alert>Si us plau comenci la validació abans de la importació</alert>
         </validation>
         <start-validation>
@@ -621,16 +634,13 @@
         <validation-canceled>Validació cancelada.</validation-canceled>
         <import>
             <label>Importar</label>
+            <completed-label>Importat</completed-label>
         </import>
         <existing-records>
-            <label>Valors de la BD existents</label>
-            <item id="0">Mantindre</item>
-            <item id="1">Esborrar</item>
+            <label>Esborrar primer tots els registres existents de la base de dades</label>
         </existing-records>
         <invalid-data>
-            <label>Files amb dades invalides</label>
-            <item id="0">Ometre</item>
-            <item id="1">Importar</item>
+            <label>Importar registres amb dades invàlides</label>
         </invalid-data>
         <start-import>
             <label>Començar la importació</label>
@@ -659,6 +669,9 @@
         <valid-records-message>
             {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#té|1&lt;tenen} validació i s'importaran.
         </valid-records-message>
+        <issues-records-message>
+            {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#té|1&lt;tenen} validació. Hi ha alguns problemes al full de càlcul.
+        </issues-records-message>
         <invalid-document-message>
             El document penjat conté errors de validació. Utilitzeu el botó "Revisa les dades" per revisar i corregir els errors abans de desar-los.
         </invalid-document-message>
@@ -666,14 +679,32 @@
             El document penjat conté dades vàlides. Feu servir el botó "Revisa les dades" per revisar les dades del formulari abans de desar-les.
         </valid-document-message>
         <import-complete-message>
-            L'importació de {0,number,integer} {0,choice,1#document|1&lt;documents} s'ha completat.
-            {1,number,integer} invalid {1,choice,1#document s'ha|1&lt;documents s'han} omes.
+            L''importació de {0,number,integer} {0,choice,1#document|1&lt;documents} s''ha completat.{1,choice,0#|0&lt; '{1,number,integer} invalid {1,choice,1#document s''''ha|1&lt;documents s''''han} omès.'}
         </import-complete-message>
         <na>N/D</na>
         <fields-found>Camps trobats</fields-found>
         <values-found>Valors trobats</values-found>
         <errors>Errors</errors>
         <warnings>Advertències</warnings>
+        <validation-details>
+            <title>Detalls de la validació</title>
+            <row>Fila</row>
+            <label>Etiqueta</label>
+            <name>Nom</name>
+            <validation-type>Tipus de validació</validation-type>
+            <reason>Motiu</reason>
+            <data-entered>Dades introduïdes</data-entered>
+            <error>Error</error>
+            <warning>Advertència</warning>
+            <info>Informació</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; Baixar com a CSV</download-csv>
+            <next-steps-title>Ara heu de:</next-steps-title>
+            <next-steps-title-allow-invalid>Ara podeu:</next-steps-title-allow-invalid>
+            <next-steps-errors>corregir les dades al full de càlcul</next-steps-errors>
+            <next-steps-errors-allow-invalid>bé corregir les dades al full de càlcul o bé optar per continuar, cas en què s''aplicaran les opcions per a "{0}"</next-steps-errors-allow-invalid>
+            <next-steps-warnings>revisar les advertències i corregir les dades al full de càlcul o bé continuar sense canvis</next-steps-warnings>
+            <next-steps-reupload>si heu fet canvis al full de càlcul, torneu a pujar el full de càlcul actualitzat, que substituirà les dades de la pujada anterior</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>S'ha produït un error en validar les dades.</validating>
             <importing>S'ha produït un error en importar les dades.</importing>

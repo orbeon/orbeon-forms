@@ -60,6 +60,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Nästa</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Föreg</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Innehåll</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Ladda upp igen</reupload>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>Rensa och stäng</submit-dialog-clear>
@@ -558,6 +559,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Ladda upp</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Validera</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Importera</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Skicka</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Skicka med varningar</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Skicka med fel</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Ladda upp igen</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Slutför</complete>
+        </buttons>
         <form-version>
             <label>Formulärversion</label>
             <alert>Formulärversion saknas</alert>
@@ -573,17 +584,19 @@
         </version-comment>
         <upload>
             <label>Uppladdning</label>
+            <completed-label>Uppladdad</completed-label>
         </upload>
         <file>
             <label>Fil att importera</label>
-            <hint>Filen måste vara i Excel 2007-format (.xlsx) eller XML-format (.xml)</hint>
+            <hint>{1,choice,1#Filtyp som stöds|1&lt;Filtyper som stöds}: {0}</hint>
             <alert>Fil saknas eller stöds inte</alert>
             <excel-headings-format>Excel 2007 med namngivna kolumnrubriker (.xslx)</excel-headings-format>
             <excel-named-ranges-format>Excel 2007 med namngivna områden (.xslx)</excel-named-ranges-format>
             <xml-form-structure-and-data-format>Orbeon XML-exportformat (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label>Validering</label>
+            <label>Validera</label>
+            <completed-label>Validerad</completed-label>
             <alert>Starta valideringen innan du fortsätter med importen</alert>
         </validation>
         <start-validation>
@@ -601,16 +614,13 @@
         <validation-canceled>Valideringen avbröts.</validation-canceled>
         <import>
             <label>Importera</label>
+            <completed-label>Importerad</completed-label>
         </import>
         <existing-records>
-            <label>Befintliga poster i databasen</label>
-            <item id="0">Behåll</item>
-            <item id="1">Ta bort</item>
+            <label>Ta bort alla befintliga poster i databasen först</label>
         </existing-records>
         <invalid-data>
-            <label>Poster med ogiltiga data</label>
-            <item id="0">Hoppa över</item>
-            <item id="1">Importera</item>
+            <label>Importera poster med ogiltiga data</label>
         </invalid-data>
         <start-import>
             <label>Starta import</label>
@@ -637,6 +647,9 @@
         <valid-records-message>
             {0,number,integer} {0,choice,1#dokument|1&lt;dokument} {0,choice,1#har|1&lt;har} validerats och kommer att importeras.
         </valid-records-message>
+        <issues-records-message>
+            {0,number,integer} {0,choice,1#dokument|1&lt;dokument} {0,choice,1#har|1&lt;har} validerats. Det finns några problem i kalkylarket.
+        </issues-records-message>
         <invalid-document-message>
             Den uppladdade filen innehåller valideringsfel. Använd knappen "Granska data" för att granska och rätta felen innan du sparar.
         </invalid-document-message>
@@ -644,13 +657,32 @@
             Den uppladdade filen innehåller giltiga data. Använd knappen "Granska data" för att granska formulärets data innan du sparar.
         </valid-document-message>
         <import-complete-message>
-            Import av {0,number,integer} {0,choice,1#dokument|1&lt;dokument} är klar. {1,number,integer} ogiltiga {1,choice,1#dokument|1&lt;dokument} hoppades över.
+            Import av {0,number,integer} {0,choice,1#dokument|1&lt;dokument} är klar.{1,choice,0#|0&lt; '{1,number,integer} ogiltiga {1,choice,1#dokument|1&lt;dokument} hoppades över.'}
         </import-complete-message>
         <na>Ej tillämpligt</na>
         <fields-found>Fält hittade</fields-found>
         <values-found>Värden hittade</values-found>
         <errors>Fel</errors>
         <warnings>Varningar</warnings>
+        <validation-details>
+            <title>Valideringsdetaljer</title>
+            <row>Rad</row>
+            <label>Etikett</label>
+            <name>Namn</name>
+            <validation-type>Valideringstype</validation-type>
+            <reason>Orsak</reason>
+            <data-entered>Inmatade data</data-entered>
+            <error>Fel</error>
+            <warning>Varning</warning>
+            <info>Info</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; Ladda ner som CSV</download-csv>
+            <next-steps-title>Du måste nu:</next-steps-title>
+            <next-steps-title-allow-invalid>Du kan nu:</next-steps-title-allow-invalid>
+            <next-steps-errors>korrigera data i kalkylarket</next-steps-errors>
+            <next-steps-errors-allow-invalid>antingen korrigera data i kalkylarket eller välja att fortsätta, i vilket fall alternativen för "{0}" tillämpas</next-steps-errors-allow-invalid>
+            <next-steps-warnings>granska eventuella varningar och antingen korrigera data i ditt kalkylark eller fortsätta utan ändringar</next-steps-warnings>
+            <next-steps-reupload>om du har gjort ändringar i kalkylarket, ladda upp det uppdaterade kalkylarket igen, vilket ersätter data från din tidigare uppladdning</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>Ett fel uppstod vid validering av data.</validating>
             <importing>Ett fel uppstod vid import av data.</importing>

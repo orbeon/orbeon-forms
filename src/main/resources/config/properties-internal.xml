@@ -463,6 +463,9 @@
     <property as="xs:string"  name="oxf.fr.detail.process.wizard-toc.*.*">
         xf:dispatch(name = "fr-show-toc",  targetid = "fr-view-component")
     </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.reupload.*.*">
+        xf:dispatch(name = "fr-reupload", targetid = "fr-form-model")
+    </property>
 
     <!-- Home page internal processes -->
     <property as="xs:string"  name="oxf.fr.home.process.load-metadata">

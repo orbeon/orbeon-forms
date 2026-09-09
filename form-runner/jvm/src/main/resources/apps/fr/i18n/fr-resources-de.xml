@@ -60,6 +60,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Weiter</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Zurück</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Inhalt</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Erneut hochladen</reupload>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>Zurücksetzen und schließen</submit-dialog-clear>
@@ -558,6 +559,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Hochladen</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Validieren</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Importieren</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Abschicken</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Mit Warnungen abschicken</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Mit Fehlern abschicken</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Erneut hochladen</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Fertigstellen</complete>
+        </buttons>
         <form-version>
             <label>Formularversion</label>
             <alert>Fehlende Formularversion</alert>
@@ -573,17 +584,19 @@
         </version-comment>
         <upload>
             <label>Hochladen</label>
+            <completed-label>Hochgeladen</completed-label>
         </upload>
         <file>
             <label>Datei zum Importieren</label>
-            <hint>Datei muss in Excel 2007 Format (.xlsx) oder XML (.xml) sein</hint>
+            <hint>{1,choice,1#Unterstützter Dateityp|1&lt;Unterstützte Dateitypen}: {0}</hint>
             <alert>Fehlende Datei</alert>
             <excel-headings-format>Excel 2007 mit benannten Überschriften (.xlsx)</excel-headings-format>
             <excel-named-ranges-format>Excel 2007 mit benannten Bereichen (.xlsx)</excel-named-ranges-format>
             <xml-form-structure-and-data-format>Orbeon XML-Exportformat (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label>Validierung</label>
+            <label>Validieren</label>
+            <completed-label>Validiert</completed-label>
             <alert>Bitte Validierung vor dem Import starten</alert>
         </validation>
         <start-validation>
@@ -601,16 +614,13 @@
         <validation-canceled>Validierung wurde abgebrochen.</validation-canceled>
         <import>
             <label>Import</label>
+            <completed-label>Importiert</completed-label>
         </import>
         <existing-records>
-            <label>Vorhandene Datenbankeinträge</label>
-            <item id="0">Beibehalten</item>
-            <item id="1">Löschen</item>
+            <label>Alle vorhandenen Datenbankeinträge zuerst löschen</label>
         </existing-records>
         <invalid-data>
-            <label>Datensätze mit ungültigen Daten</label>
-            <item id="0">Überspringen</item>
-            <item id="1">Import</item>
+            <label>Datensätze mit ungültigen Daten importieren</label>
         </invalid-data>
         <start-import>
             <label>Import starten</label>
@@ -637,6 +647,9 @@
         <valid-records-message>
             {0,number,integer} {0,choice,1#Dokument|1&lt;Dokumente} {0,choice,1#wurde|1&lt;wurden} validiert und {0,choice,1#wird|1&lt;werden} hochgeladen.
         </valid-records-message>
+        <issues-records-message>
+            {0,number,integer} {0,choice,1#Dokument|1&lt;Dokumente} {0,choice,1#wurde|1&lt;wurden} validiert. Es gibt einige Probleme in Ihrer Tabelle.
+        </issues-records-message>
         <invalid-document-message>
             Das hochgeladene Dokument enthält Validierungsfehler. Verwenden Sie die Schaltfläche "Daten überprüfen", um die Fehler vor dem Speichern zu überprüfen und zu beheben.
         </invalid-document-message>
@@ -644,13 +657,32 @@
             Die Daten des hochgeladenen Dokuments sind gültig. Verwenden Sie die Schaltfläche "Daten überprüfen", um die Formulardaten vor dem Speichern zu überprüfen.
         </valid-document-message>
         <import-complete-message>
-            Der Import von {0,number,integer} {0,choice,1#Dokument|1&lt;Dokumenten} ist abgeschlossen. {1,number,integer} {1,choice,1#ungültiges Dokument wurde|1&lt;ungültige Dokumente wurden} übersprungen.
+            Der Import von {0,number,integer} {0,choice,1#Dokument|1&lt;Dokumenten} ist abgeschlossen.{1,choice,0#|0&lt; '{1,number,integer} {1,choice,1#ungültiges Dokument wurde|1&lt;ungültige Dokumente wurden} übersprungen.'}
         </import-complete-message>
         <na>N/A</na>
         <fields-found>Gefundene Felder</fields-found>
         <values-found>Gefundene Werte</values-found>
         <errors>Fehler</errors>
         <warnings>Warnungen</warnings>
+        <validation-details>
+            <title>Validierungsdetails</title>
+            <row>Zeile</row>
+            <label>Beschriftung</label>
+            <name>Name</name>
+            <validation-type>Validierungstyp</validation-type>
+            <reason>Grund</reason>
+            <data-entered>Eingegebene Daten</data-entered>
+            <error>Fehler</error>
+            <warning>Warnung</warning>
+            <info>Information</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; Als CSV herunterladen</download-csv>
+            <next-steps-title>Sie müssen jetzt:</next-steps-title>
+            <next-steps-title-allow-invalid>Sie können jetzt:</next-steps-title-allow-invalid>
+            <next-steps-errors>die Daten in der Tabelle korrigieren</next-steps-errors>
+            <next-steps-errors-allow-invalid>entweder die Daten in der Tabelle korrigieren oder fortfahren; in diesem Fall gelten die Optionen für "{0}"</next-steps-errors-allow-invalid>
+            <next-steps-warnings>etwaige Warnungen prüfen und entweder die Daten in Ihrer Tabelle korrigieren oder ohne Änderungen fortfahren</next-steps-warnings>
+            <next-steps-reupload>wenn Sie Änderungen an der Tabelle vorgenommen haben, laden Sie die aktualisierte Tabelle erneut hoch, wodurch die Daten Ihres vorherigen Uploads ersetzt werden</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>Beim Validieren der Daten ist ein Fehler aufgetreten.</validating>
             <importing>Beim Importieren der Daten ist ein Fehler aufgetreten.</importing>

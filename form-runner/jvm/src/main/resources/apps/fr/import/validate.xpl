@@ -57,6 +57,7 @@
                         <total>0</total>
                         <processed>0</processed>
                         <succeeded>0</succeeded>
+                        <invalid-rows-string/>
                         <invalid-rows/>
                     </stats>
                 </xf:instance>
@@ -140,8 +141,21 @@
                                     value="xs:integer(.) + 1"/>
                                 <xf:setvalue
                                     if="xxf:instance('fr-error-summary-instance')/valid != true()"
-                                    ref="instance('fr-import-stats')/invalid-rows"
+                                    ref="instance('fr-import-stats')/invalid-rows-string"
                                     value="if (. != '') then concat(., ' ', $p) else $p"/>
+
+                                <xf:var name="row-errors" as="element(error)*" value="fr:errors()[@level = ('error', 'warning')]"/>
+                                <xf:action if="exists($row-errors)">
+                                    <xf:insert
+                                        context="instance('fr-import-stats')/invalid-rows"
+                                        ref="row"
+                                        origin="
+                                            xf:element('row', (
+                                                xf:attribute('index', $p),
+                                                xf:attribute('excel-row', $p + 1),
+                                                $row-errors
+                                            ))"/>
+                                </xf:action>
 
                                 <xf:action type="xpath">
                                     xxf:set-session-attribute('org.orbeon.fr.import.processed', instance('fr-import-stats')/processed/xs:integer(.)),
@@ -170,8 +184,19 @@
                             value="xs:integer(.) + 1"/>
                         <xf:setvalue
                             if="xxf:instance('fr-error-summary-instance')/valid != true()"
-                            ref="instance('fr-import-stats')/invalid-rows"
-                            value="1"/>
+                            ref="instance('fr-import-stats')/invalid-rows-string"
+                            value="'1'"/>
+
+                        <xf:var name="doc-errors" as="element(error)*" value="fr:errors()[@level = ('error', 'warning')]"/>
+                        <xf:action if="exists($doc-errors)">
+                            <xf:insert
+                                context="instance('fr-import-stats')/invalid-rows"
+                                origin="
+                                    xf:element('row', (
+                                        xf:attribute('index', 1),
+                                        $doc-errors
+                                    ))"/>
+                        </xf:action>
 
                         <xf:action type="xpath">
                             xxf:set-session-attribute('org.orbeon.fr.import.processed', instance('fr-import-stats')/processed/xs:integer(.)),
@@ -189,9 +214,9 @@
                     </xf:action>
 
                     <xf:action type="xpath">
-                        xxf:set-session-attribute('org.orbeon.fr.import.invalid-rows', xs:string(instance('fr-import-stats')/invalid-rows))
+                        xxf:set-session-attribute('org.orbeon.fr.import.invalid-rows', xs:string(instance('fr-import-stats')/invalid-rows-string))
                     </xf:action>
-                    <xf:delete ref="instance('fr-import-stats')/invalid-rows"/>
+                    <xf:delete ref="instance('fr-import-stats')/invalid-rows-string"/>
 
                     <!-- Output resulting instance -->
                     <xf:send submission="fr-send-stats"/>

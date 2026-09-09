@@ -60,6 +60,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Próximo</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Anterior</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Conteúdo</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Carregar novamente</reupload>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>Apagar e fechar</submit-dialog-clear>
@@ -558,6 +559,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Carregar</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Validar</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Importar</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Submeter</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Submeter com avisos</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Submeter com erros</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Carregar novamente</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Concluir</complete>
+        </buttons>
         <form-version>
             <label>Versão do formulário</label>
             <alert>Versão do formulário em falta</alert>
@@ -573,17 +584,19 @@
         </version-comment>
         <upload>
             <label>Carregar</label>
+            <completed-label>Carregado</completed-label>
         </upload>
         <file>
             <label>Ficheiro a importar</label>
-            <hint>O ficheiro deve estar no formato Excel 2007 (.xlsx) ou no formato XML (.xml)</hint>
+            <hint>{1,choice,1#Tipo de ficheiro suportado|1&lt;Tipos de ficheiro suportados}: {0}</hint>
             <alert>Ficheiro em falta ou não suportado</alert>
             <excel-headings-format>Excel 2007 com cabeçalhos com nome (.xslx)</excel-headings-format>
             <excel-named-ranges-format>Excel 2007 com intervalos com nome (.xslx)</excel-named-ranges-format>
             <xml-form-structure-and-data-format>Formato de exportação Orbeon XML (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label>Validação</label>
+            <label>Validar</label>
+            <completed-label>Validado</completed-label>
             <alert>Inicie a validação antes de continuar com a importação</alert>
         </validation>
         <start-validation>
@@ -601,16 +614,13 @@
         <validation-canceled>A validação foi cancelada.</validation-canceled>
         <import>
             <label>Importar</label>
+            <completed-label>Importado</completed-label>
         </import>
         <existing-records>
-            <label>Registos existentes na base de dados</label>
-            <item id="0">Manter</item>
-            <item id="1">Apagar</item>
+            <label>Apagar primeiro todos os registos existentes da base de dados</label>
         </existing-records>
         <invalid-data>
-            <label>Registos com dados inválidos</label>
-            <item id="0">Ignorar</item>
-            <item id="1">Importar</item>
+            <label>Importar registos com dados inválidos</label>
         </invalid-data>
         <start-import>
             <label>Iniciar importação</label>
@@ -637,6 +647,9 @@
         <valid-records-message>
             {0,number,integer} {0,choice,1#documento|1&lt;documentos} {0,choice,1#foi validado|1&lt;foram validados} e será(ão) importado(s).
         </valid-records-message>
+        <issues-records-message>
+            {0,number,integer} {0,choice,1#documento|1&lt;documentos} {0,choice,1#foi validado|1&lt;foram validados}. Existem alguns problemas na sua folha de cálculo.
+        </issues-records-message>
         <invalid-document-message>
             O documento carregado contém erros de validação. Utilize o botão "Rever dados" para rever e corrigir os erros antes de guardar.
         </invalid-document-message>
@@ -644,13 +657,32 @@
             O documento carregado contém dados válidos. Utilize o botão "Rever dados" para rever os dados do formulário antes de guardar.
         </valid-document-message>
         <import-complete-message>
-            A importação de {0,number,integer} {0,choice,1#documento|1&lt;documentos} está concluída. {1,number,integer} {1,choice,1#documento inválido foi|1&lt;documentos inválidos foram} ignorado(s).
+            A importação de {0,number,integer} {0,choice,1#documento|1&lt;documentos} está concluída.{1,choice,0#|0&lt; '{1,number,integer} {1,choice,1#documento inválido foi|1&lt;documentos inválidos foram} ignorado(s).'}
         </import-complete-message>
         <na>N/A</na>
         <fields-found>Campos encontrados</fields-found>
         <values-found>Valores encontrados</values-found>
         <errors>Erros</errors>
         <warnings>Avisos</warnings>
+        <validation-details>
+            <title>Detalhes da validação</title>
+            <row>Linha</row>
+            <label>Rótulo</label>
+            <name>Nome</name>
+            <validation-type>Tipo de validação</validation-type>
+            <reason>Motivo</reason>
+            <data-entered>Dados introduzidos</data-entered>
+            <error>Erro</error>
+            <warning>Aviso</warning>
+            <info>Informação</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; Descarregar como CSV</download-csv>
+            <next-steps-title>Deve agora:</next-steps-title>
+            <next-steps-title-allow-invalid>Pode agora:</next-steps-title-allow-invalid>
+            <next-steps-errors>corrigir os dados na folha de cálculo</next-steps-errors>
+            <next-steps-errors-allow-invalid>corrigir os dados na folha de cálculo ou optar por continuar, caso em que se aplicarão as opções para "{0}"</next-steps-errors-allow-invalid>
+            <next-steps-warnings>rever quaisquer avisos e corrigir os dados na sua folha de cálculo ou continuar sem alterações</next-steps-warnings>
+            <next-steps-reupload>se tiver feito alterações na folha de cálculo, recarregue a folha de cálculo atualizada, que substituirá os dados do carregamento anterior</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>Ocorreu um erro ao validar os dados.</validating>
             <importing>Ocorreu um erro ao importar os dados.</importing>

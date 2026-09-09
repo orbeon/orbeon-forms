@@ -60,6 +60,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 次へ</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 前へ</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; 目次</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 再アップロード</reupload>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>クリアして閉じる</submit-dialog-clear>
@@ -545,6 +546,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; アップロード</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 検証</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; インポート</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 送信</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 警告付きで送信</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; エラー付きで送信</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 再アップロード</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 完了</complete>
+        </buttons>
         <form-version>
             <label>フォームバージョン</label>
             <alert>フォームバージョンがありません</alert>
@@ -560,10 +571,11 @@
         </version-comment>
         <upload>
             <label>アップロード</label>
+            <completed-label>アップロード済み</completed-label>
         </upload>
         <file>
             <label>インポートするファイル</label>
-            <hint>ファイルはExcel 2007形式（.xlsx）またはXML形式（.xml）である必要があります</hint>
+            <hint>対応ファイル形式: {0}</hint>
             <alert>ファイルがないか、サポートされていません</alert>
             <excel-headings-format>Excel 2007 名前付き見出し形式（.xlsx）</excel-headings-format>
             <excel-named-ranges-format>Excel 2007 名前付き範囲形式（.xlsx）</excel-named-ranges-format>
@@ -571,6 +583,7 @@
         </file>
         <validation>
             <label>検証</label>
+            <completed-label>検証済み</completed-label>
             <alert>インポートを続行する前に検証を開始してください</alert>
         </validation>
         <start-validation>
@@ -588,16 +601,13 @@
         <validation-canceled>検証がキャンセルされました。</validation-canceled>
         <import>
             <label>インポート</label>
+            <completed-label>インポート済み</completed-label>
         </import>
         <existing-records>
-            <label>既存のデータベースレコード</label>
-            <item id="0">保持</item>
-            <item id="1">削除</item>
+            <label>最初に既存のデータベースレコードをすべて削除</label>
         </existing-records>
         <invalid-data>
-            <label>無効なデータを含むレコード</label>
-            <item id="0">スキップ</item>
-            <item id="1">インポート</item>
+            <label>無効なデータを含むレコードをインポート</label>
         </invalid-data>
         <start-import>
             <label>インポートを開始</label>
@@ -624,6 +634,9 @@
         <valid-records-message>
             {0,number,integer}件のドキュメントが検証され、インポートされます。
         </valid-records-message>
+        <issues-records-message>
+            {0,number,integer}件のドキュメントが検証されました。スプレッドシートに問題があります。
+        </issues-records-message>
         <invalid-document-message>
             アップロードされたドキュメントには検証エラーがあります。「データを確認」ボタンを使用して、保存前にエラーを確認・修正してください。
         </invalid-document-message>
@@ -631,13 +644,32 @@
             アップロードされたドキュメントには有効なデータが含まれています。「データを確認」ボタンを使用して、保存前にフォームデータを確認してください。
         </valid-document-message>
         <import-complete-message>
-            {0,number,integer}件のドキュメントのインポートが完了しました。{1,number,integer}件の無効なドキュメントがスキップされました。
+            {0,number,integer}件のドキュメントのインポートが完了しました。{1,choice,0#|0&lt;'{1,number,integer}件の無効なドキュメントがスキップされました。'}
         </import-complete-message>
         <na>N/A</na>
         <fields-found>検出されたフィールド</fields-found>
         <values-found>検出された値</values-found>
         <errors>エラー</errors>
         <warnings>警告</warnings>
+        <validation-details>
+            <title>検証の詳細</title>
+            <row>行</row>
+            <label>ラベル</label>
+            <name>名前</name>
+            <validation-type>検証タイプ</validation-type>
+            <reason>理由</reason>
+            <data-entered>入力データ</data-entered>
+            <error>エラー</error>
+            <warning>警告</warning>
+            <info>情報</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; CSVとしてダウンロード</download-csv>
+            <next-steps-title>次の手順を実行してください:</next-steps-title>
+            <next-steps-title-allow-invalid>次のいずれかを実行できます:</next-steps-title-allow-invalid>
+            <next-steps-errors>スプレッドシートのデータを修正する</next-steps-errors>
+            <next-steps-errors-allow-invalid>スプレッドシートのデータを修正するか、そのまま続行することを選択します。その場合は「{0}」のオプションが適用されます</next-steps-errors-allow-invalid>
+            <next-steps-warnings>警告を確認し、スプレッドシートのデータを修正するか、変更せずに続行してください</next-steps-warnings>
+            <next-steps-reupload>スプレッドシートに変更を加えた場合は、更新されたスプレッドシートを再アップロードしてください。前回のアップロードのデータが置き換えられます</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>データの検証中にエラーが発生しました。</validating>
             <importing>データのインポート中にエラーが発生しました。</importing>

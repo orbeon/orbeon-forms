@@ -60,6 +60,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Next</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Prev</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Content</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Re-Upload</reupload>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>Clear and close</submit-dialog-clear>
@@ -559,6 +560,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Upload</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Validate</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Import</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Submit</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Submit with Warnings</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Submit with Errors</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Re-Upload</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Complete</complete>
+        </buttons>
         <form-version>
             <label>Form Version</label>
             <alert>Missing form version</alert>
@@ -574,17 +585,19 @@
         </version-comment>
         <upload>
             <label>Upload</label>
+            <completed-label>Uploaded</completed-label>
         </upload>
         <file>
             <label>File to import</label>
-            <hint>File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
+            <hint>{1,choice,1#Supported file type|1&lt;Supported file types}: {0}</hint>
             <alert>Missing or unsupported file</alert>
             <excel-headings-format>Excel 2007 with named headings format (.xslx)</excel-headings-format>
             <excel-named-ranges-format>Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
             <xml-form-structure-and-data-format>Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label>Validation</label>
+            <label>Validate</label>
+            <completed-label>Validated</completed-label>
             <alert>Please start the validation before proceeding to the import</alert>
         </validation>
         <start-validation>
@@ -602,16 +615,17 @@
         <validation-canceled>Validation was canceled.</validation-canceled>
         <import>
             <label>Import</label>
+            <completed-label>Imported</completed-label>
         </import>
         <existing-records>
-            <label>Existing database records</label>
-            <item id="0">Keep</item>
-            <item id="1">Delete</item>
+            <label>Delete all existing database records first</label>
+            <help>When selected, all existing database records for this form will be permanently deleted before importing the new data. When unselected, existing records are preserved and the imported data is added to the database.</help>
+            <hint>Delete all existing database records for this form before importing new data.</hint>
         </existing-records>
         <invalid-data>
-            <label>Records with invalid data</label>
-            <item id="0">Skip</item>
-            <item id="1">Import</item>
+            <label>Import records with invalid data</label>
+            <help>When selected, spreadsheet rows containing validation errors will still be imported so they can be reviewed and corrected later in Form Runner. When unselected, rows with validation errors are skipped and only valid rows are imported.</help>
+            <hint>Import records containing validation errors.</hint>
         </invalid-data>
         <start-import>
             <label>Start Import</label>
@@ -638,6 +652,9 @@
         <valid-records-message>
             {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
         </valid-records-message>
+        <issues-records-message>
+            {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated. There are some issues in your spreadsheet.
+        </issues-records-message>
         <invalid-document-message>
             The document uploaded contains validation errors. Use the "Review Data" button to review and fix errors before saving.
         </invalid-document-message>
@@ -645,13 +662,32 @@
             The document uploaded contains valid data. Use the "Review Data" button to review the form data before saving.
         </valid-document-message>
         <import-complete-message>
-            Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
+            Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete.{1,choice,0#|0&lt; '{1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.'}
         </import-complete-message>
         <na>N/A</na>
         <fields-found>Fields Found</fields-found>
         <values-found>Values Found</values-found>
         <errors>Errors</errors>
         <warnings>Warnings</warnings>
+        <validation-details>
+            <title>Validation Details</title>
+            <row>Row</row>
+            <label>Label</label>
+            <name>Name</name>
+            <validation-type>Validation Type</validation-type>
+            <reason>Reason</reason>
+            <data-entered>Data Entered</data-entered>
+            <error>Error</error>
+            <warning>Warning</warning>
+            <info>Info</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; Download as CSV</download-csv>
+            <next-steps-title>You must now:</next-steps-title>
+            <next-steps-title-allow-invalid>You may now:</next-steps-title-allow-invalid>
+            <next-steps-errors>correct the data in the spreadsheet</next-steps-errors>
+            <next-steps-errors-allow-invalid>either correct the data in the spreadsheet, or choose to proceed, in which case the options for "{0}" will apply</next-steps-errors-allow-invalid>
+            <next-steps-warnings>review any warnings and either correct the data in your spreadsheet or continue without changes</next-steps-warnings>
+            <next-steps-reupload>if you made changes to the spreadsheet, re-upload the updated spreadsheet which will replace data from your previous upload</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>An error occurred while validating the data.</validating>
             <importing>An error occurred while importing the data.</importing>

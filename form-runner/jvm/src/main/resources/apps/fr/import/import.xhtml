@@ -41,6 +41,12 @@
                 value="xxf:property(string-join(('oxf.fr.import.allow-invalid-documents', $app, $form), '.')) = true()"/>
 
             <xf:var
+                name="allow-delete-existing-records"
+                value="
+                    xxf:property(string-join(('oxf.fr.import.delete-existing-records', $app, $form), '.')) = true() or
+                    xxf:property(string-join(('oxf.fr.import.allow-delete-existing-records', $app, $form), '.')) = true()"/>
+
+            <xf:var
                 name="restrict-to-latest-version"
                 value="xxf:property(string-join(('oxf.fr.import.restrict-to-latest-version', $app, $form), '.')) = true()"/>
 
@@ -62,10 +68,6 @@
                         else
                             $req-allowed-formats[. = $prop-allowed-formats]
                     "/>
-
-            <xf:var
-                name="show-start-over-button"
-                value="xxf:property(string-join(('oxf.fr.import.show-start-over-button', $app, $form), '.')) = true()"/>
 
             <xf:var
                 name="show-app-form-names"
@@ -111,7 +113,7 @@
             <xf:dispatch
                 event="xforms-ready"
 
-                name="fr-import-clear-validation-and-import"
+                name="fr-import-clear-validation-and-import-stats"
                 targetid="fr-form-model"/>
 
             <!-- Main data -->
@@ -135,7 +137,7 @@
                         </stats>
                     </validate>
                     <import>
-                        <keep-existing-records>true</keep-existing-records>
+                        <delete-existing-records>false</delete-existing-records>
                         <import-invalid-data>false</import-invalid-data>
                         <!-- 'not-started' | 'started' | 'succeeded' | 'failed' -->
                         <importing>not-started</importing>
@@ -203,18 +205,31 @@
                     <xf:bind ref="validating" constraint="$validation-completed"/>
                     <xf:bind ref="stats/(total | processed | succeeded)" type="xs:integer" readonly="true()"/>
                     <xf:bind ref="stats/(all-values-count | set-values-count | counts/@*)" type="xs:integer" readonly="true()"/>
-                    <xf:bind ref="stats/errors" id="validate-stats-errors-bind"/>
+                    <xf:bind ref="stats/processed"      id="validate-stats-processed-bind"/>
+                    <xf:bind ref="stats/invalid-rows"   id="validate-stats-invalid-rows-bind"/>
                 </xf:bind>
                 <xf:bind ref="import" id="import-bind" relevant="not($file-format = ('excel-named-ranges', 'xml-form-structure-and-data'))">
-                    <xf:bind id="fr-keep-existing-records-bind" ref="keep-existing-records"/>
-                    <xf:bind id="fr-import-invalid-data-bind"   ref="import-invalid-data"/>
+                    <xf:bind
+                        id="fr-delete-existing-records-bind"
+                        ref="delete-existing-records"
+                        type="xs:boolean"
+                        relevant="$allow-delete-existing-records"
+                        readonly="not(instance('fr-import-search-response')/@search-total[string(.) castable as xs:integer][data(.) gt 0])"/>
+                    <xf:bind
+                        id="fr-import-invalid-data-bind"
+                        ref="import-invalid-data"
+                        type="xs:boolean"
+                        relevant="$allow-invalid-documents"
+                        readonly="not(bind('fr-import-invalid-count-bind') gt 0)"/>
 
                     <xf:bind ref="importing"  constraint="$import-completed"/>
                     <xf:bind ref="stats/*"    type="xs:integer" readonly="true()"/>
                 </xf:bind>
             </xf:bind>
 
-            <!-- Validation and import status -->
+            <!-- Upload, validation and import status -->
+            <xf:var name="upload-completed"     context="instance('fr-form-instance')/upload/file"          value="xxf:non-blank(.)"/>
+
             <xf:var name="validation-done"      context="instance('fr-form-instance')/validate/validating" value=". = 'succeeded'"/>
             <xf:var name="validation-completed" context="instance('fr-form-instance')/validate/stats"      value="$validation-done and total = processed"/>
             <xf:var name="validation-canceled"  context="instance('fr-form-instance')/validate/stats"      value="$validation-done and not($validation-completed)"/>
@@ -223,10 +238,14 @@
             <xf:var name="import-completed"     context="instance('fr-form-instance')/import/stats"        value="$import-done and total = processed"/>
             <xf:var name="import-canceled"      context="instance('fr-form-instance')/import/stats"        value="$import-done and not($import-completed)"/>
 
-            <xf:action event="fr-import-clear-validation-and-import">
+            <xf:action event="fr-reupload">
+                <xf:toggle case="upload-section-case"/>
+            </xf:action>
+
+            <xf:action event="fr-import-clear-validation-and-import-stats">
 
                 <xf:dispatch
-                    name="fr-import-clear-import"
+                    name="fr-import-clear-import-stats"
                     targetid="fr-form-model"/>
 
                 <xf:action context="validate">
@@ -234,9 +253,15 @@
                     <xf:setvalue iterate="stats/*" ref="."/>
                     <xf:delete ref="stats/_"/>
                 </xf:action>
+
+                <xf:action context="instance('fr-form-instance')/import">
+                    <xf:setvalue ref="delete-existing-records">false</xf:setvalue>
+                    <xf:setvalue ref="import-invalid-data">false</xf:setvalue>
+                </xf:action>
+
             </xf:action>
 
-            <xf:action event="fr-import-clear-import">
+            <xf:action event="fr-import-clear-import-stats">
 
                 <xf:action type="xpath">
                     xxf:set-session-attribute('org.orbeon.fr.import.total',     ()),
@@ -557,6 +582,10 @@
                     <description/>
                     <author>Orbeon, Inc.</author>
                     <created-with-version>2018.2</created-with-version>
+                    <wizard-toc-position>none</wizard-toc-position>
+                    <xbl>
+                        <fr:wizard allow-url-param="false" update-url-param="false"/>
+                    </xbl>
                 </metadata>
             </xf:instance>
 
@@ -727,7 +756,7 @@
                                     <xf:var name="value" value="string(.)"/>
 
                                     <xf:dispatch
-                                        name="fr-import-clear-validation-and-import"
+                                        name="fr-import-clear-validation-and-import-stats"
                                         targetid="fr-form-model"/>
 
                                     <xf:action if="not($value castable as xs:integer)">
@@ -771,7 +800,26 @@
                     </fr:grid>
                 </fr:section>
                 <fr:section id="upload-section" bind="upload-bind">
-                    <xf:label ref="xxf:r('import.upload.label', '|fr-fr-resources|')"/>
+                    <xf:label ref="xxf:r(if ($upload-completed) then 'import.upload.completed-label' else 'import.upload.label', '|fr-fr-resources|')"/>
+
+                    <!-- Start validation immediately-->
+                    <xf:action
+                        observer="upload-section-case"
+                        event="xforms-select">
+                        <!-- Do it this way, as it should work whether we come from the Form Version page,
+                             or the Validate/Import pages, as we do not support anymore a simple "Back" -->
+                        <!-- Clear file upload-->
+                        <xf:action type="xpath" xmlns:upload="java:org.orbeon.oxf.xforms.control.controls.XFormsUploadControl">
+                            upload:deleteFileIfPossible(file)
+                        </xf:action>
+                        <xf:delete ref="file/@*[not(local-name() = ('mediatype', 'filename', 'size'))]"/>
+                        <xf:setvalue iterate="file, file/@*" ref="."/>
+                        <xf:setvalue ref="file-format"/>
+                        <!-- Clear validation and import -->
+                        <xf:dispatch name="fr-import-clear-validation-and-import-stats" targetid="fr-form-model"/>
+                        <!-- Rest visited status -->
+                        <xxf:setvisited control="upload-section" visited="false" recurse="true"/>
+                    </xf:action>
 
                     <fr:grid>
                         <fr:c x="1" y="1" w="12">
@@ -821,21 +869,29 @@
                                 <xf:label ref="xxf:r('import.file.label', '|fr-fr-resources|')"/>
                                 <xf:hint
                                     ref="
-                                        string-join(
-                                            (
-                                                xxf:r('import.file.excel-headings-format',               '|fr-fr-resources|')[$allowed-formats = 'excel-headings'],
-                                                xxf:r('import.file.excel-named-ranges-format',           '|fr-fr-resources|')[$allowed-formats = 'excel-named-ranges'],
-                                                xxf:r('import.file.xml-form-structure-and-data-format',  '|fr-fr-resources|')[$allowed-formats = 'xml-form-structure-and-data']
-                                            ),
-                                            ', '
-                                        )"/>
+                                        let $formats := (
+                                            xxf:r('import.file.excel-headings-format',               '|fr-fr-resources|')[$allowed-formats = 'excel-headings'],
+                                            xxf:r('import.file.excel-named-ranges-format',           '|fr-fr-resources|')[$allowed-formats = 'excel-named-ranges'],
+                                            xxf:r('import.file.xml-form-structure-and-data-format',  '|fr-fr-resources|')[$allowed-formats = 'xml-form-structure-and-data']
+                                        )
+                                        return
+                                            if (exists($formats)) then
+                                                xxf:format-message(
+                                                    xxf:r('import.file.hint', '|fr-fr-resources|'),
+                                                    (
+                                                        string-join($formats, ', '),
+                                                        count($formats)
+                                                    )
+                                                )
+                                            else
+                                                ()"/>
                                 <xf:alert ref="xxf:r('import.file.alert', '|fr-fr-resources|')"/>
 
                                 <!-- 2021-03-26: This event does not get dispatched! -->
                                 <xf:dispatch
                                     event="xforms-value-changed"
 
-                                    name="fr-import-clear-validation-and-import"
+                                    name="fr-import-clear-validation-and-import-stats"
                                     targetid="fr-form-model"/>
 
                                 <!-- Optional file upload callback -->
@@ -855,7 +911,7 @@
                     </fr:grid>
                 </fr:section>
                 <fr:section id="validate-section" bind="validate-bind">
-                    <xf:label ref="xxf:r('import.validation.label', '|fr-fr-resources|')"/>
+                    <xf:label ref="xxf:r(if ($validation-completed) then 'import.validation.completed-label' else 'import.validation.label', '|fr-fr-resources|')"/>
 
                     <xf:var name="validating" value="validating = 'started'"/>
 
@@ -887,27 +943,6 @@
                             <xf:output ref=".[$show-app-form-names]" value="instance('fr-form-instance')/version/selected-version">
                                 <xf:label ref="xxf:r('import.form-version.label', '|fr-fr-resources|')"/>
                             </xf:output>
-                        </fr:c>
-                    </fr:grid>
-
-                    <!-- This is here so we can make the section invalid until validation has completed. -->
-                    <fr:hidden ref="validating">
-                        <xf:label ref="xxf:r('import.validation.label', '|fr-fr-resources|')"/>
-                        <xf:alert ref="xxf:r('import.validation.alert', '|fr-fr-resources|')"/>
-                    </fr:hidden>
-
-                    <fr:grid>
-                        <fr:c x="9" y="1" w="4">
-                            <xf:trigger ref=".[$validation-canceled]" class="import-start-validation-trigger" appearance="xxf:success">
-                                <xf:label ref="xxf:r('import.start-validation.label', '|fr-fr-resources|')"/>
-                                <xf:action event="DOMActivate">
-                                    <xf:dispatch
-                                        name="fr-import-clear-validation-and-import"
-                                        targetid="fr-form-model"/>
-                                    <xf:send
-                                        submission="fr-import-validate-submission"/>
-                                </xf:action>
-                            </xf:trigger>
                         </fr:c>
                     </fr:grid>
                     <xf:group ref="stats[$validating or $validation-done]">
@@ -975,12 +1010,12 @@
                                 <xf:label ref="xxf:r('import.eta', '|fr-fr-resources|')"/>
                             </xf:output>
                         </fr:c>
-                        <fr:c x="1" y="2" w="8">
+                        <fr:c x="1" y="2" w="9">
                             <xh:div class="progress">
                                 <xh:div class="progress-bar progress-bar-striped" style="width: {format-number(instance('fr-import-batch-stats')/progress, '###%')}"/>
                             </xh:div>
                         </fr:c>
-                        <fr:c x="9" y="2" w="4">
+                        <fr:c x="10" y="2" w="3" class="fr-import-cancel-validation-trigger-container">
                             <xf:trigger class="import-cancel-validation-trigger" appearance="xxf:danger">
                                 <xf:label ref="xxf:r('import.cancel-validation.label', '|fr-fr-resources|')"/>
                                 <xf:action event="DOMActivate" type="xpath">
@@ -994,68 +1029,206 @@
                     <xf:group context="stats" ref=".[$validation-done]">
 
                         <xf:var
-                            name="format-invalid"
-                            value="exists(bind('validate-stats-errors-bind')/error)"/>
-
-                        <xf:var
                             name="some-invalid"
                             value="bind('fr-import-invalid-count-bind') gt 0"/>
 
-                        <fr:grid ref=".[not($validation-canceled)]">
-                            <fr:c x="1" y="1" w="12">
-                                <xf:group bind="validate-stats-errors-bind" class="alert alert-error">
-                                    <xh:ul>
-                                        <xf:repeat ref="error">
-                                            <xh:li><xf:output value="."/></xh:li>
-                                        </xf:repeat>
-                                    </xh:ul>
-                                </xf:group>
-                            </fr:c>
-                            <fr:c x="1" y="2" w="12">
-                                <xf:group
-                                    ref=".[not($format-invalid)]"
-                                    class="alert alert-{if (bind('fr-import-invalid-count-bind') gt 0) then 'warning' else 'success'}">
+                        <xf:group
+                            ref=".[not($validation-canceled) and not(exists(invalid-rows/row/error[@level = ('error', 'warning')]) or counts/@error gt 0 or counts/@warning gt 0)]"
+                            class="fr-import-validation-details">
+                            <xf:group
+                                ref="."
+                                class="alert alert-success">
+                                <!-- TODO: i18n -->
+                                <xf:output value="'Data has been Validated. Press Submit to send your data.'"/>
+                            </xf:group>
+                        </xf:group>
+
+                        <xf:group ref="invalid-rows[row][not($validation-canceled)]" class="fr-import-validation-details">
+                            <xf:group
+                                ref="."
+                                class="alert alert-{if (bind('fr-import-invalid-count-bind') gt 0 or exists(row/error[@level = 'warning'])) then 'warning' else 'success'}">
+                                <xf:output
+                                    value="
+                                        if (bind('file-format-bind') = ('excel-named-ranges', 'xml-form-structure-and-data')) then
+                                            if ($some-invalid) then
+                                                xxf:format-message(
+                                                    xxf:r('import.invalid-document-message', '|fr-fr-resources|'),
+                                                    ()
+                                                )
+                                            else
+                                                xxf:format-message(
+                                                    xxf:r('import.valid-document-message', '|fr-fr-resources|'),
+                                                    ()
+                                                )
+                                        else
+                                            xxf:format-message(
+                                                xxf:r('import.issues-records-message', '|fr-fr-resources|'),
+                                                xs:integer(bind('validate-stats-processed-bind'))
+                                            )"
+                                />
+                            </xf:group>
+                            <xf:group ref=".[exists(row/error[@level = ('error', 'warning')])]" class="fr-import-validation-instructions">
+                                <xh:div class="fr-import-validation-instructions-title">
                                     <xf:output
                                         value="
-                                            if (bind('file-format-bind') = ('excel-named-ranges', 'xml-form-structure-and-data')) then
-                                                if ($some-invalid) then
-                                                    xxf:format-message(
-                                                        xxf:r('import.invalid-document-message', '|fr-fr-resources|'),
-                                                        ()
-                                                    )
+                                            xxf:r(
+                                                if ($allow-invalid-documents and exists(row/error[@level = 'error'])) then
+                                                    'import.validation-details.next-steps-title-allow-invalid'
                                                 else
-                                                    xxf:format-message(
-                                                        xxf:r('import.valid-document-message', '|fr-fr-resources|'),
-                                                        ()
-                                                    )
-                                            else
-                                                if ($some-invalid) then
-                                                    xxf:format-message(
-                                                        xxf:r('import.invalid-records-message', '|fr-fr-resources|'),
-                                                        for $n in (bind('fr-import-invalid-count-bind'), processed)
-                                                            return xs:integer($n)
-                                                    )
-                                                else
-                                                    xxf:format-message(
-                                                        xxf:r('import.valid-records-message', '|fr-fr-resources|'),
-                                                        xs:integer(processed)
-                                                    )"
-                                    />
-                                </xf:group>
-                            </fr:c>
-                        </fr:grid>
-                        <fr:grid ref=".[$validation-canceled]">
-                            <fr:c x="1" y="1" w="12">
-                                <xh:span class="alert alert-warning">
-                                    <xf:output value="xxf:r('import.validation-canceled', '|fr-fr-resources|')"/>
-                                </xh:span>
-                            </fr:c>
-                        </fr:grid>
+                                                    'import.validation-details.next-steps-title',
+                                                '|fr-fr-resources|'
+                                            )"/>
+                                </xh:div>
+                                <xh:ul>
+                                    <xf:group ref=".[exists(row/error[@level = 'error'])]">
+                                        <xh:li>
+                                            <xf:output
+                                                value="
+                                                    if ($allow-invalid-documents) then
+                                                        xxf:format-message(
+                                                            xxf:r('import.validation-details.next-steps-errors-allow-invalid', '|fr-fr-resources|'),
+                                                            xxf:r('import.invalid-data.label', '|fr-fr-resources|')
+                                                        )
+                                                    else
+                                                        xxf:r('import.validation-details.next-steps-errors', '|fr-fr-resources|')"/>
+                                        </xh:li>
+                                    </xf:group>
+                                    <xf:group ref=".[exists(row/error[@level = 'warning'])]">
+                                        <xh:li><xf:output value="xxf:r('import.validation-details.next-steps-warnings', '|fr-fr-resources|')"/></xh:li>
+                                    </xf:group>
+                                    <xf:group ref=".[exists(row/error[@level = ('error', 'warning')])]">
+                                        <xh:li><xf:output value="xxf:r('import.validation-details.next-steps-reupload', '|fr-fr-resources|')"/></xh:li>
+                                    </xf:group>
+                                </xh:ul>
+                            </xf:group>
+                            <!-- Import options -->
+                            <fr:grid class="fr-import-options" ref=".[$allow-invalid-documents or $allow-delete-existing-records]">
+                                <fr:c x="1" y="1" w="12">
+                                    <fr:checkbox-input ref="bind('fr-import-invalid-data-bind')">
+                                        <xf:label ref="xxf:r('import.invalid-data.label', '|fr-fr-resources|')"/>
+                                        <xf:help ref="xxf:r('import.invalid-data.help', '|fr-fr-resources|')"/>
+                                    </fr:checkbox-input>
+                                </fr:c>
+                                <fr:c x="1" y="2" w="12">
+                                    <fr:checkbox-input ref="bind('fr-delete-existing-records-bind')">
+                                        <xf:label ref="xxf:r('import.existing-records.label', '|fr-fr-resources|')"/>
+                                        <xf:help ref="xxf:r('import.existing-records.help', '|fr-fr-resources|')"/>
+                                    </fr:checkbox-input>
+                                </fr:c>
+                            </fr:grid>
+                            <xh:h3 class="fr-section-title fr-import-validation-details-header">
+                                <!-- TODO: i18n -->
+                                <xf:output class="fr-section-label">Spreadsheet Issues</xf:output>
+                            </xh:h3>
+                            <xh:table class="table table-bordered table-striped fr-import-errors-table">
+                                <xh:thead>
+                                    <xh:tr>
+                                        <xf:group ref=".[bind('file-format-bind') = 'excel-headings']">
+                                            <xh:th>
+                                                <xf:output value="xxf:r('import.validation-details.row', '|fr-fr-resources|')"/>
+                                            </xh:th>
+                                        </xf:group>
+                                        <xh:th>
+                                            <xf:output value="xxf:r('import.validation-details.label', '|fr-fr-resources|')"/>
+                                        </xh:th>
+                                        <xh:th>
+                                            <xf:output value="xxf:r('import.validation-details.name', '|fr-fr-resources|')"/>
+                                        </xh:th>
+                                        <xh:th>
+                                            <xf:output value="xxf:r('import.validation-details.validation-type', '|fr-fr-resources|')"/>
+                                        </xh:th>
+                                        <xh:th>
+                                            <xf:output value="xxf:r('import.validation-details.reason', '|fr-fr-resources|')"/>
+                                        </xh:th>
+                                        <xh:th>
+                                            <xf:output value="xxf:r('import.validation-details.data-entered', '|fr-fr-resources|')"/>
+                                        </xh:th>
+                                    </xh:tr>
+                                </xh:thead>
+                                <xh:tbody>
+                                    <xf:repeat ref="row/error">
+                                        <xf:var name="excel-row" value="../@excel-row"/>
+                                        <xh:tr>
+                                            <xf:group ref=".[bind('file-format-bind') = 'excel-headings']">
+                                                <xh:td>
+                                                    <xf:output value="$excel-row"/>
+                                                </xh:td>
+                                            </xf:group>
+                                            <xh:td>
+                                                <xf:output value="@label"/>
+                                            </xh:td>
+                                            <xh:td>
+                                                <xf:output value="@name"/>
+                                            </xh:td>
+                                            <xh:td>
+                                                <xf:output value="xxf:r(concat('import.validation-details.', @level), '|fr-fr-resources|')"/>
+                                            </xh:td>
+                                            <xh:td>
+                                                <xf:output value="@alert"/>
+                                            </xh:td>
+                                            <xh:td>
+                                                <xf:output value="@value"/>
+                                            </xh:td>
+                                        </xh:tr>
+                                    </xf:repeat>
+                                </xh:tbody>
+                            </xh:table>
+                            <xf:output
+                                appearance="xxf:download"
+                                value="fr:validation-errors-to-csv(., bind('file-format-bind'))"
+                                xxf:download="validation-errors.csv"
+                                class="fr-import-download-csv">
+                                <xf:label
+                                    mediatype="text/html"
+                                    ref="xxf:r('import.validation-details.download-csv', '|fr-fr-resources|')"/>
+                                <xf:filename
+                                    ref="
+                                        concat(
+                                            fr:form-title(),
+                                            ' - ',
+                                            fr:app-name(),
+                                            ' - ',
+                                            fr:form-name(),
+                                            ' - ',
+                                            'Import validation errors',
+                                            '.csv'
+                                        )"/>
+                                <xf:mediatype ref="'text/csv'"/>
+                            </xf:output>
+                            <fr:grid ref=".[$validation-canceled]">
+                                <fr:c x="1" y="1" w="12">
+                                    <xh:span class="alert alert-warning">
+                                        <xf:output value="xxf:r('import.validation-canceled', '|fr-fr-resources|')"/>
+                                    </xh:span>
+                                </fr:c>
+                            </fr:grid>
+                        </xf:group>
                     </xf:group>
 
                 </fr:section>
                 <fr:section id="import-section" bind="import-bind">
-                    <xf:label ref="xxf:r('import.import.label', '|fr-fr-resources|')"/>
+                    <xf:label ref="xxf:r(if ($import-completed) then 'import.import.completed-label' else 'import.import.label', '|fr-fr-resources|')"/>
+
+                    <xf:var name="importing" value="importing = 'started'"/>
+
+                    <!-- Start import immediately-->
+                    <xf:action
+                        observer="import-section-case"
+                        event="xforms-select"
+                        if="not($importing) and not($import-done) or $import-canceled">
+
+                        <xf:dispatch
+                            name="fr-import-clear-import-stats"
+                            targetid="fr-form-model"/>
+
+                        <xf:send
+                            if="$allow-delete-existing-records and xs:boolean(bind('fr-delete-existing-records-bind'))"
+                            submission="fr-import-delete-data-submission"/>
+
+                        <xf:send
+                            if="not($allow-delete-existing-records and xs:boolean(bind('fr-delete-existing-records-bind')))"
+                            submission="fr-import-import-submission"/>
+                    </xf:action>
 
                     <fr:grid>
                         <fr:c x="1" y="1" w="12">
@@ -1077,61 +1250,6 @@
                             <xf:output ref=".[$show-app-form-names]" value="instance('fr-form-instance')/version/selected-version">
                                 <xf:label ref="xxf:r('import.form-version.label', '|fr-fr-resources|')"/>
                             </xf:output>
-                        </fr:c>
-                     </fr:grid>
-
-                    <xf:var name="importing" value="importing = 'started'"/>
-
-                    <fr:grid ref=".[not($importing) and not($import-done)]">
-                        <fr:c x="1" y="1" w="6">
-                            <xf:select1
-                                appearance="full"
-                                ref="
-                                    for $t in instance('fr-import-search-response')/@search-total[string(.) castable as xs:integer][data(.) gt 0]
-                                    return
-                                        bind('fr-keep-existing-records-bind')">
-                                <xf:label ref="xxf:r('import.existing-records.label', '|fr-fr-resources|')"/>
-                                <xf:itemset ref="xxf:resource-elements('import.existing-records.item', '|fr-fr-resources|')">
-                                    <xf:label ref="."/>
-                                    <xf:value ref="if (@id = 0) then 'true' else 'false'"/>
-                                </xf:itemset>
-                            </xf:select1>
-                        </fr:c>
-                        <fr:c x="7" y="1" w="6">
-                            <xf:select1
-                                appearance="full"
-                                ref="
-                                    bind('fr-import-invalid-data-bind')[
-                                        $allow-invalid-documents and
-                                        bind('fr-import-invalid-count-bind') gt 0
-                                    ]">
-                                <xf:label ref="xxf:r('import.invalid-data.label', '|fr-fr-resources|')"/>
-                                <xf:itemset ref="xxf:resource-elements('import.invalid-data.item', '|fr-fr-resources|')">
-                                    <xf:label ref="."/>
-                                    <xf:value ref="if (@id = 0) then 'false' else 'true'"/>
-                                </xf:itemset>
-                            </xf:select1>
-                        </fr:c>
-                    </fr:grid>
-
-                    <fr:grid>
-                        <fr:c x="9" y="1" w="4">
-                            <xf:trigger ref=".[not($importing) and not($import-done) or $import-canceled]" class="import-start-import-trigger" appearance="xxf:success">
-                                <xf:label ref="xxf:r('import.start-import.label', '|fr-fr-resources|')"/>
-                                <xf:action event="DOMActivate">
-
-                                    <xf:dispatch
-                                        name="fr-import-clear-import"
-                                        targetid="fr-form-model"/>
-
-                                    <xf:send
-                                        if="bind('fr-keep-existing-records-bind') = true()"
-                                        submission="fr-import-import-submission"/>
-                                    <xf:send
-                                        if="bind('fr-keep-existing-records-bind') = false()"
-                                        submission="fr-import-delete-data-submission"/>
-                                </xf:action>
-                            </xf:trigger>
                         </fr:c>
                     </fr:grid>
 
@@ -1176,7 +1294,7 @@
                                 <xf:label ref="xxf:r('import.eta', '|fr-fr-resources|')"/>
                             </xf:output>
                         </fr:c>
-                        <fr:c x="1" y="2" w="8">
+                        <fr:c x="1" y="2" w="9">
                             <xh:div class="progress">
                                 <xh:div
                                     class="progress-bar progress-bar-striped"
@@ -1192,7 +1310,7 @@
                                 }"/>
                             </xh:div>
                         </fr:c>
-                        <fr:c x="9" y="2" w="4">
+                        <fr:c x="10" y="2" w="3">
                             <xf:trigger class="import-cancel-import-trigger" appearance="xxf:danger">
                                 <xf:label ref="xxf:r('import.cancel-import.label', '|fr-fr-resources|')"/>
                                 <xf:action event="DOMActivate" type="xpath">
@@ -1222,36 +1340,78 @@
                                             )"/>
                                 </xh:span>
                             </fr:c>
-                            <fr:c x="9" y="2" w="4">
-                                <xf:trigger ref=".[$show-start-over-button]" class="import-start-over-trigger" appearance="xxf:success">
-                                    <xf:label ref="xxf:r('import.start-over.label', '|fr-fr-resources|')"/>
-                                    <xf:action event="DOMActivate">
-                                        <xf:load resource="import"/>
-                                    </xf:action>
-                                </xf:trigger>
-                            </fr:c>
                         </fr:grid>
                         <fr:grid ref=".[$import-canceled]">
                             <fr:c x="1" y="1" w="12">
                                 <xh:span class="alert alert-warning">
                                     <xf:output value="xxf:r('import.import-canceled', '|fr-fr-resources|')"/>
                                 </xh:span>
-                                <xf:trigger ref=".[$show-start-over-button]" class="import-start-over-trigger" appearance="xxf:success">
-                                    <xf:label ref="xxf:r('import.start-over.label', '|fr-fr-resources|')"/>
-                                    <xf:action event="DOMActivate">
-                                        <xf:load resource="import"/>
-                                    </xf:action>
-                                </xf:trigger>
                             </fr:c>
                         </fr:grid>
 
                     </xf:group>
                 </fr:section>
-
             </fr:body>
             <fr:inner-buttons>
-                <fr:wizard-prev-button/>
-                <fr:wizard-next-button/>
+                <fr:process-button
+                    id="fr-button-wizard-prev"
+                    name="reupload"
+                    label="{xxf:r('import.buttons.reupload', '|fr-fr-resources|')}"
+                    ref="
+                        if (case('switch') = 'validate-section-case') then
+                            (if (instance('fr-form-instance')/validate/validating = ('succeeded', 'failed')) then . else '')
+                        else if (case('switch') = 'import-section-case') then
+                            (if (instance('fr-form-instance')/import/importing = ('succeeded', 'failed')) then . else '')
+                        else
+                            ()">
+                </fr:process-button>
+                <fr:process-button
+                    id="fr-button-wizard-next"
+                    name="{if (case('switch') = 'import-section-case') then 'summary' else 'wizard-next'}"
+                    class="xforms-trigger-appearance-xxforms-primary"
+                    label="{
+                        xxf:r(
+                            if (case('switch') = 'version-section-case') then
+                                'import.buttons.upload'
+                            else if (case('switch') = 'upload-section-case') then
+                                'import.buttons.validate'
+                            else if (case('switch') = 'validate-section-case') then
+                                if (exists(bind('validate-stats-invalid-rows-bind')/row/error[@level = 'error']) or exists(bind('validate-stats-errors-bind')/error)) then
+                                    if ($allow-invalid-documents) then
+                                        'import.buttons.submit-with-errors'
+                                    else
+                                        'import.buttons.submit'
+                                else if (exists(bind('validate-stats-invalid-rows-bind')/row/error[@level = 'warning'])) then
+                                    'import.buttons.submit-with-warnings'
+                                else
+                                    'import.buttons.submit'
+                            else if (case('switch') = 'import-section-case') then
+                                'import.buttons.complete'
+                            else
+                                'buttons.wizard-next',
+                            '|fr-fr-resources|'
+                        )
+                    }"
+                    ref="
+                        if (case('switch') = 'version-section-case') then
+                            (if (xxf:non-blank(instance('fr-form-instance')/version/selected-version)) then . else '')
+                        else if (case('switch') = 'upload-section-case') then
+                            (if ($upload-completed) then . else '')
+                        else if (case('switch') = 'validate-section-case') then
+                            (if (bind('file-format-bind') = ('excel-named-ranges', 'xml-form-structure-and-data')) then
+                                ()
+                            else if (
+                                instance('fr-form-instance')/validate/validating = 'succeeded' and
+                                ($allow-invalid-documents or not(exists(bind('validate-stats-invalid-rows-bind')/row/error[@level = 'error']) or exists(bind('validate-stats-errors-bind')/error)))
+                            ) then
+                                .
+                            else
+                                '')
+                        else if (case('switch') = 'import-section-case') then
+                            (if (instance('fr-form-instance')/import/importing = 'succeeded' and not($import-canceled)) then . else '')
+                        else
+                            ''"/>
+
                 <xf:group ref=".[bind('file-format-bind') = ('excel-named-ranges', 'xml-form-structure-and-data')]">
                     <xf:submit
                         ref="if ($validation-completed) then . else ''"

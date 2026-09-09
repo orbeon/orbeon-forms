@@ -17,6 +17,7 @@ import cats.syntax.option.*
 import org.orbeon.dom
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerPersistence.*
+import org.orbeon.oxf.fr.library.ErrorAlertSupport
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
@@ -32,6 +33,7 @@ import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.xbl.ErrorSummary
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xml.NamespaceMapping
+import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.jdk.CollectionConverters.*
@@ -850,6 +852,418 @@ class FormRunnerFunctionsTest
       )
       for (name <- excluded)
         assert(! FormRunnerCompiler.isClientPropertyName(name, appForm), s"expected `$name` to be excluded for $appForm")
+    }
+  }
+
+  describe("Validation errors to CSV") {
+    it("must generate valid CSV data URI with proper headers and escaping") {
+      withTestExternalContext { _ =>
+        val source: dom.Document =
+          <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+            <xh:head>
+              <xf:model xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+                <xf:instance id="fr-fr-resources">
+                  <resources xml:lang="en">
+                    <import>
+                      <validation-details>
+                        <row>Row</row>
+                        <label>Label</label>
+                        <name>Name</name>
+                        <validation-type>Validation Type</validation-type>
+                        <reason>Reason</reason>
+                        <data-entered>Data Entered</data-entered>
+                        <error>Error</error>
+                        <warning>Warning</warning>
+                        <info>Info</info>
+                      </validation-details>
+                    </import>
+                  </resources>
+                </xf:instance>
+                <xf:instance id="invalid-rows-instance">
+                  <invalid-rows>
+                    <row index="2" excel-row="3">
+                      <error id="first-name-control" name="first-name" label="First Name" level="error" alert="Value is required" value=""/>
+                      <error id="comments-control" name="comments" label="Questions and Comments" level="warning" alert="Contains &quot;quotes&quot; and, comma" value="Line 1, Line 2"/>
+                    </row>
+                  </invalid-rows>
+                </xf:instance>
+                <xf:instance id="csv-result">
+                  <result/>
+                </xf:instance>
+                <xf:bind ref="instance('csv-result')" calculate="fr:validation-errors-to-csv(instance('invalid-rows-instance'), 'excel-headings')"/>
+              </xf:model>
+            </xh:head>
+            <xh:body/>
+          </xh:html>.toDocument
+
+        withActionAndDoc(setupDocument(source)) {
+          val csvDataUri = inScopeContainingDocument.findInstance("csv-result").get.rootElement.stringValue
+          assert(csvDataUri.startsWith("data:text/csv;charset=utf-8;base64,"))
+          val base64Data = csvDataUri.stripPrefix("data:text/csv;charset=utf-8;base64,")
+          val csvText = new String(java.util.Base64.getDecoder.decode(base64Data), java.nio.charset.StandardCharsets.UTF_8)
+          assert(csvText.startsWith("\uFEFF"))
+          val lines = csvText.stripPrefix("\uFEFF").split("\r\n")
+          assert(lines(0) == "Row,Label,Name,Validation Type,Reason,Data Entered")
+          assert(lines(1) == "3,First Name,first-name,Error,Value is required,")
+          assert(lines(2) == "3,Questions and Comments,comments,Warning,\"Contains \"\"quotes\"\" and, comma\",\"Line 1, Line 2\"")
+        }
+      }
+    }
+
+    it("must split combined <ul><li> alerts into multiple CSV rows") {
+      withTestExternalContext { _ =>
+        val source: dom.Document =
+          <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+            <xh:head>
+              <xf:model xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+                <xf:instance id="fr-fr-resources">
+                  <resources xml:lang="en">
+                    <import>
+                      <validation-details>
+                        <row>Row</row>
+                        <label>Label</label>
+                        <name>Name</name>
+                        <validation-type>Validation Type</validation-type>
+                        <reason>Reason</reason>
+                        <data-entered>Data Entered</data-entered>
+                        <error>Error</error>
+                        <warning>Warning</warning>
+                        <info>Info</info>
+                      </validation-details>
+                    </import>
+                  </resources>
+                </xf:instance>
+                <xf:instance id="invalid-rows-instance">
+                  <invalid-rows>
+                    <row index="1" excel-row="2">
+                      <error id="code-control" name="code" label="Code" level="error" alert="&lt;ul>&lt;li>Must contain &quot;a&quot;&lt;/li>&lt;li>Must contain &quot;b&quot;&lt;/li>&lt;/ul>" value="xyz"/>
+                    </row>
+                  </invalid-rows>
+                </xf:instance>
+                <xf:instance id="csv-result">
+                  <result/>
+                </xf:instance>
+                <xf:bind ref="instance('csv-result')" calculate="fr:validation-errors-to-csv(instance('invalid-rows-instance'), 'excel-headings')"/>
+              </xf:model>
+            </xh:head>
+            <xh:body/>
+          </xh:html>.toDocument
+
+        withActionAndDoc(setupDocument(source)) {
+          val csvDataUri = inScopeContainingDocument.findInstance("csv-result").get.rootElement.stringValue
+          assert(csvDataUri.startsWith("data:text/csv;charset=utf-8;base64,"))
+          val base64Data = csvDataUri.stripPrefix("data:text/csv;charset=utf-8;base64,")
+          val csvText = new String(java.util.Base64.getDecoder.decode(base64Data), java.nio.charset.StandardCharsets.UTF_8)
+          val lines = csvText.stripPrefix("\uFEFF").split("\r\n")
+          assert(lines(0) == "Row,Label,Name,Validation Type,Reason,Data Entered")
+          assert(lines(1) == "2,Code,code,Error,\"Must contain \"\"a\"\"\",xyz")
+          assert(lines(2) == "2,Code,code,Error,\"Must contain \"\"b\"\"\",xyz")
+        }
+      }
+    }
+  }
+
+  describe("ErrorAlertSupport.extractAlerts") {
+    it("returns plain text alerts unchanged") {
+      assert(ErrorAlertSupport.extractAlerts("Value is required") == List("Value is required"))
+      assert(ErrorAlertSupport.extractAlerts("") == List(""))
+    }
+
+    it("extracts multiple alerts from <ul><li> HTML format") {
+      val alert = """<ul><li>Must contain "a"</li><li>Must contain "b"</li></ul>"""
+      assert(ErrorAlertSupport.extractAlerts(alert) == List("""Must contain "a"""", """Must contain "b""""))
+    }
+
+    it("unescapes XML/HTML entities in list items") {
+      val alert = """<ul><li>Must contain &quot;quotes&quot; and, comma</li><li>Must be &lt; 10 &amp; &gt; 0</li></ul>"""
+      assert(ErrorAlertSupport.extractAlerts(alert) == List("""Must contain "quotes" and, comma""", "Must be < 10 & > 0"))
+    }
+
+    it("handles whitespace and linebreaks around and inside <ul>/<li>") {
+      val alert =
+        """
+          |<ul>
+          |  <li>  First alert  </li>
+          |  <li>  Second alert  </li>
+          |</ul>
+          |""".stripMargin
+      assert(ErrorAlertSupport.extractAlerts(alert) == List("First alert", "Second alert"))
+    }
+
+    it("handles single item in <ul><li> format") {
+      val alert = "<ul><li>Single error</li></ul>"
+      assert(ErrorAlertSupport.extractAlerts(alert) == List("Single error"))
+    }
+  }
+
+  describe("Import file hint") {
+    it("must format hint with single and multiple supported file types in XForms") {
+      withTestExternalContext { _ =>
+        val source: dom.Document =
+          <xh:html
+              xmlns:xh="http://www.w3.org/1999/xhtml"
+              xmlns:xf="http://www.w3.org/2002/xforms"
+              xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+              xml:lang="en">
+            <xh:head>
+              <xf:model>
+                <xf:instance id="fr-fr-resources">
+                  <resources>
+                    <resource xml:lang="en">
+                      <import>
+                        <file>
+                          <hint>{{1,choice,1#Supported file type|1&lt;Supported file types}}: {{0}}</hint>
+                          <excel-headings-format>Excel 2007 with named headings format (.xslx)</excel-headings-format>
+                          <excel-named-ranges-format>Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
+                          <xml-form-structure-and-data-format>Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
+                        </file>
+                      </import>
+                    </resource>
+                  </resources>
+                </xf:instance>
+              </xf:model>
+            </xh:head>
+            <xh:body>
+              <xf:output id="single" value="
+                let $allowed-formats := 'excel-headings',
+                    $formats := (
+                      xxf:r('import.file.excel-headings-format',               '|fr-fr-resources|')[$allowed-formats = 'excel-headings'],
+                      xxf:r('import.file.excel-named-ranges-format',           '|fr-fr-resources|')[$allowed-formats = 'excel-named-ranges'],
+                      xxf:r('import.file.xml-form-structure-and-data-format',  '|fr-fr-resources|')[$allowed-formats = 'xml-form-structure-and-data']
+                    )
+                return
+                  if (exists($formats)) then
+                    xxf:format-message(
+                      xxf:r('import.file.hint', '|fr-fr-resources|'),
+                      (
+                        string-join($formats, ', '),
+                        count($formats)
+                      )
+                    )
+                  else
+                    ()
+              "/>
+              <xf:output id="multiple" value="
+                let $allowed-formats := ('excel-headings', 'xml-form-structure-and-data'),
+                    $formats := (
+                      xxf:r('import.file.excel-headings-format',               '|fr-fr-resources|')[$allowed-formats = 'excel-headings'],
+                      xxf:r('import.file.excel-named-ranges-format',           '|fr-fr-resources|')[$allowed-formats = 'excel-named-ranges'],
+                      xxf:r('import.file.xml-form-structure-and-data-format',  '|fr-fr-resources|')[$allowed-formats = 'xml-form-structure-and-data']
+                    )
+                return
+                  if (exists($formats)) then
+                    xxf:format-message(
+                      xxf:r('import.file.hint', '|fr-fr-resources|'),
+                      (
+                        string-join($formats, ', '),
+                        count($formats)
+                      )
+                    )
+                  else
+                    ()
+              "/>
+              <xf:output id="empty" value="
+                let $allowed-formats := (),
+                    $formats := (
+                      xxf:r('import.file.excel-headings-format',               '|fr-fr-resources|')[$allowed-formats = 'excel-headings'],
+                      xxf:r('import.file.excel-named-ranges-format',           '|fr-fr-resources|')[$allowed-formats = 'excel-named-ranges'],
+                      xxf:r('import.file.xml-form-structure-and-data-format',  '|fr-fr-resources|')[$allowed-formats = 'xml-form-structure-and-data']
+                    )
+                return
+                  if (exists($formats)) then
+                    xxf:format-message(
+                      xxf:r('import.file.hint', '|fr-fr-resources|'),
+                      (
+                        string-join($formats, ', '),
+                        count($formats)
+                      )
+                    )
+                  else
+                    ()
+              "/>
+            </xh:body>
+          </xh:html>.toDocument
+
+        withActionAndDoc(setupDocument(source)) {
+          assert(resolveObject[XFormsValueControl]("single").get.getValue(EventCollector.Throw) == "Supported file type: Excel 2007 with named headings format (.xslx)")
+          assert(resolveObject[XFormsValueControl]("multiple").get.getValue(EventCollector.Throw) == "Supported file types: Excel 2007 with named headings format (.xslx), Orbeon XML export format (.xml)")
+          assert(resolveObject[XFormsValueControl]("empty").get.getValue(EventCollector.Throw) == "")
+        }
+      }
+    }
+
+    it("must have valid hint format in all fr-resources-*.xml files") {
+      val languages = List(
+        "ar", "ca", "da", "de", "en", "es", "fi", "fr", "hu", "it",
+        "ja", "nl", "no", "pl", "pt", "ru", "sv", "tr", "zh-Hans", "zh-Hant"
+      )
+      for (lang <- languages) {
+        val resourcePath = s"/apps/fr/i18n/fr-resources-$lang.xml"
+        val is = getClass.getResourceAsStream(resourcePath)
+        assert(is ne null, s"Missing resource file $resourcePath")
+        val doc =
+          try
+            TransformerUtils.readTinyTree(org.orbeon.oxf.util.XPath.GlobalConfiguration, is, resourcePath, false, false)
+          finally
+            is.close()
+        val hintOpt = (doc.descendant("import") / "file" / "hint").headOption.map(_.stringValue)
+        assert(hintOpt.isDefined, s"Missing import/file/hint in $resourcePath")
+        val hintTemplate = hintOpt.get
+        assert(hintTemplate.nonEmpty, s"Empty import/file/hint in $resourcePath")
+
+        // Test formatting with 1 format
+        val singleFormatted = new java.text.MessageFormat(hintTemplate).format(Array[AnyRef]("Format A", java.lang.Integer.valueOf(1)))
+        assert(singleFormatted.contains("Format A"), s"Single format failed in $resourcePath: $singleFormatted")
+
+        // Test formatting with 2 formats
+        val multipleFormatted = new java.text.MessageFormat(hintTemplate).format(Array[AnyRef]("Format A, Format B", java.lang.Integer.valueOf(2)))
+        assert(multipleFormatted.contains("Format A, Format B"), s"Multiple format failed in $resourcePath: $multipleFormatted")
+      }
+    }
+
+    it("must have valid import section labels and completed-labels in all fr-resources-*.xml files") {
+      val languages = List(
+        "ar", "ca", "da", "de", "en", "es", "fi", "fr", "hu", "it",
+        "ja", "nl", "no", "pl", "pt", "ru", "sv", "tr", "zh-Hans", "zh-Hant"
+      )
+      for (lang <- languages) {
+        val resourcePath = s"/apps/fr/i18n/fr-resources-$lang.xml"
+        val is = getClass.getResourceAsStream(resourcePath)
+        assert(is ne null, s"Missing resource file $resourcePath")
+        val doc =
+          try
+            TransformerUtils.readTinyTree(org.orbeon.oxf.util.XPath.GlobalConfiguration, is, resourcePath, false, false)
+          finally
+            is.close()
+
+        val uploadLabel          = (doc.descendant("import") / "upload" / "label").headOption.map(_.stringValue)
+        val uploadCompletedLabel = (doc.descendant("import") / "upload" / "completed-label").headOption.map(_.stringValue)
+        val valLabel             = (doc.descendant("import") / "validation" / "label").headOption.map(_.stringValue)
+        val valCompletedLabel    = (doc.descendant("import") / "validation" / "completed-label").headOption.map(_.stringValue)
+        val importLabel          = (doc.descendant("import") / "import" / "label").headOption.map(_.stringValue)
+        val importCompletedLabel = (doc.descendant("import") / "import" / "completed-label").headOption.map(_.stringValue)
+
+        assert(uploadLabel.exists(_.nonEmpty),          s"Missing or empty import/upload/label in $resourcePath")
+        assert(uploadCompletedLabel.exists(_.nonEmpty), s"Missing or empty import/upload/completed-label in $resourcePath")
+        assert(valLabel.exists(_.nonEmpty),             s"Missing or empty import/validation/label in $resourcePath")
+        assert(valCompletedLabel.exists(_.nonEmpty),    s"Missing or empty import/validation/completed-label in $resourcePath")
+        assert(importLabel.exists(_.nonEmpty),          s"Missing or empty import/import/label in $resourcePath")
+        assert(importCompletedLabel.exists(_.nonEmpty), s"Missing or empty import/import/completed-label in $resourcePath")
+
+        if (lang == "en") {
+          assert(uploadLabel.contains("Upload"))
+          assert(uploadCompletedLabel.contains("Uploaded"))
+          assert(valLabel.contains("Validate"))
+          assert(valCompletedLabel.contains("Validated"))
+          assert(importLabel.contains("Import"))
+          assert(importCompletedLabel.contains("Imported"))
+        }
+      }
+    }
+
+    it("must dynamically update import section titles when steps complete") {
+      withTestExternalContext { _ =>
+        val source: dom.Document =
+          <xh:html
+              xmlns:xh="http://www.w3.org/1999/xhtml"
+              xmlns:xf="http://www.w3.org/2002/xforms"
+              xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+              xml:lang="en">
+            <xh:head>
+              <xf:model id="fr-form-model">
+                <xf:instance id="fr-fr-resources">
+                  <resources>
+                    <resource xml:lang="en">
+                      <import>
+                        <upload>
+                          <label>Upload</label>
+                          <completed-label>Uploaded</completed-label>
+                        </upload>
+                        <validation>
+                          <label>Validate</label>
+                          <completed-label>Validated</completed-label>
+                        </validation>
+                        <import>
+                          <label>Import</label>
+                          <completed-label>Imported</completed-label>
+                        </import>
+                      </import>
+                    </resource>
+                  </resources>
+                </xf:instance>
+
+                <xf:instance id="fr-form-instance">
+                  <wizard>
+                    <upload>
+                      <file/>
+                    </upload>
+                    <validate>
+                      <validating>not-started</validating>
+                      <stats>
+                        <total>10</total>
+                        <processed>0</processed>
+                      </stats>
+                    </validate>
+                    <import>
+                      <importing>not-started</importing>
+                      <stats>
+                        <total>10</total>
+                        <processed>0</processed>
+                      </stats>
+                    </import>
+                  </wizard>
+                </xf:instance>
+
+                <xf:var name="upload-completed"     context="instance('fr-form-instance')/upload/file"          value="xxf:non-blank(.)"/>
+                <xf:var name="validation-done"      context="instance('fr-form-instance')/validate/validating" value=". = 'succeeded'"/>
+                <xf:var name="validation-completed" context="instance('fr-form-instance')/validate/stats"      value="$validation-done and total = processed"/>
+                <xf:var name="import-done"          context="instance('fr-form-instance')/import/importing"    value=". = 'succeeded'"/>
+                <xf:var name="import-completed"     context="instance('fr-form-instance')/import/stats"        value="$import-done and total = processed"/>
+              </xf:model>
+            </xh:head>
+            <xh:body>
+              <xf:output id="upload-title"   value="xxf:r(if ($upload-completed) then 'import.upload.completed-label' else 'import.upload.label', '|fr-fr-resources|')"/>
+              <xf:output id="validate-title" value="xxf:r(if ($validation-completed) then 'import.validation.completed-label' else 'import.validation.label', '|fr-fr-resources|')"/>
+              <xf:output id="import-title"   value="xxf:r(if ($import-completed) then 'import.import.completed-label' else 'import.import.label', '|fr-fr-resources|')"/>
+
+              <xf:input id="file-input" ref="instance('fr-form-instance')/upload/file"/>
+              <xf:input id="validating-input" ref="instance('fr-form-instance')/validate/validating"/>
+              <xf:input id="val-processed-input" ref="instance('fr-form-instance')/validate/stats/processed"/>
+              <xf:input id="importing-input" ref="instance('fr-form-instance')/import/importing"/>
+              <xf:input id="imp-processed-input" ref="instance('fr-form-instance')/import/stats/processed"/>
+            </xh:body>
+          </xh:html>.toDocument
+
+        withActionAndDoc(setupDocument(source)) {
+          // Initial state
+          assert(resolveObject[XFormsValueControl]("upload-title").get.getValue(EventCollector.Throw) == "Upload")
+          assert(resolveObject[XFormsValueControl]("validate-title").get.getValue(EventCollector.Throw) == "Validate")
+          assert(resolveObject[XFormsValueControl]("import-title").get.getValue(EventCollector.Throw) == "Import")
+
+          // Complete upload
+          setControlValue("file-input", "file:/tmp/test.xlsx")
+
+          assert(resolveObject[XFormsValueControl]("upload-title").get.getValue(EventCollector.Throw) == "Uploaded")
+          assert(resolveObject[XFormsValueControl]("validate-title").get.getValue(EventCollector.Throw) == "Validate")
+          assert(resolveObject[XFormsValueControl]("import-title").get.getValue(EventCollector.Throw) == "Import")
+
+          // Complete validation
+          setControlValue("validating-input", "succeeded")
+          setControlValue("val-processed-input", "10")
+
+          assert(resolveObject[XFormsValueControl]("upload-title").get.getValue(EventCollector.Throw) == "Uploaded")
+          assert(resolveObject[XFormsValueControl]("validate-title").get.getValue(EventCollector.Throw) == "Validated")
+          assert(resolveObject[XFormsValueControl]("import-title").get.getValue(EventCollector.Throw) == "Import")
+
+          // Complete import
+          setControlValue("importing-input", "succeeded")
+          setControlValue("imp-processed-input", "10")
+
+          assert(resolveObject[XFormsValueControl]("upload-title").get.getValue(EventCollector.Throw) == "Uploaded")
+          assert(resolveObject[XFormsValueControl]("validate-title").get.getValue(EventCollector.Throw) == "Validated")
+          assert(resolveObject[XFormsValueControl]("import-title").get.getValue(EventCollector.Throw) == "Imported")
+        }
+      }
     }
   }
 }

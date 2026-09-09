@@ -60,6 +60,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Neste</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Tilbake</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Innhold</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Last opp på nytt</reupload>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>Tøm og lukk</submit-dialog-clear>
@@ -555,6 +556,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Last opp</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Valider</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Importer</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Send inn</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Send inn med advarsler</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Send inn med feil</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Last opp på nytt</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Fullfør</complete>
+        </buttons>
         <form-version>
             <label>Skjemaversjon</label>
             <alert>Mangler skjemaversjon</alert>
@@ -570,17 +581,19 @@
         </version-comment>
         <upload>
             <label>Last opp</label>
+            <completed-label>Lastet opp</completed-label>
         </upload>
         <file>
             <label>Fil som skal importeres</label>
-            <hint>Filen må være i Excel 2007-format (.xlsx) eller XML-format (.xml)</hint>
+            <hint>{1,choice,1#Støttet filtype|1&lt;Støttede filtyper}: {0}</hint>
             <alert>Manglende eller ikke støttet fil</alert>
             <excel-headings-format>Excel 2007 med navngitte overskrifter (.xslx)</excel-headings-format>
             <excel-named-ranges-format>Excel 2007 med navngitte områder (.xslx)</excel-named-ranges-format>
             <xml-form-structure-and-data-format>Orbeon XML-eksportformat (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label>Validering</label>
+            <label>Valider</label>
+            <completed-label>Validert</completed-label>
             <alert>Start valideringen før du fortsetter med importen</alert>
         </validation>
         <start-validation>
@@ -598,16 +611,13 @@
         <validation-canceled>Valideringen ble avbrutt.</validation-canceled>
         <import>
             <label>Importer</label>
+            <completed-label>Importert</completed-label>
         </import>
         <existing-records>
-            <label>Eksisterende databaseoppføringer</label>
-            <item id="0">Behold</item>
-            <item id="1">Slett</item>
+            <label>Slett alle eksisterende databaseoppføringer først</label>
         </existing-records>
         <invalid-data>
-            <label>Oppføringer med ugyldige data</label>
-            <item id="0">Hopp over</item>
-            <item id="1">Importer</item>
+            <label>Importer oppføringer med ugyldige data</label>
         </invalid-data>
         <start-import>
             <label>Start import</label>
@@ -634,6 +644,9 @@
         <valid-records-message>
             {0,number,integer} {0,choice,1#dokument|1&lt;dokumenter} {0,choice,1#har|1&lt;har} blitt validert og vil bli importert.
         </valid-records-message>
+        <issues-records-message>
+            {0,number,integer} {0,choice,1#dokument|1&lt;dokumenter} {0,choice,1#har|1&lt;har} blitt validert. Det er noen problemer i regnearket ditt.
+        </issues-records-message>
         <invalid-document-message>
             Det opplastede dokumentet inneholder valideringsfeil. Bruk knappen "Gå gjennom data" for å se gjennom og rette feil før du lagrer.
         </invalid-document-message>
@@ -641,13 +654,32 @@
             Det opplastede dokumentet inneholder gyldige data. Bruk knappen "Gå gjennom data" for å se gjennom skjemadata før du lagrer.
         </valid-document-message>
         <import-complete-message>
-            Import av {0,number,integer} {0,choice,1#dokument|1&lt;dokumenter} er fullført. {1,number,integer} ugyldige {1,choice,1#dokument ble|1&lt;dokumenter ble} hoppet over.
+            Import av {0,number,integer} {0,choice,1#dokument|1&lt;dokumenter} er fullført.{1,choice,0#|0&lt; '{1,number,integer} ugyldige {1,choice,1#dokument ble|1&lt;dokumenter ble} hoppet over.'}
         </import-complete-message>
         <na>Ikke aktuelt</na>
         <fields-found>Felter funnet</fields-found>
         <values-found>Verdier funnet</values-found>
         <errors>Feil</errors>
         <warnings>Advarsler</warnings>
+        <validation-details>
+            <title>Valideringsdetaljer</title>
+            <row>Rad</row>
+            <label>Etikett</label>
+            <name>Navn</name>
+            <validation-type>Valideringstype</validation-type>
+            <reason>Årsak</reason>
+            <data-entered>Angitte data</data-entered>
+            <error>Feil</error>
+            <warning>Advarsel</warning>
+            <info>Info</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; Last ned som CSV</download-csv>
+            <next-steps-title>Du må nå:</next-steps-title>
+            <next-steps-title-allow-invalid>Du kan nå:</next-steps-title-allow-invalid>
+            <next-steps-errors>korrigere dataene i regnearket</next-steps-errors>
+            <next-steps-errors-allow-invalid>enten korrigere dataene i regnearket, eller velge å fortsette, i så fall vil alternativene for "{0}" gjelde</next-steps-errors-allow-invalid>
+            <next-steps-warnings>se gjennom eventuelle advarsler og enten korrigere dataene i regnearket eller fortsette uten endringer</next-steps-warnings>
+            <next-steps-reupload>hvis du har gjort endringer i regnearket, last opp det oppdaterte regnearket på nytt, noe som vil erstatte data fra forrige opplasting</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>Det oppsto en feil under validering av dataene.</validating>
             <importing>Det oppsto en feil under import av dataene.</importing>

@@ -60,6 +60,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; التالي</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; السابق</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; المحتوى</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; إعادة الرفع</reupload>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>مسح وإغلاق</submit-dialog-clear>
@@ -558,6 +559,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; رفع</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; تحقق</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; استيراد</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; إرسال</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; إرسال مع تحذيرات</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; إرسال مع أخطاء</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; إعادة الرفع</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; إكمال</complete>
+        </buttons>
         <form-version>
             <label>إصدار النموذج</label>
             <alert>إصدار النموذج مفقود</alert>
@@ -573,17 +584,19 @@
         </version-comment>
         <upload>
             <label>رفع</label>
+            <completed-label>تم الرفع</completed-label>
         </upload>
         <file>
             <label>الملف المراد استيراده</label>
-            <hint>يجب أن يكون الملف بتنسيق إكسل 2007 (.xlsx) أو بتنسيق XML (.xml)</hint>
+            <hint>{1,choice,1#نوع الملف المدعوم|1&lt;أنواع الملفات المدعومة}: {0}</hint>
             <alert>الملف مفقود أو غير مدعوم</alert>
             <excel-headings-format>إكسل 2007 بتنسيق العناوين المسماة (.xlsx)</excel-headings-format>
             <excel-named-ranges-format>إكسل 2007 بتنسيق النطاقات المسماة (.xlsx)</excel-named-ranges-format>
             <xml-form-structure-and-data-format>تنسيق Orbeon XML للتصدير (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label>التحقق</label>
+            <label>تحقق</label>
+            <completed-label>تم التحقق</completed-label>
             <alert>يرجى بدء عملية التحقق قبل المتابعة للاستيراد</alert>
         </validation>
         <start-validation>
@@ -601,16 +614,13 @@
         <validation-canceled>تم إلغاء عملية التحقق.</validation-canceled>
         <import>
             <label>استيراد</label>
+            <completed-label>تم الاستيراد</completed-label>
         </import>
         <existing-records>
-            <label>السجلات الموجودة في قاعدة البيانات</label>
-            <item id="0">احتفاظ</item>
-            <item id="1">حذف</item>
+            <label>حذف جميع سجلات قاعدة البيانات الموجودة أولاً</label>
         </existing-records>
         <invalid-data>
-            <label>السجلات ذات البيانات غير الصالحة</label>
-            <item id="0">تخطي</item>
-            <item id="1">استيراد</item>
+            <label>استيراد السجلات ذات البيانات غير الصالحة</label>
         </invalid-data>
         <start-import>
             <label>بدء الاستيراد</label>
@@ -637,6 +647,9 @@
         <valid-records-message>
             تم التحقق من صحة {0,number,integer} {0,choice,1#مستند وسيتم استيراده|1&lt;مستندات وسيتم استيرادها}.
         </valid-records-message>
+        <issues-records-message>
+            تم التحقق من صحة {0,number,integer} {0,choice,1#مستند|1&lt;مستندات}. هناك بعض المشكلات في جدول البيانات الخاص بك.
+        </issues-records-message>
         <invalid-document-message>
             يحتوي المستند الذي تم تحميله على أخطاء في التحقق. استخدم زر "مراجعة البيانات" لمراجعة وإصلاح الأخطاء قبل الحفظ.
         </invalid-document-message>
@@ -644,13 +657,32 @@
             يحتوي المستند الذي تم تحميله على بيانات صالحة. استخدم زر "مراجعة البيانات" لمراجعة بيانات النموذج قبل الحفظ.
         </valid-document-message>
         <import-complete-message>
-            اكتمل استيراد {0,number,integer} {0,choice,1#مستند|1&lt;مستندات}. تم تخطي {1,number,integer} {1,choice,1#مستند غير صالح|1&lt;مستندات غير صالحة}.
+            اكتمل استيراد {0,number,integer} {0,choice,1#مستند|1&lt;مستندات}.{1,choice,0#|0&lt; ' تم تخطي {1,number,integer} {1,choice,1#مستند غير صالح|1&lt;مستندات غير صالحة}.'}
         </import-complete-message>
         <na>غير متاح</na>
         <fields-found>الحقول الموجودة</fields-found>
         <values-found>القيم الموجودة</values-found>
         <errors>الأخطاء</errors>
         <warnings>التحذيرات</warnings>
+        <validation-details>
+            <title>تفاصيل التحقق</title>
+            <row>الصف</row>
+            <label>التسمية</label>
+            <name>الاسم</name>
+            <validation-type>نوع التحقق</validation-type>
+            <reason>السبب</reason>
+            <data-entered>البيانات المدخلة</data-entered>
+            <error>خطأ</error>
+            <warning>تحذير</warning>
+            <info>معلومات</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; تنزيل بتنسيق CSV</download-csv>
+            <next-steps-title>يجب عليك الآن:</next-steps-title>
+            <next-steps-title-allow-invalid>يمكنك الآن:</next-steps-title-allow-invalid>
+            <next-steps-errors>تصحيح البيانات في جدول البيانات</next-steps-errors>
+            <next-steps-errors-allow-invalid>إما تصحيح البيانات في جدول البيانات، أو اختيار المتابعة، وفي هذه الحالة سيتم تطبيق خيارات "{0}"</next-steps-errors-allow-invalid>
+            <next-steps-warnings>مراجعة التحذيرات وإما تصحيح البيانات في جدول البيانات أو المتابعة دون تغييرات</next-steps-warnings>
+            <next-steps-reupload>إذا أجريت تغييرات على جدول البيانات، أعد رفع جدول البيانات المحدث الذي سيحل محل بيانات الرفع السابق</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>حدث خطأ أثناء التحقق من صحة البيانات.</validating>
             <importing>حدث خطأ أثناء استيراد البيانات.</importing>

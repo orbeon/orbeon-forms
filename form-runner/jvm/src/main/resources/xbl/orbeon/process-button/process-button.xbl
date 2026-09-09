@@ -29,8 +29,16 @@
         <xbl:template>
 
             <!-- Figure button label -->
-            <xf:var name="button-name"  value="fr:component-param-value('name')"/>
-            <xf:var name="button-label" value="xxf:r(concat('buttons.', $button-name), '|fr-fr-resources|')"/>
+            <xf:var
+                name="button-name"
+                value="fr:component-param-value('name')"/>
+            <xf:var
+                name="button-label"
+                value="
+                    (
+                        fr:component-param-value('label')[xxf:non-blank()],
+                        xxf:r(concat('buttons.', $button-name), '|fr-fr-resources|')
+                    )[1]"/>
 
             <!-- Figure what, if any, loading indicator to use -->
             <xf:var name="loading-indicator-property"

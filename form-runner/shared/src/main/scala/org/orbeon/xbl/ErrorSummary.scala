@@ -48,6 +48,19 @@ object ErrorSummary {
 
   import Private.*
 
+  // Returns all current errors from the error summary
+  def allErrors(onlyErrors: Boolean): List[NodeInfo] =
+    findErrorsInstance match {
+      case Some(errorsInstance) =>
+        val it = (errorsInstance.rootElement / ErrorElemName).iterator
+        if (onlyErrors)
+          it.filter(_.attValue(LevelAttName) == ValidationLevel.ErrorLevel.entryName).toList
+        else
+          it.toList
+      case None =>
+        Nil
+    }
+
   // Return the subset of section names passed which contain errors in the global error summary
   def topLevelSectionsWithErrors(sectionNamesSet: Set[String], onlyVisible: Boolean): Map[String, (Int, Int)] =
     findErrorsInstance match {

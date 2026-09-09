@@ -60,6 +60,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 下一步</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 上一步</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; 目錄</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 重新上傳</reupload>
 
         <!-- 提交對話框 -->
         <submit-dialog-clear>清除並關閉</submit-dialog-clear>
@@ -558,6 +559,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 上傳</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 驗證</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 導入</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 提交</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 帶有警告提交</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 帶有錯誤提交</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 重新上傳</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 完成</complete>
+        </buttons>
         <form-version>
             <label>表單版本</label>
             <alert>缺少表單版本</alert>
@@ -573,10 +584,11 @@
         </version-comment>
         <upload>
             <label>上傳</label>
+            <completed-label>已上傳</completed-label>
         </upload>
         <file>
             <label>要導入的文件</label>
-            <hint>文件必須為Excel 2007格式(.xlsx)或XML格式(.xml)</hint>
+            <hint>支持的文件類型：{0}</hint>
             <alert>缺少文件或不支持的文件格式</alert>
             <excel-headings-format>Excel 2007命名標題格式(.xlsx)</excel-headings-format>
             <excel-named-ranges-format>Excel 2007命名範圍格式(.xlsx)</excel-named-ranges-format>
@@ -584,6 +596,7 @@
         </file>
         <validation>
             <label>驗證</label>
+            <completed-label>已驗證</completed-label>
             <alert>請在進行導入之前開始驗證</alert>
         </validation>
         <start-validation>
@@ -601,16 +614,13 @@
         <validation-canceled>驗證已取消。</validation-canceled>
         <import>
             <label>導入</label>
+            <completed-label>已導入</completed-label>
         </import>
         <existing-records>
-            <label>現有數據庫記錄</label>
-            <item id="0">保留</item>
-            <item id="1">刪除</item>
+            <label>首先刪除所有現有數據庫記錄</label>
         </existing-records>
         <invalid-data>
-            <label>包含無效數據的記錄</label>
-            <item id="0">跳過</item>
-            <item id="1">導入</item>
+            <label>導入包含無效數據的記錄</label>
         </invalid-data>
         <start-import>
             <label>開始導入</label>
@@ -637,6 +647,9 @@
         <valid-records-message>
             {0,number,integer} 個文檔已驗證並將被導入。
         </valid-records-message>
+        <issues-records-message>
+            {0,number,integer} 個文檔已驗證。您的試算表中存在一些問題。
+        </issues-records-message>
         <invalid-document-message>
             上傳的文檔包含驗證錯誤。使用"審查數據"按鈕查看並修復錯誤後再保存。
         </invalid-document-message>
@@ -644,13 +657,32 @@
             上傳的文檔包含有效數據。使用"審查數據"按鈕在保存前審查表單數據。
         </valid-document-message>
         <import-complete-message>
-            {0,number,integer} 個文檔的導入已完成。{1,number,integer} 個無效文檔被跳過。
+            {0,number,integer} 個文檔的導入已完成。{1,choice,0#|0&lt;'{1,number,integer} 個無效文檔被跳過。'}
         </import-complete-message>
         <na>不適用</na>
         <fields-found>找到的字段</fields-found>
         <values-found>找到的值</values-found>
         <errors>錯誤</errors>
         <warnings>警告</warnings>
+        <validation-details>
+            <title>驗證詳情</title>
+            <row>列</row>
+            <label>標籤</label>
+            <name>名稱</name>
+            <validation-type>驗證類型</validation-type>
+            <reason>原因</reason>
+            <data-entered>輸入的資料</data-entered>
+            <error>錯誤</error>
+            <warning>警告</warning>
+            <info>資訊</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; 下載為 CSV</download-csv>
+            <next-steps-title>您現在必須：</next-steps-title>
+            <next-steps-title-allow-invalid>您現在可以：</next-steps-title-allow-invalid>
+            <next-steps-errors>修改試算表中的資料</next-steps-errors>
+            <next-steps-errors-allow-invalid>修改試算表中的資料，或選擇繼續，屆時將套用「{0}」的選項</next-steps-errors-allow-invalid>
+            <next-steps-warnings>檢閱警告並修改試算表中的資料，或不作修改直接繼續</next-steps-warnings>
+            <next-steps-reupload>如果您對試算表進行了變更，請重新上傳更新後的試算表，這將取代先前上傳的資料</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>驗證數據時發生錯誤。</validating>
             <importing>導入數據時發生錯誤。</importing>

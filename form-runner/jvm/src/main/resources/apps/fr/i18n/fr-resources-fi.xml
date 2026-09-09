@@ -60,6 +60,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Seuraava</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Edellinen</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Sisältö</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Lataa uudelleen</reupload>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>Tyhjennä ja sulje</submit-dialog-clear>
@@ -558,6 +559,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Lataa</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Validoi</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Tuo</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Toimita</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Toimita varoituksin</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Toimita virhein</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Lataa uudelleen</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Valmis</complete>
+        </buttons>
         <form-version>
             <label>Lomakkeen versio</label>
             <alert>Lomakkeen versio puuttuu</alert>
@@ -573,17 +584,19 @@
         </version-comment>
         <upload>
             <label>Lähetys</label>
+            <completed-label>Lähetetty</completed-label>
         </upload>
         <file>
             <label>Tuotava tiedosto</label>
-            <hint>Tiedoston on oltava Excel 2007 -muodossa (.xlsx) tai XML-muodossa (.xml)</hint>
+            <hint>{1,choice,1#Tuettu tiedostotyyppi|1&lt;Tuetut tiedostotyypit}: {0}</hint>
             <alert>Tiedosto puuttuu tai on tuntematonta tyyppiä</alert>
             <excel-headings-format>Excel 2007 otsikoilla varustetussa muodossa (.xslx)</excel-headings-format>
             <excel-named-ranges-format>Excel 2007 nimetyillä alueilla varustetussa muodossa (.xslx)</excel-named-ranges-format>
             <xml-form-structure-and-data-format>Orbeon XML -vientimuoto (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label>Validointi</label>
+            <label>Validoi</label>
+            <completed-label>Validoitu</completed-label>
             <alert>Suorita validointi ennen tuonnin jatkamista</alert>
         </validation>
         <start-validation>
@@ -601,16 +614,13 @@
         <validation-canceled>Validointi peruttiin.</validation-canceled>
         <import>
             <label>Tuo</label>
+            <completed-label>Tuotu</completed-label>
         </import>
         <existing-records>
-            <label>Olemassa olevat tietokantatietueet</label>
-            <item id="0">Säilytä</item>
-            <item id="1">Poista</item>
+            <label>Poista ensin kaikki olemassa olevat tietokantatietueet</label>
         </existing-records>
         <invalid-data>
-            <label>Tietueet, joissa on virheellisiä tietoja</label>
-            <item id="0">Ohita</item>
-            <item id="1">Tuo</item>
+            <label>Tuo tietueet, joissa on virheellisiä tietoja</label>
         </invalid-data>
         <start-import>
             <label>Aloita tuonti</label>
@@ -637,6 +647,9 @@
         <valid-records-message>
             {0,number,integer} {0,choice,1#asiakirja|1&lt;asiakirjaa} {0,choice,1#on|1&lt;on} validoitu ja tuodaan.
         </valid-records-message>
+        <issues-records-message>
+            {0,number,integer} {0,choice,1#asiakirja|1&lt;asiakirjaa} {0,choice,1#on|1&lt;on} validoitu. Laskentataulukossasi on joitakin ongelmia.
+        </issues-records-message>
         <invalid-document-message>
             Ladatussa asiakirjassa on validointivirheitä. Käytä "Tarkastele tietoja" -painiketta virheiden tarkastelemiseen ja korjaamiseen ennen tallentamista.
         </invalid-document-message>
@@ -644,13 +657,32 @@
             Ladatussa asiakirjassa on kelvolliset tiedot. Käytä "Tarkastele tietoja" -painiketta lomaketietojen tarkasteluun ennen tallentamista.
         </valid-document-message>
         <import-complete-message>
-            {0,number,integer} {0,choice,1#asiakirjan|1&lt;asiakirjan} tuonti on valmis. {1,number,integer} virheellistä {1,choice,1#asiakirjaa jätettiin|1&lt;asiakirjaa jätettiin} väliin.
+            {0,number,integer} {0,choice,1#asiakirjan|1&lt;asiakirjan} tuonti on valmis.{1,choice,0#|0&lt; '{1,number,integer} virheellistä {1,choice,1#asiakirjaa jätettiin|1&lt;asiakirjaa jätettiin} väliin.'}
         </import-complete-message>
         <na>Ei sovellettavissa</na>
         <fields-found>Löydetyt kentät</fields-found>
         <values-found>Löydetyt arvot</values-found>
         <errors>Virheet</errors>
         <warnings>Varoitukset</warnings>
+        <validation-details>
+            <title>Validoinnin tiedot</title>
+            <row>Rivi</row>
+            <label>Nimiö</label>
+            <name>Nimi</name>
+            <validation-type>Validointityyppi</validation-type>
+            <reason>Syy</reason>
+            <data-entered>Syötetyt tiedot</data-entered>
+            <error>Virhe</error>
+            <warning>Varoitus</warning>
+            <info>Tiedote</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; Lataa CSV-muodossa</download-csv>
+            <next-steps-title>Sinun on nyt:</next-steps-title>
+            <next-steps-title-allow-invalid>Voit nyt:</next-steps-title-allow-invalid>
+            <next-steps-errors>korjata laskentataulukon tiedot</next-steps-errors>
+            <next-steps-errors-allow-invalid>joko korjata laskentataulukon tiedot tai jatkaa, jolloin sovelletaan valintoja kohteelle "{0}"</next-steps-errors-allow-invalid>
+            <next-steps-warnings>tarkistaa mahdolliset varoitukset ja joko korjata laskentataulukon tiedot tai jatkaa ilman muutoksia</next-steps-warnings>
+            <next-steps-reupload>jos teit muutoksia laskentataulukkoon, lataa päivitetty laskentataulukko uudelleen korvaamaan aiemmin ladatut tiedot</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>Tapahtui virhe tietoja validoitaessa.</validating>
             <importing>Tapahtui virhe tietoja tuotaessa.</importing>

@@ -60,6 +60,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; İleri</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Geri</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; İçerik</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Yeniden Yükle</reupload>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>Temizle ve kapat</submit-dialog-clear>
@@ -556,6 +557,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Yükle</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Doğrula</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; İçe Aktar</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Gönder</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Uyarılarla Gönder</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Hatalarla Gönder</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Yeniden Yükle</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Tamamla</complete>
+        </buttons>
         <form-version>
             <label>Form Sürümü</label>
             <alert>Form sürümü eksik</alert>
@@ -571,17 +582,19 @@
         </version-comment>
         <upload>
             <label>Yükle</label>
+            <completed-label>Yüklendi</completed-label>
         </upload>
         <file>
             <label>İçe aktarılacak dosya</label>
-            <hint>Dosya Excel 2007 formatında (.xlsx) veya XML formatında (.xml) olmalıdır</hint>
+            <hint>{1,choice,1#Desteklenen dosya türü|1&lt;Desteklenen dosya türleri}: {0}</hint>
             <alert>Eksik veya desteklenmeyen dosya</alert>
             <excel-headings-format>Adlandırılmış başlıklarla Excel 2007 formatı (.xslx)</excel-headings-format>
             <excel-named-ranges-format>Adlandırılmış aralıklarla Excel 2007 formatı (.xslx)</excel-named-ranges-format>
             <xml-form-structure-and-data-format>Orbeon XML dışa aktarma formatı (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label>Doğrulama</label>
+            <label>Doğrula</label>
+            <completed-label>Doğrulandı</completed-label>
             <alert>Lütfen içe aktarmaya geçmeden önce doğrulamayı başlatın</alert>
         </validation>
         <start-validation>
@@ -599,16 +612,13 @@
         <validation-canceled>Doğrulama iptal edildi.</validation-canceled>
         <import>
             <label>İçe Aktar</label>
+            <completed-label>İçe Aktarıldı</completed-label>
         </import>
         <existing-records>
-            <label>Mevcut veritabanı kayıtları</label>
-            <item id="0">Koru</item>
-            <item id="1">Sil</item>
+            <label>Önce mevcut tüm veritabanı kayıtlarını sil</label>
         </existing-records>
         <invalid-data>
-            <label>Geçersiz veri içeren kayıtlar</label>
-            <item id="0">Atla</item>
-            <item id="1">İçe Aktar</item>
+            <label>Geçersiz veri içeren kayıtları içe aktar</label>
         </invalid-data>
         <start-import>
             <label>İçe Aktarmayı Başlat</label>
@@ -635,6 +645,9 @@
         <valid-records-message>
             {0,number,integer} belge doğrulandı ve içe aktarılacak.
         </valid-records-message>
+        <issues-records-message>
+            {0,number,integer} belge doğrulandı. Elektronik tablonuzda bazı sorunlar var.
+        </issues-records-message>
         <invalid-document-message>
             Yüklenen belge doğrulama hataları içeriyor. Kaydetmeden önce hataları incelemek ve düzeltmek için "Verileri İncele" düğmesini kullanın.
         </invalid-document-message>
@@ -642,13 +655,32 @@
             Yüklenen belge geçerli veriler içeriyor. Kaydetmeden önce form verilerini incelemek için "Verileri İncele" düğmesini kullanın.
         </valid-document-message>
         <import-complete-message>
-            {0,number,integer} belgenin içe aktarımı tamamlandı. {1,number,integer} geçersiz belge atlandı.
+            {0,number,integer} belgenin içe aktarımı tamamlandı.{1,choice,0#|0&lt; '{1,number,integer} geçersiz belge atlandı.'}
         </import-complete-message>
         <na>Geçerli Değil</na>
         <fields-found>Bulunan Alanlar</fields-found>
         <values-found>Bulunan Değerler</values-found>
         <errors>Hatalar</errors>
         <warnings>Uyarılar</warnings>
+        <validation-details>
+            <title>Doğrulama Ayrıntıları</title>
+            <row>Satır</row>
+            <label>Etiket</label>
+            <name>Ad</name>
+            <validation-type>Doğrulama Türü</validation-type>
+            <reason>Neden</reason>
+            <data-entered>Girilen Veri</data-entered>
+            <error>Hata</error>
+            <warning>Uyarı</warning>
+            <info>Bilgi</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; CSV olarak indir</download-csv>
+            <next-steps-title>Şimdi yapmanız gerekenler:</next-steps-title>
+            <next-steps-title-allow-invalid>Şimdi yapabilecekleriniz:</next-steps-title-allow-invalid>
+            <next-steps-errors>elektronik tablodaki verileri düzeltin</next-steps-errors>
+            <next-steps-errors-allow-invalid>elektronik tablodaki verileri düzeltin ya da devam etmeyi seçin; bu durumda "{0}" seçenekleri uygulanacaktır</next-steps-errors-allow-invalid>
+            <next-steps-warnings>uyarıları inceleyin ve tablonuzdaki verileri düzeltin veya değişiklik yapmadan devam edin</next-steps-warnings>
+            <next-steps-reupload>elektronik tabloda değişiklik yaptıysanız, önceki yüklemenizdeki verilerin yerini alacak güncellenmiş tabloyu yeniden yükleyin</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>Verileri doğrularken bir hata oluştu.</validating>
             <importing>Verileri içe aktarırken bir hata oluştu.</importing>

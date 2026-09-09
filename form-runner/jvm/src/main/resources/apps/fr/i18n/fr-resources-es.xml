@@ -63,6 +63,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Siguiente</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Previo</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Contenido</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Subir de nuevo</reupload>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>Limpiar y Cerrar</submit-dialog-clear>
@@ -592,6 +593,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Subir</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Validar</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Importar</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Enviar</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Enviar con advertencias</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Enviar con errores</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Subir de nuevo</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Terminar</complete>
+        </buttons>
         <form-version>
             <label>Versión del formulario</label>
             <alert>Falta la versión del formulario</alert>
@@ -607,17 +618,19 @@
         </version-comment>
         <upload>
             <label>Subir</label>
+            <completed-label>Subido</completed-label>
         </upload>
         <file>
             <label>Archivo a importar</label>
-            <hint>El archivo debe estar en formato Excel 2007 (.xlsx) o en formato XML (.xml)</hint>
+            <hint>{1,choice,1#Tipo de archivo admitido|1&lt;Tipos de archivos admitidos}: {0}</hint>
             <alert>Archivo faltante o no soportado</alert>
             <excel-headings-format>Excel 2007 con formato de encabezados con nombre (.xlsx)</excel-headings-format>
             <excel-named-ranges-format>Excel 2007 con formato de rangos con nombre (.xlsx)</excel-named-ranges-format>
             <xml-form-structure-and-data-format>Formato de exportación XML de Orbeon (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label>Validación</label>
+            <label>Validar</label>
+            <completed-label>Validado</completed-label>
             <alert>Por favor, inicie la validación antes de proceder a la importación.</alert>
         </validation>
         <start-validation>
@@ -635,16 +648,13 @@
         <validation-canceled>Validación cancelada.</validation-canceled>
         <import>
             <label>Importar</label>
+            <completed-label>Importado</completed-label>
         </import>
         <existing-records>
-            <label>Registros de bases de datos existentes</label>
-            <item id="0">Mantener</item>
-            <item id="1">Borrar</item>
+            <label>Eliminar primero todos los registros existentes de la base de datos</label>
         </existing-records>
         <invalid-data>
-            <label>Registros con datos inválidos</label>
-            <item id="0">Omitir</item>
-            <item id="1">Importar</item>
+            <label>Importar registros con datos inválidos</label>
         </invalid-data>
         <start-import>
             <label>Comenzar importación</label>
@@ -673,6 +683,9 @@
         <valid-records-message>
             {0,number,integer} {0,choice,1#documento|1&lt;documentos} {0,choice,1#tiene|1&lt;tienen} validación y se importaran.
         </valid-records-message>
+        <issues-records-message>
+            {0,number,integer} {0,choice,1#documento|1&lt;documentos} {0,choice,1#tiene|1&lt;tienen} validación. Hay algunos problemas en su hoja de cálculo.
+        </issues-records-message>
         <invalid-document-message>
             El documento cargado contiene errores de validación. Utilice el botón "Revisar datos" para revisarlos y corregirlos antes de guardarlos.
         </invalid-document-message>
@@ -680,14 +693,32 @@
            El documento cargado contiene datos válidos. Utilice el botón "Revisar datos" para revisar los datos del formulario antes de guardarlo.
         </valid-document-message>
         <import-complete-message>
-            La importación de {0,number,integer} {0,choice,1#documento|1&lt;documentos} está completa.
-            {1,number,integer} invalido {1,choice,1#documento se ha|1&lt;documentos se han} omitido.
+            La importación de {0,number,integer} {0,choice,1#documento|1&lt;documentos} está completa.{1,choice,0#|0&lt; '{1,number,integer} {1,choice,1#documento inválido se ha|1&lt;documentos inválidos se han} omitido.'}
         </import-complete-message>
         <na>N/D</na>
         <fields-found>Campos encontrados</fields-found>
         <values-found>Valores encontrados</values-found>
         <errors>Errores</errors>
         <warnings>Advertencias</warnings>
+        <validation-details>
+            <title>Detalles de la validación</title>
+            <row>Fila</row>
+            <label>Etiqueta</label>
+            <name>Nombre</name>
+            <validation-type>Tipo de validación</validation-type>
+            <reason>Motivo</reason>
+            <data-entered>Datos introducidos</data-entered>
+            <error>Error</error>
+            <warning>Advertencia</warning>
+            <info>Información</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; Descargar como CSV</download-csv>
+            <next-steps-title>Ahora debe:</next-steps-title>
+            <next-steps-title-allow-invalid>Ahora puede:</next-steps-title-allow-invalid>
+            <next-steps-errors>corregir los datos en la hoja de cálculo</next-steps-errors>
+            <next-steps-errors-allow-invalid>corregir los datos en la hoja de cálculo, o bien optar por continuar, en cuyo caso se aplicarán las opciones para "{0}"</next-steps-errors-allow-invalid>
+            <next-steps-warnings>revisar las advertencias y corregir los datos en la hoja de cálculo o continuar sin cambios</next-steps-warnings>
+            <next-steps-reupload>si ha realizado cambios en la hoja de cálculo, vuelva a subir la hoja de cálculo actualizada, lo que reemplazará los datos de la carga anterior</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>Se produjo un error al validar los datos.</validating>
             <importing>Se produjo un error al importar los datos.</importing>

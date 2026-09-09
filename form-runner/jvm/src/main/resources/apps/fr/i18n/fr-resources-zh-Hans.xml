@@ -58,6 +58,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 下一步</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 上一步</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; 内容</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 重新上传</reupload>
 
         <submit-dialog-clear>清除并关闭</submit-dialog-clear>
         <submit-dialog-keep>保留值并关闭</submit-dialog-keep>
@@ -553,6 +554,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 上传</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 验证</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 导入</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 提交</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 带有警告提交</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 带有错误提交</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 重新上传</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 完成</complete>
+        </buttons>
         <form-version>
             <label>表单版本</label>
             <alert>缺少表单版本</alert>
@@ -568,10 +579,11 @@
         </version-comment>
         <upload>
             <label>上传</label>
+            <completed-label>已上传</completed-label>
         </upload>
         <file>
             <label>要导入的文件</label>
-            <hint>文件必须为Excel 2007格式（.xlsx）或XML格式（.xml）</hint>
+            <hint>支持的文件类型：{0}</hint>
             <alert>缺少文件或不支持的文件格式</alert>
             <excel-headings-format>Excel 2007命名标题格式（.xlsx）</excel-headings-format>
             <excel-named-ranges-format>Excel 2007命名范围格式（.xlsx）</excel-named-ranges-format>
@@ -579,6 +591,7 @@
         </file>
         <validation>
             <label>验证</label>
+            <completed-label>已验证</completed-label>
             <alert>请在进行导入之前开始验证</alert>
         </validation>
         <start-validation>
@@ -596,16 +609,13 @@
         <validation-canceled>验证已取消。</validation-canceled>
         <import>
             <label>导入</label>
+            <completed-label>已导入</completed-label>
         </import>
         <existing-records>
-            <label>现有数据库记录</label>
-            <item id="0">保留</item>
-            <item id="1">删除</item>
+            <label>首先删除所有现有数据库记录</label>
         </existing-records>
         <invalid-data>
-            <label>包含无效数据的记录</label>
-            <item id="0">跳过</item>
-            <item id="1">导入</item>
+            <label>导入包含无效数据的记录</label>
         </invalid-data>
         <start-import>
             <label>开始导入</label>
@@ -632,6 +642,9 @@
         <valid-records-message>
             {0,number,integer}个文档已通过验证，将被导入。
         </valid-records-message>
+        <issues-records-message>
+            {0,number,integer}个文档已通过验证。您的电子表格中存在一些问题。
+        </issues-records-message>
         <invalid-document-message>
             上传的文档包含验证错误。使用"审核数据"按钮查看并修复错误，然后再保存。
         </invalid-document-message>
@@ -639,13 +652,32 @@
             上传的文档包含有效数据。使用"审核数据"按钮在保存前审核表单数据。
         </valid-document-message>
         <import-complete-message>
-            {0,number,integer}个文档的导入已完成。{1,number,integer}个无效文档被跳过。
+            {0,number,integer}个文档的导入已完成。{1,choice,0#|0&lt;'{1,number,integer}个无效文档被跳过。'}
         </import-complete-message>
         <na>不适用</na>
         <fields-found>找到的字段</fields-found>
         <values-found>找到的值</values-found>
         <errors>错误</errors>
         <warnings>警告</warnings>
+        <validation-details>
+            <title>验证详情</title>
+            <row>行</row>
+            <label>标签</label>
+            <name>名称</name>
+            <validation-type>验证类型</validation-type>
+            <reason>原因</reason>
+            <data-entered>输入的数据</data-entered>
+            <error>错误</error>
+            <warning>警告</warning>
+            <info>信息</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; 下载为 CSV</download-csv>
+            <next-steps-title>您现在必须：</next-steps-title>
+            <next-steps-title-allow-invalid>您现在可以：</next-steps-title-allow-invalid>
+            <next-steps-errors>修改电子表格中的数据</next-steps-errors>
+            <next-steps-errors-allow-invalid>修改电子表格中的数据，或选择继续，届时将应用“{0}”的选项</next-steps-errors-allow-invalid>
+            <next-steps-warnings>查看警告并修改电子表格中的数据，或不作修改直接继续</next-steps-warnings>
+            <next-steps-reupload>如果您对电子表格进行了更改，请重新上传更新后的电子表格，这将替换之前上传的数据</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>验证数据时发生错误。</validating>
             <importing>导入数据时发生错误。</importing>

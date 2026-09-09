@@ -46,4 +46,47 @@
             width: 100%;
         }
     }
+
+    .fr-import-validation-details {
+        display: flex;
+        flex-direction: column;
+        row-gap: 1em;
+        margin-top: 1em;
+
+        .fr-import-validation-details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+
+            .fr-import-download-csv a {
+                text-decoration: none;
+
+                i {
+                    margin-right: 4px;
+                }
+            }
+        }
+
+        .fr-import-validation-instructions {
+            margin-bottom: 15px;
+
+            .fr-import-validation-instructions-title {
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+
+            ul {
+                margin-bottom: 0;
+            }
+        }
+
+        .fr-import-errors-table {
+            margin-bottom: 0;
+
+            th, td {
+                vertical-align: middle;
+            }
+        }
+    }
 }

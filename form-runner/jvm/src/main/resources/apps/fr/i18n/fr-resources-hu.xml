@@ -60,6 +60,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Következő</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Előző</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Tartalom</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Újrafeltöltés</reupload>
 
         <!-- Küldési párbeszédpanel -->
         <submit-dialog-clear>Törlés és bezárás</submit-dialog-clear>
@@ -558,6 +559,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Feltöltés</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Érvényesítés</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Importálás</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Küldés</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Küldés figyelmeztetésekkel</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Küldés hibákkal</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Újrafeltöltés</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Befejezés</complete>
+        </buttons>
         <form-version>
             <label>Űrlapverzió</label>
             <alert>Hiányzó űrlapverzió</alert>
@@ -573,10 +584,11 @@
         </version-comment>
         <upload>
             <label>Feltöltés</label>
+            <completed-label>Feltöltve</completed-label>
         </upload>
         <file>
             <label>Importálandó fájl</label>
-            <hint>A fájlnak Excel 2007 (.xlsx) vagy XML (.xml) formátumúnak kell lennie</hint>
+            <hint>{1,choice,1#Támogatott fájltípus|1&lt;Támogatott fájltípusok}: {0}</hint>
             <alert>Hiányzó vagy nem támogatott fájl</alert>
             <excel-headings-format>Excel 2007 nevesített fejlécekkel (.xslx)</excel-headings-format>
             <excel-named-ranges-format>Excel 2007 nevesített tartományokkal (.xslx)</excel-named-ranges-format>
@@ -584,6 +596,7 @@
         </file>
         <validation>
             <label>Érvényesítés</label>
+            <completed-label>Érvényesítve</completed-label>
             <alert>Kérjük, indítsa el az érvényesítést, mielőtt továbblépne az importáláshoz</alert>
         </validation>
         <start-validation>
@@ -601,16 +614,13 @@
         <validation-canceled>Az érvényesítés megszakítva.</validation-canceled>
         <import>
             <label>Importálás</label>
+            <completed-label>Importálva</completed-label>
         </import>
         <existing-records>
-            <label>Meglévő adatbázisrekordok</label>
-            <item id="0">Megtartás</item>
-            <item id="1">Törlés</item>
+            <label>Először minden meglévő adatbázisrekord törlése</label>
         </existing-records>
         <invalid-data>
-            <label>Érvénytelen adatokat tartalmazó rekordok</label>
-            <item id="0">Kihagyás</item>
-            <item id="1">Importálás</item>
+            <label>Érvénytelen adatokat tartalmazó rekordok importálása</label>
         </invalid-data>
         <start-import>
             <label>Importálás indítása</label>
@@ -637,6 +647,9 @@
         <valid-records-message>
             {0,number,integer} dokumentum érvényesítve lett, és importálva lesz.
         </valid-records-message>
+        <issues-records-message>
+            {0,number,integer} dokumentum érvényesítve lett. Van néhány probléma a táblázatban.
+        </issues-records-message>
         <invalid-document-message>
             A feltöltött dokumentum érvényesítési hibákat tartalmaz. Az "Adatok áttekintése" gomb használatával tekintse át és javítsa ki a hibákat a mentés előtt.
         </invalid-document-message>
@@ -644,13 +657,32 @@
             A feltöltött dokumentum érvényes adatokat tartalmaz. Az "Adatok áttekintése" gomb használatával tekintse át az űrlap adatait a mentés előtt.
         </valid-document-message>
         <import-complete-message>
-            {0,number,integer} dokumentum importálása befejeződött. {1,number,integer} érvénytelen dokumentum kihagyva.
+            {0,number,integer} dokumentum importálása befejeződött.{1,choice,0#|0&lt; '{1,number,integer} érvénytelen dokumentum kihagyva.'}
         </import-complete-message>
         <na>N/A</na>
         <fields-found>Talált mezők</fields-found>
         <values-found>Talált értékek</values-found>
         <errors>Hibák</errors>
         <warnings>Figyelmeztetések</warnings>
+        <validation-details>
+            <title>Érvényesítés részletei</title>
+            <row>Sor</row>
+            <label>Címke</label>
+            <name>Név</name>
+            <validation-type>Érvényesítés típusa</validation-type>
+            <reason>Ok</reason>
+            <data-entered>Megadott adat</data-entered>
+            <error>Hiba</error>
+            <warning>Figyelmeztetés</warning>
+            <info>Információ</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; Letöltés CSV formátumban</download-csv>
+            <next-steps-title>A következő teendő:</next-steps-title>
+            <next-steps-title-allow-invalid>Most a következőket teheti:</next-steps-title-allow-invalid>
+            <next-steps-errors>javítsa az adatokat a táblázatban</next-steps-errors>
+            <next-steps-errors-allow-invalid>javítsa az adatokat a táblázatban, vagy folytassa, amely esetben a(z) "{0}" beállításai lesznek érvényesek</next-steps-errors-allow-invalid>
+            <next-steps-warnings>tekintse át a figyelmeztetéseket, és javítsa az adatokat a táblázatban, vagy folytassa módosítás nélkül</next-steps-warnings>
+            <next-steps-reupload>ha módosította a táblázatot, töltse fel újra a frissített fájlt, amely felülírja a korábban feltöltött adatokat</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>Hiba történt az adatok érvényesítése közben.</validating>
             <importing>Hiba történt az adatok importálása közben.</importing>

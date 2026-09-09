@@ -60,6 +60,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Вперед</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Назад</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Содержание</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Загрузить снова</reupload>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>Очистить и закрыть</submit-dialog-clear>
@@ -547,6 +548,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Загрузить</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Проверить</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Импортировать</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Отправить</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Отправить с предупреждениями</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Отправить с ошибками</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Загрузить снова</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Завершить</complete>
+        </buttons>
         <form-version>
             <label>Версия формы</label>
             <alert>Не указана версия формы</alert>
@@ -562,17 +573,19 @@
         </version-comment>
         <upload>
             <label>Загрузка</label>
+            <completed-label>Загружено</completed-label>
         </upload>
         <file>
             <label>Файл для импорта</label>
-            <hint>Файл должен быть в формате Excel 2007 (.xlsx) или XML (.xml).</hint>
+            <hint>{1,choice,1#Поддерживаемый тип файла|1&lt;Поддерживаемые типы файлов}: {0}</hint>
             <alert>Файл отсутствует или имеет неподдерживаемый формат</alert>
             <excel-headings-format>Excel 2007 с именованными заголовками (.xlsx)</excel-headings-format>
             <excel-named-ranges-format>Excel 2007 с именованными диапазонами (.xlsx)</excel-named-ranges-format>
             <xml-form-structure-and-data-format>Формат экспорта Orbeon XML (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label>Проверка</label>
+            <label>Проверить</label>
+            <completed-label>Проверено</completed-label>
             <alert>Перед импортом сначала выполните проверку</alert>
         </validation>
         <start-validation>
@@ -590,16 +603,13 @@
         <validation-canceled>Проверка была отменена.</validation-canceled>
         <import>
             <label>Импорт</label>
+            <completed-label>Импортировано</completed-label>
         </import>
         <existing-records>
-            <label>Существующие записи в базе данных</label>
-            <item id="0">Оставить</item>
-            <item id="1">Удалить</item>
+            <label>Сначала удалить все существующие записи из базы данных</label>
         </existing-records>
         <invalid-data>
-            <label>Записи с некорректными данными</label>
-            <item id="0">Пропустить</item>
-            <item id="1">Импортировать</item>
+            <label>Импортировать записи с некорректными данными</label>
         </invalid-data>
         <start-import>
             <label>Начать импорт</label>
@@ -626,6 +636,9 @@
         <valid-records-message>
             {0,number,integer} {0,choice,1#документ|1&lt;документов} прошли проверку и будут импортированы.
         </valid-records-message>
+        <issues-records-message>
+            {0,number,integer} {0,choice,1#документ|1&lt;документов} прошли проверку. В вашей электронной таблице есть проблемы.
+        </issues-records-message>
         <invalid-document-message>
             Загруженный документ содержит ошибки проверки. Нажмите кнопку «Просмотреть данные», чтобы просмотреть и исправить ошибки перед сохранением.
         </invalid-document-message>
@@ -633,13 +646,32 @@
             Загруженный документ содержит корректные данные. Нажмите кнопку «Просмотреть данные», чтобы просмотреть данные формы перед сохранением.
         </valid-document-message>
         <import-complete-message>
-            Импорт {0,number,integer} {0,choice,1#документа|1&lt;документов} завершен. {1,number,integer} некорректных {1,choice,1#документ|1&lt;документа} пропущен(ы).
+            Импорт {0,number,integer} {0,choice,1#документа|1&lt;документов} завершен.{1,choice,0#|0&lt; '{1,number,integer} некорректных {1,choice,1#документ|1&lt;документа} пропущен(ы).'}
         </import-complete-message>
         <na>Н/Д</na>
         <fields-found>Найденные поля</fields-found>
         <values-found>Найденные значения</values-found>
         <errors>Ошибки</errors>
         <warnings>Предупреждения</warnings>
+        <validation-details>
+            <title>Сведения о проверке</title>
+            <row>Строка</row>
+            <label>Метка</label>
+            <name>Имя</name>
+            <validation-type>Тип проверки</validation-type>
+            <reason>Причина</reason>
+            <data-entered>Введенные данные</data-entered>
+            <error>Ошибка</error>
+            <warning>Предупреждение</warning>
+            <info>Информация</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; Скачать как CSV</download-csv>
+            <next-steps-title>Теперь необходимо:</next-steps-title>
+            <next-steps-title-allow-invalid>Теперь вы можете:</next-steps-title-allow-invalid>
+            <next-steps-errors>исправить данные в электронной таблице</next-steps-errors>
+            <next-steps-errors-allow-invalid>либо исправить данные в электронной таблице, либо продолжить, и в этом случае будут применены параметры для "{0}"</next-steps-errors-allow-invalid>
+            <next-steps-warnings>просмотреть предупреждения и либо исправить данные в таблице, либо продолжить без изменений</next-steps-warnings>
+            <next-steps-reupload>если вы внесли изменения в таблицу, загрузите обновленный файл снова, что заменит данные предыдущей загрузки</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>Произошла ошибка при проверке данных.</validating>
             <importing>Произошла ошибка при импорте данных.</importing>

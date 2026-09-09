@@ -60,6 +60,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Volgende</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Vorige</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Inhoud</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Opnieuw uploaden</reupload>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>Wissen en sluiten</submit-dialog-clear>
@@ -558,6 +559,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Uploaden</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Valideren</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Importeren</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Indienen</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Indienen met waarschuwingen</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Indienen met fouten</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Opnieuw uploaden</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Voltooien</complete>
+        </buttons>
         <form-version>
             <label>Formversie</label>
             <alert>Formversie ontbreekt</alert>
@@ -573,17 +584,19 @@
         </version-comment>
         <upload>
             <label>Uploaden</label>
+            <completed-label>Geüpload</completed-label>
         </upload>
         <file>
             <label>Te importeren bestand</label>
-            <hint>Bestand moet in Excel 2007-indeling (.xlsx) of XML-indeling (.xml) zijn</hint>
+            <hint>{1,choice,1#Ondersteund bestandstype|1&lt;Ondersteunde bestandstypen}: {0}</hint>
             <alert>Bestand ontbreekt of wordt niet ondersteund</alert>
             <excel-headings-format>Excel 2007 met benoemde kopteksten-indeling (.xslx)</excel-headings-format>
             <excel-named-ranges-format>Excel 2007 met benoemde bereiken-indeling (.xslx)</excel-named-ranges-format>
             <xml-form-structure-and-data-format>Orbeon XML-exportindeling (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label>Validatie</label>
+            <label>Valideren</label>
+            <completed-label>Gevalideerd</completed-label>
             <alert>Start de validatie voordat u doorgaat met importeren</alert>
         </validation>
         <start-validation>
@@ -601,16 +614,13 @@
         <validation-canceled>Validatie is geannuleerd.</validation-canceled>
         <import>
             <label>Importeren</label>
+            <completed-label>Geïmporteerd</completed-label>
         </import>
         <existing-records>
-            <label>Bestaande records in de database</label>
-            <item id="0">Behouden</item>
-            <item id="1">Verwijderen</item>
+            <label>Eerst alle bestaande records in de database verwijderen</label>
         </existing-records>
         <invalid-data>
-            <label>Records met ongeldige gegevens</label>
-            <item id="0">Overslaan</item>
-            <item id="1">Importeren</item>
+            <label>Records met ongeldige gegevens importeren</label>
         </invalid-data>
         <start-import>
             <label>Import starten</label>
@@ -637,6 +647,9 @@
         <valid-records-message>
             {0,number,integer} {0,choice,1#document|1&lt;documenten} {0,choice,1#is|1&lt;zijn} gevalideerd en worden geïmporteerd.
         </valid-records-message>
+        <issues-records-message>
+            {0,number,integer} {0,choice,1#document|1&lt;documenten} {0,choice,1#is|1&lt;zijn} gevalideerd. Er zijn enkele problemen in uw spreadsheet.
+        </issues-records-message>
         <invalid-document-message>
             Het geüploade document bevat validatiefouten. Gebruik de knop "Gegevens controleren" om de fouten te bekijken en te corrigeren voordat u opslaat.
         </invalid-document-message>
@@ -644,13 +657,32 @@
             Het geüploade document bevat geldige gegevens. Gebruik de knop "Gegevens controleren" om de formgegevens te bekijken voordat u opslaat.
         </valid-document-message>
         <import-complete-message>
-            Import van {0,number,integer} {0,choice,1#document|1&lt;documenten} is voltooid. {1,number,integer} ongeldig{1,choice,1# document is|1&lt;e documenten zijn} overgeslagen.
+            Import van {0,number,integer} {0,choice,1#document|1&lt;documenten} is voltooid.{1,choice,0#|0&lt; '{1,number,integer} ongeldig{1,choice,1# document is|1&lt;e documenten zijn} overgeslagen.'}
         </import-complete-message>
         <na>N.V.T.</na>
         <fields-found>Velden gevonden</fields-found>
         <values-found>Waarden gevonden</values-found>
         <errors>Fouten</errors>
         <warnings>Waarschuwingen</warnings>
+        <validation-details>
+            <title>Validatiedetails</title>
+            <row>Rij</row>
+            <label>Label</label>
+            <name>Naam</name>
+            <validation-type>Validatietype</validation-type>
+            <reason>Reden</reason>
+            <data-entered>Ingevoerde gegevens</data-entered>
+            <error>Fout</error>
+            <warning>Waarschuwing</warning>
+            <info>Informatie</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; Downloaden als CSV</download-csv>
+            <next-steps-title>U moet nu:</next-steps-title>
+            <next-steps-title-allow-invalid>U kunt nu:</next-steps-title-allow-invalid>
+            <next-steps-errors>de gegevens in de spreadsheet corrigeren</next-steps-errors>
+            <next-steps-errors-allow-invalid>ofwel de gegevens in de spreadsheet corrigeren, ofwel doorgaan; in dat geval zijn de opties voor "{0}" van toepassing</next-steps-errors-allow-invalid>
+            <next-steps-warnings>eventuele waarschuwingen bekijken en de gegevens in uw spreadsheet corrigeren of doorgaan zonder wijzigingen</next-steps-warnings>
+            <next-steps-reupload>als u wijzigingen in de spreadsheet heeft aangebracht, upload dan de bijgewerkte spreadsheet opnieuw; deze vervangt de gegevens van uw eerdere upload</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>Er is een fout opgetreden bij het valideren van de gegevens.</validating>
             <importing>Er is een fout opgetreden bij het importeren van de gegevens.</importing>

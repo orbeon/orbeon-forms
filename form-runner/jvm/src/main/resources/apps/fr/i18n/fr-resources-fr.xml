@@ -60,6 +60,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Suivant</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Précédent</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Contenu</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Télécharger à nouveau</reupload>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>Effacer et fermer</submit-dialog-clear>
@@ -563,6 +564,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Télécharger</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Valider</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Importer</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Envoyer</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Envoyer avec des avertissements</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Envoyer avec des erreurs</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Télécharger à nouveau</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Terminer</complete>
+        </buttons>
         <form-version>
             <label>Version du formulaire</label>
             <alert>Version du formulaire manquante</alert>
@@ -578,17 +589,19 @@
         </version-comment>
         <upload>
             <label>Télécharger vers le serveur</label>
+            <completed-label>Téléchargé</completed-label>
         </upload>
         <file>
             <label>Importer le fichier</label>
-            <hint>Le fichier doit être au format Excel 2007 (.xlsx) ou XML (.xml)</hint>
+            <hint>{1,choice,1#Type de fichier supporté|1&lt;Types de fichiers supportés} : {0}</hint>
             <alert>Fichier manquant ou non supporté</alert>
             <excel-headings-format>Format Excel 2007 avec en-têtes nommés (.xslx)</excel-headings-format>
             <excel-named-ranges-format>Format Excel 2007 avec cellules nommées (.xslx)</excel-named-ranges-format>
             <xml-form-structure-and-data-format>Format export Orbeon XML (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label>Validation</label>
+            <label>Valider</label>
+            <completed-label>Validé</completed-label>
             <alert>Veuillez démarrer la validation avant de procéder à l'importation</alert>
         </validation>
         <start-validation>
@@ -606,16 +619,17 @@
         <validation-canceled>La validation a été annulée.</validation-canceled>
         <import>
             <label>Importer</label>
+            <completed-label>Importé</completed-label>
         </import>
         <existing-records>
-            <label>Enregistrements existant dans la base de données</label>
-            <item id="0">Garder</item>
-            <item id="1">Supprimer</item>
+            <label>Supprimer d'abord tous les enregistrements existants de la base de données</label>
+            <help>Lorsque cette option est sélectionnée, tous les enregistrements existants dans la base de données pour ce formulaire seront définitivement supprimés avant l'importation des nouvelles données. Lorsque cette option n'est pas sélectionnée, les enregistrements existants sont conservés et les données importées sont ajoutées à la base de données.</help>
+            <hint>Supprimer tous les enregistrements existants de ce formulaire avant d'importer de nouvelles données.</hint>
         </existing-records>
         <invalid-data>
-            <label>Enregistrements avec des données invalides</label>
-            <item id="0">Ignorer</item>
-            <item id="1">Importer</item>
+            <label>Importer les enregistrements avec des données non valides</label>
+            <help>Lorsque cette option est sélectionnée, les lignes de la feuille de calcul contenant des erreurs de validation seront tout de même importées afin de pouvoir être examinées et corrigées ultérieurement dans Form Runner. Lorsque cette option n'est pas sélectionnée, les lignes contenant des erreurs sont ignorées et seules les lignes valides sont importées.</help>
+            <hint>Importer les enregistrements contenant des erreurs de validation.</hint>
         </invalid-data>
         <start-import>
             <label>Démarrer l'importation</label>
@@ -642,6 +656,9 @@
         <valid-records-message>
             {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#a été validé|1&lt;ont été validés} et {0,choice,1#sera importé|1&lt;seront importés}.
         </valid-records-message>
+        <issues-records-message>
+            {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#a été validé|1&lt;ont été validés}. Il y a des problèmes dans votre feuille de calcul.
+        </issues-records-message>
         <invalid-document-message>
             Le document téléchargé contient des erreurs de validation. Veuillez utiliser le bouton "Revoir les données" pour revoir et corriger les erreurs avant d'enregistrer.
         </invalid-document-message>
@@ -649,13 +666,32 @@
             Les données du document téléchargé sont valides. Veuillez utiliser le bouton "Revoir les données" pour revoir les données du formulaire avant d'enregistrer.
         </valid-document-message>
         <import-complete-message>
-            L'importation de {0,number,integer} {0,choice,1#document|1&lt;documents} est terminée. {1,number,integer} {1,choice,1#document invalide a été ignoré|1&lt;documents invalides ont été ignorés}
+            L''importation de {0,number,integer} {0,choice,1#document|1&lt;documents} est terminée.{1,choice,0#|0&lt; '{1,number,integer} {1,choice,1#document invalide a été ignoré|1&lt;documents invalides ont été ignorés}.'}
         </import-complete-message>
         <na>n/d</na>
         <fields-found>Champs trouvés</fields-found>
         <values-found>Valeurs trouvées</values-found>
         <errors>Erreurs</errors>
         <warnings>Avertissements</warnings>
+        <validation-details>
+            <title>Détails de validation</title>
+            <row>Ligne</row>
+            <label>Libellé</label>
+            <name>Nom</name>
+            <validation-type>Type de validation</validation-type>
+            <reason>Raison</reason>
+            <data-entered>Donnée saisie</data-entered>
+            <error>Erreur</error>
+            <warning>Avertissement</warning>
+            <info>Information</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; Télécharger au format CSV</download-csv>
+            <next-steps-title>Vous devez maintenant :</next-steps-title>
+            <next-steps-title-allow-invalid>Vous pouvez maintenant :</next-steps-title-allow-invalid>
+            <next-steps-errors>corriger les données dans la feuille de calcul</next-steps-errors>
+            <next-steps-errors-allow-invalid>soit corriger les données dans la feuille de calcul, soit choisir de continuer, auquel cas les options pour "{0}" s''appliqueront</next-steps-errors-allow-invalid>
+            <next-steps-warnings>examiner les avertissements et soit corriger les données dans votre feuille de calcul, soit continuer sans modifications</next-steps-warnings>
+            <next-steps-reupload>si vous avez apporté des modifications à la feuille de calcul, télécharger à nouveau la feuille de calcul mise à jour, ce qui remplacera les données de votre envoi précédent</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>Une erreur s'est produite lors de la validation des données.</validating>
             <importing>Une erreur s'est produite lors de l'import des données.</importing>

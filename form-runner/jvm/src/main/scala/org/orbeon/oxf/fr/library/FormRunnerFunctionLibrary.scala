@@ -14,11 +14,13 @@
 package org.orbeon.oxf.fr.library
 
 import cats.syntax.option.*
+import org.jsoup.Jsoup
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunner.*
+import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.FormRunnerFunctionContext.*
 import org.orbeon.oxf.fr.definitions.ModeType
 import org.orbeon.oxf.fr.email.{EmailMetadataParsing, EvaluatedParams}
@@ -26,13 +28,16 @@ import org.orbeon.oxf.fr.process.{SimpleProcess, *}
 import org.orbeon.oxf.fr.{XMLNames, *}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, ExternalContextSupport, IndentedLogger}
+import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
 import org.orbeon.oxf.xforms.analysis.ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.contentfilter.ContentFilter
+import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
-import org.orbeon.oxf.xforms.function.xxforms.{EvaluateSupport, XXFormsResource}
+import org.orbeon.oxf.xforms.function.xxforms.{EvaluateSupport, XXFormsLangSupport, XXFormsResource}
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, function}
@@ -53,10 +58,12 @@ import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
 import org.orbeon.scaxon.Implicits
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps}
-import org.orbeon.xbl.Wizard
+import org.orbeon.xbl.{ErrorSummary, Wizard}
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_URI
 import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
+
+import scala.jdk.CollectionConverters.*
 
 
 object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
@@ -245,6 +252,12 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 
     Fun("rendered-format-filename", classOf[FRRenderedFormatFilename], op = 0, min = 0, STRING, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE),
+    )
+
+    Fun("errors", classOf[FRErrors], op = 0, min = 0, ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
+    Fun("validation-errors-to-csv", classOf[FRValidationErrorsToCSV], op = 0, min = 1, STRING, EXACTLY_ONE,
+      Arg(ITEM_TYPE, EXACTLY_ONE),
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
     )
   }
 }
@@ -1006,5 +1019,135 @@ class FRResource extends FunctionSupport with RuntimeDependentFunction {
     )
 
     null
+  }
+}
+
+object ErrorAlertSupport {
+
+  def extractAlerts(alert: String): List[String] =
+    alert.trimAllToOpt match {
+      case Some(trimmed) if trimmed.startsWith("<ul>") && trimmed.endsWith("</ul>") =>
+        val doc = Jsoup.parseBodyFragment(trimmed)
+        val lis = doc.select("body > ul > li")
+        if (! lis.isEmpty) {
+          val extracted = lis.asScala.flatMap(_.text().trimAllToOpt).toList
+          if (extracted.nonEmpty) extracted else List(alert)
+        } else
+          List(alert)
+      case _ =>
+        List(alert)
+    }
+}
+
+class FRErrors extends FunctionSupport with RuntimeDependentFunction {
+  override def iterate(context: XPathContext): SequenceIterator = {
+
+    implicit val xfc: XFormsFunction.Context = XFormsFunction.context
+
+    ErrorSummary.allErrors(onlyErrors = false).flatMap { errorNode =>
+      val id          = errorNode.attValue("id")
+      val effectiveId = if (XFormsId.isAbsoluteId(id)) XFormsId.absoluteIdToEffectiveId(id) else id
+      val controlOpt  = xfc.containingDocument.findControlByEffectiveId(effectiveId)
+      val controlName = frc.controlNameFromIdOpt(effectiveId).getOrElse(throw new IllegalStateException(s"Could not find control name for effective id: `$effectiveId`"))
+      val dataEnteredOpt =
+        controlOpt
+          .flatMap {
+            case vc: XFormsValueControl => vc.valueOpt(EventCollector.Throw)
+            case _                      => None
+          }
+
+      val rawAlert = errorNode.attValue("alert")
+      val alerts   = ErrorAlertSupport.extractAlerts(rawAlert)
+
+      alerts.map { alert =>
+        elementInfo(
+          "error",
+          List(
+            attributeInfo("id",      id),
+            attributeInfo("name",    controlName),
+            attributeInfo("label",   errorNode.attValue("label")),
+            attributeInfo("alert",   alert),
+            attributeInfo("level",   errorNode.attValue("level")),
+            attributeInfo("section", errorNode.attValue("section-name")),
+            attributeInfo("value",   dataEnteredOpt.getOrElse(""))
+          )
+        )
+      }
+    }
+  }
+}
+
+class FRValidationErrorsToCSV extends FunctionSupport with RuntimeDependentFunction {
+  override def evaluateItem(context: XPathContext): StringValue = {
+    implicit val xpc: XPathContext = context
+    implicit val xfc: XFormsFunction.Context = XFormsFunction.context
+
+    val invalidRowsNode = itemArgument(0).asInstanceOf[NodeInfo]
+    val fileFormat      = stringArgumentOpt(1).getOrElse("excel-headings")
+    val isHeadings      = fileFormat == "excel-headings"
+
+    def r(key: String, default: String): String =
+      XXFormsLangSupport.r(key, Some("|fr-fr-resources|"), None, xfc.containingDocument.rFallbackLang).getOrElse(default)
+
+    val rowHeader         = r("import.validation-details.row", "Row")
+    val labelHeader       = r("import.validation-details.label", "Label")
+    val nameHeader        = r("import.validation-details.name", "Name")
+    val typeHeader        = r("import.validation-details.validation-type", "Validation Type")
+    val reasonHeader      = r("import.validation-details.reason", "Reason")
+    val dataEnteredHeader = r("import.validation-details.data-entered", "Data Entered")
+
+    val headers =
+      if (isHeadings)
+        List(rowHeader, labelHeader, nameHeader, typeHeader, reasonHeader, dataEnteredHeader)
+      else
+        List(labelHeader, nameHeader, typeHeader, reasonHeader, dataEnteredHeader)
+
+    def levelToString(level: String): String = level match {
+      case "error"   => r("import.validation-details.error", "Error")
+      case "warning" => r("import.validation-details.warning", "Warning")
+      case "info"    => r("import.validation-details.info", "Info")
+      case other     => other.capitalize
+    }
+
+    val rowNodes =
+      if (invalidRowsNode.localname == "invalid-rows")
+        (invalidRowsNode / "row").toList
+      else if (invalidRowsNode.localname == "stats")
+        (invalidRowsNode / "invalid-rows" / "row").toList
+      else if (invalidRowsNode.isDocument)
+        invalidRowsNode.rootElement.descendant("row").toList
+      else
+        (invalidRowsNode / "row").toList
+
+    val rows: List[List[String]] =
+      rowNodes.flatMap { rowNode =>
+        val excelRow = rowNode.attValueOpt("excel-row").orElse(rowNode.attValueOpt("index")).getOrElse("")
+        (rowNode / "error").toList.flatMap { errorNode =>
+          val label       = errorNode.attValueOpt("label").getOrElse("")
+          val name        = errorNode.attValueOpt("name").getOrElse("")
+          val level       = levelToString(errorNode.attValueOpt("level").getOrElse("error"))
+          val dataEntered = errorNode.attValueOpt("value").getOrElse("")
+          val rawAlert    = errorNode.attValueOpt("alert").getOrElse("")
+          val alerts      = ErrorAlertSupport.extractAlerts(rawAlert)
+
+          alerts.map { reason =>
+            if (isHeadings)
+              List(excelRow, label, name, level, reason, dataEntered)
+            else
+              List(label, name, level, reason, dataEntered)
+          }
+        }
+      }
+
+    def escapeCsvField(field: String): String =
+      if (field.contains(',') || field.contains('"') || field.contains('\n') || field.contains('\r'))
+        "\"" + field.replace("\"", "\"\"") + "\""
+      else
+        field
+
+    val allLines = headers :: rows
+    val csvContent = "\uFEFF" + allLines.map(line => line.map(escapeCsvField).mkString(",")).mkString("\r\n")
+    val base64 = java.util.Base64.getEncoder.encodeToString(csvContent.getBytes(java.nio.charset.StandardCharsets.UTF_8))
+    new StringValue(s"data:text/csv;charset=utf-8;base64,$base64")
   }
 }

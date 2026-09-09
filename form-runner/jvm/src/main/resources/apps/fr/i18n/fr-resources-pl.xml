@@ -60,6 +60,7 @@
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Następna sekcja</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Poprzednia sekcja</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Zawartość</wizard-toc>
+        <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Wgraj ponownie</reupload>
 
         <!-- Submit dialog -->
         <submit-dialog-clear>Wyczyść i zamknij</submit-dialog-clear>
@@ -559,6 +560,16 @@
         </export-purge>
     </home>
     <import>
+        <buttons>
+            <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Prześlij</upload>
+            <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Zweryfikuj</validate>
+            <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Importuj</import>
+            <submit>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Złóż</submit>
+            <submit-with-warnings>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Złóż z ostrzeżeniami</submit-with-warnings>
+            <submit-with-errors>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Złóż z błędami</submit-with-errors>
+            <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Wgraj ponownie</reupload>
+            <complete>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Zakończ</complete>
+        </buttons>
         <form-version>
             <label>Wersja formularza</label>
             <alert>Brakująca wersja formularza</alert>
@@ -574,17 +585,19 @@
         </version-comment>
         <upload>
             <label>Wrzucić plik</label>
+            <completed-label>Przesłano</completed-label>
         </upload>
         <file>
             <label>Plik z danymi do importu</label>
-            <hint>Plik musi być w formacie Excel 2007 (.xlsx) lub XML (.xml)</hint>
+            <hint>{1,choice,1#Obsługiwany typ pliku|1&lt;Obsługiwane typy plików}: {0}</hint>
             <alert>Brakujący lub nieobsługiwany plik</alert>
             <excel-headings-format>Excel 2007 w formacie z nazwanymi nagłówkami (.xlsx)</excel-headings-format>
             <excel-named-ranges-format>Excel 2007 w formacie z nazwanymi zakresami (.xlsx)</excel-named-ranges-format>
             <xml-form-structure-and-data-format>Format eksportu Orbeon XML (.xml)</xml-form-structure-and-data-format>
         </file>
         <validation>
-            <label>Walidacja</label>
+            <label>Zweryfikuj</label>
+            <completed-label>Zweryfikowano</completed-label>
             <alert>Rozpocznij walidację przed przejściem do importu</alert>
         </validation>
         <start-validation>
@@ -602,16 +615,13 @@
         <validation-canceled>Walidacja została anulowana.</validation-canceled>
         <import>
             <label>Import</label>
+            <completed-label>Zaimportowano</completed-label>
         </import>
         <existing-records>
-            <label>Istniejące rekordy bazy danych</label>
-            <item id="0">Zapisz</item>
-            <item id="1">Usuń</item>
+            <label>Najpierw usuń wszystkie istniejące rekordy bazy danych</label>
         </existing-records>
         <invalid-data>
-            <label>Rejestruj nieprawidłowe dane</label>
-            <item id="0">Pomiń</item>
-            <item id="1">Import</item>
+            <label>Importuj rekordy z nieprawidłowymi danymi</label>
         </invalid-data>
         <start-import>
             <label>Rozpocznij import</label>
@@ -638,6 +648,9 @@
         <valid-records-message>
             {0,number,integer} {0,choice,1#dokument|1&lt;dokumenty} {0,choice,1#został zatwierdzony i zostanie zaimportowany|1&lt;zostały zatwierdzone i zostaną zaimportowane}.
         </valid-records-message>
+        <issues-records-message>
+            {0,number,integer} {0,choice,1#dokument|1&lt;dokumenty} {0,choice,1#został zatwierdzony|1&lt;zostały zatwierdzone}. W arkuszu kalkulacyjnym występują problemy.
+        </issues-records-message>
         <invalid-document-message>
             Przesłany dokument zawiera błędy walidacji. Użyj przycisku „Przejrzyj dane”, aby przejrzeć i poprawić błędy przed zapisaniem.
         </invalid-document-message>
@@ -645,13 +658,32 @@
             Przesłany dokument zawiera prawidłowe dane. Użyj przycisku „Przejrzyj dane”, aby przejrzeć dane formularza przed zapisaniem.
         </valid-document-message>
         <import-complete-message>
-            Import {0,number,integer} {0,choice,1#dokumentu|1&lt;dokumentów} jest gotowy. {1,number,integer} {1,choice,1#nieprawidłowy dokument był pominięty|1&lt;nieprawidłowe dokumenty były pominiete}.
+            Import {0,number,integer} {0,choice,1#dokumentu|1&lt;dokumentów} jest gotowy.{1,choice,0#|0&lt; '{1,number,integer} {1,choice,1#nieprawidłowy dokument był pominięty|1&lt;nieprawidłowe dokumenty były pominiete}.'}
         </import-complete-message>
         <na>Nie dotyczy</na>
         <fields-found>Znalezione pola</fields-found>
         <values-found>Znalezione wartości</values-found>
         <errors>Błędy</errors>
         <warnings>Ostrzeżenia</warnings>
+        <validation-details>
+            <title>Szczegóły walidacji</title>
+            <row>Wiersz</row>
+            <label>Etykieta</label>
+            <name>Nazwa</name>
+            <validation-type>Typ walidacji</validation-type>
+            <reason>Przyczyna</reason>
+            <data-entered>Wprowadzone dane</data-entered>
+            <error>Błąd</error>
+            <warning>Ostrzeżenie</warning>
+            <info>Informacja</info>
+            <download-csv>&lt;i class="fa fa-fw fa-download"&gt;&lt;/i&gt; Pobierz jako CSV</download-csv>
+            <next-steps-title>Musisz teraz:</next-steps-title>
+            <next-steps-title-allow-invalid>Możesz teraz:</next-steps-title-allow-invalid>
+            <next-steps-errors>poprawić dane w arkuszu kalkulacyjnym</next-steps-errors>
+            <next-steps-errors-allow-invalid>poprawić dane w arkuszu kalkulacyjnym lub kontynuować, w którym to przypadku zastosowanie będą miały opcje dla "{0}"</next-steps-errors-allow-invalid>
+            <next-steps-warnings>przejrzeć ostrzeżenia i poprawić dane w arkuszu lub kontynuować bez zmian</next-steps-warnings>
+            <next-steps-reupload>jeśli wprowadzono zmiany w arkuszu kalkulacyjnym, wgraj zaktualizowany arkusz ponownie, co zastąpi dane z poprzedniego przesłania</next-steps-reupload>
+        </validation-details>
         <error-messages>
             <validating>Wystąpił błąd podczas walidacji danych.</validating>
             <importing>Wystąpił błąd podczas importu danych.</importing>

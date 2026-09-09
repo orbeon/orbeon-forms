@@ -460,6 +460,7 @@
         background-color: var(--orbeon-help-background-color);
         border-color: var(--orbeon-help-border-color);
         --bs-popover-border-radius: var(--orbeon-help-border-radius);
+        --bs-popover-inner-border-radius: calc(var(--orbeon-help-border-radius) - var(--bs-popover-border-width));
         // Override Bootstrap's default z-index (1010) to be above the navbar which is at 1030
         z-index: 1040;
 

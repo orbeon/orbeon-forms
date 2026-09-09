@@ -212,12 +212,19 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
 
     // ***** Sections **************************************************************************************************
 
-    // Round the top corners of the first section title to match the container's border-radius
+    // The first section title touches the container's top border: match its corners and don't double its border
     .fr-view-appearance-full > .xbl-fr-section:first-child h2.fr-section-title,
     .fr-wizard-body .xbl-fr-section:first-child h2.fr-section-title {
         // Should not appear in PDF, so calc is fine
         border-top-left-radius : calc(var(--orbeon-body-decorations-border-radius) - @frBodyDecorationsBorderWidth);
         border-top-right-radius: calc(var(--orbeon-body-decorations-border-radius) - @frBodyDecorationsBorderWidth);
+        border-top: 0;
+    }
+
+    // A collapsed last section's title touches the container's bottom border: don't double it
+    .fr-view-appearance-full > .xbl-fr-section:last-child:has(.fr-section-closed) h2.fr-section-title,
+    .fr-wizard-body .xbl-fr-section:last-child:has(.fr-section-closed) h2.fr-section-title {
+        border-bottom: 0;
     }
 
     // ***** Other *****************************************************************************************************

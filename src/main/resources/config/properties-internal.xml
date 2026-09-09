@@ -154,6 +154,7 @@
 
         <!-- Form Runner CSS -->
         +/apps/fr/themes/2025/theme.css
+        +/apps/fr/style/form-runner-fonts.css
         +/apps/fr/style/form-runner-common.css
         +/apps/fr/style/form-runner-base.css
         +/apps/fr/style/form-runner-dialog.css
@@ -228,6 +229,7 @@
     <!-- CSS/JavaScript update to the Form Runner baseline -->
     <!-- Theme CSS assets are not included in the baseline anymore. See `oxf.fr.style.theme.*.*` property. -->
     <property as="xs:string"  name="oxf.xforms.assets.baseline.updates.fr">
+        +/apps/fr/style/form-runner-fonts.css
         +/apps/fr/style/form-runner-common.css
         +/apps/fr/style/form-runner-base.css
         +/apps/fr/style/form-runner-dialog.css

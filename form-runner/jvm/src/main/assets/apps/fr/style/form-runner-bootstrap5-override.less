@@ -855,6 +855,12 @@
   }
 
   .table {
+    // Override Bootstrap's pure black
+    --bs-table-color        : var(--orbeon-base-color);
+    --bs-table-striped-color: var(--orbeon-base-color);
+    --bs-table-hover-color  : var(--orbeon-base-color);
+    --bs-table-active-color : var(--orbeon-base-color);
+
     th, td {
       border-top: 1px solid var(--orbeon-table-border-color);
     }
@@ -894,7 +900,7 @@
     @media screen {
       margin-bottom: ~"calc(@{fluidLineHeight} / 2)";
     }
-    padding: 8px 1em; // Bootstrap 2 had asymmetric 8px 35px 8px 14px here; unclear why, not reproduced
+    padding: var(--orbeon-alert-padding);
     border-radius: var(--orbeon-alert-border-radius);
 
     line-height: @fixedLineHeight;

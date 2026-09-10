@@ -80,6 +80,7 @@
 
     <!-- fr:section → fr:section/(@edit-ref, @xxf:update) -->
     <xsl:template match="fr:section" mode="within-body">
+        <xsl:param name="section-level" as="xs:integer" tunnel="yes" select="1"/>
         <xsl:copy>
             <xsl:attribute name="edit-ref"/>
             <xsl:attribute name="xxf:update" select="'full'"/>
@@ -103,7 +104,20 @@
                 </xsl:otherwise>
             </xsl:choose>
 
-            <xsl:apply-templates select="(@* except (@open | @readonly | @page-size | @collapse | @collapsible)) | node()" mode="#current"/>
+            <xsl:attribute name="level" select="$section-level"/>
+            <xsl:attribute name="base-level" select="1"/>
+
+            <xsl:apply-templates select="(@* except (@level | @base-level | @open | @readonly | @page-size | @collapse | @collapsible)) | node()" mode="#current">
+                <xsl:with-param name="section-level" select="$section-level + 1" tunnel="yes"/>
+            </xsl:apply-templates>
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template match="fr:section/*[frf:isSectionTemplateContent(.)]" mode="within-body">
+        <xsl:param name="section-level" as="xs:integer" tunnel="yes"/>
+        <xsl:copy>
+            <xsl:attribute name="base-level" select="$section-level"/>
+            <xsl:apply-templates select="(@* except @base-level) | node()" mode="#current"/>
         </xsl:copy>
     </xsl:template>
 
@@ -203,6 +217,26 @@
                     frf:replaceVarReferencesWithFunctionCallsFromString(., ., true(), $library-name, ())
                 else
                     ."/>
+    </xsl:template>
+
+    <xsl:template match="fr:section" mode="within-xbl">
+        <xsl:param name="section-level" as="xs:integer" tunnel="yes" select="1"/>
+        <xsl:copy>
+            <xsl:attribute name="level" select="$section-level"/>
+            <xsl:attribute name="xbl:attr" select="'base-level'"/>
+            <xsl:apply-templates select="(@* except (@level | @xbl:attr)) | node()" mode="#current">
+                <xsl:with-param name="section-level" select="$section-level + 1" tunnel="yes"/>
+            </xsl:apply-templates>
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template match="fr:section/*[frf:isSectionTemplateContent(.)]" mode="within-xbl">
+        <xsl:param name="section-level" as="xs:integer" tunnel="yes"/>
+        <xsl:copy>
+            <xsl:apply-templates select="@* except @base-level" mode="#current"/>
+            <xsl:attribute name="base-level" select="$section-level"/>
+            <xsl:apply-templates select="node()" mode="#current"/>
+        </xsl:copy>
     </xsl:template>
 
 </xsl:stylesheet>

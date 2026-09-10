@@ -190,6 +190,8 @@ trait ContainerOps extends ControlOps {
         import ctx.bindingIndex
         FormRunnerTemplatesOps.updateTemplates(None)
 
+        updateSectionLevels(ctx.bodyElem)
+
       case _ =>
     }
   }
@@ -354,4 +356,14 @@ trait ContainerOps extends ControlOps {
     import ctx.bindingIndex
     FormRunnerTemplatesOps.updateTemplates(Some(ancestorContainerNames))
   }
+
+  def updateSectionLevels(bodyElem: NodeInfo): Unit =
+    (bodyElem descendant * filter IsSection) foreach { section =>
+      val level = (section ancestor * filter IsSection).size + 1
+      ensureAttribute(section, "level", level.toString)
+      ensureAttribute(section, "base-level", "1")
+      section / * filter isSectionTemplateContent foreach { component =>
+        ensureAttribute(component, "base-level", (level + 1).toString)
+      }
+    }
 }

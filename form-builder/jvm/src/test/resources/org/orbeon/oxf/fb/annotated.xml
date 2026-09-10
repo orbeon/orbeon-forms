@@ -282,7 +282,7 @@
                 <xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?" class="fb-annotation"/>
                 <xf:var name="fr-resources" value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')" as="element(resource)?" class="fb-annotation"/>
                 <xf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')" as="element(resource)?" class="fb-annotation"/>
-                <fr:section edit-ref="" xxf:update="full" id="section-1-control" bind="section-1-bind">
+                <fr:section edit-ref="" xxf:update="full" id="section-1-control" bind="section-1-bind" level="1" base-level="1">
                    <xf:label ref="$form-resources/section-1/label"/>
                    <fr:grid edit-ref="" id="grid-1-grid" bind="grid-1-bind">
                        <fr:c y="1" x="1" w="6">
@@ -333,7 +333,7 @@
                        </fr:c>
                    </fr:grid>
                </fr:section>
-                <fr:section edit-ref="" xxf:update="full" id="section-9-control" bind="section-9-bind" repeat="content" min="1" template="instance('section-9-template')">
+                <fr:section edit-ref="" xxf:update="full" id="section-9-control" bind="section-9-bind" repeat="content" min="1" template="instance('section-9-template')" level="1" base-level="1">
                     <xf:label ref="$form-resources/section-9/label"/>
                     <fr:grid edit-ref="" id="grid-2-grid" bind="grid-2-bind">
                         <fr:c y="1" x="1" w="12">
@@ -345,7 +345,7 @@
                         </fr:c>
                     </fr:grid>
                 </fr:section>
-                <fr:section edit-ref="" xxf:update="full" id="section-11-control" bind="section-11-bind">
+                <fr:section edit-ref="" xxf:update="full" id="section-11-control" bind="section-11-bind" level="1" base-level="1">
                     <xf:label ref="$form-resources/section-11/label"/>
                     <fr:grid edit-ref="" id="grid-12-grid" bind="grid-12-bind" repeat="content" template="instance('grid-12-template')">
                         <fr:c y="1" x="1" w="12">
@@ -366,7 +366,7 @@
                         </fr:c>
                     </fr:grid>
                 </fr:section>
-                <fr:section edit-ref="" xxf:update="full" id="section-18-control" bind="section-18-bind">
+                <fr:section edit-ref="" xxf:update="full" id="section-18-control" bind="section-18-bind" level="1" base-level="1">
                     <xf:label ref="$form-resources/section-18/label"/>
                     <fr:grid edit-ref="" id="grid-19-grid" bind="grid-19-bind" repeat="content" template="instance('grid-19-template')">
                         <fr:c y="1" x="1" w="6">
@@ -397,7 +397,7 @@
                         </fr:c>
                     </fr:grid>
                 </fr:section>
-                <fr:section edit-ref="" xxf:update="full" id="section-25-control" bind="section-25-bind">
+                <fr:section edit-ref="" xxf:update="full" id="section-25-control" bind="section-25-bind" level="1" base-level="1">
                     <xf:label ref="$form-resources/section-25/label"/>
                     <fr:grid edit-ref="" id="grid-26-grid" bind="grid-26-bind">
                         <fr:c y="1" x="1" w="6">

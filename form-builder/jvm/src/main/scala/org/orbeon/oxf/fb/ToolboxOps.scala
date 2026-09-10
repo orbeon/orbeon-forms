@@ -213,9 +213,11 @@ object ToolboxOps {
 
       val precedingSectionName = after flatMap getControlNameOpt
 
+      val level = ((into ancestorOrSelf *) filter IsSection).size + 1
+
       // NOTE: use xxf:update="full" so that xxf:dynamic can better update top-level XBL controls
       val sectionTemplate: NodeInfo =
-        <fr:section id={sectionId(newSectionName)} bind={bindId(newSectionName)} edit-ref="" xxf:update="full"
+        <fr:section id={sectionId(newSectionName)} bind={bindId(newSectionName)} level={level.toString} base-level="1" edit-ref="" xxf:update="full"
               xmlns:xh="http://www.w3.org/1999/xhtml"
               xmlns:xf={Namespaces.XF}
               xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
@@ -263,6 +265,8 @@ object ToolboxOps {
 
       // This can impact templates
       updateTemplatesCheckContainers(findAncestorRepeatNames(into, includeSelf = true).to(Set))
+
+      updateSectionLevels(ctx.bodyElem)
 
       // Select first grid cell
       if (withGrid)
@@ -417,6 +421,8 @@ object ToolboxOps {
 
         // Propagate bind attributes to the `bind` element if present
         insert(into = bind, origin = findBindAttributesTemplate(bindingElem, forEnclosingSection = true))
+
+        updateSectionLevels(ctx.bodyElem)
 
         UndoAction.InsertSectionTemplate(section.id)
 

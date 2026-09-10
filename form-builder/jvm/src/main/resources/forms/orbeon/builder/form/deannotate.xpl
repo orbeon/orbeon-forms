@@ -96,9 +96,12 @@
                             </xsl:if>
                         </xsl:if>
                         <!-- Process everything else -->
-                        <xsl:apply-templates select="(@* except (@edit-ref | @xxf:update | @open | @fb:open | @fb:readonly | @fb:page-size | @fb:collapsible)) | node()"/>
+                        <xsl:apply-templates select="(@* except (@edit-ref | @xxf:update | @level | @base-level | @open | @fb:open | @fb:readonly | @fb:page-size | @fb:collapsible)) | node()"/>
                     </xsl:element>
                 </xsl:template>
+
+                <!-- Strip @base-level from components in the body -->
+                <xsl:template match="xh:body//@base-level"/>
 
                 <!-- Convert MIP names (attributes and nested elements) -->
                 <xsl:template match="xf:bind/@fb:relevant

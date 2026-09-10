@@ -19,6 +19,7 @@
 
             border-radius: var(--orbeon-control-border-radius);
             .fieldBorder();
+            background-color: var(--orbeon-control-background-color);
             padding: 4px 6px;
             margin: 2px 0;
 
@@ -54,6 +55,7 @@
             border-width: 2px;
             border-color: var(--orbeon-control-border-color);
             border-radius: var(--orbeon-control-border-radius);
+            background-color: var(--orbeon-control-background-color);
             margin: 3px 0;
             padding: 1em;
             color: var(--orbeon-attachment-drop-color);
@@ -129,6 +131,9 @@
         .xbl-fr-attachment {
             .fr-attachment-drop, .fr-attachment-upload, .fr-attachment-select, .fr-attachment-remove {
                 display: none;
+            }
+            .xforms-dnd-item {
+                background-color: var(--orbeon-control-read-only-background-color);
             }
         }
     }

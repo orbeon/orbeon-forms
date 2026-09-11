@@ -26,7 +26,7 @@
             .select2-selection__rendered {
                 line-height: 26px;
                 .select2-selection__placeholder {
-                    color: @controlPlaceholderColor;
+                    color: var(--orbeon-control-placeholder-color);
                 }
             }
             .focusHighlight();
@@ -41,8 +41,13 @@
 
         &.select2-container--default {
             .select2-selection--single {
+                height: var(--orbeon-control-height); // Select2 hard-codes 28px
                 .select2-selection__rendered {
                     color: var(--orbeon-control-color);
+                    line-height: calc(var(--orbeon-control-height) - 2px);
+                }
+                .select2-selection__arrow {
+                    height: calc(var(--orbeon-control-height) - 2px);
                 }
                 background-color: var(--orbeon-control-background-color);
             }
@@ -53,7 +58,7 @@
 
             .select2-selection--multiple {
                 background-color: var(--orbeon-control-background-color);
-                min-height: @fixedControlMinHeight;
+                min-height: var(--orbeon-control-height);
                 .select2-selection__rendered {
                     display: flex;        // For content to be vertically centered
                     flex-wrap: wrap;
@@ -79,7 +84,7 @@
                         box-shadow: none;
                         outline: none;
                         &::placeholder {
-                            color: @controlPlaceholderColor;
+                            color: var(--orbeon-control-placeholder-color);
                         }
                     }
                 }
@@ -113,6 +118,9 @@
         line-height: 20px;                                // Better alignment of the clear icon with the selection / arrow down icon
         color: var(--orbeon-dropdown-search-caret-color); // Use the same shade of grey as the selection / arrow down icon
         .focusHighlightGroup();
+    }
+    .select2-selection--single .select2-selection__clear {
+        top: calc((var(--orbeon-control-height) - 2px - 20px) / 2); // TODO: stop using fixed line heights
     }
 
     // Caret (arrow down/up)

@@ -350,7 +350,7 @@
     font-weight: bold;
     line-height: 1.2; // about Bootstrap 2's 14px at the 13px base, unitless so it scales with the font
     color: var(--orbeon-status-color);
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+    text-shadow: 0 -1px 0 var(--orbeon-status-text-shadow-color);
     white-space: nowrap;
     vertical-align: baseline;
     background-color: var(--orbeon-status-background-color);
@@ -741,7 +741,7 @@
   }
   // Bootstrap 2's subtle light separator between a split button and its caret segment
   .btn-group > .dropdown-toggle {
-    box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.125), inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--orbeon-button-toggle-box-shadow);
     &:focus {
       box-shadow: var(--orbeon-focus-ring); // the separator would otherwise mask the focus ring
     }

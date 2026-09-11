@@ -36,8 +36,8 @@
 
     .fancytree-container {
 
-        background-color: white;
-        border: 1px solid #ccc;
+        background-color: var(--orbeon-control-background-color);
+        border: 1px solid var(--orbeon-control-border-color);
         border-radius: var(--orbeon-control-border-radius);
 
         white-space: nowrap;
@@ -78,7 +78,7 @@
 
     .ui-fancytree-disabled ul.fancytree-container {
         opacity: 0.5;
-        background-color: silver;
+        background-color: var(--orbeon-control-read-only-background-color);
     }
 
     ul.fancytree-connectors.fancytree-container {
@@ -176,7 +176,7 @@
     //}
 
     .fancytree-node.fancytree-active > .fancytree-title {
-        background-color: rgba(82, 168, 236, 0.8);
+        background-color: var(--orbeon-focus-highlight-color);
     }
 
     // Special appearance which is more compatible with the Orbeon Forms 4.7 appearance

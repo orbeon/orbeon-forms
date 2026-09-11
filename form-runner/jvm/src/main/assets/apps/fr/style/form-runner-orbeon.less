@@ -75,7 +75,7 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
         text-decoration: none;
     }
     .nav-header {
-        color: @frHeaderColor;
+        color: var(--orbeon-navbar-heading-color);
         display: none; // 2024-12-16: I don't think we need this header, do we? We don't have it in wizard mode.
     }
     .nav > li > span > .btn-link {
@@ -374,15 +374,15 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
     // Navbar
     .navbar {
         .fr-language-choice .fr-link-select1, .fr-goto-content {
-            color: @navbarLinkColorActive;
+            color: var(--orbeon-navbar-color);
             font-size: 85%;
-            a, button.btn-link { color: @navbarLinkColor }
+            a, button.btn-link { color: var(--orbeon-navbar-language-dropdown-color) }
         }
 
         &.navbar-inverse {
             .fr-language-choice .fr-link-select1, .fr-goto-content {
                 color: var(--orbeon-navbar-heading-color);
-                a, button.btn-link { color: @navbarInverseLinkColor }
+                a, button.btn-link { color: var(--orbeon-navbar-language-dropdown-color) }
             }
 
             .brand, .nav > li > a {
@@ -652,7 +652,7 @@ body.orbeon { background-color: var(--orbeon-base-background-color); }
 
                 // Used in Form Builder and Embedding Demo
                 .brand {
-                    color: @frHeaderColor;
+                    color: var(--orbeon-navbar-heading-color);
                     font-size: 25px;
                 }
             }

@@ -183,14 +183,27 @@ trait FormRunnerActions
     implicit val ctx            : InDocFormRunnerDocContext = new InDocFormRunnerDocContext(formDefinition)
     implicit val externalContext: ExternalContext           = CoreCrossPlatformSupport.externalContext
 
-    val emailMetadataNodeOpt  = frc.metadataInstanceRootOpt(formDefinition).flatMap(metadata => (metadata / "email").headOption)
-    val emailMetadata         = parseEmailMetadata(emailMetadataNodeOpt, formDefinition)
-    val pdfRequiredByTemplate = emailMetadata.templates.exists(_.attachPdf.contains(true))
+    val emailMetadataNodeOpt = frc.metadataInstanceRootOpt(formDefinition).flatMap(metadata => (metadata / "email").headOption)
+    val emailMetadata        = parseEmailMetadata(emailMetadataNodeOpt, formDefinition)
+
+    val matchingEmailTemplates =
+      EmailContent.findMatchingEmailTemplates(
+        emailMetadata   = emailMetadata,
+        templateMatch   = templateMatch,
+        language        = language,
+        templateNameOpt = templateNameOpt
+      )
 
     val selectedRenderFormats =
-      RenderedFormat.values filter { format =>
-        booleanFormRunnerProperty(s"oxf.fr.email.attach-${format.entryName}") ||
-        (format == RenderedFormat.Pdf && pdfRequiredByTemplate)
+      RenderedFormat.values filter {
+        case format @ RenderedFormat.Pdf =>
+          if (matchingEmailTemplates.exists(_.attachPdf.contains(true)) )
+            true
+          else if (matchingEmailTemplates.forall(_.attachPdf.contains(false)))
+            false
+          else
+            booleanFormRunnerProperty(s"oxf.fr.email.attach-${format.entryName}")
+        case format => booleanFormRunnerProperty(s"oxf.fr.email.attach-${format.entryName}")
       }
 
     selectedRenderFormats foreach
@@ -200,7 +213,7 @@ trait FormRunnerActions
 
     val urisByRenderedFormat =
       (for {
-        renderedFormat <- RenderedFormat.values.toList
+        renderedFormat <- selectedRenderFormats
         (uri, _)       <- renderedFormatPathOpt(
             urlsInstanceRootElem = FormRunnerActionsCommon.findUrlsInstanceRootElem.get,
             renderedFormat       = renderedFormat,
@@ -215,14 +228,14 @@ trait FormRunnerActions
       pruneMetadata     = false
     )
 
-    EmailContent.emailContents(
-      formDataMaybeMigrated  = formDataMaybeMigrated,
-      emailMetadata          = emailMetadata,
-      urisByRenderedFormat   = urisByRenderedFormat,
-      templateMatch          = templateMatch,
-      language               = language,
-      templateNameOpt        = templateNameOpt
-    )
+    matchingEmailTemplates.map { template =>
+      EmailContent(
+        template              = template,
+        parameters            = emailMetadata.params,
+        formDataMaybeMigrated = formDataMaybeMigrated,
+        urisByRenderedFormat  = urisByRenderedFormat
+      )
+    }
   }
 
   private def formDataMaybeMigratedFromEdge(

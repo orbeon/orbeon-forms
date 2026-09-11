@@ -16,6 +16,9 @@ package org.orbeon.oxf.fr
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.fr.email.EmailMetadata.{HeaderName, TemplateMatch}
 import org.orbeon.oxf.fr.email.MessageContent
+import org.orbeon.oxf.fr.process.FormRunnerRenderedFormat.renderedFormatPathOpt
+import org.orbeon.oxf.fr.process.SimpleProcess.clearRenderedFormatsResources
+import org.orbeon.oxf.fr.process.{FormRunnerActionsCommon, RenderedFormat}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -38,9 +41,9 @@ class EmailContentTest
 
   describe("Form Runner email generation") {
 
-    val (processorService, docOpt, _) = runFormRunner("issue", "6848", "new")
+    val (processorServiceFor6848, Some(docFor6848), _) = runFormRunner("issue", "6848", "new")
 
-    val doc = docOpt.get
+    val (processorServiceFor7872, Some(docFor7872), _) = runFormRunner("issue", "7872", "new")
 
     it("must handle headers, subject, body. and template parameters correctly") {
       val templatesAndResults = Seq(
@@ -187,7 +190,7 @@ param3: <ul><li>Email 1: email1@from\.control</li><li>Email 3: email3@from\.cont
       )
 
       withTestExternalContext { implicit ec =>
-        withFormRunnerDocument(processorService, doc) {
+        withFormRunnerDocument(processorServiceFor6848, docFor6848) {
 
           implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
 
@@ -212,6 +215,48 @@ param3: <ul><li>Email 1: email1@from\.control</li><li>Email 3: email3@from\.cont
                 // We test the body with a regex
                 assert(emailContent.messageContent.content.matches(expectedEmailContent.messageContentAsRegex.content))
               }
+            }
+          }
+        }
+      }
+    }
+
+    it("must generate the PDF rendered format only when requested as attachment") {
+      withTestExternalContext { implicit ec =>
+        withFormRunnerDocument(processorServiceFor7872, docFor7872) {
+
+          implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
+
+          for ((templateName, expectedResult) <- List(
+            "with-pdf-false"   -> false,
+            "with-pdf-true"    -> true,
+            "with-pdf-default" -> true // `oxf.fr.email.attach-pdf` is `true` by default
+          )) locally {
+
+            clearRenderedFormatsResources()
+
+            process.SimpleProcess.emailsToSend(
+              emailDataFormatVersion = DataFormatVersion.Edge,
+              templateMatch          = TemplateMatch.First,
+              language               = FormRunner.currentLang,
+              templateNameOpt        = templateName.some,
+              pdfParams              = Map.empty
+            )
+            .foreach { emailContent =>
+
+              // Must match the expected result in the email content
+              assert(emailContent.attachments.exists(_.contentType == "application/pdf") == expectedResult)
+
+              val urisByRenderedFormat =
+                renderedFormatPathOpt(
+                  urlsInstanceRootElem = FormRunnerActionsCommon.findUrlsInstanceRootElem.get,
+                  renderedFormat       = RenderedFormat.Pdf,
+                  pdfTemplateOpt       = None,
+                  defaultLang          = "en"
+                )
+
+              // Must also have been generated in the `urls` instance only when needed
+              assert(urisByRenderedFormat.isDefined == expectedResult)
             }
           }
         }

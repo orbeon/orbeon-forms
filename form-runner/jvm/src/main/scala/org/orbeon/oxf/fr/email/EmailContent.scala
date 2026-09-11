@@ -145,20 +145,15 @@ object EmailContent {
     evaluatedParams.processedTemplate(html = false, subjectFromTemplateOpt.getOrElse(subjectFromResources))
   }
 
-  def emailContents(
-    formDataMaybeMigrated   : NodeInfo,
-    emailMetadata           : EmailMetadata.Metadata,
-    urisByRenderedFormat    : Map[RenderedFormat, URI],
-    templateMatch           : TemplateMatch,
-    language                : String,
-    templateNameOpt         : Option[String]
+  def findMatchingEmailTemplates(
+    emailMetadata  : EmailMetadata.Metadata,
+    templateMatch  : TemplateMatch,
+    language       : String,
+    templateNameOpt: Option[String]
   )(implicit
-    logger                  : IndentedLogger,
-    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
-    formRunnerParams        : FormRunnerParams,
-    ctx                     : FormRunnerDocContext,
-    xfcd                    : XFormsContainingDocument,
-  ): List[EmailContent] = {
+    logger         : IndentedLogger,
+    ctx            : FormRunnerDocContext,
+  ): List[EmailMetadata.Template] = {
 
     // For evaluating expressions
     implicit val namespaceMapping: NamespaceMapping = NamespaceMapping(ctx.modelElem.namespaceMappings.toMap)
@@ -174,19 +169,9 @@ object EmailContent {
     }
 
     // 3) Consider first template or all templates
-    val firstOrAllTemplates = templateMatch match {
+    templateMatch match {
       case TemplateMatch.First => enabledTemplates.take(1)
       case TemplateMatch.All   => enabledTemplates
-    }
-
-    // For each email template, generate email content
-    firstOrAllTemplates.map { template =>
-      EmailContent(
-        template              = template,
-        parameters            = emailMetadata.params,
-        formDataMaybeMigrated = formDataMaybeMigrated,
-        urisByRenderedFormat  = urisByRenderedFormat
-      )
     }
   }
 

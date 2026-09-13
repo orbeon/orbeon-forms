@@ -105,7 +105,7 @@ val JakartaServletApiVersion         = "6.1.0"
 val PortletApiVersion                = "3.0.1"
 val LiferayPortalServiceVersion      = "6.2.5"
 val LiferayPortalKernelVersion       = "166.0.0"
-val WildFlyElytronHttpOidcVersion    = "2.8.2.Final"
+val WildFlyElytronHttpOidcVersion    = "2.8.5.Final"
 
 val WebJarDependencies = Seq(
   "org.webjars.npm" % "bowser"           % "1.9.4",

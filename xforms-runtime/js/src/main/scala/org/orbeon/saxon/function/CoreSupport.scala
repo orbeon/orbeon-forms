@@ -1,6 +1,7 @@
 package org.orbeon.saxon.function
 
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.value.AtomicValue
@@ -10,7 +11,7 @@ import shapeless.syntax.typeable.*
 object CoreSupport {
 
   def property(propertyName: String): Option[AtomicValue] =
-    if (propertyName.toLowerCase.contains("password"))
+    if (PropertySet.isSensitivePropertyName(propertyName))
       None
     else {
       CoreCrossPlatformSupport.properties.getObjectOpt(propertyName) map
@@ -24,7 +25,7 @@ object CoreSupport {
   def propertiesStartsWith(propertyName: String): List[AtomicValue] =
     for {
       property <- CoreCrossPlatformSupport.properties.propertiesStartsWith(propertyName)
-      if ! property.toLowerCase.contains("password")
+      if ! PropertySet.isSensitivePropertyName(property)
     } yield
       SaxonUtils.convertJavaObjectToSaxonObject(property).asInstanceOf[AtomicValue]
 

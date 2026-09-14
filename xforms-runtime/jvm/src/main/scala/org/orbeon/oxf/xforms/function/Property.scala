@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.function
 
+import org.orbeon.oxf.properties.PropertySet
+
 import java.util as ju
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
 import org.orbeon.oxf.xml.dom.Extensions
@@ -62,8 +64,8 @@ class Property extends XFormsFunction with RuntimeDependentFunction with AddToPa
       }
 
     uriLocal match {
-      case (_, local) if local.toLowerCase.contains("password") =>
-        // Never return any property containing the string "password" as a first line of defense
+      case (_, local) if PropertySet.isSensitivePropertyName(local) =>
+        // Never return any property containing a sensitive name as a first line of defense
         null
       case ("", VersionProperty) =>
         Version

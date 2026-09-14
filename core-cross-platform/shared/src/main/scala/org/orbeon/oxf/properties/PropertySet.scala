@@ -67,6 +67,11 @@ object PropertySet {
 
   val StarToken = "*"
 
+  private val SensitiveWords = Set("password", "credential")
+
+  def isSensitivePropertyName(propertyName: String): Boolean =
+    SensitiveWords.exists(word => propertyName.toLowerCase.contains(word))
+
   trait PropertyNodeT {
     def property: Option[Property]
     def hasChildren: Boolean
@@ -213,7 +218,7 @@ trait PropertySetFunctions extends PropertySetGetters {
 
   // For form compilation
   def propertyParams: Iterable[PropertyParams] =
-    propertiesByName.collect { case (name, prop) if ! name.toLowerCase.contains("password") =>
+    propertiesByName.collect { case (name, prop) if ! PropertySet.isSensitivePropertyName(name) =>
 
       // Custom serialization to String, not ideal
       val stringValue = {
@@ -232,7 +237,7 @@ trait PropertySetFunctions extends PropertySetGetters {
       for {
         (name, prop) <- propertiesByName.toList.sortBy(_._1)
         propType     = prop.typ.toString
-        propValue    = if (name.toLowerCase.contains("password")) PasswordPlaceholder else prop.stringValue
+        propValue    = if (PropertySet.isSensitivePropertyName(name)) PasswordPlaceholder else prop.stringValue
       } yield
           s"""|  "$name": {
               |    "type": "${propType.escapeJavaScript}",

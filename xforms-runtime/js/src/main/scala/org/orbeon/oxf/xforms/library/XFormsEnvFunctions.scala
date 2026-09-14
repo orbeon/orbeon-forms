@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.library
 import cats.syntax.option.*
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.properties.{PropertySet, PropertyStore}
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
@@ -33,8 +34,6 @@ import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits
 import org.orbeon.xforms.Namespaces
-
-
 
 import scala.jdk.CollectionConverters.*
 import shapeless.syntax.typeable.*
@@ -78,8 +77,8 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
     }
 
     uriLocal match {
-      case (_, local) if local.toLowerCase.contains("password") =>
-        // Never return any property containing the string "password" as a first line of defense
+      case (_, local) if PropertySet.isSensitivePropertyName(local) =>
+        // Never return any property containing a sensitive name as a first line of defense
         None
       case ("", VersionProperty) =>
         StringValue.makeStringValue(Version).some

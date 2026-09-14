@@ -15,6 +15,7 @@ package org.orbeon.saxon.function
 
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, XPathCache}
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, RuntimeDependentFunction, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
@@ -36,7 +37,7 @@ class Property extends DefaultFunctionSupport with RuntimeDependentFunction with
 object Property {
 
   def property(propertyName: String): Option[AtomicValue] =
-    if (propertyName.toLowerCase.contains("password"))
+    if (PropertySet.isSensitivePropertyName(propertyName))
       None
     else {
       CoreCrossPlatformSupport.properties.getObjectOpt(propertyName) map
@@ -75,7 +76,7 @@ object PropertiesStartsWith {
   def propertiesStartsWith(propertyName: String): List[AtomicValue] =
     for {
       property <- CoreCrossPlatformSupport.properties.propertiesStartsWith(propertyName)
-      if ! property.toLowerCase.contains("password")
+      if ! PropertySet.isSensitivePropertyName(property)
     } yield
       SaxonUtils.convertJavaObjectToSaxonObject(property).asInstanceOf[AtomicValue]
 }

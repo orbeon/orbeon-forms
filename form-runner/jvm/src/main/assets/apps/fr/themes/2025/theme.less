@@ -62,6 +62,8 @@
   --orbeon-help-icon-border-radius          : 50%;
   --orbeon-help-icon-focus-outline          : 0;
   --orbeon-help-icon-focus-ring             : var(--orbeon-focus-ring);
+  --orbeon-help-icon-gap                    : 3px;
+  --orbeon-section-help-icon-gap            : 5px;
   --orbeon-help-font-family                 : @frBaseFontFamily;
   --orbeon-help-background-color            : white;
   --orbeon-help-border-color                : rgba(0, 0, 0, 0.2);
@@ -139,7 +141,7 @@
   --orbeon-checkable-border-color             : rgba(0,0,0,.25); // resting state (unchecked, enabled)
   --orbeon-checkable-checked-background-color : var(--orbeon-button-primary-background-color);
   --orbeon-checkable-checked-border-color     : var(--orbeon-button-primary-background-color);
-  --orbeon-checkable-disabled-background-color: white;           // master: same as the enabled fill
+  --orbeon-checkable-disabled-background-color: white;           // same as the enabled fill
   --orbeon-checkable-disabled-border-color    : rgba(0,0,0,.25); // matches the base border color set on these inputs
   --orbeon-checkable-focus-ring               : var(--orbeon-focus-ring);
 
@@ -269,10 +271,10 @@
   --orbeon-toc-hover-background-color         : #eee; // @grayLighter;
   --orbeon-toc-selected-color                 : white;
   --orbeon-toc-selected-background-color      : #0d6efd;
-  --orbeon-toc-error-color                    : @error;
+  --orbeon-toc-error-color                    : var(--orbeon-error-color);
   --orbeon-toc-error-background-color         : transparent;
   --orbeon-toc-selected-error-color           : white;
-  --orbeon-toc-selected-error-background-color: @error;
+  --orbeon-toc-selected-error-background-color: var(--orbeon-error-color);
 
   // Navbar
   --orbeon-navbar-color                                : white;
@@ -577,9 +579,7 @@
     --orbeon-toc-hover-background-color                      : @gray-20;
     --orbeon-toc-selected-color                              : @base-bg;
     --orbeon-toc-selected-background-color                   : var(--orbeon-toc-color);
-    --orbeon-toc-error-color                                 : @error;
     --orbeon-toc-selected-error-color                        : @base-bg;
-    --orbeon-toc-selected-error-background-color             : @error;
     --orbeon-navbar-background-color                         : @navbar-bg;
     --orbeon-table-background-color                          : @base-bg;
     --orbeon-table-striped-background-color                  : @gray-16;

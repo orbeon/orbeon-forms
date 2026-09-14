@@ -179,7 +179,7 @@ trait FormRunnerActionsCommon {
           app                        = app,
           form                       = form,
           data                       = originalData,
-          metadataOpt                = frc.metadataInstance.map(_.root),
+          metadataOpt                = frc.metadataInstanceImplicit.map(_.root),
           dstDataFormatVersionString = databaseDataFormatVersion.entryName,
           pruneMetadata              = pruneMetadata,
           pruneTmpAttMetadata        = true

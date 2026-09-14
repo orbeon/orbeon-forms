@@ -31,7 +31,7 @@ import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtils, HtmlParsing, IndentedLogger}
-import org.orbeon.oxf.xforms.Loggers
+import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.function.XFormsFunction
@@ -480,6 +480,10 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def parametersInstance          : Option[XFormsInstance] = topLevelInstance(ParametersModel,   "fr-parameters-instance")
   def errorSummaryInstance        : XFormsInstance         = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance").get
   def persistenceInstance         : XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-persistence-instance").get
+
+  // TODO: All callers should be changed to this vs. `metadataInstance()`, then rename.
+  def metadataInstanceImplicit(implicit xfcd: XFormsContainingDocument): Option[XFormsInstance] =
+    topLevelInstance(FormModel,  MetadataInstance)
 
   def getMode: String =
     (parametersInstance.get.rootElement / "mode").stringValue

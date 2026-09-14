@@ -185,6 +185,8 @@ trait FormRunnerActions
     val emailMetadataNodeOpt = frc.metadataInstanceRootOpt(formDefinition).flatMap(metadata => (metadata / "email").headOption)
     val emailMetadata        = parseEmailMetadata(emailMetadataNodeOpt, formDefinition)
 
+    implicit val namespaceMapping: NamespaceMapping = topLevelModel(FormModel).get.staticModel.namespaceMapping
+
     val matchingEmailTemplates =
       EmailContent.findMatchingEmailTemplates(
         emailMetadata   = emailMetadata,
@@ -487,7 +489,7 @@ trait FormRunnerActions
               app                        = currentApp,
               form                       = currentForm,
               data                       = originalData,
-              metadataOpt                = frc.metadataInstance.map(_.root),
+              metadataOpt                = frc.metadataInstanceImplicit.map(_.root),
               dstDataFormatVersionString = FormRunnerPersistence.providerDataFormatVersionOrThrow(formRunnerParams.appForm).entryName,
               pruneMetadata              = effectivePruneMetadata,
               pruneTmpAttMetadata        = true

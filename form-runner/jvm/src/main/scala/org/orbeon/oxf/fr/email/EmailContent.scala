@@ -146,17 +146,14 @@ object EmailContent {
   }
 
   def findMatchingEmailTemplates(
-    emailMetadata  : EmailMetadata.Metadata,
-    templateMatch  : TemplateMatch,
-    language       : String,
-    templateNameOpt: Option[String]
+    emailMetadata   : EmailMetadata.Metadata,
+    templateMatch   : TemplateMatch,
+    language        : String,
+    templateNameOpt : Option[String]
   )(implicit
-    logger         : IndentedLogger,
-    ctx            : FormRunnerDocContext,
+    logger          : IndentedLogger,
+    namespaceMapping: NamespaceMapping, // for evaluating expressions
   ): List[EmailMetadata.Template] = {
-
-    // For evaluating expressions
-    implicit val namespaceMapping: NamespaceMapping = NamespaceMapping(ctx.modelElem.namespaceMappings.toMap)
 
     // 1) Filter templates by language and name
     val templatesFilteredByLanguageAndName = emailMetadata.templates.filter { template =>

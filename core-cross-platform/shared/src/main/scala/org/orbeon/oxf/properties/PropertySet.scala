@@ -101,7 +101,7 @@ object PropertySet {
   def apply(globalProperties: Iterable[PropertyParams], eTag: api.ETag): PropertySet = {
 
     var propertiesByName = Map[String, Property]()
-    val propertiesTree   = new MutablePropertyNode
+    val propertiesTree   = MutablePropertyNode()
 
     def setProperty(namespaces: Map[String, String], name: String, typeQName: QName, value: AnyRef): Unit = {
 
@@ -114,7 +114,7 @@ object PropertySet {
       // that start with some token)
       var currentNode = propertiesTree
       for (currentToken <- name.splitTo[List]("."))
-        currentNode = currentNode.children.getOrElseUpdate(currentToken, new MutablePropertyNode)
+        currentNode = currentNode.children.getOrElseUpdate(currentToken, MutablePropertyNode())
 
       // Store value
       currentNode.property = property.some

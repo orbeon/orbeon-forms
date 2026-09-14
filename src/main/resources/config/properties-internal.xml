@@ -293,6 +293,9 @@
     <property as="xs:string"  name="oxf.fr.style.themes.2025.css-uri">
         /apps/fr/themes/2025/theme.css
     </property>
+    <property as="xs:string"  name="oxf.fr.style.themes.2026.css-uri">
+        /apps/fr/themes/2026/theme.css
+    </property>
 
     <!-- Additional CSS/JavaScript for the detail page -->
     <property as="xs:string"  name="oxf.fr.detail.css.uri.*.*">

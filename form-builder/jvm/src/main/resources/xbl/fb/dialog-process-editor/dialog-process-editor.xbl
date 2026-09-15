@@ -1,0 +1,472 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+    xmlns:pui="java:org.orbeon.oxf.fb.process.ProcessUI"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <xbl:binding id="fb-dialog-process-editor" element="fb|dialog-process-editor">
+
+        <xbl:handlers>
+
+            <!-- Handler to open dialog -->
+            <xbl:handler event="fb-show-dialog xxforms-dialog-open" phase="target">
+
+                <xf:delete ref="instance()/*"/>
+
+                <xf:var name="incoming" value="event('config')/process"/>
+                <xf:action if="exists($incoming)">
+                    <xf:insert
+                        context="instance()"
+                        ref="*"
+                        origin="pui:deserializeProcesses(event('config'))/*"/>
+                </xf:action>
+
+                <xf:action if="empty($incoming)">
+                    <xf:insert
+                        context="instance()"
+                        ref="*"
+                        origin="instance('process-template')"/>
+                </xf:action>
+
+                <xxf:show dialog="dialog"/>
+                <xf:setfocus control="fb-process-name"/>
+            </xbl:handler>
+
+            <!-- Save and close if valid -->
+            <xbl:handler event="DOMActivate" observer="fb-save-trigger" if="instance('validity-instance') = 'true'">
+                <xf:dispatch name="fb-update" targetid="fb-dialog-process-editor">
+                    <xf:property name="config" value="pui:serializeProcesses(instance())"/>
+                </xf:dispatch>
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+
+            <xbl:handler event="DOMActivate" observer="fb-save-trigger" if="not(instance('validity-instance') = 'true')">
+                <xxf:setvisited control="dialog" recurse="true"/>
+            </xbl:handler>
+
+        </xbl:handlers>
+
+        <xbl:implementation>
+            <xf:model id="model">
+
+                <xf:instance id="_" xxf:exclude-result-prefixes="#all">
+                    <processes/>
+                </xf:instance>
+
+                <xf:instance id="actions-instance" xxf:readonly="false" xxf:exclude-result-prefixes="#all">
+                    <actions/>
+                </xf:instance>
+
+                <xf:instance id="process-template" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <process name="">
+                        <step type="action" combinator="then" name="save"/>
+                    </process>
+                </xf:instance>
+
+                <xf:instance id="validity-instance" xxf:exclude-result-prefixes="#all">
+                    <_/>
+                </xf:instance>
+
+                <xf:instance id="xml-formatting-instance" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <xsl:output method="xml" omit-xml-declaration="yes" indent="yes" saxon:indent-spaces="4" xmlns:saxon="http://saxon.sf.net/"/>
+                </xf:instance>
+
+                <xf:action event="xforms-model-construct-done">
+                    <xf:insert
+                        context="instance('actions-instance')"
+                        origin="pui:availableActionsXml()/*"/>
+                </xf:action>
+
+                <xf:var name="i" value="instance()"/>
+
+                <xf:bind
+                    ref="$i//*"
+                    readonly="fr:is-readonly-mode()"/>
+
+                <xf:bind ref="$i/process" name="process">
+                    <xf:bind
+                        ref="@name"
+                        xxf:whitespace="trim"
+                        required="true()"
+                        constraint="
+                            xxf:non-blank() and
+                            matches(., '^[a-zA-Z0-9_\-\.]+$') and
+                            not(($i/process/@name except .) = .)"/>
+                    <xf:bind
+                        ref="."
+                        constraint="exists(step)"/>
+                    <xf:bind
+                        ref=".//step[@type = 'condition']/@condition"
+                        required="true()"
+                        constraint="xxf:non-blank()"/>
+                </xf:bind>
+
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:group>
+
+                <!-- Bindings specified on control -->
+                <xf:var name="resources">
+                    <xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/>
+                </xf:var>
+                <xf:var name="fr-resources">
+                    <xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=fr-resources-ref"/>
+                </xf:var>
+
+                <xxf:dialog id="dialog" class="fb-dialog-process-editor">
+                    <xf:label value="$resources/dialog-process-editor/label"/>
+
+                    <fr:tabbable
+                        appearance="left"
+                        id="fb-processes-tabbable"
+                        ref="$i"
+                        readonly="false"
+                        class="fr-tabbable-dnd">
+
+                        <fr:tab ref="process">
+                            <fr:label value="if (xxf:non-blank(@name)) then @name else $resources/dialog-process-editor/new-process"/>
+
+                            <xh:div class="fb-process-tab-content">
+                                <fr:grid>
+                                    <fr:c x="1" y="1" w="12">
+                                        <xf:input ref="@name" id="fb-process-name">
+                                            <xf:label value="$resources/dialog-process-editor/process-name/label"/>
+                                            <xf:hint value="$resources/dialog-process-editor/process-name/hint"/>
+                                            <xf:alert value="$resources/dialog-process-editor/process-name/alert"/>
+                                        </xf:input>
+                                    </fr:c>
+                                    <fr:c x="1" y="2" w="12">
+                                        <xh:div class="fb-process-steps-container">
+                                            <xh:div class="fb-process-steps-header">
+                                                <xf:output value="$resources/dialog-process-editor/process-definition/label"/>
+                                            </xh:div>
+
+                                            <!-- Visual editor rows -->
+                                            <xf:group ref=".[exists(step)]">
+                                                <fr:dnd-repeat ref=".//*[self::step or self::else]">
+
+                                                    <xf:var
+                                                        name="current"
+                                                        value="."/>
+                                                    <xf:var
+                                                        name="step-type"
+                                                        value="if (self::else) then 'else' else (@type, 'action')[1]"/>
+                                                    <xf:var
+                                                        name="indent-level"
+                                                        value="
+                                                            if (self::else) then
+                                                                count(ancestor::step[@type = ('group', 'condition')]) - 1
+                                                            else if (@type = ('group', 'condition')) then
+                                                                count(ancestor::step[@type = ('group', 'condition')])
+                                                            else
+                                                                count(ancestor::step[@type = ('group', 'condition')])
+                                                    "/>
+<!--                                                    xxx indent:-->
+<!--                                                    <xf:output value="$indent-level"/>-->
+                                                    <xf:var
+                                                        name="is-first-step"
+                                                        value="empty(preceding-sibling::step) and not(parent::then or parent::else) and empty(ancestor::step)"/>
+                                                    <xf:var
+                                                        name="is-first-step-in-group"
+                                                        value="empty(preceding-sibling::step)"/>
+
+                                                    <xf:var
+                                                        name="is-first-line-in-block"
+                                                        value="empty(preceding-sibling::step) and $step-type != 'else'"/>
+                                                    <xf:var
+                                                        name="is-last-line-in-block"
+                                                        value="empty(following-sibling::step) and $step-type != 'condition' and $step-type != 'else'"/>
+
+                                                    <xh:div class="{
+                                                        'fb-process-iteration',
+                                                        concat('xforms-dnd-level-', max(($indent-level, 0))),
+                                                        'xforms-dnd-item',
+                                                        'xforms-dnd-moves'
+                                                    }">
+                                                        <!-- Indentation spacers -->
+                                                        <!-- ⤑ ⋯ ↦ -->
+                                                        <xh:div class="fb-process-row-spacers">
+                                                            <xf:repeat ref="1 to $indent-level" class="fb-indent-spacers"><xh:span class="fb-indent-spacer fb-indent-spacer-position-{position()}"/></xf:repeat>
+                                                        </xh:div>
+                                                        <xh:div class="fb-process-row-content-outer {'fb-process-row-content-start-row'[$is-first-line-in-block]} {'fb-process-row-content-end-row'[$is-last-line-in-block]} fb-process-row-content-indent-{$indent-level}">
+                                                        <xh:div class="fb-process-row-content">
+<!--                                                            <xh:div class="fb-process-row-content-inner">-->
+
+                                                                <!-- Combinator dropdown (then / recover) -->
+                                                                <xf:select1
+                                                                    ref="
+                                                                        if ($is-first-step-in-group) then
+                                                                            'start'
+                                                                        else
+                                                                            $current[self::step]/@combinator"
+                                                                    class="fb-process-combinator-select1">
+                                                                    <xf:itemset ref=".[$is-first-step-in-group]"><xf:label/><xf:value>start</xf:value></xf:itemset>
+                                                                    <xf:item><xf:label>then</xf:label><xf:value>then</xf:value></xf:item>
+                                                                    <xf:item><xf:label>recover</xf:label><xf:value>recover</xf:value></xf:item>
+                                                                </xf:select1>
+
+                                                                <!-- Row content based on type -->
+                                                                <xf:switch caseref="$step-type" class="fb-process-row-switch" xxf:update="full">
+                                                                    <!-- Action step -->
+                                                                    <xf:case value="'action'">
+                                                                        <xf:select1 ref="@name" class="fb-process-action-select1">
+                                                                            <xf:itemset ref="instance('actions-instance')/action">
+                                                                                <xf:label ref="@label"/>
+                                                                                <xf:value ref="@name"/>
+                                                                            </xf:itemset>
+                                                                            <xf:action event="xforms-value-changed">
+                                                                                <xf:delete ref="$current/param"/>
+                                                                                <xf:insert context="$current" origin="pui:actionParamsXml(@name)/*"/>
+                                                                            </xf:action>
+                                                                        </xf:select1>
+
+                                                                        <!-- Parameters -->
+<!--                                                                        <xf:repeat ref="param">-->
+<!--                                                                            <xh:span class="fb-process-param">-->
+<!--                                                                                <xf:input ref=".">-->
+<!--                                                                                    <xf:label value="if (@name != '') then @name else 'value'"/>-->
+<!--                                                                                </xf:input>-->
+<!--                                                                            </xh:span>-->
+<!--                                                                        </xf:repeat>-->
+                                                                    </xf:case>
+
+                                                                    <!-- Group container -->
+                                                                    <xf:case value="'group'">
+                                                                        <xh:span class="fb-process-keyword badge text-bg-primary">group</xh:span>
+                                                                    </xf:case>
+
+                                                                    <!-- Condition -->
+                                                                    <xf:case value="'condition'">
+                                                                        <xh:span class="fb-process-keyword-with-condition">
+                                                                            <xh:span class="fb-process-keyword badge text-bg-success">if</xh:span>
+                                                                            <xf:input ref="@condition" class="fb-process-condition-input">
+                                                                                <xf:alert value="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
+                                                                            </xf:input>
+                                                                        </xh:span>
+                                                                    </xf:case>
+
+                                                                    <!-- Else branch -->
+                                                                    <xf:case value="'else'">
+                                                                        <xh:span class="fb-process-keyword badge text-bg-warning">else</xh:span>
+                                                                    </xf:case>
+                                                                </xf:switch>
+<!--                                                                <xh:div class="fb-process-row-spacers-2">-->
+<!--                                                                </xh:div>-->
+                                                                <xh:div class="fb-process-row-content-params {'xforms-disabled'[$step-type != 'action']}">
+    <!--                                                                <xf:repeat ref="1 to $indent-level" class="fb-indent-spacers"><xh:span class="fb-indent-spacer"/></xf:repeat>-->
+                                                                    <xf:switch caseref="$step-type" class="fb-process-row-switch-xxx">
+                                                                        <xf:case value="'action'">
+                                                                            <xf:repeat ref="param">
+                                                                                <xh:span class="fb-process-param">
+                                                                                    <xf:input ref=".">
+                                                                                        <xf:label value="if (@name != '') then @name else 'value'" appearance="minimal"/>
+                                                                                    </xf:input>
+                                                                                </xh:span>
+                                                                            </xf:repeat>
+                                                                        </xf:case>
+                                                                    </xf:switch>
+                                                                </xh:div>
+<!--                                                            </xh:div>-->
+                                                        </xh:div>
+                                                        </xh:div>
+                                                        <xh:div class="fb-process-row-spacers">
+                                                            <xf:repeat ref="1 to $indent-level" class="fb-indent-spacers"><xh:span class="fb-indent-spacer fb-indent-spacer-position-{$indent-level - position() + 1}"/></xf:repeat>
+                                                        </xh:div>
+
+                                                        <!-- Row action buttons on the right -->
+                                                        <xh:div class="fb-process-row-buttons">
+                                                            <xh:i class="fa fa-fw fa-bars fb-process-grab" title="Move"/>
+
+                                                            <!-- Remove button -->
+                                                            <xf:trigger appearance="minimal" class="fb-process-btn">
+                                                                <xf:label><xh:i class="fa fa-fw fa-minus-circle" title="Remove"/></xf:label>
+                                                                <xf:action event="DOMActivate">
+                                                                    <xf:delete ref="$current"/>
+                                                                </xf:action>
+                                                            </xf:trigger>
+
+                                                            <!-- Add button -->
+                                                            <xf:trigger appearance="minimal" class="fb-process-btn">
+                                                                <xf:label><xh:i class="fa fa-fw fa-plus-circle" title="Add step"/></xf:label>
+                                                                <xf:action event="DOMActivate">
+                                                                    <xf:insert
+                                                                        if="$current[self::else]"
+                                                                        context="$current"
+                                                                        origin="pui:newActionTemplateXml('save', 'then')"/>
+                                                                    <xf:insert
+                                                                        if="$current[not(self::else)]"
+                                                                        ref="$current"
+                                                                        position="after"
+                                                                        origin="pui:newActionTemplateXml('save', 'then')"/>
+                                                                </xf:action>
+                                                            </xf:trigger>
+
+                                                            <!-- Group button -->
+                                                            <xf:trigger appearance="minimal" class="fb-process-btn" ref="$current[self::step and @type != 'group']">
+                                                                <xf:label><xh:i class="fa fa-fw fa-object-group" title="Group"/></xf:label>
+                                                                <xf:action event="DOMActivate">
+                                                                    <xf:var name="new-group" value="pui:newGroupTemplateXml($current/@combinator)"/>
+                                                                    <xf:insert context="$new-group" origin="xxf:mutable-document($current)"/>
+                                                                    <xf:setvalue ref="$new-group/*/@combinator" value="'then'"/>
+<!--                                                                    <xf:message value="xxf:serialize($new-group, instance('xml-formatting-instance'))"/>-->
+                                                                    <xf:insert ref="$current" position="after" origin="$new-group"/>
+                                                                    <xf:delete ref="$current"/>
+                                                                </xf:action>
+                                                            </xf:trigger>
+
+                                                            <!-- Condition button -->
+                                                            <xf:trigger appearance="minimal" class="fb-process-btn" ref="$current[self::step and @type != 'condition']">
+                                                                <xf:label><xh:i class="fa fa-fw fa-code-fork" title="Condition (if)"/></xf:label>
+                                                                <xf:action event="DOMActivate">
+                                                                    <xf:var name="new-cond" value="pui:newConditionTemplateXml($current/@combinator)"/>
+                                                                    <xf:insert context="$new-cond/then" origin="xxf:mutable-document($current)"/>
+                                                                    <xf:setvalue ref="$new-cond/then/*/@combinator" value="'then'"/>
+                                                                    <xf:insert ref="$current" position="after" origin="$new-cond"/>
+                                                                    <xf:delete ref="$current"/>
+                                                                </xf:action>
+                                                            </xf:trigger>
+
+                                                            <!-- Else button on condition -->
+                                                            <xf:trigger appearance="minimal" class="fb-process-btn" ref="$current[self::step[@type = 'condition']]">
+                                                                <xf:label>
+                                                                    <xh:span class="fb-process-btn-text">
+                                                                        <xf:output value="if (exists($current/else)) then '- Else' else '+ Else'"/>
+                                                                    </xh:span>
+                                                                </xf:label>
+                                                                <xf:action event="DOMActivate">
+                                                                    <xf:var name="add-else" value="empty($current/else)"/>
+                                                                    <xf:action if="$add-else">
+                                                                        <xf:insert
+                                                                            context="$current"
+                                                                            ref="*"
+                                                                            origin="pui:newElseTemplateXml()"/>
+                                                                    </xf:action>
+                                                                    <xf:action if="not($add-else)">
+                                                                        <xf:delete ref="$current/else"/>
+                                                                    </xf:action>
+                                                                </xf:action>
+                                                            </xf:trigger>
+
+                                                            <!-- Ungroup button -->
+                                                            <xf:trigger appearance="minimal" class="fb-process-btn" ref="$current[exists(parent::then | parent::else | parent::step[@type = 'group'] | self::step[@type = 'group'])]">
+                                                                <xf:label><xh:i class="fa fa-fw fa-object-ungroup" title="Ungroup"/></xf:label>
+                                                                <xf:action event="DOMActivate">
+                                                                    <xf:action if="$current/@type = 'group'">
+                                                                        <xf:insert ref="$current" position="after" origin="$current/step"/>
+                                                                        <xf:delete ref="$current"/>
+                                                                    </xf:action>
+                                                                    <xf:action if="$current/parent::step[@type = 'group']">
+                                                                        <xf:var name="parent-grp" value="$current/parent::step[@type = 'group']"/>
+                                                                        <xf:insert ref="$parent-grp" position="after" origin="$current"/>
+                                                                        <xf:delete ref="$current"/>
+                                                                        <xf:delete if="empty($parent-grp/step)" ref="$parent-grp"/>
+                                                                    </xf:action>
+                                                                    <xf:action if="$current/parent::then or $current/parent::else">
+                                                                        <xf:var name="parent-cnd" value="$current/ancestor::step[@type = 'condition'][1]"/>
+                                                                        <xf:insert ref="$parent-cnd" position="after" origin="$current"/>
+                                                                        <xf:delete ref="$current"/>
+                                                                    </xf:action>
+                                                                </xf:action>
+                                                            </xf:trigger>
+                                                        </xh:div>
+                                                    </xh:div>
+                                                </fr:dnd-repeat>
+                                            </xf:group>
+
+                                            <!-- When process has NO steps -->
+                                            <xf:group ref=".[empty(step)]" class="fb-process-empty-steps">
+                                                <xf:output value="$resources/dialog-process-editor/no-steps"/>
+                                                <xf:trigger appearance="minimal">
+                                                    <xf:label><xh:i class="fa fa-plus-circle"/> <xf:output value="$resources/dialog-process-editor/add-step"/></xf:label>
+                                                    <xf:action event="DOMActivate">
+                                                        <xf:insert context="." origin="pui:newActionTemplateXml('save', 'then')"/>
+                                                    </xf:action>
+                                                </xf:trigger>
+                                            </xf:group>
+
+                                            <!-- Live Process Syntax Preview -->
+                                            <xh:div class="fb-process-preview">
+                                                <xh:div class="fb-process-preview-header">
+                                                    <xf:output value="$resources/dialog-process-editor/process-preview"/>
+                                                </xh:div>
+                                                <xh:code class="fb-process-preview-code"><xf:output value="pui:xmlToProcessString(., true())"/></xh:code>
+                                            </xh:div>
+
+                                            <!-- Live XML syntax preview (for debugging) -->
+                                            <xh:div class="fb-process-preview">
+                                                <xh:div class="fb-process-preview-header">
+                                                    XML Syntax Preview
+                                                </xh:div>
+                                                <xh:code class="fb-process-preview-code">
+                                                    <xf:output value="xxf:serialize(., instance('xml-formatting-instance'))"/>
+                                                </xh:code>
+                                            </xh:div>
+                                        </xh:div>
+                                    </fr:c>
+                                    <fr:c x="1" y="3" w="12">
+                                        <xh:div class="fb-process-delete-container">
+                                            <xf:trigger appearance="xxf:mini xxf:danger">
+                                                <xf:label value="$resources/dialog-process-editor/delete-process"/>
+                                                <xf:delete event="DOMActivate" ref="."/>
+                                            </xf:trigger>
+                                        </xh:div>
+                                    </fr:c>
+                                </fr:grid>
+                            </xh:div>
+                        </fr:tab>
+                    </fr:tabbable>
+
+                    <xf:action observer="fb-processes-tabbable" event="fr-tabbable-add">
+                        <xf:insert
+                            context="$i"
+                            ref="process"
+                            origin="instance('process-template')"/>
+                        <xf:setfocus control="fb-process-name"/>
+                    </xf:action>
+
+                    <fr:error-summary id="error-summary" observer="dialog" valid-ref="instance('validity-instance')">
+                        <fr:label><xf:output value="xxf:r('errors.label', '|fr-form-resources|')"/></fr:label>
+                    </fr:error-summary>
+
+                    <xh:div class="fr-dialog-buttons" xml:space="preserve">
+                        <xf:trigger id="fb-save-trigger" appearance="xxf:primary">
+                            <xf:label mediatype="text/html" value="$resources/apply/label"/>
+                        </xf:trigger>
+                        <xf:output value="$resources/or/label"/>
+                        <xf:trigger appearance="minimal">
+                            <xf:label mediatype="text/html" value="$resources/cancel/label"/>
+                            <xxf:hide
+                                event="DOMActivate"
+                                dialog="dialog"/>
+                        </xf:trigger>
+                    </xh:div>
+
+                </xxf:dialog>
+            </xf:group>
+        </xbl:template>
+
+    </xbl:binding>
+</xbl:xbl>

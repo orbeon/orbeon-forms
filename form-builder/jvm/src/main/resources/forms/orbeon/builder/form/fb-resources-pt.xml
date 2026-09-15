@@ -1772,6 +1772,7 @@
         <insert-grid>Inserir uma nova grade</insert-grid>
         <insert-repeated-grid>Inserir uma nova grade repetida</insert-repeated-grid>
         <reload-toolbox>Recarregar a caixa de ferramentas</reload-toolbox>
+        <open-processes>Abrir editor de processos</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Mensagens</label>
@@ -1779,6 +1780,24 @@
         <name-header>Nome</name-header>
         <value-header>Valor</value-header>
     </dialog-messages>
+    <dialog-process-editor>
+        <label>Process Editor</label>
+        <process-name>
+            <label>Process name</label>
+            <hint>Unique name identifying this process (e.g. save-final)</hint>
+            <alert>A valid and unique process name is required</alert>
+        </process-name>
+        <process-definition>
+            <label>Process definition</label>
+            <hint>Actions separated by combinators, e.g. validate then save</hint>
+            <alert>Process syntax is invalid</alert>
+        </process-definition>
+        <delete-process>Delete Process</delete-process>
+        <new-process>New Process</new-process>
+        <no-steps>No steps defined for this process.</no-steps>
+        <add-step>Add Step</add-step>
+        <process-preview>Process syntax preview</process-preview>
+    </dialog-process-editor>
     <modes>
         <editable>Modos editáveis</editable>
         <review>Modo de revisão</review>

@@ -561,6 +561,21 @@
                             </xf:action>
                         </fr:trigger>
                         <fr:trigger
+                                id="open-processes-trigger"
+                                bind="fb-toolbox-processes-bind"
+                                name="toolbox.open-processes">
+                            <xf:label>
+                                <xh:i class="fa fa-cogs fa-fw"/>
+                                <xf:output value="$form-resources/dialog-process-editor/label"/>
+                            </xf:label>
+                            <xf:action event="DOMActivate">
+                                <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="dialog-process-editor">
+                                    <xf:property name="config" value="bind('processes-bind')"/>
+                                </xf:dispatch>
+                                <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog" />
+                            </xf:action>
+                        </fr:trigger>
+                        <fr:trigger
                                 id="open-keyboard-shortcuts-trigger"
                                 bind="fb-relevant-bind"
                                 name="toolbox.open-keyboard-shortcuts">

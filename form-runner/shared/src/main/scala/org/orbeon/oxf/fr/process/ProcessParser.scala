@@ -91,7 +91,7 @@ object ProcessParser {
   val CombinatorsByName: Map[String, Combinator] =
     List(Combinator.Then, Combinator.Recover).map(c => c.name -> c).toMap
 
-  private def quote(s: String): String =
+  def quote(s: String): String =
     if (s.contains("\"") && ! s.contains("'"))
       "'" + s + "'"
     else

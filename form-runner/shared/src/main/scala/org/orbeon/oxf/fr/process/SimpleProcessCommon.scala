@@ -155,11 +155,20 @@ trait SimpleProcessCommon
       inScopeContainingDocument.removeTransientState(RollbackContent.getClass.getName)
     }
 
-  // Search first in properties, then try legacy workflow-send
+  private def findProcessInMetadata(name: String): Option[String] =
+    metadataInstance.flatMap { mi =>
+      (mi.rootElement / "processes" / "process")
+        .find(elem => (elem attValueOpt "name").contains(name))
+        .flatMap(_.stringValue.trimAllToOpt)
+    }
+
+  // Search first in metadata instance, then in properties, then try legacy workflow-send
   // The scope is interpreted as a property prefix.
   def findProcessByName(scope: String, name: String): Option[String] = {
     implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
-    formRunnerProperty(scope + '.' + name) orElse buildProcessFromLegacyProperties(name)
+    findProcessInMetadata(name)            orElse
+    formRunnerProperty(scope + '.' + name) orElse
+    buildProcessFromLegacyProperties(name)
   }
 
   def withRunProcess[T](scope: String, name: String)(body: => T): T = {

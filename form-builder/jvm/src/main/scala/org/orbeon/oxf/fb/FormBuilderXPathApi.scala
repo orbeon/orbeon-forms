@@ -173,6 +173,10 @@ object FormBuilderXPathApi {
     }
   }
 
+  //@XPathFunction
+  def isProcessValid(processString: String): Boolean =
+    trimAllToOpt(processString).exists(s => Try(process.ProcessParser.parse(s)).isSuccess)
+
   // Used by Form Builder: `form-definition-xhtml`, `test-pdf`
   //@XPathFunction
   def buildContentDispositionHeader(doc: NodeInfo, formatName: String, propertyProfileOrNull: String): String = {

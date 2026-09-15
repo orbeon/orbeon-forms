@@ -2104,6 +2104,265 @@ body.orbeon {
         max-width: none;
     }
 
+    .fb-dialog-process-editor {
+        width: 1130px;
+        max-width: calc(100vw - 20px);
+
+        .fb-process-tab-content {
+            padding-top: 5px;
+        }
+
+        .fb-process-steps-container {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .fb-process-steps-header {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .xbl-fr-dnd-repeat {
+            display: block;
+            width: 100%;
+
+            .fb-process-iteration {
+                display: flex;
+                width: 100%;
+                justify-content: flex-start;
+                align-items: flex-start;
+
+                //border-bottom: thin dashed #ddd;
+                //padding-top: 2px;
+                //padding-bottom: 2px;
+
+                .fb-process-row-spacers {
+                    flex-grow: 0;
+
+                    &:has(.fb-indent-spacer) {
+                        //border-right: 1px dashed #ddd;
+                        grid-row-start: 1;
+                        grid-row-end: 100;
+                        grid-column-start: 1;
+                        white-space: nowrap;
+                        //background-color: white;
+                        height: stretch;
+                    }
+
+                    .fb-indent-spacer {
+                        display: inline-block;
+                        width: 1em;
+                        height: stretch;
+                    }
+                }
+
+                .fb-process-row-content-outer {
+                    width: 100%;
+                    flex-grow: 1;
+                }
+
+                .fb-process-row-content {
+                    display: grid;
+                    grid-template-columns: min-content 1fr auto;
+                    column-gap: 4px;
+                    padding: 2px;
+                }
+
+                .fb-process-row-content-start-row > .fb-process-row-content {
+                    border-top-left-radius: 5px;
+                    border-top-right-radius: 5px;
+                }
+
+                .fb-process-row-content-end-row > .fb-process-row-content {
+                    border-bottom-left-radius: 5px;
+                    border-bottom-right-radius: 5px;
+                }
+
+                .fb-process-row-content-indent-1 > .fb-process-row-content, .fb-indent-spacer-position-2, .fb-process-row-content-indent-2 {
+                    background-color: #ddd;
+                }
+
+                .fb-process-row-content-indent-2 > .fb-process-row-content, .fb-indent-spacer-position-3, .fb-process-row-content-indent-3 {
+                    background-color: #bbb;
+                }
+
+                .fb-process-row-content-indent-3 > .fb-process-row-content, .fb-indent-spacer-position-4, .fb-process-row-content-indent-4 {
+                    background-color: #999;
+                }
+
+                .fb-process-row-buttons {
+                    display: flex;
+                    justify-content: flex-start;
+                }
+
+                .fb-process-row-content-params {
+                    grid-column-start: 3;
+                    grid-column-end: 4;
+                    grid-row-start: 1;
+                    grid-row-end: 3;
+                }
+
+                .fb-process-row-switch {
+                    align-self: center;
+                }
+
+                .fb-process-keyword-with-condition {
+                    display: flex;
+                    column-gap: 4px;
+                    align-items: center;
+
+                    .fb-process-keyword {
+                        flex-grow: 0;
+                    }
+                    .fb-process-condition-input {
+                        flex-grow: 1;
+                    }
+                }
+
+                .fb-process-row-buttons {
+                    white-space: nowrap;
+                    width: 200px;
+                    align-items: center;
+                    flex-grow: 0;
+                    flex-shrink: 0;
+                }
+
+                // DnD
+                &.gu-mirror {
+                    .fb-process-row-buttons {
+                        display: none;
+                    }
+                }
+
+                .fb-process-grab {
+                    display: none;
+                    margin-right: 6px;
+                }
+
+                &.xforms-dnd-moves .fb-process-grab {
+                    display: inline-block;
+                    cursor: move;
+                    opacity: 0.5;
+                }
+
+                &:hover .fb-process-grab {
+                    opacity: 0.8;
+                }
+            }
+
+            .fb-indent-spacers:not(.fb-indent-spacer).xforms-update-full:empty {
+                display: none; // hide extra blank repeat spans so they don't contribute as flex items
+            }
+
+            // Match last spacer at end of spacers repeat
+            //.fb-indent-spacer:has(+ .fb-indent-spacers + .xforms-repeat-begin-end) {
+            //    border-right: 1px dashed #ddd;
+            //}
+
+            .fb-process-combinator-select1 select {
+                width: auto;
+                display: inline-block;
+                &[disabled] {
+                    opacity: 0;
+                }
+            }
+
+            .fb-process-action-select1 select {
+                width: auto;
+            }
+
+            .fb-process-param {
+                //display: block;
+
+                label {
+                }
+
+                input {
+                }
+            }
+
+            .fb-process-group-badge {
+                display: inline-block;
+                background: #e9ecef;
+                border: 1px solid #ced4da;
+                border-radius: 3px;
+                padding: 2px 8px;
+                font-weight: bold;
+                font-size: 12px;
+                color: #495057;
+            }
+
+            .fb-process-keyword {
+                display: inline-block;
+                font-weight: bold;
+                font-family: monospace;
+                font-size: 13px;
+                color: #0056b3;
+                //margin-right: 6px;
+            }
+
+            .fb-process-condition-input input {
+                width: auto;
+                display: inline-block;
+                font-family: monospace;
+            }
+
+            .fb-process-btn {
+                padding: 2px 4px;
+                margin-left: 2px;
+
+                i {
+                    font-size: 14px;
+                }
+            }
+
+            .fb-process-btn-text {
+                font-size: 11px;
+                font-weight: bold;
+                white-space: nowrap;
+            }
+        }
+
+        .fb-process-empty-steps {
+            padding: 15px;
+            text-align: center;
+            background: #f8f9fa;
+            border: 1px dashed #ced4da;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .fb-process-preview {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin-top: 15px;
+
+            .fb-process-preview-header {
+                font-size: 11px;
+                font-weight: bold;
+                text-transform: uppercase;
+                color: #888;
+                margin-bottom: 4px;
+            }
+
+            .fb-process-preview-code {
+                display: block;
+                font-family: monospace;
+                font-size: 12px;
+                color: #333;
+                word-break: break-all;
+                white-space: pre-wrap;
+            }
+        }
+
+        .fb-process-delete-container {
+            margin-top: 15px;
+        }
+    }
+
     .fb-dialog-messages {
         width: 1050px;
         max-width: none;
@@ -2442,6 +2701,7 @@ body.orbeon {
     // When we remove the `position: relative` in `grid.less`, we can remove this as well
     .fb-dialog-control-settings,
     .fb-dialog-email-settings,
+    .fb-dialog-process-editor,
     .fb-dialog-http-services,
     .fb-dialog-container-settings {
         .xbl-fr-grid .fr-grid:not(.fr-grid-css) .fr-grid-body .fr-grid-td {

@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.saxon.value.BooleanValue
+import org.orbeon.scaxon.NodeConversions.{elemToDocumentInfo, nodeInfoToElem}
 import org.orbeon.scaxon.SimplePath.*
 import org.parboiled2.ParseError
 import org.scalatest.funspec.AnyFunSpecLike
@@ -797,6 +798,95 @@ extends DocumentTestBase
           val peValidation = ProcessError.fromThrowable(submitValidationError)
           assert(peValidation.errorType == ProcessErrorType.Internal)
           assert(peValidation.statusCodeOpt.isEmpty)
+        }
+      }
+    }
+  }
+
+  describe("Processes in metadata instance") {
+
+    it("must resolve and execute process from form metadata") {
+      val (processorService, docOpt, _) = runFormRunner(
+        app        = "orbeon",
+        form       = "pta-remittance",
+        mode       = "edit",
+        documentId = Some("aed126ad8341b629f3b19ee7f3e9d4f7c83ebfe5")
+      )
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, docOpt.get) {
+          val metadataInstance = FormRunner.metadataInstance.get
+          val currentMetadataElem = nodeInfoToElem(metadataInstance.rootElement)
+          val processesXml =
+            <processes>
+              <process name="my-meta-process">
+                xf:setvalue(ref = "$submitter-name", value = "'Bart Simpson'")
+              </process>
+            </processes>
+          val updatedMetadataElem = currentMetadataElem.copy(child = currentMetadataElem.child :+ processesXml)
+
+          metadataInstance.update(
+            instanceCaching = None,
+            documentInfo    = elemToDocumentInfo(updatedMetadataElem),
+            readonly        = true
+          )
+
+          assert(SimpleProcess.findProcessByName("oxf.fr.detail.process", "my-meta-process").isDefined)
+
+          SimpleProcess.runProcessByName("oxf.fr.detail.process", "my-meta-process")
+
+          val submitterName = FormRunner.formInstance.root.descendant("submitter-name").stringValue
+          assert(submitterName == "Bart Simpson")
+        }
+      }
+    }
+
+    it("process in form metadata must override property configuration") {
+      val (processorService, docOpt, _) = runFormRunner(
+        app        = "orbeon",
+        form       = "pta-remittance",
+        mode       = "edit",
+        documentId = Some("aed126ad8341b629f3b19ee7f3e9d4f7c83ebfe5")
+      )
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, docOpt.get) {
+          val metadataInstance = FormRunner.metadataInstance.get
+          val currentMetadataElem = nodeInfoToElem(metadataInstance.rootElement)
+          val processesXml =
+            <processes>
+              <process name="collapse-all">
+                xf:setvalue(ref = "$submitter-name", value = "'Overridden Value'")
+              </process>
+            </processes>
+          val updatedMetadataElem = currentMetadataElem.copy(child = currentMetadataElem.child :+ processesXml)
+
+          metadataInstance.update(
+            instanceCaching = None,
+            documentInfo    = elemToDocumentInfo(updatedMetadataElem),
+            readonly        = true
+          )
+
+          val found = SimpleProcess.findProcessByName("oxf.fr.detail.process", "collapse-all")
+          assert(found.exists(_.contains("Overridden Value")))
+
+          SimpleProcess.runProcessByName("oxf.fr.detail.process", "collapse-all")
+
+          val submitterName = FormRunner.formInstance.root.descendant("submitter-name").stringValue
+          assert(submitterName == "Overridden Value")
+        }
+      }
+    }
+
+    it("must fallback to property when not defined in form metadata") {
+      val (processorService, docOpt, _) = runFormRunner(
+        app        = "orbeon",
+        form       = "pta-remittance",
+        mode       = "edit",
+        documentId = Some("aed126ad8341b629f3b19ee7f3e9d4f7c83ebfe5")
+      )
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, docOpt.get) {
+          val found = SimpleProcess.findProcessByName("oxf.fr.detail.process", "collapse-all")
+          assert(found.contains("collapse-all"))
         }
       }
     }

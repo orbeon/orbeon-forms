@@ -185,6 +185,10 @@
                                             <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-messages', '|fr-form-resources|')"/></xh:td>
                                         </xh:tr>
                                         <xh:tr>
+                                            <xh:td><xh:kbd>O R</xh:kbd></xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-processes', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
                                             <xh:td><xh:kbd>O S</xh:kbd></xh:td>
                                             <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-edit-source', '|fr-form-resources|')"/></xh:td>
                                         </xh:tr>

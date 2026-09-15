@@ -521,6 +521,7 @@
                     <xf:bind id="modes-bind"                      ref="modes">
                         <xf:bind id="confirmation-bind"           ref="fr:confirmation"/>
                     </xf:bind>
+                    <xf:bind id="processes-bind"                  ref="processes"/>
                     <xf:bind id="automatic-hints-bind"            ref="automatic-hints"/>
                     <xf:bind id="data-migration-bind"             ref="data-migration"/>
                     <xf:bind id="grid-tab-order-bind"             ref="grid-tab-order"/>

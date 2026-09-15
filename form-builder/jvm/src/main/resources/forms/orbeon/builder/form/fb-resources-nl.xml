@@ -1773,6 +1773,7 @@
         <insert-grid>Nieuw raster invoegen</insert-grid>
         <insert-repeated-grid>Nieuw herhalend raster invoegen</insert-repeated-grid>
         <reload-toolbox>Gereedschapskist herladen</reload-toolbox>
+        <open-processes>Proceseditor openen</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Berichten</label>
@@ -1780,6 +1781,24 @@
         <name-header>Naam</name-header>
         <value-header>Waarde</value-header>
     </dialog-messages>
+    <dialog-process-editor>
+        <label>Process Editor</label>
+        <process-name>
+            <label>Process name</label>
+            <hint>Unique name identifying this process (e.g. save-final)</hint>
+            <alert>A valid and unique process name is required</alert>
+        </process-name>
+        <process-definition>
+            <label>Process definition</label>
+            <hint>Actions separated by combinators, e.g. validate then save</hint>
+            <alert>Process syntax is invalid</alert>
+        </process-definition>
+        <delete-process>Delete Process</delete-process>
+        <new-process>New Process</new-process>
+        <no-steps>No steps defined for this process.</no-steps>
+        <add-step>Add Step</add-step>
+        <process-preview>Process syntax preview</process-preview>
+    </dialog-process-editor>
     <modes>
         <editable>Bewerkbare modi</editable>
         <review>Beoordelingsmodus</review>

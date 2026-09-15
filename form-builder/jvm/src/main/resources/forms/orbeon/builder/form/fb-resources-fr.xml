@@ -1811,6 +1811,7 @@
         <insert-grid>Insérer une nouvelle grille</insert-grid>
         <insert-repeated-grid>Insérer une nouvelle grille répétée</insert-repeated-grid>
         <reload-toolbox>Recharger la boîte à outils</reload-toolbox>
+        <open-processes>Ouvrir l'éditeur de processus</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Messages</label>
@@ -1818,6 +1819,24 @@
         <name-header>Nom</name-header>
         <value-header>Valeur</value-header>
     </dialog-messages>
+    <dialog-process-editor>
+        <label>Éditeur de processus</label>
+        <process-name>
+            <label>Nom du processus</label>
+            <hint>Nom unique identifiant ce processus (ex: save-final)</hint>
+            <alert>Un nom de processus valide et unique est requis</alert>
+        </process-name>
+        <process-definition>
+            <label>Définition du processus</label>
+            <hint>Actions séparées par des combinateurs, ex: validate then save</hint>
+            <alert>La syntaxe du processus est invalide</alert>
+        </process-definition>
+        <delete-process>Supprimer le processus</delete-process>
+        <new-process>Nouveau processus</new-process>
+        <no-steps>Aucune étape définie pour ce processus.</no-steps>
+        <add-step>Ajouter une étape</add-step>
+        <process-preview>Aperçu de la syntaxe du processus</process-preview>
+    </dialog-process-editor>
     <modes>
         <editable>Modes éditables</editable>
         <review>Mode lecture seule</review>

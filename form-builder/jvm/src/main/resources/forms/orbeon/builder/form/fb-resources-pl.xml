@@ -1789,6 +1789,7 @@
         <insert-grid>Wstaw nową siatkę</insert-grid>
         <insert-repeated-grid>Wstaw nową siatkę powtarzalną</insert-repeated-grid>
         <reload-toolbox>Przeładuj przybornik</reload-toolbox>
+        <open-processes>Otwórz edytor procesów</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Komunikaty</label>
@@ -1796,6 +1797,24 @@
         <name-header>Nazwa</name-header>
         <value-header>Wartość</value-header>
     </dialog-messages>
+    <dialog-process-editor>
+        <label>Process Editor</label>
+        <process-name>
+            <label>Process name</label>
+            <hint>Unique name identifying this process (e.g. save-final)</hint>
+            <alert>A valid and unique process name is required</alert>
+        </process-name>
+        <process-definition>
+            <label>Process definition</label>
+            <hint>Actions separated by combinators, e.g. validate then save</hint>
+            <alert>Process syntax is invalid</alert>
+        </process-definition>
+        <delete-process>Delete Process</delete-process>
+        <new-process>New Process</new-process>
+        <no-steps>No steps defined for this process.</no-steps>
+        <add-step>Add Step</add-step>
+        <process-preview>Process syntax preview</process-preview>
+    </dialog-process-editor>
     <modes>
         <editable>Tryby edycji</editable>
         <review>Tryb przeglądu</review>

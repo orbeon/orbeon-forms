@@ -706,7 +706,7 @@
           "app": "orbeon",
           "form": "builder",
           "version": 1
-        } ,
+        },
         {
           "card-type": "form-data",
           "app": "orbeon",

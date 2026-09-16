@@ -64,19 +64,6 @@
                 value="
                     $fb-permissions/app/@name = '*' or exists($fb-permissions/app[1]/@name[xxf:non-blank()])"/>
 
-            <!-- Q: Why do we need this? "Published Forms" doesn't work if missing. -->
-            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all">
-                <_/>
-            </xf:instance>
-
-            <xf:instance id="fr-landing-form-metadata-instance" xxf:exclude-result-prefixes="#all">
-                <_ state="initial"/>
-            </xf:instance>
-
-            <xf:instance id="fr-landing-form-builder-instance" xxf:exclude-result-prefixes="#all">
-                <_ state="initial"/>
-            </xf:instance>
-
             <!-- Don't use `xxf:exclude-result-prefixes="#all"` as eXist search needs the `xh` and `xf` namespaces -->
             <!-- TODO: Could we now get rid of the `<query>` elements since eXist support is no longer needed? -->
             <xf:instance id="fr-search-instance">

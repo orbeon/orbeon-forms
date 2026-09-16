@@ -852,11 +852,13 @@ class FRRenderedFormatUrl extends FunctionSupport with RuntimeDependentFunction 
     val createHardLinkIfPresent = booleanArgumentOpt(3).getOrElse(false)
 
     val renderedFormatParams =
-      (! usePdfTemplate).list(FormRunnerRenderedFormat.UsePdfTemplateParam.some -> usePdfTemplate.toString) :::
-      pdfTemplateNameOpt.map(FormRunnerRenderedFormat.PdfTemplateNameParam.some -> _).toList
+      FormRunnerRenderedFormat.RenderedFormatParams(
+        usePdfTemplate     = usePdfTemplate,
+        pdfTemplateNameOpt = pdfTemplateNameOpt
+      )
 
     SimpleProcess.tryCreateRenderedFormatIfNeeded(
-      params                  = renderedFormatParams.toMap,
+      params                  = renderedFormatParams,
       renderedFormat          = RenderedFormat.withName(stringArgument(0)),
       createHardLinkIfPresent = createHardLinkIfPresent
     )

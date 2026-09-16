@@ -193,11 +193,11 @@ extends DocumentTestBase
     import FormRunnerRenderedFormat.*
     import org.orbeon.scaxon.NodeConversions.*
 
-    val Tests = List[(String, NodeInfo, ActionParams, String, List[(String, String)])](
+    val Tests = List[(String, NodeInfo, RenderedFormatParams, String, List[(String, String)])](
       (
         "no attachment",
         <attachments/>,
-        Map.empty,
+        RenderedFormatParams(),
         "en",
         List(
           s"fr-$UsePdfTemplateParam" -> "false",
@@ -210,7 +210,7 @@ extends DocumentTestBase
         <attachments>
           <pdf>data:</pdf>
         </attachments>,
-        Map.empty,
+        RenderedFormatParams(),
         "en",
         List(
           s"fr-$UsePdfTemplateParam" -> "true"
@@ -222,7 +222,7 @@ extends DocumentTestBase
           <pdf name="" lang="en">data:</pdf>
           <pdf name="" lang="fr">data:</pdf>
         </attachments>,
-        Map.empty,
+        RenderedFormatParams(),
         "fr",
         List(
           s"fr-$UsePdfTemplateParam"  -> "true",
@@ -235,9 +235,7 @@ extends DocumentTestBase
           <pdf name="" lang="en">data:</pdf>
           <pdf name="" lang="fr">data:</pdf>
         </attachments>,
-        Map(
-          Some(PdfTemplateLangParam) -> "fr"
-        ),
+        RenderedFormatParams(pdfTemplateLangOpt = Some("fr")),
         "en",
         List(
           s"fr-$UsePdfTemplateParam"  -> "true",
@@ -252,9 +250,7 @@ extends DocumentTestBase
           <pdf name="bar" lang="en">data:</pdf>
           <pdf name="bar" lang="fr">data:</pdf>
         </attachments>,
-        Map(
-          Some(PdfTemplateNameParam) -> "bar"
-        ),
+        RenderedFormatParams(pdfTemplateNameOpt = Some("bar")),
         "fr",
         List(
           s"fr-$UsePdfTemplateParam"  -> "true",
@@ -270,10 +266,7 @@ extends DocumentTestBase
           <pdf name="bar" lang="en">data:</pdf>
           <pdf name="bar" lang="fr">data:</pdf>
         </attachments>,
-        Map(
-          Some(PdfTemplateLangParam) -> "fr",
-          Some(PdfTemplateNameParam) -> "bar"
-        ),
+        RenderedFormatParams(pdfTemplateNameOpt = Some("bar"), pdfTemplateLangOpt = Some("fr")),
         "en",
         List(
           s"fr-$UsePdfTemplateParam"  -> "true",
@@ -286,7 +279,7 @@ extends DocumentTestBase
         <attachments>
           <pdf mediatype="application/pdf" filename="" size=""/>
         </attachments>,
-        Map.empty,
+        RenderedFormatParams(),
         "en",
         List(
           s"fr-$UsePdfTemplateParam" -> "false",

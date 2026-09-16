@@ -56,7 +56,6 @@ import software.amazon.awssdk.services.s3.S3Client
 import java.net.URI
 import scala.language.postfixOps
 import scala.util.Try
-import scala.util.chaining.scalaUtilChainingOps
 
 
 trait FormRunnerActions
@@ -143,7 +142,7 @@ trait FormRunnerActions
         templateMatch          = templateMatch,
         language               = paramByNameUseAvt(params, "lang").getOrElse(FormRunner.currentLang),
         templateNameOpt        = paramByNameUseAvt(params, "template"),
-        pdfParams              = params // TODO: it would be cleaner to have a proper case class here instead of a Map
+        renderedFormatParams   = RenderedFormatParams.fromActionParams(params)
       )
 
       // S3 tests disable the actual sending of email (this parameter is not documented)
@@ -164,7 +163,7 @@ trait FormRunnerActions
     templateMatch         : TemplateMatch,
     language              : String,
     templateNameOpt       : Option[String],
-    pdfParams             : ActionParams
+    renderedFormatParams  : RenderedFormatParams
   )(implicit
     formRunnerParams      : FormRunnerParams,
     xfcd                  : XFormsContainingDocument,
@@ -207,7 +206,7 @@ trait FormRunnerActions
       }
 
     selectedRenderFormats foreach
-      (tryCreateRenderedFormatIfNeeded(pdfParams, _, createHardLinkIfPresent = false).get)
+      (tryCreateRenderedFormatIfNeeded(renderedFormatParams, _, createHardLinkIfPresent = false).get)
 
     val currentFormLang = FormRunner.currentLang
 
@@ -217,9 +216,15 @@ trait FormRunnerActions
         (uri, _)       <- renderedFormatPathOpt(
             urlsInstanceRootElem = FormRunnerActionsCommon.findUrlsInstanceRootElem.get,
             renderedFormat       = renderedFormat,
-            pdfTemplateOpt       = findPdfTemplate(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, pdfParams, Some(currentFormLang)),
+            pdfTemplateOpt       = findPdfTemplate(
+              frFormAttachmentsRootElemOpt = FormRunnerActionsCommon.findFrFormAttachmentsRootElem,
+              usePdfTemplate               = renderedFormatParams.usePdfTemplate,
+              pdfTemplateNameOpt           = renderedFormatParams.pdfTemplateNameOpt,
+              pdfTemplateLangOpt           = renderedFormatParams.pdfTemplateLangOpt,
+              defaultLang                  = currentFormLang.some
+            ),
             defaultLang          = currentFormLang
-          )
+        )
       } yield
         renderedFormat -> uri).toMap
 
@@ -465,7 +470,11 @@ trait FormRunnerActions
     // Create rendered format if needed
     val renderedFormatTmpFileUris =
       distinctRenderedFormats map { format =>
-        tryCreateRenderedFormatIfNeeded(params, format, createHardLinkIfPresent = false).get._1 -> format
+        tryCreateRenderedFormatIfNeeded(
+          RenderedFormatParams.fromActionParams(params),
+          format,
+          createHardLinkIfPresent = false
+        ).get._1 -> format
       }
 
     // Create multipart if needed
@@ -650,7 +659,7 @@ trait FormRunnerActions
 
       val pathQuery =
         buildRenderedFormatPathWithParams(
-          params          = params,
+          params          = RenderedFormatParams.fromActionParams(params),
           renderedFormat  = renderedFormat,
           fullFilename    = Some(filename),
           currentFormLang = frc.currentLang
@@ -774,7 +783,7 @@ trait FormRunnerActions
     Nil
 
   private def buildRenderedFormatPathWithParams(
-    params         : ActionParams,
+    params         : RenderedFormatParams,
     renderedFormat : RenderedFormat,
     fullFilename   : Option[String],
     currentFormLang: String
@@ -818,7 +827,7 @@ trait FormRunnerActions
 
   // Create if needed and return the element key name
   def tryCreateRenderedFormatIfNeeded(
-    params                 : ActionParams,
+    params                 : RenderedFormatParams,
     renderedFormat         : RenderedFormat,
     createHardLinkIfPresent: Boolean
   )(implicit
@@ -828,7 +837,13 @@ trait FormRunnerActions
     Try {
 
       val currentFormLang = frc.currentLang
-      val pdfTemplateOpt  = findPdfTemplate(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, Some(currentFormLang))
+      val pdfTemplateOpt  = findPdfTemplate(
+        frFormAttachmentsRootElemOpt = FormRunnerActionsCommon.findFrFormAttachmentsRootElem,
+        usePdfTemplate               = params.usePdfTemplate,
+        pdfTemplateNameOpt           = params.pdfTemplateNameOpt,
+        pdfTemplateLangOpt           = params.pdfTemplateLangOpt,
+        defaultLang                  = currentFormLang.some
+      )
 
       renderedFormatPathOpt(
         urlsInstanceRootElem = FormRunnerActionsCommon.findUrlsInstanceRootElem.get,

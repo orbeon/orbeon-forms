@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import cats.implicits.catsSyntaxOptionId
 import org.orbeon.oxf.fr.email.EmailMetadata.{HeaderName, TemplateMatch}
 import org.orbeon.oxf.fr.email.MessageContent
-import org.orbeon.oxf.fr.process.FormRunnerRenderedFormat.renderedFormatPathOpt
+import org.orbeon.oxf.fr.process.FormRunnerRenderedFormat.{RenderedFormatParams, renderedFormatPathOpt}
 import org.orbeon.oxf.fr.process.SimpleProcess.clearRenderedFormatsResources
 import org.orbeon.oxf.fr.process.{FormRunnerActionsCommon, RenderedFormat}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
@@ -201,7 +201,7 @@ param3: <ul><li>Email 1: email1@from\.control</li><li>Email 3: email3@from\.cont
               templateMatch          = TemplateMatch.First,
               language               = FormRunner.currentLang,
               templateNameOpt        = templateName.some,
-              pdfParams              = Map.empty
+              renderedFormatParams   = RenderedFormatParams()
             )
 
             assert(emailContents.size == expectedResult.size, "Wrong email count")
@@ -240,7 +240,7 @@ param3: <ul><li>Email 1: email1@from\.control</li><li>Email 3: email3@from\.cont
               templateMatch          = TemplateMatch.First,
               language               = FormRunner.currentLang,
               templateNameOpt        = templateName.some,
-              pdfParams              = Map.empty
+              renderedFormatParams   = RenderedFormatParams()
             )
             .foreach { emailContent =>
 

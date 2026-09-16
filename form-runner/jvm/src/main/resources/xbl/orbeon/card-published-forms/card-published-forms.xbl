@@ -67,7 +67,14 @@
 
                         <xf:var
                             name="sort-direction"
-                            value="(fr:component-param-value('sort-direction')[xxf:non-blank()], if ($sort-by = ('created', 'last-modified')) then 'desc' else 'asc')[1]"/>
+                            value="
+                                let $direction := fr:component-param-value('sort-direction')[. = ('asc', 'desc', 'ascending', 'descending')],
+                                    $adjusted  := if ($direction = 'ascending') then 'asc' else if ($direction = 'descending') then 'desc' else $direction
+                                return
+                                    if (empty($adjusted)) then
+                                        if ($sort-by = ('created', 'last-modified')) then 'desc' else 'asc'
+                                    else
+                                        $adjusted"/>
 
                         <xf:var
                             name="operations-filter"

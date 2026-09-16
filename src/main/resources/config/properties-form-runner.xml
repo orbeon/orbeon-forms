@@ -681,20 +681,25 @@
           "title": "landing.titles.demo-forms",
           "description": "landing.descriptions.demo-forms",
           "thumbnail": "/apps/fr/style/images/orbeon/sports-car.svg",
-          "app": "orbeon"
+          "app": "orbeon",
+          "sort-by": "title"
         },
         {
           "card-type": "published-forms",
           "title": "landing.titles.demo-features",
           "description": "landing.descriptions.demo-features",
           "thumbnail": "/apps/fr/style/images/orbeon/checkboxes.svg",
-          "app": "orbeon-features"
+          "app": "orbeon-features",
+          "sort-by": "title",
+          "link-to": "new"
         },
         {
           "card-type": "published-forms",
           "title": "landing.titles.published-forms",
           "description": "landing.descriptions.published-forms",
-          "thumbnail": "/apps/fr/style/images/orbeon/book.svg"
+          "thumbnail": "/apps/fr/style/images/orbeon/book.svg",
+          "sort-by": "last-modified",
+          "link-to": "summary new"
         },
         {
           "card-type": "form-data",

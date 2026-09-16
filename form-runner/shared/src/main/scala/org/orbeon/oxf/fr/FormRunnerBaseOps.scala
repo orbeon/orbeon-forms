@@ -448,7 +448,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
             case Some(v) =>
               // Legacy tokens
               val cards = LandingCardsJSON.legacyTokensToCaseClasses(v)
-              Some(cards, Converter.jsonToXmlDoc(LandingCardsJSON.serializeToJson(cards)))
+              Some((cards, Converter.jsonToXmlDoc(LandingCardsJSON.serializeToJson(cards))))
           }
         }
       case _ => None

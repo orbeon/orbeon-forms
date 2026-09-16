@@ -16,7 +16,9 @@ object LandingCard {
     title      : LocalizedString,
     description: LocalizedString,
     thumbnail  : String,
-    app        : Option[String]
+    app        : Option[String],
+    linkTo     : List[LinkTo],
+    sort       : Option[(SortBy, Option[SortDirection])],
   ) extends LandingCard
 
   case class FormData(
@@ -27,6 +29,29 @@ object LandingCard {
     form       : String,
     version    : Option[Int]
   ) extends LandingCard
+}
+
+sealed trait LinkTo
+object LinkTo {
+  case object New     extends LinkTo
+  case object Summary extends LinkTo
+}
+
+sealed trait SortBy
+object SortBy {
+  case object AppName        extends SortBy
+  case object FormName       extends SortBy
+  case object FormVersion    extends SortBy
+  case object Created        extends SortBy
+  case object LastModified   extends SortBy
+  case object LastModifiedBy extends SortBy
+  case object Title          extends SortBy
+}
+
+sealed trait SortDirection
+object SortDirection {
+  case object Ascending  extends SortDirection
+  case object Descending extends SortDirection
 }
 
 sealed trait LocalizedString
@@ -58,24 +83,32 @@ object LandingCardsJSON {
           Json.obj(
             "card-type" -> Json.fromString("quick-links")
           )
-        case PublishedForms(title, description, thumbnail, app) =>
+        case PublishedForms(title, description, thumbnail, app, linkTo, sort) =>
           Json.obj(
-            "card-type"  -> Json.fromString("published-forms"),
-            "title"      -> serializeLocalizedString(title),
-            "description"-> serializeLocalizedString(description),
-            "thumbnail"  -> Json.fromString(thumbnail)
-          ) deepMerge
-          app.map(a => Json.obj("app" -> Json.fromString(a))).getOrElse(Json.obj())
+            "card-type"   -> Json.fromString("published-forms"),
+            "title"       -> serializeLocalizedString(title),
+            "description" -> serializeLocalizedString(description),
+            "thumbnail"   -> Json.fromString(thumbnail)
+          )
+            .deepMerge(app.map(a => Json.obj("app" -> Json.fromString(a))).getOrElse(Json.obj()))
+            .deepMerge(if (linkTo.nonEmpty) Json.obj("link-to" -> serializeLinkTo(linkTo)) else Json.obj())
+            .deepMerge(
+              sort.map { case (sortBy, sortDirection) =>
+                Json.obj("sort-by" -> serializeSortBy(sortBy))
+                  .deepMerge(sortDirection.map(d => Json.obj("sort-direction" -> serializeSortDirection(d))).getOrElse(Json.obj()))
+              }
+              .getOrElse(Json.obj())
+            )
         case FormData(title, description, thumbnail, app, form, version) =>
           Json.obj(
             "card-type"  -> Json.fromString("form-data"),
             "app"        -> Json.fromString(app),
             "form"       -> Json.fromString(form)
-          ) deepMerge
-          title.map(t => Json.obj("title" -> serializeLocalizedString(t))).getOrElse(Json.obj()) deepMerge
-          description.map(d => Json.obj("description" -> serializeLocalizedString(d))).getOrElse(Json.obj()) deepMerge
-          thumbnail.map(t => Json.obj("thumbnail" -> Json.fromString(t))).getOrElse(Json.obj()) deepMerge
-          version.map(v => Json.obj("version" -> Json.fromInt(v))).getOrElse(Json.obj())
+          )
+          .deepMerge(title      .map(t => Json.obj("title"       -> serializeLocalizedString(t))).getOrElse(Json.obj()))
+          .deepMerge(description.map(d => Json.obj("description" -> serializeLocalizedString(d))).getOrElse(Json.obj()))
+          .deepMerge(thumbnail  .map(t => Json.obj("thumbnail"   -> Json.fromString(t)))         .getOrElse(Json.obj()))
+          .deepMerge(version    .map(v => Json.obj("version"     -> Json.fromInt(v)))            .getOrElse(Json.obj()))
       }
     )
 
@@ -91,13 +124,17 @@ object LandingCardsJSON {
             title       = LocalizedString.ByResource("landing.titles.demo-forms"),
             description = LocalizedString.ByResource("landing.descriptions.demo-forms"),
             thumbnail   = "/apps/fr/style/images/orbeon/sports-car.svg",
-            app         = Some("orbeon")
+            app         = Some("orbeon"),
+            linkTo      = List(LinkTo.Summary),
+            sort        = Some((SortBy.Title, Some(SortDirection.Ascending)))
           ),
           LandingCard.PublishedForms(
             title       = LocalizedString.ByResource("landing.titles.demo-features"),
             description = LocalizedString.ByResource("landing.descriptions.demo-features"),
             thumbnail   = "/apps/fr/style/images/orbeon/checkboxes.svg",
-            app         = Some("orbeon-features")
+            app         = Some("orbeon-features"),
+            linkTo      = List(LinkTo.New),
+            sort        = Some((SortBy.Title, Some(SortDirection.Ascending)))
           )
         )
       case "published-forms"      =>
@@ -106,7 +143,9 @@ object LandingCardsJSON {
             title       = LocalizedString.ByResource("landing.titles.published-forms"),
             description = LocalizedString.ByResource("landing.descriptions.published-forms"),
             thumbnail   = "/apps/fr/style/images/orbeon/book.svg",
-            app         = None
+            app         = None,
+            linkTo      = List(LinkTo.Summary),
+            sort        = Some((SortBy.LastModified, Some(SortDirection.Descending)))
           )
         )
       case "form-builder-forms"   =>
@@ -143,6 +182,34 @@ object LandingCardsJSON {
         Json.fromString(key)
     }
 
+  private def serializeLinkTo(linkTo: List[LinkTo]): Json =
+    Json.fromString(
+      linkTo.map {
+        case LinkTo.New     => "new"
+        case LinkTo.Summary => "summary"
+      }.mkString(" ")
+    )
+
+  private def serializeSortBy(sortBy: SortBy): Json =
+    Json.fromString(
+      sortBy match {
+        case SortBy.AppName        => "application-name"
+        case SortBy.FormName       => "form-name"
+        case SortBy.FormVersion    => "form-version"
+        case SortBy.Created        => "created"
+        case SortBy.LastModified   => "last-modified"
+        case SortBy.LastModifiedBy => "last-modified-by"
+        case SortBy.Title          => "title"
+      }
+    )
+
+  private def serializeSortDirection(sortDirection: SortDirection): Json =
+    Json.fromString(
+      sortDirection match {
+        case SortDirection.Ascending  => "ascending"
+        case SortDirection.Descending => "descending"
+      }
+    )
 
   private def error(message: String): Nothing =
     throw new IllegalArgumentException(message)
@@ -160,13 +227,55 @@ object LandingCardsJSON {
   private def parseQuickLinks(o: JsonObject): QuickLinks.type =
     QuickLinks
 
-  private def parsePublishedForms(o: JsonObject): PublishedForms =
+  private def parsePublishedForms(o: JsonObject): PublishedForms = {
+    val sortByOpt        = o("sort-by").filterNot(_.isNull).map(parseSortBy)
+    val sortDirectionOpt = o("sort-direction").filterNot(_.isNull).map(parseSortDirection)
+
+    if (sortByOpt.isEmpty && sortDirectionOpt.isDefined)
+      error("Missing `sort-by` when `sort-direction` is present")
+
     PublishedForms(
       title       = o("title").map(parseLocalizedString).getOrElse(error("Missing `title` for `published-forms`")),
       description = o("description").map(parseLocalizedString).getOrElse(error("Missing `description` for `published-forms`")),
       thumbnail   = o("thumbnail").flatMap(_.asString).getOrElse(error("Missing `thumbnail` for `published-forms`")),
-      app         = o("app").flatMap(_.asString)
+      app         = o("app").flatMap(_.asString),
+      linkTo      = o("link-to").filterNot(_.isNull).map(parseLinkTo).getOrElse(Nil),
+      sort        = sortByOpt.map(sortBy => (sortBy, sortDirectionOpt))
     )
+  }
+
+  private def parseLinkTo(json: Json): List[LinkTo] =
+    json.asString match {
+      case Some(s) =>
+        s.splitTo[List]().distinct.map {
+          case "new"     => LinkTo.New
+          case "summary" => LinkTo.Summary
+          case other     => error(s"Unknown `link-to`: $other")
+        }
+      case None =>
+        error("Expected string for `link-to`")
+    }
+
+  private def parseSortBy(json: Json): SortBy =
+    json.asString match {
+      case Some("application-name" | "app-name") => SortBy.AppName
+      case Some("form-name")                     => SortBy.FormName
+      case Some("form-version")                  => SortBy.FormVersion
+      case Some("created")                       => SortBy.Created
+      case Some("last-modified")                 => SortBy.LastModified
+      case Some("last-modified-by")              => SortBy.LastModifiedBy
+      case Some("title")                         => SortBy.Title
+      case Some(other)                           => error(s"Unknown `sort-by`: $other")
+      case None                                  => error("Expected string for `sort-by`")
+    }
+
+  private def parseSortDirection(json: Json): SortDirection =
+    json.asString match {
+      case Some("ascending"  | "asc")  => SortDirection.Ascending
+      case Some("descending" | "desc") => SortDirection.Descending
+      case Some(other)                 => error(s"Unknown `sort-direction`: $other")
+      case None                        => error("Expected string for `sort-direction`")
+    }
 
   private def parseFormData(o: JsonObject): FormData =
     FormData(

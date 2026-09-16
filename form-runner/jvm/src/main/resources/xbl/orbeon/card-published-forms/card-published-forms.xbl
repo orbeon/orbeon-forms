@@ -25,83 +25,131 @@
                         for $offset in frf:defaultTimezoneToOffsetString()
                         return xs:dayTimeDuration($offset)"/>
 
-                <xf:instance id="fr-landing-demo-forms-instance" xxf:exclude-result-prefixes="#all">
+                <xf:var
+                    name="link-to-tokens"
+                    value="
+                        let $tokens := xxf:split(fr:component-param-value('link-to'))[. = ('new', 'summary')]
+                        return
+                            if (empty($tokens)) then
+                                'summary' (: default for backward compatibility :)
+                            else
+                                $tokens
+                    "/>
+
+                <xf:instance id="fr-search-request-instance" xxf:exclude-result-prefixes="#all">
+                    <search ignore-admin-permissions="true" xml:lang=""/>
+                </xf:instance>
+
+                <xf:instance id="fr-forms-instance" xxf:exclude-result-prefixes="#all">
                     <_ state="initial"/>
                 </xf:instance>
+
                 <xf:submission
-                    id="fr-landing-read-demo-forms-submission"
-                    method="get"
-                    serialization="none"
-                    resource="/fr/service/persistence/form{
-                        for $app in fr:component-param-value('app')[xxf:non-blank()]
-                        return concat('/', $app)
-                    }?all-versions=false&amp;ignore-admin-permissions=true"
-                    replace="none"
+                    id="fr-read-demo-forms-submission"
+                    method="post"
+                    ref="instance('fr-search-request-instance')"
+                    serialization="application/xml"
+                    mediatype="application/xml"
+                    resource="/fr/service/persistence/form"
+                    replace="instance"
+                    targetref="instance('fr-forms-instance')"
                     mode="asynchronous"
                     xxf:response-must-await="200ms"
                 >
-                    <xf:setvalue
-                        event="xforms-submit"
-                        ref="instance('fr-landing-demo-forms-instance')/@state"
-                        value="'loading'"/>
+                    <xf:action event="xforms-submit">
+                        <xf:var
+                            name="app"
+                            value="fr:component-param-value('app')[xxf:non-blank()]"/>
+
+                        <xf:var
+                            name="sort-by"
+                            value="(fr:component-param-value('sort-by')[xxf:non-blank()], 'last-modified')[1]"/>
+
+                        <xf:var
+                            name="sort-direction"
+                            value="(fr:component-param-value('sort-direction')[xxf:non-blank()], if ($sort-by = ('created', 'last-modified')) then 'desc' else 'asc')[1]"/>
+
+                        <xf:var
+                            name="operations-filter"
+                            value="
+                                string-join(
+                                    (
+                                        'create'[$link-to-tokens = 'new'],
+                                        'list'  [$link-to-tokens = 'summary']
+                                    ),
+                                    ' '
+                                )"/>
+
+                        <xf:insert
+                            ref="instance('fr-forms-instance')"
+                            origin="xf:element('_', xf:attribute('state', 'loading'))"/>
+
+                        <xf:setvalue
+                            ref="instance('fr-search-request-instance')/@xml:lang"
+                            value="xxf:lang()"/>
+
+                        <xf:delete
+                            ref="instance('fr-search-request-instance')/*"/>
+
+                        <xf:insert
+                            context="instance('fr-search-request-instance')"
+                            origin="
+                                (
+                                    for $a in $app
+                                    return xf:element('filter', (xf:attribute('metadata', 'application-name'), xf:attribute('match', 'exact'), $a)),
+                                    xf:element('filter', (xf:attribute('metadata', 'form-version'), xf:attribute('match', 'exact'), 'latest')),
+                                    xf:element('filter', (xf:attribute('metadata', 'operations'),   xf:attribute('match', 'token'), xf:attribute('combinator', 'or'), $operations-filter)),
+                                    xf:element('sort',   (xf:attribute('metadata', $sort-by), xf:attribute('direction', $sort-direction)))
+                                )"/>
+                    </xf:action>
 
                     <xf:setvalue
                         event="xforms-submit-error"
-                        ref="instance('fr-landing-form-metadata-instance')/@state"
+                        ref="instance('fr-forms-instance')/@state"
                         value="'error'"/>
-
-                    <!-- Sort alphabetically by title -->
-                    <xf:action event="xforms-submit-done">
-                        <xf:insert
-                            ref="instance('fr-landing-demo-forms-instance')"
-                            origin="
-                                xf:element(
-                                    'forms',
-                                    xxf:sort(
-                                        event('response-body')/*/form,
-                                        title[1],
-                                        'text',
-                                        'ascending'
-                                    )
-                                )"/>
-                    </xf:action>
                 </xf:submission>
 
                 <xf:action event="xforms-model-construct-done">
-                    <xf:send submission="fr-landing-read-demo-forms-submission"/>
+                    <xf:send submission="fr-read-demo-forms-submission"/>
                 </xf:action>
             </xf:model>
         </xbl:implementation>
         <xbl:template>
             <fr:card
-                    status="{(instance('fr-landing-demo-forms-instance')/@state, 'done')[1]}"
+                    status="{(instance('fr-forms-instance')/@state, 'done')[1]}"
                 >
                 <xf:label ref="xxf:label('fr-card-published-forms')"/>
-                <xf:itemset ref="instance('fr-landing-demo-forms-instance')/*[position() le $page-size]">
+                <xf:itemset ref="instance('fr-forms-instance')/*[position() le $page-size]">
                     <!-- 2022-12-30: Don't use `<description>` as 1. it's not present with relational and 2. it can
                          be in HTML and shows unescaped markup in the list. Not ideal. -->
 <!--                        <xf:label ref="string-join(((title[@xml:lang = xxf:lang()], title)[normalize-space()][1], (description[@xml:lang = xxf:lang()], description)[normalize-space()][1]), ' - ')"/>-->
                     <xf:label ref="(title[@xml:lang = xxf:lang()], title)[normalize-space()][1]"/>
                     <xf:value ref="
-                        concat(
-                            '/fr/',
-                            application-name,
-                            '/',
-                            form-name,
-                            '/',
-                            if (form-name = ('controls', 'repeated-grids', 'nobel-prizes', 'placeholders', 'copy-action')) then
-                                'new'
+                        let $ops                  := xxf:split(@operations),
+                            $can-navigate-summary := $ops = ('*', 'list'),
+                            $can-navigate-new     := $ops = ('*', 'create'),
+                            $link-to              := $link-to-tokens[
+                                                         (. = 'summary' and $can-navigate-summary) or
+                                                         (. = 'new'     and $can-navigate-new)
+                                                     ][1]
+                        return
+                            if (empty($link-to)) then (: This should not happen as we search only for forms which have at least one of the permissions :)
+                                concat('#', string-join((application-name, form-name, form-version), '/'))
                             else
-                                'summary',
-                            if (xxf:property('oxf.fr.summary.show-version-selector.*.*')) then
-                                concat('?form-version=', form-version)
-                            else
-                                ''
-                        )"/>
+                                concat(
+                                    '/fr/',
+                                    application-name,
+                                    '/',
+                                    form-name,
+                                    '/',
+                                    $link-to,
+                                    '?form-version=',
+                                    form-version
+                                )"/>
                     <!-- This doesn't work because we remove the form description from the metadata -->
 <!--                        <xf:hint ref="(description[@xml:lang = xxf:lang()], description)[normalize-space()][1]"/>-->
                 </xf:itemset>
-                <xf:itemset ref=".[count(instance('fr-landing-demo-forms-instance')/*) gt $page-size]">
+                <xf:itemset ref=".[count(instance('fr-forms-instance')/*) gt $page-size]">
                     <xf:label ref="xxf:r('landing.show-more', '|fr-fr-resources|')"/>
                     <!-- https://github.com/orbeon/orbeon-forms/issues/5255
                          https://github.com/orbeon/orbeon-forms/issues/5274 -->
@@ -128,7 +176,7 @@
                     <xh:span>
                         <xf:output value="
                             (: TODO: Make this a reusable function :)
-                            let $date-time := max(instance('fr-landing-demo-forms-instance')/*/last-modified-time/xs:dateTime(.)),
+                            let $date-time := max(instance('fr-forms-instance')/*/last-modified-time/xs:dateTime(.)),
                                 $v :=
                                     if (exists($tz)) then
                                         adjust-dateTime-to-timezone(

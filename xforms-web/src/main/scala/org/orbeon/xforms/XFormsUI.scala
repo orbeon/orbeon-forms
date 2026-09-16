@@ -125,20 +125,21 @@ object XFormsUI {
   }
 
   private def setMessage(control: html.Element, lhhaType: String, message: String): Unit =
-    findControlLHHA(control, lhhaType).foreach { lhhaElement =>
-      lhhaElement.innerHTML = message
-      // https://github.com/orbeon/orbeon-forms/issues/4062
-      if (lhhaType == "help")
-        lhhaElement.toggleClass("xforms-disabled", message.isAllBlank)
-
-      // Handle placeholder
-      if ((lhhaType == "label" || lhhaType == "hint") &&
-          control.hasAnyClass("xforms-input", "xforms-textarea", "xforms-secret"))
-        control.queryNestedElems[html.Element]("input, textarea").headOption match {
-          case Some(e: html.Input)    => e.placeholder = message
-          case Some(e: html.TextArea) => e.placeholder = message
-          case _ =>
-        }
+    findControlLHHA(control, lhhaType) match {
+      case Some(lhhaElement) =>
+        lhhaElement.innerHTML = message
+        // https://github.com/orbeon/orbeon-forms/issues/4062
+        if (lhhaType == "help")
+          lhhaElement.toggleClass("xforms-disabled", message.isAllBlank)
+      case None =>
+        // Handle placeholder
+        if ((lhhaType == "label" || lhhaType == "hint") &&
+            control.hasAnyClass("xforms-input", "xforms-textarea", "xforms-secret"))
+          control.queryNestedElems[html.Element]("input, textarea").headOption match {
+            case Some(e: html.Input)    => e.placeholder = message
+            case Some(e: html.TextArea) => e.placeholder = message
+            case _ =>
+          }
     }
 
   def getLabelMessage(control: html.Element): String =

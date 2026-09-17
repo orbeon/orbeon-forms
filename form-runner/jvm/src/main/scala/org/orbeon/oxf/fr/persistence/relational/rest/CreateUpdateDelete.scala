@@ -38,7 +38,7 @@ import org.orbeon.saxon.event.SaxonOutputKeys
 import org.orbeon.saxon.om.DocumentInfo
 import org.xml.sax.InputSource
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, Writer}
+import java.io.{ByteArrayInputStream, InputStream, Writer}
 import java.sql.{Array as _, *}
 import java.time.Instant
 import javax.xml.transform.OutputKeys
@@ -48,26 +48,13 @@ import javax.xml.transform.stream.StreamResult
 
 object RequestReader {
 
-  sealed trait                                         Body
-  object Body {
-    case class Cached   (bytes  : Array[Byte]) extends Body
-    case class Streamed (stream : InputStream) extends Body
-  }
+  case class Body(bytes: Array[Byte])
 
   private def requestInputStream(bodyOpt: Option[Body]): Option[InputStream] =
-    bodyOpt.map {
-      case Body.Cached(bytes) => new ByteArrayInputStream(bytes)
-      case Body.Streamed(is)  => is
-    }
+    bodyOpt.map(b => new ByteArrayInputStream(b.bytes))
 
   def bytes(bodyOpt: Option[Body]): Option[Array[Byte]] =
-    bodyOpt.map {
-      case Body.Cached(bytes) => bytes
-      case Body.Streamed(is)  =>
-        val os = new ByteArrayOutputStream
-        IOUtils.copyStreamAndClose(is, os)
-        os.toByteArray
-    }
+    bodyOpt.map(_.bytes)
 
   // Used by FlatView
   def xmlDocument(bodyOpt: Option[Body]): Option[DocumentInfo] =
@@ -366,15 +353,7 @@ trait CreateUpdateDelete {
     // need it for any `PUT` of form definition, because we need to read the request content to compute the indexed
     // controls XPaths after storing the form definition.
     val reqBodyOpt: Option[RequestReader.Body] =
-      req.bodyStreamOpt.map { is =>
-        if (isFormDefinitionPut) {
-          val os = new ByteArrayOutputStream // TODO: not efficient! any other way?
-          IOUtils.copyStreamAndClose(is, os)
-          RequestReader.Body.Cached(os.toByteArray)
-        } else {
-          RequestReader.Body.Streamed(is)
-        }
-      }
+      req.bodyStreamOpt.map(is => RequestReader.Body(useAndClose(is)(_.readAllBytes())))
 
     val mightReindex =
       ! req.forAttachment &&               // https://github.com/orbeon/orbeon-forms/issues/6913

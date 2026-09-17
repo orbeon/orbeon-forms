@@ -339,7 +339,7 @@ object Dispatch extends Logging {
                 containingDocument.staticOps,
                 controls.getCurrentControlTree,
                 targetObject.effectiveId,
-                handler.staticId,
+                handler.prefixedId,
                 followIndexes = true // so this will return 0 or 1 element
               )
             control            <- controls.findObjectByEffectiveId(effectiveControlId)

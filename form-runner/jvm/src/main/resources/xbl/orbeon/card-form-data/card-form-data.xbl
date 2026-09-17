@@ -71,6 +71,7 @@
                         <query metadata="last-modified"    match="lt"/>
                         <query metadata="last-modified-by" match="exact"/>
                         <query metadata="workflow-stage"   match="exact"/>
+                        <drafts>exclude</drafts>
                         <page-size>5</page-size>
                         <page-number>1</page-number>
                         <lang/>
@@ -197,7 +198,7 @@
                     xxf:xinclude="true"/>
 
                 <xf:action event="xforms-submit-done" observer="fr-get-source-form-submission">
-                    
+
                     <!-- Load resources -->
                     <!-- Dereference `@src` for Form Builder if needed -->
                     <!-- It seems that we do need content in this instance, and not only when we call `frf:searchableValues()`. -->

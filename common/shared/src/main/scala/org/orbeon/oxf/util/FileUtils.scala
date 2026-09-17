@@ -29,4 +29,30 @@ object FileUtils {
       .replaceAll("^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$", "_$1") // Windows reserved names
       .replaceAll("\\.$", "")                                     // Trailing dots
       .trim
+
+  // Add "-1", "-2", etc. suffixes to the base name to make the filenames unique if needed
+  def uniqueFilenames(filenames: List[String]): List[String] = {
+
+    val allFilenames = filenames.toSet
+    val duplicates   = filenames.groupBy(identity).collect {
+      case (filename, occurrences) if occurrences.size > 1 => filename
+    }.toSet
+
+    def candidates(filename: String): LazyList[String] = {
+      val (baseName, extensionOpt) = baseNameAndExtension(filename)
+      val extension                = extensionOpt.map("." + _).getOrElse("")
+      LazyList.from(1).map(i => s"$baseName-$i$extension")
+    }
+
+    filenames.foldLeft((List.empty[String], Set.empty[String])) { case ((result, used), filename) =>
+      val unique =
+        if (duplicates(filename))
+          candidates(filename).collectFirst {
+            case candidate if ! used(candidate) && ! allFilenames(candidate) => candidate
+          }.get
+        else
+          filename
+      (unique :: result, used + unique)
+    }._1.reverse
+  }
 }

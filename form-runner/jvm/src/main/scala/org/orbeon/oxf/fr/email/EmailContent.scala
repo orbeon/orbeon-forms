@@ -20,12 +20,13 @@ import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.email.EmailMetadata.{HeaderName, TemplateMatch}
+import org.orbeon.oxf.fr.process.FormRunnerRenderedFormat.PdfTemplate
 import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.fr.s3.S3Config
 import org.orbeon.oxf.processor.XPLConstants.OXF_PROCESSORS_NAMESPACE
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
-import org.orbeon.oxf.util.{CoreCrossPlatformSupportTrait, IndentedLogger, NetUtils, TryUtils, URLRewriterUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupportTrait, FileUtils, IndentedLogger, NetUtils, TryUtils, URLRewriterUtils}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.om.NodeInfo
@@ -37,6 +38,8 @@ import java.net.URI
 import scala.util.Try
 
 
+case class RenderedFormatUri(format: RenderedFormat, uri: URI)
+
 case class EmailContent(
   headers       : List[(HeaderName, String)],
   subject       : String,
@@ -45,7 +48,11 @@ case class EmailContent(
 ) {
   def storeToS3(s3PathPrefix: String)(implicit s3Config: S3Config, s3Client: S3Client): Try[Unit] = {
     // TODO: store email body and headers as well
-    TryUtils.sequenceLazily(attachments)(_.storeToS3(s3PathPrefix)).map(_ => ())
+    // Attachments with the same filename must not overwrite each other in S3
+    val attachmentsWithS3Filenames = attachments.zip(FileUtils.uniqueFilenames(attachments.map(_.filename)))
+    TryUtils.sequenceLazily(attachmentsWithS3Filenames) { case (attachment, s3Filename) =>
+      attachment.storeToS3(s3PathPrefix, s3Filename)
+    }.map(_ => ())
   }
 }
 
@@ -60,7 +67,7 @@ object EmailContent {
     template                : EmailMetadata.Template,
     parameters              : List[EmailMetadata.Param],
     formDataMaybeMigrated   : NodeInfo,
-    urisByRenderedFormat    : Map[RenderedFormat, URI]
+    renderedFormatUris      : List[(RenderedFormatUri, Option[PdfTemplate])]
   )(implicit
     indentedLogger          : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
@@ -71,7 +78,9 @@ object EmailContent {
 
     val attachments =
       Attachment.xmlAttachment(formDataMaybeMigrated, template).toList ++
-      urisByRenderedFormat.get(RenderedFormat.Pdf).flatMap(Attachment.pdfAttachment(_, template)).toList ++
+      renderedFormatUris.collect { case (RenderedFormatUri(RenderedFormat.Pdf, uri), pdfTemplateOpt) =>
+        Attachment.pdfAttachment(uri, pdfTemplateOpt, template)
+      }.flatten ++
       Attachment.fileAttachments(template)
 
     implicit val xfc: XFormsFunction.Context = FormRunner.functionContextForFormRunnerContainingDocument(xfcd)

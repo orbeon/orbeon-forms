@@ -157,6 +157,8 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 
     Fun("use-pdf-template", classOf[FRUsePdfTemplate], op = 0, min = 0, BOOLEAN, EXACTLY_ONE)
 
+    Fun("pdf-template-name", classOf[FRPdfTemplateName], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
+
     Fun("created-with-or-newer", classOf[FRCreatedWithOrNewer], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE)
     )
@@ -563,6 +565,13 @@ private object FormRunnerFunctions {
   class FRUsePdfTemplate extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(context: XPathContext): BooleanValue =
       FormRunnerRenderedFormat.usePdfTemplate(ExternalContextSupport.externalContext.getRequest)
+  }
+
+  class FRPdfTemplateName extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(context: XPathContext): StringValue = {
+      // Extract the PDF template name from the function context
+      Option(XFormsFunction.context).flatMap(_.pdfTemplateNameOpt)
+    }
   }
 
   class FRCreatedWithOrNewer extends FunctionSupport with RuntimeDependentFunction {

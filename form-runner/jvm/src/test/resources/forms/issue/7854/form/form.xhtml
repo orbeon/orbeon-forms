@@ -1,0 +1,126 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xf:model xxf:custom-mips="fr:persist" id="fr-form-model" xxf:expose-xpath-types="true"
+                  xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <grid-1>
+                            <applicant-name/>
+                            <comment/>
+                        </grid-1>
+                    </section-1>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="applicant-name-bind" ref="applicant-name" name="applicant-name" xxf:whitespace="trim"/>
+                        <xf:bind id="comment-bind" ref="comment" name="comment" xxf:whitespace="trim"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>7854</form-name>
+                    <title xml:lang="en">Multiple PDFs by email #7854</title>
+                    <description xml:lang="en"/>
+                    <grid-tab-order>default</grid-tab-order>
+                    <library-versions>
+                        <_>1</_>
+                        <orbeon>2</orbeon>
+                        <app>2</app>
+                    </library-versions>
+                    <created-with-version>2026.1-SNAPSHOT PE</created-with-version>
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <headers/>
+                                <subject>Multiple PDFs by email #7854</subject>
+                                <body mediatype="text/plain">Form data attached, see PDF attachment(s).</body>
+                                <exclude-from-all-control-values/>
+                                <attach pdf="true" xml="true"/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments: two named PDF templates (copies of existing test templates) -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments>
+                    <pdf name="agreement" lang="en" filename="agreement.pdf" mediatype="application/pdf" size="78447" hash-algorithm="SHA-256" hash-value="acaecca1973d25a3433712de4697bde8f1a5cc697b4efb5abf9b5a0ba30adde2">/fr/service/persistence/crud/issue/7854/form/agreement.bin</pdf>
+                    <pdf name="confirmation" lang="en" filename="confirmation.pdf" mediatype="application/pdf" size="40979" hash-algorithm="SHA-256" hash-value="9ad4217d88e43b6d178a9509cf21015fec69661a66f2fb953b6323848bd6268c">/fr/service/persistence/crud/issue/7854/form/confirmation.bin</pdf>
+                </attachments>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <applicant-name>
+                            <label>Applicant name</label>
+                            <hint/>
+                        </applicant-name>
+                        <comment>
+                            <label>Comment</label>
+                            <hint/>
+                        </comment>
+                        <section-1>
+                            <label>Details</label>
+                        </section-1>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="6">
+                            <xf:input id="applicant-name-control" bind="applicant-name-bind" class="">
+                                <xf:label ref="$form-resources/applicant-name/label"/>
+                                <xf:hint ref="$form-resources/applicant-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <xf:input id="comment-control" bind="comment-bind" class="">
+                                <xf:label ref="$form-resources/comment/label"/>
+                                <xf:hint ref="$form-resources/comment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

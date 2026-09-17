@@ -26,7 +26,7 @@ import org.orbeon.oxf.fr.Names.*
 import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
 import org.orbeon.oxf.fr.definitions.{FormRunnerDetailMode, ModeType}
 import org.orbeon.oxf.fr.email.EmailMetadata.TemplateMatch
-import org.orbeon.oxf.fr.email.{EmailContent, EmailTransport}
+import org.orbeon.oxf.fr.email.{EmailContent, EmailTransport, RenderedFormatUri}
 import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.process.FormRunnerExternalMode.PrivateModeMetadata
@@ -138,11 +138,11 @@ trait FormRunnerActions
           .getOrElse(TemplateMatch.First)
 
       val emailContentsFromTemplates = emailsToSend(
-        emailDataFormatVersion = emailDataFormatVersion,
-        templateMatch          = templateMatch,
-        language               = paramByNameUseAvt(params, "lang").getOrElse(FormRunner.currentLang),
-        templateNameOpt        = paramByNameUseAvt(params, "template"),
-        renderedFormatParams   = RenderedFormatParams.fromActionParams(params)
+        emailDataFormatVersion   = emailDataFormatVersion,
+        templateMatch            = templateMatch,
+        language                 = paramByNameUseAvt(params, "lang").getOrElse(FormRunner.currentLang),
+        templateNameOpt          = paramByNameUseAvt(params, "template"),
+        renderedFormatParamsList = RenderedFormatParams.fromActionParamsPerPdfTemplate(params)
       )
 
       // S3 tests disable the actual sending of email (this parameter is not documented)
@@ -159,14 +159,14 @@ trait FormRunnerActions
     }
 
   def emailsToSend(
-    emailDataFormatVersion: DataFormatVersion,
-    templateMatch         : TemplateMatch,
-    language              : String,
-    templateNameOpt       : Option[String],
-    renderedFormatParams  : RenderedFormatParams
+    emailDataFormatVersion  : DataFormatVersion,
+    templateMatch           : TemplateMatch,
+    language                : String,
+    templateNameOpt         : Option[String],
+    renderedFormatParamsList: List[RenderedFormatParams]
   )(implicit
-    formRunnerParams      : FormRunnerParams,
-    xfcd                  : XFormsContainingDocument,
+    formRunnerParams        : FormRunnerParams,
+    xfcd                    : XFormsContainingDocument,
   ): List[EmailContent] = {
 
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
@@ -207,28 +207,28 @@ trait FormRunnerActions
         case format => booleanFormRunnerProperty(s"oxf.fr.email.attach-${format.entryName}")
       }
 
-    selectedRenderFormats foreach
-      (tryCreateRenderedFormatIfNeeded(renderedFormatParams, _, createHardLinkIfPresent = false).get)
-
     val currentFormLang = FormRunner.currentLang
 
-    val urisByRenderedFormat =
+    val renderedFormatUris =
       (for {
-        renderedFormat <- selectedRenderFormats
-        (uri, _)       <- renderedFormatPathOpt(
-            urlsInstanceRootElem = FormRunnerActionsCommon.findUrlsInstanceRootElem.get,
-            renderedFormat       = renderedFormat,
-            pdfTemplateOpt       = findPdfTemplate(
-              frFormAttachmentsRootElemOpt = FormRunnerActionsCommon.findFrFormAttachmentsRootElem,
-              usePdfTemplate               = renderedFormatParams.usePdfTemplate,
-              pdfTemplateNameOpt           = renderedFormatParams.pdfTemplateNameOpt,
-              pdfTemplateLangOpt           = renderedFormatParams.pdfTemplateLangOpt,
-              defaultLang                  = currentFormLang.some
-            ),
-            defaultLang          = currentFormLang
+        renderedFormat       <- selectedRenderFormats.toList
+        renderedFormatParams <- renderedFormat match {
+          case RenderedFormat.Pdf | RenderedFormat.Tiff                                     => renderedFormatParamsList
+          // TODO: do we need to support this? if not, we shouldn't use RenderedFormat.values for selectedRenderFormats
+          case RenderedFormat.ExcelWithNamedRanges | RenderedFormat.XmlFormStructureAndData => renderedFormatParamsList.take(1)
+        }
+        (uri, key)            = tryCreateRenderedFormatIfNeeded(renderedFormatParams, renderedFormat, createHardLinkIfPresent = false).get
+        pdfTemplateOpt        = findPdfTemplate(
+          frFormAttachmentsRootElemOpt = FormRunnerActionsCommon.findFrFormAttachmentsRootElem,
+          usePdfTemplate               = renderedFormatParams.usePdfTemplate,
+          pdfTemplateNameOpt           = renderedFormatParams.pdfTemplateNameOpt,
+          pdfTemplateLangOpt           = renderedFormatParams.pdfTemplateLangOpt,
+          defaultLang                  = currentFormLang.some
         )
       } yield
-        renderedFormat -> uri).toMap
+        key -> (RenderedFormatUri(renderedFormat, uri), pdfTemplateOpt))
+      .distinctBy(_._1)
+      .map(_._2)
 
     val formDataMaybeMigrated = formDataMaybeMigratedFromEdge(
       dataFormatVersion = emailDataFormatVersion,
@@ -240,7 +240,7 @@ trait FormRunnerActions
         template              = template,
         parameters            = emailMetadata.params,
         formDataMaybeMigrated = formDataMaybeMigrated,
-        urisByRenderedFormat  = urisByRenderedFormat
+        renderedFormatUris    = renderedFormatUris
       )
     }
   }

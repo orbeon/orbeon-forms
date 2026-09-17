@@ -38,20 +38,21 @@ object FormRunnerRenderedFormat {
     require(path ne null)
   }
 
-  val PdfTemplateNameParam = "pdf-template-name"
-  val PdfTemplateLangParam = "pdf-template-lang"
-  val UsePdfTemplateParam  = "use-pdf-template"
+  val UsePdfTemplateParam   = "use-pdf-template"
+  val PdfTemplateNameParam  = "pdf-template-name"
+  val PdfTemplateNamesParam = "pdf-template-names"
+  val PdfTemplateLangParam  = "pdf-template-lang"
 
-  private val PdfElemName  = "pdf"
+  private val PdfElemName   = "pdf"
 
   case class RenderedFormatParams(
-    usePdfTemplate    : Boolean         = true,
-    pdfTemplateNameOpt: Option[String]  = None,
-    pdfTemplateLangOpt: Option[String]  = None,
-    langOpt           : Option[String]  = None,
-    showHintsOpt      : Option[Boolean] = None,
-    showAlertsOpt     : Option[Boolean] = None,
-    showRequiredOpt   : Option[Boolean] = None
+    usePdfTemplate    : Boolean         = true, // use-pdf-template
+    pdfTemplateNameOpt: Option[String]  = None, // pdf-template-name / pdf-template-names
+    pdfTemplateLangOpt: Option[String]  = None, // pdf-template-lang
+    langOpt           : Option[String]  = None, // lang
+    showHintsOpt      : Option[Boolean] = None, // show-hints
+    showAlertsOpt     : Option[Boolean] = None, // show-alerts
+    showRequiredOpt   : Option[Boolean] = None  // show-required
   )
 
   object RenderedFormatParams {
@@ -66,6 +67,22 @@ object FormRunnerRenderedFormat {
         showAlertsOpt      = paramByNameUseAvt(params, "show-alerts"  ).map(_ == "true"),
         showRequiredOpt    = paramByNameUseAvt(params, "show-required").map(_ == "true")
       )
+
+    def fromActionParamsPerPdfTemplate(params: ActionParams): List[RenderedFormatParams] = {
+
+      val renderedFormatParams = fromActionParams(params)
+
+      val pdfTemplateNames =
+        (
+          paramByNameUseAvt(params, PdfTemplateNameParam ).toList :::
+          paramByNameUseAvt(params, PdfTemplateNamesParam).toList.flatMap(_.splitTo[List]())
+        ).distinct
+
+      if (pdfTemplateNames.isEmpty)
+        List(renderedFormatParams)
+      else
+        pdfTemplateNames.map(name => renderedFormatParams.copy(pdfTemplateNameOpt = Some(name)))
+    }
   }
 
   //@XPathFunction

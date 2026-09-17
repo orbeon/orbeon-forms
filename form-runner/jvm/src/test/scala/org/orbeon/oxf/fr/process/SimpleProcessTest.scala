@@ -302,6 +302,35 @@ extends DocumentTestBase
       }
   }
 
+  describe("#7854: rendered format parameters per PDF template") {
+
+    import FormRunnerRenderedFormat.*
+
+    val Tests = List[(String, ActionParams, List[Option[String]])](
+      ("no parameter",       Map.empty,                                                                       List(None)),
+      ("singular only",      Map(Some(PdfTemplateNameParam)  -> "a"),                                         List(Some("a"))),
+      ("plural only",        Map(Some(PdfTemplateNamesParam) -> " a  b "),                                    List(Some("a"), Some("b"))),
+      ("singular first",     Map(Some(PdfTemplateNameParam)  -> "b", Some(PdfTemplateNamesParam) -> "a c"),   List(Some("b"), Some("a"), Some("c"))),
+      ("duplicates removed", Map(Some(PdfTemplateNameParam)  -> "a", Some(PdfTemplateNamesParam) -> "a b a"), List(Some("a"), Some("b"))),
+    )
+
+    for ((description, params, expected) <- Tests)
+      it(s"must pass with $description") {
+        assert(expected == RenderedFormatParams.fromActionParamsPerPdfTemplate(params).map(_.pdfTemplateNameOpt))
+      }
+
+    it("must keep the other parameters for each PDF template") {
+      val params: ActionParams = Map(Some(PdfTemplateNamesParam) -> "a b", Some(PdfTemplateLangParam) -> "fr", Some("show-hints") -> "true")
+      assert(
+        RenderedFormatParams.fromActionParamsPerPdfTemplate(params) ==
+          List(
+            RenderedFormatParams(pdfTemplateNameOpt = Some("a"), pdfTemplateLangOpt = Some("fr"), showHintsOpt = Some(true)),
+            RenderedFormatParams(pdfTemplateNameOpt = Some("b"), pdfTemplateLangOpt = Some("fr"), showHintsOpt = Some(true))
+          )
+      )
+    }
+  }
+
   describe("`submitContinuation()` function") {
 
     val MyAsyncSuccessAction = "my-async-success"

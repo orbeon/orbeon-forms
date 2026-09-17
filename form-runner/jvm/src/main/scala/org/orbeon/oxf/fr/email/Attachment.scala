@@ -22,6 +22,7 @@ import org.orbeon.oxf.fr.email.EmailContent.URIOps
 import org.orbeon.oxf.fr.email.EmailMetadata.FilesToAttach
 import org.orbeon.oxf.fr.email.EmailMetadata.FilesToAttach.All
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
+import org.orbeon.oxf.fr.process.FormRunnerRenderedFormat.PdfTemplate
 import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException, StatusCode}
@@ -29,6 +30,7 @@ import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StaticXPath.tinyTreeToOrbeonDom
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger}
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps, *}
 import software.amazon.awssdk.services.s3.S3Client
@@ -44,8 +46,8 @@ import scala.util.Try
 
 case class Attachment(filename: String, contentType: String, contentFactory: () => Content) {
 
-  def storeToS3(s3PathPrefix: String)(implicit s3Config: S3Config, s3Client: S3Client): Try[PutObjectResponse] =
-    S3.write(key = s3PathPrefix + filename, contentFactory())
+  def storeToS3(s3PathPrefix: String, s3Filename: String)(implicit s3Config: S3Config, s3Client: S3Client): Try[PutObjectResponse] =
+    S3.write(key = s3PathPrefix + s3Filename, contentFactory())
 }
 
 object Attachment {
@@ -69,6 +71,7 @@ object Attachment {
 
   def pdfAttachment(
     uri                     : URI,
+    pdfTemplateOpt          : Option[PdfTemplate],
     template                : EmailMetadata.Template
   )(implicit
     logger                  : IndentedLogger,
@@ -79,20 +82,22 @@ object Attachment {
     val contentType = ContentTypes.PdfContentType
 
     attachment(
-      attachOpt      = template.attachPdf,
-      attachmentType = RenderedFormat.Pdf.entryName,
-      contentType    = contentType,
-      contentFactory = uriContentFactory(uri, contentType)
+      attachOpt          = template.attachPdf,
+      attachmentType     = RenderedFormat.Pdf.entryName,
+      contentType        = contentType,
+      contentFactory     = uriContentFactory(uri, contentType),
+      pdfTemplateNameOpt = pdfTemplateOpt.flatMap(_.nameOpt)
     )
   }
 
   private def attachment(
-    attachOpt       : Option[Boolean],
-    attachmentType  : String,
-    contentType     : String,
-    contentFactory  : () => Content
+    attachOpt         : Option[Boolean],
+    attachmentType    : String,
+    contentType       : String,
+    contentFactory    : () => Content,
+    pdfTemplateNameOpt: Option[String] = None
   )(implicit
-    formRunnerParams: FormRunnerParams
+    formRunnerParams  : FormRunnerParams
   ): Option[Attachment] = {
 
     // Will include attachment depending on: 1) template value, or 2) property value
@@ -100,10 +105,11 @@ object Attachment {
 
     attach.option {
       val filenameOpt = emailAttachmentFilename(
-        data           = frc.formInstance.root,
-        attachmentType = attachmentType,
-        app            = formRunnerParams.app,
-        form           = formRunnerParams.form
+        data               = frc.formInstance.root,
+        attachmentType     = attachmentType,
+        app                = formRunnerParams.app,
+        form               = formRunnerParams.form,
+        pdfTemplateNameOpt = pdfTemplateNameOpt
       )
 
       val filename = filenameOpt.getOrElse(s"form.$attachmentType")
@@ -196,20 +202,27 @@ object Attachment {
   }
 
   private def emailAttachmentFilename(
-    data          : NodeInfo,
-    attachmentType: String,
-    app           : String,
-    form          : String
+    data              : NodeInfo,
+    attachmentType    : String,
+    app               : String,
+    form              : String,
+    pdfTemplateNameOpt: Option[String]
   ): Option[String] = {
 
     // NOTE: We don't use `FormRunnerParams()` for that this works in tests.
     // Callees only require, as of 2018-05-31, `app` and `form`.
     implicit val params: FormRunnerParams = FormRunnerParams(AppForm(app, form), "email")
 
+    // Include the PDF template name in the function context, for fr:pdf-template-name()
+    val functionContext = process.SimpleProcess.xpathFunctionContext match {
+      case context: XFormsFunction.Context => context.copy(pdfTemplateNameOpt = pdfTemplateNameOpt)
+      case functionContext                 => functionContext
+    }
+
     for {
       (expr, mapping) <- formRunnerPropertyWithNs(s"oxf.fr.email.$attachmentType.filename")
       trimmedExpr     <- expr.trimAllToOpt
-      name            = process.SimpleProcess.evaluateString(trimmedExpr, data, mapping)
+      name            = process.SimpleProcess.evaluateString(trimmedExpr, data, mapping, functionContext)
     } yield {
       // This appears necessary for non-ASCII characters to make it through.
       // Verified that this works with GMail.

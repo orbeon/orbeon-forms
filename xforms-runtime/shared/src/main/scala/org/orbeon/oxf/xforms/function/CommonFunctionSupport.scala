@@ -25,12 +25,13 @@ import scala.collection.mutable as m
 trait CommonFunctionSupport {
 
   case class Context(
-    container        : XBLContainer,
-    bindingContext   : BindingContext,
-    sourceEffectiveId: String,
-    modelOpt         : Option[XFormsModel],
-    bindNodeOpt      : Option[BindNode], // used only for the `NamespaceMapping` and `XFormsModel.variableResolver`
-    attachmentIdOpt  : Option[String] = None // used only for attachment-id function
+    container         : XBLContainer,
+    bindingContext    : BindingContext,
+    sourceEffectiveId : String,
+    modelOpt          : Option[XFormsModel],
+    bindNodeOpt       : Option[BindNode],      // used only for the `NamespaceMapping` and `XFormsModel.variableResolver`
+    attachmentIdOpt   : Option[String] = None, // used only for attachment-id function
+    pdfTemplateNameOpt: Option[String] = None  // used only for pdf-template-name function
   ) extends FunctionContext {
 
     def containingDocument = container.containingDocument

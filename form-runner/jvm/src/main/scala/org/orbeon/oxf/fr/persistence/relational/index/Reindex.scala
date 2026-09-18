@@ -309,11 +309,15 @@ trait Reindex extends FormDefinition {
               paramSetter(currentDataPS)
               useAndClose(currentDataPS.executeQuery()) { currentDataRS =>
 
+                var documentsIndexed = 0
+
                 // Go through each data document
                 while (currentDataRS.next() && StatusStore.getStatus != Status.Stopping) {
 
-                  if (updateStatus)
-                    Backend.setProviderDocumentNext()
+                  if (updateStatus) {
+                    documentsIndexed += 1
+                    Backend.setProviderDocumentCurrent(documentsIndexed)
+                  }
 
                   val app         = currentDataRS.getString("app")
                   val form        = currentDataRS.getString("form")

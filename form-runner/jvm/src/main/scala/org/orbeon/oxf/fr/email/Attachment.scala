@@ -18,6 +18,7 @@ import org.orbeon.connection.{Content, StreamedContent}
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
+import org.orbeon.oxf.fr.FormRunnerFunctionContext.*
 import org.orbeon.oxf.fr.email.EmailContent.URIOps
 import org.orbeon.oxf.fr.email.EmailMetadata.FilesToAttach
 import org.orbeon.oxf.fr.email.EmailMetadata.FilesToAttach.All
@@ -215,7 +216,7 @@ object Attachment {
 
     // Include the PDF template name in the function context, for fr:pdf-template-name()
     val functionContext = process.SimpleProcess.xpathFunctionContext match {
-      case context: XFormsFunction.Context => context.copy(pdfTemplateNameOpt = pdfTemplateNameOpt)
+      case context: XFormsFunction.Context => context.withPdfTemplateName(pdfTemplateNameOpt)
       case functionContext                 => functionContext
     }
 

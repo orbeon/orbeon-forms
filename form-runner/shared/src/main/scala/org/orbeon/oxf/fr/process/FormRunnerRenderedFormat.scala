@@ -45,32 +45,64 @@ object FormRunnerRenderedFormat {
 
   private val PdfElemName   = "pdf"
 
-  case class RenderedFormatParams(
-    usePdfTemplate    : Boolean         = true, // use-pdf-template
-    pdfTemplateNameOpt: Option[String]  = None, // pdf-template-name / pdf-template-names
-    pdfTemplateLangOpt: Option[String]  = None, // pdf-template-lang
-    langOpt           : Option[String]  = None, // lang
-    showHintsOpt      : Option[Boolean] = None, // show-hints
-    showAlertsOpt     : Option[Boolean] = None, // show-alerts
-    showRequiredOpt   : Option[Boolean] = None  // show-required
-  )
+  sealed trait PdfRendering {
+    def pdfTemplateOpt: Option[PdfTemplate] // pdf-template-name / pdf-template-names
+  }
 
-  object RenderedFormatParams {
+  object PdfRendering {
 
-    def fromActionParams(params: ActionParams): RenderedFormatParams =
-      RenderedFormatParams(
-        usePdfTemplate     = booleanParamByNameUseAvt(params, UsePdfTemplateParam, default = true),
-        pdfTemplateNameOpt = paramByNameUseAvt(params, PdfTemplateNameParam),
-        pdfTemplateLangOpt = paramByNameUseAvt(params, PdfTemplateLangParam),
-        langOpt            = paramByNameUseAvt(params, "lang"),
-        showHintsOpt       = paramByNameUseAvt(params, "show-hints"   ).map(_ == "true"),
-        showAlertsOpt      = paramByNameUseAvt(params, "show-alerts"  ).map(_ == "true"),
-        showRequiredOpt    = paramByNameUseAvt(params, "show-required").map(_ == "true")
+    case class Automatic(
+      lang           : String,                 // lang
+      showHintsOpt   : Option[Boolean] = None, // show-hints
+      showAlertsOpt  : Option[Boolean] = None, // show-alerts
+      showRequiredOpt: Option[Boolean] = None  // show-required
+    ) extends PdfRendering {
+      override val pdfTemplateOpt: Option[PdfTemplate] = None
+    }
+
+    case class Template(pdfTemplate: PdfTemplate) extends PdfRendering {
+      override val pdfTemplateOpt: Option[PdfTemplate] = Some(pdfTemplate)
+    }
+
+    def templateOrAutomatic(
+      frFormAttachmentsRootElemOpt: Option[NodeInfo],
+      usePdfTemplate              : Boolean,
+      pdfTemplateNameOpt          : Option[String],
+      pdfTemplateLangOpt          : Option[String],
+      automatic                   : Automatic,
+      defaultLang                 : String
+    ): PdfRendering =
+      findPdfTemplate(
+        frFormAttachmentsRootElemOpt = frFormAttachmentsRootElemOpt,
+        usePdfTemplate               = usePdfTemplate,
+        pdfTemplateNameOpt           = pdfTemplateNameOpt,
+        pdfTemplateLangOpt           = pdfTemplateLangOpt,
+        defaultLang                  = defaultLang.some
+      ) match {
+        case Some(pdfTemplate) => Template(pdfTemplate)
+        case None              => automatic
+      }
+
+    def fromActionParams(
+      params                      : ActionParams,
+      frFormAttachmentsRootElemOpt: Option[NodeInfo],
+      defaultLang                 : String
+    ): PdfRendering =
+      templateOrAutomatic(
+        frFormAttachmentsRootElemOpt = frFormAttachmentsRootElemOpt,
+        usePdfTemplate               = booleanParamByNameUseAvt(params, UsePdfTemplateParam, default = true),
+        pdfTemplateNameOpt           = paramByNameUseAvt(params, PdfTemplateNameParam),
+        pdfTemplateLangOpt           = paramByNameUseAvt(params, PdfTemplateLangParam),
+        automatic                    = automaticFromActionParams(params, defaultLang),
+        defaultLang                  = defaultLang
       )
 
-    def fromActionParamsPerPdfTemplate(params: ActionParams): List[RenderedFormatParams] = {
-
-      val renderedFormatParams = fromActionParams(params)
+    // Used by the email action, which supports multiple PDF templates
+    def fromActionParamsPerPdfTemplate(
+      params                      : ActionParams,
+      frFormAttachmentsRootElemOpt: Option[NodeInfo],
+      defaultLang                 : String
+    ): List[PdfRendering] = {
 
       val pdfTemplateNames =
         (
@@ -78,11 +110,44 @@ object FormRunnerRenderedFormat {
           paramByNameUseAvt(params, PdfTemplateNamesParam).toList.flatMap(_.splitTo[List]())
         ).distinct
 
-      if (pdfTemplateNames.isEmpty)
-        List(renderedFormatParams)
-      else
-        pdfTemplateNames.map(name => renderedFormatParams.copy(pdfTemplateNameOpt = Some(name)))
+      val usePdfTemplate     = booleanParamByNameUseAvt(params, UsePdfTemplateParam, default = true)
+      val pdfTemplateLangOpt = paramByNameUseAvt(params, PdfTemplateLangParam)
+      val automatic          = automaticFromActionParams(params, defaultLang)
+
+      val pdfTemplateNameOpts =
+        if (pdfTemplateNames.isEmpty) List(None) else pdfTemplateNames.map(Some(_))
+
+      pdfTemplateNameOpts.map { pdfTemplateNameOpt =>
+        templateOrAutomatic(frFormAttachmentsRootElemOpt, usePdfTemplate, pdfTemplateNameOpt, pdfTemplateLangOpt, automatic, defaultLang)
+      }.distinct
     }
+
+    private def automaticFromActionParams(params: ActionParams, defaultLang: String): Automatic =
+      Automatic(
+        lang            = paramByNameUseAvt(params, "lang").getOrElse(defaultLang),
+        showHintsOpt    = paramByNameUseAvt(params, "show-hints"   ).map(_ == "true"),
+        showAlertsOpt   = paramByNameUseAvt(params, "show-alerts"  ).map(_ == "true"),
+        showRequiredOpt = paramByNameUseAvt(params, "show-required").map(_ == "true")
+      )
+  }
+
+  sealed trait RenderedFormatRequest { def format: RenderedFormat }
+  case class PrintRequest (format: RenderedFormat.Print, pdfRendering: PdfRendering) extends RenderedFormatRequest
+  case class ExportRequest(format: RenderedFormat.Export)                            extends RenderedFormatRequest
+
+  object RenderedFormatRequest {
+    def fromActionParams(
+      params                      : ActionParams,
+      format                      : RenderedFormat,
+      frFormAttachmentsRootElemOpt: Option[NodeInfo],
+      defaultLang                 : String
+    ): RenderedFormatRequest =
+      format match {
+        case format: RenderedFormat.Print  =>
+          PrintRequest(format, PdfRendering.fromActionParams(params, frFormAttachmentsRootElemOpt, defaultLang))
+        case format: RenderedFormat.Export =>
+          ExportRequest(format)
+      }
   }
 
   //@XPathFunction
@@ -106,11 +171,10 @@ object FormRunnerRenderedFormat {
   }
 
   def getOrCreateRenderedFormatPathElemOpt(
-    urlsInstanceRootElem : NodeInfo,
-    format               : RenderedFormat,
-    pdfTemplateOpt       : Option[PdfTemplate],
-    defaultLang          : String,
-    create               : Boolean
+    urlsInstanceRootElem: NodeInfo,
+    request             : RenderedFormatRequest,
+    defaultLang         : String,
+    create              : Boolean
   ): Option[NodeInfo] = {
 
     // Examples:
@@ -121,10 +185,15 @@ object FormRunnerRenderedFormat {
     //   <tiff-template-en/>
     // </urls>
 
-    val nameOpt = pdfTemplateOpt flatMap (_.nameOpt)
-    val lang    = pdfTemplateOpt flatMap (_.langOpt) getOrElse defaultLang
-
-    val key = s"${format.entryName}-${if (pdfTemplateOpt.isDefined) "template" else "automatic"}-$lang${nameOpt map ("-" +) getOrElse ""}"
+    val key =
+      request match {
+        case PrintRequest(format, PdfRendering.Template(PdfTemplate(_, nameOpt, langOpt))) =>
+          s"${format.entryName}-template-${langOpt getOrElse defaultLang}${nameOpt map ("-" +) getOrElse ""}"
+        case PrintRequest(format, PdfRendering.Automatic(lang, _, _, _)) =>
+          s"${format.entryName}-automatic-$lang"
+        case ExportRequest(format) =>
+          s"${format.entryName}-automatic-$defaultLang"
+      }
 
     urlsInstanceRootElem.child(key).headOption match {
       case None if create =>
@@ -159,12 +228,11 @@ object FormRunnerRenderedFormat {
 
   def renderedFormatPathOpt(
     urlsInstanceRootElem: NodeInfo,
-    renderedFormat      : RenderedFormat,
-    pdfTemplateOpt      : Option[PdfTemplate],
+    request             : RenderedFormatRequest,
     defaultLang         : String
   ): Option[(URI, String)] =
     for {
-      node <- getOrCreateRenderedFormatPathElemOpt(urlsInstanceRootElem, renderedFormat, pdfTemplateOpt, defaultLang, create = false)
+      node <- getOrCreateRenderedFormatPathElemOpt(urlsInstanceRootElem, request, defaultLang, create = false)
       path <- trimAllToOpt(node.stringValue)
     } yield
       URI.create(path) -> node.localname
@@ -252,54 +320,19 @@ object FormRunnerRenderedFormat {
 
   // TODO: what if no PDF/TIFF is produced at all?
   private[process] // for tests
-  def createPdfOrTiffParams(
-    frFormAttachmentsRootElemOpt : Option[NodeInfo],
-    params                       : RenderedFormatParams,
-    defaultLang                  : String
-  ): List[(String, String)] = {
+  def createPdfOrTiffParams(pdfRendering: PdfRendering): List[(String, String)] =
+    pdfRendering match {
+      case PdfRendering.Template(PdfTemplate(_, nameOpt, langOpt)) =>
+        (s"fr-$UsePdfTemplateParam" -> true.toString)          ::
+          nameOpt.toList.map(s"fr-$PdfTemplateNameParam" -> _) :::
+          langOpt.toList.map(s"fr-$PdfTemplateLangParam" -> _)
 
-    val pdfTemplateOpt = findPdfTemplate(
-      frFormAttachmentsRootElemOpt = frFormAttachmentsRootElemOpt,
-      usePdfTemplate               = params.usePdfTemplate,
-      pdfTemplateNameOpt           = params.pdfTemplateNameOpt,
-      pdfTemplateLangOpt           = params.pdfTemplateLangOpt,
-      defaultLang                  = defaultLang.some
-    )
-
-    def nameParamList =
-      (pdfTemplateOpt flatMap (_.nameOpt)).toList map (s"fr-$PdfTemplateNameParam" -> _)
-
-    def langParamList = {
-
-      def langParamForPdfTemplateOpt =
-        (pdfTemplateOpt flatMap (_.langOpt)) map { lang =>
-          (s"fr-$PdfTemplateLangParam" -> lang) :: Nil
-        }
-
-      def langParamForPdfAutomatic = {
-        val lang = params.langOpt getOrElse defaultLang
-        List(
-          "fr-remember-language" -> false.toString,
-          LanguageParam -> lang
-        )
-      }
-
-      pdfTemplateOpt match {
-        case Some(_) => langParamForPdfTemplateOpt getOrElse Nil
-        case None    => langParamForPdfAutomatic
-      }
+      case PdfRendering.Automatic(lang, showHintsOpt, showAlertsOpt, showRequiredOpt) =>
+        (s"fr-$UsePdfTemplateParam" -> false.toString)                     ::
+          ("fr-remember-language"   -> false.toString)                     ::
+          (LanguageParam            -> lang)                               ::
+          showHintsOpt   .toList.map("fr-pdf-show-hints"    -> _.toString) :::
+          showAlertsOpt  .toList.map("fr-pdf-show-alerts"   -> _.toString) :::
+          showRequiredOpt.toList.map("fr-pdf-show-required" -> _.toString)
     }
-
-    def hintsAlertsParamForPdfAutomatic(token: String, showOpt: Option[Boolean]) = {
-      val valueOpt = showOpt.map(s"fr-pdf-show-$token" -> _.toString)
-      pdfTemplateOpt.isEmpty && valueOpt.isDefined flatList valueOpt.toList
-    }
-
-    (s"fr-$UsePdfTemplateParam" -> pdfTemplateOpt.isDefined.toString) ::
-      nameParamList                                                     :::
-      langParamList                                                     :::
-      hintsAlertsParamForPdfAutomatic("hints",    params.showHintsOpt)  :::
-      hintsAlertsParamForPdfAutomatic("alerts",   params.showAlertsOpt) :::
-      hintsAlertsParamForPdfAutomatic("required", params.showRequiredOpt)
-  }
 }

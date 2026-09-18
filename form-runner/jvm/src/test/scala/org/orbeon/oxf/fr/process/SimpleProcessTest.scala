@@ -193,11 +193,11 @@ extends DocumentTestBase
     import FormRunnerRenderedFormat.*
     import org.orbeon.scaxon.NodeConversions.*
 
-    val Tests = List[(String, NodeInfo, RenderedFormatParams, String, List[(String, String)])](
+    val Tests = List[(String, NodeInfo, ActionParams, String, List[(String, String)])](
       (
         "no attachment",
         <attachments/>,
-        RenderedFormatParams(),
+        Map.empty,
         "en",
         List(
           s"fr-$UsePdfTemplateParam" -> "false",
@@ -208,9 +208,9 @@ extends DocumentTestBase
       (
         "legacy attachment with no name or language",
         <attachments>
-          <pdf>data:</pdf>
+          <pdf>data:,</pdf>
         </attachments>,
-        RenderedFormatParams(),
+        Map.empty,
         "en",
         List(
           s"fr-$UsePdfTemplateParam" -> "true"
@@ -219,10 +219,10 @@ extends DocumentTestBase
       (
         "empty name but languages, using default language",
         <attachments>
-          <pdf name="" lang="en">data:</pdf>
-          <pdf name="" lang="fr">data:</pdf>
+          <pdf name="" lang="en">data:,</pdf>
+          <pdf name="" lang="fr">data:,</pdf>
         </attachments>,
-        RenderedFormatParams(),
+        Map.empty,
         "fr",
         List(
           s"fr-$UsePdfTemplateParam"  -> "true",
@@ -232,10 +232,10 @@ extends DocumentTestBase
       (
         "empty name but languages, specifying language",
         <attachments>
-          <pdf name="" lang="en">data:</pdf>
-          <pdf name="" lang="fr">data:</pdf>
+          <pdf name="" lang="en">data:,</pdf>
+          <pdf name="" lang="fr">data:,</pdf>
         </attachments>,
-        RenderedFormatParams(pdfTemplateLangOpt = Some("fr")),
+        Map(Some(PdfTemplateLangParam) -> "fr"),
         "en",
         List(
           s"fr-$UsePdfTemplateParam"  -> "true",
@@ -245,12 +245,12 @@ extends DocumentTestBase
       (
         "names and languages, using default language",
         <attachments>
-          <pdf name="foo" lang="en">data:</pdf>
-          <pdf name="foo" lang="fr">data:</pdf>
-          <pdf name="bar" lang="en">data:</pdf>
-          <pdf name="bar" lang="fr">data:</pdf>
+          <pdf name="foo" lang="en">data:,</pdf>
+          <pdf name="foo" lang="fr">data:,</pdf>
+          <pdf name="bar" lang="en">data:,</pdf>
+          <pdf name="bar" lang="fr">data:,</pdf>
         </attachments>,
-        RenderedFormatParams(pdfTemplateNameOpt = Some("bar")),
+        Map(Some(PdfTemplateNameParam) -> "bar"),
         "fr",
         List(
           s"fr-$UsePdfTemplateParam"  -> "true",
@@ -261,12 +261,12 @@ extends DocumentTestBase
       (
         "names and languages, specifying language",
         <attachments>
-          <pdf name="foo" lang="en">data:</pdf>
-          <pdf name="foo" lang="fr">data:</pdf>
-          <pdf name="bar" lang="en">data:</pdf>
-          <pdf name="bar" lang="fr">data:</pdf>
+          <pdf name="foo" lang="en">data:,</pdf>
+          <pdf name="foo" lang="fr">data:,</pdf>
+          <pdf name="bar" lang="en">data:,</pdf>
+          <pdf name="bar" lang="fr">data:,</pdf>
         </attachments>,
-        RenderedFormatParams(pdfTemplateNameOpt = Some("bar"), pdfTemplateLangOpt = Some("fr")),
+        Map(Some(PdfTemplateNameParam) -> "bar", Some(PdfTemplateLangParam) -> "fr"),
         "en",
         List(
           s"fr-$UsePdfTemplateParam"  -> "true",
@@ -279,7 +279,7 @@ extends DocumentTestBase
         <attachments>
           <pdf mediatype="application/pdf" filename="" size=""/>
         </attachments>,
-        RenderedFormatParams(),
+        Map.empty,
         "en",
         List(
           s"fr-$UsePdfTemplateParam" -> "false",
@@ -294,21 +294,32 @@ extends DocumentTestBase
         assert(
           expected ==
             createPdfOrTiffParams(
-              Some(elem),
-              params,
-              defaultLang
+              PdfRendering.fromActionParams(params, Some(elem), defaultLang)
             )
         )
       }
   }
 
-  describe("#7854: rendered format parameters per PDF template") {
+  describe("#7854: PDF rendering per PDF template") {
 
     import FormRunnerRenderedFormat.*
+    import org.orbeon.scaxon.NodeConversions.*
+
+    val Attachments: NodeInfo =
+      <attachments>
+        <pdf name="a" lang="en">data:,</pdf>
+        <pdf name="a" lang="fr">data:,</pdf>
+        <pdf name="b" lang="en">data:,</pdf>
+        <pdf name="b" lang="fr">data:,</pdf>
+        <pdf name="c" lang="en">data:,</pdf>
+      </attachments>
+
+    def pdfRenderings(params: ActionParams): List[PdfRendering] =
+      PdfRendering.fromActionParamsPerPdfTemplate(params, Some(Attachments), "en")
 
     val Tests = List[(String, ActionParams, List[Option[String]])](
-      ("no parameter",       Map.empty,                                                                       List(None)),
-      ("singular only",      Map(Some(PdfTemplateNameParam)  -> "a"),                                         List(Some("a"))),
+      ("no parameter",       Map.empty,                                                                       List(Some("a"))),
+      ("singular only",      Map(Some(PdfTemplateNameParam)  -> "b"),                                         List(Some("b"))),
       ("plural only",        Map(Some(PdfTemplateNamesParam) -> " a  b "),                                    List(Some("a"), Some("b"))),
       ("singular first",     Map(Some(PdfTemplateNameParam)  -> "b", Some(PdfTemplateNamesParam) -> "a c"),   List(Some("b"), Some("a"), Some("c"))),
       ("duplicates removed", Map(Some(PdfTemplateNameParam)  -> "a", Some(PdfTemplateNamesParam) -> "a b a"), List(Some("a"), Some("b"))),
@@ -316,18 +327,23 @@ extends DocumentTestBase
 
     for ((description, params, expected) <- Tests)
       it(s"must pass with $description") {
-        assert(expected == RenderedFormatParams.fromActionParamsPerPdfTemplate(params).map(_.pdfTemplateNameOpt))
+        assert(expected == pdfRenderings(params).map(_.pdfTemplateOpt.flatMap(_.nameOpt)))
       }
 
-    it("must keep the other parameters for each PDF template") {
-      val params: ActionParams = Map(Some(PdfTemplateNamesParam) -> "a b", Some(PdfTemplateLangParam) -> "fr", Some("show-hints") -> "true")
+    it("must select the requested language for each PDF template") {
+      val params: ActionParams = Map(Some(PdfTemplateNamesParam) -> "a b", Some(PdfTemplateLangParam) -> "fr")
       assert(
-        RenderedFormatParams.fromActionParamsPerPdfTemplate(params) ==
+        pdfRenderings(params) ==
           List(
-            RenderedFormatParams(pdfTemplateNameOpt = Some("a"), pdfTemplateLangOpt = Some("fr"), showHintsOpt = Some(true)),
-            RenderedFormatParams(pdfTemplateNameOpt = Some("b"), pdfTemplateLangOpt = Some("fr"), showHintsOpt = Some(true))
+            PdfRendering.Template(PdfTemplate("data:,", Some("a"), Some("fr"))),
+            PdfRendering.Template(PdfTemplate("data:,", Some("b"), Some("fr")))
           )
       )
+    }
+
+    it("must produce a single automatic rendering when PDF templates are not used") {
+      val params: ActionParams = Map(Some(PdfTemplateNamesParam) -> "a b", Some(UsePdfTemplateParam) -> "false", Some("show-hints") -> "true")
+      assert(pdfRenderings(params) == List(PdfRendering.Automatic("en", showHintsOpt = Some(true))))
     }
   }
 

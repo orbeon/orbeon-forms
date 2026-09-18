@@ -26,10 +26,13 @@ object RenderedFormat extends Enum[RenderedFormat] {
 
   val values = findValues
 
-  case object Pdf                     extends RenderedFormat
-  case object Tiff                    extends RenderedFormat
-  case object ExcelWithNamedRanges    extends RenderedFormat
-  case object XmlFormStructureAndData extends RenderedFormat
+  sealed trait Print  extends RenderedFormat
+  sealed trait Export extends RenderedFormat
+
+  case object Pdf                     extends Print
+  case object Tiff                    extends Print
+  case object ExcelWithNamedRanges    extends Export
+  case object XmlFormStructureAndData extends Export
 
   val SupportedRenderFormatsMediatypes: Map[RenderedFormat, String] =
     Map(

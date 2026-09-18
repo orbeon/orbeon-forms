@@ -18,25 +18,25 @@ import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
+import org.orbeon.oxf.fr.FormRunnerFunctionContext.*
 import org.orbeon.oxf.fr.definitions.ModeType
 import org.orbeon.oxf.fr.email.{EmailMetadataParsing, EvaluatedParams}
 import org.orbeon.oxf.fr.process.{SimpleProcess, *}
-import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.fr.{XMLNames, *}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, ExternalContextSupport, IndentedLogger}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
 import org.orbeon.oxf.xforms.analysis.ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
+import org.orbeon.oxf.xforms.contentfilter.ContentFilter
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.oxf.xforms.function.xxforms.EvaluateSupport
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
-import org.orbeon.oxf.xforms.contentfilter.ContentFilter
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, function}
-import org.orbeon.oxf.xml.{DefaultFunctionSupport, FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils, XMLUtils}
+import org.orbeon.oxf.xml.*
 import org.orbeon.saxon
 import org.orbeon.saxon.`type`.BuiltInAtomicType.*
 import org.orbeon.saxon.`type`.Type
@@ -856,19 +856,34 @@ class FRRenderedFormatUrl extends FunctionSupport with RuntimeDependentFunction 
     implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
     implicit val externalContext : ExternalContext  = ExternalContextSupport.externalContext
 
+    import FormRunnerRenderedFormat.*
+
     val usePdfTemplate          = booleanArgument(1, default = true)
     val pdfTemplateNameOpt      = stringArgumentOpt(2).flatMap(_.trimAllToOpt)
     val createHardLinkIfPresent = booleanArgumentOpt(3).getOrElse(false)
 
-    val renderedFormatParams =
-      FormRunnerRenderedFormat.RenderedFormatParams(
-        usePdfTemplate     = usePdfTemplate,
-        pdfTemplateNameOpt = pdfTemplateNameOpt
-      )
+    val currentFormLang = FormRunner.currentLang
+
+    val request =
+      RenderedFormat.withName(stringArgument(0)) match {
+        case format: RenderedFormat.Print =>
+          PrintRequest(
+            format,
+            PdfRendering.templateOrAutomatic(
+              frFormAttachmentsRootElemOpt = FormRunnerActionsCommon.findFrFormAttachmentsRootElem,
+              usePdfTemplate               = usePdfTemplate,
+              pdfTemplateNameOpt           = pdfTemplateNameOpt,
+              pdfTemplateLangOpt           = None, // Not passed to the function
+              automatic                    = PdfRendering.Automatic(currentFormLang),
+              defaultLang                  = currentFormLang
+            )
+          )
+        case format: RenderedFormat.Export =>
+          ExportRequest(format)
+      }
 
     SimpleProcess.tryCreateRenderedFormatIfNeeded(
-      params                  = renderedFormatParams,
-      renderedFormat          = RenderedFormat.withName(stringArgument(0)),
+      request                 = request,
       createHardLinkIfPresent = createHardLinkIfPresent
     )
     .toOption

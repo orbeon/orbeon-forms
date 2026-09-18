@@ -20,7 +20,7 @@ import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.email.EmailMetadata.{HeaderName, TemplateMatch}
-import org.orbeon.oxf.fr.process.FormRunnerRenderedFormat.PdfTemplate
+import org.orbeon.oxf.fr.process.FormRunnerRenderedFormat.{PrintRequest, RenderedFormatRequest}
 import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.fr.s3.S3Config
 import org.orbeon.oxf.processor.XPLConstants.OXF_PROCESSORS_NAMESPACE
@@ -37,8 +37,6 @@ import software.amazon.awssdk.services.s3.S3Client
 import java.net.URI
 import scala.util.Try
 
-
-case class RenderedFormatUri(format: RenderedFormat, uri: URI)
 
 case class EmailContent(
   headers       : List[(HeaderName, String)],
@@ -67,7 +65,7 @@ object EmailContent {
     template                : EmailMetadata.Template,
     parameters              : List[EmailMetadata.Param],
     formDataMaybeMigrated   : NodeInfo,
-    renderedFormatUris      : List[(RenderedFormatUri, Option[PdfTemplate])]
+    renderedFormatUris      : List[(RenderedFormatRequest, URI)]
   )(implicit
     indentedLogger          : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait,
@@ -78,8 +76,10 @@ object EmailContent {
 
     val attachments =
       Attachment.xmlAttachment(formDataMaybeMigrated, template).toList ++
-      renderedFormatUris.collect { case (RenderedFormatUri(RenderedFormat.Pdf, uri), pdfTemplateOpt) =>
-        Attachment.pdfAttachment(uri, pdfTemplateOpt, template)
+      renderedFormatUris.collect {
+        // TODO: support other formats as well
+        case (PrintRequest(RenderedFormat.Pdf, pdfRendering), uri) =>
+          Attachment.pdfAttachment(uri, pdfRendering.pdfTemplateOpt, template)
       }.flatten ++
       Attachment.fileAttachments(template)
 

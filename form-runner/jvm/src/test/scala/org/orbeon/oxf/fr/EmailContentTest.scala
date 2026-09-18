@@ -14,13 +14,18 @@
 package org.orbeon.oxf.fr
 
 import cats.implicits.catsSyntaxOptionId
+import org.orbeon.io.IOUtils.useAndClose
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.fr.email.EmailMetadata.{HeaderName, TemplateMatch}
-import org.orbeon.oxf.fr.email.MessageContent
-import org.orbeon.oxf.fr.process.FormRunnerRenderedFormat.{RenderedFormatParams, renderedFormatPathOpt}
+import org.orbeon.oxf.fr.email.{Attachment, EmailContent, MessageContent}
+import org.orbeon.oxf.fr.process.FormRunnerRenderedFormat.*
+import org.orbeon.oxf.fr.process.ProcessInterpreter.ActionParams
 import org.orbeon.oxf.fr.process.SimpleProcess.clearRenderedFormatsResources
 import org.orbeon.oxf.fr.process.{FormRunnerActionsCommon, RenderedFormat}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.scalatest.funspec.AnyFunSpecLike
+
+import java.nio.file.{Files, Path}
 
 
 class EmailContentTest
@@ -41,9 +46,20 @@ class EmailContentTest
 
   describe("Form Runner email generation") {
 
+    def pdfRenderingsFor(params: ActionParams): List[PdfRendering] =
+      PdfRendering.fromActionParamsPerPdfTemplate(
+        params                       = params,
+        frFormAttachmentsRootElemOpt = FormRunnerActionsCommon.findFrFormAttachmentsRootElem,
+        defaultLang                  = FormRunner.currentLang
+      )
+
+    def defaultPdfRenderings: List[PdfRendering] = pdfRenderingsFor(Map.empty)
+
     val (processorServiceFor6848, Some(docFor6848), _) = runFormRunner("issue", "6848", "new")
 
     val (processorServiceFor7872, Some(docFor7872), _) = runFormRunner("issue", "7872", "new")
+
+    val (processorServiceFor7854, Some(docFor7854), _) = runFormRunner("issue", "7854", "new")
 
     it("must handle headers, subject, body. and template parameters correctly") {
       val templatesAndResults = Seq(
@@ -197,11 +213,11 @@ param3: <ul><li>Email 1: email1@from\.control</li><li>Email 3: email3@from\.cont
           for ((templateName, expectedResult) <- templatesAndResults) {
 
             val emailContents = process.SimpleProcess.emailsToSend(
-              emailDataFormatVersion = DataFormatVersion.Edge,
-              templateMatch          = TemplateMatch.First,
-              language               = FormRunner.currentLang,
-              templateNameOpt        = templateName.some,
-              renderedFormatParams   = RenderedFormatParams()
+              emailDataFormatVersion   = DataFormatVersion.Edge,
+              templateMatch            = TemplateMatch.First,
+              language                 = FormRunner.currentLang,
+              templateNameOpt          = templateName.some,
+              pdfRenderings            = defaultPdfRenderings
             )
 
             assert(emailContents.size == expectedResult.size, "Wrong email count")
@@ -236,11 +252,11 @@ param3: <ul><li>Email 1: email1@from\.control</li><li>Email 3: email3@from\.cont
             clearRenderedFormatsResources()
 
             process.SimpleProcess.emailsToSend(
-              emailDataFormatVersion = DataFormatVersion.Edge,
-              templateMatch          = TemplateMatch.First,
-              language               = FormRunner.currentLang,
-              templateNameOpt        = templateName.some,
-              renderedFormatParams   = RenderedFormatParams()
+              emailDataFormatVersion   = DataFormatVersion.Edge,
+              templateMatch            = TemplateMatch.First,
+              language                 = FormRunner.currentLang,
+              templateNameOpt          = templateName.some,
+              pdfRenderings            = defaultPdfRenderings
             )
             .foreach { emailContent =>
 
@@ -250,8 +266,7 @@ param3: <ul><li>Email 1: email1@from\.control</li><li>Email 3: email3@from\.cont
               val urisByRenderedFormat =
                 renderedFormatPathOpt(
                   urlsInstanceRootElem = FormRunnerActionsCommon.findUrlsInstanceRootElem.get,
-                  renderedFormat       = RenderedFormat.Pdf,
-                  pdfTemplateOpt       = None,
+                  request              = PrintRequest(RenderedFormat.Pdf, PdfRendering.Automatic("en")),
                   defaultLang          = "en"
                 )
 
@@ -259,6 +274,67 @@ param3: <ul><li>Email 1: email1@from\.control</li><li>Email 3: email3@from\.cont
               assert(urisByRenderedFormat.isDefined == expectedResult)
             }
           }
+        }
+      }
+    }
+
+    it("#7854: must attach several PDFs in the order of the requested PDF templates") {
+      assume(Version.isPE)
+      withTestExternalContext { implicit ec =>
+        withFormRunnerDocument(processorServiceFor7854, docFor7854) {
+
+          implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
+
+          // The form has two PDF templates: agreement and confirmation. The PDF filename for this test is defined
+          // as concat(fr:pdf-template-name(), '.pdf')
+
+          def emailContentFor(params: ActionParams): EmailContent = {
+            clearRenderedFormatsResources()
+            process.SimpleProcess.emailsToSend(
+              emailDataFormatVersion = DataFormatVersion.Edge,
+              templateMatch          = TemplateMatch.First,
+              language               = FormRunner.currentLang,
+              templateNameOpt        = "default".some,
+              pdfRenderings          = pdfRenderingsFor(params)
+            ).head
+          }
+
+          def pdfAttachments(emailContent: EmailContent): List[Attachment] =
+            emailContent.attachments.filter(_.contentType == "application/pdf")
+
+          def attachmentBytes(attachment: Attachment): Array[Byte] =
+            useAndClose(attachment.contentFactory().stream)(_.readAllBytes())
+
+          def renderedPdfBytes(templateName: String): Array[Byte] = {
+            val (uri, _) =
+              renderedFormatPathOpt(
+                urlsInstanceRootElem = FormRunnerActionsCommon.findUrlsInstanceRootElem.get,
+                request              = PrintRequest(
+                  RenderedFormat.Pdf,
+                  PdfRendering.Template(PdfTemplate("", Some(templateName), Some("en")))
+                ),
+                defaultLang          = "en"
+              ).get
+            Files.readAllBytes(Path.of(uri))
+          }
+
+          // Two templates, in the requested order
+          locally {
+            val attachments = pdfAttachments(emailContentFor(Map(Some(PdfTemplateNamesParam) -> "confirmation agreement")))
+            assert(attachments.map(_.filename) == List("confirmation.pdf", "agreement.pdf"))
+            assert(attachmentBytes(attachments(0)) sameElements renderedPdfBytes("confirmation"))
+            assert(attachmentBytes(attachments(1)) sameElements renderedPdfBytes("agreement"))
+            assert(! (attachmentBytes(attachments(0)) sameElements attachmentBytes(attachments(1))))
+          }
+
+          // Singular and plural parameters combined, singular first
+          locally {
+            val params: ActionParams = Map(Some(PdfTemplateNameParam) -> "agreement", Some(PdfTemplateNamesParam) -> "confirmation agreement")
+            assert(pdfAttachments(emailContentFor(params)).map(_.filename) == List("agreement.pdf", "confirmation.pdf"))
+          }
+
+          // No name requested: single attachment using the default template selection, as before
+          assert(pdfAttachments(emailContentFor(Map.empty)).map(_.filename) == List("agreement.pdf"))
         }
       }
     }

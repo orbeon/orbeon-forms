@@ -29,9 +29,8 @@ trait CommonFunctionSupport {
     bindingContext    : BindingContext,
     sourceEffectiveId : String,
     modelOpt          : Option[XFormsModel],
-    bindNodeOpt       : Option[BindNode],      // used only for the `NamespaceMapping` and `XFormsModel.variableResolver`
-    attachmentIdOpt   : Option[String] = None, // used only for attachment-id function
-    pdfTemplateNameOpt: Option[String] = None  // used only for pdf-template-name function
+    bindNodeOpt       : Option[BindNode],               // used only for the `NamespaceMapping` and `XFormsModel.variableResolver`
+    customValues      : Map[String, String] = Map.empty // values passed to higher-level functions, e.g. Form Runner's functions
   ) extends FunctionContext {
 
     def containingDocument = container.containingDocument

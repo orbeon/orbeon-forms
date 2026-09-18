@@ -29,6 +29,7 @@ import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.Names.FormModel
 import org.orbeon.oxf.fr.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.fr.datamigration.{MigrationSupport, PathElem}
+import org.orbeon.oxf.fr.FormRunnerFunctionContext.*
 import org.orbeon.oxf.fr.process.SimpleProcess.xpathFunctionContext
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.{BasicCredentials, Headers, HttpMethod}
@@ -806,7 +807,7 @@ trait FormRunnerPersistence {
       case Some((expression, ns)) =>
         // Include the attachment ID in the function context
         val functionContext = xpathFunctionContext match {
-          case context: XFormsFunction.Context => context.copy(attachmentIdOpt = attachmentId.some)
+          case context: XFormsFunction.Context => context.withAttachmentId(attachmentId)
           case functionContext                 => functionContext
         }
 

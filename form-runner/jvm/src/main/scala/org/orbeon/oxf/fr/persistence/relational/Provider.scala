@@ -18,20 +18,24 @@ import enumeratum.EnumEntry.Lowercase
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.Exceptions
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 
 import java.io.StringReader
-import java.sql.{Connection, PreparedStatement, ResultSet, Statement}
+import java.sql.{Connection, PreparedStatement, ResultSet, SQLException, SQLTransactionRollbackException, Statement}
 import javax.xml.transform.stream.StreamSource
 
 
 sealed trait Provider extends EnumEntry with Lowercase
 
 object Provider extends Enum[Provider] {
+
+  import Private.*
 
   val values = findValues
 
@@ -410,5 +414,48 @@ object Provider extends Enum[Provider] {
     }
 
     idFromGeneratedKeysOpt orElse idFromLastInsertRowidOpt
+  }
+
+  def isTransientConcurrency(provider: Provider, throwable: Throwable): Boolean =
+    Exceptions.causesIterator(throwable).exists {
+      case sqlEx: SQLException =>
+        allSqlExceptions(sqlEx).exists(isTransientSQLException(provider, _))
+      case _ =>
+        false
+    }
+
+  private object Private {
+
+    private val MySQLTransientErrorCodes    : Set[Int]    = Set(1205, 1213, 1451, 1452)
+    private val PostgreSQLTransientSQLStates: Set[String] = Set("40001", "40P01", "55P03", "23503")
+    private val SQLiteTransientErrorCodes   : Set[Int]    = Set(5, 6, 261, 517, 518)
+
+    def allSqlExceptions(e: SQLException): Iterator[SQLException] =
+      Iterator.iterateOpt(e)(ex => Option(ex.getNextException))
+
+    private def isGenericTransientSQLException(e: SQLException): Boolean =
+      e.isInstanceOf[SQLTransactionRollbackException] ||
+        Option(e.getSQLState).exists(_.startsWith("40"))
+
+    def isTransientSQLException(provider: Provider, e: SQLException): Boolean = {
+      val errorCode = e.getErrorCode
+      val sqlState  = Option(e.getSQLState).getOrElse("")
+
+      isGenericTransientSQLException(e) || (provider match {
+        case MySQL =>
+          MySQLTransientErrorCodes.contains(errorCode)
+        case PostgreSQL =>
+          PostgreSQLTransientSQLStates.contains(sqlState) ||
+            (sqlState == "23505" && Option(e.getMessage).exists(_.contains("orbeon_i_current")))
+        case SQLite =>
+          SQLiteTransientErrorCodes.contains(errorCode) ||
+            Option(e.getMessage).exists { msg =>
+              msg.contains("SQLITE_BUSY") ||
+              msg.contains("SQLITE_LOCKED") ||
+              msg.contains("database is locked") ||
+              msg.contains("table is locked")
+            }
+      })
+    }
   }
 }

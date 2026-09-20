@@ -152,7 +152,7 @@ trait Reindex extends FormDefinition {
 
     val connectionOpt = reindexConnectionOpt
 
-    val distinctForms: List[AppFormVersion] = RelationalUtils.withConnection(connectionOpt) { connection =>
+    val distinctForms: List[AppFormVersion] = RelationalUtils.withConnection(provider, connectionOpt) { connection =>
 
       // Clear index
       locally {
@@ -273,7 +273,7 @@ trait Reindex extends FormDefinition {
         .toMap
     }
 
-    RelationalUtils.withConnection(connectionOpt) { connection =>
+    RelationalUtils.withConnection(provider, connectionOpt) { connection =>
       // Get all the rows from `orbeon_form_data` that are "latest" and not deleted
       val xmlCol         = Provider.xmlColSelect(provider, "d")
       val selectXmlSql   = s"SELECT $xmlCol FROM orbeon_form_data d WHERE id = ?"

@@ -83,7 +83,7 @@ object FormLogic {
 
     val statementPart = StatementPart(query, setters)
 
-    RelationalUtils.withConnection { connection =>
+    RelationalUtils.withConnection(provider) { connection =>
       executeQuery(connection, statementPart.sql, List(statementPart)) { resultSet =>
 
         val forms =

@@ -95,7 +95,7 @@ private object History {
   ): Unit = {
 
     val historyWithoutDiffs =
-      RelationalUtils.withConnection { connection =>
+      RelationalUtils.withConnection(request.provider) { connection =>
         historyWithoutDiffsFromDatabase(connection, request, appForm, documentId, filenameOpt)
       }
 

@@ -108,7 +108,7 @@ trait LockUnlock {
       import LeaseStatus.*
 
       val reqLockInfo = LockInfo.parse(externalContext.getRequest.getInputStream)
-      RelationalUtils.withConnection { connection =>
+      RelationalUtils.withConnection(req.provider) { connection =>
         def callThunk(leaseStatus: LeaseStatus): Unit =
           thunk(connection, leaseStatus, req.dataPart, reqLockInfo)
         Provider.withLockedTable(connection, req.provider, "orbeon_form_data_lease") {

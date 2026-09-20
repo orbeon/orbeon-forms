@@ -227,7 +227,7 @@ trait Read {
   )(implicit
     externalContext        : ExternalContext,
     indentedLogger         : IndentedLogger
-  ): Either[HttpStatusCodeException, FromDatabase] = RelationalUtils.withConnection { connection =>
+  ): Either[HttpStatusCodeException, FromDatabase] = RelationalUtils.withConnection(req.provider) { connection =>
     val sql = {
       val table  = SqlSupport.tableName(req)
       val idCols = SqlSupport.idColumns(req)

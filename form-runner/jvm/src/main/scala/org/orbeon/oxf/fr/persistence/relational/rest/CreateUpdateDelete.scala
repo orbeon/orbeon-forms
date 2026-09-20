@@ -163,8 +163,8 @@ trait CreateUpdateDelete {
       val iControlTextWhere =
           s"""|WHERE data_id IN
               |    (
-              |        SELECT data_id
-              |          FROM orbeon_i_current
+              |        SELECT id
+              |          FROM orbeon_form_data
               |         WHERE document_id = ?   AND
               |               draft       = ?
               |    )
@@ -490,7 +490,7 @@ trait CreateUpdateDelete {
       if (allowCreateOnlyIfSearchEmpty) {
         // https://github.com/orbeon/orbeon-forms/issues/7164
         try {
-          RelationalUtils.withConnection { connection =>
+          RelationalUtils.withConnection(req.provider) { connection =>
 
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
 
@@ -528,7 +528,7 @@ trait CreateUpdateDelete {
         }
       } else if (req.forData) {
         // We must reindex only the data for a single document, so do it in the same transaction
-        RelationalUtils.withConnection { connection =>
+        RelationalUtils.withConnection(req.provider) { connection =>
           val storeResult = store(connection, req, reqBodyOpt, delete, versionToSet)
           maybeReindexAfterStore(Some(connection), precomputedIndexedControlsXPathsIfNeeded)
           storeResult
@@ -538,7 +538,7 @@ trait CreateUpdateDelete {
         if (req.forForm)
           PersistenceMetadataSupport.maybeInvalidateCachesFor(appFormVersion)
         val storeResult =
-          RelationalUtils.withConnection { connection =>
+          RelationalUtils.withConnection(req.provider) { connection =>
             store(connection, req, reqBodyOpt, delete, versionToSet)
           }
         maybeReindexAfterStore(None, precomputedIndexedControlsXPathsIfNeeded)
@@ -604,7 +604,7 @@ trait CreateUpdateDelete {
     propertySet    : PropertySet
   ): Unit =
     withDebug("CRUD: creating flat view") {
-      RelationalUtils.withConnection { connection =>
+      RelationalUtils.withConnection(req.provider) { connection =>
 
         val prefixesInMainViewColumnNames = FormRunner.providerPropertyAsBoolean(
           req.provider.entryName,

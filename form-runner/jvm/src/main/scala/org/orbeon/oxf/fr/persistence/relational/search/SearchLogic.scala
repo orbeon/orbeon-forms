@@ -100,8 +100,8 @@ object SearchLogic {
       noPermissionValue
     else {
       val commonStatementPart = commonPart(request.appForm, request.version, queries, freeTextSearch)
-      val bodyPartial         = body(_, List(commonStatementPart, permissionsPart(permissions)), permissions)
-      RelationalUtils.withConnection(connectionOpt)(bodyPartial)
+      val statementParts      = List(commonStatementPart, permissionsPart(permissions))
+      RelationalUtils.withConnection(request.provider, connectionOpt)(body(_, statementParts, permissions))
     }
   }
 

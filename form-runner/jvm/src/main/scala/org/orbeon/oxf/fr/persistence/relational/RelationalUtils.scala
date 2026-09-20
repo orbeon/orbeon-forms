@@ -30,10 +30,12 @@ import java.time.Instant
 import javax.naming.InitialContext
 import javax.sql.DataSource
 import scala.util.control.{ControlThrowable, NonFatal}
-import scala.util.{Success, Try}
+import scala.util.{Random, Success, Try}
 
 
 object RelationalUtils extends Logging {
+
+  import Retry.*
 
   val Logger: log4s.Logger = LoggerFactory.createLogger("org.orbeon.relational")
 
@@ -85,14 +87,17 @@ object RelationalUtils extends Logging {
   }
 
   def withConnection[T](
+    provider       : Provider
+  )(
     thunk          : Connection => T
   )(implicit
     externalContext: ExternalContext,
     indentedLogger : IndentedLogger
   ): T =
-    withConnection(connectionOpt = None)(thunk)
+    withConnection(provider, connectionOpt = None)(thunk)
 
   def withConnection[T](
+    provider       : Provider,
     connectionOpt  : Option[java.sql.Connection]
   )(
     thunk          : Connection => T
@@ -102,32 +107,9 @@ object RelationalUtils extends Logging {
   ): T =
     connectionOpt match {
       case Some(connection) => thunk(connection)
-      case None             => withConnectionHandleTransaction(getConnection(getDataSource(getDataSourceNameFromHeaders)))(thunk)
-    }
-
-  private def withConnectionHandleTransaction[T](
-    connection    : java.sql.Connection
-  )(
-    thunk         : Connection => T
-  )(implicit
-    indentedLogger: IndentedLogger
-  ): T =
-    useAndClose(connection) { connection =>
-      try {
-        val result = withDebug("executing block with connection")(thunk(connection))
-        debug("about to commit")
-        connection.commit()
-        result
-      } catch {
-        case t: ControlThrowable =>
-          debug("about to commit following `ControlThrowable`")
-          connection.commit()
-          throw t
-        case NonFatal(t) =>
-          debug("about to rollback following `NonFatal`", List("throwable" -> Exceptions.getRootThrowable(t).toString))
-          connection.rollback()
-          throw t
-      }
+      case None             =>
+        val dataSource = getDataSource(getDataSourceNameFromHeaders)
+        withConnectionHandleTransaction(provider, () => getConnection(dataSource))(thunk)
     }
 
   /**
@@ -201,4 +183,88 @@ object RelationalUtils extends Logging {
     } getOrElse {
       throw new IllegalArgumentException(s"Invalid date/time format: $string")
     }
+
+  private[relational] object Retry {
+
+    val MaxAttempts        = 10
+    val MinDelayMillis     = 5L
+    val InitialDelayMillis = 20L
+    val MaxDelayMillis     = 1000L
+
+    def calculateBackoff(
+      attempt     : Int,
+      minDelay    : Long = MinDelayMillis,
+      initialDelay: Long = InitialDelayMillis,
+      maxDelay    : Long = MaxDelayMillis
+    ): Long = {
+      val expDelay = math.min(maxDelay, initialDelay * (1L << math.min(attempt, 30)))
+      if (expDelay <= minDelay) minDelay
+      else Random.between(minDelay, expDelay + 1)
+    }
+
+    def withConnectionHandleTransaction[T](
+      provider         : Provider,
+      acquireConnection: () => Connection,
+      maxAttempts      : Int  = MaxAttempts,
+      minDelay         : Long = MinDelayMillis,
+      initialDelay     : Long = InitialDelayMillis,
+      maxDelay         : Long = MaxDelayMillis
+    )(
+      thunk            : Connection => T
+    )(implicit
+      indentedLogger   : IndentedLogger
+    ): T = {
+
+      @annotation.tailrec
+      def attemptTransaction(attempt: Int): T = {
+        val outcome: Either[Throwable, T] =
+          try {
+            val connection = acquireConnection()
+            val result = useAndClose(connection) { connection =>
+              try {
+                val result = withDebug("executing block with connection")(thunk(connection))
+                debug("about to commit")
+                connection.commit()
+                result
+              } catch {
+                case t: ControlThrowable =>
+                  debug("about to commit following `ControlThrowable`")
+                  connection.commit()
+                  throw t
+                case NonFatal(t) =>
+                  debug("about to rollback following `NonFatal`", List("throwable" -> Exceptions.getRootThrowable(t).toString))
+                  Try(connection.rollback())
+                  throw t
+              }
+            }
+            Right(result)
+          } catch {
+            case t: ControlThrowable => throw t
+            case NonFatal(t)         => Left(t)
+          }
+
+        outcome match {
+          case Right(result) =>
+            result
+          case Left(t) =>
+            val isTransient = Provider.isTransientConcurrency(provider, t)
+
+            if (isTransient && attempt < maxAttempts - 1) {
+              val sleepMillis = calculateBackoff(attempt, minDelay, initialDelay, maxDelay)
+              warn(
+                s"Transient concurrency error (attempt ${attempt + 1}/$maxAttempts); retrying after ${sleepMillis}ms",
+                List("throwable" -> Exceptions.getRootThrowable(t).toString)
+              )
+              if (sleepMillis > 0)
+                Thread.sleep(sleepMillis)
+              attemptTransaction(attempt + 1)
+            } else {
+              throw t
+            }
+        }
+      }
+
+      attemptTransaction(0)
+    }
+  }
 }

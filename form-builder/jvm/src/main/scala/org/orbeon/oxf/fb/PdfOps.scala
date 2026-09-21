@@ -2,6 +2,7 @@ package org.orbeon.oxf.fb
 
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.io.RandomAccessReadBuffer
+import org.apache.pdfbox.pdmodel.interactive.form.PDTerminalField
 import org.orbeon.connection.ConnectionResult
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.fr.FormDefinitionVersion
@@ -42,11 +43,12 @@ trait PdfOps {
           useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(is))) { pdd =>
             Option(pdd.getDocumentCatalog.getAcroForm) match {
               case Some(acroForm) =>
-                acroForm.getFieldTree.asScala.map { field =>
-                  <field
-                    name={field.getPartialName}
-                    fully-qualified-name={field.getFullyQualifiedName}
-                    alternate-field-name={field.getAlternateFieldName}/>
+                acroForm.getFieldTree.asScala.collect {
+                  case field: PDTerminalField =>
+                    <field
+                      name={field.getPartialName}
+                      fully-qualified-name={field.getFullyQualifiedName}
+                      alternate-field-name={field.getAlternateFieldName}/>
                 }
               case None =>
             }

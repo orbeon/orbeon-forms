@@ -882,7 +882,7 @@ trait FormRunnerActions
               val pathToTmpFile =
                 XFormsAssetServerRoute
                   .findDynamicResource(pathToTmpFileOrDynamic)
-                  .map(_.uri.toString.tap(x => println(s"xxx Found dynamic resource for rendered format at path: $x")))
+                  .map(_.uri.toString)
                   .getOrElse(pathToTmpFileOrDynamic)
 
               setvalue(

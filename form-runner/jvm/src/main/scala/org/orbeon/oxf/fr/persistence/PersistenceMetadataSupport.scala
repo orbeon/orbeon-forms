@@ -74,20 +74,19 @@ object PersistenceMetadataSupport {
     }
 
   def updatePublishedFormStorageDetailsCache(
-    formDefinitionDoc: DocumentNodeInfoType,
-    appForm          : AppForm,
-    version          : FormDefinitionVersion
+    appForm           : AppForm,
+    version           : FormDefinitionVersion,
+    formStorageDetails: FormStorageDetails
   )(implicit
-    indentedLogger   : IndentedLogger,
-    propertySet      : PropertySet
+    indentedLogger   : IndentedLogger
   ): Try[FormStorageDetails] =
-    readMaybeFromCache(appForm, version, formDefinitionCache, forceStore = true) {
-      withDebug("reading published form for storage details") {
-        Try(buildPublishedFormStorageDetails(formDefinitionDoc, appForm))
+    readMaybeFromCache(appForm, version, formDefinitionCache, forceStore = true) { // never get from cache but always read and store if possible
+      withDebug("update published form storage details") {
+        Try(formStorageDetails)
       }
     }
 
-  private def buildPublishedFormStorageDetails(
+  def buildPublishedFormStorageDetails(
     formDefinitionDoc: DocumentNodeInfoType,
     appForm          : AppForm,
   )(implicit

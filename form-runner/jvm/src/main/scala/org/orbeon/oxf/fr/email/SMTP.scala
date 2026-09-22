@@ -43,6 +43,7 @@ case object SMTP {
     host                     : String,
     port                     : Int,
     encryptionWithCredentials: EncryptionWithCredentials,
+    heloNameOpt              : Option[String]  = None,
     connectionTimeoutMsOpt   : Option[Int]     = None,
     timeoutMsOpt             : Option[Int]     = None,
     writeTimeoutMsOpt        : Option[Int]     = None,
@@ -63,6 +64,8 @@ case object SMTP {
 
       // Whether to wait for the response to the QUIT command (Jakarta Mail defaults to true)
       quitWaitOpt.foreach(v => properties.setProperty("mail.smtp.quitwait", v.toString))
+
+      heloNameOpt.foreach(v => properties.setProperty("mail.smtp.localhost", v))
 
       encryptionWithCredentials match {
         case EncryptionWithCredentials.SSL(_) =>
@@ -126,6 +129,7 @@ case object SMTP {
         host                      = host,
         port                      = portOpt.getOrElse(encryptionWithCredentials.defaultPort),
         encryptionWithCredentials = encryptionWithCredentials,
+        heloNameOpt               = prop("helo-name"),
         connectionTimeoutMsOpt    = intProp("connection-timeout"),
         timeoutMsOpt              = intProp("timeout"),
         writeTimeoutMsOpt         = intProp("write-timeout"),

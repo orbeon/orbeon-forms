@@ -418,6 +418,7 @@
     <property as="xs:string"  name="oxf.fr.email.smtp.username.*.*"                                value=""/>
     <property as="xs:string"  name="oxf.fr.email.smtp.credentials.*.*"                             value=""/>
     <property as="xs:string"  name="oxf.fr.email.smtp.encryption.*.*"                              value=""/> <!-- Blank, tls, or ssl -->
+    <property as="xs:string"  name="oxf.fr.email.smtp.helo-name.*.*"                               value=""/> <!-- Local host name used in SMTP HELO/EHLO; blank means auto-detect -->
     <property as="xs:string"  name="oxf.fr.email.smtp.connection-timeout.*.*"                      value=""/> <!-- Socket connection timeout in milliseconds; blank means infinite -->
     <property as="xs:string"  name="oxf.fr.email.smtp.timeout.*.*"                                 value=""/> <!-- Socket read timeout in milliseconds; blank means infinite -->
     <property as="xs:string"  name="oxf.fr.email.smtp.write-timeout.*.*"                           value=""/> <!-- Socket write timeout in milliseconds; blank means infinite -->

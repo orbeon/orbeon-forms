@@ -23,14 +23,14 @@ import org.orbeon.oxf.fr.email.EmailContent.URIOps
 import org.orbeon.oxf.fr.email.EmailMetadata.FilesToAttach
 import org.orbeon.oxf.fr.email.EmailMetadata.FilesToAttach.All
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
-import org.orbeon.oxf.fr.process.FormRunnerRenderedFormat.PdfTemplate
+import org.orbeon.oxf.fr.process.FormRunnerRenderedFormat.{ExportRequest, PrintRequest, RenderedFormatRequest}
 import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StaticXPath.tinyTreeToOrbeonDom
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
-import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger}
+import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, Mediatypes}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps, *}
@@ -63,16 +63,17 @@ object Attachment {
     val contentType = ContentTypes.makeContentTypeCharset(ContentTypes.XmlContentType, Some(EmailContent.Charset))
 
     attachment(
-      attachOpt      = template.attachXml,
-      attachmentType = "xml",
-      contentType    = contentType,
-      contentFactory = xmlContentFactory(formDataMaybeMigrated, contentType)
+      attachOpt       = template.attachXml,
+      attachmentType  = "xml",
+      defaultFilename = "form.xml",
+      contentType     = contentType,
+      contentFactory  = xmlContentFactory(formDataMaybeMigrated, contentType)
     )
   }
 
-  def pdfAttachment(
+  def renderedFormatAttachment(
+    request                 : RenderedFormatRequest,
     uri                     : URI,
-    pdfTemplateOpt          : Option[PdfTemplate],
     template                : EmailMetadata.Template
   )(implicit
     logger                  : IndentedLogger,
@@ -80,20 +81,35 @@ object Attachment {
     formRunnerParams        : FormRunnerParams
   ): Option[Attachment] = {
 
-    val contentType = ContentTypes.PdfContentType
+    val format      = request.format
+    val contentType = RenderedFormat.SupportedRenderFormatsMediatypes(format)
+
+    val attachOpt =
+      format match {
+        case RenderedFormat.Pdf => template.attachPdf
+        case _                  => None
+      }
+
+    val pdfTemplateNameOpt =
+      request match {
+        case PrintRequest(_, pdfRendering) => pdfRendering.pdfTemplateOpt.flatMap(_.nameOpt)
+        case _: ExportRequest              => None
+      }
 
     attachment(
-      attachOpt          = template.attachPdf,
-      attachmentType     = RenderedFormat.Pdf.entryName,
+      attachOpt          = attachOpt,
+      attachmentType     = format.entryName,
+      defaultFilename    = s"form.${Mediatypes.getExtensionForMediatypeOrThrow(contentType)}",
       contentType        = contentType,
       contentFactory     = uriContentFactory(uri, contentType),
-      pdfTemplateNameOpt = pdfTemplateOpt.flatMap(_.nameOpt)
+      pdfTemplateNameOpt = pdfTemplateNameOpt
     )
   }
 
   private def attachment(
     attachOpt         : Option[Boolean],
     attachmentType    : String,
+    defaultFilename   : String,
     contentType       : String,
     contentFactory    : () => Content,
     pdfTemplateNameOpt: Option[String] = None
@@ -113,9 +129,7 @@ object Attachment {
         pdfTemplateNameOpt = pdfTemplateNameOpt
       )
 
-      val filename = filenameOpt.getOrElse(s"form.$attachmentType")
-
-      Attachment(filename, contentType, contentFactory)
+      Attachment(filenameOpt.getOrElse(defaultFilename), contentType, contentFactory)
     }
   }
 

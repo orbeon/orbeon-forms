@@ -336,6 +336,24 @@
         )
     </property>
 
+    <property as="xs:string" name="oxf.fr.email.excel-with-named-ranges.filename.*.*">
+        concat(
+            fr:form-title(),
+            ' - ',
+            substring(fr:document-id(), 1, 16),
+            '.xlsx'
+        )
+    </property>
+
+    <property as="xs:string" name="oxf.fr.email.xml-form-structure-and-data.filename.*.*">
+        concat(
+            fr:form-title(),
+            ' - ',
+            substring(fr:document-id(), 1, 16),
+            ' - export.xml'
+        )
+    </property>
+
     <property as="xs:string" name="oxf.fr.email.s3-path.*.*">
         concat(
             fr:app-name(),
@@ -431,6 +449,8 @@
     <property as="xs:boolean" name="oxf.fr.email.attach-pdf.*.*"                                   value="true"/>
     <property as="xs:boolean" name="oxf.fr.email.attach-tiff.*.*"                                  value="false"/>
     <property as="xs:boolean" name="oxf.fr.email.attach-xml.*.*"                                   value="true"/>
+    <property as="xs:boolean" name="oxf.fr.email.attach-excel-with-named-ranges.*.*"               value="false"/>
+    <property as="xs:boolean" name="oxf.fr.email.attach-xml-form-structure-and-data.*.*"           value="false"/>
     <property as="xs:string"  name="oxf.fr.email.attach-files.*.*"                                 value="all"/>
 
     <!-- Configuration of built-in forms -->

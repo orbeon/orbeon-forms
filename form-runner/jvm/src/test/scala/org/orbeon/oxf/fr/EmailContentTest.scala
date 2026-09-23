@@ -23,6 +23,7 @@ import org.orbeon.oxf.fr.process.ProcessInterpreter.ActionParams
 import org.orbeon.oxf.fr.process.SimpleProcess.clearRenderedFormatsResources
 import org.orbeon.oxf.fr.process.{FormRunnerActionsCommon, RenderedFormat}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.util.ContentTypes
 import org.scalatest.funspec.AnyFunSpecLike
 
 import java.nio.file.{Files, Path}
@@ -335,6 +336,27 @@ param3: <ul><li>Email 1: email1@from\.control</li><li>Email 3: email3@from\.cont
 
           // No name requested: single attachment using the default template selection, as before
           assert(pdfAttachments(emailContentFor(Map.empty)).map(_.filename) == List("agreement.pdf"))
+
+          // #7891: test that TIFF attachments work again (regression during XPL/XSL-to-Scala refactoring)
+          locally {
+            val attachments = emailContentFor(Map(Some(PdfTemplateNamesParam) -> "confirmation agreement")).attachments
+            assert(
+              attachments.map(_.contentType) ==
+                List(
+                  ContentTypes.makeContentTypeCharset(ContentTypes.XmlContentType, Some(EmailContent.Charset)),
+                  ContentTypes.PdfContentType,
+                  ContentTypes.PdfContentType,
+                  ContentTypes.TiffContentType,
+                  ContentTypes.TiffContentType
+                )
+            )
+            val tiffAttachments = attachments.filter(_.contentType == ContentTypes.TiffContentType)
+            assert(tiffAttachments.map(_.filename) == List("confirmation.tiff", "agreement.tiff"))
+            // Real TIFF content (little- or big-endian header), and different for each template
+            val tiffHeaders = tiffAttachments.map(attachmentBytes).map(_.take(4).toList)
+            assert(tiffHeaders.forall(h => h == List[Byte](0x49, 0x49, 0x2a, 0x00) || h == List[Byte](0x4d, 0x4d, 0x00, 0x2a)))
+            assert(! (attachmentBytes(tiffAttachments(0)) sameElements attachmentBytes(tiffAttachments(1))))
+          }
         }
       }
     }

@@ -79,6 +79,10 @@
 
     <property as="xs:string" name="oxf.fr.email.pdf.filename.issue.7854" value="concat(fr:pdf-template-name(), '.pdf')"/>
 
+    <!-- #7891: TIFF attachments (reuse form introduced for #7854 tests, i.e. multiple PDF templates) -->
+    <property as="xs:boolean" name="oxf.fr.email.attach-tiff.issue.7854"   value="true"/>
+    <property as="xs:string"  name="oxf.fr.email.tiff.filename.issue.7854" value="concat(fr:pdf-template-name(), '.tiff')"/>
+
     <property as="xs:string" name="oxf.fb.email.custom-headers.issue.6848" value="X-Custom-1st X-Custom-2nd"/>
 
     <!-- Custom property provider for `PropertiesTest` -->

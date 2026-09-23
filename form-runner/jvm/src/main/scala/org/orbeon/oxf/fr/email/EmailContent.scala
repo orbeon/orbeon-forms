@@ -20,8 +20,7 @@ import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.email.EmailMetadata.{HeaderName, TemplateMatch}
-import org.orbeon.oxf.fr.process.FormRunnerRenderedFormat.{PrintRequest, RenderedFormatRequest}
-import org.orbeon.oxf.fr.process.RenderedFormat
+import org.orbeon.oxf.fr.process.FormRunnerRenderedFormat.RenderedFormatRequest
 import org.orbeon.oxf.fr.s3.S3Config
 import org.orbeon.oxf.processor.XPLConstants.OXF_PROCESSORS_NAMESPACE
 import org.orbeon.oxf.properties.Properties
@@ -76,11 +75,7 @@ object EmailContent {
 
     val attachments =
       Attachment.xmlAttachment(formDataMaybeMigrated, template).toList ++
-      renderedFormatUris.collect {
-        // TODO: support other formats as well
-        case (PrintRequest(RenderedFormat.Pdf, pdfRendering), uri) =>
-          Attachment.pdfAttachment(uri, pdfRendering.pdfTemplateOpt, template)
-      }.flatten ++
+      renderedFormatUris.flatMap { case (request, uri) => Attachment.renderedFormatAttachment(request, uri, template) } ++
       Attachment.fileAttachments(template)
 
     implicit val xfc: XFormsFunction.Context = FormRunner.functionContextForFormRunnerContainingDocument(xfcd)

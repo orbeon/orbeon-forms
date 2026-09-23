@@ -1087,7 +1087,9 @@ class RestApiTest
           assert(readControlTextRows().isEmpty)
 
           // `PUT` some new form data
-          HttpAssert.put(doc1URL, Specific(1), data1, StatusCode.Gone)
+          // In PE, encryptDataIfNecessary is implemented and tries to access the form definition, which causes
+          // StatusCode.Gone. In CE, encryptDataIfNecessary is not implemented, so StatusCode.NoContent is returned.
+          HttpAssert.put(doc1URL, Specific(1), data1, if (Version.isPE) StatusCode.Gone else StatusCode.NoContent)
 
           // Check with SQL that the `orbeon_i_control_text` remains empty (because the form definition was deleted)
           assert(countControlText() == 0)

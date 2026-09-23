@@ -1,5 +1,6 @@
 package org.orbeon.xforms
 
+import org.orbeon.facades.WeakMap
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom
@@ -8,7 +9,7 @@ import org.scalajs.dom.html
 import scala.collection.mutable
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global as g, newInstance as newJsInstance}
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel, JSGlobal}
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 
 @JSExportTopLevel("OrbeonXFormsXbl")
@@ -142,15 +143,6 @@ object XFormsXbl {
 
   def isFocusable(control: html.Element): Boolean =
     isComponent(control) && control.hasClass("xbl-focusable")
-
-  @js.native
-  @JSGlobal("WeakMap")
-  class WeakMap[K <: js.Object, V] extends js.Object {
-    def delete(key: K): Boolean = js.native
-    def get(key: K): js.UndefOr[V] = js.native
-    def has(key: K): Boolean = js.native
-    def set(key: K, value: V): this.type = js.native
-  }
 
   private val elementData: WeakMap[html.Element, js.Dictionary[js.Any]] =
     new WeakMap()

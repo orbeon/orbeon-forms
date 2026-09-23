@@ -16,3 +16,12 @@ class TextDecoder extends js.Object {
 class TextEncoder extends js.Object {
   def encode(value: String): Uint8Array = js.native
 }
+
+@js.native
+@JSGlobal("WeakMap")
+class WeakMap[K <: js.Object, V] extends js.Object {
+  def delete(key: K): Boolean = js.native
+  def get(key: K): js.UndefOr[V] = js.native
+  def has(key: K): Boolean = js.native
+  def set(key: K, value: V): this.type = js.native
+}

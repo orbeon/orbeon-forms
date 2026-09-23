@@ -45,7 +45,7 @@ object FormRunnerAPI extends FormRunnerEmbeddingAPI {
   // - an `html.Element` is passed and the form is not found
   // - no `html.Element` is passed and no default form is found
   def getForm(elemOrNamespacedId: js.UndefOr[html.Element | String]): FormRunnerForm =
-    Page.findXFormsForm(elemOrNamespacedId).map(new FormRunnerForm(_)).orNull
+    Page.findXFormsForm(elemOrNamespacedId).map(FormRunnerForm(_)).orNull
 
   val wizard      : FormRunnerWizardAPI.type       = FormRunnerWizardAPI
   val errorSummary: FormRunnerErrorSummaryAPI.type = FormRunnerErrorSummaryAPI

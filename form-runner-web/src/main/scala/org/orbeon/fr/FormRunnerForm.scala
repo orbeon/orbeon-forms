@@ -1,5 +1,6 @@
 package org.orbeon.fr
 
+import org.orbeon.facades.WeakMap
 import org.orbeon.fr.FormRunnerPrivateAPI.logger
 import org.orbeon.oxf.fr.{ControlOps, Names}
 import org.orbeon.web.DomSupport.*
@@ -18,6 +19,18 @@ import scala.scalajs.js
 import scala.scalajs.js.JSConverters.{JSRichFutureNonThenable, JSRichIterableOnce, JSRichOption}
 import scala.scalajs.js.|
 
+
+object FormRunnerForm {
+
+  private val formRunnerForms = new WeakMap[xforms.Form, FormRunnerForm]()
+
+  def apply(form: xforms.Form): FormRunnerForm =
+    formRunnerForms.get(form).getOrElse {
+      val formRunnerForm = new FormRunnerForm(form)
+      formRunnerForms.set(form, formRunnerForm)
+      formRunnerForm
+    }
+}
 
 // Form Runner-specific facade as we don't want to expose internal `xforms.Form` members
 class FormRunnerForm(private val form: xforms.Form) extends js.Object {

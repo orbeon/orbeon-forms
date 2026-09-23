@@ -30,8 +30,9 @@ import shapeless.syntax.typeable.*
 // good to reduce code duplication. But where to put the common code?
 
 class Property extends DefaultFunctionSupport with RuntimeDependentFunction with AddToPathMap { // when properties reload, we now recompute all values
-  override def evaluateItem(xpathContext: XPathContext): AtomicValue =
+  override def evaluateItem(xpathContext: XPathContext): AtomicValue = {
     Property.property(stringArgument(0)(xpathContext)).orNull
+  }
 }
 
 object Property {

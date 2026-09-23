@@ -49,7 +49,7 @@ trait CoreCrossPlatformSupportTrait {
 
 object ExternalContextSupport {
 
-  protected val externalContextDyn  = new DynamicVariable[ExternalContext](initial = None, isInheritable = false)
+  protected val externalContextDyn = new DynamicVariable[ExternalContext](initial = None, isInheritable = false)
 
   def externalContext: ExternalContext =
     externalContextOpt.orNull //.getOrElse(throw new IllegalStateException("missing ExternalContext"))

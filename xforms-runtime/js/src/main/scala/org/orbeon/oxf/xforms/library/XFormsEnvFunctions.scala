@@ -83,11 +83,11 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
       case ("", VersionProperty) =>
         StringValue.makeStringValue(Version).some
       case ("", ConformanceLevelProperty) =>
-        StringValue.makeStringValue(ConformanceLevel) .some
+        StringValue.makeStringValue(ConformanceLevel).some
       case (Namespaces.XXF, local) =>
         // Property in the `xxf` namespace: return our properties
-        Option(xfc.containingDocument.getProperty(local)) map
-          (v => SaxonUtils.convertJavaObjectToSaxonObject(v).asInstanceOf[om.Item])
+        Option(xfc.containingDocument.getProperty(local))
+          .map(v => SaxonUtils.convertJavaObjectToSaxonObject(v).asInstanceOf[om.Item])
       case (_, _) =>
         throw new XPathException(s"Unknown property: property('$propertyName')")
     }

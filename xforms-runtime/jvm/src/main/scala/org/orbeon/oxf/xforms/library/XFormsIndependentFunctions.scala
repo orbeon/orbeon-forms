@@ -17,6 +17,5 @@ trait XFormsIndependentFunctions extends OrbeonFunctionLibrary {
       Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE)
     )
-
   }
 }

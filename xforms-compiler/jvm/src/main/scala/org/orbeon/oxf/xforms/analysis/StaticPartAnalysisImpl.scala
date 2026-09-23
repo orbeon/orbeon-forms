@@ -78,7 +78,7 @@ trait PartAnalysisContextMutable extends TransientState {
 
 trait PartAnalysisForXblSupport
   extends PartAnalysisContextImmutable
-     with PartAnalysisForStaticMetadataAndProperties{
+     with PartAnalysisForStaticMetadataAndProperties {
 
   def xblSupport: Option[XBLSupport]
   def functionLibrary: FunctionLibrary

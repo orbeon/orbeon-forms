@@ -243,5 +243,5 @@ object XFormsProperties {
   )
 
   val SupportedDocumentProperties: Map[String, PropertyDefinition[? >: String & Boolean & Int]] =
-    SupportedDocumentPropertiesDefaults map (p => p.name -> p) toMap
+    SupportedDocumentPropertiesDefaults.map(p => p.name -> p).toMap
 }

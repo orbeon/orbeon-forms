@@ -24,7 +24,7 @@ object XXFormsFunctionLibrary
   def property(propertyName: String)(implicit xfc: XFormsFunction.Context): Option[AtomicValue] = {
 
     def fromContainingDocumentProperties =
-      propertyName.startsWith(XFormsPropertyPrefix) option {
+      propertyName.startsWith(XFormsPropertyPrefix).option {
         val shortName = propertyName.substringAfter(XFormsPropertyPrefix)
         SaxonUtils.convertJavaObjectToSaxonObject(xfc.containingDocument.getProperty(shortName)).asInstanceOf[AtomicValue]
       }

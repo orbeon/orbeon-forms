@@ -15,9 +15,10 @@ object ComponentParamSupport {
   val XblLocalName: String = XFormsNames.XBL_XBL_QNAME.localName
 
   def componentParamValue(
-    paramName : QName,
-    property  : String => Option[AtomicValue])(implicit
-    xfc       : XFormsFunction.Context
+    paramName: QName,
+    property : String => Option[AtomicValue]
+  )(implicit
+    xfc      : XFormsFunction.Context
   ): Option[AtomicValue] = {
     findSourceComponent(None) flatMap { sourceComponent =>
 

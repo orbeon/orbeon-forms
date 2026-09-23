@@ -308,7 +308,7 @@ object XFormsAssetServerRoute extends NativeRoute {
 
     val response = externalContext.getResponse
 
-    val resources = {
+    val resources =
       // New hash-based mechanism
       XFormsStores.resourcesStore.get(hash) match {
         case Some(value: Array[String]) =>
@@ -319,7 +319,6 @@ object XFormsAssetServerRoute extends NativeRoute {
           response.setStatus(StatusCode.NotFound)
           return
       }
-    }
 
     val isMinimal = false
 

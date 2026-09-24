@@ -47,7 +47,7 @@ public class XMLConverter extends TextConverterBase {
             throw new OXFException("System doctype is required if a public doctype is present");
 
         TransformerUtils.applyOutputProperties(identity.getTransformer(),
-                config.method != null ? config.method : ProcessorSupport.qNameToExplodedQName(getPropertySet().getQName(DEFAULT_METHOD_PROPERTY_NAME, DEFAULT_METHOD)),
+                config.method != null ? config.method : ProcessorSupport.qNameToExplodedQName(getPropertySet().getQName(DEFAULT_METHOD_PROPERTY_NAME, DEFAULT_METHOD, scala.Option.apply(null))),
                 config.version != null ? config.version : DEFAULT_VERSION,
                 config.publicDoctype != null ? config.publicDoctype : null,
                 config.systemDoctype != null ? config.systemDoctype : null,

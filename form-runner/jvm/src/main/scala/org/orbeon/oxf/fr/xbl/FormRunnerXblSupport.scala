@@ -44,7 +44,7 @@ object FormRunnerXblSupport extends XBLSupport {
         partAnalysis  = partAnalysisCtx,
         directNameOpt = directNameOpt,
         paramName     = paramName,
-        property      = Property.property
+        property      = Property.property(_, None) // TODO: can we/should we pass `profileOpt`?
       ) map
         (_.getStringValue)
 

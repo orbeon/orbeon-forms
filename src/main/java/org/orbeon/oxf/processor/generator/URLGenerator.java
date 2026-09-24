@@ -438,17 +438,17 @@ public class URLGenerator extends ProcessorImpl {
                             }
 
                             // Validation setting: local, then properties, then hard-coded default
-                            final boolean defaultValidating = getPropertySet().getBoolean(VALIDATING_PROPERTY, DEFAULT_VALIDATING);
+                            final boolean defaultValidating = getPropertySet().getBoolean(VALIDATING_PROPERTY, DEFAULT_VALIDATING, scala.Option.apply(null));
                             final boolean validating = ProcessorUtils.selectBooleanValue(configElement, "/config/validating", defaultValidating);
 
                             // XInclude handling
-                            final boolean defaultHandleXInclude = getPropertySet().getBoolean(HANDLE_XINCLUDE_PROPERTY, DEFAULT_HANDLE_XINCLUDE);
+                            final boolean defaultHandleXInclude = getPropertySet().getBoolean(HANDLE_XINCLUDE_PROPERTY, DEFAULT_HANDLE_XINCLUDE, scala.Option.apply(null));
                             final boolean handleXInclude = ProcessorUtils.selectBooleanValue(configElement, "/config/handle-xinclude", defaultHandleXInclude);
 
                             // External entities
                             final boolean externalEntities = ProcessorUtils.selectBooleanValue(configElement, "/config/external-entities", DEFAULT_EXTERNAL_ENTITIES);
 
-                            final boolean defaultHandleLexical = getPropertySet().getBoolean(HANDLE_LEXICAL_PROPERTY, DEFAULT_HANDLE_LEXICAL);
+                            final boolean defaultHandleLexical = getPropertySet().getBoolean(HANDLE_LEXICAL_PROPERTY, DEFAULT_HANDLE_LEXICAL, scala.Option.apply(null));
                             final boolean handleLexical = ProcessorUtils.selectBooleanValue(configElement, "/config/handle-lexical", defaultHandleLexical);
 
                             // Output mode

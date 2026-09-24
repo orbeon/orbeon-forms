@@ -481,6 +481,20 @@
         <automatic-hints>
             <label>Użyj automatycznych podpowiedzi</label>
         </automatic-hints>
+        <property-profile>
+            <label>Profil</label>
+            <hint>Ustaw profil dla tego formularza</hint>
+            <help>
+                &lt;p&gt;
+                    Profile właściwości umożliwiają grupowanie, udostępnianie i ponowne wykorzystywanie właściwości konfiguracyjnych w wielu formularzach.
+                    Wybranie profilu stosuje powiązane z nim właściwości do tego formularza.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Więcej informacji znajdziesz w &lt;a target="_blank" href="https://doc.orbeon.com/configuration/properties/property-profiles"&gt;Profilach właściwości&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+            <none>(Brak)</none>
+        </property-profile>
         <appearances>
             <item id="0">Użyj właściwości</item>
             <item id="1">W wierszu</item>

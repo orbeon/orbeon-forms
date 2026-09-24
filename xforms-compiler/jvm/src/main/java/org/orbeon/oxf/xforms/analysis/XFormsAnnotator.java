@@ -441,7 +441,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                     final PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet();
                     final String frURI = "http://orbeon.org/oxf/xml/form-runner";
                     final String inspectorLocal = "xforms-inspector";
-                    if (metadata.isTopLevelPart() && propertySet.getBoolean("oxf.epilogue.xforms.inspector", false) && ! metadata.isByNameBindingInUse(frURI, inspectorLocal)) {
+                    if (metadata.isTopLevelPart() && propertySet.getBoolean("oxf.epilogue.xforms.inspector", false, scala.Option.apply(null)) && ! metadata.isByNameBindingInUse(frURI, inspectorLocal)) {
 
                         // Register the fr:xforms-inspector binding
                         reusableAttributes.clear();

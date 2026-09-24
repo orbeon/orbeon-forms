@@ -11,14 +11,15 @@ abstract class XFormsStaticStateStaticPropertiesImpl(
   globalMaxSizePerFileProperty: Int
 ) extends XFormsStaticStateStaticProperties {
 
-  val isClientStateHandling   : Boolean     = staticStringProperty(P.StateHandlingProperty) == P.StateHandlingClientValue
-  val isServerStateHandling   : Boolean     = staticStringProperty(P.StateHandlingProperty) == P.StateHandlingServerValue
-  val isXPathAnalysis         : Boolean     = isPEFeatureEnabled(staticBooleanProperty(P.XpathAnalysisProperty),     P.XpathAnalysisProperty)
-  val isCalculateDependencies : Boolean     = isPEFeatureEnabled(staticBooleanProperty(P.CalculateAnalysisProperty), P.CalculateAnalysisProperty)
-  val singleUseStaticState    : Boolean     = staticBooleanProperty(P.SingleUseStaticState)
-  val allowErrorRecoveryOnInit: Boolean     = staticBooleanProperty(P.AllowErrorRecoveryOnInit)
-  val isInlineResources       : Boolean     = staticBooleanProperty(P.InlineResourcesProperty)
-  val allowedExternalEvents   : Set[String] = staticStringProperty(P.ExternalEventsProperty).tokenizeToSet
+  val isClientStateHandling   : Boolean        = staticStringProperty(P.StateHandlingProperty) == P.StateHandlingClientValue
+  val isServerStateHandling   : Boolean        = staticStringProperty(P.StateHandlingProperty) == P.StateHandlingServerValue
+  val isXPathAnalysis         : Boolean        = isPEFeatureEnabled(staticBooleanProperty(P.XpathAnalysisProperty),     P.XpathAnalysisProperty)
+  val isCalculateDependencies : Boolean        = isPEFeatureEnabled(staticBooleanProperty(P.CalculateAnalysisProperty), P.CalculateAnalysisProperty)
+  val singleUseStaticState    : Boolean        = staticBooleanProperty(P.SingleUseStaticState)
+  val allowErrorRecoveryOnInit: Boolean        = staticBooleanProperty(P.AllowErrorRecoveryOnInit)
+  val isInlineResources       : Boolean        = staticBooleanProperty(P.InlineResourcesProperty)
+  val allowedExternalEvents   : Set[String]    = staticStringProperty(P.ExternalEventsProperty).tokenizeToSet
+  val propertyProfileOpt      : Option[String] = staticStringProperty(P.PropertyProfileProperty).trimAllToOpt
 
   val uploadMaxSizePerFile: MaximumSize =
     (staticStringProperty(UploadMaxSizeProperty       ).trimAllToOpt orElse // For backward compatibility

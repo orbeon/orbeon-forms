@@ -10,6 +10,7 @@ trait PropertyDefinition {
   def getType      : String                 // `string | integer | boolean | nmtokens | anyURI`
   def getNamespaces: ju.Map[String, String] // immutable
   def getCategory  : ju.Optional[String]    // EQName
+  def getProfiles  : ju.Collection[String]
 }
 
 trait PropertyDefinitionsWithETag {

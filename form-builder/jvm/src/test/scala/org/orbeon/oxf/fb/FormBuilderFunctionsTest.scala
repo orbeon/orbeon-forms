@@ -1033,4 +1033,11 @@ class FormBuilderFunctionsTest
       }
     }
   }
+
+  describe("Property profiles") {
+    it("must return available property profiles as sorted list") {
+      val profiles = FormBuilderXPathApi.propertyProfiles
+      assert(profiles == profiles.sorted)
+    }
+  }
 }

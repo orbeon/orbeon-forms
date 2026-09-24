@@ -34,8 +34,11 @@ class CombinedMap[K, V](
 
 class CombinedPropertyNode(n1: PropertyNodeT, n2: PropertyNodeT) extends PropertyNodeT {
 
-  def property: Option[Property] =
-    n2.property.orElse(n1.property)
+  def defaultProperty: Option[Property] =
+    n2.defaultProperty.orElse(n1.defaultProperty)
+
+  def profileProperty(profile: String): Option[Property] =
+    n2.profileProperty(profile).orElse(n1.profileProperty(profile))
 
   def hasChildren: Boolean =
     n2.hasChildren || n1.hasChildren
@@ -64,6 +67,14 @@ class CombinedPropertySet(ps1: PropertySet, ps2: PropertySet) extends PropertySe
 
   protected[orbeon] val propertiesTree: PropertySet.PropertyNodeT =
     new CombinedPropertyNode(ps1.propertiesTree, ps2.propertiesTree)
+
+  def allProperties: Iterable[Property] = {
+    val ps2Keys = ps2.allProperties.map(p => (p.name, p.profiles.toSet)).toSet
+    ps1.allProperties.filterNot(p => ps2Keys.contains((p.name, p.profiles.toSet))) ++ ps2.allProperties
+  }
+
+  def allProfiles: Set[String] =
+    ps1.allProfiles ++ ps2.allProfiles
 
   // Used for https://github.com/orbeon/orbeon-forms/issues/6980, needs to increase when properties change
   val eTag: ETag = s"${ps1.eTag}:${ps2.eTag}"

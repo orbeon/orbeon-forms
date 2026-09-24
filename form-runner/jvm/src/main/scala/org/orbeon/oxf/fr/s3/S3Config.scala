@@ -41,17 +41,11 @@ object S3Config {
     def propertyName(valueName: String): String =
       s"$PropertyPrefix$configName.$valueName"
 
-    def valueFromProperties(valueName: String): Option[String] = {
-
-      val propertyNameForValue = propertyName(valueName)
-
-      CoreCrossPlatformSupport.properties.getPropertyOpt(propertyNameForValue) map { property =>
-        property.value match {
-          case s: String => evaluateAsAvt(s, NamespaceMapping(property.namespaces))
-          case _         => throw new Exception(s"String value expected for property $propertyNameForValue")
-        }
-      }
-    }
+    def valueFromProperties(valueName: String): Option[String] =
+      CoreCrossPlatformSupport
+        .properties
+        .getPropertyOpt(propertyName(valueName), profileOpt = None) // TODO: profile not supported yet
+        .map(property => evaluateAsAvt(property.stringValue, NamespaceMapping(property.namespaces)))
 
     config(
       valueFromName     = valueFromProperties,

@@ -599,17 +599,17 @@ public class RequestGenerator extends ProcessorImpl {
     // TODO: Should be a `long`.
     public static int getMaxSizeProperty() {
         PropertySet propertySet = Properties.instance().getPropertySet(XPLConstants.REQUEST_PROCESSOR_QNAME());
-        return propertySet.getInteger(RequestGenerator.MAX_UPLOAD_SIZE_PROPERTY, RequestGenerator.DEFAULT_MAX_UPLOAD_SIZE);
+        return propertySet.getInteger(RequestGenerator.MAX_UPLOAD_SIZE_PROPERTY, RequestGenerator.DEFAULT_MAX_UPLOAD_SIZE, scala.Option.apply(null));
     }
 
     public static int getMaxFilesProperty() {
         PropertySet propertySet = Properties.instance().getPropertySet(XPLConstants.REQUEST_PROCESSOR_QNAME());
-        return propertySet.getInteger(RequestGenerator.MAX_UPLOAD_FILES_PROPERTY, RequestGenerator.DEFAULT_MAX_UPLOAD_FILES);
+        return propertySet.getInteger(RequestGenerator.MAX_UPLOAD_FILES_PROPERTY, RequestGenerator.DEFAULT_MAX_UPLOAD_FILES, scala.Option.apply(null));
     }
 
     public static int getMaxMemorySizeProperty() {
         PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet(XPLConstants.REQUEST_PROCESSOR_QNAME());
-        return propertySet.getInteger(RequestGenerator.MAX_UPLOAD_MEMORY_SIZE_PROPERTY, RequestGenerator.DEFAULT_MAX_UPLOAD_MEMORY_SIZE);
+        return propertySet.getInteger(RequestGenerator.MAX_UPLOAD_MEMORY_SIZE_PROPERTY, RequestGenerator.DEFAULT_MAX_UPLOAD_MEMORY_SIZE, scala.Option.apply(null));
     }
 
     public static scala.Option<String> getRequestBody(PipelineContext pipelineContext) {

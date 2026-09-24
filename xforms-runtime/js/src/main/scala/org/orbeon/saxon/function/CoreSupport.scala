@@ -7,20 +7,21 @@ import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.value.AtomicValue
 import shapeless.syntax.typeable.*
 
-
 object CoreSupport {
 
-  def property(propertyName: String): Option[AtomicValue] =
+  // Also in `object Property` in `core`
+  def property(propertyName: String, profileOpt: Option[String]): Option[AtomicValue] =
     if (PropertySet.isSensitivePropertyName(propertyName))
       None
-    else {
-      CoreCrossPlatformSupport.properties.getObjectOpt(propertyName) map
-      SaxonUtils.convertJavaObjectToSaxonObject                      flatMap
-      (_.cast[AtomicValue])
-    }
+    else
+      CoreCrossPlatformSupport
+        .properties
+        .getObjectOpt(propertyName, profileOpt)
+        .map(SaxonUtils.convertJavaObjectToSaxonObject)
+        .flatMap(_.cast[AtomicValue])
 
-  def propertyAsString(propertyName: String): Option[String] =
-    property(propertyName) map (_.getStringValue)
+  def propertyAsString(propertyName: String, profileOpt: Option[String]): Option[String] =
+    property(propertyName, profileOpt).map(_.getStringValue)
 
   def propertiesStartsWith(propertyName: String): List[AtomicValue] =
     for {

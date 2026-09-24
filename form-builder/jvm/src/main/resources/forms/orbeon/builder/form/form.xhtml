@@ -766,6 +766,13 @@
                         origin="xf:attribute('xxf:hint.appearance', event('hints'))"/>
 
                     <xf:delete
+                        bind="property-profile-bind"/>
+                    <xf:insert
+                        if="xxf:non-blank(event('property-profile'))"
+                        context="bind('fb-form-model-bind')"
+                        origin="xf:attribute('xxf:property-profile', xxf:trim(event('property-profile')))"/>
+
+                    <xf:delete
                         bind="automatic-hints-bind"/>
                     <xf:insert
                         if="event('automatic-hints') = ('true', 'false')"

@@ -469,6 +469,20 @@
         <automatic-hints>
             <label>Usa suggerimenti automatici</label>
         </automatic-hints>
+        <property-profile>
+            <label>Profilo</label>
+            <hint>Imposta il profilo per questo modulo</hint>
+            <help>
+                &lt;p&gt;
+                    I profili di proprietà consentono di raggruppare, condividere e riutilizzare le proprietà di configurazione su più moduli.
+                    La selezione di un profilo applica le relative proprietà a questo modulo.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Per saperne di più, vedi &lt;a target="_blank" href="https://doc.orbeon.com/configuration/properties/property-profiles"&gt;Profili di proprietà&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+            <none>(Nessuno)</none>
+        </property-profile>
         <appearances>
             <item id="0">Usa proprietà</item>
             <item id="1">Inline</item>

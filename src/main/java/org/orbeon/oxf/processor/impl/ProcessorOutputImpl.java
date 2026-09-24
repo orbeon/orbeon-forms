@@ -318,7 +318,7 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
         final PropertySet propertySet = Properties.instance().getPropertySet();
 
         // Create and hook-up output validation processor if needed
-        final Boolean isUserValidation = (propertySet == null) ? null : propertySet.getBoolean(ProcessorImpl.USER_VALIDATION_FLAG, true);
+        final Boolean isUserValidation = (propertySet == null) ? null : propertySet.getBoolean(ProcessorImpl.USER_VALIDATION_FLAG, true, scala.Option.apply(null));
         if (isUserValidation != null && isUserValidation.booleanValue() && getSchema() != null) {
             final Processor outputValidator = new MSVValidationProcessor(getSchema());
             // Create data input and output
@@ -349,7 +349,7 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
         }
 
         // Perform basic inspection of SAX events
-        Boolean isSAXInspection = (propertySet == null) ? null : propertySet.getBoolean(ProcessorImpl.SAX_INSPECTION_FLAG, false);
+        Boolean isSAXInspection = (propertySet == null) ? null : propertySet.getBoolean(ProcessorImpl.SAX_INSPECTION_FLAG, false, scala.Option.apply(null));
         if (isSAXInspection != null && isSAXInspection.booleanValue()) {
             final RuntimeOutputFilter previousOutputFilter = outputFilter;
             outputFilter = new RuntimeOutputFilter() {

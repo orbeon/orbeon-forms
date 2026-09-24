@@ -473,6 +473,20 @@
         <automatic-hints>
             <label>Automatische Hinweise verwenden</label>
         </automatic-hints>
+        <property-profile>
+            <label>Profil</label>
+            <hint>Das Profil für dieses Formular festlegen</hint>
+            <help>
+                &lt;p&gt;
+                    Eigenschaftsprofile ermöglichen das Gruppieren, Teilen und Wiederverwenden von Konfigurationseigenschaften über mehrere Formulare hinweg.
+                    Durch die Auswahl eines Profils werden die zugehörigen Eigenschaften auf dieses Formular angewendet.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Weitere Informationen finden Sie unter &lt;a target="_blank" href="https://doc.orbeon.com/configuration/properties/property-profiles"&gt;Eigenschaftsprofile&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+            <none>(Kein)</none>
+        </property-profile>
         <appearances>
             <item id="0">Standard-Einstellung</item>
             <item id="1">Inline</item>

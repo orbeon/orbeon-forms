@@ -483,15 +483,15 @@ private object FormRunnerFunctions {
   //
   class FRComponentParam extends FunctionSupport with RuntimeDependentFunction {
 
-    override def evaluateItem(context: XPathContext): AtomicValue = {
+    override def evaluateItem(xPathContext: XPathContext): AtomicValue = {
 
-      implicit val xpc = context
-      implicit val xfc = XFormsFunction.context
+      implicit val xpc: XPathContext           = xPathContext
+      implicit val xfc: XFormsFunction.Context = XFormsFunction.context
 
       FRComponentParamSupport.componentParamValue(
         paramName            = QName(stringArgument(0)),
         sourceComponentIdOpt = stringArgumentOpt(1),
-        property             = Property.property
+        property             = Property.property(_, xfc.containingDocument.staticState.propertyProfileOpt)
       ).orNull
     }
 
@@ -536,15 +536,15 @@ private object FormRunnerFunctions {
 
   class FRComponentParamByType extends FunctionSupport with RuntimeDependentFunction {
 
-    override def evaluateItem(context: XPathContext): AtomicValue = {
+    override def evaluateItem(xPathContext: XPathContext): AtomicValue = {
 
-      implicit val xpc = context
-      implicit val xfc = XFormsFunction.context
+      implicit val xpc: XPathContext           = xPathContext
+      implicit val xfc: XFormsFunction.Context = XFormsFunction.context
 
       FRComponentParamSupport.componentParamValueByType(
         paramName  = qNameArgument(0),
         directName = qNameArgument(1),
-        property   = Property.property
+        property   = Property.property(_, xfc.containingDocument.staticState.propertyProfileOpt)
       ).orNull
     }
   }

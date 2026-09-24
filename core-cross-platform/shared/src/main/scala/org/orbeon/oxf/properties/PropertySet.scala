@@ -36,7 +36,13 @@ import scala.util.control.NonFatal
 import scala.jdk.CollectionConverters.*
 
 
-case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String], name: String) {
+case class Property(
+  typ       : QName,
+  value     : AnyRef,
+  namespaces: Map[String, String],
+  name      : String,
+  profiles  : List[String] = Nil
+) {
 
   private var _associatedValue: Option[Any] = None
 
@@ -73,19 +79,29 @@ object PropertySet {
     SensitiveWords.exists(word => propertyName.toLowerCase.contains(word))
 
   trait PropertyNodeT {
-    def property: Option[Property]
+    def defaultProperty: Option[Property]
+    def profileProperty(profile: String): Option[Property]
+    def property: Option[Property] = defaultProperty
+    def property(profileOpt: Option[String]): Option[Property] =
+      profileOpt match {
+        case Some(profile) => profileProperty(profile).orElse(defaultProperty)
+        case None          => defaultProperty
+      }
     def hasChildren: Boolean
     def get(k: String): Option[PropertyNodeT]
     def iterable: Iterable[(String, PropertyNodeT)] // xxx or iterator? iterate?; for propertiesMatching/propertiesStartsWith
   }
 
   case class MutablePropertyNode(
-    var property: Option[Property] = None,
-    children    : mutable.Map[String, MutablePropertyNode] = mutable.LinkedHashMap[String, MutablePropertyNode]()
+    var defaultProperty  : Option[Property] = None,
+    val profileProperties: mutable.Map[String, Property] = mutable.LinkedHashMap[String, Property](),
+    children             : mutable.Map[String, MutablePropertyNode] = mutable.LinkedHashMap[String, MutablePropertyNode]()
   ) extends PropertyNodeT {
       def hasChildren: Boolean = children.nonEmpty
       def get(k: String): Option[PropertyNodeT] = children.get(k)
       def iterable: Iterable[(String, PropertyNodeT)] = children.view
+
+      def profileProperty(profile: String): Option[Property] = profileProperties.get(profile)
     }
 
   private[properties] val SomeXsStringQname   = XMLConstants.XS_STRING_QNAME.some
@@ -98,22 +114,32 @@ object PropertySet {
 
   val empty: PropertySet = apply(Nil, "")
 
-  case class PropertyParams(namespaces: Map[String, String], name: String, typeQName: QName, stringValue: String)
+  case class PropertyParams(
+    namespaces : Map[String, String],
+    name       : String,
+    typeQName  : QName,
+    stringValue: String,
+    profiles   : List[String] = Nil // default param because there are many calls in tests
+  )
 
   def forTests(globalProperties: Iterable[PropertyParams]): PropertySet =
     apply(globalProperties, eTag = "") // prefer to keep a non-default parameter and use a special method for tests
 
   def apply(globalProperties: Iterable[PropertyParams], eTag: api.ETag): PropertySet = {
 
-    var propertiesByName = Map[String, Property]()
-    val propertiesTree   = MutablePropertyNode()
+    val allPropertiesBuffer = mutable.ListBuffer[Property]()
+    var propertiesByName    = Map[String, Property]()
+    val propertiesTree      = MutablePropertyNode()
 
-    def setProperty(namespaces: Map[String, String], name: String, typeQName: QName, value: AnyRef): Unit = {
+    def setProperty(namespaces: Map[String, String], name: String, typeQName: QName, value: AnyRef, profiles: List[String]): Unit = {
 
-      val property = Property(typeQName, value, if (namespaces eq null) Map.empty else namespaces, name)
+      val property = Property(typeQName, value, if (namespaces eq null) Map.empty else namespaces, name, profiles)
+
+      allPropertiesBuffer += property
 
       // Store exact property name anyway
-      propertiesByName += name -> property
+      if (profiles.isEmpty || ! propertiesByName.contains(name))
+        propertiesByName += name -> property
 
       // Also store in tree (in all cases, not only when contains wildcard, so we get find all the properties
       // that start with some token)
@@ -122,14 +148,21 @@ object PropertySet {
         currentNode = currentNode.children.getOrElseUpdate(currentToken, MutablePropertyNode())
 
       // Store value
-      currentNode.property = property.some
+      if (profiles.isEmpty)
+        currentNode.defaultProperty = property.some
+      else
+        for (profile <- profiles)
+          currentNode.profileProperties += (profile -> property)
     }
 
-    globalProperties.foreach { case PropertyParams(namespaces, name, typ, stringValue) =>
-      setProperty(namespaces, name, typ, getObjectFromStringValue(name, stringValue, typ, namespaces))
+    globalProperties.foreach { case PropertyParams(namespaces, name, typ, stringValue, profiles) =>
+      setProperty(namespaces, name, typ, getObjectFromStringValue(name, stringValue, typ, namespaces), profiles)
     }
 
-    new PropertySetImpl(propertiesByName, propertiesTree, eTag)
+    val allProperties = allPropertiesBuffer.toList
+    val allProfiles   = allProperties.flatMap(_.profiles).toSet
+
+    new PropertySetImpl(allProperties, propertiesByName, propertiesTree, allProfiles, eTag)
   }
 
   def isSupportedType(typeQName: QName): Boolean =
@@ -205,18 +238,24 @@ object PropertySet {
 }
 
 class PropertySetImpl private[properties] (
+  val allProperties                     : Iterable[Property],
   protected[orbeon] val propertiesByName: collection.Map[String, Property],
   protected[orbeon] val propertiesTree  : PropertyNodeT,  // this contains mutable nodes, but they don't mutate after construction
+  val allProfiles                       : Set[String],
                     val eTag            : api.ETag
 ) extends
   PropertySet
 
 trait PropertySet extends PropertySetFunctions {
-  val eTag: api.ETag
+  val eTag         : api.ETag
+  def allProperties: Iterable[Property]
+  def allProfiles  : Set[String]
 }
 
 trait PropertySetFunctions extends PropertySetGetters {
 
+  def allProperties: Iterable[Property]
+  def allProfiles  : Set[String]
   protected[orbeon] def propertiesByName: collection.Map[String, Property]
   protected[orbeon] def propertiesTree  : PropertyNodeT
 
@@ -226,7 +265,7 @@ trait PropertySetFunctions extends PropertySetGetters {
 
   // For form compilation
   def propertyParams: Iterable[PropertyParams] =
-    propertiesByName.collect { case (name, prop) if ! PropertySet.isSensitivePropertyName(name) =>
+    allProperties.collect { case prop if ! PropertySet.isSensitivePropertyName(prop.name) =>
 
       // Custom serialization to String, not ideal
       val stringValue = {
@@ -236,7 +275,7 @@ trait PropertySetFunctions extends PropertySetGetters {
         }
       }
 
-      PropertyParams(prop.namespaces, name, prop.typ, stringValue)
+      PropertyParams(prop.namespaces, prop.name, prop.typ, stringValue, prop.profiles)
     }
 
   def allPropertiesAsJson: String = {
@@ -294,7 +333,10 @@ trait PropertySetFunctions extends PropertySetGetters {
     result.toList
   }
 
-  def propertiesMatching(incomingPropertyName: String): List[Property] = {
+  def propertiesMatching(incomingPropertyName: String): List[Property] =
+    propertiesMatching(incomingPropertyName, None)
+
+  def propertiesMatching(incomingPropertyName: String, profileOpt: Option[String]): List[Property] = {
 
     val allIncomingTokens = incomingPropertyName.splitTo[List](".")
 
@@ -302,7 +344,7 @@ trait PropertySetFunctions extends PropertySetGetters {
       incomingTokens: List[String],
       currentNode   : PropertyNodeT,
     ): LazyList[(Property, Boolean)] =
-      (incomingTokens.headOption, currentNode.property, currentNode.hasChildren) match {
+      (incomingTokens.headOption, currentNode.property(profileOpt), currentNode.hasChildren) match {
         case (None, Some(property), _) =>
           // Found
 
@@ -344,7 +386,11 @@ trait PropertySetFunctions extends PropertySetGetters {
       .toList
   }
 
-  protected def getPropertyOptThrowIfTypeMismatch(name: String, typeToCheck: Option[QName]): Option[Property] = {
+  protected def getPropertyOptThrowIfTypeMismatch(
+    name       : String,
+    typeToCheck: Option[QName],
+    profileOpt : Option[String]
+  ): Option[Property] = {
 
     def wildcardSearch(
       propertyNodeOpt : Option[PropertyNodeT],
@@ -355,16 +401,13 @@ trait PropertySetFunctions extends PropertySetGetters {
         case Some(propertyNode) =>
           tokens match {
             case Nil =>
-              propertyNode.property
+              propertyNode.property(profileOpt)
             case head :: tail if propertyNode.hasChildren =>
               wildcardSearch(propertyNode.get(head), tail) orElse wildcardSearch(propertyNode.get(StarToken), tail)
             case _ =>
               None
           }
       }
-
-    def getExact: Option[Property] =
-      propertiesByName.get(name)
 
     def getWildcard: Option[Property] =
       wildcardSearch(Some(propertiesTree), name.splitTo[List]("."))
@@ -379,19 +422,26 @@ trait PropertySetFunctions extends PropertySetGetters {
           p
       }
 
-     getExact orElse getWildcard map checkType
+    getWildcard map checkType
   }
 }
 
 trait PropertySetGetters {
 
-  protected def getPropertyOptThrowIfTypeMismatch(name: String, typeToCheck: Option[QName]): Option[Property]
+  protected def getPropertyOptThrowIfTypeMismatch(
+    name       : String,
+    typeToCheck: Option[QName],
+    profileOpt : Option[String]
+  ): Option[Property]
 
-  def getPropertyOpt    (name: String): Option[Property] = getPropertyOptThrowIfTypeMismatch(name, None)
-  def getPropertyOrThrow(name: String): Property         = getPropertyOpt(name).getOrElse(throw new OXFException(s"property `$name` not found"))
+  def getPropertyOpt(name: String, profileOpt: Option[String] = None): Option[Property] =
+    getPropertyOptThrowIfTypeMismatch(name, None, profileOpt)
 
-  def getStringOrURIAsStringOpt(name: String, allowEmpty: Boolean = false): Option[String] =
-    getObjectOpt(name).flatMap {
+  def getPropertyOrThrow(name: String, profileOpt: Option[String] = None): Property =
+    getPropertyOpt(name, profileOpt).getOrElse(throw new OXFException(s"property `$name` not found"))
+
+  def getStringOrURIAsStringOpt(name: String, allowEmpty: Boolean = false, profileOpt: Option[String] = None): Option[String] =
+    getObjectOpt(name, profileOpt).flatMap {
       case p: String if allowEmpty => Some(p.trimAllToEmpty)
       case p: String               => p.trimAllToOpt
       case p: URI    if allowEmpty => Some(p.toString.trimAllToEmpty)
@@ -400,33 +450,33 @@ trait PropertySetGetters {
     }
 
   // Should be `getNonBlankString`
-  def getString             (name: String, default: String)                     : String  = getNonBlankString(name)                    .getOrElse(default)
-  def getStringOrURIAsString(name: String, default: String, allowEmpty: Boolean): String  = getStringOrURIAsStringOpt(name, allowEmpty).getOrElse(default)
-  def getInteger            (name: String, default: Int)                        : Int     = getIntOpt(name).map(_.intValue)            .getOrElse(default)
-  def getBoolean            (name: String, default: Boolean)                    : Boolean = getBooleanOpt(name)                        .getOrElse(default)
-  def getQName              (name: String, default: QName)                      : QName   = getQNameOpt(name)                          .getOrElse(default)
-  def getObject             (name: String, default: Any)                        : Any     = getObjectOpt(name)                         .getOrElse(default)
+  def getString             (name: String, default: String,                              profileOpt: Option[String] = None): String  = getNonBlankString(name, profileOpt).getOrElse(default)
+  def getStringOrURIAsString(name: String, default: String, allowEmpty: Boolean = false, profileOpt: Option[String] = None): String  = getStringOrURIAsStringOpt(name, allowEmpty, profileOpt).getOrElse(default)
+  def getInteger            (name: String, default: Int,                                 profileOpt: Option[String] = None): Int     = getIntOpt(name, profileOpt).map(_.intValue).getOrElse(default)
+  def getBoolean            (name: String, default: Boolean,                             profileOpt: Option[String] = None): Boolean = getBooleanOpt(name, profileOpt).getOrElse(default)
+  def getQName              (name: String, default: QName,                               profileOpt: Option[String] = None): QName   = getQNameOpt(name, profileOpt).getOrElse(default)
+  def getObject             (name: String, default: Any,                                 profileOpt: Option[String] = None): Any     = getObjectOpt(name, profileOpt).getOrElse(default)
 
   // Should be `getNonBlankStringOpt`
-  def getNonBlankString(name: String): Option[String]         = getPropertyValueOpt(name, SomeXsStringQname)  .flatMap(_.asInstanceOf[String].trimAllToOpt)
-  def getIntOpt        (name: String): Option[Int]            = getPropertyValueOpt(name, SomeXsIntegerQname) .map(_.asInstanceOf[jl.Integer].intValue)
-  def getBooleanOpt    (name: String): Option[Boolean]        = getPropertyValueOpt(name, SomeXsBooleanQname) .map(_.asInstanceOf[jl.Boolean].booleanValue)
-  def getNmtokensOpt   (name: String): Option[ju.Set[String]] = getPropertyValueOpt(name, SomeXsNmtokensQname).map(_.asInstanceOf[ju.Set[String]])
-  def getDateOpt       (name: String): Option[ju.Date]        = getPropertyValueOpt(name, SomeXsDateQname)    .map(_.asInstanceOf[ju.Date])
-  def getDateTimeOpt   (name: String): Option[ju.Date]        = getPropertyValueOpt(name, SomeXsDatetimeQname).map(_.asInstanceOf[ju.Date])
-  def getQNameOpt      (name: String): Option[QName]          = getPropertyValueOpt(name, SomeXsQnameQname)   .map(_.asInstanceOf[QName])
-  def getObjectOpt     (name: String): Option[AnyRef]         = getPropertyValueOpt(name, None)
+  def getNonBlankString(name: String, profileOpt: Option[String] = None): Option[String]         = getPropertyValueOpt(name, SomeXsStringQname, profileOpt).flatMap(_.asInstanceOf[String].trimAllToOpt)
+  def getIntOpt        (name: String, profileOpt: Option[String] = None): Option[Int]            = getPropertyValueOpt(name, SomeXsIntegerQname, profileOpt).map(_.asInstanceOf[jl.Integer].intValue)
+  def getBooleanOpt    (name: String, profileOpt: Option[String] = None): Option[Boolean]        = getPropertyValueOpt(name, SomeXsBooleanQname, profileOpt).map(_.asInstanceOf[jl.Boolean].booleanValue)
+  def getNmtokensOpt   (name: String, profileOpt: Option[String] = None): Option[ju.Set[String]] = getPropertyValueOpt(name, SomeXsNmtokensQname, profileOpt).map(_.asInstanceOf[ju.Set[String]])
+  def getDateOpt       (name: String, profileOpt: Option[String] = None): Option[ju.Date]        = getPropertyValueOpt(name, SomeXsDateQname, profileOpt).map(_.asInstanceOf[ju.Date])
+  def getDateTimeOpt   (name: String, profileOpt: Option[String] = None): Option[ju.Date]        = getPropertyValueOpt(name, SomeXsDatetimeQname, profileOpt).map(_.asInstanceOf[ju.Date])
+  def getQNameOpt      (name: String, profileOpt: Option[String] = None): Option[QName]          = getPropertyValueOpt(name, SomeXsQnameQname, profileOpt).map(_.asInstanceOf[QName])
+  def getObjectOpt     (name: String, profileOpt: Option[String] = None): Option[AnyRef]         = getPropertyValueOpt(name, None, profileOpt)
 
-  def getPattern(propertyName: String, default: String): Pattern =
-    getPatternOpt(propertyName)
+  def getPattern(propertyName: String, default: String, profileOpt: Option[String] = None): Pattern =
+    getPatternOpt(propertyName, profileOpt)
     .getOrElse(Pattern.compile(default))
 
-  def getPatternOpt(propertyName: String): Option[Pattern] =
-    getPropertyOpt(propertyName)
+  def getPatternOpt(propertyName: String, profileOpt: Option[String] = None): Option[Pattern] =
+    getPropertyOpt(propertyName, profileOpt)
     .flatMap(_.associatedValue(_.nonBlankStringValue.map(Pattern.compile)))
 
-  private def getPropertyValueOpt(name: String, typeToCheck: Option[QName]): Option[AnyRef] =
-    getPropertyOptThrowIfTypeMismatch(name, typeToCheck).map(_.value)
+  private def getPropertyValueOpt(name: String, typeToCheck: Option[QName], profileOpt: Option[String]): Option[AnyRef] =
+    getPropertyOptThrowIfTypeMismatch(name, typeToCheck, profileOpt).map(_.value)
 
   // 2024-03-18: 14 legacy Java callers
   def getString(name: String): String =
@@ -441,5 +491,5 @@ trait PropertySetGetters {
     getPropertyValueOrNull(name, SomeXsBooleanQname).asInstanceOf[jl.Boolean]
 
   private def getPropertyValueOrNull(name: String, typeToCheck: Option[QName]): AnyRef =
-    getPropertyValueOpt(name, typeToCheck).orNull
+    getPropertyValueOpt(name, typeToCheck, profileOpt = None).orNull
 }

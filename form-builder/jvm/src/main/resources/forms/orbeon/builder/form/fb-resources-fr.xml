@@ -479,6 +479,20 @@
         <automatic-hints>
             <label>Suggestions automatiques</label>
         </automatic-hints>
+        <property-profile>
+            <label>Profil</label>
+            <hint>Définir le profil pour ce formulaire</hint>
+            <help>
+                &lt;p&gt;
+                    Les profils de propriétés permettent de regrouper, partager et réutiliser des propriétés de configuration entre plusieurs formulaires.
+                    Sélectionner un profil applique les propriétés associées à ce formulaire.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Pour en savoir plus, voir &lt;a target="_blank" href="https://doc.orbeon.com/configuration/properties/property-profiles"&gt;Profils de propriétés&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+            <none>(Aucun)</none>
+        </property-profile>
         <appearances>
             <item id="0">Utiliser la propriété</item>
             <item id="1">En ligne</item>

@@ -102,7 +102,7 @@ object WhitespaceMatching  {
     def whitespacePolicyAssociateIfPossible[T](scope: String, evaluate: => T): T =
       propertySet.propertiesStartsWith(scope, matchWildcards = false)
         .headOption
-        .map(propertySet.getPropertyOrThrow)
+        .map(propertySet.getPropertyOrThrow(_))
         .map(_.associatedValue(_ => evaluate))
         .getOrElse(evaluate)
 

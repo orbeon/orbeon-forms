@@ -461,6 +461,20 @@
         <automatic-hints>
             <label>Bruk automatiske hint</label>
         </automatic-hints>
+        <property-profile>
+            <label>Profil</label>
+            <hint>Angi profil for dette skjemaet</hint>
+            <help>
+                &lt;p&gt;
+                    Egenskapsprofiler gjør det mulig å gruppere, dele og gjenbruke konfigurasjonsegenskaper på tvers av flere skjemaer.
+                    Å velge en profil bruker de tilknyttede egenskapene på dette skjemaet.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    For mer, se &lt;a target="_blank" href="https://doc.orbeon.com/configuration/properties/property-profiles"&gt;Egenskapsprofiler&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+            <none>(Ingen)</none>
+        </property-profile>
         <appearances>
             <item id="0">Bruk egenskap</item>
             <item id="1">I linje</item>

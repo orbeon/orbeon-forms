@@ -50,6 +50,8 @@ object XFormsProperties {
 
   val A11yFocusOnGroupsProperty                       = "a11y.focus-on-groups"
 
+  val PropertyProfileProperty                         = "property-profile"
+
   val StaticReadonlyHintProperty                      = "static-readonly-hint"
   val StaticReadonlyAlertProperty                     = "static-readonly-alert"
 
@@ -239,7 +241,9 @@ object XFormsProperties {
       PropertyDefinition(DateFormatInputProperty,                         "[M]/[D]/[Y]",               propagateToClient = true),
       PropertyDefinition(TimeFormatInputProperty,                         "[h]:[m]:[s] [P]",           propagateToClient = true),
       PropertyDefinition(ShowErrorDialogProperty,                         true,                        propagateToClient = true),
-      PropertyDefinition(LoginPageDetectionRegexpProperty,                "",                          propagateToClient = true)
+      PropertyDefinition(LoginPageDetectionRegexpProperty,                "",                          propagateToClient = true),
+
+      PropertyDefinition(PropertyProfileProperty,                         "",                          propagateToClient = false),
   )
 
   val SupportedDocumentProperties: Map[String, PropertyDefinition[? >: String & Boolean & Int]] =

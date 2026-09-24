@@ -22,6 +22,7 @@ import org.orbeon.saxon.`type`.BuiltInAtomicType.*
 import org.orbeon.saxon.`type`.Type.{ITEM_TYPE, NODE_TYPE}
 import org.orbeon.saxon.`type`.{BuiltInAtomicType, Type}
 import org.orbeon.saxon.expr.StaticProperty.*
+import org.orbeon.saxon.function.Property
 
 
 /*
@@ -33,6 +34,10 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   val XXFormsEnvFunctionsNS: Seq[String]
 
   Namespace(XXFormsEnvFunctionsNS) {
+
+    Fun("property", classOf[XXFormsProperty], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
 
     // NOTE: This is deprecated and just points to the event() function.
     Fun("event", classOf[Event], op = 0, min = 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,

@@ -13,18 +13,16 @@
  */
 package org.orbeon.saxon
 
-import org.orbeon.oxf.util.XPathCache
-import org.orbeon.oxf.xml.{DefaultFunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction}
+import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon
 import org.orbeon.saxon.`type`.BuiltInAtomicType.*
 import org.orbeon.saxon.`type`.Type.*
 import org.orbeon.saxon.`type`.{BuiltInAtomicType, Type}
 import org.orbeon.saxon.expr.StaticProperty.*
-import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.function.*
 import org.orbeon.saxon.functions.Doc
-import org.orbeon.saxon.om.SequenceIterator
 import org.orbeon.saxon.pattern.NodeKindTest
+
 
 // TODO: Separate pure functions from this
 trait IndependentFunctions extends OrbeonFunctionLibrary {
@@ -117,10 +115,6 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
     // Same as the standard `doc()`, but doesn't cause cache invalidation, see https://github.com/orbeon/orbeon-forms/issues/1239
     Fun("doc", classOf[Doc], op = 0, min = 1, NodeKindTest.DOCUMENT, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, ALLOWS_ZERO_OR_ONE)
-    )
-
-    Fun("property", classOf[Property], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
-      Arg(STRING, EXACTLY_ONE)
     )
 
     Fun("properties-start-with", classOf[PropertiesStartsWith], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,

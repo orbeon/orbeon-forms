@@ -31,23 +31,26 @@ import shapeless.syntax.typeable.*
 
 class Property extends DefaultFunctionSupport with RuntimeDependentFunction with AddToPathMap { // when properties reload, we now recompute all values
   override def evaluateItem(xpathContext: XPathContext): AtomicValue = {
-    Property.property(stringArgument(0)(xpathContext)).orNull
+    implicit val xpc: XPathContext = xpathContext
+    Property.property(stringArgument(0), stringArgumentOpt(1)).orNull
   }
 }
 
 object Property {
 
-  def property(propertyName: String): Option[AtomicValue] =
+  // Also in `CoreSupport`  in `xformsRuntimeJS`
+  def property(propertyName: String, profileOpt: Option[String]): Option[AtomicValue] =
     if (PropertySet.isSensitivePropertyName(propertyName))
       None
-    else {
-      CoreCrossPlatformSupport.properties.getObjectOpt(propertyName) map
-      SaxonUtils.convertJavaObjectToSaxonObject                      flatMap
-      (_.cast[AtomicValue])
-    }
+    else
+      CoreCrossPlatformSupport
+        .properties
+        .getObjectOpt(propertyName, profileOpt)
+        .map(SaxonUtils.convertJavaObjectToSaxonObject)
+        .flatMap(_.cast[AtomicValue])
 
-  def propertyAsString(propertyName: String): Option[String] =
-    property(propertyName) map (_.getStringValue)
+  def propertyAsString(propertyName: String, profileOpt: Option[String]): Option[String] =
+    property(propertyName, profileOpt).map(_.getStringValue)
 
   private object FunctionLibrary extends PipelineFunctionLibrary {
     override protected lazy val environmentVariableClass: Class[? <: EnvironmentVariable] = classOf[EnvironmentVariableAlwaysEnabled]

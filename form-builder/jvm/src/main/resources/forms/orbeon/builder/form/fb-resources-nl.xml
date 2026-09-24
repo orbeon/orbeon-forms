@@ -462,6 +462,20 @@
         <automatic-hints>
             <label>Gebruik automatische hints</label>
         </automatic-hints>
+        <property-profile>
+            <label>Profiel</label>
+            <hint>Stel het profiel voor dit formulier in</hint>
+            <help>
+                &lt;p&gt;
+                    Met eigenschappenprofielen kunt u configuratie-eigenschappen groeperen, delen en hergebruiken over meerdere formulieren.
+                    Het selecteren van een profiel past de bijbehorende eigenschappen toe op dit formulier.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Voor meer informatie, zie &lt;a target="_blank" href="https://doc.orbeon.com/configuration/properties/property-profiles"&gt;Eigenschappenprofielen&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+            <none>(Geen)</none>
+        </property-profile>
         <appearances>
             <item id="0">Gebruik standaard</item>
             <item id="1">Inline</item>

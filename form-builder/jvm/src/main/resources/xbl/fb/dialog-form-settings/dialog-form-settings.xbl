@@ -129,6 +129,10 @@
                     value="(event('automatic-hints')[. = ('true', 'false')], 'default')[1]"/>
 
                 <xf:setvalue
+                    ref="$i/property-profile"
+                    value="(event('property-profile')[xxf:non-blank()], '[none]')[1]"/>
+
+                <xf:setvalue
                     ref="$i/data-migration"
                     value="(event('data-migration')[. = ('enabled', 'disabled', 'error')], 'default')[1]"/>
 
@@ -508,6 +512,7 @@
                         <xf:property name="density"                                value="$i/density/string()"/>
                         <xf:property name="analysis-calculate"                     value="$i/analysis-calculate/string()"/>
                         <xf:property name="automatic-hints"                        value="$i/automatic-hints/string()"/>
+                        <xf:property name="property-profile"                       value="$i/property-profile/string()[. != '[none]']"/>
                         <xf:property name="summary-metadata-columns"               value="$i/summary-metadata-columns"/>
 
                         <xf:property
@@ -629,6 +634,7 @@
                         <hints/>
                         <hints-placeholders/>
                         <automatic-hints/>
+                        <property-profile/>
                         <grid-tab-order/>
                         <mode/>
                         <created-with-version/>
@@ -1349,6 +1355,24 @@
                                             deselected-value="text/plain">
                                             <xf:label ref="$resources/dialog-control-settings/use-html"/>
                                         </fr:checkbox-input>
+                                    </fr:c>
+                                    <fr:c x="1" y="6" w="4" h="1">
+                                        <fr:open-select1
+                                            ref="property-profile[not($is-new-form)]"
+                                            appearance="minimal"
+                                            class="fb-property-profile-control">
+                                            <xf:label ref="$resources/dialog-form-settings/property-profile/label"/>
+                                            <xf:hint  ref="$resources/dialog-form-settings/property-profile/hint"/>
+                                            <xf:help  ref="$resources/dialog-form-settings/property-profile/help" mediatype="text/html"/>
+                                            <xf:item>
+                                                <xf:label ref="$resources/dialog-form-settings/property-profile/none"/>
+                                                <xf:value>[none]</xf:value>
+                                            </xf:item>
+                                            <xf:itemset ref="fbf:propertyProfiles()">
+                                                <xf:label ref="."/>
+                                                <xf:value ref="."/>
+                                            </xf:itemset>
+                                        </fr:open-select1>
                                     </fr:c>
                                 </fr:grid>
                             </fr:tab>

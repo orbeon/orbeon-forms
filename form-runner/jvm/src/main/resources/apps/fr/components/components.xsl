@@ -69,6 +69,8 @@
     <xsl:variable name="fr-form-model-id"    select="generate-id($fr-form-model)"/>
     <xsl:variable name="fr-form-model-vars"  select="$fr-form-model/xf:var/@name/string()"/>
 
+    <xsl:variable name="property-profile-opt" select="$fr-form-model/@xxf:property-profile[p:non-blank()]/p:trim()"/>
+
     <xsl:variable name="fr-form-metadata"    select="($fr-form-model/xf:instance[@id = 'fr-form-metadata']/*)[1]"/>
     <xsl:variable name="fr-form-resources"   select="($fr-form-model/xf:instance[@id = 'fr-form-resources']/*)[1]"/>
     <xsl:variable name="fr-form-attachments" select="($fr-form-model/xf:instance[@id = 'fr-form-attachments']/*)[1]"/>
@@ -106,7 +108,7 @@
         select="
             $fr-form-metadata/actions/async = 'true' or (
                 not($fr-form-metadata/actions/async = 'false') and
-                p:property(string-join(('oxf.fr.detail.actions.async', $app, $form), '.')) = true()
+                p:property(string-join(('oxf.fr.detail.actions.async', $app, $form), '.'), $property-profile-opt) = true()
             )"/>
     <xsl:variable
         name="actions-response-must-await-opt"
@@ -114,7 +116,7 @@
         select="
             (
                 $fr-form-metadata/actions/response-must-await/xs:string(.)[p:non-blank()],
-                p:property(string-join(('oxf.fr.detail.actions.response-must-await', $app, $form), '.'))[p:non-blank()]
+                p:property(string-join(('oxf.fr.detail.actions.response-must-await', $app, $form), '.'), $property-profile-opt)[p:non-blank()]
             )[1]"/>
 
     <!-- MIP filtering -->
@@ -150,9 +152,9 @@
         as="xs:string?"
         select="doc('input:form-runner-config')/*/toc-position[p:non-blank()]"/>
 
-    <xsl:variable name="error-summary"        select="p:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))"                      as="xs:string?"/>
-    <xsl:variable name="default-logo-uri"     select="p:trim(p:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.')))[p:non-blank()]"   as="xs:string?"/>
-    <xsl:variable name="favicon-uri"          select="p:trim(p:property(string-join(('oxf.fr.favicon.uri', $app, $form), '.')))[p:non-blank()]"        as="xs:string?"/>
+    <xsl:variable name="error-summary"        select="p:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'), $property-profile-opt)"                      as="xs:string?"/>
+    <xsl:variable name="default-logo-uri"     select="p:trim(p:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'), $property-profile-opt))[p:non-blank()]"   as="xs:string?"/>
+    <xsl:variable name="favicon-uri"          select="p:trim(p:property(string-join(('oxf.fr.favicon.uri', $app, $form), '.'), $property-profile-opt))[p:non-blank()]"        as="xs:string?"/>
     <xsl:variable
         name="favicon-type"
         select="
@@ -166,11 +168,11 @@
                 else if (ends-with($clean-path, '.webp')) then 'image/webp'
                 else ()"
         as="xs:string?"/>
-    <xsl:variable name="hide-logo"            select="p:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'))"                          as="xs:boolean?"/>
-    <xsl:variable name="hide-footer"          select="p:property(string-join(('oxf.fr.detail.hide-footer', $app, $form), '.'))"                        as="xs:boolean?"/>
-    <xsl:variable name="hide-buttons-bar"     select="p:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))"                   as="xs:boolean?"/>
+    <xsl:variable name="hide-logo"            select="p:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'), $property-profile-opt)"                          as="xs:boolean?"/>
+    <xsl:variable name="hide-footer"          select="p:property(string-join(('oxf.fr.detail.hide-footer', $app, $form), '.'), $property-profile-opt)"                        as="xs:boolean?"/>
+    <xsl:variable name="hide-buttons-bar"     select="p:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'), $property-profile-opt)"                   as="xs:boolean?"/>
 
-    <xsl:variable name="inner-buttons"        select="p:split(p:property(string-join(('oxf.fr.detail.buttons.inner', $app, $form), '.')))"             as="xs:string*"/>
+    <xsl:variable name="inner-buttons"        select="p:split(p:property(string-join(('oxf.fr.detail.buttons.inner', $app, $form), '.'), $property-profile-opt))"             as="xs:string*"/>
 
     <xsl:variable name="error-summary-top"    select="normalize-space($error-summary) = ('top', 'both')"                                               as="xs:boolean"/>
     <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')"                                        as="xs:boolean"/>
@@ -182,7 +184,7 @@
             select="
                 p:split(
                     normalize-space(
-                        p:property(string-join(('oxf.fr', $name, $app, $form), '.'))
+                        p:property(string-join(('oxf.fr', $name, $app, $form), '.'), $property-profile-opt)
                     )
                 )"/>
 
@@ -191,7 +193,7 @@
                 select="
                     p:split(
                         normalize-space(
-                            p:property(string-join(('oxf.fr', if ($is-detail) then 'detail' else 'summary', $name, $app, $form), '.'))
+                            p:property(string-join(('oxf.fr', if ($is-detail) then 'detail' else 'summary', $name, $app, $form), '.'), $property-profile-opt)
                         )
                     )"/>
         </xsl:if>
@@ -225,7 +227,7 @@
     <xsl:variable
         name="theme-css-uri"
         as="xs:string?"
-        select="frf:resolveThemeCssUri($theme)"/>
+        select="frf:resolveThemeCssUri($theme, $property-profile-opt)"/>
 
     <xsl:variable
         name="assets-baseline-updates"
@@ -236,7 +238,7 @@
                     'fr',
                      'fb'[$is-form-builder and $is-detail]
                  )
-                return p:property(concat('oxf.xforms.assets.baseline.updates.', $update))
+                return p:property(concat('oxf.xforms.assets.baseline.updates.', $update), $property-profile-opt)
             return string-join($updates, ' ')
         "/>
     <xsl:variable
@@ -244,7 +246,7 @@
         as="xs:string"
         select="
             (
-                p:property(string-join(('oxf.fr.detail.label.appearance', $app, $form), '.'))[. = ('full', 'minimal')],
+                p:property(string-join(('oxf.fr.detail.label.appearance', $app, $form), '.'), $property-profile-opt)[. = ('full', 'minimal')],
                 'full'
             )[1]"/>
 
@@ -254,10 +256,10 @@
         select="
             (
                 (: Deprecated property for backward compatibility only :)
-                'full'   [p:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = true()],
-                'tooltip'[p:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = false()],
+                'full'   [p:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.'), $property-profile-opt) = true()],
+                'tooltip'[p:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.'), $property-profile-opt) = false()],
                 (: New property :)
-                p:property(string-join(('oxf.fr.detail.hint.appearance', $app, $form), '.'))[. = ('full', 'minimal', 'tooltip')],
+                p:property(string-join(('oxf.fr.detail.hint.appearance', $app, $form), '.'), $property-profile-opt)[. = ('full', 'minimal', 'tooltip')],
                 (: Default :)
                 'full'
             )[1]"/>
@@ -268,11 +270,11 @@
         select="
             (
                 (: Backward compatibility :)
-                p:property(string-join(('oxf.fr.detail.attachment.max-size', $app, $form), '.'))[
+                p:property(string-join(('oxf.fr.detail.attachment.max-size', $app, $form), '.'), $property-profile-opt)[
                     (: Allow -1 to mean 'unlimited' :)
                     . castable as xs:integer and xs:integer(.) ge -1
                 ],
-                p:property(string-join(('oxf.fr.detail.attachment.max-size-per-file', $app, $form), '.'))[
+                p:property(string-join(('oxf.fr.detail.attachment.max-size-per-file', $app, $form), '.'), $property-profile-opt)[
                     (: Allow -1 to mean 'unlimited' :)
                     . castable as xs:integer and xs:integer(.) ge -1
                 ]
@@ -282,7 +284,7 @@
         name="valid-attachment-max-size-aggregate-per-control-or-empty"
         as="xs:string?"
         select="
-            p:property(string-join(('oxf.fr.detail.attachment.max-size-aggregate-per-control', $app, $form), '.'))[
+            p:property(string-join(('oxf.fr.detail.attachment.max-size-aggregate-per-control', $app, $form), '.'), $property-profile-opt)[
                 (: Allow -1 to mean 'unlimited' :)
                 . castable as xs:integer and xs:integer(.) ge -1
             ]"/>
@@ -293,11 +295,11 @@
         select="
             (
                 (: Backward compatibility :)
-                p:property(string-join(('oxf.fr.detail.attachment.max-size-aggregate', $app, $form), '.'))[
+                p:property(string-join(('oxf.fr.detail.attachment.max-size-aggregate', $app, $form), '.'), $property-profile-opt)[
                     (: Allow -1 to mean 'unlimited' :)
                     . castable as xs:integer and xs:integer(.) ge -1
                 ],
-                p:property(string-join(('oxf.fr.detail.attachment.max-size-aggregate-per-form', $app, $form), '.'))[
+                p:property(string-join(('oxf.fr.detail.attachment.max-size-aggregate-per-form', $app, $form), '.'), $property-profile-opt)[
                     (: Allow -1 to mean 'unlimited' :)
                     . castable as xs:integer and xs:integer(.) ge -1
                 ]
@@ -307,14 +309,14 @@
         name="valid-attachment-max-files-per-control-or-empty"
         as="xs:string?"
         select="
-            p:property(string-join(('oxf.fr.detail.attachment.max-files-per-control', $app, $form), '.'))[
+            p:property(string-join(('oxf.fr.detail.attachment.max-files-per-control', $app, $form), '.'), $property-profile-opt)[
                 . castable as xs:integer and xs:integer(.) ge 1
             ]"/>
 
     <xsl:variable
         name="attachment-mediatypes"
         as="xs:string"
-        select="p:property(string-join(('oxf.fr.detail.attachment.mediatypes', $app, $form), '.'))"/>
+        select="p:property(string-join(('oxf.fr.detail.attachment.mediatypes', $app, $form), '.'), $property-profile-opt)"/>
 
     <xsl:variable
         name="view-appearance-opt"
@@ -334,7 +336,7 @@
                 $fr-form-metadata/wizard-mode[
                     . = ('free', 'lax', 'strict')
                 ],
-                p:property(string-join(('oxf.xforms.xbl.fr.wizard.validate', $app, $form), '.'))[
+                p:property(string-join(('oxf.xforms.xbl.fr.wizard.validate', $app, $form), '.'), $property-profile-opt)[
                     . = (
                         'free', 'lax', 'strict',
                         'true' (: for backward compatibility :)
@@ -353,7 +355,7 @@
                         . = ('true', 'false')
                     ]
                 ),
-                p:property(string-join(('oxf.xforms.xbl.fr.wizard.subsections-nav', $app, $form), '.')),
+                p:property(string-join(('oxf.xforms.xbl.fr.wizard.subsections-nav', $app, $form), '.'), $property-profile-opt),
                 false()
             )[1]"/>
 
@@ -365,7 +367,7 @@
                 $fr-form-metadata/wizard-subsections-toc[
                     . = ('active', 'all', 'none')
                 ],
-                p:property(string-join(('oxf.xforms.xbl.fr.wizard.subsections-toc', $app, $form), '.'))[
+                p:property(string-join(('oxf.xforms.xbl.fr.wizard.subsections-toc', $app, $form), '.'), $property-profile-opt)[
                     . = ('active', 'all', 'none')
                 ],
                 'active'
@@ -381,7 +383,7 @@
                         . = ('true', 'false')
                     ]
                 ),
-                p:property(string-join(('oxf.xforms.xbl.fr.wizard.separate-toc', $app, $form), '.')),
+                p:property(string-join(('oxf.xforms.xbl.fr.wizard.separate-toc', $app, $form), '.'), $property-profile-opt),
                 false()
             )[1]"/>
 
@@ -395,7 +397,7 @@
                         . = ('true', 'false')
                     ]
                 ),
-                p:property(string-join(('oxf.xforms.xbl.fr.wizard.section-status', $app, $form), '.')),
+                p:property(string-join(('oxf.xforms.xbl.fr.wizard.section-status', $app, $form), '.'), $property-profile-opt),
                 false()
             )[1]"/>
 
@@ -404,7 +406,7 @@
         as="xs:boolean"
         select="
             (
-                p:property(string-join(('oxf.xforms.xbl.fr.wizard.full-update', $app, $form), '.')),
+                p:property(string-join(('oxf.xforms.xbl.fr.wizard.full-update', $app, $form), '.'), $property-profile-opt),
                 true()
             )[1]"/>
 
@@ -413,7 +415,7 @@
         as="xs:string"
         select="
             (
-                p:property(string-join(('oxf.fr.detail.captcha.location', $app, $form), '.')),
+                p:property(string-join(('oxf.fr.detail.captcha.location', $app, $form), '.'), $property-profile-opt),
                 true()
             )[1]"/>
 
@@ -439,7 +441,7 @@
                 $fr-form-metadata/grid-markup[
                     . = ('html-table', 'css-grid')
                 ],
-                p:property(string-join(('oxf.xforms.xbl.fr.grid.markup', $app, $form), '.'))[
+                p:property(string-join(('oxf.xforms.xbl.fr.grid.markup', $app, $form), '.'), $property-profile-opt)[
                     . = ('html-table', 'css-grid')
                 ],
                 'html-table'
@@ -453,7 +455,7 @@
             $fr-form-metadata/grid-tab-order[
                 . = ('rows', 'columns')
             ],
-            p:property(string-join(('oxf.xforms.xbl.fr.grid.tab-order', $app, $form), '.'))[
+            p:property(string-join(('oxf.xforms.xbl.fr.grid.tab-order', $app, $form), '.'), $property-profile-opt)[
                 . = ('rows', 'columns')
             ],
             'rows'
@@ -464,7 +466,7 @@
         as="xs:string"
         select="
             (
-                p:property(string-join(('oxf.fr.detail.validation-mode', $app, $form), '.'))[
+                p:property(string-join(('oxf.fr.detail.validation-mode', $app, $form), '.'), $property-profile-opt)[
                     . = ('incremental', 'explicit')
                 ],
                 'incremental'
@@ -473,28 +475,28 @@
     <xsl:variable
         name="is-full-update"
         as="xs:boolean"
-        select="p:property(string-join(('oxf.fr.detail.view.full-update', $app, $form), '.'))"/>
+        select="p:property(string-join(('oxf.fr.detail.view.full-update', $app, $form), '.'), $property-profile-opt)"/>
 
     <xsl:variable
         name="custom-model"
         as="xs:anyURI?"
-        select="p:property(string-join(('oxf.fr.detail.model.custom', $app, $form), '.'))"/>
+        select="p:property(string-join(('oxf.fr.detail.model.custom', $app, $form), '.'), $property-profile-opt)"/>
 
     <xsl:variable
         name="enable-initial-focus"
         as="xs:boolean"
-        select="p:property(string-join(('oxf.fr.detail.initial-focus', $app, $form), '.'))"/>
+        select="p:property(string-join(('oxf.fr.detail.initial-focus', $app, $form), '.'), $property-profile-opt)"/>
 
     <!-- fr:section and fr:grid configuration -->
     <xsl:variable
         name="is-ajax-section-animate"
-        select="not(p:property(string-join(('oxf.fr.detail.ajax.section.animate', $app, $form), '.')) = false())"
+        select="not(p:property(string-join(('oxf.fr.detail.ajax.section.animate', $app, $form), '.'), $property-profile-opt) = false())"
         as="xs:boolean"/>
 
     <xsl:variable
         name="is-fr-section-animate"
         as="xs:boolean"
-        select="not(p:property(string-join(('oxf.xforms.xbl.fr.section.animate', $app, $form), '.')) = false())"/>
+        select="not(p:property(string-join(('oxf.xforms.xbl.fr.section.animate', $app, $form), '.'), $property-profile-opt) = false())"/>
 
     <xsl:variable
         name="is-animate-sections"
@@ -504,12 +506,12 @@
     <xsl:variable
         name="is-ajax-section-collapse"
         as="xs:boolean"
-        select="not(p:property(string-join(('oxf.fr.detail.ajax.section.collapse', $app, $form), '.')) = false())"/>
+        select="not(p:property(string-join(('oxf.fr.detail.ajax.section.collapse', $app, $form), '.'), $property-profile-opt) = false())"/>
 
     <xsl:variable
         name="is-fr-section-collapsible"
         as="xs:boolean"
-        select="not(p:property(string-join(('oxf.xforms.xbl.fr.section.collapsible', $app, $form), '.')) = false())"/>
+        select="not(p:property(string-join(('oxf.xforms.xbl.fr.section.collapsible', $app, $form), '.'), $property-profile-opt) = false())"/>
 
     <xsl:variable
         name="is-section-collapsible"
@@ -519,12 +521,12 @@
     <xsl:variable
         name="section-appearance"
         as="xs:string?"
-        select="p:property(string-join(('oxf.xforms.xbl.fr.section.appearance', $app, $form), '.'))[normalize-space()]"/>
+        select="p:property(string-join(('oxf.xforms.xbl.fr.section.appearance', $app, $form), '.'), $property-profile-opt)[normalize-space()]"/>
 
     <xsl:variable
         name="grid-appearance"
         as="xs:string?"
-        select="p:property(string-join(('oxf.xforms.xbl.fr.grid.appearance', $app, $form), '.'))[normalize-space()]"/>
+        select="p:property(string-join(('oxf.xforms.xbl.fr.grid.appearance', $app, $form), '.'), $property-profile-opt)[normalize-space()]"/>
 
     <xsl:variable
         xmlns:version="java:org.orbeon.oxf.common.Version"
@@ -534,7 +536,7 @@
             (
                 (: Consider this a pseudo-XBL component called `fr:calculated-value` :)
                 $fr-form-metadata/xbl/fr:calculated-value/@appearance[normalize-space()],
-                p:property(string-join(('oxf.xforms.xbl.fr.calculated-value.appearance', $app, $form), '.'))[normalize-space()],
+                p:property(string-join(('oxf.xforms.xbl.fr.calculated-value.appearance', $app, $form), '.'), $property-profile-opt)[normalize-space()],
                 for $created-version in $fr-form-metadata/created-with-version[normalize-space()]/normalize-space()
                     return
                         if (version:compare($created-version, '2018.2') ge 0) then
@@ -571,7 +573,8 @@
                                             $form
                                         ),
                                         '.'
-                                    )
+                                    ),
+                                    $property-profile-opt
                                 )[normalize-space()]
                             )[1]
                         )
@@ -596,7 +599,8 @@
                             $form
                         ),
                         '.'
-                    )
+                    ),
+                    $property-profile-opt
                 )[normalize-space()]
             )[1]"/>
 
@@ -616,33 +620,34 @@
                             $form
                         ),
                         '.'
-                    )
+                    ),
+                    $property-profile-opt
                 )[normalize-space()]
             )[1]"/>
 
     <xsl:variable
         name="section-insert"
         as="xs:string?"
-        select="p:property(string-join(('oxf.xforms.xbl.fr.section.insert', $app, $form), '.'))[normalize-space()]"/>
+        select="p:property(string-join(('oxf.xforms.xbl.fr.section.insert', $app, $form), '.'), $property-profile-opt)[normalize-space()]"/>
 
     <xsl:variable
         name="grid-insert"
         as="xs:string?"
-        select="p:property(string-join(('oxf.xforms.xbl.fr.grid.insert', $app, $form), '.'))[normalize-space()]"/>
+        select="p:property(string-join(('oxf.xforms.xbl.fr.grid.insert', $app, $form), '.'), $property-profile-opt)[normalize-space()]"/>
 
     <xsl:variable
         name="allow-revision-history"
         as="xs:boolean"
         select="
             $is-detail and
-            p:property(string-join(('oxf.fr.navbar.revision-history.enable', $app, $form), '.'))"/>
+            p:property(string-join(('oxf.fr.navbar.revision-history.enable', $app, $form), '.'), $property-profile-opt)"/>
 
      <xsl:variable
         name="allow-navbar-workflow-stage"
         as="xs:boolean"
         select="
             $is-detail and
-            p:property(string-join(('oxf.fr.navbar.workflow-stage.enable', $app, $form), '.'))"/>
+            p:property(string-join(('oxf.fr.navbar.workflow-stage.enable', $app, $form), '.'), $property-profile-opt)"/>
 
     <xsl:template match="/xh:html">
         <!-- Handle document language -->

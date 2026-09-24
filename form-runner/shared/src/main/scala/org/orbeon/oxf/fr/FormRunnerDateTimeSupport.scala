@@ -9,16 +9,16 @@ import java.time.temporal.TemporalAccessor
 object FormRunnerDateTimeSupport {
 
   // Get a timezone formatter based on configured properties
-  def timezoneFormatter(zoneIdStringOpt: Option[String])(implicit properties: PropertySet): (ZoneId, TemporalAccessor => String) =
+  def timezoneFormatter(zoneIdStringOpt: Option[String], propertyProfileOpt: Option[String])(implicit properties: PropertySet): (ZoneId, TemporalAccessor => String) =
     zoneIdStringOpt.map(timezoneFormatterForZoneId)
-      .orElse(timezoneFormatterForProperty("user.timezone"))
-      .orElse(timezoneFormatterForProperty("oxf.fr.default-timezone"))
+      .orElse(timezoneFormatterForProperty("user.timezone", propertyProfileOpt))
+      .orElse(timezoneFormatterForProperty("oxf.fr.default-timezone", propertyProfileOpt))
       .getOrElse(UtcTimezoneFormatter)
 
   // To avoid creating a formatter every time, we cache it against the property
-  private def timezoneFormatterForProperty(name: String)(implicit properties: PropertySet): Option[(ZoneId, TemporalAccessor => String)] =
+  private def timezoneFormatterForProperty(name: String, propertyProfileOpt: Option[String])(implicit properties: PropertySet): Option[(ZoneId, TemporalAccessor => String)] =
     for {
-      property    <- properties.getPropertyOpt(name)
+      property    <- properties.getPropertyOpt(name, propertyProfileOpt)
       stringValue <- property.nonBlankStringValue
     } yield
       property.associatedValue(_ => timezoneFormatterForZoneId(stringValue))

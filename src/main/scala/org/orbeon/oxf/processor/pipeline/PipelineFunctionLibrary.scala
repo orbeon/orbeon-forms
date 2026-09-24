@@ -20,6 +20,9 @@ import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.om.{NamespaceConstant, NodeInfo}
 import org.orbeon.saxon.sxpath.XPathEvaluator
 import org.orbeon.saxon.*
+import org.orbeon.saxon.`type`.BuiltInAtomicType.{ANY_ATOMIC, STRING}
+import org.orbeon.saxon.expr.StaticProperty.{ALLOWS_ZERO_OR_ONE, EXACTLY_ONE}
+import org.orbeon.saxon.function.Property
 
 // For backward compatibility
 object PipelineFunctionLibrary extends PipelineFunctionLibrary
@@ -52,6 +55,13 @@ class PipelineFunctionLibrary extends OrbeonFunctionLibrary
   with XSLTFunctions {
 
   // === Functions made accessible to XSLT/XPL via Java calls
+
+  Namespace(IndependentFunctionsNS) {
+    Fun("property", classOf[Property], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, ALLOWS_ZERO_OR_ONE),
+    )
+  }
 
   def newEvaluator(context: NodeInfo) = new XPathEvaluator(context.getConfiguration)
 

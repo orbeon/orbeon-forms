@@ -120,6 +120,7 @@ class XFormsStaticStateImpl(
   def staticBooleanProperty(name: String) : Boolean          = staticProperties.staticBooleanProperty(name)
   def staticIntProperty    (name: String) : Int              = staticProperties.staticIntProperty    (name)
   def allowedExternalEvents               : Set[String]      = staticProperties.allowedExternalEvents
+  def propertyProfileOpt                  : Option[String]   = staticProperties.propertyProfileOpt
 
   def propertyMaybeAsExpression(name: String) : Either[Any, CompiledExpression] = dynamicProperties.propertyMaybeAsExpression(name)
 

@@ -497,7 +497,10 @@ trait FormRunnerPersistence {
   //@XPathFunction
   def createNewFromServiceUrlOrEmpty(app: String, form: String): String = {
     val propertySet = CoreCrossPlatformSupport.properties
-    propertySet.getStringOrURIAsStringOpt(NewFromServiceUriProperty :: app :: form :: Nil mkString ".") match {
+    propertySet.getStringOrURIAsStringOpt(
+      NewFromServiceUriProperty :: app :: form :: Nil mkString ".",
+      profileOpt = inScopeContainingDocument.staticState.propertyProfileOpt
+    ) match {
       case Some(serviceUrl) =>
 
         val requestedParams =

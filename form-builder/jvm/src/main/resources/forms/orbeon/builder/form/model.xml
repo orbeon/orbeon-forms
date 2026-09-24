@@ -545,6 +545,7 @@
                 <xf:bind id="labels-bind"                                    ref="@xxf:label.appearance"/>
                 <xf:bind id="hints-bind"                                     ref="@xxf:hint.appearance"/>
                 <xf:bind id="analysis-calculate-bind"                        ref="@xxf:analysis.calculate"/>
+                <xf:bind id="property-profile-bind"                          ref="@xxf:property-profile"/>
             </xf:bind>
         </xf:bind>
         <!-- Keep all @edit-ref attributes pointing to the right spot -->

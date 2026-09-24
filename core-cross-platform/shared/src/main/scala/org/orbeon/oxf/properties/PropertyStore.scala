@@ -28,7 +28,6 @@ import org.orbeon.scaxon.NodeInfoConversions.*
 import org.orbeon.scaxon.SimplePath.*
 
 import java.util
-import java.util.Optional
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 import scala.jdk.OptionConverters.{RichOption, RichOptional}
@@ -59,6 +58,7 @@ object PropertyStore {
         name         = pp.getName,
         typeQName    = QName(pp.getType, XMLConstants.XSD_NAMESPACE),
         stringValue  = pp.getValue,
+        profiles     = Option(pp.getProfiles).map(_.asScala.toList.distinct).getOrElse(Nil)
       )
 
     val globalPropertySet =
@@ -93,7 +93,7 @@ object PropertyStore {
     )
   }
 
-  // Used by `XIncludeProcessor`, `SaxonXQueryProcessor`, `XSLTTransformer`
+  // Used by `XIncludeProcessor`, `SaxonXQueryProcessor`, `XSLTTransformer`, tests
   def parse(doc: Document, eTag: api.ETag): PropertyStore = {
 
     import PropertySet.PropertyParams
@@ -149,7 +149,13 @@ object PropertyStore {
               globalPropertyDefs
           }
 
-        builder += PropertyParams(propertyElement.allInScopeNamespacesAsStrings, name, typeQName, value)
+        val profiles =
+          propertyElement
+            .attributeValueOpt("profiles")
+            .map(_.splitTo[List]().distinct)
+            .getOrElse(Nil)
+
+        builder += PropertyParams(propertyElement.allInScopeNamespacesAsStrings, name, typeQName, value, profiles)
       }
     }
 
@@ -209,13 +215,21 @@ object PropertyStore {
             .uriQualifiedName
         )
 
+        val profiles =
+          propertyElement
+            .attributeValueOpt("profiles")
+            .map(_.splitTo[List]().distinct)
+            .getOrElse(Nil)
+            .asJava
+
         allPropertyDefinitions +=
           new PropertyDefinition {
             def getName      : String                   = propertyElement.attributeValue("name")
             def getValue     : String                   = valueFromAttOrText
             def getType      : String                   = typeQName.localName
             def getNamespaces: util.Map[String, String] = propertyElement.allInScopeNamespacesAsStrings.asJava
-            def getCategory  : Optional[String]         = categoryOpt.toJava
+            def getCategory  : util.Optional[String]    = categoryOpt.toJava
+            def getProfiles  : util.Collection[String]  = profiles
           }
       }
     }

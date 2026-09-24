@@ -242,7 +242,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   def componentParamValue(paramNameString: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[AtomicValue] =
     ComponentParamSupport.componentParamValue(
       paramName = QName(paramNameString),
-      property  = CoreSupport.property
+      property  = CoreSupport.property(_, xfc.containingDocument.staticState.propertyProfileOpt)
     )
 
   @XPathFunction

@@ -251,6 +251,150 @@ class PropertiesTest extends AnyFunSpecLike with ResourceManagerSupport {
       }
     }
   }
+
+  describe("Profiles") {
+
+    val ProfilesXmlString =
+      """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+        |    <property as="xs:string" name="oxf.fr.detail.buttons.*.*"                                                value="default-buttons"/>
+        |    <property as="xs:string" name="oxf.fr.detail.buttons.*.*"                profiles="profile1"             value="profile1-buttons"/>
+        |    <property as="xs:string" name="oxf.fr.detail.buttons.*.*"                profiles="profile2  profile3"   value="multi-profile-buttons"/>
+        |    <property as="xs:string" name="oxf.fr.detail.buttons.my-app.*"           profiles="profile1"             value="my-app-profile1-buttons"/>
+        |    <property as="xs:string" name="oxf.fr.detail.buttons.my-app.my-form"     profiles="profile1"             value="custom-profile1-buttons"/>
+        |    <property as="xs:string" name="oxf.fr.detail.buttons.other-app.my-form"                                  value="exact-default-buttons"/>
+        |    <property as="xs:string" name="test.profile.only"                        profiles="special"              value="special-val"/>
+        |    <property as="xs:string" name="test.empty.profiles"                      profiles=""                     value="empty-profiles-val"/>
+        |</properties>""".stripMargin
+
+    def newPropertyStore(xml: String): PropertyStore =
+      PropertyStore.parse(IOSupport.readOrbeonDom(xml), "")
+
+    val propertySet = newPropertyStore(ProfilesXmlString).globalPropertySet
+
+    it("must extract all profile names") {
+      assert(propertySet.allProfiles == Set("profile1", "profile2", "profile3", "special"))
+    }
+
+    it("must parse property definitions with getProfiles") {
+      val elem = IOSupport.readOrbeonDom(ProfilesXmlString)
+      val defs = PropertyStore.parseToPropertyDefinitions(elem).asScala.toList
+      val p1Def = defs.find(d => d.getName == "oxf.fr.detail.buttons.*.*" && d.getValue == "profile1-buttons")
+      assert(p1Def.isDefined)
+      assert(p1Def.get.getProfiles.asScala.toList == List("profile1"))
+
+      val multiDef = defs.find(_.getValue == "multi-profile-buttons")
+      assert(multiDef.isDefined)
+      assert(multiDef.get.getProfiles.asScala.toSet == Set("profile2", "profile3"))
+
+      val defaultDef = defs.find(_.getValue == "default-buttons")
+      assert(defaultDef.isDefined)
+      assert(defaultDef.get.getProfiles.asScala.isEmpty)
+    }
+
+    describe("Resolution without profile") {
+      it("must resolve default wildcard property when no profile is given") {
+        assert(propertySet.getNonBlankString("oxf.fr.detail.buttons.foo.bar").contains("default-buttons"))
+      }
+
+      it("must fall back to default wildcard when specific app has only profile properties") {
+        assert(propertySet.getNonBlankString("oxf.fr.detail.buttons.my-app.bar").contains("default-buttons"))
+      }
+
+      it("must resolve exact property without profile") {
+        assert(propertySet.getNonBlankString("oxf.fr.detail.buttons.other-app.my-form").contains("exact-default-buttons"))
+      }
+
+      it("must return None for a property that only has profile-specific definitions") {
+        assert(propertySet.getNonBlankString("test.profile.only").isEmpty)
+      }
+
+      it("must treat empty profiles attribute as default property") {
+        assert(propertySet.getNonBlankString("test.empty.profiles").contains("empty-profiles-val"))
+      }
+    }
+
+    describe("Resolution with profile") {
+      it("must resolve profile-specific wildcard property") {
+        assert(propertySet.getNonBlankString("oxf.fr.detail.buttons.foo.bar", Some("profile1")).contains("profile1-buttons"))
+      }
+
+      it("must resolve app-level profile property over wildcard profile property") {
+        assert(propertySet.getNonBlankString("oxf.fr.detail.buttons.my-app.bar", Some("profile1")).contains("my-app-profile1-buttons"))
+      }
+
+      it("must resolve form-level profile property over app-level profile property") {
+        assert(propertySet.getNonBlankString("oxf.fr.detail.buttons.my-app.my-form", Some("profile1")).contains("custom-profile1-buttons"))
+      }
+
+      it("must resolve multi-profile property for each specified profile") {
+        assert(propertySet.getNonBlankString("oxf.fr.detail.buttons.foo.bar", Some("profile2")).contains("multi-profile-buttons"))
+        assert(propertySet.getNonBlankString("oxf.fr.detail.buttons.foo.bar", Some("profile3")).contains("multi-profile-buttons"))
+      }
+
+      it("must fall back to default property when profile does not match") {
+        assert(propertySet.getNonBlankString("oxf.fr.detail.buttons.foo.bar", Some("unknown-profile")).contains("default-buttons"))
+      }
+
+      it("must resolve property defined only for a profile") {
+        assert(propertySet.getNonBlankString("test.profile.only", Some("special")).contains("special-val"))
+        assert(propertySet.getNonBlankString("test.profile.only", Some("other")).isEmpty)
+      }
+
+      it("must prefer exact property name over wildcard with profile") {
+        assert(propertySet.getNonBlankString("oxf.fr.detail.buttons.other-app.my-form", Some("profile1")).contains("exact-default-buttons"))
+      }
+    }
+
+    describe("propertiesMatching with profile") {
+      it("must return profile property when matching") {
+        val matchesDefault = propertySet.propertiesMatching("oxf.fr.detail.buttons.foo.bar", None)
+        assert(matchesDefault.map(_.stringValue).toSet == Set("default-buttons"))
+
+        val matchesProfile1 = propertySet.propertiesMatching("oxf.fr.detail.buttons.foo.bar", Some("profile1"))
+        assert(matchesProfile1.map(_.stringValue).toSet == Set("profile1-buttons"))
+
+        val matchesProfile2 = propertySet.propertiesMatching("oxf.fr.detail.buttons.foo.bar", Some("profile2"))
+        assert(matchesProfile2.map(_.stringValue).toSet == Set("multi-profile-buttons"))
+      }
+    }
+
+    describe("Combined property stores with profiles") {
+      val xml1 =
+        """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+          |    <property as="xs:string" name="btn" value="btn-default-1"/>
+          |    <property as="xs:string" name="btn" profiles="p1" value="btn-p1-1"/>
+          |    <property as="xs:string" name="btn" profiles="p2" value="btn-p2-1"/>
+          |</properties>""".stripMargin
+
+      val xml2 =
+        """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+          |    <property as="xs:string" name="btn" value="btn-default-2"/>
+          |    <property as="xs:string" name="btn" profiles="p1" value="btn-p1-2"/>
+          |</properties>""".stripMargin
+
+      val combined = CombinedPropertyStore.combine(NonEmptyList.of(
+        Some(newPropertyStore(xml1)),
+        Some(newPropertyStore(xml2)),
+      )).get.globalPropertySet
+
+      it("must combine profiles from multiple stores") {
+        assert(combined.allProfiles == Set("p1", "p2"))
+      }
+
+      it("must let later store override default and matching profile") {
+        assert(combined.getNonBlankString("btn").contains("btn-default-2"))
+        assert(combined.getNonBlankString("btn", Some("p1")).contains("btn-p1-2"))
+      }
+
+      it("must fall back to earlier store profile when not overridden") {
+        assert(combined.getNonBlankString("btn", Some("p2")).contains("btn-p2-1"))
+      }
+
+      it("must fall back to later store default when profile not found anywhere") {
+        assert(combined.getNonBlankString("btn", Some("unknown")).contains("btn-default-2"))
+      }
+    }
+  }
 }
 
 class TestPropertyProvider extends api.PropertyProvider {
@@ -259,8 +403,9 @@ class TestPropertyProvider extends api.PropertyProvider {
     getName      : String,
     getValue     : String,
     getType      : String,
-    getNamespaces: ju.Map[String, String],
-    getCategory  : ju.Optional[String],
+    getNamespaces: ju.Map[String, String] = ju.Collections.emptyMap[String, String](),
+    getCategory  : ju.Optional[String]    = ju.Optional.empty(),
+    getProfiles  : ju.Collection[String]  = ju.Collections.emptyList[String]()
   ) extends api.PropertyDefinition
 
   private val KeyPrefix  = "test-provider-key"
@@ -336,29 +481,21 @@ class TestPropertyProvider extends api.PropertyProvider {
         getName       = "a.b.c",
         getValue      = s"a.b.c.$suffix",
         getType       = "string",
-        getNamespaces = Map.empty.asJava,
-        getCategory   = ju.Optional.empty(),
       ),
       ConcretePropertyDefinition(
         getName       = "a.b.*",
         getValue      = s"a.b.*.$suffix",
         getType       = "string",
-        getNamespaces = Map.empty.asJava,
-        getCategory   = ju.Optional.empty(),
       ),
       ConcretePropertyDefinition(
         getName       = "a.b.f",
         getValue      = s"a.b.f.$suffix",
         getType       = "string",
-        getNamespaces = Map.empty.asJava,
-        getCategory   = ju.Optional.empty(),
       ),
       ConcretePropertyDefinition(
         getName       = "a.b.f.g",
         getValue      = s"a.b.f.g.$suffix",
         getType       = "string",
-        getNamespaces = Map.empty.asJava,
-        getCategory   = ju.Optional.empty(),
       ),
     )
 }

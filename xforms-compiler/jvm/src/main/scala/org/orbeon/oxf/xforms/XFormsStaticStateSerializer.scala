@@ -727,7 +727,8 @@ object XFormsStaticStateSerializer {
         "name"       -> Json.fromString(a.name),
         "type"       -> Json.fromInt(collectedQNamesWithPositions(a.typeQName)),
         "value"      -> Json.fromString(a.stringValue),
-        "namespaces" -> Json.fromInt(collectedNamespacesWithPositions(a.namespaces))
+        "namespaces" -> Json.fromInt(collectedNamespacesWithPositions(a.namespaces)),
+        "profiles"   -> a.profiles.asJson
       )
 
     implicit val encodeXFormsStaticState: Encoder[XFormsStaticState] = (a: XFormsStaticState) => Json.obj(

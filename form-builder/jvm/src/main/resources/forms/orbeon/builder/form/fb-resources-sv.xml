@@ -481,6 +481,20 @@
         <automatic-hints>
             <label>Använd automatiska anvisningar</label>
         </automatic-hints>
+        <property-profile>
+            <label>Profil</label>
+            <hint>Ange profil för detta formulär</hint>
+            <help>
+                &lt;p&gt;
+                    Egenskapsprofiler gör det möjligt att gruppera, dela och återanvända konfigurationsegenskaper över flera formulär.
+                    Genom att välja en profil tillämpas de associerade egenskaperna på detta formulär.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    För mer, se &lt;a target="_blank" href="https://doc.orbeon.com/configuration/properties/property-profiles"&gt;Egenskapsprofiler&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+            <none>(Ingen)</none>
+        </property-profile>
         <appearances>
             <item id="0">Använd egenskap</item>
             <item id="1">Infogad</item>

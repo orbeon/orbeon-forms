@@ -482,6 +482,20 @@
         <automatic-hints>
             <label>Käytä automaattisia vihjeitä</label>
         </automatic-hints>
+        <property-profile>
+            <label>Profiili</label>
+            <hint>Aseta tämän lomakkeen profiili</hint>
+            <help>
+                &lt;p&gt;
+                    Ominaisuusprofiilit mahdollistavat määritysominaisuuksien ryhmittelyn, jakamisen ja uudelleenkäytön useissa lomakkeissa.
+                    Profiilin valitseminen ottaa siihen liittyvät ominaisuudet käyttöön tälle lomakkeelle.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Katso lisää: &lt;a target="_blank" href="https://doc.orbeon.com/configuration/properties/property-profiles"&gt;Ominaisuusprofiilit&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+            <none>(Ei mitään)</none>
+        </property-profile>
         <appearances>
             <item id="0">Käytä ominaisuutta</item>
             <item id="1">Rivissä</item>

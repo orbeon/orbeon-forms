@@ -30,7 +30,7 @@ object XXFormsFunctionLibrary
       }
 
     def fromOtherProperties =
-      CoreSupport.property(propertyName)
+      CoreSupport.property(propertyName, xfc.containingDocument.staticState.propertyProfileOpt)
 
     fromContainingDocumentProperties orElse fromOtherProperties
   }

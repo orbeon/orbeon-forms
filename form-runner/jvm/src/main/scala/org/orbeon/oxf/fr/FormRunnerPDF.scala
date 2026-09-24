@@ -39,7 +39,7 @@ trait FormRunnerPDF {
     val formatPairsIt =
       for {
         formatPropertyName <- propertiesStartingWithIt("oxf.fr.pdf.format")
-        expression         <- Property.propertyAsString(formatPropertyName)
+        expression         <- Property.propertyAsString(formatPropertyName, profileOpt = None)
         formatName         = formatPropertyName split '.' last
       } yield
         formatName -> expression
@@ -61,7 +61,7 @@ trait FormRunnerPDF {
 
     val expressionOpt =
       for {
-        format     <- Property.propertyAsString(propertyName)
+        format     <- Property.propertyAsString(propertyName, profileOpt = None)
         expression <- Option(pdfFormats.get(format))
       } yield
         expression

@@ -78,6 +78,8 @@ trait XFormsStaticStateStaticProperties {
   def staticBooleanProperty(name: String) : Boolean
   def staticIntProperty    (name: String) : Int
 
+  def propertyProfileOpt                  : Option[String]
+
   // Probably obsolete
   def allowedExternalEvents               : Set[String]
 }

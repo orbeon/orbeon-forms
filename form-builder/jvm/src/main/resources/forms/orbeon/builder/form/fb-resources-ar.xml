@@ -481,6 +481,20 @@
         <automatic-hints>
             <label>استخدام التلميحات التلقائية</label>
         </automatic-hints>
+        <property-profile>
+            <label>ملف التعريف</label>
+            <hint>تعيين ملف التعريف لهذا النموذج</hint>
+            <help>
+                &lt;p&gt;
+                    تتيح ملفات تعريف الخصائص تجميع خصائص التكوين ومشاركتها وإعادة استخدامها عبر نماذج متعددة.
+                    يؤدي تحديد ملف تعريف إلى تطبيق الخصائص المرتبطة به على هذا النموذج.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    للمزيد، راجع &lt;a target="_blank" href="https://doc.orbeon.com/configuration/properties/property-profiles"&gt;ملفات تعريف الخصائص&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+            <none>(لا يوجد)</none>
+        </property-profile>
         <appearances>
             <item id="0">استخدام الخاصية</item>
             <item id="1">مضمن</item>

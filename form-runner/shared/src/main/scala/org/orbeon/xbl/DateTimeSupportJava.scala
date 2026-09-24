@@ -20,7 +20,9 @@ import org.orbeon.oxf.fr.FormRunnerDateTimeSupport
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.InstanceData
+import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
 
 import scala.util.{Failure, Success}
@@ -126,7 +128,9 @@ object DateTimeSupportJava {
 
     implicit val properties: PropertySet = CoreCrossPlatformSupport.properties
 
-    val timezoneFormatter = FormRunnerDateTimeSupport.timezoneFormatter(zoneIdStringOpt = None)
+    implicit val xfc: XFormsFunction.Context = XFormsFunction.context
+
+    val timezoneFormatter = FormRunnerDateTimeSupport.timezoneFormatter(zoneIdStringOpt = None, xfc.containingDocument.staticState.propertyProfileOpt)
 
     for {
       dateTime      <- IsoDateTime.tryParseIsoDateTime(binding.getStringValue).toOption

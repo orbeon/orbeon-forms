@@ -481,6 +481,20 @@
         <automatic-hints>
             <label>Use Automatic Hints</label>
         </automatic-hints>
+        <property-profile>
+            <label>Profile</label>
+            <hint>Set the profile for this form</hint>
+            <help>
+                &lt;p&gt;
+                    Property profiles allow grouping, sharing, and reusing configuration properties across multiple forms.
+                    Selecting a profile applies its associated properties to this form.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    For more, see &lt;a target="_blank" href="https://doc.orbeon.com/configuration/properties/property-profiles"&gt;Property profiles&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+            <none>(None)</none>
+        </property-profile>
         <appearances>
             <item id="0">Use property</item>
             <item id="1">Inline</item>

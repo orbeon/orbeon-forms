@@ -461,6 +461,20 @@
         <automatic-hints>
             <label>Использовать автоматические подсказки</label>
         </automatic-hints>
+        <property-profile>
+            <label>Профиль</label>
+            <hint>Установить профиль для этой формы</hint>
+            <help>
+                &lt;p&gt;
+                    Профили свойств позволяют группировать, совместно использовать и повторно применять свойства конфигурации для нескольких форм.
+                    Выбор профиля применяет связанные с ним свойства к этой форме.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Подробнее см. &lt;a target="_blank" href="https://doc.orbeon.com/configuration/properties/property-profiles"&gt;Профили свойств&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
+            <none>(Нет)</none>
+        </property-profile>
         <appearances>
             <item id="0">Использовать свойство</item>
             <item id="1">Встроенно</item>

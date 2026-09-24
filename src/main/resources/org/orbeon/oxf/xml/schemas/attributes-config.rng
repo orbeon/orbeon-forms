@@ -18,6 +18,9 @@
     <zeroOrMore>
         <element name="attribute">
             <attribute name="name"/>
+            <optional>
+                <attribute name="profiles"/>
+            </optional>
             <choice>
                 <group>
                     <choice>

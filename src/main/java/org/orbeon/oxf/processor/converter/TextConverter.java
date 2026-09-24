@@ -39,7 +39,7 @@ public class TextConverter extends TextConverterBase {
         // Create an identity transformer and start the transformation
         final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
         TransformerUtils.applyOutputProperties(identity.getTransformer(),
-                config.method != null ? config.method : ProcessorSupport.qNameToExplodedQName(getPropertySet().getQName(DEFAULT_METHOD_PROPERTY_NAME, DEFAULT_METHOD)),
+                config.method != null ? config.method : ProcessorSupport.qNameToExplodedQName(getPropertySet().getQName(DEFAULT_METHOD_PROPERTY_NAME, DEFAULT_METHOD, scala.Option.apply(null))),
                 null,
                 null,
                 null,

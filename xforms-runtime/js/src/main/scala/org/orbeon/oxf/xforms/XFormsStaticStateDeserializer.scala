@@ -1000,8 +1000,9 @@ object XFormsStaticStateDeserializer {
         typeQName   <- c.get[Int]("type")
         stringValue <- c.get[String]("value")
         namespaces  <- c.get[Int]("namespaces")
+        profiles    <- c.getOrElse[List[String]]("profiles")(Nil)
       } yield
-        PropertyParams(collectedNamespaces(namespaces), name, collectedQNames(typeQName), stringValue)
+        PropertyParams(collectedNamespaces(namespaces), name, collectedQNames(typeQName), stringValue, profiles)
 
     implicit val decodeXFormsStaticState: Decoder[XFormsStaticState] = (c: HCursor) =>
       for {
@@ -1152,6 +1153,7 @@ object XFormsStaticStateImpl {
       def staticBooleanProperty(name: String) : Boolean          = staticProperties.staticBooleanProperty(name)
       def staticIntProperty    (name: String) : Int              = staticProperties.staticIntProperty    (name)
       def allowedExternalEvents               : Set[String]      = staticProperties.allowedExternalEvents
+      def propertyProfileOpt                  : Option[String]   = staticProperties.propertyProfileOpt
 
       def propertyMaybeAsExpression(name: String) : Either[Any, StaticXPath.CompiledExpression] = dynamicProperties.propertyMaybeAsExpression(name)
 

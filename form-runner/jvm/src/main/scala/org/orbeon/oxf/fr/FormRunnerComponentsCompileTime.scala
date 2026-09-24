@@ -299,11 +299,11 @@ trait FormRunnerComponentsCompileTime {
 
   // Resolve a theme name to its CSS URI via `oxf.fr.style.themes.<name-with-dashes>.css-uri`, with fallback to a default theme
   //@XPathFunction
-  def resolveThemeCssUri(themeName: String): String = {
+  def resolveThemeCssUri(themeName: String, propertyProfile: String): String = {
 
     def propertyNameAndValueOpt(theme: String): (String, Option[String]) = {
       val propertyName = s"oxf.fr.style.themes.$theme.css-uri"
-      (propertyName, Property.propertyAsString(propertyName))
+      (propertyName, Property.propertyAsString(propertyName, propertyProfile.trimAllToOpt))
     }
 
     val (propertyName, propertyValueOpt) = propertyNameAndValueOpt(themeName)

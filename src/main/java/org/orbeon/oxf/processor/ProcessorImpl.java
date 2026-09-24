@@ -139,7 +139,7 @@ public abstract class ProcessorImpl implements Processor {
         // rare places where this should be tested on. By default, enable validation so the
         // properties can be validated!
         final PropertySet propertySet = Properties.instance().getPropertySet();
-        final boolean inputValidationEnabled = (propertySet == null) ? true : propertySet.getBoolean(PROCESSOR_VALIDATION_FLAG, true);
+        final boolean inputValidationEnabled = (propertySet == null) ? true : propertySet.getBoolean(PROCESSOR_VALIDATION_FLAG, true, scala.Option.apply(null));
         final ProcessorInput input;
         if (inputValidationEnabled && inputInfo != null && inputInfo.getSchemaURI() != null) {
 

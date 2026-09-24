@@ -75,7 +75,7 @@
                 <fr:console-server id="fr-console-server"/>
             </fr:row>
         </xsl:if>
-        <xsl:if test="p:property(string-join(('oxf.fr.detail.captcha.location', $app, $form), '.')) = 'form-bottom'">
+        <xsl:if test="p:property(string-join(('oxf.fr.detail.captcha.location', $app, $form), '.'), $property-profile-opt) = 'form-bottom'">
             <fr:row>
                 <fr:captcha id="fr-captcha" namespace-name="{frf:captchaComponent($app, $form)}" captcha-visible="{$captcha-visible}"/>
             </fr:row>
@@ -613,7 +613,7 @@
 
                 <xsl:variable
                     name="resources-names"
-                    select="distinct-values(for $n in $property-names return p:split(p:property($n)))"
+                    select="distinct-values(for $n in $property-names return p:split(p:property($n, $property-profile-opt)))"
                     as="xs:string*"/>
 
                 <!-- Make sure to use `p:doc()` in order to allow caching -->
@@ -969,7 +969,7 @@
         <!-- Include dialogs from property -->
         <xsl:variable
             name="custom-dialogs"
-            select="p:split(p:property(string-join(('oxf.fr.detail.dialogs.custom', $app, $form), '.')))"/>
+            select="p:split(p:property(string-join(('oxf.fr.detail.dialogs.custom', $app, $form), '.'), $property-profile-opt))"/>
         <xsl:for-each select="$custom-dialogs">
             <!-- Make sure to use `p:doc()` in order to allow caching -->
             <xsl:copy-of select="p:doc(.)"/>

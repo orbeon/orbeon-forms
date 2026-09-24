@@ -21,10 +21,11 @@ import org.orbeon.saxon.value.AtomicValue
 
 class XXFormsComponentParam extends XFormsFunction {
 
-  override def evaluateItem(xpathContext: XPathContext): AtomicValue =
+  override def evaluateItem(xpathContext: XPathContext): AtomicValue = {
+    implicit val xpc: XPathContext           = xpathContext
+    implicit val xfc: XFormsFunction.Context = XFormsFunction.context
     ComponentParamSupport.componentParamValue(
-      paramName = getQNameFromExpression(argument.head)(xpathContext),
-      property  = Property.property)(
-      XFormsFunction.context
-    ).orNull
+      paramName = getQNameFromExpression(argument.head),
+      property  = Property.property(_, xfc.containingDocument.staticState.propertyProfileOpt)).orNull
+  }
 }

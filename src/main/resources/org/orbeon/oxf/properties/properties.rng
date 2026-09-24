@@ -23,6 +23,9 @@
                     <data type="QName"/>
                 </attribute>
             </optional>
+            <optional>
+                <attribute name="profiles"/>
+            </optional>
             <choice>
                 <group>
                     <choice>

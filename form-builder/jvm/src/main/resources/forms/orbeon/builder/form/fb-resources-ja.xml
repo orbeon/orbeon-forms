@@ -481,6 +481,20 @@
         <automatic-hints>
             <label>自動ヒントを使う</label>
         </automatic-hints>
+        <property-profile>
+            <label>プロファイル</label>
+            <hint>このフォームのプロファイルを設定</hint>
+            <help>
+                &lt;p&gt;
+                    プロパティプロファイルを使用すると、複数のフォーム間で構成プロパティをグループ化、共有、再利用できます。
+                    プロファイルを選択すると、関連付けられたプロパティがこのフォームに適用されます。
+                &lt;/p&gt;
+                &lt;p&gt;
+                    詳細については、&lt;a target="_blank" href="https://doc.orbeon.com/configuration/properties/property-profiles"&gt;プロパティプロファイル&lt;/a&gt;を参照してください。
+                &lt;/p&gt;
+            </help>
+            <none>(なし)</none>
+        </property-profile>
         <appearances>
             <item id="0">プロパティを使う</item>
             <item id="1">インライン</item>

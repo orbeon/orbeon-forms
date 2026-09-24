@@ -32,7 +32,7 @@ import org.orbeon.oxf.fr.process.SimpleProcess.{currentXFormsDocumentId, evaluat
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{ContentTypes, Mediatypes, PathUtils}
+import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupport, Mediatypes, PathUtils}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
@@ -929,12 +929,16 @@ object FormBuilderXPathApi {
 
   //@XPathExpression
   def alwaysShowRoles: List[String] =
-    Property.propertyAsString("oxf.fb.permissions.role.always-show") match {
+    Property.propertyAsString("oxf.fb.permissions.role.always-show", inScopeContainingDocument.staticState.propertyProfileOpt) match {
       case Some(rolesJson) =>
         parser.parse(rolesJson).flatMap(_.as[List[String]]).getOrElse(throw new IllegalArgumentException(rolesJson))
       case None =>
         Nil
     }
+
+  //@XPathFunction
+  def propertyProfiles: List[String] =
+    CoreCrossPlatformSupport.properties.allProfiles.toList.sorted
 
   // Called by `permissions.xbl` when loading `instance('fr-form-metadata')/permissions`
   // TODO: Should just create the UI XML!

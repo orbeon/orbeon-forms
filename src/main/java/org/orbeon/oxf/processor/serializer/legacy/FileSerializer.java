@@ -312,7 +312,7 @@ public class FileSerializer extends ProcessorImpl {
                 config.isIndent(), config.getIndentAmount());
 
         identity.setResult(new StreamResult(writer));
-        readInputAsSAX(context, input, new SerializerXMLReceiver(identity, writer, getPropertySet().getBoolean("serialize-xml-11", false)));
+        readInputAsSAX(context, input, new SerializerXMLReceiver(identity, writer, getPropertySet().getBoolean("serialize-xml-11", false, scala.Option.apply(null))));
     }
 
     protected Writer getWriter(OutputStream outputStream, Config config) {

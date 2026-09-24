@@ -123,6 +123,9 @@
     <property as="xs:anyURI"  name="oxf.fr.default-logo.uri.*.*">
         /apps/fr/style/orbeon-logo.svg
     </property>
+    <property as="xs:anyURI"  name="oxf.fr.favicon.uri.*.*">
+        /ops/images/orbeon-icon-64.png
+    </property>
     <property as="xs:string"  name="oxf.fr.css.custom.uri.*.*"                                     value=""/>
     <property as="xs:string"  name="oxf.fr.js.custom.uri.*.*"                                      value=""/>
     <!-- "container" or "header" or empty -->

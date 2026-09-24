@@ -152,6 +152,20 @@
 
     <xsl:variable name="error-summary"        select="p:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))"                      as="xs:string?"/>
     <xsl:variable name="default-logo-uri"     select="p:trim(p:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.')))[p:non-blank()]"   as="xs:string?"/>
+    <xsl:variable name="favicon-uri"          select="p:trim(p:property(string-join(('oxf.fr.favicon.uri', $app, $form), '.')))[p:non-blank()]"        as="xs:string?"/>
+    <xsl:variable
+        name="favicon-type"
+        select="
+            let $clean-path := lower-case(tokenize($favicon-uri, '\?|#')[1])
+            return
+                     if (ends-with($clean-path, '.png')) then 'image/png'
+                else if (ends-with($clean-path, '.svg')) then 'image/svg+xml'
+                else if (ends-with($clean-path, '.ico')) then 'image/x-icon'
+                else if (ends-with($clean-path, '.gif')) then 'image/gif'
+                else if (ends-with($clean-path, '.jpg') or ends-with($clean-path, '.jpeg')) then 'image/jpeg'
+                else if (ends-with($clean-path, '.webp')) then 'image/webp'
+                else ()"
+        as="xs:string?"/>
     <xsl:variable name="hide-logo"            select="p:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'))"                          as="xs:boolean?"/>
     <xsl:variable name="hide-footer"          select="p:property(string-join(('oxf.fr.detail.hide-footer', $app, $form), '.'))"                        as="xs:boolean?"/>
     <xsl:variable name="hide-buttons-bar"     select="p:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))"                   as="xs:boolean?"/>
@@ -693,6 +707,25 @@
                            )"/>
             </xh:title>
 
+            <!-- Favicon -->
+            <xsl:choose>
+                <xsl:when test="xh:link[@rel = 'icon']">
+                    <!-- Keep existing favicon from form definition -->
+                    <xsl:for-each select="xh:link[@rel = 'icon']">
+                        <xsl:element name="xh:{local-name()}" namespace="{namespace-uri()}">
+                            <xsl:apply-templates select="@*|node()"/>
+                        </xsl:element>
+                    </xsl:for-each>
+                </xsl:when>
+                <xsl:when test="not($is-pdf-mode) and exists($favicon-uri)">
+                    <xh:link rel="icon" href="{$favicon-uri}">
+                        <xsl:if test="exists($favicon-type)">
+                            <xsl:attribute name="type" select="$favicon-type"/>
+                        </xsl:if>
+                    </xh:link>
+                </xsl:when>
+            </xsl:choose>
+
             <!-- Theme CSS (selected via `oxf.fr.style.theme.*.*` -> `oxf.fr.style.themes.<name>.css-uri`) -->
             <xsl:if test="exists($theme-css-uri)">
                 <xh:link rel="stylesheet" href="{$theme-css-uri}" type="text/css" media="all"/>
@@ -704,7 +737,7 @@
             </xsl:for-each>
 
             <!-- Handle existing stylesheets -->
-            <xsl:for-each select="xh:link | xh:style">
+            <xsl:for-each select="xh:link[not(@rel = 'icon')] | xh:style">
                 <xsl:element name="xh:{local-name()}" namespace="{namespace-uri()}">
                     <xsl:apply-templates select="@*|node()"/>
                 </xsl:element>

@@ -25,8 +25,6 @@
     <xsl:template match="xh:head" priority="10">
         <xsl:copy>
             <xsl:call-template name="head"/>
-            <!-- Favicon -->
-            <xh:link rel="icon" type="image/png"     href="/ops/images/orbeon-icon-64.png"/>
             <xh:meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes"/>
         </xsl:copy>
     </xsl:template>

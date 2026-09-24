@@ -31,7 +31,7 @@
             <xsl:variable  name="classes-to-copy" select="p:split(/xh:html/xh:body/@class)[matches(., '^xforms-(dis|en)able-[^-]+-as-tooltip$')]"/>
             <xsl:attribute name="class"           select="string-join(('orbeon orbeon-portlet-div', $classes-to-copy), ' ')"/>
             <!-- Handle head elements except scripts -->
-            <xsl:for-each select="/xh:html/xh:head/(xh:meta | xh:link | xh:style)">
+            <xsl:for-each select="/xh:html/xh:head/(xh:meta | xh:link[not(@rel = 'icon')] | xh:style)">
                 <xsl:element name="xh:{local-name()}" namespace="{namespace-uri()}">
                     <xsl:copy-of select="@*"/>
                     <xsl:apply-templates/>

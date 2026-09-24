@@ -717,7 +717,7 @@
                         </xsl:element>
                     </xsl:for-each>
                 </xsl:when>
-                <xsl:when test="not($is-pdf-mode) and exists($favicon-uri)">
+                <xsl:when test="exists($favicon-uri)">
                     <xh:link rel="icon" href="{$favicon-uri}">
                         <xsl:if test="exists($favicon-type)">
                             <xsl:attribute name="type" select="$favicon-type"/>

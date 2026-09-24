@@ -1611,7 +1611,7 @@
                                                                     if (empty(@alternate-field-name)) then
                                                                          @fully-qualified-name
                                                                     else
-                                                                       concat(@alternate-field-name, ' (', @fully-qualified-name, ')')
+                                                                       concat(@alternate-field-name, ' (', @name, ')')
                                                                 )[1]"/>
                                                         <xf:value ref="@fully-qualified-name"/>
                                                     </xf:itemset>

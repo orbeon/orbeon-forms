@@ -728,8 +728,10 @@ trait ContainingDocumentDelayedEvents {
   self: XBLContainer & ContainingDocumentEvent =>
 
   private val _delayedEvents = mutable.ListBuffer[DelayedEvent]()
+  private var _newTwoPassSubmissionIds = Set.empty[String]
 
-  def addTwoPassSubmitEvent(p: TwoPassSubmissionParameters): Unit =
+  def addTwoPassSubmitEvent(p: TwoPassSubmissionParameters): Unit = {
+    val submissionId = CoreCrossPlatformSupport.randomHexId
     _delayedEvents += DelayedEvent(
       eventName              = XFormsEvents.XXFORMS_SUBMIT,
       targetEffectiveId      = p.submissionEffectiveId,
@@ -738,14 +740,26 @@ trait ContainingDocumentDelayedEvents {
       time                   = None,
       showProgress           = p.submissionParameters.xxfShowProgress,
       browserTarget          = p.submissionParameters.xxfTargetOpt,
-      submissionId           = CoreCrossPlatformSupport.randomHexId.some,
+      submissionId           = submissionId.some,
       isResponseResourceType = p.submissionParameters.resolvedIsResponseResourceType,
       stringProperties       = Nil, // `submissionParameters` is used instead
       submissionParameters   = p.submissionParameters.some
     )
 
+    // Ids of two-pass submit events created during the current request. This is to avoid resending an
+    // `<xxf:submission>` on a subsequent `xxforms-poll`, which can trigger the browser doing the 2nd-phase
+    // POST twice, resulting in a blank page.
+    _newTwoPassSubmissionIds += submissionId
+  }
+
   def findTwoPassSubmitEvents: List[DelayedEvent] =
     _delayedEvents.filter(_.eventName == XFormsEvents.XXFORMS_SUBMIT).toList // also `_.time.isEmpty && _.submissionId.nonEmpty`
+
+  def findNewTwoPassSubmitEvents: List[DelayedEvent] =
+    findTwoPassSubmitEvents.filter(_.submissionId.exists(_newTwoPassSubmissionIds))
+
+  def clearNewTwoPassSubmitEvents(): Unit =
+    _newTwoPassSubmissionIds = Set.empty
 
   // This excludes events where `time == None`, which means it doesn't return the `xxforms-submit` event.
   def findEarliestPendingDelayedEvent: Option[DelayedEvent] =

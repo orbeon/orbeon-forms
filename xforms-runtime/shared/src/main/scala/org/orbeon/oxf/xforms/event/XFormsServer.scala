@@ -446,7 +446,7 @@ object XFormsServer {
                 // In case there is a submission AND a poll needed, send both, except if we guess that there
                 // is navigation within the same browsing context. It's just a heuristic to prevent sending
                 // an Ajax request whose response might not succeed because the browsing context has navigated.
-                if (! (containingDocument.findTwoPassSubmitEvents exists (_.browserTarget.isEmpty))) {
+                if (! (containingDocument.findNewTwoPassSubmitEvents exists (_.browserTarget.isEmpty))) {
                   containingDocument.findEarliestPendingDelayedEvent foreach { event =>
                     outputPoll(event, System.currentTimeMillis)
                   }
@@ -506,7 +506,7 @@ object XFormsServer {
                   outputHelpInfo(containingDocument, helpControlEffectiveId)
                 }
 
-                containingDocument.findTwoPassSubmitEvents foreach { twoPassSubmitEvent =>
+                containingDocument.findNewTwoPassSubmitEvents foreach { twoPassSubmitEvent =>
                   outputSubmissionInfo(twoPassSubmitEvent)
                 }
 

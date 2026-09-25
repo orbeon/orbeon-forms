@@ -236,6 +236,7 @@ class XFormsContainingDocument(
 
     clearRequestStats()
     clearTransientState()
+    clearNewTwoPassSubmitEvents()
 
     this.controlsStructuralChanges = Set.empty
   }

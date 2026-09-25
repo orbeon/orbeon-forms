@@ -776,6 +776,7 @@
                         color: var(--orbeon-button-color); // Not used in practice?
                         display: block;
                         margin: auto;
+                        padding: 0;
                     }
                 }
 
@@ -827,12 +828,21 @@
                     }
                 }
 
+                .fr-repeat-column-left .dropdown > .fr-grid-dropdown-button {
+                    // Center the dropdown menu button in its column
+                    display: flex;
+                    margin: 0 auto;
+                }
+
                 // Update caret icon with Font Awesome
                 .dropdown .fa-caret-down {
                     width: 8px;
                     height: 12px;
                     margin: 4px auto;
-                    line-height: 1em; // Allow the icon to be vertically centered
+                    // Center the caret in the dropdown menu button
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                 }
             }
         }

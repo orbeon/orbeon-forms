@@ -147,6 +147,11 @@
     display: none;
   }
 
+  .dropdown-toggle:has(> .caret:only-child)::after {
+    // No left margin if the toggle only contains a caret, so the caret becomes centered
+    margin-left: 0;
+  }
+
   .dropdown:not(:has(.show)) {
     // Dropdown toggles carry btn btn-secondary (user nav in view.xsl, bootstrap5-select1.xbl), which the Bootstrap 2
     // markup did not, so the button styling must be neutralized

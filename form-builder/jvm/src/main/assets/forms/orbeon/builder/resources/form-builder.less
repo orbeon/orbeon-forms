@@ -771,8 +771,8 @@ body.orbeon {
             }
         }
 
-        // Indent all radio controls, not only those with
-        .xforms-select1-appearance-full .xforms-items,
+        // Indent all radio controls, except in open select1, which adds its own padding on .fr-component-group
+        .xforms-select1-appearance-full:not(.xbl-fr-open-select1 *) .xforms-items,
         .xbl-fb-boolean-or-formula .fr-component-group .xforms-textarea {
             padding: 4px 6px;
         }
@@ -1038,6 +1038,7 @@ body.orbeon {
             & > .fr-component-group {
                 display: flex;
                 align-items: center;
+                column-gap: 6px; // between the radio buttons and the "Other" field
 
                 label.radio {
                     margin-bottom: 0; // remove extra margin for `align-items`

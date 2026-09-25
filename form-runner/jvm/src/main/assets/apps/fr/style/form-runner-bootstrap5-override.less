@@ -505,6 +505,13 @@
     cursor: pointer;
   }
 
+  label:has(:disabled),
+  select:disabled,
+  input[type="radio"]:disabled,
+  input[type="checkbox"]:disabled {
+    cursor: not-allowed; // same as .xforms-field
+  }
+
   // Bootstrap 2 vertical-aligned form fields middle (Reboot uses baseline); keeps the date/time "fields" appearance
   // aligned with its add-on widget
   input[type="text"],
@@ -554,7 +561,7 @@
       justify-content: center;
       text-align     : center;   // inherits into children wider than their content (e.g. a currency output)
       line-height    : 1;
-      padding        : 0 0.38em; // Match Bootstrap at a font size of 13px (i.e. 5px)
+      padding        : 0 0.38em; // match Bootstrap at a font size of 13px (i.e. 5px)
 
       // Matching inputs
       font-size : var(--orbeon-control-font-size);
@@ -637,8 +644,11 @@
         border-color    : var(--orbeon-checkable-checked-border-color);
       }
       &:disabled {
-        background-color: var(--orbeon-checkable-disabled-background-color);
-        border-color    : var(--orbeon-checkable-disabled-border-color);
+        opacity: .5;
+        &:not(:checked) {
+          background-color: var(--orbeon-checkable-disabled-background-color);
+          border-color    : var(--orbeon-checkable-disabled-border-color);
+        }
       }
       &:focus {
         .focusDecorations();

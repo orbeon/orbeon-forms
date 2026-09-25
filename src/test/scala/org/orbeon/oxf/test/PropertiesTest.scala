@@ -261,6 +261,7 @@ class PropertiesTest extends AnyFunSpecLike with ResourceManagerSupport {
         |    <property as="xs:string" name="oxf.fr.detail.buttons.*.*"                profiles="profile2  profile3"   value="multi-profile-buttons"/>
         |    <property as="xs:string" name="oxf.fr.detail.buttons.my-app.*"           profiles="profile1"             value="my-app-profile1-buttons"/>
         |    <property as="xs:string" name="oxf.fr.detail.buttons.my-app.my-form"     profiles="profile1"             value="custom-profile1-buttons"/>
+        |    <property as="xs:string" name="oxf.fr.detail.buttons.other-app.*"        profiles="profile1"             value="other-app-profile1-buttons"/>
         |    <property as="xs:string" name="oxf.fr.detail.buttons.other-app.my-form"                                  value="exact-default-buttons"/>
         |    <property as="xs:string" name="test.profile.only"                        profiles="special"              value="special-val"/>
         |    <property as="xs:string" name="test.empty.profiles"                      profiles=""                     value="empty-profiles-val"/>
@@ -341,6 +342,9 @@ class PropertiesTest extends AnyFunSpecLike with ResourceManagerSupport {
       }
 
       it("must prefer exact property name over wildcard with profile") {
+        // Currently, this wins over `oxf.fr.detail.buttons.other-app.*`/`profile1`. We could go the other way, and
+        // give the profile a higher priority compared to a wildcard. In normal use, we should avoid creating properties
+        // which are ambiguous in this way.
         assert(propertySet.getNonBlankString("oxf.fr.detail.buttons.other-app.my-form", Some("profile1")).contains("exact-default-buttons"))
       }
     }

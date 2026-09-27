@@ -95,7 +95,7 @@ val JakartaServletApiVersion         = "6.1.0"
 val PortletApiVersion                = "3.0.1"
 val LiferayPortalServiceVersion      = "6.2.5"
 val LiferayPortalKernelVersion       = "166.0.0"
-val WildFlyElytronHttpOidcVersion    = "2.9.2.SP1"
+val WildFlyElytronHttpOidcVersion    = "2.9.4.Final"
 
 val CoreLibraryDependencies = Seq(
   "org.orbeon"                  % "saxon"                           % SaxonJvmVersion, // Java library!

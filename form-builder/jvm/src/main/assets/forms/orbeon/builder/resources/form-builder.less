@@ -31,7 +31,6 @@
 @wallAccentLight:  @color2;
 @wallAccentBright: @color3;
 @cellHighlight: @color5;
-@explanatoryTextShadow: rgba(0, 123, 255, 25%);
 
 @fbButtonsBackground: white; // so that the borderless buttons look good
 
@@ -43,7 +42,7 @@ body.orbeon {
     width: 100vw;
     height: 100vh;
     box-sizing: border-box;
-    background-color: @grayLight;
+    background-color: var(--orbeon-fb-background-color);
 }
 
 // Case of embedded Form Builder: size with some defaults (expecting that the embedding code will override this)
@@ -54,8 +53,8 @@ body.orbeon {
     width: 98vw;
     bottom: 1vh;
     box-sizing: border-box;
-    border: 1px solid @grayLight;
-    background-color: @grayLight;
+    border: 1px solid var(--orbeon-fb-background-color);
+    background-color: var(--orbeon-fb-background-color);
 
     // Reset general embedding styles
     .navbar.navbar-fixed-top {
@@ -92,7 +91,7 @@ body.orbeon {
         border-radius: @baseBorderRadius;
 
         .fb-main-inner {
-            background-color: @wellBackground;
+            background-color: var(--orbeon-fb-form-area-background-color);
             box-sizing: border-box;
             margin-bottom: 0;
             min-width: 740px; // To allow for fluidity but not "too small" (was 980px)
@@ -121,7 +120,7 @@ body.orbeon {
             }
             .xforms-required.xforms-empty {
                 .xforms-label:before {
-                    color: #333; // TODO: variable specifically for field border
+                    color: var(--orbeon-base-color);
                 }
             }
         }
@@ -237,7 +236,7 @@ body.orbeon {
         cursor: pointer;
         font-size: 18px;                // Matching the title font size
         line-height: 36px;              // So text is vertically centered
-        color: #BBB;                    // Light gray denoting hint
+        color: var(--orbeon-fb-placeholder-color);
         font-family: @frBaseFontFamily; // Matching font defined by Bootstrap for titles
         z-index: 1;                     // Show on top of the page (default is 0)
     }
@@ -252,7 +251,7 @@ body.orbeon {
     }
 
     h2.fr-section-title.hover {                                             // .hover added by CS on mouse over click interceptor
-        background-color: #ddd;
+        background-color: var(--orbeon-fb-editable-hover-background-color);
     }
 
     .fb-delete-grid-trigger {
@@ -278,7 +277,7 @@ body.orbeon {
                 .xforms-label, .xforms-hint, .xforms-text .xforms-output-output {
                     &:empty:before {
                         content: attr(placeholder);
-                        color: #bbb;
+                        color: var(--orbeon-fb-placeholder-color);
                         font-size: 100%; // Override the larger size set by Form Runner for the `*`
                     }
                 }
@@ -324,7 +323,7 @@ body.orbeon {
 
         // Highlight the grid cell when dragging over
         &:has(.gu-transit) {
-            background-color: #ccc;
+            background-color: var(--orbeon-fb-dnd-background-color);
         }
 
         // D&D from the toolbox
@@ -367,7 +366,7 @@ body.orbeon {
     }
     .fb-grid-dnd-wall-shadow {
         position: absolute;
-        background-color: #ccc;
+        background-color: var(--orbeon-fb-dnd-background-color);
         z-index: 1; // For shadow to be above controls
     }
 
@@ -412,11 +411,6 @@ body.orbeon {
                 margin: 4px 0;
             }
 
-            .xforms-trigger a {
-                text-decoration: none;
-                color: @frHeaderColor;
-            }
-
             // Toolbox-specific tweaks on top of the generic .nav-tabs port below
             .xbl-fr-tabbable .nav-tabs {
 
@@ -435,12 +429,12 @@ body.orbeon {
 
                 &>  li:not(.active) > a {
 
-                    background-color: #ccc;
-                    color: white;
+                    background-color: var(--orbeon-fb-toolbox-tab-background-color);
+                    color: var(--orbeon-fb-toolbox-tab-color);
 
                     &:hover {
-                        background-color: white;
-                        color: #ccc;
+                        background-color: var(--orbeon-tab-background-color);
+                        color: var(--orbeon-fb-toolbox-tab-hover-color);
                     }
                 }
             }
@@ -531,7 +525,7 @@ body.orbeon {
                     line-height: 24px;
                     text-align: left;
                     font-weight: bold;
-                    border-bottom: 1px solid #e5e5e5;
+                    border-bottom: 1px solid var(--orbeon-base-border-color);
                 }
 
                 .fb-tools-title {
@@ -546,17 +540,17 @@ body.orbeon {
                     right: 0;
                     width: 20px;
                     text-align: center;
-                    color: @grayDark;
+                    color: var(--orbeon-base-color);
 
                     &:hover {
                         border-radius: @baseBorderRadius;
-                        background-color: @grayLighter;
+                        background-color: var(--orbeon-fb-hover-background-color);
                     }
                 }
 
                 .fb-library-empty {
                     padding: 2px 4px;
-                    color: @grayLight;
+                    color: var(--orbeon-fb-empty-message-color);
                     font-style: italic;
                     font-size: 85%;
                 }
@@ -591,7 +585,7 @@ body.orbeon {
                         i, img { margin-right: 3px } // space between icon and text
 
                         &:hover {
-                            background-color: @grayLighter; // effect on hover
+                            background-color: var(--orbeon-fb-hover-background-color); // effect on hover
                         }
 
                         i.fa {
@@ -638,7 +632,7 @@ body.orbeon {
 
                         &:hover {
                             border-radius: @baseBorderRadius;
-                            background-color: @grayLighter; // effect on hover
+                            background-color: var(--orbeon-fb-hover-background-color); // effect on hover
                         }
                     }
                 }
@@ -834,7 +828,7 @@ body.orbeon {
                 display: none;
             }
             .tab-content {
-                border-top: 1px solid #ddd;
+                border-top: 1px solid var(--orbeon-tab-border-color);
                 border-radius: @baseBorderRadius; // nicer when there are no tabs (arguably in all cases)
             }
         }
@@ -876,7 +870,7 @@ body.orbeon {
                     display: flex;
                     flex-direction: column;
                     white-space: nowrap;
-                    border: 1px solid #ddd;
+                    border: 1px solid var(--orbeon-base-border-color);
                     padding: .5em;
                     border-radius: 10px;
                     row-gap: 2px;
@@ -902,7 +896,7 @@ body.orbeon {
                         //text-decoration: underline;
                         text-align: center;
                         min-height: 2em;
-                        border-bottom: 2px solid #ddd;
+                        border-bottom: 2px solid var(--orbeon-base-border-color);
                     }
                     .fb-template-thumbnail {
                         img {
@@ -1694,8 +1688,8 @@ body.orbeon {
             td:nth-child(3) { width: 50%; }
         }
         kbd {
-            background-color: #eee;
-            border: 1px solid #ddd;
+            background-color: var(--orbeon-kbd-background-color);
+            border: 1px solid var(--orbeon-kbd-border-color);
             padding: 3px;
             border-radius: 4px;
             font-size: smaller;
@@ -1878,12 +1872,11 @@ body.orbeon {
 
                 border-radius: @baseBorderRadius;
 
-                // Similar to .focusHighlight()
+                transition: border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                            box-shadow   var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
                 &:focus-within {
-                    box-shadow: 0 0 0 3px @explanatoryTextShadow; // was 0.2rem (16px root), rounded
-                    outline: 0;
-                    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-                    border-color: #ccc;
+                    border-color: var(--orbeon-focus-border-color);
+                    .focusDecorations();
                 }
             }
         }
@@ -1903,7 +1896,7 @@ body.orbeon {
             button {
                 width: 100%;
                 &:hover {
-                    background-color: #ddd;
+                    background-color: var(--orbeon-button-highlight-background-color);
                 }
             }
         }
@@ -1952,7 +1945,7 @@ body.orbeon {
 
     .fr-grid .fr-grid-td .fb-grid-control-icons img { display: inline }
     .fb-label-hint-placeholder,                                                         // Grey color for placeholder "Click here to edit…" so users can distinguish it from an actual value
-    .fb-label-hint-placeholder .btn { color: #bbb } // To take precedence over color set for button's labels in xforms.css
+    .fb-label-hint-placeholder .btn { color: var(--orbeon-fb-placeholder-color) }       // To take precedence over color set for button's labels in xforms.css
     .fr-grid .fr-grid-td .xforms-trigger .btn input,                                    // Override margin set in form-runner-base.css for buttons in noscript (rendered as input)
     .btn .xforms-label { margin: 0 }                // Override margin set in form-runner-base.css for regular labels
 
@@ -1976,7 +1969,7 @@ body.orbeon {
 
                 .fr-grid-td {
                     &:hover:not(.fb-selected) { // Grey background on hover on non-selected cell, to indicate it can be selected
-                        background-color: #eee;
+                        background-color: var(--orbeon-fb-hover-background-color);
                     }
                 }
 
@@ -2005,7 +1998,7 @@ body.orbeon {
                     }
 
                     &.fb-hover .fr-grid-td {
-                        box-shadow: 0 0 0 1px @grayLighter
+                        box-shadow: 0 0 0 1px var(--orbeon-fb-hover-background-color)
                     }
                 }
 
@@ -2029,7 +2022,7 @@ body.orbeon {
                 .xforms-label, .xforms-hint, .btn span, .xforms-text .xforms-output-output {
                     &:hover {
                         // Indicate the value can be edited
-                        background-color: #ddd;
+                        background-color: var(--orbeon-fb-editable-hover-background-color);
                         cursor: pointer;
                         border-radius: @baseBorderRadius;
                     }
@@ -2091,7 +2084,7 @@ body.orbeon {
     .fb-use-toolbar-message, .fb-click-message {
         display: none;
         font-size: 70%;
-        color: gray;
+        color: var(--orbeon-fb-cell-message-color);
         width: 100%;
         font-style: italic;
         text-align: center;
@@ -2104,10 +2097,10 @@ body.orbeon {
     .fb-component-icon { display: block }
 
     // Read-only components
-    .fb-section-component .fr-grid-td { background-image: none; background-color: #F8F8F8; border: solid 1px #F8F8F8 }
+    .fb-section-component .fr-grid-td { background-image: none; background-color: var(--orbeon-control-read-only-background-color); border: solid 1px var(--orbeon-control-read-only-background-color) }
     // 2024-09-23: Unsure whether we need to do this as here is already general styling for readonly control.
-    .xforms-readonly .xforms-input-input { background-image: none; background-color: @inputDisabledBackground }
-    .xforms-readonly textarea { background-image: none; background-color: @inputDisabledBackground }
+    .xforms-readonly .xforms-input-input { background-image: none; background-color: var(--orbeon-control-read-only-background-color) }
+    .xforms-readonly textarea { background-image: none; background-color: var(--orbeon-control-read-only-background-color) }
 
     // ***** Message ***************************************************************************************************
 
@@ -2183,21 +2176,21 @@ body.orbeon {
         margin-bottom: 0;                                                    // the content below (.fr-top) has its own padding
         padding: 0;                                                          // the inner carries our padding
         border-radius: 0;                                                    // override Bootstrap rounded corners
-        background-color: var(--orbeon-fb-navbar-background-color, #fafafa); // light header (overrides the dark navbar background)
+        background-color: var(--orbeon-fb-navbar-background-color);
         .navbar-inner {
             display: flex;
             align-items: center;
             width: 100%;
             min-height: 43px;
             padding: 0 20px;
-            background-color: var(--orbeon-fb-navbar-background-color, #fafafa); // Bootstrap 2 put the background here
+            background-color: var(--orbeon-fb-navbar-background-color);
             .container {
                 display: flex;
                 align-items: center;
                 width: 100%;
                 max-width: none; // override Bootstrap 5 .container responsive max-widths
                 h1 {
-                    color: #777;
+                    color: var(--orbeon-fb-navbar-color);
                     margin: 0; // so align-items: center actually centers it
                 }
                 .nav {
@@ -2214,11 +2207,11 @@ body.orbeon {
                 // Bootstrap 2's navbar-link look (Bootstrap 5 leaves default blue underlined anchors)
                 .nav > li > a,
                 .fr-navbar-home-link a {
-                    color: #777;
+                    color: var(--orbeon-fb-navbar-color);
                     text-decoration: none;
                     &:hover,
                     &:focus {
-                        color: #333;
+                        color: var(--orbeon-fb-navbar-hover-color);
                         text-decoration: none;
                     }
                 }
@@ -2259,7 +2252,7 @@ body.orbeon {
             margin-left: 10px; // breathing room after the language selector
             i {
                 background: none;
-                color: white;
+                color: var(--orbeon-navbar-color);
                 opacity: 0.7;
             }
         }
@@ -2268,21 +2261,20 @@ body.orbeon {
             .nav {
                 margin-right: 0;
             }
-            // Bootstrap 2's inverse-navbar link look and open-state (.show) highlight
             .dropdown-toggle {
                 display: inline-block;
                 padding: 5px 15px; // Bootstrap 2's padded clickable zone
                 line-height: @baseLineHeight;
-                color: #999;
+                color: var(--orbeon-navbar-language-dropdown-color);
                 text-decoration: none;
                 &:hover,
                 &:focus {
-                    color: #fff;
+                    color: var(--orbeon-navbar-language-dropdown-hover-color);
                     text-decoration: none;
                 }
                 &.show {
-                    background-color: #111;
-                    color: #fff;
+                    background-color: var(--orbeon-navbar-dropdown-open-toggle-background-color);
+                    color: var(--orbeon-navbar-language-dropdown-hover-color);
                 }
             }
         }
@@ -2297,15 +2289,15 @@ body.orbeon {
         &.show,
         &.show:hover,
         &.show:focus {
-            background-color: #e5e5e5;
-            color: #555;
+            background-color: var(--orbeon-dropdown-open-toggle-background-color);
+            color: var(--orbeon-fb-navbar-hover-color);
         }
     }
 
-    // Constrain and center the form-editing canvas like the runtime view (its container has no .fr-view class); the
-    // fr-density-* match hits the canvas but never the navbar's .container
+    // Constrain and center the form area like the runtime view (its container has no .fr-view class); the
+    // fr-density-* match hits the form area but never the navbar's .container
     .fb-main-inner .container[class*="fr-density-"] {
-        max-width: var(--orbeon-view-max-width, 940px);
+        max-width: var(--orbeon-view-max-width);
         margin-left: auto;
         margin-right: auto;
         box-sizing: content-box;
@@ -2314,7 +2306,7 @@ body.orbeon {
     // Bootstrap 2's horizontal tab look for fr:tabbable's .nav-tabs > li > a markup, which Bootstrap 5 leaves unstyled
     // (it only styles .nav-link). The toolbox tabs layer on top of this.
     .nav-tabs {
-        border-bottom: 1px solid #ddd;
+        border-bottom: 1px solid var(--orbeon-tab-border-color);
         &> li {
             margin-bottom: -1px; // overlap the container's bottom border
             &> a {
@@ -2330,15 +2322,15 @@ body.orbeon {
                     color: var(--orbeon-link-color);
                 }
                 &:hover {
-                    border-color: #eee #eee #ddd;
-                    background-color: #eee;
+                    border-color: var(--orbeon-fb-hover-background-color) var(--orbeon-fb-hover-background-color) var(--orbeon-tab-border-color);
+                    background-color: var(--orbeon-fb-hover-background-color);
                 }
             }
             &.active > a,
             &.active > a:hover {
-                color: #555;
-                background-color: white;
-                border-color: #ddd #ddd transparent;
+                color: var(--orbeon-base-color);
+                background-color: var(--orbeon-tab-background-color);
+                border-color: var(--orbeon-tab-border-color) var(--orbeon-tab-border-color) transparent;
                 cursor: default;
             }
         }
@@ -2352,19 +2344,19 @@ body.orbeon {
             float: left;
             width: auto;            // shrink to the widest tab label
             margin-right: 19px;
-            border-right: 1px solid #ddd;
+            border-right: 1px solid var(--orbeon-tab-border-color);
             border-bottom: 0;
             > li > a {
                 margin-right: -1px;                                     // overlap the nav's right border
                 margin-bottom: 3px;                                     // small gap between stacked tabs
                 border-radius: @baseBorderRadius 0 0 @baseBorderRadius; // round the left corners (vertical tab)
                 &:hover {
-                    border-color: #eee #ddd #eee #eee;
+                    border-color: var(--orbeon-fb-hover-background-color) var(--orbeon-tab-border-color) var(--orbeon-fb-hover-background-color) var(--orbeon-fb-hover-background-color);
                 }
             }
             > li.active > a,
             > li.active > a:hover {
-                border-color: #ddd transparent #ddd #ddd; // transparent right edge so the active tab merges into the content
+                border-color: var(--orbeon-tab-border-color) transparent var(--orbeon-tab-border-color) var(--orbeon-tab-border-color); // transparent right edge so the active tab merges into the content
             }
         }
         > .tab-content {
@@ -2372,14 +2364,13 @@ body.orbeon {
         }
     }
 
-    // Language selector in Form Builder dialogs: Bootstrap 2's muted link look (not a blue underlined link)
     .xforms-dialog .fr-language-choice .dropdown-toggle {
-        color: #777;
+        color: var(--orbeon-fb-dialog-language-dropdown-color);
         text-decoration: none;
         &:hover,
         &:focus,
         &.show {
-            color: #333;
+            color: var(--orbeon-fb-dialog-language-dropdown-hover-color);
             text-decoration: none;
         }
     }
@@ -2407,8 +2398,8 @@ body.orbeon {
     }
 
     kbd {
-        background-color: #ddd;
-        color: #333; // Bootstrap 2's grey shortcut hints (Reboot forces white kbd text)
+        background-color: var(--orbeon-kbd-background-color);
+        color: var(--orbeon-kbd-color);
     }
 
     .popover.xforms-help-popover {

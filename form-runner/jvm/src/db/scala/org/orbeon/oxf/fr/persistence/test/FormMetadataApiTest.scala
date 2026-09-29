@@ -42,11 +42,30 @@ import java.time.temporal.ChronoUnit
 import scala.collection.immutable.ListMap
 
 
+object FormMetadataApiTest {
+  def withProvider(applicationCounts: Int)(test: Provider => ExternalContext => Unit)(implicit logger: IndentedLogger): Unit =
+    XFormsSupport.withTestExternalContext { implicit externalContext =>
+      Connect.withOrbeonTables("form definition") { (_, provider) =>
+
+        // TODO: We should find a way to have dynamic in-memory properties for tests. Here we write an actual XML file
+        //  which includes the default properties (oxf:/ops/unit-tests/properties.xml) and override them with new
+        //  properties. We had a bug (#7547) where we wrote different properties to the same file and then read the
+        //  properties in less than 50 ms, which led to the wrong properties being read, because of how ExpirationMap
+        //  and ObjectCache work. This approach works here because we usually only have one value for activeProvider
+        //  per JVM/sbt run. And up to this point, ResourceManagerSupportInitializer is "active", pointing to the
+        //  default oxf:/ops/unit-tests/properties.xml properties.
+        ActiveProviderResourceManagerSupport(activeProvider = provider, applicationCounts = applicationCounts)
+
+        test(provider)(externalContext)
+      }
+    }
+}
+
 // We're writing dynamic properties to a file, to have a single provider active at a time at the proxy level. We could
 // probably do this in-memory, but at the time it's easier to write to a file and reload the properties, especially
-// since we're including (xi:include) existing test properties defined in a file.
+// since we're including (`xi:include`) existing test properties defined in a file.
 case class ActiveProviderResourceManagerSupport(
-  activeProvider: Provider,
+  activeProvider   : Provider,
   applicationCounts: Int
 ) extends WithResourceManagerSupport {
 
@@ -124,29 +143,14 @@ class FormMetadataApiTest
     with ResourceManagerSupport
     with AnyFunSpecLike {
 
+  import FormMetadataApiTest.*
+
   // Number of application names that will be generated and associated with the active provider
   private val applicationCounts = 4
 
   private implicit val Logger: IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(classOf[SearchTest]), true)
 
   val FormMetadataPostApiURL = "form"
-
-  def withProvider(test: Provider => ExternalContext => Unit): Unit =
-    withTestExternalContext { implicit externalContext =>
-      Connect.withOrbeonTables("form definition") { (connection, provider) =>
-
-        // TODO: We should find a way to have dynamic in-memory properties for tests. Here we write an actual XML file
-        //  which includes the default properties (oxf:/ops/unit-tests/properties.xml) and override them with new
-        //  properties. We had a bug (#7547) where we wrote different properties to the same file and then read the
-        //  properties in less than 50 ms, which led to the wrong properties being read, because of how ExpirationMap
-        //  and ObjectCache work. This approach works here because we usually only have one value for activeProvider
-        //  per JVM/sbt run. And up to this point, ResourceManagerSupportInitializer is "active", pointing to the
-        //  default oxf:/ops/unit-tests/properties.xml properties.
-        ActiveProviderResourceManagerSupport(activeProvider = provider, applicationCounts = applicationCounts)
-
-        test(provider)(externalContext)
-      }
-    }
 
   def xmlResponseFilter(doc: Document) = {
     val modifiedDoc = doc.deepCopy
@@ -367,7 +371,7 @@ class FormMetadataApiTest
   describe("Form Metadata API") {
 
     it("returns an empty result when there are no form definition") {
-      withProvider { _ => externalContext =>
+      withProvider(applicationCounts) { _ => externalContext =>
 
         implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
@@ -383,7 +387,7 @@ class FormMetadataApiTest
     }
 
     it("returns a single result when there is a single form definition") {
-      withProvider { provider => externalContext =>
+      withProvider(applicationCounts) { provider => externalContext =>
 
         implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
@@ -413,7 +417,7 @@ class FormMetadataApiTest
     }
 
     it("returns forms filtered according to filter query") {
-      withProvider { provider => externalContext =>
+      withProvider(applicationCounts) { provider => externalContext =>
 
         implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
@@ -734,7 +738,7 @@ class FormMetadataApiTest
     }
 
     it("returns forms sorted according to sort query") {
-      withProvider { provider => externalContext =>
+      withProvider(applicationCounts) { provider => externalContext =>
 
         implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
@@ -890,7 +894,7 @@ class FormMetadataApiTest
     }
 
     it("returns forms paginated according to pagination query") {
-      withProvider { provider => implicit externalContext =>
+      withProvider(applicationCounts) { provider => implicit externalContext =>
 
         implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
@@ -968,7 +972,7 @@ class FormMetadataApiTest
     }
 
     it("serializes and deserializes requests and responses") {
-      withProvider { provider => implicit externalContext =>
+      withProvider(applicationCounts) { provider => implicit externalContext =>
 
         // Form request
 

@@ -38,10 +38,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import scala.reflect.ClassTag
 
 
-trait XFormsSupport extends MockitoSugar {
-
-  self: DocumentTestBase =>
-
+object XFormsSupport {
   def withTestExternalContext[T](body: ExternalContext => T): T =
     PipelineSupport.withPipelineContextAndTestExternalContext(
       XFormsStateManager.sessionCreated,
@@ -52,8 +49,19 @@ trait XFormsSupport extends MockitoSugar {
     withTestExternalContext { externalContext =>
       body(SafeRequestContext(externalContext))
     }
+}
 
-  def withActionAndDoc[T](url: String)(body: => T): T =
+trait XFormsSupport extends MockitoSugar {
+
+  self: DocumentTestBase =>
+
+  def withTestExternalContext[T](body: ExternalContext => T): T =
+    XFormsSupport.withTestExternalContext(body)
+
+  def withTestSafeRequestContext[T](body: SafeRequestContext => T): T =
+    XFormsSupport.withTestSafeRequestContext(body)
+
+    def withActionAndDoc[T](url: String)(body: => T): T =
     withActionAndDoc(setupDocument(url))(body)
 
   def withActionAndDoc[T](doc: XFormsContainingDocument)(body: => T): T =

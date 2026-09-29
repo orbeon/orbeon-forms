@@ -37,6 +37,7 @@ import org.scalatest.Assertions.*
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import java.net.URI
+import java.nio.charset.StandardCharsets
 import scala.util.Try
 
 
@@ -46,6 +47,7 @@ private[persistence] object HttpCall {
   case class XML        (doc   : Document             ) extends Body
   case class Binary     (file  : Array[Byte]          ) extends Body
   case class FormEncoded(params: Seq[(String, String)]) extends Body
+  case class JSON       (json  : io.circe.Json        ) extends Body
 
   sealed trait Check[+T]
   object Check {
@@ -67,6 +69,7 @@ private[persistence] object HttpCall {
     body              : Option[Body]                 = None,
     credentials       : Option[Credentials]          = None,
     timeout           : Option[Int]                  = None,
+    headers           : Map[String, List[String]]    = Map.empty,
     xmlResponseFilter : Option[Document => Document] = None
   )
 
@@ -128,6 +131,14 @@ private[persistence] object HttpCall {
 
           case HttpCall.Binary(expectedFile) =>
             assert(actualResponse.body sameElements expectedFile)
+
+          case HttpCall.JSON(expectedJson) =>
+            val actualJson =
+              io.circe.parser.parse(new String(actualResponse.body, StandardCharsets.UTF_8))
+                .getOrElse(throw new AssertionError(s"Failed to parse response as JSON: ${new String(actualResponse.body, StandardCharsets.UTF_8)}"))
+            assert(actualJson == expectedJson)
+
+          case HttpCall.FormEncoded(_) =>
         }
       }
     )
@@ -147,7 +158,8 @@ private[persistence] object HttpCall {
         stage       = solicitedRequest.stage,
         body        = solicitedRequest.body,
         credentials = solicitedRequest.credentials,
-        timeout     = solicitedRequest.timeout
+        timeout     = solicitedRequest.timeout,
+        headers     = solicitedRequest.headers
       )
     ) { closableHttpResponse =>
 
@@ -189,8 +201,9 @@ private[persistence] object HttpCall {
     httpRange                : Option[HttpRange] = None,
     timeout                  : Option[Int]       = None,
     ifMatch                  : Option[String]    = None,
-    hashAlgorithm            : Option[String]    = None,
-    hashValue                : Option[String]    = None
+    hashAlgorithm            : Option[String]            = None,
+    hashValue                : Option[String]            = None,
+    headers                  : Map[String, List[String]] = Map.empty
   )(implicit
     logger                   : IndentedLogger,
     safeRequestCtx      : SafeRequestContext
@@ -215,12 +228,12 @@ private[persistence] object HttpCall {
       val ifMatchHeader    = ifMatch.map(e => Headers.IfMatch -> List(e))
       val hashHeaders      = hashAlgorithm.map(FormRunnerPersistence.OrbeonHashAlgorithm -> List(_)).toList ++
                              hashValue.map(FormRunnerPersistence.OrbeonHashValue -> List(_)).toList
-      val headers          = (timeoutHeader.toList ++ versionHeaders ++ stageHeader.toList ++ ifMatchHeader.toList ++ hashHeaders).toMap ++ httpRangeHeaders
+      val allCustomHeaders = (timeoutHeader.toList ++ versionHeaders ++ stageHeader.toList ++ ifMatchHeader.toList ++ hashHeaders).toMap ++ httpRangeHeaders ++ headers
 
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
         url              = URI.create(documentURL),
         hasCredentials   = false,
-        customHeaders    = headers,
+        customHeaders    = allCustomHeaders,
         headersToForward = Connection.headersToForwardFromProperty,
         cookiesToForward = Connection.cookiesToForwardFromProperty,
         getHeader        = _ => None
@@ -231,12 +244,14 @@ private[persistence] object HttpCall {
       case XML        (_) => ContentTypes.XmlContentType
       case Binary     (_) => ContentTypes.OctetStreamContentType
       case FormEncoded(_) => ContentTypes.ApplicationXWwwFormUrlencoded
+      case JSON       (_) => ContentTypes.JsonContentType
     }
 
     val messageBody = body map {
       case XML        (doc   ) => doc.getRootElement.serializeToString().getBytes
       case Binary     (file  ) => file
       case FormEncoded(params) => PathUtils.encodeSimpleQuery(params).getBytes(ExternalContext.StandardFormCharacterEncoding)
+      case JSON       (json  ) => json.noSpaces.getBytes(StandardCharsets.UTF_8)
     }
 
     val content = messageBody map

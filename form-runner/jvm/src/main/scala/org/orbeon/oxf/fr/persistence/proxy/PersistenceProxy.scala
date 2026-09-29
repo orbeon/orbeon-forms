@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.fr.persistence.proxy
 
+import io.circe.Encoder
+import io.circe.syntax.*
 import org.apache.hc.core5.http.HttpStatus
 import org.log4s
 import org.orbeon.connection.{ConnectionResult, StreamedContent}
@@ -51,6 +53,7 @@ import org.orbeon.xforms.RelevanceHandling.*
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream}
 import java.net.URI
+import java.nio.charset.StandardCharsets
 import javax.xml.transform.stream.StreamResult
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters.*
@@ -1098,22 +1101,45 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
       throw HttpStatusCodeException(StatusCode.MethodNotAllowed)
     }
 
-  private def proxyDistinct(
+  private def streamJson(
+    jsonString: String,
+    response  : Response
+  ): Unit = {
+    response.setContentType(ContentTypes.JsonContentType)
+    val bytes = jsonString.getBytes(StandardCharsets.UTF_8)
+    response.setContentLength(bytes.length)
+    val os = response.getOutputStream
+    os.write(bytes)
+    os.flush()
+  }
+
+  private def proxyDistinct[T: Encoder](
     request       : Request,
     response      : Response,
-    valuesSupplier: => collection.Seq[Any]
+    valuesSupplier: => collection.Seq[T]
   )(implicit
-    properties    : PropertySet,
     indentedLogger: IndentedLogger
   ): Unit =
     if (request.getMethod == HttpMethod.GET) {
       Try(valuesSupplier) match {
         case Success(values) =>
-          val xml: NodeInfo =
-            <_>{
-              values.map(v => <_>{v.toString}</_>)
-            }</_>
-          streamDocument(xml, response)
+
+          val acceptHeaders =
+            Option(request.getHeaderValuesMap).toList.flatMap { map =>
+              map.asScala.collect {
+                case (k, values) if k.equalsIgnoreCase(Headers.Accept) && values != null => values
+              }.flatten
+            }
+
+          if (Headers.allowsJsonOverXml(acceptHeaders.mkString(","))) {
+            streamJson(values.asJson.spaces2, response)
+          } else {
+            val xml: NodeInfo =
+              <_>{
+                values.map(v => <_>{v.toString}</_>)
+              }</_>
+            streamDocument(xml, response)
+          }
 
         case Failure(t) =>
           indentedLogger.logError("", s"Distinct API error: ${t.getMessage}")

@@ -425,12 +425,12 @@
             <xf:bind ref="instance('fr-metadata')/form/remote-server/created"            type="xs:dateTime"/>
             <xf:bind ref="instance('fr-metadata')/form/remote-server/last-modified-time" type="xs:dateTime"/>
 
-            <!-- This will be used by the export/purge dialog as long as we don't have an API to retrieve distinct
-                 values for application names, form names, and versions -->
-            <xf:instance id="fr-all-metadata-request" xxf:exclude-result-prefixes="#all">
-                <search all-forms="false" ignore-admin-permissions="false"/>
-            </xf:instance>
-            <xf:instance id="fr-all-metadata" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
+            <!-- Distinct values for export/purge dialog (#6573) -->
+            <xf:instance id="fr-distinct-apps" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
+            <xf:instance id="fr-distinct-forms-cache" xxf:exclude-result-prefixes="#all"><forms/></xf:instance>
+            <xf:instance id="fr-distinct-versions-cache" xxf:exclude-result-prefixes="#all"><versions/></xf:instance>
+            <xf:instance id="fr-distinct-forms-response" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
+            <xf:instance id="fr-distinct-versions-response" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
 
             <xf:action event="fr-order-by">
                 <xf:var name="local-or-remote" value="event('local-or-remote')"/>
@@ -603,14 +603,45 @@
             </xf:action>
 
             <xf:submission
-                id="read-all-metadata"
-                resource="/fr/service/persistence/form"
-                method="post"
-                ref="instance('fr-all-metadata-request')"
-                serialization="application/xml"
+                id="distinct-apps-submission"
+                resource="/fr/service/persistence/distinct-apps"
+                method="get"
+                serialization="none"
                 mediatype="application/xml"
                 replace="instance"
-                targetref="instance('fr-all-metadata')"/>
+                targetref="instance('fr-distinct-apps')"/>
+
+            <xf:submission
+                id="distinct-forms-submission"
+                resource="/fr/service/persistence/distinct-forms/{encode-for-uri(event('app'))}"
+                method="get"
+                serialization="none"
+                mediatype="application/xml"
+                replace="instance"
+                targetref="instance('fr-distinct-forms-response')">
+                <xf:action event="xforms-submit-done">
+                    <xf:delete ref="instance('fr-distinct-forms-cache')/app[@name = event('app')]"/>
+                    <xf:insert
+                        context="instance('fr-distinct-forms-cache')"
+                        origin="xf:element('app', (xf:attribute('name', event('app')), instance('fr-distinct-forms-response')/*))"/>
+                </xf:action>
+            </xf:submission>
+
+            <xf:submission
+                id="distinct-versions-submission"
+                resource="/fr/service/persistence/distinct-versions/{encode-for-uri(event('app'))}/{encode-for-uri(event('form'))}"
+                method="get"
+                serialization="none"
+                mediatype="application/xml"
+                replace="instance"
+                targetref="instance('fr-distinct-versions-response')">
+                <xf:action event="xforms-submit-done">
+                    <xf:delete ref="instance('fr-distinct-versions-cache')/form[@app = event('app') and @form = event('form')]"/>
+                    <xf:insert
+                        context="instance('fr-distinct-versions-cache')"
+                        origin="xf:element('form', (xf:attribute('app', event('app')), xf:attribute('form', event('form')), instance('fr-distinct-versions-response')/*))"/>
+                </xf:action>
+            </xf:submission>
 
             <xf:action event="process-results">
 

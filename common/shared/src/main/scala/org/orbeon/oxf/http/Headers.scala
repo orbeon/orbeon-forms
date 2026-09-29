@@ -15,7 +15,7 @@ package org.orbeon.oxf.http
 
 import cats.data.NonEmptyList
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.util.NumericUtils
+import org.orbeon.oxf.util.{ContentTypes, NumericUtils}
 import org.orbeon.oxf.util.StringUtils.*
 
 import java.net.URLEncoder
@@ -231,6 +231,82 @@ object Headers {
 
   def isEmbeddedFromHeaders[T](headers: Iterable[(String, T)])(implicit ev: T => Iterable[String]): Boolean =
     embeddedClientValueFromHeaders(headers) exists EmbeddedClientValues
+
+  private case class MediaRangePreference(q: Double, specificity: Int)
+
+  def allowsJsonOverXml(allowHeader: String): Boolean = {
+
+    val mediaRanges =
+      for {
+        header  <- allowHeader.splitTo[List](",")
+        trimmed <- header.trimAllToOpt
+      } yield
+        trimmed
+
+    if (mediaRanges.isEmpty) {
+      false
+    } else {
+      var bestJsonOpt: Option[MediaRangePreference] = None
+      var bestXmlOpt : Option[MediaRangePreference] = None
+
+      def updateBest(currentOpt: Option[MediaRangePreference], newPref: MediaRangePreference): Option[MediaRangePreference] =
+        currentOpt match {
+          case Some(current) =>
+            if (newPref.q > current.q || (newPref.q == current.q && newPref.specificity > current.specificity))
+              Some(newPref)
+            else
+              Some(current)
+          case None =>
+            Some(newPref)
+        }
+
+      for (range <- mediaRanges) {
+        val parts = range.splitTo[List](";").flatMap(_.trimAllToOpt)
+        val rawMediaType = parts.head.toLowerCase
+        val qOpt = parts.tail.collectFirst { param =>
+          param.splitTo[List]("=", 2) match {
+            case List(name, value) if name.trim.equalsIgnoreCase("q") =>
+              value.trim.toDoubleOption
+            case _ =>
+              None
+          }
+        }.flatten
+
+        val q = qOpt.getOrElse(1.0).max(0.0).min(1.0)
+
+        if (q > 0.0) {
+          if (ContentTypes.isJSONMediatype(rawMediaType) || rawMediaType == "text/json") {
+            bestJsonOpt = updateBest(bestJsonOpt, MediaRangePreference(q, 2))
+          } else if (rawMediaType == "application/*") {
+            bestJsonOpt = updateBest(bestJsonOpt, MediaRangePreference(q, 1))
+            bestXmlOpt  = updateBest(bestXmlOpt,  MediaRangePreference(q, 1))
+          } else if (rawMediaType == "*/*") {
+            bestJsonOpt = updateBest(bestJsonOpt, MediaRangePreference(q, 0))
+            bestXmlOpt  = updateBest(bestXmlOpt,  MediaRangePreference(q, 0))
+          }
+
+          if (ContentTypes.isXMLMediatype(rawMediaType))
+            bestXmlOpt = updateBest(bestXmlOpt, MediaRangePreference(q, 2))
+          else if (rawMediaType == "text/*")
+            bestXmlOpt = updateBest(bestXmlOpt, MediaRangePreference(q, 1))
+        }
+      }
+
+      (bestJsonOpt, bestXmlOpt) match {
+        case (Some(jsonPref), Some(xmlPref)) =>
+          if (jsonPref.q > xmlPref.q)
+            true
+          else if (jsonPref.q < xmlPref.q)
+            false
+          else
+            jsonPref.specificity >= xmlPref.specificity
+        case (Some(_), None) =>
+          true
+        case _ =>
+          false
+      }
+    }
+  }
 
   // List of common HTTP headers
   val CommonHeaders = Seq(

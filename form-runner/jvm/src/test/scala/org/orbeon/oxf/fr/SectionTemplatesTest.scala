@@ -126,4 +126,34 @@ class SectionTemplatesTest
       }
     }
   }
+
+  describe("#7905: Section template readonly propagation") {
+
+    it("must make controls inside a section template readonly when the enclosing section is readonly") {
+      assume(Version.isPE)
+
+      val (processorService, Some(xfcd), _) =
+        runFormRunner("issue", "7905", "new")
+
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, xfcd) {
+
+          val readonlyControl =
+            resolveObjectInsideComponent[XFormsValueControl](
+              componentStaticOrAbsoluteId = "section-readonly-content-control",
+              targetStaticOrAbsoluteId    = "text-field-control"
+            ).get
+
+          val editableControl =
+            resolveObjectInsideComponent[XFormsValueControl](
+              componentStaticOrAbsoluteId = "section-editable-content-control",
+              targetStaticOrAbsoluteId    = "text-field-control"
+            ).get
+
+          assert(readonlyControl.isReadonly)
+          assert(!editableControl.isReadonly)
+        }
+      }
+    }
+  }
 }

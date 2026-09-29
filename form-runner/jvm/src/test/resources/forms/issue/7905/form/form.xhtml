@@ -1,0 +1,120 @@
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:exf="http://www.exforms.org/exf/1-0">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-readonly readonly="true">
+                        <grid-1>
+                            <text-field>Initial 1</text-field>
+                        </grid-1>
+                    </section-readonly>
+                    <section-editable>
+                        <grid-1>
+                            <text-field>Initial 2</text-field>
+                        </grid-1>
+                    </section-editable>
+                </form>
+            </xf:instance>
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-readonly-bind" ref="section-readonly" name="section-readonly" readonly="@readonly = 'true'"/>
+                <xf:bind id="section-editable-bind" ref="section-editable" name="section-editable" readonly="@readonly = 'true'"/>
+            </xf:bind>
+
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>7905</form-name>
+                    <title xml:lang="en">Section template readonly propagation #7905</title>
+                    <description xml:lang="en"/>
+                    <library-versions>
+                        <orbeon>1</orbeon>
+                        <app>1</app>
+                    </library-versions>
+                </metadata>
+            </xf:instance>
+
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <section-readonly><label>Readonly Section</label></section-readonly>
+                        <section-editable><label>Editable Section</label></section-editable>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+        <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+            <xbl:binding xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/issue/library"
+                         id="issue-my-section-component"
+                         element="component|my-section"
+                         data-library-version="1"
+                         class="fr-section-component">
+                <xbl:implementation>
+                    <xf:model id="my-section-model">
+                        <xf:instance id="fr-form-template">
+                            <my-section>
+                                <grid-1>
+                                    <text-field/>
+                                </grid-1>
+                            </my-section>
+                        </xf:instance>
+                        <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                            <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                                <xf:bind id="text-field-bind" ref="text-field" name="text-field" xxf:whitespace="trim"/>
+                            </xf:bind>
+                        </xf:bind>
+                        <xf:instance id="fr-form-resources" xxf:readonly="true">
+                            <resources>
+                                <resource xml:lang="en">
+                                    <my-section><label>Section Template</label></my-section>
+                                    <text-field><label>Text Field</label><hint/></text-field>
+                                </resource>
+                            </resources>
+                        </xf:instance>
+                        <xf:instance id="fr-form-metadata" xxf:readonly="true">
+                            <metadata/>
+                        </xf:instance>
+                    </xf:model>
+                </xbl:implementation>
+                <xbl:template>
+                    <xf:group appearance="xxf:internal" model="my-section-model" id="fr-section-template-view">
+                        <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                            <fr:c x="1" y="1" w="12">
+                                <xf:input id="text-field-control" bind="text-field-bind">
+                                    <xf:label ref="$form-resources/text-field/label"/>
+                                    <xf:hint ref="$form-resources/text-field/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </fr:c>
+                        </fr:grid>
+                    </xf:group>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+                <fr:section id="section-readonly-section" bind="section-readonly-bind">
+                    <xf:label ref="$form-resources/section-readonly/label"/>
+                    <component:my-section xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                          xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/issue/library"
+                                          id="section-readonly-content-control"/>
+                </fr:section>
+                <fr:section id="section-editable-section" bind="section-editable-bind">
+                    <xf:label ref="$form-resources/section-editable/label"/>
+                    <component:my-section xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                          xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/issue/library"
+                                          id="section-editable-content-control"/>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

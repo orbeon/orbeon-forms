@@ -159,7 +159,7 @@
             name="binding-id"
             select="
                 if (ends-with($binding/@id, '-component')) then
-                    substring($binding/@id, string-length($binding/@id) - string-length('-component'))
+                    substring($binding/@id, 1, string-length($binding/@id) - string-length('-component'))
                 else
                     error((), concat('binding id doesn''t end with ''-component'': ', $binding/@id))"/>
         <xsl:variable

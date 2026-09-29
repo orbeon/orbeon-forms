@@ -56,9 +56,26 @@ trait FormProxyLogic { this: PersistenceProxy.type =>
   )(implicit
     propertySet      : PropertySet,
     indentedLogger   : IndentedLogger
-  ): NodeInfo = {
+  ): NodeInfo =
+    localAndRemoteFormsResponse(request, appFormFromUrlOpt, allVersionsDefault = false).toXML
 
-    val formRequest = FormRequest.parseOrThrowBadRequest(FormRequest(request, bodyFromPipelineOpt = None, appFormFromUrlOpt))
+  def localAndRemoteFormsResponse(
+    request           : Request,
+    appFormFromUrlOpt : Option[AppFormOpt],
+    allVersionsDefault: Boolean = false
+  )(implicit
+    propertySet       : PropertySet,
+    indentedLogger    : IndentedLogger
+  ): FormResponse = {
+
+    val formRequest = FormRequest.parseOrThrowBadRequest(
+      FormRequest(
+        request             = request,
+        bodyFromPipelineOpt = None,
+        appFormFromUrlOpt   = appFormFromUrlOpt,
+        allVersionsDefault  = allVersionsDefault
+      )
+    )
 
     val providers     = getProviders(formRequest.exactAppOpt, formRequest.exactFormOpt, FormOrData.Form)
     val remoteServers = FormRunnerHome.remoteServers
@@ -80,9 +97,7 @@ trait FormProxyLogic { this: PersistenceProxy.type =>
       remoteMetadataProvider.remoteServer -> remoteForms(request, remoteMetadataProvider, formRequest.formRequestForRemoteServer)
     }
 
-    val mergedFormsMetadata = merged(localFormsMetadata, remoteFormsMetadata, formRequest)
-
-    mergedFormsMetadata.toXML
+    merged(localFormsMetadata, remoteFormsMetadata, formRequest)
   }
 
   private def merged(

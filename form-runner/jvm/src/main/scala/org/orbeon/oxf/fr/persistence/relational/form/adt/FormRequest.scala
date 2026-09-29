@@ -135,11 +135,12 @@ object FormRequest {
   def apply(
     request            : Request,
     bodyFromPipelineOpt: Option[NodeInfo],
-    appFormFromUrlOpt  : Option[AppFormOpt]
+    appFormFromUrlOpt  : Option[AppFormOpt],
+    allVersionsDefault : Boolean = false
   ): FormRequest =
     if (request.getMethod == HttpMethod.GET) {
       // Compatibility with old API: read parameters from URL
-      fromGetRequest(request, appFormFromUrlOpt)
+      fromGetRequest(request, appFormFromUrlOpt, allVersionsDefault)
     } else if (request.getMethod == HttpMethod.POST) {
       // Read parameters from POST body (ignore URL parameters)
       fromPostRequest(request, bodyFromPipelineOpt)
@@ -147,7 +148,11 @@ object FormRequest {
       throw new IllegalArgumentException(s"Unsupported method: ${request.getMethod}")
     }
 
-  private def fromGetRequest(request: Request, appFormFromUrlOpt: Option[AppFormOpt]): FormRequest =  {
+  private def fromGetRequest(
+    request            : Request,
+    appFormFromUrlOpt  : Option[AppFormOpt],
+    allVersionsDefault : Boolean
+  ): FormRequest =  {
 
     // Convert parameters extracted from URL to Query instances
 
@@ -157,7 +162,7 @@ object FormRequest {
     val formOpt   = appFormFromUrlOpt.flatMap(_.formOpt)
     val formQuery = formOpt.toSeq.map(FilterQuery.exactFormQuery)
 
-    val allVersions      = request.getFirstParamAsString("all-versions").getOrElse("false").toBoolean
+    val allVersions      = request.getFirstParamAsString("all-versions").map(_.toBoolean).getOrElse(allVersionsDefault)
     val allVersionsQuery = (! allVersions).seq(FilterQuery.latestVersionsQuery)
 
     val modifiedSinceOpt   = request.getFirstParamAsString("modified-since").map(instantFromString)

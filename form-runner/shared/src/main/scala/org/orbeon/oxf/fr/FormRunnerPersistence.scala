@@ -164,6 +164,9 @@ object FormRunnerPersistence {
   val ExportPath                          = """/fr/service/persistence/export(?:/([^/]+))?(?:/([^/]+))?(?:/([^/]+))?""".r
   val PurgePath                           = """/fr/service/persistence/purge(?:/([^/]+))?(?:/([^/]+))?(?:/([^/]+))?""".r
   val DistinctValuesPath                  = """/fr/service/persistence(/distinct-values/([^/]+)/([^/]+))""".r
+  val DistinctAppsPath                    = """/fr/service/persistence/distinct-apps/?""".r
+  val DistinctFormsPath                   = """/fr/service/persistence/distinct-forms/([^/]+)/?""".r
+  val DistinctVersionsPath                = """/fr/service/persistence/distinct-versions/([^/]+)/([^/]+)/?""".r
   val ReindexPath                         = """/fr/service/persistence/reindex(?:/([^/]+)/([^/]+))?""".r
   val ReEncryptStatusPath                 =   "/fr/service/persistence/reencrypt" // `GET` only
 

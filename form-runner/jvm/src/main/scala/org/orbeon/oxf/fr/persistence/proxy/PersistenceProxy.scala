@@ -44,6 +44,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xml.{ElementFilterXMLReceiver, ParserConfiguration, TransformerUtils, XMLParsing}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits.*
+import org.orbeon.scaxon.NodeConversions.elemToNodeInfo
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.RelevanceHandling.*
@@ -192,6 +193,9 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
       case (POST,   ReEncryptAppFormPath(path, app, form))                        => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Form, path)
       case (GET,    HistoryPath(path, app, form, _, _))                           => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
       case (POST,   DistinctValuesPath(path, app, form))                          => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
+      case (_,      DistinctAppsPath())                                           => proxyDistinctApps          (request, response)
+      case (_,      DistinctFormsPath(app))                                       => proxyDistinctForms         (request, response, app)
+      case (_,      DistinctVersionsPath(app, form))                              => proxyDistinctVersions      (request, response, app, form)
       case (_,      PublishedFormsMetadataPath(_, app, form))                     => proxyPublishedFormsMetadata(request, response, AppFormOpt(Option(app), Option(form)))
       case (GET,    ReindexPath(null, null))                                      => proxyReindex               (request, response, None)
       case (POST,   ReindexPath(app, form))                                       => proxyReindex               (request, response, AppForm(Option(app), Option(form)))
@@ -1093,6 +1097,73 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     } else {
       throw HttpStatusCodeException(StatusCode.MethodNotAllowed)
     }
+
+  private def proxyDistinct(
+    request       : Request,
+    response      : Response,
+    valuesSupplier: => collection.Seq[Any]
+  )(implicit
+    properties    : PropertySet,
+    indentedLogger: IndentedLogger
+  ): Unit =
+    if (request.getMethod == HttpMethod.GET) {
+      Try(valuesSupplier) match {
+        case Success(values) =>
+          val xml: NodeInfo =
+            <_>{
+              values.map(v => <_>{v.toString}</_>)
+            }</_>
+          streamDocument(xml, response)
+
+        case Failure(t) =>
+          indentedLogger.logError("", s"Distinct API error: ${t.getMessage}")
+          throw t
+      }
+    } else {
+      throw HttpStatusCodeException(StatusCode.MethodNotAllowed)
+    }
+
+  private def proxyDistinctApps(
+    request       : Request,
+    response      : Response
+  )(implicit
+    properties    : PropertySet,
+    indentedLogger: IndentedLogger
+  ): Unit =
+    proxyDistinct(
+      request,
+      response,
+      localAndRemoteFormsResponse(request, None).forms.map(_.appForm.app).distinct.sorted
+    )
+
+  private def proxyDistinctForms(
+    request       : Request,
+    response      : Response,
+    app           : String
+  )(implicit
+    properties    : PropertySet,
+    indentedLogger: IndentedLogger
+  ): Unit =
+    proxyDistinct(
+      request,
+      response,
+      localAndRemoteFormsResponse(request, AppFormOpt(Option(app), None)).forms.map(_.appForm.form).distinct.sorted
+    )
+
+  private def proxyDistinctVersions(
+    request       : Request,
+    response      : Response,
+    app           : String,
+    form          : String
+  )(implicit
+    properties    : PropertySet,
+    indentedLogger: IndentedLogger
+  ): Unit =
+    proxyDistinct(
+      request,
+      response,
+      localAndRemoteFormsResponse(request, AppFormOpt(Option(app), Option(form)), allVersionsDefault = true).forms.map(_.version.version).distinct.sorted
+    )
 
   private def proxyReindex(
     request       : Request,

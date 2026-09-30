@@ -228,8 +228,8 @@ object LHHASupport {
 
   def combinePropertiesAsUl(properties: List[MutableLHHAProperty], collector: ErrorEventCollector)(implicit indentedLogger: IndentedLogger): String =
     properties
-      .map { property => if (! property.isHTML) property.value(collector).escapeXmlMinimal else property.value(collector) }
-      .mkString ("<ul><li>", "</li><li>", "</li></ul>")
+      .map(property => if (!property.isHTML) property.value(collector).escapeXmlMinimal else property.value(collector))
+      .mkString("<ul><li>", "</li><li>", "</li></ul>")
 
   // Immutable null LHHA property
   object NullLHHA extends ImmutableLHHAProperty(null: String, isHTML = false, locationData = null) {

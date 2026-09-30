@@ -15,8 +15,8 @@ package org.orbeon.oxf.fb
 
 import cats.effect.IO
 import io.circe.{Json, parser}
-import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.builder.FormBuilderPreferences
+import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.datatypes.{AboveBelow, Direction, MediatypeRange}
 import org.orbeon.oxf.fb.FormBuilder.*
@@ -103,6 +103,43 @@ object FormBuilderXPathApi {
       .foreach(Undo.pushUserUndoAction)
   }
 
+  def doPublish(
+    doc                  : NodeInfo,
+    documentId           : String,
+    formDefinitionVersion: String,
+    versionComment       : String,
+    available            : Boolean,
+    upgradeFormDefinition: Boolean,
+    formName             : String
+  ): (Option[Int], Option[Int]) = {
+
+    XFormsAPI.sendThrowOnError(
+      "fb-publish-submission",
+      List(
+        PropertyValue("doc", Some(doc)),
+        PropertyValue("document-id", Some(documentId)),
+        PropertyValue("form-definition-version", Some(formDefinitionVersion)),
+        PropertyValue("version-comment", Some(versionComment)),
+        PropertyValue("available", Some(available)),
+        PropertyValue("upgrade-form-definition", Some(upgradeFormDefinition))
+      )
+    )
+
+    if (formName == "library")
+      XXFormsInvalidateInstanceAction.doInvalidateInstance(
+        resourceURI       = "/fr/service/custom/orbeon/builder/toolbox",
+        handleXInclude    = None,
+        ignoreQueryString = true
+      )
+
+    val ctx = FormBuilderDocContext()
+    val responseElemOpt = ctx.formBuilderModel.flatMap(_.findInstance("fb-publish-response-instance")).map(_.rootElement)
+    val publishedVersion = responseElemOpt.flatMap(e => (e / "published-version").headOption).flatMap(_.stringValue.toIntOption)
+    val publishedAttachments = responseElemOpt.flatMap(e => (e / "published-attachments").headOption).flatMap(_.stringValue.toIntOption)
+
+    (publishedVersion, publishedAttachments)
+  }
+
   //@XPathFunction
   def publishForm(
     doc                  : NodeInfo,
@@ -112,25 +149,36 @@ object FormBuilderXPathApi {
     available            : Boolean,
     formName             : String
   ): Unit =
+    publishForm(
+      doc                   = doc,
+      documentId            = documentId,
+      formDefinitionVersion = formDefinitionVersion,
+      versionComment        = versionComment,
+      available             = available,
+      upgradeFormDefinition = true,
+      formName              = formName
+    )
+
+  //@XPathFunction
+  def publishForm(
+    doc                  : NodeInfo,
+    documentId           : String,
+    formDefinitionVersion: String,
+    versionComment       : String,
+    available            : Boolean,
+    upgradeFormDefinition: Boolean,
+    formName             : String
+  ): Unit =
     saveThenContinue("publishForm()") {
-
-      XFormsAPI.sendThrowOnError(
-        "fb-publish-submission",
-        List(
-          PropertyValue("doc", Some(doc)),
-          PropertyValue("document-id", Some(documentId)),
-          PropertyValue("form-definition-version", Some(formDefinitionVersion)),
-          PropertyValue("version-comment", Some(versionComment)),
-          PropertyValue("available", Some(available))
-        )
+      doPublish(
+        doc                   = doc,
+        documentId            = documentId,
+        formDefinitionVersion = formDefinitionVersion,
+        versionComment        = versionComment,
+        available             = available,
+        upgradeFormDefinition = upgradeFormDefinition,
+        formName              = formName
       )
-
-      if (formName == "library")
-        XXFormsInvalidateInstanceAction.doInvalidateInstance(
-          resourceURI       = "/fr/service/custom/orbeon/builder/toolbox",
-          handleXInclude    = None,
-          ignoreQueryString = true
-        )
     }
 
   //@XPathFunction

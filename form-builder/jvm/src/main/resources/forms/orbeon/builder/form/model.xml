@@ -1037,6 +1037,8 @@
                 encode-for-uri(event('version-comment'))
             }&amp;available={
                 encode-for-uri(string(event('available')))
+            }&amp;upgrade-form-definition={
+                encode-for-uri(string(event('upgrade-form-definition')))
             }"
         replace="instance"
         instance="fb-publish-response-instance"/>

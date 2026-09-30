@@ -22,9 +22,9 @@ object Version {
       case Some(id) => ForDocument(id, isDraft.exists(_.toBoolean))
       case None     =>
         version match {
-          case None         => Unspecified
-          case Some("next") => Next
-          case Some(v)      => Specific(v.toInt)
+          case None | Some("latest") | Some("") => Unspecified
+          case Some("next")                     => Next
+          case Some(v)                          => Specific(v.toInt)
         }
     }
 }

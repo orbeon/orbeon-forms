@@ -15,7 +15,6 @@ package org.orbeon.oxf.fr.persistence.proxy
 
 import io.circe.Encoder
 import io.circe.syntax.*
-import org.apache.hc.core5.http.HttpStatus
 import org.log4s
 import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.io.IOUtils
@@ -1000,7 +999,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
       }
 
       val doTransforms =
-        connectionResult.statusCode == HttpStatus.SC_OK
+        connectionResult.statusCode == StatusCode.Ok
 
       // If an attachments provider is available, use it stream
       val inputStream = attachmentsProviderCxrOpt match {

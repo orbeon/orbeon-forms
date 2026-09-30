@@ -29,7 +29,7 @@ import org.orbeon.oxf.xml.dom.Converter.*
 import org.scalatest.funspec.AnyFunSpecLike
 
 
-class DistinctFormValuesApiTest
+class FormDiscoveryApiTest
   extends DocumentTestBase
     with XFormsSupport
     with ResourceManagerSupport
@@ -37,7 +37,7 @@ class DistinctFormValuesApiTest
 
   private val applicationCounts = 4
 
-  private implicit val Logger: IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(classOf[DistinctFormValuesApiTest]), true)
+  private implicit val Logger: IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(classOf[FormDiscoveryApiTest]), true)
 
   private def assertGetXml(
     path          : String,
@@ -106,7 +106,7 @@ class DistinctFormValuesApiTest
       )
     )
 
-  describe("Distinct Form Values API") {
+  describe("Form Discovery API") {
 
     it("returns empty XML and JSON when there are no form definitions") {
       FormMetadataApiTest.withProvider(applicationCounts) { provider => externalContext =>

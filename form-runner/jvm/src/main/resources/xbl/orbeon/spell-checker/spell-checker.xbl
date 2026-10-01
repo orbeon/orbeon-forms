@@ -128,12 +128,11 @@
                                 '&lt;/span&gt;',
                                 string-join($current-c/following-sibling::*/@current, ''))"/>
                             <xf:action type="javascript">
-                                var YD = YAHOO.util.Dom;
                                 // Get the word we want to make visible
                                 var unknownWord = document.getElementById("fr-spell-checker-unknown-word");
                                 // Get scrollable container accounting for span/nospan
                                 var notInDictionaryDiv = unknownWord.parentNode;
-                                if (! YD.hasClass(notInDictionaryDiv, "xforms-output")) notInDictionaryDiv = notInDictionaryDiv.parentNode;
+                                if (! notInDictionaryDiv.classList.contains("xforms-output")) notInDictionaryDiv = notInDictionaryDiv.parentNode;
                                 // Set scrollTop on container so the word is visible
                                 notInDictionaryDiv.scrollTop = Math.max(0, unknownWord.offsetTop - unknownWord.offsetHeight);
                             </xf:action>

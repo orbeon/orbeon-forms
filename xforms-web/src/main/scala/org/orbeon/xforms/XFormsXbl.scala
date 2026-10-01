@@ -20,8 +20,13 @@ object XFormsXbl {
   private val XblObjectKeyName = "xforms-xbl-object"
 
   @JSExport
-  lazy val componentInitialized: YUICustomEvent =
-    newJsInstance(g.YAHOO.util.CustomEvent)(null, null, false, g.YAHOO.util.CustomEvent.FLAT).asInstanceOf[YUICustomEvent]
+  val componentInitialized: LegacyCustomEvent =
+    new LegacyCustomEvent(
+      typeName     = "componentInitialized",
+      defaultScope = dom.window,
+      signature    = LegacyCustomEvent.Flat,
+      fireOnce     = false
+    )
 
   @JSExport
   def instanceForControl(elem: html.Element): XBLCompanion =

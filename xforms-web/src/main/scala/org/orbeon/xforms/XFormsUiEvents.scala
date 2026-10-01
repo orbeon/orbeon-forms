@@ -11,14 +11,22 @@ import scala.scalajs.js.Dynamic.{newInstance, global as g}
 object XFormsUiEvents {
 
   // Public API
-  lazy val orbeonLoadedEvent: YUICustomEvent =
-    newInstance(g.YAHOO.util.CustomEvent)(
-      "orbeonLoaded", dom.window, false, g.YAHOO.util.CustomEvent.LIST, true
-    ).asInstanceOf[YUICustomEvent]
+  val orbeonLoadedEvent: LegacyCustomEvent =
+    new LegacyCustomEvent(
+      typeName     = "orbeonLoaded",
+      defaultScope = dom.window,
+      signature    = LegacyCustomEvent.List,
+      fireOnce     = true
+    )
 
   // Public API
-  lazy val errorEvent: YUICustomEvent =
-    newInstance(g.YAHOO.util.CustomEvent)("errorEvent").asInstanceOf[YUICustomEvent]
+  val errorEvent: LegacyCustomEvent =
+    new LegacyCustomEvent(
+      typeName     = "errorEvent",
+      defaultScope = dom.window,
+      signature    = LegacyCustomEvent.List,
+      fireOnce     = false
+    )
 
   // 2026-05-13: API only used by `TinyMCE`
   val componentChangedLayoutCB = new CallbackList[Unit]()
@@ -51,8 +59,9 @@ object XFormsUiEvents {
   ): Unit = {
 
     // Cases where we don't want to reuse an existing tooltip for this control
-    if (g.YAHOO.lang.isObject(tooltipForControl.getOrElse(control.id, null)).asInstanceOf[Boolean]) {
-      val existingTooltip = tooltipForControl(control.id).asInstanceOf[js.Dynamic]
+    val currentTooltip = tooltipForControl.getOrElse(control.id, null)
+    if (currentTooltip != null && js.typeOf(currentTooltip) == "object") {
+      val existingTooltip = currentTooltip.asInstanceOf[js.Dynamic]
       if (existingTooltip.orbeonTarget.asInstanceOf[js.Any] ne (target: js.Any)) {
         existingTooltip.cfg.setProperty("disabled", true)
         existingTooltip.hide()

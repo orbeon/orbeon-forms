@@ -50,6 +50,7 @@ object XFormsApp extends App {
     xformsDyn.InitSupport = js.Dynamic.global.OrbeonInitSupport
 
     // Public API
+    xformsDyn.Events     = XFormsEvents
     xformsDyn.XBL        = js.Dynamic.global.OrbeonXFormsXbl
     xformsDyn.AjaxClient = js.Dynamic.global.OrbeonAjaxClient
     xformsDyn.Document   = DocumentAPI

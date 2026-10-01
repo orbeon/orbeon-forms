@@ -234,11 +234,11 @@ object Headers {
 
   private case class MediaRangePreference(q: Double, specificity: Int)
 
-  def allowsJsonOverXml(allowHeader: String): Boolean = {
+  def allowsJsonOverXml(acceptHeader: String): Boolean = {
 
     val mediaRanges =
       for {
-        header  <- allowHeader.splitTo[List](",")
+        header  <- acceptHeader.splitTo[List](",")
         trimmed <- header.trimAllToOpt
       } yield
         trimmed

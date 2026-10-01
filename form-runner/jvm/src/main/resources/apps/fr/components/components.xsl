@@ -25,7 +25,8 @@
         xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
-        xmlns:Wizard="java:org.orbeon.xbl.Wizard">
+        xmlns:Wizard="java:org.orbeon.xbl.Wizard"
+        xmlns:mediatypes="java:org.orbeon.oxf.util.Mediatypes">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
     <xsl:import href="services-and-actions-xf.xsl"/>
@@ -159,14 +160,9 @@
         name="favicon-type"
         select="
             let $clean-path := lower-case(tokenize($favicon-uri, '\?|#')[1])
+            let $mediatype  := mediatypes:findMediatypeForPathJava($clean-path)
             return
-                     if (ends-with($clean-path, '.png')) then 'image/png'
-                else if (ends-with($clean-path, '.svg')) then 'image/svg+xml'
-                else if (ends-with($clean-path, '.ico')) then 'image/x-icon'
-                else if (ends-with($clean-path, '.gif')) then 'image/gif'
-                else if (ends-with($clean-path, '.jpg') or ends-with($clean-path, '.jpeg')) then 'image/jpeg'
-                else if (ends-with($clean-path, '.webp')) then 'image/webp'
-                else ()"
+                $mediatype[starts-with(., 'image/')]"
         as="xs:string?"/>
     <xsl:variable name="hide-logo"            select="p:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'), $property-profile-opt)"                          as="xs:boolean?"/>
     <xsl:variable name="hide-footer"          select="p:property(string-join(('oxf.fr.detail.hide-footer', $app, $form), '.'), $property-profile-opt)"                        as="xs:boolean?"/>

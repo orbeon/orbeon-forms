@@ -27,6 +27,7 @@ object Mediatypes extends MediatypesTrait {
     Mapping(extension = "heic",     mediatype = "image/heic",                                                                 label = "HEIC"),
     Mapping(extension = "heif",     mediatype = "image/heif",                                                                 label = "HEIF"),
     Mapping(extension = "webp",     mediatype = "image/webp",                                                                 label = "WebP"),
+    Mapping(extension = "ico",      mediatype = "image/x-icon",                                                               label = "Icon"),
     Mapping(extension = "ico",      mediatype = "image/vnd.microsoft.icon",                                                   label = "Icon"),
     Mapping(extension = "xhtml",    mediatype = "application/xhtml+xml",                                                      label = "XHTML"),
     Mapping(extension = "mpeg",     mediatype = "video/mpeg",                                                                 label = "MPEG"),

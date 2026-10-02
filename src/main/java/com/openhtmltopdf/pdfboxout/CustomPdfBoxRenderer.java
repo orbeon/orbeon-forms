@@ -585,6 +585,11 @@ public class CustomPdfBoxRenderer implements Closeable, PageSupplier {
 
                     DisplayListCollector dlCollector = new DisplayListCollector(_root.getLayer().getPages());
                     dlPages = dlCollector.collectRoot(c, _root.getLayer());
+                    // TODO: uncomment when upgrading to openhtmltopdf 1.1.87 or later (the method doesn't exist before).
+                    //  PDF/UA tagging needs this since 1.1.87; without this, we get a null pointer exception.
+                    // if (_outputDevice instanceof PdfBoxFastOutputDevice) {
+                    //     ((PdfBoxFastOutputDevice) _outputDevice).setDisplayListContainer(dlPages);
+                    // }
                 }
 
                 page.setBasePagePdfPageIndex(pdfPageIndex);

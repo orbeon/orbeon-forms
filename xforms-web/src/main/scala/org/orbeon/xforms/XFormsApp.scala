@@ -54,6 +54,7 @@ object XFormsApp extends App {
     xformsDyn.XBL        = js.Dynamic.global.OrbeonXFormsXbl
     xformsDyn.AjaxClient = js.Dynamic.global.OrbeonAjaxClient
     xformsDyn.Document   = DocumentAPI
+    xformsDyn.Globals    = Globals.asInstanceOf[js.Any]
 
     // Configure logging
 //    setLoggerThreshold("org.orbeon.oxf.xforms", LogLevel)

@@ -13,22 +13,25 @@
  */
 package org.orbeon.xforms
 
+import org.orbeon.xforms.facade.BootstrapTip
 import org.scalajs.dom.html
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSExportAll
 
 
+@JSExportAll
 object Globals {
 
   // TODO: Most of these should be removed
-  var maskFocusEvents             : Boolean                   = _ // avoid catching focus event when we do call setfocus upon server request
-  var currentFocusControlId       : String                    = _ // id of the control that got the focus last
-  var currentFocusControlElement  : html.Element              = _ // element for the control that got the focus last
+  var maskFocusEvents             : Boolean                     = _ // avoid catching focus event when we do call setfocus upon server request
+  var currentFocusControlId       : String                      = _ // id of the control that got the focus last
+  var currentFocusControlElement  : html.Element                = _ // element for the control that got the focus last
 
-  var hintTooltipForControl       : js.Dictionary[js.Any]     = _ // map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element
-  var alertTooltipForControl      : js.Dictionary[js.Any]     = _ // map from element id -> YUI alert or true, that tells us if we have already created a Tooltip for an element
-  var helpTooltipForControl       : js.Dictionary[js.Any]     = _ // map from element id -> YUI help or true, that tells us if we have already created a Tooltip for an element
-  var lastDialogZIndex            : Int                       = _ // zIndex of the last dialog displayed; gets incremented so the last dialog is always on top of everything else; initial value set to Bootstrap's @zindexModal
+  var hintTooltipForControl       : js.Dictionary[BootstrapTip] = _ // map from element id -> Bootstrap tooltip
+  var alertTooltipForControl      : js.Dictionary[BootstrapTip] = _ // map from element id -> Bootstrap alert tooltip
+  var helpTooltipForControl       : js.Dictionary[BootstrapTip] = _ // map from element id -> Bootstrap help tooltip
+  var lastDialogZIndex            : Int                         = _ // zIndex of the last dialog displayed; gets incremented so the last dialog is always on top of everything else; initial value set to Bootstrap's @zindexModal
 
   // Reset all values upon initialization
   reset()

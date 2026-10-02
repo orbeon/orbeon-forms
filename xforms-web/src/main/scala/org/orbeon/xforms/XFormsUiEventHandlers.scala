@@ -380,7 +380,7 @@ object XFormsUiEventHandlers {
             // The 'for' typically points to a form field which is inside the element representing the control
             XFormsUiEvents.findParentXFormsControl(formField).foreach { control2 =>
               val message = XFormsUI.getAlertMessage(control2)
-              XFormsUiEvents.showToolTip(Globals.alertTooltipForControl, control2, target, "-orbeon-alert-tooltip", message, event)
+              XFormsUiEvents.showToolTip(Globals.alertTooltipForControl, control2, target, message)
             }
           }
         }
@@ -392,9 +392,7 @@ object XFormsUiEventHandlers {
               tooltipForControl = Globals.helpTooltipForControl,
               control           = control,
               target            = target,
-              toolTipSuffix     = "-orbeon-help-tooltip",
-              message           = XFormsUI.getHelpMessage(control),
-              event             = event
+              message           = XFormsUI.getHelpMessage(control)
             )
         }
       else
@@ -413,7 +411,7 @@ object XFormsUiEventHandlers {
                 }
                 .getOrElse("")
 
-            // Clear any `title`, to avoid having both the YUI tooltip and the browser tooltip based on the title showing up
+            // Clear any `title`, to avoid having both the tooltip and the browser tooltip based on the title showing up
             if (control.hasAnyClass("xforms-trigger", "xforms-submit"))
               control.querySelectorAllT("a, button").foreach(_.title = "")
 
@@ -421,9 +419,7 @@ object XFormsUiEventHandlers {
               tooltipForControl = Globals.hintTooltipForControl,
               control           = control,
               target            = target,
-              toolTipSuffix     = "-orbeon-hint-tooltip",
-              message           = candidateMessage,
-              event             = event
+              message           = candidateMessage
             )
           }
         }
@@ -432,12 +428,12 @@ object XFormsUiEventHandlers {
   def mouseout(event: MouseEvent): Unit =
     event.targetOpt.foreach { target =>
       XFormsUiEvents.findParentXFormsControl(target).foreach { control =>
-        // Send the `mouseout` event to the YUI tooltip to handle the case where: (1) we get the `mouseover` event, (2) we
-        // create a YUI tooltip, (3) the `mouseout` happens before the YUI dialog got a chance to register its listener
-        // on `mouseout`, (4) the YUI dialog is only dismissed after `autodismissdelay` (5 seconds) leaving a trail.
-        Globals.hintTooltipForControl.get(control.id).foreach { yuiTooltip =>
-          if (! isTooltipDisabled(control, "hint"))
-            yuiTooltip.asInstanceOf[js.Dynamic].onContextMouseOut.call(control.id, event, yuiTooltip)
+        Globals.hintTooltipForControl.get(control.id).filter(_ != null).foreach { tooltip =>
+          if (! isTooltipDisabled(control, "hint")) {
+            val relatedTarget = Option(event.relatedTarget).collect { case node: dom.Node => node }
+            if (! relatedTarget.exists(tooltip.target.contains))
+              tooltip.hide()
+          }
         }
       }
     }

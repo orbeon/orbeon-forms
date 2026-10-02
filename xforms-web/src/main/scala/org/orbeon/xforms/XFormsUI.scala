@@ -16,6 +16,7 @@ package org.orbeon.xforms
 import io.udash.wrappers.jquery.JQueryPromise
 import org.log4s.Logger
 import org.orbeon.facades.{Bowser, HTMLDialogElement}
+import org.orbeon.xforms.facade.BootstrapTip
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.MarkupUtils.*
@@ -205,16 +206,15 @@ object XFormsUI {
 
   def setHintMessage(control: html.Element, message: String): Unit = {
     val tooltips = Globals.hintTooltipForControl
-    tooltips.get(control.id).foreach { tooltipDyn =>
-      if (tooltipDyn != null && ! js.isUndefined(tooltipDyn)) {
-        val tooltip = tooltipDyn.asInstanceOf[js.Dynamic]
-        if (tooltip.cfg.getProperty("context").asInstanceOf[js.Array[html.Element]](0) != control)
-          tooltips.put(control.id, null)
+    tooltips.get(control.id).filter(_ != null).foreach { tip =>
+      if (! control.contains(tip.target)) {
+        tip.destroy()
+        tooltips.put(control.id, null)
       }
     }
     if (control.hasAnyClass("xforms-trigger", "xforms-submit")) {
-      val tooltipDyn = tooltips.get(control.id).orNull
-      if (tooltipDyn == null || js.isUndefined(tooltipDyn)) {
+      val tip = tooltips.get(control.id).orNull
+      if (tip == null) {
         control
           .queryNestedElems[html.Element]("button, a")
           .headOption
@@ -226,16 +226,14 @@ object XFormsUI {
     setTooltipMessage(control, message, tooltips)
   }
 
-  private def setTooltipMessage(control: html.Element, message: String, tooltipForControl: js.Dictionary[js.Any]): Unit =
-    tooltipForControl.get(control.id).foreach { currentTooltipDyn =>
-      if (currentTooltipDyn != null && ! js.isUndefined(currentTooltipDyn) && currentTooltipDyn.toString != "true") {
-        val currentTooltip = currentTooltipDyn.asInstanceOf[js.Dynamic]
-        if (message == "") {
-          currentTooltip.cfg.setProperty("disabled", true)
-        } else {
-          currentTooltip.cfg.setProperty("text", message)
-          currentTooltip.cfg.setProperty("disabled", false)
-        }
+  private def setTooltipMessage(control: html.Element, message: String, tooltipForControl: js.Dictionary[BootstrapTip]): Unit =
+    tooltipForControl.get(control.id).filter(_ != null).foreach { tip =>
+      if (message == "") {
+        tip.disable()
+        tip.hide()
+      } else {
+        tip.updateTitle(message)
+        tip.enable()
       }
     }
 
@@ -398,18 +396,14 @@ object XFormsUI {
         toggleCommonClasses(alertElement)
     }
 
-    Globals.alertTooltipForControl.get(control.id).foreach { alertTooltipDyn =>
-      if (alertTooltipDyn != null && ! js.isUndefined(alertTooltipDyn) && alertTooltipDyn.toString != "true") {
-        val alertTooltip = alertTooltipDyn.asInstanceOf[js.Dynamic]
-        if (! alertActive) {
-          // Prevent the tooltip from becoming visible on mouseover
-          alertTooltip.cfg.setProperty("disabled", true)
-          // If visible, hide the tooltip right away, otherwise it will only be hidden a few seconds later
-          if (js.typeOf(alertTooltip.hide) == "function")
-            alertTooltip.hide()
-        } else {
-          alertTooltip.cfg.setProperty("disabled", false)
-        }
+    Globals.alertTooltipForControl.get(control.id).filter(_ != null).foreach { alertTooltip =>
+      if (! alertActive) {
+        // Prevent the tooltip from becoming visible on mouseover
+        alertTooltip.disable()
+        // If visible, hide the tooltip right away, otherwise it will only be hidden a few seconds later
+        alertTooltip.hide()
+      } else {
+        alertTooltip.enable()
       }
     }
   }

@@ -1,11 +1,11 @@
 package org.orbeon.xforms
 
 import org.orbeon.web.DomSupport.DomElemOps
+import org.orbeon.xforms.facade.{Bootstrap, BootstrapTip}
 import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{newInstance, global as g}
 
 
 object XFormsUiEvents {
@@ -50,50 +50,41 @@ object XFormsUiEvents {
     }
 
   def showToolTip(
-    tooltipForControl: js.Dictionary[js.Any],
+    tooltipForControl: js.Dictionary[BootstrapTip],
     control          : html.Element,
     target           : html.Element,
-    toolTipSuffix    : String,
-    message          : String,
-    event            : dom.MouseEvent
+    message          : String
   ): Unit = {
 
-    // Cases where we don't want to reuse an existing tooltip for this control
-    val currentTooltip = tooltipForControl.getOrElse(control.id, null)
-    if (currentTooltip != null && js.typeOf(currentTooltip) == "object") {
-      val existingTooltip = currentTooltip.asInstanceOf[js.Dynamic]
-      if (existingTooltip.orbeonTarget.asInstanceOf[js.Any] ne (target: js.Any)) {
-        existingTooltip.cfg.setProperty("disabled", true)
-        existingTooltip.hide()
-        tooltipForControl(control.id) = null
+    if (message == "") {
+      tooltipForControl.get(control.id).filter(_ != null).foreach(_.destroy())
+      tooltipForControl(control.id) = null
+    } else {
+      val currentTooltip = tooltipForControl.getOrElse(control.id, null)
+      if (currentTooltip != null) {
+        if (currentTooltip.target ne target) {
+          currentTooltip.destroy()
+          tooltipForControl(control.id) = null
+        } else {
+          currentTooltip.updateTitle(message)
+          currentTooltip.enable()
+          currentTooltip.show()
+        }
       }
-    }
 
-    // Create tooltip if we have never "seen" this control
-    if (tooltipForControl.getOrElse(control.id, null) == null) {
-      if (message == "") {
-        // Makes it easier for tests to check that the mouseover did run
-        tooltipForControl(control.id) = null
-      } else {
-        val yuiTooltip =
-          newInstance(g.YAHOO.widget.Tooltip)(
-            control.id + toolTipSuffix,
-            js.Dynamic.literal(
-              context   = target,
-              text      = message,
-              showDelay = 0,
-              hideDelay = 0,
-              // High zIndex so tooltip is always on top, e.g. above dialogs
-              zIndex    = 10000
-            )
-          ).asInstanceOf[js.Dynamic]
-        yuiTooltip.orbeonControl = control
-        yuiTooltip.orbeonTarget  = target
-        // Position the tooltip by sending the mouse move event
-        yuiTooltip.onContextMouseMove.call(target, event, yuiTooltip)
-        // Show the tooltip since it missed the initial mouse over
-        yuiTooltip.onContextMouseOver.call(target, event, yuiTooltip)
-        tooltipForControl(control.id) = yuiTooltip
+      if (tooltipForControl.getOrElse(control.id, null) == null) {
+        val placement: js.Function = () => {
+          val p = Placement.getPlacement(Placement.getPositionDetails(target))
+          if (p == Placement.Over) "bottom" else p.entryName
+        }
+        val tip = Bootstrap.newTooltip(target, js.Dynamic.literal(
+          title     = message,
+          html      = true,
+          animation = false,
+          placement = placement
+        ))
+        tooltipForControl(control.id) = tip
+        tip.show()
       }
     }
   }

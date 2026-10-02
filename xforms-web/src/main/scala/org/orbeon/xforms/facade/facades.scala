@@ -21,7 +21,7 @@ import org.scalajs
 import org.scalajs.dom.{Element, html}
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSGlobal
+import scala.scalajs.js.annotation.{JSExportAll, JSGlobal}
 import scala.scalajs.js.|
 
 
@@ -130,15 +130,18 @@ trait Bootstrap extends js.Object {
 }
 
 // Handle on a native bootstrap.Tooltip / bootstrap.Popover (ctor is the Bootstrap class)
-class BootstrapTip private[facade] (ctor: js.Dynamic, element: Element, titleSelector: String) {
+@JSExportAll
+class BootstrapTip private[facade] (ctor: js.Dynamic, val target: Element, titleSelector: String) {
 
   private def instanceOpt: Option[js.Dynamic] = {
-    val instance = ctor.getInstance(element)
+    val instance = ctor.getInstance(target)
     if (instance == null || js.isUndefined(instance)) None else Some(instance.asInstanceOf[js.Dynamic])
   }
 
   def show()   : Unit = instanceOpt.foreach(_.show())
   def hide()   : Unit = instanceOpt.foreach(_.hide())
+  def enable() : Unit = instanceOpt.foreach(_.enable())
+  def disable(): Unit = instanceOpt.foreach(_.disable())
   def destroy(): Unit = instanceOpt.foreach(_.dispose())
 
   // The config title wins over data-orbeon-bs-original-title, so updates must go through setContent()
@@ -147,6 +150,8 @@ class BootstrapTip private[facade] (ctor: js.Dynamic, element: Element, titleSel
 
   // The tip element in the DOM, once shown: Bootstrap links the trigger to its tip via aria-describedby.
   def tipElementOpt: Option[Element] =
-    Option(element.getAttribute("aria-describedby")).flatMap(id => Option(scalajs.dom.document.getElementById(id)))
+    Option(target.getAttribute("aria-describedby")).flatMap(id => Option(scalajs.dom.document.getElementById(id)))
+
+  def element: Element = tipElementOpt.getOrElse(target)
 }
 

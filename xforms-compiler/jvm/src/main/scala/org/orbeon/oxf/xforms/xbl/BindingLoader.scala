@@ -403,7 +403,7 @@ trait BindingLoader extends Logging {
     }
   }
 
-  // E.g. `fr:tabview -> oxf:/xbl/orbeon/tabview/tabview.xbl`
+  // E.g. `fr:tabbable -> oxf:/xbl/orbeon/tabbable/tabbable.xbl`
   private def findBindingPathByNameUseMappings(
     nsUriToPrefix : Map[String, String],
     uri           : String,

@@ -11,4 +11,5 @@ import scala.scalajs.js.typedarray.Uint8Array
 class HTMLDialogElement extends dom.html.Element {
   def showModal(): Unit = js.native
   def close(): Unit = js.native
+  var open: Boolean = js.native
 }

@@ -16,6 +16,7 @@ package org.orbeon.xforms
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.xforms.facade.XBLCompanion
 import org.orbeon.xforms.rpc.ConfigurationProperties
+import org.orbeon.facades.HTMLDialogElement
 import org.scalajs.dom
 import org.scalajs.dom.html
 
@@ -58,7 +59,8 @@ class Form(
     InitSupport.removeNamespacePromise(ns)
 
     // Hide error panel, which isn't in `Globals.dialogs`
-    errorPanel.asInstanceOf[js.Dynamic].hide()
+    if (errorPanel.open)
+      errorPanel.close()
   }
 
   def addCallback(name: String, fn: js.Function): Unit =
@@ -74,7 +76,7 @@ class Form(
   def getCallbacks(name: String): List[js.Function] =
     callbacks.getOrElse(name, Nil)
 
-  lazy val errorPanel: js.Object =
+  lazy val errorPanel: HTMLDialogElement =
     ErrorPanel.initializeErrorPanel(elem) getOrElse
       (throw new IllegalStateException(s"missing error panel element for form `${elem.id}`"))
 

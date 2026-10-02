@@ -712,9 +712,12 @@
                             </xh:div>
                         </xh:noscript>
                         <xh:div class="xforms-error-dialogs">
-                            <xh:div class="xforms-error-panel xforms-initially-hidden" role="dialog" aria-labelledby="error-dialog-title">
-                                <xh:div class="hd" id="error-dialog-title">An error has occurred</xh:div>
-                                <xh:div class="bd">
+                            <xh:dialog class="xforms-error-panel xforms-dialog" aria-labelledby="error-dialog-title" tabindex="-1">
+                                <xh:div class="xxforms-dialog-head">
+                                    <xh:span id="error-dialog-title">An error has occurred</xh:span>
+                                    <xh:a class="container-close xforms-error-panel-close" role="button" aria-label="Close" href="#"/>
+                                </xh:div>
+                                <xh:div class="xxforms-dialog-body">
                                     <xh:p>You may want to try one of the following:</xh:p>
                                     <xh:ul>
                                         <xh:li>
@@ -757,7 +760,7 @@
                                         <xh:div class="xforms-error-panel-details"/>
                                     </xh:div>
                                 </xh:div>
-                            </xh:div>
+                            </xh:dialog>
                             <xh:dialog class="xforms-login-detected-dialog xforms-dialog" tabindex="-1">
                                 <xh:div class="xxforms-dialog-head">Reloading form</xh:div>
                                 <xh:div class="xxforms-dialog-body">

@@ -415,14 +415,21 @@
 
     // ***** Indicators and messages ***********************************************************************************
 
-    .xforms-error-panel .xxforms-dialog-body {
-        padding: 10px 20px 10px 20px !important; // Override padding defined by YUI
-        overflow: auto; background-color: white;
-    }
     .xforms-error-panel {
         width: 500px;
 
-        .xxforms-dialog-head { background-color: #FF6600; }
+        .xxforms-dialog-head {
+            background-color: #FF6600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .xxforms-dialog-body {
+            padding: 10px 20px 10px 20px;
+            overflow: auto;
+            background-color: white;
+        }
 
         .xforms-error-panel-details-hidden,
         .xforms-error-panel-details-shown {

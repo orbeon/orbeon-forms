@@ -11,6 +11,7 @@ import scala.scalajs.js
 object XFormsUiEvents {
 
   // Public API
+  @deprecated("Use `orbeon:form-loaded` custom DOM event instead", "Orbeon Forms 2026.1")
   val orbeonLoadedEvent: LegacyCustomEvent =
     new LegacyCustomEvent(
       typeName     = "orbeonLoaded",
@@ -20,6 +21,7 @@ object XFormsUiEvents {
     )
 
   // Public API
+  @deprecated("Use `orbeon:error` custom DOM event instead", "Orbeon Forms 2026.1")
   val errorEvent: LegacyCustomEvent =
     new LegacyCustomEvent(
       typeName     = "errorEvent",

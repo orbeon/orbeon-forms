@@ -251,7 +251,6 @@ object AjaxClient {
     showError(ErrorMessageTitle, sb.toString, formId, ignoreErrors)
   }
 
-  // TODO: After cp to 2021.1, `formId` -> `currentForm`
   // Display the error panel and shows the specified detailed message in the detail section of the panel.
   def showError(titleString: String, detailsString: String, formId: String, ignoreErrors: Boolean): Unit = {
     XFormsUiEvents.errorEvent.fire(
@@ -260,6 +259,21 @@ object AjaxClient {
         val details: String = detailsString
       }
     )
+
+    val target: dom.EventTarget =
+      Option(formId)
+        .flatMap(id => Page.findXFormsFormFromNamespacedId(id).map(_.elem).orElse(dom.document.getElementByIdOpt(id)))
+        .getOrElse(dom.document)
+
+    dispatchCustomEvent(
+      target    = target,
+      name      = Error,
+      detailOpt = js.Dynamic.literal(
+        title   = titleString,
+        details = detailsString
+      )
+    )
+
     if (! ignoreErrors && Page.getXFormsFormFromNamespacedIdOrThrow(formId).configuration.showErrorDialog)
       ErrorPanel.showError(Page.getXFormsFormFromNamespacedIdOrThrow(formId), detailsString)
   }
@@ -369,6 +383,7 @@ object AjaxClient {
 
     val UpdatesApplied = "orbeon:updates-applied"
     val EventQueued    = "orbeon:event-queued"
+    val Error          = "orbeon:error"
 
     def callbackF[T](cb: CallbackList[T], forCurrentEventQueue: Boolean, debugName: String): Future[T] = {
 

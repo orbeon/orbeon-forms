@@ -249,6 +249,8 @@ object InitSupport {
 
   private object Private {
 
+    val FormLoaded = "orbeon:form-loaded"
+
     val pageContainsFormsMarkupPromise = Promise[Unit]()
 
     private var topLevelListenerRegistered               = false
@@ -360,6 +362,11 @@ object InitSupport {
 
         if (hasOtherScripts)
           js.special.fileLevelThis.asInstanceOf[js.Dynamic].applyDynamic(xformsPageLoadedServerName)()
+
+        dispatchCustomEvent(
+          target = formElem,
+          name   = FormLoaded
+        )
 
         newForm
       }

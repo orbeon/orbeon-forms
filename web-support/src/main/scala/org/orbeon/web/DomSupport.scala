@@ -529,12 +529,14 @@ object DomSupport {
     )
 
   def dispatchCustomEvent(
-    target: dom.EventTarget,
-    name  : String
+    target   : dom.EventTarget,
+    name     : String,
+    detailOpt: js.UndefOr[js.Any] = js.undefined
   ): Unit =
     target.dispatchEvent(
       new dom.CustomEvent(name, new dom.CustomEventInit {
         bubbles = true
+        detail  = detailOpt
       })
     )
 }

@@ -30,10 +30,8 @@ import java.lang as jl
 
 
 private object XHTMLBodyHandler {
-  private def prepareAttributes(atts: Attributes, xformsHandlerContext: HandlerContext): Attributes = {
-    val newAtts = atts.appendToClass(Constants.YuiSkinSamClass)
-    XFormsBaseHandler.handleAVTsAndIDs(newAtts, XHTMLElementHandler.RefIdAttributeNames, xformsHandlerContext)
-  }
+  private def prepareAttributes(atts: Attributes, xformsHandlerContext: HandlerContext): Attributes =
+    XFormsBaseHandler.handleAVTsAndIDs(atts, XHTMLElementHandler.RefIdAttributeNames, xformsHandlerContext)
 }
 
 class XHTMLBodyHandler(

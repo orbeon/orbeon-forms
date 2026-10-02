@@ -73,7 +73,6 @@
         </input>
         <output name="data">
             <xh:head xmlns:xh="http://www.w3.org/1999/xhtml">
-                <xh:link href="/ops/yui/container/assets/skins/sam/container.css" class="xforms-baseline"/>
                 <xh:link href="/apps/fr/style/bootstrap-5.3.8-orbeon/css/bootstrap.min.css" class="xforms-baseline"/>
                 <xh:link href="/apps/fr/style/form-runner-bootstrap5-override.css" class="xforms-baseline"/>
                 <xh:link href="/apps/fr/style/fontawesome-free-6.7.2-web/css/all.min.css" class="xforms-baseline"/>
@@ -99,14 +98,6 @@
                 <xh:script src="/webjars/mousetrap/1.6.5/mousetrap.min.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/whatwg-fetch/3.0.0/dist/fetch.umd.js" class="xforms-baseline"/>
                 <xh:script src="/ops/web-streams-polyfill/ponyfill.es2018.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/yahoo/yahoo.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/event/event.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/dom/dom.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/element/element.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/animation/animation.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/dragdrop/dragdrop.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/container/container.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/examples/container/assets/containerariaplugin.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/scalajs/orbeon-xforms-web.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/codemirror/5.65.20/lib/codemirror.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/codemirror/5.65.20/mode/xml/xml.js" class="xforms-baseline"/>

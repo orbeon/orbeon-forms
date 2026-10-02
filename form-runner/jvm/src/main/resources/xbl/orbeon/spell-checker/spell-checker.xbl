@@ -59,7 +59,7 @@
                     <xf:instance id="fr-spell-checker-internal">
                         <internal>
                             <readonly/>         <!-- Is the node bound to this spell checker readonly -->
-                            <button/>           <!-- Node to which the YUI spell checker is bound so we can make it readonly -->
+                            <button/>           <!-- Node to which the spell checker button is bound so we can make it readonly -->
                             <unknown-word/>     <!-- The current word we're looking at and trying to fix -->
                             <correction/>       <!-- The current correction being considered -->
                             <context/>          <!-- Text around the word to fix (HTML) -->

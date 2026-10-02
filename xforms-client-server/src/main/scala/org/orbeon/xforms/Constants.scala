@@ -32,7 +32,6 @@ object Constants {
 
   val AbsoluteIdSeparator      : Char   = '|'      // | see https://github.com/orbeon/orbeon-forms/issues/551
 
-  val YuiSkinSamClass                   = "yui-skin-sam"
   val XFormsIosClass                    = "xforms-ios"
   val XFormsMobileClass                 = "xforms-mobile"
   val XFormsPlatformAppleClass          = "xforms-platform-apple"

@@ -208,10 +208,6 @@ object InitSupport {
 
     val body = dom.document.body
 
-    // For embedding as we don't have control over the generation of the `<body>` element
-    // Remove once we no longer depend on YUI widgets at all anymore.
-    body.classList.add(Constants.YuiSkinSamClass)
-
     // TODO: With embedding, consider placing those on the root element of the embedded code. Watch for dialogs behavior.
     if (Bowser.ios.contains(true))
       body.classList.add(Constants.XFormsIosClass)

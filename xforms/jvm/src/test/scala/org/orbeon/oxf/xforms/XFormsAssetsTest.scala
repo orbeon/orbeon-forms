@@ -30,7 +30,6 @@ class XFormsAssetsTest extends AnyFunSpec{
     """
       {
           "css": [
-            { "full": "/ops/yui/container/assets/skins/sam/container.css",                   "min": false },
             { "full": "/apps/fr/style/bootstrap-5.3.8-orbeon/css/bootstrap.css",               "min": true  },
             { "full": "/apps/fr/style/form-runner-bootstrap5-override.css",                  "min": false },
             { "full": "/apps/fr/style/fontawesome-free-6.7.2-web/css/all.css",               "min": true  },
@@ -51,15 +50,6 @@ class XFormsAssetsTest extends AnyFunSpec{
             { "full": "/webjars/whatwg-fetch/3.0.0/dist/fetch.umd.js",                       "min": false },
 
             { "full": "/ops/web-streams-polyfill/ponyfill.es2018.js",                        "min": false },
-
-            { "full": "/ops/yui/yahoo/yahoo.js",                                             "min": true  },
-            { "full": "/ops/yui/event/event.js",                                             "min": true  },
-            { "full": "/ops/yui/dom/dom.js",                                                 "min": true  },
-            { "full": "/ops/yui/element/element.js",                                         "min": true  },
-            { "full": "/ops/yui/animation/animation.js",                                     "min": true  },
-            { "full": "/ops/yui/dragdrop/dragdrop.js",                                       "min": true  },
-            { "full": "/ops/yui/container/container.js",                                     "min": true  },
-            { "full": "/ops/yui/examples/container/assets/containerariaplugin.js",           "min": true  },
 
             { "full": "/ops/javascript/scalajs/orbeon-xforms-web.js",                        "min": false }
           ],
@@ -106,15 +96,6 @@ class XFormsAssetsTest extends AnyFunSpec{
 
             { "full": "/ops/web-streams-polyfill/ponyfill.es2018.js",                        "min": false },
 
-            { "full": "/ops/yui/yahoo/yahoo.js",                                             "min": true  },
-            { "full": "/ops/yui/event/event.js",                                             "min": true  },
-            { "full": "/ops/yui/dom/dom.js",                                                 "min": true  },
-            { "full": "/ops/yui/element/element.js",                                         "min": true  },
-            { "full": "/ops/yui/animation/animation.js",                                     "min": true  },
-            { "full": "/ops/yui/dragdrop/dragdrop.js",                                       "min": true  },
-            { "full": "/ops/yui/container/container.js",                                     "min": true  },
-            { "full": "/ops/yui/examples/container/assets/containerariaplugin.js",           "min": true  },
-
             { "full": "/apps/fr/resources/scalajs/orbeon-form-runner.js",                    "min": false }
           ],
 
@@ -136,12 +117,11 @@ class XFormsAssetsTest extends AnyFunSpec{
       XFormsAssetsBuilder.updateAssets(
         globalAssetsBaseline = assets,
         globalXblBaseline    = XblBaseline,
-        localExcludesProp    = Some("/ops/javascript/scalajs/orbeon-xforms-web.js /ops/yui/container/assets/skins/sam/container.css"),
+        localExcludesProp    = Some("/ops/javascript/scalajs/orbeon-xforms-web.js"),
         localUpdatesProp     = Some(
           Property(
             XS_STRING_QNAME,
             """+/apps/fr/resources/scalajs/orbeon-form-runner.js
-               -/ops/yui/calendar/assets/skins/sam/calendar.css
                +/apps/fr/assets/foo.css
                -fr:code-mirror
                +fr:foo

@@ -41,7 +41,7 @@ class EmbeddingApiSupportTest extends AnyFunSpec {
       s"/${optionalPath1}apps/fr/style/images/pixelmixer/bubble_64.png",
       s"/${optionalPath1}apps/fr/style/orbeon-navbar-logo.png",
       s"/${optionalPath1}ops/images/xforms/calendar.png",
-      s"/${optionalPath1}ops/yui/assets/skins/sam/sprite.png",
+      s"/${optionalPath1}ops/css-loader/css-loader.css",
       s"/${optionalPath1}xbl/orbeon/california-plate/images/platetahoe_small.jpg",
 
       s"/$Versioned1../xbl/orbeon/california-plate/images/platetahoe_small.jpg",

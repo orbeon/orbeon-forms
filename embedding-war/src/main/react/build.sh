@@ -2,7 +2,7 @@
 
 OUTPUT_PATH="$1"
 
-npm install
+npm install --ignore-scripts
 npm run build
 
 mkdir -p "$OUTPUT_PATH"

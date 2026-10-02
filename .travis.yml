@@ -56,7 +56,7 @@ install:
 # specify the exact command to run using install". Here we install npm dependencies for Node.js as we need them for integration tests.
 - nvm install 24
 - nvm use 24
-- npm install
+- npm install --ignore-scripts
 - |
   export SBT_OPTS="-Dfile.encoding=UTF-8"
 before_script:

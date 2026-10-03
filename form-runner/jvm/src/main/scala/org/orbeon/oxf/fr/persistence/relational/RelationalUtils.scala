@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.fr.persistence.relational
 
+import cats.instances.try_.*
 import org.log4s
 import org.orbeon.io.IOUtils.*
 import org.orbeon.oxf.common.OXFException
@@ -24,13 +25,15 @@ import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, DateUtilsUsingSaxon, Exceptions, IndentedLogger, LoggerFactory, Logging}
+import retry.*
 
 import java.sql.{Connection, ResultSet}
 import java.time.Instant
 import javax.naming.InitialContext
 import javax.sql.DataSource
+import scala.concurrent.duration.*
 import scala.util.control.{ControlThrowable, NonFatal}
-import scala.util.{Random, Success, Try}
+import scala.util.{Success, Try}
 
 
 object RelationalUtils extends Logging {
@@ -191,16 +194,18 @@ object RelationalUtils extends Logging {
     val InitialDelayMillis = 20L
     val MaxDelayMillis     = 1000L
 
-    def calculateBackoff(
-      attempt     : Int,
-      minDelay    : Long = MinDelayMillis,
-      initialDelay: Long = InitialDelayMillis,
-      maxDelay    : Long = MaxDelayMillis
-    ): Long = {
-      val expDelay = math.min(maxDelay, initialDelay * (1L << math.min(attempt, 30)))
-      if (expDelay <= minDelay) minDelay
-      else Random.between(minDelay, expDelay + 1)
-    }
+    private implicit val sleepTry: Sleep[Try] =
+      (delay: FiniteDuration) => Try(if (delay.toMillis > 0) Thread.sleep(delay.toMillis))
+
+    private def retryPolicy(
+      maxAttempts : Int,
+      initialDelay: FiniteDuration,
+      maxDelay    : FiniteDuration
+    ): RetryPolicy[Try] =
+      RetryPolicies.capDelay[Try](
+        maxDelay,
+        RetryPolicies.fullJitter[Try](initialDelay)
+      ).join(RetryPolicies.limitRetries[Try](maxAttempts - 1))
 
     def withConnectionHandleTransaction[T](
       provider         : Provider,
@@ -215,56 +220,44 @@ object RelationalUtils extends Logging {
       indentedLogger   : IndentedLogger
     ): T = {
 
-      @annotation.tailrec
-      def attemptTransaction(attempt: Int): T = {
-        val outcome: Either[Throwable, T] =
+      def singleAttempt: T = {
+        val connection = acquireConnection()
+        useAndClose(connection) { connection =>
           try {
-            val connection = acquireConnection()
-            val result = useAndClose(connection) { connection =>
-              try {
-                val result = withDebug("executing block with connection")(thunk(connection))
-                debug("about to commit")
-                connection.commit()
-                result
-              } catch {
-                case t: ControlThrowable =>
-                  debug("about to commit following `ControlThrowable`")
-                  connection.commit()
-                  throw t
-                case NonFatal(t) =>
-                  debug("about to rollback following `NonFatal`", List("throwable" -> Exceptions.getRootThrowable(t).toString))
-                  Try(connection.rollback())
-                  throw t
-              }
-            }
-            Right(result)
-          } catch {
-            case t: ControlThrowable => throw t
-            case NonFatal(t)         => Left(t)
-          }
-
-        outcome match {
-          case Right(result) =>
+            val result = withDebug("executing block with connection")(thunk(connection))
+            debug("about to commit")
+            connection.commit()
             result
-          case Left(t) =>
-            val isTransient = Provider.isTransientConcurrency(provider, t)
-
-            if (isTransient && attempt < maxAttempts - 1) {
-              val sleepMillis = calculateBackoff(attempt, minDelay, initialDelay, maxDelay)
-              warn(
-                s"Transient concurrency error (attempt ${attempt + 1}/$maxAttempts); retrying after ${sleepMillis}ms",
-                List("throwable" -> Exceptions.getRootThrowable(t).toString)
-              )
-              if (sleepMillis > 0)
-                Thread.sleep(sleepMillis)
-              attemptTransaction(attempt + 1)
-            } else {
+          } catch {
+            case t: ControlThrowable =>
+              debug("about to commit following `ControlThrowable`")
+              connection.commit()
               throw t
-            }
+            case NonFatal(t) =>
+              debug("about to rollback following `NonFatal`", List("throwable" -> Exceptions.getRootThrowable(t).toString))
+              Try(connection.rollback())
+              throw t
+          }
         }
       }
 
-      attemptTransaction(0)
+      val policy = retryPolicy(maxAttempts, initialDelay.millis, maxDelay.millis)
+
+      val onError: (Throwable, RetryDetails) => Try[Unit] = (t, details) => Try {
+        details match {
+          case RetryDetails.WillDelayAndRetry(nextDelay, retriesSoFar, _) =>
+            warn(
+              s"Transient concurrency error (attempt ${retriesSoFar + 1}/$maxAttempts); retrying after ${nextDelay.toMillis}ms",
+              List("throwable" -> Exceptions.getRootThrowable(t).toString)
+            )
+          case RetryDetails.GivingUp(_, _) =>
+        }
+      }
+
+      val isWorthRetrying: Throwable => Try[Boolean] =
+        t => Try(Provider.isTransientConcurrency(provider, t))
+
+      retryingOnSomeErrors[T](policy, isWorthRetrying, onError)(Try(singleAttempt)).get
     }
   }
 }

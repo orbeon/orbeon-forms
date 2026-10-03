@@ -427,7 +427,10 @@
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.require-uploads.*.*">
         pending-uploads
-        recover (error-message("upload-in-progress") then terminate-with-success)
+        recover (
+            error-message("upload-in-progress")
+            then terminate-with-failure
+        )
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.require-valid.*.*">
         show-relevant-errors
@@ -438,7 +441,7 @@
             then xf:show(dialog = "fr-validation-dialog")
             then suspend
             then xf:dispatch(name = "fr-focus-first-error", targetid = "error-summary-control-bottom")
-            then terminate-with-success
+            then terminate-with-failure
         )
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.review-messages.*.*">

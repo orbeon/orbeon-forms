@@ -590,7 +590,10 @@
         then save
         then new-to-edit
         then if ("xxf:open-dialogs() = 0") then success-message("save-success")
-        recover error-message("database-error")
+        recover (
+            error-message("database-error")
+            then terminate-with-failure
+        )
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.save-overwrite.*.*">
         save(overwrite = "true")

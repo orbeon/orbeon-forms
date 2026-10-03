@@ -20,10 +20,12 @@ import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.SimpleDataMigration.{FormDiff, diffSimilarXmlData}
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.importexport.FormDefinitionOps
+import org.orbeon.oxf.fr.persistence.relational.StageHeader
 import org.orbeon.oxf.http.{HttpStatusCode, StatusCode}
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, StaticXPath, StringUtils}
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsResourceSupport
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
 import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiver}
@@ -42,6 +44,7 @@ object HistoryDiff {
   val TruncationSizeParam = "truncation-size"
 
   case class FormDefinition(formDefinition: NodeInfo, metadataRootElem: NodeInfo, resourceRootElem: NodeInfo)
+  case class MigratedDataWithStage(rootElem: NodeInfo, stageOpt: Option[String])
 
   case class HttpStatusCodeWithDescription(code: Int, error: String) extends HttpStatusCode
 
@@ -105,13 +108,19 @@ object HistoryDiff {
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
   ): Try[Map[(Instant, Instant), Option[Diffs]]] = {
 
-    def readFormData(lastModifiedTime: Instant): Try[DocumentNodeInfoType] =
+    def readFormData(lastModifiedTime: Instant): Try[(DocumentNodeInfoType, Option[String])] =
       PersistenceApi.readFormData(
         appFormVersion      = appFormVersion,
         documentId          = documentId,
         lastModifiedTime    = lastModifiedTime.some,
         isInternalAdminUser = false
-      ).map(_._1._2)
+      ).map { case ((headers, data), _) =>
+        val stageOpt = headers.collectFirst {
+          case (k, v) if k.equalsIgnoreCase(StageHeader.HeaderName) => v
+        }.flatMap(_.headOption).flatMap(_.trimAllToOpt)
+
+        (data, stageOpt)
+      }
 
     def dataMigratedToEdge(data: DocumentNodeInfoType): Try[DocumentNodeInfoType] = Try {
       MigrationSupport.dataMigratedToEdge(
@@ -128,15 +137,15 @@ object HistoryDiff {
       if (isFormBuilder) Success(data) else dataMigratedToEdge(data)
 
     // Read and migrate the form data for a single modified time
-    def readMigratedFormData(modifiedTime: Instant): Try[NodeInfo] =
+    def readMigratedFormData(modifiedTime: Instant): Try[MigratedDataWithStage] =
       for {
-        formData         <- readFormData(modifiedTime)
-        migratedFormData <- dataMigratedIfNeeded(formData)
-      } yield migratedFormData.rootElement
+        (formData, stageOpt) <- readFormData(modifiedTime)
+        migratedFormData     <- dataMigratedIfNeeded(formData)
+      } yield MigratedDataWithStage(migratedFormData.rootElement, stageOpt)
 
-    def computeDiffs(olderDataMigrated: NodeInfo, newerDataMigrated: NodeInfo): Option[Diffs] =
-      if (isFormBuilder) formDefinitionDiffs(olderDataMigrated, newerDataMigrated)
-      else               formDataDiffs      (olderDataMigrated, newerDataMigrated, formDefinition.formDefinition)
+    def computeDiffs(olderDataMigrated: MigratedDataWithStage, newerDataMigrated: MigratedDataWithStage): Option[Diffs] =
+      if (isFormBuilder) formDefinitionDiffs(olderDataMigrated.rootElem, newerDataMigrated.rootElem)
+      else               formDataDiffs      (olderDataMigrated,            newerDataMigrated,            formDefinition.formDefinition)
 
     val sortedModifiedTimes = modifiedTimes.sorted
 
@@ -145,7 +154,7 @@ object HistoryDiff {
     @tailrec
     def loop(
       olderModifiedTime: Instant,
-      olderDataMigrated: NodeInfo,
+      olderDataMigrated: MigratedDataWithStage,
       remaining        : List[Instant],
       acc              : List[((Instant, Instant), Option[Diffs])]
     ): Try[List[((Instant, Instant), Option[Diffs])]] =
@@ -203,27 +212,43 @@ object HistoryDiff {
     if (same) None else Some(OtherDiffs)
   }
 
-  private def formDataDiffs(d1: NodeInfo, d2: NodeInfo, formDefinition: NodeInfo): Option[Diffs] = {
+  private def formDataDiffs(
+    olderData     : MigratedDataWithStage,
+    newerData     : MigratedDataWithStage,
+    formDefinition: NodeInfo
+  ): Option[Diffs] = {
 
     val formDefinitionOps = new FormDefinitionOps(formDefinition)
 
     val formDiffs =
       diffSimilarXmlData(
-        srcDocRootElem    = d1,
-        dstDocRootElem    = d2,
+        srcDocRootElem    = olderData.rootElem,
+        dstDocRootElem    = newerData.rootElem,
         isElementReadonly = _ => false,
         formOps           = formDefinitionOps
       )(
         mapBind           = formDefinitionOps.bindNameOpt
       )
 
-    if (formDiffs.isEmpty) None else FormDataDiffs(formDiffs).some
+    val stageDiffOpt =
+      if (olderData.stageOpt != newerData.stageOpt)
+        Some(StageDiff(from = olderData.stageOpt.getOrElse(""), to = newerData.stageOpt.getOrElse("")))
+      else
+        None
+
+    if (formDiffs.isEmpty && stageDiffOpt.isEmpty) None
+    else FormDataDiffs(formDiffs, stageDiffOpt).some
   }
 }
 
+case class StageDiff(from: String, to: String)
+
 sealed trait Diffs
-case class  FormDataDiffs(formDiffs: List[FormDiff[Option[String]]]) extends Diffs
-case object OtherDiffs                                               extends Diffs
+case class  FormDataDiffs(
+  formDiffs   : List[FormDiff[Option[String]]],
+  stageDiffOpt: Option[StageDiff] = None
+) extends Diffs
+case object OtherDiffs extends Diffs
 
 object Diffs {
 
@@ -252,7 +277,15 @@ object Diffs {
           }
     ) {
       diffsOpt match {
-        case Some(FormDataDiffs(formDiffs)) =>
+        case Some(FormDataDiffs(formDiffs, stageDiffOpt)) =>
+
+          stageDiffOpt.foreach { stageDiff =>
+            withElement("diff", atts = List("type" -> "workflow-stage-changed")) {
+              element("from", text = truncate(stageDiff.from))
+              element("to",   text = truncate(stageDiff.to))
+            }
+          }
+
           formDiffs.distinct map { formDiff =>
             import FormDiff.*
 
@@ -272,7 +305,7 @@ object Diffs {
             def labelOpt(name: String) = (formDefinition.resourceRootElem / name / "label").headOption.map(_.stringValue)
             def isHTML(name: String)   = (findControlByName(name).toList / "label" /@ "mediatype").headOption.exists(_.getStringValue == ContentTypes.HtmlContentType)
 
-            withElement("diff", atts = List("type" -> diffType) ::: formDiff.bind.toList.map("name " -> _) :::  atts) {
+            withElement("diff", atts = List("type" -> diffType) ::: formDiff.bind.toList.map("name" -> _) :::  atts) {
               for {
                 name  <- formDiff.bind
                 label <- labelOpt(name)

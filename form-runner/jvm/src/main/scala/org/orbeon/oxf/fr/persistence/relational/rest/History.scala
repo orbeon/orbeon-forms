@@ -156,7 +156,7 @@ private object History {
         case Some(_)              => throw HttpStatusCodeException(StatusCode.BadRequest)
       }
 
-    val hasStage = filenameOpt.isDefined
+    val hasStage = filenameOpt.isEmpty
 
     val innerSQL =
       s"""|SELECT  t.last_modified_time, t.last_modified_by, t.created
@@ -270,7 +270,7 @@ private object History {
         ownerUserAndGroupOpt = UserAndGroup.fromStrings(rs.getString("username"), rs.getString("groupname")),
         organizationOpt      = OrganizationSupport.readFromResultSet(connection, rs).map(_._2),
         deleted              = rs.getString("deleted") == "Y",
-        stageOpt             = hasStage.option(rs.getString("stage").trimAllToEmpty)
+        stageOpt             = if (hasStage) Option(rs.getString("stage")).flatMap(_.trimAllToOpt) else None
       )
 
       position += 1

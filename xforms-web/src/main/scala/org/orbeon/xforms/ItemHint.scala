@@ -26,7 +26,7 @@ object ItemHint {
       // `UndefOr` to try to avoid occasional error with fastOptJS but that doesn't seem to work; `.html()` is meant to
       // return a `String` but occasionally returns `undefined`, and that's probably the main problem. Should be ok
       // with `fullOptJS`.
-      val hintHtml: js.UndefOr[String] = hintRegionEl.nextElementSiblings(".xforms-hint").nextOption().get.outerHTML
+      val hintHtml: js.UndefOr[String] = hintRegionEl.nextElementSiblings(".xforms-hint").nextOption().get.innerHTML
 
       val existingTooltipOpt = Bootstrap.getTooltip(hintRegionEl)
       val haveHint           = hintHtml.exists(_.nonEmpty)

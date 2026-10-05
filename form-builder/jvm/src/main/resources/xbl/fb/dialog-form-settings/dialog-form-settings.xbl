@@ -1141,10 +1141,10 @@
                                 xmlns:BrowserVersion="java:org.orbeon.builder.BrowserVersion"
                                 value="BrowserVersion:MinimalMicrosoftBrowserNameAndVersion()"/>
                             or newer, or use
-                            <a href="http://www.google.com/chrome">Google Chrome</a>,
-                            <a href="http://www.mozilla.com/firefox/">Firefox</a>,
+                            <a href="https://www.google.com/chrome">Google Chrome</a>,
+                            <a href="https://www.mozilla.com/firefox/">Firefox</a>,
                             or
-                            <a href="http://www.apple.com/safari/">Safari</a>.
+                            <a href="https://www.apple.com/safari/">Safari</a>.
                             If we made a mistake and you are not using
                             <xf:output value="xxf:instance('fb-user-agent-instance')/browser-name"/>,
                             please

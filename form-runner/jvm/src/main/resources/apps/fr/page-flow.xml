@@ -18,7 +18,7 @@
 
     <!-- ==== Files ================================================================================================ -->
 
-    <files path="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|map|png|jpg|xml|xsd|ico|html|txt|svg|ttf|eot|woff|woff2)"/>
+    <files path="(?!/([^/]+)/(?:service/|config/(?!theme/))).+\.(gif|css|pdf|js|map|png|pdf|js|ico|html|txt|svg|ttf|eot|woff|woff2)"/>
 
     <!-- ==== Entry point for persistence services ================================================================= -->
 

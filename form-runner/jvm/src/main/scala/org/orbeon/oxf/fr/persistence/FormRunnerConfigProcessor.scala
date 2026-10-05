@@ -558,16 +558,25 @@ private object FormRunnerConfigProcessor {
         .flatMap(_.toBooleanOption)
         .nextOption()
 
-    val disableParams: (Option[Boolean], Option[Boolean], Option[Boolean]) =
-      if (isService || updatedParams.mode == "test-pdf")
-        (
-          paramOpts(DisableRelevantParams),
-          paramOpts(DisableDefaultParams),
-          paramOpts(DisableCalculateParams) // the parameter takes precedence
-            .orElse((isReadonlyMode && disableCalculateInReadonlyModes).option(true))
-        )
-      else
-        (None, None, None)
+    val disableParams: (Option[Boolean], Option[Boolean], Option[Boolean]) = {
+
+      val (disableRelevantParamOpt, disableDefaultParamOpt, disableCalculateParamOpt) =
+        if (isService || updatedParams.mode == "test-pdf")
+          (
+            paramOpts(DisableRelevantParams),
+            paramOpts(DisableDefaultParams),
+            paramOpts(DisableCalculateParams)
+          )
+        else
+          (None, None, None)
+
+      (
+        disableRelevantParamOpt,
+        disableDefaultParamOpt,
+        disableCalculateParamOpt // the parameter takes precedence
+          .orElse((isReadonlyMode && disableCalculateInReadonlyModes).option(true))
+      )
+    }
 
     FormRunnerConfig(
       app                              = updatedParams.app,

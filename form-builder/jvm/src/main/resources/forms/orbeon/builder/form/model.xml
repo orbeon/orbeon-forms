@@ -444,6 +444,15 @@
                     not($valid-app-form-params) and
                     xxf:split(xxf:property('oxf.fb.new-form.wizard-steps')) = ('templates', 'general-settings')"/>
 
+            <!-- Default title is "Untitled Form", but it is left empty if users may be required to enter a title -->
+            <xf:var
+                name="untitled-form-opt"
+                value="
+                    if (some $p in xxf:properties-start-with('oxf.fb.form-title.required') satisfies string(xxf:property($p)) = 'true') then
+                        ()
+                    else
+                        $fb-resources/template/untitled-form/string()"/>
+
             <!-- Skip showing the dialog and create the form directly -->
             <!-- Reuse existing logic of event handlers on `dialog-form-settings` -->
             <xf:dispatch
@@ -464,7 +473,7 @@
                 <xf:property name="mode"                                      value="'new'"/>
                 <xf:property name="app"                                       value="$requested-app"/>
                 <xf:property name="form"                                      value="$requested-form"/>
-                <xf:property name="title"                                     value="xf:element('title',       (xf:attribute('xml:lang', $fb-lang), ($requested-title, $fb-resources/template/untitled-form/string())[1]))"/>
+                <xf:property name="title"                                     value="xf:element('title',       (xf:attribute('xml:lang', $fb-lang), ($requested-title, $untitled-form-opt)[1]))"/>
                 <xf:property name="description"                               value="xf:element('description', (xf:attribute('xml:lang', $fb-lang), $requested-description))"/>
             </xf:dispatch>
 
@@ -475,7 +484,7 @@
                 <xf:property name="mode"                                      value="'new'"/>
                 <xf:property name="app"                                       value="($requested-app,         bind('application-name-bind'))[1]"/>
                 <xf:property name="form"                                      value="($requested-form,        bind('form-name-bind'))[1]"/>
-                <xf:property name="title"                                     value="xf:element('title',       (xf:attribute('xml:lang', $fb-lang), ($requested-title, $fb-resources/template/untitled-form/string())[1]))"/>
+                <xf:property name="title"                                     value="xf:element('title',       (xf:attribute('xml:lang', $fb-lang), ($requested-title, $untitled-form-opt)[1]))"/>
                 <xf:property name="description"                               value="xf:element('description', (xf:attribute('xml:lang', $fb-lang), $requested-description))"/>
             </xxf:show>
         </xf:action>

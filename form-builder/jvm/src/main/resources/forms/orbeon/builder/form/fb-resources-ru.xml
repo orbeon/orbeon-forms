@@ -28,10 +28,12 @@
     <title>
         <label>Заголовок формы</label>
         <hint>Нажмите чтобы ввести заголовок</hint>
+        <alert>Заголовок формы обязателен</alert>
     </title>
     <description>
         <label>Описание формы</label>
         <hint>Нажмите чтобы ввести описание (не обязательно)</hint>
+        <alert>Описание формы обязательно</alert>
     </description>
     <logo>
         <label>Логотип</label>

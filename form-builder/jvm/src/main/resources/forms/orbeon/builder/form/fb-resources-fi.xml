@@ -48,10 +48,12 @@
     <title>
         <label>Lomakkeen otsikko</label>
         <hint>Lomakkeen otsikko nykyisellä kielellä</hint>
+        <alert>Lomakkeen otsikko vaaditaan</alert>
     </title>
     <description>
         <label>Lomakkeen kuvaus</label>
         <hint>Lomakkeen kuvaus nykyisellä kielellä</hint>
+        <alert>Lomakkeen kuvaus vaaditaan</alert>
     </description>
     <logo>
         <label>Logo</label>

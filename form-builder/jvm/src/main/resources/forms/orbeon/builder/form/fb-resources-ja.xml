@@ -48,10 +48,12 @@
     <title>
         <label>フォームタイトル</label>
         <hint>現在の言語でのタイトル</hint>
+        <alert>フォームタイトルは必須です</alert>
     </title>
     <description>
         <label>フォーム説明</label>
         <hint>現在の言語での説明</hint>
+        <alert>フォーム説明は必須です</alert>
     </description>
     <logo>
         <label>ロゴ</label>

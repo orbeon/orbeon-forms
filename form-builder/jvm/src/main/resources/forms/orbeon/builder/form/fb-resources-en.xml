@@ -48,10 +48,12 @@
     <title>
         <label>Form Title</label>
         <hint>Form title in the current language</hint>
+        <alert>Form title is required</alert>
     </title>
     <description>
         <label>Form Description</label>
         <hint>Form description in the current language</hint>
+        <alert>Form description is required</alert>
     </description>
     <logo>
         <label>Logo</label>

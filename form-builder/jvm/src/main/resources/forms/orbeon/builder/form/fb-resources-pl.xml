@@ -48,10 +48,12 @@
     <title>
         <label>Tytuł formularza</label>
         <hint>Tytuł formularza w bieżącym języku</hint>
+        <alert>Tytuł formularza jest wymagany</alert>
     </title>
     <description>
         <label>Opis formularza</label>
         <hint>Opis formularza w bieżącym języku</hint>
+        <alert>Opis formularza jest wymagany</alert>
     </description>
     <logo>
         <label>Logo</label>

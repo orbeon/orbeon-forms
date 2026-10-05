@@ -36,10 +36,12 @@
     <title>
         <label>Titolo del modulo</label>
         <hint>Titolo del modulo nella lingua attualmente usata</hint>
+        <alert>Il titolo del modulo è obbligatorio</alert>
     </title>
     <description>
         <label>Descrizione del modulo</label>
         <hint>Descrizione del modulo nella lingua attualmente usata</hint>
+        <alert>La descrizione del modulo è obbligatoria</alert>
     </description>
     <logo>
         <label>Logo</label>

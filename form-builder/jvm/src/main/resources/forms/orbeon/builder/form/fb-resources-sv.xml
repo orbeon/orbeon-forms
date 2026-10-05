@@ -48,10 +48,12 @@
     <title>
         <label>Titel</label>
         <hint>Formulärets titel på aktuellt språk</hint>
+        <alert>Formulärtitel krävs</alert>
     </title>
     <description>
         <label>Beskrivning</label>
         <hint>Beskrivning av formuläret på aktuellt språk</hint>
+        <alert>Formulärbeskrivning krävs</alert>
     </description>
     <logo>
         <label>Logotyp</label>

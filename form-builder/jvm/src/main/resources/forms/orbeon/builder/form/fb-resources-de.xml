@@ -40,10 +40,12 @@
     <title>
         <label>Formulartitel</label>
         <hint>Formulartitel in der zur Zeit verwendeten Sprache</hint>
+        <alert>Formulartitel ist erforderlich</alert>
     </title>
     <description>
         <label>Formularbeschreibung</label>
         <hint>Formularbeschreibung in der zur Zeit verwendeten Sprache</hint>
+        <alert>Formularbeschreibung ist erforderlich</alert>
     </description>
     <logo>
         <label>Logo</label>

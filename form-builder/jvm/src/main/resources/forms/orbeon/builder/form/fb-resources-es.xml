@@ -29,10 +29,12 @@
     <title>
         <label>Título del Formulario</label>
         <hint>Título del Formulario en el idioma configurado</hint>
+        <alert>El título del formulario es obligatorio</alert>
     </title>
     <description>
         <label>Descripción del Formulario</label>
         <hint>Descripción del Formulario en el idioma configurado</hint>
+        <alert>La descripción del formulario es obligatoria</alert>
     </description>
     <logo>
         <label>Logo</label>

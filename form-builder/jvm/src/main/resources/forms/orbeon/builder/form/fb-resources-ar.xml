@@ -48,10 +48,12 @@
     <title>
         <label>عنوان النموذج</label>
         <hint>عنوان النموذج باللغة الحالية</hint>
+        <alert>عنوان النموذج مطلوب</alert>
     </title>
     <description>
         <label>وصف النموذج</label>
         <hint>وصف النموذج باللغة الحالية</hint>
+        <alert>وصف النموذج مطلوب</alert>
     </description>
     <logo>
         <label>الشعار</label>

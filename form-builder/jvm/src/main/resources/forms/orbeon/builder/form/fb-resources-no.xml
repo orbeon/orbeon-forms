@@ -28,10 +28,12 @@
     <title>
         <label>Skjematittel</label>
         <hint>Klikk for å skrive inn en skjematittel</hint>
+        <alert>Skjematittel er påkrevd</alert>
     </title>
     <description>
         <label>Skjemainnstillinger</label>
         <hint>Klikk for å skrive inn skjemainnstillinger</hint>
+        <alert>Skjemabeskrivelse er påkrevd</alert>
     </description>
     <logo>
         <label>Logo</label>

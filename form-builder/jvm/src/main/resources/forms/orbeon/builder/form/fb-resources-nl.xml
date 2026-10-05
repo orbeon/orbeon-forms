@@ -29,10 +29,12 @@
     <title>
         <label>Form titel</label>
         <hint>Formtitel in de huidige taal</hint>
+        <alert>Form titel is verplicht</alert>
     </title>
     <description>
         <label>Form omschrijving</label>
         <hint>Form omschrijving in de huidige taal</hint>
+        <alert>Form omschrijving is verplicht</alert>
     </description>
     <logo>
         <label>Logo</label>

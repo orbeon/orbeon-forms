@@ -829,7 +829,7 @@
                             <title xml:lang="fr">Formulaire vide</title>
                             <description xml:lang="en">Use this template to start from scratch.</description>
                             <description xml:lang="fr">Utilisez ce modèle pour commencer à partir de zéro.</description>
-                            <thumbnail></thumbnail>
+                            <thumbnail/>
                         </_>
                         <_>
                             <url>oxf:/forms/orbeon/builder/form/template-wizard.xml</url>

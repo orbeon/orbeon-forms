@@ -36,6 +36,7 @@
 @tint-header      : #f3f6fd; //  3% on gray 99
 @tint-band        : #e7ecf5; //  5% on gray 97
 @tint-hover       : #dee3eb; //  5% on gray 94
+@tint-edit-hover  : #d1d6e0; //  5% on gray 90
 @tint-button      : #d2dae8; // 10% on gray 94
 @tint-button-hover: #c7cfde; // 10% on gray 90
 @tint-muted       : #6a707a; //  5% on gray 55
@@ -326,7 +327,7 @@
   --orbeon-navbar-title-color                          : @gray-52;
   --orbeon-navbar-background-color                     : @tint-header;
   --orbeon-navbar-border-bottom                        : @base-border;
-  --orbeon-fb-navbar-background-color                  : @tint-header;
+  --orbeon-fb-navbar-background-color                  : white;
   --orbeon-navbar-heading-font-size                    : @text-2xl;
   --orbeon-navbar-heading-color                        : var(--orbeon-base-color);
   --orbeon-navbar-dropdown-open-toggle-background-color: @tint-hover;
@@ -334,10 +335,10 @@
   --orbeon-navbar-language-dropdown-hover-color        : @gray-15;
 
   // Form Builder
-  --orbeon-fb-background-color                    : @gray-68;
-  --orbeon-fb-form-area-background-color          : @gray-97;
-  --orbeon-fb-hover-background-color              : @gray-94;
-  --orbeon-fb-editable-hover-background-color     : @gray-90;
+  --orbeon-fb-background-color                    : @gray-82;
+  --orbeon-fb-form-area-background-color          : @gray-90;
+  --orbeon-fb-hover-background-color              : @tint-hover;
+  --orbeon-fb-editable-hover-background-color     : @tint-edit-hover;
   --orbeon-fb-placeholder-color                   : @gray-82;
   --orbeon-fb-dnd-background-color                : @gray-82;
   --orbeon-fb-navbar-color                        : @gray-52;
@@ -536,7 +537,6 @@
 
     // @tint-header: 3% on gray 99
     --orbeon-navbar-background-color                    : color-mix(in oklab, var(--orbeon-accent-color) 3%, @gray-99);
-    --orbeon-fb-navbar-background-color                 : color-mix(in oklab, var(--orbeon-accent-color) 3%, @gray-99);
     --orbeon-dialog-title-background-color              : color-mix(in oklab, var(--orbeon-accent-color) 3%, @gray-99);
     --orbeon-revision-history-pane-head-background-color: color-mix(in oklab, var(--orbeon-accent-color) 3%, @gray-99);
     --orbeon-landing-card-hover-background-color        : color-mix(in oklab, var(--orbeon-accent-color) 3%, @gray-99);
@@ -555,6 +555,10 @@
     --orbeon-repetition-selected-background-color        : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-94);
     --orbeon-navbar-dropdown-open-toggle-background-color: color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-94);
     --orbeon-progress-background-color                   : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-94);
+    --orbeon-fb-hover-background-color                   : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-94);
+
+    // @tint-edit-hover: 5% on gray 90
+    --orbeon-fb-editable-hover-background-color: color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-90);
 
     // @tint-button, @tint-button-hover: 10% on gray 94 and 90
     --orbeon-button-background-color          : color-mix(in oklab, var(--orbeon-accent-color) 10%, @gray-94);

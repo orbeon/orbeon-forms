@@ -142,7 +142,7 @@
             <rule pattern="org.relaxng.datatype.**" result="org.orbeon.msv.relaxng.datatype.@1"/>
         </jarjar>
     </target>
-    
+
     <target name="xforms-filter-jar" depends="war-common">
 <!--    <target name="xforms-filter-jar" depends="prepare">-->
 
@@ -197,7 +197,7 @@
 
             -libraryjars ${java.home}/jmods(java/**.class,javax/**.class,org/w3c/**.class,org/xml/**.class)
 
-            -libraryjars xforms-filter-war/target/webapp/WEB-INF/lib/slf4j-api-2.0.18.jar
+            -libraryjars xforms-filter-war/target/webapp/WEB-INF/lib/slf4j-api-2.0.20.jar
 
             -libraryjars lib/proguard/(javax.servlet-api-*.jar;)
             -libraryjars lib/proguard/(jakarta.servlet-api-*.jar;)
@@ -324,7 +324,7 @@
 
             -libraryjars ${java.home}/jmods(java/**.class,javax/**.class,org/w3c/**.class,org/xml/**.class)
 
-            -libraryjars authorizer-war/target/webapp/WEB-INF/lib/slf4j-api-2.0.18.jar
+            -libraryjars authorizer-war/target/webapp/WEB-INF/lib/slf4j-api-2.0.20.jar
 
             -libraryjars lib/proguard/(javax.servlet-api-*.jar;)
             -libraryjars lib/proguard/(jakarta.servlet-api-*.jar;)

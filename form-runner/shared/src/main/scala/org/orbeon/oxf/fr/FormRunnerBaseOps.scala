@@ -539,25 +539,14 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
 
   def optionFromMetadataOrProperties(
     metadataInstanceRootElemOpt: Option[NodeInfo],
-    featureName                : String
-  )(implicit
-    formRunnerParams           : FormRunnerParams
-  ): Option[String] =
-    optionFromMetadataOrProperties(
-      metadataInstanceRootElemOpt = metadataInstanceRootElemOpt,
-      featureName                 = featureName,
-      propertyName                = s"oxf.fr.detail.$featureName"
-    )
-
-  def optionFromMetadataOrProperties(
-    metadataInstanceRootElemOpt: Option[NodeInfo],
     featureName                : String,
-    propertyName               : String
+    propertyName               : Option[String] = None
   )(implicit
     formRunnerParams           : FormRunnerParams
   ): Option[String] =
-    metadataInstanceRootElemOpt.flatMap(_.elemValueOpt(featureName))
-      .orElse(formRunnerProperty(propertyName))
+    metadataInstanceRootElemOpt
+      .flatMap(_.elemValueOpt(featureName))
+      .orElse(formRunnerProperty(propertyName.getOrElse(s"oxf.fr.detail.$featureName")))
 
   //@XPathFunction
   def optionFromMetadataOrPropertiesDynamicXPath(

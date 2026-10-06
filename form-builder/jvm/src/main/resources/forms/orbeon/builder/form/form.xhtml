@@ -224,11 +224,13 @@
                     name="is-page-layout-fluid"
                     value="
                         frf:optionFromMetadataOrPropertiesXPath(
-                            bind('metadata-bind'),
-                            'html-page-layout',
-                            bind('application-name-bind'),
-                            bind('form-name-bind'),
-                            'edit'
+                            (: metadataInstanceRootElemOrNull :) bind('metadata-bind'),
+                            (: featureName                    :) 'html-page-layout',
+                            (: propertyNameOrNull             :) (),
+                            (: app                            :) bind('application-name-bind'),
+                            (: form                           :) bind('form-name-bind'),
+                            (: mode                           :) 'edit',
+                            (: propertyProfileOrNull          :) bind('fb-form-model-bind')/@xxf:property-profile[xxf:non-blank()]/xxf:trim()
                         ) = 'fluid'"/>
 
                 <xf:var
@@ -236,11 +238,13 @@
                     value="
                     (
                         frf:optionFromMetadataOrPropertiesXPath(
-                            bind('metadata-bind'),
-                            'density',
-                            bind('application-name-bind'),
-                            bind('form-name-bind'),
-                            'edit'
+                            (: metadataInstanceRootElemOrNull :) bind('metadata-bind'),
+                            (: featureName                    :) 'density',
+                            (: propertyNameOrNull             :) (),
+                            (: app                            :) bind('application-name-bind'),
+                            (: form                           :) bind('form-name-bind'),
+                            (: mode                           :) 'edit',
+                            (: propertyProfileOrNull          :) bind('fb-form-model-bind')/@xxf:property-profile[xxf:non-blank()]/xxf:trim()
                         ),
                         'compact'
                     )[1]"/>

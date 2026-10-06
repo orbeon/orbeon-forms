@@ -32,8 +32,23 @@
     <xsl:import href="toc.xsl"/>
 
     <xsl:variable name="metadata"      select="if ($is-detail) then frf:metadataInstanceRootOpt($fr-form-model) else ()"/>
+
     <!-- Mode is not used by `frf:optionFromMetadataOrPropertiesXPath()`  -->
-    <xsl:variable name="page-layout"   select="if ($is-detail) then frf:optionFromMetadataOrPropertiesXPath($metadata, 'html-page-layout', $app, $form, 'view') else ()"/>
+    <xsl:variable
+        name="page-layout"
+        select="
+            if ($is-detail) then
+                frf:optionFromMetadataOrPropertiesXPath(
+                    (: metadataInstanceRootElemOrNull :) $metadata,
+                    (: featureName                    :) 'html-page-layout',
+                    (: propertyNameOrNull             :) (),
+                    (: app                            :) $app,
+                    (: form                           :) $form,
+                    (: mode                           :) 'view',
+                    (: propertyProfileOrNull          :) $property-profile-opt
+                )
+            else
+                ()"/>
 
     <xsl:variable name="view"                 select="(/xh:html/xh:body/fr:view)[1]"                   as="element(fr:view)?"/>
     <xsl:variable name="fluid"                select="$view/@fluid = 'true' or $page-layout = 'fluid'" as="xs:boolean"/>

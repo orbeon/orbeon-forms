@@ -259,42 +259,29 @@ trait FormRunnerComponentsCompileTime {
 
   // Used by:
   //
-  // - `print-pdf-notemplate.xsl`: `rendered-page-orientation`/`rendered-page-size`
-  // - Form Builder: `html-page-layout`
-  // - `view.xsl`: `html-page-layout`
-  //
-  //@XPathFunction
-  def optionFromMetadataOrPropertiesXPath(
-    metadataInstanceRootElemOrNull: NodeInfo,
-    featureName                   : String,
-    app                           : String,
-    form                          : String,
-    mode                          : String
-  ): Option[String] =
-    FormRunner.optionFromMetadataOrProperties(
-      metadataInstanceRootElemOpt = Option(metadataInstanceRootElemOrNull),
-      featureName                 = featureName
-    )(
-      formRunnerParams            = FormRunnerParams(app, form, Some(1), None, None, mode)
-    )
-
-  // Used by:
-  //
   // - `components.xsl`: `theme`
+  // - `view.xsl`: `html-page-layout`
+  // - Form Builder form.xhtml:
+  //   - `html-page-layout`
+  //   - `density`
+  // - `print-pdf-notemplate.xsl`:
+  //   - `rendered-page-orientation`
+  //   - `rendered-page-size`
   //
   //@XPathFunction
   def optionFromMetadataOrPropertiesXPath(
     metadataInstanceRootElemOrNull: NodeInfo,
     featureName                   : String,
-    propertyName                  : String,
+    propertyNameOrNull            : String,
     app                           : String,
     form                          : String,
-    mode                          : String
+    mode                          : String,
+    propertyProfileOrNull         : String // xxx TODO
   ): Option[String] =
     FormRunner.optionFromMetadataOrProperties(
       metadataInstanceRootElemOpt = Option(metadataInstanceRootElemOrNull),
       featureName                 = featureName,
-      propertyName                = propertyName
+      propertyName                = propertyNameOrNull.trimAllToOpt
     )(
       formRunnerParams            = FormRunnerParams(app, form, Some(1), None, None, mode)
     )

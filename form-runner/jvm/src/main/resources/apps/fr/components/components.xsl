@@ -211,12 +211,13 @@
         select="
             (
                 frf:optionFromMetadataOrPropertiesXPath(
-                    frf:metadataInstanceRootOpt($fr-form-model),
-                    'theme',
-                    'oxf.fr.style.theme',
-                    $app,
-                    $form,
-                    $major-mode
+                    (: metadataInstanceRootElemOrNull :) frf:metadataInstanceRootOpt($fr-form-model),
+                    (: featureName                    :) 'theme',
+                    (: propertyNameOrNull             :) 'oxf.fr.style.theme',
+                    (: app                            :) $app,
+                    (: form                           :) $form,
+                    (: mode                           :) $major-mode,
+                    (: propertyProfileOrNull          :) $property-profile-opt
                 ),
                 '2025'
             )[1]"/>

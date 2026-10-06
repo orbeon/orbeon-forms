@@ -19,6 +19,7 @@
     xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
@@ -27,23 +28,49 @@
     <xsl:variable name="app"                    select="doc('input:parameters')/*/app/string()"/>
     <xsl:variable name="form"                   select="doc('input:parameters')/*/form/string()"/>
     <xsl:variable name="mode"                   select="doc('input:parameters')/*/mode/string()"/>
-    <xsl:variable name="hyperlinks"             select="p:property(string-join(('oxf.fr.detail.pdf.hyperlinks', $app, $form), '.')) = true()"/>
-    <xsl:variable name="long-content-threshold" select="p:property(string-join(('oxf.fr.detail.pdf.long-content-threshold', $app, $form), '.'))"/>
+
+    <xsl:variable name="form-definition"        select="doc('input:xforms')"/>
+    <xsl:variable name="form-model"             select="$form-definition/xh:html/xh:head/(xf:model[@id = 'fr-form-model'], xf:model[1])[1]"/>
+    <xsl:variable name="metadata"               select="frf:metadataInstanceRootOpt($form-definition)"/>
+    <xsl:variable name="property-profile-opt"   select="$form-model/@xxf:property-profile[p:non-blank()]/p:trim()"/>
+
+    <xsl:variable name="hyperlinks"             select="p:property(string-join(('oxf.fr.detail.pdf.hyperlinks',             $app, $form), '.'), $property-profile-opt) = true()"/>
+    <xsl:variable name="long-content-threshold" select="p:property(string-join(('oxf.fr.detail.pdf.long-content-threshold', $app, $form), '.'), $property-profile-opt)"/>
 
     <xsl:variable
         name="color-mode"
         select="
             (
-                p:property(string-join(('oxf.fr.detail.pdf.color-mode', $app, $form), '.'))[
+                p:property(string-join(('oxf.fr.detail.pdf.color-mode', $app, $form), '.'), $property-profile-opt)[
                     . = ('black-and-white', 'keep-field-colors', 'color')
                 ],
                 'black-and-white'
             )[1]"/>
 
-    <!-- MAYBE: Support URL parameters as well for #4206. Should they be trusted? -->
-    <xsl:variable name="metadata"               select="frf:metadataInstanceRootOpt(doc('input:xforms'))"/>
-    <xsl:variable name="page-orientation"       select="frf:optionFromMetadataOrPropertiesXPath($metadata, 'rendered-page-orientation', $app, $form, $mode)"/>
-    <xsl:variable name="page-size"              select="frf:optionFromMetadataOrPropertiesXPath($metadata, 'rendered-page-size',        $app, $form, $mode)"/>
+    <xsl:variable
+        name="page-orientation"
+        select="
+            frf:optionFromMetadataOrPropertiesXPath(
+                (: metadataInstanceRootElemOrNull :) $metadata,
+                (: featureName                    :) 'rendered-page-orientation',
+                (: propertyNameOrNull             :) (),
+                (: app                            :) $app,
+                (: form                           :) $form,
+                (: mode                           :) $mode,
+                (: propertyProfileOrNull          :) $property-profile-opt
+            )"/>
+    <xsl:variable
+        name="page-size"
+        select="
+            frf:optionFromMetadataOrPropertiesXPath(
+                (: metadataInstanceRootElemOrNull :) $metadata,
+                (: featureName                    :) 'rendered-page-size',
+                (: propertyNameOrNull             :) (),
+                (: app                            :) $app,
+                (: form                           :) $form,
+                (: mode                           :) $mode,
+                (: propertyProfileOrNull          :) $property-profile-opt
+            )"/>
 
     <xsl:variable name="title" select="/*/*:head/*:title/string()"/>
 

@@ -87,7 +87,7 @@ val AwsNettyVersion                  = "4.2.18.Final"
 val InfinispanVersion                = "14.0.35.Final"
 val SqliteJdbcVersion                = "3.53.4.0"
 val PostgresqlVersion                = "42.7.13"
-val OracleJdbcVersion                = "23.26.2.0.0"
+val OracleJdbcVersion                = "23.26.3.0.0"
 
 // "Provided" Java libraries
 val JavaxServletApiVersion           = "4.0.1"

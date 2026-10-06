@@ -761,6 +761,15 @@
       box-shadow: var(--orbeon-focus-ring); // the separator would otherwise mask the focus ring
     }
   }
+  .btn-group:has(> .btn + .dropdown-toggle) {
+    > .btn:focus {
+      box-shadow: none;
+    }
+    &:has(> .btn:focus) {
+      box-shadow   : var(--orbeon-button-focus-ring);
+      border-radius: var(--orbeon-button-border-radius);
+    }
+  }
 
   // Bootstrap 2's 5px gap between adjacent button groups (e.g. the search toolbar buttons)
   .btn-group + .btn-group {

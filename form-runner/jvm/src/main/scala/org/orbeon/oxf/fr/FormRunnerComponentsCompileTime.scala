@@ -159,13 +159,15 @@ trait FormRunnerComponentsCompileTime {
     propertyName : String,
     avt          : Boolean,
     libraryName  : String,
-    norewrite    : Array[String]
+    norewrite    : Array[String],
+    profileOrNull: String
   ): String =
   FormRunnerRename.replaceVarReferencesWithFunctionCallsFromPropertyAsString(
     propertyName    = propertyName,
     avt             = avt,
     libraryName     = libraryName.trimAllToOpt,
     norewrite       = norewrite.toSet,
+    profileOpt      = profileOrNull.trimAllToOpt,
     functionLibrary = componentsFunctionLibrary
   )(newIndentedLogger).getOrElse("") // xxx should be null, so result is empty sequence, right?
 

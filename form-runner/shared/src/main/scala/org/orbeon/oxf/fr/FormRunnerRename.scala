@@ -138,12 +138,13 @@ object FormRunnerRename {
     avt            : Boolean,
     libraryName    : Option[String],
     norewrite      : Set[String],
+    profileOpt     : Option[String],
     functionLibrary: FunctionLibrary
   )(implicit
     logger         : IndentedLogger
   ): Option[String] =
     for {
-      property <- CoreCrossPlatformSupport.properties.getPropertyOpt(propertyName)
+      property <- CoreCrossPlatformSupport.properties.getPropertyOpt(propertyName, profileOpt)
       value    <- property.nonBlankStringValue
     } yield
       property.associatedValue { _ =>

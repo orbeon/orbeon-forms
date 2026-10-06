@@ -33,7 +33,6 @@
 @accent-hover     : #0c378d; // 88% accent + black
 @accent-text      : #0a3282; // 83% accent + black
 @accent-text-hover: #041f56; // 62% accent + black
-@tint-header      : #f3f6fd; //  3% on gray 99
 @tint-band        : #e7ecf5; //  5% on gray 97
 @tint-hover       : #dee3eb; //  5% on gray 94
 @tint-edit-hover  : #d1d6e0; //  5% on gray 90
@@ -323,7 +322,7 @@
   // Navbar
   --orbeon-navbar-color                                : @gray-30;
   --orbeon-navbar-title-color                          : @gray-52;
-  --orbeon-navbar-background-color                     : @tint-header;
+  --orbeon-navbar-background-color                     : @tint-band;
   --orbeon-navbar-border-bottom                        : @base-border;
   --orbeon-fb-navbar-background-color                  : white;
   --orbeon-navbar-heading-font-size                    : @text-2xl;
@@ -366,7 +365,7 @@
 
   // Revision history
   --orbeon-revision-history-pane-title-font-size      : @text-lg;
-  --orbeon-revision-history-pane-head-background-color: @tint-header;
+  --orbeon-revision-history-pane-head-background-color: @tint-band;
   --orbeon-revision-history-entry-background-color    : @gray-96;
   --orbeon-revision-history-entry-border-color        : var(--orbeon-base-border-color);
 
@@ -458,7 +457,7 @@
   --orbeon-dialog-background-color      : white;
   --orbeon-dialog-title-font-size       : @text-lg;
   --orbeon-dialog-title-color           : @gray-15;
-  --orbeon-dialog-title-background-color: @tint-header;
+  --orbeon-dialog-title-background-color: @tint-band;
   --orbeon-dialog-border-radius         : @radius-floating;
 
   // Misc
@@ -496,7 +495,7 @@
   --orbeon-landing-card-header-background-color: @tint-band;
   --orbeon-landing-card-footer-color           : @gray-52;
   --orbeon-landing-card-footer-background-color: @tint-band;
-  --orbeon-landing-card-hover-background-color : @tint-header;
+  --orbeon-landing-card-hover-background-color : @tint-band;
   --orbeon-landing-card-link-color             : @accent-text;
   --orbeon-landing-card-link-hover-color       : @accent-text-hover;
   --orbeon-landing-tile-border-radius          : @radius-field;
@@ -533,17 +532,15 @@
     --orbeon-landing-card-link-color                  : var(--orbeon-link-color);
     --orbeon-landing-card-link-hover-color            : var(--orbeon-link-hover-color);
 
-    // @tint-header: 3% on gray 99
-    --orbeon-navbar-background-color                    : color-mix(in oklab, var(--orbeon-accent-color) 3%, @gray-99);
-    --orbeon-dialog-title-background-color              : color-mix(in oklab, var(--orbeon-accent-color) 3%, @gray-99);
-    --orbeon-revision-history-pane-head-background-color: color-mix(in oklab, var(--orbeon-accent-color) 3%, @gray-99);
-    --orbeon-landing-card-hover-background-color        : color-mix(in oklab, var(--orbeon-accent-color) 3%, @gray-99);
-
     // @tint-band: 5% on gray 97
-    --orbeon-section-title-background-color      : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
-    --orbeon-help-title-background-color         : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
-    --orbeon-landing-card-header-background-color: color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
-    --orbeon-landing-card-footer-background-color: color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
+    --orbeon-navbar-background-color                    : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
+    --orbeon-section-title-background-color             : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
+    --orbeon-help-title-background-color                : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
+    --orbeon-dialog-title-background-color              : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
+    --orbeon-revision-history-pane-head-background-color: color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
+    --orbeon-landing-card-header-background-color       : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
+    --orbeon-landing-card-footer-background-color       : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
+    --orbeon-landing-card-hover-background-color        : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
 
     // @tint-hover: 5% on gray 94
     --orbeon-add-on-background-color                     : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-94);
@@ -703,7 +700,7 @@
     --orbeon-tab-background-color                            : @dark-21;
     --orbeon-tab-border-color                                : @dark-38;
     --orbeon-search-free-input-read-only-background-color    : @dark-28;
-    --orbeon-revision-history-pane-head-background-color     : color-mix(in oklab, var(--orbeon-accent-color) 3%, @dark-28);
+    --orbeon-revision-history-pane-head-background-color     : color-mix(in oklab, var(--orbeon-accent-color) 5%, @dark-28);
     --orbeon-revision-history-entry-background-color         : @dark-32;
     --orbeon-active-alert-color                              : @dark-21;
     --orbeon-alert-border-color                              : var(--orbeon-base-border-color);
@@ -723,7 +720,7 @@
     --orbeon-error-color                                     : @error;
     --orbeon-dialog-background-color                         : @dark-32;
     --orbeon-dialog-title-color                              : @dark-96;
-    --orbeon-dialog-title-background-color                   : color-mix(in oklab, var(--orbeon-accent-color) 3%, @dark-28);
+    --orbeon-dialog-title-background-color                   : color-mix(in oklab, var(--orbeon-accent-color) 5%, @dark-28);
     --orbeon-version-color                                   : @dark-62;
     --orbeon-progress-background-color                       : color-mix(in oklab, var(--orbeon-accent-color) 5%, @dark-32);
     --orbeon-landing-card-border-color                       : @dark-38;
@@ -731,7 +728,7 @@
     --orbeon-landing-card-header-background-color            : color-mix(in oklab, var(--orbeon-accent-color) 5%, @dark-28);
     --orbeon-landing-card-footer-color                       : @dark-70;
     --orbeon-landing-card-footer-background-color            : color-mix(in oklab, var(--orbeon-accent-color) 5%, @dark-28);
-    --orbeon-landing-card-hover-background-color             : color-mix(in oklab, var(--orbeon-accent-color) 3%, @dark-28);
+    --orbeon-landing-card-hover-background-color             : color-mix(in oklab, var(--orbeon-accent-color) 5%, @dark-28);
     --orbeon-on-premise-captcha-label-color                  : @dark-28;
     --orbeon-stripe-color-1                                  : @dark-28;
     --orbeon-stripe-color-2                                  : @dark-21;

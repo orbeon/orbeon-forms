@@ -175,6 +175,7 @@ object FRComponentParamSupport {
         avt             = true,
         libraryName     = None,
         norewrite       = Set.empty,
+        profileOpt      = xfcd.staticState.propertyProfileOpt,
         functionLibrary = xfcd.functionLibrary
       )
       .map { rewrittenXPathExpr =>

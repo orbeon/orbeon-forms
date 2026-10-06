@@ -620,6 +620,7 @@ private object FormRunnerFunctions {
         avt             = false,
         libraryName     = None,
         norewrite       = Set.empty,
+        profileOpt      = xfc.containingDocument.staticState.propertyProfileOpt,
         functionLibrary = FormRunner.componentsFunctionLibrary
       )
       .map { rewrittenXPathExpr =>

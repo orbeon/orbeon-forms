@@ -151,7 +151,7 @@
 
                 <xf:bind ref="$i/message">
                     <xf:bind ref="@xml:lang" readonly="count($available-languages) &lt;= 1"/>
-                    <xf:bind ref="@name, ." xxf:whitespace="trim"  readonly="false()" constraint=". != ''"/>
+                    <xf:bind ref="@name, ." xxf:whitespace="trim"  readonly="false()" required="true()"/>
 
                     <!-- No duplicate message names for a given language -->
                     <xf:bind ref="@name" constraint="for $l in string(../@xml:lang) return

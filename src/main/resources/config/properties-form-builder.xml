@@ -116,6 +116,8 @@
     <property as="xs:string"  name="oxf.fb.publish.version"                                     value="default-to-select"/>
 
     <property as="xs:string"  name="oxf.fb.new-form.wizard-steps"                               value="templates general-settings"/>
+    <property as="xs:boolean" name="oxf.fb.form-title.required.*.*"                             value="false"/>
+    <property as="xs:boolean" name="oxf.fb.form-description.required.*.*"                       value="false"/>
     <property as="xs:boolean" name="oxf.fb.metadata.logo"                                       value="true"/>
     <property as="xs:integer" name="oxf.fb.section.close"                                       value="100"/>
     <property as="xs:string"  name="oxf.fb.tinymce.config"                                      value=""/>
@@ -155,9 +157,18 @@
     <!-- TODO: Once we have `continue-with-*` actions, we can reduce some of the duplication in the properties below. -->
     <property as="xs:string"  name="oxf.fr.detail.process.excel-export.orbeon.builder">
         if ("
-            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
+            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*,
+                $app-form := concat($metadata/application-name, '.', $metadata/form-name)
             return
-                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
+                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name) or
+                (
+                    string(xxf:property(concat('oxf.fb.form-title.required.', $app-form))) = 'true' and
+                    (empty($metadata/title) or (some $t in $metadata/title satisfies xxf:is-blank($t)))
+                ) or
+                (
+                    string(xxf:property(concat('oxf.fb.form-description.required.', $app-form))) = 'true' and
+                    (empty($metadata/description) or (some $d in $metadata/description satisfies xxf:is-blank(if ($d/@mediatype = 'text/html') then replace($d, '&lt;[^&gt;]*&gt;', '') else string($d))))
+                )
         ") then (
             xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "excel-export") then
             suspend then
@@ -168,9 +179,18 @@
 
     <property as="xs:string"  name="oxf.fr.detail.process.xml-export.orbeon.builder">
         if ("
-            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
+            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*,
+                $app-form := concat($metadata/application-name, '.', $metadata/form-name)
             return
-                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
+                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name) or
+                (
+                    string(xxf:property(concat('oxf.fb.form-title.required.', $app-form))) = 'true' and
+                    (empty($metadata/title) or (some $t in $metadata/title satisfies xxf:is-blank($t)))
+                ) or
+                (
+                    string(xxf:property(concat('oxf.fb.form-description.required.', $app-form))) = 'true' and
+                    (empty($metadata/description) or (some $d in $metadata/description satisfies xxf:is-blank(if ($d/@mediatype = 'text/html') then replace($d, '&lt;[^&gt;]*&gt;', '') else string($d))))
+                )
         ") then (
             xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "xml-export") then
             suspend then
@@ -181,9 +201,18 @@
 
     <property as="xs:string"  name="oxf.fr.detail.process.form-definition-xhtml-export.orbeon.builder">
         if ("
-            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
+            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*,
+                $app-form := concat($metadata/application-name, '.', $metadata/form-name)
             return
-                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
+                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name) or
+                (
+                    string(xxf:property(concat('oxf.fb.form-title.required.', $app-form))) = 'true' and
+                    (empty($metadata/title) or (some $t in $metadata/title satisfies xxf:is-blank($t)))
+                ) or
+                (
+                    string(xxf:property(concat('oxf.fb.form-description.required.', $app-form))) = 'true' and
+                    (empty($metadata/description) or (some $d in $metadata/description satisfies xxf:is-blank(if ($d/@mediatype = 'text/html') then replace($d, '&lt;[^&gt;]*&gt;', '') else string($d))))
+                )
         ") then (
             xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "form-definition-xhtml-export") then
             suspend then
@@ -210,9 +239,18 @@
 
     <property as="xs:string"  name="oxf.fr.detail.process.publish.orbeon.builder">
         if ("
-            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
+            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*,
+                $app-form := concat($metadata/application-name, '.', $metadata/form-name)
             return
-                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
+                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name) or
+                (
+                    string(xxf:property(concat('oxf.fb.form-title.required.', $app-form))) = 'true' and
+                    (empty($metadata/title) or (some $t in $metadata/title satisfies xxf:is-blank($t)))
+                ) or
+                (
+                    string(xxf:property(concat('oxf.fb.form-description.required.', $app-form))) = 'true' and
+                    (empty($metadata/description) or (some $d in $metadata/description satisfies xxf:is-blank(if ($d/@mediatype = 'text/html') then replace($d, '&lt;[^&gt;]*&gt;', '') else string($d))))
+                )
         ") then (
             xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "publish") then
             suspend then
@@ -231,9 +269,18 @@
 
     <property as="xs:string"  name="oxf.fr.detail.process.save.orbeon.builder">
         if ("
-            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*
+            let $metadata := xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*,
+                $app-form := concat($metadata/application-name, '.', $metadata/form-name)
             return
-                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name)
+                xxf:is-blank($metadata/application-name) or xxf:is-blank($metadata/form-name) or
+                (
+                    string(xxf:property(concat('oxf.fb.form-title.required.', $app-form))) = 'true' and
+                    (empty($metadata/title) or (some $t in $metadata/title satisfies xxf:is-blank($t)))
+                ) or
+                (
+                    string(xxf:property(concat('oxf.fb.form-description.required.', $app-form))) = 'true' and
+                    (empty($metadata/description) or (some $d in $metadata/description satisfies xxf:is-blank(if ($d/@mediatype = 'text/html') then replace($d, '&lt;[^&gt;]*&gt;', '') else string($d))))
+                )
         ") then (
             xf:dispatch(name = "DOMActivate", targetid="open-form-settings-trigger", mode = "app-form", for-button-name = "save") then
             suspend then

@@ -181,8 +181,7 @@ class FormRunnerConfigProcessor extends ProcessorImpl {
               })
 
               readInputToReceiver(new TeeXMLReceiver(List(rcv, metadataFilter, attachmentsFilter, bodyFilter, sectionTemplateFilter, modelFilter)))
-
-
+              
               val metadataRootElemOpt    = Option(metadataResult()).flatMap(_.rootElementOpt)
               val attachmentsRootElemOpt = Option(attachmentsResult()).flatMap(_.rootElementOpt)
               val tocOpt                 = metadataRootElemOpt.flatMap(e => (e / "xbl" / (FR -> "toc")).headOption)

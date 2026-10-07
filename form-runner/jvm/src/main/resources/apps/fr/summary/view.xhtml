@@ -461,8 +461,12 @@
 
                 <!-- Are we authorized to see all the data based because of our role? -->
                 <xf:var
+                    name="property-profile-opt"
+                    value="frf:getModelElem(instance('fr-source-form-instance'))/@xxf:property-profile[xxf:non-blank()]/xxf:trim()"/>
+
+                <xf:var
                     name="operations-from-role"
-                    value="frf:authorizedOperationsBasedOnRolesXPath($source-form-metadata/permissions, $app, $form)"/>
+                    value="frf:authorizedOperationsBasedOnRolesXPath($source-form-metadata/permissions, $app, $form, $property-profile-opt)"/>
 
                 <!-- Check if the user doesn't have the permission to 'list'
                      https://github.com/orbeon/orbeon-forms/issues/5397 -->

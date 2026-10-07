@@ -293,6 +293,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   }
 
   // Get the form model
+  //@XPathFunction
   def getModelElem(inDoc: NodeInfo): NodeInfo =
     findModelElem(inDoc).head
 
@@ -363,10 +364,10 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def formRunnerProperty(name: String, propertyProfileOpt: Option[String] = None)(implicit p: FormRunnerParams): Option[String] =
     CoreCrossPlatformSupport.properties.getObjectOpt(buildPropertyName(name), propertyProfileOpt.orElse(inScopePropertyProfileOpt)).map(_.toString)
 
-  def formRunnerProperty(name: String, appForm: AppForm, propertyProfileOpt: Option[String] = None): Option[String] =
+  def formRunnerProperty(name: String, appForm: AppForm, propertyProfileOpt: Option[String]): Option[String] =
     CoreCrossPlatformSupport.properties.getObjectOpt(buildPropertyName(name, appForm), propertyProfileOpt.orElse(inScopePropertyProfileOpt)).map(_.toString)
 
-  def formRunnerRawProperty(name: String, appForm: AppForm): Option[Property] =
+  def formRunnerRawProperty(name: String, appForm: AppForm, propertyProfileOpt: Option[String] = None): Option[Property] =
     CoreCrossPlatformSupport.properties.getPropertyOpt(buildPropertyName(name, appForm), inScopePropertyProfileOpt)
 
   def formRunnerRawProperty(name: String)(implicit p: FormRunnerParams): Option[Property] =

@@ -171,15 +171,16 @@ object FormBuilderXPathApi {
     }
   }
 
+  // Used by Form Builder: `form-definition-xhtml`, `test-pdf`
   //@XPathFunction
-  def buildContentDispositionHeader(doc: NodeInfo, formatName: String): String = {
+  def buildContentDispositionHeader(doc: NodeInfo, formatName: String, propertyProfileOrNull: String): String = {
 
     // TODO: Use namespaces from appropriate scope.
     // TODO: Ideally the expression would have access to various aspects of the form, e.g. the form title in a
     //  structured way. For now, we pass a reference to the root element of the edited form's metadata, which gives a
     //  little flexibility.
     val filenameProperty      = s"oxf.fr.detail.$formatName.filename"
-    val filenamePropertyValue = formRunnerProperty(filenameProperty, AppForm.FormBuilder).flatMap(trimAllToOpt)
+    val filenamePropertyValue = formRunnerProperty(filenameProperty, AppForm.FormBuilder, propertyProfileOrNull.trimAllToOpt).flatMap(trimAllToOpt)
     val filenameFromProperty  = filenamePropertyValue.map(evaluateString(_, FormBuilderDocContext(doc).metadataRootElem)).flatMap(trimAllToOpt)
     val filename              = filenameFromProperty.getOrElse(currentXFormsDocumentId)
 

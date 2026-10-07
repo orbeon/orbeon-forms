@@ -87,7 +87,7 @@ case class FormMetadata(
       val otherOperations =
         Operations.serialize(
           PermissionsAuthorization.authorizedOperationsForNoData(
-            permissions    = FormRunner.permissionsFromElemOrProperties(permissionsOpt, appForm),
+            permissions    = FormRunner.permissionsFromElemOrProperties(permissionsOpt, appForm, propertyProfileOpt = None /* TODO: from cached form definition metadata */),
             credentialsOpt = credentialsOpt
           ),
           normalized = true

@@ -972,7 +972,7 @@
         <xf:send submission="fb-test-pdf-submission">
             <xf:property name="fr-form-data"         value="event('fr-form-data')"/>
             <xf:property name="language"             value="event('language')"/>
-            <xf:property name="fr-rendered-filename" value="fbf:buildContentDispositionHeader(instance('fb-form-instance'), 'pdf')"/>
+            <xf:property name="fr-rendered-filename" value="fbf:buildContentDispositionHeader(instance('fb-form-instance'), 'pdf', bind('property-profile-bind')[xxf:non-blank()]/xxf:trim())"/>
         </xf:send>
     </xf:action>
 
@@ -1074,7 +1074,7 @@
         xxf:show-progress="false">
         <xf:header>
             <xf:name>Content-Disposition</xf:name>
-            <xf:value value="fbf:buildContentDispositionHeader(instance('fb-form-instance'), 'form-definition-xhtml')"/>
+            <xf:value value="fbf:buildContentDispositionHeader(instance('fb-form-instance'), 'form-definition-xhtml', bind('property-profile-bind')[xxf:non-blank()]/xxf:trim())"/>
         </xf:header>
     </xf:submission>
 

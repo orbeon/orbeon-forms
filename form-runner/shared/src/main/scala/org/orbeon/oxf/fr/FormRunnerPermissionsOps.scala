@@ -30,7 +30,8 @@ trait FormRunnerPermissionsOps extends FormRunnerPlatform {
 
   def permissionsFromElemOrProperties(
     permissionsElemOpt: Option[NodeInfo],
-    appForm           : AppForm
+    appForm           : AppForm,
+    propertyProfileOpt: Option[String]
   ): Permissions =
     permissionsElemOpt match {
       case some @ Some(_) =>
@@ -38,7 +39,7 @@ trait FormRunnerPermissionsOps extends FormRunnerPlatform {
         PermissionsXML.parse(some)
       case None =>
         // Try app/form properties
-        frc.formRunnerRawProperty("oxf.fr.permissions", appForm) match {
+        frc.formRunnerRawProperty("oxf.fr.permissions", appForm, propertyProfileOpt) match {
           case Some(p) if p.stringValue.nonAllBlank =>
             p.associatedValue { _ =>
               PermissionsJSON.parseString(p.stringValue).get // will throw if there is an error in the format of the property
@@ -53,7 +54,8 @@ trait FormRunnerPermissionsOps extends FormRunnerPlatform {
       PermissionsAuthorization.possiblyAllowedTokenOperations(
         permissionsFromElemOrProperties(
           Option(permissionsElOrNull),
-          AppForm(app, form)
+          AppForm(app, form),
+          propertyProfileOpt = None /* in scope */
         ),
         Operations.parseFromString(authorizedOperations) collect {
           case SpecificOperations(operations) => operations
@@ -64,14 +66,15 @@ trait FormRunnerPermissionsOps extends FormRunnerPlatform {
 
   // 2024-12-02: Used by the Summary page.
   //@XPathFunction
-  def authorizedOperationsBasedOnRolesXPath(permissionsElOrNull: NodeInfo, app: String, form: String): List[String] = {
+  def authorizedOperationsBasedOnRolesXPath(permissionsElOrNull: NodeInfo, app: String, form: String, propertyProfileOrNull: String): List[String] = {
     implicit val logger: IndentedLogger =
       inScopeContainingDocument.getIndentedLogger(XFormsActions.LoggingCategory)
     Operations.serialize(
       PermissionsAuthorization.authorizedOperationsForSummary(
         permissionsFromElemOrProperties(
           Option(permissionsElOrNull),
-          AppForm(app, form)
+          AppForm(app, form),
+          propertyProfileOrNull.trimAllToOpt
         ),
         CoreCrossPlatformSupport.externalContext.getRequest.credentials
       ),
@@ -84,7 +87,7 @@ trait FormRunnerPermissionsOps extends FormRunnerPlatform {
     implicit val logger: IndentedLogger =
       inScopeContainingDocument.getIndentedLogger(XFormsActions.LoggingCategory)
     PermissionsAuthorization.autosaveAuthorizedForNew(
-      permissions    = permissionsFromElemOrProperties(Option(permissionsElOrNull), AppForm(app, form)),
+      permissions    = permissionsFromElemOrProperties(Option(permissionsElOrNull), AppForm(app, form), propertyProfileOpt = None /* in scope */),
       credentialsOpt = PermissionsAuthorization.findCurrentCredentialsFromSession
     )
   }
@@ -134,7 +137,7 @@ trait FormRunnerPermissionsOps extends FormRunnerPlatform {
           // The scenario is an external `POST` to `edit`/`view`. In that case, we fall back to permissions without
           // checking the data.
           PermissionsAuthorization.authorizedOperationsForNoDataOrThrow(
-            permissions    = permissionsFromElemOrProperties(Option(permissionsElemOrNull), formRunnerParams.appForm),
+            permissions    = permissionsFromElemOrProperties(Option(permissionsElemOrNull), formRunnerParams.appForm, propertyProfileOpt = None /* in scope */),
             credentialsOpt = PermissionsAuthorization.findCurrentCredentialsFromSession,
           )
       },

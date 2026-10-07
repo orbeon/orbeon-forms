@@ -151,7 +151,8 @@ object PersistenceMetadataSupport {
       else
         FormRunner.permissionsFromElemOrProperties(
           readFormPermissions(appForm, version),
-          appForm
+          appForm,
+          propertyProfileOpt = None /* TODO: from cached form definition metadata */
         )
     ) |!>
       (formPermissions => debug("CRUD: form permissions", List("permissions" -> formPermissions.toString)))

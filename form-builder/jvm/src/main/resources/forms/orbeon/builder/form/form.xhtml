@@ -230,7 +230,7 @@
                             (: app                            :) bind('application-name-bind'),
                             (: form                           :) bind('form-name-bind'),
                             (: mode                           :) 'edit',
-                            (: propertyProfileOrNull          :) bind('fb-form-model-bind')/@xxf:property-profile[xxf:non-blank()]/xxf:trim()
+                            (: propertyProfileOrNull          :) bind('property-profile-bind')[xxf:non-blank()]/xxf:trim()
                         ) = 'fluid'"/>
 
                 <xf:var
@@ -244,7 +244,7 @@
                             (: app                            :) bind('application-name-bind'),
                             (: form                           :) bind('form-name-bind'),
                             (: mode                           :) 'edit',
-                            (: propertyProfileOrNull          :) bind('fb-form-model-bind')/@xxf:property-profile[xxf:non-blank()]/xxf:trim()
+                            (: propertyProfileOrNull          :) bind('property-profile-bind')[xxf:non-blank()]/xxf:trim()
                         ),
                         'compact'
                     )[1]"/>
@@ -1124,7 +1124,7 @@
                         <xf:send submission="fb-test-pdf-submission">
                             <xf:property name="fr-form-data"         value="''"/>
                             <xf:property name="language"             value="$fb-lang"/>
-                            <xf:property name="fr-rendered-filename" value="fbf:buildContentDispositionHeader(instance('fb-form-instance'), 'pdf')"/>
+                            <xf:property name="fr-rendered-filename" value="fbf:buildContentDispositionHeader(instance('fb-form-instance'), 'pdf', bind('property-profile-bind')[xxf:non-blank()]/xxf:trim())"/>
                         </xf:send>
                     </xf:action>
                 </xf:action>

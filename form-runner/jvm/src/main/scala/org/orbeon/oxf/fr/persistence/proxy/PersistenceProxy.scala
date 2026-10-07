@@ -196,7 +196,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
       case (GET,    HistoryPath(path, app, form, _, _))                           => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
       case (POST,   DistinctValuesPath(path, app, form))                          => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
       case (_,      DistinctAppsPath())                                           => proxyDistinctApps          (request, response)
-      case (_,      DistinctFormsPath(app))                                       => proxyDistinctForms         (request, response, app)
+      case (_,      DistinctFormsPath(app))                                       => proxyDistinctForms         (request, response, Option(app))
       case (_,      DistinctVersionsPath(app, form))                              => proxyDistinctVersions      (request, response, app, form)
       case (_,      PublishedFormsMetadataPath(_, app, form))                     => proxyPublishedFormsMetadata(request, response, AppFormOpt(Option(app), Option(form)))
       case (GET,    ReindexPath(null, null))                                      => proxyReindex               (request, response, None)
@@ -1164,7 +1164,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
   private def proxyDistinctForms(
     request       : Request,
     response      : Response,
-    app           : String
+    appOpt        : Option[String]
   )(implicit
     properties    : PropertySet,
     indentedLogger: IndentedLogger
@@ -1172,7 +1172,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     proxyDistinct(
       request,
       response,
-      localAndRemoteFormsResponse(request, AppFormOpt(Option(app), None)).forms.map(_.appForm.form).distinct.sorted
+      localAndRemoteFormsResponse(request, AppFormOpt(appOpt, None)).forms.map(_.appForm.form).distinct.sorted
     )
 
   private def proxyDistinctVersions(

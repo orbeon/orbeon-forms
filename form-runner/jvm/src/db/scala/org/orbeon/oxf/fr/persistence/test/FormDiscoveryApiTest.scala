@@ -108,15 +108,41 @@ class FormDiscoveryApiTest
 
   describe("Form Discovery API") {
 
+    it("matches paths without trailing slash but rejects trailing slash in DistinctFormsPath") {
+      import org.orbeon.oxf.fr.FormRunnerPersistence.DistinctFormsPath
+
+      assert("/fr/service/persistence/distinct-forms" match {
+        case DistinctFormsPath(null) => true
+        case _                       => false
+      })
+
+      assert("/fr/service/persistence/distinct-forms/my-app" match {
+        case DistinctFormsPath("my-app") => true
+        case _                           => false
+      })
+
+      assert("/fr/service/persistence/distinct-forms/" match {
+        case DistinctFormsPath(_) => false
+        case _                    => true
+      })
+
+      assert("/fr/service/persistence/distinct-forms/my-app/" match {
+        case DistinctFormsPath(_) => false
+        case _                    => true
+      })
+    }
+
     it("returns empty XML and JSON when there are no form definitions") {
       FormMetadataApiTest.withProvider(applicationCounts) { provider => externalContext =>
         implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
 
         assertGet("distinct-apps", <_/>.toDocument)
+        assertGet("distinct-forms", <_/>.toDocument)
         assertGet(s"distinct-forms/${provider.entryName}-1", <_/>.toDocument)
         assertGet(s"distinct-versions/${provider.entryName}-1/test-form-1", <_/>.toDocument)
 
         assertGetJson("distinct-apps", Json.arr())
+        assertGetJson("distinct-forms", Json.arr())
         assertGetJson(s"distinct-forms/${provider.entryName}-1", Json.arr())
         assertGetJson(s"distinct-versions/${provider.entryName}-1/test-form-1", Json.arr())
       }
@@ -133,8 +159,9 @@ class FormDiscoveryApiTest
         val form1b = TestForm(AppForm(app1, "form-b"), Map("en" -> "Form B"), Seq.empty, "read list".some)
         val form1a = TestForm(AppForm(app1, "form-a"), Map("en" -> "Form A"), Seq.empty, "read list".some)
 
-        // App 2: form-c with versions 1, 3, 2
+        // App 2: form-c with versions 1, 3, 2; form-b with version 1
         val form2c = TestForm(AppForm(app2, "form-c"), Map("en" -> "Form C"), Seq.empty, "read list".some)
+        val form2b = TestForm(AppForm(app2, "form-b"), Map("en" -> "Form B in App 2"), Seq.empty, "read list".some)
 
         form1b.putFormDefinition(version = Version.Specific(1))
         form1b.putFormDefinition(version = Version.Specific(2))
@@ -143,6 +170,7 @@ class FormDiscoveryApiTest
         form2c.putFormDefinition(version = Version.Specific(1))
         form2c.putFormDefinition(version = Version.Specific(3))
         form2c.putFormDefinition(version = Version.Specific(2))
+        form2b.putFormDefinition(version = Version.Specific(1))
 
         // Distinct apps: should be sorted
         val expectedApps =
@@ -154,6 +182,18 @@ class FormDiscoveryApiTest
         assertGet("distinct-apps", expectedApps)
         assertGetJson("distinct-apps", Json.arr(app1.asJson, app2.asJson))
 
+        // Distinct forms across all apps: sorted alphabetically (form-a, form-b, form-c)
+        val expectedFormsAll =
+          <_>
+            <_>form-a</_>
+            <_>form-b</_>
+            <_>form-c</_>
+          </_>.toDocument
+
+        assertGet("distinct-forms", expectedFormsAll)
+        assertGetJson("distinct-forms", Json.arr("form-a".asJson, "form-b".asJson, "form-c".asJson))
+
+
         // Distinct forms for app1: sorted alphabetically (form-a, form-b)
         val expectedFormsApp1 =
           <_>
@@ -164,14 +204,15 @@ class FormDiscoveryApiTest
         assertGet(s"distinct-forms/$app1", expectedFormsApp1)
         assertGetJson(s"distinct-forms/$app1", Json.arr("form-a".asJson, "form-b".asJson))
 
-        // Distinct forms for app2: form-c
+        // Distinct forms for app2: form-b, form-c
         val expectedFormsApp2 =
           <_>
+            <_>form-b</_>
             <_>form-c</_>
           </_>.toDocument
 
         assertGet(s"distinct-forms/$app2", expectedFormsApp2)
-        assertGetJson(s"distinct-forms/$app2", Json.arr("form-c".asJson))
+        assertGetJson(s"distinct-forms/$app2", Json.arr("form-b".asJson, "form-c".asJson))
 
         // Distinct forms for non-existent app
         assertGet(s"distinct-forms/non-existent-app", <_/>.toDocument)
@@ -255,6 +296,7 @@ class FormDiscoveryApiTest
 
         for (method <- Seq(POST, PUT, DELETE)) {
           assertMethodNotAllowed("distinct-apps", method)
+          assertMethodNotAllowed("distinct-forms", method)
           assertMethodNotAllowed(s"distinct-forms/$app", method)
           assertMethodNotAllowed(s"distinct-versions/$app/$form", method)
         }

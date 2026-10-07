@@ -276,12 +276,14 @@ trait FormRunnerComponentsCompileTime {
     app                           : String,
     form                          : String,
     mode                          : String,
-    propertyProfileOrNull         : String // xxx TODO
+    propertyProfileOrNull         : String
   ): Option[String] =
     FormRunner.optionFromMetadataOrProperties(
       metadataInstanceRootElemOpt = Option(metadataInstanceRootElemOrNull),
       featureName                 = featureName,
-      propertyName                = propertyNameOrNull.trimAllToOpt
+      propertyName                = propertyNameOrNull.trimAllToOpt,
+      propertyProfileOpt          = propertyProfileOrNull.trimAllToOpt
+
     )(
       formRunnerParams            = FormRunnerParams(app, form, Some(1), None, None, mode)
     )

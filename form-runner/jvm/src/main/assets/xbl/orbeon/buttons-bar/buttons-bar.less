@@ -9,11 +9,21 @@
         position: sticky;
         bottom: 0;
 
+        width: var(--orbeon-buttons-bar-width, 100%);
+        margin-left: var(--orbeon-buttons-bar-margin-left, 0);
+        margin-right: var(--orbeon-buttons-bar-margin-right, 0);
+
         padding: 10px;
         background-color: var(--orbeon-page-background-color);
-        border-radius: var(--orbeon-body-decorations-border-radius);
+        border-radius: var(--orbeon-buttons-bar-border-radius, var(--orbeon-body-decorations-border-radius));
         text-align: center;
         z-index: 4; // To show above the date `.add-on`, which has a `z-index: 3`
+
+        transition: box-shadow var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+        &.fr-buttons-floating {
+            box-shadow: var(--orbeon-buttons-bar-box-shadow);
+        }
 
         .fr-buttons-message div {
             display: inline;
@@ -46,8 +56,11 @@
         }
     }
 
-    .fr-buttons, .fr-dialog-buttons {
+    .fr-dialog-buttons {
         width: 100%;
+    }
+
+    .fr-buttons, .fr-dialog-buttons {
         box-sizing: border-box;
 
         // Space between the image and the text in a button, only for the buttons bar
@@ -90,6 +103,9 @@
             bottom: 0;
             left: 0;
             right: 0;
+            width: 100%;
+            margin-left: 0;
+            margin-right: 0;
             padding: 0;
 
             .xforms-trigger button {
@@ -115,6 +131,15 @@
                     margin-left: 0;
                 }
             }
+        }
+    }
+
+    &.orbeon-portlet-div {
+        .fr-buttons {
+            width: 100%;
+            margin-left: 0;
+            margin-right: 0;
+            border-radius: var(--orbeon-body-decorations-border-radius);
         }
     }
 }

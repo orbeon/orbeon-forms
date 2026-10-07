@@ -87,6 +87,7 @@ object FormRunnerApp extends App {
     DomSupport.atLeastDomReadyStateF(document, DomSupport.DomReadyState.Interactive) foreach { _ =>
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .navbar.fixed-top, .orbeon .navbar-fixed-top", addScrollPadding(_, "scroll-padding-top"))
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-buttons"                                 , addScrollPadding(_, "scroll-padding-bottom"))
+      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-buttons"                                 , initStickyButtons)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-session-expiration-dialog"               , initSessionExpirationDialog)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-duplicate-tab-dialog"                    , initDuplicateTabDialog)
     }
@@ -105,6 +106,45 @@ object FormRunnerApp extends App {
         })
         resizeObserver.observe(htmlElement)
       }
+    }
+  }
+
+  // Once Safari and Firefox ship native support for `@container scroll-state(stuck: bottom)`, that Scala.js code
+  // can simply be deleted and replaced with pure CSS.
+  private def initStickyButtons(buttonsElem: html.Element): Unit = {
+    val position = window.getComputedStyle(buttonsElem).position
+    if (position == "fixed" || position == "sticky") {
+      var ticking = false
+
+      val update = () => {
+        val isOverForm =
+          Option(buttonsElem.parentElement).exists { parent =>
+            val parentBottom  = parent.getBoundingClientRect().bottom
+            val buttonsBottom = buttonsElem.getBoundingClientRect().bottom
+            buttonsBottom >= window.innerHeight - 2 && parentBottom - buttonsBottom > 2
+          }
+        buttonsElem.toggleClass("fr-buttons-floating", isOverForm)
+      }
+
+      val requestUpdate = () =>
+        if (!ticking) {
+          ticking = true
+          window.requestAnimationFrame(_ => {
+            update()
+            ticking = false
+          })
+        }
+
+      GlobalEventListenerSupport.addListener(window, DomEventNames.Scroll, (_: dom.Event) => requestUpdate(), useCapture = true)
+      GlobalEventListenerSupport.addListener(window, "resize", (_: dom.Event) => requestUpdate())
+
+      if (js.typeOf(g.ResizeObserver) != "undefined") {
+        val resizeObserver = new ResizeObserver((_, _) => requestUpdate())
+        Option(buttonsElem.parentElement).foreach(resizeObserver.observe)
+        resizeObserver.observe(buttonsElem)
+      }
+
+      update()
     }
   }
 

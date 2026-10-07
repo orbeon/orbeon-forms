@@ -53,9 +53,9 @@
 @text-xs  : 0.86em; // 12px: keyboard hints, tooltips, repetition labels
 @text-sm  : 0.93em; // 13px: code
 @text-base: 1em;    // 14px: labels, fields, buttons, help text
-@text-lg  : 1.07em; // 15px: subsection, help, dialog and revision pane titles, buttons bar, header and footer, captcha
+@text-lg  : 1.14em; // 16px: subsection, help, dialog and revision pane titles, buttons bar, header and footer, captcha
 @text-xl  : 1.29em; // 18px: section titles, blockquote
-@text-2xl : 1.57em; // 22px: navbar heading
+@text-2xl : 1.43em; // 20px: navbar heading
 
 .orbeon {
 
@@ -82,7 +82,7 @@
   // Labels
   --orbeon-label-font-size      : @text-base;
   --orbeon-label-font-family    : var(--orbeon-base-font-family);
-  --orbeon-label-font-weight    : 600;
+  --orbeon-label-font-weight    : 500;
   --orbeon-label-color          : var(--orbeon-base-color);
   --orbeon-label-read-only-color: @gray-52;
   --orbeon-label-letter-spacing : normal;
@@ -322,11 +322,12 @@
 
   // Navbar
   --orbeon-navbar-color                                : @gray-30;
-  --orbeon-navbar-title-color                          : @gray-52;
+  --orbeon-navbar-title-color                          : var(--orbeon-base-color);
   --orbeon-navbar-background-color                     : @tint-band;
   --orbeon-navbar-border-bottom                        : @base-border;
   --orbeon-fb-navbar-background-color                  : white;
   --orbeon-navbar-heading-font-size                    : @text-2xl;
+  --orbeon-navbar-heading-font-weight                  : 500;
   --orbeon-navbar-heading-color                        : var(--orbeon-base-color);
   --orbeon-navbar-dropdown-open-toggle-background-color: @tint-hover;
   --orbeon-navbar-language-dropdown-color              : @gray-52;
@@ -670,10 +671,10 @@
     --orbeon-toc-selected-color                              : @dark-96;
     --orbeon-toc-selected-error-color                        : @dark-21;
     --orbeon-navbar-color                                    : @dark-96;
-    --orbeon-navbar-title-color                              : @dark-62;
+    --orbeon-navbar-title-color                              : var(--orbeon-base-color);
     --orbeon-navbar-background-color                         : color-mix(in oklab, var(--orbeon-accent-color) 3%, @dark-12);
     --orbeon-fb-navbar-background-color                      : color-mix(in oklab, var(--orbeon-accent-color) 3%, @dark-12);
-    --orbeon-navbar-heading-color                            : @dark-84;
+    --orbeon-navbar-heading-color                            : var(--orbeon-base-color);
     --orbeon-navbar-dropdown-open-toggle-background-color    : color-mix(in oklab, var(--orbeon-accent-color) 5%, @dark-32);
     --orbeon-navbar-language-dropdown-color                  : @dark-62;
     --orbeon-navbar-language-dropdown-hover-color            : @dark-96;

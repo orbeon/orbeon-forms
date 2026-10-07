@@ -26,6 +26,7 @@
         <xsl:param name="static-form"            tunnel="yes" as="xs:string"/>
         <xsl:param name="static-subsections-nav" tunnel="yes" as="xs:boolean"/>
         <xsl:param name="static-subsections-toc" tunnel="yes" as="xs:string"/>
+        <xsl:param name="static-initial-focus"   tunnel="yes" as="xs:boolean?"/>
 
         <xsl:variable
             name="static-current-section"
@@ -339,7 +340,7 @@
                             <!-- ...and focus on specific subsection -->
                             <xsl:choose>
                                 <xsl:when test="$is-wizard">
-                                    <xsl:if test="p:property(string-join(('oxf.fr.detail.initial-focus', $static-app, $static-form), '.'))">
+                                    <xsl:if test="($static-initial-focus, p:property(string-join(('oxf.fr.detail.initial-focus', $static-app, $static-form), '.')))[1]">
                                         <xf:setfocus
                                             control="{$static-section-id}"
                                             includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"

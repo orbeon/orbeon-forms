@@ -93,7 +93,7 @@
                     ref="$i/attachment-mediatypes"
                     value="(event('attachment-mediatypes'), $unlikely-mediatype)[1]"/>
 
-                <xf:action iterate="'wizard', 'wizard-subsections-nav', 'wizard-separate-toc', 'wizard-section-status'">
+                <xf:action iterate="'wizard', 'wizard-subsections-nav', 'wizard-separate-toc', 'wizard-section-status', 'initial-focus'">
                     <xf:var name="name" value="."/>
                     <xf:setvalue
                         ref="$i/*[name() = $name]"
@@ -527,6 +527,7 @@
                         <xf:property name="readonly"                               value="$i/readonly/string()"/>
                         <xf:property name="html-page-layout"                       value="$i/html-page-layout/string()"/>
                         <xf:property name="density"                                value="$i/density/string()"/>
+                        <xf:property name="initial-focus"                          value="$i/initial-focus/string()"/>
                         <xf:property name="analysis-calculate"                     value="$i/analysis-calculate/string()"/>
                         <xf:property name="automatic-hints"                        value="$i/automatic-hints/string()"/>
                         <xf:property name="property-profile"                       value="$i/property-profile/string()[. != '[none]']"/>
@@ -649,6 +650,7 @@
                         <readonly/>
                         <html-page-layout/>
                         <density/>
+                        <initial-focus/>
                         <attachment-max-size-per-file/>
                         <attachment-max-size-aggregate-per-form/>
                         <attachment-max-files-per-control/>
@@ -1663,6 +1665,19 @@
                                                 />
                                             </fr:checkbox-input>
                                         </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:select1 ref="initial-focus" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/initial-focus/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/initial-focus/hint"/>
+                                                <xf:itemset ref="$resources/property-yes-no/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+                                        <xh:td/>
                                     </xh:tr>
                                 </fr:grid>
                             </fr:tab>

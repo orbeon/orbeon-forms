@@ -481,7 +481,16 @@
     <xsl:variable
         name="enable-initial-focus"
         as="xs:boolean"
-        select="p:property(string-join(('oxf.fr.detail.initial-focus', $app, $form), '.'), $property-profile-opt)"/>
+        select="
+            (
+                xs:boolean(
+                    $fr-form-metadata/initial-focus[
+                        . = ('true', 'false')
+                    ]
+                ),
+                p:property(string-join(('oxf.fr.detail.initial-focus', $app, $form), '.'), $property-profile-opt),
+                true()
+            )[1]"/>
 
     <!-- fr:section and fr:grid configuration -->
     <xsl:variable

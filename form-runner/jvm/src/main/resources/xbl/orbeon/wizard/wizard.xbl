@@ -259,6 +259,18 @@
                     as="xs:string"/>
 
                 <xsl:variable
+                    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                    name="static-initial-focus"
+                    select="
+                        (
+                            for $a in /*/@initial-focus return $a = 'true', (: takes precedence if present :)
+                            p:property(string-join(('oxf.fr.detail.initial-focus', $static-app, $static-form), '.')) = true(),
+                            true()
+                        )[1]
+                    "
+                    as="xs:boolean"/>
+
+                <xsl:variable
                     name="static-nav-sections-or-grids"
                     select="
                         if ($static-subsections-nav) then
@@ -675,7 +687,7 @@
                                                     repeat="{{concat($section-id, '-repeater-repeat')}}"
                                                     index="$new-index"/>
                                             </xf:action>
-                                            <xsl:if test="p:property(string-join(('oxf.fr.detail.initial-focus', $static-app, $static-form), '.'))">
+                                            <xsl:if test="$static-initial-focus">
                                                 <xf:setfocus
                                                     control="{{$prev-case-id}}"
                                                     includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
@@ -716,7 +728,7 @@
                                                     repeat="{{concat($section-id, '-repeater-repeat')}}"
                                                     index="$new-index"/>
                                             </xf:action>
-                                            <xsl:if test="p:property(string-join(('oxf.fr.detail.initial-focus', $static-app, $static-form), '.'))">
+                                            <xsl:if test="$static-initial-focus">
                                                 <xf:setfocus
                                                     control="{{$next-case-id}}"
                                                     includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
@@ -725,7 +737,7 @@
                                         </xf:action>
                                     </xf:action>
                                     <xf:action if="not($allow-next)">
-                                        <xsl:if test="p:property(string-join(('oxf.fr.detail.initial-focus', $static-app, $static-form), '.'))">
+                                        <xsl:if test="$static-initial-focus">
                                             <xf:setfocus
                                                 control="{{$current-nav-case-id}}"
                                                 includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
@@ -1074,6 +1086,7 @@
                                             <xsl:with-param name="static-form"            select="$static-form"            tunnel="yes"/>
                                             <xsl:with-param name="static-subsections-nav" select="$static-subsections-nav" tunnel="yes"/>
                                             <xsl:with-param name="static-subsections-toc" select="$static-subsections-toc" tunnel="yes"/>
+                                            <xsl:with-param name="static-initial-focus"   select="$static-initial-focus"   tunnel="yes"/>
                                         </xsl:apply-templates>
                                     </xh:ul>
                                 </xh:div>

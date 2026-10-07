@@ -572,6 +572,10 @@
             <item id="2">Comfortable</item>
             <item id="3">Roomy</item>
         </density>
+        <initial-focus>
+            <label>Focus on First Field</label>
+            <hint>Whether to focus on the first field upon form load and when navigating wizard pages</hint>
+        </initial-focus>
         <analysis-calculate>
             <label>Automatic Calculations Dependencies</label>
             <hint>Automatically determine evaluation order for "Calculated Value" and "Initial Value" formulas</hint>

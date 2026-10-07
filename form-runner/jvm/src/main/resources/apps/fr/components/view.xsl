@@ -338,6 +338,7 @@
                         <xsl:attribute name="subsections-toc"        select="$wizard-subsections-toc"/>
                         <xsl:attribute name="separate-toc"           select="$wizard-separate-toc"/>
                         <xsl:attribute name="section-status"         select="$wizard-section-status"/>
+                        <xsl:attribute name="initial-focus"          select="$enable-initial-focus"/>
                         <xsl:attribute name="full-update"            select="$wizard-full-update"/>
                         <xsl:attribute name="captcha-location"       select="$captcha-location"/>
                         <xsl:attribute name="captcha-visible"        select="$captcha-visible"/>

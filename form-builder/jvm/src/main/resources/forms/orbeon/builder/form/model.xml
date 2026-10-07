@@ -521,6 +521,7 @@
                     <xf:bind id="rendered-page-size-bind"         ref="rendered-page-size"/>
                     <xf:bind id="html-page-layout-bind"           ref="html-page-layout"/>
                     <xf:bind id="density-bind"                    ref="density"/>
+                    <xf:bind id="initial-focus-bind"              ref="initial-focus"/>
                     <xf:bind id="readonly-disable-calculate-bind" ref="readonly-disable-calculate"/>
                     <xf:bind id="xbl-bind"                        ref="xbl"/>
                     <xf:bind id="summary-metadata-columns-bind"   ref="summary-metadata-columns"/>

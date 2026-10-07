@@ -570,6 +570,10 @@
             <item id="2">Confortable</item>
             <item id="3">Spacieux</item>
         </density>
+        <initial-focus>
+            <label>Focus sur le premier champ</label>
+            <hint>Focus sur le premier champ lors du chargement du formulaire et de la navigation entre les pages de l'assistant</hint>
+        </initial-focus>
         <analysis-calculate>
             <label>Dépendances automatiques des formules de calculs</label>
             <hint>Détermine automatiquement l'ordre d'évaluation pour les formules "Valeur calculée" et "Valeur initiale"</hint>

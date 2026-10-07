@@ -788,7 +788,7 @@
                     else 'xforms-hidden'
                 "/>
             <xh:li role="presentation" class="dropdown-item disabled {{$logged-in-class}}">
-                <xh:a role="menuitem" href="#" class="btn btn-link">
+                <xh:a role="menuitem" href="#" class="btn-link">
                     <xf:output value="
                         xxf:format-message(
                             xxf:r(
@@ -814,7 +814,7 @@
                     else 'xforms-hidden'
                 "/>
             <xh:li role="presentation" class="dropdown-item {{$logout-class}}">
-                <xh:a role="menuitem" href="{{$logout-url}}" class="btn btn-link fr-logout-link">
+                <xh:a role="menuitem" href="{{$logout-url}}" class="btn-link fr-logout-link">
                     <xf:output value="
                         xxf:r(
                             'authentication.menu.logout',
@@ -835,7 +835,7 @@
                     else 'xforms-hidden'
                 "/>
             <xh:li role="presentation" class="dropdown-item {{$login-class}}">
-                <xh:a role="menuitem" href="{{$login-url}}" class="btn btn-link">
+                <xh:a role="menuitem" href="{{$login-url}}" class="btn-link">
                     <xf:output value="
                         xxf:r(
                             'authentication.menu.login',
@@ -856,7 +856,7 @@
                     else 'xforms-hidden'
                 "/>
             <xh:li role="presentation" class="dropdown-item {{$register-class}}">
-                <xh:a role="menuitem" href="{{$register-url}}" class="btn btn-link">
+                <xh:a role="menuitem" href="{{$register-url}}" class="btn-link">
                     <xf:output value="
                         xxf:r(
                             'authentication.menu.register',

@@ -218,9 +218,9 @@
     .btn-link:hover,
     .btn-link:focus,
     .dropdown-item:hover,
-    .dropdown-item:focus,
+    .dropdown-item:focus-within,
     .dropdown-item:hover .btn-link,
-    .dropdown-item:focus .btn-link {
+    .dropdown-item:focus-within .btn-link {
       color: var(--orbeon-dropdown-menu-hover-color);
       background-color: var(--orbeon-dropdown-menu-hover-background-color);
       text-decoration: none;
@@ -246,6 +246,7 @@
     .disabled .btn-link:hover,
     .disabled .btn-link:focus,
     .dropdown-item.disabled:hover,
+    .dropdown-item.disabled:focus-within,
     .dropdown-item:disabled:hover {
       color: var(--orbeon-dropdown-menu-disabled-color);
       background-color: var(--orbeon-dropdown-menu-background-color);

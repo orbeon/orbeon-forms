@@ -189,10 +189,9 @@ object RelationalUtils extends Logging {
 
   private[relational] object Retry {
 
-    val MaxAttempts        = 10
-    val MinDelayMillis     = 5L
-    val InitialDelayMillis = 20L
-    val MaxDelayMillis     = 1000L
+    private val MaxAttempts  = 10
+    private val InitialDelay = 20.millis
+    private val MaxDelay     = 1.second
 
     private implicit val sleepTry: Sleep[Try] =
       (delay: FiniteDuration) => Try(if (delay.toMillis > 0) Thread.sleep(delay.toMillis))
@@ -210,10 +209,9 @@ object RelationalUtils extends Logging {
     def withConnectionHandleTransaction[T](
       provider         : Provider,
       acquireConnection: () => Connection,
-      maxAttempts      : Int  = MaxAttempts,
-      minDelay         : Long = MinDelayMillis,
-      initialDelay     : Long = InitialDelayMillis,
-      maxDelay         : Long = MaxDelayMillis
+      maxAttempts      : Int            = MaxAttempts,
+      initialDelay     : FiniteDuration = InitialDelay,
+      maxDelay         : FiniteDuration = MaxDelay
     )(
       thunk            : Connection => T
     )(implicit
@@ -241,7 +239,7 @@ object RelationalUtils extends Logging {
         }
       }
 
-      val policy = retryPolicy(maxAttempts, initialDelay.millis, maxDelay.millis)
+      val policy = retryPolicy(maxAttempts, initialDelay, maxDelay)
 
       val onError: (Throwable, RetryDetails) => Try[Unit] = (t, details) => Try {
         details match {

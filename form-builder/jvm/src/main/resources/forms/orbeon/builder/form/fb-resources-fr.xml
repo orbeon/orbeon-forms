@@ -425,7 +425,7 @@
             <hint>Si sélectionné, ce formulaire sera montré dans la liste des modèles de formulaires</hint>
         </allow-template-use>
         <wizard>
-            <label>Vue "wizard"</label>
+            <label>Vue wizard</label>
             <hint>Montrer les sections de premier niveau dans des pages de wizard séparées</hint>
         </wizard>
         <wizard-mode>
@@ -572,7 +572,7 @@
         </density>
         <initial-focus>
             <label>Focus sur le premier champ</label>
-            <hint>Focus sur le premier champ lors du chargement du formulaire et de la navigation entre les pages de l'assistant</hint>
+            <hint>Focus sur le premier champ lors du chargement du formulaire et de la navigation entre les pages du wizard</hint>
         </initial-focus>
         <analysis-calculate>
             <label>Dépendances automatiques des formules de calculs</label>

@@ -28,15 +28,18 @@ class ReadonlyDisableCalculateTest
   describe("Calculations disabled in readonly modes") {
 
     val Expected = List(
-      "edit" -> "calculated",
-      "view" -> "saved",
+      ("7921-true",  "true",  List("edit" -> "calculated", "view" -> "saved")),      // readonly-disable-calculate = true
+      ("7921-false", "false", List("edit" -> "calculated", "view" -> "calculated")), // readonly-disable-calculate = false
     )
 
-    for ((mode, expected) <- Expected)
-      it(s"must return `$expected` for mode `$mode`") {
+    for {
+      (form, readonlyDisableCalculate, expectedByMode) <- Expected
+      (mode, expected)                                 <- expectedByMode
+    }
+      it(s"must return `$expected` for mode `$mode` with `readonly-disable-calculate` set to `$readonlyDisableCalculate`") {
 
         val (processorService, Some(doc), _) =
-          runFormRunner("issue", "7921", mode, documentId = "d58bf2707df15bd0889ea0ff641420ec3416845b".some)
+          runFormRunner("issue", form, mode, documentId = "d58bf2707df15bd0889ea0ff641420ec3416845b".some)
 
         withTestExternalContext { _ =>
           withFormRunnerDocument(processorService, doc) {

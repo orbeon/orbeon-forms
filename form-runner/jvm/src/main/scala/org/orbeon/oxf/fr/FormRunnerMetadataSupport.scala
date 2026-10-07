@@ -48,7 +48,7 @@ object FormRunnerMetadataSupport {
     }
 
   def newInstanceFilter(
-    metadataReceiver      : XMLReceiver,
+    instanceReceiver      : XMLReceiver,
     isStartElement        : List[StartElement] => Boolean,
     metadataElementsToKeep: String => Boolean
   ): FilterReceiver =
@@ -56,7 +56,7 @@ object FormRunnerMetadataSupport {
     new FilterReceiver(
       new WhitespaceXMLReceiver(
         new ElementFilterXMLReceiver(
-          metadataReceiver,
+          instanceReceiver,
           (level, uri, localname, _) => level != 1 || level == 1 && uri == "" && metadataElementsToKeep(localname)
         ),
         Whitespace.Policy.Normalize,
@@ -94,5 +94,20 @@ object FormRunnerMetadataSupport {
         case _ => false
       },
       multiple = true
+    )
+
+  def newModelFilter(
+    modelReceiver: XMLReceiver
+  ): FilterReceiver =
+    new FilterReceiver(
+      modelReceiver,
+      {
+        case
+          StartElement(JXQName(XF, "model"), IdAtt(Names.FormModel)) ::
+          StartElement(JXQName(XH, "head"),  _)                      ::
+          StartElement(JXQName(XH, "html"),  _)                      ::
+          Nil => true
+        case _  => false
+      }
     )
 }

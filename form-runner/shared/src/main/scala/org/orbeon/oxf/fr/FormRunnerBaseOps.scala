@@ -356,29 +356,29 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def xpathFormRunnerStringProperty(name: String): Option[String] =
     formRunnerProperty(name)(FormRunnerParams())
 
-  private def propertyProfileOpt: Option[String] =
+  private def inScopePropertyProfileOpt: Option[String] =
     inScopeContainingDocumentOpt.flatMap(_.staticState.propertyProfileOpt)
 
   // Return a property using the form's app/name, None if the property is not defined
-  def formRunnerProperty(name: String)(implicit p: FormRunnerParams): Option[String] =
-    CoreCrossPlatformSupport.properties.getObjectOpt(buildPropertyName(name), propertyProfileOpt).map(_.toString)
+  def formRunnerProperty(name: String, propertyProfileOpt: Option[String] = None)(implicit p: FormRunnerParams): Option[String] =
+    CoreCrossPlatformSupport.properties.getObjectOpt(buildPropertyName(name), propertyProfileOpt.orElse(inScopePropertyProfileOpt)).map(_.toString)
 
-  def formRunnerProperty(name: String, appForm: AppForm): Option[String] =
-    CoreCrossPlatformSupport.properties.getObjectOpt(buildPropertyName(name, appForm), propertyProfileOpt).map(_.toString)
+  def formRunnerProperty(name: String, appForm: AppForm, propertyProfileOpt: Option[String] = None): Option[String] =
+    CoreCrossPlatformSupport.properties.getObjectOpt(buildPropertyName(name, appForm), propertyProfileOpt.orElse(inScopePropertyProfileOpt)).map(_.toString)
 
   def formRunnerRawProperty(name: String, appForm: AppForm): Option[Property] =
-    CoreCrossPlatformSupport.properties.getPropertyOpt(buildPropertyName(name, appForm), propertyProfileOpt)
+    CoreCrossPlatformSupport.properties.getPropertyOpt(buildPropertyName(name, appForm), inScopePropertyProfileOpt)
 
   def formRunnerRawProperty(name: String)(implicit p: FormRunnerParams): Option[Property] =
-    CoreCrossPlatformSupport.properties.getPropertyOpt(buildPropertyName(name), propertyProfileOpt)
+    CoreCrossPlatformSupport.properties.getPropertyOpt(buildPropertyName(name), inScopePropertyProfileOpt)
 
   def formRunnerPropertyWithNs(name: String)(implicit p: FormRunnerParams): Option[(String, NamespaceMapping)] =
-    CoreCrossPlatformSupport.properties.getPropertyOpt(buildPropertyName(name), propertyProfileOpt).map({ p => (p.stringValue, p.namespaceMapping) })
+    CoreCrossPlatformSupport.properties.getPropertyOpt(buildPropertyName(name), inScopePropertyProfileOpt).map({ p => (p.stringValue, p.namespaceMapping) })
 
   // `None` if property not defined or blank
-  def formRunnerQNameProperty(name: String)(implicit p: FormRunnerParams): Option[QName] =
+  def formRunnerQNameProperty(name: String, propertyProfileOpt: Option[String] = None)(implicit p: FormRunnerParams): Option[QName] =
     for {
-      property            <- CoreCrossPlatformSupport.properties.getPropertyOpt(buildPropertyName(name), propertyProfileOpt)
+      property            <- CoreCrossPlatformSupport.properties.getPropertyOpt(buildPropertyName(name), propertyProfileOpt.orElse(inScopePropertyProfileOpt))
       trimmedValue        <- property.stringValue.trimAllToOpt
       ns                  = property.namespaceMapping
       (prefix, localname) = SaxonUtils.parseQName(trimmedValue)
@@ -390,11 +390,11 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
     }
 
   def intFormRunnerProperty(name: String)(implicit p: FormRunnerParams): Option[Int] =
-    CoreCrossPlatformSupport.properties.getIntOpt(buildPropertyName(name), propertyProfileOpt)
+    CoreCrossPlatformSupport.properties.getIntOpt(buildPropertyName(name), inScopePropertyProfileOpt)
 
   // Return a boolean property using the form's app/name, false if the property is not defined
-  def booleanFormRunnerProperty(name: String)(implicit p: FormRunnerParams): Boolean =
-    CoreCrossPlatformSupport.properties.getObjectOpt(buildPropertyName(name), propertyProfileOpt).map(_.toString).contains("true")
+  def booleanFormRunnerProperty(name: String, propertyProfileOpt: Option[String] = None)(implicit p: FormRunnerParams): Boolean =
+    CoreCrossPlatformSupport.properties.getObjectOpt(buildPropertyName(name), propertyProfileOpt.orElse(inScopePropertyProfileOpt)).map(_.toString).contains("true")
 
   // We expect that the app/form are the last two parts of the property
   def trailingAppFormFromProperty(requestedName: String, property: Property): AppForm =
@@ -606,7 +606,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
     val captchaPropertyPrefix    = "oxf.fr.detail.captcha"
     val captchaPropertyShortName = captchaPropertyPrefix                :: app :: form :: Nil mkString "."
     val captchaPropertyLongName  = captchaPropertyPrefix :: "component" :: app :: form :: Nil mkString "."
-    def property(name: String)   = CoreCrossPlatformSupport.properties.getPropertyOpt(name, propertyProfileOpt)
+    def property(name: String)   = CoreCrossPlatformSupport.properties.getPropertyOpt(name, inScopePropertyProfileOpt)
     val captchaPropertyOpt       = property(captchaPropertyLongName) orElse
                                    property(captchaPropertyShortName)
     captchaPropertyOpt match {

@@ -36,6 +36,9 @@ object FormRunnerXblSupport extends XBLSupport {
     elem              : Element
   ): Boolean = {
 
+    val propertyProfileOpt =
+      partAnalysisCtx.staticProperties.propertyProfileOpt
+
     def fromAttribute(paramName: QName): Option[String] =
       boundElement.attributeValueOpt(paramName)
 
@@ -44,7 +47,7 @@ object FormRunnerXblSupport extends XBLSupport {
         partAnalysis  = partAnalysisCtx,
         directNameOpt = directNameOpt,
         paramName     = paramName,
-        property      = Property.property(_, None) // TODO: can we/should we pass `profileOpt`?
+        property      = Property.property(_, propertyProfileOpt)
       ) map
         (_.getStringValue)
 

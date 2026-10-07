@@ -8,7 +8,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner.{InternalValidateSelectionControlsChoicesParam, UsePdfTemplateParam}
 import org.orbeon.oxf.fr.FormRunnerMetadataSupport.*
-import org.orbeon.oxf.fr.XMLNames.{FR, FRNamespace}
+import org.orbeon.oxf.fr.XMLNames.{FR, FRNamespace, XXF}
 import org.orbeon.oxf.fr.definitions.FormRunnerDetailMode.SupportedNonDetailModes
 import org.orbeon.oxf.fr.process.FormRunnerRenderedFormat
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerParams}
@@ -18,6 +18,7 @@ import org.orbeon.oxf.processor.ProcessorImpl.INPUT_DATA
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.oxf.xforms.XFormsProperties.PropertyProfileProperty
 import org.orbeon.oxf.xforms.xbl.{BindingAttributeDescriptor, BindingDescriptor, BindingLoader, GlobalBindingIndex}
 import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.XMLReceiverSupport.*
@@ -116,6 +117,7 @@ class FormRunnerConfigProcessor extends ProcessorImpl {
               readInputToReceiver(rcv)
 
               CacheableFormMetadata(
+                propertyProfileOpt               = None,
                 tocModes                         = None,
                 tocMinSections                   = None,
                 tocPosition                      = None,
@@ -137,6 +139,7 @@ class FormRunnerConfigProcessor extends ProcessorImpl {
 
               var sectionCount = 0
               var hasPdfAutomaticBinding = false
+              var propertyProfileOpt: Option[String] = None
 
               val namesWithPdfAutomaticBinding =
                 BindingLoader
@@ -168,13 +171,24 @@ class FormRunnerConfigProcessor extends ProcessorImpl {
                     hasPdfAutomaticBinding = namesWithPdfAutomaticBinding(namespaceURI -> localName)
               })
 
-              readInputToReceiver(new TeeXMLReceiver(List(rcv, metadataFilter, attachmentsFilter, bodyFilter, sectionTemplateFilter)))
+              val modelFilter = newModelFilter(new XMLReceiverAdapter {
+                private var inModel = false
+                override def startElement(namespaceURI: String, localName: String, qName: String, atts: Attributes): Unit =
+                  if (! inModel) {
+                    propertyProfileOpt = Option(atts.getValue(XXF, PropertyProfileProperty)).flatMap(_.trimAllToOpt)
+                    inModel = true
+                  }
+              })
+
+              readInputToReceiver(new TeeXMLReceiver(List(rcv, metadataFilter, attachmentsFilter, bodyFilter, sectionTemplateFilter, modelFilter)))
+
 
               val metadataRootElemOpt    = Option(metadataResult()).flatMap(_.rootElementOpt)
               val attachmentsRootElemOpt = Option(attachmentsResult()).flatMap(_.rootElementOpt)
               val tocOpt                 = metadataRootElemOpt.flatMap(e => (e / "xbl" / (FR -> "toc")).headOption)
 
               CacheableFormMetadata(
+                propertyProfileOpt               = propertyProfileOpt,
                 tocModes                         = tocOpt.map(_ attTokens "modes"),
                 tocMinSections                   = tocOpt.flatMap(_ attValueOpt "min-sections").flatMap(_.trimAllToOpt).map(_.toInt),
                 tocPosition                      = tocOpt.flatMap(_ attValueNonBlankOpt "position").flatMap(_.trimAllToOpt),
@@ -304,6 +318,7 @@ private object FormRunnerConfigProcessor {
   // This contains metadata extracted from the form definition as it is read. This information is needed to compute
   // `FormRunnerConfig`. It can be cached against the form definition, while taking much less space.
   case class CacheableFormMetadata(
+    propertyProfileOpt              : Option[String],
     tocModes                        : Option[Set[String]],
     tocMinSections                  : Option[Int],
     tocPosition                     : Option[String],
@@ -444,7 +459,7 @@ private object FormRunnerConfigProcessor {
         metadata.useWizard.contains(true).option(WizardQName)               // if wizard is explicitly enabled in metadata, use that (including `import` page)
           .orElse(metadata.useWizard.contains(false).option(FullQName))     // else if wizard is explicitly disabled in metadata, use the full mode
           .orElse {                                                         // else use mode from property
-            FormRunner.formRunnerQNameProperty("oxf.fr.detail.view.appearance")(updatedParams)
+            FormRunner.formRunnerQNameProperty("oxf.fr.detail.view.appearance", metadata.propertyProfileOpt)(updatedParams)
               .map {
                 case qName if qName.namespace.prefix.isEmpty => QName(qName.localName, FRNamespace) // `wizard` or `full` without prefix
                 case qName                                   => qName
@@ -487,12 +502,12 @@ private object FormRunnerConfigProcessor {
     val disableCalculateInReadonlyModes =
       metadata.readonlyDisableCalculate.contains(true) || (
         ! metadata.readonlyDisableCalculate.contains(false) &&
-        FormRunner.booleanFormRunnerProperty("oxf.fr.detail.readonly.disable-calculate")(updatedParams)
+        FormRunner.booleanFormRunnerProperty("oxf.fr.detail.readonly.disable-calculate", metadata.propertyProfileOpt)(updatedParams)
       )
 
     val tocModes = {
 
-      val tocModesFromProperties = FormRunner.formRunnerProperty("oxf.fr.detail.toc.modes")(updatedParams).map(_.tokenizeToSet)
+      val tocModesFromProperties = FormRunner.formRunnerProperty("oxf.fr.detail.toc.modes", metadata.propertyProfileOpt)(updatedParams).map(_.tokenizeToSet)
 
       metadata.tocModes
         .orElse(tocModesFromProperties)
@@ -503,8 +518,8 @@ private object FormRunnerConfigProcessor {
     val tocMinSections = {
 
       // Use `-2` as internal magic value to indicate that the property is not set
-      val tocMinSectionsFromProperties1 = FormRunner.formRunnerProperty("oxf.fr.detail.toc")(updatedParams).map(_.toInt).filter(_ != -2)
-      val tocMinSectionsFromProperties2 = FormRunner.formRunnerProperty("oxf.fr.detail.toc.min-sections")(updatedParams).map(_.toInt).filter(_ != -2)
+      val tocMinSectionsFromProperties1 = FormRunner.formRunnerProperty("oxf.fr.detail.toc", metadata.propertyProfileOpt)(updatedParams).map(_.toInt).filter(_ != -2)
+      val tocMinSectionsFromProperties2 = FormRunner.formRunnerProperty("oxf.fr.detail.toc.min-sections", metadata.propertyProfileOpt)(updatedParams).map(_.toInt).filter(_ != -2)
 
       metadata.tocMinSections
         .orElse(tocMinSectionsFromProperties1)
@@ -515,7 +530,7 @@ private object FormRunnerConfigProcessor {
     val tocPositionOpt = {
 
       val tocPositionFromProperties =
-        FormRunner.formRunnerProperty("oxf.fr.detail.toc.position")(updatedParams).flatMap(_.trimAllToOpt)
+        FormRunner.formRunnerProperty("oxf.fr.detail.toc.position", metadata.propertyProfileOpt)(updatedParams).flatMap(_.trimAllToOpt)
 
       metadata.tocPosition                                    // explicitly in form definition wins
         .orElse(tocPositionFromProperties)                    // then property
@@ -545,7 +560,7 @@ private object FormRunnerConfigProcessor {
           .getOrElse(
             metadata.validateSelectionControlsChoices.contains(true) || (
               ! metadata.validateSelectionControlsChoices.contains(false) &&
-                FormRunner.booleanFormRunnerProperty("oxf.fr.detail.validate-selection-controls-choices")(updatedParams)
+                FormRunner.booleanFormRunnerProperty("oxf.fr.detail.validate-selection-controls-choices", metadata.propertyProfileOpt)(updatedParams)
             )
           )
       else

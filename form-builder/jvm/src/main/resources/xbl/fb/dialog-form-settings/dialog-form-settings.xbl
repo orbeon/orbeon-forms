@@ -194,7 +194,7 @@
                 </xf:action>
 
                 <!-- Load summary metadata column settings from form metadata (#7553) -->
-                <xf:delete if="$is-form-settings" ref="$i/summary-metadata-columns/column"/>
+                <xf:delete ref="$i/summary-metadata-columns/*"/>
                 <xf:action if="$is-form-settings" iterate="('created', 'last-modified', 'workflow-stage', 'created-by', 'last-modified-by')">
                     <xf:var name="column-name" value="."/>
                     <xf:var name="column"      value="event('summary-metadata-columns')/column[@name = $column-name]"/>

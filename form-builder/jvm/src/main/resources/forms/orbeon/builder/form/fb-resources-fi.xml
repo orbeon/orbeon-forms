@@ -573,6 +573,10 @@
             <item id="2">Mukava</item>
             <item id="3">Väljä</item>
         </density>
+        <initial-focus>
+            <label>Kohdistus ensimmäiseen kenttään</label>
+            <hint>Kohdistetaanko ensimmäiseen kenttään lomakkeen latautuessa ja ohjatun toiminnon sivuilla siirryttäessä</hint>
+        </initial-focus>
         <analysis-calculate>
             <label>Automaattiset laskentariippuvuudet</label>
             <hint>Määritä automaattisesti arviointijärjestys "Laskettu arvo" ja "Alkuarvo" -kaavoille</hint>

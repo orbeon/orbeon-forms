@@ -552,6 +552,10 @@
             <item id="2">Behagelig</item>
             <item id="3">Romslig</item>
         </density>
+        <initial-focus>
+            <label>Fokus på første felt</label>
+            <hint>Om det skal settes fokus på det første feltet når skjemaet lastes og ved navigering mellom veivisersider</hint>
+        </initial-focus>
         <analysis-calculate>
             <label>Automatiske beregningsavhengigheter</label>
             <hint>Bestem automatisk evalueringsrekkefølge for "Utregnet verdi" og "Forhåndsutfylt verdi" formler</hint>

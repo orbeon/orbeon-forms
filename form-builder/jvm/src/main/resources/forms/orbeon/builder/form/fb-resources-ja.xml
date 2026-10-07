@@ -572,6 +572,10 @@
             <item id="2">標準</item>
             <item id="3">広め</item>
         </density>
+        <initial-focus>
+            <label>最初のフィールドにフォーカス</label>
+            <hint>フォーム読み込み時およびウィザードページの移動時に最初のフィールドにフォーカスするかどうか</hint>
+        </initial-focus>
         <analysis-calculate>
             <label>自動計算の依存関係</label>
             <hint>計算値/初期値の式の評価順を自動で決定</hint>

@@ -572,6 +572,10 @@
             <item id="2">Bekväm</item>
             <item id="3">Rymlig</item>
         </density>
+        <initial-focus>
+            <label>Fokus på första fältet</label>
+            <hint>Om fokus ska sättas på det första fältet när formuläret laddas och vid navigering mellan guidesidor</hint>
+        </initial-focus>
         <analysis-calculate>
             <label>Automatiska beräkningsberoenden</label>
             <hint>Bestäm automatiskt utvärderingsordning för formler för "Beräknat värde" och "Förvalt värde"</hint>

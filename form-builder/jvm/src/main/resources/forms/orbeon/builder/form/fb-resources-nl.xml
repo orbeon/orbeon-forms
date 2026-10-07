@@ -553,6 +553,10 @@
             <item id="2">Comfortabel</item>
             <item id="3">Ruim</item>
         </density>
+        <initial-focus>
+            <label>Focus op eerste veld</label>
+            <hint>Of de focus op het eerste veld moet worden geplaatst bij het laden van het formulier en bij het navigeren door wizardpagina's</hint>
+        </initial-focus>
         <analysis-calculate>
             <label>Automatische afhankelijkheid calculatie</label>
             <hint>Bepaal automatisch de evaluatievolgorde voor formules "Berekende waarde" en "Initiële waarde"</hint>

@@ -572,6 +572,10 @@
             <item id="2">Wygodna</item>
             <item id="3">Przestronna</item>
         </density>
+        <initial-focus>
+            <label>Fokus na pierwszym polu</label>
+            <hint>Czy ustawić fokus na pierwszym polu po załadowaniu formularza i podczas nawigacji po stronach kreatora</hint>
+        </initial-focus>
         <analysis-calculate>
             <label>Automatyczne zależności obliczeń</label>
             <hint>Automatycznie określ kolejność obliczeń formuł "Wartość obliczana" i "Wartość początkowa"</hint>

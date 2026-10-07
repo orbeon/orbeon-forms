@@ -560,6 +560,10 @@
             <item id="2">Confortevole</item>
             <item id="3">Ampia</item>
         </density>
+        <initial-focus>
+            <label>Focus sul primo campo</label>
+            <hint>Se impostare il focus sul primo campo al caricamento del modulo e durante la navigazione tra le pagine della procedura guidata</hint>
+        </initial-focus>
         <analysis-calculate>
             <label>Dipendenze dei calcoli automatici</label>
             <hint>Determina automaticamente l'ordine di valutazione per le formule "Valore calcolato" e "Valore iniziale"</hint>

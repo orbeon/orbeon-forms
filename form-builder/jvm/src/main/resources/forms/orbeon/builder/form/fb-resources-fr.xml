@@ -429,7 +429,7 @@
             <hint>Montrer les sections de premier niveau dans des pages de wizard séparées</hint>
         </wizard>
         <wizard-mode>
-            <label>Mode de navigation du "wizard"</label>
+            <label>Mode de navigation du wizard</label>
             <hint>Navigation entre pages lorsque les données sont invalides</hint>
             <item id="0">Utiliser la propriété</item>
             <item id="1">Libre</item>

@@ -553,6 +553,10 @@
             <item id="2">Confortável</item>
             <item id="3">Espaçoso</item>
         </density>
+        <initial-focus>
+            <label>Foco no Primeiro Campo</label>
+            <hint>Se deve focar o primeiro campo ao carregar o formulário e ao navegar pelas páginas do assistente</hint>
+        </initial-focus>
         <analysis-calculate>
             <label>Dependências de Cálculos Automáticos</label>
             <hint>Determinar automaticamente a ordem de avaliação para fórmulas de "Valor Calculado" e "Valor Inicial"</hint>

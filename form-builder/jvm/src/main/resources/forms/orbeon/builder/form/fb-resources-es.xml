@@ -552,6 +552,10 @@
             <item id="2">Cómoda</item>
             <item id="3">Amplia</item>
         </density>
+        <initial-focus>
+            <label>Foco en el primer campo</label>
+            <hint>Si se debe poner el foco en el primer campo al cargar el formulario y al navegar por las páginas del asistente</hint>
+        </initial-focus>
         <analysis-calculate>
             <label>Dependencias de cálculos automáticos</label>
             <hint>Determina automáticamente el orden de evaluación para las fórmulas de "Valor calculado" y "Valor inicial"</hint>

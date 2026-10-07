@@ -564,6 +564,10 @@
             <item id="2">Komfortabel</item>
             <item id="3">Geräumig</item>
         </density>
+        <initial-focus>
+            <label>Fokus auf erstes Feld</label>
+            <hint>Ob beim Laden des Formulars und beim Navigieren auf Wizard-Seiten auf das erste Feld fokussiert werden soll</hint>
+        </initial-focus>
         <analysis-calculate>
             <label>Abhängigkeiten automatisch ermitteln</label>
             <hint>Bestimmt die Auswertungsreihenfolge von „Berechneter Wert“ und „Initialer Wert“ automatisch</hint>

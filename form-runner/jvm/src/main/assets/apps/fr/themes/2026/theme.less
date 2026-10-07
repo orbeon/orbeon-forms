@@ -60,8 +60,9 @@
 .orbeon {
 
   // General
-  --orbeon-base-background-color         : @gray-99;
+  --orbeon-page-background-color         : @gray-99;
   --orbeon-base-border-color             : @gray-90;
+  --orbeon-form-background-color         : white;
   --orbeon-body-decorations-border-radius: @radius-box;
 
   // Max width of the (non-fluid) form view
@@ -310,7 +311,7 @@
 
   // Regular and wizard table of contents (TOC)
   --orbeon-toc-color                          : @accent-text;
-  --orbeon-toc-background-color               : var(--orbeon-base-background-color);
+  --orbeon-toc-background-color               : var(--orbeon-page-background-color);
   --orbeon-toc-hover-background-color         : @tint-hover;
   --orbeon-toc-selected-color                 : white;
   --orbeon-toc-selected-background-color      : @accent;
@@ -419,7 +420,7 @@
   --orbeon-info-alert-border-color       : var(--orbeon-info-color);
   --orbeon-info-alert-pointer-color      : var(--orbeon-info-color);
   --orbeon-alert-color                   : var(--orbeon-base-color);
-  --orbeon-alert-background-color        : var(--orbeon-base-background-color);
+  --orbeon-alert-background-color        : var(--orbeon-page-background-color);
   --orbeon-alert-border-color            : @gray-90;
   --orbeon-alert-text-shadow-color       : transparent;
   --orbeon-alert-border-radius           : @radius-box;
@@ -592,7 +593,8 @@
     @warning: hsl(@warning-hue, 95%, 48%);
     @error  : hsl(@error-hue  , 45%, 62%);
 
-    --orbeon-base-background-color                           : @dark-21;
+    --orbeon-page-background-color                           : @dark-21;
+    --orbeon-form-background-color                           : @dark-21;
     --orbeon-base-border-color                               : @dark-38;
     --orbeon-base-color                                      : @dark-96;
     --orbeon-accent-color                                    : oklch(54% 0.17 262);
@@ -740,11 +742,12 @@
     // For CSS debugging with "Preview" and the relevant .fr-pdf-color-mode-* classes
     &:has(.fr-pdf-color-mode-black-and-white), &:has(.fr-pdf-color-mode-keep-field-colors) {
       // Use !important instead of more complex selectors to win over .orbeon:not(:has(.fb-main)), etc.
-      --orbeon-base-background-color: white !important;
+      --orbeon-page-background-color: white !important;
     }
 
     &, .fr-pdf-color-mode-black-and-white, .fr-pdf-color-mode-keep-field-colors {
-      --orbeon-base-background-color                           : white;
+      --orbeon-page-background-color                           : white;
+      --orbeon-form-background-color                           : white;
       --orbeon-base-border-color                               : #e3e3e3;
       --orbeon-base-font-size                                  : 13px; // Same as 2025
       --orbeon-base-font-family                                : @frPrintBaseFontFamily;

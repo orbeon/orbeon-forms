@@ -15,8 +15,9 @@
 .orbeon {
 
   // General
-  --orbeon-base-background-color         : white;
+  --orbeon-page-background-color         : white;
   --orbeon-base-border-color             : #e3e3e3;           // darken(@wellBackground, 7%);
+  --orbeon-form-background-color         : white;
   --orbeon-body-decorations-border-radius: @baseBorderRadius; // bordered containers: view, TOC, repeat grid
 
   // Max width of the (non-fluid) form view: keep this theme at Bootstrap 2's fixed 940px; a future theme can go wider.
@@ -510,7 +511,7 @@
     @warning: hsl(@warning-hue, 95%, 48%);
     @error  : hsl(@error-hue  , 45%, 62%);
 
-    --orbeon-base-background-color                           : @base-bg;
+    --orbeon-page-background-color                           : @base-bg;
     --orbeon-base-border-color                               : @gray-27;
     --orbeon-base-color                                      : @text-light;
     --orbeon-link-hover-color                                : lighten(#08c, 15%);
@@ -651,12 +652,12 @@
     // For CSS debugging with "Preview" and the relevant .fr-pdf-color-mode-* classes
     &:has(.fr-pdf-color-mode-black-and-white), &:has(.fr-pdf-color-mode-keep-field-colors) {
       // Use !important instead of more complex selectors to win over .orbeon:not(:has(.fb-main)), etc.
-      --orbeon-base-background-color: white !important;
+      --orbeon-page-background-color: white !important;
     }
 
     &, .fr-pdf-color-mode-black-and-white, .fr-pdf-color-mode-keep-field-colors {
       --orbeon-base-font-size                                  : 13px;
-      --orbeon-base-background-color                           : white;
+      --orbeon-page-background-color                           : white;
       --orbeon-base-border-color                               : #e3e3e3;
       --orbeon-base-font-family                                : @frPrintBaseFontFamily;
       --orbeon-base-color                                      : black;

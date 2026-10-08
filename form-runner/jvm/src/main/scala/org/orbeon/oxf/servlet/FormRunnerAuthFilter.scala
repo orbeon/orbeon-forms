@@ -76,55 +76,40 @@ object FormRunnerAuthFilterImpl {
 
   def amendRequest(servletRequest: HttpServletRequest)(implicit propertySet: PropertySet): HttpServletRequest = {
 
-    // Do not create a session for fonts, source maps, or OPTIONS requests
-    val createSession  = ! (servletRequest.isFont || servletRequest.isSourceMap || servletRequest.isOptions)
-    val httpSession    = new ServletSessionImpl(servletRequest.getSession(createSession))
-    val getHttpHeaders = (name: String) => servletRequest.headerValuesList(name)
-
     logger.debug(s"incoming headers:\n${servletRequest.headersAsStringForDebug}")
+
+    val isService = servletRequest.getRequestPathInfo.startsWith("/fr/service/")
 
     // The Form Runner service path is hardcoded but that's ok. When we are filtering a service, we don't retrieve the
     // credentials, which would be provided by the container or by incoming headers. Instead, credentials are provided
     // directly with `Orbeon-*` headers. See https://github.com/orbeon/orbeon-forms/issues/2275
+    // For service calls, do not create or use a session (#6780).
     val requestWithAmendedHeaders =
-      if (servletRequest.getRequestPathInfo.startsWith("/fr/service/")) {
-
-        // `ServletPortletRequest` gets credentials from the session, which means we need to store the credentials into
-        // the session. This is done by `getCredentialsAsHeadersUseSession()` if we are not a service, but here we
-        // don't use that function so we need to do make sure they are stored.
-
-        CredentialsSupport.findCredentialsInSession(httpSession) match {
-          case None =>
-            CredentialsSupport.storeCredentialsInSession(
-              httpSession,
-              FormRunnerAuth.fromHeaderValues(
-                credentialsOpt = servletRequest.headerFirstValueOpt(Headers.OrbeonCredentials),
-                usernameOpt    = servletRequest.headerFirstValueOpt(Headers.OrbeonUsername),
-                rolesList      = getHttpHeaders(Headers.OrbeonRoles),
-                groupOpt       = servletRequest.headerFirstValueOpt(Headers.OrbeonGroup),
-              )
-            )
-          case Some(_) =>
-        }
-
-        servletRequest
-      } else if (! createSession) {
-        // Don't amend headers if we're not creating a session, as there may be no session to retrieve
-        // credentials from, which would cause a NullPointerException.
-        servletRequest
+      if (isService) {
+        new StatelessHttpServletRequest(servletRequest)
       } else {
+        // Do not create a session for fonts, source maps, or OPTIONS requests
+        val createSession = ! (servletRequest.isFont || servletRequest.isSourceMap || servletRequest.isOptions)
+        if (! createSession) {
+          // Don't amend headers if we're not creating a session, as there may be no session to retrieve
+          // credentials from, which would cause a NullPointerException.
+          servletRequest
+        } else {
+          val httpSession    = new ServletSessionImpl(servletRequest.getSession(true))
+          val getHttpHeaders = (name: String) => servletRequest.headerValuesList(name)
 
-        trait CustomHeaders extends RequestRemoveHeaders with RequestPrependHeaders  {
-          override def headersToRemoveAsSet: Set[String] = FormRunnerAuth.AllAuthHeaderNames
-          val headersToPrependAsMap = FormRunnerAuth.getCredentialsAsHeadersUseSession(
-            userRoles    = servletRequest,
-            getAttribute = servletRequest.getAttribute,
-            session      = httpSession,
-            getHeader    = getHttpHeaders
-          ).toMap
+          trait CustomHeaders extends RequestRemoveHeaders with RequestPrependHeaders  {
+            override def headersToRemoveAsSet: Set[String] = FormRunnerAuth.AllAuthHeaderNames
+            val headersToPrependAsMap = FormRunnerAuth.getCredentialsAsHeadersUseSession(
+              userRoles    = servletRequest,
+              getAttribute = servletRequest.getAttribute,
+              session      = httpSession,
+              getHeader    = getHttpHeaders
+            ).toMap
+          }
+
+          new HttpServletRequestWrapper(servletRequest) with CustomHeaders
         }
-
-        new HttpServletRequestWrapper(servletRequest) with CustomHeaders
       }
 
     logger.debug(s"amended headers:\n${requestWithAmendedHeaders.headersAsStringForDebug}")

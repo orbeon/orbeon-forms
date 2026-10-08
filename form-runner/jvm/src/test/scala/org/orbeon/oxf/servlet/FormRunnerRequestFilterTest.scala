@@ -31,7 +31,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
 
   describe("The servlet filter's `amendRequest()` function") {
 
-    val mockSession = {
+    def newMockSession(): HttpSession = {
       val sessionAttributes = mutable.Map[String, AnyRef]()
       val mockSession = mock[HttpSession]
       Mockito when mockSession.getAttribute(ArgumentMatchers.anyString) thenAnswer
@@ -46,7 +46,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
         (n => n -> req.headerValuesList(n)) toMap
 
     // Request with initial headers
-    def newAmendedRequest(path: String, headers: Map[String, List[String]]) = {
+    def newAmendedRequest(path: String, headers: Map[String, List[String]], session: HttpSession = newMockSession()): (HttpServletRequest, HttpSession) = {
 
       val mockRequest =
         new HttpServletRequestWrapper(mock[HttpServletRequest]) {
@@ -54,11 +54,11 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
           override def getHeaders(name: String) =
             (headers.get(name) map (_.iterator) getOrElse Iterator.empty).asJavaEnumeration
           override def getHeaderNames = headers.keysIterator.asJavaEnumeration
-          override def getSession(create: Boolean) = mockSession
+          override def getSession(create: Boolean) = session
           override def getPathInfo: String = path
         }
 
-      FormRunnerAuthFilterImpl.amendRequest(mockRequest)(PropertyLoader.getPropertyStore(None).globalPropertySet)
+      (FormRunnerAuthFilterImpl.amendRequest(mockRequest)(PropertyLoader.getPropertyStore(None).globalPropertySet), session)
     }
 
     val testCredentials =
@@ -84,18 +84,22 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
         "Orbeon-Liferay-User-Roles".toLowerCase -> List("manager,employee")
       )
 
-      val amendedRequest = newAmendedRequest("/fr/orbeon/controls/new", initialHeaders)
+      val (amendedRequest, session) = newAmendedRequest("/fr/orbeon/controls/new", initialHeaders)
 
       assert((initialHeaders ++ testOrbeonHeaders) == headersFromRequest(amendedRequest))
-      assert(CredentialsSupport.findCredentialsInSession(new ServletSessionImpl(mockSession)).contains(testCredentials))
+      assert(CredentialsSupport.findCredentialsInSession(new ServletSessionImpl(session)).contains(testCredentials))
     }
 
-    it("must keep authentication headers for services and store credentials") {
+    it("must keep authentication headers for services and prevent session creation (#6780)") {
 
-      val amendedRequest = newAmendedRequest("/fr/service/acme", testOrbeonHeaders)
+      val (amendedRequest, session) = newAmendedRequest("/fr/service/acme", testOrbeonHeaders)
 
       assert(testOrbeonHeaders == headersFromRequest(amendedRequest))
-      assert(CredentialsSupport.findCredentialsInSession(new ServletSessionImpl(mockSession)).contains(testCredentials))
+      assert(CredentialsSupport.findCredentialsInSession(new ServletSessionImpl(session)).isEmpty)
+      assert(amendedRequest.getSession(false) == null)
+      assertThrows[IllegalStateException](amendedRequest.getSession(true))
+      assert(amendedRequest.getRequestedSessionId == null)
+      assert(! amendedRequest.isRequestedSessionIdValid)
     }
   }
 
@@ -145,6 +149,50 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
       assert(h1.headerValuesList   ("My-Header-Without-Values") == Nil)
       assert(h1.headerValuesNel    ("My-Header-With-Values")   .contains(NonEmptyList.fromListUnsafe(List("v1", "v2"))))
       assert(h1.headerValuesNel    ("My-Header-Without-Values").isEmpty)
+    }
+  }
+
+  describe("#6780: `StatelessHttpServletRequest`") {
+
+    it("must reject session creation") {
+      val mockRequest = mock[HttpServletRequest]
+      val statelessRequest = new StatelessHttpServletRequest(mockRequest)
+
+      assert(statelessRequest.getSession(false) == null)
+      val exception = intercept[IllegalStateException] {
+        statelessRequest.getSession(true)
+      }
+      assert(exception.getMessage == "Session creation is disabled for Form Runner service calls")
+    }
+
+    it("must ignore requested session ID") {
+      val mockRequest = new HttpServletRequestWrapper(mock[HttpServletRequest]) {
+        override def getRequestedSessionId: String = "session-12345"
+        override def isRequestedSessionIdValid: Boolean = true
+      }
+      val statelessRequest = new StatelessHttpServletRequest(mockRequest)
+
+      assert(statelessRequest.getRequestedSessionId == null)
+      assert(! statelessRequest.isRequestedSessionIdValid)
+    }
+
+    it("must filter out JSESSIONID cookie") {
+      val jsessionIdCookie = mock[Cookie]
+      Mockito.when(jsessionIdCookie.getName).thenReturn("JSESSIONID")
+      Mockito.when(jsessionIdCookie.getValue).thenReturn("abc123xyz")
+
+      val otherCookie = mock[Cookie]
+      Mockito.when(otherCookie.getName).thenReturn("other-cookie")
+      Mockito.when(otherCookie.getValue).thenReturn("val456")
+
+      val mockRequest = new HttpServletRequestWrapper(mock[HttpServletRequest]) {
+        override def getCookies: Array[Cookie] = Array(jsessionIdCookie, otherCookie)
+      }
+      val statelessRequest = new StatelessHttpServletRequest(mockRequest)
+
+      val filteredCookies = statelessRequest.getCookies
+      assert(filteredCookies.length == 1)
+      assert(filteredCookies.head.getName == "other-cookie")
     }
   }
 }

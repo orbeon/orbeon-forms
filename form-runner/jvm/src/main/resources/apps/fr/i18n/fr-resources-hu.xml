@@ -47,6 +47,7 @@
         <!-- Egyéb szokásos gombok -->
         <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Összegzés</summary>
         <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Bezárás</close>
+        <close-message>Bezárás</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Törlés</clear>
         <cancel>Mégse</cancel>
         <save-locally>Helyi mentés</save-locally>

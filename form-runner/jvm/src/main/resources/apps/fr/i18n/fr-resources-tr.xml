@@ -47,6 +47,7 @@
         <!-- Other standard buttons -->
         <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Özet</summary>
         <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Kapat</close>
+        <close-message>Kapat</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Temizle</clear>
         <cancel>İptal</cancel>
         <save-locally>Yerel Olarak Kaydet</save-locally>

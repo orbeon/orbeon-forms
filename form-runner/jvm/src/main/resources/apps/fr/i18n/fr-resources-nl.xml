@@ -47,6 +47,7 @@
         <!-- Other standard buttons -->
         <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Samenvatting</summary>
         <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Sluiten</close>
+        <close-message>Sluiten</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Wissen</clear>
         <cancel>Anulleren</cancel>
         <save-locally>Lokaal bewaren</save-locally>

@@ -109,6 +109,13 @@
             xxf:get-request-method() = 'POST' and exists(xxf:get-request-parameter('fr-form-data'))
         "/>
 
+    <xf:var
+        name="messages-appearance"
+        value="xxf:property(string-join(('oxf.fr.detail.messages.appearance', $app, $form), '.'))"/>
+    <xf:var
+        name="messages-toast"
+        value="empty($messages-appearance) or normalize-space($messages-appearance) = 'toast'"/>
+
     <!--
         Running *before* the data is ready. At this point:
         - all instances are created (`xforms-model-construct`)
@@ -1194,7 +1201,7 @@
                 <autosave-timestamp/>
             </autosave>
             <!-- Success or error message to display -->
-            <message/>
+            <message seq="0"/>
             <!-- Error document returned -->
             <error/>
             <!-- Flag to override data-safe: set just before a `send()`, reset when the `send()` submission completes -->
@@ -1316,8 +1323,17 @@
 
     <!-- Clear message -->
     <xf:action observer="#document" event="DOMFocusIn">
-        <xf:toggle case="fr-message-none" xxf:deferred-updates="false"/>
-        <xf:setvalue ref="$persistence-instance/message"/>
+        <xf:action if="not($messages-toast)">
+            <xf:toggle case="fr-message-none"/>
+            <xf:setvalue ref="$persistence-instance/message"/>
+        </xf:action>
+    </xf:action>
+
+    <xf:action observer="fr-persistence-model" event="fr-clear-message">
+        <xf:action if="empty(event('seq')) or event('seq') = $persistence-instance/message/@seq">
+            <xf:toggle case="fr-message-none"/>
+            <xf:setvalue ref="$persistence-instance/message"/>
+        </xf:action>
     </xf:action>
 
     <!-- React to instance mutation events -->

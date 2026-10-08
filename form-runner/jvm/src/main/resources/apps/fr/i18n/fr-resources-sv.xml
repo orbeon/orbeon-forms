@@ -47,6 +47,7 @@
         <!-- Other standard buttons -->
         <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Lista</summary>
         <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Stäng</close>
+        <close-message>Stäng</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Rensa</clear>
         <cancel>Avbryt</cancel>
         <save-locally>Spara lokalt</save-locally>

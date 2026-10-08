@@ -47,6 +47,7 @@
         <!-- Other standard buttons -->
         <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Сводка</summary>
         <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Закрыть</close>
+        <close-message>Закрыть</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Очистить</clear>
         <cancel>Отменить</cancel>
         <save-locally>Сохр.на диск</save-locally>

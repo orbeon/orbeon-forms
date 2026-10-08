@@ -47,6 +47,7 @@
         <!-- 其他標準按鈕 -->
         <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; 摘要</summary>
         <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; 關閉</close>
+        <close-message>關閉</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; 清除</clear>
         <cancel>取消</cancel>
         <save-locally>本地保存</save-locally>

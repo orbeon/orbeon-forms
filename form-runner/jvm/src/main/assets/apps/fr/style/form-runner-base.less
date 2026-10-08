@@ -410,6 +410,12 @@
         width: 100%;
     }
 
+    .fr-messages-toast-container {
+        &.top-0 {
+            top: 52px;
+        }
+    }
+
     // Explanation message if present
     .fr-explanation { padding: 10px }
 
@@ -672,7 +678,9 @@
         .fr-navbar-home-link,                                          // no home link
         .xforms-upload-remove,                                         // upload remove button
         .xforms-help,                                                  // no help
-        .fr-buttons                                                    // no buttons at bottom
+        .fr-buttons,                                                   // no buttons at bottom
+        .fr-messages-toast-container,
+        .toast-container
         { display: none }
 
         // Remove background attachment image

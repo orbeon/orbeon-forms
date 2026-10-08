@@ -47,6 +47,7 @@
         <!-- Other standard buttons -->
         <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Podsumowanie</summary>
         <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Zamknij</close>
+        <close-message>Zamknij</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Wyczyść</clear>
         <cancel>Anuluj</cancel>
         <save-locally>Zapisz lokalnie</save-locally>

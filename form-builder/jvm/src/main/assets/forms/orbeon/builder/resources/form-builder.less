@@ -2144,6 +2144,10 @@ body.orbeon {
 
         .fr-messages {
             white-space: nowrap;
+
+            .toast-container {
+                line-height: var(--bs-body-line-height) // restore from `.fb-bottom`
+            }
         }
 
         // Override Form Runner defaults

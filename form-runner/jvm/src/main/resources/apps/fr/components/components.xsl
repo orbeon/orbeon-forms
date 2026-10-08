@@ -173,6 +173,24 @@
     <xsl:variable name="error-summary-top"    select="normalize-space($error-summary) = ('top', 'both')"                                               as="xs:boolean"/>
     <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')"                                        as="xs:boolean"/>
 
+    <xsl:variable name="messages-appearance"       select="p:property(string-join(('oxf.fr.detail.messages.appearance', $app, $form), '.'), $property-profile-opt)" as="xs:string?"/>
+    <xsl:variable name="messages-toast"            select="empty($messages-appearance) or normalize-space($messages-appearance) = 'toast'" as="xs:boolean"/>
+    <xsl:variable name="messages-position"         select="(p:property(string-join(('oxf.fr.detail.messages.position', $app, $form), '.'), $property-profile-opt), 'bottom-right')[1]" as="xs:string"/>
+    <xsl:variable name="messages-position-classes" select="
+        let $pos := normalize-space($messages-position)
+        return
+            if ($pos = 'bottom-right') then 'bottom-0 justify-content-end'
+            else if ($pos = 'bottom-left') then 'bottom-0 justify-content-start'
+            else if ($pos = 'top-right') then 'top-0 justify-content-end'
+            else if ($pos = 'top-left') then 'top-0 justify-content-start'
+            else if ($pos = 'top-center') then 'top-0 justify-content-center translate-middle-x'
+            else if ($pos = 'bottom-center') then 'bottom-0 justify-content-center translate-middle-x'
+            else if ($pos != '') then $pos
+            else 'bottom-0 end-0'
+    " as="xs:string"/>
+    <xsl:variable name="messages-delay-prop"       select="p:property(string-join(('oxf.fr.detail.messages.delay', $app, $form), '.'), $property-profile-opt)" as="xs:integer?"/>
+    <xsl:variable name="messages-delay"            select="if (exists($messages-delay-prop)) then xs:integer($messages-delay-prop) else 10000" as="xs:integer"/>
+
     <xsl:function name="fr:get-uris-from-properties" as="xs:string*">
         <xsl:param name="name" as="xs:string"/>
 

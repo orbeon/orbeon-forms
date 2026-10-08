@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xh:head>
+        <xh:title>Ephemeral message with inline appearance #6227</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all">
+                <form>
+                    <section-1>
+                        <my-field/>
+                    </section-1>
+                </form>
+            </xf:instance>
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" ref="section-1">
+                    <xf:bind id="my-field-bind" ref="my-field"/>
+                </xf:bind>
+            </xf:bind>
+
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>6227-inline</form-name>
+                    <title xml:lang="en">Ephemeral message with inline appearance #6227</title>
+                </metadata>
+            </xf:instance>
+
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <my-field>
+                            <label>My Field</label>
+                        </my-field>
+                    </resource>
+                </resources>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <fr:c y="1" x="1" w="12">
+                        <xf:input id="my-field-control" bind="my-field-bind">
+                            <xf:label ref="$form-resources/my-field/label"/>
+                        </xf:input>
+                    </fr:c>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

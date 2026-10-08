@@ -47,6 +47,7 @@
         <!-- Other standard buttons -->
         <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Oversigt</summary>
         <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Luk</close>
+        <close-message>Luk</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Slet indhold</clear>
         <cancel>Afbryd</cancel>
         <save-locally>Gem lokalt</save-locally>

@@ -50,6 +50,7 @@
         <!-- Other standard buttons -->
         <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Resum</summary>
         <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Tancar</close>
+        <close-message>Tancar</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Netejar</clear>
         <cancel>Cancel·lar</cancel>
         <save-locally>Emmagatzemar localment</save-locally>

@@ -47,6 +47,7 @@
         <!-- Other standard buttons -->
         <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Sammendrag</summary>
         <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Lukk</close>
+        <close-message>Lukk</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Tøm innhold</clear>
         <cancel>Angre</cancel>
         <save-locally>Lagre lokalt</save-locally>

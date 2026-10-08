@@ -106,9 +106,16 @@
             <fr:error-summary position="bottom"/>
         </xh:div>
 
-        <fr:row>
-            <fr:messages/>
-        </fr:row>
+        <xsl:choose>
+            <xsl:when test="$messages-toast">
+                <fr:messages/>
+            </xsl:when>
+            <xsl:otherwise>
+                <fr:row>
+                    <fr:messages/>
+                </fr:row>
+            </xsl:otherwise>
+        </xsl:choose>
         <fr:row>
             <fr:version/>
         </fr:row>
@@ -1227,25 +1234,94 @@
         </xf:group>
     </xsl:template>
 
-    <!-- Success messages -->
+    <!-- Success and ephemeral error messages -->
     <xsl:template match="fr:messages" name="fr-messages">
-        <xf:switch
-            class="fr-messages"
-            model="fr-persistence-model"
-            ref=".[instance('fr-persistence-instance')/message != '']"
-            xh:aria-live="polite">
+        <xsl:choose>
+            <xsl:when test="$messages-toast">
+                <xf:switch
+                    class="fr-messages"
+                    model="fr-persistence-model"
+                    ref=".[instance('fr-persistence-instance')/message != '']"
+                    xh:aria-live="polite">
 
-            <xf:case id="fr-message-none">
-                <xh:span/>
-            </xf:case>
-            <xf:case id="fr-message-success">
-                <xf:output value="instance('fr-persistence-instance')/message" mediatype="text/html" class="fr-message-success alert alert-success"/>
-            </xf:case>
-            <xf:case id="fr-message-error">
-                <xf:output value="instance('fr-persistence-instance')/message" mediatype="text/html" class="fr-message-error alert alert-error"/>
-            </xf:case>
+                    <xf:case id="fr-message-none">
+                        <xh:span/>
+                    </xf:case>
+                    <xf:case id="fr-message-success">
+                        <xsl:if test="$messages-delay gt 0">
+                            <xf:action event="xforms-select">
+                                <xf:dispatch name="fr-clear-message" targetid="fr-persistence-model" delay="{$messages-delay}">
+                                    <xf:property name="seq" value="instance('fr-persistence-instance')/message/@seq/string()"/>
+                                </xf:dispatch>
+                            </xf:action>
+                        </xsl:if>
+                        <xf:action event="xforms-select" type="javascript">
+                            <xf:body><![CDATA[
+                                document.querySelectorAll('.fr-messages-toast-container .toast').forEach(function(t) {
+                                    t.classList.add('show');
+                                });
+                            ]]></xf:body>
+                        </xf:action>
+                        <xh:div class="toast-container position-fixed d-flex {$messages-position-classes} p-3 fr-messages-toast-container">
+                            <xh:div class="toast align-items-center text-bg-success border-0 fade show" role="alert" aria-live="assertive" aria-atomic="true">
+                                <xh:div class="d-flex">
+                                    <xh:div class="toast-body">
+                                        <xf:output value="instance('fr-persistence-instance')/message" mediatype="text/html" class="fr-message-success"/>
+                                    </xh:div>
+                                    <xh:button type="button" class="btn-close btn-close-white me-2 m-auto" data-orbeon-bs-dismiss="toast" aria-label="{{xxf:r('buttons.close-message', '|fr-fr-resources|')}}" onclick="ORBEON.xforms.Document.dispatchEvent('fr-persistence-model', 'fr-clear-message');"/>
+                                </xh:div>
+                            </xh:div>
+                        </xh:div>
+                    </xf:case>
+                    <xf:case id="fr-message-error">
+                        <xsl:if test="$messages-delay gt 0">
+                            <xf:action event="xforms-select">
+                                <xf:dispatch name="fr-clear-message" targetid="fr-persistence-model" delay="{$messages-delay}">
+                                    <xf:property name="seq" value="instance('fr-persistence-instance')/message/@seq/string()"/>
+                                </xf:dispatch>
+                            </xf:action>
+                        </xsl:if>
+                        <xf:action event="xforms-select" type="javascript">
+                            <xf:body><![CDATA[
+                                document.querySelectorAll('.fr-messages-toast-container .toast').forEach(function(t) {
+                                    t.classList.add('show');
+                                });
+                            ]]></xf:body>
+                        </xf:action>
+                        <xh:div class="toast-container position-fixed {$messages-position-classes} p-3 fr-messages-toast-container">
+                            <xh:div class="toast align-items-center text-bg-danger border-0 fade show" role="alert" aria-live="assertive" aria-atomic="true">
+                                <xh:div class="d-flex">
+                                    <xh:div class="toast-body">
+                                        <xf:output value="instance('fr-persistence-instance')/message" mediatype="text/html" class="fr-message-error"/>
+                                    </xh:div>
+                                    <xh:button type="button" class="btn-close btn-close-white me-2 m-auto" data-orbeon-bs-dismiss="toast" aria-label="{{xxf:r('buttons.close-message', '|fr-fr-resources|')}}" onclick="ORBEON.xforms.Document.dispatchEvent('fr-persistence-model', 'fr-clear-message');"/>
+                                </xh:div>
+                            </xh:div>
+                        </xh:div>
+                    </xf:case>
 
-        </xf:switch>
+                </xf:switch>
+            </xsl:when>
+            <xsl:otherwise>
+                <xf:switch
+                    class="fr-messages"
+                    model="fr-persistence-model"
+                    ref=".[instance('fr-persistence-instance')/message != '']"
+                    xh:aria-live="polite">
+
+                    <xf:case id="fr-message-none">
+                        <xh:span/>
+                    </xf:case>
+                    <xf:case id="fr-message-success">
+                        <xf:output value="instance('fr-persistence-instance')/message" mediatype="text/html" class="fr-message-success alert alert-success"/>
+                    </xf:case>
+                    <xf:case id="fr-message-error">
+                        <xf:output value="instance('fr-persistence-instance')/message" mediatype="text/html" class="fr-message-error alert alert-error"/>
+                    </xf:case>
+
+                </xf:switch>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template match="fr:template-buttons-bar" name="fr-buttons-bar">

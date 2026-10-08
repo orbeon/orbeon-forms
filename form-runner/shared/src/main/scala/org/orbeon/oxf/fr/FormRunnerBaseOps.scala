@@ -672,11 +672,22 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def isBackground(path: String, modeString: String): Boolean =
     isServicePath(path) && (modeString == "new" || modeString == "edit")
 
+  private def nextMessageSeq(): Unit =
+    for {
+      messageElem <- (persistenceInstance.rootElement / "message").headOption
+      att         <- messageElem.attOpt("seq")
+    } {
+      val nextSeq = (messageElem.attValueOpt("seq").flatMap(_.toIntOption).getOrElse(0) + 1).toString
+      setvalue(att, nextSeq)
+    }
+
   // Display a success message
   // TODO: support `dialog` appearance, for symmetry with `error-message`
   //@XPathFunction
   def successMessage(message: String): Unit = {
+    toggle("fr-message-none")
     setvalue(persistenceInstance.rootElement / "message", message)
+    nextMessageSeq()
     toggle("fr-message-success")
   }
 
@@ -692,7 +703,9 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
           properties = Map("message" -> Some(message), "message-is-html" -> Some("true"))
         )
       case MessageAppearance.Ephemeral =>
+        toggle("fr-message-none")
         setvalue(persistenceInstance.rootElement / "message", message)
+        nextMessageSeq()
         toggle("fr-message-error")
     }
 

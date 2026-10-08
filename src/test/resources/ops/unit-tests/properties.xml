@@ -88,6 +88,10 @@
         summary save-final review
     </property>
 
+    <!-- #6227: Messages appearance -->
+    <property as="xs:string"  name="oxf.fr.detail.messages.appearance.issue.6227-inline" value="inline"/>
+    <property as="xs:string"  name="oxf.fr.detail.messages.appearance.issue.6227-toast"  value="toast"/>
+
     <property as="xs:string"  name="oxf.fr.detail.button.save-final.visible.issue.6542">
         $my-field = ('show-enabled', 'show-disabled')
     </property>

@@ -50,6 +50,7 @@
         <!-- Other standard buttons -->
         <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Resumen</summary>
         <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Cerrar</close>
+        <close-message>Cerrar</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Limpiar</clear>
         <cancel>Cancelar</cancel>
         <save-locally>Guardar Localmente</save-locally>

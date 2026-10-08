@@ -47,6 +47,7 @@
         <!-- Other standard buttons -->
         <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; 一覧</summary>
         <close>&lt;i class="fa fa-fw fa-trash"&gt;&lt;/i&gt; 閉じる</close>
+        <close-message>閉じる</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; クリア</clear>
         <cancel>キャンセル</cancel>
         <save-locally>ローカルに保存</save-locally>

@@ -45,6 +45,7 @@
 
         <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; 摘要</summary>
         <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; 关闭</close>
+        <close-message>关闭</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; 清除</clear>
         <cancel>取消</cancel>
         <save-locally>本地保存</save-locally>

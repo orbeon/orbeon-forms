@@ -47,6 +47,7 @@
         <!-- Other standard buttons -->
         <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Sommaire</summary>
         <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Fermer</close>
+        <close-message>Fermer</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Effacer</clear>
         <cancel>Annuler</cancel>
         <save-locally>Enreg. Local</save-locally>

@@ -200,4 +200,64 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
       assert(filteredCookies.head.getName == "other-cookie")
     }
   }
+
+  describe("#6780: `StatelessHttpServletResponse`") {
+
+    def newMockResponse(): (HttpServletResponse, mutable.ListBuffer[(String, String)]) = {
+      val headers = mutable.ListBuffer[(String, String)]()
+      val mockResponse = new HttpServletResponseWrapper(mock[HttpServletResponse]) {
+        override def setHeader(name: String, value: String): Unit = headers += (name -> value)
+        override def addHeader(name: String, value: String): Unit = headers += (name -> value)
+      }
+      (mockResponse, headers)
+    }
+
+    it("must strip Set-Cookie header containing JSESSIONID") {
+      val (mockResponse, headers) = newMockResponse()
+      val statelessResponse = new StatelessHttpServletResponse(mockResponse)
+
+      statelessResponse.setHeader("Set-Cookie", "JSESSIONID=12345; Path=/; HttpOnly")
+      statelessResponse.addHeader("Set-Cookie", "jsessionid=67890; Path=/")
+      statelessResponse.addHeader("Set-Cookie2", "JSESSIONID=abcde; Version=1")
+
+      assert(headers.isEmpty)
+    }
+
+    it("must keep other response headers and other cookies") {
+      val (mockResponse, headers) = newMockResponse()
+      val statelessResponse = new StatelessHttpServletResponse(mockResponse)
+
+      statelessResponse.setHeader("Content-Type", "application/json")
+      statelessResponse.addHeader("Set-Cookie", "my-cookie=foo; Path=/")
+
+      assert(headers.toList == List(
+        "Content-Type" -> "application/json",
+        "Set-Cookie"   -> "my-cookie=foo; Path=/"
+      ))
+    }
+  }
+
+  describe("#6780: `FormRunnerAuthFilterImpl.amendResponse`") {
+
+    it("must wrap response with StatelessHttpServletResponse for service calls") {
+      val mockRequest = new HttpServletRequestWrapper(mock[HttpServletRequest]) {
+        override def getPathInfo: String = "/fr/service/acme"
+      }
+      val mockResponse = mock[HttpServletResponse]
+      val amendedResponse = FormRunnerAuthFilterImpl.amendResponse(mockRequest, mockResponse)
+
+      assert(amendedResponse.isInstanceOf[StatelessHttpServletResponse])
+    }
+
+    it("must not wrap response for non-service calls") {
+      val mockRequest = new HttpServletRequestWrapper(mock[HttpServletRequest]) {
+        override def getPathInfo: String = "/fr/acme/form/new"
+      }
+      val mockResponse = mock[HttpServletResponse]
+      val amendedResponse = FormRunnerAuthFilterImpl.amendResponse(mockRequest, mockResponse)
+
+      assert(! amendedResponse.isInstanceOf[StatelessHttpServletResponse])
+      assert(amendedResponse eq mockResponse)
+    }
+  }
 }

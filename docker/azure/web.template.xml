@@ -140,7 +140,7 @@
     <!--Exclude resources not produced by services-->
     <context-param>
         <param-name>oxf.orbeon-limiter-filter.exclude</param-name>
-        <param-value>(?!/([^/]+)/(?:service/|config/(?!theme/))).+\.(gif|css|pdf|js|map|png|jpg|xsd|ico|html|txt|svg|ttf|eot|woff|woff2)</param-value>
+        <param-value>(?!/(?:[^/]+/)?(?:service/|config/(?!theme/))).+\.(gif|css|pdf|js|map|png|jpg|xsd|ico|html|txt|svg|ttf|eot|woff|woff2)</param-value>
     </context-param>
     <!--Minimum, requested, and maximum number of concurrent threads allowed-->
     <!--The `x` prefix specifies a multiple of the number of CPU cores reported by the JVM-->

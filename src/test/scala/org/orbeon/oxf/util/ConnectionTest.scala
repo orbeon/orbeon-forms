@@ -14,6 +14,7 @@
 package org.orbeon.oxf.util
 
 import cats.syntax.option.*
+import org.apache.hc.client5.http.cookie.BasicCookieStore
 import org.mockito.Mockito
 import org.orbeon.connection.StreamedContent
 import org.orbeon.io.CharsetNames
@@ -234,6 +235,42 @@ class ConnectionTest
 
         assert(mustIncludeToken == firstItemIgnoreCase(headersCapitalized, Headers.OrbeonToken).isDefined)
       }
+    }
+  }
+
+  describe("#6780: `ConnectionState` HTTP state saving and loading") {
+
+    it("must not fail and must not save when there is no session") {
+      implicit val externalContext: ExternalContext = newMockExternalContext(OrbeonBaseUrl)
+      implicit val logger: IndentedLogger = ResourceManagerTestBase.newIndentedLogger
+
+      val cookieStore = new BasicCookieStore
+      Connection.ConnectionState.saveHttpState(cookieStore, ExternalContext.Scope.Session)
+      assert(Connection.ConnectionState.loadHttpState(ExternalContext.Scope.Session).isEmpty)
+    }
+
+    it("must save and load when there is a session") {
+      val session = new SimpleSession("test-session")
+      val incomingRequest = new RequestAdapter {
+        override def getSession(create: Boolean): ExternalContext.Session = session
+        override def incomingCookies: Iterable[(String, String)] = Nil
+        override def getAttributesMap: ju.Map[String, AnyRef] = new ju.HashMap
+        override val getHeaderValuesMap: ju.Map[String, Array[String]] = new ju.HashMap
+        override val getContextPath: String = OrbeonBaseUrl.getPath
+        override val servicePrefix: String = OrbeonBaseUrl.toString
+      }
+      val webAppContext = Mockito.mock(classOf[WebAppContext])
+      Mockito when webAppContext.attributes thenReturn collection.mutable.Map[String, AnyRef]()
+
+      implicit val externalContext: ExternalContext = Mockito.mock(classOf[ExternalContext])
+      Mockito when externalContext.getRequest thenReturn incomingRequest
+      Mockito when externalContext.getWebAppContext thenReturn webAppContext
+
+      implicit val logger: IndentedLogger = ResourceManagerTestBase.newIndentedLogger
+
+      val cookieStore = new BasicCookieStore
+      Connection.ConnectionState.saveHttpState(cookieStore, ExternalContext.Scope.Session)
+      assert(Connection.ConnectionState.loadHttpState(ExternalContext.Scope.Session).contains(cookieStore))
     }
   }
 }

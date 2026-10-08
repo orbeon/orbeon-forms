@@ -660,7 +660,7 @@ object Connection extends ConnectionTrait {
     }
   }
 
-  private object ConnectionState {
+  private[util] object ConnectionState {
 
     private val HttpStateProperty        = "oxf.http.state"
     private val HttpCookieStoreAttribute = "oxf.http.cookie-store"
@@ -691,10 +691,13 @@ object Connection extends ConnectionTrait {
       externalContext : ExternalContext
     ): Unit = {
 
-      stateAttributes(stateScope, createSession = true) foreach
-        (_._2.apply(HttpCookieStoreAttribute, cookieStore))
+      val cookieStoreOpt =
+        stateAttributes(stateScope, createSession = false).map { case (_, setAttribute) =>
+          setAttribute(HttpCookieStoreAttribute, cookieStore)
+          cookieStore
+        }
 
-      debugStore(cookieStore.some, stateScope, "saved HTTP state", "did not save HTTP state")
+      debugStore(cookieStoreOpt, stateScope, "saved HTTP state", "did not save HTTP state")
     }
 
     def stateScopeFromProperty: ExternalContext.Scope = {

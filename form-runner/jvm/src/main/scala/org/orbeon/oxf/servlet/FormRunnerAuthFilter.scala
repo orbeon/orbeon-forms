@@ -86,6 +86,18 @@ object FormRunnerAuthFilterImpl {
     // For service calls, do not create or use a session (#6780).
     val requestWithAmendedHeaders =
       if (isService) {
+        val getHttpHeaders = (name: String) => servletRequest.headerValuesList(name)
+        val credentialsOpt = FormRunnerAuth.fromHeaderValues(
+          credentialsOpt = servletRequest.headerFirstValueOpt(Headers.OrbeonCredentials),
+          usernameOpt    = servletRequest.headerFirstValueOpt(Headers.OrbeonUsername),
+          rolesList      = getHttpHeaders(Headers.OrbeonRoles),
+          groupOpt       = servletRequest.headerFirstValueOpt(Headers.OrbeonGroup),
+        )
+        CredentialsSupport.storeCredentialsInRequest(
+          servletRequest.setAttribute,
+          servletRequest.removeAttribute,
+          credentialsOpt
+        )
         new StatelessHttpServletRequest(servletRequest)
       } else {
         // Do not create a session for fonts, source maps, or OPTIONS requests

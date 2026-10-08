@@ -48,8 +48,12 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
     // Request with initial headers
     def newAmendedRequest(path: String, headers: Map[String, List[String]], session: HttpSession = newMockSession()): (HttpServletRequest, HttpSession) = {
 
+      val requestAttributes = mutable.Map[String, AnyRef]()
       val mockRequest =
         new HttpServletRequestWrapper(mock[HttpServletRequest]) {
+          override def getAttribute(name: String): AnyRef = requestAttributes.get(name).orNull
+          override def setAttribute(name: String, o: AnyRef): Unit = requestAttributes += (name -> o)
+          override def removeAttribute(name: String): Unit = requestAttributes -= name
           override def getHeader(name: String) = headers.get(name) map (_.head) orNull
           override def getHeaders(name: String) =
             (headers.get(name) map (_.iterator) getOrElse Iterator.empty).asJavaEnumeration
@@ -96,6 +100,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
 
       assert(testOrbeonHeaders == headersFromRequest(amendedRequest))
       assert(CredentialsSupport.findCredentialsInSession(new ServletSessionImpl(session)).isEmpty)
+      assert(CredentialsSupport.findCredentialsInRequest(amendedRequest.getAttribute(_)).contains(testCredentials))
       assert(amendedRequest.getSession(false) == null)
       assertThrows[IllegalStateException](amendedRequest.getSession(true))
       assert(amendedRequest.getRequestedSessionId == null)

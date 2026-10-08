@@ -673,7 +673,7 @@ object Connection extends ConnectionTrait {
     }
   }
 
-  private object ConnectionState {
+  private[util] object ConnectionState {
 
     private val HttpCookieStoreAttribute = "oxf.http.cookie-store"
 
@@ -693,14 +693,17 @@ object Connection extends ConnectionTrait {
     }
 
     def saveHttpState(cookieStore: CookieStore)(implicit
-      logger         : IndentedLogger,
+      logger        : IndentedLogger,
       safeRequestCtx: SafeRequestContext
     ): Unit = {
 
-      stateAttributes(createSession = true)
-        .foreach(_._2.apply(HttpCookieStoreAttribute, cookieStore))
+      val cookieStoreOpt =
+        stateAttributes(createSession = false).map { case (_, setAttribute) =>
+          setAttribute(HttpCookieStoreAttribute, cookieStore)
+          cookieStore
+        }
 
-      debugStore(cookieStore.some, "saved HTTP state", "did not save HTTP state")
+      debugStore(cookieStoreOpt, "saved HTTP state", "did not save HTTP state")
     }
 
     private def debugStore(

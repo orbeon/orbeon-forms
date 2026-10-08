@@ -189,7 +189,7 @@ object RelationalUtils extends Logging {
 
   private[relational] object Retry {
 
-    private val MaxAttempts  = 10
+    private val MaxAttempts  = 15
     private val InitialDelay = 20.millis
     private val MaxDelay     = 1.second
 

@@ -80,6 +80,8 @@ class PageFlowFilesRegexTest extends AnyFunSpecLike {
         "/logo.svg",
 
         // Config theme assets (allowed under config/theme/)
+        "/config/theme/theme.css",
+        "/config/theme/sub/theme.png",
         "/fr/config/theme/theme.css",
         "/fr/config/theme/sub/theme.png",
         "/my-app/config/theme/style.css",
@@ -113,6 +115,17 @@ class PageFlowFilesRegexTest extends AnyFunSpecLike {
 
     describe("does not match configuration assets outside `theme/`") {
       val configPaths = Seq(
+        "/config/form-runner-properties.xml",
+        "/config/properties.xml",
+        "/config/properties-local.xml",
+        "/config/properties-internal.xml",
+        "/config/properties-dev.xml",
+        "/config/properties-prod.xml",
+        "/config/test.json",
+        "/config/secret.txt",
+        "/config/schema.xsd",
+        "/config/image.png",
+        "/config/sub/nested.txt",
         "/fr/config/form-runner-properties.xml",
         "/fr/config/properties.xml",
         "/fr/config/properties-local.xml",

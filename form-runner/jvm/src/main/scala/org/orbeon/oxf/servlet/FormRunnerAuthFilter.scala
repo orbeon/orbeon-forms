@@ -74,11 +74,20 @@ object FormRunnerAuthFilterImpl {
 
   private val logger = LoggerFactory.getLogger("org.orbeon.filter.form-runner-auth")
 
+  def isService(servletRequest: HttpServletRequest): Boolean =
+    servletRequest.getRequestPathInfo.startsWith("/fr/service/")
+
+  def amendResponse(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse): HttpServletResponse =
+    if (isService(servletRequest))
+      new StatelessHttpServletResponse(servletResponse)
+    else
+      servletResponse
+
   def amendRequest(servletRequest: HttpServletRequest)(implicit propertySet: PropertySet): HttpServletRequest = {
 
     logger.debug(s"incoming headers:\n${servletRequest.headersAsStringForDebug}")
 
-    val isService = servletRequest.getRequestPathInfo.startsWith("/fr/service/")
+    val isService = this.isService(servletRequest)
 
     // The Form Runner service path is hardcoded but that's ok. When we are filtering a service, we don't retrieve the
     // credentials, which would be provided by the container or by incoming headers. Instead, credentials are provided

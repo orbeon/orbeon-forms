@@ -700,6 +700,7 @@
             <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Search Options</show-search-options>
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Search Options</close-search-options>
             <search-options>Search options</search-options>
+            <exact-match-hint>Exact match</exact-match-hint>
             <any>[Any]</any>
             <dates>
                 <item>

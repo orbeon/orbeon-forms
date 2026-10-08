@@ -697,6 +697,7 @@
             <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Arama Seçeneklerini Göster</show-search-options>
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Arama Seçeneklerini Gizle</close-search-options>
             <search-options>Arama seçenekleri</search-options>
+            <exact-match-hint>Exact match</exact-match-hint>
             <any>[Herhangi biri]</any>
             <dates>
                 <item>

@@ -699,6 +699,7 @@
             <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; 顯示搜索選項</show-search-options>
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; 隱藏搜索選項</close-search-options>
             <search-options>搜索選項</search-options>
+            <exact-match-hint>Exact match</exact-match-hint>
             <any>[任意]</any>
             <dates>
                 <item>

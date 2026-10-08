@@ -722,6 +722,7 @@
             <show-search-options>Mostrar opcions de cerca</show-search-options>
             <close-search-options>Tancar opcions de cerca</close-search-options>
             <search-options>Opcions de cerca</search-options>
+            <exact-match-hint>Exact match</exact-match-hint>
             <any>Qualsevol</any>
             <dates>
                 <item>

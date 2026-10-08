@@ -699,6 +699,7 @@
             <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostra opzioni</show-search-options>
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Chiudi opzioni</close-search-options>
             <search-options>Opzioni di ricerca</search-options>
+            <exact-match-hint>Exact match</exact-match-hint>
             <any>[Tutti]</any>
             <dates>
                 <item>

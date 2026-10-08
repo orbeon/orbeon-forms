@@ -699,6 +699,7 @@
             <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Näytä hakuvaihtoehdot</show-search-options>
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Sulje hakuvaihtoehdot</close-search-options>
             <search-options>Hakuvaihtoehdot</search-options>
+            <exact-match-hint>Exact match</exact-match-hint>
             <any>[mikä tahansa]</any>
             <dates>
                 <item>

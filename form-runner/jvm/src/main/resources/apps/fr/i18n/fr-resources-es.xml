@@ -736,6 +736,7 @@
             <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostrar opciones</show-search-options>
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cerrar opciones</close-search-options>
             <search-options>Buscar opciones</search-options>
+            <exact-match-hint>Exact match</exact-match-hint>
             <any>[Cualquiera]</any>
             <dates>
                 <item>

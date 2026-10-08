@@ -696,6 +696,7 @@
             <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Vis alternativer for søk</show-search-options>
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Lukk alternativer for søk</close-search-options>
             <search-options>Alternativer for søk</search-options>
+            <exact-match-hint>Exact match</exact-match-hint>
             <any>[Vilkårlig]</any>
             <dates>
                 <item>

@@ -704,6 +704,7 @@
             <show-search-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Montrer les options de recherche</show-search-options>
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cacher les options de recherche</close-search-options>
             <search-options>Options de recherche</search-options>
+            <exact-match-hint>Correspondance exacte</exact-match-hint>
             <any>[Tous]</any>
             <dates>
                 <item>

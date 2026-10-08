@@ -699,6 +699,7 @@
             <show-search-options>إظهار خيارات البحث</show-search-options>
             <close-search-options>إخفاء خيارات البحث</close-search-options>
             <search-options>خيارات البحث</search-options>
+            <exact-match-hint>Exact match</exact-match-hint>
             <any>[أي]</any>
             <dates>
                 <item>

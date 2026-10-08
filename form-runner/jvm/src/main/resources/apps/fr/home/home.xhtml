@@ -124,8 +124,8 @@
                 <xf:var name="fr-search-app-opt"        value="if (count($fr-search-app-tokens)  gt 1) then $fr-search-app-tokens[2]  else $fr-search-app-tokens[1]"/>
                 <xf:var name="fr-search-form-opt"       value="if (count($fr-search-form-tokens) gt 1) then $fr-search-form-tokens[2] else $fr-search-form-tokens[1]"/>
 
-                <xf:var name="fr-search-app-match"      value="(if (count($fr-search-app-tokens)  gt 1) then $fr-search-app-tokens [1][. = ('exact', 'substring')] else (), 'substring')"/>
-                <xf:var name="fr-search-form-match"     value="(if (count($fr-search-form-tokens) gt 1) then $fr-search-form-tokens[1][. = ('exact', 'substring')] else (), 'substring')"/>
+                <xf:var name="fr-search-app-match"      value="(if (count($fr-search-app-tokens)  gt 1) then $fr-search-app-tokens [1][. = ('exact', 'substring')] else (), 'exact')"/>
+                <xf:var name="fr-search-form-match"     value="(if (count($fr-search-form-tokens) gt 1) then $fr-search-form-tokens[1][. = ('exact', 'substring')] else (), 'exact')"/>
 
                 <xf:action if="instance()/request-parameters-loaded = 'false'">
 
@@ -156,6 +156,15 @@
 
                     <xf:action if="$show-search-options-because-property or $show-search-options-because-app-form-provided">
                         <xf:toggle case="fr-search-options-shown"/>
+
+                        <!-- Distinct values for search options (#7917) -->
+                        <xf:send submission="distinct-apps-submission"/>
+                        <xf:send submission="distinct-forms-all-submission"/>
+                        <xf:action if="instance()/search-options/local/application-name/@match = 'exact' and xxf:non-blank(instance()/search-options/local/application-name) and empty(instance('fr-distinct-forms-cache')/app[@name = instance()/search-options/local/application-name])">
+                            <xf:send submission="distinct-forms-submission">
+                                <xf:property name="app" value="string(instance()/search-options/local/application-name)" xxf:tunnel="true"/>
+                            </xf:send>
+                        </xf:action>
                     </xf:action>
 
                     <xf:setvalue ref="instance()/request-parameters-loaded" value="'true'"/>
@@ -246,8 +255,8 @@
                             <last-modified-after/>
                             <last-modified-before/>
                             <last-modified-by/>
-                            <application-name match="substring"/>
-                            <form-name match="substring"/>
+                            <application-name match="exact"/>
+                            <form-name match="exact"/>
                             <form-version/>
                             <title/>
                         </local>
@@ -382,8 +391,8 @@
             <xf:instance id="fr-metadata-queries">
                 <_>
                     <local>
-                        <filter metadata="application-name" match="substring"/>
-                        <filter metadata="form-name"        match="substring"/>
+                        <filter metadata="application-name" match="exact"/>
+                        <filter metadata="form-name"        match="exact"/>
                         <filter metadata="form-version"     match="exact"/>
                         <filter metadata="created"          match="gte"/>
                         <filter metadata="created"          match="lt"/>
@@ -425,9 +434,10 @@
             <xf:bind ref="instance('fr-metadata')/form/remote-server/created"            type="xs:dateTime"/>
             <xf:bind ref="instance('fr-metadata')/form/remote-server/last-modified-time" type="xs:dateTime"/>
 
-            <!-- Distinct values for export/purge dialog (#6573) -->
+            <!-- Distinct values for export/purge dialog (#6573) and search options (#7917) -->
             <xf:instance id="fr-distinct-apps" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
             <xf:instance id="fr-distinct-forms-cache" xxf:exclude-result-prefixes="#all"><forms/></xf:instance>
+            <xf:instance id="fr-distinct-forms-all" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
             <xf:instance id="fr-distinct-versions-cache" xxf:exclude-result-prefixes="#all"><versions/></xf:instance>
             <xf:instance id="fr-distinct-forms-response" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
             <xf:instance id="fr-distinct-versions-response" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
@@ -626,6 +636,15 @@
                         origin="xf:element('app', (xf:attribute('name', event('app')), instance('fr-distinct-forms-response')/*))"/>
                 </xf:action>
             </xf:submission>
+
+            <xf:submission
+                id="distinct-forms-all-submission"
+                resource="/fr/service/persistence/distinct-forms"
+                method="get"
+                serialization="none"
+                mediatype="application/xml"
+                replace="instance"
+                targetref="instance('fr-distinct-forms-all')"/>
 
             <xf:submission
                 id="distinct-versions-submission"
@@ -830,6 +849,9 @@
                 </xf:action>
 
                 <!-- Update the view -->
+                <xf:send submission="distinct-apps-submission"/>
+                <xf:send submission="distinct-forms-all-submission"/>
+                <xf:delete ref="instance('fr-distinct-forms-cache')/*"/>
                 <xf:dispatch name="fr-initialize" targetid="fr-form-model"/>
 
             </xf:action>
@@ -937,7 +959,7 @@
 
             </xf:submission>
 
-            <xf:action event="xforms-submit-error" observer="read-form publish-submission delete-submission">
+            <xf:action event="xforms-submit-error" observer="read-form publish-submission delete-submission distinct-apps-submission distinct-forms-submission distinct-forms-all-submission distinct-versions-submission">
 
                 <xf:setvalue
                     ref="error"
@@ -1004,8 +1026,10 @@
                                 last-modified-after-local  last-modified-after-remote
                                 last-modified-before-local last-modified-before-remote
                                 form-version-select
+                                application-name-select    form-name-select
                                 fr-application-name-match  fr-form-name-match
                             "
+                            if="instance('fr-form-instance')/request-parameters-loaded = 'true'"
                             name="fr-initialize"
                             targetid="fr-form-model">
 
@@ -1379,6 +1403,12 @@
 
                                         <xf:action if="case('fr-search-options-switch') = 'fr-search-options-shown'">
                                             <xf:setfocus control="fr-search-options-switch"/>
+                                            <xf:action if="empty(instance('fr-distinct-apps')/*)">
+                                                <xf:send submission="distinct-apps-submission"/>
+                                            </xf:action>
+                                            <xf:action if="empty(instance('fr-distinct-forms-all')/*)">
+                                                <xf:send submission="distinct-forms-all-submission"/>
+                                            </xf:action>
                                         </xf:action>
                                     </xf:action>
                                 </xf:trigger>
@@ -1516,22 +1546,93 @@
                                         <xh:fieldset class="fr-search-options">
                                             <xh:legend><xf:output ref="$fr-resources/home/titles/form-identification"/></xh:legend>
 
+                                            <xf:var name="current-app-name"  value="$search-options/local/application-name"/>
+                                            <xf:var name="current-form-name" value="$search-options/local/form-name"/>
+
+                                            <xf:var
+                                                name="applications"
+                                                value="
+                                                    if ($current-form-name/@match = 'exact' and xxf:non-blank($current-form-name) and (empty($current-app-name) or $current-app-name = '')) then
+                                                        xxf:sort(distinct-values((
+                                                            instance('fr-metadata')/form[form-name = $current-form-name]/application-name,
+                                                            instance('fr-distinct-forms-cache')/app[* = $current-form-name]/@name
+                                                        )), ., 'text')
+                                                    else
+                                                        instance('fr-distinct-apps')/*"/>
+
+                                            <xf:var
+                                                name="forms"
+                                                value="
+                                                    if ($current-app-name/@match = 'exact' and xxf:non-blank($current-app-name)) then
+                                                        instance('fr-distinct-forms-cache')/app[@name = $current-app-name]/*
+                                                    else
+                                                        instance('fr-distinct-forms-all')/*"/>
+
                                             <xf:group ref="$search-options/local/application-name" class="fr-search-item fr-application-name">
-                                                <xf:input ref=".">
+                                                <xf:select1 id="application-name-select" ref=".[@match = 'exact']" appearance="search" disable-placeholder="true">
+                                                    <xf:label mediatype="text/html" value="$fr-resources/home-summary/titles/application-name"/>
+                                                    <xf:item>
+                                                        <xf:label ref="$fr-resources/home/export-purge/all-applications"/>
+                                                        <xf:value/>
+                                                    </xf:item>
+                                                    <xf:itemset ref="$applications">
+                                                        <xf:label ref="."/>
+                                                        <xf:value ref="."/>
+                                                    </xf:itemset>
+                                                </xf:select1>
+                                                <xf:input ref=".[not(@match = 'exact')]">
                                                     <xf:label mediatype="text/html" value="$fr-resources/home-summary/titles/application-name"/>
                                                 </xf:input>
                                                 <fr:checkbox-input ref="@match" selected-value="exact" deselected-value="substring" class="xforms-enable-hint-as-tooltip" id="fr-application-name-match">
                                                     <xf:hint appearance="minimal" ref="$fr-resources/home-summary/search/exact-match-hint"/>
                                                 </fr:checkbox-input>
+
+                                                <xf:action event="xforms-value-changed" if="$current-app-name/@match = 'exact' and xxf:non-blank($current-app-name)">
+                                                    <xf:action if="exists(instance('fr-distinct-apps')/*) and not($current-app-name = instance('fr-distinct-apps')/*)">
+                                                        <xf:setvalue ref="$current-app-name"/>
+                                                    </xf:action>
+                                                    <xf:action if="xxf:non-blank($current-app-name) and empty(instance('fr-distinct-forms-cache')/app[@name = $current-app-name])">
+                                                        <xf:send submission="distinct-forms-submission">
+                                                            <xf:property name="app" value="string($current-app-name)" xxf:tunnel="true"/>
+                                                        </xf:send>
+                                                    </xf:action>
+                                                    <xf:action if="xxf:non-blank($current-app-name) and $current-form-name/@match = 'exact' and xxf:non-blank($current-form-name) and not($current-form-name = instance('fr-distinct-forms-cache')/app[@name = $current-app-name]/*)">
+                                                        <xf:setvalue ref="$current-form-name"/>
+                                                    </xf:action>
+                                                </xf:action>
                                             </xf:group>
 
                                             <xf:group ref="$search-options/local/form-name" class="fr-search-item fr-form-name">
-                                                <xf:input ref=".">
+                                                <xf:select1 id="form-name-select" ref=".[@match = 'exact']" appearance="search" disable-placeholder="true">
+                                                    <xf:label mediatype="text/html" value="$fr-resources/home-summary/titles/form-name"/>
+                                                    <xf:item>
+                                                        <xf:label ref="$fr-resources/home/export-purge/all-forms"/>
+                                                        <xf:value/>
+                                                    </xf:item>
+                                                    <xf:itemset ref="$forms">
+                                                        <xf:label ref="."/>
+                                                        <xf:value ref="."/>
+                                                    </xf:itemset>
+                                                </xf:select1>
+                                                <xf:input ref=".[not(@match = 'exact')]">
                                                     <xf:label mediatype="text/html" value="$fr-resources/home-summary/titles/form-name"/>
                                                 </xf:input>
                                                 <fr:checkbox-input ref="@match" selected-value="exact" deselected-value="substring" class="xforms-enable-hint-as-tooltip" id="fr-form-name-match">
                                                     <xf:hint appearance="minimal" ref="$fr-resources/home-summary/search/exact-match-hint"/>
                                                 </fr:checkbox-input>
+
+                                                <xf:action event="xforms-value-changed" if="$current-form-name/@match = 'exact' and xxf:non-blank($current-form-name)">
+                                                    <xf:var
+                                                        name="valid-forms"
+                                                        value="
+                                                            if ($current-app-name/@match = 'exact' and xxf:non-blank($current-app-name)) then
+                                                                instance('fr-distinct-forms-cache')/app[@name = $current-app-name]/*
+                                                            else
+                                                                instance('fr-distinct-forms-all')/*"/>
+                                                    <xf:action if="exists($valid-forms) and not($current-form-name = $valid-forms)">
+                                                        <xf:setvalue ref="$current-form-name"/>
+                                                    </xf:action>
+                                                </xf:action>
                                             </xf:group>
 
                                             <xf:group ref="$search-options/local/form-version" class="fr-search-item">

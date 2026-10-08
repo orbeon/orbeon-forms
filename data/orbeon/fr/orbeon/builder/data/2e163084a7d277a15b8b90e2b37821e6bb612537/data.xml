@@ -1,0 +1,189 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:math="http://www.w3.org/2005/xpath-functions/math">
+    <xh:head>
+        <xf:model xxf:custom-mips="fr:persist" id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-step1>
+                        <grid-1><step1a_first_name_mi></step1a_first_name_mi><step1a_last_name></step1a_last_name><step1b_ssn></step1b_ssn><step1b_ssn_explanation></step1b_ssn_explanation><step1a_street_address></step1a_street_address><step1a_city></step1a_city><step1a_state></step1a_state><step1a_zip></step1a_zip><step1a_city_state_zip></step1a_city_state_zip><step1c_status></step1c_status></grid-1>
+
+                    <section-exemption><grid-5><exemption_claimed>false</exemption_claimed></grid-5></section-exemption></section-step1><section-step2><grid-2><step2_applies>false</step2_applies><step2c_two_jobs_total>false</step2c_two_jobs_total></grid-2></section-step2><section-step3><grid-3><step3_qualifying_children_count></step3_qualifying_children_count><step3_qualifying_children_amount></step3_qualifying_children_amount><step3_other_dependents_count></step3_other_dependents_count><step3_other_dependents_amount></step3_other_dependents_amount><step3_total_credits></step3_total_credits></grid-3></section-step3><section-step4><grid-4><step4a_other_income></step4a_other_income><step4b_deductions></step4b_deductions><step4c_extra_withholding></step4c_extra_withholding></grid-4></section-step4><section-step5><grid-6><signature></signature><signature_date></signature_date></grid-6></section-step5><section-employers><grid-7><employer_name_and_address></employer_name_and_address><employer_first_date_of_employment></employer_first_date_of_employment><employer_ein></employer_ein></grid-7></section-employers>
+                </form>
+            </xf:instance>
+
+            
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-step1-bind" name="section-step1" ref="section-step1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1"><xf:bind id="step1a_first_name_mi-bind" ref="step1a_first_name_mi" name="step1a_first_name_mi" xxf:whitespace="trim" required="true()"></xf:bind><xf:bind id="step1a_last_name-bind" ref="step1a_last_name" name="step1a_last_name" xxf:whitespace="trim" required="true()"></xf:bind><xf:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="step1b_ssn-bind" ref="step1b_ssn" name="step1b_ssn" type="fr:us-ssn" required="true()" xxf:default="'078-05-1120'"></xf:bind><xf:bind id="step1a_street_address-bind" ref="step1a_street_address" name="step1a_street_address" xxf:whitespace="trim"></xf:bind><xf:bind id="step1a_city-bind" ref="step1a_city" name="step1a_city" xxf:whitespace="trim"></xf:bind><xf:bind id="step1a_state-bind" ref="step1a_state" name="step1a_state" xxf:whitespace="trim"></xf:bind><xf:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="step1a_zip-bind" ref="step1a_zip" name="step1a_zip" xxf:whitespace="trim" constraint="not(normalize-space()) or matches(normalize-space(), '^\d{5}(-\d{4})?$')"></xf:bind><xf:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="step1a_city_state_zip-bind" ref="step1a_city_state_zip" name="step1a_city_state_zip" xxf:whitespace="trim" calculate="concat($step1a_city, (if (normalize-space($step1a_city) != '' and (normalize-space($step1a_state) != '' or normalize-space($step1a_zip) != '')) then ', ' else ''), $step1a_state, (if (normalize-space($step1a_state) != '' and normalize-space($step1a_zip) != '') then ' ' else ''), $step1a_zip)" readonly="true()"></xf:bind><xf:bind id="step1c_status-bind" ref="step1c_status" name="step1c_status" required="true()"></xf:bind><xf:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="step1b_ssn_explanation-bind" ref="step1b_ssn_explanation" name="step1b_ssn_explanation" fr:persist="false()"></xf:bind></xf:bind>
+
+                <xf:bind id="section-exemption-bind" ref="section-exemption" name="section-exemption"><xf:bind id="grid-5-bind" ref="grid-5" name="grid-5"><xf:bind id="exemption_claimed-bind" ref="exemption_claimed" name="exemption_claimed" type="xf:boolean"></xf:bind></xf:bind></xf:bind></xf:bind><xf:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="section-step2-bind" ref="section-step2" name="section-step2" relevant="$exemption_claimed != true()"><xf:bind id="grid-2-bind" ref="grid-2" name="grid-2"><xf:bind id="step2_applies-bind" ref="step2_applies" name="step2_applies" type="xf:boolean"></xf:bind><xf:bind id="step2c_two_jobs_total-bind" ref="step2c_two_jobs_total" name="step2c_two_jobs_total" type="xf:boolean" relevant="$step2_applies = true()"></xf:bind></xf:bind></xf:bind><xf:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="section-step3-bind" ref="section-step3" name="section-step3" relevant="$exemption_claimed != true()"><xf:bind id="grid-3-bind" ref="grid-3" name="grid-3"><xf:bind id="step3_qualifying_children_count-bind" ref="step3_qualifying_children_count" name="step3_qualifying_children_count" type="xf:integer" constraint="empty(.) or xs:integer(.) ge 0"></xf:bind><xf:bind id="step3_qualifying_children_amount-bind" ref="step3_qualifying_children_amount" name="step3_qualifying_children_amount" type="xf:decimal" constraint="xxf:fraction-digits(2)" readonly="true()" calculate="if ($step3_qualifying_children_count castable as xs:integer and xs:integer($step3_qualifying_children_count) gt 0) then xs:integer($step3_qualifying_children_count) * 2200 else 0"></xf:bind><xf:bind id="step3_other_dependents_count-bind" ref="step3_other_dependents_count" name="step3_other_dependents_count" type="xf:integer" constraint="empty(.) or xs:integer(.) ge 0"></xf:bind><xf:bind id="step3_other_dependents_amount-bind" ref="step3_other_dependents_amount" name="step3_other_dependents_amount" type="xf:decimal" constraint="xxf:fraction-digits(2)" readonly="true()" calculate="if ($step3_other_dependents_count castable as xs:integer and xs:integer($step3_other_dependents_count) gt 0) then xs:integer($step3_other_dependents_count) * 500 else 0"></xf:bind><xf:bind id="step3_total_credits-bind" ref="step3_total_credits" name="step3_total_credits" type="xf:decimal" constraint="xxf:fraction-digits(2)" readonly="true()" calculate="(if ($step3_qualifying_children_amount castable as xs:decimal) then xs:decimal($step3_qualifying_children_amount) else 0) + (if ($step3_other_dependents_amount castable as xs:decimal) then xs:decimal($step3_other_dependents_amount) else 0)"></xf:bind></xf:bind></xf:bind><xf:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="section-step4-bind" ref="section-step4" name="section-step4" relevant="$exemption_claimed != true()"><xf:bind id="grid-4-bind" ref="grid-4" name="grid-4"><xf:bind id="step4a_other_income-bind" ref="step4a_other_income" name="step4a_other_income" type="xf:decimal" constraint="empty(.) or xs:decimal(.) ge 0"></xf:bind><xf:bind id="step4b_deductions-bind" ref="step4b_deductions" name="step4b_deductions" type="xf:decimal" constraint="empty(.) or xs:decimal(.) ge 0"></xf:bind><xf:bind id="step4c_extra_withholding-bind" ref="step4c_extra_withholding" name="step4c_extra_withholding" type="xf:decimal" constraint="empty(.) or xs:decimal(.) ge 0"></xf:bind></xf:bind></xf:bind><xf:bind id="section-step5-bind" ref="section-step5" name="section-step5"><xf:bind id="grid-6-bind" ref="grid-6" name="grid-6"><xf:bind id="signature-bind" ref="signature" name="signature" type="xf:anyURI" required="true()"></xf:bind><xf:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="signature_date-bind" ref="signature_date" name="signature_date" type="xf:date" required="true()" xxf:default="current-date()"></xf:bind></xf:bind></xf:bind><xf:bind id="section-employers-bind" ref="section-employers" name="section-employers"><xf:bind id="grid-7-bind" ref="grid-7" name="grid-7"><xf:bind id="employer_name_and_address-bind" ref="employer_name_and_address" name="employer_name_and_address"></xf:bind><xf:bind id="employer_first_date_of_employment-bind" ref="employer_first_date_of_employment" name="employer_first_date_of_employment" type="xf:date"></xf:bind><xf:bind id="employer_ein-bind" ref="employer_ein" name="employer_ein" xxf:whitespace="trim"></xf:bind></xf:bind></xf:bind>
+            </xf:bind>
+
+            
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>orbeon</application-name>
+                    <form-name>w4</form-name>
+                    <title xml:lang="en">Orbeon Demo: Employee's Withholding Certificate</title>
+                    <description xml:lang="en">Use this form to tell your employer how much federal income tax to withhold from your pay.</description>
+                    
+                    <library-versions>
+                        <_>1</_>
+                    </library-versions>
+                    <created-with-version>2026.1-SNAPSHOT PE</created-with-version><updated-with-version>2026.1-SNAPSHOT PE</updated-with-version>
+                <email><templates><template name="default"><headers></headers><exclude-from-all-control-values></exclude-from-all-control-values></template></templates><parameters></parameters></email></metadata>
+            </xf:instance>
+
+            
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments><pdf name="fw4" lang="" filename="fw4.pdf" mediatype="application/pdf" size="480816">/fr/service/persistence/crud/orbeon/builder/data/2e163084a7d277a15b8b90e2b37821e6bb612537/8cbeb58362b7bc1e8669733f79ce39f87d7c616f.bin</pdf></attachments>
+            </xf:instance>
+
+            
+            <xf:instance xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en"><employer_name_and_address><label>Employer's name and address</label><hint></hint></employer_name_and_address><employer_first_date_of_employment><label>First date of employment</label><hint></hint></employer_first_date_of_employment><employer_ein><label>Employer identification number (EIN)</label><hint></hint></employer_ein><signature><label>Employee’s signature (This form is not valid unless you sign it.)</label><hint></hint></signature><signature_date><label>Date</label><hint></hint></signature_date><exemption_claimed><label>I claim exemption from withholding for 2026, and I certify that I meet both of the conditions for exemption for 2026.</label><hint></hint></exemption_claimed><step4a_other_income><label>4(a) Other income (not from jobs)</label><hint></hint><alert>Amount cannot be negative</alert></step4a_other_income><step4b_deductions><label>4(b) Deductions</label><hint></hint><alert>Amount cannot be negative</alert></step4b_deductions><step4c_extra_withholding><label>4(c) Extra withholding</label><hint></hint><alert>Amount cannot be negative</alert></step4c_extra_withholding><step3_qualifying_children_amount><label>Step 3(a): Qualifying children credit ($2,200 each)</label><hint>Calculated automatically</hint></step3_qualifying_children_amount><step3_other_dependents_amount><label>Step 3(b): Other dependents credit ($500 each)</label><hint>Calculated automatically</hint></step3_other_dependents_amount><step3_total_credits><label>Step 3 Total: Total dependent credits</label><hint>Calculated automatically: Step 3(a) + Step 3(b)</hint></step3_total_credits><step2c_two_jobs_total><label>Step 2(c): If there are only two jobs total, you may check this box. Do the same on Form W-4 for the other job.</label><hint></hint></step2c_two_jobs_total><step1a_first_name_mi><label>First name and middle initial</label><hint></hint></step1a_first_name_mi><step1a_last_name><label>Last name</label><hint></hint></step1a_last_name><step1b_ssn><label>Social security number</label><hint></hint></step1b_ssn><step1b_ssn_explanation><text>&lt;div&gt;
+&lt;div&gt;&lt;em&gt;This is a demo form. Please do &lt;strong&gt;not&lt;/strong&gt; enter an actual personal SSN in this form. Using the &lt;a href="https://www.ssa.gov/history/ssn/misused.html" target="_blank" rel="noopener"&gt;demo number&lt;/a&gt; "078-05-1120" is ok!&lt;/em&gt;&lt;/div&gt;
+&lt;/div&gt;</text></step1b_ssn_explanation><step1a_street_address><label>Address</label><hint>Number, street, and apt. or suite no.</hint></step1a_street_address><step1a_city><label>City or town</label><hint></hint></step1a_city><step1c_status><label>Step 1(c): Filing status</label><hint></hint><item>
+            <label>Single or Married filing separately</label>
+            <hint></hint>
+            <value>single</value>
+          </item><item>
+            <label>Married filing jointly or Qualifying surviving spouse</label>
+            <hint></hint>
+            <value>married_jointly</value>
+          </item><item>
+            <label>Head of household</label>
+            <hint>Check only if you’re unmarried and pay more than half the costs of keeping up a home for yourself and a qualifying individual.</hint>
+            <value>head_of_household</value>
+          </item></step1c_status>
+                        <section-step1>
+                            <label>Step 1: Enter Personal Information</label>
+                        </section-step1><section-step2><label>Step 2: Multiple Jobs or Spouse Works</label><help>Complete this step if you (1) hold more than one job at a time, or (2) are married filing jointly and your spouse also works. The correct amount of withholding depends on income earned from all of these jobs. For the most accurate withholding, use the estimator at https://www.irs.gov/W4App.</help></section-step2><section-step3><label>Step 3: Claim Dependent and Other Credits</label><help>Complete Step 3 if your total income will be $200,000 or less ($400,000 or less if married filing jointly). Enter the count of qualifying children and dependents to automatically calculate your credits.</help></section-step3><section-step4><label>Step 4: Other Adjustments (optional)</label><help>Optional adjustments. You may also use the online IRS estimator at https://www.irs.gov/W4App.</help></section-step4><section-exemption><label>Exemption from Withholding</label><help></help></section-exemption><section-step5><label>Step 5: Sign Here</label><help></help></section-step5><section-employers><label>Employers Only</label><help>This section is for employer use only. If you are completing this Form W-4 as an employee, you do not need to fill out this section.</help></section-employers>
+
+                    <step1a_state><label>State</label><hint>2-letter abbreviation (e.g. CA)</hint></step1a_state><step1a_zip><label>ZIP code</label><hint>e.g. 94103</hint><alert>Please enter a valid 5-digit ZIP code (e.g. 12345 or 12345-6789)</alert></step1a_zip><step1a_city_state_zip><label>City, state, and ZIP (as formatted for Form W-4)</label><hint>Calculated automatically from City, State, and ZIP above</hint></step1a_city_state_zip><step2_applies><label>Do you hold more than one job at a time, or are you married filing jointly and your spouse also works?</label><hint></hint><item><label>Yes, multiple jobs or working spouse</label><value>true</value></item><item><label>No, only one job in household</label><value>false</value></item></step2_applies><step3_qualifying_children_count><label>Number of qualifying children under age 17</label><hint>Multiply by $2,200</hint><alert>Please enter a non-negative whole number</alert></step3_qualifying_children_count><step3_other_dependents_count><label>Number of other dependents</label><hint>Multiply by $500</hint><alert>Please enter a non-negative whole number</alert></step3_other_dependents_count></resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-step1-section" bind="section-step1-bind"><xf:label ref="$form-resources/section-step1/label"></xf:label>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind"><fr:c x="1" y="1" w="4"><xf:input id="step1a_first_name_mi-control" bind="step1a_first_name_mi-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].Step1a[0].step1a_first_name_mi">
+                        <xf:label ref="$form-resources/step1a_first_name_mi/label"></xf:label>
+                        <xf:hint ref="$form-resources/step1a_first_name_mi/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </xf:input>
+
+                            </fr:c><fr:c x="5" y="1" w="4"><xf:input id="step1a_last_name-control" bind="step1a_last_name-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].Step1a[0].step1a_last_name">
+                        <xf:label ref="$form-resources/step1a_last_name/label"></xf:label>
+                        <xf:hint ref="$form-resources/step1a_last_name/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </xf:input></fr:c><fr:c x="9" y="1" w="4"><fr:us-ssn id="step1b_ssn-control" bind="step1b_ssn-bind" class="" fr:pdf-template-field-name="topmostSubform[0].Page1[0].step1b_ssn"><fr:encrypt></fr:encrypt>
+                        <xf:label ref="$form-resources/step1b_ssn/label"></xf:label>
+                        <xf:hint ref="$form-resources/step1b_ssn/hint"></xf:hint><xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                        
+                        
+                    </fr:us-ssn></fr:c><fr:c x="1" y="2" w="12"><fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="step1b_ssn_explanation-control" bind="step1b_ssn_explanation-bind">
+                        <fr:text ref="$form-resources/step1b_ssn_explanation/text" mediatype="text/html"></fr:text>
+                    </fr:explanation></fr:c><fr:c x="1" y="3" w="12"><xf:input id="step1a_street_address-control" bind="step1a_street_address-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].Step1a[0].step1a_street_address">
+                        <xf:label ref="$form-resources/step1a_street_address/label"></xf:label>
+                        <xf:hint ref="$form-resources/step1a_street_address/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </xf:input></fr:c><fr:c x="1" y="4" w="5"><xf:input id="step1a_city-control" bind="step1a_city-bind"><xf:label ref="$form-resources/step1a_city/label"></xf:label><xf:hint ref="$form-resources/step1a_city/hint"></xf:hint><xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert></xf:input></fr:c><fr:c x="6" y="4" w="3" h="1"><xf:input id="step1a_state-control" bind="step1a_state-bind"><xf:label ref="$form-resources/step1a_state/label"></xf:label><xf:hint ref="$form-resources/step1a_state/hint"></xf:hint><xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert></xf:input></fr:c><fr:c x="9" y="4" w="4" h="1"><xf:input id="step1a_zip-control" bind="step1a_zip-bind"><xf:label ref="$form-resources/step1a_zip/label"></xf:label><xf:hint ref="$form-resources/step1a_zip/hint"></xf:hint><xf:alert ref="$form-resources/step1a_zip/alert"></xf:alert></xf:input></fr:c><fr:c x="1" y="5" w="12"><xf:input id="step1a_city_state_zip-control" bind="step1a_city_state_zip-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].Step1a[0].step1a_city_state_zip">
+                        <xf:label ref="$form-resources/step1a_city_state_zip/label"></xf:label>
+                        <xf:hint ref="$form-resources/step1a_city_state_zip/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </xf:input></fr:c><fr:c x="1" y="6" w="12"><xf:select1 id="step1c_status-control" appearance="full" bind="step1c_status-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].step1c_status">
+                        <xf:label ref="$form-resources/step1c_status/label"></xf:label>
+                        <xf:hint ref="$form-resources/step1c_status/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                        <xf:itemset ref="$form-resources/step1c_status/item">
+                            <xf:label ref="label"></xf:label>
+                            <xf:value ref="value"></xf:value>
+                            <xf:hint ref="hint"></xf:hint>
+                        </xf:itemset>
+                    </xf:select1></fr:c></fr:grid><fr:section id="section-exemption-section" bind="section-exemption-bind"><xf:label ref="$form-resources/section-exemption/label"></xf:label><fr:grid id="grid-5-grid" bind="grid-5-bind">
+              <fr:c x="1" y="1" w="12"><fr:checkbox-input id="exemption_claimed-control" bind="exemption_claimed-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].exemption_claimed">
+                        <xf:label ref="$form-resources/exemption_claimed/label"></xf:label>
+                        <xf:hint ref="$form-resources/exemption_claimed/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </fr:checkbox-input></fr:c>
+            </fr:grid></fr:section></fr:section><fr:section id="section-step2-section" bind="section-step2-bind"><xf:label ref="$form-resources/section-step2/label"></xf:label><fr:grid id="grid-2-grid" bind="grid-2-bind"><fr:c x="1" y="1" w="12"><xf:select1 id="step2_applies-control" bind="step2_applies-bind" appearance="full"><xf:label ref="$form-resources/step2_applies/label"></xf:label><xf:hint ref="$form-resources/step2_applies/hint"></xf:hint><xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert><xf:itemset ref="$form-resources/step2_applies/item"><xf:label ref="label"></xf:label><xf:value ref="value"></xf:value></xf:itemset></xf:select1></fr:c><fr:c x="1" y="2" w="12"><fr:checkbox-input id="step2c_two_jobs_total-control" bind="step2c_two_jobs_total-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].step2c_two_jobs_total">
+                        <xf:label ref="$form-resources/step2c_two_jobs_total/label"></xf:label>
+                        <xf:hint ref="$form-resources/step2c_two_jobs_total/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </fr:checkbox-input></fr:c></fr:grid></fr:section><fr:section id="section-step3-section" bind="section-step3-bind"><xf:label ref="$form-resources/section-step3/label"></xf:label><fr:grid id="grid-3-grid" bind="grid-3-bind"><fr:c x="1" y="1" w="6"><xf:input id="step3_qualifying_children_count-control" bind="step3_qualifying_children_count-bind"><xf:label ref="$form-resources/step3_qualifying_children_count/label"></xf:label><xf:hint ref="$form-resources/step3_qualifying_children_count/hint"></xf:hint><xf:alert ref="$form-resources/step3_qualifying_children_count/alert"></xf:alert></xf:input></fr:c><fr:c x="7" y="1" w="6"><fr:currency id="step3_qualifying_children_amount-control" bind="step3_qualifying_children_amount-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].Step3_ReadOrder[0].step3_qualifying_children_amount">
+                        <xf:label ref="$form-resources/step3_qualifying_children_amount/label"></xf:label>
+                        <xf:hint ref="$form-resources/step3_qualifying_children_amount/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </fr:currency></fr:c><fr:c x="1" y="2" w="6"><xf:input id="step3_other_dependents_count-control" bind="step3_other_dependents_count-bind"><xf:label ref="$form-resources/step3_other_dependents_count/label"></xf:label><xf:hint ref="$form-resources/step3_other_dependents_count/hint"></xf:hint><xf:alert ref="$form-resources/step3_other_dependents_count/alert"></xf:alert></xf:input></fr:c><fr:c x="7" y="2" w="6"><fr:currency id="step3_other_dependents_amount-control" bind="step3_other_dependents_amount-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].Step3_ReadOrder[0].step3_other_dependents_amount">
+                        <xf:label ref="$form-resources/step3_other_dependents_amount/label"></xf:label>
+                        <xf:hint ref="$form-resources/step3_other_dependents_amount/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </fr:currency></fr:c><fr:c x="1" y="3" w="6"></fr:c><fr:c x="7" y="3" w="6"><fr:currency id="step3_total_credits-control" bind="step3_total_credits-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].step3_total_credits">
+                        <xf:label ref="$form-resources/step3_total_credits/label"></xf:label>
+                        <xf:hint ref="$form-resources/step3_total_credits/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </fr:currency></fr:c></fr:grid></fr:section><fr:section id="section-step4-section" bind="section-step4-bind"><xf:label ref="$form-resources/section-step4/label"></xf:label><fr:grid id="grid-4-grid" bind="grid-4-bind">
+              <fr:c x="1" y="1" w="4"><fr:currency id="step4a_other_income-control" bind="step4a_other_income-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].step4a_other_income">
+                        <xf:label ref="$form-resources/step4a_other_income/label"></xf:label>
+                        <xf:hint ref="$form-resources/step4a_other_income/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </fr:currency></fr:c><fr:c x="5" y="1" w="4"><fr:currency id="step4b_deductions-control" bind="step4b_deductions-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].step4b_deductions">
+                        <xf:label ref="$form-resources/step4b_deductions/label"></xf:label>
+                        <xf:hint ref="$form-resources/step4b_deductions/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </fr:currency></fr:c><fr:c x="9" y="1" w="4"><fr:currency id="step4c_extra_withholding-control" bind="step4c_extra_withholding-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].step4c_extra_withholding">
+                        <xf:label ref="$form-resources/step4c_extra_withholding/label"></xf:label>
+                        <xf:hint ref="$form-resources/step4c_extra_withholding/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </fr:currency></fr:c></fr:grid></fr:section><fr:section id="section-step5-section" bind="section-step5-bind"><xf:label ref="$form-resources/section-step5/label"></xf:label><fr:grid id="grid-6-grid" bind="grid-6-bind">
+              <fr:c x="1" y="1" w="4"><fr:handwritten-signature id="signature-control" bind="signature-bind">
+                        <xf:label ref="$form-resources/signature/label"></xf:label>
+                        <xf:hint ref="$form-resources/signature/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </fr:handwritten-signature></fr:c><fr:c x="5" y="1" w="4"><fr:date id="signature_date-control" bind="signature_date-bind">
+                        <xf:label ref="$form-resources/signature_date/label"></xf:label>
+                        <xf:hint ref="$form-resources/signature_date/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </fr:date></fr:c><fr:c x="9" y="1" w="4"></fr:c></fr:grid></fr:section><fr:section collapsible="true" id="section-employers-section" bind="section-employers-bind" initiallyOpen="false"><xf:label ref="$form-resources/section-employers/label"></xf:label><fr:grid id="grid-7-grid" bind="grid-7-bind">
+              <fr:c x="1" y="1" w="4"><xf:textarea id="employer_name_and_address-control" bind="employer_name_and_address-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].employer_name_and_address">
+                        <xf:label ref="$form-resources/employer_name_and_address/label"></xf:label>
+                        <xf:hint ref="$form-resources/employer_name_and_address/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </xf:textarea></fr:c><fr:c x="5" y="1" w="4"><fr:date id="employer_first_date_of_employment-control" bind="employer_first_date_of_employment-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].employer_first_date_of_employment">
+                        <xf:label ref="$form-resources/employer_first_date_of_employment/label"></xf:label>
+                        <xf:hint ref="$form-resources/employer_first_date_of_employment/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </fr:date></fr:c><fr:c x="9" y="1" w="4" h="1"><xf:input id="employer_ein-control" bind="employer_ein-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].employer_ein">
+                        <xf:label ref="$form-resources/employer_ein/label"></xf:label>
+                        <xf:hint ref="$form-resources/employer_ein/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </xf:input></fr:c>
+            </fr:grid></fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

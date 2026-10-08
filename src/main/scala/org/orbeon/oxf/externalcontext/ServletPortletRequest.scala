@@ -22,7 +22,8 @@ trait ServletPortletRequest extends ExternalContext.Request {
   protected def headerValuesMap: Map[String, Array[String]]
 
   lazy val credentials: Option[Credentials] =
-    sessionOpt.flatMap(CredentialsSupport.findCredentialsInSession)
+    CredentialsSupport.findCredentialsInRequest(this) orElse
+      sessionOpt.flatMap(CredentialsSupport.findCredentialsInSession)
 
   def isUserInRole(role: String): Boolean =
     credentials exists (_.roles exists (_.roleName == role))

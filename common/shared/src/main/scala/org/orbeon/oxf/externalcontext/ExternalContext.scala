@@ -68,7 +68,8 @@ object Credentials {
 
 object CredentialsSupport {
 
-  private val CredentialsSessionKey = "org.orbeon.auth.credentials"
+  val CredentialsSessionKey = "org.orbeon.auth.credentials"
+  val CredentialsRequestKey = "org.orbeon.auth.credentials"
 
   def findCredentialsInSession(session: ExternalContext.Session): Option[Credentials] =
     session.getAttribute(CredentialsSessionKey) collect {
@@ -84,6 +85,24 @@ object CredentialsSupport {
       case None              => session.removeAttribute(CredentialsSessionKey)
     }
   }
+
+  def findCredentialsInRequest(request: ExternalContext.Request): Option[Credentials] =
+    findCredentialsInRequest(request.getAttributesMap.get(_))
+
+  def findCredentialsInRequest(getAttribute: String => AnyRef): Option[Credentials] =
+    Option(getAttribute(CredentialsRequestKey)) collect {
+      case credentials: Credentials => credentials
+    }
+
+  def storeCredentialsInRequest(
+    setAttribute   : (String, AnyRef) => Unit,
+    removeAttribute: String => Unit,
+    credentialsOpt : Option[Credentials]
+  ): Unit =
+    credentialsOpt match {
+      case Some(credentials) => setAttribute(CredentialsRequestKey, credentials)
+      case None              => removeAttribute(CredentialsRequestKey)
+    }
 }
 
 /**

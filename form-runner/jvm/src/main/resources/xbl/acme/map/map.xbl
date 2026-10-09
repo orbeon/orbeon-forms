@@ -57,7 +57,7 @@
 
         <xbl:template>
             <!-- Div in which Google Maps does its rendering -->
-            <xh:div class="acme-map-google" data-google-maps-key="{xxf:property('oxf.xforms.xbl.acme.map.key')}"/>
+            <xh:div class="acme-map-google" data-google-maps-key="{fr:component-param-value('api-key')}"/>
         </xbl:template>
     </xbl:binding>
 

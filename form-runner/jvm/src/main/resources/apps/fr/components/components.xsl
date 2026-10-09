@@ -193,8 +193,8 @@
             else if ($pos = 'bottom-left') then 'bottom-0 justify-content-start'
             else if ($pos = 'top-right') then 'top-0 justify-content-end'
             else if ($pos = 'top-left') then 'top-0 justify-content-start'
-            else if ($pos = 'top-center') then 'top-0 justify-content-center translate-middle-x'
-            else if ($pos = 'bottom-center') then 'bottom-0 justify-content-center translate-middle-x'
+            else if ($pos = 'top-center') then 'top-0 justify-content-center'
+            else if ($pos = 'bottom-center') then 'bottom-0 justify-content-center'
             else if ($pos != '') then $pos
             else 'bottom-0 end-0'
     " as="xs:string"/>

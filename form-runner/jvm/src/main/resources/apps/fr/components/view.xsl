@@ -1381,7 +1381,7 @@
                                 });
                             ]]></xf:body>
                         </xf:action>
-                        <xh:div class="toast-container position-fixed d-flex {$messages-position-classes} p-3 fr-messages-toast-container">
+                        <xh:div class="toast-container position-fixed {$messages-position-classes} p-3 fr-messages-toast-container">
                             <xh:div class="toast align-items-center fr-message-toast-success fade show" role="alert" aria-live="assertive" aria-atomic="true">
                                 <xh:div class="d-flex">
                                     <xh:div class="toast-body">

@@ -2,7 +2,7 @@ dist: focal
 sudo: required
 language: java
 jdk:
-- openjdk11
+- openjdk17
 env:
   global:
     # See https://docs.google.com/document/d/1MqG8OW2kLGeedzbu6vb9D00tHljVabPA2tYwh3DB9UE/edit
@@ -61,7 +61,7 @@ install:
   export SBT_OPTS="-Dfile.encoding=UTF-8"
 before_script:
 - sudo /etc/init.d/mysql stop # We use MySQL through Docker, so avoid conflict with port 3306
-- if [ "$TARGET" == "test-unit"                              ]; then docker pull tomcat:9.0.109-jdk11-temurin-noble; fi
+- if [ "$TARGET" == "test-unit"                              ]; then docker pull tomcat:9.0.109-jdk17-temurin-noble; fi
 - if [ "$TARGET" == "test-unit"                              ]; then docker pull kennethreitz/httpbin; fi
 - if [ "$TARGET" == "test-unit"                              ]; then docker run -d --name httpbin -p 8084:80 kennethreitz/httpbin; fi
 - if [ "$TARGET" == "test-db"                                ]; then echo $DOCKER_PASSWORD | docker login -u orbeon --password-stdin; fi

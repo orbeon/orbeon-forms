@@ -85,7 +85,7 @@ val AntVersion                       = "1.10.11"
 val ThumbnailatorVersion             = "0.4.16"
 val AwsSdkVersion                    = "2.55.11"
 val AwsNettyVersion                  = "4.2.18.Final"
-val InfinispanVersion                = "14.0.35.Final"
+val InfinispanVersion                = "16.2.3"
 val SqliteJdbcVersion                = "3.53.4.0"
 val PostgresqlVersion                = "42.7.13"
 val OracleJdbcVersion                = "23.26.3.0.0"
@@ -406,7 +406,7 @@ lazy val baseCommonSettings = Seq(
 
   javacOptions ++= Seq(
     "-encoding", "utf8",
-    "--release", "11"
+    "--release", "17"
   ),
 
   scalacOptions ++= Seq(

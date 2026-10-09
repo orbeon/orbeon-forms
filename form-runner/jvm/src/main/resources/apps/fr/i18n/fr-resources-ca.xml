@@ -724,6 +724,7 @@
             <close-search-options>Tancar opcions de cerca</close-search-options>
             <search-options>Opcions de cerca</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
+            <partial-match-hint>Coincidència parcial</partial-match-hint>
             <any>Qualsevol</any>
             <dates>
                 <item>

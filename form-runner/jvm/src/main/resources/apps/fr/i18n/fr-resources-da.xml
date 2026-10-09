@@ -692,6 +692,7 @@
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Luk alternativer for søgnng</close-search-options>
             <search-options>Alternativer for søgning</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
+            <partial-match-hint>Delvis match</partial-match-hint>
             <any>[Vilkårlig]</any>
             <dates>
                 <item>

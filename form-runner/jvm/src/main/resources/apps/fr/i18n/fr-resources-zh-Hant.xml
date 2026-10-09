@@ -701,6 +701,7 @@
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; 隱藏搜索選項</close-search-options>
             <search-options>搜索選項</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
+            <partial-match-hint>部分符合</partial-match-hint>
             <any>[任意]</any>
             <dates>
                 <item>

@@ -701,6 +701,7 @@
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Fechar opções</close-search-options>
             <search-options>Opções de procurar</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
+            <partial-match-hint>Correspondência parcial</partial-match-hint>
             <any>[Qualquer]</any>
             <dates>
                 <item>

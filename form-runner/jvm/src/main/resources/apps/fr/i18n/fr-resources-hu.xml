@@ -701,6 +701,7 @@
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Keresési beállítások elrejtése</close-search-options>
             <search-options>Keresési beállítások</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
+            <partial-match-hint>Részleges egyezés</partial-match-hint>
             <any>[Bármely]</any>
             <dates>
                 <item>

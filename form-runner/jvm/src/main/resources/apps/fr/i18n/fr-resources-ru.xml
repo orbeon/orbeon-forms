@@ -690,6 +690,7 @@
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Закрыть настройки поиска</close-search-options>
             <search-options>настройки поиска</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
+            <partial-match-hint>Частичное совпадение</partial-match-hint>
             <any>Что угодно</any>
             <dates>
                 <item>

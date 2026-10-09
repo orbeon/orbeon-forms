@@ -701,6 +701,7 @@
             <close-search-options>إخفاء خيارات البحث</close-search-options>
             <search-options>خيارات البحث</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
+            <partial-match-hint>تطابق جزئي</partial-match-hint>
             <any>[أي]</any>
             <dates>
                 <item>

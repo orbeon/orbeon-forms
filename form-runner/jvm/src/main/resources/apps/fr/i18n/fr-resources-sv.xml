@@ -701,6 +701,7 @@
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Dölj sökalternativ</close-search-options>
             <search-options>Sökalternativ</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
+            <partial-match-hint>Delvis matchning</partial-match-hint>
             <any>[Alla]</any>
             <dates>
                 <item>

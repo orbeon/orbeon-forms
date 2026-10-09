@@ -696,6 +696,7 @@
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; 隐藏搜索选项</close-search-options>
             <search-options>搜索选项</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
+            <partial-match-hint>部分匹配</partial-match-hint>
             <any>[任何]</any>
             <dates>
                 <item>

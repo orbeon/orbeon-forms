@@ -701,6 +701,7 @@
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Sulje hakuvaihtoehdot</close-search-options>
             <search-options>Hakuvaihtoehdot</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
+            <partial-match-hint>Osittainen osuma</partial-match-hint>
             <any>[mikä tahansa]</any>
             <dates>
                 <item>

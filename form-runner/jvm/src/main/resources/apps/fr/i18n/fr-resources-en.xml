@@ -702,6 +702,7 @@
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Search Options</close-search-options>
             <search-options>Search options</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
+            <partial-match-hint>Partial match</partial-match-hint>
             <any>[Any]</any>
             <dates>
                 <item>

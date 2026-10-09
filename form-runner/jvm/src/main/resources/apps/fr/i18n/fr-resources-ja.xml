@@ -688,6 +688,7 @@
             <close-search-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; 検索オプションを非表示</close-search-options>
             <search-options>検索オプション</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
+            <partial-match-hint>部分一致</partial-match-hint>
             <any>[すべて]</any>
             <dates>
                 <item>

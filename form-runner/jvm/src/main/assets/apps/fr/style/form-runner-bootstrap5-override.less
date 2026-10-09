@@ -457,10 +457,7 @@
     white-space: normal;
     overflow-wrap: break-word;
     word-wrap: break-word; // kept (deprecated) for the PDF renderer
-    min-height: @fixedControlMinHeight;
-    @media screen {
-      min-height: @fluidControlMinHeight;
-    }
+    min-height: var(--orbeon-control-height);
     height: auto;
     font-size: var(--orbeon-control-font-size);
     font-family: var(--orbeon-control-font-family);

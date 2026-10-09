@@ -933,7 +933,7 @@
                     display: block;
 
                     box-sizing: border-box;
-                    min-height: @fixedControlMinHeight - 2 * 2px !important; // not sure why it doesn't kick in otherwise
+                    min-height: @fixedControlMinHeight - 2 * 2px + 2 * @frGridCellPadding + 2px !important; // not sure why it doesn't kick in otherwise
                     line-height: @fixedControlMinHeight - 2 * 2px;
                 }
             }

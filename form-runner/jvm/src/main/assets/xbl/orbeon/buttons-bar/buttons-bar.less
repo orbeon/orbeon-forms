@@ -111,23 +111,20 @@
             display: block;
 
             .xbl-fr-buttons-bar {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
+                display: flex;
+                flex-wrap: wrap;
                 gap: 8px;
                 width: 100%;
                 box-sizing: border-box;
 
-                @media (max-width: 480px) {
-                    grid-template-columns: repeat(2, 1fr);
-                }
-
-                // Hide repeat delimiters and markers so they don't occupy grid cells
+                // Hide repeat delimiters and markers so they don't occupy layout space
                 > :not(.xforms-switch):not(.fr-buttons-message) {
                     display: none;
                 }
 
                 .fr-buttons-message {
-                    grid-column: 1 / -1;
+                    width: 100%;
+                    flex: 1 0 100%;
 
                     &:empty, &:has(.xforms-output-output:empty) {
                         display: none;
@@ -136,7 +133,13 @@
 
                 .xforms-switch {
                     display: flex;
-                    width: 100%;
+                    flex: 1 1 calc((100% - 2 * 8px) / 3);
+                    min-width: 0;
+                    box-sizing: border-box;
+
+                    @media (max-width: 480px) {
+                        flex: 1 1 calc((100% - 8px) / 2);
+                    }
                 }
 
                 .xforms-switch > span,

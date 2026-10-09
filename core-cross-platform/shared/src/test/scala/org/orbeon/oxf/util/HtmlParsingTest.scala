@@ -15,6 +15,11 @@ class HtmlParsingTest extends AnyFunSpec {
       ("""<a href="https://orbeon.com/">Link</a>"""                 , """<a href="https://orbeon.com/">Link</a>"""              , KeepFilter),
       ("""<A HREF="https://orbeon.com/">Link</A>"""                 , """<a href="https://orbeon.com/">Link</a>"""              , KeepFilter),
       ("""<a href="javascript:alert('')">Link</a>"""                , """<a>Link</a>"""                                         , KeepFilter),
+      ("""<a href="JavaScript:alert('')">Link</a>"""                , """<a>Link</a>"""                                         , KeepFilter),
+      ("""<a href="jav&#x09;ascript:alert('')">Link</a>"""          , """<a>Link</a>"""                                         , KeepFilter),
+      ("<a href=\"java\nscript:alert('')\">Link</a>"                , """<a>Link</a>"""                                         , KeepFilter),
+      ("""<a href="&#106;avascript:alert('')">Link</a>"""           , """<a>Link</a>"""                                         , KeepFilter),
+      ("""<img src="JAVA&#x0D;SCRIPT:alert('')">"""                 , """<img>"""                                               , KeepFilter),
       ("""This is a <b>bold</b> thing to say!"""                    , """This is a <b>bold</b> thing to say!"""                 , KeepFilter),
       ("""<script>alert("");</script>"""                            , """"""                                                    , KeepFilter),
       ("""This is a <b onclick="alert('')">bold</b> thing to say!""", """This is a <b>bold</b> thing to say!"""                 , KeepFilter),
@@ -29,7 +34,7 @@ class HtmlParsingTest extends AnyFunSpec {
 
       // With jsoup, tagsoup, and the browser, the `<custom>` element is removed. So keep this test.
       ("""This is a totally <custom>element</custom>"""             , """This is a totally """                                  , KeepFilter),
-      ("""This is a <mark>highlight</mark>!"""                       , """This is a <mark>highlight</mark>!"""                  , KeepFilter),
+      ("""This is a <mark>highlight</mark>!"""                      , """This is a <mark>highlight</mark>!"""                   , KeepFilter),
     )
 
     for ((input, output, filter) <- expected) {

@@ -106,29 +106,81 @@
             width: 100%;
             margin-left: 0;
             margin-right: 0;
-            padding: 0;
+            padding: 8px 0;
+            box-sizing: border-box;
+            display: block;
 
-            .xforms-trigger button {
-                // Each button is on its own line and takes the whole line
-                display: block;
+            .xbl-fr-buttons-bar {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
                 width: 100%;
-                margin-left: 0;
-                text-align: left;
+                box-sizing: border-box;
 
-                &[class~=btn]:first-of-type {
-                    margin-left: 0;
+                @media (max-width: 480px) {
+                    grid-template-columns: repeat(2, 1fr);
                 }
+
+                // Hide repeat delimiters and markers so they don't occupy grid cells
+                > :not(.xforms-switch):not(.fr-buttons-message) {
+                    display: none;
+                }
+
+                .fr-buttons-message {
+                    grid-column: 1 / -1;
+
+                    &:empty, &:has(.xforms-output-output:empty) {
+                        display: none;
+                    }
+                }
+
+                .xforms-switch {
+                    display: flex;
+                    width: 100%;
+                }
+
+                .xforms-switch > span,
+                .xbl-fr-process-button,
+                .xbl-fr-drop-trigger,
+                .xforms-group,
+                .xbl-fr-trigger,
+                .xforms-trigger,
+                .xbl-fr-ladda-button {
+                    display: flex;
+                    width: 100%;
+                    flex-grow: 1;
+                }
+            }
+
+            .xforms-trigger button,
+            .xforms-trigger button[class ~= btn]:first-of-type,
+            .xforms-submit input {
+                display: flex;
+                align-items: center;
+                justify-content: start;
+                width: 100%;
+                min-width: 0;
+                margin-left: 0;
+                margin-bottom: 0;
+                box-sizing: border-box;
+                text-align: left;
+                padding-left: 1.25em;
             }
 
             .btn-group.dropup {
                 display: flex;
                 width: 100%;
                 margin-left: 0;
+                margin-bottom: 0;
 
                 button[class ~= btn]:first-of-type {
                     flex-grow: 1;
                     justify-content: start;
+                    min-width: 0;
                     margin-left: 0;
+                    margin-bottom: 0;
+                    text-align: left;
+                    padding-left: 1.25em;
                 }
             }
         }

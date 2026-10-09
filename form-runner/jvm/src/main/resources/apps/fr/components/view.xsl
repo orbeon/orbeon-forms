@@ -1268,7 +1268,7 @@
                                     <xh:div class="toast-body">
                                         <xf:output value="instance('fr-persistence-instance')/message" mediatype="text/html" class="fr-message-success"/>
                                     </xh:div>
-                                    <xh:button type="button" class="btn-close btn-close-white me-2 m-auto" data-orbeon-bs-dismiss="toast" aria-label="{{xxf:r('buttons.close-message', '|fr-fr-resources|')}}" onclick="ORBEON.xforms.Document.dispatchEvent('fr-persistence-model', 'fr-clear-message');"/>
+                                    <xh:button type="button" class="btn-close me-2 m-auto" data-orbeon-bs-dismiss="toast" aria-label="{{xxf:r('buttons.close-message', '|fr-fr-resources|')}}" onclick="ORBEON.xforms.Document.dispatchEvent('fr-persistence-model', 'fr-clear-message');"/>
                                 </xh:div>
                             </xh:div>
                         </xh:div>
@@ -1294,7 +1294,7 @@
                                     <xh:div class="toast-body">
                                         <xf:output value="instance('fr-persistence-instance')/message" mediatype="text/html" class="fr-message-error"/>
                                     </xh:div>
-                                    <xh:button type="button" class="btn-close btn-close-white me-2 m-auto" data-orbeon-bs-dismiss="toast" aria-label="{{xxf:r('buttons.close-message', '|fr-fr-resources|')}}" onclick="ORBEON.xforms.Document.dispatchEvent('fr-persistence-model', 'fr-clear-message');"/>
+                                    <xh:button type="button" class="btn-close me-2 m-auto" data-orbeon-bs-dismiss="toast" aria-label="{{xxf:r('buttons.close-message', '|fr-fr-resources|')}}" onclick="ORBEON.xforms.Document.dispatchEvent('fr-persistence-model', 'fr-clear-message');"/>
                                 </xh:div>
                             </xh:div>
                         </xh:div>

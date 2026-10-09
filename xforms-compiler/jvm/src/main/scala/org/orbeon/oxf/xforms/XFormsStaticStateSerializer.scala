@@ -15,6 +15,7 @@ import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.model.{Instance, MipName, Model, StaticBind}
 import org.orbeon.oxf.xforms.itemset.{Item, ItemNode, Itemset, LHHAValue}
+import org.orbeon.oxf.xforms.processor.XFormsCompiler
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding}
 import org.orbeon.oxf.xml.SAXStore
@@ -65,7 +66,13 @@ object XFormsStaticStateSerializer {
   implicit val encodeDocumentInfo: Encoder[StaticXPath.DocumentNodeInfoType] =
     (a: StaticXPath.DocumentNodeInfoType) => Json.fromString(StaticXPath.tinyTreeToString(a))
 
-  def serialize(template: SAXStore, staticState: XFormsStaticState): String = {
+  def serialize(
+    template        : SAXStore,
+    staticState     : XFormsStaticState,
+    isClientProperty: String => Boolean = XFormsCompiler.isClientPropertyName(_)
+  ): String = {
+
+    val clientPropertyParams = CoreCrossPlatformSupport.properties.propertyParams(isClientProperty)
 
     val namePool = StaticXPath.GlobalNamePool
 
@@ -172,7 +179,7 @@ object XFormsStaticStateSerializer {
       }
 
       // Namespaces associated with properties
-      CoreCrossPlatformSupport.properties.propertyParams foreach {
+      clientPropertyParams foreach {
         distinct += _.namespaces
       }
 
@@ -263,7 +270,7 @@ object XFormsStaticStateSerializer {
           updateDistinctCommon(e)
       }
 
-      CoreCrossPlatformSupport.properties.propertyParams foreach { c =>
+      clientPropertyParams foreach { c =>
         distinct += c.typeQName
       }
 
@@ -736,7 +743,7 @@ object XFormsStaticStateSerializer {
       "namespaces"           -> collectedNamespacesInOrder.asJson,
       "qnames"               -> collectedQNamesInOrder.asJson,
       "nonDefaultProperties" -> a.nonDefaultProperties.asJson,
-      "properties"           -> CoreCrossPlatformSupport.properties.propertyParams.asJson,
+      "properties"           -> clientPropertyParams.asJson,
       "commonBindings"       -> collectedCommonBindingsInOrder.asJson,
       "scopes"               -> collectedScopesInOrder.asJson,
       "topLevelPart"         -> a.topLevelPart.asJson,

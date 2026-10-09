@@ -265,7 +265,10 @@ trait PropertySetFunctions extends PropertySetGetters {
 
   // For form compilation
   def propertyParams: Iterable[PropertyParams] =
-    allProperties.collect { case prop if ! PropertySet.isSensitivePropertyName(prop.name) =>
+    propertyParams(_ => true)
+
+  def propertyParams(predicate: String => Boolean): Iterable[PropertyParams] =
+    allProperties.collect { case prop if ! PropertySet.isSensitivePropertyName(prop.name) && predicate(prop.name) =>
 
       // Custom serialization to String, not ideal
       val stringValue = {

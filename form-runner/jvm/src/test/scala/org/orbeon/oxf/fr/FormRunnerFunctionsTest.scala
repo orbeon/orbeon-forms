@@ -749,6 +749,109 @@ class FormRunnerFunctionsTest
       }
     }
   }
+
+  describe("FormRunnerCompiler.isClientPropertyName") {
+
+    it("must exclude server-only Form Runner properties and include client-eligible Form Runner properties") {
+      val excluded = List(
+        "oxf.crypto.password",
+        "oxf.fb.toolbox.group.other.uri.*.*",
+        "oxf.fr.authentication.method",
+        "oxf.fr.access-token.validity",
+        "oxf.fr.state-token.validity",
+        "oxf.fr.field-encryption.reencrypt.chunk-size",
+        "oxf.fr.email.smtp.host.*.*",
+        "oxf.fr.s3.my-config.bucket",
+        "oxf.fr.send-s3.my-config.overwrite",
+        "oxf.fr.home.page-size",
+        "oxf.fr.landing.cards",
+        "oxf.fr.summary.page-size.*.*",
+        "oxf.fr.import.allowed-values",
+        "oxf.fr.export.filename",
+        "oxf.fr.admin.all",
+        "oxf.fr.forms.page-size",
+        "oxf.fr.pdf.template.font.paths",
+        "oxf.fr.detail.tiff.compression.type.*.*",
+        "oxf.fr.detail.pdf.barcode.*.*",
+        "oxf.fr.detail.pdf.filename.*.*",
+        "oxf.fr.detail.button.keyboard-shortcut.toolbox.*",
+        "oxf.fr.detail.button.keyboard-shortcut.summary.*",
+        "oxf.fr.detail.send.success.headers.*.*",
+        "oxf.fr.detail.send.error.headers.*.*",
+        "oxf.fr.persistence.proxy.uri",
+        "oxf.fr.persistence.service.log-wait",
+        "oxf.fr.persistence.mysql.uri",
+        "oxf.fr.persistence.mysql.datasource",
+        "oxf.fr.persistence.filesystem.directory",
+        "oxf.fr.persistence.filesystem.base-path",
+        "oxf.fr.persistence.s3.s3-config",
+        "oxf.fr.persistence.relational.reencrypt",
+        "oxf.fr.persistence.relational.reindex",
+        "oxf.fr.persistence.relational.max-batch-size",
+        "oxf.fr.persistence.relational.create-flat-view",
+        "oxf.fr.persistence.relational.flat-view",
+        "oxf.fr.style.themes.*.*",
+        "oxf.fr.detail.buttons.orbeon.builder",
+        "oxf.xforms.xbl.fr.code-mirror.line-numbers.orbeon.builder"
+      )
+      for (name <- excluded)
+        assert(! FormRunnerCompiler.isClientPropertyName(name), s"expected `$name` to be excluded")
+
+      val included = List(
+        "oxf.xforms.format.output.date",
+        "oxf.fr.version",
+        "oxf.fr.default-language.*.*",
+        "oxf.fr.available-languages.*.*",
+        "oxf.fr.detail.buttons.*.*",
+        "oxf.fr.detail.process.save-final.*.*",
+        "oxf.fr.detail.pdf.disable-if-invalid.*.*",
+        "oxf.fr.detail.button.keyboard-shortcut.save-final.*",
+        "oxf.fr.persistence.provider.*.*.*",
+        "oxf.fr.persistence.mysql.active",
+        "oxf.fr.persistence.mysql.autosave",
+        "oxf.fr.persistence.mysql.lease",
+        "oxf.fr.persistence.mysql.versioning",
+        "oxf.fr.persistence.mysql.data-format-version",
+        "oxf.fr.persistence.attachments.max-size",
+        "oxf.fr.persistence.attachments.filename.*.*"
+      )
+      for (name <- included)
+        assert(FormRunnerCompiler.isClientPropertyName(name), s"expected `$name` to be included")
+    }
+
+    it("must filter app/form-specific properties when appFormOpt is provided") {
+      val appForm = Some(AppForm("my-app", "my-form"))
+
+      val included = List(
+        "oxf.fr.detail.buttons.*.*",
+        "oxf.fr.detail.buttons.my-app.*",
+        "oxf.fr.detail.buttons.*.my-form",
+        "oxf.fr.detail.buttons.my-app.my-form",
+        "oxf.fr.persistence.provider.*.*.*",
+        "oxf.fr.persistence.provider.my-app.*.data",
+        "oxf.fr.persistence.provider.my-app.my-form.data",
+        "oxf.fr.resource.my-app.my-form.en.detail.buttons.save",
+        "oxf.fr.resource.*.*.en.detail.buttons.save",
+        "oxf.xforms.xbl.fr.currency.prefix.*.*",
+        "oxf.xforms.xbl.fr.currency.prefix.my-app.my-form"
+      )
+      for (name <- included)
+        assert(FormRunnerCompiler.isClientPropertyName(name, appForm), s"expected `$name` to be included for $appForm")
+
+      val excluded = List(
+        "oxf.fr.detail.buttons.other-app.*",
+        "oxf.fr.detail.buttons.my-app.other-form",
+        "oxf.fr.detail.buttons.other-app.my-form",
+        "oxf.fr.detail.buttons.orbeon.builder",
+        "oxf.fr.persistence.provider.other-app.*.data",
+        "oxf.fr.persistence.provider.my-app.other-form.data",
+        "oxf.fr.resource.other-app.my-form.en.detail.buttons.save",
+        "oxf.xforms.xbl.fr.currency.prefix.other-app.my-form"
+      )
+      for (name <- excluded)
+        assert(! FormRunnerCompiler.isClientPropertyName(name, appForm), s"expected `$name` to be excluded for $appForm")
+    }
+  }
 }
 
 // Class for test above

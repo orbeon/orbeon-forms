@@ -399,6 +399,49 @@ class PropertiesTest extends AnyFunSpecLike with ResourceManagerSupport {
       }
     }
   }
+
+  describe("Sensitive and predicate property filtering") {
+
+    it("must detect sensitive properties") {
+      val sensitive = List(
+        "oxf.crypto.password",
+        "oxf.xforms.password",
+        "oxf.fr.credential.token",
+        "oxf.fr.api-key",
+        "oxf.fr.s3.accesskey",
+        "oxf.fr.s3.secretaccesskey",
+        "oxf.fr.private-key"
+      )
+      for (name <- sensitive)
+        assert(PropertySet.isSensitivePropertyName(name), s"expected `$name` to be sensitive")
+
+      assert(! PropertySet.isSensitivePropertyName("oxf.xforms.format.output.date"))
+    }
+
+    it("must filter PropertySet.propertyParams") {
+      val ps =
+        PropertySet.forTests(
+          List(
+            PropertyParams(Map.empty, "oxf.crypto.password",           XS_STRING_QNAME, "secret"),
+            PropertyParams(Map.empty, "oxf.xforms.format.output.date", XS_STRING_QNAME, "[M]/[D]/[Y]"),
+            PropertyParams(Map.empty, "oxf.fr.detail.buttons.*.*",     XS_STRING_QNAME, "save")
+          )
+        )
+
+      assert(
+        ps.propertyParams.map(_.name).toSet ==
+          Set(
+            "oxf.xforms.format.output.date",
+            "oxf.fr.detail.buttons.*.*"
+          )
+      )
+
+      assert(
+        ps.propertyParams(_.startsWith("oxf.xforms.")).map(_.name).toSet ==
+          Set("oxf.xforms.format.output.date")
+      )
+    }
+  }
 }
 
 class TestPropertyProvider extends api.PropertyProvider {

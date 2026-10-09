@@ -431,15 +431,23 @@
   --orbeon-alert-text-shadow-color       : transparent;
   --orbeon-alert-border-radius           : @radius-box;
   --orbeon-alert-padding                 : 12px 1.15em;
-  --orbeon-alert-error-color             : #842029;
-  --orbeon-alert-error-background-color  : #f8d7da;
-  --orbeon-alert-error-border-color      : #f5c2c7;
-  --orbeon-alert-success-color           : #0f5132;
-  --orbeon-alert-success-background-color: #d1e7dd;
-  --orbeon-alert-success-border-color    : #badbcc;
+  --orbeon-alert-error-color             : oklch(42% 0.13 25);
+  --orbeon-alert-error-background-color  : oklch(97% 0.015 25);
+  --orbeon-alert-error-border-color      : oklch(89% 0.04 25);
+  --orbeon-alert-error-icon-color        : oklch(55% 0.18 25);
+  --orbeon-alert-success-color           : oklch(40% 0.09 155);
+  --orbeon-alert-success-background-color: oklch(97% 0.02 155);
+  --orbeon-alert-success-border-color    : oklch(89% 0.05 155);
+  --orbeon-alert-success-icon-color      : oklch(55% 0.14 155);
   --orbeon-alert-warning-color           : #664d03;
   --orbeon-alert-warning-background-color: #fff3cd;
   --orbeon-alert-warning-border-color    : #ffecb5;
+
+  // Inline save messages
+  --orbeon-message-width       : 100%;
+  --orbeon-message-margin-top  : 10px;
+  --orbeon-message-padding     : 8px 14px;
+  --orbeon-message-icon-display: inline-block;
 
   // Errors and error summary
   --orbeon-error-summary-display                  : block;
@@ -719,6 +727,8 @@
     --orbeon-alert-success-color                             : hsl(@success-hue, 64%, 68%);
     --orbeon-alert-success-background-color                  : hsl(@success-hue, 16%, 20%);
     --orbeon-alert-success-border-color                      : hsl(@success-hue, 18%, 25%);
+    --orbeon-alert-error-icon-color                          : var(--orbeon-alert-error-color);
+    --orbeon-alert-success-icon-color                        : var(--orbeon-alert-success-color);
     --orbeon-alert-warning-color                             : hsl(@warning-hue, 48%, 61%);
     --orbeon-alert-warning-background-color                  : hsl(@warning-hue, 32%, 20%);
     --orbeon-alert-warning-border-color                      : hsl(@warning-hue, 33%, 25%);

@@ -410,6 +410,34 @@
         width: 100%;
     }
 
+    .fr-messages > .alert {
+        display     : flex;
+        align-items : baseline;
+        gap         : 8px;
+        width       : var(--orbeon-message-width);
+        margin-top  : var(--orbeon-message-margin-top);
+        margin-left : auto;
+        margin-right: auto;
+        padding     : var(--orbeon-message-padding);
+
+        &::before {
+            display    : var(--orbeon-message-icon-display);
+            font-family: FontAwesome;
+            font-size  : 1.14em;
+            line-height: 1;
+        }
+
+        &.alert-success::before {
+            content: "\f058";
+            color  : var(--orbeon-alert-success-icon-color);
+        }
+
+        &.alert-error::before {
+            content: "\f06a";
+            color  : var(--orbeon-alert-error-icon-color);
+        }
+    }
+
     .fr-messages-toast-container {
         &.top-0 {
             top: 52px;

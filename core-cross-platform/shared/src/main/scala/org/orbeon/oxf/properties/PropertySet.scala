@@ -190,7 +190,10 @@ class PropertySet private (
 
   // For form compilation
   def propertyParams: Iterable[PropertyParams] =
-    propertiesByName.collect { case (name, prop) if ! PropertySet.isSensitivePropertyName(name) =>
+    propertyParams(_ => true)
+
+  def propertyParams(predicate: String => Boolean): Iterable[PropertyParams] =
+    propertiesByName.collect { case (name, prop) if ! PropertySet.isSensitivePropertyName(name) && predicate(name) =>
 
       // Custom serialization to String, not ideal
       val stringValue = {

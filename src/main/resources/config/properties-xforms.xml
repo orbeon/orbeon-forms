@@ -180,11 +180,6 @@
 
     <property as="xs:string"  name="oxf.xforms.sanitize"                                         value=""/>
 
-    <!-- Properties for XBL components which will eventually be moved inside the component to keep encapsulation -->
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.map.key"                                   value=""/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.map.clientid"                              value=""/>
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.map.ssl"                                   value="false"/>
-
     <property as="xs:integer" name="oxf.xforms.xbl.fr.dropdown-select1-search.min-input-length"  value="0"/>
     <property as="xs:integer" name="oxf.xforms.xbl.fr.databound-select1-search.min-input-length" value="0"/>
 

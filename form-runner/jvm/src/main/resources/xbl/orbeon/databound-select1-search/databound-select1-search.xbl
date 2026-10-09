@@ -585,16 +585,18 @@
                                         xf:attribute('type', 'array'),
                                         if ($is-multiple) then (
                                             let $result-items := instance('result-raw')/xxf:evaluate(instance('local')/itemset-ref)
-                                            for $v in xxf:split($binding)
-                                            let $matched := $result-items[xxf:evaluate(instance('local')/value-ref) = $v]
                                             return
-                                                if (exists($matched)) then
-                                                    xf:element('_', (
-                                                        xf:attribute('type', 'object'),
-                                                        xf:element('id',   string($matched[1]/xxf:evaluate(instance('local')/value-ref))),
-                                                        xf:element('text', string($matched[1]/xxf:evaluate(instance('local')/label-ref)))
-                                                    ))
-                                                else ()
+                                                for $v in xxf:split($binding)
+                                                return
+                                                    let $matched := $result-items[xxf:evaluate(instance('local')/value-ref) = $v]
+                                                    return
+                                                        if (exists($matched)) then
+                                                            xf:element('_', (
+                                                                xf:attribute('type', 'object'),
+                                                                xf:element('id',   string($matched[1]/xxf:evaluate(instance('local')/value-ref))),
+                                                                xf:element('text', string($matched[1]/xxf:evaluate(instance('local')/label-ref)))
+                                                            ))
+                                                        else ()
                                         ) else if (xxf:non-blank($binding)) then
                                             (: For single selection, use `instance('local')/label`, which might come from
                                                the stored `@label` attribute, if available, without a service call. :)

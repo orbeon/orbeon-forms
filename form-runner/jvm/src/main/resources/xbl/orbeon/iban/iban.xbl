@@ -22,22 +22,22 @@
                 (: Check-digit pair (characters 3-4) must be in [02..98]; ISO 7064 MOD 97-10 excludes 00, 01 and 99 :)
                 not(substring($iban, 3, 2) = ('00', '01', '99')) and
                 (
-                  let $rearranged := concat(substring($iban, 5), substring($iban, 1, 4))
-                  let $converted :=
-                    string-join(
-                      for $c in string-to-codepoints($rearranged)
-                      return
-                        if ($c >= 65 and $c le 90) then
-                          (: Letters A-Z :)
-                          xs:string($c - 65 + 10)
-                        else if ($c >= 48 and $c le 57) then
-                          (: Digits 0-9 :)
-                          xs:string($c - 48)
-                        else
-                          (: Unrecognized characters :)
-                          '',
-                      ''
-                    )
+                  let $rearranged := concat(substring($iban, 5), substring($iban, 1, 4)),
+                      $converted :=
+                          string-join(
+                            for $c in string-to-codepoints($rearranged)
+                            return
+                              if ($c >= 65 and $c le 90) then
+                                (: Letters A-Z :)
+                                xs:string($c - 65 + 10)
+                              else if ($c >= 48 and $c le 57) then
+                                (: Digits 0-9 :)
+                                xs:string($c - 48)
+                              else
+                                (: Unrecognized characters :)
+                                '',
+                            ''
+                          )
                   return
                     xs:decimal($converted) mod 97 = 1
                 )

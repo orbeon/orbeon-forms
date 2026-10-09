@@ -73,7 +73,7 @@ object PropertySet {
 
   val StarToken = "*"
 
-  private val SensitiveWords = Set("password", "credential")
+  private val SensitiveWords = Set("password", "credential", "api-key", "accesskey", "secretaccesskey", "private-key")
 
   def isSensitivePropertyName(propertyName: String): Boolean =
     SensitiveWords.exists(word => propertyName.toLowerCase.contains(word))

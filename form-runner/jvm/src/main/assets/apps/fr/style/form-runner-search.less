@@ -97,6 +97,7 @@
         &.fr-application-name, &.fr-form-name {
           display: inline-flex;
           align-items: end;
+          align-self: start; // don't stretch to the row height, which would push the content down
           column-gap: 1em;
 
           .xforms-select-appearance-full .xforms-help {

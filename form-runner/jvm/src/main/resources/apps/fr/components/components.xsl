@@ -175,7 +175,7 @@
 
     <xsl:variable name="messages-appearance"       select="p:property(string-join(('oxf.fr.detail.messages.appearance', $app, $form), '.'), $property-profile-opt)" as="xs:string?"/>
     <xsl:variable name="messages-toast"            select="empty($messages-appearance) or normalize-space($messages-appearance) = 'toast'" as="xs:boolean"/>
-    <xsl:variable name="messages-position"         select="(p:property(string-join(('oxf.fr.detail.messages.position', $app, $form), '.'), $property-profile-opt), 'bottom-right')[1]" as="xs:string"/>
+    <xsl:variable name="messages-position"         select="(p:property(string-join(('oxf.fr.detail.messages.position', $app, $form), '.'), $property-profile-opt), 'top-right')[1]" as="xs:string"/>
     <xsl:variable name="messages-position-classes" select="
         let $pos := normalize-space($messages-position)
         return

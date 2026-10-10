@@ -208,7 +208,7 @@
     <property as="xs:string"  name="oxf.fr.detail.error-summary.*.*"                               value="bottom"/>
 
     <property as="xs:string"  name="oxf.fr.detail.messages.appearance.*.*"                         value="toast"/>
-    <property as="xs:string"  name="oxf.fr.detail.messages.position.*.*"                           value="bottom-right"/>
+    <property as="xs:string"  name="oxf.fr.detail.messages.position.*.*"                           value="top-right"/>
     <property as="xs:integer" name="oxf.fr.detail.messages.delay.*.*"                              value="10000"/>
 
     <property as="xs:boolean" name="oxf.fr.detail.new.service.enable.*.*"                          value="false"/>

@@ -143,8 +143,8 @@
         display: table-cell;
         padding-top: 10px;
         padding-bottom: 10-5px; // adjust for the 5px bottom margin of buttons (see below)
-        padding-right: 10-1px;  // align with bottom buttons
-        padding-left: 10-1px;   // same as right
+        padding-right: calc(10px - 1px + (var(--orbeon-buttons-bar-width) - 100%) / 2);  // align with bottom buttons
+        padding-left: calc(10px - 1px + (var(--orbeon-buttons-bar-width) - 100%) / 2);   // same as right
         text-align: right;
     }
 

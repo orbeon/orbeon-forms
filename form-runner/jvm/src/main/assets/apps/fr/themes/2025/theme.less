@@ -405,6 +405,11 @@
   --orbeon-message-padding     : var(--orbeon-alert-padding);
   --orbeon-message-icon-display: none;
 
+  // Toast messages
+  --orbeon-toast-close-filter       : none;
+  --orbeon-toast-close-opacity      : 0.5;
+  --orbeon-toast-close-hover-opacity: 0.75;
+
   // Errors and error summary
   --orbeon-error-summary-display                  : block;
   --orbeon-error-summary-title-color              : white;
@@ -638,6 +643,7 @@
     --orbeon-alert-warning-color                             : hsl(@warning-hue, 48%, 61%);
     --orbeon-alert-warning-background-color                  : hsl(@warning-hue, 32%, 20%);
     --orbeon-alert-warning-border-color                      : hsl(@warning-hue, 33%, 25%);
+    --orbeon-toast-close-filter                              : invert(1) grayscale(100%) brightness(200%);
     --orbeon-error-summary-title-color                       : @base-bg;
     --orbeon-error-summary-title-bottom-border-color         : transparent;
     --orbeon-error-summary-item-background-color             : @base-bg;

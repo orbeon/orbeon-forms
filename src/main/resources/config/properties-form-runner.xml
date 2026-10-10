@@ -490,10 +490,18 @@
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.w9"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.inner.orbeon.w9">
-        home summary wizard-prev wizard-next review
+        wizard-prev wizard-next review
     </property>
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.orbeon.w9">
-        edit save
+        edit
+    </property>
+
+    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.w4"/>
+    <property as="xs:string"  name="oxf.fr.detail.buttons.inner.orbeon.w4">
+        wizard-prev wizard-next review
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.buttons.view.orbeon.w4">
+        edit
     </property>
 
     <property as="xs:string"  name="oxf.fr.summary.buttons.orbeon.contact">

@@ -25,13 +25,16 @@
                 <metadata>
                     <application-name>orbeon</application-name>
                     <form-name>w4</form-name>
-                    <title xml:lang="en">Orbeon Demo: Employee's Withholding Certificate</title>
+                    <title xml:lang="en">Orbeon Demo: W-4 Employee's Withholding Certificate</title>
                     <description xml:lang="en">Use this form to tell your employer how much federal income tax to withhold from your pay.</description>
                     
                     <library-versions>
                         <_>1</_>
                     </library-versions>
                     <created-with-version>2026.1-SNAPSHOT PE</created-with-version>
+                    <wizard>true</wizard>
+                    <wizard-subsections-nav>false</wizard-subsections-nav>
+                    <wizard-mode>lax</wizard-mode>
                 <email><templates><template name="default"><headers></headers><exclude-from-all-control-values></exclude-from-all-control-values></template></templates><parameters></parameters></email><updated-with-version>2026.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"section-step1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"step1a_first_name_mi"},{"value":"step1a_last_name"},{"value":"step1b_ssn"},{"value":"step1b_ssn_explanation"},{"value":"step1a_street_address"},{"value":"step1a_city"},{"value":"step1a_state"},{"value":"step1a_zip"},{"value":"step1a_city_state_zip"},{"value":"step1c_status"}],"topLevel":true},{"containerPath":[{"value":"section-step1"},{"value":"section-exemption"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"exemption_claimed"}],"topLevel":true},{"containerPath":[{"value":"section-step2"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"step2_applies"},{"value":"step2c_two_jobs_total"}],"topLevel":true},{"containerPath":[{"value":"section-step3"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"step3_qualifying_children_count"},{"value":"step3_qualifying_children_amount"},{"value":"step3_other_dependents_count"},{"value":"step3_other_dependents_amount"},{"value":"step3_total_credits"}],"topLevel":true},{"containerPath":[{"value":"section-step4"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"step4a_other_income"},{"value":"step4b_deductions"},{"value":"step4c_extra_withholding"}],"topLevel":true},{"containerPath":[{"value":"section-step5"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"signature"},{"value":"signature_date"}],"topLevel":true},{"containerPath":[{"value":"section-employers"}],"newGridElem":{"value":"grid-7"},"afterElem":null,"content":[{"value":"employer_name_and_address"},{"value":"employer_first_date_of_employment"},{"value":"employer_ein"}],"topLevel":true}]}</migration></metadata>
             </xf:instance>
 
@@ -77,6 +80,9 @@
                         <xf:hint ref="$form-resources/step1a_first_name_mi/hint"></xf:hint>
                         
                         <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                        <fr:index>
+                            <fr:summary-show/>
+                        </fr:index>
                     </xf:input>
 
                             </fr:c><fr:c x="5" y="1" w="4"><xf:input id="step1a_last_name-control" bind="step1a_last_name-bind" fr:pdf-template-field-name="topmostSubform[0].Page1[0].Step1a[0].step1a_last_name">
@@ -84,6 +90,9 @@
                         <xf:hint ref="$form-resources/step1a_last_name/hint"></xf:hint>
                         
                         <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                        <fr:index>
+                            <fr:summary-show/>
+                        </fr:index>
                     </xf:input></fr:c><fr:c x="9" y="1" w="4"><fr:us-ssn id="step1b_ssn-control" bind="step1b_ssn-bind" class="" fr:pdf-template-field-name="topmostSubform[0].Page1[0].step1b_ssn"><fr:encrypt></fr:encrypt>
                         <xf:label ref="$form-resources/step1b_ssn/label"></xf:label>
                         <xf:hint ref="$form-resources/step1b_ssn/hint"></xf:hint><xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>

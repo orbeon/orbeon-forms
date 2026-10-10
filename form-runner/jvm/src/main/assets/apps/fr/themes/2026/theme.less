@@ -64,6 +64,8 @@
   --orbeon-base-border-color             : @gray-90;
   --orbeon-form-background-color         : white;
   --orbeon-body-decorations-border-radius: @radius-box;
+  --orbeon-view-border                   : none;        // top-level sections are cards, see `--orbeon-section-border`
+  --orbeon-view-background-color         : transparent;
 
   // Max width of the (non-fluid) form view
   --orbeon-view-max-width: 1140px;
@@ -278,6 +280,9 @@
   --orbeon-dropdown-menu-border-radius            : @radius-floating;
 
   // Sections
+  --orbeon-section-border                       : @base-border; // each top-level section is a card
+  --orbeon-section-border-radius                : @radius-box;
+  --orbeon-section-background-color             : var(--orbeon-form-background-color);
   --orbeon-section-title-font-size              : @text-xl;
   --orbeon-section-repetition-label-font-size   : @text-xs;
   --orbeon-subsection-title-font-size           : @text-lg;
@@ -290,7 +295,7 @@
   --orbeon-section-gap                          : 20px;
   --orbeon-section-content-padding              : 10px 16px; // 16px: title padding minus grid cell padding
   --orbeon-section-iteration-title-padding      : 0 0 0 10px;
-  --orbeon-section-title-border-top             : @base-border;
+  --orbeon-section-title-border-top             : none;         // the card's border is above the title
   --orbeon-section-title-border-bottom          : @base-border;
   --orbeon-subsection-title-border              : @base-border;
   --orbeon-section-iteration-title-border       : var(--orbeon-subsection-title-border);
@@ -773,7 +778,6 @@
       --orbeon-control-height                                  : 28px; // Same as 2025
       --orbeon-section-title-color                             : black;
       --orbeon-section-title-background-color                  : white;
-      --orbeon-section-title-border-top                        : none;
       --orbeon-subsection-title-border                         : none;
       --orbeon-repeat-menu-background-color                    : white;
       --orbeon-toc-color                                       : black;

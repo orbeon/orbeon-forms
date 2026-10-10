@@ -168,6 +168,15 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
     .fr-mode-new, .fr-mode-edit, .fr-mode-view, .fr-mode-test {
         .fr-view-appearance-full {
             .fr-body-decorations();
+            border          : var(--orbeon-view-border);
+            background-color: var(--orbeon-view-background-color);
+
+            // Top-level sections, which the theme can show as cards
+            > .xbl-fr-section {
+                border          : var(--orbeon-section-border);
+                border-radius   : var(--orbeon-section-border-radius);
+                background-color: var(--orbeon-section-background-color);
+            }
         }
     }
 
@@ -215,6 +224,19 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
 
     // ***** Sections **************************************************************************************************
 
+    // If top-level sections are shown as cards, their title touches the card's top border: match its corners
+    .fr-view-appearance-full > .xbl-fr-section h2.fr-section-title {
+        border-top-left-radius : calc(var(--orbeon-section-border-radius) - @frBodyDecorationsBorderWidth);
+        border-top-right-radius: calc(var(--orbeon-section-border-radius) - @frBodyDecorationsBorderWidth);
+    }
+
+    // Same for the bottom corners when the section is collapsed
+    .fr-view-appearance-full > .xbl-fr-section h2.fr-section-title:has(.fr-section-closed) {
+        border-bottom-left-radius : calc(var(--orbeon-section-border-radius) - @frBodyDecorationsBorderWidth);
+        border-bottom-right-radius: calc(var(--orbeon-section-border-radius) - @frBodyDecorationsBorderWidth);
+        border-bottom: 0;
+    }
+
     // The first section title touches the container's top border: match its corners and don't double its border
     .fr-view-appearance-full > .xbl-fr-section:first-child h2.fr-section-title,
     .fr-wizard-body .xbl-fr-section:first-child h2.fr-section-title {
@@ -225,7 +247,6 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
     }
 
     // A collapsed last section's title touches the container's bottom border: don't double it
-    .fr-view-appearance-full > .xbl-fr-section:last-child:has(.fr-section-closed) h2.fr-section-title,
     .fr-wizard-body .xbl-fr-section:last-child:has(.fr-section-closed) h2.fr-section-title {
         border-bottom: 0;
     }

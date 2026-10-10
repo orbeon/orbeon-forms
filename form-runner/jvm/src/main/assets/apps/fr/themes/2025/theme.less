@@ -19,6 +19,8 @@
   --orbeon-base-border-color             : #e3e3e3;           // darken(@wellBackground, 7%);
   --orbeon-form-background-color         : white;
   --orbeon-body-decorations-border-radius: @baseBorderRadius; // bordered containers: view, TOC, repeat grid
+  --orbeon-view-border                   : 1px solid var(--orbeon-base-border-color);
+  --orbeon-view-background-color         : var(--orbeon-form-background-color);
 
   // Max width of the (non-fluid) form view: keep this theme at Bootstrap 2's fixed 940px; a future theme can go wider.
   // Fluid views remain full-width.
@@ -233,6 +235,9 @@
   --orbeon-dropdown-menu-border-radius            : 4.875px;
 
   // Sections
+  --orbeon-section-border                       : none;              // top-level sections all in the bordered view
+  --orbeon-section-border-radius                : 0px;               // unit needed, as used in calc()
+  --orbeon-section-background-color             : transparent;
   --orbeon-section-title-font-size              : 1.38em;            // 18px
   --orbeon-section-repetition-label-font-size   : 0.89em;            // 18px * 0.8 * 0.8
   --orbeon-subsection-title-font-size           : 1.11em;            // 18px * 0.8

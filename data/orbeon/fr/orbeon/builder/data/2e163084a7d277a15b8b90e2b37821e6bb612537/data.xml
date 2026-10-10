@@ -94,7 +94,7 @@
                         <fr:index>
                             <fr:summary-show/>
                         </fr:index>
-                    </xf:input></fr:c><fr:c x="9" y="1" w="4"><fr:us-ssn id="step1b_ssn-control" bind="step1b_ssn-bind" class="" fr:pdf-template-field-name="topmostSubform[0].Page1[0].step1b_ssn"><fr:encrypt></fr:encrypt>
+                    </xf:input></fr:c><fr:c x="9" y="1" w="4"><fr:us-ssn id="step1b_ssn-control" bind="step1b_ssn-bind" class="" fr:pdf-template-field-name="topmostSubform[0].Page1[0].step1b_ssn">
                         <xf:label ref="$form-resources/step1b_ssn/label"></xf:label>
                         <xf:hint ref="$form-resources/step1b_ssn/hint"></xf:hint><xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
                         

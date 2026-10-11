@@ -69,5 +69,8 @@ before_script:
 - if [ "$TARGET" == "test-db"   ] && [ "$DB" == "postgresql" ]; then ./tools/postgresql-prepare.sh; fi
 script:
 - if [ "$TARGET" == "orbeon-dist"                            ]; then ant orbeon-dist ; fi
-- if [ "$TARGET" == "test-unit"                              ]; then sbt Test/compile ; sbt Test/test ; fi
+# For running tests, lower sbt's heap from the 4G in `.sbtopts` to 2G, or the VM (7.5 GB, no swap) runs out of memory and
+# thrashes until Travis kills the job (#6236). Appending to `.sbtopts` is required, as on Travis `sbt -J-Xmx2G` puts that
+# option before those from `.sbtopts`, so it would lose.
+- if [ "$TARGET" == "test-unit"                              ]; then sbt Test/compile ; echo "-J-Xmx2G" >> .sbtopts ; sbt Test/test ; fi
 - if [ "$TARGET" == "test-db"                                ]; then export SBT_OPTS="$SBT_OPTS -Dorbeon.skip-offline -Dorbeon.prefer-fast-opt-js" ; sbt Test/compile ; sbt dbToS3AttachmentMigration/proguard ; sbt Db/test ; fi

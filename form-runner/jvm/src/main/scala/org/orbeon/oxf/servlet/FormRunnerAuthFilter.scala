@@ -57,16 +57,20 @@ class FormRunnerAuthFilterImpl extends Filter {
 
     implicit val propertySet: PropertySet = PropertyLoader.getPropertyStore(None).globalPropertySet
 
+    val httpReq = req.asInstanceOf[HttpServletRequest]
+    val httpRes = res.asInstanceOf[HttpServletResponse]
+
     val addHttpHeadersToThreadContext =
       propertySet.getBoolean("oxf.log4j.thread-context.http-headers", default = false)
+
     if (addHttpHeadersToThreadContext)
-      req.asInstanceOf[HttpServletRequest]
+      httpReq
         .headerNamesWithValues
         .foreach { case (name, values) =>
           ThreadContext.put(s"orbeon-incoming-http-header-${name.toLowerCase}", values.head)
         }
 
-    chain.doFilter(amendRequest(req.asInstanceOf[HttpServletRequest]), res)
+    chain.doFilter(amendRequest(httpReq), amendResponse(httpReq, httpRes))
   }
 }
 

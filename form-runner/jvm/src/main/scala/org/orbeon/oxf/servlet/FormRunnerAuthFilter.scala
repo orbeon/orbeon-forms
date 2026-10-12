@@ -55,16 +55,20 @@ class FormRunnerAuthFilterImpl extends Filter {
       res.asInstanceOf[HttpServletResponse].setHeader("Content-Security-Policy", value)
     }
 
+    val httpReq = req.asInstanceOf[HttpServletRequest]
+    val httpRes = res.asInstanceOf[HttpServletResponse]
+
     val addHttpHeadersToThreadContext =
       Properties.instance.getPropertySet.getBoolean("oxf.log4j.thread-context.http-headers", default = false)
+
     if (addHttpHeadersToThreadContext)
-      req.asInstanceOf[HttpServletRequest]
+      httpReq
         .headerNamesWithValues
         .foreach { case (name, values) =>
           ThreadContext.put(s"orbeon-incoming-http-header-${name.toLowerCase}", values.head)
         }
 
-    chain.doFilter(amendRequest(req.asInstanceOf[HttpServletRequest]), res)
+    chain.doFilter(amendRequest(httpReq), amendResponse(httpReq, httpRes))
   }
 }
 
@@ -84,7 +88,7 @@ object FormRunnerAuthFilterImpl {
   def amendRequest(servletRequest: HttpServletRequest): HttpServletRequest = {
 
     logger.debug(s"incoming headers:\n${servletRequest.headersAsStringForDebug}")
-    
+
     val isService = this.isService(servletRequest)
 
     // The Form Runner service path is hardcoded but that's ok. When we are filtering a service, we don't retrieve the

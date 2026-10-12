@@ -961,6 +961,13 @@
     border-color     : var(--orbeon-alert-warning-border-color);
   }
 
+  .alert-error, .alert-danger, .alert-success, .alert-warning {
+    a {
+      color           : inherit;   // Avoid readability color of blue on alert background color
+      text-decoration : underline; // Add back underline, so we can see this is a link
+    }
+  }
+
   // ***** Progress ****************************************************************************************************
 
   // Bootstrap 2 sized the progress bar in px; Bootstrap 5 uses rem, so it comes out ~35% shorter at our 13px base

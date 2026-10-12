@@ -22,11 +22,23 @@ object ElemFilter {
 }
 
 class SimpleHtmlFilter(
-  elemFilter  : String => ElemFilter        = _      => ElemFilter.Keep,
-  filterOutAtt: (String, String) => Boolean = (_, _) => false,
+  elemFilter  : String => ElemFilter                       = _ => ElemFilter.Keep,
+  attFilter   : (String, String, String) => Option[String] = (_, _, v) => Some(v),
 )(
-  xmlReceiver: XMLReceiver
+  xmlReceiver : XMLReceiver
 ) extends ForwardingXMLReceiver(xmlReceiver) {
+
+  def this(
+    elemFilter  : String => ElemFilter,
+    filterOutAtt: (String, String) => Boolean
+  )(
+    xmlReceiver : XMLReceiver
+  ) = this(
+    elemFilter,
+    (elem, name, value) => if (filterOutAtt(name, value)) None else Some(value)
+  )(
+    xmlReceiver
+  )
 
   private var level = 0
   private var removeSubtreeLevel: Option[Int] = None
@@ -49,14 +61,24 @@ class SimpleHtmlFilter(
         val currentName  = attributes.getLocalName(i)
         val currentValue = attributes.getValue(i)
 
-        if (filterOutAtt(currentName, currentValue)) {
-          if (newAtts == null) {
-            newAtts = new AttributesImpl
-            for (j <- 0 until i)
-              newAtts.addAttribute(attributes.getURI(j), attributes.getLocalName(j), attributes.getQName(j), attributes.getType(j), attributes.getValue(j))
-          }
-        } else if (newAtts != null) {
-          newAtts.addAttribute(attributes.getURI(i), currentName, attributes.getQName(i), attributes.getType(i), currentValue)
+        attFilter(localname, currentName, currentValue) match {
+          case None =>
+            if (newAtts == null) {
+              newAtts = new AttributesImpl
+              for (j <- 0 until i)
+                newAtts.addAttribute(attributes.getURI(j), attributes.getLocalName(j), attributes.getQName(j), attributes.getType(j), attributes.getValue(j))
+            }
+          case Some(newValue) =>
+            if (newValue != currentValue) {
+              if (newAtts == null) {
+                newAtts = new AttributesImpl
+                for (j <- 0 until i)
+                  newAtts.addAttribute(attributes.getURI(j), attributes.getLocalName(j), attributes.getQName(j), attributes.getType(j), attributes.getValue(j))
+              }
+              newAtts.addAttribute(attributes.getURI(i), currentName, attributes.getQName(i), attributes.getType(i), newValue)
+            } else if (newAtts != null) {
+              newAtts.addAttribute(attributes.getURI(i), currentName, attributes.getQName(i), attributes.getType(i), currentValue)
+            }
         }
       }
 
@@ -96,7 +118,7 @@ class SimpleHtmlSerializer(sb: java.lang.StringBuilder)
       sb.append(' ')
       sb.append(attributes.getLocalName(i))
       sb.append("=\"")
-      sb.append(attributes.getValue(i))
+      sb.append(attributes.getValue(i).escapeXmlForAttribute)
       sb.append('"')
     }
 

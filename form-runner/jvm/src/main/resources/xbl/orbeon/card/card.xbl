@@ -10,7 +10,7 @@
         id="fr-card"
         element="fr|card"
         xxbl:mode="lhha custom-lhha binding"
-        class="p-2"
+        class="p-2 h-100"
     >
         <xbl:template
             xmlns:xsl="http://www.w3.org/1999/XSL/Transform"

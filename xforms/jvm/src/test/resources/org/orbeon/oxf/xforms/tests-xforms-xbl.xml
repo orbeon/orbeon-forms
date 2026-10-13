@@ -3631,7 +3631,7 @@
                         <xbl:binding id="fr-foo" element="fr|foo">
                             <xbl:template>
                                 <xf:trigger id="xbl-trigger">
-                                    <xf:label id="xbl-label"><xh:div id="xbl-avt" style="{'background-color: red'}"/></xf:label>
+                                    <xf:label id="xbl-label"><xh:div style="{'background-color: red'}"/></xf:label>
                                 </xf:trigger>
                             </xbl:template>
                         </xbl:binding>

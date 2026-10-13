@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 import cats.syntax.option.*
-import org.apache.hc.client5.http.cookie.BasicCookieStore
+import org.apache.http.impl.client.BasicCookieStore
 import org.mockito.Mockito
 import org.orbeon.connection.StreamedContent
 import org.orbeon.io.CharsetNames

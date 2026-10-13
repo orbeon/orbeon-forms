@@ -291,6 +291,22 @@
                             </xh:tr>
                         </fr:grid>
                     </xf:group>
+
+                    <xh:div class="fb-itemset-toolbar">
+                        <xf:trigger id="clipboard-copy-trigger">
+                            <xf:label ref="$resources/dialog-itemsets/copy/label"/>
+                        </xf:trigger>
+                        <xf:trigger id="clipboard-paste-trigger" ref="$i/triggers/(if (fr:is-readonly-mode()) then disabled else enabled)">
+                            <xf:label ref="$resources/dialog-itemsets/paste/label"/>
+                        </xf:trigger>
+                        <xf:trigger id="clear-value-trigger" ref="$i/triggers/(if (fr:is-readonly-mode()) then disabled else enabled)">
+                            <xf:label ref="$resources/dialog-itemsets/clear-value/label"/>
+                        </xf:trigger>
+                        <xf:trigger id="remove-all-trigger" appearance="xxf:danger" class="fb-itemset-remove-all" ref="$i/triggers/(if (fr:is-readonly-mode()) then disabled else enabled)">
+                            <xf:label ref="$resources/dialog-itemsets/remove-all/label"/>
+                        </xf:trigger>
+                    </xh:div>
+
                     <fr:grid ref="$i" markup="css-grid">
                         <fr:c y="1" x="1" w="12">
                             <xf:textarea ref="filter" appearance="xpath-completion" xpath-completion-updates="">
@@ -317,48 +333,6 @@
                             </xf:select1>
                         </fr:c>
                     </fr:grid>
-<!--                    <xh:div class="btn-group">-->
-<!--                        <xh:button id="operations-button" class="btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">-->
-<!--                            <xf:output value="'Operations'"/>-->
-<!--                            <xh:span class="caret"/>-->
-<!--                        </xh:button>-->
-<!--                        <xh:ul class="dropdown-menu" role="menu" aria-labelledBy="operations-button">-->
-<!--                            <xh:li role="presentation">-->
-<!--                                <xf:trigger appearance="minimal" role="menuitem">-->
-<!--                                    <xf:label ref="$resources/dialog-itemsets/remove-all/label"/>-->
-<!--                                </xf:trigger>-->
-<!--                            </xh:li>-->
-<!--                            <xh:li role="presentation">-->
-<!--                                <xf:trigger appearance="minimal" role="menuitem">-->
-<!--                                    <xf:label ref="$resources/dialog-itemsets/clear-value/label"/>-->
-<!--                                </xf:trigger>-->
-<!--                            </xh:li>-->
-<!--                            <xh:li role="presentation">-->
-<!--                                <xf:trigger appearance="minimal" role="menuitem">-->
-<!--                                    <xf:label ref="$resources/dialog-itemsets/copy/label"/>-->
-<!--                                </xf:trigger>-->
-<!--                            </xh:li>-->
-<!--                            <xh:li role="presentation">-->
-<!--                                <xf:trigger appearance="minimal" role="menuitem">-->
-<!--                                    <xf:label ref="$resources/dialog-itemsets/paste/label"/>-->
-<!--                                </xf:trigger>-->
-<!--                            </xh:li>-->
-<!--                        </xh:ul>-->
-<!--                    </xh:div>-->
-                </xh:div>
-                <xh:div class="fr-dialog-buttons">
-                    <xf:trigger id="remove-all-trigger" appearance="xxf:danger" class="pull-left" ref="$i/triggers/(if (fr:is-readonly-mode()) then disabled else enabled)">
-                        <xf:label ref="$resources/dialog-itemsets/remove-all/label"/>
-                    </xf:trigger>
-                    <xf:trigger id="clear-value-trigger" ref="$i/triggers/(if (fr:is-readonly-mode()) then disabled else enabled)">
-                        <xf:label ref="$resources/dialog-itemsets/clear-value/label"/>
-                    </xf:trigger>
-                    <xf:trigger id="clipboard-copy-trigger">
-                        <xf:label ref="$resources/dialog-itemsets/copy/label"/>
-                    </xf:trigger>
-                    <xf:trigger id="clipboard-paste-trigger">
-                        <xf:label ref="$resources/dialog-itemsets/paste/label"/>
-                    </xf:trigger>
                 </xh:div>
                 <xh:div class="fr-dialog-buttons">
                     <xf:trigger ref="$i/triggers/(if (valid($i)) then enabled else disabled)" id="save-trigger" appearance="xxf:primary">

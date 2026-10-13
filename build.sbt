@@ -183,7 +183,7 @@ val CoreLibraryDependencies = Seq(
   "io.github.openhtmltopdf"     % "openhtmltopdf-java2d"            % OpenHtmlToPdfVersion,
   "org.apache.pdfbox"           % "pdfbox"                          % PdfBoxVersion,
   "com.github.librepdf"         % "openpdf"                         % "1.3.26",
-  "org.bouncycastle"            % "bcmail-jdk18on"                  % "1.84", // for `openpdf`, also pulls `bcprov` and `bcpkix`
+  "org.bouncycastle"            % "bcmail-jdk18on"                  % "1.86",   // for `openpdf`, also pulls `bcprov` and `bcpkix`
   "com.drewnoakes"              % "metadata-extractor"              % "2.19.0",
   "com.twelvemonkeys.imageio"   % "imageio-webp"                    % "3.12.0",
   "com.twelvemonkeys.imageio"   % "imageio-core"                    % "3.12.0",

@@ -361,10 +361,15 @@
   --orbeon-fb-dialog-language-dropdown-hover-color: @gray-15;
 
   // Tables
-  --orbeon-table-background-color        : white;
-  --orbeon-table-striped-background-color: @gray-98;
-  --orbeon-table-hover-background-color  : @tint-hover;
-  --orbeon-table-border-color            : @gray-90;
+  --orbeon-table-background-color          : white;
+  --orbeon-table-striped-background-color  : @gray-98;
+  --orbeon-table-hover-background-color    : @tint-hover;
+  --orbeon-table-border-color              : @gray-90;
+  --orbeon-table-header-background-color   : @tint-band;
+  --orbeon-table-header-border-color       : @gray-82;
+  --orbeon-table-header-font-weight        : 600;
+  --orbeon-table-header-sorted-color       : var(--orbeon-link-color);
+  --orbeon-table-header-sorted-border-color: var(--orbeon-accent-color);
 
   // Tabs
   --orbeon-tab-background-color: white;
@@ -563,6 +568,7 @@
     --orbeon-help-title-background-color                : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
     --orbeon-dialog-title-background-color              : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
     --orbeon-revision-history-pane-head-background-color: color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
+    --orbeon-table-header-background-color              : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
     --orbeon-landing-card-header-background-color       : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
     --orbeon-landing-card-footer-background-color       : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
     --orbeon-landing-card-hover-background-color        : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-97);
@@ -724,6 +730,8 @@
     --orbeon-table-striped-background-color                  : @dark-28;
     --orbeon-table-hover-background-color                    : color-mix(in oklab, var(--orbeon-accent-color) 5%, @dark-32);
     --orbeon-table-border-color                              : @dark-38;
+    --orbeon-table-header-background-color                   : color-mix(in oklab, var(--orbeon-accent-color) 5%, @dark-32);
+    --orbeon-table-header-border-color                       : @dark-44;
     --orbeon-tab-background-color                            : @dark-21;
     --orbeon-tab-border-color                                : @dark-38;
     --orbeon-search-free-input-read-only-background-color    : @dark-28;

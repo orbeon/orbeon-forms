@@ -171,7 +171,7 @@
       max-width: none;                                        // Because table can scrolls beyond size of container
     }
 
-    thead {
+    .table > thead {
       tr {
         &.header-groups {
           th {
@@ -181,6 +181,13 @@
 
         th {
           padding: 0;
+          background-color: var(--orbeon-table-header-background-color);
+          border-bottom: 1px solid var(--orbeon-table-header-border-color);
+
+          &:has(.caret-container:not(.no-caret)) {
+            color: var(--orbeon-table-header-sorted-color);
+            box-shadow: inset 0 -2px 0 var(--orbeon-table-header-sorted-border-color);
+          }
 
           span.fr-sortable-th button.btn-link {
             &:hover, &:focus {
@@ -209,7 +216,7 @@
             white-space: nowrap;
 
             // Not as heavy as Bootstrap's default bold
-            font-weight: 500;
+            font-weight: var(--orbeon-table-header-font-weight);
 
             div {
               display: inline;

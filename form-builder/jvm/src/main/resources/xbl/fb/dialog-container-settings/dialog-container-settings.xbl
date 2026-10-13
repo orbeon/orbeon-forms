@@ -58,8 +58,8 @@
                 <xf:setvalue ref="$i/is-repeat"                      value="$i/was-repeat"/>
 
                 <xf:setvalue ref="$i/user-can-add-remove"            value="not($control/@fb:readonly = 'true')"/>
-                <xf:setvalue ref="$i/number-rows"                    value="$control/@number-rows = 'true'"/>
-                <xf:setvalue ref="$i/use-paging"                     value="$control/@fb:page-size = '1'"/>
+                <xf:setvalue ref="$i/number-rows"                    value="if ($i/container-type = 'grid') then $control/@number-rows = 'true' else false()"/>
+                <xf:setvalue ref="$i/use-paging"                     value="if ($i/container-type = 'section') then $control/@fb:page-size = '1' else false()"/>
 
                 <xf:setvalue ref="$i/was-custom-iteration-name"      value="$i/was-repeat = true() and fbf:hasCustomIterationName($i/control-name)"/>
                 <xf:setvalue ref="$i/is-custom-iteration-name"       value="$i/was-custom-iteration-name"/>
@@ -98,22 +98,16 @@
                 <xf:delete ref="$i/namespace::node()"/>
                 <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($i/control-name)/namespace::node()"/>
 
-                <!-- Read Label/Help if we are a section/grid -->
+                <!-- Read Label/Help if we are a section -->
                 <xf:action iterate="$i/(label, help, short-label, iteration-label, add-iteration-label)">
 
                     <xf:delete ref="fr:param"/>
+                    <xf:setvalue ref="value"  value="''"/>
+                    <xf:setvalue ref="@isHTML" value="false()"/>
 
-                    <xf:var name="lhh" value="local-name()"/>
+                    <xf:action if="$i/container-type = 'section'">
 
-                    <xf:setvalue
-                        ref="@supported"
-                        value="($i/container-type = 'section') or ($i/container-type = 'grid' and $lhh = ('add-iteration-label', 'remove-iteration-label'))"/>
-
-                    <xf:setvalue
-                        ref="@isHTML"
-                        value="false()"/>
-
-                    <xf:action if="@supported = 'true'">
+                        <xf:var name="lhh" value="local-name()"/>
 
                         <xf:setvalue
                             ref="value"
@@ -503,6 +497,10 @@
                     xxf:default="false()"/>
 
                 <xf:bind
+                    ref="number-rows"
+                    readonly="$i/container-type = 'section'"/>
+
+                <xf:bind
                     ref="use-paging"
                     readonly="$i/container-type = 'grid' or $i/user-can-add-remove = true()"/>
 
@@ -573,14 +571,20 @@
                     readonly="xxf:is-blank()"/>
 
                 <xf:bind
-                    ref="label | help | short-label | iteration-label | add-iteration-label"
-                    readonly="not(@supported = 'true')"/>
+                    ref="label | help | short-label"
+                    readonly="not(@supported = 'true')">
+                    <xf:bind
+                        ref="@supported"
+                        calculate="string($i/container-type = 'section')"/>
+                </xf:bind>
 
-                <!-- We could do this but the issue is that things will look inconsistent when switching between repeated and
-                     non-repeated in the settings until the changes are saved. -->
-<!--                <xf:bind-->
-<!--                    ref="iteration-label"-->
-<!--                    readonly="../is-repeat = false()"/>-->
+                <xf:bind
+                    ref="iteration-label | add-iteration-label"
+                    readonly="not(@supported = 'true')">
+                    <xf:bind
+                        ref="@supported"
+                        calculate="string($i/container-type = 'section' and $i/is-repeat = true())"/>
+                </xf:bind>
 
                 <xf:bind
                     ref="(label | help)/value"

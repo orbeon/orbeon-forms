@@ -3631,7 +3631,7 @@
                         <xbl:binding id="fr-foo" element="fr|foo">
                             <xbl:template>
                                 <xf:trigger id="xbl-trigger">
-                                    <xf:label id="xbl-label"><xh:div style="{'background-color: red'}"/></xf:label>
+                                    <xf:label id="xbl-label"><xh:div id="xbl-avt" style="{'background-color: red'}"/></xf:label>
                                 </xf:trigger>
                             </xbl:template>
                         </xbl:binding>
@@ -3649,7 +3649,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo1≡xbl-trigger" label="&lt;div id=&#34;my-foo1≡xbl-avt&#34; style=&#34;background-color: red&#34;&gt;&lt;/div&gt;"/>
+                        <xxf:control id="my-foo1≡xbl-trigger" label="&lt;div style=&#34;background-color: red&#34;&gt;&lt;/div&gt;"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

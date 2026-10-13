@@ -89,6 +89,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <dropdown>cat</dropdown>
                             <dropdown-with-other>Pistachio</dropdown-with-other>
                             <dropdown-with-search>cat</dropdown-with-search>
+                            <dynamic-multiselect>ca mx us</dynamic-multiselect>
                             <dynamic-dropdown itemset-empty="false">ca</dynamic-dropdown>
                             <dynamic-dropdown-with-search-by-ui itemset-empty="false">Canada</dynamic-dropdown-with-search-by-ui>
                             <dynamic-dropdown-with-search-by-service itemset-empty="false" label="Canada">Canada</dynamic-dropdown-with-search-by-service>
@@ -261,6 +262,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind id="checkboxes-bind" ref="checkboxes" name="checkboxes"/>
                         <xf:bind id="radio-buttons-bind" ref="radio-buttons" name="radio-buttons"/>
                         <xf:bind id="dropdown-with-search-bind" ref="dropdown-with-search" name="dropdown-with-search"/>
+                        <xf:bind id="dynamic-multiselect-bind" ref="dynamic-multiselect" name="dynamic-multiselect"/>
 
 
 
@@ -561,6 +563,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 <value>fish</value>
                             </item>
                         </dropdown-with-search>
+                        <dynamic-multiselect>
+                            <label>Dynamic Multiselect</label>
+                            <hint/>
+                        </dynamic-multiselect>
                         <dynamic-dropdown>
                             <label>Dynamic Dropdown&lt;br&gt;No search&lt;br&gt;No paging</label>
                             <hint/>
@@ -1169,6 +1175,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 <value>fish</value>
                             </item>
                         </dropdown-with-search>
+                        <dynamic-multiselect>
+                            <label>Sélection multiple dynamique</label>
+                            <hint/>
+                        </dynamic-multiselect>
                         <dynamic-dropdown>
                             <label>Menu déroulant dynamique</label>
                             <hint/>
@@ -2340,7 +2350,17 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 </xf:itemset>
                             </xf:select1>
                         </fr:c>
-                        <fr:c x="10" y="1" w="3" h="1"/>
+                        <fr:c x="10" y="1" w="3">
+                            <fr:databound-select id="dynamic-multiselect-control" bind="dynamic-multiselect-bind" appearance="search" resource="/fr/service/custom/orbeon/controls/countries?all=true">
+                                <xf:label ref="$form-resources/dynamic-multiselect/label"/>
+                                <xf:hint ref="$form-resources/dynamic-multiselect/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:itemset ref="/countries/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                </xf:itemset>
+                            </fr:databound-select>
+                        </fr:c>
                         <fr:c x="1" y="2" w="3">
                             <fr:databound-select1 id="dynamic-dropdown-control" resource="/fr/service/custom/orbeon/controls/countries?all=true" bind="dynamic-dropdown-bind">
                                 <xf:label ref="$form-resources/dynamic-dropdown/label" mediatype="text/html"/>

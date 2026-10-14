@@ -211,8 +211,8 @@ class ConnectionTest
     val Expected = List(
       "/foo/bar"                         -> true,
       "/fr/service/custom/orbeon/echo"   -> true,
-      "/exist/crud/"                     -> false, // Since #7944
-      "/foo/bar.jsp"                     -> false, // Since #7944
+      "/exist/crud/"                     -> true, // with #7955, this is no longer special-cased
+      "/foo/bar.jsp"                     -> true, // with #7955, this is no longer special-cased
       OrbeonBaseUrl.toString             -> true,
       "http://example.org/other-prefix"  -> false,
       "https://example.org/other-prefix" -> false,

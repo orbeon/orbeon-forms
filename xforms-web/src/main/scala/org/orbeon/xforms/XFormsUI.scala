@@ -793,6 +793,7 @@ object XFormsUI {
     val dialogElem = dom.document.getElementById(id).asInstanceOf[HTMLDialogElement]
     dialogElem.removeEventListener("cancel" , dialogCancelListener )
     dialogElem.removeEventListener("keydown", dialogKeydownListener)
+    Help.hideHelpPopoversIn(dialogElem)
     dialogElem.close()
 
     val inspectorElemOpt = dialogElem.querySelectorOpt("#orbeon-inspector")

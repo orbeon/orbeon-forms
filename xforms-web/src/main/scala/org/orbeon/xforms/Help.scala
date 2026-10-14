@@ -91,6 +91,9 @@ object Help {
     }
   }
 
+  def hideHelpPopoversIn(elem: html.Element): Unit =
+    elem.querySelectorAllT(".xforms-help-popover").foreach(destroyPopoverForTip)
+
   private object Private {
 
     // Hide help when user presses the escape key

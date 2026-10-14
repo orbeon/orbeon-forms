@@ -209,12 +209,15 @@ object Connection extends ConnectionTrait {
     normalizedUrl  : URI,
     filter         : String => Boolean,
     servicePrefix  : String
-  ): Option[String] =
+  ): Option[String] = {
+    val normalizedUrlString = normalizedUrl.toString
     for {
-      pathQuery <- normalizedUrl.toString.substringAfterOpt(servicePrefix).map(_.prependSlash)
+      // #7944: match service prefix at the start only (not in a query parameter, for example)
+      pathQuery <- normalizedUrlString.startsWith(servicePrefix).option(normalizedUrlString.substring(servicePrefix.length).prependSlash)
       if filter(splitQuery(pathQuery)._1)
     } yield
       pathQuery
+  }
 
   // Build all the connection headers
   def buildConnectionHeadersCapitalizedIfNeeded(

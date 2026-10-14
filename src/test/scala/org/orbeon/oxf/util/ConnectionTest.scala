@@ -21,6 +21,7 @@ import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.*
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.{Headers, HttpMethod}
+import org.orbeon.oxf.properties.PropertyLoader
 import org.orbeon.oxf.test.{ResourceManagerSupport, ResourceManagerTestBase}
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -51,8 +52,11 @@ class ConnectionTest
       override val servicePrefix: String = servicePrefixUri.toString
 
       override def incomingCookies: Iterable[(String, String)] = Nil
-      override def getAttributesMap: ju.Map[String, AnyRef] = new ju.HashMap
+      override val getAttributesMap: ju.Map[String, AnyRef] = new ju.HashMap
     }
+
+    // Needed by PropertyLoader.fromSafeRequestContext in buildConnectionHeadersCapitalized
+    PropertyLoader.getPropertyStore(Some(incomingRequest))
 
     val webAppContext = Mockito.mock(classOf[WebAppContext])
     Mockito when webAppContext.attributes thenReturn collection.mutable.Map[String, AnyRef]()
@@ -207,12 +211,18 @@ class ConnectionTest
     val Expected = List(
       "/foo/bar"                         -> true,
       "/fr/service/custom/orbeon/echo"   -> true,
-      "/exist/crud/"                     -> true,
+      "/exist/crud/"                     -> false, // Since #7944
+      "/foo/bar.jsp"                     -> false, // Since #7944
       OrbeonBaseUrl.toString             -> true,
       "http://example.org/other-prefix"  -> false,
       "https://example.org/other-prefix" -> false,
       "http://other.example.org/orbeon"  -> false,
       "https://other.example.org/orbeon" -> false,
+      // #7944: the service prefix should be detected at the start of the URL only
+      s"https://api.example.com/lookup/$OrbeonBaseUrl/fr/service/custom/orbeon/echo" -> false,
+      s"http://other.example.org/x?u=$OrbeonBaseUrl/fr/service/custom/orbeon/echo"   -> false,
+      s"http://other.example.org/x?u=$OrbeonBaseUrl/a.jsp"                           -> false,
+      s"http://other.example.org/$OrbeonBaseUrl/"                                    -> false,
     )
 
     for {

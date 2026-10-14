@@ -269,7 +269,8 @@ trait ConnectionTrait {
 
     // 4. Authorization token only for internal connections
     // https://github.com/orbeon/orbeon-forms/issues/4388
-    val tokenHeaderCapitalized = findInternalUrl(normalizedUrl, _ => true)(externalContext.getRequest).isDefined list {
+    // #7944: use same filter (isInternalPath) as Connection.connect (previously _ => true)
+    val tokenHeaderCapitalized = findInternalUrl(normalizedUrl, isInternalPath)(externalContext.getRequest).isDefined list {
 
       // Get token from web app scope
       val token =

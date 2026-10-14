@@ -223,7 +223,8 @@ object Connection extends ConnectionTrait {
       )
 
     for {
-      pathQuery <- normalizedUrlString.substringAfterOpt(servicePrefix) map (_.prependSlash)
+      // #7944: match service prefix at the start only (not in a query parameter, for example)
+      pathQuery <- normalizedUrlString.startsWith(servicePrefix).option(normalizedUrlString.substring(servicePrefix.length).prependSlash)
       if filter(splitQuery(pathQuery)._1)
     } yield
       pathQuery

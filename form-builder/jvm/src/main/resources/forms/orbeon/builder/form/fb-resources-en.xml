@@ -1217,10 +1217,39 @@
     </dialog-pdf>
     <dialog-itemsets>
         <copy>
-            <label>Copy to Clipboard</label>
+            <label>Copy</label>
+            <help>
+                &lt;p&gt;
+                    This allows you to copy all choices (label, value, and hint) for the current language to the clipboard in tab-separated format (TSV).
+                &lt;/p&gt;
+                &lt;p&gt;
+                    You can then paste them into a spreadsheet application, such as Microsoft Excel or Google Sheets, to manage or track choices.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    For more, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;Form Builder documentation&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </copy>
         <paste>
-            <label>Paste from Clipboard</label>
+            <label>Paste</label>
+            <help>
+                &lt;p&gt;
+                    This allows you to paste choices from the clipboard in tab-separated format (TSV), such as from Microsoft Excel or Google Sheets.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    The expected columns are label, value, and optionally hint. When pasting, choices are matched by value for the current language:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;Existing values are updated.&lt;/li&gt;
+                    &lt;li&gt;Missing values are added.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    To replace all choices instead, use the &lt;strong&gt;Remove All&lt;/strong&gt; button before pasting.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    For more, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;Form Builder documentation&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </paste>
         <paste-failed>
             <label>Paste failed. The clipboard format cannot be parsed.</label>
@@ -1239,7 +1268,18 @@
             <label>Hint</label>
         </hint-header>
         <clear-value>
-            <label>Clear Value</label>
+            <label>Deselect</label>
+            <help>
+                &lt;p&gt;
+                    This allows you to clear the default selection for this control, so that no choice is selected by default when the form is initially displayed.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    For single-selection controls (such as radio buttons or dropdown menus), this allows you to deselect the selected option.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    For more, see the &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#selected-items"&gt;Form Builder documentation&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </clear-value>
         <remove-all>
             <label>Remove All</label>

@@ -1199,10 +1199,39 @@
     </dialog-pdf>
     <dialog-itemsets>
         <copy>
-            <label>نسخ إلى الحافظة</label>
+            <label>نسخ</label>
+            <help>
+                &lt;p&gt;
+                    يتيح لك هذا نسخ جميع الخيارات (التسمية، القيمة، والتلميح) للغة الحالية إلى الحافظة بتنسيق مفصول بعلامات جدولة (TSV).
+                &lt;/p&gt;
+                &lt;p&gt;
+                    يمكنك بعد ذلك لصقها في تطبيق جداول بيانات، مثل Microsoft Excel أو Google Sheets، لإدارة الخيارات أو تتبعها.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    لمزيد من المعلومات، راجع &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;وثائق Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </copy>
         <paste>
-            <label>لصق من الحافظة</label>
+            <label>لصق</label>
+            <help>
+                &lt;p&gt;
+                    يتيح لك هذا لصق الخيارات من الحافظة بتنسيق مفصول بعلامات جدولة (TSV)، مثل البيانات المنسوخة من Microsoft Excel أو Google Sheets.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    الأعمدة المتوقعة هي التسمية، القيمة، والتلميح (اختياري). عند اللصق، تتم مطابقة الخيارات حسب القيمة للغة الحالية:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;يتم تحديث القيم الموجودة.&lt;/li&gt;
+                    &lt;li&gt;تتم إضافة القيم غير الموجودة.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    لاستبدال كافة الخيارات، استخدم زر &lt;strong&gt;إزالة الكل&lt;/strong&gt; قبل اللصق.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    لمزيد من المعلومات، راجع &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;وثائق Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </paste>
         <paste-failed>
             <label>فشل اللصق. لا يمكن تحليل تنسيق الحافظة.</label>
@@ -1221,7 +1250,18 @@
             <label>تلميح</label>
         </hint-header>
         <clear-value>
-            <label>مسح القيمة</label>
+            <label>إلغاء التحديد</label>
+            <help>
+                &lt;p&gt;
+                    يتيح لك هذا مسح التحديد الافتراضي لعنصر التحكم هذا، بحيث لا يتم تحديد أي خيار افتراضيًا عند عرض النموذج لأول مرة.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    بالنسبة لعناصر التحكم ذات التحديد الفردي (مثل أزرار الاختيار أو القوائم المنسدلة)، يتيح لك هذا إلغاء تحديد الخيار المحدد.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    لمزيد من المعلومات، راجع &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#selected-items"&gt;وثائق Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </clear-value>
         <remove-all>
             <label>إزالة الكل</label>

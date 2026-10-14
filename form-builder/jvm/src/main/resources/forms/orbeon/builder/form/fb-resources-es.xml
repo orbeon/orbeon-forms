@@ -1165,10 +1165,39 @@
     </dialog-pdf>
     <dialog-itemsets>
         <copy>
-            <label>Copiar al portapapeles</label>
+            <label>Copiar</label>
+            <help>
+                &lt;p&gt;
+                    Esto le permite copiar todas las opciones (etiqueta, valor y sugerencia) para el idioma actual al portapapeles en formato separado por tabulaciones (TSV).
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Luego puede pegarlas en una hoja de cálculo, como Microsoft Excel o Google Sheets, para administrar o rastrear opciones.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Para más información, consulte la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;documentación de Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </copy>
         <paste>
-            <label>Pegar desde el portapapeles</label>
+            <label>Pegar</label>
+            <help>
+                &lt;p&gt;
+                    Esto le permite pegar opciones desde el portapapeles en formato separado por tabulaciones (TSV), por ejemplo desde Microsoft Excel o Google Sheets.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Las columnas esperadas son etiqueta, valor y opcionalmente sugerencia. Al pegar, las opciones se emparejan por valor para el idioma actual:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;Los valores existentes se actualizan.&lt;/li&gt;
+                    &lt;li&gt;Los valores que faltan se añaden.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    Para reemplazar todas las opciones, use el botón &lt;strong&gt;Eliminar todo&lt;/strong&gt; antes de pegar.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Para más información, consulte la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;documentación de Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </paste>
         <paste-failed>
             <label>Error al pegar. El formato del portapapeles no se puede analizar.</label>
@@ -1187,7 +1216,18 @@
             <label>Ayuda</label>
         </hint-header>
         <clear-value>
-            <label>Limpiar Valor</label>
+            <label>Deseleccionar</label>
+            <help>
+                &lt;p&gt;
+                    Esto le permite borrar la selección predeterminada de este control, de modo que no se seleccione ninguna opción de forma predeterminada cuando se muestre el formulario por primera vez.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Para controles de selección única (como botones de opción o menús desplegables), esto le permite deseleccionar la opción elegida.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Para más información, consulte la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#selected-items"&gt;documentación de Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </clear-value>
         <remove-all>
             <label>Eliminar todo</label>

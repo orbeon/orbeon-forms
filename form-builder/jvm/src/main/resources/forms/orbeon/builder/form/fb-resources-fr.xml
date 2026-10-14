@@ -1218,10 +1218,39 @@
     </dialog-pdf>
     <dialog-itemsets>
         <copy>
-            <label>Copier dans le presse-papiers</label>
+            <label>Copier</label>
+            <help>
+                &lt;p&gt;
+                    Ceci vous permet de copier tous les choix (libellé, valeur et suggestion) pour la langue courante dans le presse-papiers au format séparé par des tabulations (TSV).
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Vous pouvez ensuite les coller dans un tableur, comme Microsoft Excel ou Google Sheets, pour gérer ou suivre les choix.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Pour en savoir plus, consultez la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;documentation de Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </copy>
         <paste>
-            <label>Coller depuis le presse-papiers</label>
+            <label>Coller</label>
+            <help>
+                &lt;p&gt;
+                    Ceci vous permet de coller des choix depuis le presse-papiers au format séparé par des tabulations (TSV), par exemple depuis Microsoft Excel ou Google Sheets.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Les colonnes attendues sont libellé, valeur et optionnellement suggestion. Lors du collage, les choix sont mis en correspondance par valeur pour la langue courante&#160;:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;Les valeurs existantes sont mises à jour.&lt;/li&gt;
+                    &lt;li&gt;Les valeurs manquantes sont ajoutées.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    Pour remplacer tous les choix plutôt que de les mettre à jour, utilisez le bouton &lt;strong&gt;Tout supprimer&lt;/strong&gt; avant de coller.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Pour en savoir plus, consultez la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;documentation de Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </paste>
         <paste-failed>
             <label>Le collage a échoué. Le format du presse-papiers ne peut pas être analysé.</label>
@@ -1240,7 +1269,18 @@
             <label>Suggestion</label>
         </hint-header>
         <clear-value>
-            <label>Supprimer la valeur</label>
+            <label>Désélectionner</label>
+            <help>
+                &lt;p&gt;
+                    Ceci vous permet d'effacer la sélection par défaut pour ce contrôle, afin qu'aucun choix ne soit sélectionné par défaut lorsque le formulaire s'affiche initialement.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Pour les contrôles à sélection unique (comme les boutons radio ou les menus déroulants), cela vous permet de désélectionner l'option choisie.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Pour en savoir plus, consultez la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#selected-items"&gt;documentation de Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </clear-value>
         <remove-all>
             <label>Tout supprimer</label>

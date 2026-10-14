@@ -1152,10 +1152,39 @@
     </dialog-pdf>
     <dialog-itemsets>
         <copy>
-            <label>Copia negli appunti</label>
+            <label>Copia</label>
+            <help>
+                &lt;p&gt;
+                    Consente di copiare tutte le scelte (etichetta, valore e suggerimento) per la lingua corrente negli appunti in formato separato da tabulazioni (TSV).
+                &lt;/p&gt;
+                &lt;p&gt;
+                    È quindi possibile incollarle in un foglio di calcolo, come Microsoft Excel o Google Sheets, per gestire o monitorare le scelte.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Per saperne di più, consultare la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;documentazione di Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </copy>
         <paste>
-            <label>Incolla dagli appunti</label>
+            <label>Incolla</label>
+            <help>
+                &lt;p&gt;
+                    Consente di incollare le scelte dagli appunti in formato separato da tabulazioni (TSV), ad esempio da Microsoft Excel o Google Sheets.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Le colonne previste sono etichetta, valore e facoltativamente suggerimento. Durante l'operazione di incolla, le scelte vengono associate per valore per la lingua corrente:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;I valori esistenti vengono aggiornati.&lt;/li&gt;
+                    &lt;li&gt;I valori mancanti vengono aggiunti.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    Per sostituire tutte le scelte, utilizzare il pulsante &lt;strong&gt;Rimuovi tutto&lt;/strong&gt; prima di incollare.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Per saperne di più, consultare la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;documentazione di Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </paste>
         <paste-failed>
             <label>Incollaggio non riuscito. Il formato degli appunti non può essere analizzato.</label>
@@ -1174,7 +1203,18 @@
             <label>Suggerimento</label>
         </hint-header>
         <clear-value>
-            <label>Cancella valore</label>
+            <label>Deseleziona</label>
+            <help>
+                &lt;p&gt;
+                    Consente di cancellare la selezione predefinita per questo controllo, in modo che nessuna scelta sia selezionata per impostazione predefinita alla visualizzazione iniziale del modulo.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Per i controlli a selezione singola (come pulsanti di opzione o menu a discesa), ciò consente di deselezionare l'opzione scelta.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Per saperne di più, consultare la &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#selected-items"&gt;documentazione di Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </clear-value>
         <remove-all>
             <label>Rimuovi tutto</label>

@@ -1149,10 +1149,39 @@
     </dialog-pdf>
     <dialog-itemsets>
         <copy>
-            <label>In die Zwischenablage kopieren</label>
+            <label>Kopieren</label>
+            <help>
+                &lt;p&gt;
+                    Ermöglicht das Kopieren aller Auswahlmöglichkeiten (Beschriftung, Wert und Hinweis) für die aktuelle Sprache im tabulatorgetrennten Format (TSV) in die Zwischenablage.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Sie können sie anschließend in eine Tabellenkalkulation wie Microsoft Excel oder Google Sheets einfügen, um Auswahlmöglichkeiten zu verwalten oder zu verfolgen.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Weitere Informationen finden Sie in der &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;Form Builder-Dokumentation&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </copy>
         <paste>
-            <label>Aus der Zwischenablage einfügen</label>
+            <label>Einfügen</label>
+            <help>
+                &lt;p&gt;
+                    Ermöglicht das Einfügen von Auswahlmöglichkeiten aus der Zwischenablage im tabulatorgetrennten Format (TSV), z. B. aus Microsoft Excel oder Google Sheets.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Die erwarteten Spalten sind Beschriftung, Wert und optional Hinweis. Beim Einfügen werden die Auswahlmöglichkeiten für die aktuelle Sprache anhand des Werts zugeordnet:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;Bestehende Werte werden aktualisiert.&lt;/li&gt;
+                    &lt;li&gt;Fehlende Werte werden hinzugefügt.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    Um stattdessen alle Auswahlmöglichkeiten zu ersetzen, verwenden Sie vor dem Einfügen die Schaltfläche &lt;strong&gt;Alle entfernen&lt;/strong&gt;.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Weitere Informationen finden Sie in der &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;Form Builder-Dokumentation&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </paste>
         <paste-failed>
             <label>Einfügen fehlgeschlagen. Das Format der Zwischenablage kann nicht analysiert werden.</label>
@@ -1171,7 +1200,18 @@
             <label>Hinweis</label>
         </hint-header>
         <clear-value>
-            <label>Wert löschen</label>
+            <label>Auswahl aufheben</label>
+            <help>
+                &lt;p&gt;
+                    Ermöglicht das Löschen der Standardauswahl für dieses Steuerelement, sodass beim anfänglichen Anzeigen des Formulars keine Auswahl standardmäßig getroffen ist.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Bei Steuerelementen mit Einzelauswahl (wie Optionsfeldern oder Dropdown-Menüs) können Sie damit eine getroffene Auswahl wieder aufheben.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Weitere Informationen finden Sie in der &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#selected-items"&gt;Form Builder-Dokumentation&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </clear-value>
         <remove-all>
             <label>Alle entfernen</label>

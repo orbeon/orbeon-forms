@@ -17,7 +17,7 @@
     // Itemset editor dialog
     // Using a class instead of an id since the id is simply 'dialog' as it is declared in a component
     .xforms-dialog.fb-dialog-itemsets {
-        width: 600px;
+        width: 750px;
         max-width: none;
 
         .fb-dialog-body {
@@ -60,19 +60,35 @@
         }
 
         .fb-itemset-toolbar {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 0.5em;
             margin-top: 5px;
             margin-bottom: 10px;
 
-            .xforms-trigger button {
-                min-width: auto;
+            .xforms-trigger {
+                display: flex;
+                align-items: center;
+                gap: var(--orbeon-help-icon-gap);
+                width: 100%;
+                min-width: 0;
+
+                button.btn {
+                    width: 100%;
+                    min-width: 0;
+                }
+
+                .xforms-help {
+                    .help-icon();
+                    order: 1;
+                    flex-shrink: 0;
+                    margin: 0;
+                }
             }
 
             .fb-itemset-remove-all {
-                margin-left: auto;
+                margin-left: 0;
+                padding-right: calc(14px + var(--orbeon-help-icon-gap));
             }
         }
 

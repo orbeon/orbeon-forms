@@ -1191,10 +1191,39 @@
     </dialog-pdf>
     <dialog-itemsets>
         <copy>
-            <label>クリップボードにコピー</label>
+            <label>コピー</label>
+            <help>
+                &lt;p&gt;
+                    これにより、現在の言語のすべての選択肢（ラベル、値、ヒント）をタブ区切り形式（TSV）でクリップボードにコピーできます。
+                &lt;/p&gt;
+                &lt;p&gt;
+                    その後、Microsoft Excel や Google スプレッドシートなどのスプレッドシートアプリケーションに貼り付けて、選択肢の管理や追跡を行うことができます。
+                &lt;/p&gt;
+                &lt;p&gt;
+                    詳細については、&lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;Form Builder のドキュメント&lt;/a&gt;を参照してください。
+                &lt;/p&gt;
+            </help>
         </copy>
         <paste>
-            <label>クリップボードから貼り付け</label>
+            <label>貼り付け</label>
+            <help>
+                &lt;p&gt;
+                    これにより、Microsoft Excel や Google スプレッドシートなどから、タブ区切り形式（TSV）の選択肢をクリップボードから貼り付けることができます。
+                &lt;/p&gt;
+                &lt;p&gt;
+                    想定される列はラベル、値、およびオプションのヒントです。貼り付け時、選択肢は現在の言語の値によって照合されます。
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;既存の値は更新されます。&lt;/li&gt;
+                    &lt;li&gt;存在しない値は新規追加されます。&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    代わりにすべての選択肢を置き換えるには、貼り付ける前に&lt;strong&gt;すべて削除&lt;/strong&gt;ボタンを使用してください。
+                &lt;/p&gt;
+                &lt;p&gt;
+                    詳細については、&lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;Form Builder のドキュメント&lt;/a&gt;を参照してください。
+                &lt;/p&gt;
+            </help>
         </paste>
         <paste-failed>
             <label>貼り付けに失敗しました。クリップボードの形式を解析できません。</label>
@@ -1213,7 +1242,18 @@
             <label>ヒント</label>
         </hint-header>
         <clear-value>
-            <label>値をクリア</label>
+            <label>選択解除</label>
+            <help>
+                &lt;p&gt;
+                    これにより、このコントロールのデフォルトの選択をクリアして、フォームが最初に表示されたときにデフォルトでどの選択肢も選択されないようにすることができます。
+                &lt;/p&gt;
+                &lt;p&gt;
+                    単一選択コントロール（ラジオボタンやドロップダウンメニューなど）の場合、選択したオプションの選択を解除できます。
+                &lt;/p&gt;
+                &lt;p&gt;
+                    詳細については、&lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#selected-items"&gt;Form Builder のドキュメント&lt;/a&gt;を参照してください。
+                &lt;/p&gt;
+            </help>
         </clear-value>
         <remove-all>
             <label>すべて削除</label>

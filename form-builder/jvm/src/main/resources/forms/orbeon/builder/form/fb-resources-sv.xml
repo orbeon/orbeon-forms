@@ -1199,10 +1199,39 @@
     </dialog-pdf>
     <dialog-itemsets>
         <copy>
-            <label>Kopiera till urklipp</label>
+            <label>Kopiera</label>
+            <help>
+                &lt;p&gt;
+                    Detta låter dig kopiera alla alternativ (etikett, värde och ledtråd) för det aktuella språket till urklipp i tabbavgränsat format (TSV).
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Du kan sedan klistra in dem i ett kalkylblad, till exempel Microsoft Excel eller Google Sheets, för att hantera eller följa alternativen.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    För mer information, se &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;Form Builder-dokumentationen&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </copy>
         <paste>
-            <label>Klistra in från urklipp</label>
+            <label>Klistra in</label>
+            <help>
+                &lt;p&gt;
+                    Detta låter dig klistra in alternativ från urklipp i tabbavgränsat format (TSV), till exempel från Microsoft Excel eller Google Sheets.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    De förväntade kolumnerna är etikett, värde och valfritt ledtråd. Vid inklistring matchas alternativen efter värde för det aktuella språket:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;Befintliga värden uppdateras.&lt;/li&gt;
+                    &lt;li&gt;Saknade värden läggs till.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    För att ersätta alla alternativ använder du knappen &lt;strong&gt;Ta bort alla&lt;/strong&gt; innan du klistrar in.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    För mer information, se &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;Form Builder-dokumentationen&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </paste>
         <paste-failed>
             <label>Klistra in misslyckades. Urklippsformatet kan inte tolkas.</label>
@@ -1221,7 +1250,18 @@
             <label>Anvisning</label>
         </hint-header>
         <clear-value>
-            <label>Rensa</label>
+            <label>Avmarkera</label>
+            <help>
+                &lt;p&gt;
+                    Detta låter dig rensa standardvalet för denna kontroll, så att inget alternativ är markerat som standard när formuläret först visas.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    För kontroller med enkelval (som radioknappar eller rullgardinsmenyer) kan du med detta avmarkera det valda alternativet.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    För mer information, se &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#selected-items"&gt;Form Builder-dokumentationen&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </clear-value>
         <remove-all>
             <label>Ta bort alla</label>

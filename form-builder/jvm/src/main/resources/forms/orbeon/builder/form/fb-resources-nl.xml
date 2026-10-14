@@ -1180,10 +1180,39 @@
     </dialog-pdf>
     <dialog-itemsets>
         <copy>
-            <label>Kopiëren naar klembord</label>
+            <label>Kopiëren</label>
+            <help>
+                &lt;p&gt;
+                    Hiermee kunt u alle keuzes (label, waarde en hint) voor de huidige taal naar het klembord kopiëren in door tabs gescheiden indeling (TSV).
+                &lt;/p&gt;
+                &lt;p&gt;
+                    U kunt ze vervolgens in een spreadsheetprogramma zoals Microsoft Excel of Google Sheets plakken om keuzes te beheren of bij te houden.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Zie voor meer informatie de &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;Form Builder-documentatie&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </copy>
         <paste>
-            <label>Plakken vanaf klembord</label>
+            <label>Plakken</label>
+            <help>
+                &lt;p&gt;
+                    Hiermee kunt u keuzes vanaf het klembord plakken in door tabs gescheiden indeling (TSV), zoals vanuit Microsoft Excel of Google Sheets.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    De verwachte kolommen zijn label, waarde en optioneel hint. Bij het plakken worden keuzes vergeleken op waarde voor de huidige taal:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;Bestaande waarden worden bijgewerkt.&lt;/li&gt;
+                    &lt;li&gt;Ontbrekende waarden worden toegevoegd.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    Gebruik vóór het plakken de knop &lt;strong&gt;Alles verwijderen&lt;/strong&gt; om alle keuzes te vervangen.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Zie voor meer informatie de &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;Form Builder-documentatie&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </paste>
         <paste-failed>
             <label>Plakken mislukt. Het klembordformaat kan niet worden geparseerd.</label>
@@ -1202,7 +1231,18 @@
             <label>Hint</label>
         </hint-header>
         <clear-value>
-            <label>Waarde wissen</label>
+            <label>Deselecteren</label>
+            <help>
+                &lt;p&gt;
+                    Hiermee wist u de standaardselectie voor dit besturingselement, zodat er standaard geen keuze is geselecteerd wanneer het formulier voor het eerst wordt weergegeven.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Voor besturingselementen met één selectie (zoals keuzerondjes of dropdown-menu's) kunt u hiermee de geselecteerde optie deselecteren.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Zie voor meer informatie de &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#selected-items"&gt;Form Builder-documentatie&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </clear-value>
         <remove-all>
             <label>Alles verwijderen</label>

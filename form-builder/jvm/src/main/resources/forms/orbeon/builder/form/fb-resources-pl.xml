@@ -1196,10 +1196,39 @@
     </dialog-pdf>
     <dialog-itemsets>
         <copy>
-            <label>Kopiuj do schowka</label>
+            <label>Kopiuj</label>
+            <help>
+                &lt;p&gt;
+                    Umożliwia skopiowanie wszystkich opcji wyboru (etykiety, wartości i wskazówki) dla bieżącego języka do schowka w formacie rozdzielanym tabulatorami (TSV).
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Możesz je następnie wkleić do arkusza kalkulacyjnego, takiego jak Microsoft Excel lub Google Sheets, aby nimi zarządzać.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Więcej informacji znajdziesz w &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;dokumentacji Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </copy>
         <paste>
-            <label>Wklej ze schowka</label>
+            <label>Wklej</label>
+            <help>
+                &lt;p&gt;
+                    Umożliwia wklejenie opcji wyboru ze schowka w formacie rozdzielanym tabulatorami (TSV), na przykład z programu Microsoft Excel lub Google Sheets.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Oczekiwane kolumny to etykieta, wartość oraz opcjonalnie wskazówka. Podczas wklejania opcje są dopasowywane według wartości dla bieżącego języka:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;Istniejące wartości są aktualizowane.&lt;/li&gt;
+                    &lt;li&gt;Brakujące wartości są dodawane.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    Aby zastąpić wszystkie opcje, przed wklejeniem użyj przycisku &lt;strong&gt;Usuń wszystko&lt;/strong&gt;.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Więcej informacji znajdziesz w &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;dokumentacji Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </paste>
         <paste-failed>
             <label>Wklejanie nie powiodło się. Nie można zinterpretować formatu schowka.</label>
@@ -1218,7 +1247,18 @@
             <label>Podpowiedź</label>
         </hint-header>
         <clear-value>
-            <label>Wyczyść wartość</label>
+            <label>Odznacz</label>
+            <help>
+                &lt;p&gt;
+                    Umożliwia wyczyszczenie domyślnego wyboru dla tej kontrolki, dzięki czemu po początkowym wyświetleniu formularza żadna opcja nie jest zaznaczona.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    W przypadku kontrolek pojedynczego wyboru (takich jak przyciski radiowe lub menu rozwijane) pozwala to na odznaczenie wybranej opcji.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Więcej informacji znajdziesz w &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#selected-items"&gt;dokumentacji Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </clear-value>
         <remove-all>
             <label>Usuń wszystko</label>

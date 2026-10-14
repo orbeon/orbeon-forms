@@ -1193,10 +1193,39 @@
     </dialog-pdf>
     <dialog-itemsets>
         <copy>
-            <label>Kopioi leikepöydälle</label>
+            <label>Kopioi</label>
+            <help>
+                &lt;p&gt;
+                    Tämän avulla voit kopioida nykyisen kielen kaikki valinnat (nimike, arvo ja vihje) leikepöydälle sarkainerotellussa muodossa (TSV).
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Voit sitten liittää ne taulukkolaskentaohjelmaan, kuten Microsoft Exceliin tai Google Sheetsiin, valintojen hallintaa tai seurantaa varten.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Lisätietoja on &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;Form Builder -dokumentaatiossa&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </copy>
         <paste>
-            <label>Liitä leikepöydältä</label>
+            <label>Liitä</label>
+            <help>
+                &lt;p&gt;
+                    Tämän avulla voit liittää valintoja leikepöydältä sarkainerotellussa muodossa (TSV), kuten Microsoft Excelistä tai Google Sheetsistä.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Odotetut sarakkeet ovat nimike, arvo ja valinnainen vihje. Liitettäessä valinnat täsmätään arvon mukaan nykyiselle kielelle:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;Olemassa olevat arvot päivitetään.&lt;/li&gt;
+                    &lt;li&gt;Puuttuvat arvot lisätään.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    Jos haluat korvata kaikki valinnat, käytä &lt;strong&gt;Poista kaikki&lt;/strong&gt; -painiketta ennen liittämistä.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Lisätietoja on &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;Form Builder -dokumentaatiossa&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </paste>
         <paste-failed>
             <label>Liittäminen epäonnistui. Leikepöydän muotoa ei voida jäsentää.</label>
@@ -1215,7 +1244,18 @@
             <label>Vihje</label>
         </hint-header>
         <clear-value>
-            <label>Tyhjennä arvo</label>
+            <label>Poista valinta</label>
+            <help>
+                &lt;p&gt;
+                    Tämän avulla voit tyhjentää tämän säätimen oletusvalinnan, jotta mitään valintaa ei ole oletuksena valittuna, kun lomake näytetään ensimmäisen kerran.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Yksivalintasäätimissä (kuten valintanapeissa tai pudotusvalikoissa) tämän avulla voit poistaa valitun vaihtoehdon valinnan.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Lisätietoja on &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#selected-items"&gt;Form Builder -dokumentaatiossa&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </clear-value>
         <remove-all>
             <label>Poista kaikki</label>

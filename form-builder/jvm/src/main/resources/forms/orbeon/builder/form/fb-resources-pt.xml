@@ -1179,10 +1179,39 @@
     </dialog-pdf>
     <dialog-itemsets>
         <copy>
-            <label>Copiar para a área de transferência</label>
+            <label>Copiar</label>
+            <help>
+                &lt;p&gt;
+                    Permite copiar todas as opções (rótulo, valor e dica) para o idioma atual para a área de transferência no formato separado por tabulações (TSV).
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Em seguida, pode colá-las numa folha de cálculo, como o Microsoft Excel ou o Google Sheets, para gerir ou acompanhar opções.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Para mais informações, consulte a &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;documentação do Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </copy>
         <paste>
-            <label>Colar da área de transferência</label>
+            <label>Colar</label>
+            <help>
+                &lt;p&gt;
+                    Permite colar opções da área de transferência no formato separado por tabulações (TSV), como a partir do Microsoft Excel ou Google Sheets.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    As colunas esperadas são rótulo, valor e opcionalmente dica. Ao colar, as opções são correspondidas por valor para o idioma atual:
+                &lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;Os valores existentes são atualizados.&lt;/li&gt;
+                    &lt;li&gt;Os valores em falta são adicionados.&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;p&gt;
+                    Para substituir todas as opções, use o botão &lt;strong&gt;Remover Tudo&lt;/strong&gt; antes de colar.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Para mais informações, consulte a &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#copying-and-pasting-items"&gt;documentação do Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </paste>
         <paste-failed>
             <label>Falha ao colar. O formato da área de transferência não pode ser analisado.</label>
@@ -1201,7 +1230,18 @@
             <label>Pista</label>
         </hint-header>
         <clear-value>
-            <label>Limpar Valor</label>
+            <label>Desmarcar</label>
+            <help>
+                &lt;p&gt;
+                    Permite limpar a seleção padrão deste controle, de modo que nenhuma opção seja selecionada por padrão quando o formulário é exibido inicialmente.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Para controles de seleção única (como botões de rádio ou menus suspensos), isso permite desmarcar a opção selecionada.
+                &lt;/p&gt;
+                &lt;p&gt;
+                    Para mais informações, consulte a &lt;a target="_blank" href="https://doc.orbeon.com/form-builder/form-editor/itemset-editor#selected-items"&gt;documentação do Form Builder&lt;/a&gt;.
+                &lt;/p&gt;
+            </help>
         </clear-value>
         <remove-all>
             <label>Remover Tudo</label>

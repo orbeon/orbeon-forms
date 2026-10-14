@@ -742,6 +742,7 @@
         },
         {
           "card-type": "form-data",
+          "thumbnail": "/apps/fr/style/images/orbeon/library.svg",
           "app": "orbeon",
           "form": "builder",
           "version": 1

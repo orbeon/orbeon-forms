@@ -87,6 +87,9 @@ object HtmlParsing extends HtmlParsingPlatform {
           } else {
             None
           }
+        case "data-orbeon-keyboard-shortcut" | "data-orbeon-keyboard-shortcut-condition" =>
+          val v = attValue.trimAllToEmpty
+          if (v.forall(c => c >= ' ' && c != 127)) Some(v) else None
         case _ =>
           // 2. Element-specific attributes
           sanitizeElementAttribute(lowerElemName, lowerAttName, attValue)

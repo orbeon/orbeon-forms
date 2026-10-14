@@ -1769,7 +1769,7 @@
         <metadata-edit-title>フォームメタデータ</metadata-edit-title>
         <select-template-output>開始に使うフォームテンプレートを選択してください。</select-template-output>
         <app-form-optional>フォームを識別するアプリ名とフォーム名を今入力できます。未定なら後で入力できます。保存または公開の前に入力を求められます。</app-form-optional>
-        <app-form-required>フォームを識別するアプリ名とフォーム名を入力してください。保存や公開の前に必要です。</app-form-required>
+        <app-form-required>以下の必須項目を入力してください。続行する前に必要です。</app-form-required>
         <save-as-metadata-output>このフォームのコピーに使う新しいアプリ名とフォーム名を入力してください:</save-as-metadata-output>
         <xpath-errors>フォームに {0,choice,1#1件のXPathエラーがあります|1&lt;{0,number,integer} 件の計算式エラーがあります}。</xpath-errors>
         <lhha-checkbox>HTMLタグを入力する場合はこのチェックボックスをオン</lhha-checkbox>

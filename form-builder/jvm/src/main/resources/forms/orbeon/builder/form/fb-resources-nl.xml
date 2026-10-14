@@ -1758,7 +1758,7 @@
         <metadata-edit-title>Form metagegevens</metadata-edit-title>
         <select-template-output>Selecteer een formsjabloon om als uitgangspunt te gebruiken.</select-template-output>
         <app-form-optional>Geef de applicatienaam en formnaam op, die worden gebruikt ter identificatie van uw form.</app-form-optional>
-        <app-form-required>Geef de applicatienaam en formnaam op, die worden gebruikt ter identificatie van uw form.</app-form-required>
+        <app-form-required>Vul de verplichte velden hieronder in. Deze informatie is nodig voordat u verder kunt gaan.</app-form-required>
         <save-as-metadata-output>Voer een nieuwe applicatienaam en formnaam in die worden gebruikt voor de kopie van dit form:</save-as-metadata-output>
         <xpath-errors>Er {0,choice,1#is een XPath fout|1&lt;zijn {0,number,integer} XPath fouten} in uw form.</xpath-errors>
         <lhha-checkbox>Activeer deze optie als u HTML tags wilt gebruiken</lhha-checkbox>

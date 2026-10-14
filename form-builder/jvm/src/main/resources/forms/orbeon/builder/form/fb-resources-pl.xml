@@ -1774,7 +1774,7 @@
         <metadata-edit-title>Metadane formularza</metadata-edit-title>
         <select-template-output>Wybierz szablon formularza jako punkt wyjścia.</select-template-output>
         <app-form-optional>Możesz podać nazwę aplikacji i formularza już teraz. Jeśli jeszcze jej nie znasz, zrobisz to później, przed zapisem lub publikacją formularza.</app-form-optional>
-        <app-form-required>Podaj nazwę aplikacji i formularza. Informacje te są wymagane przed zapisem lub publikacją formularza.</app-form-required>
+        <app-form-required>Wypełnij poniższe wymagane pola. Te informacje są niezbędne, aby kontynuować.</app-form-required>
         <save-as-metadata-output>Wprowadź nową nazwę aplikacji i formularza, które zostaną użyte dla kopii tego formularza:</save-as-metadata-output>
         <xpath-errors>W formularzu {0,choice,1#jest jeden błąd XPath|1&lt;jest {0,number,integer} błędów formuł}.</xpath-errors>
         <lhha-checkbox>Zaznacz to pole, jeśli chcesz wpisywać znaczniki HTML</lhha-checkbox>

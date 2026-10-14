@@ -1771,7 +1771,7 @@
         <metadata-edit-title>Lomakkeen metatiedot</metadata-edit-title>
         <select-template-output>Valitse lomakemalli käytettäväksi lähtökohtana.</select-template-output>
         <app-form-optional>Ole hyvä ja toimita sovelluksen sekä lomakkeesi nimi. Näitä tietoja käytetään lomakkeesi tunnistamiseen.</app-form-optional>
-        <app-form-required>Ole hyvä ja toimita sovelluksen sekä lomakkeesi nimi. Näitä tietoja käytetään lomakkeesi tunnistamiseen.</app-form-required>
+        <app-form-required>Täytä alla olevat pakolliset kentät. Näitä tietoja tarvitaan ennen kuin voit jatkaa.</app-form-required>
         <save-as-metadata-output>Syötä uusi nimi sekä sovellukselle että lomakkeelle. Näitä käytetään tämän lomakkeen kopiota varten:</save-as-metadata-output>
         <xpath-errors>Lomakkeestasi löytyi {0,choice,1#yksi XPath virhe|1&lt; {0,number,integer} XPath virhettä}.</xpath-errors>
         <lhha-checkbox>Merkkaa tämä valintaruutu jos haluat kirjoittaa HTML-tageja</lhha-checkbox>

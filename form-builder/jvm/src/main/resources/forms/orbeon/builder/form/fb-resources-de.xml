@@ -1727,7 +1727,7 @@
         <metadata-edit-title>Formularmetadaten</metadata-edit-title>
         <select-template-output>Bitte wählen Sie eine Formularvorlage als Ausgangspunkt aus.</select-template-output>
         <app-form-optional>Geben Sie einen Anwendungstitel und einen Formulartitel ein, welche für die Identifizierung Ihres Formulars verwendet werden.</app-form-optional>
-        <app-form-required>Geben Sie einen Anwendungs- und einen Formularnamen an, um Ihr Formular zu identifizieren. Diese Information ist erforderlich, bevor Sie Ihr Formular speichern oder veröffentlichen können.</app-form-required>
+        <app-form-required>Füllen Sie die erforderlichen Felder unten aus. Diese Information ist erforderlich, bevor Sie fortfahren können.</app-form-required>
         <save-as-metadata-output>Geben Sie einen neuen Anwendungstitel und Formulartitel ein, welche für die Kopie dieses Formulars verwendet werden:
         </save-as-metadata-output>
         <xpath-errors>{0,choice,1#Ein XPath Fehler|1&lt;{0,number,integer} XPath Fehler} im Formular.</xpath-errors>

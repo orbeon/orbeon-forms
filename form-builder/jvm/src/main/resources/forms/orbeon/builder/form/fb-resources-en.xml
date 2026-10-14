@@ -1795,7 +1795,7 @@
         <metadata-edit-title>Form Metadata</metadata-edit-title>
         <select-template-output>Please select a form template to use as a starting point.</select-template-output>
         <app-form-optional>If you wish, you can provide an application and form name to identify your form right now. If you don't yet know what to enter, you can do this later. You will be prompted for it before you can save or publish your form.</app-form-optional>
-        <app-form-required>Please provide an application and form name to identify your form. This information is necessary before you can save or publish your form.</app-form-required>
+        <app-form-required>Please fill in the required fields below. This information is necessary before you can continue.</app-form-required>
         <save-as-metadata-output>Enter a new application name and form name to be used for the copy of this form:</save-as-metadata-output>
         <xpath-errors>There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} formula errors} in your form.</xpath-errors>
         <lhha-checkbox>Mark this checkbox if you'd like to type HTML tags</lhha-checkbox>

@@ -1758,7 +1758,7 @@
         <metadata-edit-title>Metadata for skjemaet</metadata-edit-title>
         <select-template-output>Velg en skjemamal som skal brukes som utgangspunkt.</select-template-output>
         <app-form-optional>Angi et applikasjons- og et skjemanavn som vil brukes for å identifisere skjemaet.</app-form-optional>
-        <app-form-required>Angi et applikasjons- og et skjemanavn for å identifisere skjemaet ditt. Denne informasjonen er nødvendig før du kan lagre eller publisere skjemaet ditt.</app-form-required>
+        <app-form-required>Fyll ut de obligatoriske feltene nedenfor. Denne informasjonen er nødvendig før du kan fortsette.</app-form-required>
         <save-as-metadata-output>Angi et nytt applikasjonsnavn og skjemanavn som skal brukes for kopien av dette skjemaet:</save-as-metadata-output>
         <xpath-errors>Det {0,choice,1#er én XPath-feil|1&lt;er {0,number,integer} formelfeil} i skjemaet ditt.</xpath-errors>
         <lhha-checkbox>Merk av i denne boksen hvis du vil skrive HTML-tagger</lhha-checkbox>

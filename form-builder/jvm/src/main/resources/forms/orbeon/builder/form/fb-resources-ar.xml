@@ -1777,7 +1777,7 @@
         <metadata-edit-title>بيانات وصفية للنموذج</metadata-edit-title>
         <select-template-output>الرجاء اختيار قالب نموذج لاستخدامه كنقطة بداية.</select-template-output>
         <app-form-optional>إذا رغبت، يمكنك تقديم اسم تطبيق واسم نموذج لتحديد نموذجك الآن. إذا كنت لا تعرف بعد ما ستدخله، يمكنك القيام بذلك لاحقاً. سيُطلب منك ذلك قبل أن تتمكن من حفظ أو نشر نموذجك.</app-form-optional>
-        <app-form-required>الرجاء تقديم اسم تطبيق واسم نموذج لتحديد نموذجك. هذه المعلومات ضرورية قبل أن تتمكن من حفظ أو نشر نموذجك.</app-form-required>
+        <app-form-required>الرجاء ملء الحقول المطلوبة أدناه. هذه المعلومات ضرورية قبل أن تتمكن من المتابعة.</app-form-required>
         <save-as-metadata-output>أدخل اسم تطبيق جديد واسم نموذج ليتم استخدامهما لنسخة من هذا النموذج:</save-as-metadata-output>
         <xpath-errors>هناك {0,choice,1#خطأ واحد في XPath|1&lt;{0,number,integer} أخطاء في الصيغ} في نموذجك.</xpath-errors>
         <lhha-checkbox>حدد هذا المربع إذا كنت ترغب في كتابة علامات HTML</lhha-checkbox>

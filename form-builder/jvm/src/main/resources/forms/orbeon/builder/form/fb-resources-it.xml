@@ -1730,7 +1730,7 @@
         <metadata-edit-title>metadati del modulo</metadata-edit-title>
         <select-template-output>Seleziona un modello di modulo da usare come punto di partenza.</select-template-output>
         <app-form-optional>Si prega di fornire un nome per l'applicazione e per il modulo, che saranno utilizzati per identificare il tuo modulo.</app-form-optional>
-        <app-form-required>Si prega di fornire un nome per l'applicazione e per il modulo, che saranno utilizzati per identificare il tuo modulo.</app-form-required>
+        <app-form-required>Si prega di compilare i campi obbligatori qui sotto. Queste informazioni sono necessarie prima di poter continuare.</app-form-required>
         <save-as-metadata-output>Inserisci un nuovo nome per l'applicazione e per il modulo che saranno usati per la copia di questo modulo:</save-as-metadata-output>
         <xpath-errors>{0,choice,1# Un errore XPath è stato trovato |1&lt; {0,number,integer} errori sono stati trovati} nel tuo modulo.</xpath-errors>
         <lhha-checkbox>Contrassegna questa casella se vuoi usare tag HTML</lhha-checkbox>

@@ -1771,7 +1771,7 @@
         <metadata-edit-title>Metadata del Formulario</metadata-edit-title>
         <select-template-output>Seleccione una plantilla de formulario para usar como punto de partida.</select-template-output>
         <app-form-optional>Por favor ingrese nombre de aplicación y de formulario, que serán usados para identificar su formulario.</app-form-optional>
-        <app-form-required>Por favor ingrese nombre de aplicación y de formulario, que serán usados para identificar su formulario.</app-form-required>
+        <app-form-required>Por favor complete los campos obligatorios a continuación. Esta información es necesaria para poder continuar.</app-form-required>
         <save-as-metadata-output>Ingrese el nombre de la nueva apliación y formulario ha ser usado para copiar este formulario:</save-as-metadata-output>
         <xpath-errors>Hay {0,choice,1#is one XPath error|1&lt;are {0,number,integer} formula errors} en su formulario.</xpath-errors>
         <lhha-checkbox>Marque el checkbox si quiere ingresar etiquetas HTML</lhha-checkbox>

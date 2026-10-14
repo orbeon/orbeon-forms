@@ -1757,7 +1757,7 @@
         <metadata-edit-title>Meta-dados do formulário</metadata-edit-title>
         <select-template-output>Por favor seleccione um modelo de formulário para usar como ponto de partida.</select-template-output>
         <app-form-optional>Por favor forneça um nome para a aplicação e para o formulário que serão usados para identificar o seu formulário.</app-form-optional>
-        <app-form-required>Por favor forneça um nome para a aplicação e para o formulário que serão usados para identificar o seu formulário.</app-form-required>
+        <app-form-required>Por favor preencha os campos obrigatórios abaixo. Esta informação é necessária para poder continuar.</app-form-required>
         <save-as-metadata-output>Introduza um novo nome de aplicação e um nome de formulário para ser usado para cópia deste formulário:</save-as-metadata-output>
         <xpath-errors> {0,choice,1#Existe um erro de XPath |1&lt;Existem {0,number,integer} erros de XPath} no seu formulário.</xpath-errors>
         <lhha-checkbox>Seleccione esta checkbox se gostaria introduzir tags de HTML</lhha-checkbox>

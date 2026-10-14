@@ -1757,7 +1757,7 @@
         <metadata-edit-title>Описание формы</metadata-edit-title>
         <select-template-output>Пожалуйста, выберите шаблон формы для использования в качестве отправной точки.</select-template-output>
         <app-form-optional>Задайте название приложения и название формы.</app-form-optional>
-        <app-form-required>Задайте название приложения и название формы.</app-form-required>
+        <app-form-required>Заполните обязательные поля ниже. Эта информация необходима, чтобы продолжить.</app-form-required>
         <save-as-metadata-output>Задайте название приложения и название формы, куда необходимо сохранить данную форму:</save-as-metadata-output>
         <xpath-errors>В вашей форме {0,choice,1#одна ошибка XPath|1&lt;{0,number,integer} ошибок XPath}.</xpath-errors>
         <lhha-checkbox>Отметьте этот флажок, если хотите использовать HTML-теги</lhha-checkbox>

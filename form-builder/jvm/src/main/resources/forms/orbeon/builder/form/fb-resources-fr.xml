@@ -1795,8 +1795,8 @@
         <controls-will-be-deleted>{0,choice,0#Aucun contrôle ne sera supprimé.|1#1 contrôle sera supprimé.|1&lt;{0,number,integer} contrôles seront supprimés.}</controls-will-be-deleted>
         <metadata-edit-title>Métadonnées</metadata-edit-title>
         <select-template-output>Veuillez sélectionner un modèle de formulaire comme point de départ.</select-template-output>
-        <app-form-optional>Si vous le souhaitez, vous pouvez fournier un nom d'application et un nom de formulaire maintenant. Si vous ne savez pas encore quelles valeurs entrer, vous pouvez faire ceci plus tard. Form Builder vous demandera cette information avant de sauvegarder ou de publier votre formulaire.</app-form-optional>
-        <app-form-required>Veuillez fournir un nom d'application et un nom de formulaire. Cette information est nécessaire pour pouvoir sauvegarder ou publier le formulaire.</app-form-required>
+        <app-form-optional>Si vous le souhaitez, vous pouvez fournir un nom d'application et un nom de formulaire maintenant. Si vous ne savez pas encore quelles valeurs entrer, vous pouvez faire ceci plus tard. Form Builder vous demandera cette information avant de sauvegarder ou de publier votre formulaire.</app-form-optional>
+        <app-form-required>Veuillez remplir les champs obligatoires ci-dessous. Cette information est nécessaire pour pouvoir continuer.</app-form-required>
         <save-as-metadata-output>Veuillez fournir un nom d'application et un nom de formulaire qui sera utilisé pour la copie de ce formulaire:</save-as-metadata-output>
         <xpath-errors>Il y a {0,choice,1#une erreur|1&lt;{0,number,integer} erreurs} XPath dans votre formulaire.</xpath-errors>
         <lhha-checkbox>Cochez cette case si vous souhaitez saisir des balises HTML</lhha-checkbox>

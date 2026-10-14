@@ -1693,6 +1693,7 @@
         <undo>Отменить последнюю операцию</undo>
         <redo>Повторить последнюю операцию</redo>
         <open-control-settings>Открыть диалог настроек элемента управления</open-control-settings>
+        <open-edit-choices>Открыть диалог редактирования элементов</open-edit-choices>
         <apply-ok-dialog>Применить/OK (нажимает главную кнопку)</apply-ok-dialog>
         <open-quick-search>Открыть быстрый поиск элементов управления</open-quick-search>
         <open-form-settings>Открыть настройки формы</open-form-settings>

@@ -1705,6 +1705,7 @@
         <undo>最後の操作を元に戻す</undo>
         <redo>最後の操作をやり直す</redo>
         <open-control-settings>コントロール設定ダイアログを開く</open-control-settings>
+        <open-edit-choices>選択肢編集ダイアログを開く</open-edit-choices>
         <apply-ok-dialog>適用/OK（メインボタンをクリック）</apply-ok-dialog>
         <open-quick-search>クイックコントロール検索を開く</open-quick-search>
         <open-form-settings>フォーム設定を開く</open-form-settings>

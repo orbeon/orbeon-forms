@@ -1707,6 +1707,7 @@
         <undo>Kumoa viimeisin toiminto</undo>
         <redo>Tee viimeisin toiminto uudelleen</redo>
         <open-control-settings>Avaa ohjauselementin asetukset -valintaikkuna</open-control-settings>
+        <open-edit-choices>Avaa vaihtoehtojen muokkaus -valintaikkuna</open-edit-choices>
         <apply-ok-dialog>Käytä/OK (napsauttaa pääpainiketta)</apply-ok-dialog>
         <open-quick-search>Avaa ohjauselementtien pikahaku</open-quick-search>
         <open-form-settings>Avaa lomakeasetukset</open-form-settings>

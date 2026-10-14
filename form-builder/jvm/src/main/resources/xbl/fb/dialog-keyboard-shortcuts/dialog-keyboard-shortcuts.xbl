@@ -143,9 +143,16 @@
                                             <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.redo', '|fr-form-resources|')"/></xh:td>
                                         </xh:tr>
                                         <xh:tr>
-                                            <xh:td rowspan="15"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.all-dialogs', '|fr-form-resources|')"/></xh:td>
+                                            <xh:td rowspan="14"><xf:output ref="xxf:r('dialog-keyboard-shortcuts.all-dialogs', '|fr-form-resources|')"/></xh:td>
                                             <xh:td><xh:kbd>⇧↵</xh:kbd></xh:td>
                                             <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-control-settings', '|fr-form-resources|')"/></xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <xh:kbd class="fb-for-platform-apple">⌥↵</xh:kbd>
+                                                <xh:kbd class="fb-for-platform-other">Alt+↵</xh:kbd>
+                                            </xh:td>
+                                            <xh:td><xf:output ref="xxf:r('dialog-keyboard-shortcuts.open-edit-choices', '|fr-form-resources|')"/></xh:td>
                                         </xh:tr>
                                         <xh:tr>
                                             <xh:td>

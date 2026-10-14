@@ -1666,6 +1666,7 @@
         <undo>Annulla l'ultima operazione</undo>
         <redo>Ripristina l'ultima operazione</redo>
         <open-control-settings>Apri la finestra impostazioni controllo</open-control-settings>
+        <open-edit-choices>Apri la finestra modifica scelte</open-edit-choices>
         <apply-ok-dialog>Applica/OK (clicca il pulsante principale)</apply-ok-dialog>
         <open-quick-search>Apri la ricerca rapida controlli</open-quick-search>
         <open-form-settings>Apri impostazioni modulo</open-form-settings>

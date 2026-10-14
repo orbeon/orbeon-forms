@@ -1707,6 +1707,7 @@
         <undo>Deshacer la última operación</undo>
         <redo>Rehacer la última operación</redo>
         <open-control-settings>Abrir el diálogo de configuración del control</open-control-settings>
+        <open-edit-choices>Abrir el diálogo de edición de opciones</open-edit-choices>
         <apply-ok-dialog>Aplicar/OK (hace clic en el botón principal)</apply-ok-dialog>
         <open-quick-search>Abrir la búsqueda rápida de controles</open-quick-search>
         <open-form-settings>Abrir configuración del formulario</open-form-settings>

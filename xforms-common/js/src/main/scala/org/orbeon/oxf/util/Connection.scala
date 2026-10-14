@@ -323,11 +323,8 @@ object Connection extends ConnectionTrait {
     )
   }
 
-  def isInternalPath(path: String)(implicit propertySet: PropertySet): Boolean = false
-
   def findInternalUrl(
     normalizedUrl: URI,
-    filter       : String => Boolean,
     servicePrefix: String
   ): Option[String] = None
 

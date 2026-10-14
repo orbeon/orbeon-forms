@@ -198,25 +198,14 @@ object Connection extends ConnectionTrait {
     )
   }
 
-  def isInternalPath(path: String)(implicit propertySet: PropertySet): Boolean = {
-    val p = propertySet.getPropertyOrThrow(HttpInternalPathsProperty)
-    val r = p.associatedValue(_.stringValue.r)
-
-    r.pattern.matcher(path).matches()
-  }
-
   def findInternalUrl(
     normalizedUrl  : URI,
-    filter         : String => Boolean,
     servicePrefix  : String
   ): Option[String] = {
     val normalizedUrlString = normalizedUrl.toString
-    for {
-      // #7944: match service prefix at the start only (not in a query parameter, for example)
-      pathQuery <- normalizedUrlString.startsWith(servicePrefix).option(normalizedUrlString.substring(servicePrefix.length).prependSlash)
-      if filter(splitQuery(pathQuery)._1)
-    } yield
-      pathQuery
+    normalizedUrlString
+      .startsWith(servicePrefix)
+      .option(normalizedUrlString.substring(servicePrefix.length).prependSlash)
   }
 
   // Build all the connection headers
@@ -362,7 +351,6 @@ object Connection extends ConnectionTrait {
 
     private val SupportedNonHttpReadonlySchemes = Set[UriScheme](UriScheme.File, UriScheme.Oxf, UriScheme.Data)
 
-    val HttpInternalPathsProperty               = "oxf.http.internal-paths"
     val HttpForwardCookiesProperty              = "oxf.http.forward-cookies"
     val HttpForwardCookiesSessionPrefixProperty = "oxf.http.forward-cookies.session.prefix"
     val HttpForwardCookiesSessionSuffixProperty = "oxf.http.forward-cookies.session.suffix"
@@ -533,7 +521,7 @@ object Connection extends ConnectionTrait {
             }
 
             val (clientType, effectiveConnectionUrlString, response) =
-              findInternalUrl(normalizedUrl, isInternalPath, safeRequestCtx.servicePrefix) match {
+              findInternalUrl(normalizedUrl, safeRequestCtx.servicePrefix) match {
                 case Some(internalPath) =>
                   (
                     "internal",

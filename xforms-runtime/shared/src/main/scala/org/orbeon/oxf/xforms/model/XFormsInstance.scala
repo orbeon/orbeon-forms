@@ -19,10 +19,8 @@ import org.orbeon.dom
 import org.orbeon.dom.*
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.http.HttpMethod
-import org.orbeon.oxf.properties.{PropertyLoader, PropertySet}
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.CollectionUtils.*
-import org.orbeon.oxf.util.Connection.isInternalPath
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 import org.orbeon.oxf.xforms.*
@@ -90,15 +88,13 @@ object InstanceCaching {
     sourceURI     : String,
     method        : HttpMethod,
     requestContent: Option[(Array[Byte], String)]
-  ): InstanceCaching = {
-    implicit val propertySet: PropertySet = PropertyLoader.getPropertyStore(CoreCrossPlatformSupport.requestOpt).globalPropertySet
+  ): InstanceCaching =
     InstanceCaching(
       timeToLive        = timeToLive,
       handleXInclude    = handleXInclude,
       pathOrAbsoluteURI =
         Connection.findInternalUrl(
           normalizedUrl = URI.create(sourceURI).normalize,
-          filter        = isInternalPath,
           servicePrefix = CoreCrossPlatformSupport.externalContext.getRequest.servicePrefix
         ).getOrElse(sourceURI), // adjust for internal path so replication works
       method            = method,
@@ -110,7 +106,6 @@ object InstanceCaching {
         )
       }
     )
-  }
 }
 
 /**

@@ -21,7 +21,6 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext}
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.HttpMethod.{GET, HttpMethodsWithRequestBody, POST}
 import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, StatusCode}
-import org.orbeon.oxf.properties.{PropertyLoader, PropertySet}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.debug
 
@@ -72,11 +71,8 @@ trait ConnectionTrait {
     resourceResolver: Option[ResourceResolver]
   ): IO[AsyncConnectionResult]
 
-  def isInternalPath(path: String)(implicit propertySet: PropertySet): Boolean
-
   def findInternalUrl(
     normalizedUrl: URI,
-    filter       : String => Boolean,
     servicePrefix: String
   ): Option[String]
 
@@ -267,13 +263,10 @@ trait ConnectionTrait {
 
     // 4. Authorization token only for internal connections
     // https://github.com/orbeon/orbeon-forms/issues/4388
-    val tokenHeaderCapitalized = {
-      def propertySet: PropertySet = PropertyLoader.fromSafeRequestContext(safeRequestCtx).globalPropertySet
-      // #7944: use same filter (isInternalPath) as Connection.connect (previously _ => true)
-      findInternalUrl(normalizedUrl, isInternalPath(_)(propertySet), safeRequestCtx.servicePrefix)
+    val tokenHeaderCapitalized =
+      findInternalUrl(normalizedUrl, safeRequestCtx.servicePrefix)
         .isDefined
         .flatList(buildTokenHeaderCapitalized.toList)
-    }
 
     // Don't forward headers for which a value is explicitly passed by the caller, so start with headersToForward
     // New cookie header, if present, overrides any existing cookies

@@ -1741,6 +1741,7 @@
         <undo>Ångra senaste åtgärden</undo>
         <redo>Gör om senaste åtgärden</redo>
         <open-control-settings>Öppna kontrollinställningsdialogrutan</open-control-settings>
+        <open-edit-choices>Öppna dialogrutan för att ändra alternativ</open-edit-choices>
         <apply-ok-dialog>Tillämpa/OK (klickar på huvudknappen)</apply-ok-dialog>
         <open-quick-search>Öppna snabbsökning för kontroller</open-quick-search>
         <open-form-settings>Öppna formulärinställningar</open-form-settings>
@@ -1760,6 +1761,7 @@
         <insert-grid>Infoga ett nytt rutnät</insert-grid>
         <insert-repeated-grid>Infoga ett nytt upprepande rutnät</insert-repeated-grid>
         <reload-toolbox>Ladda om verktygslådan</reload-toolbox>
+        <open-processes>Öppna processredigeraren</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Meddelanden</label>

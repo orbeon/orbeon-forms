@@ -1694,6 +1694,7 @@
         <undo>Laatste bewerking ongedaan maken</undo>
         <redo>Laatste bewerking opnieuw uitvoeren</redo>
         <open-control-settings>Besturingselement instellingen openen</open-control-settings>
+        <open-edit-choices>Dialoogvenster keuzes bewerken openen</open-edit-choices>
         <apply-ok-dialog>Toepassen/OK (klikt op de hoofdknop)</apply-ok-dialog>
         <open-quick-search>Snelzoeken voor besturingselementen openen</open-quick-search>
         <open-form-settings>Formulierinstellingen openen</open-form-settings>
@@ -1713,6 +1714,7 @@
         <insert-grid>Nieuw raster invoegen</insert-grid>
         <insert-repeated-grid>Nieuw herhalend raster invoegen</insert-repeated-grid>
         <reload-toolbox>Gereedschapskist herladen</reload-toolbox>
+        <open-processes>Proceseditor openen</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Berichten</label>

@@ -1694,6 +1694,7 @@
         <undo>Angre siste operasjon</undo>
         <redo>Gjør om siste operasjon</redo>
         <open-control-settings>Åpne dialogboks for kontrollinnstillinger</open-control-settings>
+        <open-edit-choices>Åpne dialogboks for redigering av valg</open-edit-choices>
         <apply-ok-dialog>Bruk/OK (klikker på hovedknappen)</apply-ok-dialog>
         <open-quick-search>Åpne hurtigsøk for kontroller</open-quick-search>
         <open-form-settings>Åpne skjemainnstillinger</open-form-settings>
@@ -1713,6 +1714,7 @@
         <insert-grid>Sett inn et nytt rutenett</insert-grid>
         <insert-repeated-grid>Sett inn et nytt gjentakende rutenett</insert-repeated-grid>
         <reload-toolbox>Last inn verktøykassen på nytt</reload-toolbox>
+        <open-processes>Åpne prosessredigering</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Meldinger</label>

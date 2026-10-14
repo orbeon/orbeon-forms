@@ -1707,6 +1707,7 @@
         <undo>Deshacer la última operación</undo>
         <redo>Rehacer la última operación</redo>
         <open-control-settings>Abrir el diálogo de configuración del control</open-control-settings>
+        <open-edit-choices>Abrir el diálogo de edición de opciones</open-edit-choices>
         <apply-ok-dialog>Aplicar/OK (hace clic en el botón principal)</apply-ok-dialog>
         <open-quick-search>Abrir la búsqueda rápida de controles</open-quick-search>
         <open-form-settings>Abrir configuración del formulario</open-form-settings>
@@ -1726,6 +1727,7 @@
         <insert-grid>Insertar una nueva cuadrícula</insert-grid>
         <insert-repeated-grid>Insertar una nueva cuadrícula repetida</insert-repeated-grid>
         <reload-toolbox>Recargar la caja de herramientas</reload-toolbox>
+        <open-processes>Abrir el editor de procesos</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Mensajes</label>

@@ -1731,6 +1731,7 @@
         <undo>Undo the last operation</undo>
         <redo>Redo the last operation</redo>
         <open-control-settings>Open the Control Settings dialog</open-control-settings>
+        <open-edit-choices>Open the Edit Choices dialog</open-edit-choices>
         <apply-ok-dialog>Apply/OK dialog (clicks primary button)</apply-ok-dialog>
         <open-quick-search>Open the Quick control search</open-quick-search>
         <open-form-settings>Open Form Settings</open-form-settings>

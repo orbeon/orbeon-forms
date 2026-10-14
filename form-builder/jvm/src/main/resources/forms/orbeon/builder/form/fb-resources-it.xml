@@ -1666,6 +1666,7 @@
         <undo>Annulla l'ultima operazione</undo>
         <redo>Ripristina l'ultima operazione</redo>
         <open-control-settings>Apri la finestra impostazioni controllo</open-control-settings>
+        <open-edit-choices>Apri la finestra modifica scelte</open-edit-choices>
         <apply-ok-dialog>Applica/OK (clicca il pulsante principale)</apply-ok-dialog>
         <open-quick-search>Apri la ricerca rapida controlli</open-quick-search>
         <open-form-settings>Apri impostazioni modulo</open-form-settings>
@@ -1685,6 +1686,7 @@
         <insert-grid>Inserisci una nuova griglia</insert-grid>
         <insert-repeated-grid>Inserisci una nuova griglia ripetuta</insert-repeated-grid>
         <reload-toolbox>Ricarica la casella degli strumenti</reload-toolbox>
+        <open-processes>Apri editor dei processi</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Messaggi</label>

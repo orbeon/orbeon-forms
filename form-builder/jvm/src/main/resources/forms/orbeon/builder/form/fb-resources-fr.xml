@@ -1732,6 +1732,7 @@
         <undo>Annuler la dernière opération</undo>
         <redo>Rétablir la dernière opération</redo>
         <open-control-settings>Ouvrir la fenêtre des propriétés du contrôle</open-control-settings>
+        <open-edit-choices>Ouvrir la fenêtre d'édition des choix</open-edit-choices>
         <apply-ok-dialog>Appliquer/OK (cliquer sur le bouton principal)</apply-ok-dialog>
         <open-quick-search>Ouvrir la recherche rapide de contrôle</open-quick-search>
         <open-form-settings>Ouvrir les paramètres du formulaire</open-form-settings>

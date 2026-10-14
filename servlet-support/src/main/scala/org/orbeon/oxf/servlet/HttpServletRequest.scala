@@ -80,8 +80,8 @@ trait HttpServletRequest extends ServletRequest {
   def isUserInRole(role: String): Boolean
 
   lazy val headerNamesWithValues: List[(String, NonEmptyList[String])] =
-    getHeaderNames.asScala
-      .map { headerName => headerName -> NonEmptyList.fromList(getHeaders(headerName).asScala.toList) }
+    Option(getHeaderNames).fold(Iterator.empty[String])(_.asScala)
+      .map { headerName => headerName -> NonEmptyList.fromList(Option(getHeaders(headerName)).fold(List.empty[String])(_.asScala.toList)) }
       .collect { case (name, Some(valueNel)) => name -> valueNel } // value list *should* be non-empty in the first place
       .toList
 
@@ -92,8 +92,10 @@ trait HttpServletRequest extends ServletRequest {
   // custom filters. Here we try to be case-insensitive by first finding the header name ignoring case, and then
   // getting the headers for that name using the exact case of the header name found.
   def headerValuesNel(name: String): Option[NonEmptyList[String]] =
-    getHeaderNames.asScala
-      .collectFirst { case headerName if headerName.equalsIgnoreCase(name) => NonEmptyList.fromList(getHeaders(headerName).asScala.toList) }
+    Option(getHeaderNames).fold(Iterator.empty[String])(_.asScala)
+      .collectFirst { case headerName if headerName.equalsIgnoreCase(name) =>
+        NonEmptyList.fromList(Option(getHeaders(headerName)).fold(List.empty[String])(_.asScala.toList))
+      }
       .collect { case Some(valueNel) => valueNel }
 
   def headersAsStringForDebug: String =

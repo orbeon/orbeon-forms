@@ -29,6 +29,16 @@ import scala.jdk.CollectionConverters.*
 
 class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpecLike with MockitoSugar {
 
+  def newMockServletContext(attributes: Map[String, AnyRef] = Map.empty): ServletContext = {
+    val contextAttributes = mutable.Map[String, AnyRef](attributes.toSeq: _*)
+    val mockContext = mock[ServletContext]
+    Mockito when mockContext.getAttribute(ArgumentMatchers.anyString) thenAnswer
+      ((invocation: InvocationOnMock) => contextAttributes.get(invocation.getArguments()(0).asInstanceOf[String]).orNull)
+    Mockito when mockContext.setAttribute(ArgumentMatchers.anyString, ArgumentMatchers.any) thenAnswer
+      ((invocation: InvocationOnMock) => contextAttributes += invocation.getArguments()(0).asInstanceOf[String] -> invocation.getArguments()(1))
+    mockContext
+  }
+
   describe("The servlet filter's `amendRequest()` function") {
 
     def newMockSession(): HttpSession = {
@@ -46,7 +56,13 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
         (n => n -> req.headerValuesList(n)) toMap
 
     // Request with initial headers
-    def newAmendedRequest(path: String, headers: Map[String, List[String]], session: HttpSession = newMockSession()): (HttpServletRequest, HttpSession) = {
+    def newAmendedRequest(
+      path          : String,
+      headers       : Map[String, List[String]],
+      session       : HttpSession            = newMockSession(),
+      queryString   : Option[String]         = None,
+      servletContext: Option[ServletContext] = None
+    ): (HttpServletRequest, HttpSession) = {
 
       val requestAttributes = mutable.Map[String, AnyRef]()
       val mockRequest =
@@ -60,6 +76,8 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
           override def getHeaderNames = headers.keysIterator.asJavaEnumeration
           override def getSession(create: Boolean) = session
           override def getPathInfo: String = path
+          override def getQueryString: String = queryString.orNull
+          override def getServletContext: ServletContext = servletContext.orNull
         }
 
       (FormRunnerAuthFilterImpl.amendRequest(mockRequest)(PropertyLoader.getPropertyStore(None).globalPropertySet), session)
@@ -105,6 +123,91 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
       assertThrows[IllegalStateException](amendedRequest.getSession(true))
       assert(amendedRequest.getRequestedSessionId == null)
       assert(! amendedRequest.isRequestedSessionIdValid)
+    }
+
+    it("must allow session creation for services when fr-keep-form-session=true and valid Orbeon-Token are passed") {
+
+      val testToken = "test-token"
+      val mockContext = newMockServletContext(Map(Headers.OrbeonTokenLower -> testToken))
+      val headersWithToken = testOrbeonHeaders + (Headers.OrbeonToken -> List(testToken))
+      val (amendedRequest, session) = newAmendedRequest(
+        "/fr/service/orbeon/builder/new",
+        headersWithToken,
+        queryString = Some("fr-keep-form-session=true"),
+        servletContext = Some(mockContext)
+      )
+
+      assert(amendedRequest.getSession(true) == session)
+      assert(CredentialsSupport.findCredentialsInRequest(amendedRequest.getAttribute(_)).contains(testCredentials))
+    }
+
+    it("must prevent session creation for services when fr-keep-form-session=true is passed without valid Orbeon-Token") {
+
+      val testToken = "test-token"
+      val mockContext = newMockServletContext(Map(Headers.OrbeonTokenLower -> testToken))
+
+      // No token header
+      val (amendedRequestNoToken, _) = newAmendedRequest(
+        "/fr/service/orbeon/builder/new",
+        testOrbeonHeaders,
+        queryString = Some("fr-keep-form-session=true"),
+        servletContext = Some(mockContext)
+      )
+      assertThrows[IllegalStateException](amendedRequestNoToken.getSession(true))
+
+      // Wrong token header
+      val (amendedRequestWrongToken, _) = newAmendedRequest(
+        "/fr/service/orbeon/builder/new",
+        testOrbeonHeaders + (Headers.OrbeonToken -> List("wrong-token")),
+        queryString = Some("fr-keep-form-session=true"),
+        servletContext = Some(mockContext)
+      )
+      assertThrows[IllegalStateException](amendedRequestWrongToken.getSession(true))
+    }
+  }
+
+  describe("`FormRunnerAuthFilterImpl.isService` and `preserveSession`") {
+
+    it("must detect service paths") {
+      val serviceReq = new HttpServletRequestWrapper(mock[HttpServletRequest]) {
+        override def getPathInfo: String = "/fr/service/orbeon/builder/new"
+      }
+      val nonServiceReq = new HttpServletRequestWrapper(mock[HttpServletRequest]) {
+        override def getPathInfo: String = "/fr/orbeon/builder/new"
+      }
+
+      assert(FormRunnerAuthFilterImpl.isService(serviceReq))
+      assert(! FormRunnerAuthFilterImpl.isService(nonServiceReq))
+    }
+
+    it("must detect whether session should be preserved") {
+      val testToken = "test-token"
+      val mockContext = newMockServletContext(Map(Headers.OrbeonTokenLower -> testToken))
+
+      def newMockRequest(queryStringOpt: Option[String], tokenOpt: Option[String]) =
+        new HttpServletRequestWrapper(mock[HttpServletRequest]) {
+          override def getPathInfo: String = "/fr/service/orbeon/builder/new"
+          override def getQueryString: String = queryStringOpt.orNull
+          override def getServletContext: ServletContext = mockContext
+          override def getHeader(name: String): String =
+            if (name.equalsIgnoreCase(Headers.OrbeonToken)) tokenOpt.orNull else null
+          override def getHeaders(name: String): java.util.Enumeration[String] =
+            if (name.equalsIgnoreCase(Headers.OrbeonToken)) tokenOpt.iterator.asJavaEnumeration else Iterator.empty.asJavaEnumeration
+          override def getHeaderNames: java.util.Enumeration[String] =
+            tokenOpt.map(_ => Headers.OrbeonToken).iterator.asJavaEnumeration
+        }
+
+      // Valid token + keep-form-session
+      assert(FormRunnerAuthFilterImpl.preserveSession(newMockRequest(Some("fr-keep-form-session=true"), Some(testToken))))
+
+      // Wrong token
+      assert(! FormRunnerAuthFilterImpl.preserveSession(newMockRequest(Some("fr-keep-form-session=true"), Some("wrong-token"))))
+
+      // Missing token
+      assert(! FormRunnerAuthFilterImpl.preserveSession(newMockRequest(Some("fr-keep-form-session=true"), None)))
+
+      // Valid token but no keep-form-session
+      assert(! FormRunnerAuthFilterImpl.preserveSession(newMockRequest(None, Some(testToken))))
     }
   }
 
@@ -258,6 +361,39 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
 
       assert(! amendedResponse.isInstanceOf[StatelessHttpServletResponse])
       assert(amendedResponse eq mockResponse)
+    }
+
+    it("must not wrap response for service calls with fr-keep-form-session=true and valid Orbeon-Token") {
+      val testToken = "test-token"
+      val mockContext = newMockServletContext(Map(Headers.OrbeonTokenLower -> testToken))
+      val mockRequest = new HttpServletRequestWrapper(mock[HttpServletRequest]) {
+        override def getPathInfo: String = "/fr/service/orbeon/builder/new"
+        override def getQueryString: String = "fr-keep-form-session=true"
+        override def getServletContext: ServletContext = mockContext
+        override def getHeader(name: String): String =
+          if (name.equalsIgnoreCase(Headers.OrbeonToken)) testToken else null
+        override def getHeaders(name: String): java.util.Enumeration[String] =
+          if (name.equalsIgnoreCase(Headers.OrbeonToken)) Iterator(testToken).asJavaEnumeration else Iterator.empty.asJavaEnumeration
+        override def getHeaderNames: java.util.Enumeration[String] =
+          Iterator(Headers.OrbeonToken).asJavaEnumeration
+      }
+      val mockResponse = mock[HttpServletResponse]
+      val amendedResponse = FormRunnerAuthFilterImpl.amendResponse(mockRequest, mockResponse)
+
+      assert(! amendedResponse.isInstanceOf[StatelessHttpServletResponse])
+      assert(amendedResponse eq mockResponse)
+    }
+
+    it("must wrap response with StatelessHttpServletResponse for service calls with fr-keep-form-session=true but invalid Orbeon-Token") {
+      val mockRequest = new HttpServletRequestWrapper(mock[HttpServletRequest]) {
+        override def getPathInfo: String = "/fr/service/orbeon/builder/new"
+        override def getQueryString: String = "fr-keep-form-session=true"
+        override def getHeaderNames: java.util.Enumeration[String] = Iterator.empty.asJavaEnumeration
+      }
+      val mockResponse = mock[HttpServletResponse]
+      val amendedResponse = FormRunnerAuthFilterImpl.amendResponse(mockRequest, mockResponse)
+
+      assert(amendedResponse.isInstanceOf[StatelessHttpServletResponse])
     }
   }
 }

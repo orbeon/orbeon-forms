@@ -18,6 +18,8 @@ import org.orbeon.oxf.externalcontext.CredentialsSupport
 import org.orbeon.oxf.fr.FormRunnerAuth
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.{PropertyLoader, PropertySet}
+import org.orbeon.oxf.util.*
+import org.orbeon.oxf.util.PathUtils.splitQueryDecodeParams
 import org.orbeon.oxf.util.StringUtils.*
 import org.slf4j.LoggerFactory
 
@@ -78,11 +80,29 @@ object FormRunnerAuthFilterImpl {
 
   private val logger = LoggerFactory.getLogger("org.orbeon.filter.form-runner-auth")
 
+  val KeepFormSessionParam = "fr-keep-form-session"
+
   def isService(servletRequest: HttpServletRequest): Boolean =
     servletRequest.getRequestPathInfo.startsWith("/fr/service/")
 
+  private def hasValidToken(servletRequest: HttpServletRequest): Boolean = {
+    val incomingToken = servletRequest.headerFirstValueOpt(Headers.OrbeonToken)
+    val appToken      = Option(servletRequest.getServletContext)
+      .flatMap(ctx => Option(ctx.getAttribute(Headers.OrbeonTokenLower)))
+      .collect { case token: String => token }
+
+    incomingToken.isDefined && incomingToken == appToken
+  }
+
+  def preserveSession(servletRequest: HttpServletRequest): Boolean = {
+    val path = servletRequest.getRequestPathInfo
+    val url  = Option(servletRequest.getQueryString).fold(path)(qs => s"$path?$qs")
+
+    splitQueryDecodeParams(url)._2.contains(KeepFormSessionParam -> "true") && hasValidToken(servletRequest)
+  }
+
   def amendResponse(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse): HttpServletResponse =
-    if (isService(servletRequest))
+    if (isService(servletRequest) && ! preserveSession(servletRequest))
       new StatelessHttpServletResponse(servletResponse)
     else
       servletResponse
@@ -96,7 +116,7 @@ object FormRunnerAuthFilterImpl {
     // The Form Runner service path is hardcoded but that's ok. When we are filtering a service, we don't retrieve the
     // credentials, which would be provided by the container or by incoming headers. Instead, credentials are provided
     // directly with `Orbeon-*` headers. See https://github.com/orbeon/orbeon-forms/issues/2275
-    // For service calls, do not create or use a session (#6780).
+    // For service calls, do not create or use a session (#6780), unless the session must be preserved.
     val requestWithAmendedHeaders =
       if (isService) {
         val getHttpHeaders = (name: String) => servletRequest.headerValuesList(name)
@@ -111,7 +131,10 @@ object FormRunnerAuthFilterImpl {
           servletRequest.removeAttribute,
           credentialsOpt
         )
-        new StatelessHttpServletRequest(servletRequest)
+        if (preserveSession(servletRequest))
+          servletRequest
+        else
+          new StatelessHttpServletRequest(servletRequest)
       } else {
         // Do not create a session for fonts, source maps, or OPTIONS requests
         val createSession = ! (servletRequest.isFont || servletRequest.isSourceMap || servletRequest.isOptions)

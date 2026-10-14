@@ -110,8 +110,9 @@ object APISupport {
               content = contentFromRequest,
               url     = url,
               path    = sanitizedResourcePath,
-              headers = proxyCapitalizeAndCombineHeaders(req.headerNamesWithValues, request = true).toList,
-              params  = Nil
+              headers = browserHeadersToForward(req),
+              params  = Nil,
+              canUpdateRemoteSession = false
             )
           )
 
@@ -149,8 +150,9 @@ object APISupport {
           content = Some(contentFromRequest),
           url     = settings.formRunnerURL.dropTrailingSlash + Constants.XFormsServerSubmit,
           path    = Constants.XFormsServerSubmit,
-          headers = proxyCapitalizeAndCombineHeaders(req.headerNamesWithValues, request = true).toList,
-          params  = Nil
+          headers = browserHeadersToForward(req),
+          params  = Nil,
+          canUpdateRemoteSession = false
         ))
 
       contentOrRedirect match {
@@ -398,6 +400,13 @@ object APISupport {
     val RemoteSessionIdKey    = "orbeon.form-runner.remote-session-id"
     val LastNamespaceIndexKey = "orbeon.form-runner.last-namespace-index"
 
+    val CredentialsHeaderNamesLower = Set(OrbeonUsernameLower, OrbeonGroupLower, OrbeonRolesLower, OrbeonCredentialsLower)
+
+    def browserHeadersToForward(req: HttpServletRequest): List[(String, String)] =
+      proxyCapitalizeAndCombineHeaders(req.headerNamesWithValues, request = true)
+        .filterNot { case (name, _) => CredentialsHeaderNamesLower(name.toLowerCase) }
+        .toList
+
     // POST when we get RequestDetails for:
     //
     // - actions requests
@@ -411,7 +420,11 @@ object APISupport {
       ctx.httpClient.connect(
         url         = recombineQuery(requestDetails.url, requestDetails.params),
         credentials = None,
-        cookieStore = getOrCreateCookieStore,
+        cookieStore =
+          if (requestDetails.canUpdateRemoteSession)
+            getOrCreateCookieStore
+          else
+            copyOfCookieStore,
         method      = if (requestDetails.content.isEmpty) GET else POST,
         headers     = requestDetails.headersMapWithContentType + (Headers.OrbeonClient -> List(ctx.client)),
         content     = requestDetails.content
@@ -419,11 +432,20 @@ object APISupport {
         requestCtx  = None
       )
 
+    private def findCookieStore(implicit ctx: EmbeddingContext): Option[CookieStore] =
+      ctx.getSessionAttribute(RemoteSessionIdKey).map(_.asInstanceOf[CookieStore])
+
     private def getOrCreateCookieStore(implicit ctx: EmbeddingContext): CookieStore =
-      ctx.getSessionAttribute(RemoteSessionIdKey).map(_.asInstanceOf[CookieStore]).getOrElse {
+      findCookieStore.getOrElse {
         val newCookieStore = new BasicCookieStore
         ctx.setSessionAttribute(RemoteSessionIdKey, newCookieStore)
         newCookieStore
       }
+
+    private def copyOfCookieStore(implicit ctx: EmbeddingContext): CookieStore = {
+      val newCookieStore = new BasicCookieStore
+      findCookieStore.foreach(_.getCookies.forEach(newCookieStore.addCookie))
+      newCookieStore
+    }
   }
 }

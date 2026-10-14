@@ -39,11 +39,12 @@ object FormRunnerMode extends Enum[FormRunnerMode] {
 }
 
 case class RequestDetails(
-  content : Option[StreamedContent],
-  url     : String,
-  path    : String, // this is the path used to create the URL // xxx only used for `mustRewriteForPath()`
-  headers : List[(String, String)],
-  params  : List[(String, String)]
+  content               : Option[StreamedContent],
+  url                   : String,
+  path                  : String, // this is the path used to create the URL // xxx only used for `mustRewriteForPath()`
+  headers               : List[(String, String)],
+  params                : List[(String, String)],
+  canUpdateRemoteSession: Boolean = true
 ) {
   def contentType: Option[String] =
     content flatMap (_.contentType)

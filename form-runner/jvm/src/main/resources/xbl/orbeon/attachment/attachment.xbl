@@ -391,7 +391,7 @@
                             context="xxf:instance('i')/error-messages"
                             origin="xf:element('error-message', $error-message)"/>
                     </xf:action>
-                    <xf:action if="$upload-error-appearance != 'inline'" type="xpath">
+                    <xf:action if="not($upload-error-appearance = 'inline')" type="xpath">
                         frf:errorMessage($error-message)
                     </xf:action>
 

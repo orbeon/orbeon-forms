@@ -150,8 +150,14 @@
                                     form-name,
                                     '/',
                                     $link-to,
-                                    '?form-version=',
-                                    form-version
+                                    if (
+                                        $link-to = 'summary' and
+                                        form-version != '1'  and
+                                        xxf:property(string-join(('oxf.fr.summary.show-version-selector', application-name, form-name), '.'))
+                                    ) then
+                                        concat('?form-version=', form-version)
+                                    else
+                                        ''
                                 )"/>
                     <!-- This doesn't work because we remove the form description from the metadata -->
 <!--                        <xf:hint ref="(description[@xml:lang = xxf:lang()], description)[normalize-space()][1]"/>-->

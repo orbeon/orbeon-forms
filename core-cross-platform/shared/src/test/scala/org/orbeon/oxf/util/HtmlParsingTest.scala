@@ -75,6 +75,20 @@ class HtmlParsingTest extends AnyFunSpec {
 
       // Attribute value escaping against breakout
       ("""<a title="foo&quot; onclick=&quot;alert('1')">Link</a>""" , """<a title="foo&quot; onclick=&quot;alert('1')">Link</a>""", KeepFilter),
+
+      // Keyboard shortcuts
+      ("""<kbd data-orbeon-keyboard-shortcut="⌘S">Save</kbd>"""      , """<kbd data-orbeon-keyboard-shortcut="⌘S">Save</kbd>"""   , KeepFilter),
+      ("""<kbd title="Keyboard shortcut" data-orbeon-keyboard-shortcut="⌘S" data-orbeon-keyboard-shortcut-condition="clipboard-empty"></kbd>""",
+       """<kbd title="Keyboard shortcut" data-orbeon-keyboard-shortcut="⌘S" data-orbeon-keyboard-shortcut-condition="clipboard-empty"></kbd>""", KeepFilter),
+      ("""<kbd data-orbeon-keyboard-shortcut="⌘S ctrl+s">Save</kbd>""", """<kbd data-orbeon-keyboard-shortcut="⌘S ctrl+s">Save</kbd>""", KeepFilter),
+      ("""<kbd data-orbeon-keyboard-shortcut="TW">Test</kbd>"""     , """<kbd data-orbeon-keyboard-shortcut="TW">Test</kbd>"""  , KeepFilter),
+      ("""<kbd data-orbeon-keyboard-shortcut="/">Search</kbd>"""    , """<kbd data-orbeon-keyboard-shortcut="/">Search</kbd>""" , KeepFilter),
+      ("""<kbd data-orbeon-keyboard-shortcut="">None</kbd>"""       , """<kbd data-orbeon-keyboard-shortcut="">None</kbd>"""    , KeepFilter),
+      ("""<kbd data-orbeon-keyboard-shortcut-condition="clipboard-empty">Paste</kbd>""", """<kbd data-orbeon-keyboard-shortcut-condition="clipboard-empty">Paste</kbd>""", KeepFilter),
+      ("""<kbd data-orbeon-keyboard-shortcut-condition="">Empty</kbd>""", """<kbd data-orbeon-keyboard-shortcut-condition="">Empty</kbd>""", KeepFilter),
+      (s"""<kbd data-orbeon-keyboard-shortcut="bad${1.toChar}val">X</kbd>""", """<kbd>X</kbd>"""                                         , KeepFilter),
+      (s"""<kbd data-orbeon-keyboard-shortcut-condition="bad${1.toChar}val">X</kbd>""", """<kbd>X</kbd>"""                               , KeepFilter),
+      ("""<kbd data-foo="bar">Foo</kbd>"""                          , """<kbd>Foo</kbd>"""                                      , KeepFilter),
     )
 
     for ((input, output, filter) <- expected) {

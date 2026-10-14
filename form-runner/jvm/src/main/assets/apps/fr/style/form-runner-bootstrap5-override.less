@@ -6,12 +6,12 @@
 .orbeon {
 
   body& {
-    // Offset content below the fixed navbar (62px, like the Bootstrap 2 pages). Screen only: in PDF the navbar is
+    // Offset content below the fixed navbar (70px: the navbar's height plus 16px). Screen only: in PDF the navbar is
     // collapsed into the running page header. body&: embedded pages have no navbar.
     @media screen {
       .container, .container-fluid {
         &.fr-view {
-          padding-top: 62px;
+          padding-top: 70px;
         }
       }
     }

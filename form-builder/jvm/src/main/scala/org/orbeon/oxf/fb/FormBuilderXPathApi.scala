@@ -923,11 +923,10 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
-  def hasEditor(controlElement: NodeInfo, editor: String): Boolean =
-    (controlElement ne null) && {
-      implicit val index: BindingIndex[BindingDescriptor] = FormBuilderDocContext().bindingIndex
-      FormBuilder.hasEditor(controlElement, editor)
-    }
+  def hasEditor(controlElement: NodeInfo, editor: String): Boolean = {
+    implicit val index: BindingIndex[BindingDescriptor] = FormBuilderDocContext().bindingIndex
+    FormBuilder.hasEditor(controlElement, editor)
+  }
 
   //@XPathExpression
   def alwaysShowRoles: List[String] =

@@ -1693,7 +1693,6 @@
         <undo>Desfazer a última operação</undo>
         <redo>Refazer a última operação</redo>
         <open-control-settings>Abrir a caixa de diálogo de configurações do controle</open-control-settings>
-        <open-edit-choices>Abrir a caixa de diálogo de alteração de escolhas</open-edit-choices>
         <apply-ok-dialog>Aplicar/OK (clica no botão principal)</apply-ok-dialog>
         <open-quick-search>Abrir a pesquisa rápida de controles</open-quick-search>
         <open-form-settings>Abrir configurações do formulário</open-form-settings>
@@ -1713,7 +1712,6 @@
         <insert-grid>Inserir uma nova grade</insert-grid>
         <insert-repeated-grid>Inserir uma nova grade repetida</insert-repeated-grid>
         <reload-toolbox>Recarregar a caixa de ferramentas</reload-toolbox>
-        <open-processes>Abrir editor de processos</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Mensagens</label>

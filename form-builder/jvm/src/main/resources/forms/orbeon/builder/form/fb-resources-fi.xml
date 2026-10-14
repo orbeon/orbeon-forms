@@ -1707,7 +1707,6 @@
         <undo>Kumoa viimeisin toiminto</undo>
         <redo>Tee viimeisin toiminto uudelleen</redo>
         <open-control-settings>Avaa ohjauselementin asetukset -valintaikkuna</open-control-settings>
-        <open-edit-choices>Avaa vaihtoehtojen muokkaus -valintaikkuna</open-edit-choices>
         <apply-ok-dialog>Käytä/OK (napsauttaa pääpainiketta)</apply-ok-dialog>
         <open-quick-search>Avaa ohjauselementtien pikahaku</open-quick-search>
         <open-form-settings>Avaa lomakeasetukset</open-form-settings>
@@ -1727,7 +1726,6 @@
         <insert-grid>Lisää uusi ruudukko</insert-grid>
         <insert-repeated-grid>Lisää uusi toistuva ruudukko</insert-repeated-grid>
         <reload-toolbox>Lataa työkalupakki uudelleen</reload-toolbox>
-        <open-processes>Avaa prosessieditori</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Viestit</label>

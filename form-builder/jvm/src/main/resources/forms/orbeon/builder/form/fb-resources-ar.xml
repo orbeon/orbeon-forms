@@ -1713,7 +1713,6 @@
         <undo>التراجع عن العملية الأخيرة</undo>
         <redo>إعادة العملية الأخيرة</redo>
         <open-control-settings>فتح مربع حوار إعدادات عنصر التحكم</open-control-settings>
-        <open-edit-choices>فتح مربع حوار تحرير الخيارات</open-edit-choices>
         <apply-ok-dialog>تطبيق/موافق (النقر على الزر الرئيسي)</apply-ok-dialog>
         <open-quick-search>فتح البحث السريع عن عناصر التحكم</open-quick-search>
         <open-form-settings>فتح إعدادات النموذج</open-form-settings>
@@ -1733,7 +1732,6 @@
         <insert-grid>إدراج شبكة جديدة</insert-grid>
         <insert-repeated-grid>إدراج شبكة متكررة جديدة</insert-repeated-grid>
         <reload-toolbox>إعادة تحميل صندوق الأدوات</reload-toolbox>
-        <open-processes>فتح محرر العمليات</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>الرسائل</label>

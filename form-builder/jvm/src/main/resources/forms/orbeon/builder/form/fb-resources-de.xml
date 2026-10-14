@@ -1663,7 +1663,6 @@
         <undo>Letzte Operation rückgängig machen</undo>
         <redo>Letzte Operation wiederherstellen</redo>
         <open-control-settings>Steuerelement-Einstellungsdialog öffnen</open-control-settings>
-        <open-edit-choices>Auswahlmöglichkeiten-Dialog öffnen</open-edit-choices>
         <apply-ok-dialog>Anwenden/OK (klickt auf die Hauptschaltfläche)</apply-ok-dialog>
         <open-quick-search>Schnellsuche für Steuerelemente öffnen</open-quick-search>
         <open-form-settings>Formulareinstellungen öffnen</open-form-settings>
@@ -1683,7 +1682,6 @@
         <insert-grid>Neues Raster einfügen</insert-grid>
         <insert-repeated-grid>Neues wiederholendes Raster einfügen</insert-repeated-grid>
         <reload-toolbox>Werkzeugkasten neu laden</reload-toolbox>
-        <open-processes>Prozess-Editor öffnen</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Nachrichten</label>

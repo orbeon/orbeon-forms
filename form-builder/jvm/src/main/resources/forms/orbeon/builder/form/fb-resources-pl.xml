@@ -1710,7 +1710,6 @@
         <undo>Cofnij ostatnią operację</undo>
         <redo>Ponów ostatnią operację</redo>
         <open-control-settings>Otwórz okno ustawień kontrolki</open-control-settings>
-        <open-edit-choices>Otwórz okno edycji wyborów</open-edit-choices>
         <apply-ok-dialog>Zastosuj/OK (kliknij główny przycisk)</apply-ok-dialog>
         <open-quick-search>Otwórz szybkie wyszukiwanie kontrolek</open-quick-search>
         <open-form-settings>Otwórz ustawienia formularza</open-form-settings>
@@ -1730,7 +1729,6 @@
         <insert-grid>Wstaw nową siatkę</insert-grid>
         <insert-repeated-grid>Wstaw nową siatkę powtarzalną</insert-repeated-grid>
         <reload-toolbox>Przeładuj przybornik</reload-toolbox>
-        <open-processes>Otwórz edytor procesów</open-processes>
     </dialog-keyboard-shortcuts>
     <dialog-messages>
         <label>Komunikaty</label>

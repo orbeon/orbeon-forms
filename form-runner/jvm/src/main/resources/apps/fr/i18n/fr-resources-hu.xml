@@ -702,7 +702,7 @@
             <search-options>Keresési beállítások</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
             <partial-match-hint>Részleges egyezés</partial-match-hint>
-            <any>[Bármely]</any>
+            <any>Bármely</any>
             <dates>
                 <item>
                     <label>Ma</label>

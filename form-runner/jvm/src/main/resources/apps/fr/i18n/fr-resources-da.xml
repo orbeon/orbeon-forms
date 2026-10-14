@@ -693,7 +693,7 @@
             <search-options>Alternativer for søgning</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
             <partial-match-hint>Delvis match</partial-match-hint>
-            <any>[Vilkårlig]</any>
+            <any>Vilkårlig</any>
             <dates>
                 <item>
                     <label>I dag</label>

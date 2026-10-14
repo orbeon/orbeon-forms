@@ -702,7 +702,7 @@
             <search-options>Opzioni di ricerca</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
             <partial-match-hint>Corrispondenza parziale</partial-match-hint>
-            <any>[Tutti]</any>
+            <any>Tutti</any>
             <dates>
                 <item>
                     <label>Oggi</label>

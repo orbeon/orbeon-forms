@@ -739,7 +739,7 @@
             <search-options>Buscar opciones</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
             <partial-match-hint>Coincidencia parcial</partial-match-hint>
-            <any>[Cualquiera]</any>
+            <any>Cualquiera</any>
             <dates>
                 <item>
                     <label>Hoy</label>

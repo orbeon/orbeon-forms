@@ -702,7 +702,7 @@
             <search-options>خيارات البحث</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
             <partial-match-hint>تطابق جزئي</partial-match-hint>
-            <any>[أي]</any>
+            <any>أي</any>
             <dates>
                 <item>
                     <label>اليوم</label>

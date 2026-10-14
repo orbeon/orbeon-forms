@@ -702,7 +702,7 @@
             <search-options>Zoekopties</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
             <partial-match-hint>Gedeeltelijke overeenkomst</partial-match-hint>
-            <any>[Elke]</any>
+            <any>Elke</any>
             <dates>
                 <item>
                     <label>Vandaag</label>

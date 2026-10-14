@@ -702,7 +702,7 @@
             <search-options>搜索選項</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
             <partial-match-hint>部分符合</partial-match-hint>
-            <any>[任意]</any>
+            <any>任意</any>
             <dates>
                 <item>
                     <label>今天</label>

@@ -697,7 +697,7 @@
             <search-options>搜索选项</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
             <partial-match-hint>部分匹配</partial-match-hint>
-            <any>[任何]</any>
+            <any>任何</any>
             <dates>
                 <item>
                     <label>今天</label>

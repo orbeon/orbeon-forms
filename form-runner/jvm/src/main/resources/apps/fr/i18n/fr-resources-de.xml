@@ -702,7 +702,7 @@
             <search-options>Suchoptionen</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
             <partial-match-hint>Teilweise Übereinstimmung</partial-match-hint>
-            <any>[Alle]</any>
+            <any>Alle</any>
             <dates>
                 <item>
                     <label>Heute</label>

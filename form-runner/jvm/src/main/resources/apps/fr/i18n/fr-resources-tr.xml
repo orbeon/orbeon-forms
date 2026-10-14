@@ -700,7 +700,7 @@
             <search-options>Arama seçenekleri</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
             <partial-match-hint>Kısmi eşleşme</partial-match-hint>
-            <any>[Herhangi biri]</any>
+            <any>Herhangi biri</any>
             <dates>
                 <item>
                     <label>Bugün</label>

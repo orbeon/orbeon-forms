@@ -707,7 +707,7 @@
             <search-options>Options de recherche</search-options>
             <exact-match-hint>Correspondance exacte</exact-match-hint>
             <partial-match-hint>Correspondance partielle</partial-match-hint>
-            <any>[Tous]</any>
+            <any>Tous</any>
             <dates>
                 <item>
                     <label>Aujourd'hui</label>

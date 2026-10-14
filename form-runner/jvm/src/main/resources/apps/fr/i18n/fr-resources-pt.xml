@@ -702,7 +702,7 @@
             <search-options>Opções de procurar</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
             <partial-match-hint>Correspondência parcial</partial-match-hint>
-            <any>[Qualquer]</any>
+            <any>Qualquer</any>
             <dates>
                 <item>
                     <label>Hoje</label>

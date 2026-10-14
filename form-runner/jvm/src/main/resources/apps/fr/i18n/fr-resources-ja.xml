@@ -689,7 +689,7 @@
             <search-options>検索オプション</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
             <partial-match-hint>部分一致</partial-match-hint>
-            <any>[すべて]</any>
+            <any>すべて</any>
             <dates>
                 <item>
                     <label>今日</label>

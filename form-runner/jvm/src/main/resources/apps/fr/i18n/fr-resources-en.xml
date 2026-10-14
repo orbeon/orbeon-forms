@@ -703,7 +703,7 @@
             <search-options>Search options</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
             <partial-match-hint>Partial match</partial-match-hint>
-            <any>[Any]</any>
+            <any>Any</any>
             <dates>
                 <item>
                     <label>Today</label>

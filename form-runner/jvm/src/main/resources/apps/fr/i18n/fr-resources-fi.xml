@@ -702,7 +702,7 @@
             <search-options>Hakuvaihtoehdot</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
             <partial-match-hint>Osittainen osuma</partial-match-hint>
-            <any>[mikä tahansa]</any>
+            <any>Mikä tahansa</any>
             <dates>
                 <item>
                     <label>Tänään</label>

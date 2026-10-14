@@ -699,7 +699,7 @@
             <search-options>Alternativer for søk</search-options>
             <exact-match-hint>Exact match</exact-match-hint>
             <partial-match-hint>Delvis treff</partial-match-hint>
-            <any>[Vilkårlig]</any>
+            <any>Vilkårlig</any>
             <dates>
                 <item>
                     <label>I dag</label>

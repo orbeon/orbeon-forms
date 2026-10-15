@@ -54,7 +54,6 @@ object XFormsCompiler {
     "oxf.xforms.local-instance-include",
     "oxf.xforms.optimize-get-all",
     "oxf.xforms.forward-submission-headers",
-    "oxf.xforms.sanitize",
   )
 
   def isClientPropertyName(

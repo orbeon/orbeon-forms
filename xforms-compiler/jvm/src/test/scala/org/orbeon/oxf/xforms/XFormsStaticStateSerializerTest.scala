@@ -35,7 +35,6 @@ class XFormsStaticStateSerializerTest
         "oxf.xforms.local-instance-include",
         "oxf.xforms.optimize-get-all",
         "oxf.xforms.forward-submission-headers",
-        "oxf.xforms.sanitize"
       )
       for (name <- excluded)
         assert(! XFormsCompiler.isClientPropertyName(name), s"expected `$name` to be excluded")

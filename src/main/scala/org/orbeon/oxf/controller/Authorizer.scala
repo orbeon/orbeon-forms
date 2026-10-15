@@ -15,7 +15,7 @@ package org.orbeon.oxf.controller
 
 import org.orbeon.connection.{ConnectionResult, StreamedContent}
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.http.{EmptyInputStream, HttpStatusCodeException}
@@ -113,10 +113,15 @@ object Authorizer extends Logging {
       new URI(uri.getScheme, uri.getRawUserInfo, uri.getHost, uri.getPort, newPath, if (newQuery.nonEmpty) newQuery else null, null)
     }
 
-    // NOTE: If the authorizer base URL is an absolute path, it is rewritten against the host
-    def delegateAbsoluteBaseURIOpt =
-      propertySet.getStringOrURIAsStringOpt(AuthorizerProperty) map
-        (p => URI.create(URLRewriterUtils.rewriteServiceURL(request, p, UrlRewriteMode.AbsoluteNoContext)))
+    def delegateAbsoluteBaseURIOpt: Option[URI] =
+      propertySet.getStringOrURIAsStringOpt(AuthorizerProperty) flatMap { p =>
+        if (urlHasProtocol(p))
+          Some(URI.create(p))
+        else {
+          error("The `authorizer` property must be an absolute URL, denying access", Seq("authorizer" -> p))
+          None
+        }
+      }
 
     delegateAbsoluteBaseURIOpt match {
       case Some(baseDelegateURI) =>

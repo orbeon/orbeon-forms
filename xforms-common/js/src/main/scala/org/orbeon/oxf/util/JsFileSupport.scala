@@ -15,6 +15,23 @@ object JsFileSupport {
 
   val UploadUriScheme = "upload"
 
+  case class FileDetails(file: dom.File, size: Long, mediatype: Option[String]) {
+
+    // The URL must be associated only once, as each call to `URL.createObjectURL()` creates a new URL.
+    private var mustRevokeObjectUrl: Boolean = false
+    lazy val objectUrl: URI = {
+      val result = dom.URL.createObjectURL(file).asInstanceOf[String]
+      mustRevokeObjectUrl = true
+      URI.create(result)
+    }
+
+    def revokeObjectUrl(): Unit =
+      if (mustRevokeObjectUrl) {
+        dom.URL.revokeObjectURL(objectUrl.toString)
+        mustRevokeObjectUrl = false
+      }
+  }
+
   def createTemporaryFileUri(file: dom.File, size: Long, mediatype: Option[String]): URI = {
     val uri = new URI(UploadUriScheme, java.util.UUID.randomUUID.toString, null)
     temporaryFiles += uri -> FileDetails(file, size, mediatype)
@@ -25,6 +42,12 @@ object JsFileSupport {
     getFileDetails(uri).map { case FileDetails(file, _, _) =>
       file.asInstanceOf[js.Dynamic].stream().asInstanceOf[sjsdom.ReadableStream[Uint8Array]]
     }
+
+  def findTemporaryFileDetails(uri: URI): Option[FileDetails] =
+    getFileDetails(uri)
+
+  def findTemporaryFile(uri: URI): Option[dom.File] =
+    getFileDetails(uri).map(_.file)
 
   // This can be called by `proxyURI()` multiple times
   def findObjectUrl(uri: URI): Option[URI] =
@@ -46,24 +69,6 @@ object JsFileSupport {
   }
 
   private object Private {
-
-    case class FileDetails(file: dom.File, size: Long, mediatype: Option[String]) {
-
-      // The URL must be associated only once, as each call to `URL.createObjectURL()` creates a new URL.
-      private var mustRevokeObjectUrl: Boolean = false
-      lazy val objectUrl: URI = {
-        val result = dom.URL.createObjectURL(file).asInstanceOf[String]
-        mustRevokeObjectUrl = true
-        URI.create(result)
-      }
-
-      def revokeObjectUrl(): Unit =
-        if (mustRevokeObjectUrl) {
-          dom.URL.revokeObjectURL(objectUrl.toString)
-          mustRevokeObjectUrl = false
-        }
-    }
-
     var temporaryFiles: Map[URI, FileDetails] = Map.empty
 
     def getFileDetails(uri: URI): Option[FileDetails] =

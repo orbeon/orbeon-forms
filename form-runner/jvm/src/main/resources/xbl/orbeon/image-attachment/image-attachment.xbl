@@ -590,17 +590,6 @@
                         targetid="fr-image-attachment"
                         name="{event('xxf:type')}"/>
 
-                    <xf:dispatch
-                        event="xxforms-upload-done"
-                        targetid="fr-image-attachment"
-                        name="{event('xxf:type')}"
-                        propagate="stop"
-                        defaultAction="cancel">
-                        <xf:property name="filename"       value="event('filename')"/>
-                        <xf:property name="content-type"   value="event('content-type')"/>
-                        <xf:property name="content-length" value="event('content-length')"/>
-                    </xf:dispatch>
-
                     <xf:action
                         event="xxforms-upload-done"
                         if="exists(
@@ -613,6 +602,7 @@
                         )"
                         type="xpath">
                         fr:transform-uploaded-image(
+                            xxf:absolute-id('fr-image-attachment'),
                             $binding,
                             fr:component-param-value('transform-max-width'),
                             fr:component-param-value('transform-max-height'),
@@ -620,6 +610,17 @@
                             fr:component-param-value('transform-format')
                         )
                     </xf:action>
+
+                    <xf:dispatch
+                        event="xxforms-upload-done"
+                        targetid="fr-image-attachment"
+                        name="{event('xxf:type')}"
+                        propagate="stop"
+                        defaultAction="cancel">
+                        <xf:property name="filename"       value="event('filename')"/>
+                        <xf:property name="content-type"   value="event('content-type')"/>
+                        <xf:property name="content-length" value="event('content-length')"/>
+                    </xf:dispatch>
 
                 </fr:attachment>
                 <xf:output mediatype="image/*" ref="$binding[xxf:non-blank()]">

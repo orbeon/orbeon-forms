@@ -25,13 +25,14 @@ class FRTransformUploadedImage extends FunctionSupport with RuntimeDependentFunc
     implicit val ec          : ExternalContext = CoreCrossPlatformSupport.externalContext
     implicit val logger      : IndentedLogger  = XFormsAPI.inScopeContainingDocument.controls.indentedLogger
 
-    val binding = itemArgument(0).narrowTo[om.NodeInfo].getOrElse(throw new IllegalArgumentException("not a node"))
+    // Argument 0 is ignored in this implementation but used in the JS env
+    val binding = itemArgument(1).narrowTo[om.NodeInfo].getOrElse(throw new IllegalArgumentException("not a node"))
 
     val bindingValue = binding.getStringValue
-    val maxWidthOpt  = stringArgumentOpt(1).flatMap(_.trimAllToOpt).map(_.toInt)
-    val maxHeightOpt = stringArgumentOpt(2).flatMap(_.trimAllToOpt).map(_.toInt)
-    val formatOpt    = stringArgumentOpt(4).flatMap(_.trimAllToOpt)
-    val quality      = stringArgumentOpt(3).flatMap(_.trimAllToOpt).map(_.toFloat / 100f).getOrElse(0.8f)
+    val maxWidthOpt  = stringArgumentOpt(2).flatMap(_.trimAllToOpt).map(_.toInt)
+    val maxHeightOpt = stringArgumentOpt(3).flatMap(_.trimAllToOpt).map(_.toInt)
+    val quality      = stringArgumentOpt(4).flatMap(_.trimAllToOpt).map(_.toFloat / 100f).getOrElse(0.8f)
+    val formatOpt    = stringArgumentOpt(5).flatMap(_.trimAllToOpt)
 
     val mediatypeStringOpt = formatOpt flatMap Mediatypes.findMediatypeForExtension
     val mediatypeOpt       = mediatypeStringOpt.flatMap(Mediatype.unapply)

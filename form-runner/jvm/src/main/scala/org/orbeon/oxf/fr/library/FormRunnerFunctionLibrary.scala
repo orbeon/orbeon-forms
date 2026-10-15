@@ -174,6 +174,7 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     )
 
     Fun("transform-uploaded-image", classOf[FRTransformUploadedImage], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, EXACTLY_ONE),
       Arg(ITEM_TYPE, EXACTLY_ONE),
       Arg(STRING, ALLOWS_ZERO_OR_ONE),
       Arg(STRING, ALLOWS_ZERO_OR_ONE),

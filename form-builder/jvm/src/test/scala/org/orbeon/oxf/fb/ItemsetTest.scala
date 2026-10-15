@@ -308,4 +308,23 @@ class ItemsetTest
       assert(result.isEmpty)
     }
   }
+
+  describe("Build control effective id") {
+    it("must compute effective id from static id") {
+      withActionAndFBDoc(ItemsetsDoc) { implicit ctx =>
+        val staticId = "radios-control"
+        val effectiveId = FormBuilderXPathApi.buildFormBuilderControlEffectiveIdOrEmpty(staticId)
+
+        assert(effectiveId == "fb≡section-1-control≡grid-1-grid≡radios-control")
+
+        // Dropdown control
+        val dropdownEffectiveId = FormBuilderXPathApi.buildFormBuilderControlEffectiveIdOrEmpty("dropdown-control")
+        assert(dropdownEffectiveId == "fb≡section-1-control≡grid-1-grid≡dropdown-control")
+
+        // Unknown id returns static id
+        val unknownId = FormBuilderXPathApi.buildFormBuilderControlEffectiveIdOrEmpty("non-existent-control")
+        assert(unknownId == "non-existent-control")
+      }
+    }
+  }
 }

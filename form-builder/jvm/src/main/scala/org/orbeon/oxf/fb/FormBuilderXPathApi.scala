@@ -830,10 +830,12 @@ object FormBuilderXPathApi {
 
   // Find the control's bound item if any (resolved from the top-level form model `fr-form-model`)
   //@XPathFunction
-  def findControlBoundNodeByEffectiveId(controlEffectiveId: String): Option[NodeInfo] =
+  def findControlBoundNodeByEffectiveId(controlEffectiveId: String): Option[NodeInfo] = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
     findConcreteControlByEffectiveId(controlEffectiveId)
       .collect { case c: XFormsSingleNodeControl => c }
       .flatMap(_.boundNodeOpt)
+  }
 
   //@XPathFunction
   def currentLang: String =
@@ -1000,6 +1002,10 @@ object FormBuilderXPathApi {
       ).getOrElse(throw new IllegalStateException)
     )
   }
+
+  //@XPathFunction
+  def buildFormBuilderControlEffectiveIdOrEmpty(staticId: String): String =
+    FormBuilder.buildFormBuilderControlEffectiveId(staticId)(FormBuilderDocContext()).getOrElse(staticId)
 
   //@XPathFunction
   def buildFormBuilderControlNamespacedIdOrEmpty(staticId: String): String =

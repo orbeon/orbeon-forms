@@ -517,10 +517,20 @@ trait ControlOps extends ResourcesOps {
   ): Boolean =
     FormBuilder.controlElementHasEditor(controlElement, editor)
 
-  // Find the control by name (resolved from the top-level form model `fr-form-model`)
-  def findConcreteControlByEffectiveId(controlEffectiveId: String): Option[XFormsControl] =
-    inScopeContainingDocument.findObjectByEffectiveId(controlEffectiveId)
-      .map(_.asInstanceOf[XFormsControl])
+  // Find the control by effective id or static id (resolved from the top-level form model `fr-form-model`)
+  def findConcreteControlByEffectiveId(
+    controlEffectiveId: String
+  )(implicit
+    ctx               : FormBuilderDocContext
+  ): Option[XFormsControl] =
+    controlEffectiveId.trimAllToOpt.flatMap { id =>
+      val doc = inScopeContainingDocument
+      doc.findControlByEffectiveId(id) orElse
+        buildFormBuilderControlEffectiveId(XFormsId.getStaticIdFromId(id)).flatMap(doc.findControlByEffectiveId) orElse {
+          val staticId = XFormsId.getStaticIdFromId(id)
+          doc.controls.getCurrentControlTree.effectiveIdsToControls.values.find(_.getId == staticId)
+        }
+    }
 
   def setControlLabelHintHelpOrText(
     controlName : String,

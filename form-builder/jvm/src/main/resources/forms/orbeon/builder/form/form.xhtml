@@ -373,7 +373,7 @@
 
                                 <xf:dispatch name="fb-show-dialog" targetid="dialog-itemsets">
                                     <xf:property name="control-element" value="fbf:getCurrentlySelectedCell()/*[1]"/>
-                                    <xf:property name="control-effective-id" value="fbf:getCurrentlySelectedCell()/*[1]/@id/string()"/>
+                                    <xf:property name="control-effective-id" value="fbf:buildFormBuilderControlEffectiveIdOrEmpty(fbf:getCurrentlySelectedCell()/*[1]/@id/string())"/>
                                 </xf:dispatch>
                             </xf:action>
 

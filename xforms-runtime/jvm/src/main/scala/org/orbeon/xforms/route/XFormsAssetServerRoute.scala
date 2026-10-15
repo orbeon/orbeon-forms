@@ -512,7 +512,7 @@ object XFormsAssetServerRoute extends NativeRoute {
 
       // Just digest a key produced with `toString`, since we know that tuples, `List` and `Map` produce
       // a reasonable output with `toString`.
-      val key    = (uri, headers filterNot (_._1.equalsIgnoreCase("Orbeon-Token"))).toString
+      val key    = (uri, headers filterNot (_._1.equalsIgnoreCase(Headers.OrbeonToken))).toString
       val digest = SecureUtils.digestStringToHexShort(key)
 
       val mediatypeOpt        = contentTypeOpt flatMap ContentTypes.getContentTypeMediaType

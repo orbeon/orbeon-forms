@@ -63,7 +63,7 @@ object BatchDelete {
             FormRunner.createFormDataBasePathNoPrefix(
               appForm,
               version       = None,
-              isDraft       = false,
+              isDraft       = searchResult.isDraft,
               documentIdOpt = Some(searchResult.documentId)
             )                                 ::
             DataXml                           ::
@@ -72,10 +72,11 @@ object BatchDelete {
           )
 
         PersistenceApi.doDelete(
-          path                = dataPathQuery,
-          modifiedTimeOpt     = None,
-          forceDelete         = false,
-          isInternalAdminUser = false,
+          path                        = dataPathQuery,
+          modifiedTimeOpt             = None,
+          forceDelete                 = false,
+          isInternalAdminUser         = false,
+          requireLastModificationDate = false
         )
       }
       .size

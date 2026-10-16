@@ -448,10 +448,11 @@ trait PersistenceApiTrait {
   } .get
 
   def doDelete(
-    path               : String,
-    modifiedTimeOpt    : Option[Instant],
-    forceDelete        : Boolean,
-    isInternalAdminUser: Boolean
+    path                       : String,
+    modifiedTimeOpt            : Option[Instant],
+    forceDelete                : Boolean,
+    isInternalAdminUser        : Boolean,
+    requireLastModificationDate: Boolean
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
@@ -484,7 +485,7 @@ trait PersistenceApiTrait {
         headerFromRFC1123OrIso(cxr.headers, Headers.OrbeonLastModified, Headers.LastModified)
       }.get // can throw
 
-      if (lastModificationDateOpt.isEmpty && ! forceDelete) {
+      if (lastModificationDateOpt.isEmpty && requireLastModificationDate) {
         // require implementation to return modified date, unless we're force deleting
         throw HttpStatusCodeException(StatusCode.InternalServerError)
       }

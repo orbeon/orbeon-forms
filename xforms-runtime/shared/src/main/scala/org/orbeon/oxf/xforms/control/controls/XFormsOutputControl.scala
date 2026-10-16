@@ -179,61 +179,44 @@ class XFormsOutputControl(
     forDownload  : Boolean
   ): String =
     try {
-      // If the value is a file: we make sure it is signed otherwise we return the default value
-
-      def verifiedValueOrDefault[T](initial: String, value: => T, default: => T): T =
-        if (PathUtils.getProtocol(initial) == "file" && ! XFormsUploadControl.verifyMAC(initial))
-          default
-        else
-          value
-
       implicit val resourceResolver: Option[ResourceResolver] = containingDocument.staticState.resourceResolverOpt
 
       internalValue.trimAllToOpt match {
         case Some(trimmedInternalValue) =>
           getBuiltinTypeName match {
             case null | "anyURI" =>
-              val (maybeResolved, maybeProxied) =
-                if (! urlNorewrite) {
+
+              val resolvedURI =
+                if (urlNorewrite)
+                  trimmedInternalValue
+                else
                   // Resolve `xml:base` and try to obtain a path which is an absolute path without the context
-
-                  val resolvedURI =
-                    URLRewriterUtils.rewriteResourceURL(
-                      XFormsCrossPlatformSupport.externalContext.getRequest,
-                      containingDocument.resolveXMLBase(element, trimmedInternalValue).toString,
-                      URLRewriterUtils.getPathMatchers,
-                      UrlRewriteMode.AbsolutePathNoContext
-                    )
-
-                  (
-                    resolvedURI,
-                    XFormsCrossPlatformSupport.proxyURI(
-                      urlString       = resolvedURI,
-                      forEffectiveId  = effectiveId,
-                      forDownload     = forDownload,
-                      filename        = filename,
-                      contentType     = mediatype,
-                      lastModified    = XFormsCrossPlatformSupport.getLastModifiedIfFast(resolvedURI),
-                      customHeaders   = evaluatedHeaders(collector),
-                      getHeader       = containingDocument.headersGetter,
-                      fromCacheOrElse = (uri: URI, compute: () => URI) => containingDocument.staticState.fromUriCacheOrElse(uri, compute())
-                    )
-                    .map(_.toString)         // TODO: would be nice to stay with `URI`
-                    .getOrElse(defaultValue) // https://github.com/orbeon/orbeon-forms/issues/7149
+                  URLRewriterUtils.rewriteResourceURL(
+                    XFormsCrossPlatformSupport.externalContext.getRequest,
+                    containingDocument.resolveXMLBase(element, trimmedInternalValue).toString,
+                    URLRewriterUtils.getPathMatchers,
+                    UrlRewriteMode.AbsolutePathNoContext
                   )
-                } else {
-                  // Otherwise we leave the value as is
-                  (
-                    trimmedInternalValue,
-                    trimmedInternalValue
-                  )
-                }
 
-              verifiedValueOrDefault(
-                maybeResolved,
-                maybeProxied,
+              // #7952: check the value *before* proxying it, so that a refused value is never accessed or stored in the session
+              if (! XFormsOutputControl.isAllowedProxyUri(resolvedURI))
                 defaultValue
-              )
+              else if (urlNorewrite)
+                resolvedURI
+              else
+                XFormsCrossPlatformSupport.proxyURI(
+                  urlString       = resolvedURI,
+                  forEffectiveId  = effectiveId,
+                  forDownload     = forDownload,
+                  filename        = filename,
+                  contentType     = mediatype,
+                  lastModified    = XFormsCrossPlatformSupport.getLastModifiedIfFast(resolvedURI),
+                  customHeaders   = evaluatedHeaders(collector),
+                  getHeader       = containingDocument.headersGetter,
+                  fromCacheOrElse = (uri: URI, compute: () => URI) => containingDocument.staticState.fromUriCacheOrElse(uri, compute())
+                )
+                .map(_.toString)         // TODO: would be nice to stay with `URI`
+                .getOrElse(defaultValue) // https://github.com/orbeon/orbeon-forms/issues/7149
             case "base64Binary" =>
               // NOTE: "-1" for `lastModified` will cause `XFormsAssetServer` to set `Last-Modified` and `Expires` properly to "now"
               XFormsCrossPlatformSupport.proxyBase64Binary(
@@ -343,6 +326,15 @@ object XFormsOutputControl {
 
   def isTemporaryFileUri(uri: String): Boolean =
     Try(URI.create(uri)).toOption.exists(FileUtils.isTemporaryFileUri)
+
+  // #7952: only proxy values the client is expected to reach through /xforms-server/dynamic/; in particular, refuse
+  // oxf: URLs, which would expose server resources
+  def isAllowedProxyUri(uri: String): Boolean =
+    PathUtils.getProtocol(uri) match {
+      case null | "http" | "https" | "data" => true                               // null = e.g. relative/absolute path
+      case "file" | "upload"                => XFormsUploadControl.verifyMAC(uri) // temporary upload signed by hmacURL()
+      case _                                => false
+    }
 
   def getExternalValueOrDefault(
     control       : XFormsOutputControl,

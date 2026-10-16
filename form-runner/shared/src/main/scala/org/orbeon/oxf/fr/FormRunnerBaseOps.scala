@@ -117,6 +117,14 @@ case class AppForm(app: String, form: String) {
     (! AppForm.isSpecificPart(other.app)  || AppForm.isSpecificPart(app)) &&
     (! AppForm.isSpecificPart(other.form) || AppForm.isSpecificPart(form))
   }
+
+  def specificity: Int =
+    (AppForm.isSpecificPart(app), AppForm.isSpecificPart(form)) match {
+      case (true, true)   => 4
+      case (true, false)  => 3
+      case (false, true)  => 2
+      case (false, false) => 1
+    }
 }
 
 object AppForm {
@@ -367,8 +375,13 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def formRunnerProperty(name: String, appForm: AppForm, propertyProfileOpt: Option[String]): Option[String] =
     CoreCrossPlatformSupport.properties.getObjectOpt(buildPropertyName(name, appForm), propertyProfileOpt.orElse(inScopePropertyProfileOpt)).map(_.toString)
 
-  def formRunnerRawProperty(name: String, appForm: AppForm, propertyProfileOpt: Option[String] = None): Option[Property] =
-    CoreCrossPlatformSupport.properties.getPropertyOpt(buildPropertyName(name, appForm), inScopePropertyProfileOpt)
+  def formRunnerRawProperty(
+    name              : String,
+    appForm           : AppForm,
+    propertyProfileOpt: Option[String] = None,
+    propertySet       : PropertySet    = CoreCrossPlatformSupport.properties
+  ): Option[Property] =
+    propertySet.getPropertyOpt(buildPropertyName(name, appForm), propertyProfileOpt.orElse(inScopePropertyProfileOpt))
 
   def formRunnerRawProperty(name: String)(implicit p: FormRunnerParams): Option[Property] =
     CoreCrossPlatformSupport.properties.getPropertyOpt(buildPropertyName(name), inScopePropertyProfileOpt)
@@ -403,6 +416,125 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
       case List(app, form) => AppForm(app, form)
       case _               => throw new IllegalArgumentException(s"cannot match property name `$requestedName` with `${property.name}`")
     }
+
+  val WizardTocPositions: Set[String] = Set("left", "separate", "none")
+  val DefaultWizardTocPosition: String = "left"
+
+  val WizardTocPositionPropertyName: String = "oxf.xforms.xbl.fr.wizard.toc.position"
+  val WizardSeparateTocPropertyName: String = "oxf.xforms.xbl.fr.wizard.separate-toc"
+
+  def resolveWizardTocPosition(
+    app                   : String,
+    form                  : String,
+    metadataTocPositionOpt: Option[String],
+    metadataSeparateTocOpt: Option[String],
+    propertyProfileOpt    : Option[String],
+    propertySet           : PropertySet
+  ): String = {
+    val fromMetadataOpt =
+      metadataTocPositionOpt.flatMap(_.trimAllToOpt).filter(WizardTocPositions) orElse
+      metadataSeparateTocOpt.flatMap(_.trimAllToOpt).collect {
+        case "true"  => "separate"
+        case "false" => "left"
+      }
+
+    fromMetadataOpt getOrElse {
+      val appForm = AppForm(app, form)
+
+      val newPropOpt =
+        formRunnerRawProperty(WizardTocPositionPropertyName, appForm, propertyProfileOpt, propertySet).flatMap { prop =>
+          prop.stringValue.trimAllToOpt.filter(WizardTocPositions).map { value =>
+            (trailingAppFormFromProperty(WizardTocPositionPropertyName, prop), value)
+          }
+        }
+
+      val legacyPropOpt =
+        formRunnerRawProperty(WizardSeparateTocPropertyName, appForm, propertyProfileOpt, propertySet).flatMap { prop =>
+          val boolOpt = prop.stringValue.trimAllToOpt.collect {
+            case "true"  => true
+            case "false" => false
+          }
+          boolOpt.map { isSeparate =>
+            val value = if (isSeparate) "separate" else "left"
+            (trailingAppFormFromProperty(WizardSeparateTocPropertyName, prop), value)
+          }
+        }
+
+      (newPropOpt, legacyPropOpt) match {
+        case (Some((appFormNew, valNew)), Some((appFormLegacy, valLegacy))) =>
+          if (appFormNew.specificity >= appFormLegacy.specificity) valNew
+          else valLegacy
+        case (Some((_, valNew)), None) =>
+          valNew
+        case (None, Some((_, valLegacy))) =>
+          valLegacy
+        case (None, None) =>
+          DefaultWizardTocPosition
+      }
+    }
+  }
+
+  def resolveWizardTocPosition(
+    app                   : String,
+    form                  : String,
+    metadataTocPositionOpt: Option[String],
+    metadataSeparateTocOpt: Option[String]
+  ): String =
+    resolveWizardTocPosition(
+      app                    = app,
+      form                   = form,
+      metadataTocPositionOpt = metadataTocPositionOpt,
+      metadataSeparateTocOpt = metadataSeparateTocOpt,
+      propertyProfileOpt     = None,
+      propertySet            = CoreCrossPlatformSupport.properties
+    )
+
+  def resolveWizardTocPosition(
+    app                   : String,
+    form                  : String,
+    metadataTocPositionOpt: Option[String],
+    metadataSeparateTocOpt: Option[String],
+    propertyProfileOpt    : Option[String]
+  ): String =
+    resolveWizardTocPosition(
+      app                    = app,
+      form                   = form,
+      metadataTocPositionOpt = metadataTocPositionOpt,
+      metadataSeparateTocOpt = metadataSeparateTocOpt,
+      propertyProfileOpt     = propertyProfileOpt,
+      propertySet            = CoreCrossPlatformSupport.properties
+    )
+
+  //@XPathFunction
+  def resolveWizardTocPosition(
+    app                   : String,
+    form                  : String,
+    metadataTocPosition   : String,
+    metadataSeparateToc   : String,
+    propertyProfile       : String
+  ): String =
+    resolveWizardTocPosition(
+      app                    = app,
+      form                   = form,
+      metadataTocPositionOpt = Option(metadataTocPosition).flatMap(_.trimAllToOpt),
+      metadataSeparateTocOpt = Option(metadataSeparateToc).flatMap(_.trimAllToOpt),
+      propertyProfileOpt     = Option(propertyProfile).flatMap(_.trimAllToOpt)
+    )
+
+  //@XPathFunction
+  def resolveWizardTocPosition(
+    app                   : String,
+    form                  : String,
+    metadataTocPosition   : String,
+    metadataSeparateToc   : String
+  ): String =
+    resolveWizardTocPosition(
+      app                 = app,
+      form                = form,
+      metadataTocPosition = metadataTocPosition,
+      metadataSeparateToc = metadataSeparateToc,
+      propertyProfile     = null
+    )
 
   //@XPathFunction
   def isSupportedMode(modePublicNameString: String): Boolean =

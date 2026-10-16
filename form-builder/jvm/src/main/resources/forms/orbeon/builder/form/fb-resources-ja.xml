@@ -450,9 +450,13 @@
             <item id="2">すべてのセクションを表示</item>
             <item id="3">表示しない</item>
         </wizard-subsections-toc>
-        <wizard-separate-toc>
-            <label>ウィザード専用の目次を表示</label>
-        </wizard-separate-toc>
+        <wizard-toc-position>
+            <label>ウィザードの目次</label>
+            <item id="0">プロパティを使う</item>
+            <item id="1">左側</item>
+            <item id="2">別ページ</item>
+            <item id="3">なし</item>
+        </wizard-toc-position>
         <wizard-section-status>
             <label>ウィザード進捗を常に表示</label>
         </wizard-section-status>

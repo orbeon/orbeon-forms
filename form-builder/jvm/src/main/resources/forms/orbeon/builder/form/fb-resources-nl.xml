@@ -431,9 +431,13 @@
             <item id="2">Toon subsecties voor alle secties</item>
             <item id="3">Toon geen subsecties</item>
         </wizard-subsections-toc>
-        <wizard-separate-toc>
-            <label>Wizard aparte inhoudsopgave</label>
-        </wizard-separate-toc>
+        <wizard-toc-position>
+            <label>Wizard inhoudsopgave</label>
+            <item id="0">Gebruik standaard</item>
+            <item id="1">Links</item>
+            <item id="2">Apart</item>
+            <item id="3">Geen</item>
+        </wizard-toc-position>
         <wizard-section-status>
             <label>Toon altijd wizard sectie-status</label>
         </wizard-section-status>

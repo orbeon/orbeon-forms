@@ -70,6 +70,7 @@
                             <xf:property name="wizard-mode"                               value="bind('wizard-mode-bind')"/>
                             <xf:property name="wizard-subsections-nav"                    value="bind('wizard-subsections-nav-bind')"/>
                             <xf:property name="wizard-subsections-toc"                    value="bind('wizard-subsections-toc-bind')"/>
+                            <xf:property name="wizard-toc-position"                       value="bind('wizard-toc-position-bind')"/>
                             <xf:property name="wizard-separate-toc"                       value="bind('wizard-separate-toc-bind')"/>
                             <xf:property name="wizard-section-status"                     value="bind('wizard-section-status-bind')"/>
                             <xf:property name="labels"                                    value="bind('labels-bind')"/>

@@ -450,9 +450,13 @@
             <item id="2">إظهار الأقسام الفرعية لجميع الأقسام</item>
             <item id="3">عدم إظهار الأقسام الفرعية</item>
         </wizard-subsections-toc>
-        <wizard-separate-toc>
-            <label>جدول محتويات منفصل للمعالج</label>
-        </wizard-separate-toc>
+        <wizard-toc-position>
+            <label>جدول محتويات المعالج</label>
+            <item id="0">استخدام الخاصية</item>
+            <item id="1">يسار</item>
+            <item id="2">منفصل</item>
+            <item id="3">بدون</item>
+        </wizard-toc-position>
         <wizard-section-status>
             <label>إظهار حالة قسم المعالج دائمًا</label>
         </wizard-section-status>

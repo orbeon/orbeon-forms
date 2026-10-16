@@ -448,9 +448,13 @@
             <item id="2">Montrer les sous-sections pour toutes les sections</item>
             <item id="3">Ne pas montrer les sous-sections</item>
         </wizard-subsections-toc>
-        <wizard-separate-toc>
-            <label>Table de matières séparée pour le wizard</label>
-        </wizard-separate-toc>
+        <wizard-toc-position>
+            <label>Table des matières du wizard</label>
+            <item id="0">Utiliser la propriété</item>
+            <item id="1">À gauche</item>
+            <item id="2">Séparée</item>
+            <item id="3">Aucune</item>
+        </wizard-toc-position>
         <wizard-section-status>
             <label>Toujours montrer l'état des sections du wizard</label>
         </wizard-section-status>

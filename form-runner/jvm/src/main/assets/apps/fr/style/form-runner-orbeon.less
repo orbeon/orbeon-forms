@@ -34,10 +34,10 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
 .fr-toc-body-container-left() {
     display: grid;
 
-    &:not(:has(> .fr-wizard-separate-toc)) {
+    &:not(:has(> .fr-wizard-separate-toc, > .fr-wizard-toc-none)) {
         grid-template-columns: 20% 1fr;
     }
-    &:has(> .fr-wizard-separate-toc) {
+    &:has(> .fr-wizard-separate-toc, > .fr-wizard-toc-none) {
         grid-template-columns: 1fr;
     }
 
@@ -57,14 +57,14 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
         grid-row: 1;
         grid-column: 2;
     }
-    .wizard-toc.fr-wizard-separate-toc, .wizard-body.fr-wizard-separate-toc {
+    .wizard-toc.fr-wizard-separate-toc {
         grid-row: 1 / 2;
     }
     .fr-wizard-other {
         grid-row: 2;
         grid-column: 2;
     }
-    &:has(> .fr-wizard-separate-toc) {
+    &:has(> .fr-wizard-separate-toc, > .fr-wizard-toc-none) {
         & > .fr-wizard-body {
             grid-column: 1;
         }

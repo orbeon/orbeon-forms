@@ -450,9 +450,13 @@
             <item id="2">Show subsections for all sections</item>
             <item id="3">Don't show subsections</item>
         </wizard-subsections-toc>
-        <wizard-separate-toc>
-            <label>Wizard Separate Table of Contents</label>
-        </wizard-separate-toc>
+        <wizard-toc-position>
+            <label>Wizard Table of Contents</label>
+            <item id="0">Use property</item>
+            <item id="1">Left</item>
+            <item id="2">Separate</item>
+            <item id="3">None</item>
+        </wizard-toc-position>
         <wizard-section-status>
             <label>Always Show Wizard Section Status</label>
         </wizard-section-status>

@@ -701,7 +701,7 @@
                         origin="xf:element('singleton', event('singleton'))"/>
 
                     <!-- Add/remove wizard setting as needed -->
-                    <xf:action iterate="'wizard', 'wizard-subsections-nav', 'wizard-separate-toc', 'wizard-section-status'">
+                    <xf:action iterate="'wizard', 'wizard-subsections-nav', 'wizard-section-status'">
                         <xf:var name="name" value="."/>
                         <xf:delete
                             ref="bind(concat($name, '-bind'))"/>
@@ -711,6 +711,19 @@
                             ref="*"
                             origin="xf:element($name, event($name))"/>
                     </xf:action>
+
+                    <!-- Always delete legacy wizard-separate-toc -->
+                    <xf:delete
+                        ref="bind('wizard-separate-toc-bind')"/>
+
+                    <!-- Add/remove wizard-toc-position setting as needed -->
+                    <xf:delete
+                        ref="bind('wizard-toc-position-bind')"/>
+                    <xf:insert
+                        if="event('wizard-toc-position') = ('left', 'separate', 'none')"
+                        context="bind('metadata-bind')"
+                        ref="*"
+                        origin="xf:element('wizard-toc-position', event('wizard-toc-position'))"/>
 
                     <!-- Add/remove wizard mode setting as needed -->
                     <xf:delete

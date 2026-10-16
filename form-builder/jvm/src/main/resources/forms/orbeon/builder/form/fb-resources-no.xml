@@ -430,9 +430,13 @@
             <item id="2">Show Subsections for All Sections</item>
             <item id="3">Don't Show Subsections</item>
         </wizard-subsections-toc>
-        <wizard-separate-toc>
-            <label>Veiviser separat innholdsfortegnelse</label>
-        </wizard-separate-toc>
+        <wizard-toc-position>
+            <label>Veiviser innholdsfortegnelse</label>
+            <item id="0">Bruk egenskap</item>
+            <item id="1">Venstre</item>
+            <item id="2">Separat</item>
+            <item id="3">Ingen</item>
+        </wizard-toc-position>
         <wizard-section-status>
             <label>Vis alltid veiviser seksjonsstatus</label>
         </wizard-section-status>

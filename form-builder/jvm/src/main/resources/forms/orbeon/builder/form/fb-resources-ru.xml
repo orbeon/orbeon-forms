@@ -430,9 +430,13 @@
             <item id="2">Показывать подразделы для всех разделов</item>
             <item id="3">Не показывать подразделы</item>
         </wizard-subsections-toc>
-        <wizard-separate-toc>
-            <label>Отдельное оглавление мастера</label>
-        </wizard-separate-toc>
+        <wizard-toc-position>
+            <label>Оглавление мастера</label>
+            <item id="0">Использовать свойство</item>
+            <item id="1">Слева</item>
+            <item id="2">Отдельное</item>
+            <item id="3">Нет</item>
+        </wizard-toc-position>
         <wizard-section-status>
             <label>Всегда показывать статус раздела мастера</label>
         </wizard-section-status>

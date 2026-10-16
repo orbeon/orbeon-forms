@@ -389,18 +389,21 @@
             )[1]"/>
 
     <xsl:variable
+        name="wizard-toc-position"
+        as="xs:string"
+        select="
+            frf:resolveWizardTocPosition(
+                $app,
+                $form,
+                string($fr-form-metadata/wizard-toc-position),
+                string($fr-form-metadata/wizard-separate-toc),
+                $property-profile-opt
+            )"/>
+
+    <xsl:variable
         name="wizard-separate-toc"
         as="xs:boolean"
-        select="
-            (
-                xs:boolean(
-                    $fr-form-metadata/wizard-separate-toc[
-                        . = ('true', 'false')
-                    ]
-                ),
-                p:property(string-join(('oxf.xforms.xbl.fr.wizard.separate-toc', $app, $form), '.'), $property-profile-opt),
-                false()
-            )[1]"/>
+        select="$wizard-toc-position = 'separate'"/>
 
     <xsl:variable
         name="wizard-section-status"
@@ -1128,7 +1131,7 @@
                  Builder for example can open a dialog upon load. Another possible fix would be to fix setfocus to
                  understand that if a modal dialog is currently visible, setting focus to a control outside that dialog
                  should not have any effect. See https://github.com/orbeon/orbeon-forms/issues/2010  -->
-            <xsl:if test="$enable-initial-focus and $wizard-separate-toc = false()">
+            <xsl:if test="$enable-initial-focus and $wizard-toc-position != 'separate'">
                 <xf:setfocus
                     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
                     event="xforms-ready"

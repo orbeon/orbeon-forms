@@ -779,7 +779,9 @@
     <property as="xs:string"  name="oxf.fr.import.buttons.*.*"                                     value="home summary close"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.validate.*.*"                         value="free"/>
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.separate-toc.*.*"                     value="false"/>
+    <!-- Table of contents position: "left", "separate", or "none". Empty defaults to "left".
+         Replaces deprecated "oxf.xforms.xbl.fr.wizard.separate-toc.*.*". -->
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.toc.position.*.*"                     value=""/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.subsections-nav.*.*"                  value="false"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.subsections-toc.*.*"                  value="active"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.lazy-section-relevance.*.*"           value="false"/>

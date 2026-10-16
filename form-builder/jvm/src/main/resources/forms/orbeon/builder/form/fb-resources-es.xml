@@ -430,9 +430,13 @@
             <item id="2">Show Subsections for All Sections</item>
             <item id="3">Don't Show Subsections</item>
         </wizard-subsections-toc>
-        <wizard-separate-toc>
-            <label>Tabla de contenidos del asistente separada</label>
-        </wizard-separate-toc>
+        <wizard-toc-position>
+            <label>Tabla de contenidos del asistente</label>
+            <item id="0">Usar propiedad</item>
+            <item id="1">Izquierda</item>
+            <item id="2">Separada</item>
+            <item id="3">Ninguna</item>
+        </wizard-toc-position>
         <wizard-section-status>
             <label>Mostrar siempre el estado de la sección del asistente</label>
         </wizard-section-status>

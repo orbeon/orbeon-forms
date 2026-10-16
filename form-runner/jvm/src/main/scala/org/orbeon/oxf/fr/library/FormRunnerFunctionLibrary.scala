@@ -250,7 +250,8 @@ private object FormRunnerFunctions {
     "username"                    -> (() => ExternalContextSupport.externalContext.getRequest.credentials map     (_.userAndGroup.username)),
     "user-group"                  -> (() => ExternalContextSupport.externalContext.getRequest.credentials flatMap (_.userAndGroup.groupname)),
     "relevant-form-values-string" -> (() => Some(FormRunnerMetadata.findAllControlsWithValues(html = false, Nil))),
-    "wizard-current-page-name"    -> (() => Wizard.wizardCurrentPageNameOpt)
+    "wizard-current-page-name"    -> (() => Wizard.wizardCurrentPageNameOpt),
+    "wizard-toc-position"         -> (() => Wizard.wizardTocPositionOpt)
   )
 
   val BooleanGettersByName = List(

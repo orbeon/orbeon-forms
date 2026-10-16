@@ -431,9 +431,13 @@
             <item id="2">Show Subsections for All Sections</item>
             <item id="3">Don't Show Subsections</item>
         </wizard-subsections-toc>
-        <wizard-separate-toc>
-            <label>Índice Separado do Assistente</label>
-        </wizard-separate-toc>
+        <wizard-toc-position>
+            <label>Índice do Assistente</label>
+            <item id="0">Usar propriedade</item>
+            <item id="1">À esquerda</item>
+            <item id="2">Separado</item>
+            <item id="3">Nenhum</item>
+        </wizard-toc-position>
         <wizard-section-status>
             <label>Mostrar Sempre Estado da Secção do Assistente</label>
         </wizard-section-status>

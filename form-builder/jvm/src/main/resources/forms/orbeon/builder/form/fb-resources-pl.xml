@@ -450,9 +450,13 @@
             <item id="2">Pokaż podsekcje dla wszystkich sekcji</item>
             <item id="3">Nie pokazuj podsekcji</item>
         </wizard-subsections-toc>
-        <wizard-separate-toc>
-            <label>Oddzielny spis treści kreatora</label>
-        </wizard-separate-toc>
+        <wizard-toc-position>
+            <label>Spis treści kreatora</label>
+            <item id="0">Użyj właściwości</item>
+            <item id="1">Po lewej</item>
+            <item id="2">Oddzielny</item>
+            <item id="3">Brak</item>
+        </wizard-toc-position>
         <wizard-section-status>
             <label>Zawsze pokazuj status sekcji kreatora</label>
         </wizard-section-status>

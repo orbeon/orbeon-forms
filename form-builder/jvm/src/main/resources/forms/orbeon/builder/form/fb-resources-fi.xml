@@ -451,9 +451,13 @@
             <item id="2">Show Subsections for All Sections</item>
             <item id="3">Don't Show Subsections</item>
         </wizard-subsections-toc>
-        <wizard-separate-toc>
-            <label>Ohjatun toiminnon erillinen sisällysluettelo</label>
-        </wizard-separate-toc>
+        <wizard-toc-position>
+            <label>Ohjatun toiminnon sisällysluettelo</label>
+            <item id="0">Käytä ominaisuutta</item>
+            <item id="1">Vasemmalla</item>
+            <item id="2">Erillinen</item>
+            <item id="3">Ei mitään</item>
+        </wizard-toc-position>
         <wizard-section-status>
             <label>Näytä aina ohjatun toiminnon lohkon tila</label>
         </wizard-section-status>

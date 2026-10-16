@@ -438,9 +438,13 @@
             <item id="2">Show Subsections for All Sections</item>
             <item id="3">Don't Show Subsections</item>
         </wizard-subsections-toc>
-        <wizard-separate-toc>
-            <label>Sommario separato per procedura guidata</label>
-        </wizard-separate-toc>
+        <wizard-toc-position>
+            <label>Sommario per procedura guidata</label>
+            <item id="0">Usa proprietà</item>
+            <item id="1">A sinistra</item>
+            <item id="2">Separato</item>
+            <item id="3">Nessuno</item>
+        </wizard-toc-position>
         <wizard-section-status>
             <label>Mostra sempre lo stato delle sezioni della procedura guidata</label>
         </wizard-section-status>

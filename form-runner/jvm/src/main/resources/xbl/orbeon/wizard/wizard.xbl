@@ -198,6 +198,7 @@
                         <readwrite/>
 
                         <validate/>
+                        <toc-position/>
                         <separate-toc/>
                         <section-status/>
                         <visit-on-page-change/>
@@ -209,12 +210,13 @@
                 <xf:bind ref="@initialized"         type="xs:boolean" xxf:default="false()"/>
 
                 <xf:bind ref="validate"                               xxf:default="Wizard:normalizeWizardMode(fr:component-param-value('validate'))"/>
-                <xf:bind ref="separate-toc"         type="xs:boolean" xxf:default="(fr:component-param-value('separate-toc'), 'false')[1]"/>
+                <xf:bind ref="toc-position"         type="xs:string"  xxf:default="Wizard:normalizeTocPosition(fr:component-param-value('toc-position'), fr:component-param-value('separate-toc'))"/>
+                <xf:bind ref="separate-toc"         type="xs:boolean" xxf:default="../toc-position/data(.) = 'separate'"/>
                 <xf:bind ref="section-status"       type="xs:boolean" xxf:default="../separate-toc/data(.) or fr:component-param-value('section-status') = 'true'"/>
                 <xf:bind ref="visit-on-page-change" type="xs:string"  xxf:default="fr:component-param-value('visit-on-page-change')"/>
 
                 <xf:bind ref="current-index"        type="xs:integer" xxf:default="1"/>
-                <xf:bind ref="show-toc"             type="xs:boolean" xxf:default="true()"/>
+                <xf:bind ref="show-toc"             type="xs:boolean" xxf:default="../toc-position/data(.) != 'none'"/>
                 <xf:bind ref="show-body"            type="xs:boolean" xxf:default="not(../separate-toc/data(.))"/>
 
                 <xf:instance id="available-top-level-sections" xxf:expose-xpath-types="true" xxf:exclude-result-prefixes="#all">
@@ -638,7 +640,9 @@
                             xxbl:scope="inner"
                             class="fr-wizard-toc{{
                                 ' xforms-hidden'         [not($local/show-toc/data(.))],
-                                ' fr-wizard-separate-toc'[$local/separate-toc/data(.)]
+                                ' fr-wizard-separate-toc'[$local/toc-position/data(.) = 'separate'],
+                                ' fr-wizard-toc-separate'[$local/toc-position/data(.) = 'separate'],
+                                ' fr-wizard-toc-none'    [$local/toc-position/data(.) = 'none']
                             }}">
 
                             <!-- Dispatch fr-toc-shown event as needed -->
@@ -1066,6 +1070,7 @@
                                                 <xf:property name="section-name"    value="frf:controlNameFromIdOpt($last-available-and-visited-top-level-section-id-opt)" xxbl:scope="outer"/>
                                                 <xf:property name="validate"        value="xxf:instance('local')/validate/data(.)"/>
                                                 <xf:property name="separate-toc"    value="xxf:instance('local')/separate-toc/data(.)"/>
+                                                <xf:property name="toc-position"    value="xxf:instance('local')/toc-position/data(.)"/>
                                             </xf:dispatch>
                                         </xf:action>
 
@@ -1543,6 +1548,7 @@
                                                     <xf:property name="section-name"    value="frf:controlNameFromIdOpt($section-id)"/>
                                                     <xf:property name="validate"        value="$local/validate/data(.)"/>
                                                     <xf:property name="separate-toc"    value="$local/separate-toc/data(.)"/>
+                                                    <xf:property name="toc-position"    value="$local/toc-position/data(.)"/>
                                                 </xf:dispatch>
 
                                             </xf:action>

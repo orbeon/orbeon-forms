@@ -93,12 +93,23 @@
                     ref="$i/attachment-mediatypes"
                     value="(event('attachment-mediatypes'), $unlikely-mediatype)[1]"/>
 
-                <xf:action iterate="'wizard', 'wizard-subsections-nav', 'wizard-separate-toc', 'wizard-section-status', 'initial-focus'">
+                <xf:action iterate="'wizard', 'wizard-subsections-nav', 'wizard-section-status', 'initial-focus'">
                     <xf:var name="name" value="."/>
                     <xf:setvalue
                         ref="$i/*[name() = $name]"
                         value="(event($name)[. = ('true', 'false')], 'default')[1]"/>
                 </xf:action>
+
+                <xf:setvalue
+                    ref="$i/wizard-toc-position"
+                    value="
+                        (
+                            event('wizard-toc-position')[. = ('left', 'separate', 'none')],
+                            if (event('wizard-separate-toc') = 'true') then 'separate'
+                            else if (event('wizard-separate-toc') = 'false') then 'left'
+                            else (),
+                            'default'
+                        )[1]"/>
 
                 <xf:setvalue
                     ref="$i/wizard-mode"
@@ -512,7 +523,7 @@
                         <xf:property name="wizard-mode"                            value="$i/wizard-mode/string()"/>
                         <xf:property name="wizard-subsections-nav"                 value="$i/wizard-subsections-nav/string()"/>
                         <xf:property name="wizard-subsections-toc"                 value="$i/wizard-subsections-toc/string()"/>
-                        <xf:property name="wizard-separate-toc"                    value="$i/wizard-separate-toc/string()"/>
+                        <xf:property name="wizard-toc-position"                    value="$i/wizard-toc-position/string()"/>
                         <xf:property name="wizard-section-status"                  value="$i/wizard-section-status/string()"/>
                         <xf:property name="mode"                                   value="$i/mode/string()"/>
                         <xf:property name="automatic-hints"                        value="$i/automatic-hints/string()"/>
@@ -641,7 +652,7 @@
                         <wizard-mode/>
                         <wizard-subsections-nav/>
                         <wizard-subsections-toc/>
-                        <wizard-separate-toc/>
+                        <wizard-toc-position/>
                         <wizard-section-status/>
                         <rendered-page-orientation/>
                         <rendered-page-size/>
@@ -1740,12 +1751,16 @@
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td>
-                                            <xf:select1 ref="wizard-separate-toc" appearance="full xxf:horizontal">
-                                                <xf:label ref="$resources/dialog-form-settings/wizard-separate-toc/label"/>
-                                                <xf:hint  ref="$resources/dialog-form-settings/wizard-separate-toc/hint"/>
-                                                <xf:itemset ref="$resources/property-yes-no/item">
+                                            <xf:select1 ref="wizard-toc-position" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/wizard-toc-position/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/wizard-toc-position/hint"/>
+                                                <xf:itemset ref="$resources/dialog-form-settings/wizard-toc-position/item">
                                                     <xf:label ref="."/>
-                                                    <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
+                                                    <xf:value ref="
+                                                             if (@id = 1) then 'left'
+                                                        else if (@id = 2) then 'separate'
+                                                        else if (@id = 3) then 'none'
+                                                        else                   'default'"/>
                                                 </xf:itemset>
                                             </xf:select1>
                                         </xh:td>

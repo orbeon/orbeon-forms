@@ -358,6 +358,7 @@
 
                         <xsl:attribute name="subsections-nav"        select="$wizard-subsections-nav"/>
                         <xsl:attribute name="subsections-toc"        select="$wizard-subsections-toc"/>
+                        <xsl:attribute name="toc-position"           select="$wizard-toc-position"/>
                         <xsl:attribute name="separate-toc"           select="$wizard-separate-toc"/>
                         <xsl:attribute name="section-status"         select="$wizard-section-status"/>
                         <xsl:attribute name="initial-focus"          select="$enable-initial-focus"/>

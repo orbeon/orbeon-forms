@@ -442,9 +442,13 @@
             <item id="2">Alle Unterabschnitte zeigen</item>
             <item id="3">Keine Unterabschnitte</item>
         </wizard-subsections-toc>
-        <wizard-separate-toc>
-            <label>Assistent: Separates Inhaltsverzeichnis</label>
-        </wizard-separate-toc>
+        <wizard-toc-position>
+            <label>Assistent: Inhaltsverzeichnis</label>
+            <item id="0">Standard</item>
+            <item id="1">Links</item>
+            <item id="2">Separat</item>
+            <item id="3">Keines</item>
+        </wizard-toc-position>
         <wizard-section-status>
             <label>Assistent: Abschnittsstatus immer anzeigen</label>
         </wizard-section-status>

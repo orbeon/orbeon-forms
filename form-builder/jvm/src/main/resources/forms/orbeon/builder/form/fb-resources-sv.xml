@@ -450,9 +450,13 @@
             <item id="2">Show Subsections for All Sections</item>
             <item id="3">Don't Show Subsections</item>
         </wizard-subsections-toc>
-        <wizard-separate-toc>
-            <label>Separat innehållsförteckning för guide</label>
-        </wizard-separate-toc>
+        <wizard-toc-position>
+            <label>Innehållsförteckning för guide</label>
+            <item id="0">Använd egenskap</item>
+            <item id="1">Vänster</item>
+            <item id="2">Separat</item>
+            <item id="3">Ingen</item>
+        </wizard-toc-position>
         <wizard-section-status>
             <label>Visa alltid status för guidesektioner</label>
         </wizard-section-status>

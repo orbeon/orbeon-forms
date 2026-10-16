@@ -58,8 +58,24 @@ object Wizard {
   def isWizardValidatedMode: Boolean =
     getWizardValidatedMode != "free"
 
+  //@XPathFunction
+  def normalizeTocPosition(tocPosition: String, separateToc: String): String =
+    tocPosition match {
+      case "left" | "separate" | "none" => tocPosition
+      case _ =>
+        separateToc match {
+          case "true"  => "separate"
+          case "false" => "left"
+          case _       => "left"
+        }
+    }
+
+  def wizardTocPositionOpt: Option[String] =
+    findWizardState map (_ elemValue "toc-position") flatMap (_.trimAllToOpt)
+
   def isWizardSeparateToc: Boolean =
-    findWizardState map (_ elemValue "separate-toc") contains "true"
+    wizardTocPositionOpt.contains("separate") ||
+      (findWizardState map (_ elemValue "separate-toc") contains "true")
 
   def wizardAvailableSections: Set[String] = {
 

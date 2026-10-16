@@ -60,13 +60,17 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
     .wizard-toc.fr-wizard-separate-toc, .wizard-body.fr-wizard-separate-toc {
         grid-row: 1 / 2;
     }
-
     .fr-wizard-other {
         grid-row: 2;
         grid-column: 2;
     }
-    &:not(:has(> .fr-wizard-separate-toc)) > .fr-wizard-other {
-        grid-column: 1 / -1;
+    &:has(> .fr-wizard-separate-toc) {
+        & > .fr-wizard-body {
+            grid-column: 1;
+        }
+        & > .fr-wizard-other {
+            grid-column: 1;
+        }
     }
 }
 

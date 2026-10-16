@@ -176,12 +176,14 @@
     <loading>S'està carregant</loading>
     <loading-complete>Càrrega completada</loading-complete>
     <errors>
-        <summary-title>El seu formulari {1,choice,0#no te cap missatge|1#té els següents missatges
-            '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;té els següents
-            '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}</summary-title>
-        <form-title>[{1,choice,0#|1#{1,number,integer} '{0,choice,0#Error|1#Warning|2#Informational
-            Message|3#Message}' - |1&lt;{1,number,integer}
-            '{0,choice,0#Errors|1#Warnings|2#Informational Messages|3#Messages}' - }{2}]</form-title>
+        <summary-title>El seu formulari {1,choice,
+            0#no té cap missatge|
+            1#té '{0,choice,0#l''''error següent|1#l''''avís següent|2#el missatge informatiu següent|3#el missatge següent}'|
+            1&lt;té '{0,choice,0#els errors següents|1#els avisos següents|2#els missatges informatius següents|3#els missatges següents}'}</summary-title>
+        <form-title>{1,choice,
+            0#|
+            1#{1,number,integer} '{0,choice,0#Error|1#Avís|2#Missatge informatiu|3#Missatge}' - |
+            1&lt;{1,number,integer} '{0,choice,0#Errors|1#Avisos|2#Missatges informatius|3#Missatges}' - }{2}</form-title>
         <none>No hi ha errors al formulari</none>
         <unsaved>Canvis sense desar</unsaved>
         <canvas-not-supported>Per poder anotar a les imatges el teu navegador ha de suportar HTML5 canvas</canvas-not-supported>

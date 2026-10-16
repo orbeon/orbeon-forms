@@ -286,12 +286,13 @@
             <submit-dialog-message>Twój formularz został złożony, dziękuję.</submit-dialog-message>
             <validation-dialog-title>Przegląd komunikatów walidacji</validation-dialog-title>
             <validation-dialog-message>Twój formularz {1,choice,
-                0#nie zawiera błędów|
-                1#zawiera 1 lub więcej '{0,choice,0#błędów|1#ostrzeżeń|2#komunikatów informacyjnych|3#komunikatów}'|
-                1&lt;contains {1,number,integer} '{0,choice,0#błędów|1#ostrzeżeń|2#komunikatów informacyjnych|3#komunikatów}'}.
+                0#nie zawiera żadnych komunikatów|
+                1#zawiera '{0,choice,0#jeden błąd|1#jedno ostrzeżenie|2#jeden komunikat informacyjny|3#jeden komunikat}'|
+                1&lt;zawiera {1,number,integer} '{0,choice,0#błędy|1#ostrzeżenia|2#komunikaty informacyjne|3#komunikaty}'|
+                5#zawiera {1,number,integer} '{0,choice,0#błędów|1#ostrzeżeń|2#komunikatów informacyjnych|3#komunikatów}'}.
                 {0,choice,
                     0#Proszę sprawdzić, czy wszystkie pola zostały wypełnione poprawnie|
-                    0&lt;Możesz dokonać przeglądu '{1,choice,1#it|1&lt;them}' najpierw lub zignoruj '{1,choice,1#it|1&lt;them}' i kontynuuj uzupełnianie}.
+                    0&lt;Możesz najpierw przejrzeć '{1,choice,1#ten komunikat|1&lt;te komunikaty}' lub '{1,choice,1#go|1&lt;je}' zignorować i kontynuować operację}.
             </validation-dialog-message>
             <buttons-message/>
             <saved-locally-open>Kliknij tutaj, by otworzyć dokument. Dane wprowadzone przez Ciebie będą zaprezentowane w takiej formie, w jakiej je zapisałeś.</saved-locally-open>

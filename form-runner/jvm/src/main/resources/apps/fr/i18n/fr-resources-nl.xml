@@ -291,7 +291,7 @@
                 1&lt;bevat {1,number,integer} '{0,choice,0#fouten|1#waarschuwingen|2#meldingen ter info|3#meldingen}'}.
                 {0,choice,
                     0#Probeer het opnieuw als alle velden correct zijn gevuld|
-                    0&lt;U kunt '{1,choice,1#deze|1&lt;deze}' eerst bekijken of negerenen doorgaan met de bewerking}.
+                    0&lt;U kunt '{1,choice,1#deze|1&lt;deze}' eerst bekijken of negeren en doorgaan met de bewerking}.
             </validation-dialog-message>
             <buttons-message/>
             <saved-locally-open>Klik hier om het document te openen. De informatie die u hebt ingevoerd wordt weergegeven zoals deze was toen u uw werk heeft opgeslagen.</saved-locally-open>

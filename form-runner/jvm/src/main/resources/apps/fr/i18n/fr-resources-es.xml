@@ -303,12 +303,12 @@
             <validation-dialog-title>Revisar mensajes de validación del Formulario</validation-dialog-title>
             <validation-dialog-message>Su formulario {1,choice,
                 0#no tiene ningún mensaje|
-                1#tiene un '{0,choice,0#error|1#advertencia|2#Mensaje informativo|3#Mensajes}'|
-                1&lt;tiene {1,number,integer} '{0,choice,0#errors|1#advertencia|2#mensaje informativo|3#mensajes}'}.
+                1#tiene '{0,choice,0#un error|1#una advertencia|2#un mensaje informativo|3#un mensaje}'|
+                1&lt;tiene {1,number,integer} '{0,choice,0#errores|1#advertencias|2#mensajes informativos|3#mensajes}'}.
                 {0,choice,
                 0#Corrija los errores e intente nuevamente|
-                0&lt;Puede optar por revisarlos '{1,choice,1#it|1&lt;them}' primero o ignorar
-                '{1,choice,1#it|1&lt;them}' y continuar la operación}.
+                0&lt;Puede optar por revisar primero '{1,choice,1#el mensaje|1&lt;los mensajes}' o
+                ignorar'{1,choice,1#lo|1&lt;los}' y continuar con la operación}.
             </validation-dialog-message>
             <buttons-message/>
             <saved-locally-open>Haga click aquí para abrir el documento. La información ingresada

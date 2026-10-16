@@ -291,13 +291,11 @@
             <validation-dialog-title>Revisi els missatges de validació del seu Formulari</validation-dialog-title>
             <validation-dialog-message>El seu formulari {1,choice,
                 0#no té cap missatge|
-                1#té un '{0,choice,0#error|1#warning|2#informational message|3#message}'|
-                1&lt;té {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational
-                messages|3#messages}'}.
+                1#té '{0,choice,0#un error|1#un avís|2#un missatge informatiu|3#un missatge}'|
+                1&lt;té {1,number,integer} '{0,choice,0#errors|1#avisos|2#missatges informatius|3#missatges}'}.
                 {0,choice,
                 0#Corregeixi els errors i intenti novament|
-                0&lt;Pot revisar-los si vol '{1,choice,1#it|1&lt;them}' primer o ignorar-los
-                '{1,choice,1#it|1&lt;them}' i continuar amb l'operació}.
+                0&lt;Pot revisar-'{1,choice,1#lo|1&lt;los}' primer o ignorar-'{1,choice,1#lo|1&lt;los}' i continuar amb l''''operació}.
             </validation-dialog-message>
             <buttons-message />
             <saved-locally-open> Fes click aquí per obrir el document. La informació ingressada és

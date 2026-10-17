@@ -383,8 +383,9 @@ private[persistence] object HttpCall {
   def connectPersistence(
     method                  : HttpMethod,
     path                    : String,
-    requestBodyContent      : Option[StreamedContent] = None,
-    formVersionOpt          : Option[Either[FormDefinitionVersion, SearchVersion]]
+    requestBodyContent      : Option[StreamedContent],
+    formVersionOpt          : Option[Either[FormDefinitionVersion, SearchVersion]],
+    credentialsOpt          : Option[Credentials] = None
   )(implicit
     logger                  : IndentedLogger,
     coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
@@ -406,7 +407,7 @@ private[persistence] object HttpCall {
       version       = version,
       stage         = None,
       body          = requestBodyContent.map(sc => Binary(BufferedContent(sc)(toByteArray).body)),
-      credentials   = None,
+      credentials   = credentialsOpt,
       httpRange     = None,
       timeout       = None,
       ifMatch       = None,

@@ -86,6 +86,7 @@
                 <xf:help value="xxf:help('fr-checkbox-input-binding')"><xsl:copy-of select="$root/xf:help/@mediatype"/></xf:help>
                 <xf:item>
                     <xf:label value="xxf:label('fr-checkbox-input-binding')"><xsl:copy-of select="$root/xf:label/@mediatype"/></xf:label>
+                    <xf:hint value="xxf:hint('fr-checkbox-input-binding')"><xsl:copy-of select="$root/xf:hint/@mediatype"/></xf:hint>
                     <xsl:choose>
                         <xsl:when test="exists($root/@template)">
                             <xf:copy xxbl:scope="outer" xbl:attr="ref=template"/>

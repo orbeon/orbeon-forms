@@ -100,7 +100,7 @@
                             </xh:tr>
                         </fr:grid>
 
-                        <xh:table class="table table-condensed table-striped">
+                        <xh:table class="table table-condensed">
                             <xh:colgroup>
                               <xh:col class="fb-original-name"/>
                               <xh:col class="fb-new-name"/>

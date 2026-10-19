@@ -178,6 +178,17 @@ case object SMTP {
   def send(serverConfig: ServerConfig, emailContent: EmailContent): Try[Unit] = {
 
     val session = serverConfig.newSession
+    val message = mimeMessage(session, emailContent)
+
+    Try {
+      useAndClose(session.getTransport("smtp")) { _ =>
+        Transport.send(message)
+      }
+    }
+  }
+
+  def mimeMessage(session: Session, emailContent: EmailContent): MimeMessage = {
+
     val message = new MimeMessage(session)
 
     def emailAddresses(headerName: HeaderName): Array[Address] =
@@ -224,11 +235,7 @@ case object SMTP {
       message.setContent(multipart)
     }
 
-    Try {
-      useAndClose(session.getTransport("smtp")) { _ =>
-        Transport.send(message)
-      }
-    }
+    message
   }
 
   private def encoded(string: String): String =

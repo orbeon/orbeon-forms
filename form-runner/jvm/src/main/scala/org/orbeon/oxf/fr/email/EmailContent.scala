@@ -98,8 +98,9 @@ object EmailContent {
     indentedLogger  : IndentedLogger
   ): List[(HeaderName, String)] = {
 
+    // #7969: replace newlines with spaces to prevent header injection
     def evaluatedHeaderValues(headerName: HeaderName): List[String] =
-      template.headers.filter(_._1 == headerName).map(_._2).flatMap(evaluatedTemplateValue)
+      template.headers.filter(_._1 == headerName).map(_._2).flatMap(evaluatedTemplateValue).map(_.replaceAll("[\r\n]+", " "))
 
     def emailAddressesFromProperties(headerName: HeaderName): List[String] =
       formRunnerProperty(s"oxf.fr.email.${headerName.entryName}").toList

@@ -14,10 +14,16 @@
 package org.orbeon.oxf.fr
 
 import cats.implicits.catsSyntaxOptionId
+import jakarta.mail.Session
 import org.orbeon.oxf.fr.email.EmailMetadata.{HeaderName, TemplateMatch}
-import org.orbeon.oxf.fr.email.MessageContent
+import org.orbeon.oxf.fr.email.{MessageContent, SMTP}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.scalatest.funspec.AnyFunSpecLike
+
+import java.io.ByteArrayOutputStream
+import java.nio.charset.StandardCharsets
+import java.util.Properties as JProperties
 
 
 class EmailContentTest
@@ -201,6 +207,39 @@ param3: <ul><li>Email 1: email1@from\.control</li><li>Email 3: email3@from\.cont
               }
             }
           }
+        }
+      }
+    }
+
+    it("#7969: must keep header values on one line") {
+      withTestExternalContext { implicit ec =>
+        withFormRunnerDocument(processorService, doc) {
+
+          implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
+
+          setControlValue(resolveObject[XFormsValueControl]("custom-1-control").get.effectiveId, "hello\r\nBcc: evil@example.org\nX-Other: injected")
+
+          val emailContent = process.SimpleProcess.emailsToSend(
+            emailDataFormatVersion = DataFormatVersion.Edge,
+            templateMatch          = TemplateMatch.First,
+            language               = FormRunner.currentLang,
+            templateNameOpt        = "1".some,
+            pdfParams              = Map.empty
+          ).head
+
+          // Just check that the newlines are replaced with spaces; without the fix, we would just get raw newlines here
+          assert(emailContent.headers.contains(HeaderName.Custom("X-Custom-1st") -> "hello Bcc: evil@example.org X-Other: injected"))
+
+          val headerLines = {
+            val bytes = new ByteArrayOutputStream
+            SMTP.mimeMessage(Session.getInstance(new JProperties), emailContent).writeTo(bytes)
+            bytes.toString(StandardCharsets.UTF_8).split("\r\n").takeWhile(_.nonEmpty).toList
+          }
+
+          // Test the fix at the Jakarta Mail serialization level (after a writeTo/toString sequence)
+          assert(headerLines.count(_ == "X-Custom-1st: hello Bcc: evil@example.org X-Other: injected") == 1)
+          assert(! headerLines.contains("Bcc: evil@example.org"))
+          assert(! headerLines.exists(_.startsWith("X-Other:")))
         }
       }
     }

@@ -387,7 +387,10 @@
                                 $attachment-holders/(
                                     self::*[@filename and (p:non-blank(.))], (: single attachment    :)
                                     _[@filename and (p:non-blank(.))]        (: multiple attachments :)
-                                )">
+                                )[
+                                    (: #7970: only attach signed temporary uploads or persisted files; in particular, refuse oxf: URLs :)
+                                    frf:isUploadedFileOrPersistenceURL(p:trim((@fr:tmp-file, .)[p:non-blank(.)][1]))
+                                ]">
                             <!-- URL may be absolute or already point to persistence layer -->
                             <!-- Use `@fr:tmp-file` first if present, see https://github.com/orbeon/orbeon-forms/issues/5768 -->
                             <part

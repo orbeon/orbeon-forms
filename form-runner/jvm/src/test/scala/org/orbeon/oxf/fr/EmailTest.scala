@@ -19,6 +19,7 @@ import org.orbeon.oxf.fr.email.EmailMetadata
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.scaxon.Implicits.asScalaSeq
 import org.orbeon.scaxon.NodeConversions
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsCrossPlatformSupport.readTinyTreeFromUrl
@@ -123,6 +124,34 @@ class EmailTest
           assert(expectedValues === actualValues)
           assert(expectedPath   === actualPaths)
         }
+    }
+  }
+
+  describe("Header values") {
+
+    it("#7969: must keep header values on one line") {
+
+      val template = NodeConversions.elemToNodeInfo(
+        <template name="default">
+          <headers>
+            <header name="X-Custom-1st" type="control-value">control-1</header>
+          </headers>
+        </template>
+      )
+
+      val data = NodeConversions.elemToDocumentInfo(
+        <form>
+          <section-1>
+            <control-1>{"hello\r\nBcc: evil@example.org\nX-Other: injected"}</control-1>
+          </section-1>
+        </form>
+      )
+
+      val headerValues =
+        asScalaSeq(FormRunner.headerValues(readTinyTreeFromUrl(FormWithEmailControls), Some(template), data, "X-Custom-1st"))
+          .map(_.getStringValue)
+
+      assert(headerValues == List("hello Bcc: evil@example.org X-Other: injected"))
     }
   }
 

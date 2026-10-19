@@ -71,7 +71,8 @@ trait FormRunnerEmailBackend {
     val emailTemplateOpt = emailTemplateElemOpt.map(EmailMetadataParsing.parseCurrentTemplate(_, formDefinition))
     val templateValues   = emailTemplateOpt.toList.flatMap(_.headers.filter(_._1.entryName == headerName).map(_._2))
 
-    values(formDefinition, formData, templateValues)
+    // #7969: replace newlines with spaces to prevent header injection
+    asScalaIterator(values(formDefinition, formData, templateValues)).map(_.getStringValue.replaceAll("[\r\n]+", " ")).toList
   }
 
   //@XPathFunction

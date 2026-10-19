@@ -28,6 +28,7 @@ import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.fr.s3.{S3, S3Config}
 import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.tinyTreeToOrbeonDom
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, Mediatypes}
@@ -171,20 +172,24 @@ object Attachment {
     val multipleAttachments = (attachmentHolders / *).filter(_.hasAtt("filename"))
 
     (singleAttachments ++ multipleAttachments).flatMap { attachment =>
-      // URL may be absolute or already point to persistence layer
       // Use `@fr:tmp-file` first if present, see https://github.com/orbeon/orbeon-forms/issues/5768
       val mediaTypeOpt = (attachment /@ "mediatype") .headOption.map(_.stringValue)
       val contentType  = mediaTypeOpt.getOrElse(ContentTypes.OctetStreamContentType)
       val filenameOpt  = (attachment /@ "filename")  .headOption.map(_.stringValue)
       val tmpFileOpt   = (attachment /@ "*:tmp-file").headOption.map(_.stringValue)
       val valueOpt     = tmpFileOpt.flatMap(_.trimAllToOpt).orElse(attachment.getStringValue.trimAllToOpt)
-      valueOpt.map { value =>
-        val uri = new URI(value)
-        Attachment(
-          filename       = filenameOpt.orElse(uri.getPath.split("/").last.trimAllToOpt).getOrElse("unknown"),
-          contentType    = contentType,
-          contentFactory = uriContentFactory(uri, contentType)
-        )
+      valueOpt.flatMap { value =>
+        if (isUploadedFileOrPersistenceURL(value)) {
+          val uri = new URI(value)
+          Attachment(
+            filename       = filenameOpt.orElse(uri.getPath.split("/").last.trimAllToOpt).getOrElse("unknown"),
+            contentType    = contentType,
+            contentFactory = uriContentFactory(uri, contentType)
+          ).some
+        } else {
+          warn("ignoring email attachment whose value is neither a signed upload URL nor a persistence path", List("value" -> value))
+          None
+        }
       }
     }
   }

@@ -22,6 +22,7 @@ import org.orbeon.oxf.fr.email.*
 import org.orbeon.oxf.fr.email.EmailMetadata.HeaderName
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.scaxon.NodeConversions
 import org.orbeon.scaxon.SimplePath.*
@@ -391,5 +392,36 @@ class EmailTest
         assert(List(mail.getContent).collect { case s: String => s} == List("Test body"))
       }
     }
+  }
+
+  describe("#7970: allowed attachment holder values") {
+
+    val signedUploadUrl =
+      XFormsUploadControl.hmacURL("file:/foo/tmp1.tmp", Some("a.bin"), Some("application/octet-stream"), Some("1234"))
+
+    val Expected = List(
+      signedUploadUrl                                                                                          -> true,
+      "/fr/service/persistence/crud/issue2016/test/data/417b8b4473f6db9e0f94b05ccb9208be/attachment-14.bin"    -> true,
+      "/fr/service/persistence/crud/issue2016/test/draft/417b8b4473f6db9e0f94b05ccb9208be/a.bin?form-version=2" -> true,
+      "file:/foo/tmp1.tmp"                                                                                     -> false, // unsigned
+      "file:/foo/tmp1.tmp?filename=a.bin&mac=0000"                                                             -> false, // wrong signature
+      "oxf:/config/properties-local.xml"                                                                       -> false,
+      "data:text/plain;base64,Zm9v"                                                                            -> false,
+      "http://127.0.0.1:8080/orbeon/fr/service/persistence/crud/a/b/data/c/d.bin"                              -> false,
+      "a:/fr/service/persistence/crud/a/b/form/form.xhtml"                                                     -> false, // one-letter scheme
+      "a:foo"                                                                                                  -> false, // opaque URI
+      "//evil.example.org/fr/service/persistence/crud/a/b/data/c/d.bin"                                        -> false,
+      "/fr/service/postgresql/crud/a/b/form/form.xhtml"                                                        -> false,
+      "/fr/service/persistence/crud/../../postgresql/crud/a/b/form/form.xhtml"                                 -> false,
+      "/fr/service/persistence/crud/%2e%2e/%2e%2e/postgresql/crud/a/b/form/form.xhtml"                         -> false,
+      "/fr/service/persistence/crud/./issue2016/test/form/form.xhtml"                                          -> false,
+      "/fr/service/persistence/crud"                                                                           -> false,
+      "not a uri"                                                                                              -> false
+    )
+
+    for ((value, expected) <- Expected)
+      it(s"must ${if (expected) "accept" else "refuse"} `$value`") {
+        assert(FormRunner.isUploadedFileOrPersistenceURL(value) == expected)
+      }
   }
 }

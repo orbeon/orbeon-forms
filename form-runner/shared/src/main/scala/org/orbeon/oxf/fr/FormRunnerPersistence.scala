@@ -450,6 +450,15 @@ trait FormRunnerPersistence {
   def isUploadedFileURL(value: String): Boolean =
     (value.startsWith("file:/") || value.startsWith("upload:")) && XFormsUploadControl.verifyMAC(value)
 
+  // #7970: only serve attachments that are signed temporary uploads or persisted files; in particular, refuse oxf: URLs,
+  // which would expose server resources, or external (http/https) URLs.
+  def isUploadedFileOrPersistenceURL(value: String): Boolean =
+    isUploadedFileURL(value) || isPersistencePath(value)
+
+  // Here the path is not decoded/normalized, so we check for . and .., which we refuse.
+  private def isPersistencePath(value: String): Boolean =
+    (FormPath.matches(value) || DataPath.matches(value)) && ! value.split('/').exists(s => s == "." || s == "..")
+
   // Create a path starting and ending with `/`
   // `documentIdOrEmpty` can be empty and if so won't be included. Ideally should be `Option[String]`.
   //@XPathFunction

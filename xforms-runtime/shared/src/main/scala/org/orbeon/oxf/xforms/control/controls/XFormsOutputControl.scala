@@ -329,11 +329,11 @@ object XFormsOutputControl {
 
   // #7952: only proxy values the client is expected to reach through /xforms-server/dynamic/; in particular, refuse
   // oxf: URLs, which would expose server resources
-  def isAllowedProxyUri(uri: String): Boolean =
+  private def isAllowedProxyUri(uri: String): Boolean =
     PathUtils.getProtocol(uri) match {
       case null | "http" | "https" | "data" => true                               // null = e.g. relative/absolute path
       case "file" | "upload"                => XFormsUploadControl.verifyMAC(uri) // temporary upload signed by hmacURL()
-      case _                                => false
+      case _                                => false                              // oxf:, etc.
     }
 
   def getExternalValueOrDefault(

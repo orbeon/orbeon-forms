@@ -66,8 +66,7 @@ class FRTransformUploadedImage extends FunctionSupport with RuntimeDependentFunc
       bindingValue.trimAllToOpt foreach { uriString =>
 
         // For now we limit the ability to transform to a just-uploaded temporary file
-        require(PathUtils.getProtocol(uriString) == "file")
-        require(XFormsUploadControl.verifyMAC(uriString))
+        require(XFormsUploadControl.isUploadedFileURL(uriString))
 
         ImageSupport.tryMaybeTransformImage(
           URI.create(uriString),

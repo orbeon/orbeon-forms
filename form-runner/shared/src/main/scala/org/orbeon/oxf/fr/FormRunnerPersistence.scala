@@ -440,20 +440,10 @@ trait FormRunnerPersistence {
 
   import FormRunnerPersistence.*
 
-  // Check whether a value corresponds to an uploaded file
-  //
-  // For this to be true
-  // - the protocol must be `file:`
-  // - the URL must have a valid signature
-  //
-  // This guarantees that the local file was in fact placed there by the upload control, and not tampered with.
-  def isUploadedFileURL(value: String): Boolean =
-    (value.startsWith("file:/") || value.startsWith("upload:")) && XFormsUploadControl.verifyMAC(value)
-
   // #7970: only serve attachments that are signed temporary uploads or persisted files; in particular, refuse oxf: URLs,
   // which would expose server resources, or external (http/https) URLs.
   def isUploadedFileOrPersistenceURL(value: String): Boolean =
-    isUploadedFileURL(value) || isPersistencePath(value)
+    XFormsUploadControl.isUploadedFileURL(value) || isPersistencePath(value)
 
   // Here the path is not decoded/normalized, so we check for . and .., which we refuse.
   private def isPersistencePath(value: String): Boolean =
@@ -727,7 +717,7 @@ trait FormRunnerPersistence {
       // 2025-08-27: previous test was holder.isAttribute || (holder.isElement && ! holder.hasChildElement)
       if holder.isElement && ! holder.hasChildElement
       beforeURL     = holder.stringValue.trimAllToEmpty
-      if isUploadedFileURL(beforeURL) || (
+      if XFormsUploadControl.isUploadedFileURL(beforeURL) || (
         attachmentMatch match {
           case AttachmentMatch.UploadedOnly =>
             false
@@ -861,7 +851,7 @@ trait FormRunnerPersistence {
     indentedLogger  : IndentedLogger
   ): String = {
     val filename =
-      if (isUploadedFileURL(url))
+      if (XFormsUploadControl.isUploadedFileURL(url))
         uploadedAttachmentFilename(attachmentHolder)
       else
         getAttachmentPathFilenameRemoveQuery(url)

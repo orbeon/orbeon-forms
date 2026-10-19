@@ -331,9 +331,8 @@ object XFormsOutputControl {
   // oxf: URLs, which would expose server resources
   private def isAllowedProxyUri(uri: String): Boolean =
     PathUtils.getProtocol(uri) match {
-      case null | "http" | "https" | "data" => true                               // null = e.g. relative/absolute path
-      case "file" | "upload"                => XFormsUploadControl.verifyMAC(uri) // temporary upload signed by hmacURL()
-      case _                                => false                              // oxf:, etc.
+      case null | "http" | "https" | "data" => true                                       // null = e.g. relative/absolute path
+      case _                                => XFormsUploadControl.isUploadedFileURL(uri) // signed temporary upload; refuses oxf:, etc.
     }
 
   def getExternalValueOrDefault(

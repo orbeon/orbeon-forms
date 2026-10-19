@@ -378,6 +378,14 @@ object XFormsUploadControl {
       case None      => false
     }
 
+  // Check whether the value is a temporary upload URL signed by hmacURL(). The protocol must be `file:` (JVM) or
+  // `upload:` (offline). This guarantees that the file was placed there by the upload control, and not tampered with.
+  def isUploadedFileURL(url: String): Boolean =
+    PathUtils.getProtocol(url) match {
+      case "file" | "upload" => verifyMAC(url)
+      case _                 => false
+    }
+
   /**
    * Convert a String in xs:anyURI to an xs:base64Binary.
    *

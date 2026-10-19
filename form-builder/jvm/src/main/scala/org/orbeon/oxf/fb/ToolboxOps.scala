@@ -1452,7 +1452,7 @@ object ToolboxOps {
             // There is in fact not much benefit in keeping the metadata as temporary file URL parameters, as the values
             // are supposed to be present in the element's attributes already. The HMAC is the more important part.
             val newTmpFileUrl =
-              if (isUploadedFileURL(fromPath)) {
+              if (XFormsUploadControl.isUploadedFileURL(fromPath)) {
 
                 val fromPathParams =
                   PathUtils.splitQueryDecodeParams(fromPath)._2

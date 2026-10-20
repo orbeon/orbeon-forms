@@ -50,7 +50,8 @@
     <!--
         These JARs are checked in. They can be rebuilt with the jarjar target
 
-        - xerces-2.12-orbeon.jar
+        - xerces-2.12-orbeon.jar (built from Xerces-J 2.12.2, see lib/src/README.txt; written directly to
+          lib/runtime)
         - msv-20081113-orbeon.jar
 
         For directory scanner and SSH support:
@@ -115,8 +116,8 @@
 
     <target name="jarjar" depends="prepare">
         <!-- Xerces fat JAR -->
-        <jarjar jarfile="lib/xerces-2.12-orbeon.jar">
-            <zipfileset src="lib/src/xerces-xercesImpl-2.12.jar">
+        <jarjar jarfile="lib/runtime/xerces-2.12-orbeon.jar">
+            <zipfileset src="lib/src/xerces-xercesImpl-2.12.2.jar">
                 <!-- Don't expose any services -->
                 <exclude name="META-INF/**"/>
                 <exclude name="org/apache/wml/**"/>
@@ -127,6 +128,12 @@
                 <!-- Don't expose any services -->
                 <exclude name="META-INF/**"/>
             </zipfileset>
+            <!-- Record the upstream base version so that people and vulnerability scanners can see it -->
+            <manifest>
+                <attribute name="Implementation-Title"   value="Apache Xerces-J, repackaged under org.orbeon.apache"/>
+                <attribute name="Implementation-Version" value="2.12.2"/>
+                <attribute name="Implementation-Vendor"  value="Apache Software Foundation"/>
+            </manifest>
             <rule pattern="org.apache.**" result="org.orbeon.apache.@1"/>
         </jarjar>
         <!-- MSV fat JAR -->

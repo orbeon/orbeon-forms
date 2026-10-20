@@ -143,8 +143,22 @@ class ServletExternalContext(
 
     def getHeaderValuesMap = headerValuesMap.asJava
 
-    lazy val incomingCookies: Iterable[(String, String)] =
-      nativeRequest.getCookies.map(cookie => cookie.getName -> cookie.getValue)
+    lazy val incomingCookies: Iterable[(String, String)] = {
+      val fromHeaders =
+        for {
+          cookieHeader <- nativeRequest.headerValuesList(Headers.Cookie)
+          cookiePair   <- cookieHeader.splitTo[List](";")
+          eqIndex      = cookiePair.indexOf('=')
+          if eqIndex > 0
+          cookieName   <- cookiePair.substring(0, eqIndex).trimAllToOpt
+        } yield
+          cookieName -> cookiePair.substring(eqIndex + 1).trimAllToEmpty
+
+      if (fromHeaders.nonEmpty)
+        fromHeaders
+      else
+        Option(nativeRequest.getCookies).getOrElse(Array.empty).map(cookie => cookie.getName -> cookie.getValue)
+    }
 
     lazy val getParameterMap: ju.Map[String, Array[AnyRef]] = {
 

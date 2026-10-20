@@ -250,8 +250,22 @@ class Portlet2ExternalContext(
 
     def getHeaderValuesMap: ju.Map[String, Array[String]] = headerValuesMap.asJava
 
-    lazy val incomingCookies: Iterable[(String, String)] =
-      portletRequest.getCookies.map(cookie => cookie.getName -> cookie.getValue)
+    lazy val incomingCookies: Iterable[(String, String)] = {
+      val fromHeaders =
+        for {
+          cookieHeader <- Option(portletRequest.getProperties(Headers.Cookie)).fold(Iterator.empty[String])(_.asScala).toList
+          cookiePair   <- cookieHeader.splitTo[List](";")
+          eqIndex      = cookiePair.indexOf('=')
+          if eqIndex > 0
+          cookieName   <- cookiePair.substring(0, eqIndex).trimAllToOpt
+        } yield
+          cookieName -> cookiePair.substring(eqIndex + 1).trimAllToEmpty
+
+      if (fromHeaders.nonEmpty)
+        fromHeaders
+      else
+        Option(portletRequest.getCookies).getOrElse(Array.empty).map(cookie => cookie.getName -> cookie.getValue)
+    }
 
     def getSession(create: Boolean): ExternalContext.Session =
       Portlet2ExternalContext.this.getSession(create)

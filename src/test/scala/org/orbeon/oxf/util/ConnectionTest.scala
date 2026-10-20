@@ -21,7 +21,9 @@ import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.*
 import org.orbeon.oxf.http.Headers.*
 import org.orbeon.oxf.http.{Headers, HttpMethod}
+import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.PropertyLoader
+import org.orbeon.oxf.servlet.*
 import org.orbeon.oxf.test.{ResourceManagerSupport, ResourceManagerTestBase}
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -286,6 +288,190 @@ class ConnectionTest
       val cookieStore = new BasicCookieStore
       Connection.ConnectionState.saveHttpState(cookieStore)
       assert(Connection.ConnectionState.loadHttpState.contains(cookieStore))
+    }
+  }
+
+  describe("#7066: Cookie forwarding") {
+
+    def testCookieForwarding(
+      cookiesToForward    : List[String],
+      incomingCookiesList : List[(String, String)],
+      externalSessionOpt  : Option[ExternalContext.Session] = None,
+      requestedSessionId  : String                          = null
+    ): Option[String] = {
+      val incomingRequest = new RequestAdapter {
+        override def getSession(create: Boolean): ExternalContext.Session = externalSessionOpt.orNull
+        override def incomingCookies: Iterable[(String, String)] = incomingCookiesList
+        override def getRequestedSessionId: String = requestedSessionId
+        override def getAttributesMap: ju.Map[String, AnyRef] = new ju.HashMap
+        override val getHeaderValuesMap: ju.Map[String, Array[String]] = new ju.HashMap
+        override val getContextPath: String = OrbeonBaseUrl.getPath
+        override val servicePrefix: String = OrbeonBaseUrl.toString
+      }
+
+      PropertyLoader.getPropertyStore(Some(incomingRequest))
+
+      val webAppContext = Mockito.mock(classOf[WebAppContext])
+      Mockito when webAppContext.attributes thenReturn collection.mutable.Map[String, AnyRef]()
+
+      val externalContext = Mockito.mock(classOf[ExternalContext])
+      Mockito when externalContext.getRequest thenReturn incomingRequest
+      Mockito when externalContext.getWebAppContext thenReturn webAppContext
+
+      implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(externalContext)
+      implicit val logger: IndentedLogger = ResourceManagerTestBase.newIndentedLogger
+
+      val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
+        url              = URI.create("/service"),
+        hasCredentials   = false,
+        customHeaders    = Map.empty,
+        headersToForward = Set.empty,
+        cookiesToForward = cookiesToForward,
+        getHeader        = _ => None
+      )
+
+      headers.get(Headers.Cookie).map(_.head)
+    }
+
+    it("must forward custom cookie with its original value, and NOT with the session ID") {
+      val session = new SimpleSession("session-123")
+      val cookieHeader = testCookieForwarding(
+        cookiesToForward    = List("MYCOOKIE"),
+        incomingCookiesList = List("MYCOOKIE" -> "my-secret-token"),
+        externalSessionOpt  = Some(session),
+        requestedSessionId  = null
+      )
+      assert(cookieHeader.contains("MYCOOKIE=my-secret-token"))
+    }
+
+    it("must not synthesize a session cookie for a custom cookie when not in incoming cookies") {
+      val session = new SimpleSession("session-123")
+      val cookieHeader = testCookieForwarding(
+        cookiesToForward    = List("MYCOOKIE"),
+        incomingCookiesList = Nil,
+        externalSessionOpt  = Some(session),
+        requestedSessionId  = null
+      )
+      assert(cookieHeader.isEmpty)
+    }
+
+    it("must synthesize JSESSIONID when JSESSIONID is in cookiesToForward and session exists") {
+      val session = new SimpleSession("session-123")
+      val cookieHeader = testCookieForwarding(
+        cookiesToForward    = List("JSESSIONID"),
+        incomingCookiesList = Nil,
+        externalSessionOpt  = Some(session),
+        requestedSessionId  = null
+      )
+      assert(cookieHeader.contains("JSESSIONID=session-123"))
+    }
+
+    it("must forward incoming JSESSIONID when cookie value matches session ID (e.g. WebSphere prefix/suffix)") {
+      val session = new SimpleSession("session-123")
+      val cookieHeader = testCookieForwarding(
+        cookiesToForward    = List("JSESSIONID"),
+        incomingCookiesList = List("JSESSIONID" -> "0000session-123:-1"),
+        externalSessionOpt  = Some(session),
+        requestedSessionId  = "0000session-123:-1"
+      )
+      assert(cookieHeader.contains("JSESSIONID=0000session-123:-1"))
+    }
+
+    it("must handle clustered session cookie (e.g. WildFly route) and filter out non-matching JSESSIONID cookies") {
+      val session = new SimpleSession("session-123")
+      val cookieHeader = testCookieForwarding(
+        cookiesToForward    = List("JSESSIONID", "JWT_AUTH_COOKIE"),
+        incomingCookiesList = List(
+          "JSESSIONID"      -> "other-app-session",
+          "JSESSIONID"      -> "session-123.node1",
+          "JWT_AUTH_COOKIE" -> "jwt.token.val"
+        ),
+        externalSessionOpt  = Some(session),
+        requestedSessionId  = "session-123.node1"
+      )
+      assert(cookieHeader.contains("JSESSIONID=session-123.node1; JWT_AUTH_COOKIE=jwt.token.val"))
+    }
+
+    it("must ignore incoming JSESSIONID and synthesize from session when session is new") {
+      val newSession = new SimpleSession("new-session-456") {
+        override def isNew: Boolean = true
+      }
+      val cookieHeader = testCookieForwarding(
+        cookiesToForward    = List("JSESSIONID"),
+        incomingCookiesList = List("JSESSIONID" -> "new-session-456.node1"),
+        externalSessionOpt  = Some(newSession),
+        requestedSessionId  = "old-session-123"
+      )
+      assert(cookieHeader.contains("JSESSIONID=new-session-456"))
+    }
+
+    it("must preserve cookie forwarding order when multiple cookies are configured") {
+      val session = new SimpleSession("session-123")
+      val header1 = testCookieForwarding(
+        cookiesToForward    = List("MYCOOKIE", "JSESSIONID"),
+        incomingCookiesList = List("MYCOOKIE" -> "val1"),
+        externalSessionOpt  = Some(session),
+        requestedSessionId  = null
+      )
+      assert(header1.contains("MYCOOKIE=val1; JSESSIONID=session-123"))
+
+      val header2 = testCookieForwarding(
+        cookiesToForward    = List("JSESSIONID", "MYCOOKIE"),
+        incomingCookiesList = List("MYCOOKIE" -> "val1"),
+        externalSessionOpt  = Some(session),
+        requestedSessionId  = null
+      )
+      assert(header2.contains("JSESSIONID=session-123; MYCOOKIE=val1"))
+    }
+
+    it("must return None if no matching cookies and no session") {
+      val cookieHeader = testCookieForwarding(
+        cookiesToForward    = List("JSESSIONID", "MYCOOKIE"),
+        incomingCookiesList = Nil,
+        externalSessionOpt  = None,
+        requestedSessionId  = null
+      )
+      assert(cookieHeader.isEmpty)
+    }
+  }
+
+  describe("ServletExternalContext incomingCookies parsing") {
+
+    it("must parse cookies from the Cookie header") {
+      val nativeRequest = Mockito.mock(classOf[HttpServletRequest])
+      Mockito.when(nativeRequest.headerValuesList(Headers.Cookie))
+        .thenReturn(List("SESSION=abc; JWT_TOKEN=xyz.123; OTHER="))
+
+      val pipelineContext = Mockito.mock(classOf[PipelineContext])
+      val webAppContext = Mockito.mock(classOf[WebAppContext])
+      val nativeResponse = Mockito.mock(classOf[HttpServletResponse])
+
+      val sec = new ServletExternalContext(pipelineContext, webAppContext, nativeRequest, nativeResponse)
+      val cookies = sec.getRequest.incomingCookies.toList
+
+      assert(cookies == List("SESSION" -> "abc", "JWT_TOKEN" -> "xyz.123", "OTHER" -> ""))
+    }
+
+    it("must fall back to nativeRequest.getCookies when Cookie header is absent") {
+      val mockCookie = new Cookie {
+        override def getNativeCookie: AnyRef = null
+        override def getName: String = "FALLBACK"
+        override def getValue: String = "cookie-val"
+      }
+      val nativeRequest = Mockito.mock(classOf[HttpServletRequest])
+      Mockito.when(nativeRequest.headerValuesList(Headers.Cookie))
+        .thenReturn(Nil)
+      Mockito.when(nativeRequest.getCookies)
+        .thenReturn(Array(mockCookie))
+
+      val pipelineContext = Mockito.mock(classOf[PipelineContext])
+      val webAppContext = Mockito.mock(classOf[WebAppContext])
+      val nativeResponse = Mockito.mock(classOf[HttpServletResponse])
+
+      val sec = new ServletExternalContext(pipelineContext, webAppContext, nativeRequest, nativeResponse)
+      val cookies = sec.getRequest.incomingCookies.toList
+
+      assert(cookies == List("FALLBACK" -> "cookie-val"))
     }
   }
 }

@@ -291,88 +291,91 @@ object Connection extends ConnectionTrait {
     logger           : IndentedLogger
   ): Option[(String, List[String])] = {
 
-    // NOTE: We use a property, as some app servers like WebLogic allow configuring the session cookie name.
     if (cookiesToForward.nonEmpty) {
 
-      // By convention, the first cookie name is the session cookie
-      val sessionCookieName = cookiesToForward.head
+      val propertySet       = Properties.instance.getPropertySet
+      val sessionCookieName =
+        propertySet.getNonBlankString(HttpForwardCookiesSessionCookieNameProperty).getOrElse("JSESSIONID")
 
-      // NOTES 2011-01-22:
-      //
-      // If this is requested when a page is generated, it turns out we cannot rely on a JSESSIONID that makes
-      // sense right after authentication, even in the scenario where the JSESSIONID is clean, because Tomcat
-      // replays the initial request. In other words the JSESSIONID cookie can be stale.
-      //
-      // This means that the forwarding done below often doesn't make sense.
-      //
-      // We could possibly allow it only for XForms Ajax/page updates, where the probability that JSESSIONID is
-      // correct is greater.
-      //
-      // A stronger fix might be to simply disable JSESSIONID forwarding, or support a stronger SSO option.
-      //
-      // See: http://forge.ow2.org/tracker/?func=detail&atid=350207&aid=315104&group_id=168
-      //      https://issues.apache.org/bugzilla/show_bug.cgi?id=50633
-      //
+      val requestOption   = Option(externalContext.getRequest)
+      val incomingCookies = requestOption.toList.flatMap(_.incomingCookies)
+      val sessionOpt      = externalContext.getSessionOpt(false)
 
-      // TODO: ExternalContext must provide direct access to cookies
-      val requestOption = Option(externalContext.getRequest)
-      val nativeRequestOption =
-        requestOption flatMap
-        (r => Option(r.getNativeRequest)) collect
-        { case r: HttpServletRequest => r }
-
-      // 1. If there is an incoming JSESSIONID cookie, use it. The reason is that there is not necessarily an
-      // obvious mapping between "session id" and JSESSIONID cookie value. With Tomcat, this works, but with e.g.
-      // WebSphere, you get session id="foobar" and JSESSIONID=0000foobar:-1. So we must first try to get the
-      // incoming JSESSIONID. To do this, we get the cookie, then serialize it as a header.
-      def fromIncoming =
-        nativeRequestOption flatMap
-        (sessionCookieFromIncomingCapitalized(externalContext, _, cookiesToForward, sessionCookieName))
-
-      // 2. If there is no incoming session cookie, try to make our own cookie. For this to work on WebSphere,
-      // users will have the define the prefix and suffix properties.
-      def fromSession =
-        externalContext.getSessionOpt(false).map(session => {
-          val propertySet   = Properties.instance.getPropertySet
-          val prefix        = propertySet.getString(HttpForwardCookiesSessionPrefixProperty, default = "")
-          val suffix        = propertySet.getString(HttpForwardCookiesSessionSuffixProperty, default = "")
-          val sessionId     = session.getId
-          val sessionCookie = s"$sessionCookieName=$prefix$sessionId$suffix"
-          Headers.Cookie    -> List(sessionCookie)
-        })
+      def incomingSessionCookieMatches(cookieValue: String): Boolean =
+        sessionOpt.exists { session =>
+          ! session.isNew && session.getId.nonEmpty && cookieValue.contains(session.getId)
+        }
 
       // Logging
       ifDebug {
-        val incomingSessionHeaders =
+        val incomingSessionCookieValue =
           for {
-            request       <- requestOption.toList
-            cookieHeaders <- request.getHeaderValuesMap.asScala.get("cookie").toList
-            cookieValue   <- cookieHeaders
-            if cookieValue.contains(sessionCookieName) // rough test
+            (name, value) <- incomingCookies
+            if name == sessionCookieName
           } yield
-            cookieValue
-
-        val incomingSessionCookies =
-          for {
-            nativeRequest <- nativeRequestOption.toList
-            cookies       <- Option(nativeRequest.getCookies).toList
-            cookie        <- cookies
-            if cookie.getName == sessionCookieName
-          } yield
-            cookie.getValue
-
-        val sessionOpt = externalContext.getSessionOpt(false)
+            value
 
         debug("setting cookie", List(
-          "new session"              -> (sessionOpt map (_.isNew.toString) orNull),
-          "session id"               -> (sessionOpt map (_.getId) orNull),
-          "requested session id"     -> (requestOption flatMap (r => Option(r.getRequestedSessionId)) orNull),
-          "session cookie name"      -> sessionCookieName,
-          "incoming session cookies" -> (incomingSessionCookies mkString " - "),
-          "incoming session headers" -> (incomingSessionHeaders mkString " - ")))
+          "new session"             -> sessionOpt.map(_.isNew.toString).orNull,
+          "session id"              -> (sessionOpt.map(_.getId) orNull),
+          "requested session id"    -> requestOption.flatMap(r => Option(r.getRequestedSessionId)).orNull,
+          "session cookie name"     -> sessionCookieName,
+          "incoming session cookie" -> (incomingSessionCookieValue mkString " - ")))
       }
 
-      fromIncoming orElse fromSession
+      // 1. If there is an incoming session cookie and it matches the current session, use it. The reason is that
+      // there is not necessarily an obvious mapping between "session id" and session cookie value. With Tomcat,
+      // this works, but with e.g. WebSphere, you get session id="foobar" and JSESSIONID=0000foobar:-1. So we
+      // must first try to get the incoming session cookie.
+      //
+      // 2. If there is no matching incoming session cookie, try to make our own cookie. For this to work on
+      // WebSphere, users will have to define the prefix and suffix properties.
+      def synthesizedSessionCookie: Option[String] =
+        sessionOpt.map { session =>
+          val prefix    = propertySet.getString(HttpForwardCookiesSessionPrefixProperty, default = "")
+          val suffix    = propertySet.getString(HttpForwardCookiesSessionSuffixProperty, default = "")
+          val sessionId = session.getId
+          s"$sessionCookieName=$prefix$sessionId$suffix"
+        }
+
+      val pairsToForward =
+        for {
+          cookieNameToForward <- cookiesToForward.distinct
+          pair <-
+            if (cookieNameToForward == sessionCookieName) {
+              val incomingSessionCookies =
+                incomingCookies
+                  .collect {
+                    case (name, value) if name == sessionCookieName && incomingSessionCookieMatches(value) =>
+                      s"$name=$value"
+                  }
+                  .toList
+              if (incomingSessionCookies.nonEmpty)
+                incomingSessionCookies
+              else
+                synthesizedSessionCookie.toList
+            } else {
+              incomingCookies
+                .collect {
+                  case (name, value) if name == cookieNameToForward =>
+                    s"$name=$value"
+                }
+                .toList
+            }
+        } yield
+          pair
+
+      if (pairsToForward.nonEmpty) {
+        val cookieHeaderValue = pairsToForward mkString "; "
+
+        debug("forwarding cookies", List(
+          "cookie"               -> cookieHeaderValue,
+          "requested session id" -> requestOption.flatMap(r => Option(r.getRequestedSessionId)).orNull)
+        )
+
+        Some(Headers.Cookie -> List(cookieHeaderValue))
+      } else
+        None
     } else
       None
   }
@@ -381,12 +384,13 @@ object Connection extends ConnectionTrait {
 
     private val SupportedNonHttpReadonlySchemes = Set[UriScheme](UriScheme.File, UriScheme.Oxf, UriScheme.Data)
 
-    val HttpInternalPathsProperty               = "oxf.http.internal-paths"
-    val HttpForwardCookiesProperty              = "oxf.http.forward-cookies"
-    val HttpForwardCookiesSessionPrefixProperty = "oxf.http.forward-cookies.session.prefix"
-    val HttpForwardCookiesSessionSuffixProperty = "oxf.http.forward-cookies.session.suffix"
-    val HttpForwardHeadersProperty              = "oxf.http.forward-headers"
-    val LegacyXFormsHttpForwardHeadersProperty  = "oxf.xforms.forward-submission-headers"
+    val HttpInternalPathsProperty                   = "oxf.http.internal-paths"
+    val HttpForwardCookiesProperty                  = "oxf.http.forward-cookies"
+    val HttpForwardCookiesSessionCookieNameProperty = "oxf.http.forward-cookies.session-cookie-name"
+    val HttpForwardCookiesSessionPrefixProperty     = "oxf.http.forward-cookies.session.prefix"
+    val HttpForwardCookiesSessionSuffixProperty     = "oxf.http.forward-cookies.session.suffix"
+    val HttpForwardHeadersProperty                  = "oxf.http.forward-headers"
+    val LegacyXFormsHttpForwardHeadersProperty      = "oxf.xforms.forward-submission-headers"
 
     def valueAs[T[_]](value: String)(implicit cbf: Factory[String, T[String]]): T[String] =
       value.trimAllToOpt map (_.splitTo[T]()) getOrElse cbf.newBuilder.result()
@@ -612,52 +616,6 @@ object Connection extends ConnectionTrait {
 
       propertySet.getNonBlankString(propertyName).toList ++
         propertySet.getNonBlankString(propertyName + ".private").toList mkString " "
-    }
-
-    def sessionCookieFromIncomingCapitalized(
-      externalContext   : ExternalContext,
-      nativeRequest     : HttpServletRequest,
-      cookiesToForward  : List[String],
-      sessionCookieName : String
-    )(implicit
-      logger            : IndentedLogger
-    ): Option[(String, List[String])] = {
-
-      def requestedSessionIdMatches =
-        externalContext.getSessionOpt(false) exists { session =>
-          val requestedSessionId = externalContext.getRequest.getRequestedSessionId
-          session.getId == requestedSessionId
-        }
-
-      val cookies = Option(nativeRequest.getCookies) getOrElse Array.empty[Cookie]
-      if (cookies.nonEmpty) {
-
-        val pairsToForward =
-          for {
-            cookie <- cookies
-            // Only forward cookie listed as cookies to forward
-            if cookiesToForward.contains(cookie.getName)
-            // Only forward if there is the requested session id is the same as the current session. Otherwise,
-            // it means that the current session is no longer valid, or that the incoming cookie is out of date.
-            if sessionCookieName != cookie.getName || requestedSessionIdMatches
-          } yield
-            cookie.getName + '=' + cookie.getValue
-
-        if (pairsToForward.nonEmpty) {
-
-          // Multiple cookies in the header, separated with ";"
-          val cookieHeaderValue = pairsToForward mkString "; "
-
-          debug("forwarding cookies", List(
-            "cookie"               -> cookieHeaderValue,
-            "requested session id" -> externalContext.getRequest.getRequestedSessionId)
-          )
-
-          Some(Headers.Cookie -> List(cookieHeaderValue))
-        } else
-          None
-      } else
-        None
     }
   }
 

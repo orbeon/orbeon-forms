@@ -48,6 +48,7 @@ class LocalRequest private (
   val getAttributesMap: ju.Map[String, AnyRef],
   val getHeaderValuesMap: ju.Map[String, Array[String]],
   val getParameterMap: ju.Map[String, Array[AnyRef]],
+  override val incomingCookies: Iterable[(String, String)],
 
   val getContentLength: Int,
   val getContentType: String,
@@ -223,6 +224,7 @@ object LocalRequest {
       getAttributesMap                        = attributesMap,
       getHeaderValuesMap                      = headersIncludingAuthBodyLowercase,
       getParameterMap                         = queryAndBodyParameters,
+      incomingCookies                         = incomingRequest.incomingCookies,
 
       getContentLength                        = contentLengthOpt map (_.toInt) getOrElse -1,
       getContentType                          = contentTypeOpt.orNull,

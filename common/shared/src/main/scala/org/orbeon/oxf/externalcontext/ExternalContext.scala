@@ -153,6 +153,7 @@ object ExternalContext {
     def getAttributesMap: ju.Map[String, AnyRef]
     def getHeaderValuesMap: ju.Map[String, Array[String]] // TODO: don't use `Array`
     def getParameterMap: ju.Map[String, Array[AnyRef]]
+    def incomingCookies: Iterable[(String, String)] = Nil
 
     def getCharacterEncoding: String
     def getContentLength: Int

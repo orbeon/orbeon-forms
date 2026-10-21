@@ -286,138 +286,138 @@
                         class="img-thumbnail img-invertible"/>
                 </fr:card-thumbnail>
 
-                    <xf:itemset ref="instance('fr-search-results-instance')/document[position() le $document-count-to-show]">
-                        <xf:label
-                            ref="
-                                string-join(
-                                    let $document := .
+                <xf:itemset ref="instance('fr-search-results-instance')/document[position() le $document-count-to-show]">
+                    <xf:label
+                        ref="
+                            string-join(
+                                let $document := .
+                                return
+                                    for $detail-position in $detail-positions
                                     return
-                                        for $detail-position in $detail-positions
-                                        return
-                                            let $raw     := $document/details/detail[$detail-position],
-                                                $query   := instance('fr-search-instance')/query[exists(@name)][$detail-position],
-                                                $control := $query/@control,
-                                                $value   :=
-                                                    if ($control = 'textarea') then
-                                                        if (string-length($raw) > 20) then
-                                                            concat(substring($raw, 1, 20), '...')
-                                                        else
-                                                            $raw
-                                                    else if (frf:isMultipleSelectionControl($control)) then
-                                                        string-join(
-                                                            for $code in xxf:split($raw) return
-                                                                ($form-resources/*[local-name() = $query/@name]/item[value = $code]/label, $code)[1],
-                                                            ', '
-                                                        )
-                                                    else if (frf:isSingleSelectionControl($control)) then
-                                                        for $code in $raw return
-                                                            ($form-resources/*[local-name() = $query/@name]/item[value = $code]/label, $code)[1]
-                                                    else if ($control = 'secret') then
-                                                        if (normalize-space($raw) = '') then
-                                                            ''
-                                                        else
-                                                            '••••••••'
+                                        let $raw     := $document/details/detail[$detail-position],
+                                            $query   := instance('fr-search-instance')/query[exists(@name)][$detail-position],
+                                            $control := $query/@control,
+                                            $value   :=
+                                                if ($control = 'textarea') then
+                                                    if (string-length($raw) > 20) then
+                                                        concat(substring($raw, 1, 20), '...')
                                                     else
-                                                        for $type in substring-after($query/@type, ':') return
-                                                            if ($type = 'date') then
-                                                                if ($raw castable as xs:date) then
-                                                                    format-date(
-                                                                        xs:date($raw),
-                                                                        xxf:r('summary.formats.date', '|fr-fr-resources|'),
-                                                                        $datelang,
-                                                                        (),
-                                                                        ()
-                                                                    )
-                                                                else
-                                                                    $raw
-                                                            else if ($type = 'time') then
-                                                                if ($raw castable as xs:time) then
-                                                                    format-time(
-                                                                        xs:time($raw),
-                                                                        xxf:r('summary.formats.time', '|fr-fr-resources|'),
-                                                                        $datelang,
-                                                                        (),
-                                                                        ()
-                                                                    )
-                                                                else
-                                                                    $raw
-                                                            else if ($type = 'dateTime') then
-                                                                if ($raw castable as xs:dateTime) then
-                                                                    format-dateTime(
-                                                                        xs:dateTime($raw),
-                                                                        xxf:r('summary.formats.dateTime', '|fr-fr-resources|'),
-                                                                        $datelang,
-                                                                        (),
-                                                                        ()
-                                                                    )
-                                                                else
-                                                                    $raw
-                                                            else if ($type = 'dayTimeDuration') then
-                                                                if ($raw castable as xs:dayTimeDuration) then
-                                                                    string-join(
-                                                                        (
-                                                                            if (days-from-duration($raw) = 0) then
-                                                                                ()
-                                                                            else
-                                                                                concat(days-from-duration($raw), ' d'),
-                                                                            if (hours-from-duration($raw) = 0) then
-                                                                                ()
-                                                                            else
-                                                                                concat(hours-from-duration($raw), ' h'),
-                                                                            if (minutes-from-duration($raw) = 0) then
-                                                                                ()
-                                                                            else
-                                                                                concat(minutes-from-duration($raw), ' min'),
-                                                                            if (seconds-from-duration($raw) = 0) then
-                                                                                ()
-                                                                            else
-                                                                                concat(seconds-from-duration($raw), ' sec')
-                                                                         ),
-                                                                         ' '
-                                                                    )
-                                                                else
-                                                                    $raw
+                                                        $raw
+                                                else if (frf:isMultipleSelectionControl($control)) then
+                                                    string-join(
+                                                        for $code in xxf:split($raw) return
+                                                            ($form-resources/*[local-name() = $query/@name]/item[value = $code]/label, $code)[1],
+                                                        ', '
+                                                    )
+                                                else if (frf:isSingleSelectionControl($control)) then
+                                                    for $code in $raw return
+                                                        ($form-resources/*[local-name() = $query/@name]/item[value = $code]/label, $code)[1]
+                                                else if ($control = 'secret') then
+                                                    if (normalize-space($raw) = '') then
+                                                        ''
+                                                    else
+                                                        '••••••••'
+                                                else
+                                                    for $type in substring-after($query/@type, ':') return
+                                                        if ($type = 'date') then
+                                                            if ($raw castable as xs:date) then
+                                                                format-date(
+                                                                    xs:date($raw),
+                                                                    xxf:r('summary.formats.date', '|fr-fr-resources|'),
+                                                                    $datelang,
+                                                                    (),
+                                                                    ()
+                                                                )
                                                             else
                                                                 $raw
-                                            return
-                                                if (xxf:is-blank($value)) then
-                                                    ' - '
-                                                else
-                                                    $value,
-                                    ' | '
-                                )"/>
+                                                        else if ($type = 'time') then
+                                                            if ($raw castable as xs:time) then
+                                                                format-time(
+                                                                    xs:time($raw),
+                                                                    xxf:r('summary.formats.time', '|fr-fr-resources|'),
+                                                                    $datelang,
+                                                                    (),
+                                                                    ()
+                                                                )
+                                                            else
+                                                                $raw
+                                                        else if ($type = 'dateTime') then
+                                                            if ($raw castable as xs:dateTime) then
+                                                                format-dateTime(
+                                                                    xs:dateTime($raw),
+                                                                    xxf:r('summary.formats.dateTime', '|fr-fr-resources|'),
+                                                                    $datelang,
+                                                                    (),
+                                                                    ()
+                                                                )
+                                                            else
+                                                                $raw
+                                                        else if ($type = 'dayTimeDuration') then
+                                                            if ($raw castable as xs:dayTimeDuration) then
+                                                                string-join(
+                                                                    (
+                                                                        if (days-from-duration($raw) = 0) then
+                                                                            ()
+                                                                        else
+                                                                            concat(days-from-duration($raw), ' d'),
+                                                                        if (hours-from-duration($raw) = 0) then
+                                                                            ()
+                                                                        else
+                                                                            concat(hours-from-duration($raw), ' h'),
+                                                                        if (minutes-from-duration($raw) = 0) then
+                                                                            ()
+                                                                        else
+                                                                            concat(minutes-from-duration($raw), ' min'),
+                                                                        if (seconds-from-duration($raw) = 0) then
+                                                                            ()
+                                                                        else
+                                                                            concat(seconds-from-duration($raw), ' sec')
+                                                                     ),
+                                                                     ' '
+                                                                )
+                                                            else
+                                                                $raw
+                                                        else
+                                                            $raw
+                                        return
+                                            if (xxf:is-blank($value)) then
+                                                ' - '
+                                            else
+                                                $value,
+                                ' | '
+                            )"/>
 
-                        <xf:value
-                            ref="
-                                let
-                                    $current-document-name := @name,
-                                    $current-document-operations := xxf:split(@operations),
-                                    $edit-view-opt :=
-                                        if ($current-document-operations = ('*', 'update')) then
-                                            'edit'
-                                        else if ($current-document-operations = 'read') then
-                                            'view'
-                                        else
-                                            ''
-                                return
-                                    if (exists($edit-view-opt)) then
-                                        string-join(
-                                            (
-                                                '/fr',
-                                                $app,
-                                                $form,
-                                                $edit-view-opt,
-                                                $current-document-name
-                                            ),
-                                            '/'
-                                        )
+                    <xf:value
+                        ref="
+                            let
+                                $current-document-name := @name,
+                                $current-document-operations := xxf:split(@operations),
+                                $edit-view-opt :=
+                                    if ($current-document-operations = ('*', 'update')) then
+                                        'edit'
+                                    else if ($current-document-operations = 'read') then
+                                        'view'
                                     else
-                                        ''"/>
-                    </xf:itemset>
-                    <xf:itemset ref=".[$show-more]">
-                        <xf:label ref="xxf:r('landing.show-more', '|fr-fr-resources|')"/>
-                        <xf:value ref="concat('/fr/', $app, '/', $form, '/summary?form-version=', $version)"/>
-                    </xf:itemset>
+                                        ''
+                            return
+                                if (exists($edit-view-opt)) then
+                                    string-join(
+                                        (
+                                            '/fr',
+                                            $app,
+                                            $form,
+                                            $edit-view-opt,
+                                            $current-document-name
+                                        ),
+                                        '/'
+                                    )
+                                else
+                                    ''"/>
+                </xf:itemset>
+                <xf:itemset ref=".[$show-more]">
+                    <xf:label ref="xxf:r('landing.show-more', '|fr-fr-resources|')"/>
+                    <xf:value ref="concat('/fr/', $app, '/', $form, '/summary?form-version=', $version)"/>
+                </xf:itemset>
 ]
 <!--                                    <xf:switch-->
 <!--                                        caseref="starts-with(normalize-space($detail), '&lt;div')"-->

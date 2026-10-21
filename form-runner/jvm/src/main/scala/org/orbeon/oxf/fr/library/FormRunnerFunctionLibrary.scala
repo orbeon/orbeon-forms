@@ -202,6 +202,7 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     Fun("process-template", classOf[FRProcessTemplate], op = 0, min = 0, STRING, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE),
       Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(BOOLEAN, ALLOWS_ZERO_OR_ONE),
     )
 
     Fun("rendered-format-url", classOf[FRRenderedFormatUrl], op = 0, min = 0, STRING, EXACTLY_ONE,
@@ -223,7 +224,7 @@ private object FormRunnerFunctions {
     "workflow-stage-value"        -> (() => FormRunner.documentWorkflowStage),
     "username"                    -> (() => NetUtils.getExternalContext.getRequest.credentials map     (_.userAndGroup.username)),
     "user-group"                  -> (() => NetUtils.getExternalContext.getRequest.credentials flatMap (_.userAndGroup.groupname)),
-    "relevant-form-values-string" -> (() => Some(FormRunnerMetadata.findAllControlsWithValues(html = false, Nil))),
+    "relevant-form-values-string" -> (() => Some(FormRunnerMetadata.findAllControlsWithValues(outputIsHtml = false, Nil))),
     "wizard-current-page-name"    -> (() => Wizard.wizardCurrentPageNameOpt)
   )
 
@@ -709,7 +710,8 @@ class FRProcessTemplate extends FunctionSupport with RuntimeDependentFunction {
 
     // xxx lang?
 
-    val isHtml = true // TODO: param
+    // Are we outputting HTML? This was previously hardcoded to true, so we keep true as a default value.
+    val outputIsHtml = booleanArgumentOpt(2).getOrElse(true)
 
     val paramElems = Implicits.asScalaIterator(itemsArgument(1)).collect {
       case nodeInfo: NodeInfo if nodeInfo.getNodeKind == Type.ELEMENT =>
@@ -719,7 +721,7 @@ class FRProcessTemplate extends FunctionSupport with RuntimeDependentFunction {
     val params = EmailMetadataParsing.parseParameters(paramElems.to(Iterable))
 
     EvaluatedParams.fromEmailMetadataUsingContainingDocument(params.toList, Nil)
-      .processedTemplate(isHtml, templateString)
+      .processedTemplate(outputIsHtml, templateString)
   }
 }
 

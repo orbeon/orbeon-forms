@@ -15,9 +15,13 @@ package org.orbeon.oxf.fr.email
 
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
+import org.orbeon.oxf.fr.definitions.ControlValue
 import org.orbeon.oxf.fr.email.EmailMetadata.TemplateValue
 import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.function.ProcessTemplateSupport
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
@@ -26,7 +30,7 @@ import org.orbeon.xml.NamespaceMapping
 
 
 sealed trait EvaluatedParam {
-  def value(html: Boolean): String
+  def value(outputIsHtml: Boolean): String
 }
 
 object EvaluatedParam {
@@ -34,17 +38,20 @@ object EvaluatedParam {
   // "All Control Values" parameters can generate HTML or not
   case class AllControls(controlsToExclude: List[String]) extends EvaluatedParam {
 
-    override def value(html: Boolean): String =
-      FormRunnerMetadata.findAllControlsWithValuesExcludingNamedControls(html, controlsToExclude)
+    override def value(outputIsHtml: Boolean): String =
+      FormRunnerMetadata.findAllControlsWithValuesExcludingNamedControls(outputIsHtml, controlsToExclude)
   }
 
-  // Once evaluated, the parameter value is static (i.e. it doesn't depend on whether we're generating HTML or not)
-  case class Static(staticValue: String) extends EvaluatedParam {
+  // Once evaluated, the parameter value is static, but it must be escaped when inserted into HTML, unless it is HTML
+  // itself. Quotes are escaped too, as the placeholder can be inside an attribute value.
+  case class Static(staticValue: String, valueIsHtml: Boolean = false) extends EvaluatedParam {
 
-    override def value(html: Boolean): String = staticValue
+    override def value(outputIsHtml: Boolean): String =
+      if (outputIsHtml && ! valueIsHtml) staticValue.escapeXmlForAttribute else staticValue
   }
 
-  def apply(staticValue: String): EvaluatedParam = Static(staticValue)
+  def apply(staticValue: String                      ): EvaluatedParam = Static(staticValue)
+  def apply(staticValue: String, valueIsHtml: Boolean): EvaluatedParam = Static(staticValue, valueIsHtml)
 
   def apply(
     param                                : EmailMetadata.Param,
@@ -100,16 +107,35 @@ object EvaluatedParam {
         // TODO: add way to configure values separator
         // TODO: add support for section templates in Email Settings UI (Control Value dropdown)
 
-        EvaluatedParam(
-          FormRunner.resolveTargetRelativeToActionSourceOpt(
-            actionSourceAbsoluteId  = XFormsId.effectiveIdToAbsoluteId(Constants.DocumentId),
-            targetControlName       = controlName,
-            followIndexes           = false,
-            libraryOrSectionNameOpt = None
+        // The following uses the live form controls
+        val relevantControlValues =
+          xfcd
+            .resolveObjectsById(Constants.DocumentId, s"$controlName-control", contextItemOpt = None, followIndexes = false)
+            .collect { case c: XFormsControl if c.isRelevant => FormRunner.findControlValue(c, EventCollector.Throw) }
+            .flatten
+
+        if (relevantControlValues.nonEmpty)
+          EvaluatedParam(
+            relevantControlValues
+              .flatMap {
+                case ControlValue.SingleControlValue  (_, value, _)  => value.toList
+                case ControlValue.MultipleControlValue(_, values, _) => values
+              }
+              .mkString(", "),
+            valueIsHtml = relevantControlValues.exists(_.isHtml)
           )
-          .map(_.map(_.getStringValue).mkString(", "))
-          .getOrElse("")
-        )
+        else
+          // For non-relevant controls, read the value stored in the data
+          EvaluatedParam(
+            FormRunner.resolveTargetRelativeToActionSourceOpt(
+              actionSourceAbsoluteId  = XFormsId.effectiveIdToAbsoluteId(Constants.DocumentId),
+              targetControlName       = controlName,
+              followIndexes           = false,
+              libraryOrSectionNameOpt = None
+            )
+            .map(_.map(_.getStringValue).mkString(", "))
+            .getOrElse("")
+          )
 
       case EmailMetadata.Param.AllControlValuesParam(_) =>
         // Control values from section templates will be included
@@ -125,10 +151,10 @@ object EvaluatedParam {
 }
 
 case class EvaluatedParams(parameters: List[(String, EvaluatedParam)]) {
-  def processedTemplate(html: Boolean, contentTemplate: String): String =
+  def processedTemplate(outputIsHtml: Boolean, contentTemplate: String): String =
     ProcessTemplateSupport.processTemplateWithNames(
       contentTemplate,
-      parameters.map { case (name, value) => name -> value.value(html)}
+      parameters.map { case (name, value) => name -> value.value(outputIsHtml)}
     )
 }
 

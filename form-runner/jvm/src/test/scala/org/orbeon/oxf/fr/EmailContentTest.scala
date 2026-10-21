@@ -149,16 +149,16 @@ param14: http://localhost:8080/orbeon/fr/issue/6848/pdf/([a-zA-Z0-9]+)\?form-ver
                 """<li>Custom 2: Control: custom2</li><li>Param 1: Control: param1</li>""" +
                 """<li>Param 2: Control: param2</li></ul><br>""" +
                 """param4: http://localhost:8080/orbeon/fr/issue/6848/edit/([a-zA-Z0-9]+)\?form-version=1<br>""" +
-                """param5: http://localhost:8080/orbeon/fr/issue/6848/edit/([a-zA-Z0-9]+)\?form-version=1&fr-access-token=(.+?)<br>""" +
+                """param5: http://localhost:8080/orbeon/fr/issue/6848/edit/([a-zA-Z0-9]+)\?form-version=1&amp;fr-access-token=(.+?)<br>""" +
                 """param6: http://localhost:8080/orbeon/fr/issue/6848/view/([a-zA-Z0-9]+)\?form-version=1<br>""" +
-                """param7: http://localhost:8080/orbeon/fr/issue/6848/view/([a-zA-Z0-9]+)\?form-version=1&fr-access-token=(.+?)<br>""" +
+                """param7: http://localhost:8080/orbeon/fr/issue/6848/view/([a-zA-Z0-9]+)\?form-version=1&amp;fr-access-token=(.+?)<br>""" +
                 """param8: http://localhost:8080/orbeon/fr/issue/6848/new\?form-version=1<br>""" +
                 """param9: http://localhost:8080/orbeon/fr/issue/6848/summary\?form-version=1<br>""" +
                 """param10: http://localhost:8080/orbeon/fr/<br>""" +
                 """param11: http://localhost:8080/orbeon/fr/forms<br>""" +
                 """param12: http://localhost:8080/orbeon/fr/admin<br>""" +
                 """param13: http://localhost:8080/orbeon/fr/issue/6848/pdf/([a-zA-Z0-9]+)\?form-version=1<br>""" +
-                """param14: http://localhost:8080/orbeon/fr/issue/6848/pdf/([a-zA-Z0-9]+)\?form-version=1&fr-access-token=(.+?)</div></body></html>$""",
+                """param14: http://localhost:8080/orbeon/fr/issue/6848/pdf/([a-zA-Z0-9]+)\?form-version=1&amp;fr-access-token=(.+?)</div></body></html>$""",
               html    = true
             )
           )
@@ -240,6 +240,32 @@ param3: <ul><li>Email 1: email1@from\.control</li><li>Email 3: email3@from\.cont
           assert(headerLines.count(_ == "X-Custom-1st: hello Bcc: evil@example.org X-Other: injected") == 1)
           assert(! headerLines.contains("Bcc: evil@example.org"))
           assert(! headerLines.exists(_.startsWith("X-Other:")))
+        }
+      }
+    }
+
+    it("#7971: must escape control values inserted into an HTML body") {
+      withTestExternalContext { implicit ec =>
+        withFormRunnerDocument(processorService, doc) {
+
+          implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
+
+          val injected = """<b>bold</b> <a href="https://attacker.example/">click</a> & more"""
+          val escaped  = """&lt;b&gt;bold&lt;/b&gt; &lt;a href=&quot;https://attacker.example/&quot;&gt;click&lt;/a&gt; &amp; more"""
+
+          setControlValue(resolveObject[XFormsValueControl]("param-1-control").get.effectiveId, injected)
+
+          val body = process.SimpleProcess.emailsToSend(
+            emailDataFormatVersion = DataFormatVersion.Edge,
+            templateMatch          = TemplateMatch.First,
+            language               = FormRunner.currentLang,
+            templateNameOpt        = "5".some,
+            pdfParams              = Map.empty
+          ).head.messageContent.content
+
+          assert(body.contains(s"param1: $escaped<br>"))       // Control Value parameter
+          assert(body.contains(s"<li>Param 1: $escaped</li>")) // All Control Values parameter
+          assert(! body.contains(injected))
         }
       }
     }

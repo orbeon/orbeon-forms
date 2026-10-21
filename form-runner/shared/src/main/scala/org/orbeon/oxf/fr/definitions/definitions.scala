@@ -7,6 +7,21 @@ import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.xml.SaxonUtils
 
 
+sealed trait ControlValue {
+  val storageValue: String
+  val isHtml      : Boolean
+  def mapFormattedValues(f: String => String): ControlValue
+}
+object ControlValue {
+  case class SingleControlValue(storageValue: String, formattedValue: Option[String], isHtml: Boolean)
+    extends ControlValue {
+    def mapFormattedValues(f: String => String): ControlValue = copy(formattedValue = formattedValue.map(f))
+  }
+  case class MultipleControlValue(storageValue: String, formattedValues: List[String], isHtml: Boolean)
+    extends ControlValue {
+    def mapFormattedValues(f: String => String): ControlValue = copy(formattedValues = formattedValues.map(f))
+  }
+}
 sealed trait ModeType
 
 object ModeType {

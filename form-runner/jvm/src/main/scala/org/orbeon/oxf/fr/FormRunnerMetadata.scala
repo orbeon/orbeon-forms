@@ -13,21 +13,21 @@
  */
 package org.orbeon.oxf.fr
 
-import cats.syntax.option.*
-import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.Names.*
+import org.orbeon.oxf.fr.definitions.ControlValue
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.*
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
-import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XFormsSelect1Control, XFormsSelectControl}
+import org.orbeon.oxf.xforms.control.controls.{XFormsSelect1Control, XFormsSelectControl}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
-import org.orbeon.oxf.xforms.itemset.{ItemNode, ItemsetSupport}
+import org.orbeon.oxf.xforms.itemset.ItemNode
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.saxon.function.ProcessTemplateSupport
@@ -57,10 +57,6 @@ object FormRunnerMetadata {
 
   case class Lang(lang: String) extends AnyVal
 
-  sealed trait ControlValue { val storageValue: String }
-  case class SingleControlValue(storageValue: String, formattedValue: Option[String]) extends ControlValue
-  case class MultipleControlValue(storageValue: String, formattedValues: List[String]) extends ControlValue
-
   private val Debug            = false
 
   val FrExcludeFromEmailBody   = "fr-exclude-from-email-body"
@@ -70,10 +66,10 @@ object FormRunnerMetadata {
   val DeselectedCheckboxString = "☐"
 
   //@XPathFunction
-  def findAllControlsWithValues(html: Boolean, controlsToExclude: List[NodeInfo]): String =
-    findAllControlsWithValuesExcludingNamedControls(html, controlsToExclude.map(_.stringValue))
+  def findAllControlsWithValues(outputIsHtml: Boolean, controlsToExclude: List[NodeInfo]): String =
+    findAllControlsWithValuesExcludingNamedControls(outputIsHtml, controlsToExclude.map(_.stringValue))
 
-  def findAllControlsWithValuesExcludingNamedControls(html: Boolean, controlsToExclude: List[String]): String = {
+  def findAllControlsWithValuesExcludingNamedControls(outputIsHtml: Boolean, controlsToExclude: List[String]): String = {
 
     val collector: ErrorEventCollector = EventCollector.Throw
 
@@ -85,11 +81,13 @@ object FormRunnerMetadata {
     def iterationString(it: Int) =
       ProcessTemplateSupport.processTemplateWithNames(iterationResource, List(("iteration", it)))
 
+    // HTML escaping is done by gatherRelevantControls when producing HTML
     val controlDetails =
       gatherRelevantControls(
         doc                   = XFormsAPI.inScopeContainingDocument,
         currentLang           = Lang(FormRunnerLang.currentFRLang),
         controlNamesToExclude = controlsToExclude.toSet,
+        outputIsHtml          = outputIsHtml,
         collector             = collector
       )
 
@@ -101,13 +99,11 @@ object FormRunnerMetadata {
       isFirst  : Boolean
     ): Option[String] = {
 
-      // TODO: escape values when in HTML
-
       val valueOpt =
         value flatMap {
-          case SingleControlValue  (_, formattedValue)  =>
+          case ControlValue.SingleControlValue  (_, formattedValue, _)  =>
             formattedValue
-          case MultipleControlValue(_, formattedValues) =>
+          case ControlValue.MultipleControlValue(_, formattedValues, _) =>
             formattedValues.nonEmpty option (formattedValues map (SelectedCheckboxString + ' ' + _) mkString ", ")
         }
 
@@ -198,10 +194,8 @@ object FormRunnerMetadata {
 
     processNext(controlDetails, 1)
 
-    if (html)
-      sb.toString()
-    else
-      sb.toString()
+    // TODO: text templates should get plain text here, not HTML
+    sb.toString()
   }
 
   //@XPathFunction
@@ -316,10 +310,15 @@ object FormRunnerMetadata {
     doc                  : XFormsContainingDocument,
     currentLang          : Lang,
     controlNamesToExclude: Set[String],
+    outputIsHtml         : Boolean,
     collector            : ErrorEventCollector
   ): List[ControlDetails] = {
 
     val controls = doc.controls.getCurrentControlTree.effectiveIdsToControls
+
+    // When producing HTML, escape values which are not HTML already
+    def escapeIfNeeded(s: String, valueIsHtml: Boolean): String =
+      if (outputIsHtml && ! valueIsHtml) s.escapeXmlForAttribute else s
 
     def instanceInScope(control: XFormsSingleNodeControl, staticId: String): Option[XFormsInstance] =
       control.container.resolveObjectByIdInScope(control.effectiveId, staticId, None) flatMap
@@ -383,7 +382,7 @@ object FormRunnerMetadata {
                 currentLang,
                 (
                   List(
-                    LHHA.Label -> control.getLabel(collector),
+                    LHHA.Label -> control.getLabel(collector).map(escapeIfNeeded(_, control.isHTMLLabel)),
                     LHHA.Help  -> control.getHelp(collector),
                     LHHA.Hint  -> control.getHint(collector),
                     LHHA.Alert -> control.getAlert(collector)
@@ -398,70 +397,7 @@ object FormRunnerMetadata {
             )
 
           val valueOpt =
-            Option(control) collect {
-              case c: XFormsSelectControl  =>
-
-                val selectedLabels = c.findSelectedItems(collector) map (_.label.label) // TODO: HTML
-
-                MultipleControlValue(c.getValue(collector), selectedLabels) // TODO
-
-              case c: XFormsSelect1Control =>
-
-                val selectedLabel = c.findSelectedItem(collector) map (_.label.label) // TODO: HTML
-
-                SingleControlValue(c.getValue(collector), selectedLabel) // TODO
-
-              case c: XFormsValueComponentControl if c.staticControl.commonBinding.modeSelection =>
-
-                val selectionControlOpt = ItemsetSupport.findSelectionControl(c)
-
-                selectionControlOpt match {
-                  case Some(selectControl: XFormsSelectControl) =>
-                    val selectedLabels = selectControl.findSelectedItems(collector) map (_.label.label)  // TODO: HTML
-                    MultipleControlValue(selectControl.getValue(collector), selectedLabels) // TODO
-                  case Some(select1Control) =>
-
-                    // HACK for https://github.com/orbeon/orbeon-forms/issues/4042
-                    val itemOpt =
-                      if (c.staticControl.element.getQName == QName("dropdown-select1", XMLNames.FRNamespace))
-                        select1Control.findSelectedItem(collector) filter (_.value match {
-                          case Left(v) if v.nonAllBlank => true
-                          case _                        => false
-                        })
-                      else
-                        select1Control.findSelectedItem(collector)
-
-                    // TODO: HTML
-                    val selectedLabelOpt  = itemOpt map (_.label.label) orElse "".some // use a blank string so we get `N/A` in the end
-                    SingleControlValue(select1Control.getValue(collector), selectedLabelOpt)
-                  case None =>
-                    throw new IllegalStateException
-                }
-
-              case c: XFormsOutputControl =>
-
-                // Special case: if there is a "Calculated Value" control, but which has a blank value in the
-                // instance and no initial/calculated expressions, then consider that this control doesn't have
-                // a formatted value.
-                val noCalculationAndIsEmpty =
-                  ! c.bind.get.staticBind.hasDefaultOrCalculateBind && c.getValue(collector).trimAllToOpt.isEmpty
-
-                val formattedValue =
-                  if (noCalculationAndIsEmpty)
-                    None
-                  else
-                    c.getFormattedValue(collector) orElse Option(c.getValue(collector))
-
-                SingleControlValue(c.getValue(collector), formattedValue)
-
-              case c: XFormsValueControl if Set("image-attachment", "attachment")(staticControl.localName) =>
-
-                SingleControlValue(c.getValue(collector), c.boundNodeOpt flatMap (_.attValueOpt("filename")))
-
-              case c: XFormsValueControl =>
-
-                SingleControlValue(c.getValue(collector), c.getFormattedValue(collector) orElse Option(c.getValue(collector)))
-            }
+            FormRunner.findControlValue(control, collector).map(v => v.mapFormattedValues(escapeIfNeeded(_, v.isHtml)))
 
           // Include sections and repeated grids only
           def ancestorLevelContainers(control: XFormsControl): Iterator[XFormsComponentControl] =

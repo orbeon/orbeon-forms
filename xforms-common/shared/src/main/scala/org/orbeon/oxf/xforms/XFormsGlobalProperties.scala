@@ -1,5 +1,7 @@
 package org.orbeon.oxf.xforms
 
+import org.orbeon.datatypes.MaximumSize
+import org.orbeon.datatypes.MaximumSize.LimitedSize
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 
 import scala.jdk.CollectionConverters.*
@@ -31,4 +33,7 @@ object XFormsGlobalProperties {
   def getRetryDelayIncrement    : Int     = propertySet.getInteger(PropertyPrefix + "retry.delay-increment",              default = 5000)
   def getRetryMaxDelay          : Int     = propertySet.getInteger(PropertyPrefix + "retry.max-delay",                    default = 30000)
   def isKeepLocation            : Boolean = propertySet.getString (PropertyPrefix + "location-mode", "none") != "none"
+  def ajaxMaxRequestSize        : MaximumSize = propertySet.getNonBlankString(PropertyPrefix + "ajax.max-request-size")
+      .flatMap(MaximumSize.unapply)
+      .getOrElse(LimitedSize(10000000L))
 }

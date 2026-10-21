@@ -15,9 +15,11 @@ package org.orbeon.oxf.controller
 
 import cats.syntax.option.*
 import org.log4s
-import org.orbeon.datatypes.LocationData
+import org.orbeon.datatypes.MaximumSize.{LimitedSize, UnlimitedSize}
+import org.orbeon.datatypes.{LocationData, MaximumSize}
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document, Element, QName}
+import org.orbeon.io.LimiterInputStream
 import org.orbeon.oxf.util.Exceptions.*
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -42,6 +44,7 @@ import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.oxf.xml.{DeferredXMLReceiver, DeferredXMLReceiverImpl, TransformerUtils}
 import org.orbeon.saxon.om.DocumentInfo
 
+import java.io.InputStream
 import java.util as ju
 import java.util.regex.Pattern
 import javax.xml.transform.stream.StreamResult
@@ -64,8 +67,8 @@ trait XmlNativeRoute extends NativeRoute {
       false
     )
 
-  final def readRequestBodyAsDomDocument(implicit ec: ExternalContext): Document =
-    IOSupport.readOrbeonDom(ec.getRequest.getInputStream)
+  final def readRequestBodyAsDomDocument(maxSize: MaximumSize)(implicit ec: ExternalContext): Document =
+    IOSupport.readOrbeonDom(XmlNativeRoute.limitedRequestInputStream(ec.getRequest, maxSize))
 
   final def getResponseXmlReceiverSetContentType(implicit ec: ExternalContext): DeferredXMLReceiver = {
     ec.getResponse.setContentType(ContentTypes.XmlContentType)
@@ -88,6 +91,24 @@ trait XmlNativeRoute extends NativeRoute {
   }
 
   private val XmlIndentation = 2
+}
+
+object XmlNativeRoute {
+
+  def limitedRequestInputStream(request: Request, maxSize: MaximumSize): InputStream =
+    maxSize match {
+      case LimitedSize(maxBytes) =>
+        request.contentLengthOpt.filter(_ > maxBytes).foreach(throwRequestEntityTooLarge(maxBytes, _))
+        new LimiterInputStream(request.getInputStream, maxSize, throwRequestEntityTooLarge)
+      case UnlimitedSize =>
+        request.getInputStream
+    }
+
+  private def throwRequestEntityTooLarge(maxSize: Long, currentSize: Long): Unit =
+    throw HttpStatusCodeException(
+      StatusCode.RequestEntityTooLarge,
+      throwable = Some(new IllegalArgumentException(s"the request was rejected because its size ($currentSize) exceeds the configured maximum ($maxSize)"))
+    )
 }
 
 // Orbeon Forms application controller

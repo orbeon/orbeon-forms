@@ -14,7 +14,7 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.event.XFormsServer
 import org.orbeon.oxf.xforms.event.events.*
 import org.orbeon.oxf.xforms.state.RequestParameters
-import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsGlobalProperties}
 import org.orbeon.oxf.xml.{EncodeDecode, XMLReceiver}
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.XFormsNames.*
@@ -29,7 +29,7 @@ object XFormsServerRoute extends XmlNativeRoute {
 
   def process()(implicit pc: PipelineContext, ec: ExternalContext): Unit =
     doIt(
-      readRequestBodyAsDomDocument,
+      readRequestBodyAsDomDocument(XFormsGlobalProperties.ajaxMaxRequestSize),
       Some(getResponseXmlReceiverSetContentType)
     )
 

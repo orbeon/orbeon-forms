@@ -4,13 +4,22 @@ import io.circe.*
 import io.circe.syntax.*
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.fr.permission.Operations
-import org.orbeon.oxf.xml.SaxonUtils
 
 
-sealed trait ControlValue { val storageValue: String }
+sealed trait ControlValue {
+  val storageValue: String
+  val isHtml      : Boolean
+  def mapFormattedValues(f: String => String): ControlValue
+}
 object ControlValue {
-  case class SingleControlValue  (storageValue: String, formattedValue: Option[String]) extends ControlValue
-  case class MultipleControlValue(storageValue: String, formattedValues: List[String])  extends ControlValue
+  case class SingleControlValue(storageValue: String, formattedValue: Option[String], isHtml: Boolean)
+    extends ControlValue {
+    def mapFormattedValues(f: String => String): ControlValue = copy(formattedValue = formattedValue.map(f))
+  }
+  case class MultipleControlValue(storageValue: String, formattedValues: List[String], isHtml: Boolean)
+    extends ControlValue {
+    def mapFormattedValues(f: String => String): ControlValue = copy(formattedValues = formattedValues.map(f))
+  }
 }
 
 // xxx rename to `DetailModeType` or `FormRunnerDetailModeType` in separate commit

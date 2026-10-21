@@ -147,7 +147,7 @@ object EmailContent {
     val subjectFromTemplateOpt    = template.subject.map(_.text)
     lazy val subjectFromResources = (frc.currentFRResources / "email" / "subject").stringValue
 
-    evaluatedParams.processedTemplate(html = false, subjectFromTemplateOpt.getOrElse(subjectFromResources))
+    evaluatedParams.processedTemplate(outputIsHtml = false, subjectFromTemplateOpt.getOrElse(subjectFromResources))
   }
 
   def findMatchingEmailTemplates(

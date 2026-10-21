@@ -17,6 +17,7 @@ import org.orbeon.oxf.fr.Names.*
 import org.orbeon.oxf.fr.definitions.ControlValue
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -65,10 +66,10 @@ object FormRunnerMetadata {
   val DeselectedCheckboxString = "☐"
 
   //@XPathFunction
-  def findAllControlsWithValues(html: Boolean, controlsToExclude: List[NodeInfo]): String =
-    findAllControlsWithValuesExcludingNamedControls(html, controlsToExclude.map(_.stringValue))
+  def findAllControlsWithValues(outputIsHtml: Boolean, controlsToExclude: List[NodeInfo]): String =
+    findAllControlsWithValuesExcludingNamedControls(outputIsHtml, controlsToExclude.map(_.stringValue))
 
-  def findAllControlsWithValuesExcludingNamedControls(html: Boolean, controlsToExclude: List[String]): String = {
+  def findAllControlsWithValuesExcludingNamedControls(outputIsHtml: Boolean, controlsToExclude: List[String]): String = {
 
     val collector: ErrorEventCollector = EventCollector.Throw
 
@@ -80,11 +81,13 @@ object FormRunnerMetadata {
     def iterationString(it: Int) =
       ProcessTemplateSupport.processTemplateWithNames(iterationResource, List(("iteration", it)))
 
+    // HTML escaping is done by gatherRelevantControls when producing HTML
     val controlDetails =
       gatherRelevantControls(
         doc                   = XFormsAPI.inScopeContainingDocument,
         currentLang           = Lang(FormRunnerLang.currentFRLang),
         controlNamesToExclude = controlsToExclude.toSet,
+        outputIsHtml          = outputIsHtml,
         collector             = collector
       )
 
@@ -96,13 +99,11 @@ object FormRunnerMetadata {
       isFirst  : Boolean
     ): Option[String] = {
 
-      // TODO: escape values when in HTML
-
       val valueOpt =
         value flatMap {
-          case ControlValue.SingleControlValue  (_, formattedValue)  =>
+          case ControlValue.SingleControlValue  (_, formattedValue, _)  =>
             formattedValue
-          case ControlValue.MultipleControlValue(_, formattedValues) =>
+          case ControlValue.MultipleControlValue(_, formattedValues, _) =>
             formattedValues.nonEmpty option (formattedValues map (SelectedCheckboxString + ' ' + _) mkString ", ")
         }
 
@@ -193,10 +194,8 @@ object FormRunnerMetadata {
 
     processNext(controlDetails, 1)
 
-    if (html)
-      sb.toString()
-    else
-      sb.toString()
+    // TODO: text templates should get plain text here, not HTML
+    sb.toString()
   }
 
   //@XPathFunction
@@ -311,10 +310,15 @@ object FormRunnerMetadata {
     doc                  : XFormsContainingDocument,
     currentLang          : Lang,
     controlNamesToExclude: Set[String],
+    outputIsHtml         : Boolean,
     collector            : ErrorEventCollector
   ): List[ControlDetails] = {
 
     val controls = doc.controls.getCurrentControlTree.effectiveIdsToControls
+
+    // When producing HTML, escape values which are not HTML already
+    def escapeIfNeeded(s: String, valueIsHtml: Boolean): String =
+      if (outputIsHtml && ! valueIsHtml) s.escapeXmlForAttribute else s
 
     def instanceInScope(control: XFormsSingleNodeControl, staticId: String): Option[XFormsInstance] =
       control.container.resolveObjectByIdInScope(control.effectiveId, staticId, None) flatMap
@@ -378,7 +382,7 @@ object FormRunnerMetadata {
                 currentLang,
                 (
                   List(
-                    LHHA.Label -> control.getLabel(collector),
+                    LHHA.Label -> control.getLabel(collector).map(escapeIfNeeded(_, control.isHTMLLabel)),
                     LHHA.Help  -> control.getHelp(collector),
                     LHHA.Hint  -> control.getHint(collector),
                     LHHA.Alert -> control.getAlert(collector)
@@ -393,7 +397,7 @@ object FormRunnerMetadata {
             )
 
           val valueOpt =
-            FormRunner.findControlValue(control, collector)
+            FormRunner.findControlValue(control, collector).map(v => v.mapFormattedValues(escapeIfNeeded(_, v.isHtml)))
 
           // Include sections and repeated grids only
           def ancestorLevelContainers(control: XFormsControl): Iterator[XFormsComponentControl] =

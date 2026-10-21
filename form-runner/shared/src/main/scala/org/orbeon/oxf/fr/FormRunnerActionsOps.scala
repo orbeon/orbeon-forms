@@ -25,19 +25,19 @@ import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.topLevelInstance
+import org.orbeon.oxf.xforms.control.*
 import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XFormsSelect1Control, XFormsSelectControl}
-import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsSingleNodeControl, XFormsValueComponentControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xforms.model.{BindVariableResolver, RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsContainingDocument, function}
+import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsContainingDocument}
 import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath.*
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{XFormsId, XFormsNames}
 import shapeless.syntax.typeable.typeableOps
 
 import scala.collection.mutable
@@ -146,16 +146,28 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       .filter(_.isRelevant)
       .map {
       case c: XFormsSelectControl  =>
-        val selectedLabels = c.findSelectedItems(collector).map(_.label.label) // TODO: HTML
-        ControlValue.MultipleControlValue(c.getValue(collector), selectedLabels) // TODO
+        val selectedItems = c.findSelectedItems(collector)
+        ControlValue.MultipleControlValue(
+          storageValue    = c.getValue(collector),
+          formattedValues = selectedItems.map(_.label.label),
+          isHtml          = selectedItems.exists(_.label.isHTML)
+        )
       case c: XFormsSelect1Control =>
-        val selectedLabel = c.findSelectedItem(collector) map (_.label.label) // TODO: HTML
-        ControlValue.SingleControlValue(c.getValue(collector), selectedLabel) // TODO
+        val selectedItemOpt = c.findSelectedItem(collector)
+        ControlValue.SingleControlValue(
+          storageValue   = c.getValue(collector),
+          formattedValue = selectedItemOpt.map(_.label.label),
+          isHtml         = selectedItemOpt.exists(_.label.isHTML)
+        )
       case c: XFormsValueComponentControl if c.staticControl.commonBinding.modeSelection =>
         ItemsetSupport.findSelectionControl(c) match {
           case Some(selectControl: XFormsSelectControl) =>
-            val selectedLabels = selectControl.findSelectedItems(collector) map (_.label.label)  // TODO: HTML
-            ControlValue.MultipleControlValue(selectControl.getValue(collector), selectedLabels) // TODO
+            val selectedItems = selectControl.findSelectedItems(collector)
+            ControlValue.MultipleControlValue(
+              storageValue    = selectControl.getValue(collector),
+              formattedValues = selectedItems.map(_.label.label),
+              isHtml          = selectedItems.exists(_.label.isHTML)
+            )
           case Some(select1Control) =>
 
             // HACK for https://github.com/orbeon/orbeon-forms/issues/4042
@@ -168,9 +180,11 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
               else
                 select1Control.findSelectedItem(collector)
 
-            // TODO: HTML
-            val selectedLabelOpt  = itemOpt map (_.label.label) orElse "".some // use a blank string so we get `N/A` in the end
-            ControlValue.SingleControlValue(select1Control.getValue(collector), selectedLabelOpt)
+            ControlValue.SingleControlValue(
+              storageValue   = select1Control.getValue(collector),
+              formattedValue = itemOpt.map(_.label.label) orElse "".some, // use a blank string so we get `N/A` in the end
+              isHtml         = itemOpt.exists(_.label.isHTML)
+            )
           case None =>
             throw new IllegalStateException
         }
@@ -187,12 +201,27 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
           else
             c.getFormattedValue(collector) orElse Option(c.getValue(collector))
 
-        ControlValue.SingleControlValue(c.getValue(collector), formattedValue)
+        ControlValue.SingleControlValue(c.getValue(collector), formattedValue, isHtml = isHtmlValueControl(c))
       case c if Set("image-attachment", "attachment")(c.staticControl.localName) =>
-        ControlValue.SingleControlValue(c.getValue(collector), c.boundNodeOpt flatMap (_.attValueOpt("filename")))
+        ControlValue.SingleControlValue(
+          storageValue   = c.getValue(collector),
+          formattedValue = c.boundNodeOpt flatMap (_.attValueOpt("filename")),
+          isHtml         = false
+        )
       case c =>
-        ControlValue.SingleControlValue(c.getValue(collector), c.getFormattedValue(collector) orElse Option(c.getValue(collector)))
+        ControlValue.SingleControlValue(
+          storageValue   = c.getValue(collector),
+          formattedValue = c.getFormattedValue(collector) orElse Option(c.getValue(collector)),
+          isHtml         = isHtmlValueControl(c)
+        )
     }
+
+  // Is the control a formatted text control or a control with a "text/html" media type?
+  private def isHtmlValueControl(c: XFormsControl): Boolean =
+    c.staticControl.element.getQName == TinymceQName ||
+    c.staticControl.element.attributeValueOpt(XFormsNames.MEDIATYPE_QNAME).contains(ContentTypes.HtmlContentType)
+
+  private val TinymceQName = QName("tinymce", XMLNames.FRNamespace)
 
   private def resolveTargetRelativeToActionSourceFromControlsUseSectionNameOpt(
     container        : XBLContainer,

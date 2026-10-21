@@ -37,7 +37,8 @@
                     value="
                         fr:process-template(
                             $template/subject,
-                            $config/parameters/*
+                            $config/parameters/*,
+                            false() (: the title is output as plain text :)
                         )"/>
                 <xf:setvalue
                     if="xxf:non-blank($template/body)"
@@ -45,7 +46,8 @@
                     value="
                         fr:process-template(
                             $template/body,
-                            $config/parameters/*
+                            $config/parameters/*,
+                            true() (: the body is output as HTML :)
                         )"/>
                 <xf:action if="$template/attach/@pdf = 'true'">
                     <xf:setvalue

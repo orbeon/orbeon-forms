@@ -74,22 +74,101 @@
         }
     }
 
+    .card .list-group {
+        display: grid;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        column-gap: 0.5rem;
+
+        --orbeon-card-columns: 1;
+
+        each(range(1, 30), {
+            &.fr-card-cols-@{value} {
+                --orbeon-card-columns: @value;
+            }
+        });
+
+        // At most 3 columns are shown on the tile at once; any additional columns are accessible via horizontal scrolling
+        --orbeon-card-visible-columns: ~"min(var(--orbeon-card-columns, 1), 3)";
+        --orbeon-card-column-width: calc((100% - (var(--orbeon-card-visible-columns) - 1) * 0.5rem) / var(--orbeon-card-visible-columns));
+
+        grid-template-columns: repeat(var(--orbeon-card-columns, 1), var(--orbeon-card-column-width));
+
+        // Prevent delimiter and empty repeat items from creating phantom tracks
+        & > .xforms-repeat-begin-end,
+        & > .xforms-repeat-delimiter,
+        & > span:not(:has(*)) {
+            display: none !important;
+        }
+    }
+
     .card .list-group-item {
         background-color: var(--orbeon-form-background-color);
         border-bottom: 1px solid var(--orbeon-landing-card-border-color);
         padding: 0.5em 1em;
+
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(var(--orbeon-card-columns, 1), minmax(0, 1fr)); // Fallback
+        grid-template-columns: subgrid;
+        align-items: center;
+
         a {
             color: var(--orbeon-landing-card-link-color);
             &:hover {
                 color: var(--orbeon-landing-card-link-hover-color);
             }
-            display: block;
             padding: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            min-width: 0;
+
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(var(--orbeon-card-columns, 1), minmax(0, 1fr)); // Fallback
+            grid-template-columns: subgrid;
+            align-items: center;
+
+            // Hide delimiter and non-column spans inside link
+            & > .xforms-repeat-begin-end,
+            & > .xforms-repeat-delimiter,
+            & > span:not(.fr-card-col) {
+                display: none !important;
+            }
         }
         &:has(a:focus-visible) {
             box-shadow: 0 0 0 3px inset var(--orbeon-focus-highlight-color);
+        }
+    }
+
+    .fr-card-col {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+
+        &.fr-card-col-single {
+            grid-column: 1 / -1;
+            position: sticky;
+            left: 1em;
+        }
+
+        & + .fr-card-col::before {
+            content: "|";
+            margin-right: 0.5rem;
+            color: var(--orbeon-landing-card-border-color);
+            flex: 0 0 auto;
+        }
+
+        .fr-card-col-text {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1 1 auto;
+
+            .xforms-output,
+            .xforms-output-output {
+                display: inline;
+                min-width: 0;
+            }
         }
     }
 

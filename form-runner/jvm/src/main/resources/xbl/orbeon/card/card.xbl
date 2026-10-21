@@ -37,13 +37,24 @@
                         <xf:output value="xxf:r('detail.messages.database-error', '|fr-fr-resources|')"/>
                     </xh:div>
                 </xh:div>
-                <xh:ul class="list-group list-group-flush">
+                <xf:var name="columns" value="(fr:component-param-value('columns')[xxf:non-blank()], '1')[1]"/>
+                <xh:ul class="list-group list-group-flush fr-card-cols-{{$columns}}">
                     <xf:repeat ref="$items/value/string()">
                         <xf:var name="value" value="."/>
                         <xf:var name="label" value="$items[value = $value]/label/string()"/>
                         <xf:var name="hint"  value="$items[value = $value]/hint/string()"/>
+                        <xf:var name="parts" value="for $p in xxf:split($label, '|') return xxf:trim($p)"/>
+                        <xf:var name="is-single-cell" value="count($parts) le 1"/>
                         <xh:li class="list-group-item text-truncate">
-                            <xh:a href="{{$value}}" title="{{$hint}}"><xf:output value="$label"/></xh:a>
+                            <xh:a href="{{$value}}" title="{{$hint}}">
+                                <xf:repeat ref="$parts">
+                                    <xh:span class="fr-card-col {{if ($is-single-cell) then 'fr-card-col-single' else ''}}">
+                                        <xh:span class="fr-card-col-text text-truncate">
+                                            <xf:output value="."/>
+                                        </xh:span>
+                                    </xh:span>
+                                </xf:repeat>
+                            </xh:a>
 <!--                            <xh:br/>-->
 <!--                            <xf:output value="$hint"/>-->
                         </xh:li>

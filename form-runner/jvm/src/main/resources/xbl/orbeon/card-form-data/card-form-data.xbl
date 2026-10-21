@@ -267,6 +267,7 @@
 
             <fr:card
                 status="{(instance('fr-state-instance')/@state, 'done')[1]}"
+                columns="{count($detail-positions)}"
             >
                 <xf:label value="instance('fr-form-metadata-instance')/(title[@xml:lang = xxf:lang()], title)[1]"/>
 <!--                <xh:span class="badge rounded-pill bg-primary">-->

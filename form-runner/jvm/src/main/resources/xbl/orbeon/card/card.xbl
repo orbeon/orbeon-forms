@@ -39,6 +39,11 @@
                 </xh:div>
                 <xf:var name="columns" value="(fr:component-param-value('columns')[xxf:non-blank()], '1')[1]"/>
                 <xh:ul class="list-group list-group-flush fr-card-cols-{{$columns}}">
+                    <xsl:if test="exists(/*/fr:headings)">
+                        <xh:li class="list-group-item fr-card-head text-truncate">
+                            <xbl:content includes=":root > fr|headings > *"/>
+                        </xh:li>
+                    </xsl:if>
                     <xf:repeat ref="$items/value/string()">
                         <xf:var name="value" value="."/>
                         <xf:var name="label" value="$items[value = $value]/label/string()"/>

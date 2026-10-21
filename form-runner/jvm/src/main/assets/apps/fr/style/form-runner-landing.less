@@ -113,6 +113,25 @@
         grid-template-columns: subgrid;
         align-items: center;
 
+        &.fr-card-head {
+            font-weight: 600;
+            color: var(--orbeon-landing-card-header-color);
+            background-color: var(--orbeon-landing-card-header-background-color);
+            border-bottom: 1px solid var(--orbeon-landing-card-border-color);
+
+            // Hide delimiter and non-column spans
+            & > .xforms-repeat-begin-end,
+            & > .xforms-repeat-delimiter,
+            & > span:not(.fr-card-col) {
+                display: none !important;
+            }
+
+            // Hide completely if there are no heading columns
+            &:not(:has(.fr-card-col)) {
+                display: none !important;
+            }
+        }
+
         a {
             color: var(--orbeon-landing-card-link-color);
             &:hover {
@@ -202,7 +221,7 @@
         }
     }
 
-    a figure, .card .list-group-item {
+    a figure, .card .list-group-item:not(.fr-card-head) {
         &:hover {
             background-color: var(--orbeon-landing-card-hover-background-color);
         }

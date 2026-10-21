@@ -270,6 +270,16 @@
                 columns="{count($detail-positions)}"
             >
                 <xf:label value="instance('fr-form-metadata-instance')/(title[@xml:lang = xxf:lang()], title)[1]"/>
+                <fr:headings>
+                    <xf:repeat ref="instance('fr-search-labels-instance')/query[@name and @summary-show = 'true']">
+                        <xf:var name="label" value="(resources[@lang = xxf:lang()]/label, resources/label, @name)[1]"/>
+                        <xh:span class="fr-card-col fr-card-heading">
+                            <xh:span class="fr-card-col-text text-truncate">
+                                <xf:output value="$label"/>
+                            </xh:span>
+                        </xh:span>
+                    </xf:repeat>
+                </fr:headings>
 <!--                <xh:span class="badge rounded-pill bg-primary">-->
 <!--                        <xf:output value="instance('fr-search-results-instance')/@search-total" appearance="minimal"/>-->
 <!--                    </xh:span>-->

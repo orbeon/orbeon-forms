@@ -1,0 +1,127 @@
+<xh:html
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:xpath-analysis="true">
+            <xf:instance id="fr-form-instance" xxf:index="id">
+                <form>
+                    <section-1>
+                        <grid-1>
+                            <date-metadata>2026-10-25</date-metadata>
+                            <date-custom>2026-10-25</date-custom>
+                            <date-dots>2026-10-25</date-dots>
+                            <time-metadata>14:35:45</time-metadata>
+                            <time-custom>14:35:45</time-custom>
+                            <time-24h>14:35:45</time-24h>
+                            <datetime-metadata>2026-10-25T14:35:45</datetime-metadata>
+                            <datetime-custom>2026-10-25T14:35:45</datetime-custom>
+                            <datetime-dots>2026-10-25T14:35:45</datetime-dots>
+                        </grid-1>
+                    </section-1>
+                </form>
+            </xf:instance>
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" ref="section-1" name="section-1">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="date-metadata-bind" ref="date-metadata" name="date-metadata" type="xf:date"/>
+                        <xf:bind id="date-custom-bind" ref="date-custom" name="date-custom" type="xf:date"/>
+                        <xf:bind id="date-dots-bind" ref="date-dots" name="date-dots" type="xf:date"/>
+                        <xf:bind id="time-metadata-bind" ref="time-metadata" name="time-metadata" type="xf:time"/>
+                        <xf:bind id="time-custom-bind" ref="time-custom" name="time-custom" type="xf:time"/>
+                        <xf:bind id="time-24h-bind" ref="time-24h" name="time-24h" type="xf:time"/>
+                        <xf:bind id="datetime-metadata-bind" ref="datetime-metadata" name="datetime-metadata" type="xf:dateTime"/>
+                        <xf:bind id="datetime-custom-bind" ref="datetime-custom" name="datetime-custom" type="xf:dateTime"/>
+                        <xf:bind id="datetime-dots-bind" ref="datetime-dots" name="datetime-dots" type="xf:dateTime"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+            <xf:instance id="fr-form-metadata" xxf:readonly="true">
+                <metadata>
+                    <application-name>tests</application-name>
+                    <form-name>date-time-output-format</form-name>
+                    <title xml:lang="en">Date Time Output Format Test Form</title>
+                    <xbl>
+                        <fr:date output-format="[D01]/[M01]/[Y]"/>
+                        <fr:time output-format="[H01]:[m]:[s]"/>
+                        <fr:datetime output-format="[D01]/[M01]/[Y] [H01]:[m]:[s]"/>
+                    </xbl>
+                </metadata>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="fr-form-resources">
+                <resources>
+                    <resource xml:lang="en">
+                        <section-1><label>Section 1</label></section-1>
+                        <date-metadata><label>Date Metadata</label></date-metadata>
+                        <date-custom><label>Date Custom</label></date-custom>
+                        <date-dots><label>Date Dots</label></date-dots>
+                        <time-metadata><label>Time Metadata</label></time-metadata>
+                        <time-custom><label>Time Custom</label></time-custom>
+                        <time-24h><label>Time 24h</label></time-24h>
+                        <datetime-metadata><label>DateTime Metadata</label></datetime-metadata>
+                        <datetime-custom><label>DateTime Custom</label></datetime-custom>
+                        <datetime-dots><label>DateTime Dots</label></datetime-dots>
+                    </resource>
+                </resources>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="4">
+                            <fr:date id="date-metadata-control" bind="date-metadata-bind">
+                                <xf:label ref="$form-resources/date-metadata/label"/>
+                            </fr:date>
+                        </fr:c>
+                        <fr:c y="1" x="5" w="4">
+                            <fr:date id="date-custom-control" bind="date-custom-bind" output-format="[Y]-[M01]-[D01]">
+                                <xf:label ref="$form-resources/date-custom/label"/>
+                            </fr:date>
+                        </fr:c>
+                        <fr:c y="1" x="9" w="4">
+                            <fr:date id="date-dots-control" bind="date-dots-bind" output-format="[D01].[M01].[Y]">
+                                <xf:label ref="$form-resources/date-dots/label"/>
+                            </fr:date>
+                        </fr:c>
+                        <fr:c y="2" x="1" w="4">
+                            <fr:time id="time-metadata-control" bind="time-metadata-bind">
+                                <xf:label ref="$form-resources/time-metadata/label"/>
+                            </fr:time>
+                        </fr:c>
+                        <fr:c y="2" x="5" w="4">
+                            <fr:time id="time-custom-control" bind="time-custom-bind" output-format="[h]:[m] [P,2-2]">
+                                <xf:label ref="$form-resources/time-custom/label"/>
+                            </fr:time>
+                        </fr:c>
+                        <fr:c y="2" x="9" w="4">
+                            <fr:time id="time-24h-control" bind="time-24h-bind" output-format="[H01]:[m]">
+                                <xf:label ref="$form-resources/time-24h/label"/>
+                            </fr:time>
+                        </fr:c>
+                        <fr:c y="3" x="1" w="4">
+                            <fr:datetime id="datetime-metadata-control" bind="datetime-metadata-bind">
+                                <xf:label ref="$form-resources/datetime-metadata/label"/>
+                            </fr:datetime>
+                        </fr:c>
+                        <fr:c y="3" x="5" w="4">
+                            <fr:datetime id="datetime-custom-control" bind="datetime-custom-bind" output-format="[Y]-[M01]-[D01] [h]:[m] [P,2-2]">
+                                <xf:label ref="$form-resources/datetime-custom/label"/>
+                            </fr:datetime>
+                        </fr:c>
+                        <fr:c y="3" x="9" w="4">
+                            <fr:datetime id="datetime-dots-control" bind="datetime-dots-bind" output-format="[D01].[M01].[Y] [H01]:[m]">
+                                <xf:label ref="$form-resources/datetime-dots/label"/>
+                            </fr:datetime>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

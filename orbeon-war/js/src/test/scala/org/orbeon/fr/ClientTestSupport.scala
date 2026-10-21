@@ -123,6 +123,7 @@ trait ClientTestSupport {
   def withFormReady[T](
     app            : String,
     form           : String,
+    mode           : String = "new",
     queryStringOpt : Option[String] = None)(
     body           : FormRunnerWindow => Future[T]
   ): Future[T] =
@@ -131,12 +132,10 @@ trait ClientTestSupport {
 
         val sessionCookie = await(waitForServerCookie(None, OrbeonServerUrl))
         assert(sessionCookie.isSuccess)
-
-        val path = s"/fr/$app/$form/new" + queryStringOpt.map(qs => s"?$qs").getOrElse("")
-        val domWindow =
-          await(loadDocumentViaJSDOM(path, OrbeonServerUrl, sessionCookie.toOption))
-
-        val window = FormRunnerWindow(domWindow)
+        
+        val path      = s"/fr/$app/$form/$mode" + queryStringOpt.map(qs => s"?$qs").getOrElse("")
+        val domWindow = await(loadDocumentViaJSDOM(path, OrbeonServerUrl, sessionCookie.toOption))
+        val window    = FormRunnerWindow(domWindow)
 
         // Wait until there is a form returned by the API
         await {

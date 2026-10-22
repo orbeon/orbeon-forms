@@ -34,9 +34,9 @@ val DefaultOrbeonEdition             = "CE"
 
 // Scala libraries for Scala.js only
 val ScalaJsMacrotaskExecutor     = "1.1.1"
-val SaxonJsVersion               = "10.0.0.78-SNAPSHOT"
-val XercesVersion                = "2.11.0.11-SNAPSHOT"
-val SaxVersion                   = "2.0.2.8-SNAPSHOT"
+val SaxonJsVersion               = "10.0.0.82-SNAPSHOT"
+val XercesVersion                = "2.11.0.16-SNAPSHOT"
+val SaxVersion                   = "2.0.2.10-SNAPSHOT"
 val ScalaJsDomVersion            = "2.8.1"
 val ScalaJsJQueryVersion         = "3.4.0"
 val ScalaJsStubsVersion          = "1.1.0" // can be different from Scala.js version
@@ -1427,7 +1427,7 @@ lazy val coreCrossPlatformJS = coreCrossPlatform.js
   .settings(commonScalaJsSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.xml"      %%% "sax"         % SaxVersion,
+      ("org.xml"      %% "sax"         % SaxVersion).cross(CrossVersion.for2_13Use3),
       "org.orbeon"   %%% "saxon"       % SaxonJsVersion,
       "org.orbeon"   %%% "xerces"      % XercesVersion,
       "com.chuusai"   %% "shapeless"   % ShapelessVersion,

@@ -936,7 +936,7 @@
                             (: Reminder: empty string property returns the empty sequence :)
                             (fr:component-param-value('output-format'), property('xxf:format.input.date'))[1],
                             instance('orbeon-resources')/resource[@xml:lang = 'en']/format,
-                            xxf:r('format')
+                            fr:r('format')
                         )
                     }"
                     xxf:control="true"
@@ -945,7 +945,7 @@
                     class="add-on"
                     tabindex="0"
                     role="button"
-                    aria-label="{xxf:r('components.date-time.select-date', '|fr-fr-resources|')}"
+                    aria-label="{fr:r('components.date-time.select-date', '|fr-fr-resources|')}"
                     aria-haspopup="dialog">
                     <xh:i class="fa fa-fw fa-calendar"/>
                 </xh:span>

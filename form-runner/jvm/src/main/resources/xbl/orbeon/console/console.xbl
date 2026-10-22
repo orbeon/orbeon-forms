@@ -251,26 +251,26 @@
             <xf:group id="console-group" model="console-model" class="fr-console-group fr-console-{instance('console-instance')/layout}">
                 <fr:tabbable>
                     <fr:tab>
-                        <xf:label ref="xxf:r('formula-errors')"/>
+                        <xf:label ref="fr:r('formula-errors')"/>
                         <fr:grid id="fr-console-formulas-grid" bind="formulas-bind" repeat="content" readonly="true" columns="24" template="()" number-rows="true" iteration-name="_">
                             <fr:c x="1" y="1" w="4">
                                 <xf:output id="formula-bind-name-control" bind="formula-bind-name-bind">
-                                    <xf:label appearance="minimal" ref="xxf:r('control-name')"/>
+                                    <xf:label appearance="minimal" ref="fr:r('control-name')"/>
                                 </xf:output>
                             </fr:c>
                             <fr:c x="5" y="1" w="4">
                                 <xf:output id="formula-context-name-control" bind="formula-context-name-bind">
-                                    <xf:label appearance="minimal" ref="xxf:r('context-name')"/>
+                                    <xf:label appearance="minimal" ref="fr:r('context-name')"/>
                                 </xf:output>
                             </fr:c>
                             <fr:c x="9" y="1" w="16">
                                 <xf:output id="formula-formula-control" bind="formula-formula-bind">
-                                    <xf:label appearance="minimal" ref="xxf:r('formula')"/>
+                                    <xf:label appearance="minimal" ref="fr:r('formula')"/>
                                 </xf:output>
                             </fr:c>
                             <fr:c x="1" y="2" w="23">
                                 <xf:output id="formula-error-control" bind="formula-error-bind">
-                                    <xf:label appearance="minimal" ref="xxf:r('error')"/>
+                                    <xf:label appearance="minimal" ref="fr:r('error')"/>
                                 </xf:output>
                             </fr:c>
                             <fr:c x="24" y="2" w="1" h="1" class="fr-console-badge">

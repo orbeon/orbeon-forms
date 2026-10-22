@@ -95,4 +95,10 @@
     <property as="xs:string"  name="a.b.d"  value="a.b.d.1"/>
     <property as="xs:string"  name="a.b.*"  value="a.b.*.1"/>
 
+    <!-- Tests for #3235: XBL resource override -->
+    <property as="xs:string" name="oxf.fr.resource.*.*.en.xbl.fr:test-comp.alert-from-property"      value="Alert from property wildcard"/>
+    <property as="xs:string" name="oxf.fr.resource.acme.order.en.xbl.fr:test-comp.alert-specificity" value="Specific app-form alert"/>
+    <property as="xs:string" name="oxf.fr.resource.acme.*.en.xbl.fr:test-comp.alert-specificity"     value="App wildcard alert"/>
+    <property as="xs:string" name="oxf.fr.resource.*.*.en.xbl.fr:test-comp.alert-specificity"        value="Global wildcard alert"/>
+
 </properties>

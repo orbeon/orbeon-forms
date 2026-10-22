@@ -454,8 +454,8 @@
                             type="integer"
 
                             suffix="px">
-                            <xf:label ref="xxf:r('max-width.label')"/>
-                            <xf:alert ref="xxf:r('components.parameters-editor.name.alert', '|fr-form-resources|')"/>
+                            <xf:label ref="fr:r('max-width.label')"/>
+                            <xf:alert ref="fr:r('components.parameters-editor.name.alert', '|fr-form-resources|')"/>
 
                             <xf:itemset ref="xxf:resource-elements('max-width.item')">
                                 <xf:label ref="."/>
@@ -473,8 +473,8 @@
                             type="integer"
 
                             suffix="px">
-                            <xf:label ref="xxf:r('max-height.label')"/>
-                            <xf:alert ref="xxf:r('components.parameters-editor.name.alert', '|fr-form-resources|')"/>
+                            <xf:label ref="fr:r('max-height.label')"/>
+                            <xf:alert ref="fr:r('components.parameters-editor.name.alert', '|fr-form-resources|')"/>
 
                             <xf:itemset ref="xxf:resource-elements('max-width.item')">
                                 <xf:label ref="."/>
@@ -485,7 +485,7 @@
                     </fr:c>
                     <fr:c x="1" y="2" w="6">
                         <xf:select1 ref="instance('local')/format" id="format-control">
-                            <xf:label ref="xxf:r('format.label')"/>
+                            <xf:label ref="fr:r('format.label')"/>
                             <xf:itemset ref="xxf:resource-elements('format.item')">
                                 <xf:label ref="."/>
                                 <xf:value ref="@value"/>
@@ -513,8 +513,8 @@
                             round-when-storing="true"
                             round-when-formatting="true">
 
-                            <xf:label ref="xxf:r('quality.label')"/>
-                            <xf:alert ref="xxf:r('components.parameters-editor.name.alert', '|fr-form-resources|')"/>
+                            <xf:label ref="fr:r('quality.label')"/>
+                            <xf:alert ref="fr:r('components.parameters-editor.name.alert', '|fr-form-resources|')"/>
 
                             <xf:itemset ref="xxf:resource-elements('quality.item')">
                                 <xf:label ref="."/>

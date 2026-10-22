@@ -74,7 +74,7 @@
                         <pdf-attachment mediatype="application/pdf" filename=""/>
                     </_>
                 </xf:instance>
-                <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                     <_>
                         <resource xml:lang="en">
                             <download-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Download PDF</download-pdf>
@@ -143,7 +143,7 @@
                             appearance="xxf:download"
                             ref="instance()/pdf-attachment[xxf:non-blank()]"
                             xxf:download="{{@filename}}">
-                            <xf:label mediatype="text/html" ref="xxf:r('download-pdf')"/>
+                            <xf:label mediatype="text/html" ref="fr:r('download-pdf')"/>
                             <xf:filename  ref="@filename"/>
                             <xf:mediatype ref="@mediatype"/>
                         </xf:output>

@@ -848,7 +848,7 @@
                             (: Reminder: empty string property returns the empty sequence :)
                             (fr:component-param-value('output-format'), property('xxf:format.input.time'))[1],
                             instance('orbeon-resources')/resource[@xml:lang = 'en']/format,
-                            xxf:r('format')
+                            fr:r('format')
                         )}"
                     xxf:control="true"
                     xbl:attr="autocomplete"/>

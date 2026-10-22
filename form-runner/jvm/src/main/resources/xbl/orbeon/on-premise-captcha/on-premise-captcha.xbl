@@ -76,7 +76,7 @@
                 <xh:div>
                     <xf:output ref="instance()/image" mediatype="image/png"/>
                     <xf:input ref="instance()/user-answer">
-                        <xf:label ref="xxf:r('ask-to-type-word')"/>
+                        <xf:label ref="fr:r('ask-to-type-word')"/>
                     </xf:input>
                 </xh:div>
             </xf:group>

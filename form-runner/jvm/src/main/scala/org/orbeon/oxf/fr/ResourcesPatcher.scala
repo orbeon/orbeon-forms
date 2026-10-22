@@ -183,17 +183,21 @@ object ResourcesPatcher {
 
       val _ :: _ :: _ :: _ :: _ :: lang :: resourceTokens = propertyName.splitTo[List](".")
 
-      // Property name with possible `*` replaced by actual app/form name
-      val expandedPropertyName = Prefix :: appForm.toList ::: lang :: resourceTokens mkString "."
+      if (resourceTokens.headOption.contains("xbl")) {
+        None
+      } else {
+        // Property name with possible `*` replaced by actual app/form name
+        val expandedPropertyName = Prefix :: appForm.toList ::: lang :: resourceTokens mkString "."
 
-      // Had a case where value was null (more details would be useful)
-      val value = properties.getNonBlankString(expandedPropertyName)
+        // Had a case where value was null (more details would be useful)
+        val value = properties.getNonBlankString(expandedPropertyName)
 
-      // TODO: this doesn't work, as the base (i.e. suffix-less) property doesn't seem to be listed by
-      //  propertiesStartsWith if a property with the .html suffix exists
-      val isHtml = properties.getBoolean(expandedPropertyName + ".html", default = false)
+        // TODO: this doesn't work, as the base (i.e. suffix-less) property doesn't seem to be listed by
+        //  propertiesStartsWith if a property with the .html suffix exists
+        val isHtml = properties.getBoolean(expandedPropertyName + ".html", default = false)
 
-      value.map(Resource(lang, filterPathForBackwardCompatibility(resourceTokens), _, isHtml))
+        value.map(Resource(lang, filterPathForBackwardCompatibility(resourceTokens), _, isHtml))
+      }
     }
   }
 

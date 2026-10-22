@@ -235,7 +235,7 @@
                 </xh:span>
             </xh:span>
             <fr:checkbox-input ref="instance('i')[fr:component-param-value('edit-format') = 'reveal']">
-                <xf:label ref="xxf:r('reveal')"/>
+                <xf:label ref="fr:r('reveal')"/>
             </fr:checkbox-input>
         </xbl:template>
     </xbl:binding>

@@ -107,7 +107,7 @@
 
                 <xh:button class="fr-clipboard-copy-button">
                     <xh:i
-                        title="{{xxf:r('copy')}}"
+                        title="{{fr:r('copy')}}"
                         class="fa fa-fw fa-copy"/>
                 </xh:button>
 

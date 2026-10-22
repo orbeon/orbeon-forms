@@ -232,12 +232,12 @@
                 <fr:grid xmlns="" id="fb-editor-attachment-grid">
                     <fr:c x="1" y="1" w="12">
                         <fr:checkbox-input ref="instance('local')/allow-download" id="allow-download-control">
-                            <xf:label ref="xxf:r('allow-download')"/>
+                            <xf:label ref="fr:r('allow-download')"/>
                         </fr:checkbox-input>
                     </fr:c>
                     <fr:c x="1" y="2" w="12">
                         <xf:select1 ref="instance('local')/upload-error-appearance" appearance="full xxf:horizontal" id="upload-error-appearance-control">
-                            <xf:label ref="xxf:r('upload-error-appearance.label')"/>
+                            <xf:label ref="fr:r('upload-error-appearance.label')"/>
                             <xf:itemset ref="xxf:resource-elements('upload-error-appearance.item')">
                                 <xf:label ref="."/>
                                 <xf:value
@@ -317,7 +317,7 @@
                         value="
                             if (event('error-type') = 'empty-file-error') then
                                 xxf:format-message(
-                                    xxf:r(
+                                    fr:r(
                                         'detail.messages.upload-error-empty-file',
                                         '|fr-fr-resources|'
                                     ),
@@ -325,7 +325,7 @@
                                 )
                             else if (event('error-type') = 'upload-password-not-configured-error') then
                                 xxf:format-message(
-                                    xxf:r(
+                                    fr:r(
                                         'detail.messages.upload-error-upload-password-not-configured-error',
                                         '|fr-fr-resources|'
                                     ),
@@ -333,7 +333,7 @@
                                 )
                             else if (event('error-type') = 'size-error') then
                                 xxf:format-message(
-                                    xxf:r(
+                                    fr:r(
                                         'detail.messages.upload-error-size',
                                         '|fr-fr-resources|'
                                     ),
@@ -345,7 +345,7 @@
                                 )
                             else if (event('error-type') = 'max-files-per-control') then
                                 xxf:format-message(
-                                    xxf:r(
+                                    fr:r(
                                         'detail.messages.upload-error-max-files-per-control',
                                         '|fr-fr-resources|'
                                     ),
@@ -355,7 +355,7 @@
                                 )
                             else if (event('error-type') = 'mediatype-error') then
                                 xxf:format-message(
-                                    xxf:r(
+                                    fr:r(
                                         'detail.messages.upload-error-mediatype',
                                         '|fr-fr-resources|'
                                     ),
@@ -367,7 +367,7 @@
                                 )
                             else if (event('error-type') = 'file-scan-error') then
                                 xxf:format-message(
-                                    xxf:r(
+                                    fr:r(
                                         'detail.messages.upload-error-file-scan',
                                         '|fr-fr-resources|'
                                     ),
@@ -377,7 +377,7 @@
                                     )
                                 )
                             else
-                                xxf:r(
+                                fr:r(
                                     'detail.messages.upload-error',
                                     '|fr-fr-resources|'
                                 )
@@ -819,7 +819,7 @@
                             value="filemetadata:humanReadableBytesCompact(@size)"
                             class="fr-attachment-size"/>
 
-                        <xf:trigger ref="." appearance="minimal" class="fr-attachment-remove" xxf:title="{xxf:r('remove')}">
+                        <xf:trigger ref="." appearance="minimal" class="fr-attachment-remove" xxf:title="{fr:r('remove')}">
                             <xf:label><xh:i class="fa fa-fw fa-times"/></xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:action type="xpath" xmlns:upload="java:org.orbeon.oxf.xforms.control.controls.XFormsUploadControl">
@@ -853,7 +853,7 @@
                 <xf:group
                     class="fr-attachment-empty"
                     ref="$binding[$view and (if ($multiple) then count(_[xxf:non-blank(string(.))]) = 0 else xxf:is-blank(string(.)))]">
-                    <xf:output value="xxf:r('empty')"/>
+                    <xf:output value="fr:r('empty')"/>
                 </xf:group>
 
                 <xh:div class="{if ($cant-take-upload) then 'xforms-hidden' else ''}">
@@ -861,7 +861,7 @@
                         <xf:output
                             value="
                                 xxf:format-message(
-                                    xxf:r(if ($multiple) then 'drag-multiple' else 'drag-single'),
+                                    fr:r(if ($multiple) then 'drag-multiple' else 'drag-single'),
                                     (
                                         '&lt;a href=&quot;javascript:void(0)&quot; class=&quot;fr-attachment-select&quot; role=&quot;button&quot;&gt;',
                                         '&lt;/a&gt;'
@@ -870,8 +870,8 @@
                             mediatype="text/html"/>
                     </xh:div>
                     <xf:upload
-                        data-r-cancel="{xxf:r('cancel')}"
-                        data-r-uploading="{xxf:r('uploading')}"
+                        data-r-cancel="{fr:r('cancel')}"
+                        data-r-uploading="{fr:r('uploading')}"
                         id="xf-upload"
                         class="fr-attachment-upload"
                         ref="if ($readonly) then '' else instance()/file"

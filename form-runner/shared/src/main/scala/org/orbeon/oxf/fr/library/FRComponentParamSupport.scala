@@ -6,6 +6,7 @@ import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
@@ -135,10 +136,11 @@ object FRComponentParamSupport {
 
   // Instead of using `FormRunnerParams()`, we use the form definition metadata.
   // This also allows support of the edited form in Form Builder.
-  def appFormFromMetadata(constantMetadataRootElem: om.NodeInfo): Option[AppForm] =
+  def nonBlankAppFormFromMetadata(constantMetadataRootElem: om.NodeInfo): Option[AppForm] =
     for {
       appName                  <- constantMetadataRootElem elemValueOpt Names.AppName
       formName                 <- constantMetadataRootElem elemValueOpt Names.FormName
+      if appName.nonAllBlank && formName.nonAllBlank
     } yield
       AppForm(appName, formName)
 
@@ -218,8 +220,8 @@ object FRComponentParamSupport {
 
     def fromPropertiesWithSuffix: Option[AtomicValue] =
       (
-        iterateMetadataInParts flatMap
-        appFormFromMetadata    flatMap
+        iterateMetadataInParts      flatMap
+        nonBlankAppFormFromMetadata flatMap
         (appForm => findInProperties(paramName, appForm.some))
       ).nextOption()
 

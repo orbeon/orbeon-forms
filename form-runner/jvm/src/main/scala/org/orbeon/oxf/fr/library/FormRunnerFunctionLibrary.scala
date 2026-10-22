@@ -32,7 +32,7 @@ import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.contentfilter.ContentFilter
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
-import org.orbeon.oxf.xforms.function.xxforms.EvaluateSupport
+import org.orbeon.oxf.xforms.function.xxforms.{EvaluateSupport, XXFormsResource}
 import org.orbeon.oxf.xforms.function.{Instance, XFormsFunction}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, function}
@@ -92,6 +92,11 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     Fun("workflow-stage-value",        classOf[FRWorkflowStageValue],   op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
     Fun("lang",                        classOf[FRLang],                 op = 0, min = 0, STRING, EXACTLY_ONE)
     Fun("fr-lang",                     classOf[FRFrLang],               op = 0, min = 0, STRING, EXACTLY_ONE)
+    Fun("r",                           classOf[FRResource],             op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
+    )
 
     // Form runner parameter functions
     Fun("mode",                        classOf[FRMode],                 op = 0, min = 0, STRING, EXACTLY_ONE)
@@ -968,6 +973,36 @@ class FRFrLang extends FunctionSupport with RuntimeDependentFunction {
       instancePrefixedId = "fr-fr-language-instance",
       path               = Nil,
       isAttribute        = false
+    )
+
+    null
+  }
+}
+
+class FRResource extends FunctionSupport with RuntimeDependentFunction {
+
+  override def evaluateItem(xpathContext: XPathContext): StringValue = {
+
+    implicit val ctx: XPathContext           = xpathContext
+    implicit val xfc: XFormsFunction.Context = XFormsFunction.context
+
+    FRResourceSupport.r(
+      resourceKey        = stringArgument(0),
+      instanceOpt        = stringArgumentOpt(1),
+      fallbackLangOpt    = xfc.containingDocument.rFallbackLang
+    )
+  }
+
+  override def addToPathMap(
+    pathMap        : PathMap,
+    pathMapNodeSet : PathMapNodeSet
+  ): PathMapNodeSet = {
+
+    XXFormsResource.updatePathMap(
+      getExecutable.getConfiguration.getNamePool,
+      arguments,
+      pathMap,
+      pathMapNodeSet
     )
 
     null

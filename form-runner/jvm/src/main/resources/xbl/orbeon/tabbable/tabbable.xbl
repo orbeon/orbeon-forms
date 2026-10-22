@@ -154,7 +154,7 @@
                                             <xf:group ref=".[$readonly = 'false']">
                                                 <xh:li class="fr-tabbable-add">
                                                     <xf:trigger appearance="xxf:mini" ref="xxf:binding('fr-tabbable')">
-                                                        <xf:label value="xxf:r('add')"/>
+                                                        <xf:label value="fr:r('add')"/>
                                                         <xf:dispatch
                                                             event="DOMActivate"
                                                             name="fr-tabbable-add"

@@ -133,7 +133,7 @@
                             <xsl:value-of select="/*/@autocomplete"/>
                         </xsl:attribute>
                     </xsl:if>
-                    <xf:alert validation="internal-validation" ref="xxf:r('alert')"/>
+                    <xf:alert validation="internal-validation" ref="fr:r('alert')"/>
                     <xf:setvalue
                         event="DOMActivate DOMFocusOut"
                         ref="$binding"

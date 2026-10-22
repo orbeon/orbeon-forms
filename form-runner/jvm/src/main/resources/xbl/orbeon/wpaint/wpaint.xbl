@@ -180,7 +180,7 @@
 
             <!-- Allow access to annotation and image from JavaScript -->
             <xf:output id="image"      class="fr-wpaint-image"      ref="image[not($is-readonly)]" mediatype="image/*"/>
-            <xf:output id="annotation" class="fr-wpaint-annotation {'xforms-hidden'[not($is-readonly)]}" ref="annotation" alt="{xxf:r('annotated-image')}" mediatype="image/*"/>
+            <xf:output id="annotation" class="fr-wpaint-annotation {'xforms-hidden'[not($is-readonly)]}" ref="annotation" alt="{fr:r('annotated-image')}" mediatype="image/*"/>
 
             <!-- Block in which wPaint renders its canvas -->
             <xf:var
@@ -232,7 +232,7 @@
             <xf:output
                 class="fr-wpaint-annotation"
                 ref="xxf:binding('fr-wpaint-output')/annotation"
-                alt="{xxf:r('annotated-image')}"
+                alt="{fr:r('annotated-image')}"
                 mediatype="image/*"/>
         </xbl:template>
     </xbl:binding>

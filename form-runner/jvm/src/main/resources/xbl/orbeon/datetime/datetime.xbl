@@ -219,10 +219,10 @@
 
             <xh:div id="fr-datetime-elem" class="fr-datetime-fields fr-field-width-{fr:component-param-value('field-width')}" xxf:control="true">
                 <fr:date ref="$local-date" id="date">
-                    <xf:label ref="xxf:r('date')"/>
+                    <xf:label ref="fr:r('date')"/>
                 </fr:date>
                 <fr:time ref="$local-time" id="time">
-                    <xf:label ref="xxf:r('time')"/>
+                    <xf:label ref="fr:r('time')"/>
                 </fr:time>
             </xh:div>
         </xbl:template>

@@ -88,18 +88,62 @@ object PropertySet {
         case None          => defaultProperty
       }
     def hasChildren: Boolean
-    def get(k: String): Option[PropertyNodeT]
-    def iterable: Iterable[(String, PropertyNodeT)] // xxx or iterator? iterate?; for propertiesMatching/propertiesStartsWith
+    def get(segment: PropertySegment): Option[PropertyNodeT]
+    def get(k: String): Option[PropertyNodeT] = get(PropertySegment.StringSegment(k))
+    def iterable: Iterable[(PropertySegment, PropertyNodeT)] // xxx or iterator? iterate?; for propertiesMatching/propertiesStartsWith
   }
+
+  sealed trait PropertySegment {
+    def asString: String
+  }
+
+  object PropertySegment {
+
+    case class StringSegment(name: String) extends PropertySegment {
+      def asString: String = name
+      override def toString: String = name
+    }
+
+    case class QNameSegment(qName: QName) extends PropertySegment {
+      def asString: String = qName.qualifiedName
+      override def toString: String = qName.qualifiedName
+    }
+
+    val StarSegment: PropertySegment = StringSegment(StarToken)
+
+    def parseSegment(segment: String, namespaces: Map[String, String]): PropertySegment =
+      segment.indexOf(':') match {
+        case -1 =>
+          StringSegment(segment)
+        case colonIndex if colonIndex > 0 && colonIndex < segment.length - 1 && segment.indexOf(':', colonIndex + 1) == -1 =>
+          val prefix    = segment.substring(0, colonIndex)
+          val localName = segment.substring(colonIndex + 1)
+          if (SaxonUtils.isValidNCName(prefix) && SaxonUtils.isValidNCName(localName)) {
+            namespaces.get(prefix) match {
+              case Some(uri) => QNameSegment(QName(localName, prefix, uri))
+              case None      => StringSegment(segment)
+            }
+          } else {
+            StringSegment(segment)
+          }
+        case _ =>
+          StringSegment(segment)
+      }
+
+    def parseSegments(propertyName: String, namespaces: Map[String, String]): List[PropertySegment] =
+      propertyName.splitTo[List](".").map(parseSegment(_, namespaces))
+  }
+
+  val StarSegment: PropertySegment = PropertySegment.StarSegment
 
   case class MutablePropertyNode(
     var defaultProperty  : Option[Property] = None,
     val profileProperties: mutable.Map[String, Property] = mutable.LinkedHashMap[String, Property](),
-    children             : mutable.Map[String, MutablePropertyNode] = mutable.LinkedHashMap[String, MutablePropertyNode]()
+    children             : mutable.Map[PropertySegment, MutablePropertyNode] = mutable.LinkedHashMap[PropertySegment, MutablePropertyNode]()
   ) extends PropertyNodeT {
       def hasChildren: Boolean = children.nonEmpty
-      def get(k: String): Option[PropertyNodeT] = children.get(k)
-      def iterable: Iterable[(String, PropertyNodeT)] = children.view
+      def get(segment: PropertySegment): Option[PropertyNodeT] = children.get(segment)
+      def iterable: Iterable[(PropertySegment, PropertyNodeT)] = children.view
 
       def profileProperty(profile: String): Option[Property] = profileProperties.get(profile)
     }
@@ -144,8 +188,8 @@ object PropertySet {
       // Also store in tree (in all cases, not only when contains wildcard, so we get find all the properties
       // that start with some token)
       var currentNode = propertiesTree
-      for (currentToken <- name.splitTo[List]("."))
-        currentNode = currentNode.children.getOrElseUpdate(currentToken, MutablePropertyNode())
+      for (currentSegment <- PropertySegment.parseSegments(name, property.namespaces))
+        currentNode = currentNode.children.getOrElseUpdate(currentSegment, MutablePropertyNode())
 
       // Store value
       if (profiles.isEmpty)
@@ -311,40 +355,51 @@ trait PropertySetFunctions extends PropertySetGetters {
   }
 
   // Return all the properties starting with the given name
-  def propertiesStartsWith(incomingPropertyName: String, matchWildcards: Boolean = true): List[String] = {
+  def propertiesStartsWith(
+    incomingPropertyName : String,
+    matchWildcards       : Boolean = true,
+    namespaces           : Map[String, String] = Map.empty
+  ): List[String] = {
 
     if (incomingPropertyName.contains(StarToken))
       println(s"propertiesStartsWith: incomingPropertyName=$incomingPropertyName, matchWildcards=$matchWildcards")
 
     val result = mutable.Buffer[String]()
 
-    def processNode(propertyNode: PropertyNodeT, foundTokens: List[String], incomingTokens: List[String]): Unit =
+    def processNode(propertyNode: PropertyNodeT, foundTokens: List[PropertySegment], incomingTokens: List[PropertySegment]): Unit =
       (incomingTokens.headOption, propertyNode.hasChildren) match {
         case (None, false) =>
-          result += foundTokens.reverse.mkString(".")
-        case (None, true) | (Some(StarToken), _) =>
+          result += foundTokens.reverse.map(_.asString).mkString(".")
+        case (None, true) | (Some(StarSegment), _) =>
           for ((key, value) <- propertyNode.iterable)
             processNode(value, key :: foundTokens, incomingTokens.drop(1))
         case (Some(currentToken), _) =>
-          def findChild(t: String): List[(String, PropertyNodeT)] =
+          def findChild(t: PropertySegment): List[(PropertySegment, PropertyNodeT)] =
             propertyNode.get(t).map(t -> _).toList
-          for ((key, value) <- findChild(currentToken) ::: (matchWildcards flatList findChild(StarToken)))
+          for ((key, value) <- findChild(currentToken) ::: (matchWildcards flatList findChild(StarSegment)))
             processNode(value, key :: foundTokens, incomingTokens.drop(1))
       }
-    processNode(propertiesTree, Nil, incomingPropertyName.splitTo[List]("."))
+    processNode(propertiesTree, Nil, PropertySegment.parseSegments(incomingPropertyName, namespaces))
 
     result.toList
   }
 
   def propertiesMatching(incomingPropertyName: String): List[Property] =
-    propertiesMatching(incomingPropertyName, None)
+    propertiesMatching(incomingPropertyName, None, Map.empty)
 
-  def propertiesMatching(incomingPropertyName: String, profileOpt: Option[String]): List[Property] = {
+  def propertiesMatching(incomingPropertyName: String, profileOpt: Option[String]): List[Property] =
+    propertiesMatching(incomingPropertyName, profileOpt, Map.empty)
 
-    val allIncomingTokens = incomingPropertyName.splitTo[List](".")
+  def propertiesMatching(
+    incomingPropertyName : String,
+    profileOpt           : Option[String],
+    namespaces           : Map[String, String]
+  ): List[Property] = {
+
+    val allIncomingTokens = PropertySegment.parseSegments(incomingPropertyName, namespaces)
 
     def processNode(
-      incomingTokens: List[String],
+      incomingTokens: List[PropertySegment],
       currentNode   : PropertyNodeT,
     ): LazyList[(Property, Boolean)] =
       (incomingTokens.headOption, currentNode.property(profileOpt), currentNode.hasChildren) match {
@@ -352,9 +407,9 @@ trait PropertySetFunctions extends PropertySetGetters {
           // Found
 
           val incomingAlwaysMatches =
-            property.name.splitTo[List](".").zip(allIncomingTokens)
+            PropertySegment.parseSegments(property.name, property.namespaces).zip(allIncomingTokens)
               .forall { case (t1, incoming) =>
-                t1 == incoming || t1 == StarToken
+                t1 == incoming || t1 == StarSegment
               }
 
           LazyList(property -> incomingAlwaysMatches)
@@ -364,15 +419,15 @@ trait PropertySetFunctions extends PropertySetGetters {
         case (None, _, true) =>
           // Not found because requested property is shorter
           LazyList.empty
-        case (Some(StarToken), _, _) =>
+        case (Some(StarSegment), _, _) =>
           // Return all branches, but first the ones that are not wildcard if any, so that the resulting list is sorted
-          (currentNode.iterable.filter(_._1 != StarToken) ++ currentNode.iterable.filter(_._1 == StarToken))
+          (currentNode.iterable.filter(_._1 != StarSegment) ++ currentNode.iterable.filter(_._1 == StarSegment))
             .map(_._2)
             .flatMap(newNode => processNode(incomingTokens.drop(1), newNode))
             .to(LazyList)
         case (Some(currentToken), _, _) =>
           // Return an exact branch if any and a wildcard branch if any
-          (currentNode.get(currentToken) #:: currentNode.get(StarToken) #:: LazyList.empty)
+          (currentNode.get(currentToken) #:: currentNode.get(StarSegment) #:: LazyList.empty)
             .flatten
             .flatMap(newNode => processNode(incomingTokens.drop(1), newNode))
         case (None, None, false) =>
@@ -393,11 +448,19 @@ trait PropertySetFunctions extends PropertySetGetters {
     name       : String,
     typeToCheck: Option[QName],
     profileOpt : Option[String]
+  ): Option[Property] =
+    getPropertyOptThrowIfTypeMismatch(name, typeToCheck, profileOpt, Map.empty)
+
+  protected def getPropertyOptThrowIfTypeMismatch(
+    name       : String,
+    typeToCheck: Option[QName],
+    profileOpt : Option[String],
+    namespaces : Map[String, String]
   ): Option[Property] = {
 
     def wildcardSearch(
       propertyNodeOpt : Option[PropertyNodeT],
-      tokens          : List[String]
+      tokens          : List[PropertySegment]
     ): Option[Property] =
       propertyNodeOpt match {
         case None               => None
@@ -406,14 +469,17 @@ trait PropertySetFunctions extends PropertySetGetters {
             case Nil =>
               propertyNode.property(profileOpt)
             case head :: tail if propertyNode.hasChildren =>
-              wildcardSearch(propertyNode.get(head), tail) orElse wildcardSearch(propertyNode.get(StarToken), tail)
+              if (head == StarSegment)
+                wildcardSearch(propertyNode.get(StarSegment), tail)
+              else
+                wildcardSearch(propertyNode.get(head), tail) orElse wildcardSearch(propertyNode.get(StarSegment), tail)
             case _ =>
               None
           }
       }
 
     def getWildcard: Option[Property] =
-      wildcardSearch(Some(propertiesTree), name.splitTo[List]("."))
+      wildcardSearch(Some(propertiesTree), PropertySegment.parseSegments(name, namespaces))
 
     def checkType(p: Property): Property =
       typeToCheck match {
@@ -434,14 +500,23 @@ trait PropertySetGetters {
   protected def getPropertyOptThrowIfTypeMismatch(
     name       : String,
     typeToCheck: Option[QName],
-    profileOpt : Option[String]
+    profileOpt : Option[String],
+    namespaces : Map[String, String]
   ): Option[Property]
 
-  def getPropertyOpt(name: String, profileOpt: Option[String] = None): Option[Property] =
-    getPropertyOptThrowIfTypeMismatch(name, None, profileOpt)
+  def getPropertyOpt(
+    name       : String,
+    profileOpt : Option[String] = None,
+    namespaces : Map[String, String] = Map.empty
+  ): Option[Property] =
+    getPropertyOptThrowIfTypeMismatch(name, None, profileOpt, namespaces)
 
-  def getPropertyOrThrow(name: String, profileOpt: Option[String] = None): Property =
-    getPropertyOpt(name, profileOpt).getOrElse(throw new OXFException(s"property `$name` not found"))
+  def getPropertyOrThrow(
+    name       : String,
+    profileOpt : Option[String] = None,
+    namespaces : Map[String, String] = Map.empty
+  ): Property =
+    getPropertyOpt(name, profileOpt, namespaces).getOrElse(throw new OXFException(s"property `$name` not found"))
 
   def getStringOrURIAsStringOpt(name: String, allowEmpty: Boolean = false, profileOpt: Option[String] = None): Option[String] =
     getObjectOpt(name, profileOpt).flatMap {
@@ -461,7 +536,13 @@ trait PropertySetGetters {
   def getObject             (name: String, default: Any,                                 profileOpt: Option[String] = None): Any     = getObjectOpt(name, profileOpt).getOrElse(default)
 
   // Should be `getNonBlankStringOpt`
-  def getNonBlankString(name: String, profileOpt: Option[String] = None): Option[String]         = getPropertyValueOpt(name, SomeXsStringQname, profileOpt).flatMap(_.asInstanceOf[String].trimAllToOpt)
+  def getNonBlankString(
+    name       : String,
+    profileOpt : Option[String] = None,
+    namespaces : Map[String, String] = Map.empty
+  ): Option[String] =
+    getPropertyValueOpt(name, SomeXsStringQname, profileOpt, namespaces).flatMap(_.asInstanceOf[String].trimAllToOpt)
+
   def getIntOpt        (name: String, profileOpt: Option[String] = None): Option[Int]            = getPropertyValueOpt(name, SomeXsIntegerQname, profileOpt).map(_.asInstanceOf[jl.Integer].intValue)
   def getBooleanOpt    (name: String, profileOpt: Option[String] = None): Option[Boolean]        = getPropertyValueOpt(name, SomeXsBooleanQname, profileOpt).map(_.asInstanceOf[jl.Boolean].booleanValue)
   def getNmtokensOpt   (name: String, profileOpt: Option[String] = None): Option[ju.Set[String]] = getPropertyValueOpt(name, SomeXsNmtokensQname, profileOpt).map(_.asInstanceOf[ju.Set[String]])
@@ -478,8 +559,13 @@ trait PropertySetGetters {
     getPropertyOpt(propertyName, profileOpt)
     .flatMap(_.associatedValue(_.nonBlankStringValue.map(Pattern.compile)))
 
-  private def getPropertyValueOpt(name: String, typeToCheck: Option[QName], profileOpt: Option[String]): Option[AnyRef] =
-    getPropertyOptThrowIfTypeMismatch(name, typeToCheck, profileOpt).map(_.value)
+  private def getPropertyValueOpt(
+    name        : String,
+    typeToCheck : Option[QName],
+    profileOpt  : Option[String],
+    namespaces  : Map[String, String] = Map.empty
+  ): Option[AnyRef] =
+    getPropertyOptThrowIfTypeMismatch(name, typeToCheck, profileOpt, namespaces).map(_.value)
 
   // 2024-03-18: 14 legacy Java callers
   def getString(name: String): String =

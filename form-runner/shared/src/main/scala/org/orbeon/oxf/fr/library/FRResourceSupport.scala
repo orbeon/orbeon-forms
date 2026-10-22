@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.fr.library
 
-import cats.syntax.option.*
 import org.orbeon.oxf.fr.{AppForm, FormRunnerCommon, FormRunnerParamsOpt}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
@@ -33,7 +32,9 @@ object FRResourceSupport {
     xfc                : XFormsFunction.Context
   ): Option[String] = {
 
-    // xxx TODO: clarify where we should get appform from
+    // NOTE: It's unclear whether we should get the app/form from the metadata or from the parameters. In `test` mode,
+    // we might not have the metadata yet, but we'll get `_`/`_` as the app/form from the parameters. In `run` mode, we
+    // might have some discrepancy (but we shouldn't).
     val appFormOpt = {
 
       def appFormFromMetadataOpt =
@@ -52,9 +53,6 @@ object FRResourceSupport {
 
     val componentControlOpt = ComponentParamSupport.findSourceComponent(None)
 
-    val isComponentLocal: Boolean =
-      componentControlOpt.isDefined && (instanceOpt.isEmpty || instanceOpt.contains("orbeon-resources"))
-
     def noOverrideFallback =
       XXFormsLangSupport.r(
         resourceKey        = resourceKey,
@@ -63,31 +61,30 @@ object FRResourceSupport {
         fallbackLangOpt    = fallbackLangOpt
       )
 
-    appFormOpt match {
-      case Some(appForm) if isComponentLocal =>
+    appFormOpt.zip(componentControlOpt) match {
+      case Some((appForm, componentControl)) if instanceOpt.isEmpty || instanceOpt.contains("orbeon-resources") =>
 
-        val directNameOpt = componentControlOpt.flatMap { cc =>
-          cc.staticControl.commonBinding.directName.orElse(cc.staticControl.element.getQName.some)
-        }
-        val componentNameOpt =
-          directNameOpt.map(_.qualifiedName)
+        // Query within a component
+        val directName =
+          componentControl.staticControl.commonBinding.directName
+            .getOrElse(componentControl.staticControl.element.getQName)
 
-        componentNameOpt.flatMap { compName =>
+        val componentName =
+          directName.qualifiedName
 
-          def findRequestedLang: Option[String] =
-            XFormsFunction.elementAnalysisForSource
-              .flatMap(elementAnalysis => XXFormsLangSupport.resolveXMLangHandleAVTs(xfc.containingDocument, elementAnalysis))
-              .orElse(fallbackLangOpt)
+        def findRequestedLang: Option[String] =
+          XFormsFunction.elementAnalysisForSource
+            .flatMap(elementAnalysis => XXFormsLangSupport.resolveXMLangHandleAVTs(xfc.containingDocument, elementAnalysis))
+            .orElse(fallbackLangOpt)
 
-          val effectiveLang      = findRequestedLang.getOrElse(FormRunnerCommon.frc.getDefaultLang(appFormOpt))
-          val propertyProfileOpt = xfc.containingDocument.staticState.propertyProfileOpt
-          val properties         = propertySetOpt.getOrElse(CoreCrossPlatformSupport.properties)
-          val propName           = s"oxf.fr.resource.${appForm.app}.${appForm.form}.$effectiveLang.xbl.$compName.$resourceKey"
+        val effectiveLang      = findRequestedLang.getOrElse(FormRunnerCommon.frc.getDefaultLang(appFormOpt))
+        val propertyProfileOpt = xfc.containingDocument.staticState.propertyProfileOpt
+        val properties         = propertySetOpt.getOrElse(CoreCrossPlatformSupport.properties)
+        val propName           = s"oxf.fr.resource.${appForm.app}.${appForm.form}.$effectiveLang.xbl.$componentName.$resourceKey"
 
-          properties
-            .getNonBlankString(propName, propertyProfileOpt)
+        properties
+          .getNonBlankString(propName, propertyProfileOpt, componentControl.staticControl.namespaceMapping.mapping)
             .orElse(noOverrideFallback)
-        }
       case _ =>
         noOverrideFallback
     }

@@ -442,6 +442,75 @@ class PropertiesTest extends AnyFunSpecLike with ResourceManagerSupport {
       )
     }
   }
+
+  describe("Qualified-name property matching (#7977)") {
+
+    val nsFr  = "http://orbeon.org/oxf/xml/form-runner"
+    val nsFoo = "http://example.com/foo"
+
+    val propSet =
+      PropertySet.forTests(
+        List(
+          PropertyParams(Map("fr" -> nsFr),   "oxf.fr.resource.*.*.en.xbl.fr:test-comp.alert",        XS_STRING_QNAME, "Wildcard alert"),
+          PropertyParams(Map("fr" -> nsFr),   "oxf.fr.resource.acme.order.en.xbl.fr:test-comp.alert", XS_STRING_QNAME, "Specific alert"),
+          PropertyParams(Map("foo" -> nsFoo), "oxf.fr.resource.*.*.en.xbl.foo:other-comp.alert",      XS_STRING_QNAME, "Foo alert"),
+        )
+      )
+
+    it("must match exact property with same prefix and URI") {
+      val result = propSet.getNonBlankString(
+        "oxf.fr.resource.acme.order.en.xbl.fr:test-comp.alert",
+        profileOpt = None,
+        namespaces = Map("fr" -> nsFr)
+      )
+      assert(result.contains("Specific alert"))
+    }
+
+    it("must match exact property with different prefix but same URI") {
+      val result = propSet.getNonBlankString(
+        "oxf.fr.resource.acme.order.en.xbl.custom:test-comp.alert",
+        profileOpt = None,
+        namespaces = Map("custom" -> nsFr)
+      )
+      assert(result.contains("Specific alert"))
+    }
+
+    it("must match wildcard property with different prefix but same URI") {
+      val result = propSet.getNonBlankString(
+        "oxf.fr.resource.foo.bar.en.xbl.custom:test-comp.alert",
+        profileOpt = None,
+        namespaces = Map("custom" -> nsFr)
+      )
+      assert(result.contains("Wildcard alert"))
+    }
+
+    it("must NOT match property if namespace URI is different even if prefix and local name match") {
+      val result = propSet.getNonBlankString(
+        "oxf.fr.resource.acme.order.en.xbl.fr:test-comp.alert",
+        profileOpt = None,
+        namespaces = Map("fr" -> "http://wrong.org/ns")
+      )
+      assert(result.isEmpty)
+    }
+
+    it("must NOT match property if local name is different") {
+      val result = propSet.getNonBlankString(
+        "oxf.fr.resource.acme.order.en.xbl.fr:other-comp.alert",
+        profileOpt = None,
+        namespaces = Map("fr" -> nsFr)
+      )
+      assert(result.isEmpty)
+    }
+
+    it("must match with propertiesMatching using different prefix") {
+      val matches = propSet.propertiesMatching(
+        "oxf.fr.resource.acme.order.en.xbl.custom:test-comp.alert",
+        profileOpt = None,
+        namespaces = Map("custom" -> nsFr)
+      )
+      assert(matches.map(_.stringValue) == List("Specific alert"))
+    }
+  }
 }
 
 class TestPropertyProvider extends api.PropertyProvider {

@@ -2,7 +2,7 @@ package org.orbeon.oxf.properties
 
 import cats.data.NonEmptyList
 import org.orbeon.dom.QName
-import org.orbeon.oxf.properties.PropertySet.PropertyNodeT
+import org.orbeon.oxf.properties.PropertySet.{PropertyNodeT, PropertySegment}
 import org.orbeon.properties.api.ETag
 
 
@@ -43,8 +43,8 @@ class CombinedPropertyNode(n1: PropertyNodeT, n2: PropertyNodeT) extends Propert
   def hasChildren: Boolean =
     n2.hasChildren || n1.hasChildren
 
-  def get(k: String): Option[PropertyNodeT] =
-    (n1.get(k), n2.get(k)) match {
+  def get(segment: PropertySegment): Option[PropertyNodeT] =
+    (n1.get(segment), n2.get(segment)) match {
       case (Some(c1), Some(c2)) => Some(new CombinedPropertyNode(c1, c2))
       case (Some(c1), None)     => Some(c1)
       case (None, Some(c2))     => Some(c2)
@@ -52,7 +52,7 @@ class CombinedPropertyNode(n1: PropertyNodeT, n2: PropertyNodeT) extends Propert
     }
 
   // xxx FIXME
-  def iterable: Iterable[(String, PropertyNodeT)] = {
+  def iterable: Iterable[(PropertySegment, PropertyNodeT)] = {
     val keys = n1.iterable.map(_._1).toSet.union(n2.iterable.map(_._1).toSet)
     keys.map { key =>
       key -> get(key).get

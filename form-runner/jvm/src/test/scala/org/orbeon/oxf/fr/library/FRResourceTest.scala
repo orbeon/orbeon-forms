@@ -101,6 +101,60 @@ class FRResourceTest
       }
     }
 
+    it("must match property when component uses a different namespace prefix with the same URI (#7977)") {
+      def testDocWithDifferentPrefix: dom.Document =
+        <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+                 xmlns:xf="http://www.w3.org/2002/xforms"
+                 xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+                 xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                 xmlns:custom="http://orbeon.org/oxf/xml/form-runner"
+                 xmlns:xbl="http://www.w3.org/ns/xbl"
+                 xml:lang="en">
+          <xh:head>
+            <xf:model id="fr-form-model"
+                      xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+              <xf:instance id="fr-form-metadata" xxf:readonly="true">
+                <metadata>
+                  <application-name>foo</application-name>
+                  <form-name>bar</form-name>
+                </metadata>
+              </xf:instance>
+            </xf:model>
+            <xbl:xbl>
+              <xbl:binding id="fr-test-comp" element="custom|test-comp">
+                <xbl:implementation>
+                  <xf:model id="test-comp-model"
+                            xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+                    <xf:instance id="orbeon-resources" xxf:readonly="true">
+                      <resources>
+                        <resource xml:lang="en">
+                          <default-alert>Default Component Alert</default-alert>
+                        </resource>
+                      </resources>
+                    </xf:instance>
+                  </xf:model>
+                </xbl:implementation>
+                <xbl:template>
+                  <xf:group id="inner-group">
+                    <xf:output id="out-prop-wildcard" value="fr:r('alert-from-property')"/>
+                  </xf:group>
+                </xbl:template>
+              </xbl:binding>
+            </xbl:xbl>
+          </xh:head>
+          <xh:body>
+            <custom:test-comp id="my-component"/>
+          </xh:body>
+        </xh:html>.toDocument
+
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(testDocWithDifferentPrefix)) {
+          val out = resolveObjectInsideComponent[XFormsValueControl]("my-component", targetStaticOrAbsoluteId = "out-prop-wildcard").get
+          assert(out.getValue(EventCollector.Throw) == "Alert from property wildcard")
+        }
+      }
+    }
+
     it("must respect language in XBL resource resolution") {
       withTestExternalContext { _ =>
         withActionAndDoc(setupDocument(testDoc("fr"))) {

@@ -58,7 +58,7 @@
         <expand-all-full>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt; Fäll ut alla</expand-all-full>
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Uppdatera</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Nästa</wizard-next>
-        <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Föreg</wizard-prev>
+        <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Föregående</wizard-prev>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Innehåll</wizard-toc>
 
         <!-- Submit dialog -->

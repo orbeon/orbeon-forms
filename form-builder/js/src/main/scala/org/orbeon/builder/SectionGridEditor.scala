@@ -106,7 +106,7 @@ object SectionGridEditor {
         if (sectionGridBody.el.matches(BlockCache.SectionSelector)) {
           val container = sectionGridBody.el.childrenT(".fr-section-container").head
           showMoveDeleteIcons(container)
-          if (! isViewMode && container.queryNestedElems(".fr-section-component", includeSelf = false).nonEmpty)
+          if (! isViewMode && container.queryNestedElems[html.Element](".fr-section-component", includeSelf = false).nonEmpty)
             allIconsWith(ContainerMerge.className).foreach(_.show())
         }
 

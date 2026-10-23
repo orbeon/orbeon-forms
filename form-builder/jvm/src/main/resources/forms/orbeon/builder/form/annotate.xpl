@@ -95,7 +95,7 @@
         <p:input name="bindings"         href="#bindings"/>
         <p:input name="is-readonly-mode" href="#is-readonly-mode"/>
         <p:input name="config">
-            <xsl:stylesheet version="2.0"
+            <xsl:stylesheet version="2.0" exclude-result-prefixes="#all"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                 xmlns:fb="http://orbeon.org/oxf/xml/form-builder"

@@ -75,7 +75,7 @@ object ToolboxOps {
             findViewTemplate(bindingElem, forEnclosingSection = false) match {
               case Some(viewTemplate) =>
                 // There is a specific template available
-                val controlElem = insert(into = gridTd, origin = viewTemplate).head
+                val controlElem = insert(into = gridTd, origin = copyElementInfoWithoutExtraNamespaces(viewTemplate, Some(gridTd))).head
                 // xf:help might be in the template, but we don't need it as it is created on demand
                 delete(controlElem / "help")
 
@@ -147,7 +147,7 @@ object ToolboxOps {
                   Nil
                 }
 
-              val resourceEls = lhhaResourceEls ++ xblResourceEls ++ itemsResourceEls
+              val resourceEls = lhhaResourceEls ++ (xblResourceEls ++ itemsResourceEls).map(copyElementInfoWithoutExtraNamespaces(_, None))
               formLang -> List(elementInfo(newControlName, resourceEls))
             }
           }
@@ -377,7 +377,7 @@ object ToolboxOps {
 
         // Insert template into section
         findViewTemplate(bindingElem, forEnclosingSection = false) foreach { template =>
-          val control = insert(into = section, after = section / *, origin = template)
+          val control = insert(into = section, after = section / *, origin = copyElementInfoWithoutExtraNamespaces(template, Some(section)))
           val contentName = formSectionName + TemplateContentSuffix
           val idAttribute = NodeInfoFactory.attributeInfo(ID_QNAME, controlId(contentName))
           insert(into = control, origin = idAttribute)

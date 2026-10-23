@@ -33,7 +33,6 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupport, Mediatypes, PathUtils}
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
 import org.orbeon.oxf.xforms.action.actions.XXFormsInvalidateInstanceAction
@@ -44,6 +43,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor.*
 import org.orbeon.oxf.xforms.xbl.BindingIndex.DatatypeMatch
 import org.orbeon.oxf.xforms.xbl.{BindingDescriptor, BindingIndex}
+import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsContainingDocument}
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
 import org.orbeon.saxon.ArrayFunctions
 import org.orbeon.saxon.function.Property
@@ -529,15 +529,20 @@ object FormBuilderXPathApi {
       } yield
         (holder, instanceRoot, isRepeated)
 
+    // Content of the holder, copied from the template instance without the namespace declarations in scope in the
+    // XBL, see #7619
+    def holderContent(instanceRoot: NodeInfo, holder: NodeInfo): collection.Seq[NodeInfo] =
+      (instanceRoot / *).map(NodeInfoFactory.copyElementInfoWithoutExtraNamespaces(_, Some(holder)))
+
     holdersWithRoots foreach {
       case (holder, instanceRoot, false) =>
         delete(holder / *)
-        insert(into = holder, origin = instanceRoot / *)
+        insert(into = holder, origin = holderContent(instanceRoot, holder))
       case (holder, instanceRoot, true) =>
         // https://github.com/orbeon/orbeon-forms/issues/7352
         holder / * foreach { iterationHolder =>
           delete(iterationHolder / *)
-          insert(into = iterationHolder, origin = instanceRoot / *)
+          insert(into = iterationHolder, origin = holderContent(instanceRoot, iterationHolder))
         }
     }
   }

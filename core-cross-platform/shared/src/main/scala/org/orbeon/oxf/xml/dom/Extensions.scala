@@ -87,6 +87,28 @@ object Extensions {
     def copyAndCopyParentNamespaces: Element =
       e.createCopy.copyMissingNamespacesByPrefix(e.parentElemOpt)
 
+    /**
+     * Remove, on this element and its descendants, the namespace declarations already in scope with the same URI.
+     *
+     * @param inScopeFromParent namespaces in scope at the parent, or at the destination if the element is detached
+     */
+    def removeRedundantNamespaceDeclarations(inScopeFromParent: Map[String, String]): Element = {
+
+      def removeFromElementAndDescendants(elem: Element, inScopeFromParent: Map[String, String]): Unit = {
+
+        for (ns <- elem.declaredNamespacesIterator.toList)
+          if (inScopeFromParent.get(ns.prefix).contains(ns.uri))
+            elem.remove(ns)
+
+        val inScopeForChildren = inScopeFromParent ++ elem.declaredNamespacesIterator.map(ns => ns.prefix -> ns.uri)
+        elem.elements.foreach(removeFromElementAndDescendants(_, inScopeForChildren))
+      }
+
+      removeFromElementAndDescendants(e, inScopeFromParent)
+
+      e
+    }
+
     def getNamespaceContextNoDefault: Map[String, String] =
       e.allInScopeNamespacesAsStrings.filter(_._1.nonEmpty)
 

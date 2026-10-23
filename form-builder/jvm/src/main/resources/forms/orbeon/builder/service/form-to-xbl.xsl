@@ -521,12 +521,20 @@
                     <xsl:copy-of select="$fr-form-model/(@schema | @xxf:custom-mips)"/>
 
                     <!-- Template -->
-                    <xf:instance id="fr-form-template">
-                        <xsl:copy-of select="$section-data"/>
+                    <!-- Don't copy namespaces and exclude all prefixes, so that namespace declarations don't end up in
+                         the form data (see #7619) -->
+                    <xf:instance id="fr-form-template" xxf:exclude-result-prefixes="#all">
+                        <xsl:copy-of select="$section-data" copy-namespaces="no"/>
                     </xf:instance>
 
                     <!-- Repeat templates if any -->
-                    <xsl:copy-of select="$repeat-templates"/>
+                    <xsl:for-each select="$repeat-templates">
+                        <xsl:copy copy-namespaces="no">
+                            <xsl:copy-of select="@*"/>
+                            <xsl:attribute name="xxf:exclude-result-prefixes">#all</xsl:attribute>
+                            <xsl:copy-of select="node()" copy-namespaces="no"/>
+                        </xsl:copy>
+                    </xsl:for-each>
 
                     <!-- Section constraints -->
                     <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">

@@ -83,6 +83,13 @@
                     <_/>
                 </xf:instance>
 
+                <xf:instance id="fr-order-by" xxf:exclude-result-prefixes="#all">
+                    <order-by>
+                        <column>last-modified</column>
+                        <direction>desc</direction>
+                    </order-by>
+                </xf:instance>
+
                 <xf:submission
                     id="fr-get-source-form-submission"
                     method="get"
@@ -272,11 +279,63 @@
                 <xf:label value="instance('fr-form-metadata-instance')/(title[@xml:lang = xxf:lang()], title)[1]"/>
                 <fr:headings>
                     <xf:repeat ref="instance('fr-search-labels-instance')/query[@name and @summary-show = 'true']">
+                        <xf:var name="path" value="@path"/>
                         <xf:var name="label" value="(resources[@lang = xxf:lang()]/label, resources/label, @name)[1]"/>
+                        <xf:var name="is-sorted" value="instance('fr-order-by')/column = $path"/>
+                        <xf:var name="caret-value" value="
+                            if (not($is-sorted)) then
+                                ''
+                            else if (instance('fr-order-by')/direction = 'asc') then
+                                '&#x25B2;'
+                            else
+                                '&#x25BC;'
+                        "/>
                         <xh:span class="fr-card-col fr-card-heading">
-                            <xh:span class="fr-card-col-text text-truncate">
-                                <xf:output value="$label"/>
-                            </xh:span>
+                            <xf:trigger appearance="minimal" class="fr-card-sort-trigger">
+                                <xf:label>
+                                    <xh:span class="fr-card-col-text text-truncate">
+                                        <xf:output value="$label"/>
+                                    </xh:span>
+                                    <xh:span class="fr-card-sort-caret {if ($is-sorted) then '' else 'no-caret'}">
+                                        <xf:output value="$caret-value"/>
+                                    </xh:span>
+                                </xf:label>
+                                <xf:action event="DOMActivate">
+                                    <xf:var name="target-col" value="$path"/>
+                                    <xf:var name="current-col" value="instance('fr-order-by')/column"/>
+                                    <xf:var name="current-dir" value="instance('fr-order-by')/direction"/>
+                                    <xf:var name="next-col" value="
+                                        if ($current-col = $target-col and $current-dir = 'desc') then
+                                            'last-modified'
+                                        else
+                                            $target-col
+                                    "/>
+                                    <xf:var name="next-dir" value="
+                                        if ($current-col = $target-col) then
+                                            if ($current-dir = 'asc') then 'desc' else 'desc'
+                                        else
+                                            'asc'
+                                    "/>
+
+                                    <xf:setvalue ref="instance('fr-order-by')/column" value="$next-col"/>
+                                    <xf:setvalue ref="instance('fr-order-by')/direction" value="$next-dir"/>
+
+                                    <!-- Delete sort attribute from all queries -->
+                                    <xf:delete ref="instance('fr-search-instance')/query/@sort"/>
+
+                                    <!-- Insert sort attribute on the appropriate query -->
+                                    <xf:insert
+                                        context="
+                                            if ($next-col = 'last-modified') then
+                                                instance('fr-search-instance')/query[@metadata = 'last-modified'][1]
+                                            else
+                                                instance('fr-search-instance')/query[@path = $next-col]"
+                                        origin="xf:attribute('sort', $next-dir)"/>
+
+                                    <!-- Query documents with updated sort order -->
+                                    <xf:send submission="fr-search-submission"/>
+                                </xf:action>
+                            </xf:trigger>
                         </xh:span>
                     </xf:repeat>
                 </fr:headings>

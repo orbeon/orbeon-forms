@@ -153,7 +153,7 @@ object StaticXPath extends StaticXPathTrait {
     avt           : Boolean
   ): XPathExpression = {
     val evaluator = new XPathEvaluator(GlobalConfiguration)
-    evaluator.setStaticContext(staticContext)
+    evaluator.staticContext = staticContext
     if (avt)
       evaluator.createValueTemplateExpression(xpathString)
     else

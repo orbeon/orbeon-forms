@@ -39,7 +39,7 @@ class ShareableXPathStaticContext(
 
     this.packageData = {
       val pd = new PackageData(config)
-      pd.setHostLanguage(HostLanguage.XPATH)
+      pd.hostLanguage = HostLanguage.XPATH
       pd.setSchemaAware(false)
       pd
     }

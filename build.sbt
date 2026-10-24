@@ -43,7 +43,7 @@ val ScalaJsStubsVersion          = "1.1.0" // can be different from Scala.js ver
 val ScalaJsWeakReferencesVersion = "1.0.0"
 val ScalaJsSecureRandomVersion   = "1.0.0"
 val ScalaJsTimeVersion           = "2.6.0"
-val ScalaJsLocalesVersion        = "1.4.1"
+val ScalaJsLocalesVersion        = "1.5.4"
 
 // Scala libraries for Scala JVM only
 val ScalaLoggingVersion              = "3.9.4"
@@ -595,8 +595,8 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
   .jsSettings(commonScalaJsSettings)
   .jsSettings(
     libraryDependencies += "org.scala-lang.modules" %%% "scala-async"           % ScalaAsyncVersion,
-    libraryDependencies += "io.github.cquiroz"      %%% "scala-java-time"       % ScalaJsTimeVersion % Test,
-    libraryDependencies += "io.github.cquiroz"      %%% "scala-java-time-tzdb"  % ScalaJsTimeVersion % Test,
+    libraryDependencies += ("io.github.cquiroz"      %%% "scala-java-time"       % ScalaJsTimeVersion % Test).cross(CrossVersion.for2_13Use3),
+    libraryDependencies += ("io.github.cquiroz"      %%% "scala-java-time-tzdb"  % ScalaJsTimeVersion % Test).cross(CrossVersion.for2_13Use3),
     Compile / unmanagedJars := Nil
   )
 
@@ -1327,7 +1327,7 @@ lazy val xformsWeb = (project in file("xforms-web"))
       "io.udash"               %%% "udash-jquery"     % ScalaJsJQueryVersion withSources(),
       "com.beachape"           %%% "enumeratum"       % EnumeratumVersion,
       "com.beachape"           %%% "enumeratum-circe" % EnumeratumCirceVersion,
-      "io.github.cquiroz"      %%% "scala-java-time"  % ScalaJsTimeVersion,
+      ("io.github.cquiroz"      %%% "scala-java-time"  % ScalaJsTimeVersion).cross(CrossVersion.for2_13Use3),
     ),
 
     jsDependencies                      += "org.webjars" % "jquery" % "3.6.1" / "jquery.js",
@@ -1445,8 +1445,8 @@ lazy val coreCrossPlatformJS = coreCrossPlatform.js
   .settings(
     libraryDependencies ++= Seq(
       ("org.xml"      %% "sax"         % SaxVersion).cross(CrossVersion.for2_13Use3),
-      "org.orbeon"   %%% "saxon"       % SaxonJsVersion,
-      "org.orbeon"   %%% "xerces"      % XercesVersion,
+      ("org.orbeon"  %%% "saxon"       % SaxonJsVersion).cross(CrossVersion.for2_13Use3),
+      ("org.orbeon"  %%% "xerces"      % XercesVersion).cross(CrossVersion.for3Use2_13),
       "com.chuusai"   %% "shapeless"   % ShapelessVersion,
       "org.scala-js" %%% "scalajs-dom" % ScalaJsDomVersion,
     ),

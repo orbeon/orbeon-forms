@@ -1006,6 +1006,21 @@ lazy val formRunnerWeb = (project in file("form-runner-web"))
     )
   )
 
+lazy val xpathFormatter = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) in file("xpath-formatter"))
+  .settings(scala2CommonSettings*)
+  .settings(
+    name := "orbeon-xpath-formatter"
+  )
+
+lazy val xpathFormatterJVM = xpathFormatter.jvm
+
+lazy val xpathFormatterJS = xpathFormatter.js
+  .settings(commonScalaJsSettings)
+  .settings(
+    Compile / unmanagedJars      := Nil,
+    Compile / unmanagedClasspath := Nil
+  )
+
 lazy val formBuilder = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("form-builder"))
   .settings(scala2CommonSettings*)
   .settings(

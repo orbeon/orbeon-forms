@@ -618,9 +618,13 @@
         </import>
         <existing-records>
             <label>Ta bort alla befintliga poster i databasen först</label>
+            <help>När detta är valt tas alla befintliga poster i databasen för detta formulär bort permanent innan de nya uppgifterna importeras. När detta inte är valt bevaras befintliga poster och de importerade uppgifterna läggs till i databasen.</help>
+            <hint>Ta bort alla befintliga databasposter för detta formulär innan nya data importeras.</hint>
         </existing-records>
         <invalid-data>
             <label>Importera poster med ogiltiga data</label>
+            <help>När detta är valt importeras kalkylbladsrader med valideringsfel ändå så att de kan granskas och korrigeras senare i Form Runner. När detta inte är valt hoppas rader med valideringsfel över och endast giltiga rader importeras.</help>
+            <hint>Importera poster som innehåller valideringsfel.</hint>
         </invalid-data>
         <start-import>
             <label>Starta import</label>

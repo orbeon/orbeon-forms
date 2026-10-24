@@ -638,9 +638,13 @@
         </import>
         <existing-records>
             <label>Esborrar primer tots els registres existents de la base de dades</label>
+            <help>Quan està seleccionat, tots els registres existents a la base de dades per a aquest formulari s'eliminaran permanentment abans d'importar les noves dades. Quan no està seleccionat, els registres existents es conserven i les dades importades s'afegeixen a la base de dades.</help>
+            <hint>Esborrar tots els registres existents a la base de dades per a aquest formulari abans d'importar noves dades.</hint>
         </existing-records>
         <invalid-data>
             <label>Importar registres amb dades invàlides</label>
+            <help>Quan està seleccionat, les files del full de càlcul que continguin errors de validació s'importaran igualment perquè es puguin revisar i corregir posteriorment a Form Runner. Quan no està seleccionat, les files amb errors de validació s'ometen i només s'importen les files vàlides.</help>
+            <hint>Importar registres que contenen errors de validació.</hint>
         </invalid-data>
         <start-import>
             <label>Començar la importació</label>

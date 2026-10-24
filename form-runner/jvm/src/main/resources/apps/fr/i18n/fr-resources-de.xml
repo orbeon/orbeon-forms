@@ -618,9 +618,13 @@
         </import>
         <existing-records>
             <label>Alle vorhandenen Datenbankeinträge zuerst löschen</label>
+            <help>Wenn diese Option ausgewählt ist, werden alle vorhandenen Datenbankeinträge für dieses Formular dauerhaft gelöscht, bevor die neuen Daten importiert werden. Wenn die Option nicht ausgewählt ist, bleiben vorhandene Einträge erhalten und die importierten Daten werden zur Datenbank hinzugefügt.</help>
+            <hint>Alle vorhandenen Datenbankeinträge für dieses Formular vor dem Importieren neuer Daten löschen.</hint>
         </existing-records>
         <invalid-data>
             <label>Datensätze mit ungültigen Daten importieren</label>
+            <help>Wenn diese Option ausgewählt ist, werden Tabellenzeilen mit Validierungsfehlern dennoch importiert, damit sie später in Form Runner überprüft und korrigiert werden können. Wenn die Option nicht ausgewählt ist, werden Zeilen mit Validierungsfehlern übersprungen und nur gültige Zeilen importiert.</help>
+            <hint>Datensätze mit Validierungsfehlern importieren.</hint>
         </invalid-data>
         <start-import>
             <label>Import starten</label>

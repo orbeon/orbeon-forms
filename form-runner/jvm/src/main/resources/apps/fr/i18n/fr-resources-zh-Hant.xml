@@ -618,9 +618,13 @@
         </import>
         <existing-records>
             <label>首先刪除所有現有數據庫記錄</label>
+            <help>選中時，在導入新數據之前，將永久刪除此表單的所有現有數據庫記錄。取消選中時，將保留現有記錄，並將導入的數據添加到數據庫中。</help>
+            <hint>在導入新數據之前，刪除此表單的所有現有數據庫記錄。</hint>
         </existing-records>
         <invalid-data>
             <label>導入包含無效數據的記錄</label>
+            <help>選中時，仍將導入包含驗證錯誤的電子表格行，以便稍後在 Form Runner 中查看和更正。取消選中時，將跳過包含驗證錯誤的行，僅導入有效行。</help>
+            <hint>導入包含驗證錯誤的記錄。</hint>
         </invalid-data>
         <start-import>
             <label>開始導入</label>

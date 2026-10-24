@@ -618,9 +618,13 @@
         </import>
         <existing-records>
             <label>Apagar primeiro todos os registos existentes da base de dados</label>
+            <help>Quando selecionado, todos os registos existentes na base de dados para este formulário serão eliminados permanentemente antes de importar os novos dados. Quando desselecionado, os registos existentes são preservados e os dados importados são adicionados à base de dados.</help>
+            <hint>Apagar todos os registos existentes na base de dados para este formulário antes de importar novos dados.</hint>
         </existing-records>
         <invalid-data>
             <label>Importar registos com dados inválidos</label>
+            <help>Quando selecionado, as linhas da folha de cálculo contendo erros de validação ainda serão importadas para que possam ser revistas e corrigidas posteriormente no Form Runner. Quando desselecionado, as linhas com erros de validação são ignoradas e apenas as linhas válidas são importadas.</help>
+            <hint>Importar registos contendo erros de validação.</hint>
         </invalid-data>
         <start-import>
             <label>Iniciar importação</label>

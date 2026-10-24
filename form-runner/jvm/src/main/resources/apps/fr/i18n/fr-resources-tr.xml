@@ -616,9 +616,13 @@
         </import>
         <existing-records>
             <label>Önce mevcut tüm veritabanı kayıtlarını sil</label>
+            <help>Seçildiğinde, yeni veriler içe aktarılmadan önce bu form için mevcut tüm veritabanı kayıtları kalıcı olarak silinir. Seçilmediğinde, mevcut kayıtlar korunur ve içe aktarılan veriler veritabanına eklenir.</help>
+            <hint>Yeni verileri içe aktarmadan önce bu form için mevcut tüm veritabanı kayıtlarını silin.</hint>
         </existing-records>
         <invalid-data>
             <label>Geçersiz veri içeren kayıtları içe aktar</label>
+            <help>Seçildiğinde, doğrulama hataları içeren e-tablo satırları daha sonra Form Runner'da incelenip düzeltilebilmesi için yine de içe aktarılır. Seçilmediğinde, doğrulama hataları olan satırlar atlanır ve yalnızca geçerli satırlar içe aktarılır.</help>
+            <hint>Doğrulama hataları içeren kayıtları içe aktarın.</hint>
         </invalid-data>
         <start-import>
             <label>İçe Aktarmayı Başlat</label>

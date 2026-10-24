@@ -618,9 +618,13 @@
         </import>
         <existing-records>
             <label>Eerst alle bestaande records in de database verwijderen</label>
+            <help>Indien geselecteerd, worden alle bestaande databaserecords voor dit formulier permanent verwijderd voordat de nieuwe gegevens worden geïmporteerd. Indien niet geselecteerd, blijven bestaande records behouden en worden de geïmporteerde gegevens aan de database toegevoegd.</help>
+            <hint>Verwijder alle bestaande databaserecords voor dit formulier voordat nieuwe gegevens worden geïmporteerd.</hint>
         </existing-records>
         <invalid-data>
             <label>Records met ongeldige gegevens importeren</label>
+            <help>Indien geselecteerd, worden spreadsheetrijen met validatiefouten alsnog geïmporteerd, zodat ze later in Form Runner kunnen worden bekeken en gecorrigeerd. Indien niet geselecteerd, worden rijen met validatiefouten overgeslagen en worden alleen geldige rijen geïmporteerd.</help>
+            <hint>Importeer records met validatiefouten.</hint>
         </invalid-data>
         <start-import>
             <label>Import starten</label>

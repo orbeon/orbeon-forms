@@ -615,9 +615,13 @@
         </import>
         <existing-records>
             <label>Slett alle eksisterende databaseoppføringer først</label>
+            <help>Når valgt, slettes alle eksisterende databaseoppføringer for dette skjemaet permanent før nye data importeres. Når ikke valgt, beholdes eksisterende oppføringer og de importerte dataene legges til i databasen.</help>
+            <hint>Slett alle eksisterende databaseoppføringer for dette skjemaet før nye data importeres.</hint>
         </existing-records>
         <invalid-data>
             <label>Importer oppføringer med ugyldige data</label>
+            <help>Når valgt, importeres regnearkrader med valideringsfeil likevel, slik at de kan gjennomgås og korrigeres senere i Form Runner. Når ikke valgt, hoppes rader med valideringsfeil over og bare gyldige rader importeres.</help>
+            <hint>Importer oppføringer som inneholder valideringsfeil.</hint>
         </invalid-data>
         <start-import>
             <label>Start import</label>

@@ -618,9 +618,13 @@
         </import>
         <existing-records>
             <label>Először minden meglévő adatbázisrekord törlése</label>
+            <help>Ha be van jelölve, az űrlaphoz tartozó összes meglévő adatbázisrekord véglegesen törlődik az új adatok importálása előtt. Ha nincs bejelölve, a meglévő rekordok megmaradnak, és az importált adatok hozzáadódnak az adatbázishoz.</help>
+            <hint>Az űrlap összes meglévő adatbázisrekordjának törlése új adatok importálása előtt.</hint>
         </existing-records>
         <invalid-data>
             <label>Érvénytelen adatokat tartalmazó rekordok importálása</label>
+            <help>Ha be van jelölve, az érvényesítési hibákat tartalmazó táblázatsorok is importálásra kerülnek, így később áttekinthetők és javíthatók a Form Runnerben. Ha nincs bejelölve, az érvényesítési hibákat tartalmazó sorok kimaradnak, és csak az érvényes sorok kerülnek importálásra.</help>
+            <hint>Érvényesítési hibákat tartalmazó rekordok importálása.</hint>
         </invalid-data>
         <start-import>
             <label>Importálás indítása</label>

@@ -609,9 +609,13 @@
         </import>
         <existing-records>
             <label>Slet alle eksisterende poster i databasen først</label>
+            <help>Når dette er valgt, slettes alle eksisterende databaseposter for denne formular permanent, før de nye data importeres. Når dette ikke er valgt, bevares eksisterende poster, og de importerede data føjes til databasen.</help>
+            <hint>Slet alle eksisterende databaseposter for denne formular, før der importeres nye data.</hint>
         </existing-records>
         <invalid-data>
             <label>Importér poster med ugyldige data</label>
+            <help>Når dette er valgt, importeres regnearksrækker med valideringsfejl stadig, så de kan gennemgås og rettes senere i Form Runner. Når dette ikke er valgt, springes rækker med valideringsfejl over, og kun gyldige rækker importeres.</help>
+            <hint>Importér poster, der indeholder valideringsfejl.</hint>
         </invalid-data>
         <start-import>
             <label>Start import</label>

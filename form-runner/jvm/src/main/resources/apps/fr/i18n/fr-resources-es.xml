@@ -652,9 +652,13 @@
         </import>
         <existing-records>
             <label>Eliminar primero todos los registros existentes de la base de datos</label>
+            <help>Cuando está seleccionado, todos los registros existentes en la base de datos para este formulario se eliminarán permanentemente antes de importar los nuevos datos. Cuando no está seleccionado, los registros existentes se conservan y los datos importados se agregan a la base de datos.</help>
+            <hint>Eliminar todos los registros existentes de la base de datos para este formulario antes de importar nuevos datos.</hint>
         </existing-records>
         <invalid-data>
             <label>Importar registros con datos inválidos</label>
+            <help>Cuando está seleccionado, las filas de la hoja de cálculo que contienen errores de validación se importarán igualmente para que puedan revisarse y corregirse más tarde en Form Runner. Cuando no está seleccionado, se omiten las filas con errores de validación y solo se importan las filas válidas.</help>
+            <hint>Importar registros que contienen errores de validación.</hint>
         </invalid-data>
         <start-import>
             <label>Comenzar importación</label>

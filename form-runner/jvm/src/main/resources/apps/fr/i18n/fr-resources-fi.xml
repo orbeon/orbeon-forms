@@ -618,9 +618,13 @@
         </import>
         <existing-records>
             <label>Poista ensin kaikki olemassa olevat tietokantatietueet</label>
+            <help>Kun tämä on valittuna, kaikki tämän lomakkeen olemassa olevat tietokantatietueet poistetaan pysyvästi ennen uusien tietojen tuontia. Kun valintaa ei ole tehty, olemassa olevat tietueet säilytetään ja tuodut tiedot lisätään tietokantaan.</help>
+            <hint>Poista kaikki tämän lomakkeen olemassa olevat tietokantatietueet ennen uusien tietojen tuomista.</hint>
         </existing-records>
         <invalid-data>
             <label>Tuo tietueet, joissa on virheellisiä tietoja</label>
+            <help>Kun tämä on valittuna, vahvistusvirheitä sisältävät taulukkolaskentarivit tuodaan silti, jotta ne voidaan tarkistaa ja korjata myöhemmin Form Runnerissa. Kun valintaa ei ole tehty, virheelliset rivit ohitetaan ja vain kelvolliset rivit tuodaan.</help>
+            <hint>Tuo vahvistusvirheitä sisältävät tietueet.</hint>
         </invalid-data>
         <start-import>
             <label>Aloita tuonti</label>

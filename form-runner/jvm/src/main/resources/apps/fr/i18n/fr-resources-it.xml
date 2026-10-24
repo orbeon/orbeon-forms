@@ -618,9 +618,13 @@
         </import>
         <existing-records>
             <label>Eliminare prima tutti i record esistenti dal database</label>
+            <help>Se selezionato, tutti i record esistenti nel database per questo modulo verranno eliminati definitivamente prima di importare i nuovi dati. Se deselezionato, i record esistenti vengono conservati e i dati importati vengono aggiunti al database.</help>
+            <hint>Eliminare tutti i record esistenti nel database per questo modulo prima di importare nuovi dati.</hint>
         </existing-records>
         <invalid-data>
             <label>Importare record con dati non validi</label>
+            <help>Se selezionato, le righe del foglio di calcolo contenenti errori di convalida verranno comunque importate per poter essere esaminate e corrette successivamente in Form Runner. Se deselezionato, le righe con errori di convalida vengono ignorate e vengono importate solo le righe valide.</help>
+            <hint>Importare record contenenti errori di convalida.</hint>
         </invalid-data>
         <start-import>
             <label>Avviare Importazione</label>

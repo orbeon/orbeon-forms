@@ -613,9 +613,13 @@
         </import>
         <existing-records>
             <label>首先删除所有现有数据库记录</label>
+            <help>选中时，在导入新数据之前，将永久删除此表单的所有现有数据库记录。取消选中时，将保留现有记录，并将导入的数据添加到数据库中。</help>
+            <hint>在导入新数据之前，删除此表单的所有现有数据库记录。</hint>
         </existing-records>
         <invalid-data>
             <label>导入包含无效数据的记录</label>
+            <help>选中时，仍将导入包含验证错误的电子表格行，以便稍后在 Form Runner 中查看和更正。取消选中时，将跳过包含验证错误的行，仅导入有效行。</help>
+            <hint>导入包含验证错误的记录。</hint>
         </invalid-data>
         <start-import>
             <label>开始导入</label>

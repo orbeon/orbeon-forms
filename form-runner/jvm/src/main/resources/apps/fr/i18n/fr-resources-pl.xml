@@ -619,9 +619,13 @@
         </import>
         <existing-records>
             <label>Najpierw usuń wszystkie istniejące rekordy bazy danych</label>
+            <help>Po zaznaczeniu wszystkie istniejące rekordy bazy danych dla tego formularza zostaną trwale usunięte przed zaimportowaniem nowych danych. Po odznaczeniu istniejące rekordy zostaną zachowane, a zaimportowane dane zostaną dodane do bazy danych.</help>
+            <hint>Usuń wszystkie istniejące rekordy bazy danych dla tego formularza przed zaimportowaniem nowych danych.</hint>
         </existing-records>
         <invalid-data>
             <label>Importuj rekordy z nieprawidłowymi danymi</label>
+            <help>Po zaznaczeniu wiersze arkusza kalkulacyjnego zawierające błędy walidacji zostaną mimo to zaimportowane, aby można je było później przejrzeć i poprawić w Form Runnerze. Po odznaczeniu wiersze z błędami walidacji zostaną pominięte i zaimportowane zostaną tylko prawidłowe wiersze.</help>
+            <hint>Importuj rekordy zawierające błędy walidacji.</hint>
         </invalid-data>
         <start-import>
             <label>Rozpocznij import</label>

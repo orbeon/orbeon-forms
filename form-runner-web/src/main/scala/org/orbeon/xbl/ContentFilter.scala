@@ -6,9 +6,10 @@ import org.orbeon.web.DomSupport.DomElemOps
 import org.orbeon.xforms.facade.XBLCompanion
 import org.orbeon.xforms.{EventListenerSupport, XFormsXbl}
 import org.scalajs.dom
-import org.scalajs.dom.html
+import org.scalajs.dom.{ResizeObserver, html}
 
 import scala.scalajs.js
+import scala.scalajs.js.Dynamic.global as g
 
 
 object ContentFilter {
@@ -27,14 +28,11 @@ object ContentFilter {
     "text-align",
     "text-indent",
     "text-transform",
+    "tab-size",
     "padding-top",
     "padding-right",
     "padding-bottom",
     "padding-left",
-    "border-top-width",
-    "border-right-width",
-    "border-bottom-width",
-    "border-left-width",
     "box-sizing",
     "white-space",
     "word-break",
@@ -45,13 +43,16 @@ object ContentFilter {
 
     private object EventSupport extends EventListenerSupport
 
-    private var fieldElemOpt     : Option[html.Element] = None
-    private var backdropElemOpt  : Option[html.Element] = None
-    private var highlightsElemOpt: Option[html.Element] = None
-    private var valueOpt         : Option[String]       = None
+    private var wrapperElemOpt   : Option[html.Element]   = None
+    private var fieldElemOpt     : Option[html.Element]   = None
+    private var backdropElemOpt  : Option[html.Element]   = None
+    private var highlightsElemOpt: Option[html.Element]   = None
+    private var valueOpt         : Option[String]         = None
+    private var resizeObserverOpt: Option[ResizeObserver] = None
 
     override def init(): Unit = {
 
+      wrapperElemOpt = containerElem.querySelectorOpt(".fr-content-filter-wrapper")
       fieldElemOpt =
         containerElem.queryNestedElems[html.Input]("input").headOption
           .orElse(containerElem.queryNestedElems[html.TextArea]("textarea").headOption)
@@ -64,13 +65,35 @@ object ContentFilter {
         // Sync scroll between field and backdrop
         EventSupport.addListener(fieldElem, DomEventNames.Scroll, (_: dom.Event) => syncScroll())
 
-        // Listen for key/input events to update highlights dynamically
+        // Listen for key/input/focus events to update highlights dynamically
         EventSupport.addListeners(
           fieldElem,
-          List(DomEventNames.Input, DomEventNames.KeyUp, DomEventNames.KeyDown, DomEventNames.Change),
+          List(DomEventNames.Input, DomEventNames.KeyUp, DomEventNames.KeyDown, DomEventNames.Change, DomEventNames.FocusIn),
           (_: dom.Event) => updateOrClearHighlights()
         )
+
+        // Mouseup on field in case user finishes resizing with native handle
+        EventSupport.addListener(fieldElem, "mouseup", (_: dom.Event) => {
+          updateSizeAndStyles()
+          syncScroll()
+        })
+
+        // ResizeObserver to detect when the user resizes the field (e.g. textarea resize handle)
+        if (js.typeOf(g.ResizeObserver) != "undefined") {
+          val observer = new ResizeObserver((_, _) => {
+            updateSizeAndStyles()
+            syncScroll()
+          })
+          observer.observe(fieldElem)
+          resizeObserverOpt = Some(observer)
+        }
       }
+
+      // Also listen on window resize
+      EventSupport.addListener(dom.window, "resize", (_: dom.Event) => {
+        updateSizeAndStyles()
+        syncScroll()
+      })
 
       updateOrClearHighlights()
     }
@@ -92,6 +115,9 @@ object ContentFilter {
 
     override def destroy(): Unit = {
       EventSupport.clearAllListeners()
+      resizeObserverOpt.foreach(_.disconnect())
+      resizeObserverOpt = None
+      wrapperElemOpt    = None
       fieldElemOpt      = None
       backdropElemOpt   = None
       highlightsElemOpt = None
@@ -118,7 +144,8 @@ object ContentFilter {
       highlightsElemOpt.foreach { highlightsElem =>
         val value           = valueOpt.getOrElse(getFieldValue)
         val highlightedHtml = CoreContentFilter.highlightContent(value)
-        highlightsElem.innerHTML = highlightedHtml
+        val finalHtml       = if (value.endsWith("\n")) highlightedHtml + " " else highlightedHtml
+        highlightsElem.innerHTML = finalHtml
       }
     }
 
@@ -133,8 +160,20 @@ object ContentFilter {
       } locally {
         val width  = fieldElem.clientWidth
         val height = fieldElem.clientHeight
-        if (width > 0)  backdropElem.style.width  = s"${width}px"
-        if (height > 0) backdropElem.style.height = s"${height}px"
+
+        if (width > 0 && height > 0) {
+          val wrapperElem = wrapperElemOpt.getOrElse(containerElem)
+          val wrapperRect = wrapperElem.getBoundingClientRect()
+          val fieldRect   = fieldElem.getBoundingClientRect()
+
+          val left = fieldRect.left - wrapperRect.left - wrapperElem.clientLeft + fieldElem.clientLeft
+          val top  = fieldRect.top  - wrapperRect.top  - wrapperElem.clientTop  + fieldElem.clientTop
+
+          backdropElem.style.left   = s"${left}px"
+          backdropElem.style.top    = s"${top}px"
+          backdropElem.style.width  = s"${width}px"
+          backdropElem.style.height = s"${height}px"
+        }
 
         val computed = dom.window.getComputedStyle(fieldElem)
 

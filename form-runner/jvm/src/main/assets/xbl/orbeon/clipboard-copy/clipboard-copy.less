@@ -5,33 +5,84 @@
     .xbl-fr-clipboard-copy {
 
         display: inline-block;
+        width: 100%;
 
         .xforms-label-appearance-minimal {
             display: none;
         }
 
+        &.xforms-disabled {
+            .fr-clipboard-copy-button {
+                display: none;
+            }
+        }
+
         &> .fr-clipboard-copy-wrapper {
 
-            display: flex;
-            column-gap: 10px;
-
-            &> * {
-                vertical-align: top;
-            }
-
-            &> .fr-clipboard-copy-button {
-                height: fit-content;
-                border-radius: var(--orbeon-add-on-border-radius);
-                .focusHighlight();
-
-                // Follow .add-on colors
-                color: var(--orbeon-add-on-color);
-                background-color: var(--orbeon-add-on-background-color);
-            }
+            position: relative;
+            display: inline-block;
+            width: 100%;
 
             &> .xforms-input, &> .xforms-textarea, &> .xbl-fr-tinymce, &> .xforms-output {
                 width: 100%;
                 word-break: break-all;
+
+                input, textarea, output, .xforms-output-output {
+                    padding-right: 32px;
+                }
+            }
+
+            &> .fr-clipboard-copy-button {
+                position: absolute;
+                top: 6px;
+                right: 8px;
+                z-index: 3;
+                width: 22px;
+                height: 22px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid var(--orbeon-border-color, var(--orbeon-base-border-color, #ced4da));
+                border-radius: var(--orbeon-add-on-border-radius, 4px);
+                background-color: var(--orbeon-input-bg, #ffffff);
+                color: var(--orbeon-fb-placeholder-color, #6c757d);
+                cursor: pointer;
+                opacity: 0.4;
+                font-size: 11px;
+                line-height: 1;
+                transition: opacity 0.2s ease, color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+
+                &:hover, &:focus {
+                    opacity: 1;
+                    color: var(--orbeon-base-color, #212529);
+                    border-color: var(--orbeon-focus-border-color, #86b7fe);
+                    background-color: var(--orbeon-input-bg, #ffffff);
+                    outline: none;
+                }
+
+                &.fr-clipboard-copy-success {
+                    color: var(--orbeon-success-color, #198754) !important;
+                    border-color: var(--orbeon-success-color, #198754) !important;
+                    opacity: 1 !important;
+                }
+
+                &.fr-clipboard-copy-error {
+                    color: var(--orbeon-error-color, #dc3545) !important;
+                    border-color: var(--orbeon-error-color, #dc3545) !important;
+                    opacity: 1 !important;
+                }
+            }
+
+            // On single-line inputs, center vertically
+            &> .xforms-input ~ .fr-clipboard-copy-button {
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+            &:hover > .fr-clipboard-copy-button,
+            &:focus-within > .fr-clipboard-copy-button {
+                opacity: 0.8;
             }
         }
     }

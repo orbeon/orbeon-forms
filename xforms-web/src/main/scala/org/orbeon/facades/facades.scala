@@ -38,6 +38,7 @@ object Mousetrap extends Mousetrap {
 @JSGlobal("ClipboardJS")
 class ClipboardJS(selector: String, config: ClipboardJSConfig) extends js.Object {
   def destroy(): Unit = js.native
+  def on(event: String, handler: js.Function1[js.Dynamic, Unit]): ClipboardJS = js.native
 }
 
 trait ClipboardJSConfig extends js.Object {

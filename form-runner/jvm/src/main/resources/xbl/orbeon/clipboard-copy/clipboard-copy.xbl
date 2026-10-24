@@ -105,10 +105,13 @@
                     </xsl:if>
                 </xsl:element>
 
-                <xh:button class="fr-clipboard-copy-button">
-                    <xh:i
-                        title="{{fr:r('copy')}}"
-                        class="fa fa-fw fa-copy"/>
+                <xh:button
+                    type="button"
+                    class="fr-clipboard-copy-button"
+                    title="{{fr:r('copy')}}"
+                    aria-label="{{fr:r('copy')}}"
+                    tabindex="-1">
+                    <xh:i class="fa fa-fw fa-copy"/>
                 </xh:button>
 
             </xh:span>

@@ -252,31 +252,31 @@ object ControlCustomSettings {
 
   private val ImageAttachmentSettings: List[SettingDef] = List(
     SettingDef(
-      name         = "maxWidth",
+      name         = "transformMaxWidth",
       settingType  = IntegerType,
-      aliases      = Set("max-width", "maxWidth", "Max width", "max_width", "transformMaxWidth", "transform-max-width"),
+      aliases      = Set("transform-max-width", "transformMaxWidth", "Transform max width", "transform_max_width"),
       minInt       = Some(1),
       xmlAttribute = Some("transform-max-width")
     ),
     SettingDef(
-      name         = "maxHeight",
+      name         = "transformMaxHeight",
       settingType  = IntegerType,
-      aliases      = Set("max-height", "maxHeight", "Max height", "max_height", "transformMaxHeight", "transform-max-height"),
+      aliases      = Set("transform-max-height", "transformMaxHeight", "Transform max height", "transform_max_height"),
       minInt       = Some(1),
       xmlAttribute = Some("transform-max-height")
     ),
     SettingDef(
-      name         = "quality",
+      name         = "transformQuality",
       settingType  = IntegerType,
-      aliases      = Set("quality", "Quality", "transformQuality", "transform-quality"),
+      aliases      = Set("transform-quality", "transformQuality", "Transform quality", "transform_quality"),
       minInt       = Some(1),
       maxInt       = Some(100),
       xmlAttribute = Some("transform-quality")
     ),
     SettingDef(
-      name          = "format",
+      name          = "transformFormat",
       settingType   = StringType,
-      aliases       = Set("format", "Format", "transformFormat", "transform-format"),
+      aliases       = Set("transform-format", "transformFormat", "Transform format", "transform_format"),
       allowedValues = Some(Set("jpg", "png")),
       xmlAttribute  = Some("transform-format")
     )

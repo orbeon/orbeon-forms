@@ -59,6 +59,17 @@
                     </xsl:element>
                 </xh:text-expander>
 
+                <xsl:if test="local-name(/*) = 'textarea'">
+                    <xh:button
+                        type="button"
+                        class="fb-xpath-completion-format-button"
+                        title="Format XPath expression (Shift+Alt+F)"
+                        aria-label="Format XPath expression"
+                        tabindex="-1">
+                        <xh:i class="fa fa-wand-magic-sparkles fa-fw"/>
+                    </xh:button>
+                </xsl:if>
+
             </xh:span>
         </xbl:template>
     </xbl:binding>

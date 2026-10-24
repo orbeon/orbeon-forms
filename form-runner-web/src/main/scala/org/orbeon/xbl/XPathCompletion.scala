@@ -3,7 +3,7 @@ package org.orbeon.xbl
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.web.{DomEventNames, DomSupport}
 import org.orbeon.web.DomSupport.DomElemOps
-import org.orbeon.xpath.formatter.XPathHighlighter
+import org.orbeon.xpath.formatter.{XPathFormatter, XPathHighlighter}
 import org.orbeon.xforms.facade.XBLCompanion
 import org.orbeon.xforms.{AjaxClient, AjaxEvent, EventListenerSupport, XFormsXbl}
 import org.scalajs.dom
@@ -55,6 +55,7 @@ object XPathCompletion {
     private var fieldElemOpt     : Option[dom.html.Element] = None
     private var backdropElemOpt  : Option[dom.html.Element] = None
     private var highlightsElemOpt: Option[dom.html.Element] = None
+    private var formatButtonOpt  : Option[dom.html.Element] = None
     private var valueOpt         : Option[String]           = None
     private var resizeObserverOpt: Option[ResizeObserver]   = None
 
@@ -73,6 +74,15 @@ object XPathCompletion {
 
       backdropElemOpt   = containerElem.querySelectorOpt(".fb-xpath-completion-backdrop")
       highlightsElemOpt = containerElem.querySelectorOpt(".fb-xpath-completion-highlights")
+      formatButtonOpt   = containerElem.querySelectorOpt(".fb-xpath-completion-format-button")
+
+      formatButtonOpt.foreach { formatButton =>
+        EventSupport.addListener(formatButton, "click", (event: dom.MouseEvent) => {
+          event.preventDefault()
+          event.stopPropagation()
+          reformatExpression()
+        })
+      }
 
       if (expander != null) {
         EventSupport.addListener(expander, "text-expander-change", (event: CustomEvent) => {
@@ -134,6 +144,15 @@ object XPathCompletion {
           (_: dom.Event) => updateOrClearHighlights()
         )
 
+        // Listen for reformat keyboard shortcut (Shift+Alt+F or Cmd/Ctrl+Option+L)
+        EventSupport.addListener(inputField, DomEventNames.KeyDown, (event: dom.KeyboardEvent) => {
+          if (isFormatShortcut(event)) {
+            event.preventDefault()
+            event.stopPropagation()
+            reformatExpression()
+          }
+        })
+
         // Mouseup on field in case user finishes resizing with native handle
         EventSupport.addListener(inputField, "mouseup", (_: dom.Event) => {
           updateSizeAndStyles()
@@ -192,8 +211,72 @@ object XPathCompletion {
       fieldElemOpt      = None
       backdropElemOpt   = None
       highlightsElemOpt = None
+      formatButtonOpt   = None
       valueOpt          = None
     }
+
+    private def isFormatShortcut(event: dom.KeyboardEvent): Boolean = {
+      val isShiftAltF = event.shiftKey && event.altKey && !event.ctrlKey && !event.metaKey &&
+        (event.key.equalsIgnoreCase("f") || event.keyCode == 70)
+      val isCtrlAltL = (event.ctrlKey || event.metaKey) && event.altKey && !event.shiftKey &&
+        (event.key.equalsIgnoreCase("l") || event.keyCode == 76)
+      isShiftAltF || isCtrlAltL
+    }
+
+    private def reformatExpression(): Unit =
+      if (!isMarkedReadonly) {
+        val isTextarea = fieldElemOpt.exists(_.isInstanceOf[dom.html.TextArea])
+        if (isTextarea) {
+          val currentValue = getFieldValue
+          if (currentValue.trimAllToOpt.nonEmpty) {
+            scala.util.Try(XPathFormatter.format(currentValue)) match {
+              case scala.util.Success(formatted) =>
+                if (formatted != currentValue)
+                  applyFormattedValue(formatted)
+              case scala.util.Failure(_) =>
+                flashFormatError()
+            }
+          }
+        }
+      }
+
+    private def applyFormattedValue(formatted: String): Unit =
+      fieldElemOpt.foreach { fieldElem =>
+        fieldElem.focus()
+        fieldElem match {
+          case ta: dom.html.TextArea => ta.select()
+          case in: dom.html.Input    => in.select()
+          case _                     =>
+        }
+
+        val execSuccess =
+          try {
+            dom.document.asInstanceOf[js.Dynamic].execCommand("insertText", false, formatted).asInstanceOf[Boolean]
+          } catch {
+            case _: Throwable => false
+          }
+
+        if (!execSuccess || getFieldValue != formatted) {
+          fieldElem match {
+            case ta: dom.html.TextArea => ta.value = formatted
+            case in: dom.html.Input    => in.value = formatted
+            case _                     =>
+          }
+          fieldElem.dispatchEvent(new dom.Event("input", new dom.EventInit { bubbles = true }))
+        }
+
+        valueOpt = Some(formatted)
+        DomSupport.dispatchChange(fieldElem)
+        updateOrClearHighlights(Some(formatted))
+      }
+
+    private def flashFormatError(): Unit =
+      formatButtonOpt.foreach { button =>
+        button.classList.add("fb-xpath-format-error")
+        dom.window.setTimeout(() => {
+          button.classList.remove("fb-xpath-format-error")
+        }, 1000)
+      }
 
     private def getFieldValue: String =
       fieldElemOpt match {

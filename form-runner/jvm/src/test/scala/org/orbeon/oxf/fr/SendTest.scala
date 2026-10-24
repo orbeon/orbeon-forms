@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.xforms.route.XFormsAssetServerRoute
 import org.scalatest.funspec.AnyFunSpecLike
 
 class SendTest
@@ -405,6 +406,40 @@ class SendTest
             assert(result.descendant("control-1.1").nonEmpty)
             assert(result.descendant("my-explanation").nonEmpty)
           }
+        }
+      }
+    }
+
+    it("must send a dynamic PDF URL when `content = \"pdf-url\"`") {
+
+      val (processorService, docOpt, _) =
+        runFormRunner("tests", "send-action", "new")
+
+      withTestExternalContext { implicit externalContext =>
+        withFormRunnerDocument(processorService, docOpt.get) {
+
+          XFormsAPI.dispatch(
+            name       = "my-run-process",
+            targetId   = Names.FormModel,
+            properties = Map(
+              "process" -> Some(
+                s"""
+                  send(
+                    uri     = "/fr/service/custom/orbeon/echo",
+                    content = "pdf-url",
+                    method  = "post",
+                    replace = "instance"
+                  )
+                """
+              )
+            )
+          )
+
+          val result = instance("fr-send-submission-response").get.rootElement
+          assert(result.localname == "url")
+          assert(!result.stringValue.startsWith("file:"))
+          assert(result.stringValue.matches("^/xforms-server/dynamic/[a-f0-9]+$"))
+          assert(XFormsAssetServerRoute.findDynamicResource(result.stringValue).isDefined)
         }
       }
     }

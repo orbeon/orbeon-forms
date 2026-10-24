@@ -373,12 +373,12 @@ object XFormsAssetServerRoute extends NativeRoute {
   // The mapping expires with the session.
   def proxyURI(
     urlString       : String,
-    filename        : Option[String],
-    contentType     : Option[String],
-    lastModified    : Long,
-    customHeaders   : Map[String, List[String]],
-    headersToForward: Set[String],
-    getHeader       : String => Option[List[String]]
+    filename        : Option[String]                 = None,
+    contentType     : Option[String]                 = None,
+    lastModified    : Long                           = -1,
+    customHeaders   : Map[String, List[String]]      = Map.empty,
+    headersToForward: Set[String]                    = Set.empty,
+    getHeader       : String => Option[List[String]] = _ => None
   )(implicit
     logger          : IndentedLogger
   ): Option[URI] = {
@@ -425,15 +425,10 @@ object XFormsAssetServerRoute extends NativeRoute {
   // 2015-09-21: Only used by FileSerializer.
   def jProxyURI(urlString: String, contentType: String): String =
     proxyURI(
-      urlString        = urlString,
-      filename         = None,
-      contentType      = Option(contentType),
-      lastModified     = -1,
-      customHeaders    = Map.empty,
-      headersToForward = Set.empty,
-      getHeader        = _ => None
+      urlString   = urlString,
+      contentType = Option(contentType)
     )(
-      logger           = null
+      logger      = null
     )
     .map(_.toString)
     .getOrElse("")

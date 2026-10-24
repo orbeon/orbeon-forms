@@ -513,7 +513,23 @@ trait FormRunnerActions
     // If submitting binary (from the `xf:submission`'s point of view) find the URL
     // For rendered formats, if there are multiple of them, we fall under the multipart case
     def binaryContentUrlOpt =
-      multipartTmpFileUriOpt.orElse(renderedFormatTmpFileUris.headOption).map(_._1)
+      multipartTmpFileUriOpt
+        .map(_._1)
+        .orElse {
+          renderedFormatTmpFileUris.headOption.flatMap { case (uri, format) =>
+            val isUrlOnly = contentToSend match {
+              case ContentToSend.Single(ContentToken.Rendered(_, true)) => true
+              case _                                                    => false
+            }
+            if (isUrlOnly && uri.getScheme == "file")
+              XFormsAssetServerRoute.proxyURI(
+                urlString   = uri.toString,
+                contentType = RenderedFormat.SupportedRenderFormatsMediatypes(format).some
+              )
+            else
+              uri.some
+          }
+        }
 
     // Add the `boundary` parameter to the mediatype if needed
     def multipartContentTypeOpt =

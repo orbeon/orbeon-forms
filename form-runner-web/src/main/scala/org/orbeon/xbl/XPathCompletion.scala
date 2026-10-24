@@ -56,6 +56,7 @@ object XPathCompletion {
     private var backdropElemOpt  : Option[dom.html.Element] = None
     private var highlightsElemOpt: Option[dom.html.Element] = None
     private var formatButtonOpt  : Option[dom.html.Element] = None
+    private var copyButtonOpt    : Option[dom.html.Element] = None
     private var valueOpt         : Option[String]           = None
     private var resizeObserverOpt: Option[ResizeObserver]   = None
 
@@ -75,12 +76,27 @@ object XPathCompletion {
       backdropElemOpt   = containerElem.querySelectorOpt(".fb-xpath-completion-backdrop")
       highlightsElemOpt = containerElem.querySelectorOpt(".fb-xpath-completion-highlights")
       formatButtonOpt   = containerElem.querySelectorOpt(".fb-xpath-completion-format-button")
+      copyButtonOpt     = containerElem.querySelectorOpt(".fb-xpath-completion-copy-button")
 
       formatButtonOpt.foreach { formatButton =>
+        EventSupport.addListener(formatButton, "mousedown", (event: dom.MouseEvent) => {
+          event.preventDefault()
+        })
         EventSupport.addListener(formatButton, "click", (event: dom.MouseEvent) => {
           event.preventDefault()
           event.stopPropagation()
           reformatExpression()
+        })
+      }
+
+      copyButtonOpt.foreach { copyButton =>
+        EventSupport.addListener(copyButton, "mousedown", (event: dom.MouseEvent) => {
+          event.preventDefault()
+        })
+        EventSupport.addListener(copyButton, "click", (event: dom.MouseEvent) => {
+          event.preventDefault()
+          event.stopPropagation()
+          copyExpression()
         })
       }
 
@@ -212,6 +228,7 @@ object XPathCompletion {
       backdropElemOpt   = None
       highlightsElemOpt = None
       formatButtonOpt   = None
+      copyButtonOpt     = None
       valueOpt          = None
     }
 
@@ -272,6 +289,80 @@ object XPathCompletion {
 
     private def flashFormatError(): Unit =
       formatButtonOpt.foreach { button =>
+        button.classList.add("fb-xpath-format-error")
+        dom.window.setTimeout(() => {
+          button.classList.remove("fb-xpath-format-error")
+        }, 1000)
+      }
+
+    private val DefaultCopyTitle = "Copy to clipboard"
+
+    private def copyExpression(): Unit = {
+      val value = getFieldValue
+      copyToClipboard(
+        value,
+        onSuccess = () => flashCopySuccess(),
+        onFailure = () => flashCopyError()
+      )
+    }
+
+    private def copyToClipboard(text: String, onSuccess: () => Unit, onFailure: () => Unit): Unit = {
+      val nav = dom.window.navigator.asInstanceOf[js.Dynamic]
+      val hasClipboardApi =
+        !js.isUndefined(nav) &&
+        !js.isUndefined(nav.clipboard) &&
+        !js.isUndefined(nav.clipboard.writeText)
+
+      if (hasClipboardApi) {
+        nav.clipboard.writeText(text).asInstanceOf[js.Promise[Unit]].toFuture.onComplete {
+          case scala.util.Success(_) =>
+            onSuccess()
+          case scala.util.Failure(_) =>
+            if (copyViaExecCommand(text)) onSuccess()
+            else onFailure()
+        }
+      } else {
+        if (copyViaExecCommand(text)) onSuccess()
+        else onFailure()
+      }
+    }
+
+    private def copyViaExecCommand(text: String): Boolean =
+      try {
+        val textarea = dom.document.createElement("textarea").asInstanceOf[dom.html.TextArea]
+        textarea.value = text
+        textarea.style.position = "fixed"
+        textarea.style.left = "-9999px"
+        textarea.style.top = "-9999px"
+        dom.document.body.appendChild(textarea)
+        textarea.focus()
+        textarea.select()
+        val success = dom.document.asInstanceOf[js.Dynamic].execCommand("copy").asInstanceOf[Boolean]
+        dom.document.body.removeChild(textarea)
+        success
+      } catch {
+        case _: Throwable => false
+      }
+
+    private def flashCopySuccess(): Unit =
+      copyButtonOpt.foreach { button =>
+        button.title = "Copied!"
+        button.classList.add("fb-xpath-copy-success")
+        val iconElemOpt = Option(button.querySelector("i"))
+        iconElemOpt.foreach { icon =>
+          icon.setAttribute("class", "fa fa-check fa-fw")
+        }
+        dom.window.setTimeout(() => {
+          button.title = DefaultCopyTitle
+          button.classList.remove("fb-xpath-copy-success")
+          iconElemOpt.foreach { icon =>
+            icon.setAttribute("class", "fa fa-copy fa-fw")
+          }
+        }, 1500)
+      }
+
+    private def flashCopyError(): Unit =
+      copyButtonOpt.foreach { button =>
         button.classList.add("fb-xpath-format-error")
         dom.window.setTimeout(() => {
           button.classList.remove("fb-xpath-format-error")

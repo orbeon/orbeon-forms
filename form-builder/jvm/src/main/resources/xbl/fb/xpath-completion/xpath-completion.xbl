@@ -60,14 +60,24 @@
                 </xh:text-expander>
 
                 <xsl:if test="local-name(/*) = 'textarea'">
-                    <xh:button
-                        type="button"
-                        class="fb-xpath-completion-format-button"
-                        title="Format XPath expression (Shift+Alt+F)"
-                        aria-label="Format XPath expression"
-                        tabindex="-1">
-                        <xh:i class="fa fa-wand-magic-sparkles fa-fw"/>
-                    </xh:button>
+                    <xh:div class="fb-xpath-completion-buttons">
+                        <xh:button
+                            type="button"
+                            class="fb-xpath-completion-format-button"
+                            title="Format XPath expression (Shift+Alt+F)"
+                            aria-label="Format XPath expression"
+                            tabindex="-1">
+                            <xh:i class="fa fa-wand-magic-sparkles fa-fw"/>
+                        </xh:button>
+                        <xh:button
+                            type="button"
+                            class="fb-xpath-completion-copy-button"
+                            title="Copy to clipboard"
+                            aria-label="Copy to clipboard"
+                            tabindex="-1">
+                            <xh:i class="fa fa-copy fa-fw"/>
+                        </xh:button>
+                    </xh:div>
                 </xsl:if>
 
             </xh:span>

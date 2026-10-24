@@ -4,9 +4,14 @@
   .xbl-fb-xpath-completion {
     display: contents;
 
-    &.xforms-readonly,
-    &.xforms-disabled {
+    &.xforms-readonly {
       .fb-xpath-completion-format-button {
+        display: none;
+      }
+    }
+
+    &.xforms-disabled {
+      .fb-xpath-completion-buttons {
         display: none;
       }
     }
@@ -16,44 +21,56 @@
       display: inline-block;
       width: 100%;
 
-      & > .fb-xpath-completion-format-button {
+      & > .fb-xpath-completion-buttons {
         position: absolute;
         top: 6px;
         right: 8px;
         z-index: 3;
-        width: 22px;
-        height: 22px;
-        padding: 0;
         display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid var(--orbeon-border-color, #ced4da);
-        border-radius: var(--orbeon-add-on-border-radius, 4px);
-        background-color: var(--orbeon-input-bg, #ffffff);
-        color: var(--orbeon-fb-placeholder-color, #6c757d);
-        cursor: pointer;
-        opacity: 0.4;
-        font-size: 11px;
-        line-height: 1;
-        transition: opacity 0.2s ease, color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+        flex-direction: column;
+        gap: 4px;
 
-        &:hover, &:focus {
-          opacity: 1;
-          color: var(--orbeon-base-color, #212529);
-          border-color: var(--orbeon-focus-border-color, #86b7fe);
+        & > button {
+          width: 22px;
+          height: 22px;
+          padding: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid var(--orbeon-border-color, #ced4da);
+          border-radius: var(--orbeon-add-on-border-radius, 4px);
           background-color: var(--orbeon-input-bg, #ffffff);
-          outline: none;
-        }
+          color: var(--orbeon-fb-placeholder-color, #6c757d);
+          cursor: pointer;
+          opacity: 0.4;
+          font-size: 11px;
+          line-height: 1;
+          transition: opacity 0.2s ease, color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 
-        &.fb-xpath-format-error {
-          color: var(--orbeon-error-color, #dc3545) !important;
-          border-color: var(--orbeon-error-color, #dc3545) !important;
-          opacity: 1 !important;
+          &:hover, &:focus {
+            opacity: 1;
+            color: var(--orbeon-base-color, #212529);
+            border-color: var(--orbeon-focus-border-color, #86b7fe);
+            background-color: var(--orbeon-input-bg, #ffffff);
+            outline: none;
+          }
+
+          &.fb-xpath-format-error {
+            color: var(--orbeon-error-color, #dc3545) !important;
+            border-color: var(--orbeon-error-color, #dc3545) !important;
+            opacity: 1 !important;
+          }
+
+          &.fb-xpath-copy-success {
+            color: var(--orbeon-success-color, #198754) !important;
+            border-color: var(--orbeon-success-color, #198754) !important;
+            opacity: 1 !important;
+          }
         }
       }
 
-      &:hover > .fb-xpath-completion-format-button,
-      &:focus-within > .fb-xpath-completion-format-button {
+      &:hover > .fb-xpath-completion-buttons > button,
+      &:focus-within > .fb-xpath-completion-buttons > button {
         opacity: 0.8;
       }
 

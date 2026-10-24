@@ -133,7 +133,7 @@ class XPathFormatter(val options: XPathFormatterOptions = XPathFormatterOptions.
 
       val returnLineSpans: List[Span] =
         if (returnBodyText.contains("\n")) {
-          List(pl(indent(returnLevel)), kw("return"), pl(nl), pl(indent(returnLevel + 1))) ::: returnBodySpans
+          List(pl(indent(returnLevel)), kw("return"), pl(nl)) ::: ensureIndented(returnBodySpans, returnLevel + 1)
         } else {
           List(pl(indent(returnLevel)), kw("return"), pl(" ")) ::: returnBodySpans
         }
@@ -169,10 +169,16 @@ class XPathFormatter(val options: XPathFormatterOptions = XPathFormatterOptions.
   private def formatFlworClause(clause: FlworClause, level: Int): List[List[Span]] = clause match {
     case ForClause(bindings) =>
       if (options.flworVariablePerLine && bindings.length > 1) {
-        val first = (pl(indent(level)) :: kw("for") :: pl(" ") :: vr(bindings.head.varName) :: pl(" ") :: kw("in") :: pl(" ") :: formatExprSpans(bindings.head.expr, level + 2)) :+ punc(",")
+        val maxVarLen = if (options.flworAlignBindings) bindings.map(_.varName.length).max else 0
+        def padSpaces(varName: String): String =
+          if (options.flworAlignBindings) " " * (1 + (maxVarLen - varName.length))
+          else " "
+
+        val contIndent = indent(level) + "    "
+        val first = (pl(indent(level)) :: kw("for") :: pl(" ") :: vr(bindings.head.varName) :: pl(padSpaces(bindings.head.varName)) :: kw("in") :: pl(" ") :: formatExprSpans(bindings.head.expr, level + 2)) :+ punc(",")
         val rest = bindings.tail.zipWithIndex.map { case (b, idx) =>
           val isLast = idx == bindings.length - 2
-          val base = pl(indent(level + 2)) :: vr(b.varName) :: pl(" ") :: kw("in") :: pl(" ") :: formatExprSpans(b.expr, level + 2)
+          val base = pl(contIndent) :: vr(b.varName) :: pl(padSpaces(b.varName)) :: kw("in") :: pl(" ") :: formatExprSpans(b.expr, level + 2)
           if (isLast) base else base :+ punc(",")
         }
         first :: rest
@@ -185,10 +191,16 @@ class XPathFormatter(val options: XPathFormatterOptions = XPathFormatterOptions.
 
     case LetClause(bindings) =>
       if (options.flworVariablePerLine && bindings.length > 1) {
-        val first = (pl(indent(level)) :: kw("let") :: pl(" ") :: vr(bindings.head.varName) :: pl(" ") :: op(":=") :: pl(" ") :: formatExprSpans(bindings.head.expr, level + 2)) :+ punc(",")
+        val maxVarLen = if (options.flworAlignBindings) bindings.map(_.varName.length).max else 0
+        def padSpaces(varName: String): String =
+          if (options.flworAlignBindings) " " * (1 + (maxVarLen - varName.length))
+          else " "
+
+        val contIndent = indent(level) + "    "
+        val first = (pl(indent(level)) :: kw("let") :: pl(" ") :: vr(bindings.head.varName) :: pl(padSpaces(bindings.head.varName)) :: op(":=") :: pl(" ") :: formatExprSpans(bindings.head.expr, level + 2)) :+ punc(",")
         val rest = bindings.tail.zipWithIndex.map { case (b, idx) =>
           val isLast = idx == bindings.length - 2
-          val base = pl(indent(level + 2)) :: vr(b.varName) :: pl(" ") :: op(":=") :: pl(" ") :: formatExprSpans(b.expr, level + 2)
+          val base = pl(contIndent) :: vr(b.varName) :: pl(padSpaces(b.varName)) :: op(":=") :: pl(" ") :: formatExprSpans(b.expr, level + 2)
           if (isLast) base else base :+ punc(",")
         }
         first :: rest
@@ -247,42 +259,93 @@ class XPathFormatter(val options: XPathFormatterOptions = XPathFormatterOptions.
 
   // If Formatting
   private def formatIf(cond: Expr, thenExpr: Expr, elseExpr: Expr, level: Int): List[Span] = {
-    val condSpans = formatExprSpans(cond, level)
-    val thenSpans = formatExprSpans(thenExpr, level + 1)
-    val elseSpans = formatExprSpans(elseExpr, level + 1)
-
-    val inline = List(kw("if"), pl(" "), punc("(")) ::: condSpans ::: List(punc(")"), pl(" "), kw("then"), pl(" ")) ::: thenSpans ::: List(pl(" "), kw("else"), pl(" ")) ::: elseSpans
+    val (branches, finalElse) = collectIfBranches(IfExpr(cond, thenExpr, elseExpr))
+    val inline = formatIfInline(branches, finalElse)
     val inlineText = inline.toPlainText
 
     if (options.ifStyle == IfStyle.Inline || (inlineText.length <= options.ifInlineThreshold && !inlineText.contains("\n"))) {
       inline
     } else options.ifStyle match {
       case IfStyle.ClausePerLine =>
-        List(
-          pl(indent(level)), kw("if"), pl(" "), punc("(")
-        ) ::: condSpans ::: List(
-          punc(")"), pl(nl),
-          pl(indent(level)), kw("then"), pl(" ")
-        ) ::: thenSpans ::: List(
+        val branchSpans = branches.zipWithIndex.flatMap { case ((bCond, bThen), idx) =>
+          val prefix =
+            if (idx == 0) List(pl(indent(level)), kw("if"), pl(" "), punc("("))
+            else List(pl(nl), pl(indent(level)), kw("else"), pl(" "), kw("if"), pl(" "), punc("("))
+          val condSpans = formatExprSpans(bCond, level)
+          val thenSpans = formatExprSpans(bThen, level + 1)
+          prefix ::: condSpans ::: List(
+            punc(")"), pl(nl),
+            pl(indent(level)), kw("then"), pl(" ")
+          ) ::: thenSpans
+        }
+        val elseSpans = formatExprSpans(finalElse, level + 1)
+        val elseBranchSpans = List(
           pl(nl),
           pl(indent(level)), kw("else"), pl(" ")
         ) ::: elseSpans
+        branchSpans ::: elseBranchSpans
 
       case _ => // MultiLine
-        val thenFormatted: List[Span] =
-          if (thenSpans.toPlainText.contains("\n")) thenSpans
-          else pl(indent(level + 1)) :: thenSpans
-        val elseFormatted: List[Span] =
-          if (elseSpans.toPlainText.contains("\n")) elseSpans
-          else pl(indent(level + 1)) :: elseSpans
-
-        List(
-          pl(indent(level)), kw("if"), pl(" "), punc("(")
-        ) ::: condSpans ::: List(
-          punc(")"), pl(" "), kw("then"), pl(nl)
-        ) ::: thenFormatted ::: List(
+        val branchSpans = branches.zipWithIndex.flatMap { case ((bCond, bThen), idx) =>
+          val prefix =
+            if (idx == 0) List(pl(indent(level)), kw("if"), pl(" "), punc("("))
+            else List(pl(nl), pl(indent(level)), kw("else"), pl(" "), kw("if"), pl(" "), punc("("))
+          val condSpans = formatExprSpans(bCond, level)
+          val thenSpans = formatExprSpans(bThen, level + 1)
+          prefix ::: condSpans ::: List(
+            punc(")"), pl(" "), kw("then"), pl(nl)
+          ) ::: ensureIndented(thenSpans, level + 1)
+        }
+        val elseSpans = formatExprSpans(finalElse, level + 1)
+        val elseBranchSpans = List(
           pl(nl), pl(indent(level)), kw("else"), pl(nl)
-        ) ::: elseFormatted
+        ) ::: ensureIndented(elseSpans, level + 1)
+
+        branchSpans ::: elseBranchSpans
+    }
+  }
+
+  private def collectIfBranches(ifExpr: IfExpr): (List[(Expr, Expr)], Expr) = {
+    val branches = ListBuffer[(Expr, Expr)]()
+    var current: Expr = ifExpr
+    var done = false
+    while (!done) {
+      current match {
+        case IfExpr(cond, thenExpr, elseExpr) =>
+          branches += ((cond, thenExpr))
+          current = elseExpr
+        case other =>
+          done = true
+      }
+    }
+    (branches.toList, current)
+  }
+
+  private def formatIfInline(branches: List[(Expr, Expr)], finalElse: Expr): List[Span] = {
+    val branchSpans = branches.zipWithIndex.flatMap { case ((cond, thenExpr), idx) =>
+      val prefix =
+        if (idx == 0) List(kw("if"), pl(" "))
+        else List(pl(" "), kw("else"), pl(" "), kw("if"), pl(" "))
+      val condSpans = formatExprSpans(cond, 0)
+      val thenSpans = formatExprSpans(thenExpr, 0)
+      prefix ::: (punc("(") :: condSpans ::: List(punc(")"), pl(" "), kw("then"), pl(" ")) ::: thenSpans)
+    }
+    val elseSpans = formatExprSpans(finalElse, 0)
+    branchSpans ::: List(pl(" "), kw("else"), pl(" ")) ::: elseSpans
+  }
+
+  private def ensureIndented(spans: List[Span], level: Int): List[Span] = {
+    if (spans.isEmpty) Nil
+    else {
+      val cleanSpans = spans.dropWhile(s => s.tokenType == XPathTokenType.Plain && s.text.isEmpty)
+      cleanSpans match {
+        case Span(text, XPathTokenType.Plain) :: rest if text.nonEmpty && text.forall(c => c == ' ' || c == '\t') =>
+          if (level > 0) pl(indent(level)) :: rest
+          else rest
+        case _ =>
+          if (level > 0) pl(indent(level)) :: cleanSpans
+          else cleanSpans
+      }
     }
   }
 
@@ -459,7 +522,7 @@ class XPathFormatter(val options: XPathFormatterOptions = XPathFormatterOptions.
 
     val prefix = kw("function") :: punc("(") :: paramsSpans ::: (punc(")") :: retSpans) ::: List(pl(" "), punc("{"))
     if (bodyText.contains("\n")) {
-      prefix ::: List(pl(nl), pl(indent(level + 1))) ::: bodySpans ::: List(pl(nl), pl(indent(level)), punc("}"))
+      prefix ::: List(pl(nl)) ::: ensureIndented(bodySpans, level + 1) ::: List(pl(nl), pl(indent(level)), punc("}"))
     } else {
       prefix ::: List(pl(" ")) ::: bodySpans ::: List(pl(" "), punc("}"))
     }

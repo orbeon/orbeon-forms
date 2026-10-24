@@ -19,7 +19,7 @@ class XPathFormatterTest extends AnyFunSpec with Matchers {
       val expected =
         """for $x in 1 to 10,
           |    $y in 1 to 10
-          |let $sum := $x + $y,
+          |let $sum  := $x + $y,
           |    $prod := $x * $y
           |return $sum + $prod""".stripMargin
       formatted shouldBe expected
@@ -44,6 +44,80 @@ class XPathFormatterTest extends AnyFunSpec with Matchers {
       val expected =
         """let $x := 10
           |  return $x * 2""".stripMargin
+      formatted shouldBe expected
+    }
+
+    it("formats FLWOR returning multi-line chained conditional expression") {
+      val input =
+        """for $start in $first-date,
+          |    $end in $second-date,
+          |    $startW in xs:integer(format-date($start, '[F1]')),
+          |    $endW in xs:integer(format-date($end, '[F1]')),
+          |    $days in days-from-duration($end - $start),
+          |    $daysNoWeekends in $days - (floor($days div 7) * 2)
+          |return
+          |    if ($days mod 7 != 0 and ($startW = 7 or $endW = 7)) then
+          |    $daysNoWeekends - 1
+          |  else
+          |    if ($endW < $startW) then
+          |      $daysNoWeekends - 2
+          |    else
+          |      $daysNoWeekends""".stripMargin
+      val formatted = XPathFormatter.format(input)
+      val expected =
+        """for $start          in $first-date,
+          |    $end            in $second-date,
+          |    $startW         in xs:integer(format-date($start, '[F1]')),
+          |    $endW           in xs:integer(format-date($end, '[F1]')),
+          |    $days           in days-from-duration($end - $start),
+          |    $daysNoWeekends in $days - (floor($days div 7) * 2)
+          |return
+          |  if ($days mod 7 != 0 and ($startW = 7 or $endW = 7)) then
+          |    $daysNoWeekends - 1
+          |  else if ($endW < $startW) then
+          |    $daysNoWeekends - 2
+          |  else
+          |    $daysNoWeekends""".stripMargin
+      formatted shouldBe expected
+    }
+
+    it("vertically aligns := in multi-variable let clauses") {
+      val input = "let $short := 1, $longerVariable := 2, $mid := 3 return $short + $longerVariable + $mid"
+      val options = XPathFormatterOptions.default.copy(flworInlineThreshold = 10)
+      val formatted = XPathFormatter.format(input, options)
+      val expected =
+        """let $short          := 1,
+          |    $longerVariable := 2,
+          |    $mid            := 3
+          |return $short + $longerVariable + $mid""".stripMargin
+      formatted shouldBe expected
+    }
+
+    it("formats FLWOR without aligning bindings when flworAlignBindings is false") {
+      val input =
+        """for $start in $first-date,
+          |    $end in $second-date,
+          |    $daysNoWeekends in $days
+          |return $daysNoWeekends""".stripMargin
+      val options = XPathFormatterOptions.default.copy(flworAlignBindings = false)
+      val formatted = XPathFormatter.format(input, options)
+      val expected =
+        """for $start in $first-date,
+          |    $end in $second-date,
+          |    $daysNoWeekends in $days
+          |return $daysNoWeekends""".stripMargin
+      formatted shouldBe expected
+    }
+
+    it("formats nested FLWOR expressions with correct indentation") {
+      val input = "for $x in 1 to 2 return for $y in 1 to 2 return $x * $y"
+      val options = XPathFormatterOptions.default.copy(flworInlineThreshold = 10)
+      val formatted = XPathFormatter.format(input, options)
+      val expected =
+        """for $x in 1 to 2
+          |return
+          |  for $y in 1 to 2
+          |  return $x * $y""".stripMargin
       formatted shouldBe expected
     }
   }
@@ -75,6 +149,40 @@ class XPathFormatterTest extends AnyFunSpec with Matchers {
         """if ($valid)
           |then $successMessage
           |else $errorMessage""".stripMargin
+      formatted shouldBe expected
+    }
+
+    it("formats chained else-if expressions") {
+      val input =
+        """if ($x > 0) then
+          |  'positive'
+          |else
+          |  if ($x < 0) then
+          |    'negative'
+          |  else
+          |    'zero'""".stripMargin
+      val options = XPathFormatterOptions.default.copy(ifInlineThreshold = 10)
+      val formatted = XPathFormatter.format(input, options)
+      val expected =
+        """if ($x > 0) then
+          |  'positive'
+          |else if ($x < 0) then
+          |  'negative'
+          |else
+          |  'zero'""".stripMargin
+      formatted shouldBe expected
+    }
+
+    it("formats chained else-if in ClausePerLine style") {
+      val input = "if ($x > 0) then 1 else if ($x < 0) then -1 else 0"
+      val options = XPathFormatterOptions.default.copy(ifInlineThreshold = 10, ifStyle = IfStyle.ClausePerLine)
+      val formatted = XPathFormatter.format(input, options)
+      val expected =
+        """if ($x > 0)
+          |then 1
+          |else if ($x < 0)
+          |then -1
+          |else 0""".stripMargin
       formatted shouldBe expected
     }
   }

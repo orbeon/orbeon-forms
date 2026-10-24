@@ -62,6 +62,8 @@ object QuotePreference {
  *                                       on a new line (default: true).
  * @param flworVariablePerLine           In multi-variable `for` or `let` clauses (e.g. `let $a := 1, $b := 2`),
  *                                       put each variable binding on its own line (default: true).
+ * @param flworAlignBindings             In multi-variable `for` and `let` clauses, vertically align the `in`
+ *                                       and `:=` operators across bindings (default: true).
  * @param flworIndentReturn              Whether the `return` clause should be indented relative to the `for`/`let`
  *                                       clauses (default: false).
  * @param flworInlineThreshold           Maximum length for a short FLWOR expression to be kept inline on a single line (default: 40).
@@ -103,6 +105,7 @@ case class XPathFormatterOptions(
 
   flworClauseOnNewline: Boolean       = true,
   flworVariablePerLine: Boolean       = true,
+  flworAlignBindings: Boolean         = true,
   flworIndentReturn: Boolean          = false,
   flworInlineThreshold: Int           = 40,
 

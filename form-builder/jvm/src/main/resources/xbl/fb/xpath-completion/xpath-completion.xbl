@@ -16,7 +16,7 @@
                 fb|xpath-completion,
                 xf|input[appearance ~= xpath-completion],
                 xf|textarea[appearance ~= xpath-completion]"
-            xxbl:mode="binding lhha value javascript-lifecycle allow-minimal-label-hint"
+            xxbl:mode="binding lhha value external-value javascript-lifecycle allow-minimal-label-hint"
             xxbl:label-for="field"
             xxbl:container="span"
             xxf:external-events="fb-query-completions">
@@ -44,6 +44,10 @@
                 <xf:var
                     name="binding"
                     value="xxf:binding('fb-xpath-completion')"/>
+
+                <xh:div class="fb-xpath-completion-backdrop" aria-hidden="true">
+                    <xh:div class="fb-xpath-completion-highlights"/>
+                </xh:div>
 
                 <xh:text-expander keys="$" suffix="">
                     <xsl:element name="{name(/*)}">

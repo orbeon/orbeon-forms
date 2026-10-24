@@ -970,6 +970,22 @@ lazy val formRunnerClientServerJS = formRunnerClientServer.js
     Compile / unmanagedClasspath := Nil
   )
 
+lazy val xpathFormatter = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) in file("xpath-formatter"))
+  .settings(scala2CommonSettings*)
+  .settings(
+    name := "orbeon-xpath-formatter"
+  )
+
+lazy val xpathFormatterJVM = xpathFormatter.jvm
+
+lazy val xpathFormatterJS = xpathFormatter.js
+  .settings(commonScalaJsSettings)
+  .settings(
+    Test / jsEnv                 := new org.scalajs.jsenv.nodejs.NodeJSEnv(),
+    Compile / unmanagedJars      := Nil,
+    Compile / unmanagedClasspath := Nil
+  )
+
 lazy val formRunnerWeb = (project in file("form-runner-web"))
   .settings(scala2CommonSettings*)
   .settings(
@@ -980,7 +996,8 @@ lazy val formRunnerWeb = (project in file("form-runner-web"))
     xformsWeb % "test->test;compile->compile",
     webFacades,
     formRunnerClientServerJS,
-    contentFilterJS
+    contentFilterJS,
+    xpathFormatterJS
   )
   .settings(commonScalaJsSettings)
   .enablePlugins(JSDependenciesPlugin)
@@ -1004,21 +1021,6 @@ lazy val formRunnerWeb = (project in file("form-runner-web"))
       (ThisBuild/ baseDirectory).value,
       FormRunnerResourcesPathInWar
     )
-  )
-
-lazy val xpathFormatter = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) in file("xpath-formatter"))
-  .settings(scala2CommonSettings*)
-  .settings(
-    name := "orbeon-xpath-formatter"
-  )
-
-lazy val xpathFormatterJVM = xpathFormatter.jvm
-
-lazy val xpathFormatterJS = xpathFormatter.js
-  .settings(commonScalaJsSettings)
-  .settings(
-    Compile / unmanagedJars      := Nil,
-    Compile / unmanagedClasspath := Nil
   )
 
 lazy val formBuilder = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("form-builder"))

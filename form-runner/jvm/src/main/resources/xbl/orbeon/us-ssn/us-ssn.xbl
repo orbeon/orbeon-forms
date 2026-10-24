@@ -63,6 +63,12 @@
                     </fr:us-ssn>
                 </view>
             </templates>
+            <custom-settings>
+                <setting name="edit-format" type="xs:string" values="visible obscured reveal"/>
+                <setting name="view-format" type="xs:string" values="visible obscured partial"/>
+                <setting name="pdf-format" type="xs:string" values="visible obscured partial"/>
+                <setting name="pdf-template-format" type="xs:string" values="visible obscured partial"/>
+            </custom-settings>
             <control-details>
                 <xf:model xmlns="" id="fb-editor-us-snn-model">
 

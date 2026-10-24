@@ -82,6 +82,9 @@
                 </view>
             </templates>
             <!-- TODO: This is duplicated from `dropdown-select1.xbl` except for one line (`dropdown` vs. `search`) -->
+            <custom-settings>
+                <setting name="fr:pdf-appearance" type="xs:string" values="search full"/>
+            </custom-settings>
             <control-details>
                 <xf:model xmlns="" id="fb-editor-dropdown-select1-model">
 

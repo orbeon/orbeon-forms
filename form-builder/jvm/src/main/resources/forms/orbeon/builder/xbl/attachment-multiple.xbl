@@ -44,6 +44,11 @@
                     </fr:attachment>
                 </view>
             </templates>
+            <custom-settings>
+                <setting name="allow-download" type="xs:boolean" default="true"/>
+                <setting name="show-size" type="xs:boolean" default="true"/>
+                <setting name="upload-error-appearance" type="xs:string" values="dialog inline"/>
+            </custom-settings>
         </metadata>
     </xbl:binding>
 </xbl:xbl>

@@ -106,6 +106,19 @@
                 <!--href="/xbl/orbeon/number/number.xbl"-->
                 <!--xpointer="xpath(/xbl:xbl/xbl:binding/fb:metadata/fb:control-details)"/>-->
             <!-- So all this is duplicated from `fr:number` for now. -->
+            <custom-settings>
+                <setting name="prefix" type="xs:string"/>
+                <setting name="suffix" type="xs:string"/>
+                <setting name="decimal-separator" type="xs:string" max-length="1"/>
+                <setting name="grouping-separator" type="xs:string" max-length="1"/>
+                <setting name="digits-after-decimal" type="xs:integer" min="0"/>
+                <setting name="round-when-formatting" type="xs:boolean"/>
+                <setting name="round-when-storing" type="xs:boolean"/>
+                <setting name="field-width" type="xs:string" values="full natural"/>
+                <setting name="field-align" type="xs:string" values="left right"/>
+                <constraint test="empty(decimal-separator) or empty(grouping-separator) or decimal-separator != grouping-separator"
+                            message="Decimal and grouping separators must be different"/>
+            </custom-settings>
             <control-details>
                 <xf:model xmlns="" id="fb-editor-number-model">
 

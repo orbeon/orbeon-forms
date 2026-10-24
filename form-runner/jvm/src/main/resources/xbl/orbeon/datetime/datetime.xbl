@@ -58,6 +58,9 @@
                     </fr:datetime>
                 </view>
             </templates>
+            <custom-settings>
+                <setting name="field-width" type="xs:string" values="full natural"/>
+            </custom-settings>
             <control-details>
                 <xf:model xmlns="" id="fb-editor-datetime-model">
 

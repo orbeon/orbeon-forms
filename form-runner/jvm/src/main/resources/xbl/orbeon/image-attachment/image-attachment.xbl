@@ -58,7 +58,12 @@
                     </fr:image-attachment>
                 </view>
             </templates>
-
+            <custom-settings>
+                <setting name="transform-max-width" type="xs:integer" min="1"/>
+                <setting name="transform-max-height" type="xs:integer" min="1"/>
+                <setting name="transform-quality" type="xs:integer" min="1" max="100"/>
+                <setting name="transform-format" type="xs:string" values="jpg png"/>
+            </custom-settings>
             <control-details>
                 <xf:model xmlns="">
 

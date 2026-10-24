@@ -66,6 +66,11 @@
                     </fr:time>
                 </view>
             </templates>
+            <custom-settings>
+                <setting name="field-width" type="xs:string" values="full natural"/>
+                <setting name="native-picker" type="xs:string" values="ios always"/>
+                <setting name="output-format" type="xs:string"/>
+            </custom-settings>
             <control-details>
                 <xf:model xmlns="" id="fb-editor-time-model">
 

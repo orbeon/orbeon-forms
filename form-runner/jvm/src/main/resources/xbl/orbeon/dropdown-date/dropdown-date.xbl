@@ -59,6 +59,10 @@
                     </fr:dropdown-date>
                 </view>
             </templates>
+            <custom-settings>
+                <setting name="start-year" type="xs:string"/>
+                <setting name="end-year" type="xs:string"/>
+            </custom-settings>
             <control-details>
                 <xf:model xmlns="">
 

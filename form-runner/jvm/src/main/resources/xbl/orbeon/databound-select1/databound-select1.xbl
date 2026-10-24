@@ -65,6 +65,13 @@
                     </fr:databound-select1>
                 </view>
             </templates>
+            <custom-settings>
+                <setting name="resource" type="xs:string"/>
+                <setting name="items" type="xs:string" ref="xf:itemset/@ref"/>
+                <setting name="item-label" type="xs:string" ref="xf:itemset/xf:label/@ref"/>
+                <setting name="item-value" type="xs:string" ref="xf:itemset/xf:value/@ref"/>
+                <setting name="item-hint" type="xs:string" ref="xf:itemset/xf:hint/@ref"/>
+            </custom-settings>
             <control-details>
                 <xf:model>
                     <xf:bind ref="@resource"/>

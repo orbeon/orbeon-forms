@@ -87,6 +87,19 @@
                     </fr:databound-select1>
                 </view>
             </templates>
+            <custom-settings>
+                <setting name="fb:selection" type="xs:string"/>
+                <setting name="service-performs-search" type="xs:boolean"/>
+                <setting name="service-supports-paging" type="xs:boolean"/>
+                <setting name="resource" type="xs:string"/>
+                <setting name="is-last-page" type="xs:string"/>
+                <setting name="items" type="xs:string" ref="xf:itemset/@ref"/>
+                <setting name="item-label" type="xs:string" ref="xf:itemset/xf:label/@ref"/>
+                <setting name="item-value" type="xs:string" ref="xf:itemset/xf:value/@ref"/>
+                <setting name="item-hint" type="xs:string" ref="xf:itemset/xf:hint/@ref"/>
+                <setting name="auto-select-unique-choice" type="xs:boolean"/>
+                <setting name="store-label" type="xs:boolean"/>
+            </custom-settings>
             <control-details>
                 <xf:model>
                     <xf:var name="control" value="."/>

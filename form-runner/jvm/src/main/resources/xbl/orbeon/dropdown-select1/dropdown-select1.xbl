@@ -61,6 +61,9 @@
                     </fr:dropdown-select1>
                 </view>
             </templates>
+            <custom-settings>
+                <setting name="fr:pdf-appearance" type="xs:string" values="dropdown full"/>
+            </custom-settings>
             <control-details>
                 <xf:model xmlns="" id="fb-editor-dropdown-select1-model">
 

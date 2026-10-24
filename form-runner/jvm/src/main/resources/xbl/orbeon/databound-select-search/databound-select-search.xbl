@@ -72,6 +72,15 @@
                 </view>
             </templates>
             <!-- FIXME: This doesn't work as of 2018-12-03 because we read this with `doc()` which doesn't process XInclude. -->
+            <custom-settings>
+                <setting name="fb:selection" type="xs:string"/>
+                <setting name="resource" type="xs:string"/>
+                <setting name="items" type="xs:string" ref="xf:itemset/@ref"/>
+                <setting name="item-label" type="xs:string" ref="xf:itemset/xf:label/@ref"/>
+                <setting name="item-value" type="xs:string" ref="xf:itemset/xf:value/@ref"/>
+                <setting name="item-hint" type="xs:string" ref="xf:itemset/xf:hint/@ref"/>
+                <setting name="auto-select-unique-choice" type="xs:boolean"/>
+            </custom-settings>
             <control-details>
                 <xf:model>
                     <xf:var name="control" value="."/>

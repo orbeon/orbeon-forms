@@ -92,7 +92,7 @@ val OracleJdbcVersion                = "23.26.3.0.0"
 val JsoupVersion                     = "1.23.1"
 
 // Only on PE for now
-val ApachePOIVersion                 = "5.5.1"
+val ApachePOIVersion                 = "6.0.0"
 val SendGridVersion                  = "4.10.3"
 
 // Force patched version (PDFBOX-6220 backport)

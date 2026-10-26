@@ -47,11 +47,11 @@ class HtmlParsingTest extends AnyFunSpec {
 
       // Style sanitization: dangerous styles stripped, safe styles kept
       ("""<span style="color: red; position: fixed; top: 0; z-index: 9999;">overlay</span>""", """<span style="color: red">overlay</span>""", KeepFilter),
-      ("""<span style="position: fixed; z-index: 9999;">overlay</span>""", """<span>overlay</span>""", KeepFilter),
-      ("""<span style="background-image: url('http://evil.com');">test</span>""", """<span>test</span>""", KeepFilter),
+      ("""<span style="position: fixed; z-index: 9999;">overlay</span>""", """<span>overlay</span>"""                           , KeepFilter),
+      ("""<span style="background-image: url('http://evil.com');">test</span>""", """<span>test</span>"""                       , KeepFilter),
       ("""<span style="color: expression(alert(1));">test</span>""" , """<span>test</span>"""                                   , KeepFilter),
-      ("""<span style="color: /*comment*/ red;">test</span>"""       , """<span>test</span>"""                                   , KeepFilter),
-      ("""<span style="color: \6a avascript;">test</span>"""         , """<span>test</span>"""                                   , KeepFilter),
+      ("""<span style="color: /*comment*/ red;">test</span>"""      , """<span>test</span>"""                                   , KeepFilter),
+      ("""<span style="color: \6a avascript;">test</span>"""        , """<span>test</span>"""                                   , KeepFilter),
 
       // URL scheme validation
       ("""<a href="data:text/html,<script>alert('')</script>">Link</a>""", """<a>Link</a>"""                                    , KeepFilter),
@@ -61,7 +61,7 @@ class HtmlParsingTest extends AnyFunSpec {
       ("""<a href="/relative/path">Relative</a>"""                  , """<a href="/relative/path">Relative</a>"""               , KeepFilter),
 
       // Attribute allowlisting: disallowed attributes stripped
-      ("""<a href="https://orbeon.com/" ping="https://evil.com">Link</a>""", """<a href="https://orbeon.com/">Link</a>"""      , KeepFilter),
+      ("""<a href="https://orbeon.com/" ping="https://evil.com">Link</a>""", """<a href="https://orbeon.com/">Link</a>"""       , KeepFilter),
       ("""<div id="clobber" name="test">text</div>"""               , """<div>text</div>"""                                     , KeepFilter),
       ("""<a href="https://orbeon.com/" target="_blank" rel="noopener noreferrer">Link</a>""", """<a href="https://orbeon.com/" target="_blank" rel="noopener noreferrer">Link</a>""", KeepFilter),
 
@@ -80,7 +80,7 @@ class HtmlParsingTest extends AnyFunSpec {
       ("""<a href="https://orbeon.com/?a=1&amp;b=2" title="a &lt; b">Link</a>""", """<a href="https://orbeon.com/?a=1&amp;b=2" title="a &lt; b">Link</a>""", KeepFilter),
 
       // Keyboard shortcuts
-      ("""<kbd data-orbeon-keyboard-shortcut="⌘S">Save</kbd>"""      , """<kbd data-orbeon-keyboard-shortcut="⌘S">Save</kbd>"""   , KeepFilter),
+      ("""<kbd data-orbeon-keyboard-shortcut="⌘S">Save</kbd>"""     , """<kbd data-orbeon-keyboard-shortcut="⌘S">Save</kbd>"""  , KeepFilter),
       ("""<kbd title="Keyboard shortcut" data-orbeon-keyboard-shortcut="⌘S" data-orbeon-keyboard-shortcut-condition="clipboard-empty"></kbd>""",
        """<kbd title="Keyboard shortcut" data-orbeon-keyboard-shortcut="⌘S" data-orbeon-keyboard-shortcut-condition="clipboard-empty"></kbd>""", KeepFilter),
       ("""<kbd data-orbeon-keyboard-shortcut="⌘S ctrl+s">Save</kbd>""", """<kbd data-orbeon-keyboard-shortcut="⌘S ctrl+s">Save</kbd>""", KeepFilter),
@@ -89,8 +89,8 @@ class HtmlParsingTest extends AnyFunSpec {
       ("""<kbd data-orbeon-keyboard-shortcut="">None</kbd>"""       , """<kbd data-orbeon-keyboard-shortcut="">None</kbd>"""    , KeepFilter),
       ("""<kbd data-orbeon-keyboard-shortcut-condition="clipboard-empty">Paste</kbd>""", """<kbd data-orbeon-keyboard-shortcut-condition="clipboard-empty">Paste</kbd>""", KeepFilter),
       ("""<kbd data-orbeon-keyboard-shortcut-condition="">Empty</kbd>""", """<kbd data-orbeon-keyboard-shortcut-condition="">Empty</kbd>""", KeepFilter),
-      (s"""<kbd data-orbeon-keyboard-shortcut="bad${1.toChar}val">X</kbd>""", """<kbd>X</kbd>"""                                         , KeepFilter),
-      (s"""<kbd data-orbeon-keyboard-shortcut-condition="bad${1.toChar}val">X</kbd>""", """<kbd>X</kbd>"""                               , KeepFilter),
+      (s"""<kbd data-orbeon-keyboard-shortcut="bad${1.toChar}val">X</kbd>""", """<kbd>X</kbd>"""                                , KeepFilter),
+      (s"""<kbd data-orbeon-keyboard-shortcut-condition="bad${1.toChar}val">X</kbd>""", """<kbd>X</kbd>"""                      , KeepFilter),
       ("""<kbd data-foo="bar">Foo</kbd>"""                          , """<kbd>Foo</kbd>"""                                      , KeepFilter),
     )
 

@@ -194,8 +194,9 @@
                             <xf:param name="uiXml"   value="xxf:serialize($ui/permissions,       'xml')"/>
                             <xf:param name="formXml" value="xxf:serialize($metadata/permissions, 'xml')"/>
                             <xf:body>
-                                console.log(ORBEON.jQuery.parseXML(unescape(uiXml)));
-                                console.log(ORBEON.jQuery.parseXML(unescape(formXml)));
+                                const parser = new DOMParser();
+                                console.log(parser.parseFromString(unescape(uiXml), "application/xml"));
+                                console.log(parser.parseFromString(unescape(formXml), "application/xml"));
                             </xf:body>
                         </xf:action>
                     </xf:action>

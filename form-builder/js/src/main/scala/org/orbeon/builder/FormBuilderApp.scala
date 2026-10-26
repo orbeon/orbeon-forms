@@ -14,8 +14,8 @@
 package org.orbeon.builder
 
 import org.orbeon.fr.*
-import org.orbeon.xforms.*
 import org.orbeon.xbl.XPathCompletion
+import org.orbeon.xforms.App
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global as g

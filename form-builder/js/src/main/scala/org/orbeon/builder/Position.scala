@@ -17,7 +17,7 @@ import org.orbeon.datatypes.Orientation
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.*
+import org.orbeon.xforms.{AjaxClient, XFormsUiEvents}
 import org.scalajs.dom
 import org.scalajs.dom.{ResizeObserver, html}
 

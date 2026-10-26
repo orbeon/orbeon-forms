@@ -15,7 +15,7 @@ package org.orbeon.builder
 
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.*
+import org.orbeon.xforms.DocumentAPI
 import org.scalajs.dom
 
 

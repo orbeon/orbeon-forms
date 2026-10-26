@@ -18,7 +18,6 @@ import cats.Eval
 import cats.implicits.catsSyntaxOptionId
 import enumeratum.*
 import enumeratum.EnumEntry.Lowercase
-import org.orbeon.builder.facade.*
 import org.orbeon.builder.rpc.FormBuilderRpcClient
 import org.orbeon.facades.TinyMce
 import org.orbeon.facades.TinyMce.{GlobalTinyMce, TinyMceConfig, TinyMceDefaultConfig, TinyMceEditor}
@@ -27,7 +26,7 @@ import org.orbeon.oxf.util.HtmlParsing
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
 import org.orbeon.web.{DomEventNames, DomSupport}
-import org.orbeon.xforms.*
+import org.orbeon.xforms.{AjaxClient, CallbackList, GlobalEventListenerSupport, Language, Page}
 import org.orbeon.xforms.facade.Bootstrap
 import org.scalajs.dom
 import org.scalajs.dom.{document, html}

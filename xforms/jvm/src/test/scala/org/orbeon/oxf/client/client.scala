@@ -267,7 +267,7 @@ trait FormBuilderOps extends FormRunnerOps {
     def findCell(row: Int, col: Int) =
       Option(
         executeScript(
-          "return ORBEON.jQuery('.fb-selected').closest('tbody').find('tr:nth-of-type(' + arguments[0] + ') td:nth-of-type(' + arguments[1] + ')')[0]",
+          "const s = document.querySelector('.fb-selected'); return s && s.closest('tbody') ? s.closest('tbody').querySelector('tr:nth-of-type(' + arguments[0] + ') td:nth-of-type(' + arguments[1] + ')') : null",
           java.lang.Integer.valueOf(row),
           java.lang.Integer.valueOf(col)
         ).asInstanceOf[WebElement]
@@ -308,16 +308,16 @@ trait FormBuilderOps extends FormRunnerOps {
       cssSelector(".fb-tool > .fb-add-control").findAllElements.size
 
     def countCurrentGridRows =
-      executeScript("return ORBEON.jQuery('.fb-selected').closest('.fr-grid').find('.fr-grid-tr').size()").asInstanceOf[Long]
+      executeScript("const s = document.querySelector('.fb-selected'); return s && s.closest('.fr-grid') ? s.closest('.fr-grid').querySelectorAll('.fr-grid-tr').length : 0").asInstanceOf[Long]
 
     def countSections =
-      executeScript("return ORBEON.jQuery('.xbl-fr-section').size()").asInstanceOf[Long]
+      executeScript("return document.querySelectorAll('.xbl-fr-section').length").asInstanceOf[Long]
 
     def countGrids =
-      executeScript("return ORBEON.jQuery('.xbl-fr-section .xbl-fr-grid').size()").asInstanceOf[Long]
+      executeScript("return document.querySelectorAll('.xbl-fr-section .xbl-fr-grid').length").asInstanceOf[Long]
 
     def countRepeatedGrids =
-      executeScript("return ORBEON.jQuery('.xbl-fr-section .xbl-fr-grid .fr-repeat').size()").asInstanceOf[Long]
+      executeScript("return document.querySelectorAll('.xbl-fr-section .xbl-fr-grid .fr-repeat').length").asInstanceOf[Long]
   }
 }
 

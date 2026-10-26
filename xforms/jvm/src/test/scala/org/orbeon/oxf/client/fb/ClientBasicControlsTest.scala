@@ -25,7 +25,7 @@ trait ClientBasicControlsTest extends AssertionsForJUnit with FormBuilderOps wit
 
     def clickOnToolboxControlButtons(from: Int, to: Int) =
       executeScript(
-        "ORBEON.jQuery('.fb-tool > .fb-add-control > button').slice(arguments[0], arguments[1] + 1).click();",
+        "Array.from(document.querySelectorAll('.fb-tool > .fb-add-control > button')).slice(arguments[0], arguments[1] + 1).forEach(b => b.click());",
         java.lang.Integer.valueOf(from),
         java.lang.Integer.valueOf(to)
       )

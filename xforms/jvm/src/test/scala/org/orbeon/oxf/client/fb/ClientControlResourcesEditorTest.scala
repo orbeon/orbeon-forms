@@ -34,7 +34,7 @@ trait ClientControlResourcesEditorTest extends AssertionsForJUnit with FormBuild
   // works on the browser, it doesn't work when the click is done through WebDriver, just with Firefox. So here
   // we remove the `for` before doing the click.
   private def clickLabel(selector: CssSelectorQuery): Unit = {
-    executeScript(s"""ORBEON.jQuery("${selector.queryString}").removeAttr('for')""")
+    executeScript(s"""document.querySelectorAll("${selector.queryString}").forEach(e => e.removeAttribute('for'))""")
     click on selector
   }
 

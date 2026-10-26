@@ -16,7 +16,6 @@ package org.orbeon.oxf.fb
 import org.orbeon.datatypes.Direction
 import org.orbeon.builder.HtmlElementCell.*
 import org.orbeon.oxf.fr.Cell
-import org.orbeon.xforms.*
 import org.scalajs.dom
 import org.scalatest.funspec.AnyFunSpec
 import org.orbeon.web.DomSupport.*
@@ -26,7 +25,7 @@ class ClientGridTest extends AnyFunSpec {
 
   describe("The `spaceToExtendCell()` function") {
 
-    $(dom.document).find("body").append(
+    dom.document.body.insertAdjacentHTML("beforeend",
       """
         |<div id="fb≡section-1-control≡grid-1-control" class="xbl-component xbl-fr-grid">
         |    <div class="fr-grid fr-grid-12 fr-grid-css fr-norepeat fr-editable">
@@ -119,7 +118,7 @@ class ClientGridTest extends AnyFunSpec {
     } locally {
       it(s"must pass moving `$id` ${direction.entryName.toLowerCase}") {
         // TODO
-        //assert(space == Grid.spaceToExtendCell($(s"#$id")(0), direction))
+        //assert(space == Grid.spaceToExtendCell(dom.document.querySelectorT(s"#$id"), direction))
       }
     }
   }

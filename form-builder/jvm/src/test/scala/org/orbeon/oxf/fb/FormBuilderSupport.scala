@@ -141,7 +141,8 @@ trait FormBuilderSupport extends XFormsSupport {
 
               <xf:action type="xpath" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
                 fbf:initializeGrids($temp),
-                fbf:updateSectionTemplateContentHolders($temp)
+                fbf:updateSectionTemplateContentHolders($temp),
+                fbf:removeUnneededNamespaceDeclarationsFromForm($temp)
               </xf:action>
 
               <xf:insert ref="instance('fb-form-instance')" origin="$temp"/>

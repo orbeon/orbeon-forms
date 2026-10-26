@@ -88,23 +88,65 @@ object Extensions {
       e.createCopy.copyMissingNamespacesByPrefix(e.parentElemOpt)
 
     /**
-     * Remove, on this element and its descendants, the namespace declarations already in scope with the same URI.
+     * Remove the namespace declarations this element and its descendants don't need, for example to clean up a form
+     * definition which accumulated declarations copied from XBL files. A declaration is removed if it is already in
+     * scope with the same URI, or if its prefix is used neither by an element or attribute name nor within an
+     * attribute value or text node (QName, XPath). The latter is a heuristic: it doesn't see an expression built
+     * dynamically, nor other syntaxes, such as the CSS selectors in xbl:binding/@element.
      *
      * @param inScopeFromParent namespaces in scope at the parent, or at the destination if the element is detached
      */
-    def removeRedundantNamespaceDeclarations(inScopeFromParent: Map[String, String]): Element = {
+    def removeUnneededNamespaceDeclarations(inScopeFromParent: Map[String, String]): Element = {
 
-      def removeFromElementAndDescendants(elem: Element, inScopeFromParent: Map[String, String]): Unit = {
+      // Whether the text, typically an XPath expression or a QName, refers to the namespace through its prefix, as in
+      // frf:foo() or xs:string. The prefix must start a name: `http:` is not a reference to `p`, nor `xxf:` to `xf`.
+      // A default namespace can't be referred to this way, as an unprefixed name in a value is in no namespace.
+      def refersToNamespace(text: String, namespace: Namespace): Boolean =
+        namespace.prefix.nonEmpty && text.indices.exists { i =>
+          text.startsWith(namespace.prefix + ":", i) && (i == 0 || ! SaxonUtils.isNCNameChar(text.charAt(i - 1)))
+        }
 
-        for (ns <- elem.declaredNamespacesIterator.toList)
-          if (inScopeFromParent.get(ns.prefix).contains(ns.uri))
+      def removeUnneededNamespacesFromElement(
+        elem                     : Element,
+        inScopeFromParent        : Map[String, String],
+        locallyDeclaredNamespaces: List[Namespace]
+      ): Unit = {
+
+        val subtree = elem.descendantElementIterator(includeSelf = true).toList
+
+        // Namespaces used by element and attribute names. An attribute without a prefix is in no namespace, whatever
+        // the default namespace, so we ignore EmptyNamespace.
+        val elemNamespaces = subtree                      .map(_.getNamespace).toSet
+        val attNamespaces  = subtree.flatMap(_.attributes).map(_.getNamespace).toSet - Namespace.EmptyNamespace
+        val usedNamespaces = elemNamespaces ++ attNamespaces
+
+        // Attribute values and text nodes, which can contain QNames and XPath expressions. Examples of text nodes
+        // which can use XPath expressions: <xf:action type="xpath"/>, <xf:setvalue/>, <type> in an instance.
+        val values =
+          subtree.flatMap(_.attributes).map(_.getValue) ++
+          subtree.flatMap(_.content).collect { case text: Text => text.getText }
+
+        for (ns <- locallyDeclaredNamespaces) {
+          val isRedundant = inScopeFromParent.get(ns.prefix).contains(ns.uri)
+          def isUsed      = usedNamespaces(ns) || values.exists(refersToNamespace(_, ns))
+          if (isRedundant || ! isUsed)
             elem.remove(ns)
-
-        val inScopeForChildren = inScopeFromParent ++ elem.declaredNamespacesIterator.map(ns => ns.prefix -> ns.uri)
-        elem.elements.foreach(removeFromElementAndDescendants(_, inScopeForChildren))
+        }
       }
 
-      removeFromElementAndDescendants(e, inScopeFromParent)
+      def removeUnneededNamespacesFromElementAndDescendants(elem: Element, inScopeFromParent: Map[String, String]): Unit = {
+
+        val locallyDeclaredNamespaces = elem.declaredNamespacesIterator.toList
+
+        if (locallyDeclaredNamespaces.nonEmpty) {
+          removeUnneededNamespacesFromElement(elem, inScopeFromParent, locallyDeclaredNamespaces)
+        }
+
+        val inScopeForChildren = inScopeFromParent ++ elem.declaredNamespacesIterator.map(ns => ns.prefix -> ns.uri)
+        elem.elements.foreach(removeUnneededNamespacesFromElementAndDescendants(_, inScopeForChildren))
+      }
+
+      removeUnneededNamespacesFromElementAndDescendants(e, inScopeFromParent)
 
       e
     }

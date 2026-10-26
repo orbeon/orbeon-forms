@@ -94,6 +94,7 @@ trait SaxonUtilsTrait {
   def hasXPathNumberer(lang: String): Boolean
   def isValidNCName   (name: String): Boolean
   def isValidNmtoken  (name: String): Boolean
+  def isNCNameChar    (c: Char)     : Boolean
 
   val ChildAxisInfo: AxisType
   val AttributeAxisInfo: AxisType

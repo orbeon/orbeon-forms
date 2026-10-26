@@ -249,6 +249,9 @@ object SaxonUtils extends SaxonUtilsTrait {
   def isValidNmtoken(name: String): Boolean =
     Name10Checker.getInstance.isValidNmtoken(name)
 
+  def isNCNameChar(c: Char): Boolean =
+    Name10Checker.getInstance.isNCNameChar(c)
+
   val ChildAxisInfo: AxisType = Axis.CHILD
   val AttributeAxisInfo: AxisType = Axis.ATTRIBUTE
 

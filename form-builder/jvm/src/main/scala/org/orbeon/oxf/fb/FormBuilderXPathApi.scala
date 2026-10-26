@@ -26,7 +26,7 @@ import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.{allLangs, findControlByName, formRunnerProperty}
 import org.orbeon.oxf.fr.Names.FormBinds
 import org.orbeon.oxf.fr.NodeInfoCell.*
-import org.orbeon.oxf.fr.XMLNames.{FRServiceCallTest, XFBindTest, XFSendTest}
+import org.orbeon.oxf.fr.XMLNames.{FRServiceCallTest, XFBindTest, XFInstanceTest, XFSendTest}
 import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.fr.process.SimpleProcess.{currentXFormsDocumentId, evaluateString}
 import org.orbeon.oxf.http.Headers
@@ -44,15 +44,16 @@ import org.orbeon.oxf.xforms.xbl.BindingDescriptor.*
 import org.orbeon.oxf.xforms.xbl.BindingIndex.DatatypeMatch
 import org.orbeon.oxf.xforms.xbl.{BindingDescriptor, BindingIndex}
 import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsContainingDocument}
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
 import org.orbeon.saxon.ArrayFunctions
 import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.saxon.value.QNameValue
 import org.orbeon.scaxon.Implicits.*
-import org.orbeon.scaxon.NodeConversions
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.*
+import org.orbeon.scaxon.{NodeConversions, NodeInfoConversions}
 import org.orbeon.xforms.XFormsNames.XFORMS_VAR_QNAME
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
@@ -544,6 +545,29 @@ object FormBuilderXPathApi {
           delete(iterationHolder / *)
           insert(into = iterationHolder, origin = holderContent(instanceRoot, iterationHolder))
         }
+    }
+  }
+
+  // Remove the unneeded namespace declarations which previous versions of Form Builder introduced into the form
+  // definition, for example on `fr:body`, on controls, and in the data holders of section templates. Only the body
+  // and the data instances are processed, and declarations used by names, QNames, or XPath expressions are kept.
+  //@XPathFunction
+  def removeUnneededNamespaceDeclarationsFromForm(inDoc: NodeInfo): Unit = {
+
+    // Create context explicitly based on the document passed, as the node might not be
+    // in the main Form Builder instance yet.
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext(inDoc)
+
+    val instanceRootElems =
+      ctx.modelElem / XFInstanceTest filter { instanceElem =>
+        instanceElem.id == fr.Names.FormInstance || FormRunner.isTemplateId(instanceElem.id)
+      } child *
+
+    (ctx.bodyElemOpt.toList ++ instanceRootElems) foreach { elem =>
+      val domElem = NodeInfoConversions.unsafeUnwrapElement(elem)
+      domElem.removeUnneededNamespaceDeclarations(
+        domElem.parentElemOpt.map(_.allInScopeNamespacesAsStrings).getOrElse(Map.empty)
+      )
     }
   }
 

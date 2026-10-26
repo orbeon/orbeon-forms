@@ -18,7 +18,9 @@ import org.orbeon.oxf.fb.ToolboxOps.*
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.NodeInfoCell
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport}
+import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.NodeConversions.elemToNodeInfo
 import org.orbeon.scaxon.NodeInfoConversions.unsafeUnwrapElement
 import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
@@ -33,11 +35,12 @@ class NamespaceDeclarationsTest
      with XMLSupport {
 
   val SectionTemplatesDoc = "oxf:/org/orbeon/oxf/fb/template-with-section-templates.xhtml"
+  val ExtraNamespacesDoc  = "oxf:/org/orbeon/oxf/fb/template-with-extra-namespaces.xhtml"
   val ComponentNamespace  = "http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"
 
-  // All the namespace declarations on the element and its descendants
+  // All the namespace declarations on the element and its descendants, except on the annotations added by Form Builder
   def declaredNamespaces(elem: NodeInfo): List[(String, String)] =
-    (elem descendantOrSelf *).toList flatMap { e =>
+    (elem descendantOrSelf *).toList filterNot (_.attClasses("fb-annotation")) flatMap { e =>
       unsafeUnwrapElement(e).declaredNamespacesIterator.map(ns => ns.prefix -> ns.uri)
     }
 
@@ -80,6 +83,28 @@ class NamespaceDeclarationsTest
       }
     }
 
+    it("must keep a declaration used only in an XPath expression") {
+
+      val xblElem: NodeInfo =
+        <xbl:xbl
+          xmlns:xbl="http://www.w3.org/ns/xbl"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:acme="java:com.acme.Functions">
+          <xf:input xxf:default="acme:default()"/>
+        </xbl:xbl>
+
+      val destination: NodeInfo =
+        <xh:body
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"/>
+
+      val copy = NodeInfoFactory.copyElementInfoWithoutExtraNamespaces((xblElem / *).head, Some(destination))
+
+      assert(declaredNamespaces(copy) == List("acme" -> "java:com.acme.Functions"))
+    }
+
     it("must not add namespace declarations to section template data holders") {
       withActionAndFBDoc(SectionTemplatesDoc) { implicit ctx =>
 
@@ -94,5 +119,13 @@ class NamespaceDeclarationsTest
       }
     }
 
+    it("must remove unneeded namespace declarations when loading a form definition") {
+      withActionAndFBDoc(ExtraNamespacesDoc) { implicit ctx =>
+
+        // The form has extra declarations on `fr:body`, on the control inside it, and on the data holder
+        assert(declaredNamespaces(ctx.bodyElem).isEmpty)
+        assert(findDataHolders("control-1").flatMap(declaredNamespaces).isEmpty)
+      }
+    }
   }
 }

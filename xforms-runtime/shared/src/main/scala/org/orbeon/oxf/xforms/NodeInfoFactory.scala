@@ -33,14 +33,10 @@ object NodeInfoFactory {
   def elementInfo(elem: dom.Element): om.NodeInfo =
     Wrapper.wrap(elem)
 
-  // Copy an element to be inserted under `destination`, without the namespace declarations that `insert` would
-  // otherwise copy from the origin's ancestors, and without those already in scope at the destination. Used to
-  // insert templates from XBL components into form definitions and form data without extra namespaces (#7619).
+  // Copy an element to be inserted under `destination`, without the namespace declarations it doesn't use, which
+  // `insert` would otherwise copy from the origin's ancestors, and without those already in scope at the destination.
+  // Used to insert templates from XBL components into form definitions and form data without extra namespaces (#7619).
   def copyElementInfoWithoutExtraNamespaces(elem: om.NodeInfo, destination: Option[om.NodeInfo]): om.NodeInfo = {
-
-    def inScopeNamespaces(nodeOpt: Option[om.NodeInfo]): Map[String, String] =
-      Map("" -> "") ++                            // the absence of a default namespace counts as xmlns="" being in scope
-      nodeOpt.toList.flatMap(_.namespaceMappings)
 
     // We'll work on a mutable copy of the element to insert; in both cases, the copy includes all the namespaces in
     // scope at the origin
@@ -50,19 +46,8 @@ object NodeInfoFactory {
         case None          => StaticXPath.tinyTreeToOrbeonDom(elem).getRootElement
       }
 
-    // Namespace prefixes used by element and attribute *names* of the element subtree. We don't inspect attribute
-    // values here (XPath expressions, etc.), as the assumption is that templates from XBL components only use prefixes
-    // they declare themselves or prefixes that are implicitly present at the destination, such as xf:, xxf:, and fr:.
-    val subtree      = copy.descendantElementIterator(includeSelf = true).toList
-    val usedPrefixes =
-      subtree                      .map(_.getNamespace.prefix).toSet ++
-      subtree.flatMap(_.attributes).map(_.getNamespace.prefix).filter(_.nonEmpty) // attributes: no prefix = no namespace
-
-    // Remove all namespace declarations inherited from the source's ancestors, *except* those actually used in names
-    copy.removeRedundantNamespaceDeclarations(inScopeNamespaces(elem.parentOption) -- usedPrefixes)
-
-    // Remove all namespace declarations the destination already has
-    copy.removeRedundantNamespaceDeclarations(inScopeNamespaces(destination))
+    // The absence of a default namespace counts as `xmlns=""` being in scope
+    copy.removeUnneededNamespaceDeclarations(Map("" -> "") ++ destination.toList.flatMap(_.namespaceMappings))
 
     elementInfo(copy)
   }

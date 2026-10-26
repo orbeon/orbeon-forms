@@ -135,7 +135,8 @@
 
         <xf:action type="xpath">
             fbf:initializeGrids($temp),
-            fbf:updateSectionTemplateContentHolders($temp)
+            fbf:updateSectionTemplateContentHolders($temp),
+            fbf:removeUnneededNamespaceDeclarationsFromForm($temp)
         </xf:action>
 
         <!--<xf:message level="xxf:log-info" value="xxf:serialize($temp, 'xml')"/>-->

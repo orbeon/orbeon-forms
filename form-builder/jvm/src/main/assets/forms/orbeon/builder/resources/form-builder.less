@@ -1181,10 +1181,6 @@ body.orbeon {
             height: auto;
         }
 
-        .tab-content {
-            .dialog-scrollable();
-        }
-
         // On the left, taking most of the space, all for the fields for one line
         .fb-action-options {
 
@@ -1380,6 +1376,11 @@ body.orbeon {
                 display: flex;
                 flex-grow: 1; // Take the whole width when we have few cards
                 flex-direction: column;
+
+                > .tab-content {
+                    min-height: 0;
+                    .dialog-scrollable();
+                }
             }
         }
     }
@@ -1820,10 +1821,6 @@ body.orbeon {
                     .xbl-fr-grid .fr-grid .fr-grid-body .fr-grid-td.fr-console-badge {
                         text-align: center;
                         vertical-align: middle;
-                    }
-
-                    .tab-pane {
-                        .dialog-scrollable();
                     }
                 }
             }

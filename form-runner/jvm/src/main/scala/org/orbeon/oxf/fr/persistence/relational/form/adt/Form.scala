@@ -165,14 +165,7 @@ case class Form(
   )(implicit
     indentedLogger        : IndentedLogger
   ): Option[Form] = {
-    val hasAdminPermissionForAppForm  = {
-      def canAccessEverything = fbPermissions.contains("*")
-      def canAccessAppForm = {
-        val formsUserCanAccess = fbPermissions.getOrElse(appForm.app, Set.empty)
-        formsUserCanAccess.contains("*") || formsUserCanAccess.contains(appForm.form)
-      }
-      canAccessEverything || canAccessAppForm
-    }
+    val hasAdminPermissionForAppForm = FormRunner.hasFormBuilderPermissionForAppForm(fbPermissions, appForm)
 
     // Add operations from permissions on local metadata, if any
     val localMetadataWithOperationsOpt = localMetadataOpt.map {

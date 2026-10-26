@@ -87,6 +87,22 @@ trait FormBuilderPermissionsOps {
         }
     }
 
+  def hasFormBuilderPermissionForAppForm(fbPermissions: Map[String, Set[String]], appForm: AppForm): Boolean = {
+    def canAccessEverything = fbPermissions.contains("*")
+    def canAccessAppForm = {
+      val formsUserCanAccess = fbPermissions.getOrElse(appForm.app, Set.empty)
+      formsUserCanAccess.contains("*") || formsUserCanAccess.contains(appForm.form)
+    }
+    canAccessEverything || canAccessAppForm
+  }
+
+  //@XPathFunction
+  def isFormBuilderPublishAuthorized(app: String, form: String): Boolean = {
+    val configurationOpt = formBuilderPermissionsConfiguration
+    findConfiguredRoles(configurationOpt).isEmpty ||
+      hasFormBuilderPermissionForAppForm(formBuilderPermissions(configurationOpt, orbeonRolesFromCurrentRequest), AppForm(app, form))
+  }
+
   //@XPathFunction
   def createMcpToken(
     readwrite: Boolean

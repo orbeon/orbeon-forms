@@ -11,6 +11,10 @@ class HtmlParsingTest extends AnyFunSpec {
     val KeepFilter  : String => ElemFilter = _ => ElemFilter.Keep
     val RemoveFilter: String => ElemFilter = _ => ElemFilter.Remove
 
+    // On this branch the JVM parses with TagSoup (jsoup since #7826 on master), which adds the default attributes of its
+    // schema and removes control characters from attribute values, unlike jsoup and the browser
+    val IsTagSoup = System.getProperty("java.vm.name") != "Scala.js"
+
     val expected = List[(String, String, String => ElemFilter)](
       ("""<a href="https://orbeon.com/">Link</a>"""                 , """<a href="https://orbeon.com/">Link</a>"""              , KeepFilter),
       ("""<A HREF="https://orbeon.com/">Link</A>"""                 , """<a href="https://orbeon.com/">Link</a>"""              , KeepFilter),
@@ -70,7 +74,8 @@ class HtmlParsingTest extends AnyFunSpec {
       ("""<img src="data:image/svg+xml;base64,PHN2Zz4=">"""         , """<img>"""                                               , KeepFilter),
 
       // Tables
-      ("""<table border="1" cellpadding="2" cellspacing="0"><tbody><tr align="center"><td colspan="2" style="background-color: #eee">Cell</td></tr></tbody></table>""", """<table border="1" cellpadding="2" cellspacing="0"><tbody><tr align="center"><td colspan="2" style="background-color: #eee">Cell</td></tr></tbody></table>""", KeepFilter),
+      ("""<table border="1" cellpadding="2" cellspacing="0"><tbody><tr align="center"><td colspan="2" style="background-color: #eee">Cell</td></tr></tbody></table>""",
+       if (IsTagSoup) """<table border="1" cellpadding="2" cellspacing="0"><tbody><tr align="center"><td colspan="2" rowspan="1" style="background-color: #eee">Cell</td></tr></tbody></table>""" else """<table border="1" cellpadding="2" cellspacing="0"><tbody><tr align="center"><td colspan="2" style="background-color: #eee">Cell</td></tr></tbody></table>""", KeepFilter),
 
       // Attribute value escaping against breakout
       ("""<a title="foo&quot; onclick=&quot;alert('1')">Link</a>""" , """<a title="foo&quot; onclick=&quot;alert('1')">Link</a>""", KeepFilter),
@@ -88,8 +93,8 @@ class HtmlParsingTest extends AnyFunSpec {
       ("""<kbd data-orbeon-keyboard-shortcut="">None</kbd>"""       , """<kbd data-orbeon-keyboard-shortcut="">None</kbd>"""    , KeepFilter),
       ("""<kbd data-orbeon-keyboard-shortcut-condition="clipboard-empty">Paste</kbd>""", """<kbd data-orbeon-keyboard-shortcut-condition="clipboard-empty">Paste</kbd>""", KeepFilter),
       ("""<kbd data-orbeon-keyboard-shortcut-condition="">Empty</kbd>""", """<kbd data-orbeon-keyboard-shortcut-condition="">Empty</kbd>""", KeepFilter),
-      (s"""<kbd data-orbeon-keyboard-shortcut="bad${1.toChar}val">X</kbd>""", """<kbd>X</kbd>"""                                         , KeepFilter),
-      (s"""<kbd data-orbeon-keyboard-shortcut-condition="bad${1.toChar}val">X</kbd>""", """<kbd>X</kbd>"""                               , KeepFilter),
+      (s"""<kbd data-orbeon-keyboard-shortcut="bad${1.toChar}val">X</kbd>""", if (IsTagSoup) """<kbd data-orbeon-keyboard-shortcut="badval">X</kbd>""" else """<kbd>X</kbd>""", KeepFilter),
+      (s"""<kbd data-orbeon-keyboard-shortcut-condition="bad${1.toChar}val">X</kbd>""", if (IsTagSoup) """<kbd data-orbeon-keyboard-shortcut-condition="badval">X</kbd>""" else """<kbd>X</kbd>""", KeepFilter),
       ("""<kbd data-foo="bar">Foo</kbd>"""                          , """<kbd>Foo</kbd>"""                                      , KeepFilter),
     )
 

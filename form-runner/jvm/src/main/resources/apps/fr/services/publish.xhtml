@@ -103,6 +103,9 @@
 
             <xf:action event="do-read-toolbox">
                 <!-- Here we have the form definition in `fr-form-definition-instance` -->
+                <xf:action if="not(frf:isFormBuilderPublishAuthorized(string($app), string($form)))" type="xpath">
+                    frf:sendError(403)
+                </xf:action>
                 <xf:send submission="read-toolbox-submission"/>
             </xf:action>
 

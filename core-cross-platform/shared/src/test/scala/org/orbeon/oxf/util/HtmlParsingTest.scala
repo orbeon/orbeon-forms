@@ -75,6 +75,9 @@ class HtmlParsingTest extends AnyFunSpec {
 
       // Attribute value escaping against breakout
       ("""<a title="foo&quot; onclick=&quot;alert('1')">Link</a>""" , """<a title="foo&quot; onclick=&quot;alert('1')">Link</a>""", KeepFilter),
+      ("""<img alt='x" onerror="alert(1)'>"""                       , """<img alt="x&quot; onerror=&quot;alert(1)">"""          , KeepFilter),
+      ("""<img alt="x&amp;quot; onerror=&amp;quot;alert(1)">"""     , """<img alt="x&amp;quot; onerror=&amp;quot;alert(1)">"""  , KeepFilter),
+      ("""<a href="https://orbeon.com/?a=1&amp;b=2" title="a &lt; b">Link</a>""", """<a href="https://orbeon.com/?a=1&amp;b=2" title="a &lt; b">Link</a>""", KeepFilter),
 
       // Keyboard shortcuts
       ("""<kbd data-orbeon-keyboard-shortcut="⌘S">Save</kbd>"""      , """<kbd data-orbeon-keyboard-shortcut="⌘S">Save</kbd>"""   , KeepFilter),
@@ -95,6 +98,14 @@ class HtmlParsingTest extends AnyFunSpec {
       it(s"should sanitize `$input` to `$output`") {
         assert(HtmlParsing.sanitizeHtmlString(input, filter) == output)
       }
+    }
+
+    // Sanitizing twice must not reveal a new attribute, whatever the entity-encoding depth of the input
+    it("should be idempotent when attribute values contain quotes and ampersands") {
+      val once  = HtmlParsing.sanitizeHtmlString("""<img alt='x" onerror="alert(1)' title="a &amp;quot; b">""", KeepFilter)
+      val twice = HtmlParsing.sanitizeHtmlString(once, KeepFilter)
+      assert(once == twice)
+      assert(! once.contains("onerror=\""))
     }
   }
 }

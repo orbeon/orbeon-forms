@@ -17,39 +17,68 @@
     .xbl-fr-character-counter {
 
         display: inline-block;
-        // 2022-12-02: This caused https://github.com/orbeon/orbeon-forms/issues/5551
-        //width: 100%;
+
+        .xforms-label-appearance-minimal {
+            display: none;
+        }
+
+        &.xforms-disabled {
+            .fr-charcounter-count {
+                display: none;
+            }
+        }
 
         &> .fr-charcounter-wrapper {
 
-            // Use table layout as Flexbox doesn't work with IE < 11
-            display: table;
+            position: relative;
+            display: inline-block;
+            width: 100%;
 
-            &> * {
-                display: table-cell;
-                vertical-align: top;
+            &> .xforms-input, &> .xforms-textarea, &> .xforms-secret, &> .xbl-fr-tinymce {
+                width: 100%;
+
+                input, textarea {
+                    padding-right: 44px;
+                }
             }
 
             &> .fr-charcounter-count {
-
-                display: inline-block;
-                text-align: right;
-                margin-left: 4px;
-                margin-bottom: 3px;
+                position: absolute;
+                top: 6px;
+                right: 8px;
+                z-index: 3;
+                pointer-events: none;
+                user-select: none;
+                line-height: 1;
 
                 .xforms-output {
                     display: inline-block;
                     min-width: 28px; // try to fit 3 digits without widening
+                    text-align: center;
                     box-sizing: border-box;
+                    opacity: 0.4;
+                    transition: opacity 0.2s ease;
+
+                    &.fr-charcounter-over {
+                        opacity: 1 !important;
+                    }
                 }
 
                 .fr-charcounter-over .xforms-output-output:before {
-                    content: "-"
+                    content: "-";
                 }
             }
 
-            &> .xforms-input, &> .xforms-textarea, &> .xbl-fr-tinymce {
-                width: 100%;
+            // On single-line inputs, center vertically
+            &> .xforms-input ~ .fr-charcounter-count,
+            &> .xforms-secret ~ .fr-charcounter-count {
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+            &:hover > .fr-charcounter-count .xforms-output,
+            &:focus-within > .fr-charcounter-count .xforms-output {
+                opacity: 0.8;
             }
         }
     }

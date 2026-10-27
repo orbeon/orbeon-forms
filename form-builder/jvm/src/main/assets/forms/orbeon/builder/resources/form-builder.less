@@ -2138,8 +2138,6 @@ body.orbeon {
         justify-content: end;
         column-gap: .5em;
 
-        .fr-status-icons { display: none } // Don't show valid/invalid icon, as we show XPath errors in .fb-xpath-errors
-
         .fr-messages {
             white-space: nowrap;
 
@@ -2223,6 +2221,16 @@ body.orbeon {
                 // --orbeon-navbar-color (white, for the dark navbar) is invisible on this light header
                 .fr-navbar-home-link a i {
                     color: inherit;
+                }
+                .fr-status-icons {
+                    display: inline-flex;
+                    align-items: center;
+                    .fr-validity-icon {
+                        display: none; // Don't show "No errors on form" icon, as Form Builder forms are typically valid
+                    }
+                    i {
+                        color: var(--orbeon-fb-navbar-color);
+                    }
                 }
             }
         }

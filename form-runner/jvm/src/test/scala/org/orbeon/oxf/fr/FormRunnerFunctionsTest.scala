@@ -1319,6 +1319,17 @@ class FormRunnerFunctionsTest
       }
     }
 
+    it("must not pick up scheme from fr-color-scheme cookie header") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(formSource)) {
+          val doc = inScopeContainingDocument
+          val reqInfo = doc.getRequestInformation
+          doc.setRequestInformation(reqInfo.copy(requestHeaders = Map("cookie" -> List("fr-color-scheme=dark"))))
+          assert(effectiveColorScheme() == "light")
+        }
+      }
+    }
+
     it("must prefer URL parameter over cookie") {
       withTestExternalContext { _ =>
         withActionAndDoc(setupDocument(formSource)) {

@@ -1313,7 +1313,7 @@ class FormRunnerFunctionsTest
         withActionAndDoc(setupDocument(formSource)) {
           val doc = inScopeContainingDocument
           val reqInfo = doc.getRequestInformation
-          doc.setRequestInformation(reqInfo.copy(requestHeaders = Map("cookie" -> List("fr-color-scheme=system"))))
+          doc.setRequestInformation(reqInfo.copy(requestHeaders = Map("cookie" -> List("orbeon-color-scheme=system"))))
           assert(effectiveColorScheme() == "system")
         }
       }
@@ -1337,7 +1337,7 @@ class FormRunnerFunctionsTest
           val reqInfo = doc.getRequestInformation
           doc.setRequestInformation(reqInfo.copy(
             requestParameters = Map("fr-color-scheme" -> List("light")),
-            requestHeaders    = Map("cookie" -> List("fr-color-scheme=dark"))
+            requestHeaders    = Map("cookie" -> List("orbeon-color-scheme=dark"))
           ))
           assert(effectiveColorScheme() == "light")
         }
@@ -1347,7 +1347,7 @@ class FormRunnerFunctionsTest
     it("must pick up scheme from session") {
       withTestExternalContext { _ =>
         withActionAndDoc(setupDocument(formSource)) {
-          NetUtils.getExternalContext.getRequest.getSession(true).setAttribute("fr-color-scheme", "dark")
+          NetUtils.getExternalContext.getRequest.getSession(true).setAttribute("orbeon-color-scheme", "dark")
           assert(effectiveColorScheme() == "dark")
         }
       }

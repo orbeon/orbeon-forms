@@ -708,7 +708,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
     ).getOrElse(default)
   }
 
-  val ColorSchemeCookieName = "fr-color-scheme"
+  val ColorSchemeCookieName = "orbeon-color-scheme"
   val ColorSchemeParamName  = "fr-color-scheme"
   val AllowedColorSchemes   = Set("light", "dark", "system")
 

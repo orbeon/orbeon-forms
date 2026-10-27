@@ -96,7 +96,7 @@ object FormRunnerApp extends App {
   }
 
   private def initColorSchemeSelector(navElem: html.Element): Unit = {
-    val ColorSchemeCookieName = "fr-color-scheme"
+    val ColorSchemeCookieName = "orbeon-color-scheme"
     val AllowedSchemes = Set("light", "dark", "system")
 
     val frViewElemOpt = document.getElementByIdOpt("fr-view")

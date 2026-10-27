@@ -167,6 +167,12 @@
 
             <load-more>Daha Fazla Yükle</load-more>
         </revision-history>
+        <color-scheme>
+            <toggle-theme>Temayı değiştir</toggle-theme>
+            <light>Açık</light>
+            <dark>Koyu</dark>
+            <system>Otomatik</system>
+        </color-scheme>
     </components>
     <untitled-form>Başlıksız Form</untitled-form>
     <loading>Yükleniyor</loading>

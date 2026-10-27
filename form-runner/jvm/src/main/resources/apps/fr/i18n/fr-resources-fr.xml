@@ -167,6 +167,12 @@
 
             <load-more>Charger plus</load-more>
         </revision-history>
+        <color-scheme>
+            <toggle-theme>Changer de thème</toggle-theme>
+            <light>Clair</light>
+            <dark>Sombre</dark>
+            <system>Auto</system>
+        </color-scheme>
     </components>
     <untitled-form>Formulaire sans titre</untitled-form>
     <loading>Chargement en cours</loading>

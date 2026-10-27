@@ -167,6 +167,12 @@
 
             <load-more>Läs in fler</load-more>
         </revision-history>
+        <color-scheme>
+            <toggle-theme>Växla tema</toggle-theme>
+            <light>Ljust</light>
+            <dark>Mörkt</dark>
+            <system>Automatiskt</system>
+        </color-scheme>
     </components>
     <untitled-form>Formulär utan titel</untitled-form>
     <loading>Läser in</loading>

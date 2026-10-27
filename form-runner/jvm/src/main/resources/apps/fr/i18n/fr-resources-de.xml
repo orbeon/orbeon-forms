@@ -167,6 +167,12 @@
 
             <load-more>Mehr laden</load-more>
         </revision-history>
+        <color-scheme>
+            <toggle-theme>Design wechseln</toggle-theme>
+            <light>Hell</light>
+            <dark>Dunkel</dark>
+            <system>Automatisch</system>
+        </color-scheme>
     </components>
     <untitled-form>Formular ohne Namen</untitled-form>
     <loading>Wird geladen</loading>

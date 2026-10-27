@@ -172,6 +172,12 @@
 
             <load-more>Carregar més</load-more>
         </revision-history>
+        <color-scheme>
+            <toggle-theme>Canvia el tema</toggle-theme>
+            <light>Clar</light>
+            <dark>Fosc</dark>
+            <system>Automàtic</system>
+        </color-scheme>
     </components>
     <untitled-form>Formulari sense Títol</untitled-form>
     <loading>S'està carregant</loading>

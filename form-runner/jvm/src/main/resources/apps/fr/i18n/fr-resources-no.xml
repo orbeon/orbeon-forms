@@ -167,6 +167,12 @@
 
             <load-more>Last mer</load-more>
         </revision-history>
+        <color-scheme>
+            <toggle-theme>Bytt tema</toggle-theme>
+            <light>Lyst</light>
+            <dark>Mørkt</dark>
+            <system>Automatisk</system>
+        </color-scheme>
     </components>
     <untitled-form>Skjema ikke navngitt</untitled-form>
     <loading>Laster</loading>

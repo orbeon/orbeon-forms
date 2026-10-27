@@ -167,6 +167,12 @@
 
             <load-more>Továbbiak betöltése</load-more>
         </revision-history>
+        <color-scheme>
+            <toggle-theme>Téma váltása</toggle-theme>
+            <light>Világos</light>
+            <dark>Sötét</dark>
+            <system>Automatikus</system>
+        </color-scheme>
     </components>
     <untitled-form>Cím nélküli űrlap</untitled-form>
     <loading>Betöltés</loading>

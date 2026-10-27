@@ -167,6 +167,12 @@
 
             <load-more>Load More</load-more>
         </revision-history>
+        <color-scheme>
+            <toggle-theme>Toggle theme</toggle-theme>
+            <light>Light</light>
+            <dark>Dark</dark>
+            <system>Auto</system>
+        </color-scheme>
     </components>
     <untitled-form>Untitled Form</untitled-form>
     <loading>Loading</loading>

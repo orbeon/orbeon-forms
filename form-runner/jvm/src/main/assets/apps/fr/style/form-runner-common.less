@@ -253,13 +253,13 @@
 .dark-mode(@rules) {
     // Explicit dark mode
     @media screen {
-        .fr-color-scheme-dark, &:has(.fr-color-scheme-dark) {
+        &.fr-color-scheme-dark, .fr-color-scheme-dark, &:has(.fr-color-scheme-dark) {
             @rules();
         }
     }
     // System-preference dark mode (screen only)
     @media screen and (prefers-color-scheme: dark) {
-        .fr-color-scheme-system, &:has(.fr-color-scheme-system) {
+        &.fr-color-scheme-system, .fr-color-scheme-system, &:has(.fr-color-scheme-system) {
             @rules();
         }
     }

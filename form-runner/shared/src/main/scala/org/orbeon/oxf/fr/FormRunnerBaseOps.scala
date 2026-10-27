@@ -38,7 +38,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.{ElemFilter, ForwardingXMLReceiver, HTMLBodyXMLReceiver, SaxonUtils, SimpleHtmlSerializer}
 import org.xml.sax.Attributes
-import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.XFormsCrossPlatformSupport
@@ -706,6 +706,60 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
       featureName  = featureName,
       propertyName = propertyName
     ).getOrElse(default)
+  }
+
+  val ColorSchemeCookieName = "fr-color-scheme"
+  val ColorSchemeParamName  = "fr-color-scheme"
+  val AllowedColorSchemes   = Set("light", "dark", "system")
+
+  //@XPathFunction
+  def effectiveColorScheme(): String = {
+    val xfcd = inScopeContainingDocument
+
+    def fromParam: Option[String] =
+      xfcd.getFirstParamAsString(ColorSchemeParamName)
+        .flatMap(_.trimAllToOpt)
+        .filter(AllowedColorSchemes)
+
+    def fromCookie: Option[String] = {
+      val fromIncomingCookies =
+        Option(CoreCrossPlatformSupport.externalContext).flatMap(ec => Option(ec.getRequest)).flatMap { req =>
+          Option(req.incomingCookies).flatMap { cookies =>
+            cookies.find(_._1 == ColorSchemeCookieName).map(_._2.trimAllToEmpty).filter(AllowedColorSchemes)
+          }
+        }
+
+      fromIncomingCookies orElse {
+        xfcd.getFirstHeaderIgnoreCase(Headers.Cookie).flatMap { cookieHeader =>
+          cookieHeader.splitTo[List](";")
+            .flatMap(_.trimAllToOpt)
+            .find(_.startsWith(ColorSchemeCookieName + "="))
+            .map(_.substring(ColorSchemeCookieName.length + 1).trimAllToEmpty)
+            .filter(AllowedColorSchemes)
+        }
+      }
+    }
+
+    def fromSession: Option[String] =
+      Option(CoreCrossPlatformSupport.externalContext).flatMap(ec => Option(ec.getRequest)).flatMap(_.sessionOpt)
+        .flatMap(_.getAttribute(ColorSchemeCookieName))
+        .map {
+          case item: Item => item.getStringValue
+          case other      => other.toString
+        }
+        .flatMap(_.trimAllToOpt)
+        .filter(AllowedColorSchemes)
+
+    def fromMetadataOrProperties: String = {
+      implicit val indentedLogger: IndentedLogger = xfcd.getIndentedLogger("form-runner")
+      FRComponentParamSupport.fromMetadataAndPropertiesEvaluateAvt(
+        xfcd         = xfcd,
+        featureName  = "color-scheme",
+        propertyName = "oxf.fr.style.color-scheme"
+      ).flatMap(_.trimAllToOpt).filter(AllowedColorSchemes).getOrElse("light")
+    }
+
+    fromParam orElse fromCookie orElse fromSession getOrElse fromMetadataOrProperties
   }
 
   def formTitleFromMetadata: Option[String] =

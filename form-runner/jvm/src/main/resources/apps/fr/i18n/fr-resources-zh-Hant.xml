@@ -167,6 +167,12 @@
 
             <load-more>加載更多</load-more>
         </revision-history>
+        <color-scheme>
+            <toggle-theme>切換主題</toggle-theme>
+            <light>淺色</light>
+            <dark>深色</dark>
+            <system>自動</system>
+        </color-scheme>
     </components>
     <untitled-form>未命名表單</untitled-form>
     <loading>載入中</loading>

@@ -163,6 +163,12 @@
 
             <load-more>加载更多</load-more>
         </revision-history>
+        <color-scheme>
+            <toggle-theme>切换主题</toggle-theme>
+            <light>浅色</light>
+            <dark>深色</dark>
+            <system>自动</system>
+        </color-scheme>
     </components>
     <untitled-form>无标题表单</untitled-form>
     <loading>加载中</loading>

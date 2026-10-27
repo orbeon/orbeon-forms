@@ -14,6 +14,7 @@
 package org.orbeon.fr
 
 import org.orbeon.facades.{HTMLDialogElement, Ladda}
+import org.orbeon.oxf.util.StringUtils.*
 import org.scalajs.dom.ResizeObserver
 import org.orbeon.web.DomSupport.*
 import org.orbeon.web.{DomEventNames, DomSupport}
@@ -90,7 +91,84 @@ object FormRunnerApp extends App {
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-buttons"                                 , initStickyButtons)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-session-expiration-dialog"               , initSessionExpirationDialog)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-duplicate-tab-dialog"                    , initDuplicateTabDialog)
+      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-color-scheme-nav"                        , initColorSchemeSelector)
     }
+  }
+
+  private def initColorSchemeSelector(navElem: html.Element): Unit = {
+    val ColorSchemeCookieName = "fr-color-scheme"
+    val AllowedSchemes = Set("light", "dark", "system")
+
+    val frViewElemOpt = document.getElementByIdOpt("fr-view")
+    val iconElemOpt   = navElem.querySelectorOpt(".fr-color-scheme-icon-active")
+    val itemButtons   = navElem.querySelectorAllT("button[data-orbeon-color-scheme]")
+
+    def getEffectiveCurrentScheme: String = {
+      val classListOpt = frViewElemOpt.map(_.classList)
+      if (classListOpt.exists(_.contains("fr-color-scheme-dark"))) "dark"
+      else if (classListOpt.exists(_.contains("fr-color-scheme-system"))) "system"
+      else if (classListOpt.exists(_.contains("fr-color-scheme-light"))) "light"
+      else {
+        val fromCookie = document.cookie.splitTo[List](";")
+          .map(_.trimAllToEmpty)
+          .find(_.startsWith(s"$ColorSchemeCookieName="))
+          .map(_.substring(ColorSchemeCookieName.length + 1).trimAllToEmpty)
+          .filter(AllowedSchemes)
+        fromCookie.getOrElse("light")
+      }
+    }
+
+    def updateUI(scheme: String): Unit = {
+      iconElemOpt.foreach { iconElem =>
+        List("fa-sun", "fa-moon", "fa-circle-half-stroke").foreach(iconElem.classList.remove)
+        val iconClass = scheme match {
+          case "light"  => "fa-sun"
+          case "dark"   => "fa-moon"
+          case "system" => "fa-circle-half-stroke"
+          case _        => "fa-circle-half-stroke"
+        }
+        iconElem.classList.add(iconClass)
+      }
+
+      itemButtons.foreach { btn =>
+        val btnScheme = btn.getAttribute("data-orbeon-color-scheme")
+        val isActive = btnScheme == scheme
+        btn.closestOpt(".dropdown-item").foreach { li =>
+          li.classList.toggle("active", isActive)
+        }
+        btn.setAttribute("aria-pressed", isActive.toString)
+      }
+    }
+
+    def setColorScheme(scheme: String): Unit =
+      if (AllowedSchemes.contains(scheme)) {
+        val toRemove = List("fr-color-scheme-light", "fr-color-scheme-dark", "fr-color-scheme-system")
+        frViewElemOpt.foreach { frView =>
+          toRemove.foreach(frView.classList.remove)
+          frView.classList.add(s"fr-color-scheme-$scheme")
+        }
+        Option(document.body).foreach { body =>
+          toRemove.foreach(body.classList.remove)
+          body.classList.add(s"fr-color-scheme-$scheme")
+        }
+
+        document.cookie = s"$ColorSchemeCookieName=$scheme; path=/; max-age=31536000; SameSite=Lax"
+
+        try
+          window.localStorage.setItem("orbeon-color-scheme", scheme)
+        catch {
+          case _: Throwable =>
+        }
+
+        updateUI(scheme)
+      }
+
+    itemButtons.foreach { btn =>
+      val btnScheme = btn.getAttribute("data-orbeon-color-scheme")
+      btn.addEventListener("click", (_: dom.MouseEvent) => setColorScheme(btnScheme))
+    }
+
+    updateUI(getEffectiveCurrentScheme)
   }
 
   // Add `scroll-padding-top` and `scroll-padding-bottom` to prevent the focused form field from being

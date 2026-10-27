@@ -1266,6 +1266,82 @@ class FormRunnerFunctionsTest
       }
     }
   }
+
+  describe("Effective color scheme") {
+
+    def formSource: dom.Document =
+      <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+               xmlns:xf="http://www.w3.org/2002/xforms"
+               xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+        <xh:head>
+          <xf:model id="fr-form-model">
+            <xf:instance id="fr-form-instance">
+              <_/>
+            </xf:instance>
+            <xf:instance id="fr-form-metadata">
+              <metadata>
+                <application-name>acme</application-name>
+                <form-name>order</form-name>
+              </metadata>
+            </xf:instance>
+          </xf:model>
+        </xh:head>
+        <xh:body/>
+      </xh:html>.toDocument
+
+    it("must default to `light` when no property or cookie is set") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(formSource)) {
+          assert(effectiveColorScheme() == "light")
+        }
+      }
+    }
+
+    it("must pick up scheme from URL parameter") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(formSource)) {
+          val doc = inScopeContainingDocument
+          val reqInfo = doc.getRequestInformation
+          doc.setRequestInformation(reqInfo.copy(requestParameters = Map("fr-color-scheme" -> List("dark"))))
+          assert(effectiveColorScheme() == "dark")
+        }
+      }
+    }
+
+    it("must pick up scheme from cookie header") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(formSource)) {
+          val doc = inScopeContainingDocument
+          val reqInfo = doc.getRequestInformation
+          doc.setRequestInformation(reqInfo.copy(requestHeaders = Map("cookie" -> List("fr-color-scheme=system"))))
+          assert(effectiveColorScheme() == "system")
+        }
+      }
+    }
+
+    it("must prefer URL parameter over cookie") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(formSource)) {
+          val doc = inScopeContainingDocument
+          val reqInfo = doc.getRequestInformation
+          doc.setRequestInformation(reqInfo.copy(
+            requestParameters = Map("fr-color-scheme" -> List("light")),
+            requestHeaders    = Map("cookie" -> List("fr-color-scheme=dark"))
+          ))
+          assert(effectiveColorScheme() == "light")
+        }
+      }
+    }
+
+    it("must pick up scheme from session") {
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(formSource)) {
+          NetUtils.getExternalContext.getRequest.getSession(true).setAttribute("fr-color-scheme", "dark")
+          assert(effectiveColorScheme() == "dark")
+        }
+      }
+    }
+  }
 }
 
 // Class for test above

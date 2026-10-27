@@ -167,6 +167,12 @@
 
             <load-more>تحميل المزيد</load-more>
         </revision-history>
+        <color-scheme>
+            <toggle-theme>تبديل المظهر</toggle-theme>
+            <light>فاتح</light>
+            <dark>داكن</dark>
+            <system>تلقائي</system>
+        </color-scheme>
     </components>
     <untitled-form>نموذج بدون عنوان</untitled-form>
     <loading>جارٍ التحميل</loading>

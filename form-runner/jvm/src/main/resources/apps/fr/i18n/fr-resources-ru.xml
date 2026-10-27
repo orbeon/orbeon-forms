@@ -167,6 +167,12 @@
 
                 <load-more>Загрузить еще</load-more>
             </revision-history>
+        <color-scheme>
+            <toggle-theme>Переключить тему</toggle-theme>
+            <light>Светлая</light>
+            <dark>Темная</dark>
+            <system>Автоматически</system>
+        </color-scheme>
     </components>
     <untitled-form>Форма без названия</untitled-form>
     <loading>Загрузка</loading>

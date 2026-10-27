@@ -167,6 +167,12 @@
 
             <load-more>Carregar mais</load-more>
         </revision-history>
+        <color-scheme>
+            <toggle-theme>Alternar tema</toggle-theme>
+            <light>Claro</light>
+            <dark>Escuro</dark>
+            <system>Automático</system>
+        </color-scheme>
     </components>
     <untitled-form>Formulário sem título</untitled-form>
     <loading>A carregar</loading>

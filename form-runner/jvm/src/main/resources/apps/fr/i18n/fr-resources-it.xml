@@ -167,6 +167,12 @@
 
             <load-more>Carica altro</load-more>
         </revision-history>
+        <color-scheme>
+            <toggle-theme>Cambia tema</toggle-theme>
+            <light>Chiaro</light>
+            <dark>Scuro</dark>
+            <system>Automatico</system>
+        </color-scheme>
     </components>
     <untitled-form>Modulo senza nome</untitled-form>
     <loading>Caricamento in corso</loading>

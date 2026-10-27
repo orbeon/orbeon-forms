@@ -167,6 +167,12 @@
 
             <load-more>Meer laden</load-more>
         </revision-history>
+        <color-scheme>
+            <toggle-theme>Thema wisselen</toggle-theme>
+            <light>Licht</light>
+            <dark>Donker</dark>
+            <system>Automatisch</system>
+        </color-scheme>
     </components>
     <untitled-form>Naamloos form</untitled-form>
     <loading>Laden</loading>

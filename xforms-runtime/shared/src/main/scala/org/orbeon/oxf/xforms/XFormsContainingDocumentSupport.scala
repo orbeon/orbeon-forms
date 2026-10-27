@@ -680,6 +680,9 @@ trait ContainingDocumentRequest {
   def setRequestInformation(requestInformation: RequestInformation): Unit =
     this._requestInformation = requestInformation
 
+  def getRequestInformation: RequestInformation =
+    _requestInformation
+
   def namespaceId(id: CharSequence): String =
     if (id == null)
       null

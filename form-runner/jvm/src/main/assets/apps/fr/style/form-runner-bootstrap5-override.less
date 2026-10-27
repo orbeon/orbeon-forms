@@ -144,8 +144,31 @@
 
   // ***** Dropdowns ***************************************************************************************************
 
-  .fr-user-nav .dropdown-toggle::after {
-    display: none;
+  .fr-user-nav, .fr-color-scheme-nav {
+    .dropdown-toggle::after {
+      display: none;
+    }
+  }
+
+  .fr-color-scheme-nav {
+    .dropdown-item {
+      padding: 0;
+
+      .fr-check-icon {
+        display: none;
+      }
+
+      &.active {
+        .fr-check-icon {
+          display: inline-block;
+        }
+
+        .btn-link {
+          background-color: transparent;
+          color: var(--orbeon-dropdown-menu-selected-color);
+        }
+      }
+    }
   }
 
   .dropdown-toggle:has(> .caret:only-child)::after {

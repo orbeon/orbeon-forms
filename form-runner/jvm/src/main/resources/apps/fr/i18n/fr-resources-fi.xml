@@ -167,6 +167,12 @@
 
              <load-more>Lataa lisää</load-more>
         </revision-history>
+        <color-scheme>
+            <toggle-theme>Vaihda teemaa</toggle-theme>
+            <light>Vaalea</light>
+            <dark>Tumma</dark>
+            <system>Automaattinen</system>
+        </color-scheme>
     </components>
     <untitled-form>Nimetön lomake</untitled-form>
     <loading>Ladataan</loading>

@@ -471,7 +471,7 @@
                         not(xxf:property(string-join(('oxf.fr.keyboard-shortcuts.show-hints', fr:app-name(), fr:form-name()), '.')) = true())
                     ]
                 }}{{
-                    let $color-scheme-opt := frf:optionFromMetadataOrPropertiesDynamicXPath('color-scheme', 'oxf.fr.style.color-scheme', 'light')[. = ('light', 'dark', 'system')]
+                    let $color-scheme-opt := frf:effectiveColorScheme()[. = ('light', 'dark', 'system')]
                     return
                         if (
                             (
@@ -522,6 +522,9 @@
                         <xh:ul class="navbar-nav ms-auto">
                             <xh:li class="nav-item px-0 py-1 py-lg-1">
                                 <fr:language-selector appearance="bootstrap5" fr:dropdown-align="right"/>
+                            </xh:li>
+                            <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
+                                <fr:color-scheme-selector/>
                             </xh:li>
                             <!-- Optional items; each hides itself when disabled/non-relevant, and the CSS collapses
                                  the then-empty <li> -->
@@ -937,6 +940,52 @@
                     name="fr-open"
                     targetid="fr-revision-history"/>
             </xf:trigger>
+        </xf:group>
+    </xsl:template>
+
+    <xsl:template match="fr:color-scheme-selector">
+        <xf:group
+            class="fr-color-scheme-nav"
+            ref=".[
+                not(fr:mode() = 'test') and
+                not(fr:is-embedded())   and
+                xxf:property(string-join(('oxf.fr.navbar.color-scheme-selector.enable', fr:app-name(), fr:form-name()), '.'))
+            ]">
+            <xh:div class="dropdown">
+                <xh:a
+                    id="fr-color-scheme-toggle"
+                    href="#"
+                    class="btn btn-secondary dropdown-toggle"
+                    data-orbeon-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    title="{{xxf:r('components.color-scheme.toggle-theme', '|fr-fr-resources|')}}"
+                    aria-label="{{xxf:r('components.color-scheme.toggle-theme', '|fr-fr-resources|')}}">
+                    <xh:i class="fa fa-fw fa-circle-half-stroke fr-color-scheme-icon-active"/>
+                </xh:a>
+                <xh:ul class="dropdown-menu dropdown-menu-end" role="menu" aria-labelledby="fr-color-scheme-toggle">
+                    <xh:li role="presentation" class="dropdown-item">
+                        <xh:button type="button" role="menuitem" class="btn-link d-flex align-items-center w-100" data-orbeon-color-scheme="light">
+                            <xh:i class="fa fa-fw fa-sun me-2 opacity-75"/>
+                            <xf:output value="xxf:r('components.color-scheme.light', '|fr-fr-resources|')"/>
+                            <xh:i class="fa fa-check ms-auto fr-check-icon"/>
+                        </xh:button>
+                    </xh:li>
+                    <xh:li role="presentation" class="dropdown-item">
+                        <xh:button type="button" role="menuitem" class="btn-link d-flex align-items-center w-100" data-orbeon-color-scheme="dark">
+                            <xh:i class="fa fa-fw fa-moon me-2 opacity-75"/>
+                            <xf:output value="xxf:r('components.color-scheme.dark', '|fr-fr-resources|')"/>
+                            <xh:i class="fa fa-check ms-auto fr-check-icon"/>
+                        </xh:button>
+                    </xh:li>
+                    <xh:li role="presentation" class="dropdown-item">
+                        <xh:button type="button" role="menuitem" class="btn-link d-flex align-items-center w-100" data-orbeon-color-scheme="system">
+                            <xh:i class="fa fa-fw fa-circle-half-stroke me-2 opacity-75"/>
+                            <xf:output value="xxf:r('components.color-scheme.system', '|fr-fr-resources|')"/>
+                            <xh:i class="fa fa-check ms-auto fr-check-icon"/>
+                        </xh:button>
+                    </xh:li>
+                </xh:ul>
+            </xh:div>
         </xf:group>
     </xsl:template>
 

@@ -167,6 +167,12 @@
 
             <load-more>Wczytaj więcej</load-more>
         </revision-history>
+        <color-scheme>
+            <toggle-theme>Przełącz motyw</toggle-theme>
+            <light>Jasny</light>
+            <dark>Ciemny</dark>
+            <system>Automatyczny</system>
+        </color-scheme>
     </components>
     <untitled-form>Bez tytułu</untitled-form>
     <loading>Ładowanie</loading>

@@ -167,6 +167,12 @@
 
             <load-more>Indlæs flere</load-more>
         </revision-history>
+        <color-scheme>
+            <toggle-theme>Skift tema</toggle-theme>
+            <light>Lyst</light>
+            <dark>Mørkt</dark>
+            <system>Automatisk</system>
+        </color-scheme>
     </components>
     <untitled-form>Blanket uden navn</untitled-form>
     <loading>Indlæser</loading>

@@ -154,12 +154,6 @@ object FormRunnerApp extends App {
 
         document.cookie = s"$ColorSchemeCookieName=$scheme; path=/; max-age=31536000; SameSite=Lax"
 
-        try
-          window.localStorage.setItem("orbeon-color-scheme", scheme)
-        catch {
-          case _: Throwable =>
-        }
-
         updateUI(scheme)
       }
 

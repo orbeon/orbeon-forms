@@ -31,33 +31,25 @@ import com.openhtmltopdf.layout.BoxBuilder;
 import com.openhtmltopdf.layout.Layer;
 import com.openhtmltopdf.layout.LayoutContext;
 import com.openhtmltopdf.layout.SharedContext;
-import com.openhtmltopdf.outputdevice.helper.BaseDocument;
-import com.openhtmltopdf.outputdevice.helper.ExternalResourceControlPriority;
-import com.openhtmltopdf.outputdevice.helper.ExternalResourceType;
-import com.openhtmltopdf.extend.FSDOMMutator;
-import com.openhtmltopdf.outputdevice.helper.PageDimensions;
-import com.openhtmltopdf.outputdevice.helper.UnicodeImplementation;
+import com.openhtmltopdf.outputdevice.helper.*;
 import com.openhtmltopdf.pdfboxout.PdfBoxUtil.Metadata;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder.CacheStore;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder.PdfAConformance;
-import com.openhtmltopdf.render.BlockBox;
-import com.openhtmltopdf.render.Box;
-import com.openhtmltopdf.render.PageBox;
-import com.openhtmltopdf.render.RenderingContext;
-import com.openhtmltopdf.render.ViewportBox;
+import com.openhtmltopdf.render.*;
 import com.openhtmltopdf.render.displaylist.DisplayListCollector;
 import com.openhtmltopdf.render.displaylist.DisplayListContainer;
+import com.openhtmltopdf.render.displaylist.DisplayListContainer.DisplayListPageContainer;
 import com.openhtmltopdf.render.displaylist.DisplayListPainter;
 import com.openhtmltopdf.render.displaylist.PagedBoxCollector;
-import com.openhtmltopdf.render.displaylist.DisplayListContainer.DisplayListPageContainer;
 import com.openhtmltopdf.resource.XMLResource;
 import com.openhtmltopdf.simple.extend.XhtmlNamespaceHandler;
 import com.openhtmltopdf.util.LogMessageId;
 import com.openhtmltopdf.util.OpenUtil;
 import com.openhtmltopdf.util.ThreadCtx;
 import com.openhtmltopdf.util.XRLog;
-
 import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.pdfwriter.compress.COSWriterCompressionPool;
+import org.apache.pdfbox.pdfwriter.compress.CompressParameters;
 import org.apache.pdfbox.pdmodel.*;
 import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
@@ -65,6 +57,7 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkInfo;
 import org.apache.pdfbox.pdmodel.encryption.PDEncryption;
 import org.apache.pdfbox.pdmodel.graphics.color.PDOutputIntent;
+import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.viewerpreferences.PDViewerPreferences;
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.*;
@@ -74,16 +67,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
-import javax.xml.transform.*;
+import javax.xml.transform.TransformerException;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
@@ -179,7 +168,7 @@ public class CustomPdfBoxRenderer implements Closeable, PageSupplier {
             _outputDevice =
                     new PdfBoxFastOutputDevice(DEFAULT_DOTS_PER_POINT, _testMode,
                             state._pdfUaConform || state._pdfAConformance.getConformanceValue().equals("A"),
-                            state._pdfAConformance != PdfAConformance.NONE);
+                            state._pdfAConformance);
             _outputDevice.setWriter(_pdfDoc);
             _outputDevice.setStartPageNo(_pdfDoc.getPages().getCount());
 
@@ -502,7 +491,22 @@ public class CustomPdfBoxRenderer implements Closeable, PageSupplier {
                 try {
                     fireOnClose();
                     if (success) {
-                        _pdfDoc.save(_os);
+                        // #7998: fix the "NeedAppearance is present with the value true" error (PDFBox Preflight).
+                        // openhtmltopdf creates an empty AcroForm, with NeedAppearances set to true, as soon as the
+                        // document contains a form element. PDF/A doesn't allow NeedAppearances set to true.
+                        if (_pdfAConformance != PdfAConformance.NONE) {
+                            PDAcroForm acroForm = _pdfDoc.getDocumentCatalog().getAcroForm(null);
+                            if (acroForm != null && acroForm.getFields().isEmpty())
+                                _pdfDoc.getDocumentCatalog().setAcroForm(null);
+                        }
+                        // #7998: fix the "Trailer Syntax error, /XRef cross reference streams are not allowed" error
+                        // from PDFBox Preflight. For PDF/A-1a and PDF/A-1b, the PDF version must be 1.4 and compression
+                        // is not supported with that version.
+                        CompressParameters compressParameters =
+                                getPDFVersion() < COSWriterCompressionPool.MINIMUM_SUPPORTED_VERSION
+                                        ? CompressParameters.NO_COMPRESSION
+                                        : CompressParameters.DEFAULT_COMPRESSION;
+                        _pdfDoc.save(_os, compressParameters);
                     }
                 } finally {
                     OpenUtil.closeQuietly(_pdfDoc);

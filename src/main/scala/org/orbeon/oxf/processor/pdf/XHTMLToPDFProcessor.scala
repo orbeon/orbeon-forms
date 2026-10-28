@@ -31,6 +31,7 @@ import org.w3c.dom.Document
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
+import java.awt.color.{ColorSpace, ICC_Profile}
 import java.io.{FileInputStream, OutputStream}
 import java.text.Normalizer
 import javax.xml.transform.dom.DOMResult
@@ -131,7 +132,7 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
 
     pdfRendererBuilder.usePdfUaAccessibility(propertySet.getBoolean("oxf.fr.pdf.accessibility", default = false))
 
-    pdfRendererBuilder.usePdfAConformance(
+    val pdfAConformance =
       propertySet.getString("oxf.fr.pdf.pdf/a", default = "none") match {
         case "none" => PdfRendererBuilder.PdfAConformance.NONE
         case "1a"   => PdfRendererBuilder.PdfAConformance.PDFA_1_A
@@ -144,7 +145,12 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
         case "3u"   => PdfRendererBuilder.PdfAConformance.PDFA_3_U
         case other  => throw new IllegalArgumentException(s"Invalid PDF/A conformance: `$other`")
       }
-    )
+
+    pdfRendererBuilder.usePdfAConformance(pdfAConformance)
+    if (pdfAConformance != PdfRendererBuilder.PdfAConformance.NONE) {
+      // #7998: fix the "Invalid Color space" errors from PDFBox Preflight. A color profile must be specified.
+      pdfRendererBuilder.useColorProfile(ICC_Profile.getInstance(ColorSpace.CS_sRGB).getData)
+    }
 
     embedFontsConfiguredInProperties(pdfRendererBuilder, propertySet)
     embedDefaultFont(pdfRendererBuilder)
@@ -207,7 +213,9 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
             jpegCompressionLevel,
             outputDevice,
             pipelineContext,
-            DefaultDotsPerPixel
+            DefaultDotsPerPixel,
+            // #7998: PDF/A-1 doesn't allow transparency, so images with an alpha channel are drawn on white
+            flattenImageTransparency = pdfAConformance.getPart == 1
           )
         )
       ) { pdfBoxRenderer =>

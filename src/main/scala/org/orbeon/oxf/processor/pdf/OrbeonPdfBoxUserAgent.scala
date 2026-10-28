@@ -27,6 +27,8 @@ import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.TryUtils.*
 import org.orbeon.oxf.util.{Connection, ImageMetadata, IndentedLogger, ResourceResolver, URLRewriterUtils}
 
+import java.awt.Color
+import java.awt.image.BufferedImage
 import java.io.*
 import java.net.URI
 import java.nio.charset.StandardCharsets
@@ -40,7 +42,8 @@ class OrbeonPdfBoxUserAgent(
   jpegCompressionLevel                 : Float,
   outputDevice                         : PdfBoxOutputDevice,
   override val pipelineContext         : PipelineContext,
-  dotsPerPixel                         : Int
+  dotsPerPixel                         : Int,
+  flattenImageTransparency             : Boolean
 )(override implicit val externalContext: ExternalContext,
   override implicit val indentedLogger : IndentedLogger
 ) extends PdfBoxUserAgent(outputDevice)
@@ -121,7 +124,22 @@ class OrbeonPdfBoxUserAgent(
                   sourceBytes
               }
             }
-          val fsImage = new PdfBoxImage(imgBytes, uriStr)
+          val flatBytes =
+            if (flattenImageTransparency)
+              Option(ImageIO.read(new ByteArrayInputStream(imgBytes))).filter(_.getColorModel.hasAlpha).map { image =>
+                val flat = new BufferedImage(image.getWidth, image.getHeight, BufferedImage.TYPE_INT_RGB)
+                val g = flat.createGraphics()
+                g.setColor(Color.WHITE)
+                g.fillRect(0, 0, image.getWidth, image.getHeight)
+                g.drawImage(image, 0, 0, null)
+                g.dispose()
+                val os = new ByteArrayOutputStream
+                ImageIO.write(flat, "png", os)
+                os.toByteArray
+              }.getOrElse(imgBytes)
+            else
+              imgBytes
+          val fsImage = new PdfBoxImage(flatBytes, uriStr)
           scaleToOutputResolution(fsImage)
           outputDevice.realizeImage(fsImage)
           resource = new ImageResource(uriResolved, fsImage)

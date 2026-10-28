@@ -7910,6 +7910,8 @@
                     <xf:output id="xxf-escape-xml-minimal" value="xxf:escape-xml-minimal(value)"/>
                     <xf:output id="xxf-json-to-xml"        value="xxf:json-to-xml(value)"/>
                     <xf:output id="xxf-xml-to-json"        value="xxf:xml-to-json(value)"/>
+                    <xf:output id="xxf-csv-to-xml"        value="xxf:csv-to-xml(value)"/>
+                    <xf:output id="xxf-xml-to-csv"        value="xxf:xml-to-csv(value)"/>
                 </xh:body>
             </xh:html>
         </input>
@@ -8011,6 +8013,26 @@
                 <output scope="" prefixed-id="xxf-xml-to-json" model-prefixed-id="m" binding="false" value="true">
                     <value>
                         <analysis expression="string((xxf:xml-to-json(value))[1])" analyzed="false"/>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="xxf-csv-to-xml" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((xxf:csv-to-xml(value))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i')/value</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>m</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <output scope="" prefixed-id="xxf-xml-to-csv" model-prefixed-id="m" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((xxf:xml-to-csv(value))[1])" analyzed="false"/>
                     </value>
                 </output>
             </root>

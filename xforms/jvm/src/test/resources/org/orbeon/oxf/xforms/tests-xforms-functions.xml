@@ -2926,6 +2926,73 @@
         </output>
     </test>
 
+    <test description="#6826: XPath functions to convert between CSV and XML" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="results">
+                            <result>
+                                <r1/>
+                                <r2/>
+                                <r3/>
+                                <r4/>
+                                <r5/>
+                            </result>
+                        </xf:instance>
+
+                        <xf:action event="xforms-model-construct-done">
+                            <xf:var name="csv1" value="'Year, Result&#10;2011, 143&#10;2012, 457'"/>
+                            <xf:var name="xml1" value="xxf:csv-to-xml($csv1)"/>
+                            <xf:setvalue ref="instance()/r1" value="string-join(($xml1/*/h/Year, $xml1/*/r[1]/Result, $xml1/*/r[2]/Year), ',')"/>
+
+                            <!-- header = false -->
+                            <xf:var name="csv2" value="'2011, &quot;Jan, Mar&quot;&#10;2012, &quot;Feb, Apr&quot;'"/>
+                            <xf:var name="xml2" value="xxf:csv-to-xml($csv2, false())"/>
+                            <xf:setvalue ref="instance()/r2" value="string-join(($xml2/*/r[1]/v[1], $xml2/*/r[1]/v[2], $xml2/*/r[2]/v[2]), ',')"/>
+
+                            <!-- xml-to-csv round-trip -->
+                            <xf:var name="csv3" value="xxf:xml-to-csv($xml1)"/>
+                            <xf:setvalue ref="instance()/r3" value="replace(replace($csv3, '&#13;', ''), '&#10;', ' ')"/>
+
+                            <!-- xml-to-csv with header = false -->
+                            <xf:var name="csv4" value="xxf:xml-to-csv($xml1, false())"/>
+                            <xf:setvalue ref="instance()/r4" value="replace(replace($csv4, '&#13;', ''), '&#10;', ' ')"/>
+
+                            <!-- header = 'absent' -->
+                            <xf:var name="xml5" value="xxf:csv-to-xml($csv2, 'absent')"/>
+                            <xf:setvalue ref="instance()/r5" value="string-join(($xml5/*/r[1]/v[1], $xml5/*/r[1]/v[2]), ',')"/>
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="results" model-id="model">
+                                <result>
+                                    <r1>Year,143,2012</r1>
+                                    <r2>2011,Jan, Mar,Feb, Apr</r2>
+                                    <r3>Year,Result&#10;2011,143&#10;2012,457</r3>
+                                    <r4>2011,143&#10;2012,457</r4>
+                                    <r5>2011,Jan, Mar</r5>
+                                </result>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <test description="Map functions" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">

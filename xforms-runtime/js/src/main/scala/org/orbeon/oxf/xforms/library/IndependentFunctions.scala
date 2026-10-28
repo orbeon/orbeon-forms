@@ -11,7 +11,7 @@ import org.orbeon.oxf.xml.FunctionSupport.*
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, StringValueWithEquals}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
-import org.orbeon.saxon.value.{AtomicValue, StringValue}
+import org.orbeon.saxon.value.{AtomicValue, BooleanValue, StringValue}
 import org.orbeon.scaxon.SimplePath.*
 
 import scala.util.Try
@@ -225,6 +225,40 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
   @XPathFunction
   def xmlToJson(root: Option[om.NodeInfo])(implicit xpc: XPathContext): String =
     Converter.xmlToJsonString(root.getOrElse(xpc.getContextItem.asInstanceOf[om.NodeInfo]), strict = false)
+
+  @XPathFunction
+  def csvToXml(s: Option[String] = null, header: Option[om.Item] = None)(implicit xpc: XPathContext): Option[om.NodeInfo] = {
+    val headerBool = parseHeaderOption(header).getOrElse(true)
+    stringArgumentOrContextOpt(s).flatMap(csvString =>
+      Try(org.orbeon.oxf.csv.Converter.csvStringToXmlDoc(csvString, header = headerBool)).toOption
+    )
+  }
+
+  @XPathFunction
+  def xmlToCsv(root: Option[om.NodeInfo] = null, header: Option[om.Item] = None)(implicit xpc: XPathContext): Option[String] = {
+    val headerBool = parseHeaderOption(header).getOrElse(true)
+    itemArgumentOrContextOpt(root).collect {
+      case node: om.NodeInfo =>
+        org.orbeon.oxf.csv.Converter.xmlToCsvString(node, header = headerBool)
+    }
+  }
+
+  private def parseHeaderOption(itemOpt: Option[om.Item]): Option[Boolean] =
+    itemOpt.map {
+      case b: BooleanValue => b.getBooleanValue
+      case s: StringValue =>
+        s.getStringValue.trim.toLowerCase match {
+          case "present" | "true" | "yes" | "1" => true
+          case "absent"  | "false" | "no" | "0" => false
+          case _                                => true
+        }
+      case other =>
+        other.getStringValue.trim.toLowerCase match {
+          case "present" | "true" | "yes" | "1" => true
+          case "absent"  | "false" | "no" | "0" => false
+          case _                                => true
+        }
+    }
 
   private def classesFromAttribute(i: Option[om.Item])(implicit xpc: XPathContext): Set[String] =
     itemArgumentOrContextOpt(i) match {

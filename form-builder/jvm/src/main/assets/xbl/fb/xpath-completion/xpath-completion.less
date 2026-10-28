@@ -8,6 +8,10 @@
       .fb-xpath-completion-format-button {
         display: none;
       }
+
+      & > .fb-xpath-completion-wrapper.fb-xpath-completion-expanded {
+        background-color: var(--orbeon-control-read-only-background-color, var(--orbeon-input-bg, #ffffff));
+      }
     }
 
     &.xforms-disabled {
@@ -20,6 +24,35 @@
       position: relative;
       display: inline-block;
       width: 100%;
+
+      &.fb-xpath-completion-expanded {
+        position: fixed;
+        z-index: 1050;
+        background-color: var(--orbeon-input-bg, #ffffff);
+        border-radius: var(--orbeon-control-border-radius, 4px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+
+        text-expander {
+          width: 100%;
+          height: 100%;
+
+          .xforms-textarea {
+            display: block;
+            width: 100%;
+            height: 100%;
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+
+          textarea {
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+            resize: none !important;
+            box-sizing: border-box;
+          }
+        }
+      }
 
       & > .fb-xpath-completion-buttons {
         position: absolute;
@@ -162,6 +195,7 @@
         }
 
         textarea {
+          min-height: ~"calc(@{fluidLineHeight} * 4 + 12px)";
           padding-right: 32px;
           white-space: pre-wrap;
           word-wrap: break-word;

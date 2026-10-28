@@ -21,16 +21,20 @@ object XPathCompletion {
 
   XFormsXbl.declareCompanion("fb|xpath-completion", js.constructorOf[XPathCompletionCompanion])
 
-  private class XPathCompletionCompanion(containerElem: dom.html.Element) extends XBLCompanion {
+  private[xbl] class XPathCompletionCompanion(containerElem: dom.html.Element) extends XBLCompanion {
 
     private var pendingPromiseOpt : Option[Promise[Completions]] = None
     private var textExpanderActive: Boolean                     = false
     private var stoppedChangeEvent: Boolean                     = false
 
-    private var backdropOpt    : Option[HighlightBackdrop] = None
-    private var formatButtonOpt: Option[dom.html.Element]  = None
-    private var copyButtonOpt  : Option[dom.html.Element]  = None
-    private var valueOpt       : Option[String]            = None
+    private var backdropOpt             : Option[HighlightBackdrop] = None
+    private var expandButtonOpt         : Option[dom.html.Element]  = None
+    private var formatButtonOpt         : Option[dom.html.Element]  = None
+    private var copyButtonOpt           : Option[dom.html.Element]  = None
+    private var placeholderElemOpt      : Option[dom.html.Element]  = None
+    private var isExpanded              : Boolean                   = false
+    private var suppressNextOutsideClick: Boolean                   = false
+    private var valueOpt                : Option[String]            = None
 
     private object EventSupport extends EventListenerSupport
 
@@ -51,8 +55,20 @@ object XPathCompletion {
       )
       backdropOpt = Some(backdrop)
 
+      expandButtonOpt = containerElem.querySelectorOpt(".fb-xpath-completion-expand-button")
       formatButtonOpt = containerElem.querySelectorOpt(".fb-xpath-completion-format-button")
       copyButtonOpt   = containerElem.querySelectorOpt(".fb-xpath-completion-copy-button")
+
+      expandButtonOpt.foreach { expandButton =>
+        EventSupport.addListener(expandButton, "mousedown", (event: dom.MouseEvent) => {
+          event.preventDefault()
+        })
+        EventSupport.addListener(expandButton, "click", (event: dom.MouseEvent) => {
+          event.preventDefault()
+          event.stopPropagation()
+          toggleExpand()
+        })
+      }
 
       formatButtonOpt.foreach { formatButton =>
         EventSupport.addListener(formatButton, "mousedown", (event: dom.MouseEvent) => {
@@ -126,15 +142,72 @@ object XPathCompletion {
           useCapture = true
         )
 
-        // Listen for reformat keyboard shortcut (Shift+Alt+F or Cmd/Ctrl+Option+L)
+        // Listen for reformat keyboard shortcut (Shift+Alt+F or Cmd/Ctrl+Option+L) and Esc to restore expanded view
         EventSupport.addListener(fieldElem, DomEventNames.KeyDown, (event: dom.KeyboardEvent) => {
           if (isFormatShortcut(event)) {
             event.preventDefault()
             event.stopPropagation()
             reformatExpression()
+          } else if (event.key == "Escape" && isExpanded && !textExpanderActive) {
+            event.preventDefault()
+            event.stopPropagation()
+            collapse()
           }
         })
       }
+
+      // Restore expanded textarea when clicking outside of it
+      EventSupport.addListener(
+        dom.document,
+        "mousedown",
+        (event: dom.MouseEvent) => {
+          if (isExpanded) {
+            backdropOpt.flatMap(_.wrapperElemOpt).foreach { wrapperElem =>
+              val targetNode = event.target.asInstanceOf[dom.Node]
+              if (targetNode != null && !wrapperElem.contains(targetNode)) {
+                suppressNextOutsideClick = true
+                event.preventDefault()
+                event.stopPropagation()
+                collapse()
+              }
+            }
+          }
+        },
+        useCapture = true
+      )
+
+      EventSupport.addListener(
+        dom.document,
+        "mouseup",
+        (_: dom.MouseEvent) => {
+          if (suppressNextOutsideClick) {
+            dom.window.setTimeout(() => {
+              suppressNextOutsideClick = false
+            }, 0)
+          }
+        },
+        useCapture = true
+      )
+
+      EventSupport.addListener(
+        dom.document,
+        "click",
+        (event: dom.MouseEvent) => {
+          if (suppressNextOutsideClick) {
+            suppressNextOutsideClick = false
+            event.preventDefault()
+            event.stopPropagation()
+          }
+        },
+        useCapture = true
+      )
+
+      EventSupport.addListener(dom.window, "resize", (_: dom.Event) => {
+        if (isExpanded) {
+          updateExpandedBounds()
+          updateHighlights()
+        }
+      })
 
       // Prevent a `xxforms-value` when users click on a completion
       EventSupport.addListener(containerElem, "change",
@@ -163,14 +236,113 @@ object XPathCompletion {
       updateHighlights()
 
     override def destroy(): Unit = {
+      collapse()
       EventSupport.clearAllListeners()
       backdropOpt.foreach(_.destroy())
-      backdropOpt       = None
-      pendingPromiseOpt = None
-      formatButtonOpt   = None
-      copyButtonOpt     = None
-      valueOpt          = None
+      backdropOpt        = None
+      pendingPromiseOpt  = None
+      expandButtonOpt    = None
+      formatButtonOpt    = None
+      copyButtonOpt      = None
+      placeholderElemOpt = None
+      valueOpt           = None
     }
+
+    private val DefaultExpandTitle = "Expand"
+    private val ExpandedTitle      = "Restore (Esc)"
+    private val ExpandedInsetPx    = 10.0
+
+    private def toggleExpand(): Unit =
+      if (isExpanded) collapse() else expand()
+
+    private def expand(): Unit =
+      if (!isExpanded) {
+        backdropOpt.flatMap(_.wrapperElemOpt).foreach { wrapperElem =>
+          val inlineRect = wrapperElem.getBoundingClientRect()
+
+          if (placeholderElemOpt.isEmpty) {
+            val placeholder = dom.document.createElement("span").asInstanceOf[dom.html.Element]
+            placeholder.className           = "fb-xpath-completion-placeholder"
+            placeholder.style.display       = "inline-block"
+            placeholder.style.width         = s"${inlineRect.width}px"
+            placeholder.style.height        = s"${inlineRect.height}px"
+            placeholder.style.verticalAlign = "top"
+            Option(wrapperElem.parentNode).foreach(_.insertBefore(placeholder, wrapperElem))
+            placeholderElemOpt = Some(placeholder)
+          }
+
+          isExpanded = true
+          wrapperElem.classList.add("fb-xpath-completion-expanded")
+          updateExpandedBounds()
+          updateExpandButtonState()
+          fieldElemOpt.foreach(_.focus())
+          updateHighlights()
+        }
+      }
+
+    private def collapse(): Unit =
+      if (isExpanded) {
+        isExpanded = false
+        backdropOpt.flatMap(_.wrapperElemOpt).foreach { wrapperElem =>
+          wrapperElem.classList.remove("fb-xpath-completion-expanded")
+          wrapperElem.style.left   = ""
+          wrapperElem.style.top    = ""
+          wrapperElem.style.width  = ""
+          wrapperElem.style.height = ""
+        }
+        placeholderElemOpt.foreach { placeholder =>
+          Option(placeholder.parentNode).foreach(_.removeChild(placeholder))
+        }
+        placeholderElemOpt = None
+        updateExpandButtonState()
+        updateHighlights()
+      }
+
+    private def updateExpandedBounds(): Unit =
+      backdropOpt.flatMap(_.wrapperElemOpt).foreach { wrapperElem =>
+        val targetContainerOpt =
+          containerElem.closestOpt(".xxforms-dialog-body")
+            .orElse(containerElem.closestOpt("dialog, .xforms-dialog"))
+            .orElse(Option(dom.document.querySelector(".fb-main")).map(_.asInstanceOf[dom.html.Element]))
+
+        val (left, top, width, height) =
+          targetContainerOpt match {
+            case Some(targetContainer) =>
+              val rect = targetContainer.getBoundingClientRect()
+              (
+                rect.left + ExpandedInsetPx,
+                rect.top  + ExpandedInsetPx,
+                math.max(100.0, rect.width  - ExpandedInsetPx * 2),
+                math.max(100.0, rect.height - ExpandedInsetPx * 2)
+              )
+            case None =>
+              val vw = dom.window.innerWidth
+              val vh = dom.window.innerHeight
+              val inset = 20.0
+              (
+                inset,
+                inset,
+                math.max(100.0, vw - inset * 2),
+                math.max(100.0, vh - inset * 2)
+              )
+          }
+
+        wrapperElem.style.left   = s"${left}px"
+        wrapperElem.style.top    = s"${top}px"
+        wrapperElem.style.width  = s"${width}px"
+        wrapperElem.style.height = s"${height}px"
+      }
+
+    private def updateExpandButtonState(): Unit =
+      expandButtonOpt.foreach { button =>
+        val title     = if (isExpanded) ExpandedTitle          else DefaultExpandTitle
+        val ariaLabel = if (isExpanded) "Restore"              else "Expand"
+        val iconClass = if (isExpanded) "fa fa-compress fa-fw" else "fa fa-expand fa-fw"
+        button.title = title
+        button.setAttribute("aria-label", ariaLabel)
+        button.setAttribute("aria-expanded", isExpanded.toString)
+        Option(button.querySelector("i")).foreach(_.setAttribute("class", iconClass))
+      }
 
     private def isFormatShortcut(event: dom.KeyboardEvent): Boolean = {
       val isShiftAltF = event.shiftKey && event.altKey && !event.ctrlKey && !event.metaKey &&

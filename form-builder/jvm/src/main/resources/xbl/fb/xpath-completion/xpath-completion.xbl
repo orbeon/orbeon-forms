@@ -63,6 +63,15 @@
                     <xh:div class="fb-xpath-completion-buttons">
                         <xh:button
                             type="button"
+                            class="fb-xpath-completion-expand-button"
+                            title="Expand"
+                            aria-label="Expand"
+                            aria-expanded="false"
+                            tabindex="-1">
+                            <xh:i class="fa fa-expand fa-fw"/>
+                        </xh:button>
+                        <xh:button
+                            type="button"
                             class="fb-xpath-completion-format-button"
                             title="Format XPath expression (Shift+Alt+F)"
                             aria-label="Format XPath expression"

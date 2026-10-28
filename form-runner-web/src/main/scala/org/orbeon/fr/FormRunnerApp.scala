@@ -134,9 +134,9 @@ object FormRunnerApp extends App {
         val btnScheme = btn.getAttribute("data-orbeon-color-scheme")
         val isActive = btnScheme == scheme
         btn.closestOpt(".dropdown-item").foreach { li =>
-          li.classList.toggle("active", isActive)
+          li.classList.toggle("disabled", isActive)
         }
-        btn.setAttribute("aria-pressed", isActive.toString)
+        btn.setAttribute("aria-checked", isActive.toString)
       }
     }
 

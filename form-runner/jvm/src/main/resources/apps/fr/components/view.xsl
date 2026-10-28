@@ -964,24 +964,21 @@
                 </xh:a>
                 <xh:ul class="dropdown-menu dropdown-menu-end" role="menu" aria-labelledby="fr-color-scheme-toggle">
                     <xh:li role="presentation" class="dropdown-item">
-                        <xh:button type="button" role="menuitem" class="btn-link d-flex align-items-center w-100" data-orbeon-color-scheme="light">
-                            <xh:i class="fa fa-fw fa-sun me-2 opacity-75"/>
+                        <xh:button type="button" role="menuitemradio" class="btn-link" data-orbeon-color-scheme="light">
+                            <xh:i class="fa fa-fw fa-sun me-2"/>
                             <xf:output value="xxf:r('components.color-scheme.light', '|fr-fr-resources|')"/>
-                            <xh:i class="fa fa-check ms-auto fr-check-icon"/>
                         </xh:button>
                     </xh:li>
                     <xh:li role="presentation" class="dropdown-item">
-                        <xh:button type="button" role="menuitem" class="btn-link d-flex align-items-center w-100" data-orbeon-color-scheme="dark">
-                            <xh:i class="fa fa-fw fa-moon me-2 opacity-75"/>
+                        <xh:button type="button" role="menuitemradio" class="btn-link" data-orbeon-color-scheme="dark">
+                            <xh:i class="fa fa-fw fa-moon me-2"/>
                             <xf:output value="xxf:r('components.color-scheme.dark', '|fr-fr-resources|')"/>
-                            <xh:i class="fa fa-check ms-auto fr-check-icon"/>
                         </xh:button>
                     </xh:li>
                     <xh:li role="presentation" class="dropdown-item">
-                        <xh:button type="button" role="menuitem" class="btn-link d-flex align-items-center w-100" data-orbeon-color-scheme="system">
-                            <xh:i class="fa fa-fw fa-circle-half-stroke me-2 opacity-75"/>
+                        <xh:button type="button" role="menuitemradio" class="btn-link" data-orbeon-color-scheme="system">
+                            <xh:i class="fa fa-fw fa-circle-half-stroke me-2"/>
                             <xf:output value="xxf:r('components.color-scheme.system', '|fr-fr-resources|')"/>
-                            <xh:i class="fa fa-check ms-auto fr-check-icon"/>
                         </xh:button>
                     </xh:li>
                 </xh:ul>

@@ -150,27 +150,6 @@
     }
   }
 
-  .fr-color-scheme-nav {
-    .dropdown-item {
-      padding: 0;
-
-      .fr-check-icon {
-        display: none;
-      }
-
-      &.active {
-        .fr-check-icon {
-          display: inline-block;
-        }
-
-        .btn-link {
-          background-color: transparent;
-          color: var(--orbeon-dropdown-menu-selected-color);
-        }
-      }
-    }
-  }
-
   .dropdown-toggle:has(> .caret:only-child)::after {
     // No left margin if the toggle only contains a caret, so the caret becomes centered
     margin-left: 0;
@@ -236,6 +215,10 @@
       color: var(--orbeon-dropdown-menu-color);
       background-color: var(--orbeon-dropdown-menu-background-color);
       width: 100%;
+
+      .fa {
+        color: inherit;
+      }
     }
 
     .btn-link:hover,

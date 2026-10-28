@@ -96,6 +96,12 @@ trait FormBuilderPermissionsOps {
     canAccessEverything || canAccessAppForm
   }
 
+  def isFormBuilderAuthorized: Boolean = {
+    val configurationOpt = formBuilderPermissionsConfiguration
+    findConfiguredRoles(configurationOpt).isEmpty ||
+      formBuilderPermissions(configurationOpt, orbeonRolesFromCurrentRequest).nonEmpty
+  }
+
   //@XPathFunction
   def isFormBuilderPublishAuthorized(app: String, form: String): Boolean = {
     val configurationOpt = formBuilderPermissionsConfiguration

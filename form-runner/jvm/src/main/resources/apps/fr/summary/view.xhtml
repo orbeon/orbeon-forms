@@ -659,7 +659,7 @@
                 `xforms-model-construct-done`. -->
             <xf:action
                 event="xforms-ready"
-                if="$has-fb-roles and not($has-fb-roles-for-all-apps) and empty($initial-app-value)"
+                if="$is-fb and not(frf:isFormBuilderAuthorized())"
                 type="xpath">
                 frf:sendError(403)
             </xf:action>

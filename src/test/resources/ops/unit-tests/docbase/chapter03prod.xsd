@@ -17,7 +17,7 @@
             xmlns:prod2="http://example.org/prod2"
             elementFormDefault="qualified">
 
-  <xsd:import namespace="http://example.org/prod2" schemaLocation="docbase/chapter03prod2.xsd"/>
+  <xsd:import namespace="http://example.org/prod2" schemaLocation="chapter03prod2.xsd"/>
 
   <xsd:element name="product" type="ProductType"/>
 

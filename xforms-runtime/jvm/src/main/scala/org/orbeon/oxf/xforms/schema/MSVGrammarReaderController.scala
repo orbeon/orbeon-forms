@@ -14,18 +14,14 @@
 package org.orbeon.oxf.xforms.schema
 
 import org.orbeon.msv.grammar.Grammar
-import org.orbeon.msv.reader.GrammarReaderController
 import org.orbeon.oxf.cache.CacheKey
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
-import org.orbeon.oxf.processor.validation.SchemaValidationException
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.model.XFormsModelSchemaValidator
 import org.orbeon.oxf.xml.XMLParsing
-import org.orbeon.oxf.xml.dom.XmlLocationData
 import org.orbeon.xforms.XFormsCrossPlatformSupport
-import org.xml.sax.{InputSource, Locator}
+import org.xml.sax.InputSource
 
 import java.net.URL
 import scala.util.control.NonFatal
@@ -38,7 +34,7 @@ class MSVGrammarReaderController(
     containingDocument: XFormsContainingDocument,
     dependencies      : SchemaDependencies,
     baseURL           : Option[String]
-  ) extends GrammarReaderController {
+  ) extends MSVGrammarReaderControllerTrait {
 
   def resolveEntity(publicId: String, systemId: String): InputSource = {
 
@@ -55,25 +51,6 @@ class MSVGrammarReaderController(
 
     dependencies.addInclude(url)
     XMLParsing.EntityResolver.resolveEntity("", url.toString)
-  }
-
-  def warning(locators: Array[Locator], message: String): Unit = {
-
-    def locToString(loc: Locator) =
-      loc.getSystemId + ", line " + loc.getLineNumber + ", column " + loc.getColumnNumber
-
-    val formatted =
-      locators match {
-        case Array()  => message
-        case locators => s"${locators map locToString mkString ", "}: $message"
-      }
-
-    XFormsModelSchemaValidator.logger.warn(formatted)
-  }
-
-  def error(locators: Array[Locator], message: String, exception: Exception): Unit = {
-    val locationData = locators.headOption map XmlLocationData.createIfPresent
-    throw new SchemaValidationException(message, exception, locationData.orNull)
   }
 }
 

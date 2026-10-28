@@ -1,5 +1,6 @@
 package org.orbeon.oxf.xforms.library
 
+import org.orbeon.oxf.util.MessageFormatter
 import org.scalatest.funspec.AnyFunSpec
 
 

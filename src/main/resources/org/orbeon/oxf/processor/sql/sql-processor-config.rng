@@ -186,7 +186,7 @@
                                                     </data>
                                                 </choice>
                                             </attribute>
-                                            <optional>2
+                                            <optional>
                                                 <attribute name="sql-type">
                                                     <choice>
                                                         <value>char</value>

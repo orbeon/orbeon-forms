@@ -11,24 +11,23 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.processor.validation;
+package org.orbeon.oxf.processor.validation
 
-import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.datatypes.LocationData;
+import org.orbeon.datatypes.LocationData
+import org.orbeon.oxf.common.ValidationException
+
 
 // So we can differentiate with other ValidationException, see:
 // https://github.com/orbeon/orbeon-forms/issues/910
-public class SchemaValidationException extends ValidationException {
+class SchemaValidationException(
+  message            : String,
+  throwable          : Throwable,
+  locationDataOrNull : LocationData
+) extends ValidationException(message, throwable, locationDataOrNull) {
 
-    public SchemaValidationException(String message, LocationData locationData) {
-        super(message, locationData);
-    }
+  def this(message: String, locationData: LocationData) =
+    this(message, null, locationData)
 
-    public SchemaValidationException(Throwable throwable, LocationData locationData) {
-        super(throwable, locationData);
-    }
-
-    public SchemaValidationException(String message, Throwable throwable, LocationData locationData) {
-        super(message, throwable, locationData);
-    }
+  def this(throwable: Throwable, locationData: LocationData) =
+    this(throwable.getMessage, throwable, locationData)
 }

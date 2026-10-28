@@ -66,6 +66,7 @@ val ScalatagsVersion                 = "0.13.1"
 val SbinaryVersion                   = "0.5.1"
 val Log4sVersion                     = "1.10.0"
 val PPrintVersion                    = "0.9.6"
+val MsvVersion                       = "2026.1.1"
 
 // Java libraries
 val SaxonJvmVersion                  = "9.1.0.8.4"
@@ -578,6 +579,7 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
     libraryDependencies +=  "org.log4s"              %%% "log4s"             % Log4sVersion,
     libraryDependencies +=  "org.parboiled"          %%% "parboiled"         % Parboiled2Version,
     libraryDependencies +=  "com.lihaoyi"            %%% "pprint"            % PPrintVersion,
+    libraryDependencies += ("org.orbeon"             %%% "msv"               % MsvVersion).cross(CrossVersion.for2_13Use3),
     crossScalaVersions := supportedScalaVersions
   )
   .jvmSettings(commonScalaJvmSettings)

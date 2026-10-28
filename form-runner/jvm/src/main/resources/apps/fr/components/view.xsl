@@ -948,8 +948,11 @@
             class="fr-color-scheme-nav"
             ref=".[
                 not(fr:mode() = 'test') and
-                not(fr:is-embedded())   and
-                xxf:property(string-join(('oxf.fr.navbar.color-scheme-selector.enable', fr:app-name(), fr:form-name()), '.'))
+                not(fr:is-embedded())   and (
+                        fr:mode() = ('forms', 'admin', 'landing')  and xxf:property('oxf.fr.navbar.color-scheme-selector.enable') or
+                    not(fr:mode() = ('forms', 'admin', 'landing')) and xxf:property(string-join(('oxf.fr.navbar.color-scheme-selector.enable', fr:app-name(), fr:form-name()), '.')) and
+                    not(fr:is-form-builder() and fr:mode() = ('edit', 'view'))
+                )
             ]">
             <xh:div class="dropdown">
                 <xh:a

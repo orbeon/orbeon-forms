@@ -151,15 +151,13 @@ object FormRunnerApp extends App {
         }
       }
 
-    dataIconElem.addEventListener("click", (e: dom.MouseEvent) => {
-      e.stopPropagation()
+    dataIconElem.addEventListener("click", (_: dom.MouseEvent) =>
       showOrUpdatePopover(toggleIfShown = true)
-    })
+    )
 
     dataIconElem.addEventListener("keydown", (e: dom.KeyboardEvent) =>
       if (e.key == "Enter" || e.key == " ") {
         e.preventDefault()
-        e.stopPropagation()
         showOrUpdatePopover(toggleIfShown = true)
       }
     )

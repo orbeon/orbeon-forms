@@ -308,9 +308,6 @@
   --orbeon-fb-dnd-background-color                : #ccc;
   --orbeon-fb-navbar-color                        : #777;
   --orbeon-fb-navbar-hover-color                  : #333;
-  --orbeon-fb-toolbox-tab-background-color        : #eee;
-  --orbeon-fb-toolbox-tab-color                   : #666;
-  --orbeon-fb-toolbox-tab-hover-color             : #333;
   --orbeon-fb-empty-message-color                 : #999;
   --orbeon-fb-cell-message-color                  : #777;
   --orbeon-fb-dialog-language-dropdown-color      : #777;
@@ -328,10 +325,13 @@
   --orbeon-table-header-sorted-border-color: transparent;
 
   // Tabs
-  --orbeon-tab-background-color: white;
-  --orbeon-tab-border-color    : #ddd;
-  --orbeon-tab-border-width    : 1px;
-  --orbeon-tab-padding         : 10px;
+  --orbeon-tab-background-color     : white;
+  --orbeon-tab-bar-background-color : #eee;
+  --orbeon-tab-inactive-color       : #666;
+  --orbeon-tab-inactive-hover-color : #333;
+  --orbeon-tab-border-color         : #ddd;
+  --orbeon-tab-border-width         : 1px;
+  --orbeon-tab-padding              : 10px;
 
   // Search
   --orbeon-search-free-input-read-only-background-color: #e8e8e8; // darken(@wellBackground, 5%);
@@ -635,6 +635,9 @@
     --orbeon-table-hover-background-color                    : @gray-20;
     --orbeon-table-border-color                              : @gray-27;
     --orbeon-tab-background-color                            : @base-bg;
+    --orbeon-tab-bar-background-color                        : @gray-16;
+    --orbeon-tab-inactive-color                              : @gray-53;
+    --orbeon-tab-inactive-hover-color                        : @text-light;
     --orbeon-tab-border-color                                : @gray-27;
     --orbeon-search-free-input-read-only-background-color    : @gray-20;
     --orbeon-revision-history-pane-head-background-color     : @gray-16;

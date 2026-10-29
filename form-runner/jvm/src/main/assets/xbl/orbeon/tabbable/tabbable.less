@@ -12,7 +12,7 @@
 
 @import (reference)  "../../../apps/fr/style/form-runner-common";
 
-.xbl-fr-tabbable {
+.orbeon .xbl-fr-tabbable {
 
     &.fr-tabbable-dnd.xforms-readonly > .tabs-left > .nav-tabs {
         i.fr-tabbable-grab {
@@ -24,7 +24,6 @@
         &> .nav-tabs {
             i.fr-tabbable-grab {
                 display: block;
-                float: right;
                 cursor: move;
                 opacity: 0.25;
                 padding-left: 5px;
@@ -37,16 +36,50 @@
     }
 
     .nav-tabs {
-        margin-bottom: 0;
+        flex-wrap: nowrap;
+        margin-bottom: 8px;
+        padding: 3px;
+        gap: 2px;
+        background-color: var(--orbeon-tab-bar-background-color);
+        border-radius: var(--orbeon-body-decorations-border-radius);
+        border-bottom: none;
 
-        &>li {
+        &> li {
+            flex: 1 1 auto;
+            min-width: 0;
+            margin-bottom: 0;
 
             > a {
+                display: block;
+                text-align: center;
+                padding: 5px 12px;
+                line-height: 20px;
+                font-weight: 500;
+                border: none;
+                border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
                 text-decoration: none;
+                transition: background-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
             }
 
-            &:not(.active) a:hover {
+            &.active > a,
+            &.active > a:hover {
+                background-color: var(--orbeon-tab-background-color);
+                color: var(--orbeon-base-color);
+                border: none;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+                cursor: default;
+            }
+
+            &:not(.active) > a {
+                background-color: transparent;
+                color: var(--orbeon-tab-inactive-color);
+                border: none;
                 cursor: pointer;
+
+                &:hover {
+                    background-color: transparent;
+                    color: var(--orbeon-tab-inactive-hover-color);
+                }
             }
 
             i {
@@ -60,30 +93,50 @@
     }
 
     .fr-tabbable-add {
-        padding: 0 5px;
-        margin: 10px;
+        padding: 2px;
+        margin: 2px 0 0 0;
         button {
             width: 100%;
-            padding: 2px 10px;
+            padding: 3px 10px;
         }
     }
 
     .tab-content {
         border: var(--orbeon-tab-border-width) solid var(--orbeon-tab-border-color);
-        border-top: none;
+        border-radius: var(--orbeon-body-decorations-border-radius);
         background-color: var(--orbeon-tab-background-color);
         padding: var(--orbeon-tab-padding);
     }
 
-    .xforms-tabbable-appearance-left > .tabs-left {
+    &.xforms-tabbable-appearance-left > .tabs-left {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        column-gap: 10px;
 
         &> .nav-tabs {
+            grid-row: 1;
+            grid-column: 1;
+            flex-direction: column;
+            align-self: start;
             margin-right: 0;
+            margin-bottom: 0;
+
+            > li {
+                flex: 0 0 auto;
+
+                > a {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    text-align: left;
+                }
+            }
         }
 
         &> .tab-content {
-            border: var(--orbeon-tab-border-width) solid var(--orbeon-tab-border-color);
-            border-left: none;
+            grid-row: 1;
+            grid-column: 2;
+            min-width: 0;
 
             .tab-pane {
                 padding-left: 1px; // prevent radio buttons from being truncated on the left in some cases

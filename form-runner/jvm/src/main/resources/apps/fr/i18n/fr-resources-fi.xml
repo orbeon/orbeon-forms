@@ -78,7 +78,7 @@
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testaa</test>
         <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Tarkastele kaavoja (beta)</test-formulas>
-        <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Testaa offline-tilassa (beta)</test-offline>
+        <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Testaa offline-tilassa</test-offline>
         <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel-vienti</excel-export>
         <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel-vienti</excel-export-with-search>
         <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; XML-vienti</xml-export>

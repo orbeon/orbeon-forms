@@ -78,7 +78,7 @@
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testa</test>
         <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspektera formler (beta)</test-formulas>
-        <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Testa offline (beta)</test-offline>
+        <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Testa offline</test-offline>
         <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Exportera till Excel</excel-export>
         <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Exportera till Excel</excel-export-with-search>
         <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Exportera XML</xml-export>

@@ -2199,6 +2199,7 @@ body.orbeon {
                 align-items: center;
                 width: 100%;
                 max-width: none; // override Bootstrap 5 .container responsive max-widths
+                column-gap: 0;
                 h1 {
                     color: var(--orbeon-fb-navbar-color);
                     margin: 0; // so align-items: center actually centers it
@@ -2230,7 +2231,12 @@ body.orbeon {
                     color: inherit;
                 }
                 .btn-link {
-                    color: var(--orbeon-fb-navbar-color);
+                    display      : inline-block;
+                    padding      : 5px 15px;
+                    border       : 0;
+                    border-radius: var(--orbeon-button-border-radius);
+                    line-height  : 1.5;
+                    color        : var(--orbeon-fb-navbar-color);
                     &:hover,
                     &:focus {
                         color: var(--orbeon-fb-navbar-hover-color);
@@ -2254,7 +2260,7 @@ body.orbeon {
                     }
                     .fr-data-icon {
                         &:hover,
-                        &:focus,
+                        &:focus-within,
                         &.show {
                             i {
                                 color: var(--orbeon-fb-navbar-hover-color);
@@ -2308,13 +2314,19 @@ body.orbeon {
             .dropdown-toggle {
                 display: inline-block;
                 padding: 5px 15px; // Bootstrap 2's padded clickable zone
-                line-height: @baseLineHeight;
+                border-radius: var(--orbeon-button-border-radius);
+                line-height: 1.5;
                 color: var(--orbeon-navbar-language-dropdown-color);
                 text-decoration: none;
                 &:hover,
                 &:focus {
                     color: var(--orbeon-navbar-language-dropdown-hover-color);
                     text-decoration: none;
+                    outline: 0;
+                    box-shadow: none;
+                }
+                &:focus-visible:not(.show) {
+                    .focusDecorations();
                 }
                 &.show {
                     background-color: var(--orbeon-navbar-dropdown-open-toggle-background-color);
@@ -2329,7 +2341,15 @@ body.orbeon {
     .fb-navbar.navbar .navbar-inner .container .fr-language-choice .dropdown-toggle {
         display: inline-block;
         padding: 5px 15px;
-        line-height: @baseLineHeight;
+        border-radius: var(--orbeon-button-border-radius);
+        line-height: 1.5;
+        &:focus {
+            outline: 0;
+            box-shadow: none;
+        }
+        &:focus-visible:not(.show) {
+            .focusDecorations();
+        }
         &.show,
         &.show:hover,
         &.show:focus {

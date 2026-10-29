@@ -75,8 +75,12 @@
 
   // Home (fa-th) link: Bootstrap 2's navbar icon color and 15px link padding
   .fr-navbar-home-link a {
+    display        : inline-block;
+    padding        : 5px 15px;
+    border-radius  : var(--orbeon-button-border-radius);
+    line-height    : 1.5;
     text-decoration: none;
-    padding: 0 15px;
+    .focusHighlightGroup();
 
     i {
       color: var(--orbeon-navbar-color);
@@ -88,6 +92,15 @@
     color: var(--orbeon-navbar-color);
     margin-left: 10px; // Bootstrap 2's total spacing (5px icon margin + its anchor padding)
   }
+  .fr-status-icons .fr-validity-icon {
+    display    : inline-block;
+    padding    : 5px 10px;
+    line-height: 1.5;
+
+    i {
+      margin-left: 0;
+    }
+  }
   .fr-status-icons .badge {
     margin-left: 10px; // same lead spacing as the icons
   }
@@ -97,12 +110,20 @@
     border-radius: var(--orbeon-button-border-radius);
     line-height  : 1.5;
 
-    i {
+    i,
+    i[role = button][tabindex = '0']:focus {
       margin-left: 0;
+      outline    : 0;
+      box-shadow : none;
+    }
+
+    &:focus-within:not(.show) {
+      .focusDecorations();
     }
 
     &.show {
       background-color: var(--orbeon-navbar-dropdown-open-toggle-background-color);
+      box-shadow      : none;
     }
   }
 
@@ -123,7 +144,11 @@
   }
   .fr-share-nav, .fr-revision-history {
     .btn-link {
-      padding: 0 5px; // Bootstrap 2's 5px horizontal footprint
+      display      : inline-block;
+      padding      : 5px 15px;
+      border       : 0;
+      border-radius: var(--orbeon-button-border-radius);
+      line-height  : 1.5;
       .fa {
         color: var(--orbeon-navbar-color);
       }
@@ -185,6 +210,10 @@
 
     &:focus {
       box-shadow: none;
+    }
+
+    &:focus-visible:not(.show) {
+      .focusDecorations();
     }
 
     &.show {

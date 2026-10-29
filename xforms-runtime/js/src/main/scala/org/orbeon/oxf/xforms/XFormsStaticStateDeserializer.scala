@@ -298,6 +298,7 @@ object XFormsStaticStateDeserializer {
       for {
         nameIndex   <- c.get[Int]("name")
         attsIndexes <- c.getOrElse[List[(Int, String)]]("atts")(Nil)
+        ns          <- c.getOrElse[List[(String, String)]]("ns")(Nil)
         children <- {
 
           val childIt =
@@ -314,6 +315,7 @@ object XFormsStaticStateDeserializer {
         }
       } yield {
         val r = dom.Element(collectedQNames(nameIndex))
+        ns foreach { case (prefix, uri) => r.addNamespace(prefix, uri) }
         attsIndexes foreach { case (index, value) => r.addAttribute(collectedQNames(index), value) }
         children foreach r.add
         r
@@ -471,7 +473,13 @@ object XFormsStaticStateDeserializer {
                   figuredAllBindRefAnalysis        <- c.getOrElse[Boolean]("figuredAllBindRefAnalysis")(true)
                   recalculateOrder                 <- c.getOrElse[Option[Iterable[String]]]("recalculateOrder")(None)
                   defaultValueOrder                <- c.getOrElse[Option[Iterable[String]]]("defaultValueOrder")(None)
+                  schemas                          <- c.getOrElse[List[dom.Element]]("schemas")(Nil)
                 } yield {
+                  if (schemas.nonEmpty) {
+                    namespaceMapping.mapping foreach { case (prefix, uri) => element.addNamespace(prefix, uri) }
+                    schemas foreach element.add
+                  }
+
                   val model = new Model(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
 
                   model.bindInstances                    ++= bindInstances

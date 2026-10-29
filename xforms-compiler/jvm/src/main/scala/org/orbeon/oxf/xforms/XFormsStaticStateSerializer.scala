@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.itemset.{Item, ItemNode, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.processor.XFormsCompiler
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding}
-import org.orbeon.oxf.xml.SAXStore
+import org.orbeon.oxf.xml.{SAXStore, XMLConstants}
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.analysis.{Perform, Propagate}
@@ -244,20 +244,26 @@ object XFormsStaticStateSerializer {
         distinct += e.element.getQName
       }
 
+      def collectElementTreeQNames(rootElem: dom.Element): Unit =
+        rootElem.descendantElementIterator(includeSelf = true) foreach { e =>
+          distinct += e.getQName
+          e.attributeIterator foreach { att =>
+            distinct += att.getQName
+          }
+        }
+
       staticState.topLevelPart.iterateControls foreach {
         case e: ComponentControl =>
           updateDistinctCommon(e)
           e.commonBinding.directName foreach (distinct +=)
+        case e: Model =>
+          updateDistinctCommon(e)
+          e.element.elements(XMLConstants.XML_SCHEMA_QNAME) foreach collectElementTreeQNames
         case e: Instance =>
           updateDistinctCommon(e)
           // All inline instance element QNames
           // Considered serializing instance as plain XML, but it turns out the parsing on the other side is slow.
-          e.inlineRootElemOpt.iterator flatMap (_.descendantElementIterator(includeSelf = true)) foreach { e =>
-            distinct += e.getQName
-            e.attributeIterator foreach { att =>
-              distinct += att.getQName
-            }
-          }
+          e.inlineRootElemOpt foreach collectElementTreeQNames
         case e: StaticBind =>
           updateDistinctCommon(e)
           e.allMipNamesToXPathMIP.valuesIterator.flatten foreach { xpathMip =>
@@ -387,6 +393,10 @@ object XFormsStaticStateSerializer {
 
       appendElemAndAtts(a, b)
 
+      val ns = (a.declaredNamespacesIterator map (n => n.prefix -> n.uri)).toList
+      if (ns.nonEmpty)
+        b += "ns" -> ns.asJson
+
       val children =
         a.content collect {
           case n: dom.Element => n.asJson // recurse
@@ -451,6 +461,9 @@ object XFormsStaticStateSerializer {
           val defaultValueOrder = c.defaultValueOrder filter (_.nonEmpty)
           if (defaultValueOrder.isDefined)
             b += "defaultValueOrder"                -> (defaultValueOrder map (_ map (_.staticId))).asJson
+          val schemas = c.element.elements(XMLConstants.XML_SCHEMA_QNAME)
+          if (schemas.nonEmpty)
+            b += "schemas"                          -> schemas.map(_.copyAndCopyParentNamespaces).asJson
         case c: Instance      =>
             if (c.readonly)
               b += "readonly"              -> Json.fromBoolean(c.readonly)

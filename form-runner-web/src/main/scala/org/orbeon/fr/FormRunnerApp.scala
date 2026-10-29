@@ -177,14 +177,16 @@ object FormRunnerApp extends App {
       }
     )
 
-    document.addEventListener("click", (e: dom.MouseEvent) =>
+    def hideIfTargetOutside(e: dom.Event): Unit =
       if (isPopoverShown) {
-        val target               = e.target.asInstanceOf[dom.Node]
-        val clickedInsidePopover = currentPopoverElemOpt.exists(_.contains(target))
-        if (! statusIconElem.contains(target) && ! clickedInsidePopover)
+        val target          = e.target.asInstanceOf[dom.Node]
+        val isInsidePopover = currentPopoverElemOpt.exists(_.contains(target))
+        if (! statusIconElem.contains(target) && ! isInsidePopover)
           hidePopover()
       }
-    )
+
+    document.addEventListener("click"  , hideIfTargetOutside _)
+    document.addEventListener("focusin", hideIfTargetOutside _)
 
     document.addEventListener("keyup", (e: dom.KeyboardEvent) =>
       if (e.key == "Escape" && isPopoverShown)

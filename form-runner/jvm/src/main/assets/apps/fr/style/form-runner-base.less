@@ -533,10 +533,14 @@
         font-size  : var(--orbeon-base-font-size);
         font-family: var(--orbeon-help-font-family);
         line-height: @fluidLineHeight;
-        background-color: var(--orbeon-help-background-color);
-        border-color: var(--orbeon-help-border-color);
+        --bs-popover-bg: var(--orbeon-help-background-color);
+        --bs-popover-border-color: var(--orbeon-help-border-color);
+        --bs-popover-arrow-border: var(--orbeon-help-border-color);
+        --bs-popover-header-bg: var(--orbeon-help-title-background-color);
         --bs-popover-border-radius: var(--orbeon-help-border-radius);
         --bs-popover-inner-border-radius: calc(var(--orbeon-help-border-radius) - var(--bs-popover-border-width));
+        background-color: var(--orbeon-help-background-color);
+        border-color: var(--orbeon-help-border-color);
         // Override Bootstrap's default z-index (1010) to be above the navbar which is at 1030
         z-index: 1040;
 
@@ -547,6 +551,10 @@
             color: var(--orbeon-help-title-color);
             background-color: var(--orbeon-help-title-background-color);
             border-bottom-color: var(--orbeon-help-title-border-color);
+
+            &::before {
+                display: none;
+            }
         }
 
         .popover-body {
@@ -555,25 +563,10 @@
             color: var(--orbeon-help-content-color);
         }
 
-        // Bootstrap 5 arrow: ::before is the border triangle, ::after the fill
-        &.bs-popover-top .popover-arrow {
-            &::before { border-top-color: var(--orbeon-help-border-color); }
-            &::after  { border-top-color: var(--orbeon-help-background-color); }
-        }
-
-        &.bs-popover-end .popover-arrow {
-            &::before { border-right-color: var(--orbeon-help-border-color); }
-            &::after  { border-right-color: var(--orbeon-help-background-color); }
-        }
-
-        &.bs-popover-bottom .popover-arrow {
-            &::before { border-bottom-color: var(--orbeon-help-border-color); }
-            &::after  { border-bottom-color: var(--orbeon-help-background-color); }
-        }
-
-        &.bs-popover-start .popover-arrow {
-            &::before { border-left-color: var(--orbeon-help-border-color); }
-            &::after  { border-left-color: var(--orbeon-help-background-color); }
+        // When the popover is below the trigger and has a title, the top arrow touches the header rather than the body
+        &.bs-popover-bottom:has(.popover-header:not(:empty)) > .popover-arrow::after,
+        &.bs-popover-auto[data-popper-placement^="bottom"]:has(.popover-header:not(:empty)) > .popover-arrow::after {
+            border-bottom-color: var(--orbeon-help-title-background-color);
         }
 
         // Bootstrap 5 has no .close (now .btn-close), so restyle the '×' button added by Help.scala like Bootstrap 2's

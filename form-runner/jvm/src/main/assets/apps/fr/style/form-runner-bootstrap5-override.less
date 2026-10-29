@@ -95,9 +95,13 @@
   .fr-status-icons .badge {
     margin-left: 10px; // same lead spacing as the icons
   }
-  .fr-status-icons {
-    .fr-validity-icon,
-    .fr-data-icon {
+  .fr-status-icons:not(.xforms-disabled) {
+    display    : flex;
+    align-items: center;
+    white-space: nowrap;
+
+    .fr-validity-icon:not(.xforms-disabled),
+    .fr-data-icon:not(.xforms-disabled) {
       display      : inline-block;
       padding      : 5px 15px;
       border-radius: var(--orbeon-button-border-radius);

@@ -520,7 +520,7 @@
                     </xh:button>
                     <xh:div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <xh:ul class="navbar-nav ms-auto">
-                            <xh:li class="nav-item px-0 py-1 py-lg-1">
+                            <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
                                 <fr:language-selector appearance="bootstrap5" fr:dropdown-align="right"/>
                             </xh:li>
                             <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">

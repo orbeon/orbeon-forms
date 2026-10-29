@@ -940,7 +940,8 @@
 
             // Bootstrap adds `content: " (" attr(href) ")"` and `content: " (" attr(title) ")"`
             a[href]:after, abbr[title]:after {
-                content: "";
+                // #7621: use "none" and not an empty string here in order not to trigger the bug in openhtmltopdf
+                content: none;
             }
         }
     }

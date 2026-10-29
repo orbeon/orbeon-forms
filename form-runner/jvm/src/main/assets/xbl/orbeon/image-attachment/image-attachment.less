@@ -14,4 +14,16 @@
             }
         }
     }
+
+    // #7999: openhtmltopdf ignores "margin: auto" on an image without an explicit width, so center it as inline content
+    // as a workaround until openhtmltopdf fixes this
+    @media print {
+        .fr-mode-pdf .xbl-fr-grid .fr-grid .xbl-fr-image-attachment .xforms-output.xforms-mediatype-image {
+            text-align: center;
+            line-height: 0;
+            img {
+                display: inline-block;
+            }
+        }
+    }
 }

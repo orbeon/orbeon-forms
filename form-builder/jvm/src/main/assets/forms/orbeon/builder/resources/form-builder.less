@@ -32,7 +32,7 @@
 @wallAccentBright: @color3;
 @cellHighlight: @color5;
 
-@fbButtonsBackground: white; // so that the borderless buttons look good
+@fbButtonsBackground: var(--orbeon-fb-navbar-background-color); // so that the borderless buttons look good
 
 // Case of non-embedded Form Builder: size body to take the whole viewport
 body.orbeon {
@@ -88,7 +88,8 @@ body.orbeon {
         left: @fbGutter + @fbToolbarWidth + (@fbGutter/2); // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
         bottom: @fbBottomHeight + @fbGutter;
         overflow-y: auto;
-        border-radius: @baseBorderRadius;
+        border-radius: var(--orbeon-body-decorations-border-radius);
+        border: 1px solid var(--orbeon-base-border-color);
 
         .fb-main-inner {
             background-color: var(--orbeon-fb-form-area-background-color);
@@ -138,6 +139,7 @@ body.orbeon {
     .fb-bottom {
         z-index: @zindexFixedNavbar; // put in front like the navbar
         background-color: @fbButtonsBackground;
+        border-top: 1px solid var(--orbeon-base-border-color);
     }
 
     .fb-messages { display: none; } // Section of the HTML we use to output localized text used by client-side code
@@ -219,9 +221,9 @@ body.orbeon {
             padding: 4px 8px;
             //background-color: rgba(red(@color1), green(@color1), blue(@color1), 75%);
             //background-color: rgba(red(@color6), green(@color6), blue(@color6), 75%);
-            background-color: rgba(255, 255, 255, 75%);
-            border: 2px solid @cellHighlight;
-            border-radius: @baseBorderRadius;
+            background-color: var(--orbeon-form-background-color);
+            border: 2px solid var(--orbeon-focus-border-color);
+            border-radius: var(--orbeon-body-decorations-border-radius);
         }
     }
 
@@ -2003,10 +2005,10 @@ body.orbeon {
             .xbl-fr-grid .fr-grid.fr-editable {
                 .fr-grid-td {
                     &.fb-selected {
-                        box-shadow: 0 0 0 4px @cellHighlight !important;
+                        box-shadow: 0 0 0 2px var(--orbeon-focus-border-color), 0 0 0 5px var(--orbeon-focus-highlight-color) !important;
                         outline: 0;
                         transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-                        border-radius: @baseBorderRadius;
+                        border-radius: var(--orbeon-body-decorations-border-radius);
                         z-index: 1; // Highlight to show over grey background for hover cell
                     }
                 }
@@ -2014,6 +2016,18 @@ body.orbeon {
                 .fr-grid-td {
                     &:hover:not(.fb-selected) { // Grey background on hover on non-selected cell, to indicate it can be selected
                         background-color: var(--orbeon-fb-hover-background-color);
+                        border-radius: var(--orbeon-body-decorations-border-radius);
+                    }
+                }
+
+                &.fr-repeat {
+                    overflow: visible; // Don't clip the .fb-selected focus ring or .fb-control-editor-top badge
+
+                    .fr-grid-repeat-iteration:first-child > .fr-repeat-column-left {
+                        border-top-left-radius: calc(var(--orbeon-body-decorations-border-radius) - 1px);
+                    }
+                    .fr-grid-repeat-iteration:last-child > .fr-repeat-column-left {
+                        border-bottom-left-radius: calc(var(--orbeon-body-decorations-border-radius) - 1px);
                     }
                 }
 
@@ -2068,7 +2082,7 @@ body.orbeon {
                         // Indicate the value can be edited
                         background-color: var(--orbeon-fb-editable-hover-background-color);
                         cursor: pointer;
-                        border-radius: @baseBorderRadius;
+                        border-radius: var(--orbeon-body-decorations-border-radius);
                     }
                 }
 
@@ -2077,7 +2091,7 @@ body.orbeon {
                     min-height: 50px;
                     display: block;
                     border: 1px solid transparent; // so we can have a visible border when editing without causing resizing
-                    border-radius: @baseBorderRadius;
+                    border-radius: var(--orbeon-body-decorations-border-radius);
                     padding: 1px;                  // so that cursor does not touch border
                 }
 
@@ -2223,6 +2237,7 @@ body.orbeon {
         margin-bottom: 0;                                                    // the content below (.fr-top) has its own padding
         padding: 0;                                                          // the inner carries our padding
         border-radius: 0;                                                    // override Bootstrap rounded corners
+        border-bottom: 1px solid var(--orbeon-base-border-color);
         background-color: var(--orbeon-fb-navbar-background-color);
         .navbar-inner {
             display: flex;
@@ -2289,6 +2304,7 @@ body.orbeon {
         margin-bottom: 10px; // Bootstrap 2's gap between the title bar and the editing area
         padding-top: 0;      // .navbar-inner carries the padding, keeping Bootstrap 2's bar height
         padding-bottom: 0;
+        border-radius: 0;
 
         // Fill the width so the form title can push the language selector to the right edge
         .navbar-inner {

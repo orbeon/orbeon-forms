@@ -403,6 +403,30 @@
         }
     }
 
+    .fr-status-icons .fr-data-icon {
+        cursor: pointer;
+        i {
+            display: none;
+        }
+        &.fr-data-status-new .fr-status-new,
+        &.fr-data-status-safe .fr-status-safe,
+        &.fr-data-status-autosaved .fr-status-autosaved,
+        &.fr-data-status-unsafe .fr-status-unsafe {
+            display: inline-block;
+        }
+    }
+
+    form.fr-client-data-dirty .fr-status-icons .fr-data-icon {
+        .fr-status-new,
+        .fr-status-safe,
+        .fr-status-autosaved {
+            display: none;
+        }
+        .fr-status-unsafe {
+            display: inline-block;
+        }
+    }
+
     // Messages
     .fr-message-success, .fr-message-error {
         display: block;
@@ -508,7 +532,7 @@
     }
 
     // Bootstrap 5 appends the popover to <body>, outside #fr-view, so scope to .orbeon. Bootstrap 5 class names.
-    .xforms-help-popover {
+    .xforms-help-popover, .fr-data-status-popover {
         // Reset to Form Runner defaults; these otherwise inherit from where the popover is used (e.g. a section title)
         font-size  : var(--orbeon-base-font-size);
         font-family: var(--orbeon-help-font-family);

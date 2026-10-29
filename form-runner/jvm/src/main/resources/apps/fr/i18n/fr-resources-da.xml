@@ -399,6 +399,24 @@
         <workflow-stage>
             <label>Arbejdstrin</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>Nyt dokument</title>
+                <body>Der er endnu ikke foretaget nogen ændringer.</body>
+            </new>
+            <safe>
+                <title>Gemt</title>
+                <body>Alle ændringer er blevet gemt.</body>
+            </safe>
+            <autosaved>
+                <title>Automatisk gemt</title>
+                <body>Ændringer er automatisk blevet gemt som kladde.</body>
+            </autosaved>
+            <unsafe>
+                <title>Ikke-gemte ændringer</title>
+                <body>Der er ikke-gemte ændringer.</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>Gem lokalt</dialog-title>

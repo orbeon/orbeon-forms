@@ -403,6 +403,24 @@
         <workflow-stage>
             <label>Aşama</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>Yeni belge</title>
+                <body>Henüz hiçbir değişiklik yapılmadı.</body>
+            </new>
+            <safe>
+                <title>Kaydedildi</title>
+                <body>Tüm değişiklikler kaydedildi.</body>
+            </safe>
+            <autosaved>
+                <title>Otomatik kaydedildi</title>
+                <body>Değişiklikler taslak olarak otomatik kaydedildi.</body>
+            </autosaved>
+            <unsafe>
+                <title>Kaydedilmemiş değişiklikler</title>
+                <body>Kaydedilmemiş değişiklikler var.</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>Yerel Olarak Kaydet</dialog-title>

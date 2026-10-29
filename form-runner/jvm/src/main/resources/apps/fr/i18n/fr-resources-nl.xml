@@ -405,6 +405,24 @@
         <workflow-stage>
             <label>Fase</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>Nieuw document</title>
+                <body>Er zijn nog geen wijzigingen aangebracht.</body>
+            </new>
+            <safe>
+                <title>Opgeslagen</title>
+                <body>Alle wijzigingen zijn opgeslagen.</body>
+            </safe>
+            <autosaved>
+                <title>Automatisch opgeslagen</title>
+                <body>Wijzigingen zijn automatisch opgeslagen als concept.</body>
+            </autosaved>
+            <unsafe>
+                <title>Niet-opgeslagen wijzigingen</title>
+                <body>Er zijn niet-opgeslagen wijzigingen.</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>Lokaal opslaan</dialog-title>

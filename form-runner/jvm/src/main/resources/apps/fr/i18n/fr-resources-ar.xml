@@ -405,6 +405,24 @@
         <workflow-stage>
             <label>المرحلة</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>مستند جديد</title>
+                <body>لم يتم إجراء أي تغييرات بعد.</body>
+            </new>
+            <safe>
+                <title>تم الحفظ</title>
+                <body>تم حفظ جميع التغييرات.</body>
+            </safe>
+            <autosaved>
+                <title>تم الحفظ تلقائياً</title>
+                <body>تم حفظ التغييرات تلقائياً كمسودة.</body>
+            </autosaved>
+            <unsafe>
+                <title>تغييرات غير محفوظة</title>
+                <body>توجد تغييرات غير محفوظة.</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>حفظ محليًا</dialog-title>

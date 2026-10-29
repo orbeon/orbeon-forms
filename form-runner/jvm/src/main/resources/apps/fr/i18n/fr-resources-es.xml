@@ -430,6 +430,24 @@
         <workflow-stage>
             <label>Etapa</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>Nuevo documento</title>
+                <body>Aún no se han realizado cambios.</body>
+            </new>
+            <safe>
+                <title>Guardado</title>
+                <body>Se han guardado todos los cambios.</body>
+            </safe>
+            <autosaved>
+                <title>Guardado automáticamente</title>
+                <body>Los cambios se han guardado automáticamente como borrador.</body>
+            </autosaved>
+            <unsafe>
+                <title>Cambios no guardados</title>
+                <body>Hay cambios no guardados.</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>Guardar Localmente</dialog-title>

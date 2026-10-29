@@ -405,6 +405,24 @@
         <workflow-stage>
             <label>Stage</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>New document</title>
+                <body>No changes have been made yet.</body>
+            </new>
+            <safe>
+                <title>Saved</title>
+                <body>All changes have been saved.</body>
+            </safe>
+            <autosaved>
+                <title>Autosaved</title>
+                <body>Changes have been automatically saved as a draft.</body>
+            </autosaved>
+            <unsafe>
+                <title>Unsaved changes</title>
+                <body>There are unsaved changes.</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>Save Locally</dialog-title>

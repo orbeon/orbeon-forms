@@ -342,6 +342,7 @@ object AjaxClient {
 
       // Reset changes, as changes are included in this batch of events
       currentForm.ajaxFieldChangeTracker.afterResponseProcessed()
+      currentForm.afterAjaxResponseProcessed()
       ServerValueStore.purgeExpired()
 
       // `require(EventQueue.ajaxRequestInProgress == false)`
@@ -469,6 +470,7 @@ object AjaxClient {
       val currentForm             = Page.getXFormsFormFromNamespacedIdOrThrow(currentNamespacedFormId)
 
       currentForm.ajaxFieldChangeTracker.beforeRequestSent(eventsAsList)
+      currentForm.beforeAjaxRequestSent(eventsAsList)
 
       eventsAsList foreach { event =>
 

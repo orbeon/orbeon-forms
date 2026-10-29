@@ -27,6 +27,8 @@ trait FormRunnerExternalModeTrait {
     lastModified        : Option[Instant],
     eTag                : Option[String],
     dataStatus          : DataStatus,
+    autosaveStatus      : DataStatus,
+    saved               : Boolean,
     renderedFormats     : Map[String, URI],
   )
 

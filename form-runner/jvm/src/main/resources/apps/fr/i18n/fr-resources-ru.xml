@@ -398,6 +398,24 @@
         <workflow-stage>
             <label>Стадия</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>Новый документ</title>
+                <body>Изменений пока не вносилось.</body>
+            </new>
+            <safe>
+                <title>Сохранено</title>
+                <body>Все изменения сохранены.</body>
+            </safe>
+            <autosaved>
+                <title>Автосохранено</title>
+                <body>Изменения автоматически сохранены как черновик.</body>
+            </autosaved>
+            <unsafe>
+                <title>Несохранённые изменения</title>
+                <body>Есть несохранённые изменения.</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>Сохранить</dialog-title>

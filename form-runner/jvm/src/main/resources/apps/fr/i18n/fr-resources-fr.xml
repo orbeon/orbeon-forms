@@ -408,6 +408,24 @@
         <workflow-stage>
             <label>Étape</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>Nouveau document</title>
+                <body>Aucune modification n'a encore été effectuée.</body>
+            </new>
+            <safe>
+                <title>Enregistré</title>
+                <body>Toutes les modifications ont été enregistrées.</body>
+            </safe>
+            <autosaved>
+                <title>Enregistré automatiquement</title>
+                <body>Les modifications ont été enregistrées automatiquement comme brouillon.</body>
+            </autosaved>
+            <unsafe>
+                <title>Modifications non enregistrées</title>
+                <body>Il y a des modifications non enregistrées.</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>Enregistrer Localement</dialog-title>

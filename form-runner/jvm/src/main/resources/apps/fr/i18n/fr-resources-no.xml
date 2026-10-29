@@ -405,6 +405,24 @@
         <workflow-stage>
             <label>Trinn</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>Nytt dokument</title>
+                <body>Ingen endringer er gjort ennå.</body>
+            </new>
+            <safe>
+                <title>Lagret</title>
+                <body>Alle endringer er lagret.</body>
+            </safe>
+            <autosaved>
+                <title>Automatisk lagret</title>
+                <body>Endringer er automatisk lagret som utkast.</body>
+            </autosaved>
+            <unsafe>
+                <title>Ulagrede endringer</title>
+                <body>Det finnes ulagrede endringer.</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>Lagre</dialog-title>

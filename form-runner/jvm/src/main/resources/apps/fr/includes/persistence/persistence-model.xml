@@ -333,7 +333,8 @@
                     <!-- When running in the background, we know that no internal state can be passed -->
                     <xf:setvalue
                         if="mode = 'edit'"
-                        ref="$persistence-instance/initial-data-status">dirty</xf:setvalue>
+                        iterate="($persistence-instance/initial-data-status, $persistence-instance/initial-autosave-status)"
+                        ref=".">dirty</xf:setvalue>
                 </xf:action>
 
                 <!-- Workflow stage must be available to background processes as well -->
@@ -463,7 +464,7 @@
         <xf:var name="draft-requested" value="xxf:get-request-parameter('draft') = 'true'"/>
         <xf:action if="$draft-requested">
             <xf:send submission="fr-get-document-submission">
-                <xf:property name="data-or-draft"  value="'draft'"/>
+                <xf:property name="data-or-draft"        value="'draft'"                     xxf:tunnel="true"/>
                 <xf:property name="fr-data-ready-needed" value="event('fr-data-ready-needed')" xxf:tunnel="true"/>
             </xf:send>
         </xf:action>
@@ -485,7 +486,7 @@
 
             <!-- Otherwise just load the data -->
             <xf:send if="not($draft-found)" submission="fr-get-document-submission">
-                <xf:property name="data-or-draft"  value="'data'"/>
+                <xf:property name="data-or-draft"        value="'data'"                      xxf:tunnel="true"/>
                 <xf:property name="fr-data-ready-needed" value="event('fr-data-ready-needed')" xxf:tunnel="true"/>
             </xf:send>
         </xf:action>
@@ -805,9 +806,11 @@
         <xf:refresh/>
         <!-- Set the initial data status -->
         <xf:setvalue
-            iterate="($persistence-instance/data-status, $autosave-elem/status)"
-            ref="."
+            ref="$persistence-instance/data-status"
             value="$persistence-instance/initial-data-status"/>
+        <xf:setvalue
+            ref="$autosave-elem/status"
+            value="$persistence-instance/initial-autosave-status"/>
     </xf:action>
 
     <!-- Clear operation -->
@@ -832,7 +835,10 @@
     </xf:action>
 
     <!-- New document operation -->
-    <xf:setvalue event="fr-new-document" ref="$document-element" value="secure:randomHexId()"/>
+    <xf:action event="fr-new-document">
+        <xf:setvalue ref="$document-element" value="secure:randomHexId()"/>
+        <xf:setvalue ref="$persistence-instance/saved" value="'false'"/>
+    </xf:action>
 
     <!-- Delete operation -->
     <xf:action event="fr-delete-data">
@@ -1062,6 +1068,18 @@
         <!-- Force-`<xf:rebuild>` unneeded: structural changes above and `<xf:recalculate>` rebuilds if needed. -->
         <xf:recalculate model="fr-form-model"/>
 
+        <xf:action if="not(event('for') = 'load-template')">
+            <xf:action if="event('data-or-draft') = 'draft'">
+                <xf:setvalue ref="$persistence-instance/initial-data-status"     value="'dirty'"/>
+                <xf:setvalue ref="$persistence-instance/initial-autosave-status" value="'clean'"/>
+            </xf:action>
+            <xf:action if="not(event('data-or-draft') = 'draft')">
+                <xf:setvalue ref="$persistence-instance/saved"                   value="'true'"/>
+                <xf:setvalue ref="$persistence-instance/initial-data-status"     value="'clean'"/>
+                <xf:setvalue ref="$persistence-instance/initial-autosave-status" value="'clean'"/>
+            </xf:action>
+        </xf:action>
+
         <xf:action if="event('fr-data-ready-needed') = true()">
 
             <!-- During initialization, when `fr-get-document-submission` is called, we dispatch directly `fr-data-ready`.
@@ -1076,9 +1094,11 @@
             </xf:dispatch>
 
             <xf:setvalue
-                iterate="($persistence-instance/data-status, $autosave-elem/status)"
-                ref="."
+                ref="$persistence-instance/data-status"
                 value="$persistence-instance/initial-data-status"/>
+            <xf:setvalue
+                ref="$autosave-elem/status"
+                value="$persistence-instance/initial-autosave-status"/>
         </xf:action>
     </xf:action>
 
@@ -1159,6 +1179,7 @@
     </xf:instance>
 
     <xf:action event="fr-data-save-done" observer="fr-form-model" if="not(event('draft') = 'true')">
+        <xf:setvalue ref="$persistence-instance/saved" value="'true'"/>
         <!-- Update last modification date/time and ETag after save -->
         <xf:delete ref="instance('fr-document-metadata')/@*[name() = ('last-modified', 'etag')]"/>
         <xf:insert
@@ -1184,7 +1205,8 @@
     <xf:action event="fr-conflict-discard-reload">
         <!-- Simply reload the document without handling the drafts -->
         <xf:send submission="fr-get-document-submission">
-            <xf:property name="data-or-draft" value="'data'"/>
+            <xf:property name="data-or-draft"        value="'data'" xxf:tunnel="true"/>
+            <xf:property name="fr-data-ready-needed" value="true()" xxf:tunnel="true"/>
         </xf:send>
     </xf:action>
 
@@ -1192,14 +1214,19 @@
         <_ xmlns="">
             <!-- Dialog to show upon xforms-ready for handling drafts -->
             <found-document-message-to-show/>
-            <!-- Initial data status -->
+            <!-- Initial data and autosave status -->
             <initial-data-status>clean</initial-data-status>
+            <initial-autosave-status>clean</initial-autosave-status>
+            <!-- Whether the document has been explicitly saved at least once (or loaded from saved data) -->
+            <saved>false</saved>
             <!-- Whether form data is clean or dirty (i.e. saved or not saved) -->
             <data-status>clean</data-status>
             <autosave>
                 <status>clean</status>
                 <autosave-timestamp/>
             </autosave>
+            <!-- Computed display status: new | safe | autosaved | unsafe -->
+            <data-display-status/>
             <!-- Success or error message to display -->
             <message seq="0"/>
             <!-- Error document returned -->
@@ -1234,6 +1261,14 @@
 
     <xf:bind ref="$persistence-instance">
         <xf:bind ref="data-safe" calculate="../data-status = 'clean' or ../data-safe-override = 'true'"/>
+        <xf:bind
+            ref="data-display-status"
+            calculate="
+                if (../data-status = 'clean') then
+                    if (../saved = 'true') then 'safe' else 'new'
+                else
+                    if (../autosave/status = 'clean') then 'autosaved' else 'unsafe'
+            "/>
         <xf:bind ref="captcha" constraint=". = 'true'"/>
         <xf:bind
             ref="lease-owned-by-current-user"
@@ -1361,10 +1396,10 @@
 
             <!-- Mark status as dirty if data changes -->
             <xf:setvalue ref="$persistence-instance/data-status"          value="'dirty'"/>
+            <xf:setvalue ref="$autosave-elem/status"                      value="'dirty'"/>
             <!-- Reset override, see: https://github.com/orbeon/orbeon-forms/issues/1325  -->
             <xf:setvalue ref="$persistence-instance/data-safe-override"   value="'false'"/>
             <xf:action if="$autosave-enabled">
-                <xf:setvalue ref="$autosave-elem/status"                  value="'dirty'"/>
                 <xf:dispatch
                     name="maybe-autosave"
                     targetid="fr-persistence-model"

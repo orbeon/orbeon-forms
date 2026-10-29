@@ -1277,9 +1277,40 @@
                 <!-- Form has no error or warning messages -->
                 <xf:group model="fr-form-model"><xh:i class="fa fa-check fa-fw" title="{{$fr-resources/errors/none}}"/></xf:group>
             </xf:group>
-            <xf:group model="fr-persistence-model" ref="instance('fr-persistence-instance')[data-status = 'dirty']" class="fr-data-icon">
-                <!-- Data is dirty -->
-                <xf:group model="fr-form-model"><xh:i class="fa fa-hdd-o fa-fw" title="{{$fr-resources/errors/unsaved}}"/></xf:group>
+            <xf:group
+                model="fr-persistence-model"
+                ref="instance('fr-persistence-instance')"
+                class="fr-data-icon fr-data-status-{{data-display-status}}">
+                <xf:group model="fr-form-model">
+                    <xh:i
+                        class="fa-regular fa-file fa-fw fr-status-new"
+                        tabindex="0"
+                        role="button"
+                        aria-label="{{$fr-resources/detail/data-status/new/title}}"
+                        data-orbeon-title="{{$fr-resources/detail/data-status/new/title}}"
+                        data-orbeon-content="{{$fr-resources/detail/data-status/new/body}}"/>
+                    <xh:i
+                        class="fa-solid fa-file-circle-check fa-fw fr-status-safe"
+                        tabindex="0"
+                        role="button"
+                        aria-label="{{$fr-resources/detail/data-status/safe/title}}"
+                        data-orbeon-title="{{$fr-resources/detail/data-status/safe/title}}"
+                        data-orbeon-content="{{$fr-resources/detail/data-status/safe/body}}"/>
+                    <xh:i
+                        class="fa-solid fa-file-pen fa-fw fr-status-autosaved"
+                        tabindex="0"
+                        role="button"
+                        aria-label="{{$fr-resources/detail/data-status/autosaved/title}}"
+                        data-orbeon-title="{{$fr-resources/detail/data-status/autosaved/title}}"
+                        data-orbeon-content="{{$fr-resources/detail/data-status/autosaved/body}}"/>
+                    <xh:i
+                        class="fa-solid fa-file-circle-exclamation fa-fw fr-status-unsafe"
+                        tabindex="0"
+                        role="button"
+                        aria-label="{{$fr-resources/detail/data-status/unsafe/title}}"
+                        data-orbeon-title="{{$fr-resources/detail/data-status/unsafe/title}}"
+                        data-orbeon-content="{{$fr-resources/detail/data-status/unsafe/body}}"/>
+                </xf:group>
             </xf:group>
         </xf:group>
     </xsl:template>

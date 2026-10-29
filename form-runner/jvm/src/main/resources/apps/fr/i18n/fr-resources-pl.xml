@@ -406,6 +406,24 @@
         <workflow-stage>
             <label>Etap</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>Nowy dokument</title>
+                <body>Nie wprowadzono jeszcze żadnych zmian.</body>
+            </new>
+            <safe>
+                <title>Zapisano</title>
+                <body>Wszystkie zmiany zostały zapisane.</body>
+            </safe>
+            <autosaved>
+                <title>Zapisano automatycznie</title>
+                <body>Zmiany zostały automatycznie zapisane jako wersja robocza.</body>
+            </autosaved>
+            <unsafe>
+                <title>Niezapisane zmiany</title>
+                <body>Istnieją niezapisane zmiany.</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>Zapisz lokalnie</dialog-title>

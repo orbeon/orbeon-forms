@@ -405,6 +405,24 @@
         <workflow-stage>
             <label>Fase</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>Nuovo documento</title>
+                <body>Non sono ancora state apportate modifiche.</body>
+            </new>
+            <safe>
+                <title>Salvato</title>
+                <body>Tutte le modifiche sono state salvate.</body>
+            </safe>
+            <autosaved>
+                <title>Salvato automaticamente</title>
+                <body>Le modifiche sono state salvate automaticamente come bozza.</body>
+            </autosaved>
+            <unsafe>
+                <title>Modifiche non salvate</title>
+                <body>Ci sono modifiche non salvate.</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>Salva localmente</dialog-title>

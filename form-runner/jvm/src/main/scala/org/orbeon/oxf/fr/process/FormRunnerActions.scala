@@ -751,6 +751,8 @@ trait FormRunnerActions
       lastModified         = FormRunner.documentModifiedDateAsInstant,
       eTag                 = FormRunner.documentEtag,
       dataStatus           = if (FormRunner.isFormDataSaved) DataStatus.Clean else DataStatus.Dirty,
+      autosaveStatus       = if (FormRunner.isFormDataAutosaved) DataStatus.Clean else DataStatus.Dirty,
+      saved                = FormRunner.isDocumentSaved,
       renderedFormats      = if (preserveRenderedFormats) renderedFormatsMap(createHardLinks = true) else Map.empty
     )
 

@@ -405,6 +405,24 @@
         <workflow-stage>
             <label>工作流階段</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>新文件</title>
+                <body>尚未進行任何更改。</body>
+            </new>
+            <safe>
+                <title>已儲存</title>
+                <body>所有更改均已儲存。</body>
+            </safe>
+            <autosaved>
+                <title>已自動儲存</title>
+                <body>更改已自動儲存為草稿。</body>
+            </autosaved>
+            <unsafe>
+                <title>未儲存的更改</title>
+                <body>存在未儲存的更改。</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>本地保存</dialog-title>

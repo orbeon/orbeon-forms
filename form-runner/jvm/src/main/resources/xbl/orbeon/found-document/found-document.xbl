@@ -122,7 +122,7 @@
                                 <xf:label value="$fr-resources/detail/draft-singleton/open-saved"/>
                                 <xf:action event="DOMActivate">
                                     <xf:send xxbl:scope="outer" submission="fr-get-document-submission">
-                                        <xf:property name="data-or-draft"       value="'data'"/>
+                                        <xf:property name="data-or-draft"        value="'data'"  xxf:tunnel="true"/>
                                         <xf:property name="fr-data-ready-needed" value="true()" xxf:tunnel="true"/>
                                     </xf:send>
                                 </xf:action>
@@ -131,7 +131,7 @@
                                 <xf:label value="$fr-resources/detail/draft-singleton/open-draft"/>
                                 <xf:action event="DOMActivate">
                                     <xf:send xxbl:scope="outer" submission="fr-get-document-submission">
-                                        <xf:property name="data-or-draft"       value="'draft'"/>
+                                        <xf:property name="data-or-draft"        value="'draft'" xxf:tunnel="true"/>
                                         <xf:property name="fr-data-ready-needed" value="true()" xxf:tunnel="true"/>
                                     </xf:send>
                                 </xf:action>
@@ -167,7 +167,7 @@
                                     <xf:setvalue xxbl:scope="outer" ref="xxf:instance('fr-parameters-instance')/document" value="xxf:instance('fr-search-response')/document/@name"/>
                                     <xf:setvalue xxbl:scope="outer" ref="xxf:instance('fr-parameters-instance')/draft">true</xf:setvalue>
                                     <xf:send xxbl:scope="outer" submission="fr-get-document-submission">
-                                        <xf:property name="data-or-draft"       value="'draft'"/>
+                                        <xf:property name="data-or-draft"        value="'draft'" xxf:tunnel="true"/>
                                         <xf:property name="fr-data-ready-needed" value="true()" xxf:tunnel="true"/>
                                     </xf:send>
                                     <xf:action xxbl:scope="outer" type="xpath">fr:run-process-by-name('oxf.fr.detail.process', 'new-to-edit')</xf:action>

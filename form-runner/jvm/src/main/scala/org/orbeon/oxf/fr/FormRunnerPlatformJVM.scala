@@ -51,6 +51,16 @@ trait FormRunnerPlatformJVM extends FormRunnerPlatform {
             value = privateModeMetadata.dataStatus.entryName
           )
 
+          XFormsAPI.setvalue(
+            ref   = List(persistenceInstanceElem) / "initial-autosave-status",
+            value = privateModeMetadata.autosaveStatus.entryName
+          )
+
+          XFormsAPI.setvalue(
+            ref   = List(persistenceInstanceElem) / "saved",
+            value = privateModeMetadata.saved.toString
+          )
+
           val documentMetadataElemAsList = List(documentMetadataElem)
 
           // 2025-10-24: Reproducing the logic we had in `persistence-model.xml`. It's unclear why we set the value

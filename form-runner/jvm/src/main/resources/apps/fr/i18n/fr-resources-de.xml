@@ -405,6 +405,24 @@
         <workflow-stage>
             <label>Stufe</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>Neues Dokument</title>
+                <body>Es wurden noch keine Änderungen vorgenommen.</body>
+            </new>
+            <safe>
+                <title>Gespeichert</title>
+                <body>Alle Änderungen wurden gespeichert.</body>
+            </safe>
+            <autosaved>
+                <title>Automatisch gespeichert</title>
+                <body>Änderungen wurden automatisch als Entwurf gespeichert.</body>
+            </autosaved>
+            <unsafe>
+                <title>Nicht gespeicherte Änderungen</title>
+                <body>Es liegen nicht gespeicherte Änderungen vor.</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>Lokal speichern</dialog-title>

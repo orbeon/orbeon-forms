@@ -392,6 +392,24 @@
         <workflow-stage>
             <label>ステージ</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>新規ドキュメント</title>
+                <body>まだ変更は行われていません。</body>
+            </new>
+            <safe>
+                <title>保存済み</title>
+                <body>すべての変更が保存されました。</body>
+            </safe>
+            <autosaved>
+                <title>自動保存済み</title>
+                <body>変更は下書きとして自動保存されました。</body>
+            </autosaved>
+            <unsafe>
+                <title>未保存の変更</title>
+                <body>保存されていない変更があります。</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>ローカルに保存</dialog-title>

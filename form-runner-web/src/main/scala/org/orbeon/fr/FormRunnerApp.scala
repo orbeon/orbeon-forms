@@ -15,13 +15,14 @@ package org.orbeon.fr
 
 import org.orbeon.facades.{HTMLDialogElement, Ladda}
 import org.orbeon.oxf.util.StringUtils.*
-import org.scalajs.dom.ResizeObserver
+import org.scalajs.dom.{MutationObserver, MutationObserverInit, ResizeObserver}
 import org.orbeon.web.DomSupport.*
 import org.orbeon.web.{DomEventNames, DomSupport}
 import org.orbeon.xbl
 import org.orbeon.xforms.*
 import org.orbeon.xforms.Constants.InitiallyHiddenClass
 import org.orbeon.xforms.Session.SessionUpdate
+import org.orbeon.xforms.facade.Bootstrap
 import org.scalajs.dom
 import org.scalajs.dom.*
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
@@ -92,6 +93,102 @@ object FormRunnerApp extends App {
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-session-expiration-dialog"               , initSessionExpirationDialog)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-duplicate-tab-dialog"                    , initDuplicateTabDialog)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-color-scheme-nav"                        , initColorSchemeSelector)
+      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-data-icon"                               , initDataStatusPopover)
+    }
+  }
+
+  private def initDataStatusPopover(dataIconElem: html.Element): Unit = {
+
+    def activeStatusIconOpt: Option[html.Element] =
+      if (dataIconElem.closestOpt("form.fr-client-data-dirty").isDefined)
+        dataIconElem.querySelectorOpt(".fr-status-unsafe")
+      else if (dataIconElem.classList.contains("fr-data-status-new"))
+        dataIconElem.querySelectorOpt(".fr-status-new")
+      else if (dataIconElem.classList.contains("fr-data-status-safe"))
+        dataIconElem.querySelectorOpt(".fr-status-safe")
+      else if (dataIconElem.classList.contains("fr-data-status-autosaved"))
+        dataIconElem.querySelectorOpt(".fr-status-autosaved")
+      else if (dataIconElem.classList.contains("fr-data-status-unsafe"))
+        dataIconElem.querySelectorOpt(".fr-status-unsafe")
+      else
+        None
+
+    def currentPopoverElemOpt: Option[html.Element] =
+      Option(dataIconElem.getAttribute("aria-describedby"))
+        .filter(_.nonEmpty)
+        .flatMap(id => dom.document.getElementByIdOpt(id))
+        .filter(_.classList.contains("fr-data-status-popover"))
+
+    def isPopoverShown: Boolean =
+      currentPopoverElemOpt.isDefined
+
+    def hidePopover(): Unit =
+      Bootstrap.getPopover(dataIconElem).foreach(_.destroy())
+
+    def showOrUpdatePopover(toggleIfShown: Boolean): Unit =
+      if (isPopoverShown && toggleIfShown) {
+        hidePopover()
+      } else {
+        hidePopover()
+        activeStatusIconOpt.foreach { iconElem =>
+          val title   = Option(iconElem.getAttribute("data-orbeon-title")).getOrElse("")
+          val content = Option(iconElem.getAttribute("data-orbeon-content")).getOrElse("")
+          if (title.nonEmpty || content.nonEmpty) {
+            val popoverConfig = js.Dynamic.literal(
+              placement = "bottom",
+              trigger   = "manual",
+              title     = title,
+              content   = content,
+              html      = false,
+              animation = false
+            )
+            val popoverHandle = Bootstrap.newPopover(dataIconElem, popoverConfig)
+            popoverHandle.show()
+            popoverHandle.tipElementOpt.map(_.asInstanceOf[html.Element]).foreach { popover =>
+              popover.classList.add("fr-data-status-popover")
+            }
+          }
+        }
+      }
+
+    dataIconElem.addEventListener("click", (e: dom.MouseEvent) => {
+      e.stopPropagation()
+      showOrUpdatePopover(toggleIfShown = true)
+    })
+
+    dataIconElem.addEventListener("keydown", (e: dom.KeyboardEvent) =>
+      if (e.key == "Enter" || e.key == " ") {
+        e.preventDefault()
+        e.stopPropagation()
+        showOrUpdatePopover(toggleIfShown = true)
+      }
+    )
+
+    document.addEventListener("click", (e: dom.MouseEvent) =>
+      if (isPopoverShown) {
+        val target               = e.target.asInstanceOf[dom.Node]
+        val clickedInsidePopover = currentPopoverElemOpt.exists(_.contains(target))
+        if (! dataIconElem.contains(target) && ! clickedInsidePopover)
+          hidePopover()
+      }
+    )
+
+    document.addEventListener("keyup", (e: dom.KeyboardEvent) =>
+      if (e.key == "Escape" && isPopoverShown)
+        hidePopover()
+    )
+
+    if (js.typeOf(g.MutationObserver) != "undefined") {
+      val observer = new MutationObserver((_, _) =>
+        if (isPopoverShown)
+          showOrUpdatePopover(toggleIfShown = false)
+      )
+      val options = new MutationObserverInit {
+        attributes      = true
+        attributeFilter = js.Array("class")
+      }
+      observer.observe(dataIconElem, options)
+      dataIconElem.closestOpt("form").foreach(observer.observe(_, options))
     }
   }
 

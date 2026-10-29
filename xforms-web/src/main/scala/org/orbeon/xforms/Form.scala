@@ -83,12 +83,48 @@ class Form(
   // https://github.com/orbeon/orbeon-forms/issues/6960
   var allowClientDataStatus: Boolean = false
 
+  // https://github.com/orbeon/orbeon-forms/issues/6975
+  private var uncommittedValueControlIds: Set[String] = Set.empty
+  private var inFlightValueControlIds   : Set[String] = Set.empty
+
+  private def updateClientDataDirtyClass(): Unit =
+    elem.classList.toggle("fr-client-data-dirty", uncommittedValueControlIds.nonEmpty || inFlightValueControlIds.nonEmpty)
+
+  def onControlValueInput(controlId: String, matchesServerValue: Boolean): Unit = {
+    if (matchesServerValue)
+      uncommittedValueControlIds -= controlId
+    else
+      uncommittedValueControlIds += controlId
+    updateClientDataDirtyClass()
+  }
+
+  def beforeAjaxRequestSent(events: List[AjaxEvent]): Unit = {
+    val sentValueControlIds =
+      events.iterator.collect { case e if e.eventName == EventNames.XXFormsValue => e.targetIdOpt }.flatten.toSet
+    if (sentValueControlIds.nonEmpty) {
+      uncommittedValueControlIds --= sentValueControlIds
+      inFlightValueControlIds    ++= sentValueControlIds
+      updateClientDataDirtyClass()
+    }
+  }
+
+  def afterAjaxResponseProcessed(): Unit =
+    if (inFlightValueControlIds.nonEmpty) {
+      inFlightValueControlIds = Set.empty
+      updateClientDataDirtyClass()
+    }
+
   // https://github.com/orbeon/orbeon-forms/issues/4286
   private var _formDataSafe: Boolean = true
 
   def formDataSafe_=(safe: Boolean): Unit = {
     val wasSafe   = _formDataSafe
     _formDataSafe = safe
+    if (safe) {
+      uncommittedValueControlIds = Set.empty
+      inFlightValueControlIds    = Set.empty
+      updateClientDataDirtyClass()
+    }
     if (safe && ! wasSafe) {
       dom.window.removeEventListener(Form.ListenerEvents, Form.ReturnMessage)
       clearDiscardableTimerIds()

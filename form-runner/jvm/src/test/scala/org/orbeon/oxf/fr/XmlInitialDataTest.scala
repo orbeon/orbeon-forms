@@ -77,6 +77,8 @@ class XmlInitialDataTest
             lastModified         = None,
             eTag                 = None,
             dataStatus           = DataStatus.Dirty,
+            autosaveStatus       = DataStatus.Dirty,
+            saved                = false,
             renderedFormats      = Map.empty,
           )
         )
@@ -96,6 +98,87 @@ class XmlInitialDataTest
       } locally {
         it (s"must handle mode=$mode/documentIdOpt=$documentIdOpt/params=$params") {
           assert(runFormRunnerGetFieldValue(mode, documentIdOpt, params) == expected)
+        }
+      }
+
+      def runFormRunnerHasDataStatusClass(
+        mode        : String,
+        params      : Iterable[(String, String)],
+        contentOpt  : Option[StreamedContent],
+        expectedClass: String
+      ): Boolean = {
+        val (_, bufferedContent, _) =
+          runFormRunnerReturnContent(
+            "issue",
+            "7240",
+            mode,
+            documentId = Some("12345"),
+            query      = params,
+            background = false,
+            content    = contentOpt
+          )
+
+        val (receiver, result) = StaticXPath.newTinyTreeReceiver
+
+        HtmlParsing.parseHtmlString(
+          new String(bufferedContent.body, CharsetNames.Utf8),
+          receiver
+        )
+
+        val resultDoc = result()
+
+        XPathCache.evaluateAsString(
+          contextItems       = List(resultDoc: om.Item).asJava,
+          contextPosition    = 1,
+          xpathString        = s"exists(//*[tokenize(@class, '\\s+') = 'fr-data-icon' and tokenize(@class, '\\s+') = '$expectedClass'])",
+          namespaceMapping   = NamespaceMapping.EmptyMapping,
+          variableToValueMap = Map.empty.asJava,
+          functionLibrary    = null,
+          functionContext    = null,
+          baseURI            = null,
+          locationData       = null,
+          reporter           = null
+        ).toBoolean
+      }
+
+      val ExpectedDataStatuses = List(
+        (DataStatus.Clean, DataStatus.Clean, false, "fr-data-status-new"),
+        (DataStatus.Clean, DataStatus.Clean, true,  "fr-data-status-safe"),
+        (DataStatus.Dirty, DataStatus.Clean, false, "fr-data-status-autosaved"),
+        (DataStatus.Dirty, DataStatus.Clean, true,  "fr-data-status-autosaved"),
+        (DataStatus.Dirty, DataStatus.Dirty, false, "fr-data-status-unsafe"),
+        (DataStatus.Dirty, DataStatus.Dirty, true,  "fr-data-status-unsafe"),
+      )
+
+      for {
+        mode                                                     <- List("new", "edit", "view")
+        (dataStatus, autosaveStatus, saved, expectedStatusClass) <- ExpectedDataStatuses
+      } locally {
+        it(s"must preserve data status `$expectedStatusClass` in mode `$mode` (dataStatus=$dataStatus, autosaveStatus=$autosaveStatus, saved=$saved)") {
+          val encryptedInternalState =
+            FormRunnerExternalMode.encryptPrivateModeMetadata(
+              PrivateModeMetadata(
+                authorizedOperations = Operations.parseFromString("read update"),
+                workflowStage        = None,
+                created              = None,
+                lastModified         = None,
+                eTag                 = None,
+                dataStatus           = dataStatus,
+                autosaveStatus       = autosaveStatus,
+                saved                = saved,
+                renderedFormats      = Map.empty,
+              )
+            )
+          val xmlStreamedContent =
+            StreamedContent.fromBytes(Xml.getBytes(CharsetNames.Utf8), Some(ContentTypes.XmlContentType))
+          assert(
+            runFormRunnerHasDataStatusClass(
+              mode          = mode,
+              params        = List(FormRunner.InternalStateParam -> encryptedInternalState),
+              contentOpt    = Some(xmlStreamedContent),
+              expectedClass = expectedStatusClass
+            )
+          )
         }
       }
     }

@@ -694,10 +694,16 @@ object XFormsUI {
   var modalProgressPanelShown: Boolean = false
 
   def fieldValueChanged(targetElem: html.Element): Unit =
-    // https://github.com/orbeon/orbeon-forms/issues/6960
-    Page.findXFormsFormFromHtmlElem(targetElem)
-      .filter(_.allowClientDataStatus)
-      .foreach(_.formDataSafe = false)
+    Page.findXFormsFormFromHtmlElem(targetElem).foreach { form =>
+      // https://github.com/orbeon/orbeon-forms/issues/6960
+      if (form.allowClientDataStatus)
+        form.formDataSafe = false
+
+      // https://github.com/orbeon/orbeon-forms/issues/6975
+      val matchesServerValue =
+        ServerValueStore.getOpt(targetElem.id).exists(getCurrentValue(targetElem).contains)
+      form.onControlValueInput(targetElem.id, matchesServerValue)
+    }
 
   def displayModalProgressPanel(): Unit =
     if (! modalProgressPanelShown) {

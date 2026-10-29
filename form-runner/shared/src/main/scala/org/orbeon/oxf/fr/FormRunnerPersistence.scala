@@ -600,6 +600,12 @@ trait FormRunnerPersistence {
   def isFormDataSaved: Boolean =
     frc.persistenceInstance.rootElement / "data-status" === "clean"
 
+  def isFormDataAutosaved: Boolean =
+    frc.persistenceInstance.rootElement / "autosave" / "status" === "clean"
+
+  def isDocumentSaved: Boolean =
+    frc.persistenceInstance.rootElement / "saved" === "true"
+
   // Return all nodes which refer to data attachments
   // Used by attachments service
   //@XPathFunction

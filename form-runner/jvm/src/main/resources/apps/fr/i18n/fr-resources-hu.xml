@@ -405,6 +405,24 @@
         <workflow-stage>
             <label>Állapot</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>Új dokumentum</title>
+                <body>Még nem történt módosítás.</body>
+            </new>
+            <safe>
+                <title>Mentve</title>
+                <body>Minden módosítás mentve lett.</body>
+            </safe>
+            <autosaved>
+                <title>Automatikusan mentve</title>
+                <body>A módosítások automatikusan piszkozatként lettek mentve.</body>
+            </autosaved>
+            <unsafe>
+                <title>Nem mentett módosítások</title>
+                <body>Nem mentett módosítások vannak.</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>Helyi mentés</dialog-title>

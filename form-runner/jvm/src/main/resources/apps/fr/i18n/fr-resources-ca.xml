@@ -418,6 +418,24 @@
         <workflow-stage>
             <label>Etapa</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>Document nou</title>
+                <body>Encara no s'ha fet cap canvi.</body>
+            </new>
+            <safe>
+                <title>Desat</title>
+                <body>S'han desat tots els canvis.</body>
+            </safe>
+            <autosaved>
+                <title>Desat automàticament</title>
+                <body>Els canvis s'han desat automàticament com a esborrany.</body>
+            </autosaved>
+            <unsafe>
+                <title>Canvis no desats</title>
+                <body>Hi ha canvis no desats.</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>Guardar localment</dialog-title>

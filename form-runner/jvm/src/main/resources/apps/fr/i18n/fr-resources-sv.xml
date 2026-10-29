@@ -405,6 +405,24 @@
         <workflow-stage>
             <label>Steg</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>Nytt dokument</title>
+                <body>Inga ändringar har gjorts ännu.</body>
+            </new>
+            <safe>
+                <title>Sparat</title>
+                <body>Alla ändringar har sparats.</body>
+            </safe>
+            <autosaved>
+                <title>Autosparat</title>
+                <body>Ändringar har sparats automatiskt som ett utkast.</body>
+            </autosaved>
+            <unsafe>
+                <title>Osparade ändringar</title>
+                <body>Det finns osparade ändringar.</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>Spara lokalt</dialog-title>

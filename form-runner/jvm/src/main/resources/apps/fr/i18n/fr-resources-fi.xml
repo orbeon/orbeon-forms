@@ -405,6 +405,24 @@
         <workflow-stage>
             <label>Vaihe</label>
         </workflow-stage>
+        <data-status>
+            <new>
+                <title>Uusi asiakirja</title>
+                <body>Muutoksia ei ole vielä tehty.</body>
+            </new>
+            <safe>
+                <title>Tallennettu</title>
+                <body>Kaikki muutokset on tallennettu.</body>
+            </safe>
+            <autosaved>
+                <title>Automaattisesti tallennettu</title>
+                <body>Muutokset on tallennettu automaattisesti luonnoksena.</body>
+            </autosaved>
+            <unsafe>
+                <title>Tallentamattomia muutoksia</title>
+                <body>Asiakirjassa on tallentamattomia muutoksia.</body>
+            </unsafe>
+        </data-status>
     </detail>
     <save-locally>
         <dialog-title>Tallenna paikallisesti</dialog-title>

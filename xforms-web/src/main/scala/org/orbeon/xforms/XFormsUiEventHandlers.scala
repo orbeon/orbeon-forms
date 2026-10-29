@@ -147,6 +147,9 @@ object XFormsUiEventHandlers {
     } else if (! Globals.maskFocusEvents) {
       findAncestorFocusableControl(event.target).foreach { control =>
 
+        if (ServerValueStore.getOpt(control.id).exists(XFormsUI.getCurrentValue(control).contains))
+          Page.findXFormsFormFromHtmlElem(control).foreach(_.onControlValueInput(control.id, matchesServerValue = true))
+
         Globals.currentFocusControlId      = control.id
         Globals.currentFocusControlElement = control
 

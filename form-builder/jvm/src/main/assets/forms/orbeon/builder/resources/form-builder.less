@@ -14,7 +14,7 @@
 @import (reference) "../../../../../../../../../form-runner/jvm/src/main/assets/apps/fr/style/form-runner-dialog";
 
 @fbGutter: 10px;
-@fbToolbarWidth: 208px;
+@fbToolbarWidth: 224px;
 @fbBottomHeight: 54px;
 @fbGridIconsGutter: 22px;
 @fbIconsHeight: 16px;
@@ -385,12 +385,21 @@ body.orbeon {
         width: @fbToolbarWidth;
         box-sizing: border-box;
 
-        kbd {
-            float: right;
+        kbd,
+        button.btn kbd,
+        button.btn:not(.disabled):not([disabled]) kbd {
             display: none;
-            line-height: 18px; // try not to cause the enclosing button to become taller
-            min-width: 3.7em;
+            line-height: 16px; // try not to cause the enclosing button to become taller
+            min-width: 3.2em;
+            padding: 1px 4px;
+            margin-left: 6px;
+            margin-right: 0;
             text-align: center;
+            background-color: var(--orbeon-kbd-background-color);
+            border: 1px solid var(--orbeon-kbd-border-color);
+            border-radius: 4px;
+            color: var(--orbeon-kbd-color);
+            opacity: 1;
         }
 
         .fb-tool .fb-insert-control button {
@@ -411,38 +420,59 @@ body.orbeon {
                 margin: 4px 0;
             }
 
-            // Toolbox-specific tweaks on top of the generic .nav-tabs port below
+            // Segmented pill switcher for toolbox tabs ("Controls" / "Advanced")
             .xbl-fr-tabbable .nav-tabs {
+                flex-wrap: nowrap;
+                margin: 8px 8px 0 8px;
+                padding: 3px;
+                background-color: var(--orbeon-fb-toolbox-tab-background-color);
+                border-radius: var(--orbeon-body-decorations-border-radius);
+                border-bottom: none;
+                gap: 2px;
 
                 li {
-                    width: 50%;
+                    flex: 1 1 0;
+                    min-width: 0;
+                    margin-bottom: 0;
+
                     a {
                         text-align: center;
-                        margin-right: 2px; // Bootstrap 2's tab gap; removed from the last tab below
+                        margin-right: 0;
+                        padding: 4px 8px;
+                        line-height: 20px;
+                        font-size: 0.93em;
+                        font-weight: 500;
+                        border: none;
+                        border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+                        transition: background-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
                     }
                 }
 
-
-                li:last-of-type > a {
-                    margin-right: 0;
+                & > li.active > a,
+                & > li.active > a:hover {
+                    background-color: var(--orbeon-tab-background-color);
+                    color: var(--orbeon-base-color);
+                    border: none;
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
                 }
 
-                &>  li:not(.active) > a {
-
-                    background-color: var(--orbeon-fb-toolbox-tab-background-color);
+                & > li:not(.active) > a {
+                    background-color: transparent;
                     color: var(--orbeon-fb-toolbox-tab-color);
+                    border: none;
 
                     &:hover {
-                        background-color: var(--orbeon-tab-background-color);
+                        background-color: transparent;
                         color: var(--orbeon-fb-toolbox-tab-hover-color);
                     }
                 }
             }
 
             .fb-toolbox-icons-tools {
-                padding: 8px;
+                padding: 4px;
                 text-align: center;
-                background-color: white;
+                background-color: var(--orbeon-tab-background-color);
+                border: var(--orbeon-tab-border-width) solid var(--orbeon-tab-border-color);
 
                 .xforms-trigger-appearance-minimal {
                     margin: 0;
@@ -459,8 +489,8 @@ body.orbeon {
                 &.fb-toolbox-top-icons {
                     display: grid;
                     grid-template-columns: repeat(6, 1fr);
-                    //align-items: center; // no effect
-                    border-radius: @baseBorderRadius;
+                    gap: 2px;
+                    border-radius: var(--orbeon-body-decorations-border-radius);
 
                     .fb-form-settings-button     { grid-row-start: 1; grid-column-start: 1; }
                     .fb-cut-button               { grid-row-start: 1; grid-column-start: 2; }
@@ -470,7 +500,14 @@ body.orbeon {
                     .fb-redo-button              { grid-row-start: 1; grid-column-start: 6; }
 
                     button {
-                        padding: 2px 0;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 100%;
+                        height: 28px;
+                        padding: 0;
+                        border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+                        transition: background-color 100ms ease;
                     }
                 }
 
@@ -487,19 +524,9 @@ body.orbeon {
                     .fb-reload-components-button { grid-row-start: 1; ; grid-column-start: 3; }
                 }
 
-                // Zoom effect on icons
-                .xforms-trigger-appearance-minimal:not(.xforms-readonly) {
-                    button {
-                    }
-                }
                 .xforms-trigger-appearance-minimal:not(.xforms-readonly):hover {
                     button {
-                        padding: 3px 0 0 0;
-                        transition: all ease 100ms;
-                    }
-                    .fa::before {
-                        font-size: 18px;
-                        transition: all ease 100ms;
+                        background-color: var(--orbeon-fb-hover-background-color);
                     }
                 }
             }
@@ -507,8 +534,6 @@ body.orbeon {
             .fb-tools {
 
                 padding: 0;
-                margin-bottom: 15px;
-
                 margin-bottom: @fbGutter;
                 &:last-child { margin-bottom: 0 }
 
@@ -520,18 +545,22 @@ body.orbeon {
                 .fb-tools-title {
                     display: block;
                     width: 100%;
-                    font-size: 11px;
-                    margin-bottom: 4px;
-                    line-height: 24px;
+                    box-sizing: border-box;
+                    font-size: 0.79em;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.04em;
+                    color: var(--orbeon-hint-color);
+                    margin-bottom: 2px;
+                    padding: 0 6px;
+                    line-height: 20px;
                     text-align: left;
-                    font-weight: bold;
-                    border-bottom: 1px solid var(--orbeon-base-border-color);
+                    border-bottom: none;
                 }
 
                 .fb-tools-title {
                     position: relative; // For positioning of the `.fb-library-link` icons
                     padding-right: 24px;
-                    box-sizing: border-box;
                 }
 
                 .fb-library-link {
@@ -540,32 +569,35 @@ body.orbeon {
                     right: 0;
                     width: 20px;
                     text-align: center;
+                    letter-spacing: normal;
+                    text-transform: none;
                     color: var(--orbeon-base-color);
 
                     &:hover {
-                        border-radius: @baseBorderRadius;
+                        border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
                         background-color: var(--orbeon-fb-hover-background-color);
                     }
                 }
 
                 .fb-library-empty {
-                    padding: 2px 4px;
+                    padding: 2px 6px;
                     color: var(--orbeon-fb-empty-message-color);
                     font-style: italic;
                     font-size: 85%;
                 }
 
                 .fb-tool {
-                    //margin: 0 0 0 4px;
                     margin: 0;
 
                     .xforms-trigger button {
-                        padding: 2px 4px;
+                        padding: 4px 6px;
                         border: none; background: none; box-shadow: none; // remove button default styling
+                        border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
                         font-size: 85%;                                   // smaller text next icon
                         width: 100%;                                      // to increase clicking area
                         text-align: left;
                         justify-content: start;
+                        transition: background-color 100ms ease;
 
                         & > span {
                             flex-grow: 1;
@@ -582,32 +614,35 @@ body.orbeon {
                             height: 16px;
                         }
 
-                        i, img { margin-right: 3px } // space between icon and text
-
-                        &:hover {
-                            background-color: var(--orbeon-fb-hover-background-color); // effect on hover
-                        }
+                        i, img { margin-right: 6px } // space between icon and text
 
                         i.fa {
                             width: 14px;
                             font-size: 14px;
-                            margin-left: 1px;
-                            margin-right: 4px;
+                            margin-left: 0;
+                            margin-right: 6px;
+                            color: var(--orbeon-hint-color);
+                            transition: color 100ms ease;
+                        }
+
+                        &:hover {
+                            background-color: var(--orbeon-fb-hover-background-color); // effect on hover
+
+                            i.fa {
+                                color: var(--orbeon-base-color);
+                            }
                         }
                     }
 
                     .fb-add-action-button, .fb-add-http-service-button, .fb-add-service-database-button {
                         display: block;
-                        //border-top: 1px solid #e5e5e5;
-                        button {
-                            padding-left: 0;
-                        }
                     }
 
                     &.xforms-dnd-item {
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
+                        padding-left: 6px;
 
                         i.fa {
                             margin-left: 0;
@@ -631,7 +666,7 @@ body.orbeon {
                         }
 
                         &:hover {
-                            border-radius: @baseBorderRadius;
+                            border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
                             background-color: var(--orbeon-fb-hover-background-color); // effect on hover
                         }
                     }
@@ -644,13 +679,25 @@ body.orbeon {
 
             #fb-toolbox-tabs {
                 min-height: 0;
+
+                .fb-tools {
+                    margin-bottom: 14px;
+                    &:last-child { margin-bottom: 0 }
+                }
+
                 > div {
                     height: 100%;
                     display: grid;
                     grid-template-rows: auto 1fr;
+                    background-color: var(--orbeon-tab-background-color);
+                    border: var(--orbeon-tab-border-width) solid var(--orbeon-tab-border-color);
+                    border-radius: var(--orbeon-body-decorations-border-radius);
+                    overflow: hidden;
+
                     .tab-content {
                         overflow-y: auto;
-                        border-radius: 0 0 @baseBorderRadius @baseBorderRadius;
+                        border: none;
+                        padding: 10px 8px;
                     }
                 }
             }

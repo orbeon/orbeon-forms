@@ -2286,6 +2286,16 @@ body.orbeon {
                 .fr-navbar-home-link a i {
                     color: inherit;
                 }
+                .btn-link {
+                    color: var(--orbeon-fb-navbar-color);
+                    &:hover,
+                    &:focus {
+                        color: var(--orbeon-fb-navbar-hover-color);
+                    }
+                    .fa {
+                        color: inherit;
+                    }
+                }
                 .fr-status-icons {
                     display: inline-flex;
                     align-items: center;
@@ -2294,6 +2304,10 @@ body.orbeon {
                     }
                     i {
                         color: var(--orbeon-fb-navbar-color);
+                        &:hover,
+                        &:focus {
+                            color: var(--orbeon-fb-navbar-hover-color);
+                        }
                     }
                 }
             }

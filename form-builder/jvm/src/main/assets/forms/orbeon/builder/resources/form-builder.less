@@ -402,8 +402,7 @@ body.orbeon {
         box-sizing: border-box;
 
         kbd,
-        button.btn kbd,
-        button.btn:not(.disabled):not([disabled]) kbd {
+        button.btn kbd {
             display: none;
             line-height: 16px; // try not to cause the enclosing button to become taller
             min-width: 3.2em;
@@ -416,6 +415,10 @@ body.orbeon {
             border-radius: 4px;
             color: var(--orbeon-kbd-color);
             opacity: 1;
+        }
+
+        button.btn:not(.disabled):not([disabled]) kbd {
+            border-color: var(--orbeon-kbd-border-color);
         }
 
         .fb-tool .fb-insert-control button {

@@ -113,6 +113,8 @@ object FormRunnerApp extends App {
       else
         None
 
+    var lastActiveIconOpt: Option[html.Element] = None
+
     def currentPopoverElemOpt: Option[html.Element] =
       Option(dataIconElem.getAttribute("aria-describedby"))
         .filter(_.nonEmpty)
@@ -122,8 +124,11 @@ object FormRunnerApp extends App {
     def isPopoverShown: Boolean =
       currentPopoverElemOpt.isDefined
 
-    def hidePopover(): Unit =
+    def hidePopover(): Unit = {
+      lastActiveIconOpt = None
+      dataIconElem.classList.remove("show")
       Bootstrap.getPopover(dataIconElem).foreach(_.destroy())
+    }
 
     def showOrUpdatePopover(toggleIfShown: Boolean): Unit =
       if (isPopoverShown && toggleIfShown) {
@@ -144,6 +149,8 @@ object FormRunnerApp extends App {
             )
             val popoverHandle = Bootstrap.newPopover(dataIconElem, popoverConfig)
             popoverHandle.show()
+            lastActiveIconOpt = Some(iconElem)
+            dataIconElem.classList.add("show")
             popoverHandle.tipElementOpt.map(_.asInstanceOf[html.Element]).foreach { popover =>
               popover.classList.add("fr-data-status-popover")
             }
@@ -178,7 +185,7 @@ object FormRunnerApp extends App {
 
     if (js.typeOf(g.MutationObserver) != "undefined") {
       val observer = new MutationObserver((_, _) =>
-        if (isPopoverShown)
+        if (isPopoverShown && activeStatusIconOpt != lastActiveIconOpt)
           showOrUpdatePopover(toggleIfShown = false)
       )
       val options = new MutationObserverInit {

@@ -326,8 +326,8 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
             final ProcessorOutput output = outputValidator.createOutput(ProcessorImpl.OUTPUT_DATA);
             // Create and connect config input
             final Processor resourceGenerator = PipelineUtils.createURLGenerator(getSchema());
-            PipelineUtils.connect(resourceGenerator, ProcessorImpl.OUTPUT_DATA, outputValidator, MSVValidationProcessor.INPUT_SCHEMA);
-            PipelineUtils.connect(MSVValidationProcessor.NO_DECORATION_CONFIG, ProcessorImpl.OUTPUT_DATA,
+            PipelineUtils.connect(resourceGenerator, ProcessorImpl.OUTPUT_DATA, outputValidator, MSVValidationProcessor.InputSchema());
+            PipelineUtils.connect(MSVValidationProcessor.NO_DECORATION_CONFIG(), ProcessorImpl.OUTPUT_DATA,
                     outputValidator, ProcessorImpl.INPUT_CONFIG);
             outputFilter = new ConcreteRuntimeOutputFilter(input, output, outputFilter);
         }
@@ -342,8 +342,8 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
             // Create and connect config input
 
             final Processor resourceGenerator = PipelineUtils.createURLGenerator(getInput().getSchema());
-            PipelineUtils.connect(resourceGenerator, ProcessorImpl.OUTPUT_DATA, inputValidator, MSVValidationProcessor.INPUT_SCHEMA);
-            PipelineUtils.connect(MSVValidationProcessor.NO_DECORATION_CONFIG, ProcessorImpl.OUTPUT_DATA,
+            PipelineUtils.connect(resourceGenerator, ProcessorImpl.OUTPUT_DATA, inputValidator, MSVValidationProcessor.InputSchema());
+            PipelineUtils.connect(MSVValidationProcessor.NO_DECORATION_CONFIG(), ProcessorImpl.OUTPUT_DATA,
                 inputValidator, ProcessorImpl.INPUT_CONFIG);
             outputFilter = new ConcreteRuntimeOutputFilter(input, output, outputFilter);
         }

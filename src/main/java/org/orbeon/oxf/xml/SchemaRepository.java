@@ -99,7 +99,7 @@ public class SchemaRepository {
         SCHEMAS.put(TraxTransformer.TRAX_TRANSFORMER_CONFIG_NAMESPACE_URI, "schemas/trax-transformer-config.rng");
 
         SCHEMAS.put(PageFlowControllerProcessor.ControllerNamespaceURI(), "schemas/page-flow-controller.rng");
-        SCHEMAS.put(MSVValidationProcessor.ORBEON_ERROR_NS, "schemas/validation-config.rng");
+        SCHEMAS.put(MSVValidationProcessor.OrbeonErrorNs(), "schemas/validation-config.rng");
         SCHEMAS.put(DirectoryScannerProcessor.DIRECTORY_GENERATOR_NAMESPACE_URI, "schemas/directory-generator-config.rng");
 
         // SQL processor schemas

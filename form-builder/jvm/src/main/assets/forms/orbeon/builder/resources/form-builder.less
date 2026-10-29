@@ -16,9 +16,9 @@
 @fbGutter: 10px;
 @fbToolbarWidth: 224px;
 @fbBottomHeight: 54px;
-@fbGridIconsGutter: 22px;
-@fbIconsHeight: 16px;
-@fbGridRowMinHeight: 66px;
+@fbGridIconsGutter: 30px;
+@fbIconsHeight: 18px;
+@fbGridRowMinHeight: 84px;
 
 // Retro Summer #2 Color Scheme
 @color1: #FFEA48; // Gargoyle Gas
@@ -157,44 +157,61 @@ body.orbeon {
     .fb-section-grid-editor,
     .fb-control-editor-left,
     .fb-control-editor-right {
+        z-index: 2;
 
         &> div {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 2px;
+            gap: 2px;
+            margin-top: 3px;
+            padding: 3px;
+            background-color: var(--orbeon-tab-background-color);
+            border: var(--orbeon-tab-border-width) solid var(--orbeon-tab-border-color);
+            border-radius: var(--orbeon-body-decorations-border-radius);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 
             .fa {
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                width: 16px;
-                height: 17px;
-                padding: 0 0 2px 0;
+                width: 20px;
+                height: 18px;
+                padding: 0;
+                font-size: 12px;
+                color: var(--orbeon-fb-navbar-color);
+                border-radius: calc(var(--orbeon-body-decorations-border-radius) - 3px);
+                transition: background-color 100ms ease, color 100ms ease;
+
+                &.fb-x-split,
+                &.fb-y-split {
+                    font-size: 10.5px;
+                }
+                &.fb-x-split::before {
+                    transform: rotate(-45deg); // Rotate only the glyph so the hover highlight box stays upright
+                }
+                &.fb-y-split::before {
+                    transform: rotate(45deg);
+                }
+
+                &.disabled {
+                    opacity: 0.35;
+                }
+
+                &:not([class ~= 'disabled']):hover {
+                    color: var(--orbeon-base-color);
+                    background-color: var(--orbeon-fb-hover-background-color);
+                }
             }
-        }
-
-        // Zoom effect on icons
-        .fa:not([class ~= 'disabled']):hover {
-
-            &::before {
-                font-size: 120%;
-                transition: all ease 100ms;
-            }
-
-            transition: all ease 100ms;
         }
     }
 
-    .fb-section-grid-editor,
     .fb-row-editor {
         .fa {
             width: 18px;
         }
     }
 
-    .fb-control-editor-left,
-    .fb-control-editor-right,
     .fb-control-editor-top {
         .fa {
             font-size: 14px;
@@ -202,14 +219,14 @@ body.orbeon {
     }
 
     .fb-section-grid-editor {
-        padding-right: 10px; // Space between icons and section
+        padding-right: 6px; // Space between icons and section
     }
     .fb-control-editor-left {
-        padding-left:  4px;
+        padding-left:  3px;
         padding-top: 0;
     }
     .fb-control-editor-right {
-        padding-right: 4px;
+        padding-right: 3px;
         padding-top: 0;
     }
 
@@ -228,11 +245,6 @@ body.orbeon {
             border: 2px solid var(--orbeon-focus-border-color);
             border-radius: var(--orbeon-body-decorations-border-radius);
         }
-    }
-
-    .fb-control-editor-left {
-        .fb-x-split { transform: rotate(-45deg) } // Default icon is tilted at a 45º angle
-        .fb-y-split { transform: rotate(45deg)  }
     }
 
     .fb-section-label-editor-click-interceptor {                            // Shown on top of each section label to avoid click → collapse
@@ -2070,8 +2082,8 @@ body.orbeon {
                     padding-top: 4px;
                     padding-bottom: 4px;
                     // Space for the icons to the left and right of the control
-                    padding-left: 24px;
-                    padding-right: 24px;
+                    padding-left: 34px;
+                    padding-right: 34px;
 
                     // Inputs for editing the label and hint to take the whole width of the grid content
                     .xforms-label input, .xforms-hint input {

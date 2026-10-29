@@ -161,12 +161,16 @@ body.orbeon {
         &> div {
             display: flex;
             flex-direction: column;
-            align-items: baseline;
+            align-items: center;
             margin-top: 2px;
 
             .fa {
-                height: 16px;
-                padding: 1px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 16px;
+                height: 17px;
+                padding: 0 0 2px 0;
             }
         }
 
@@ -193,7 +197,6 @@ body.orbeon {
     .fb-control-editor-right,
     .fb-control-editor-top {
         .fa {
-            height: 16px;
             font-size: 14px;
         }
     }
@@ -228,9 +231,8 @@ body.orbeon {
     }
 
     .fb-control-editor-left {
-        .fb-x-split { transform: rotate(135deg) }                 // Default icon is tilted at a 45º angle
+        .fb-x-split { transform: rotate(-45deg) } // Default icon is tilted at a 45º angle
         .fb-y-split { transform: rotate(45deg)  }
-        .fb-x-split { position: relative; left: -1px; top: -4px } // Adjustments
     }
 
     .fb-section-label-editor-click-interceptor {                            // Shown on top of each section label to avoid click → collapse

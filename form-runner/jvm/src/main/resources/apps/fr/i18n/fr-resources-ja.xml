@@ -410,6 +410,12 @@
                 <body>保存されていない変更があります。</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>エラーなし</title>
+                <body>このフォームには入力検証のエラーや警告はありません。</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>ローカルに保存</dialog-title>

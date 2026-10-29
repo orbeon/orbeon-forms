@@ -423,6 +423,12 @@
                 <body>Existem alterações não guardadas.</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>Sem erros</title>
+                <body>Este formulário não contém erros ou avisos de validação.</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>Guardar Localmente</dialog-title>

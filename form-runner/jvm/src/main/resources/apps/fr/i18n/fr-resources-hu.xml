@@ -423,6 +423,12 @@
                 <body>Nem mentett módosítások vannak.</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>Nincs hiba</title>
+                <body>Ez az űrlap nem tartalmaz érvényesítési hibákat vagy figyelmeztetéseket.</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>Helyi mentés</dialog-title>

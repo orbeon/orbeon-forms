@@ -424,6 +424,12 @@
                 <body>Istnieją niezapisane zmiany.</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>Brak błędów</title>
+                <body>Ten formularz nie zawiera błędów ani ostrzeżeń walidacji.</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>Zapisz lokalnie</dialog-title>

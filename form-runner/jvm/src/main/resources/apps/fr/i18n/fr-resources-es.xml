@@ -448,6 +448,12 @@
                 <body>Hay cambios no guardados.</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>Sin errores</title>
+                <body>Este formulario no contiene errores ni advertencias de validación.</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>Guardar Localmente</dialog-title>

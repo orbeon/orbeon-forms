@@ -390,18 +390,25 @@
         }
     }
 
-    .fr-status-icons .fr-data-icon {
-        cursor: pointer;
-        outline: none;
-        i {
-            display: none;
+    .fr-status-icons {
+        .fr-validity-icon,
+        .fr-data-icon {
+            cursor: pointer;
             outline: none;
+            i {
+                outline: none;
+            }
         }
-        &.fr-data-status-new .fr-status-new,
-        &.fr-data-status-safe .fr-status-safe,
-        &.fr-data-status-autosaved .fr-status-autosaved,
-        &.fr-data-status-unsafe .fr-status-unsafe {
-            display: inline-block;
+        .fr-data-icon {
+            i {
+                display: none;
+            }
+            &.fr-data-status-new .fr-status-new,
+            &.fr-data-status-safe .fr-status-safe,
+            &.fr-data-status-autosaved .fr-status-autosaved,
+            &.fr-data-status-unsafe .fr-status-unsafe {
+                display: inline-block;
+            }
         }
     }
 

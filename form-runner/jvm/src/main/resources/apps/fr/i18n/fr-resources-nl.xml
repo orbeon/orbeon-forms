@@ -423,6 +423,12 @@
                 <body>Er zijn niet-opgeslagen wijzigingen.</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>Geen fouten</title>
+                <body>Dit formulier bevat geen validatiefouten of waarschuwingen.</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>Lokaal opslaan</dialog-title>

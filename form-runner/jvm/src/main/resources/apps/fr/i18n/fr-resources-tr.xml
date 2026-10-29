@@ -421,6 +421,12 @@
                 <body>Kaydedilmemiş değişiklikler var.</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>Hata yok</title>
+                <body>Bu formda doğrulama hatası veya uyarı bulunmamaktadır.</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>Yerel Olarak Kaydet</dialog-title>

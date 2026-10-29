@@ -423,6 +423,12 @@
                 <body>توجد تغييرات غير محفوظة.</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>لا توجد أخطاء</title>
+                <body>لا يحتوي هذا النموذج على أي أخطاء أو تحذيرات في التحقق من الصحة.</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>حفظ محليًا</dialog-title>

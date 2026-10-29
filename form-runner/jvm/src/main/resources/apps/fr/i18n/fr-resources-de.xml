@@ -423,6 +423,12 @@
                 <body>Es liegen nicht gespeicherte Änderungen vor.</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>Keine Fehler</title>
+                <body>Dieses Formular enthält keine Validierungsfehler oder Warnungen.</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>Lokal speichern</dialog-title>

@@ -423,6 +423,12 @@
                 <body>There are unsaved changes.</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>No errors</title>
+                <body>This form contains no validation errors or warnings.</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>Save Locally</dialog-title>

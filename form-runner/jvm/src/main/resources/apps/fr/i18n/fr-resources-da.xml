@@ -417,6 +417,12 @@
                 <body>Der er ikke-gemte ændringer.</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>Ingen fejl</title>
+                <body>Denne formular indeholder ingen valideringsfejl eller advarsler.</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>Gem lokalt</dialog-title>

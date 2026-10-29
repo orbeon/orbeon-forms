@@ -423,6 +423,12 @@
                 <body>Ci sono modifiche non salvate.</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>Nessun errore</title>
+                <body>Questo modulo non contiene errori o avvisi di convalida.</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>Salva localmente</dialog-title>

@@ -426,6 +426,12 @@
                 <body>Il y a des modifications non enregistrées.</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>Aucune erreur</title>
+                <body>Ce formulaire ne contient aucune erreur ni aucun avertissement de validation.</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>Enregistrer Localement</dialog-title>

@@ -423,6 +423,12 @@
                 <body>存在未儲存的更改。</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>無錯誤</title>
+                <body>此表單不包含任何驗證錯誤或警告。</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>本地保存</dialog-title>

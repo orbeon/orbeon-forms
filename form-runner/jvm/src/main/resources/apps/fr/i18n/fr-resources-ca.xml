@@ -436,6 +436,12 @@
                 <body>Hi ha canvis no desats.</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>Cap error</title>
+                <body>Aquest formulari no conté errors ni advertiments de validació.</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>Guardar localment</dialog-title>

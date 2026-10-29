@@ -423,6 +423,12 @@
                 <body>Asiakirjassa on tallentamattomia muutoksia.</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>Ei virheitä</title>
+                <body>Tässä lomakkeessa ei ole tarkistusvirheitä tai varoituksia.</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>Tallenna paikallisesti</dialog-title>

@@ -423,6 +423,12 @@
                 <body>Det finnes ulagrede endringer.</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>Ingen feil</title>
+                <body>Dette skjemaet inneholder ingen valideringsfeil eller advarsler.</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>Lagre</dialog-title>

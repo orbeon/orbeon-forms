@@ -1275,7 +1275,15 @@
             </xf:group>
             <xf:group model="fr-error-summary-model" ref=".[visible-counts/@alert = 0]" class="fr-validity-icon">
                 <!-- Form has no error or warning messages -->
-                <xf:group model="fr-form-model"><xh:i class="fa fa-check fa-fw" title="{{$fr-resources/errors/none}}"/></xf:group>
+                <xf:group model="fr-form-model">
+                    <xh:i
+                        class="fa fa-check fa-fw fr-status-valid"
+                        tabindex="0"
+                        role="button"
+                        aria-label="{{$fr-resources/detail/validity-status/valid/title}}"
+                        data-orbeon-title="{{$fr-resources/detail/validity-status/valid/title}}"
+                        data-orbeon-content="{{$fr-resources/detail/validity-status/valid/body}}"/>
+                </xf:group>
             </xf:group>
             <xf:group
                 model="fr-persistence-model"

@@ -416,6 +416,12 @@
                 <body>Есть несохранённые изменения.</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>Нет ошибок</title>
+                <body>Эта форма не содержит ошибок или предупреждений проверки.</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>Сохранить</dialog-title>

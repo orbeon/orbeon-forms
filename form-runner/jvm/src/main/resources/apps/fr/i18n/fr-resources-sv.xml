@@ -423,6 +423,12 @@
                 <body>Det finns osparade ändringar.</body>
             </unsafe>
         </data-status>
+        <validity-status>
+            <valid>
+                <title>Inga fel</title>
+                <body>Detta formulär innehåller inga valideringsfel eller varningar.</body>
+            </valid>
+        </validity-status>
     </detail>
     <save-locally>
         <dialog-title>Spara lokalt</dialog-title>

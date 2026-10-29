@@ -2960,9 +2960,9 @@
                             <xf:var name="csv4" value="xxf:xml-to-csv($xml1, false())"/>
                             <xf:setvalue ref="instance()/r4" value="replace(replace($csv4, '&#13;', ''), '&#10;', ' ')"/>
 
-                            <!-- header = 'absent' -->
-                            <xf:var name="xml5" value="xxf:csv-to-xml($csv2, 'absent')"/>
-                            <xf:setvalue ref="instance()/r5" value="string-join(($xml5/*/r[1]/v[1], $xml5/*/r[1]/v[2]), ',')"/>
+                            <!-- header = true() explicit -->
+                            <xf:var name="xml5" value="xxf:csv-to-xml($csv1, true())"/>
+                            <xf:setvalue ref="instance()/r5" value="string-join(($xml5/*/h/Year, $xml5/*/r[1]/Result), ',')"/>
                         </xf:action>
 
                     </xf:model>
@@ -2980,7 +2980,7 @@
                                     <r2>2011,Jan, Mar,Feb, Apr</r2>
                                     <r3>Year,Result&#10;2011,143&#10;2012,457</r3>
                                     <r4>2011,143&#10;2012,457</r4>
-                                    <r5>2011,Jan, Mar</r5>
+                                    <r5>Year,143</r5>
                                 </result>
                             </instance>
                         </instances>

@@ -227,37 +227,16 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
     Converter.xmlToJsonString(root.getOrElse(xpc.getContextItem.asInstanceOf[om.NodeInfo]), strict = false)
 
   @XPathFunction
-  def csvToXml(s: Option[String] = null, header: Option[om.Item] = None)(implicit xpc: XPathContext): Option[om.NodeInfo] = {
-    val headerBool = parseHeaderOption(header).getOrElse(true)
+  def csvToXml(s: Option[String] = null, header: Option[Boolean] = None)(implicit xpc: XPathContext): Option[om.NodeInfo] =
     stringArgumentOrContextOpt(s).flatMap(csvString =>
-      Try(org.orbeon.oxf.csv.Converter.csvStringToXmlDoc(csvString, header = headerBool)).toOption
+      Try(org.orbeon.oxf.csv.Converter.csvStringToXmlDoc(csvString, header = header.getOrElse(true))).toOption
     )
-  }
 
   @XPathFunction
-  def xmlToCsv(root: Option[om.NodeInfo] = null, header: Option[om.Item] = None)(implicit xpc: XPathContext): Option[String] = {
-    val headerBool = parseHeaderOption(header).getOrElse(true)
+  def xmlToCsv(root: Option[om.NodeInfo] = null, header: Option[Boolean] = None)(implicit xpc: XPathContext): Option[String] =
     itemArgumentOrContextOpt(root).collect {
       case node: om.NodeInfo =>
-        org.orbeon.oxf.csv.Converter.xmlToCsvString(node, header = headerBool)
-    }
-  }
-
-  private def parseHeaderOption(itemOpt: Option[om.Item]): Option[Boolean] =
-    itemOpt.map {
-      case b: BooleanValue => b.getBooleanValue
-      case s: StringValue =>
-        s.getStringValue.trim.toLowerCase match {
-          case "present" | "true" | "yes" | "1" => true
-          case "absent"  | "false" | "no" | "0" => false
-          case _                                => true
-        }
-      case other =>
-        other.getStringValue.trim.toLowerCase match {
-          case "present" | "true" | "yes" | "1" => true
-          case "absent"  | "false" | "no" | "0" => false
-          case _                                => true
-        }
+        org.orbeon.oxf.csv.Converter.xmlToCsvString(node, header = header.getOrElse(true))
     }
 
   private def classesFromAttribute(i: Option[om.Item])(implicit xpc: XPathContext): Set[String] =

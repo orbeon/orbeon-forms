@@ -224,12 +224,12 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
 
     Fun("csv-to-xml", classOf[CsvStringToXml], op = 0, min = 0, NODE_TYPE, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, ALLOWS_ZERO_OR_ONE),
-      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
+      Arg(BOOLEAN, ALLOWS_ZERO_OR_ONE)
     )
 
     Fun("xml-to-csv", classOf[XmlToCsvString], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE,
       Arg(NODE_TYPE, ALLOWS_ZERO_OR_ONE),
-      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
+      Arg(BOOLEAN, ALLOWS_ZERO_OR_ONE)
     )
 
     Fun("create-document", classOf[CreateDocument], op = 0, min = 0, Type.NODE_TYPE, EXACTLY_ONE)

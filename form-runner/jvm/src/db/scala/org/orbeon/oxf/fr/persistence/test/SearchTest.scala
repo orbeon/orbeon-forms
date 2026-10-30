@@ -468,6 +468,75 @@ class SearchTest
       )
     }
 
+    it("returns correct results when sorting by a repeated control") {
+      withTestSafeRequestContext { implicit safeRequestCtx =>
+        Connect.withOrbeonTables("form definition") { (_, provider) =>
+
+          val testForm     = TestForm(provider, controls = Seq(TestForm.Control("control 1"), TestForm.Control("control 2", repeated = true)))
+          val control1Path = testForm.controlPath(0)
+          val control2Path = testForm.controlPath(1)
+          val version      = Specific(1)
+
+          testForm.putFormDefinition(version)
+
+          val documents = Seq(
+            "1" -> Seq(Seq("one"),   Seq("a2", "a1")),
+            "2" -> Seq(Seq("two"),   Seq("d", "b")),
+            "3" -> Seq(Seq("three"), Seq("c")),
+            "4" -> Seq(Seq("four"),  Seq("e1", "e2"))
+          )
+
+          documents.foreach { case (id, valuesPerControl) =>
+            testForm.putSingleFormDataRepeated(
+              version          = version,
+              id               = id,
+              valuesPerControl = valuesPerControl,
+              update           = false,
+              credentialsOpt   = TestForm.credentials("user").some
+            )
+          }
+
+          def searchRequest(direction: String, pageNumber: Int): Document =
+            <search>
+              <query/>
+              <query path={control1Path}/>
+              <query path={control2Path} sort={direction}/>
+              <drafts>include</drafts>
+              <page-size>2</page-size>
+              <page-number>{pageNumber}</page-number>
+              <lang>en</lang>
+            </search>.toDocument
+
+          def assertSearch(direction: String, pageNumber: Int, expectedDocuments: List[(String, List[String])]): Unit =
+            eventually(timeout(Span(10, Seconds)), interval(Span(1, Second))) {
+              assertCall(
+                actualRequest = HttpCall.SolicitedRequest(
+                  path    = HttpCall.searchURL(provider),
+                  version = Unspecified,
+                  method  = POST,
+                  body    = Some(HttpCall.XML(searchRequest(direction, pageNumber)))
+                ),
+                assertResponse = actualResponse => {
+                  assert(actualResponse.code == StatusCode.Ok)
+                  val root = IOSupport.readOrbeonDom(new ByteArrayInputStream(actualResponse.body)).getRootElement
+                  assert(root.attributeValue("search-total") == "4")
+                  val actualDocuments =
+                    root.elements("document").map { doc =>
+                      doc.attributeValue("name") -> doc.element("details").elements("detail").map(_.getText).toList
+                    }.toList
+                  assert(actualDocuments == expectedDocuments)
+                }
+              )
+            }
+
+          assertSearch("asc",  pageNumber = 1, List("1" -> List("one",   "a2, a1"), "2" -> List("two",   "d, b")))
+          assertSearch("asc",  pageNumber = 2, List("3" -> List("three", "c"),      "4" -> List("four",  "e1, e2")))
+          assertSearch("desc", pageNumber = 1, List("4" -> List("four",  "e1, e2"), "2" -> List("two",   "d, b")))
+          assertSearch("desc", pageNumber = 2, List("3" -> List("three", "c"),      "1" -> List("one",   "a2, a1")))
+        }
+      }
+    }
+
     def expectStatusCode(
       path          : String,
       searchRequest : Document,

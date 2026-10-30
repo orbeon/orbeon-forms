@@ -35,19 +35,24 @@ object TestForm {
   def credentials(user: String): Credentials =
     Credentials(UserAndGroup(user, None), Nil, Nil)
 
-  case class Control(label: String)
+  case class Control(label: String, repeated: Boolean = false)
 
   private def controlName(index: Int) = s"control-${index + 1}"
+  private def repeatedGridName(index: Int) = s"grid-${index + 2}"
+  private def repeatedGridIterationName(index: Int) = s"${repeatedGridName(index)}-iteration"
 
-  private def controlElem(index: Int, children: Seq[xml.Node]): xml.Elem =
+  private def elem(name: String, children: Seq[xml.Node]): xml.Elem =
     xml.Elem(
       prefix        = None.orNull,
-      label         = controlName(index),
+      label         = name,
       attributes    = xml.Null,
       scope         = xml.TopScope,
       minimizeEmpty = true,
       child         = children*
     )
+
+  private def controlElem(index: Int, children: Seq[xml.Node]): xml.Elem =
+    elem(controlName(index), children)
 }
 
 case class FormData(
@@ -67,7 +72,11 @@ case class TestForm(
   operations      : Option[String]
 ) {
 
-  def controlPath(index: Int): String = s"section-1/${TestForm.controlName(index)}"
+  def controlPath(index: Int): String =
+    if (controls(index).repeated)
+      s"section-1/${TestForm.repeatedGridName(index)}/${TestForm.controlName(index)}"
+    else
+      s"section-1/${TestForm.controlName(index)}"
 
   def formDefinitionURL: String       = HttpCall.crudURLPrefix(appForm) + s"form/$FormXhtml"
   def formDataURL(id: String): String = HttpCall.crudURLPrefix(appForm) + s"data/$id/$DataXml"
@@ -125,9 +134,31 @@ case class TestForm(
   )(implicit
     logger             : IndentedLogger,
     safeRequestCtx: SafeRequestContext
+  ): Option[FormDataDates] =
+    putSingleFormDataRepeated(
+      version          = version,
+      id               = id,
+      valuesPerControl = values.map(Seq(_)),
+      update           = update,
+      credentialsOpt   = credentialsOpt,
+      workflowStageOpt = workflowStageOpt,
+      returnDates      = returnDates
+    )
+
+  def putSingleFormDataRepeated(
+    version            : Version,
+    id                 : String,
+    valuesPerControl   : Seq[Seq[String]],
+    update             : Boolean,
+    credentialsOpt     : Option[Credentials],
+    workflowStageOpt   : Option[String] = None,
+    returnDates        : Boolean = false
+  )(implicit
+    logger             : IndentedLogger,
+    safeRequestCtx: SafeRequestContext
   ): Option[FormDataDates] = {
     val url                = formDataURL(id)
-    val body               = HttpCall.XML(formData(values))
+    val body               = HttpCall.XML(formDataRepeated(valuesPerControl))
     val stageOpt           = workflowStageOpt.map(Stage( _, documentation = ""))
     val expectedStatusCode = if (update) StatusCode.NoContent else StatusCode.Created
 
@@ -143,7 +174,23 @@ case class TestForm(
     }
   }
 
-  def formDefinition: Document =
+  def formDefinition: Document = {
+    val nonRepeatedControlIndices = controls.indices.filterNot(controls(_).repeated)
+    val repeatedControlIndices    = controls.indices.filter(controls(_).repeated)
+
+    def inputElem(index: Int): xml.Elem = {
+      val controlName = TestForm.controlName(index)
+
+      <xf:input id={s"$controlName-control"} bind={s"$controlName-bind"}>
+        <fr:index>
+          <fr:summary-show/>
+        </fr:index>
+        <xf:label ref={s"$$form-resources/$controlName/label"}/>
+        <xf:hint ref={s"$$form-resources/$controlName/hint"}/>
+        <xf:alert ref="$fr-resources/detail/labels/alert"/>
+      </xf:input>
+    }
+
     <xh:html
         xmlns:xh="http://www.w3.org/1999/xhtml"
         xmlns:xf="http://www.w3.org/2002/xforms"
@@ -168,21 +215,41 @@ case class TestForm(
           <!-- Main instance -->
           <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
             <form>
-              <section-1>
-                <grid-1>{controls.indices.map(TestForm.controlElem(_, children = Seq()))}</grid-1>
-              </section-1>
+              <section-1>{
+                (nonRepeatedControlIndices.nonEmpty || repeatedControlIndices.isEmpty).list(
+                  <grid-1>{nonRepeatedControlIndices.map(TestForm.controlElem(_, children = Seq()))}</grid-1>
+                ) ++
+                repeatedControlIndices.map { index =>
+                  TestForm.elem(
+                    TestForm.repeatedGridName(index),
+                    Seq(TestForm.elem(TestForm.repeatedGridIterationName(index), Seq(TestForm.controlElem(index, children = Seq()))))
+                  )
+                }
+              }</section-1>
             </form>
           </xf:instance>
           <!-- Bindings -->
           <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
-            <xf:bind id="section-1-bind" name="section-1" ref="section-1">
-              <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">{
-                controls.indices.map { index =>
-                  val controlName = TestForm.controlName(index)
-                  <xf:bind id={s"$controlName-bind"} name={controlName} ref={controlName}/>
-                }
-              }</xf:bind>
-            </xf:bind>
+            <xf:bind id="section-1-bind" name="section-1" ref="section-1">{
+              (nonRepeatedControlIndices.nonEmpty || repeatedControlIndices.isEmpty).list(
+                <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">{
+                  nonRepeatedControlIndices.map { index =>
+                    val controlName = TestForm.controlName(index)
+                    <xf:bind id={s"$controlName-bind"} name={controlName} ref={controlName}/>
+                  }
+                }</xf:bind>
+              ) ++
+              repeatedControlIndices.map { index =>
+                val gridName      = TestForm.repeatedGridName(index)
+                val iterationName = TestForm.repeatedGridIterationName(index)
+                val controlName   = TestForm.controlName(index)
+                <xf:bind id={s"$gridName-bind"} ref={gridName} name={gridName}>
+                  <xf:bind id={s"$iterationName-bind"} ref={iterationName} name={iterationName}>
+                    <xf:bind id={s"$controlName-bind"} name={controlName} ref={controlName}/>
+                  </xf:bind>
+                </xf:bind>
+              }
+            }</xf:bind>
           </xf:bind>
           <!-- Metadata -->
           <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
@@ -210,15 +277,28 @@ case class TestForm(
               </email>
               <grid-tab-order>default</grid-tab-order>
               <library-versions></library-versions>
-              <updated-with-version>2022.1-SNAPSHOT PE</updated-with-version>
-              <migration version="2019.1.0">{
-                val content = controls.indices.map { index =>
-                  val controlName = TestForm.controlName(index)
-                  s"""{"value":"$controlName"}"""
-                }.mkString(",")
+              <updated-with-version>2022.1-SNAPSHOT PE</updated-with-version>{
+                repeatedControlIndices.nonEmpty.list(
+                  <migration version="4.8.0">{
+                    val migrations = repeatedControlIndices.map { index =>
+                      val gridName      = TestForm.repeatedGridName(index)
+                      val iterationName = TestForm.repeatedGridIterationName(index)
+                      s"""{"path":"section-1/$gridName","iteration-name":"$iterationName"}"""
+                    }.mkString(",")
+                    s"[$migrations]"
+                  }</migration>
+                ) ++
+                (nonRepeatedControlIndices.nonEmpty || repeatedControlIndices.isEmpty).list(
+                  <migration version="2019.1.0">{
+                    val content = nonRepeatedControlIndices.map { index =>
+                      val controlName = TestForm.controlName(index)
+                      s"""{"value":"$controlName"}"""
+                    }.mkString(",")
 
-                s"""{"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[$content],"topLevel":true}]}"""
-              }</migration>
+                    s"""{"migrations":[{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[$content],"topLevel":true}]}"""
+                  }</migration>
+                )
+              }
             </metadata>
           </xf:instance>
           <!-- Attachments -->
@@ -234,10 +314,21 @@ case class TestForm(
                 </section-1>{
                   controls.zipWithIndex.map { case (control, index) =>
                     TestForm.controlElem(index, children = Seq(<label>{control.label}</label>, <hint/>))
+                  } ++
+                  repeatedControlIndices.map { index =>
+                    TestForm.elem(TestForm.repeatedGridName(index), Seq.empty)
                   }
               }</resource>
             </resources>
-          </xf:instance>
+          </xf:instance>{
+            repeatedControlIndices.map { index =>
+              val gridName      = TestForm.repeatedGridName(index)
+              val iterationName = TestForm.repeatedGridIterationName(index)
+              <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id={s"$gridName-template"}>{
+                TestForm.elem(iterationName, Seq(TestForm.controlElem(index, children = Seq())))
+              }</xf:instance>
+            }
+          }
         </xf:model>
       </xh:head>
       <xh:body>
@@ -247,37 +338,44 @@ case class TestForm(
               xmlns:xbl="http://www.w3.org/ns/xbl"
               xmlns:oxf="http://www.orbeon.com/oxf/processors">
             <fr:section id="section-1-section" bind="section-1-bind">
-              <xf:label ref="$form-resources/section-1/label"></xf:label>
-              <fr:grid id="grid-1-grid" bind="grid-1-bind">
-                <fr:c y="1" x="1" w="6">{
-                  controls.zipWithIndex.map { case (control, index) =>
-                    val controlName = TestForm.controlName(index)
-
-                    <xf:input id={s"$controlName-control"} bind={s"$controlName-bind"}>
-                      <fr:index>
-                        <fr:summary-show/>
-                      </fr:index>
-                      <xf:label ref={s"$$form-resources/$controlName/label"}/>
-                      <xf:hint ref={s"$$form-resources/$controlName/hint"}/>
-                      <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                    </xf:input>
-                  }
-                }</fr:c>
-                <fr:c y="1" x="7" w="6"/>
-              </fr:grid>
+              <xf:label ref="$form-resources/section-1/label"></xf:label>{
+                (nonRepeatedControlIndices.nonEmpty || repeatedControlIndices.isEmpty).list(
+                  <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                    <fr:c y="1" x="1" w="6">{nonRepeatedControlIndices.map(inputElem)}</fr:c>
+                    <fr:c y="1" x="7" w="6"/>
+                  </fr:grid>
+                ) ++
+                repeatedControlIndices.map { index =>
+                  val gridName = TestForm.repeatedGridName(index)
+                  <fr:grid id={s"$gridName-grid"} bind={s"$gridName-bind"} repeat="content" min="1" template={s"instance('$gridName-template')"}>
+                    <fr:c y="1" x="1" w="12">{inputElem(index)}</fr:c>
+                  </fr:grid>
+                }
+              }
             </fr:section>
           </fr:body>
         </fr:view>
       </xh:body>
     </xh:html>.toDocument
+  }
 
-  def formData(values: Seq[String]): Document = {
-    assert(controls.size == values.size)
+  def formData(values: Seq[String]): Document =
+    formDataRepeated(values.map(Seq(_)))
+
+  def formDataRepeated(valuesPerControl: Seq[Seq[String]]): Document = {
+    assert(controls.size == valuesPerControl.size)
 
     <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
       <section-1>{
-        values.zipWithIndex.map { case (value, index) =>
-          TestForm.controlElem(index, children = Seq(xml.Text(value)))
+        valuesPerControl.zipWithIndex.flatMap { case (controlValues, index) =>
+          if (controls(index).repeated)
+            controlValues.map { value =>
+              TestForm.elem(TestForm.repeatedGridName(index), Seq(TestForm.controlElem(index, children = Seq(xml.Text(value)))))
+            }
+          else
+            controlValues.map { value =>
+              TestForm.controlElem(index, children = Seq(xml.Text(value)))
+            }
         }
       }</section-1>
     </form>.toDocument

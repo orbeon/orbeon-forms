@@ -129,38 +129,38 @@
           word-wrap: break-word;
           overflow-wrap: break-word;
 
-          // Syntax highlighting colors
+          // Syntax highlighting colors (light and dark values come from the theme)
           .xpath-keyword {
-            color: #7928ca;
+            color: var(--orbeon-fb-xpath-keyword-color);
             font-weight: bold;
           }
           .xpath-variable {
-            color: #0070c1;
+            color: var(--orbeon-fb-xpath-variable-color);
           }
           .xpath-string {
-            color: #22863a;
+            color: var(--orbeon-fb-xpath-string-color);
           }
           .xpath-number {
-            color: #098658;
+            color: var(--orbeon-fb-xpath-number-color);
           }
           .xpath-function {
-            color: #795e26;
+            color: var(--orbeon-fb-xpath-function-color);
             font-weight: bold;
           }
           .xpath-axis {
-            color: #9c27b0;
+            color: var(--orbeon-fb-xpath-axis-color);
           }
           .xpath-node-test {
-            color: #001080;
+            color: var(--orbeon-fb-xpath-node-test-color);
           }
           .xpath-operator {
-            color: #d73a49;
+            color: var(--orbeon-fb-xpath-operator-color);
           }
           .xpath-punctuation {
-            color: #555555;
+            color: var(--orbeon-fb-xpath-punctuation-color);
           }
           .xpath-comment {
-            color: #6a737d;
+            color: var(--orbeon-fb-xpath-comment-color);
             font-style: italic;
           }
         }
@@ -213,7 +213,8 @@
         ul {
           position: absolute;
 
-          background-color: white;
+          color: var(--orbeon-dropdown-menu-color);
+          background-color: var(--orbeon-dropdown-menu-background-color);
           border-color: var(--orbeon-dropdown-menu-border-color);
           border-style: solid;
           border-radius: 5px;
@@ -226,14 +227,14 @@
             line-height: @fluidLineHeight;
 
             &:hover {
-              color: @dropdownLinkColorHover;
-              background-color: @dropdownLinkBackgroundHover;
+              color: var(--orbeon-dropdown-menu-hover-color);
+              background-color: var(--orbeon-dropdown-menu-hover-background-color);
               cursor: pointer;
             }
 
             &[aria-selected = true] {
-              color: @dropdownLinkColorHover;
-              background-color: @dropdownLinkBackgroundActive;
+              color: var(--orbeon-dropdown-menu-selected-color);
+              background-color: var(--orbeon-dropdown-menu-selected-background-color);
             }
           }
         }

@@ -473,15 +473,7 @@
                 }}{{
                     let $color-scheme-opt := frf:effectiveColorScheme()[. = ('light', 'dark', 'system')]
                     return
-                        if (
-                            (
-                                not(
-                                    fr:is-form-builder() and
-                                    not($fr-mode = 'summary')
-                                ) and
-                                exists($color-scheme-opt)
-                            )
-                        ) then
+                        if (exists($color-scheme-opt)) then
                             concat(' fr-color-scheme-', $color-scheme-opt)
                         else
                             ''
@@ -950,8 +942,7 @@
                 not(fr:mode() = 'test') and
                 not(fr:is-embedded())   and (
                         fr:mode() = ('forms', 'admin', 'landing')  and xxf:property('oxf.fr.navbar.color-scheme-selector.enable') or
-                    not(fr:mode() = ('forms', 'admin', 'landing')) and xxf:property(string-join(('oxf.fr.navbar.color-scheme-selector.enable', fr:app-name(), fr:form-name()), '.')) and
-                    not(fr:is-form-builder() and fr:mode() = ('edit', 'view'))
+                    not(fr:mode() = ('forms', 'admin', 'landing')) and xxf:property(string-join(('oxf.fr.navbar.color-scheme-selector.enable', fr:app-name(), fr:form-name()), '.'))
                 )
             ]">
             <xh:div class="dropdown">

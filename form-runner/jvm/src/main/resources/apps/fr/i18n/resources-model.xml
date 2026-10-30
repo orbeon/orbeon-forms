@@ -110,7 +110,7 @@
         />
 
         <!-- Save current form language into the session unless fr-remember-language=false or we are testing -->
-        <xf:action type="xpath" if="not(xxf:get-request-parameter('fr-remember-language') = 'false' or $mode = ('test', 'test-pdf'))">
+        <xf:action type="xpath" if="not(fr:is-service-path() or xxf:get-request-parameter('fr-remember-language') = 'false' or $mode = ('test', 'test-pdf'))">
             xxf:set-session-attribute('fr-language', string(if ($use-form-resources) then $lang else $fr-lang))
         </xf:action>
 

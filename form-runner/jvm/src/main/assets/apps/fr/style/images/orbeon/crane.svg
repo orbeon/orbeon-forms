@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <style>
-    .bg { fill: rgba(37, 99, 235, 0.10); stroke: rgba(37, 99, 235, 0.22); stroke-width: 1.5; }
-    .glyph { stroke: #2563eb; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .bg { fill: rgba(37, 99, 235, 0.14); stroke: rgba(37, 99, 235, 0.30); stroke-width: 1.5; }
+    .glyph { stroke: #1d4ed8; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     @media (prefers-color-scheme: dark) {
       .bg { fill: rgba(59, 130, 246, 0.18); stroke: rgba(59, 130, 246, 0.35); }
       .glyph { stroke: #60a5fa; }

@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <style>
-    .bg { fill: rgba(99, 102, 241, 0.10); stroke: rgba(99, 102, 241, 0.22); stroke-width: 1.5; }
-    .glyph { stroke: #6366f1; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .bg { fill: rgba(124, 58, 237, 0.14); stroke: rgba(124, 58, 237, 0.30); stroke-width: 1.5; }
+    .glyph { stroke: #6d28d9; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     @media (prefers-color-scheme: dark) {
-      .bg { fill: rgba(129, 140, 248, 0.18); stroke: rgba(129, 140, 248, 0.35); }
-      .glyph { stroke: #a5b4fc; }
+      .bg { fill: rgba(167, 139, 250, 0.18); stroke: rgba(167, 139, 250, 0.35); }
+      .glyph { stroke: #c4b5fd; }
     }
   </style>
   <rect class="bg" x="2" y="2" width="60" height="60" rx="14"/>

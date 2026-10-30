@@ -106,7 +106,9 @@ trait XFormsStateManagerTrait extends XFormsStateLifecycle {
     if (containingDocument.staticState.isClientStateHandling)
       -1L
     else
-      externalContext.getRequest.getSession(ForceSessionCreation).getMaxInactiveInterval * 1000
+      externalContext.getRequest.sessionOpt
+        .map(_.getMaxInactiveInterval * 1000L)
+        .getOrElse(-1L)
 
   // Ideally we wouldn't want to force session creation, but it's hard to implement the more elaborate expiration
   // strategy without session.

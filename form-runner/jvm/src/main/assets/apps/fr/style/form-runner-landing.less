@@ -357,6 +357,16 @@
         }
     }
 
+    // #8011: propagate the correct color scheme (light, dark, system) to the SVG icons
+    .img-invertible {
+        color-scheme: light;
+    }
+    .dark-mode({
+        .img-invertible {
+            color-scheme: dark;
+        }
+    });
+
     .fr-landing-quick-links-card {
         .img-thumbnail {
             padding: 15%;

@@ -169,5 +169,29 @@ class ControlCustomSettingsParserTest
       assert(spec.findSetting("showCode").exists(_.settingType == BooleanType))
       assert(spec.findSetting("showFlag").exists(_.settingType == BooleanType))
     }
+
+    it("must parse `<fr:phone>` custom settings from `phone.xbl`") {
+      val binding = {
+        import org.orbeon.scaxon.SimplePath.*
+        val docWrapper = new org.orbeon.dom.saxon.DocumentWrapper(
+          org.orbeon.oxf.resources.ResourceManagerWrapper.instance.getContentAsOrbeonDom("/xbl/orbeon/phone/phone.xbl"),
+          null,
+          org.orbeon.oxf.util.XPath.GlobalConfiguration
+        )
+        (docWrapper.rootElement / "*:binding").head
+      }
+
+      val specOpt = ControlCustomSettingsParser.fromBinding(binding)
+      assert(specOpt.isDefined)
+      val spec = specOpt.get
+      assert(spec.localName == "phone")
+      assert(spec.settings.map(_.name) == List("defaultCountry", "preferredCountries", "includeCountries", "excludeCountries", "showCode", "showFlag"))
+      assert(spec.findSetting("defaultCountry").exists(_.settingType == StringType))
+      assert(spec.findSetting("preferredCountries").exists(_.settingType == StringType))
+      assert(spec.findSetting("includeCountries").exists(_.settingType == StringType))
+      assert(spec.findSetting("excludeCountries").exists(_.settingType == StringType))
+      assert(spec.findSetting("showCode").exists(_.settingType == BooleanType))
+      assert(spec.findSetting("showFlag").exists(_.settingType == BooleanType))
+    }
   }
 }

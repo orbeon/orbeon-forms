@@ -134,13 +134,33 @@ object Select1Search {
       .replace("œ", "oe")
       .trimAllToEmpty
 
+  private val CallingCodeRegex = "\\((?:([A-Za-z]{2}),\\s*)?(\\+\\d+)\\)\\s*$".r
+
+  // Use `Char.isSurrogate` rather than a `[\uD83C][\uDDE6-\uDDFF]` regex because Scala.js compiles `Regex` with the JS
+  // `/u` flag, which decodes surrogate pairs into single supplementary code points outside `0xD800..0xDFFF`.
   private def stripLeadingEmoji(s: String): String =
-    s.replaceFirst("^([\\uD83C][\\uDDE6-\\uDDFF])+\\s*", "")
+    s.dropWhile(c => c.isSurrogate || c.isWhitespace)
+
+  private def extractLeadingEmoji(s: String): Option[String] =
+    s.takeWhile(c => c.isSurrogate || c.isWhitespace).trimAllToOpt
+
+  def formatPhoneCountrySelection(option: Select2.Option): String = {
+    val text    = Option(option.text).getOrElse("")
+    val flagOpt = extractLeadingEmoji(text)
+    CallingCodeRegex.findFirstMatchIn(text) match {
+      case Some(m) =>
+        val isoCodeOpt  = Option(m.group(1)).map(_.toUpperCase)
+        val callingCode = m.group(2)
+        List(flagOpt, isoCodeOpt, Some(callingCode)).flatten.mkString(" ")
+      case None =>
+        text
+    }
+  }
 
   // Lower tier number = higher relevance rank when sorting search results:
-  // 1: Exact ISO code, exact label, or exact alias match
+  // 1: Exact ISO code, exact calling code, exact label, or exact alias match
   // 2: Label starts with search term
-  // 3: Word in label or alias starts with search term
+  // 3: Word in label, calling code, or alias starts with search term
   // 4: Substring match in label or alias
   def matchTier(
     option           : Select2.Option,
@@ -150,18 +170,31 @@ object Select1Search {
     if (normTerm.isEmpty) {
       Some(0)
     } else {
-      val normLabel = normalizeText(stripLeadingEmoji(option.text))
-      val codeUpper = Option(option.id).map(_.toUpperCase).getOrElse("")
-      val codeLower = codeUpper.toLowerCase
-      val aliases   = if (isCountryControl) CountryAliases.getOrElse(codeUpper, Nil) else Nil
+      val normLabel      = normalizeText(stripLeadingEmoji(option.text))
+      val codeUpper      = Option(option.id).map(_.toUpperCase).getOrElse("")
+      val codeLower      = codeUpper.toLowerCase
+      val aliases        = if (isCountryControl) CountryAliases.getOrElse(codeUpper, Nil) else Nil
+      val normTermNoPlus = normTerm.stripPrefix("+")
+      val callingCodeOpt =
+        if (isCountryControl && normTermNoPlus.nonEmpty && normTermNoPlus.forall(_.isDigit))
+          CallingCodeRegex.findFirstMatchIn(Option(option.text).getOrElse("")).map(_.group(2).stripPrefix("+"))
+        else
+          None
 
-      if (normLabel == normTerm || (isCountryControl && (codeLower == normTerm || aliases.contains(normTerm))))
+      if (
+        normLabel == normTerm ||
+        (isCountryControl && (codeLower == normTerm || callingCodeOpt.contains(normTermNoPlus) || aliases.contains(normTerm)))
+      )
         Some(1)
       else if (normLabel.startsWith(normTerm))
         Some(2)
       else if (
         normLabel.splitTo[List](" -()/").exists(_.startsWith(normTerm)) ||
-        (isCountryControl && (codeLower.startsWith(normTerm) || aliases.exists(a => a.startsWith(normTerm) || a.splitTo[List](" -").exists(_.startsWith(normTerm)))))
+        (isCountryControl && (
+          codeLower.startsWith(normTerm) ||
+          callingCodeOpt.exists(_.startsWith(normTermNoPlus)) ||
+          aliases.exists(a => a.startsWith(normTerm) || a.splitTo[List](" -").exists(_.startsWith(normTerm)))
+        ))
       )
         Some(3)
       else if (normLabel.contains(normTerm) || (isCountryControl && aliases.exists(_.contains(normTerm))))
@@ -191,7 +224,8 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   private var currentSearchTerm            : String                           = ""
 
   private def isMultiple       : Boolean = Option(queryElementWithData.getAttribute(DataIsMultipleSelection)).contains("true")
-  private def isCountryControl : Boolean = containerElem.closestOpt(".xbl-fr-country").isDefined
+  private def isCountryControl : Boolean = containerElem.closestOpt(".xbl-fr-country, .xbl-fr-phone").isDefined
+  private def isPhoneControl   : Boolean = containerElem.closestOpt(".xbl-fr-phone").isDefined
 
   private def findPlaceholderOptionId(select: html.Select): String =
     Option(select.options)
@@ -263,6 +297,12 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     data.text
   }
 
+  private def customTemplateSelection(
+    data      : Select2.Option,
+    container : html.Element
+  ): String =
+    Select1Search.formatPhoneCountrySelection(data)
+
   override def init(): Unit = {
     val isStaticReadonly = containerElem.querySelector(".xforms-static") != null
     val elementWithData  = queryElementWithData
@@ -270,6 +310,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       for (select <- Option(querySelect)) {
         val isDatabound   = DataboundClasses.exists(containerElem.hasClass)
         val isCountry     = isCountryControl
+        val isPhone       = isPhoneControl
         val placeholderId = findPlaceholderOptionId(select)
 
         // Prevent the propagation of `focusout` so the client doesn't send an `xxforms-value` event when users click on the dropdown,
@@ -289,16 +330,17 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
 
           optionsOpt = Some(
             new Select2.Options {
-              val allowClear            = placeholderOpt.isDefined // allowClear can be enabled only if a placeholder is defined
-              val dropdownParent        = containerElem.closestOpt("dialog").orUndefined
-              val ajax                  = if (isDatabound) Select2Ajax else null
-              val width                 = "100%" // For Select2 width to update as the viewport width changes
-              val tags                  = false
-              val minimumInputLength    = Option(queryElementWithData.getAttribute(DataMinimumInputLength)).filter(_.nonEmpty).map(_.toInt).getOrElse(0)
-              val placeholder           = placeholderOpt.orUndefined
-              override val matcher        = (! isDatabound).option(js.Any.fromFunction2(customMatcher(isCountry, placeholderId))).orUndefined
-              override val sorter         = (! isDatabound).option(js.Any.fromFunction1(customSorter(isCountry))).orUndefined
-              override val templateResult = (! isDatabound).option(js.Any.fromFunction2(customTemplateResult)).orUndefined
+              val allowClear               = placeholderOpt.isDefined // allowClear can be enabled only if a placeholder is defined
+              val dropdownParent           = containerElem.closestOpt("dialog").orUndefined
+              val ajax                     = if (isDatabound) Select2Ajax else null
+              val width                    = "100%" // For Select2 width to update as the viewport width changes
+              val tags                     = false
+              val minimumInputLength       = Option(queryElementWithData.getAttribute(DataMinimumInputLength)).filter(_.nonEmpty).map(_.toInt).getOrElse(0)
+              val placeholder              = placeholderOpt.orUndefined
+              override val matcher           = (! isDatabound).option(js.Any.fromFunction2(customMatcher(isCountry, placeholderId))).orUndefined
+              override val sorter            = (! isDatabound).option(js.Any.fromFunction1(customSorter(isCountry))).orUndefined
+              override val templateResult    = (! isDatabound).option(js.Any.fromFunction2(customTemplateResult)).orUndefined
+              override val templateSelection = isPhone.option(js.Any.fromFunction2(customTemplateSelection)).orUndefined
             }
           )
         }
@@ -528,6 +570,13 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   private def onOpen(): Unit = {
     currentSearchTerm   = ""
     val dropdownElement = document.querySelector(".select2-dropdown")
+    containerElem.closestOpt(".xbl-fr-phone").foreach { phoneElem =>
+      val fieldsWidth      = phoneElem.querySelectorOpt(".fr-phone-fields").map(_.clientWidth).getOrElse(phoneElem.clientWidth)
+      val targetWidth      = math.max(fieldsWidth, 260)
+      val dropdownHtmlElem = dropdownElement.asInstanceOf[html.Element]
+      dropdownHtmlElem.classList.add("fr-phone-dropdown")
+      dropdownHtmlElem.style.setProperty("--fr-phone-dropdown-width", s"${targetWidth}px")
+    }
     val listboxElement  = dropdownElement.querySelector("[role=listbox]")
     val comboboxElement = containerElem.querySelector(".select2-selection")
     val labelledBy      = comboboxElement.getAttribute("aria-labelledby")

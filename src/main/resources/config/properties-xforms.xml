@@ -212,6 +212,12 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.time.output-format"                        value=""/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.time.native-picker"                        value="ios"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.datetime.field-width"                      value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.phone.default-country"                     value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.phone.preferred-countries"                 value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.phone.include-countries"                   value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.phone.exclude-countries"                   value=""/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.phone.show-code"                           value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.phone.show-flag"                           value="true"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.us-phone.field-width"                      value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.country.appearance"                        value="search"/>

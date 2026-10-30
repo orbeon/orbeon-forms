@@ -91,6 +91,7 @@ val SqliteJdbcVersion                = "3.53.4.0"
 val PostgresqlVersion                = "42.7.14"
 val OracleJdbcVersion                = "23.26.3.0.0"
 val JsoupVersion                     = "1.23.1"
+val LibPhoneNumberVersion            = "9.0.42"
 
 // Only on PE for now
 val ApachePOIVersion                 = "5.5.1"
@@ -113,7 +114,8 @@ val WebJarDependencies = Seq(
   "org.webjars"     % "clipboard.js"     % "2.0.11",
   "org.webjars.npm" % "codemirror"       % "5.65.20",
   "org.webjars.npm" % "dragula"          % "3.7.3",
-  "org.webjars.npm" % "fflate"           % "0.6.10",
+  "org.webjars.npm" % "fflate"                % "0.6.10",
+  "org.webjars.npm" % "google-libphonenumber" % "3.2.43",
   "org.webjars.npm" % "jquery"           % "3.6.1",
   "org.webjars.npm" % "jquery.fancytree" % "2.21.0",
   "org.webjars.npm" % "mousetrap"        % "1.6.5",
@@ -127,6 +129,7 @@ val WebJarDependencies = Seq(
 
 val CoreLibraryDependencies = Seq(
   "org.jsoup"                   % "jsoup"                           % JsoupVersion,
+  "com.googlecode.libphonenumber" % "libphonenumber"                % LibPhoneNumberVersion,
   "org.orbeon"                  % "saxon"                           % SaxonJvmVersion, // Java library!
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
   "com.beachape"                %% "enumeratum-circe"               % EnumeratumCirceVersion,
@@ -871,6 +874,7 @@ lazy val formRunnerJS = formRunner.js
     xformsRuntimeJS,
     formRunnerCommonJS,
     formRunnerClientServerJS,
+    webFacades,
     formRunnerWeb % "test->compile"
   )
   .settings(commonScalaJsSettings)

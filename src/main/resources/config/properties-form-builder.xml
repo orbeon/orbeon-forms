@@ -42,6 +42,7 @@
         oxf:/forms/orbeon/builder/xbl/typed-email.xbl
         oxf:/xbl/orbeon/country/country.xbl
         oxf:/xbl/orbeon/us-phone/us-phone.xbl
+        oxf:/xbl/orbeon/phone/phone.xbl
         oxf:/xbl/orbeon/us-state/us-state.xbl
         oxf:/xbl/orbeon/us-ssn/us-ssn.xbl
         oxf:/xbl/orbeon/us-ein/us-ein.xbl

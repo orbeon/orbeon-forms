@@ -82,6 +82,7 @@ object ImportExportSupport {
     QName("number",   FRNamespace),
     QName("currency", FRNamespace),
     QName("country",  FRNamespace),
+    QName("phone",    FRNamespace),
     QName("us-phone", FRNamespace),
     QName("us-state", FRNamespace),
   )

@@ -197,6 +197,7 @@
         +fr:explanation
         +fr:open-select1
         +fr:country
+        +fr:phone
         +fr:us-phone
         +fr:us-state
         +fr:yesno-input
@@ -210,6 +211,7 @@
 
         <!-- Extra support needed when offline -->
         +/webjars/fflate/0.6.10/umd/index.js
+        +/webjars/google-libphonenumber/3.2.43/dist/libphonenumber.js
 
         <!-- Main offline JavaScript -->
         +/apps/fr/resources/scalajs/orbeon-form-runner-offline.js
@@ -275,6 +277,7 @@
         +fr:explanation
         +fr:open-select1
         +fr:country
+        +fr:phone
         +fr:us-phone
         +fr:us-state
         +fr:yesno-input
@@ -389,6 +392,7 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-currency.*"                     value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-date.*"                         value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-time.*"                         value="input-time-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-phone.*"                        value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-us-phone.*"                     value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-dropdown-select1.*"             value="select-label"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-yesno-input.*"                  value="select-value"/>

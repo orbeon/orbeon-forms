@@ -1,0 +1,74 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+.orbeon {
+    .xforms-form .xbl-component.xbl-fr-phone,
+    .xbl-fr-phone {
+        .fr-phone-fields.input-append {
+            display: inline-flex;
+            width: 100%;
+
+            > .fr-phone-country {
+                flex: 0 0 auto;
+                width: auto;
+                margin-right: var(--orbeon-add-on-gap);
+
+                &:focus-within {
+                    position: relative;
+                    z-index: 2;
+                }
+
+                .xforms-select1-appearance-minimal select {
+                    width: auto;
+                }
+
+                .select2-container {
+                    width: auto !important;
+
+                    .select2-selection--single {
+                        border-top-right-radius: var(--orbeon-add-on-inner-border-radius);
+                        border-bottom-right-radius: var(--orbeon-add-on-inner-border-radius);
+
+                        .select2-selection__rendered {
+                            padding-left: 8px;
+                            padding-right: 22px;
+                        }
+                    }
+                }
+            }
+
+            > .fr-phone-number {
+                flex: 1 1 auto;
+                min-width: 0;
+
+                input.xforms-input-input {
+                    border-top-left-radius: var(--orbeon-add-on-inner-border-radius);
+                    border-bottom-left-radius: var(--orbeon-add-on-inner-border-radius);
+                    width: 100%;
+                }
+            }
+        }
+    }
+
+    .select2-container {
+        .select2-dropdown.fr-phone-dropdown {
+            width: var(--fr-phone-dropdown-width, 260px) !important;
+            min-width: 260px;
+        }
+
+        .select2-results__option.fr-country-last-preferred {
+            border-bottom: 1px solid var(--orbeon-control-border-color);
+            margin-bottom: 2px;
+            padding-bottom: 8px;
+        }
+    }
+}

@@ -1,0 +1,644 @@
+<!--
+    Copyright (C) 2026 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:PhoneSupport="java:org.orbeon.xbl.PhoneSupportJava">
+
+    <xbl:binding
+        id="fr-phone"
+        element="fr|phone"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value"
+        xxbl:label-for="input"
+        xxbl:type="xs:string"
+        xxbl:constraint="xxf:is-blank(.) or matches(string(.), '^\+[1-9]\d+$')"
+        xxbl:format="PhoneSupport:formatReadonlyPhone(string(.), string(fr:component-param-value('default-country')))">
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Phone Number</display-name>
+            <display-name lang="fr">Numéro de téléphone</display-name>
+            <display-name lang="no">Telefonnummer</display-name>
+            <display-name lang="ru">Номер телефона</display-name>
+            <display-name lang="it">Numero di telefono</display-name>
+            <display-name lang="de">Telefonnummer</display-name>
+            <display-name lang="fi">Puhelinnumero</display-name>
+            <display-name lang="es">Número de teléfono</display-name>
+            <display-name lang="nl">Telefoonnummer</display-name>
+            <display-name lang="pt">Número de telefone</display-name>
+            <display-name lang="sv">Telefonnummer</display-name>
+            <display-name lang="ar">رقم الهاتف</display-name>
+            <display-name lang="pl">Numer telefonu</display-name>
+            <display-name lang="ja">電話番号</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-phone</icon-class>
+            </icon>
+            <templates>
+                <bind type="fr:phone"/>
+                <view>
+                    <fr:phone>
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:phone>
+                </view>
+            </templates>
+            <custom-settings>
+                <setting name="default-country" type="xs:string"/>
+                <setting name="preferred-countries" type="xs:string"/>
+                <setting name="include-countries" type="xs:string"/>
+                <setting name="exclude-countries" type="xs:string"/>
+                <setting name="show-code" type="xs:boolean"/>
+                <setting name="show-flag" type="xs:boolean"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-phone-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue
+                            ref="$c"
+                            value="
+                                let $val := instance()/@*[name() = name($c)]
+                                return
+                                    if (name($c) = 'default-country') then
+                                        upper-case($val)
+                                    else
+                                        $val
+                            "/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <default-country/>
+                            <preferred-countries/>
+                            <include-countries/>
+                            <exclude-countries/>
+                            <show-code/>
+                            <show-flag/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="default-country | preferred-countries | include-countries | exclude-countries"
+                            xxf:whitespace="trim"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true">
+                        <_>
+                            <resource xml:lang="en">
+                                <default-country>Default Country</default-country>
+                                <preferred-countries>Preferred Countries</preferred-countries>
+                                <include-countries>Included Countries</include-countries>
+                                <exclude-countries>Excluded Countries</exclude-countries>
+                                <countries-hint>Space-separated 2-letter ISO codes (e.g. US CA GB)</countries-hint>
+                                <show-code>Show Country Code</show-code>
+                                <show-flag>Show Country Flag</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Use default</item>
+                                    <item id="1">Yes</item>
+                                    <item id="2">No</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <default-country>Pays par défaut</default-country>
+                                <preferred-countries>Pays préférés</preferred-countries>
+                                <include-countries>Pays inclus</include-countries>
+                                <exclude-countries>Pays exclus</exclude-countries>
+                                <countries-hint>Codes ISO à 2 lettres séparés par des espaces (ex. FR CH CA)</countries-hint>
+                                <show-code>Afficher le code du pays</show-code>
+                                <show-flag>Afficher le drapeau du pays</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Utiliser le défaut</item>
+                                    <item id="1">Oui</item>
+                                    <item id="2">Non</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="no">
+                                <default-country>Standardland</default-country>
+                                <preferred-countries>Foretrukne land</preferred-countries>
+                                <include-countries>Inkluderte land</include-countries>
+                                <exclude-countries>Ekskluderte land</exclude-countries>
+                                <countries-hint>Mellomromseparerte 2-bokstavs ISO-koder (f.eks. NO SE DK)</countries-hint>
+                                <show-code>Vis landkode</show-code>
+                                <show-flag>Vis landflagg</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Bruk standard</item>
+                                    <item id="1">Ja</item>
+                                    <item id="2">Nei</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <default-country>Страна по умолчанию</default-country>
+                                <preferred-countries>Предпочитаемые страны</preferred-countries>
+                                <include-countries>Включенные страны</include-countries>
+                                <exclude-countries>Исключенные страны</exclude-countries>
+                                <countries-hint>Двухбуквенные коды ISO через пробел (например, US CA GB)</countries-hint>
+                                <show-code>Показывать код страны</show-code>
+                                <show-flag>Показывать флаг страны</show-flag>
+                                <default-yes-no>
+                                    <item id="0">По умолчанию</item>
+                                    <item id="1">Да</item>
+                                    <item id="2">Нет</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="it">
+                                <default-country>Paese predefinito</default-country>
+                                <preferred-countries>Paesi preferiti</preferred-countries>
+                                <include-countries>Paesi inclusi</include-countries>
+                                <exclude-countries>Paesi esclusi</exclude-countries>
+                                <countries-hint>Codici ISO a 2 lettere separati da spazi (es. IT CH FR)</countries-hint>
+                                <show-code>Mostra codice paese</show-code>
+                                <show-flag>Mostra bandiera paese</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Usa predefinito</item>
+                                    <item id="1">Sì</item>
+                                    <item id="2">No</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="de">
+                                <default-country>Standardland</default-country>
+                                <preferred-countries>Bevorzugte Länder</preferred-countries>
+                                <include-countries>Eingeschlossene Länder</include-countries>
+                                <exclude-countries>Ausgeschlossene Länder</exclude-countries>
+                                <countries-hint>Durch Leerzeichen getrennte 2-stellige ISO-Codes (z. B. DE AT CH)</countries-hint>
+                                <show-code>Ländercode anzeigen</show-code>
+                                <show-flag>Länderflagge anzeigen</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Standard verwenden</item>
+                                    <item id="1">Ja</item>
+                                    <item id="2">Nein</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <default-country>Oletusmaa</default-country>
+                                <preferred-countries>Suositut maat</preferred-countries>
+                                <include-countries>Sisällytetyt maat</include-countries>
+                                <exclude-countries>Poissuljetut maat</exclude-countries>
+                                <countries-hint>Välilyönnein erotetut 2-kirjaimiset ISO-koodit (esim. FI SE NO)</countries-hint>
+                                <show-code>Näytä maakoodi</show-code>
+                                <show-flag>Näytä maan lippu</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Käytä oletusta</item>
+                                    <item id="1">Kyllä</item>
+                                    <item id="2">Ei</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="es">
+                                <default-country>País predeterminado</default-country>
+                                <preferred-countries>Países preferidos</preferred-countries>
+                                <include-countries>Países incluidos</include-countries>
+                                <exclude-countries>Países excluidos</exclude-countries>
+                                <countries-hint>Códigos ISO de 2 letras separados por espacios (p. ej. ES MX AR)</countries-hint>
+                                <show-code>Mostrar código de país</show-code>
+                                <show-flag>Mostrar bandera de país</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Usar predeterminado</item>
+                                    <item id="1">Sí</item>
+                                    <item id="2">No</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <default-country>Standaardland</default-country>
+                                <preferred-countries>Voorkeurslanden</preferred-countries>
+                                <include-countries>Opgenomen landen</include-countries>
+                                <exclude-countries>Uitgesloten landen</exclude-countries>
+                                <countries-hint>Door spaties gescheiden 2-letterige ISO-codes (bijv. NL BE DE)</countries-hint>
+                                <show-code>Landcode tonen</show-code>
+                                <show-flag>Landvlag tonen</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Gebruik standaard</item>
+                                    <item id="1">Ja</item>
+                                    <item id="2">Nee</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <default-country>País padrão</default-country>
+                                <preferred-countries>Países preferidos</preferred-countries>
+                                <include-countries>Países incluídos</include-countries>
+                                <exclude-countries>Países excluídos</exclude-countries>
+                                <countries-hint>Códigos ISO de 2 letras separados por espaço (ex. PT BR AO)</countries-hint>
+                                <show-code>Mostrar código do país</show-code>
+                                <show-flag>Mostrar bandeira do país</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Usar padrão</item>
+                                    <item id="1">Sim</item>
+                                    <item id="2">Não</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <default-country>Standardland</default-country>
+                                <preferred-countries>Föredragna länder</preferred-countries>
+                                <include-countries>Inkluderade länder</include-countries>
+                                <exclude-countries>Exkluderade länder</exclude-countries>
+                                <countries-hint>Blankstegsavgränsade 2-bokstavs ISO-koder (t.ex. SE NO FI)</countries-hint>
+                                <show-code>Visa landskod</show-code>
+                                <show-flag>Visa landsflagga</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Använd standard</item>
+                                    <item id="1">Ja</item>
+                                    <item id="2">Nej</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <default-country>البلد الافتراضي</default-country>
+                                <preferred-countries>البلدان المفضلة</preferred-countries>
+                                <include-countries>البلدان المضمنة</include-countries>
+                                <exclude-countries>البلدان المستبعدة</exclude-countries>
+                                <countries-hint>رموز ISO مكونة من حرفين مفصولة بمسافات (مثل AE SA EG)</countries-hint>
+                                <show-code>إظهار رمز البلد</show-code>
+                                <show-flag>إظهار علم البلد</show-flag>
+                                <default-yes-no>
+                                    <item id="0">استخدام الإعداد الافتراضي</item>
+                                    <item id="1">نعم</item>
+                                    <item id="2">لا</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <default-country>Domyślny kraj</default-country>
+                                <preferred-countries>Preferowane kraje</preferred-countries>
+                                <include-countries>Uwzględnione kraje</include-countries>
+                                <exclude-countries>Wykluczone kraje</exclude-countries>
+                                <countries-hint>Rozdzielone spacjami 2-literowe kody ISO (np. PL DE GB)</countries-hint>
+                                <show-code>Pokaż kod kraju</show-code>
+                                <show-flag>Pokaż flagę kraju</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Użyj domyślnie</item>
+                                    <item id="1">Tak</item>
+                                    <item id="2">Nie</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <default-country>既定の国</default-country>
+                                <preferred-countries>優先表示する国</preferred-countries>
+                                <include-countries>含める国</include-countries>
+                                <exclude-countries>除外する国</exclude-countries>
+                                <countries-hint>スペース区切りの2文字ISOコード (例: JP US GB)</countries-hint>
+                                <show-code>国コードを表示</show-code>
+                                <show-flag>国旗を表示</show-flag>
+                                <default-yes-no>
+                                    <item id="0">既定を使う</item>
+                                    <item id="1">はい</item>
+                                    <item id="2">いいえ</item>
+                                </default-yes-no>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-phone-grid">
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <fr:country ref="instance('local')/default-country" id="default-country-control">
+                                <xf:label ref="xxf:r('default-country')"/>
+                                <xf:alert/>
+                            </fr:country>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <xf:input ref="instance('local')/preferred-countries" id="preferred-countries-control">
+                                <xf:label ref="xxf:r('preferred-countries')"/>
+                                <xf:hint ref="xxf:r('countries-hint')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <xf:input ref="instance('local')/include-countries" id="include-countries-control">
+                                <xf:label ref="xxf:r('include-countries')"/>
+                                <xf:hint ref="xxf:r('countries-hint')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <xf:input ref="instance('local')/exclude-countries" id="exclude-countries-control">
+                                <xf:label ref="xxf:r('exclude-countries')"/>
+                                <xf:hint ref="xxf:r('countries-hint')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/show-code" appearance="full" id="show-code-control">
+                                <xf:label ref="xxf:r('show-code')"/>
+                                <xf:alert/>
+                                <xf:itemset ref="xxf:resource-elements('default-yes-no.item')">
+                                    <xf:label ref="."/>
+                                    <xf:value ref="if (@id = 0) then '' else if (@id = 1) then 'true' else 'false'"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/show-flag" appearance="full" id="show-flag-control">
+                                <xf:label ref="xxf:r('show-flag')"/>
+                                <xf:alert/>
+                                <xf:itemset ref="xxf:resource-elements('default-yes-no.item')">
+                                    <xf:label ref="."/>
+                                    <xf:value ref="if (@id = 0) then '' else if (@id = 1) then 'true' else 'false'"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-phone-action"
+                    event="xforms-value-changed"
+                    observer="
+                        default-country-control
+                        preferred-countries-control
+                        include-countries-control
+                        exclude-countries-control
+                        show-code-control
+                        show-flag-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/phone/phone.css"/>
+        </xbl:resources>
+
+        <xbl:handlers>
+            <xbl:handler event="xforms-enabled xforms-readonly xforms-readwrite" phase="target">
+                <xf:setvalue
+                    ref="instance('local')/is-readonly"
+                    value="xxf:is-control-readonly('fr-phone')"/>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance
+                    id="countries"
+                    src="oxf:/xbl/orbeon/country/countries.xml"
+                    xxf:readonly="true"
+                    xxf:cache="true"/>
+                <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <country/>
+                        <number/>
+                        <is-readonly/>
+                    </_>
+                </xf:instance>
+                <xf:bind ref="instance('local')" readonly="is-readonly = 'true'"/>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:var
+                name="binding"
+                value="xxf:binding('fr-phone')"/>
+            <xf:var
+                name="view"
+                value="instance('local')/is-readonly = 'true' and property('xxf:readonly-appearance') = 'static'"/>
+
+            <xf:var
+                name="default-country"
+                value="string(fr:component-param-value('default-country'))"/>
+            <xf:var
+                name="preferred-codes"
+                value="distinct-values(xxf:split(translate(upper-case(fr:component-param-value('preferred-countries')), ',', ' ')))"/>
+            <xf:var
+                name="include-codes"
+                value="xxf:split(translate(upper-case(fr:component-param-value('include-countries')), ',', ' '))"/>
+            <xf:var
+                name="exclude-codes"
+                value="xxf:split(translate(upper-case(fr:component-param-value('exclude-countries')), ',', ' '))"/>
+            <xf:var
+                name="show-code"
+                value="string(fr:component-param-value('show-code')) = 'true'"/>
+            <xf:var
+                name="show-flag"
+                value="string(fr:component-param-value('show-flag')) = 'true'"/>
+
+            <xf:var
+                name="lang"
+                value="xxf:lang()"/>
+            <xf:var
+                name="lang-countries"
+                value="
+                    (
+                        instance('countries')/lang[@xml:lang = $lang],
+                        instance('countries')/lang[@xml:lang = substring-before($lang, '-')],
+                        instance('countries')/lang[@xml:lang = 'en']
+                    )[1]/country
+                "/>
+            <xf:var
+                name="available-countries"
+                value="
+                    $lang-countries[
+                        PhoneSupport:countryCallingCode(@code) gt 0 and
+                        (empty($include-codes) or @code = $include-codes) and
+                        not(@code = $exclude-codes)
+                    ]
+                "/>
+            <xf:var
+                name="preferred-items"
+                value="
+                    for $c in $preferred-codes
+                    return $available-countries[@code = $c]
+                "/>
+            <xf:var
+                name="remaining-items"
+                value="$available-countries[not(@code = $preferred-codes)]"/>
+            <xf:var
+                name="ordered-items"
+                value="($preferred-items, $remaining-items)"/>
+            <xf:var
+                name="available-codes-string"
+                value="string-join($ordered-items/@code, ' ')"/>
+
+            <!-- Synchronize external bound value and configuration changes into local state -->
+            <xf:var
+                name="sync-key"
+                value="string-join((xxf:value('fr-phone'), $default-country, $available-codes-string), '|')">
+                <xf:action event="xforms-enabled xforms-value-changed">
+                    <xf:var name="val" value="xxf:value('fr-phone')"/>
+                    <xf:var
+                        name="new-country"
+                        value="
+                            PhoneSupport:extractCountry(
+                                $val,
+                                instance('local')/country,
+                                $default-country,
+                                $available-codes-string
+                            )
+                        "/>
+                    <xf:var
+                        name="stored"
+                        value="
+                            PhoneSupport:computeStoredValue(
+                                $val,
+                                $new-country,
+                                $available-codes-string
+                            )
+                        "/>
+                    <xf:var
+                        name="new-number"
+                        value="
+                            PhoneSupport:formatForEdit(
+                                $stored,
+                                $new-country,
+                                $available-codes-string
+                            )
+                        "/>
+                    <xf:setvalue ref="instance('local')/country" value="$new-country"/>
+                    <xf:setvalue ref="instance('local')/number"  value="$new-number"/>
+                    <xf:setvalue
+                        if="not($view) and string($binding) != $stored"
+                        ref="$binding"
+                        value="$stored"/>
+                </xf:action>
+            </xf:var>
+
+            <!-- Edit mode -->
+            <xf:group ref="$binding[not($view)]">
+                <xh:span class="fr-phone-fields input-append">
+                    <xf:select1
+                        id="country-select"
+                        class="fr-phone-country"
+                        ref="instance('local')/country"
+                        appearance="search"
+                        disable-placeholder="true"
+                        xxf:encrypt-item-values="false">
+                        <xf:itemset
+                            xxbl:scope="inner"
+                            ref="$ordered-items"
+                            class="{if (position() = count($preferred-items) and exists($remaining-items)) then 'fr-country-last-preferred' else ''}">
+                            <xf:label
+                                ref="
+                                    let $calling-code := concat('+', PhoneSupport:countryCallingCode(@code))
+                                    return
+                                        concat(
+                                            if ($show-flag) then
+                                                concat(
+                                                    codepoints-to-string(
+                                                        for $cp in string-to-codepoints(@code)
+                                                        return $cp + 127397
+                                                    ),
+                                                    ' '
+                                                )
+                                            else
+                                                '',
+                                            @name,
+                                            ' (',
+                                            if ($show-code) then
+                                                concat(@code, ', ', $calling-code)
+                                            else
+                                                $calling-code,
+                                            ')'
+                                        )
+                                "/>
+                            <xf:value ref="@code"/>
+                        </xf:itemset>
+                        <xf:action event="xforms-value-changed">
+                            <xf:var
+                                name="stored"
+                                value="
+                                    PhoneSupport:computeStoredValue(
+                                        instance('local')/number,
+                                        instance('local')/country,
+                                        $available-codes-string
+                                    )
+                                "/>
+                            <xf:setvalue
+                                ref="instance('local')/number"
+                                value="
+                                    PhoneSupport:formatForEdit(
+                                        $stored,
+                                        instance('local')/country,
+                                        $available-codes-string
+                                    )
+                                "/>
+                            <xf:setvalue
+                                if="string($binding) != $stored"
+                                ref="$binding"
+                                value="$stored"/>
+                        </xf:action>
+                    </xf:select1>
+                    <xf:input
+                        id="input"
+                        class="fr-phone-number"
+                        ref="instance('local')/number"
+                        xxf:type="tel"
+                        xbl:attr="navindex navindex=tabindex autocomplete">
+                        <xf:hint
+                            appearance="minimal"
+                            value="PhoneSupport:exampleNationalNumber(instance('local')/country)"/>
+                        <xf:action event="xforms-value-changed">
+                            <xf:var
+                                name="effective-country"
+                                value="
+                                    PhoneSupport:resolveCountryForInput(
+                                        instance('local')/number,
+                                        instance('local')/country,
+                                        $available-codes-string
+                                    )
+                                "/>
+                            <xf:var
+                                name="stored"
+                                value="
+                                    PhoneSupport:computeStoredValue(
+                                        instance('local')/number,
+                                        $effective-country,
+                                        $available-codes-string
+                                    )
+                                "/>
+                            <xf:setvalue
+                                ref="instance('local')/country"
+                                value="$effective-country"/>
+                            <xf:setvalue
+                                ref="instance('local')/number"
+                                value="
+                                    PhoneSupport:formatForEdit(
+                                        $stored,
+                                        $effective-country,
+                                        $available-codes-string
+                                    )
+                                "/>
+                            <xf:setvalue
+                                if="string($binding) != $stored"
+                                ref="$binding"
+                                value="$stored"/>
+                        </xf:action>
+                    </xf:input>
+                    <xh:span class="add-on">
+                        <xh:i class="fa fa-fw fa-phone"/>
+                    </xh:span>
+                </xh:span>
+            </xf:group>
+
+            <!-- View mode -->
+            <xf:input ref="$binding[$view]" xxf:format="xxf:formatted-value('fr-phone')"/>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

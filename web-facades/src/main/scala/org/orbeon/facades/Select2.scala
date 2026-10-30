@@ -40,6 +40,7 @@ object Select2 {
     val matcher            : js.UndefOr[js.Function2[ParamsData, Option, Option]]                 = js.undefined
     val sorter             : js.UndefOr[js.Function1[js.Array[Option], js.Array[Option]]]         = js.undefined
     val templateResult     : js.UndefOr[js.Function2[Option, html.Element, String]]               = js.undefined
+    val templateSelection  : js.UndefOr[js.Function2[Option, html.Element, String]]               = js.undefined
   }
 
   implicit class OptionsOps(val o: Options) extends AnyVal {
@@ -53,7 +54,8 @@ object Select2 {
       newMinimumInputLength : Int                                                          = o.minimumInputLength,
       newMatcher            : js.UndefOr[js.Function2[ParamsData, Option, Option]]         = o.matcher,
       newSorter             : js.UndefOr[js.Function1[js.Array[Option], js.Array[Option]]] = o.sorter,
-      newTemplateResult     : js.UndefOr[js.Function2[Option, html.Element, String]]       = o.templateResult
+      newTemplateResult     : js.UndefOr[js.Function2[Option, html.Element, String]]       = o.templateResult,
+      newTemplateSelection  : js.UndefOr[js.Function2[Option, html.Element, String]]       = o.templateSelection
     ): Options = {
       new Options {
         val placeholder        = newPlaceholder
@@ -63,9 +65,10 @@ object Select2 {
         val width              = newWidth
         val tags               = newTags
         val minimumInputLength = newMinimumInputLength
-        override val matcher        = newMatcher
-        override val sorter         = newSorter
-        override val templateResult = newTemplateResult
+        override val matcher           = newMatcher
+        override val sorter            = newSorter
+        override val templateResult    = newTemplateResult
+        override val templateSelection = newTemplateSelection
       }
     }
   }

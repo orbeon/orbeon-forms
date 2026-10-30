@@ -51,31 +51,45 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                         </grid-9>
                     </utility-controls>
-                    <typed-controls>
+                    <international-controls>
                         <grid-3>
                             <email>info@orbeon.com</email>
                             <currency>10.99</currency>
                             <number>299792458</number>
+                            <control-1/>
                             <currency-right>10.99</currency-right>
                             <number-right>299792458</number-right>
+                            <country>AQ</country>
+                            <legal-entity-identifier-lei>F50EOCWSQFAUVO9Q8Z97</legal-entity-identifier-lei>
+                            <international-securities-identification-number-isin>US0378331005</international-securities-identification-number-isin>
+                            <iban>BE68539007547034</iban>
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+                        </grid-3>
+
+
+                    </international-controls>
+                    <us-controls>
+                        <grid-10>
                             <us-phone>5555555555</us-phone>
                             <us-state>CA</us-state>
                             <control-2>00-1234567</control-2>
                             <us-ssn>078-05-1120</us-ssn>
-                            <international-securities-identification-number-isin>US0378331005</international-securities-identification-number-isin>
                             <ssn-explanation/>
-                            <legal-entity-identifier-lei>F50EOCWSQFAUVO9Q8Z97</legal-entity-identifier-lei>
-                            <country>AQ</country>
-                            <iban>BE68539007547034</iban>
-                        </grid-3>
-
-
-                    </typed-controls>
+                        </grid-10>
+                    </us-controls>
                     <date-time-controls>
                         <grid-4>
                             <date-us/>
@@ -187,6 +201,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
+
                         </address-us>
                         <address-uk>
                             <grid-2>
@@ -205,6 +220,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
+
                         </address-uk>
                         <contact-information>
                             <grid-5>
@@ -214,6 +230,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 <contact-information-phone/>
                                 <contact-information-email/>
                             </grid-5>
+
 
 
 
@@ -391,26 +408,17 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind id="info-button-bind" ref="info-button" name="info-button" fr:persist="false()"/>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind name="typed-controls" id="typed-controls-bind" ref="typed-controls">
+                <xf:bind name="international-controls" id="international-controls-bind"
+                         ref="international-controls">
                     <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
                         <xf:bind ref="email" id="email-bind" type="xf:email" name="email" xxf:whitespace="trim"/>
-
-
-
-
-
-                        <xf:bind id="us-ssn-bind" ref="us-ssn" name="us-ssn" type="fr:us-ssn"/>
-                        <xf:bind ref="us-state" id="us-state-bind" name="us-state"/>
-                        <xf:bind ref="us-phone" id="us-phone-bind" constraint=". = '' or matches(., '^\d{10}$')"
-                                 name="us-phone"/>
                         <xf:bind ref="currency" id="currency-bind" type="xf:decimal" name="currency"/>
                         <xf:bind ref="number" id="number-bind" name="number" type="xf:decimal"/>
+                        <xf:bind id="control-1-bind" ref="control-1" name="control-1" type="fr:phone"/>
                         <xf:bind ref="currency-right" id="currency-right-bind" type="xf:decimal"
                                  name="currency-right"/>
                         <xf:bind ref="number-right" id="number-right-bind" name="number-right" type="xf:decimal"/>
-                        <xf:bind id="control-2-bind" ref="control-2" name="control-2" type="fr:us-ein"/>
-                        <xf:bind id="ssn-explanation-bind" ref="ssn-explanation" name="ssn-explanation"
-                                 fr:persist="false()"/>
+                        <xf:bind id="country-bind" ref="country" name="country"/>
                         <xf:bind id="legal-entity-identifier-lei-bind" ref="legal-entity-identifier-lei"
                                  name="legal-entity-identifier-lei"
                                  type="fr:lei"/>
@@ -419,10 +427,39 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                  name="international-securities-identification-number-isin"
                                  type="fr:isin"/>
                         <xf:bind id="iban-bind" ref="iban" name="iban" type="fr:iban"/>
-                        <xf:bind id="country-bind" ref="country" name="country"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     </xf:bind>
 
 
+                </xf:bind>
+                <xf:bind id="us-controls-bind" ref="us-controls" name="us-controls">
+                    <xf:bind id="grid-10-bind" ref="grid-10" name="grid-10">
+                        <xf:bind ref="us-phone" id="us-phone-bind" constraint=". = '' or matches(., '^\d{10}$')"
+                                 name="us-phone"/>
+                        <xf:bind ref="us-state" id="us-state-bind" name="us-state"/>
+                        <xf:bind id="control-2-bind" ref="control-2" name="control-2" type="fr:us-ein"/>
+                        <xf:bind id="us-ssn-bind" ref="us-ssn" name="us-ssn" type="fr:us-ssn"/>
+                        <xf:bind id="ssn-explanation-bind" ref="ssn-explanation" name="ssn-explanation"
+                                 fr:persist="false()"/>
+                    </xf:bind>
                 </xf:bind>
 
                 <xf:bind id="utility-controls-bind" ref="utility-controls" name="utility-controls">
@@ -475,16 +512,16 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                    <thumbnail filename="" mediatype="" size="">/fr/service/persistence/crud/orbeon-features/controls/form/9d6db6998461fe76ae4e9d453f7d26f5bafce443.bin</thumbnail>
-                    <singleton>true</singleton>
-                    <wizard>true</wizard>
-                    <wizard-subsections-nav>true</wizard-subsections-nav>
-                    <wizard-separate-toc>false</wizard-separate-toc>
-                    <wizard-section-status>false</wizard-section-status>
-                    <wizard-mode>free</wizard-mode>
-                    <wizard-subsections-toc>all</wizard-subsections-toc>
-                    <data-migration>enabled</data-migration>
-                    <density>comfortable</density>
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -493,6 +530,17 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     <updated-with-version>2024.1-SNAPSHOT PE</updated-with-version>
                     <updated-with-version>2026.1-SNAPSHOT PE</updated-with-version>
 
+
+                    <thumbnail filename="" mediatype="" size="">/fr/service/persistence/crud/orbeon-features/controls/form/9d6db6998461fe76ae4e9d453f7d26f5bafce443.bin</thumbnail>
+                    <singleton>true</singleton>
+                    <wizard>true</wizard>
+                    <wizard-subsections-nav>true</wizard-subsections-nav>
+                    <wizard-section-status>false</wizard-section-status>
+                    <wizard-toc-position>left</wizard-toc-position>
+                    <wizard-mode>free</wizard-mode>
+                    <wizard-subsections-toc>all</wizard-subsections-toc>
+                    <data-migration>enabled</data-migration>
+                    <density>comfortable</density>
                     <email>
                         <templates>
                             <template name="default">
@@ -513,6 +561,34 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
             <xf:instance xxf:readonly="true" id="fr-form-resources">
                 <resources>
                     <resource xml:lang="en">
+                        <us-phone>
+                            <label>US Phone Number</label>
+                            <hint>US phone number field</hint>
+
+
+
+                        </us-phone>
+                        <us-state>
+                            <label>US State</label>
+                            <hint>US state selector</hint>
+
+
+
+                        </us-state>
+                        <control-2>
+                            <label>US EIN</label>
+                            <hint>US Employer Identification Number</hint>
+                        </control-2>
+                        <us-ssn>
+                            <label>US SSN</label>
+                            <hint>US Social Security Number</hint>
+                        </us-ssn>
+                        <ssn-explanation>
+                            <text>&lt;div&gt;
+&lt;div&gt;&lt;em&gt;This is a demo form. Please do &lt;strong&gt;not&lt;/strong&gt; enter an actual personal SSN in this form. Using the &lt;a href="https://www.ssa.gov/history/ssn/misused.html" target="_blank" rel="noopener"&gt;demo number&lt;/a&gt; "078-05-1120" is ok!&lt;/em&gt;&lt;/div&gt;
+&lt;/div&gt;</text>
+
+                        </ssn-explanation>
                         <date-us>
                             <label>Date with US format</label>
                             <hint/>
@@ -795,6 +871,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
                         </number>
+                        <control-1>
+                            <label>Phone Number</label>
+                            <hint>International Phone Number</hint>
+                        </control-1>
                         <currency-right>
                             <label>Currency (right-aligned)</label>
                             <hint>Currency field</hint>
@@ -809,56 +889,40 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
                         </number-right>
-
-
-
-
-
-                        <us-phone>
-                            <label>US Phone Number</label>
-                            <hint>US phone number field</hint>
-
-
-
-                        </us-phone>
-                        <us-state>
-                            <label>US State</label>
-                            <hint>US state selector</hint>
-
-
-
-                        </us-state>
-                        <control-2>
-                            <label>US EIN</label>
-                            <hint>US Employer Identification Number</hint>
-                        </control-2>
-                        <us-ssn>
-                            <label>US SSN</label>
-                            <hint>US Social Security Number</hint>
-                        </us-ssn>
-                        <international-securities-identification-number-isin>
-                            <label>ISIN</label>
-                            <hint>International Securities Identification Number (ISIN)</hint>
-                        </international-securities-identification-number-isin>
-                        <ssn-explanation>
-                            <text>&lt;div&gt;
-&lt;div&gt;&lt;em&gt;This is a demo form. Please do &lt;strong&gt;not&lt;/strong&gt; enter an actual personal SSN in this form. Using the &lt;a href="https://www.ssa.gov/history/ssn/misused.html" target="_blank" rel="noopener"&gt;demo number&lt;/a&gt; "078-05-1120" is ok!&lt;/em&gt;&lt;/div&gt;
-&lt;/div&gt;</text>
-
-                        </ssn-explanation>
-                        <legal-entity-identifier-lei>
-                            <label>LEI</label>
-                            <hint>Legal Entity Identifier (LEI)</hint>
-                        </legal-entity-identifier-lei>
                         <country>
                             <label>Country</label>
                             <hint>Country selector</hint>
                         </country>
+                        <legal-entity-identifier-lei>
+                            <label>LEI</label>
+                            <hint>Legal Entity Identifier (LEI)</hint>
+                        </legal-entity-identifier-lei>
+                        <international-securities-identification-number-isin>
+                            <label>ISIN</label>
+                            <hint>International Securities Identification Number (ISIN)</hint>
+                        </international-securities-identification-number-isin>
                         <iban>
                             <label>IBAN</label>
                             <hint>International Bank Account Number (IBAN)</hint>
 
                         </iban>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        <us-controls>
+                            <label>US Controls</label>
+                            <help/>
+                        </us-controls>
                         <standard-button>
                             <label>Standard Button</label>
                             <hint>Standard browser button</hint>
@@ -1078,9 +1142,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <utility-controls>
                             <label>Utility Controls</label>
                         </utility-controls>
-                        <typed-controls>
-                            <label>Typed Controls</label>
-                        </typed-controls>
+                        <international-controls>
+                            <label>International Controls</label>
+
+                        </international-controls>
                         <input>
                             <label>Text Field</label>
                             <hint>Standard input field</hint>
@@ -1140,6 +1205,34 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         </attachment-controls>
                     </resource>
                     <resource xml:lang="fr">
+                        <us-phone>
+                            <label>Téléphone US</label>
+                            <hint>Champ numéro de téléphone US</hint>
+
+
+
+                        </us-phone>
+                        <us-state>
+                            <label>Etat US</label>
+                            <hint>Sélecteur d'état US</hint>
+
+
+
+                        </us-state>
+                        <control-2>
+                            <label>EIN</label>
+                            <hint>Numéro d'identifiant employeur US (EIN)</hint>
+                        </control-2>
+                        <us-ssn>
+                            <label>US SSN</label>
+                            <hint>Numéro de sécurité sociale US (SSN)</hint>
+                        </us-ssn>
+                        <ssn-explanation>
+                            <text>&lt;div&gt;
+&lt;div&gt;&lt;em&gt;Ceci est un formulaire de démonstration. Veuillez &lt;strong&gt;ne pas&lt;/strong&gt; saisir de véritable numéro de sécurité sociale personnel dans ce formulaire. L'utilisation du &lt;a href="https://www.ssa.gov/history/ssn/misused.html" target="_blank" rel="noopener"&gt;numéro de démonstration&lt;/a&gt; « 078-05-1120 » est autorisée !&lt;/em&gt;&lt;/div&gt;
+&lt;/div&gt;</text>
+
+                        </ssn-explanation>
                         <date-us>
                             <label>Date au format É.-U.</label>
                             <hint/>
@@ -1424,6 +1517,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
                         </number>
+                        <control-1>
+                            <label>Numéro de télephone</label>
+                            <hint>Numéro de télephone international</hint>
+                        </control-1>
                         <currency-right>
                             <label>Devise (alignement à droite)</label>
                             <hint>Champ de devise</hint>
@@ -1438,56 +1535,40 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
                         </number-right>
-
-
-
-
-
-                        <us-phone>
-                            <label>Téléphone US</label>
-                            <hint>Champ numéro de téléphone US</hint>
-
-
-
-                        </us-phone>
-                        <us-state>
-                            <label>Etat US</label>
-                            <hint>Sélecteur d'état US</hint>
-
-
-
-                        </us-state>
-                        <control-2>
-                            <label>EIN</label>
-                            <hint>Numéro d'identifiant employeur US (EIN)</hint>
-                        </control-2>
-                        <us-ssn>
-                            <label>US SSN</label>
-                            <hint>Numéro de sécurité sociale US (SSN)</hint>
-                        </us-ssn>
-                        <international-securities-identification-number-isin>
-                            <label>ISIN</label>
-                            <hint>Numéro international d’identification des valeurs mobilières (ISIN)</hint>
-                        </international-securities-identification-number-isin>
-                        <ssn-explanation>
-                            <text>&lt;div&gt;
-&lt;div&gt;&lt;em&gt;Ceci est un formulaire de démonstration. Veuillez &lt;strong&gt;ne pas&lt;/strong&gt; saisir de véritable numéro de sécurité sociale personnel dans ce formulaire. L'utilisation du &lt;a href="https://www.ssa.gov/history/ssn/misused.html" target="_blank" rel="noopener"&gt;numéro de démonstration&lt;/a&gt; « 078-05-1120 » est autorisée !&lt;/em&gt;&lt;/div&gt;
-&lt;/div&gt;</text>
-
-                        </ssn-explanation>
-                        <legal-entity-identifier-lei>
-                            <label>LEI</label>
-                            <hint>Identifiant d’entité juridique (LEI)</hint>
-                        </legal-entity-identifier-lei>
                         <country>
                             <label>Pays</label>
                             <hint>Sélecteur de pays</hint>
                         </country>
+                        <legal-entity-identifier-lei>
+                            <label>LEI</label>
+                            <hint>Identifiant d’entité juridique (LEI)</hint>
+                        </legal-entity-identifier-lei>
+                        <international-securities-identification-number-isin>
+                            <label>ISIN</label>
+                            <hint>Numéro international d’identification des valeurs mobilières (ISIN)</hint>
+                        </international-securities-identification-number-isin>
                         <iban>
                             <label>IBAN</label>
                             <hint>Numéro de compte bancaire international (IBAN)</hint>
 
                         </iban>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        <us-controls>
+                            <label>Contrôles US</label>
+                            <help/>
+                        </us-controls>
                         <standard-button>
                             <label>Bouton standard</label>
                             <hint>Bouton navigateur standard</hint>
@@ -1707,9 +1788,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <utility-controls>
                             <label>Contrôles utilitaires</label>
                         </utility-controls>
-                        <typed-controls>
-                            <label>Contrôles typés</label>
-                        </typed-controls>
+                        <international-controls>
+                            <label>Contrôles internationaux</label>
+
+                        </international-controls>
                         <input>
                             <label>Champ de texte</label>
                             <hint>Champ de texte standard</hint>
@@ -1933,8 +2015,9 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         </fr:c>
                     </fr:grid>
                 </fr:section>
-                <fr:section id="typed-controls-section" bind="typed-controls-bind">
-                    <xf:label ref="$form-resources/typed-controls/label"/>
+                <fr:section id="international-controls-section" bind="international-controls-bind">
+                    <xf:label ref="$form-resources/international-controls/label"/>
+
                     <fr:grid id="grid-3-grid" bind="grid-3-bind">
                         <fr:c y="1" x="1" w="4">
                             <xf:input bind="email-bind" id="email-control">
@@ -1962,10 +2045,16 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                         </fr:c>
                         <fr:c y="2" x="1" w="4">
+                            <fr:phone id="control-1-control" bind="control-1-bind">
+                                <xf:label ref="$form-resources/control-1/label"/>
+                                <xf:hint ref="$form-resources/control-1/hint"/>
+
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:phone>
 
                         </fr:c>
                         <fr:c y="2" x="5" w="4">
-                            <fr:currency bind="currency-right-bind" id="currency-right-control">
+                            <fr:currency bind="currency-right-bind" id="currency-right-control" field-align="right">
                                 <xf:label ref="$form-resources/currency-right/label"/>
                                 <xf:hint ref="$form-resources/currency-right/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -1974,7 +2063,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                         </fr:c>
                         <fr:c y="2" x="9" w="4">
-                            <fr:number id="number-right-control" bind="number-right-bind">
+                            <fr:number id="number-right-control" bind="number-right-bind" field-align="right">
                                 <xf:label ref="$form-resources/number-right/label"/>
                                 <xf:hint ref="$form-resources/number-right/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
@@ -1983,57 +2072,16 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         </fr:c>
 
 
-                        <fr:c x="1" y="3" w="4">
-                            <fr:us-phone bind="us-phone-bind" id="us-phone-control">
-                                <xf:label ref="$form-resources/us-phone/label"/>
-                                <xf:hint ref="$form-resources/us-phone/hint"/>
+                        <fr:c x="1" y="3" w="6">
+                            <fr:country id="country-control" bind="country-bind" show-code="true" show-flag="true">
+                                <xf:label ref="$form-resources/country/label"/>
+                                <xf:hint ref="$form-resources/country/hint"/>
+
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:country>
 
-                            </fr:us-phone>
                         </fr:c>
-                        <fr:c x="5" y="3" w="4">
-                            <fr:us-state bind="us-state-bind" id="us-state-control">
-                                <xf:label ref="$form-resources/us-state/label"/>
-                                <xf:hint ref="$form-resources/us-state/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-                            </fr:us-state>
-                        </fr:c>
-                        <fr:c x="9" y="3" w="4">
-                            <fr:us-ein id="control-2-control" bind="control-2-bind">
-                                <xf:label ref="$form-resources/control-2/label"/>
-                                <xf:hint ref="$form-resources/control-2/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-                            </fr:us-ein>
-                        </fr:c>
-                        <fr:c x="1" y="4" w="6">
-                            <fr:us-ssn id="us-ssn-control" bind="us-ssn-bind">
-                                <xf:label ref="$form-resources/us-ssn/label"/>
-                                <xf:hint ref="$form-resources/us-ssn/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-                            </fr:us-ssn>
-                        </fr:c>
-                        <fr:c x="7" y="4" w="6">
-                            <fr:isin id="international-securities-identification-number-isin-control"
-                                     bind="international-securities-identification-number-isin-bind">
-                                <xf:label ref="$form-resources/international-securities-identification-number-isin/label"/>
-                                <xf:hint ref="$form-resources/international-securities-identification-number-isin/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-                            </fr:isin>
-                        </fr:c>
-                        <fr:c x="1" y="5" w="6">
-                            <fr:explanation id="ssn-explanation-control" bind="ssn-explanation-bind">
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                <fr:text ref="$form-resources/ssn-explanation/text" mediatype="text/html"/>
-                            </fr:explanation>
-                        </fr:c>
-                        <fr:c x="7" y="5" w="6">
+                        <fr:c x="7" y="3" w="6" h="1">
                             <fr:lei id="legal-entity-identifier-lei-control"
                                     bind="legal-entity-identifier-lei-bind">
                                 <xf:label ref="$form-resources/legal-entity-identifier-lei/label"/>
@@ -2043,15 +2091,19 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                             </fr:lei>
                         </fr:c>
-                        <fr:c x="1" y="6" w="6">
-                            <fr:country id="country-control" bind="country-bind" show-code="true" show-flag="true">
-                                <xf:label ref="$form-resources/country/label"/>
-                                <xf:hint ref="$form-resources/country/hint"/>
 
+                        <fr:c x="1" y="4" w="6">
+                            <fr:isin id="international-securities-identification-number-isin-control"
+                                     bind="international-securities-identification-number-isin-bind">
+                                <xf:label ref="$form-resources/international-securities-identification-number-isin/label"/>
+                                <xf:hint ref="$form-resources/international-securities-identification-number-isin/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                            </fr:country>
+
+
+                            </fr:isin>
+
                         </fr:c>
-                        <fr:c x="7" y="6" w="6">
+                        <fr:c x="7" y="4" w="6">
                             <fr:iban id="iban-control" bind="iban-bind">
                                 <xf:label ref="$form-resources/iban/label"/>
                                 <xf:hint ref="$form-resources/iban/hint"/>
@@ -2059,10 +2111,61 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
                             </fr:iban>
+
                         </fr:c>
+
+
+
+
                     </fr:grid>
 
 
+                </fr:section>
+                <fr:section id="us-controls-section" bind="us-controls-bind">
+                    <xf:label ref="$form-resources/us-controls/label"/>
+                    <fr:grid id="grid-10-grid" bind="grid-10-bind">
+                        <fr:c x="1" y="1" w="4">
+                            <fr:us-phone bind="us-phone-bind" id="us-phone-control">
+                                <xf:label ref="$form-resources/us-phone/label"/>
+                                <xf:hint ref="$form-resources/us-phone/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </fr:us-phone>
+                        </fr:c>
+                        <fr:c x="5" y="1" w="4" h="1">
+                            <fr:us-state bind="us-state-bind" id="us-state-control">
+                                <xf:label ref="$form-resources/us-state/label"/>
+                                <xf:hint ref="$form-resources/us-state/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </fr:us-state>
+                        </fr:c>
+                        <fr:c x="9" y="1" w="4" h="1">
+                            <fr:us-ein id="control-2-control" bind="control-2-bind">
+                                <xf:label ref="$form-resources/control-2/label"/>
+                                <xf:hint ref="$form-resources/control-2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:us-ein>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="4">
+                            <fr:us-ssn id="us-ssn-control" bind="us-ssn-bind">
+                                <xf:label ref="$form-resources/us-ssn/label"/>
+                                <xf:hint ref="$form-resources/us-ssn/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:us-ssn>
+                        </fr:c>
+                        <fr:c x="5" y="2" w="4" h="1">
+                            <fr:explanation id="ssn-explanation-control" bind="ssn-explanation-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:text ref="$form-resources/ssn-explanation/text" mediatype="text/html"/>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="9" y="2" w="4" h="1"/>
+                    </fr:grid>
                 </fr:section>
                 <fr:section id="date-time-controls-section" bind="date-time-controls-bind">
                     <xf:label ref="$form-resources/date-time-controls/label"/>

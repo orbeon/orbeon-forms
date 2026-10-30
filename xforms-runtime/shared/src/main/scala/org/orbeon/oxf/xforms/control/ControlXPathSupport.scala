@@ -66,14 +66,15 @@ trait ControlXPathSupport {
   // Evaluate an XPath expression as a string in the context of this control.
   // 6 usages
   def evaluateAsString(
-    xpathString        : String,
-    contextItems       : collection.Seq[om.Item],
-    contextPosition    : Int,
-    collector          : ErrorEventCollector,
-    contextMessage     : String,
-    namespaceMapping   : NamespaceMapping                        = getNamespaceMappings,
-    variableToValueMap : ju.Map[String, ValueRepresentationType] = bindingContext.getInScopeVariables,
-    functionContext    : FunctionContext                         = newFunctionContext,
+    xpathString           : String,
+    contextItems          : collection.Seq[om.Item],
+    contextPosition       : Int,
+    collector             : ErrorEventCollector,
+    contextMessage        : String,
+    namespaceMapping      : NamespaceMapping                        = getNamespaceMappings,
+    variableToValueMap    : ju.Map[String, ValueRepresentationType] = bindingContext.getInScopeVariables,
+    functionContext       : FunctionContext                         = newFunctionContext,
+    isFunctionsRestricted : Boolean                                 = elementAnalysis.isFunctionsRestricted
   ): Option[String] = {
 
     assert(isRelevant)
@@ -91,7 +92,7 @@ trait ControlXPathSupport {
           xpathString,
           namespaceMapping,
           variableToValueMap,
-          containingDocument.functionLibrary,
+          container.partAnalysis.functionLibrary(isFunctionsRestricted),
           functionContext,
           null,
           getLocationData,
@@ -151,7 +152,7 @@ object ControlXPathSupport {
             attributeValue,
             namespaceMappings,
             bindingContext.getInScopeVariables,
-            container.containingDocument.functionLibrary,
+            container.partAnalysis.functionLibrary(eventTarget.elementAnalysis.isFunctionsRestricted),
             xfc,
             null,
             locationData,

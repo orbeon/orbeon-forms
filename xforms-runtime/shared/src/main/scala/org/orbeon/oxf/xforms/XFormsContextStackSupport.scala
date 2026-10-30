@@ -108,7 +108,7 @@ object XFormsContextStackSupport {
               xpathString        = expr,
               namespaceMapping   = childElem.namespaceMapping,
               variableToValueMap = currentBindingContext.getInScopeVariables,
-              functionLibrary    = contextStack.container.containingDocument.functionLibrary,
+              functionLibrary    = contextStack.container.partAnalysis.functionLibrary(childElem.isFunctionsRestricted),
               functionContext    = contextStack.getFunctionContext(getElementEffectiveId(parentEffectiveId, childElem)),
               baseURI            = null,
               locationData       = childElem.locationData,

@@ -85,6 +85,12 @@
 
     <xsl:variable name="is-form-builder"     select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
 
+    <!-- Function restrictions apply only to user forms, excluding internal pages: Form Builder, Landing, Summary, Forms/Admin -->
+    <xsl:variable
+        name="is-restricted-form"
+        select="not($is-form-builder or $is-landing or $is-summary or $is-home)"
+        as="xs:boolean"/>
+
     <xsl:variable name="input-data" select="/*" as="element(xh:html)"/>
 
     <xsl:variable
@@ -221,6 +227,11 @@
         name="js-uri"
         as="xs:string*"
         select="fr:get-uris-from-properties('js.uri'), fr:get-uris-from-properties('js.custom.uri')"/>
+
+    <xsl:variable
+        name="allowed-functions"
+        as="xs:string?"
+        select="frf:allowedFunctionsProperty($app, $form, $property-profile-opt)"/>
 
     <!-- Theme selection -->
     <xsl:variable
@@ -938,6 +949,10 @@
             xxf:allow-error-recovery-on-init="{$is-test-mode}"
         >
 
+            <xsl:if test="$is-restricted-form and exists($allowed-functions)">
+                <xsl:attribute name="xxf:allowed-functions" select="$allowed-functions"/>
+            </xsl:if>
+
             <!-- Override if specified -->
             <xsl:copy-of select="@xxf:xpath-analysis"/>
             <xsl:copy-of select="@xxf:no-updates"/><!-- for unit tests -->
@@ -1330,17 +1345,44 @@
         match="xf:bind/@calculate[$disable-calculate]"
         mode="filter-mips"/>
 
+    <!-- Strip any author-provided xxf:functions or xxf:allowed-functions attribute -->
+    <xsl:template match="@xxf:functions[$is-restricted-form] | @xxf:allowed-functions[$is-restricted-form]" mode="#all"/>
+
+    <!-- User actions and submissions in candidate models -->
+    <xsl:template
+        match="
+            /xh:html/xh:head//xf:model[generate-id() = $candidate-action-models-ids]/xf:action[
+                not((@event, @ev:event)[1] = ('xforms-model-construct-done', 'fr-call-itemset-action', 'xforms-submit-error', 'xxforms-action-error')) and
+                not(p:has-class('fr-design-time-preserve'))
+            ] |
+            /xh:html/xh:head//xf:model[generate-id() = $candidate-action-models-ids]/xf:submission[
+                not(starts-with(@id, 'fr-')) and
+                not(generate-id() = $service-submissions-ids)
+            ]"
+        priority="-10">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xsl:if test="$is-restricted-form">
+                <xsl:attribute name="xxf:functions" select="'restricted'"/>
+            </xsl:if>
+            <xsl:apply-templates select="node()"/>
+        </xsl:copy>
+    </xsl:template>
+
     <xsl:template
         match="
             /xh:html/xh:head//
                 xf:model[
                     generate-id() = $candidate-action-models-ids
-                ]/xf:bind[1]">
+                ]/xf:bind[@id = 'fr-form-binds' or position() = 1]">
 
         <xsl:variable name="model" select="parent::xf:model"/>
 
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
+            <xsl:if test="$is-restricted-form">
+                <xsl:attribute name="xxf:functions" select="'restricted'"/>
+            </xsl:if>
 
             <xsl:variable
                 name="controls-root"

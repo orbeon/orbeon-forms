@@ -181,7 +181,7 @@
                               if="xxf:get-document-attribute(event('fr-action-id'), 'action-continuation-id') = 'my-action-3-id'">
                        <xf:var name="current-action-id" value="event('fr-action-id')"/>
                        <!--Action Implementation Here-->
-                       <xf:var name="cond1" value="true()"/>
+                       <xf:var name="cond1" value="true()" xxf:functions="restricted"/>
                        <xf:action if="$cond1">
                            <!--Action Implementation Here-->
                            <xf:dispatch name="fr-action-continuation-my-action-4-id" targetid="fr-form-model">
@@ -198,12 +198,13 @@
                               event="fr-action-continuation-my-action-4-id" context="xxf:instance('fr-service-response-instance')">
                        <xf:var name="current-action-id" value="event('fr-action-id')"/>
                        <!--Action Implementation Here-->
-                       <xf:action if="empty((/response/row))">
+                       <xf:var name="iterate1" value="/response/row" xxf:functions="restricted"/>
+                       <xf:action if="empty($iterate1)">
                            <xf:dispatch name="fr-action-continuation-my-action-5-id" targetid="fr-form-model">
                                <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
                            </xf:dispatch>
                        </xf:action>
-                       <xf:action iterate="/response/row">
+                       <xf:action iterate="$iterate1">
                            <xf:action if="exists(xxf:get-document-attribute($current-action-id, 'action-source'))">
                                <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-is-last-iteration-1', position() = last()), xxf:set-document-attribute($current-action-id, 'iteration-context-1', .)</xf:action>
                                <!--Action Implementation Here-->
@@ -217,12 +218,13 @@
                               event="fr-action-continuation-my-action-5-id" context="xxf:instance('fr-service-response-instance')">
                        <xf:var name="current-action-id" value="event('fr-action-id')"/>
                        <!--Action Implementation Here-->
-                       <xf:action if="empty((/response/row[exists(foo)]))">
+                       <xf:var name="iterate2" value="/response/row[exists(foo)]" xxf:functions="restricted"/>
+                       <xf:action if="empty($iterate2)">
                            <xf:dispatch name="fr-action-continuation-my-action-7-id" targetid="fr-form-model">
                                <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
                            </xf:dispatch>
                        </xf:action>
-                       <xf:action iterate="/response/row[exists(foo)]">
+                       <xf:action iterate="$iterate2">
                            <xf:action if="exists(xxf:get-document-attribute($current-action-id, 'action-source'))">
                                <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-is-last-iteration-1', position() = last()), xxf:set-document-attribute($current-action-id, 'iteration-context-1', .)</xf:action>
                                <!--Action Implementation Here-->
@@ -311,7 +313,7 @@
                    <!--Action Implementation Here-->
                    <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-source', event('action-source'))</xf:action>
                    <!--Action Implementation Here-->
-                   <xf:var name="cond1" value="true()"/>
+                   <xf:var name="cond1" value="true()" xxf:functions="restricted"/>
                    <xf:action if="$cond1">
                        <!--Action Implementation Here-->
                        <xf:dispatch name="fr-action-continuation-my-action-2-id" targetid="fr-form-model">
@@ -415,12 +417,13 @@
                         if="xxf:get-document-attribute(event('fr-action-id'), 'action-continuation-id') = 'my-action-2-id'">
                    <xf:var name="current-action-id" value="event('fr-action-id')"/>
                    <!--Action Implementation Here-->
-                   <xf:action if="empty((/*/record))">
+                   <xf:var name="iterate1" value="/*/record" xxf:functions="restricted"/>
+                   <xf:action if="empty($iterate1)">
                        <xf:dispatch name="fr-action-continuation-my-action-6-id" targetid="fr-form-model">
                            <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
                        </xf:dispatch>
                    </xf:action>
-                   <xf:action iterate="/*/record">
+                   <xf:action iterate="$iterate1">
                        <xf:action if="exists(xxf:get-document-attribute($current-action-id, 'action-source'))">
                            <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-is-last-iteration-1', position() = last()), xxf:set-document-attribute($current-action-id, 'iteration-context-1', .)</xf:action>
                            <!--Action Implementation Here-->
@@ -440,7 +443,7 @@
                         if="xxf:get-document-attribute(event('fr-action-id'), 'action-continuation-id') = 'my-action-3-id'">
                    <xf:var name="current-action-id" value="event('fr-action-id')"/>
                    <!--Action Implementation Here-->
-                   <xf:var name="cond1" value="true()"/>
+                   <xf:var name="cond1" value="true()" xxf:functions="restricted"/>
                    <xf:action if="$cond1">
                        <!--Action Implementation Here-->
                        <xf:insert ref="xxf:instance('fr-service-request-instance')" origin="xf:parse(xxf:instance('my-service-3-instance'))"/>
@@ -593,21 +596,24 @@
                         if="xxf:get-document-attribute(event('fr-action-id'), 'action-continuation-id') = 'my-action-2-id'">
                    <xf:var name="current-action-id" value="event('fr-action-id')"/>
                    <!--Action Implementation Here-->
-                   <xf:action if="empty((/*/level1))">
+                   <xf:var name="iterate1" value="/*/level1" xxf:functions="restricted"/>
+                   <xf:action if="empty($iterate1)">
                        <xf:dispatch name="fr-action-continuation-my-action-4-id" targetid="fr-form-model">
                            <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
                        </xf:dispatch>
                    </xf:action>
-                   <xf:action iterate="/*/level1">
+                   <xf:action iterate="$iterate1">
                        <xf:action if="exists(xxf:get-document-attribute($current-action-id, 'action-source'))">
                            <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-is-last-iteration-1', position() = last()), xxf:set-document-attribute($current-action-id, 'iteration-context-1', .)</xf:action>
                            <!--Action Implementation Here-->
-                           <xf:action if="empty((level2))">
+                           <xf:var name="iterate1-context" value="xxf:get-document-attribute($current-action-id, 'iteration-context-1')"/>
+                           <xf:var name="iterate1" value="level2" context="$iterate1-context" xxf:functions="restricted"/>
+                           <xf:action if="empty($iterate1)">
                                <xf:dispatch name="fr-action-continuation-my-action-3-id" targetid="fr-form-model">
                                    <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
                                </xf:dispatch>
                            </xf:action>
-                           <xf:action iterate="level2" context="xxf:get-document-attribute($current-action-id, 'iteration-context-1')">
+                           <xf:action iterate="$iterate1">
                                <xf:action if="exists(xxf:get-document-attribute($current-action-id, 'action-source'))">
                                    <xf:action type="xpath">xxf:set-document-attribute($current-action-id, 'action-continuation-is-last-iteration-2', position() = last()), xxf:set-document-attribute($current-action-id, 'iteration-context-2', .)</xf:action>
                                    <!--Action Implementation Here-->

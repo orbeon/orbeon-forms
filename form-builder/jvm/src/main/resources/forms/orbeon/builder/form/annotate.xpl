@@ -166,6 +166,15 @@
                         match="xf:model/xf:instance[@id = 'fr-form-metadata']/metadata/migration"
                         mode="within-model"/>
 
+                <!-- Mark fr-form-binds as restricted for XPath functions -->
+                <xsl:template match="xf:bind[@id = 'fr-form-binds' or (parent::xf:model and position() = 1)]" mode="within-model">
+                    <xsl:copy>
+                        <xsl:apply-templates select="@*" mode="#current"/>
+                        <xsl:attribute name="xxf:functions" select="'restricted'"/>
+                        <xsl:apply-templates select="node()" mode="#current"/>
+                    </xsl:copy>
+                </xsl:template>
+
                 <!--
                     fr:view:
                     - copied over along with nested fr:buttons
@@ -179,7 +188,7 @@
                 <!-- fr:body → xf:group -->
                 <xsl:template match="xh:body//fr:body[not(parent::fr:repeat) and not (parent::fr:grid)]">
 
-                    <xf:group id="fb-body" class="fb-body fr-view-appearance-full">
+                    <xf:group id="fb-body" class="fb-body fr-view-appearance-full" xxf:functions="restricted">
                         <xsl:copy-of select="namespace::*"/>
                         <!-- Scope $lang which is the language of the form being edited -->
                         <xf:var

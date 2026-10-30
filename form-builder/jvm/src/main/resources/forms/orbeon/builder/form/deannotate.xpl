@@ -174,6 +174,9 @@
                     </xsl:copy>
                 </xsl:template>
 
+                <!-- Remove xxf:functions and xxf:allowed-functions -->
+                <xsl:template match="@xxf:functions | @xxf:allowed-functions"/>
+
             </xsl:stylesheet>
         </p:input>
         <p:output name="data" ref="data"/>

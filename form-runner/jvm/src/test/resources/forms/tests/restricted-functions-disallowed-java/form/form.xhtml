@@ -1,0 +1,61 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:System="java:java.lang.System"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xh:head>
+        <xh:title>Restricted Functions: Disallowed Java</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <time/>
+                    </section-1>
+                </form>
+            </xf:instance>
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" ref="section-1" name="section-1">
+                    <xf:bind id="time-bind" ref="time" name="time" calculate="System:currentTimeMillis()"/>
+                </xf:bind>
+            </xf:bind>
+
+            <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>tests</application-name>
+                    <form-name>restricted-functions-disallowed-java</form-name>
+                    <title xml:lang="en">Restricted Functions Disallowed Java</title>
+                </metadata>
+            </xf:instance>
+
+            <xf:instance id="fr-form-resources" xxf:readonly="true">
+                <resources>
+                    <resource xml:lang="en">
+                        <section-1><label>Section 1</label></section-1>
+                        <time><label>Time</label></time>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <fr:grid id="grid-1-grid">
+                        <fr:c y="1" x="1" w="12">
+                            <xf:output id="time-control" bind="time-bind">
+                                <xf:label ref="$form-resources/time/label"/>
+                            </xf:output>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

@@ -641,17 +641,24 @@ object StaticBindBuilder {
       mipName   : MipName.XPath,
       level     : ValidationLevel,
       expression: String
-    ): Option[XPathMIP] =
+    ): Option[XPathMIP] = {
+      val isRestricted =
+        element.attributeValueOpt(XXFORMS_FUNCTIONS_QNAME).contains("restricted") ||
+        parent.exists(_.isFunctionsRestricted)
+      val lib =
+        if (isRestricted) partAnalysisCtx.whitelistedFunctionLibrary
+        else partAnalysisCtx.functionLibrary
       if (partAnalysisCtx.isTopLevelPart && ! partAnalysisCtx.staticProperties.allowErrorRecoveryOnInit)
-        Some(XPathMIP(id, mipName, level, expression, namespaceMapping, xpathMipLocationData, partAnalysisCtx.functionLibrary))
+        Some(XPathMIP(id, mipName, level, expression, namespaceMapping, xpathMipLocationData, lib))
       else
-        Try(XPathMIP(id, mipName, level, expression, namespaceMapping, xpathMipLocationData, partAnalysisCtx.functionLibrary)) match {
+        Try(XPathMIP(id, mipName, level, expression, namespaceMapping, xpathMipLocationData, lib)) match {
           case Success(mip) =>
             Some(mip)
           case Failure(t)   =>
             partAnalysisCtx.reportStaticXPathError(expression, t.some, XPathErrorDetails.ForBindMip(bindNameOpt, mipName))
             None
         }
+    }
 
     val originalTypeMIPOpt: Option[TypeMIP] = {
 

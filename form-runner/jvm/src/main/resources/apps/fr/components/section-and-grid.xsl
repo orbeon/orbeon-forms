@@ -20,6 +20,7 @@
     xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xsl:variable name="starting-section-level" select="2"/>
@@ -54,6 +55,9 @@
                 )"/>
 
         <xsl:copy>
+            <xsl:if test="parent::xf:group/@id = 'fr-section-template-view'">
+                <xsl:attribute name="xxf:functions" select="'restricted'"/>
+            </xsl:if>
             <xsl:if test="frf:isRepeat(.) and empty(@iteration-name) and exists($bind-id-opt)">
                 <xsl:for-each select="$binds-root//xf:bind[@id = $bind-id-opt]/xf:bind/@name">
                     <xsl:attribute name="iteration-name" select="."/>
@@ -159,6 +163,9 @@
         <xsl:variable name="bind-id-opt" as="xs:string?" select="@bind"/>
 
         <xsl:copy>
+            <xsl:if test="parent::xf:group/@id = 'fr-section-template-view'">
+                <xsl:attribute name="xxf:functions" select="'restricted'"/>
+            </xsl:if>
 
             <xsl:if test="frf:isRepeat(.) and empty(@iteration-name) and exists($bind-id-opt)">
                 <xsl:for-each select="$binds-root//xf:bind[@id = $bind-id-opt]/xf:bind/@name">

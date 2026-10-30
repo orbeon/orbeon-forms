@@ -67,7 +67,7 @@
                     </section-25>
                 </form>
             </xf:instance>
-            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')" xxf:functions="restricted">
                 <xf:bind id="section-1-bind" name="section-1" ref="section-1">
                     <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
                         <xf:bind id="control-1-bind" name="control-1" ref="control-1" fb:constraint="true()" fb:default="42" type="xf:string">
@@ -277,7 +277,7 @@
     </xh:head>
     <xh:body>
         <fr:view width="800px" appearance="custom" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" >
-            <xf:group id="fb-body" class="fb-body fr-view-appearance-full">
+            <xf:group id="fb-body" class="fb-body fr-view-appearance-full" xxf:functions="restricted">
                 <xf:var name="lang" value="xxf:get-variable('fr-form-model', 'fb-lang')" as="element()" class="fb-annotation"/>
                 <xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?" class="fb-annotation"/>
                 <xf:var name="fr-resources" value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')" as="element(resource)?" class="fb-annotation"/>

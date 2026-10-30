@@ -543,11 +543,19 @@
                             </xsl:when>
                             <xsl:when test="exists(@value)">
                                 <xsl:variable name="value" select="@value/string()" as="xs:string"/>
+                                <xsl:variable name="use-iteration-context" select="@expression-context = 'current-iteration'" as="xs:boolean"/>
+                                <xsl:if test="$use-iteration-context">
+                                    <xf:var
+                                        name="iteration-context"
+                                        value="xxf:get-document-attribute($current-action-id, '{fr:build-context-param(..)}')"/>
+                                </xsl:if>
                                 <xf:var
                                     name="value"
-                                    context="$original-context"
+                                    context="{if ($use-iteration-context) then '$iteration-context' else '$original-context'}"
                                     value="{frf:replaceVarReferencesWithFunctionCallsForAction(. , $value, false(), $library-name, $fr-form-model-vars, ())}">
-                                    <xsl:copy-of select="fr:build-context-att(., @expression-context)"/>
+                                    <xsl:if test="$is-restricted-form">
+                                        <xsl:attribute name="xxf:functions" select="'restricted'"/>
+                                    </xsl:if>
                                 </xf:var>
                             </xsl:when>
                         </xsl:choose>
@@ -556,7 +564,11 @@
                                 <xsl:variable name="ref" select="@ref/string()" as="xs:string"/>
                                 <xf:setvalue
                                     ref="{frf:replaceVarReferencesWithFunctionCallsForAction(. , $ref, false(), $library-name, $fr-form-model-vars, ())}"
-                                    value="$value"/>
+                                    value="$value">
+                                    <xsl:if test="$is-restricted-form">
+                                        <xsl:attribute name="xxf:functions" select="'restricted'"/>
+                                    </xsl:if>
+                                </xf:setvalue>
                             </xsl:when>
                             <xsl:when test="./self::fr:sql-param">
                                 <xsl:variable name="index" select="xs:integer(@index)" as="xs:integer"/>
@@ -641,15 +653,33 @@
             <xf:property name="action-type"  value="'{name(.)}'"/>
         </xxf:log>
 
-        <xf:action if="empty(({@ref}))">
+        <xsl:variable name="iterate-position-within-block" select="count(preceding-sibling::fr:data-iterate)"/>
+        <xsl:variable name="var-name"                      select="concat('iterate', $iterate-position-within-block + 1)"/>
+        <xsl:variable name="use-iteration-context"         select="@expression-context = 'current-iteration'" as="xs:boolean"/>
+
+        <xsl:if test="$use-iteration-context">
+            <xf:var
+                name="{$var-name}-context"
+                value="xxf:get-document-attribute($current-action-id, '{fr:build-context-param(..)}')"/>
+        </xsl:if>
+        <xf:var
+            name="{$var-name}"
+            value="{frf:replaceVarReferencesWithFunctionCallsForAction(. , @ref, false(), $library-name, $fr-form-model-vars, ())}">
+            <xsl:if test="$use-iteration-context">
+                <xsl:attribute name="context" select="concat('$', $var-name, '-context')"/>
+            </xsl:if>
+            <xsl:if test="$is-restricted-form">
+                <xsl:attribute name="xxf:functions" select="'restricted'"/>
+            </xsl:if>
+        </xf:var>
+        <xf:action if="empty(${$var-name})">
             <xf:dispatch
                 name="{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}"
                 targetid="fr-form-model">
                 <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
             </xf:dispatch>
         </xf:action>
-        <xf:action iterate="{frf:replaceVarReferencesWithFunctionCallsForAction(. , @ref, false(), $library-name, $fr-form-model-vars, ())}">
-            <xsl:copy-of select="fr:build-context-att($data-iterate-elem, @expression-context)"/>
+        <xf:action iterate="${$var-name}">
 
             <!-- Apply only up to the first delimiter for https://github.com/orbeon/orbeon-forms/issues/4067 -->
             <xsl:for-each-group
@@ -692,8 +722,19 @@
             <xf:property name="action-type"  value="'{name(.)}'"/>
         </xxf:log>
 
+        <xsl:variable name="use-iteration-context" select="@expression-context = 'current-iteration'" as="xs:boolean"/>
+        <xsl:if test="$use-iteration-context">
+            <xf:var
+                name="{$var-name}-context"
+                value="xxf:get-document-attribute($current-action-id, '{fr:build-context-param(..)}')"/>
+        </xsl:if>
         <xf:var name="{$var-name}" value="{frf:replaceVarReferencesWithFunctionCallsForAction(. , @condition, false(), $library-name, $fr-form-model-vars, ())}">
-            <xsl:copy-of select="fr:build-context-att(., @expression-context)"/>
+            <xsl:if test="$use-iteration-context">
+                <xsl:attribute name="context" select="concat('$', $var-name, '-context')"/>
+            </xsl:if>
+            <xsl:if test="$is-restricted-form">
+                <xsl:attribute name="xxf:functions" select="'restricted'"/>
+            </xsl:if>
         </xf:var>
         <xf:action if="${$var-name}">
             <xsl:for-each-group
@@ -814,7 +855,11 @@
         </xxf:log>
 
         <xf:action class="fr-action-impl">
-            <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCallsForAction(. , $value-expr, false(), $library-name, $fr-form-model-vars, ())}"/>
+            <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCallsForAction(. , $value-expr, false(), $library-name, $fr-form-model-vars, ())}">
+                <xsl:if test="$is-restricted-form">
+                    <xsl:attribute name="xxf:functions" select="'restricted'"/>
+                </xsl:if>
+            </xf:var>
 
             <xf:recalculate/>
 
@@ -963,12 +1008,21 @@
 
                 <xf:var name="fr-lang" value="@xml:lang"/>
 
+                <xsl:variable name="use-iteration-context" select="$context = 'current-iteration'" as="xs:boolean"/>
+                <xsl:if test="$use-iteration-context">
+                    <xf:var
+                        name="iteration-context"
+                        value="xxf:get-document-attribute($current-action-id, '{fr:build-context-param($elem/..)}')"/>
+                </xsl:if>
+
                 <!-- Re-evaluate `$response-items` at each iteration because that can depend on `$fr-lang` -->
                 <xf:var
                     name="response-items"
-                    context="$items-expr-context"
+                    context="{if ($use-iteration-context) then '$iteration-context' else '$items-expr-context'}"
                     value="{frf:replaceVarReferencesWithFunctionCallsForAction($elem , $items-expr, false(), $library-name, $fr-form-model-vars, ())}">
-                    <xsl:copy-of select="fr:build-context-att(., $context)"/>
+                    <xsl:if test="$is-restricted-form">
+                        <xsl:attribute name="xxf:functions" select="'restricted'"/>
+                    </xsl:if>
                 </xf:var>
 
                 <xf:insert
@@ -983,11 +1037,23 @@
                 <!-- Should use a version of `XFormsItemUtils.evaluateItemset()`
                      See https://github.com/orbeon/orbeon-forms/issues/3125 -->
                 <xf:action iterate="$response-items">
-                    <xf:var name="item-label" value="{frf:replaceVarReferencesWithFunctionCallsForAction($elem , $label-expr, false(), $library-name, $fr-form-model-vars, ())}"/>
-                    <xf:var name="item-value" value="{frf:replaceVarReferencesWithFunctionCallsForAction($elem , $value-expr, false(), $library-name, $fr-form-model-vars, ())}"/>
+                    <xf:var name="item-label" value="{frf:replaceVarReferencesWithFunctionCallsForAction($elem , $label-expr, false(), $library-name, $fr-form-model-vars, ())}">
+                        <xsl:if test="$is-restricted-form">
+                            <xsl:attribute name="xxf:functions" select="'restricted'"/>
+                        </xsl:if>
+                    </xf:var>
+                    <xf:var name="item-value" value="{frf:replaceVarReferencesWithFunctionCallsForAction($elem , $value-expr, false(), $library-name, $fr-form-model-vars, ())}">
+                        <xsl:if test="$is-restricted-form">
+                            <xsl:attribute name="xxf:functions" select="'restricted'"/>
+                        </xsl:if>
+                    </xf:var>
                     <xsl:choose>
                         <xsl:when test="exists($hint-expr)">
-                            <xf:var name="item-hint"  value="{frf:replaceVarReferencesWithFunctionCallsForAction($elem , $hint-expr, false(), $library-name, $fr-form-model-vars, ())}"/>
+                            <xf:var name="item-hint"  value="{frf:replaceVarReferencesWithFunctionCallsForAction($elem , $hint-expr, false(), $library-name, $fr-form-model-vars, ())}">
+                                <xsl:if test="$is-restricted-form">
+                                    <xsl:attribute name="xxf:functions" select="'restricted'"/>
+                                </xsl:if>
+                            </xf:var>
                             <xf:insert
                                 context="$new-choices-holder"
                                 ref="*"
@@ -1121,6 +1187,9 @@
         <!-- Prefer `<xf:load>` to `fr:run-process(…, 'navigate(…))`, as the latter builds a process (string) with
              XPath, which requires escaping, and is thus more error-prone -->
         <xf:load resource="{frf:replaceVarReferencesWithFunctionCallsForAction(. , $location, true(), $library-name, $fr-form-model-vars, ())}" class="fr-action-impl">
+            <xsl:if test="$is-restricted-form">
+                <xsl:attribute name="xxf:functions" select="'restricted'"/>
+            </xsl:if>
             <xsl:if test="exists($target)">
                 <xsl:attribute name="xxf:target" select="$target"/>
             </xsl:if>
@@ -1193,7 +1262,11 @@
         </xxf:log>
 
         <xf:action class="fr-action-impl">
-            <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCallsForAction(. , $value-expr, false(), $library-name, $fr-form-model-vars, ())}"/>
+            <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCallsForAction(. , $value-expr, false(), $library-name, $fr-form-model-vars, ())}">
+                <xsl:if test="$is-restricted-form">
+                    <xsl:attribute name="xxf:functions" select="'restricted'"/>
+                </xsl:if>
+            </xf:var>
 
             <xf:recalculate/>
 
@@ -1229,7 +1302,11 @@
         </xxf:log>
         <xf:action class="fr-action-impl">
             <xf:var name="message"><xsl:value-of select="frf:replaceVarReferencesWithFunctionCallsForAction(. , @message, true(), $library-name, $fr-form-model-vars, ())"/></xf:var>
-            <xf:message value="xxf:evaluate-avt($message)"/>
+            <xf:message value="xxf:evaluate-avt($message)">
+                <xsl:if test="$is-restricted-form">
+                    <xsl:attribute name="xxf:functions" select="'restricted'"/>
+                </xsl:if>
+            </xf:message>
         </xf:action>
     </xsl:template>
 

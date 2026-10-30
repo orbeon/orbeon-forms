@@ -34,6 +34,7 @@ import org.orbeon.oxf.xforms.model.{BindVariableResolver, RuntimeBind, XFormsMod
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsContainingDocument}
 import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
+import org.orbeon.saxon.value.SequenceExtent
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath.*
@@ -124,16 +125,30 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     ).map(_.toList) // https://github.com/orbeon/orbeon-forms/issues/6016
   }
 
+  def resolveActionSourceAbsoluteId(
+    actionSourceOrActionId: String
+  )(implicit
+    xfc                   : XFormsFunction.Context
+  ): String =
+    if (XFormsId.isAbsoluteId(actionSourceOrActionId))
+      actionSourceOrActionId
+    else
+      xfc.containingDocument.getAttribute(actionSourceOrActionId, "action-source") match {
+        case Some(v: SequenceExtent) if v.getLength > 0 => v.itemAt(0).getStringValue
+        case Some(v: Item)                              => v.getStringValue
+        case _                                          => actionSourceOrActionId
+      }
+
   // https://github.com/orbeon/orbeon-forms/issues/6837
   //@XPathFunction
   def controlVariableValueForAction(
-    actionSourceAbsoluteId: String,
+    actionSourceOrActionId: String,
     targetControlName     : String,
     libraryName           : String
   ): SequenceIterator = {
     implicit val xfc: XFormsFunction.Context = XFormsFunction.context
     resolveTargetRelativeToActionSourceOpt(
-      actionSourceAbsoluteId  = actionSourceAbsoluteId,
+      actionSourceAbsoluteId  = resolveActionSourceAbsoluteId(actionSourceOrActionId),
       targetControlName       = targetControlName,
       followIndexes           = false,
       libraryOrSectionNameOpt = libraryName.trimAllToOpt.map(Left.apply)

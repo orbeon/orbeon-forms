@@ -31,7 +31,16 @@ class ShareableXPathStaticContext(
 
   // Add function library
   setDefaultFunctionLibrary()
-  getFunctionLibrary.asInstanceOf[FunctionLibraryList].libraryList.asInstanceOf[ju.List[FunctionLibrary]].add(0, functionLibrary)
+  val flList = getFunctionLibrary.asInstanceOf[FunctionLibraryList]
+  functionLibrary match {
+    case WhitelistedFunctionLibrary(delegate, allowedFunctions) =>
+      if (delegate ne null)
+        flList.libraryList.asInstanceOf[ju.List[FunctionLibrary]].add(0, delegate)
+      setFunctionLibrary(WhitelistedFunctionLibrary(flList, allowedFunctions))
+    case _ =>
+      if (functionLibrary ne null)
+        flList.libraryList.asInstanceOf[ju.List[FunctionLibrary]].add(0, functionLibrary)
+  }
 
   // This should be unused as we handle global variables differently
   private val stackFrameMap = config.makeSlotManager

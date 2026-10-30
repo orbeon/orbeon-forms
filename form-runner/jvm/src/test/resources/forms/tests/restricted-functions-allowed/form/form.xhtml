@@ -1,0 +1,94 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xh:head>
+        <xh:title>Restricted Functions: Allowed</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <first-name>World</first-name>
+                        <greeting/>
+                        <math-result/>
+                        <length-result/>
+                        <amount>1234.56</amount>
+                    </section-1>
+                </form>
+            </xf:instance>
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" ref="section-1" name="section-1">
+                    <xf:bind id="first-name-bind" ref="first-name" name="first-name"/>
+                    <xf:bind id="greeting-bind" ref="greeting" name="greeting" calculate="concat('Hello, ', $first-name)"/>
+                    <xf:bind id="math-result-bind" ref="math-result" name="math-result" calculate="string(math:pow(2, 3))"/>
+                    <xf:bind id="length-result-bind" ref="length-result" name="length-result" calculate="string(string-length($first-name))"/>
+                    <xf:bind id="amount-bind" ref="amount" name="amount" type="xs:decimal"/>
+                </xf:bind>
+            </xf:bind>
+
+            <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>tests</application-name>
+                    <form-name>restricted-functions-allowed</form-name>
+                    <title xml:lang="en">Restricted Functions Allowed</title>
+                    <description xml:lang="en">Testing allowed functions in Form Runner</description>
+                </metadata>
+            </xf:instance>
+
+            <xf:instance id="fr-form-resources" xxf:readonly="true">
+                <resources>
+                    <resource xml:lang="en">
+                        <section-1><label>Section 1</label></section-1>
+                        <first-name><label>First Name</label></first-name>
+                        <greeting><label>Greeting</label></greeting>
+                        <math-result><label>Math Result</label></math-result>
+                        <length-result><label>Length Result</label></length-result>
+                        <amount><label>Amount</label></amount>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <fr:grid id="grid-1-grid">
+                        <fr:c y="1" x="1" w="6">
+                            <xf:input id="first-name-control" bind="first-name-bind">
+                                <xf:label ref="$form-resources/first-name/label"/>
+                            </xf:input>
+                        </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <xf:output id="greeting-control" bind="greeting-bind">
+                                <xf:label ref="$form-resources/greeting/label"/>
+                            </xf:output>
+                        </fr:c>
+                        <fr:c y="2" x="1" w="6">
+                            <xf:output id="math-result-control" bind="math-result-bind">
+                                <xf:label ref="$form-resources/math-result/label"/>
+                            </xf:output>
+                        </fr:c>
+                        <fr:c y="2" x="7" w="6">
+                            <xf:output id="length-result-control" bind="length-result-bind">
+                                <xf:label ref="$form-resources/length-result/label"/>
+                            </xf:output>
+                        </fr:c>
+                        <fr:c y="3" x="1" w="6">
+                            <fr:number id="amount-control" bind="amount-bind">
+                                <xf:label ref="$form-resources/amount/label"/>
+                            </fr:number>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

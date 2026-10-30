@@ -104,8 +104,10 @@
                             test="$editable"
                             use-when="function-available('fbf:sectionCanDoClasses')"><!-- prevent error with `fbf:sectionCanDoClasses` during tests -->
                             <!-- Variables for design time -->
-                            <xf:var name="fb-section"        value="for $src in xxf:instance('fb-form-instance') return id('{@id}', $src)"/>
-                            <xf:var name="fb-can-do-classes" value="if (exists($fb-section)) then fbf:sectionCanDoClasses($fb-section) else ()"/>
+                            <xf:var name="fb-section" xxbl:scope="inner" value="for $src in xxf:instance('fb-form-instance') return id('{@id}', $src)"/>
+                            <xf:var name="fb-can-do-classes">
+                                <xxf:value xxbl:scope="inner" value="if (exists($fb-section)) then fbf:sectionCanDoClasses($fb-section) else ()"/>
+                            </xf:var>
                         </xsl:if>
 
                         <xf:var

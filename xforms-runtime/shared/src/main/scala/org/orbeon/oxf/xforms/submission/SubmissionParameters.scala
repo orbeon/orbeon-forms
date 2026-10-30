@@ -423,7 +423,7 @@ object SubmissionParameters {
         new XPathContext(
           namespaceMapping   = staticSubmission.namespaceMapping,
           variableToValueMap = bindingContext.getInScopeVariables,
-          functionLibrary    = containingDocument.functionLibrary,
+          functionLibrary    = model.container.partAnalysis.functionLibrary(staticSubmission.isFunctionsRestricted),
           functionContext    = model.getContextStack.getFunctionContext(dynamicSubmission.effectiveId),
           baseURI            = null,
           locationData       = staticSubmission.locationData

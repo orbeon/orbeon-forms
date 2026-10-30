@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.orbeon.oxf.test.XMLSupport
+import org.orbeon.oxf.test.{ResourceManagerSupport, XMLSupport}
 import org.orbeon.oxf.xforms.XFormsStaticStateStaticProperties
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, Global, Metadata, PartAnalysis, PartAnalysisContextForTree, XPathErrorDetails}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
+import org.orbeon.oxf.xml.AllowedFunctions
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.xforms.xbl.Scope
@@ -27,7 +28,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.xml.Elem
 
-class XBLTransformerTest extends AnyFunSpec with XMLSupport {
+class XBLTransformerTest extends AnyFunSpec with XMLSupport with ResourceManagerSupport {
 
   describe("Conversion of CSS to XPath") {
 
@@ -56,6 +57,8 @@ class XBLTransformerTest extends AnyFunSpec with XMLSupport {
 
     def xblSupport: Option[XBLSupport] = None
     def functionLibrary: FunctionLibrary = XFormsFunctionLibrary
+    def allowedFunctions: AllowedFunctions = AllowedFunctions.Default
+    def whitelistedFunctionLibrary: FunctionLibrary = functionLibrary
 
     def startScope: Scope = ???
     def ancestorIterator: Iterator[PartAnalysis] = ???

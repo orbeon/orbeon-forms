@@ -583,7 +583,8 @@ object ElementAnalysisTreeXPathAnalyzer {
         defaultInstancePrefixedId = e.model flatMap (_.defaultInstancePrefixedId),
         locationData              = e.locationData,
         element                   = e.element,
-        avt                       = avt
+        avt                       = avt,
+        isFunctionsRestricted     = e.isFunctionsRestricted
       )
 
     // 2024-08-05: Only 1 caller.

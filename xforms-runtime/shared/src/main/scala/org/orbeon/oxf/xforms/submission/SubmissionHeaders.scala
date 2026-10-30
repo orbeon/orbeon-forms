@@ -94,7 +94,7 @@ object SubmissionHeaders {
                       avtCombine,
                       headerElem.namespaceMapping,
                       contextStack.getCurrentBindingContext.getInScopeVariables,
-                      xblContainer.containingDocument.functionLibrary,
+                      xblContainer.partAnalysis.functionLibrary(headerElem.isFunctionsRestricted),
                       contextStack.getFunctionContext(parentEffectiveId),
                       null,
                       headerElem.locationData,

@@ -13,6 +13,13 @@
   -->
 <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
+            xmlns:fn="http://www.w3.org/2005/xpath-functions"
+            xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+            xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+            xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+            xmlns:xf="http://www.w3.org/2002/xforms"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+            xmlns:exf="http://www.exforms.org/exf/1-0"
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <!-- === General properties === -->
@@ -183,6 +190,53 @@
     <property as="xs:string"  name="oxf.fr.detail.data-migration.*.*"                              value="{if (fr:created-with-or-newer('2024.1')) then 'enabled' else 'disabled'}"/>
 
     <property as="xs:string"  name="oxf.fr.detail.warn-when-data-unsafe.*.*"                       value="true"/>
+
+    <!-- Functions allowed in user-defined form formulas and expressions -->
+    <property as="xs:string" name="oxf.fr.detail.formula.allowed-functions.private">
+        math:*
+        fn:*
+        xf:*
+        xs:*
+        map:*
+        array:*
+        xxf:*
+        exf:*
+        fr:*
+        -fn:doc
+        -fn:doc-available
+        -fn:collection
+        -fn:unparsed-text
+        -fn:unparsed-text-available
+        -fn:unparsed-text-lines
+        -fn:uri-collection
+        -fn:environment-variable
+        -fn:available-environment-variables
+        -fn:load-xquery-module
+        -fn:transform
+        -xxf:evaluate
+        -xxf:evaluate-in-context
+        -xxf:call-xpl
+        -xxf:instance
+        -xxf:doc
+        -xxf:doc-base64
+        -xxf:doc-base64-available
+        -xxf:image-metadata
+        -xxf:property
+        -xxf:properties-start-with
+        -xxf:get-session-attribute
+        -xxf:set-session-attribute
+        -xxf:get-request-attribute
+        -xxf:set-request-attribute
+        -xxf:get-document-attribute
+        -xxf:set-document-attribute
+        -xxf:remove-document-attribute
+        -xxf:remove-document-attributes
+        -fr:evaluate-from-property
+        -fr:run-process
+        -fr:save-state
+        -fr:transform-uploaded-image
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.formula.allowed-functions.*.*"                   value=""/>
 
     <property as="xs:string"  name="oxf.fr.detail.lhha-order.*.*"                                  value="help label control alert hint"/>
     <property as="xs:boolean" name="oxf.fr.detail.static-readonly-hint.*.*"                        value="false"/>

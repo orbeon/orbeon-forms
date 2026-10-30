@@ -276,6 +276,9 @@
             ref="instance('fr-form-instance')[$_fr-show-form-data]"
             xxf:validation-mode="{$validation-mode}"
         >
+            <xsl:if test="$is-restricted-form">
+                <xsl:attribute name="xxf:functions" select="'restricted'"/>
+            </xsl:if>
             <xsl:if test="$is-full-update">
                 <xsl:attribute name="xxf:update">full</xsl:attribute>
             </xsl:if>

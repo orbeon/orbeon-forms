@@ -219,7 +219,7 @@ object FormRunnerRename {
     )
   }
 
-  val DefaultActionSourceExpr = "xxf:get-document-attribute($current-action-id, 'action-source')"
+  val DefaultActionSourceExpr = "$current-action-id"
 
   // https://github.com/orbeon/orbeon-forms/issues/6837
   def replaceVarReferencesWithFunctionCallsForAction(

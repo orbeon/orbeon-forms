@@ -52,7 +52,8 @@ object PathMapXPathAnalysisBuilder {
     defaultInstancePrefixedId : Option[String],
     locationData              : LocationData,
     element                   : Element,
-    avt                       : Boolean
+    avt                       : Boolean,
+    isFunctionsRestricted     : Boolean = false
   )(implicit
     logger                    : IndentedLogger
   ): XPathAnalysis = {
@@ -62,7 +63,7 @@ object PathMapXPathAnalysisBuilder {
         xpathString      = xpathString,
         namespaceMapping = namespaceMapping,
         locationData     = locationData,
-        functionLibrary  = partAnalysisCtx.functionLibrary,
+        functionLibrary  = if (isFunctionsRestricted) partAnalysisCtx.whitelistedFunctionLibrary else partAnalysisCtx.functionLibrary,
         avt              = avt
       )
 

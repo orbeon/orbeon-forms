@@ -34,12 +34,12 @@ trait VariableAnalysisTrait
 
   // `lazy` because the children are evaluated after the container
   // All used by `Variable`
-  lazy val (valueElement, hasNestedValue, valueScope, valueNamespaceMapping, valueStaticId) =
+  lazy val (valueElement, hasNestedValue, valueScope, valueNamespaceMapping, valueStaticId, valueIsFunctionsRestricted) =
     nestedValueAnalysis match {
       case Some(valueElem) =>
-        (valueElem.element, true, valueElem.scope, valueElem.namespaceMapping, valueElem.staticId)
+        (valueElem.element, true, valueElem.scope, valueElem.namespaceMapping, valueElem.staticId, valueElem.isFunctionsRestricted)
       case None =>
-        (variableSelf.element, false, variableSelf.scope, variableSelf.namespaceMapping, variableSelf.staticId)
+        (variableSelf.element, false, variableSelf.scope, variableSelf.namespaceMapping, variableSelf.staticId, variableSelf.isFunctionsRestricted)
     }
 
   def variableAnalysis: Option[XPathAnalysis] = valueAnalysis

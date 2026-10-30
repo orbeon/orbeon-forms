@@ -55,6 +55,10 @@
         name="actions-response-must-await-opt"
         select="()"/>
 
+    <xsl:variable
+        name="is-restricted-form"
+        select="true()"/>
+
     <xsl:template match="/">
         <xsl:for-each select="$fr-form-model">
             <xsl:copy>

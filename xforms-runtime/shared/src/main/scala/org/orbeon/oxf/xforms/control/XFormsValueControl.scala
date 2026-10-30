@@ -171,25 +171,27 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
 
   // Format value according to format attribute
   final protected def valueWithSpecifiedFormat(
-    format             : String,
-    collector          : ErrorEventCollector,
-    namespaceMapping   : NamespaceMapping                        = getNamespaceMappings,
-    variableToValueMap : ju.Map[String, ValueRepresentationType] = bindingContext.getInScopeVariables,
-    functionContext    : FunctionContext                         = newFunctionContext
+    format                : String,
+    collector             : ErrorEventCollector,
+    namespaceMapping      : NamespaceMapping                        = getNamespaceMappings,
+    variableToValueMap    : ju.Map[String, ValueRepresentationType] = bindingContext.getInScopeVariables,
+    functionContext       : FunctionContext                         = newFunctionContext,
+    isFunctionsRestricted : Boolean                                 = elementAnalysis.isFunctionsRestricted
   ): Option[String] = {
 
     assert(isRelevant)
     assert(getValue(collector) ne null)
 
     evaluateAsString(
-      xpathString        = format,
-      contextItems       = List(stringToStringValue(getValue(collector))),
-      contextPosition    = 1,
-      collector          = collector,
-      contextMessage     = "formatting value",
-      namespaceMapping   = namespaceMapping,
-      variableToValueMap = variableToValueMap,
-      functionContext    = functionContext
+      xpathString           = format,
+      contextItems          = List(stringToStringValue(getValue(collector))),
+      contextPosition       = 1,
+      collector             = collector,
+      contextMessage        = "formatting value",
+      namespaceMapping      = namespaceMapping,
+      variableToValueMap    = variableToValueMap,
+      functionContext       = functionContext,
+      isFunctionsRestricted = isFunctionsRestricted
     )
   }
 
@@ -201,13 +203,14 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
 
     def evaluateFormat(format: String): Option[String] =
       evaluateAsString(
-        xpathString        = format,
-        contextItems       = List(stringToStringValue(getValue(collector))),
-        contextPosition    = 1,
-        collector          = collector,
-        contextMessage     = "formatting value",
-        namespaceMapping   = FormatNamespaceMapping,
-        variableToValueMap = bindingContext.getInScopeVariables
+        xpathString           = format,
+        contextItems          = List(stringToStringValue(getValue(collector))),
+        contextPosition       = 1,
+        collector             = collector,
+        contextMessage        = "formatting value",
+        namespaceMapping      = FormatNamespaceMapping,
+        variableToValueMap    = bindingContext.getInScopeVariables,
+        isFunctionsRestricted = false
       )
 
     for {

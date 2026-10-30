@@ -1,0 +1,70 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+    <xh:head>
+        <xh:title>Restricted Functions: 2018.2 Action Disallowed Internal Function</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section-1>
+                        <target/>
+                    </section-1>
+                </form>
+            </xf:instance>
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" ref="section-1" name="section-1">
+                    <xf:bind id="target-bind" ref="target" name="target"/>
+                </xf:bind>
+            </xf:bind>
+
+            <fr:listener
+                version="2018.2"
+                events="form-load-after-controls"
+                actions="my-action"/>
+
+            <fr:action name="my-action" version="2018.2">
+                <fr:control-setvalue value="frf:bindId('target')" control="target"/>
+            </fr:action>
+
+            <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>tests</application-name>
+                    <form-name>restricted-functions-action-20182-disallowed-internal</form-name>
+                    <title xml:lang="en">Restricted Functions 2018.2 Action Disallowed Internal</title>
+                </metadata>
+            </xf:instance>
+
+            <xf:instance id="fr-form-resources" xxf:readonly="true">
+                <resources>
+                    <resource xml:lang="en">
+                        <section-1><label>Section 1</label></section-1>
+                        <target><label>Target</label></target>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                    <fr:grid id="grid-1-grid">
+                        <fr:c y="1" x="1" w="12">
+                            <xf:output id="target-control" bind="target-bind">
+                                <xf:label ref="$form-resources/target/label"/>
+                            </xf:output>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

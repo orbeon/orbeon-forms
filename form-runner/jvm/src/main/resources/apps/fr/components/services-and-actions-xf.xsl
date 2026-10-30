@@ -346,11 +346,19 @@
                     true(),
                     $library-name,
                     $fr-form-model-vars,
-                    'xxf:get-document-attribute(event(''fr-action-id''), ''action-source'')'
+                    'event(''fr-action-id'')'
                 )"/>
         <xsl:variable name="resource" select="concat('$', @id, '-resource')"/>
+        <xsl:if test="empty(preceding-sibling::xf:submission[generate-id() = $service-submissions-ids])">
+            <xf:var name="fr-service-request-instance"  value="xxf:instance('fr-service-request-instance')"/>
+            <xf:var name="fr-service-response-instance" value="xxf:instance('fr-service-response-instance')"/>
+            <xf:var name="fr-service-headers-instance"  value="xxf:instance('fr-service-headers-instance')"/>
+        </xsl:if>
         <xsl:copy>
             <xsl:copy-of select="@* except (@resource | @ref | @replace | @instance | @xxf:instance | @serialization)"/>
+            <xsl:if test="$is-restricted-form">
+                <xsl:attribute name="xxf:functions" select="'restricted'"/>
+            </xsl:if>
             <xsl:choose>
                 <!-- Don't rely on XForms URL parameter serialization, as we want to support parameters where the
                      name is provided through an attribute, e.g. `<param name="my-name">my-value</param>`, this in
@@ -363,7 +371,7 @@
                             $resource-without-params := xxf:evaluate-avt('<xsl:value-of select="replace($resource-avt, '''', '''''')"/>'),
                             $parameters-separator    := if (contains($resource-without-params, '?')) then '&amp;' else '?',
                             $parameters-list         :=
-                                for $param-element in xxf:instance('fr-service-request-instance')/*
+                                for $param-element in $fr-service-request-instance/*
                                 return
                                     let
                                         $param-value := $param-element/string(),
@@ -385,10 +393,10 @@
                 <xsl:otherwise>
                     <xsl:copy-of select="@serialization"/>
                     <xsl:attribute name="resource" select="$resource-avt"/>
-                    <xsl:attribute name="ref">xxf:instance('fr-service-request-instance')</xsl:attribute>
+                    <xsl:attribute name="ref">$fr-service-request-instance</xsl:attribute>
                 </xsl:otherwise>
             </xsl:choose>
-            <xsl:attribute name="targetref">xxf:instance('fr-service-response-instance')</xsl:attribute>
+            <xsl:attribute name="targetref">$fr-service-response-instance</xsl:attribute>
             <xsl:choose>
                 <!-- See https://github.com/orbeon/orbeon-forms/issues/3945 -->
                 <xsl:when test="@replace = 'xxf:binary'">
@@ -471,7 +479,7 @@
             <xsl:copy-of select="xf:name"/>
             <xsl:variable name="header-name" select="normalize-space(xf:name)"/>
             <!-- Read header value from instance, fallback to default value (with support for attribute and text content) -->
-            <xf:value value="(xxf:instance('fr-service-headers-instance')/header[@name = '{$header-name}'][xxf:non-blank(.)], {
+            <xf:value value="($fr-service-headers-instance/header[@name = '{$header-name}'][xxf:non-blank(.)], {
                 if (xf:value/@value) then
                     xf:value/@value
                 else

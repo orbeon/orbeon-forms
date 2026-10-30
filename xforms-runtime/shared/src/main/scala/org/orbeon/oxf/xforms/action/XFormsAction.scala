@@ -166,7 +166,7 @@ object XFormsAction {
                   xpathString        = valueExpr,
                   namespaceMapping   = property.namespaceMapping,
                   variableToValueMap = contextStack.getCurrentBindingContext.getInScopeVariables,
-                  functionLibrary    = actionInterpreter.containingDocument.functionLibrary,
+                  functionLibrary    = actionInterpreter.container.partAnalysis.functionLibrary(property.isFunctionsRestricted),
                   functionContext    = contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(property)),
                   baseURI            = null,
                   locationData       = element.getData.asInstanceOf[LocationData],

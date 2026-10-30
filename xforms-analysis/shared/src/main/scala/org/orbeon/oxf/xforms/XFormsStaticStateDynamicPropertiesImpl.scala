@@ -16,7 +16,8 @@ class XFormsStaticStateDynamicPropertiesImpl(
   private val nonDefaultPropertiesOnly: Map[String, Either[Any, CompiledExpression]] =
     nonDefaultProperties map { case (name, (rawPropertyValue, isInline)) =>
       name -> {
-        val maybeAVT = XMLUtils.maybeAVT(rawPropertyValue)
+        val isAVTSupported = P.SupportedDocumentProperties.get(name).exists(_.supportAVT)
+        val maybeAVT       = isAVTSupported && XMLUtils.maybeAVT(rawPropertyValue)
         topLevelPart.getDefaultModel match {
           case model if isInline && maybeAVT =>
             Right(StaticXPath.compileExpression(rawPropertyValue, model.namespaceMapping, null, topLevelPart.functionLibrary, avt = true))

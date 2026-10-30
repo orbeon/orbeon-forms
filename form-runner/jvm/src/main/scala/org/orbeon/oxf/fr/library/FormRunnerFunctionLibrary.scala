@@ -260,6 +260,10 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Arg(STRING, ALLOWS_ZERO_OR_ONE)
     )
   }
+
+  Namespace(List("http://orbeon.org/oxf/xml/form-builder")) {
+    Fun("lang", classOf[FBLang], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE)
+  }
 }
 
 private object FormRunnerFunctions {
@@ -984,6 +988,29 @@ class FRFrLang extends FunctionSupport with RuntimeDependentFunction {
     PathMapSupport.addAbsoluteInstancePath(
       pathMap            = pathMap,
       instancePrefixedId = "fr-fr-language-instance",
+      path               = Nil,
+      isAttribute        = false
+    )
+
+    null
+  }
+}
+
+class FBLang extends FunctionSupport with RuntimeDependentFunction {
+
+  override def evaluateItem(xpathContext: XPathContext): StringValue =
+    FormRunner.currentFBLang
+
+  override def addToPathMap(
+    pathMap        : PathMap,
+    pathMapNodeSet : PathMapNodeSet
+  ): PathMapNodeSet = {
+
+    implicit val exprContainer: Container = getContainer
+
+    PathMapSupport.addAbsoluteInstancePath(
+      pathMap            = pathMap,
+      instancePrefixedId = "fb-language-instance",
       path               = Nil,
       isAttribute        = false
     )

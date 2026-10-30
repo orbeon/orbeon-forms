@@ -308,7 +308,7 @@
 
         <xbl:handlers>
             <xbl:handler event="xxforms-upload-error" phase="target" defaultAction="cancel" xxbl:scope="outer">
-                <xf:action>
+                <xf:action xxbl:scope="inner">
 
                     <xf:var
                         name="filename"

@@ -40,6 +40,7 @@ trait FormRunnerLang {
 
   def currentLang          = topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo("lang").stringValue
   def currentFRLang        = topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo("fr-lang").stringValue
+  def currentFBLang        = topLevelInstance(FormModel, "fb-language-instance").map(_.rootElement.stringValue)
   def currentFRResources   = topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo("fr-fr-resources")
   //@XPathFunction
   def currentFormResources = topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo("fr-form-resources")

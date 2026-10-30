@@ -78,6 +78,19 @@
         <xsl:copy-of select="."/>
     </xsl:template>
 
+    <!-- Mark section template binds and view as restricted for XPath functions -->
+    <xsl:template
+        match="
+            xbl:binding[p:has-class('fr-section-component')]/xbl:implementation/xf:model/xf:bind[@id = 'fr-form-binds'] |
+            xbl:binding[p:has-class('fr-section-component')]/xbl:template/xf:group[@id = 'fr-section-template-view']"
+        mode="within-xbl">
+        <xsl:copy>
+            <xsl:apply-templates select="@*" mode="#current"/>
+            <xsl:attribute name="xxf:functions" select="'restricted'"/>
+            <xsl:apply-templates select="node()" mode="#current"/>
+        </xsl:copy>
+    </xsl:template>
+
     <!-- fr:section → fr:section/(@edit-ref, @xxf:update) -->
     <xsl:template match="fr:section" mode="within-body">
         <xsl:param name="section-level" as="xs:integer" tunnel="yes" select="1"/>

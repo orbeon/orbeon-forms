@@ -91,6 +91,11 @@ abstract class ElementAnalysis(
   // Element local name
   def localName: String = element.getName
 
+  // Restriction on allowed XPath functions
+  lazy val isFunctionsRestricted: Boolean =
+    closestAncestorInScope.exists(_.isFunctionsRestricted) ||
+    element.attributeValueOpt(XXFORMS_FUNCTIONS_QNAME).contains("restricted")
+
   // In-scope variables (for XPath analysis)
   // Only overridden anonymously in `VariableAnalysisTrait` where it says "This is bad architecture"
   // FIXME

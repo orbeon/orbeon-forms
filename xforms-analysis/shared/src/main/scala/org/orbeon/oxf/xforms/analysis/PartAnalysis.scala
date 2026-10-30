@@ -4,7 +4,7 @@ import cats.syntax.option.*
 import org.orbeon.dom
 import org.orbeon.oxf.xforms.PartGlobalOps
 import org.orbeon.oxf.xforms.analysis.model.*
-import org.orbeon.oxf.xml.SAXStore
+import org.orbeon.oxf.xml.{AllowedFunctions, SAXStore}
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.xforms.xbl.Scope
@@ -70,6 +70,11 @@ trait PartAnalysisRuntimeOps extends PartGlobalOps {
   def iterateModels: Iterator[Model]
 
   def functionLibrary: FunctionLibrary
+  def allowedFunctions: AllowedFunctions = AllowedFunctions.Default
+  def whitelistedFunctionLibrary: FunctionLibrary = functionLibrary
+  def functionLibrary(isRestricted: Boolean): FunctionLibrary =
+    if (isRestricted) whitelistedFunctionLibrary
+    else functionLibrary
 
   def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping]
   def hasControls: Boolean

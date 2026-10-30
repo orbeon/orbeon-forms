@@ -449,7 +449,7 @@ class XFormsContextStack {
             nodeset                        = context,
             modelId                        = modelId,
             bindId                         = null,
-            bindingElement                 = null,
+            bindingElement                 = bindingElement,
             bindingElementNamespaceMapping = bindingElementNamespaceMapping,
             sourceEffectiveId              = sourceEffectiveId,
             scope                          = scope,
@@ -549,6 +549,17 @@ class XFormsContextStack {
             )
 
           val expression = if (ref != null) ref else nodeset
+          val bindingElementAnalysisOpt =
+            for {
+              be <- Option(bindingElement)
+              id <- be.idOpt
+              ea <- container.partAnalysis.findControlAnalysis(scope.prefixedIdForStaticId(id))
+            } yield ea
+          val isRestricted =
+            bindingElementAnalysisOpt
+              .orElse(container.partAnalysis.findControlAnalysis(sourceEffectiveId))
+              .exists(_.isFunctionsRestricted) ||
+            Option(bindingElement).exists(_.attributeValueOpt(XFormsNames.XXFORMS_FUNCTIONS_QNAME).contains("restricted"))
           val result =
             try
               XPathCache.evaluateKeepItemsJava(
@@ -557,7 +568,7 @@ class XFormsContextStack {
                 expression,
                 bindingElementNamespaceMapping,
                 evaluationContextBinding.getInScopeVariables,
-                containingDocument.functionLibrary,
+                container.partAnalysis.functionLibrary(isRestricted),
                 functionContext,
                 null,
                 locationData,

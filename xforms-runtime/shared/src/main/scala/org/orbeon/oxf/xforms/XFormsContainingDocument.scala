@@ -77,7 +77,12 @@ class XFormsContainingDocument(
   def elementAnalysis: ElementAnalysis = staticState.topLevelPart.getDefaultModel // Q: Anything better?
 
   // Members which depend from `staticState`
-  val functionLibrary   : FunctionLibrary      = staticState.topLevelPart.functionLibrary
+  val functionLibrary            : FunctionLibrary      = staticState.topLevelPart.functionLibrary
+  val whitelistedFunctionLibrary : FunctionLibrary      = staticState.topLevelPart.whitelistedFunctionLibrary
+
+  def functionLibrary(isRestricted: Boolean): FunctionLibrary =
+    if (isRestricted) whitelistedFunctionLibrary
+    else functionLibrary
   val staticOps         : StaticStateGlobalOps = new StaticStateGlobalOps(staticState.topLevelPart)
   val xpathDependencies : XPathDependencies    =
     if (CoreCrossPlatformSupport.isPE && staticState.isXPathAnalysis)

@@ -202,12 +202,13 @@
                 <xf:var
                     fr:keep-if-design-time="false"
                     name="form-resources"
-                    value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]"
+                    value="instance('fr-form-resources')/(resource[@xml:lang = fr:lang()], resource[1])[1]"
                     as="element(resource)"/>
                 <xf:var
+                    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                     fr:keep-if-design-time="true"
                     name="form-resources"
-                    value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]"
+                    value="instance('fr-form-resources')/(resource[@xml:lang = fb:lang()], resource[1])[1]"
                     as="element(resource)"/>
 
                 <xh:div fr:keep-if-design-time="true" class="fb-section-template-details">

@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.ReflectionUtils.loadClassByName
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, NumberUtils, WhitespaceMatching}
 import org.orbeon.oxf.xforms.*
-import org.orbeon.oxf.xforms.XFormsProperties.{FunctionLibraryProperty, XblSupportProperty}
+import org.orbeon.oxf.xforms.XFormsProperties.{AllowedFunctionsProperty, FunctionLibraryProperty, XblSupportProperty}
 import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.model.*
@@ -33,9 +33,10 @@ import org.orbeon.oxf.xml.*
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.dom.LocationDocumentResult
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
-import org.orbeon.xforms.XFormsNames.XFORMS_BIND_QNAME
+import org.orbeon.xforms.XFormsNames.{XFORMS_BIND_QNAME, XFORMS_MODEL_QNAME}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{Constants, Namespaces, XXBLScope}
+import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.Attributes
 
 import scala.collection.mutable
@@ -89,7 +90,22 @@ object PartAnalysisBuilder {
     // all XBL components. They would then have to be properly scoped.
     metadata.extractInlineXBL(staticStateDocument.xblElements, startScope)
 
-    val partAnalysisCtx = StaticPartAnalysisImpl(staticProperties, parent, startScope, metadata, xblSupport, functionLibrary)
+    val allowedFunctions =
+      staticStateDocument.nonDefaultProperties.get(AllowedFunctionsProperty)
+        .map(_._1)
+        .flatMap(_.trimAllToOpt)
+        .map { spec =>
+          val firstModelNamespaceMapping =
+            staticStateDocument.rootControl.elementOpt(XFORMS_MODEL_QNAME)
+              .flatMap(_.idOpt)
+              .flatMap(staticId => metadata.getNamespaceMapping(startScope.fullPrefix + staticId))
+              .getOrElse(NamespaceMapping.EmptyMapping)
+          AllowedFunctions.parse(spec, firstModelNamespaceMapping).withCompilerHelpers
+        }
+        .orElse(parent.map(_.allowedFunctions))
+        .getOrElse(AllowedFunctions.Default.withCompilerHelpers)
+
+    val partAnalysisCtx = StaticPartAnalysisImpl(staticProperties, parent, startScope, metadata, xblSupport, functionLibrary, allowedFunctions)
     analyze(partAnalysisCtx, staticStateDocument.rootControl)
 
     if (XFormsGlobalProperties.getDebugLogXPathAnalysis)

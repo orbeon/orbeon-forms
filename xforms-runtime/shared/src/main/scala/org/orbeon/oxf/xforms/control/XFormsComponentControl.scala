@@ -91,10 +91,11 @@ class XFormsValueComponentControl(
         evaluateWithContext(
           (namespaceMapping, functionContext) =>
             valueWithSpecifiedFormat(
-              format           = formatExpr,
-              collector        = collector,
-              namespaceMapping = namespaceMapping,
-              functionContext  = functionContext
+              format                = formatExpr,
+              collector             = collector,
+              namespaceMapping      = namespaceMapping,
+              functionContext       = functionContext,
+              isFunctionsRestricted = false
             ),
           collector
         )
@@ -113,14 +114,15 @@ class XFormsValueComponentControl(
         evaluateWithContext(
           (namespaceMapping, functionContext) =>
             evaluateAsString(
-              xpathString        = serializeExpr,
-              contextItems       = List(stringToStringValue(getValue(collector))),
-              contextPosition    = 1,
-              collector          = collector,
-              contextMessage     = "evaluating external value",
-              namespaceMapping   = namespaceMapping,
-              variableToValueMap = bindingContext.getInScopeVariables,
-              functionContext    = functionContext
+              xpathString           = serializeExpr,
+              contextItems          = List(stringToStringValue(getValue(collector))),
+              contextPosition       = 1,
+              collector             = collector,
+              contextMessage        = "evaluating external value",
+              namespaceMapping      = namespaceMapping,
+              variableToValueMap    = bindingContext.getInScopeVariables,
+              functionContext       = functionContext,
+              isFunctionsRestricted = false
             ),
           collector
         )
@@ -140,14 +142,15 @@ class XFormsValueComponentControl(
         evaluateWithContext(
           (namespaceMapping, functionContext) =>
             evaluateAsString(
-              xpathString        = deserializeExpr,
-              contextItems       = List(externalValue),
-              contextPosition    = 1,
-              collector          = collector,
-              contextMessage     = "translating external value",
-              namespaceMapping   = namespaceMapping,
-              variableToValueMap = bindingContext.getInScopeVariables,
-              functionContext    = functionContext
+              xpathString           = deserializeExpr,
+              contextItems          = List(externalValue),
+              contextPosition       = 1,
+              collector             = collector,
+              contextMessage        = "translating external value",
+              namespaceMapping      = namespaceMapping,
+              variableToValueMap    = bindingContext.getInScopeVariables,
+              functionContext       = functionContext,
+              isFunctionsRestricted = false
             ),
           collector
         )

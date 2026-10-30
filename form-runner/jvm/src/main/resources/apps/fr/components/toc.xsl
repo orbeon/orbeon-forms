@@ -80,18 +80,17 @@
                 </xsl:otherwise>
             </xsl:choose>
 
-            <xf:var name="top-level-section-available">
+            <xf:var name="fr-toc-top-level-section-available">
                 <xsl:choose>
                     <xsl:when test="$is-wizard">
                         <xxf:value
                             value="
                                 exists(
                                     index-of(
-                                        xxf:split(xxf:instance('available-top-level-sections')),
+                                        xxf:split($fr-wizard-available-top-level-sections),
                                         '{frf:controlNameFromIdOpt($static-top-level-section-id)}'
                                     )
-                                )"
-                            xxbl:scope="inner"/>
+                                )"/>
                     </xsl:when>
                     <xsl:otherwise>
                         <xxf:value value="true()"/>
@@ -106,47 +105,47 @@
                     - the workaround below works
             -->
             <xf:var
-                name="top-level-section-visited"
+                name="fr-toc-top-level-section-visited"
                 value="exists(@*[namespace-uri() = 'http://orbeon.org/oxf/xml/form-runner' and local-name() = 'section-status'])"/>
 
             <xf:var
-                name="top-level-section-tokens"
+                name="fr-toc-top-level-section-tokens"
                 value="xxf:split(@fr:section-status)"/>
 
             <xsl:choose>
                 <xsl:when test="not($is-wizard)">
                     <xf:var
-                        name="top-level-section-active"
+                        name="fr-toc-top-level-section-active"
                         value="false()"/>
                     <xf:var
-                        name="section-active"
+                        name="fr-toc-section-active"
                         value="false()"/>
                 </xsl:when>
                 <xsl:when test="$use-paging">
                     <xf:var
-                        name="top-level-section-active"
+                        name="fr-toc-top-level-section-active"
                         value="
-                            not($separate-toc-mode) and
-                            $current-top-level-case-id = '{$static-section-id}-case' and
-                            xxf:repeat-position() = xxf:instance('local')/current-index/data(.)"/>
+                            not($fr-wizard-separate-toc-mode) and
+                            $fr-wizard-current-top-level-case-id = '{$static-section-id}-case' and
+                            xxf:repeat-position() = $fr-wizard-local/current-index/data(.)"/>
                     <xf:var
-                        name="section-active"
+                        name="fr-toc-section-active"
                         value="
-                            not($separate-toc-mode) and
-                            $current-nav-case-id = '{$static-section-id}-case' and
-                            xxf:repeat-position() = xxf:instance('local')/current-index/data(.)"/>
+                            not($fr-wizard-separate-toc-mode) and
+                            $fr-wizard-current-nav-case-id = '{$static-section-id}-case' and
+                            xxf:repeat-position() = $fr-wizard-local/current-index/data(.)"/>
                 </xsl:when>
                 <xsl:otherwise>
                     <xf:var
-                        name="top-level-section-active"
+                        name="fr-toc-top-level-section-active"
                         value="
-                            not($separate-toc-mode) and
-                            $current-top-level-case-id = '{$static-section-id}-case'"/>
+                            not($fr-wizard-separate-toc-mode) and
+                            $fr-wizard-current-top-level-case-id = '{$static-section-id}-case'"/>
                     <xf:var
-                        name="section-active"
+                        name="fr-toc-section-active"
                         value="
-                            not($separate-toc-mode) and
-                            $current-nav-case-id = '{$static-section-id}-case'"/>
+                            not($fr-wizard-separate-toc-mode) and
+                            $fr-wizard-current-nav-case-id = '{$static-section-id}-case'"/>
                 </xsl:otherwise>
             </xsl:choose>
 
@@ -197,23 +196,32 @@
             <xh:li>
 
                 <xsl:attribute name="class">{
-                    'disabled'           [not($top-level-section-available)],
-                    'active'             [$section-active or $top-level-section-active],
-                    'started'            [$top-level-section-visited],
-                    $top-level-section-tokens
+                    'disabled'           [not($fr-toc-top-level-section-available)],
+                    'active'             [$fr-toc-section-active or $fr-toc-top-level-section-active],
+                    'started'            [$fr-toc-top-level-section-visited],
+                    $fr-toc-top-level-section-tokens
                     <xsl:if test="$is-wizard">
                         ,
-                        'first-page'         [$relevant-top-level-case-ids[1]      = '<xsl:value-of select="$static-section-id"/>-case'],
-                        'last-top-level-page'[$relevant-top-level-case-ids[last()] = '<xsl:value-of select="$static-section-id"/>-case'],
-                        'last-page'          [$relevant-nav-case-ids[last()]       = '<xsl:value-of select="$static-section-id"/>-case']
+                        'first-page'         [$fr-wizard-relevant-top-level-case-ids[1]      = '<xsl:value-of select="$static-section-id"/>-case'],
+                        'last-top-level-page'[$fr-wizard-relevant-top-level-case-ids[last()] = '<xsl:value-of select="$static-section-id"/>-case'],
+                        'last-page'          [$fr-wizard-relevant-nav-case-ids[last()]       = '<xsl:value-of select="$static-section-id"/>-case']
                     </xsl:if>
                 }</xsl:attribute>
                 <xsl:attribute name="aria-current">{
-                    if ($section-active) then 'page' else 'false'
+                    if ($fr-toc-section-active) then 'page' else 'false'
                 }</xsl:attribute>
                 <xsl:attribute name="aria-disabled">{
-                    if (not($top-level-section-available)) then 'true' else 'false'
+                    if (not($fr-toc-top-level-section-available)) then 'true' else 'false'
                 }</xsl:attribute>
+
+                <xsl:if test="$static-section-has-html-label and $is-wizard">
+                    <xf:var name="inner-section-label" xxbl:scope="inner">
+                        <xxf:value xxbl:scope="outer" value="{$section-label-expr}"/>
+                    </xf:var>
+                    <xf:var name="fr-toc-section-hint">
+                        <xxf:value xxbl:scope="inner" value="frf:removeHtmlTags($inner-section-label)"/>
+                    </xf:var>
+                </xsl:if>
 
                 <xf:trigger appearance="minimal">
                     <xf:label>
@@ -233,25 +241,25 @@
                         </xh:span>
                         <xsl:choose>
                             <xsl:when test="$is-wizard">
-                                <xh:span class="fr-toc-edit {{'xforms-hidden'[not(xxf:instance('local')/section-status/data(.))]}}"><xf:output value="xxf:r('components.wizard.edit', '|fr-fr-resources|')"/></xh:span>
+                                <xh:span class="fr-toc-edit {{'xforms-hidden'[not($fr-wizard-local/section-status/data(.))]}}"><xf:output value="xxf:r('components.wizard.edit', '|fr-fr-resources|')"/></xh:span>
                                 <xsl:if test="$static-is-top-level-section">
                                     <!-- NOTE: Hide labels when not in `separate-toc` mode as they take a lot of space -->
-                                    <xh:span class="fr-toc-status {{'sr-only'[not(xxf:instance('local')/section-status/data(.))]}} label{{
-                                        if ($top-level-section-tokens = 'invalid') then
+                                    <xh:span class="fr-toc-status {{'sr-only'[not($fr-wizard-local/section-status/data(.))]}} label{{
+                                        if ($fr-toc-top-level-section-tokens = 'invalid') then
                                             ' label-important fr-section-status-errors'
-                                        else if ($top-level-section-tokens = 'incomplete') then
+                                        else if ($fr-toc-top-level-section-tokens = 'incomplete') then
                                             ' label-warning fr-section-status-incomplete'
-                                        else if ($top-level-section-visited) then
+                                        else if ($fr-toc-top-level-section-visited) then
                                             ' label-success fr-section-status-complete'
                                         else
                                             ' fr-section-status-not-started'
                                     }}"><xf:output value="
                                             xxf:r(
-                                                if ($top-level-section-tokens = 'invalid') then
+                                                if ($fr-toc-top-level-section-tokens = 'invalid') then
                                                     'components.wizard.errors'
-                                                else if ($top-level-section-tokens = 'incomplete') then
+                                                else if ($fr-toc-top-level-section-tokens = 'incomplete') then
                                                     'components.wizard.incomplete'
-                                                else if ($top-level-section-visited) then
+                                                else if ($fr-toc-top-level-section-visited) then
                                                     'components.wizard.complete'
                                                 else
                                                     'components.wizard.not-started',
@@ -270,7 +278,9 @@
                          which doesn't support HTML. -->
                     <xf:hint
                         value="{
-                            if ($static-section-has-html-label) then
+                            if ($static-section-has-html-label and $is-wizard) then
+                                '$fr-toc-section-hint'
+                            else if ($static-section-has-html-label) then
                                 concat(
                                     'frf:removeHtmlTags(',
                                     $section-label-expr,
@@ -285,7 +295,7 @@
                         <xf:dispatch
                             name="fr-wizard-update-validity"
                             targetid="fr-wizard-update-validity"/>
-                        <xf:action if="$top-level-section-available">
+                        <xf:action if="$fr-toc-top-level-section-available">
 
                             <!-- Figure out the nav section id based on whether we support subsection navigation AND where in the hierarchy
                                  the clicked TOC section is. -->
@@ -326,15 +336,15 @@
                             </xsl:if>
 
                             <xsl:if test="$use-paging">
-                                <xf:var name="new-index" value="xxf:repeat-position()"/>
+                                <xf:var name="fr-toc-new-index" value="xxf:repeat-position()"/>
                                 <xsl:if test="$is-wizard">
                                     <xf:setvalue
-                                        ref="xxf:instance('local')/current-index"
-                                        value="$new-index"/>
+                                        ref="$fr-wizard-local/current-index"
+                                        value="$fr-toc-new-index"/>
                                 </xsl:if>
                                 <xf:setindex
                                     repeat="{$static-section-id}-repeater-repeat"
-                                    index="$new-index"/>
+                                    index="$fr-toc-new-index"/>
                             </xsl:if>
 
                             <!-- ...and focus on specific subsection -->
@@ -343,8 +353,8 @@
                                     <xsl:if test="($static-initial-focus, p:property(string-join(('oxf.fr.detail.initial-focus', $static-app, $static-form), '.')))[1]">
                                         <xf:setfocus
                                             control="{$static-section-id}"
-                                            includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"
-                                            excludes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.excludes')}}"/>
+                                            includes="{{$fr-wizard-focus-includes}}"
+                                            excludes="{{$fr-wizard-focus-excludes}}"/>
                                     </xsl:if>
                                 </xsl:when>
                                 <xsl:otherwise>
@@ -371,28 +381,23 @@
 
                             <xsl:if test="$is-wizard">
                                 <!-- Show body if needed -->
-                                <xf:var name="local" value="xxf:instance('local')"/>
-                                <xf:action if="$local/separate-toc/data(.)">
+                                <xf:action if="$fr-wizard-local/separate-toc/data(.)">
                                     <xf:setvalue
-                                        ref="$local/show-toc"
+                                        ref="$fr-wizard-local/show-toc"
                                         value="false()"/>
 
                                     <!-- See https://github.com/orbeon/orbeon-forms/issues/3668 -->
-                                    <xf:action if="not($local/show-body/data(.))">
-
-                                        <xf:var
-                                            name="current-top-level-section-id"
-                                            value="Wizard:sectionIdFromCaseIdOpt($current-top-level-case-id)"/>
+                                    <xf:action if="not($fr-wizard-local/show-body/data(.))">
 
                                         <xf:dispatch name="fr-section-shown" targetid="fr-wizard" xxbl:scope="inner">
-                                            <xf:property name="section-binding" value="xxf:binding($current-top-level-section-id)"              xxbl:scope="outer"/>
-                                            <xf:property name="section-name"    value="frf:controlNameFromIdOpt($current-top-level-section-id)" xxbl:scope="outer"/>
-                                            <xf:property name="validate"        value="xxf:instance('local')/validate/data(.)"/>
-                                            <xf:property name="separate-toc"    value="xxf:instance('local')/separate-toc/data(.)"/>
+                                            <xf:property name="section-binding" value="xxf:binding($fr-wizard-current-top-level-section-id)" xxbl:scope="outer"/>
+                                            <xf:property name="section-name"    value="$current-top-level-section-name"/>
+                                            <xf:property name="validate"        value="$local/validate/data(.)"/>
+                                            <xf:property name="separate-toc"    value="$local/separate-toc/data(.)"/>
                                         </xf:dispatch>
 
                                         <xf:setvalue
-                                            ref="$local/show-body"
+                                            ref="$fr-wizard-local/show-body"
                                             value="true()"/>
                                     </xf:action>
 
@@ -412,7 +417,7 @@
                     </xsl:when>
                     <xsl:when test="$static-subsections-toc = 'active' and exists(.//fr:section)">
                         <xh:div role="navigation">
-                            <xh:ul class="nav{{' xforms-hidden'[not($top-level-section-active)]}}">
+                            <xh:ul class="nav{{' xforms-hidden'[not($fr-toc-top-level-section-active)]}}">
                                 <xsl:apply-templates mode="fr-toc-sections"/>
                             </xh:ul>
                         </xh:div>

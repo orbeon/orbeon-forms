@@ -7,6 +7,7 @@ import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
+import org.orbeon.oxf.xforms.function.XFormsFunction.getPathMapContext
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.{AxisExpression, Container, PathMap, StringLiteral}
@@ -29,40 +30,42 @@ object PathMapSupport {
     exprContainer     : Container
   ): Unit = {
 
-    // Here we create an `xxf:instance()` expression with an absolute instance id as a literal argument.
-    // This will allow searching for instances globally. Even though we create an absolute id, this is
-    // made from a prefixed id and never has repeat iterations. But this allows
-    // `PathMapXPathAnalysisBuilder` to just keep the id as is instead of searching for the instance.
-    val newXxfInstanceExpression: XXFormsInstance =
-      (new XXFormsInstance) // Use `XXFormsInstance` so that we'll search ancestor models for dependencies
-        .tap(_.setFunctionName(new StructuredQName("xxf", XMLNames.XXF, "instance")))
-        .tap(_.setArguments(Array(new StringLiteral(XFormsId.effectiveIdToAbsoluteId(instancePrefixedId)))))
-        .tap(_.setContainer(exprContainer))
+    if (getPathMapContext(pathMap).partAnalysisCtx.findModelByInstancePrefixedId(instancePrefixedId).isDefined) {
+      // Here we create an `xxf:instance()` expression with an absolute instance id as a literal argument.
+      // This will allow searching for instances globally. Even though we create an absolute id, this is
+      // made from a prefixed id and never has repeat iterations. But this allows
+      // `PathMapXPathAnalysisBuilder` to just keep the id as is instead of searching for the instance.
+      val newXxfInstanceExpression: XXFormsInstance =
+        (new XXFormsInstance) // Use `XXFormsInstance` so that we'll search ancestor models for dependencies
+          .tap(_.setFunctionName(new StructuredQName("xxf", XMLNames.XXF, "instance")))
+          .tap(_.setArguments(Array(new StringLiteral(XFormsId.effectiveIdToAbsoluteId(instancePrefixedId)))))
+          .tap(_.setContainer(exprContainer))
 
-    var target = new PathMap.PathMapNodeSet(pathMap.makeNewRoot(newXxfInstanceExpression))
+      var target = new PathMap.PathMapNodeSet(pathMap.makeNewRoot(newXxfInstanceExpression))
 
-    val pool = StaticXPath.GlobalNamePool
+      val pool = StaticXPath.GlobalNamePool
 
-    val pathLength = path.size
+      val pathLength = path.size
 
-    path.zipWithIndex.foreach { case (pathElemQName, index) =>
+      path.zipWithIndex.foreach { case (pathElemQName, index) =>
 
-      val useAttribute = isAttribute && index == pathLength - 1
+        val useAttribute = isAttribute && index == pathLength - 1
 
-      val axisExpression =
-        new AxisExpression(
-          if (useAttribute) Axis.ATTRIBUTE else Axis.CHILD,
-          new NameTest(
-            if (useAttribute) Type.ATTRIBUTE else Type.ELEMENT,
-            pool.allocate(pathElemQName.namespace.prefix, pathElemQName.namespace.uri, pathElemQName.localName),
-            pool
+        val axisExpression =
+          new AxisExpression(
+            if (useAttribute) Axis.ATTRIBUTE else Axis.CHILD,
+            new NameTest(
+              if (useAttribute) Type.ATTRIBUTE else Type.ELEMENT,
+              pool.allocate(pathElemQName.namespace.prefix, pathElemQName.namespace.uri, pathElemQName.localName),
+              pool
+            )
           )
-        )
 
-      target = axisExpression.addToPathMap(pathMap, target)
+        target = axisExpression.addToPathMap(pathMap, target)
+      }
+
+      target.setAtomized()
     }
-
-    target.setAtomized()
   }
 
   def findInstancePath(

@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.model.*
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, XBLSupport}
-import org.orbeon.oxf.xml.SAXStore
+import org.orbeon.oxf.xml.{AllowedFunctions, SAXStore, WhitelistedFunctionLibrary}
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
@@ -53,6 +53,8 @@ trait PartAnalysisContextImmutable {
 trait PartAnalysisContextMutable extends TransientState {
 
   def functionLibrary: FunctionLibrary
+  def allowedFunctions: AllowedFunctions
+  def whitelistedFunctionLibrary: FunctionLibrary
 
   def controlAnalysisMap: mutable.LinkedHashMap[String, ElementAnalysis]
   def controlTypes: mutable.HashMap[String, mutable.LinkedHashMap[String, ElementAnalysis]]
@@ -126,7 +128,8 @@ case class StaticPartAnalysisImpl(
   startScope       : Scope,
   metadata         : Metadata,
   xblSupport       : Option[XBLSupport],
-  functionLibrary  : FunctionLibrary
+  functionLibrary  : FunctionLibrary,
+  override val allowedFunctions : AllowedFunctions = AllowedFunctions.Default
 ) extends PartAnalysis
      with TopLevelPartAnalysis
      with NestedPartAnalysis
@@ -136,6 +139,9 @@ case class StaticPartAnalysisImpl(
      with PartControlsAnalysis
      with PartControlsAnalysisForUpdate
      with PartXBLAnalysis {
+
+  override lazy val whitelistedFunctionLibrary: FunctionLibrary =
+    WhitelistedFunctionLibrary(functionLibrary, allowedFunctions.withCompilerHelpers)
 
   def isTopLevelPart: Boolean = startScope.isTopLevelScope
   def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping] = metadata.getNamespaceMapping(prefixedId)

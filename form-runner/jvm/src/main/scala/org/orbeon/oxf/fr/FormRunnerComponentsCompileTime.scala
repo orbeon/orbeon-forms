@@ -306,6 +306,19 @@ trait FormRunnerComponentsCompileTime {
     }.orNull
   }
 
+  // Used by components.xsl
+  //@XPathFunction
+  def allowedFunctionsProperty(
+    app                   : String,
+    form                  : String,
+    propertyProfileOrNull : String
+  ): Option[String] =
+    FormRunnerAllowedFunctions.allowedFunctionsPropertyAsUriQualifiedNames(
+      app,
+      form,
+      propertyProfileOrNull.trimAllToOpt
+    )
+
   def componentsFunctionLibrary: FunctionLibrary =
     new FunctionLibraryList                         |!>
       (_.addFunctionLibrary(XFormsFunctionLibrary)) |!>

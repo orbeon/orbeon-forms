@@ -22,6 +22,7 @@ import org.orbeon.oxf.cache.InternalCacheKey
 import org.orbeon.oxf.cache.ObjectCache
 import org.orbeon.oxf.util.StaticXPath.makeStringExpression
 import org.orbeon.xml.NamespaceMapping
+import org.orbeon.oxf.xml.WhitelistedFunctionLibrary
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.functions.FunctionLibraryList
@@ -678,8 +679,17 @@ object XPathCache extends XPathCacheTrait {
           Nil
 
       // Add function library
-      if (functionLibrary ne null)
-        independentContext.getFunctionLibrary.asInstanceOf[FunctionLibraryList].libraryList.asInstanceOf[JList[FunctionLibrary]].add(0, functionLibrary)
+      if (functionLibrary ne null) {
+        val flList = independentContext.getFunctionLibrary.asInstanceOf[FunctionLibraryList]
+        functionLibrary match {
+          case WhitelistedFunctionLibrary(delegate, allowedFunctions) =>
+            if (delegate ne null)
+              flList.libraryList.asInstanceOf[JList[FunctionLibrary]].add(0, delegate)
+            independentContext.setFunctionLibrary(WhitelistedFunctionLibrary(flList, allowedFunctions))
+          case _ =>
+            flList.libraryList.asInstanceOf[JList[FunctionLibrary]].add(0, functionLibrary)
+        }
+      }
 
       createPoolableXPathExpression(independentContext, xpathString, isAVT, pool, variables)
     }

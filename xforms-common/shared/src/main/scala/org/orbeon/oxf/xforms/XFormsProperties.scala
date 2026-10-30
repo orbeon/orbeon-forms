@@ -18,6 +18,7 @@ object XFormsProperties {
 
   // Document properties
   val FunctionLibraryProperty                         = "function-library"
+  val AllowedFunctionsProperty                        = "allowed-functions"
   val XblSupportProperty                              = "xbl-support"
   val UploadSupportProperty                           = "upload-support"
 
@@ -138,7 +139,12 @@ object XFormsProperties {
     def parse(s: String): String = s
   }
 
-  case class PropertyDefinition[T : PropertyParser](name: String, defaultValue: T, propagateToClient: Boolean) {
+  case class PropertyDefinition[T : PropertyParser](
+    name             : String,
+    defaultValue     : T,
+    propagateToClient: Boolean,
+    supportAVT       : Boolean = false
+  ) {
     def parseProperty(s: String): T =
       implicitly[PropertyParser[T]].parse(s)
   }
@@ -146,7 +152,7 @@ object XFormsProperties {
   private val SupportedDocumentPropertiesDefaults =
     Array(
       PropertyDefinition(StateHandlingProperty,      StateHandlingServerValue,       propagateToClient = false),
-      PropertyDefinition(ReadonlyAppearanceProperty, ReadonlyAppearanceDynamicValue, propagateToClient = false),
+      PropertyDefinition(ReadonlyAppearanceProperty, ReadonlyAppearanceDynamicValue, propagateToClient = false, supportAVT = true),
       PropertyDefinition(
         TypeOutputFormatPropertyPrefix + "date",
         "if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else .",
@@ -183,13 +189,14 @@ object XFormsProperties {
         propagateToClient = false
       ),
       PropertyDefinition(FunctionLibraryProperty,                         "",                          propagateToClient = false),
+      PropertyDefinition(AllowedFunctionsProperty,                        "",                          propagateToClient = false),
       PropertyDefinition(XblSupportProperty,                              "",                          propagateToClient = false),
       PropertyDefinition(UploadSupportProperty,                           "",                          propagateToClient = false),
       PropertyDefinition(ReadonlyAppearanceStaticSelectProperty,          "full",                      propagateToClient = false),
       PropertyDefinition(ReadonlyAppearanceStaticSelect1Property,         "full",                      propagateToClient = false),
-      PropertyDefinition(OrderProperty,                                   DefaultOrderProperty,        propagateToClient = false),
-      PropertyDefinition(HostLanguage,                                    "xhtml",                     propagateToClient = false),
-      PropertyDefinition(RFallbackLang,                                   "",                          propagateToClient = false),
+      PropertyDefinition(OrderProperty,                                   DefaultOrderProperty,        propagateToClient = false, supportAVT = true),
+      PropertyDefinition(HostLanguage,                                    "xhtml",                     propagateToClient = false, supportAVT = true),
+      PropertyDefinition(RFallbackLang,                                   "",                          propagateToClient = false, supportAVT = true),
       PropertyDefinition(LabelElementNameProperty,                        "label",                     propagateToClient = false),
       PropertyDefinition(HintElementNameProperty,                         "span",                      propagateToClient = false),
       PropertyDefinition(HelpElementNameProperty,                         "span",                      propagateToClient = false),
@@ -198,8 +205,8 @@ object XFormsProperties {
       PropertyDefinition(HintAppearanceProperty,                          "full",                      propagateToClient = false),
       PropertyDefinition(HelpAppearanceProperty,                          "dialog",                    propagateToClient = false),
       PropertyDefinition(A11yFocusOnGroupsProperty,                       true,                        propagateToClient = false),
-      PropertyDefinition(StaticReadonlyHintProperty,                      false,                       propagateToClient = false),
-      PropertyDefinition(StaticReadonlyAlertProperty,                     false,                       propagateToClient = false),
+      PropertyDefinition(StaticReadonlyHintProperty,                      false,                       propagateToClient = false, supportAVT = true),
+      PropertyDefinition(StaticReadonlyAlertProperty,                     false,                       propagateToClient = false, supportAVT = true),
       PropertyDefinition(UploadMaxSizeProperty,                           "",                          propagateToClient = false), // backward compatibility
       PropertyDefinition(UploadMaxSizeAggregateProperty,                  "",                          propagateToClient = false), // backward compatibility
       PropertyDefinition(UploadMaxSizePerFileProperty,                    "",                          propagateToClient = false), // blank default (see #2956)
@@ -214,10 +221,10 @@ object XFormsProperties {
       PropertyDefinition(LocalSubmissionForwardProperty,                  true,                        propagateToClient = false),
       PropertyDefinition(ExposeXpathTypesProperty,                        false,                       propagateToClient = false),
       PropertyDefinition(ShowRecoverableErrorsProperty,                   10,                          propagateToClient = false),
-      PropertyDefinition(EncryptItemValuesProperty,                       true,                        propagateToClient = false),
+      PropertyDefinition(EncryptItemValuesProperty,                       true,                        propagateToClient = false, supportAVT = true),
       PropertyDefinition(AsyncSubmissionPollDelay,                        10 * 1000,                   propagateToClient = false),
       PropertyDefinition(AjaxUpdateFullThreshold,                         20,                          propagateToClient = false),
-      PropertyDefinition(NoUpdates,                                       false,                       propagateToClient = false),
+      PropertyDefinition(NoUpdates,                                       false,                       propagateToClient = false, supportAVT = true),
       PropertyDefinition(Xforms11SwitchProperty,                          false,                       propagateToClient = false),
       PropertyDefinition(XpathAnalysisProperty,                           false,                       propagateToClient = false),
       PropertyDefinition(CalculateAnalysisProperty,                       false,                       propagateToClient = false),

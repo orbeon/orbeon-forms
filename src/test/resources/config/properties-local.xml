@@ -70,6 +70,14 @@
     <property as="xs:string"  name="oxf.fr.s3.test-s3-config.accesskey"       value="{environment-variable('S3_TEST_ACCESSKEY')}"/>
     <property as="xs:string"  name="oxf.fr.s3.test-s3-config.secretaccesskey" value="{environment-variable('S3_TEST_SECRETACCESSKEY')}"/>
 
+    <!-- Some tests use otherwise blacklisted functions -->
+    <property as="xs:string" name="oxf.fr.detail.formula.allowed-functions.issue.6564"             value="*"/>
+    <property as="xs:string" name="oxf.fr.detail.formula.allowed-functions.orbeon.pta-remittance"  value="+fr:run-process"/>
+    <property as="xs:string" name="oxf.fr.detail.formula.allowed-functions.tests.process-rollback" value="+fr:run-process"/>
+    <property as="xs:string" name="oxf.fr.detail.formula.allowed-functions.tests.send-action"      value="+fr:run-process"/>
+    <property as="xs:string" name="oxf.fr.detail.formula.allowed-functions.issue.7240"             value="+xxf:instance"/>
+    <property as="xs:string" name="oxf.fr.detail.formula.allowed-functions.issue.6564"             value="+java:org.orbeon.oxf.fr.MyTest:value +xxf:get-request-attribute"/>
+
     <property as="xs:string" name="oxf.fr.email.pdf.filename.issue.6751"  value="concat(fr:form-title(), '.pdf')"/>
     <property as="xs:string" name="oxf.fr.email.tiff.filename.issue.6751" value="concat(fr:form-title(), '.tiff')"/>
     <property as="xs:string" name="oxf.fr.email.xml.filename.issue.6751"  value="concat(fr:form-title(), '.xml')"/>

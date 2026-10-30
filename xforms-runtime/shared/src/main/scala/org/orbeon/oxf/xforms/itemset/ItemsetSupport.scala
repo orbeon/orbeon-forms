@@ -354,7 +354,7 @@ object ItemsetSupport {
                           xpathString        = attributeValue,
                           namespaceMapping   = itemChoiceItemsetElem.namespaceMapping,
                           variableToValueMap = contextStack.getCurrentBindingContext.getInScopeVariables,
-                          functionLibrary    = container.containingDocument.functionLibrary,
+                          functionLibrary    = container.partAnalysis.functionLibrary(itemChoiceItemsetElem.isFunctionsRestricted),
                           functionContext    = contextStack.getFunctionContext(elemEffectiveId),
                           baseURI            = null,
                           locationData       = itemChoiceItemsetElem.element.getData.asInstanceOf[LocationData],

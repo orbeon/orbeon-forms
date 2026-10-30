@@ -362,6 +362,8 @@ object XFormsNames {
 
   val XXFORMS_EVENT_MODE_QNAME = xxformsQName("events-mode")
   val XXFORMS_VALIDATION_MODE_QNAME = xxformsQName("validation-mode")
+  val XXFORMS_FUNCTIONS_QNAME = xxformsQName("functions")
+  val XXFORMS_ALLOWED_FUNCTIONS_QNAME = xxformsQName("allowed-functions")
 
   val STATIC_STATE_PROPERTIES_QNAME = QName("properties")
 

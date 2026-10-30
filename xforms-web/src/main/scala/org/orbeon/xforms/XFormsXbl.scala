@@ -40,6 +40,7 @@ object XFormsXbl {
         clazz != "xbl-javascript-lifecycle"
     }
 
+  // This creates and initializes a companion instance if there is none yet
   def findInstanceForControl(elem: html.Element): Option[XBLCompanion] =
     for {
       xblControlElem      <- elem.closestOpt(".xbl-component")
@@ -47,6 +48,13 @@ object XFormsXbl {
       factory             <- cssClassesToConstructors.get(identifyingCssClass)
     } yield
       factory(xblControlElem).asInstanceOf[XBLCompanion]
+
+  // Unlike `findInstanceForControl()`, this never creates a companion instance
+  def findExistingInstanceForControl(elem: html.Element): Option[XBLCompanion] =
+    elem.closestOpt(".xbl-component").flatMap(existingInstance)
+
+  private def existingInstance(xblControlElem: html.Element): Option[XBLCompanion] =
+    getData(xblControlElem, XblObjectKeyName).map(_.asInstanceOf[XBLCompanion])
 
   @JSExport
   def declareCompanion(name: String, prototypeOrClass: js.Dynamic): Unit = {
@@ -100,7 +108,7 @@ object XFormsXbl {
         case Some(containerElem) =>
 
           val existingInstanceOpt =
-            getData(containerElem, XblObjectKeyName).map(_.asInstanceOf[js.Dynamic])
+            existingInstance(containerElem).map(_.asInstanceOf[js.Dynamic])
 
           def createAndSetNewInstance(): js.Dynamic = {
 
@@ -116,14 +124,14 @@ object XFormsXbl {
           }
 
           existingInstanceOpt match {
-            case Some(existingInstance) if existingInstance.container.asInstanceOf[html.Element] == containerElem =>
-              existingInstance
-            case Some(existingInstance) =>
+            case Some(instance) if instance.container.asInstanceOf[html.Element] == containerElem =>
+              instance
+            case Some(instance) =>
               // Q: Under what circumstances can this happen?
               // Q: In this case, should we call `destroy()`?
               dom.console.debug(
                 "instanceForControl: instance found in data but for different container: `" +
-                existingInstance.container.id +
+                instance.container.id +
                 "` and `" + containerElem.id + "`"
               )
               createAndSetNewInstance()

@@ -590,7 +590,17 @@ object XFormsUI {
         case None                                                                          => js.undefined
       }
     } else if (XFormsXbl.isComponent(control)) {
-      XFormsXbl.findInstanceForControl(control) match {
+      // With `javascript-lifecycle`, the server controls when companion instances are created (`xxf:init`) and
+      // destroyed (`relevant="false"`). Reading a value must not create an instance. Otherwise, when a control becomes
+      // non-relevant, we would recreate the instance we just destroyed, with attributes which don't make sense anymore
+      // (e.g. an empty theme for `fr:code-mirror`), and this instance would be reused when the control becomes
+      // relevant again. See #8001.
+      val instanceOpt =
+        if (XFormsXbl.isJavaScriptLifecycle(control))
+          XFormsXbl.findExistingInstanceForControl(control)
+        else
+          XFormsXbl.findInstanceForControl(control)
+      instanceOpt match {
         case Some(instance) if XFormsXbl.isObjectWithMethod(instance, "xformsGetValue") =>
           instance.xformsGetValue()
         case _ =>

@@ -146,5 +146,28 @@ class ControlCustomSettingsParserTest
         validateCustomSettings(Some(spec), "test", "test-ctrl", Map("boolSetting" -> Json.fromString("foo")))
       }
     }
+
+    it("must parse `<fr:country>` custom settings from `country.xbl`") {
+      val binding = {
+        import org.orbeon.scaxon.SimplePath.*
+        val docWrapper = new org.orbeon.dom.saxon.DocumentWrapper(
+          org.orbeon.oxf.resources.ResourceManagerWrapper.instance.getContentAsOrbeonDom("/xbl/orbeon/country/country.xbl"),
+          null,
+          org.orbeon.oxf.util.XPath.GlobalConfiguration
+        )
+        (docWrapper.rootElement / "*:binding").head
+      }
+
+      val specOpt = ControlCustomSettingsParser.fromBinding(binding)
+      assert(specOpt.isDefined)
+      val spec = specOpt.get
+      assert(spec.localName == "country")
+      assert(spec.settings.map(_.name) == List("preferredCountries", "includeCountries", "excludeCountries", "showCode", "showFlag"))
+      assert(spec.findSetting("preferredCountries").exists(_.settingType == StringType))
+      assert(spec.findSetting("includeCountries").exists(_.settingType == StringType))
+      assert(spec.findSetting("excludeCountries").exists(_.settingType == StringType))
+      assert(spec.findSetting("showCode").exists(_.settingType == BooleanType))
+      assert(spec.findSetting("showFlag").exists(_.settingType == BooleanType))
+    }
   }
 }

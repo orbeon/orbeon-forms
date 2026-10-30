@@ -1,0 +1,445 @@
+<!--
+    Copyright (C) 2026 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fr-country"
+        element="fr|country"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value focus selection allow-minimal-label-hint"
+        xxbl:label-for="select1">
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Country</display-name>
+            <display-name lang="fr">Pays</display-name>
+            <display-name lang="no">Land</display-name>
+            <display-name lang="ru">Страна</display-name>
+            <display-name lang="it">Paese</display-name>
+            <display-name lang="de">Land</display-name>
+            <display-name lang="fi">Maa</display-name>
+            <display-name lang="es">País</display-name>
+            <display-name lang="nl">Land</display-name>
+            <display-name lang="pt">País</display-name>
+            <display-name lang="sv">Land</display-name>
+            <display-name lang="ar">البلد</display-name>
+            <display-name lang="pl">Kraj</display-name>
+            <display-name lang="ja">国</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-globe</icon-class>
+            </icon>
+            <templates>
+                <view>
+                    <fr:country>
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:country>
+                </view>
+            </templates>
+            <custom-settings>
+                <setting name="preferred-countries" type="xs:string"/>
+                <setting name="include-countries" type="xs:string"/>
+                <setting name="exclude-countries" type="xs:string"/>
+                <setting name="show-code" type="xs:boolean"/>
+                <setting name="show-flag" type="xs:boolean"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-country-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue
+                            ref="$c"
+                            value="instance()/@*[name() = name($c)]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <preferred-countries/>
+                            <include-countries/>
+                            <exclude-countries/>
+                            <show-code/>
+                            <show-flag/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="preferred-countries | include-countries | exclude-countries"
+                            xxf:whitespace="trim"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true">
+                        <_>
+                            <resource xml:lang="en">
+                                <preferred-countries>Preferred Countries</preferred-countries>
+                                <include-countries>Included Countries</include-countries>
+                                <exclude-countries>Excluded Countries</exclude-countries>
+                                <countries-hint>Space-separated 2-letter ISO codes (e.g. US CA GB)</countries-hint>
+                                <show-code>Show Country Code</show-code>
+                                <show-flag>Show Country Flag</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Use default</item>
+                                    <item id="1">Yes</item>
+                                    <item id="2">No</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <preferred-countries>Pays préférés</preferred-countries>
+                                <include-countries>Pays inclus</include-countries>
+                                <exclude-countries>Pays exclus</exclude-countries>
+                                <countries-hint>Codes ISO à 2 lettres séparés par des espaces (ex. FR CH CA)</countries-hint>
+                                <show-code>Afficher le code du pays</show-code>
+                                <show-flag>Afficher le drapeau du pays</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Utiliser le défaut</item>
+                                    <item id="1">Oui</item>
+                                    <item id="2">Non</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="no">
+                                <preferred-countries>Foretrukne land</preferred-countries>
+                                <include-countries>Inkluderte land</include-countries>
+                                <exclude-countries>Ekskluderte land</exclude-countries>
+                                <countries-hint>Mellomromseparerte 2-bokstavs ISO-koder (f.eks. NO SE DK)</countries-hint>
+                                <show-code>Vis landkode</show-code>
+                                <show-flag>Vis landflagg</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Bruk standard</item>
+                                    <item id="1">Ja</item>
+                                    <item id="2">Nei</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <preferred-countries>Предпочитаемые страны</preferred-countries>
+                                <include-countries>Включенные страны</include-countries>
+                                <exclude-countries>Исключенные страны</exclude-countries>
+                                <countries-hint>Двухбуквенные коды ISO через пробел (например, US CA GB)</countries-hint>
+                                <show-code>Показывать код страны</show-code>
+                                <show-flag>Показывать флаг страны</show-flag>
+                                <default-yes-no>
+                                    <item id="0">По умолчанию</item>
+                                    <item id="1">Да</item>
+                                    <item id="2">Нет</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="it">
+                                <preferred-countries>Paesi preferiti</preferred-countries>
+                                <include-countries>Paesi inclusi</include-countries>
+                                <exclude-countries>Paesi esclusi</exclude-countries>
+                                <countries-hint>Codici ISO a 2 lettere separati da spazi (es. IT CH FR)</countries-hint>
+                                <show-code>Mostra codice paese</show-code>
+                                <show-flag>Mostra bandiera paese</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Usa predefinito</item>
+                                    <item id="1">Sì</item>
+                                    <item id="2">No</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="de">
+                                <preferred-countries>Bevorzugte Länder</preferred-countries>
+                                <include-countries>Eingeschlossene Länder</include-countries>
+                                <exclude-countries>Ausgeschlossene Länder</exclude-countries>
+                                <countries-hint>Durch Leerzeichen getrennte 2-stellige ISO-Codes (z. B. DE AT CH)</countries-hint>
+                                <show-code>Ländercode anzeigen</show-code>
+                                <show-flag>Länderflagge anzeigen</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Standard verwenden</item>
+                                    <item id="1">Ja</item>
+                                    <item id="2">Nein</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <preferred-countries>Suositut maat</preferred-countries>
+                                <include-countries>Sisällytetyt maat</include-countries>
+                                <exclude-countries>Poissuljetut maat</exclude-countries>
+                                <countries-hint>Välilyönnein erotetut 2-kirjaimiset ISO-koodit (esim. FI SE NO)</countries-hint>
+                                <show-code>Näytä maakoodi</show-code>
+                                <show-flag>Näytä maan lippu</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Käytä oletusta</item>
+                                    <item id="1">Kyllä</item>
+                                    <item id="2">Ei</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="es">
+                                <preferred-countries>Países preferidos</preferred-countries>
+                                <include-countries>Países incluidos</include-countries>
+                                <exclude-countries>Países excluidos</exclude-countries>
+                                <countries-hint>Códigos ISO de 2 letras separados por espacios (p. ej. ES MX AR)</countries-hint>
+                                <show-code>Mostrar código de país</show-code>
+                                <show-flag>Mostrar bandera de país</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Usar predeterminado</item>
+                                    <item id="1">Sí</item>
+                                    <item id="2">No</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <preferred-countries>Voorkeurslanden</preferred-countries>
+                                <include-countries>Opgenomen landen</include-countries>
+                                <exclude-countries>Uitgesloten landen</exclude-countries>
+                                <countries-hint>Door spaties gescheiden 2-letterige ISO-codes (bijv. NL BE DE)</countries-hint>
+                                <show-code>Landcode tonen</show-code>
+                                <show-flag>Landvlag tonen</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Gebruik standaard</item>
+                                    <item id="1">Ja</item>
+                                    <item id="2">Nee</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <preferred-countries>Países preferidos</preferred-countries>
+                                <include-countries>Países incluídos</include-countries>
+                                <exclude-countries>Países excluídos</exclude-countries>
+                                <countries-hint>Códigos ISO de 2 letras separados por espaço (ex. PT BR AO)</countries-hint>
+                                <show-code>Mostrar código do país</show-code>
+                                <show-flag>Mostrar bandeira do país</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Usar padrão</item>
+                                    <item id="1">Sim</item>
+                                    <item id="2">Não</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <preferred-countries>Föredragna länder</preferred-countries>
+                                <include-countries>Inkluderade länder</include-countries>
+                                <exclude-countries>Exkluderade länder</exclude-countries>
+                                <countries-hint>Blankstegsavgränsade 2-bokstavs ISO-koder (t.ex. SE NO FI)</countries-hint>
+                                <show-code>Visa landskod</show-code>
+                                <show-flag>Visa landsflagga</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Använd standard</item>
+                                    <item id="1">Ja</item>
+                                    <item id="2">Nej</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <preferred-countries>البلدان المفضلة</preferred-countries>
+                                <include-countries>البلدان المضمنة</include-countries>
+                                <exclude-countries>البلدان المستبعدة</exclude-countries>
+                                <countries-hint>رموز ISO مكونة من حرفين مفصولة بمسافات (مثل AE SA EG)</countries-hint>
+                                <show-code>إظهار رمز البلد</show-code>
+                                <show-flag>إظهار علم البلد</show-flag>
+                                <default-yes-no>
+                                    <item id="0">استخدام الإعداد الافتراضي</item>
+                                    <item id="1">نعم</item>
+                                    <item id="2">لا</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <preferred-countries>Preferowane kraje</preferred-countries>
+                                <include-countries>Uwzględnione kraje</include-countries>
+                                <exclude-countries>Wykluczone kraje</exclude-countries>
+                                <countries-hint>Rozdzielone spacjami 2-literowe kody ISO (np. PL DE GB)</countries-hint>
+                                <show-code>Pokaż kod kraju</show-code>
+                                <show-flag>Pokaż flagę kraju</show-flag>
+                                <default-yes-no>
+                                    <item id="0">Użyj domyślnie</item>
+                                    <item id="1">Tak</item>
+                                    <item id="2">Nie</item>
+                                </default-yes-no>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <preferred-countries>優先表示する国</preferred-countries>
+                                <include-countries>含める国</include-countries>
+                                <exclude-countries>除外する国</exclude-countries>
+                                <countries-hint>スペース区切りの2文字ISOコード (例: JP US GB)</countries-hint>
+                                <show-code>国コードを表示</show-code>
+                                <show-flag>国旗を表示</show-flag>
+                                <default-yes-no>
+                                    <item id="0">既定を使う</item>
+                                    <item id="1">はい</item>
+                                    <item id="2">いいえ</item>
+                                </default-yes-no>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-country-grid">
+                    <xh:tr>
+                        <xh:td colspan="2">
+                            <xf:input ref="instance('local')/preferred-countries" id="preferred-countries-control">
+                                <xf:label ref="xxf:r('preferred-countries')"/>
+                                <xf:hint ref="xxf:r('countries-hint')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td colspan="2">
+                            <xf:input ref="instance('local')/include-countries" id="include-countries-control">
+                                <xf:label ref="xxf:r('include-countries')"/>
+                                <xf:hint ref="xxf:r('countries-hint')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td colspan="2">
+                            <xf:input ref="instance('local')/exclude-countries" id="exclude-countries-control">
+                                <xf:label ref="xxf:r('exclude-countries')"/>
+                                <xf:hint ref="xxf:r('countries-hint')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/show-code" appearance="full" id="show-code-control">
+                                <xf:label ref="xxf:r('show-code')"/>
+                                <xf:alert/>
+                                <xf:itemset ref="xxf:resource-elements('default-yes-no.item')">
+                                    <xf:label ref="."/>
+                                    <xf:value ref="if (@id = 0) then '' else if (@id = 1) then 'true' else 'false'"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/show-flag" appearance="full" id="show-flag-control">
+                                <xf:label ref="xxf:r('show-flag')"/>
+                                <xf:alert/>
+                                <xf:itemset ref="xxf:resource-elements('default-yes-no.item')">
+                                    <xf:label ref="."/>
+                                    <xf:value ref="if (@id = 0) then '' else if (@id = 1) then 'true' else 'false'"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-country-action"
+                    event="xforms-value-changed"
+                    observer="
+                        preferred-countries-control
+                        include-countries-control
+                        exclude-countries-control
+                        show-code-control
+                        show-flag-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/country/country.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance
+                    id="countries"
+                    src="oxf:/xbl/orbeon/country/countries.xml"
+                    xxf:readonly="true"
+                    xxf:cache="true"/>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:var
+                name="preferred-codes"
+                value="distinct-values(xxf:split(translate(upper-case(fr:component-param-value('preferred-countries')), ',', ' ')))"/>
+            <xf:var
+                name="include-codes"
+                value="xxf:split(translate(upper-case(fr:component-param-value('include-countries')), ',', ' '))"/>
+            <xf:var
+                name="exclude-codes"
+                value="xxf:split(translate(upper-case(fr:component-param-value('exclude-countries')), ',', ' '))"/>
+            <xf:var
+                name="show-code"
+                value="string(fr:component-param-value('show-code')) = 'true'"/>
+            <xf:var
+                name="show-flag"
+                value="string(fr:component-param-value('show-flag')) = 'true'"/>
+
+            <xf:var
+                name="lang"
+                value="xxf:lang()"/>
+            <xf:var
+                name="lang-countries"
+                value="
+                    (
+                        instance('countries')/lang[@xml:lang = $lang],
+                        instance('countries')/lang[@xml:lang = substring-before($lang, '-')],
+                        instance('countries')/lang[@xml:lang = 'en']
+                    )[1]/country
+                "/>
+            <xf:var
+                name="available-countries"
+                value="
+                    $lang-countries[
+                        (empty($include-codes) or @code = $include-codes) and
+                        not(@code = $exclude-codes)
+                    ]
+                "/>
+            <xf:var
+                name="preferred-items"
+                value="
+                    for $c in $preferred-codes
+                    return $available-countries[@code = $c]
+                "/>
+            <xf:var
+                name="remaining-items"
+                value="$available-countries[not(@code = $preferred-codes)]"/>
+
+            <xf:select1
+                id="select1"
+                ref="xxf:binding('fr-country')"
+                appearance="search"
+                autocomplete="country"
+                xxf:encrypt-item-values="false"
+                xbl:attr="appearance class autocomplete xxf:encrypt-item-values xxf:readonly-appearance">
+                <xf:itemset
+                    xxbl:scope="inner"
+                    ref="($preferred-items, $remaining-items)"
+                    class="{if (position() = count($preferred-items) and exists($remaining-items)) then 'fr-country-last-preferred' else ''}">
+                    <xf:label
+                        ref="
+                            concat(
+                                if ($show-flag) then
+                                    concat(
+                                        codepoints-to-string(
+                                            for $cp in string-to-codepoints(@code)
+                                            return $cp + 127397
+                                        ),
+                                        ' '
+                                    )
+                                else
+                                    '',
+                                @name,
+                                if ($show-code) then
+                                    concat(' (', @code, ')')
+                                else
+                                    ''
+                            )
+                        "/>
+                    <xf:value ref="@code"/>
+                </xf:itemset>
+            </xf:select1>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

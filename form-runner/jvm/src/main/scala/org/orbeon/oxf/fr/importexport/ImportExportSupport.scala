@@ -81,6 +81,7 @@ object ImportExportSupport {
     XFORMS_SELECT1_QNAME,
     QName("number",   FRNamespace),
     QName("currency", FRNamespace),
+    QName("country",  FRNamespace),
     QName("us-phone", FRNamespace),
     QName("us-state", FRNamespace),
   )

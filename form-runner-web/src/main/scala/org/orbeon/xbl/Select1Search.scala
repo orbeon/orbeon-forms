@@ -16,7 +16,8 @@ package org.orbeon.xbl
 import io.udash.wrappers.jquery.{JQuery, JQueryEvent}
 import org.orbeon.facades.Select2
 import org.orbeon.facades.Select2.{Success, toJQuerySelect2}
-import org.orbeon.oxf.util.CoreUtils.PipeOps
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.XFormsUiEvents.ValueChangeInternalEvent
@@ -28,13 +29,146 @@ import org.scalajs.dom.{MutationObserver, document, html}
 import scala.annotation.unused
 import scala.collection.mutable
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters.JSRichOption
+import scala.scalajs.js.JSConverters.*
 
 
 object Select1Search {
   XFormsXbl.declareCompanion(name = "fr|dropdown-select1-search" , js.constructorOf[Select1SearchCompanion])
   XFormsXbl.declareCompanion(name = "fr|databound-select1-search", js.constructorOf[Select1SearchCompanion])
   XFormsXbl.declareCompanion(name = "fr|databound-select-search" , js.constructorOf[Select1SearchCompanion])
+
+  // Common country aliases, endonyms, exonyms, and ISO alpha-3 codes keyed by ISO 3166-1 alpha-2 code
+  private val CountryAliases: Map[String, List[String]] = Map(
+    "AE" -> List("uae", "are", "united arab emirates", "emirates", "dubai"),
+    "AT" -> List("aut", "austria", "osterreich"),
+    "AU" -> List("aus", "australia"),
+    "BE" -> List("bel", "belgium", "belgique", "belgie", "belgien"),
+    "BA" -> List("bih", "bosnia", "herzegovina"),
+    "BR" -> List("bra", "brazil", "brasil"),
+    "CA" -> List("can", "canada"),
+    "CD" -> List("cod", "drc", "dr congo", "democratic republic of the congo", "zaire"),
+    "CG" -> List("cog", "republic of the congo", "congo-brazzaville"),
+    "CH" -> List("che", "switzerland", "suisse", "schweiz", "svizzera", "svizra", "swiss"),
+    "CI" -> List("civ", "ivory coast", "cote d'ivoire"),
+    "CL" -> List("chl", "chile"),
+    "CN" -> List("chn", "china", "prc"),
+    "CV" -> List("cpv", "cape verde", "cabo verde"),
+    "CZ" -> List("cze", "czechia", "czech republic", "cesko"),
+    "DE" -> List("deu", "germany", "deutschland", "allemagne", "alemania"),
+    "DK" -> List("dnk", "denmark", "danmark"),
+    "DO" -> List("dom", "dominican republic"),
+    "DZ" -> List("dza", "algeria", "algerie"),
+    "EG" -> List("egy", "egypt", "egypte", "misr"),
+    "ES" -> List("esp", "spain", "espana", "espagne"),
+    "FI" -> List("fin", "finland", "suomi"),
+    "FK" -> List("flk", "falkland islands", "malvinas"),
+    "FM" -> List("fsm", "micronesia"),
+    "FR" -> List("fra", "france"),
+    "GB" -> List("uk", "gbr", "united kingdom", "great britain", "britain", "england", "scotland", "wales", "northern ireland", "royaume-uni"),
+    "GR" -> List("grc", "greece", "hellas", "ellada"),
+    "HK" -> List("hkg", "hong kong"),
+    "HR" -> List("hrv", "croatia", "hrvatska"),
+    "HU" -> List("hun", "hungary", "magyarorszag"),
+    "ID" -> List("idn", "indonesia"),
+    "IE" -> List("irl", "ireland", "eire"),
+    "IL" -> List("isr", "israel"),
+    "IN" -> List("ind", "india", "bharat"),
+    "IR" -> List("irn", "iran", "persia"),
+    "IS" -> List("isl", "iceland", "island"),
+    "IT" -> List("ita", "italy", "italia", "italie"),
+    "JP" -> List("jpn", "japan", "nippon", "nihon"),
+    "KP" -> List("prk", "north korea", "dprk"),
+    "KR" -> List("kor", "south korea", "korea", "rok", "hanguk"),
+    "LA" -> List("lao", "laos"),
+    "LU" -> List("lux", "luxembourg", "luxemburg"),
+    "MA" -> List("mar", "morocco", "maroc"),
+    "MD" -> List("mda", "moldova"),
+    "MK" -> List("mkd", "north macedonia", "macedonia"),
+    "MM" -> List("mmr", "myanmar", "burma"),
+    "MO" -> List("mac", "macau", "macao"),
+    "MX" -> List("mex", "mexico", "mexique"),
+    "MY" -> List("mys", "malaysia"),
+    "NL" -> List("nld", "netherlands", "holland", "nederland", "pays-bas"),
+    "NO" -> List("nor", "norway", "norge", "noreg"),
+    "NZ" -> List("nzl", "new zealand", "aotearoa"),
+    "PH" -> List("phl", "philippines"),
+    "PL" -> List("pol", "poland", "polska", "pologne"),
+    "PS" -> List("pse", "palestine"),
+    "PT" -> List("prt", "portugal"),
+    "RO" -> List("rou", "romania", "romania"),
+    "RS" -> List("srb", "serbia", "srbija"),
+    "RU" -> List("rus", "russia", "russian federation"),
+    "SA" -> List("sau", "saudi arabia", "ksa"),
+    "SE" -> List("swe", "sweden", "sverige"),
+    "SG" -> List("sgp", "singapore"),
+    "SI" -> List("svn", "slovenia", "slovenija"),
+    "SK" -> List("svk", "slovakia", "slovensko"),
+    "SY" -> List("syr", "syria"),
+    "SZ" -> List("swz", "eswatini", "swaziland"),
+    "TH" -> List("tha", "thailand", "siam"),
+    "TL" -> List("tls", "timor-leste", "east timor"),
+    "TR" -> List("tur", "turkiye", "turkey", "turquie"),
+    "TW" -> List("twn", "taiwan", "roc", "formosa"),
+    "TZ" -> List("tza", "tanzania"),
+    "UA" -> List("ukr", "ukraine"),
+    "US" -> List("usa", "united states", "united states of america", "america", "etats-unis", "estados unidos", "vereinigte staaten"),
+    "VA" -> List("vat", "vatican", "vatican city", "holy see", "saint-siege"),
+    "VE" -> List("ven", "venezuela"),
+    "VG" -> List("vgb", "british virgin islands", "bvi"),
+    "VI" -> List("vir", "us virgin islands", "usvi"),
+    "VN" -> List("vnm", "vietnam", "viet nam"),
+    "ZA" -> List("zaf", "south africa", "rsa")
+  )
+
+  def normalizeText(s: String): String =
+    s.asInstanceOf[js.Dynamic]
+      .normalize("NFD")
+      .asInstanceOf[String]
+      .replaceAll("[\\u0300-\\u036f]", "")
+      .toLowerCase
+      .replace("’", "'")
+      .replace("ø", "o")
+      .replace("ł", "l")
+      .replace("ß", "ss")
+      .replace("æ", "ae")
+      .replace("œ", "oe")
+      .trimAllToEmpty
+
+  private def stripLeadingEmoji(s: String): String =
+    s.replaceFirst("^([\\uD83C][\\uDDE6-\\uDDFF])+\\s*", "")
+
+  // Lower tier number = higher relevance rank when sorting search results:
+  // 1: Exact ISO code, exact label, or exact alias match
+  // 2: Label starts with search term
+  // 3: Word in label or alias starts with search term
+  // 4: Substring match in label or alias
+  def matchTier(
+    option           : Select2.Option,
+    normTerm         : String,
+    isCountryControl : Boolean
+  ): Option[Int] =
+    if (normTerm.isEmpty) {
+      Some(0)
+    } else {
+      val normLabel = normalizeText(stripLeadingEmoji(option.text))
+      val codeUpper = Option(option.id).map(_.toUpperCase).getOrElse("")
+      val codeLower = codeUpper.toLowerCase
+      val aliases   = if (isCountryControl) CountryAliases.getOrElse(codeUpper, Nil) else Nil
+
+      if (normLabel == normTerm || (isCountryControl && (codeLower == normTerm || aliases.contains(normTerm))))
+        Some(1)
+      else if (normLabel.startsWith(normTerm))
+        Some(2)
+      else if (
+        normLabel.splitTo[List](" -()/").exists(_.startsWith(normTerm)) ||
+        (isCountryControl && (codeLower.startsWith(normTerm) || aliases.exists(a => a.startsWith(normTerm) || a.splitTo[List](" -").exists(_.startsWith(normTerm)))))
+      )
+        Some(3)
+      else if (normLabel.contains(normTerm) || (isCountryControl && aliases.exists(_.contains(normTerm))))
+        Some(4)
+      else
+        None
+    }
 }
 
 private class Select1SearchCompanion(containerElem: html.Element) extends XBLCompanion {
@@ -54,15 +188,89 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   private var inputElementOpt              : Option[dom.Element]              = None
   private var optionsOpt                   : Option[Select2.Options]          = None
   private var isOpenSelection              : Boolean                          = false
+  private var currentSearchTerm            : String                           = ""
 
-  private def isMultiple: Boolean = Option(queryElementWithData.getAttribute(DataIsMultipleSelection)).contains("true")
+  private def isMultiple       : Boolean = Option(queryElementWithData.getAttribute(DataIsMultipleSelection)).contains("true")
+  private def isCountryControl : Boolean = containerElem.closestOpt(".xbl-fr-country").isDefined
+
+  private def findPlaceholderOptionId(select: html.Select): String =
+    Option(select.options)
+      .filter(_.length > 0)
+      .map(_(0))
+      .filter(_.text.isEmpty)
+      .map(_.value)
+      .getOrElse("0")
+
+  private def customMatcher(
+    isCountry     : Boolean,
+    placeholderId : String
+  )(
+    params : Select2.ParamsData,
+    data   : Select2.Option
+  ): Select2.Option = {
+    val termOpt = params.term.toOption.flatMap(_.trimAllToOpt)
+    currentSearchTerm = termOpt.map(Select1Search.normalizeText).getOrElse("")
+    termOpt match {
+      case None =>
+        data
+      case Some(_) =>
+        if (data.children.toOption.exists(_.nonEmpty)) {
+          val matchedChildren =
+            data.children.get
+              .map(child => customMatcher(isCountry, placeholderId)(params, child))
+              .filter(_ != null)
+          if (matchedChildren.nonEmpty) {
+            val cloned = js.Object.assign(js.Dynamic.literal(), data).asInstanceOf[js.Dynamic]
+            cloned.children = matchedChildren
+            cloned.asInstanceOf[Select2.Option]
+          } else {
+            null
+          }
+        } else if (data.id == placeholderId && data.text.isEmpty) {
+          null
+        } else {
+          if (Select1Search.matchTier(data, currentSearchTerm, isCountry).isDefined) data else null
+        }
+    }
+  }
+
+  private def customSorter(
+    isCountry : Boolean
+  )(
+    results : js.Array[Select2.Option]
+  ): js.Array[Select2.Option] =
+    if (currentSearchTerm.isEmpty) {
+      results
+    } else {
+      results
+        .zipWithIndex
+        .sortBy { case (opt, idx) =>
+          (Select1Search.matchTier(opt, currentSearchTerm, isCountry).getOrElse(Int.MaxValue), idx)
+        }
+        .map(_._1)
+        .toJSArray
+    }
+
+  private def customTemplateResult(
+    data      : Select2.Option,
+    container : html.Element
+  ): String = {
+    if (currentSearchTerm.isEmpty && (container ne null)) {
+      data.element.toOption.foreach { elem =>
+        elem.className.splitTo[List]().foreach(container.classList.add)
+      }
+    }
+    data.text
+  }
 
   override def init(): Unit = {
     val isStaticReadonly = containerElem.querySelector(".xforms-static") != null
     val elementWithData  = queryElementWithData
     if (! isStaticReadonly && ! elementWithData.hasClass("xforms-disabled"))
       for (select <- Option(querySelect)) {
-        val isDatabound     = DataboundClasses.exists(containerElem.hasClass)
+        val isDatabound   = DataboundClasses.exists(containerElem.hasClass)
+        val isCountry     = isCountryControl
+        val placeholderId = findPlaceholderOptionId(select)
 
         // Prevent the propagation of `focusout` so the client doesn't send an `xxforms-value` event when users click on the dropdown,
         // as at that point the `<span class="select2-selection--single">` looses the focus, and since Select2 places that element inside
@@ -74,20 +282,23 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         locally {
           val placeholderOpt = Option(elementWithData.getAttribute(DataPlaceholder)).filter(_.nonEmpty).map { placeholder =>
             new Select2.Option {
-              val id   = "0"
+              val id   = placeholderId
               val text = placeholder
             }
           }
 
           optionsOpt = Some(
             new Select2.Options {
-              val allowClear         = placeholderOpt.isDefined // allowClear can be enabled only if a placeholder is defined
-              val dropdownParent     = containerElem.closestOpt("dialog").orUndefined
-              val ajax               = if (isDatabound) Select2Ajax else null
-              val width              = "100%" // For Select2 width to update as the viewport width changes
-              val tags               = false
-              val minimumInputLength = Option(queryElementWithData.getAttribute(DataMinimumInputLength)).filter(_.nonEmpty).map(_.toInt).getOrElse(0)
-              val placeholder        = placeholderOpt.orUndefined
+              val allowClear            = placeholderOpt.isDefined // allowClear can be enabled only if a placeholder is defined
+              val dropdownParent        = containerElem.closestOpt("dialog").orUndefined
+              val ajax                  = if (isDatabound) Select2Ajax else null
+              val width                 = "100%" // For Select2 width to update as the viewport width changes
+              val tags                  = false
+              val minimumInputLength    = Option(queryElementWithData.getAttribute(DataMinimumInputLength)).filter(_.nonEmpty).map(_.toInt).getOrElse(0)
+              val placeholder           = placeholderOpt.orUndefined
+              override val matcher        = (! isDatabound).option(js.Any.fromFunction2(customMatcher(isCountry, placeholderId))).orUndefined
+              override val sorter         = (! isDatabound).option(js.Any.fromFunction1(customSorter(isCountry))).orUndefined
+              override val templateResult = (! isDatabound).option(js.Any.fromFunction2(customTemplateResult)).orUndefined
             }
           )
         }
@@ -156,7 +367,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
             (event: dom.KeyboardEvent) =>
               if (Set(10, 13, 32)(event.keyCode)) { // Enter and space
                 event.stopPropagation() // Prevent Select2 from opening the dropdown
-                jSelect.value("").trigger("change")
+                jSelect.value(placeholderId).trigger("change")
                 onChangeDispatchFrChange()
                 xformsFocus() // Move the focus from the "x", which disappeared, to the dropdown
               }
@@ -268,11 +479,12 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
 
   private def updatePlaceholder(): Unit = {
     val newPlaceholder = queryElementWithData.getAttribute(DataPlaceholder)
+    val placeholderId  = Option(querySelect).map(findPlaceholderOptionId).getOrElse("0")
 
     // Update the optionsWithoutTagsOpt with the new placeholder
     optionsOpt = optionsOpt.map { options =>
       options.copy(newPlaceholder = new Select2.Option {
-        val id   = "0"
+        val id   = placeholderId
         val text = newPlaceholder
       })
     }
@@ -314,6 +526,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       $(containerElem).find("select").trigger("change")
 
   private def onOpen(): Unit = {
+    currentSearchTerm   = ""
     val dropdownElement = document.querySelector(".select2-dropdown")
     val listboxElement  = dropdownElement.querySelector("[role=listbox]")
     val comboboxElement = containerElem.querySelector(".select2-selection")
@@ -324,8 +537,22 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     inputElement   .setAttribute("aria-owns"      , listboxElement.id)
     inputElement   .setAttribute("aria-haspopup"  , "listbox")
     inputElement   .setAttribute("aria-labelledby", labelledBy)
+    inputElement   .setAttribute("autocorrect"    , "off")
+    inputElement   .setAttribute("autocapitalize" , "off")
+    inputElement   .setAttribute("spellcheck"     , "false")
+    inputElement   .setAttribute("enterkeyhint"   , "done")
     comboboxElement.setAttribute("aria-controls"  , listboxElement.id)
     inputElementOpt = Some(inputElement)
+
+    // On mobile/touch devices, scroll the control toward the upper portion of the viewport so the dropdown
+    // and search input remain visible above the virtual keyboard
+    if (dom.window.matchMedia("(pointer: coarse)").matches) {
+      val rect = comboboxElement.getBoundingClientRect()
+      if (rect.top > dom.window.innerHeight * 0.35)
+        comboboxElement.asInstanceOf[js.Dynamic].scrollIntoView(
+          js.Dynamic.literal(behavior = "smooth", block = "start")
+        )
+    }
   }
 
   private def onResultsFocus(event: JQueryEvent): Unit = {

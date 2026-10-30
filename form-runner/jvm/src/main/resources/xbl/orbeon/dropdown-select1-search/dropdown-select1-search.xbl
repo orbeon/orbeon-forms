@@ -226,6 +226,7 @@
                 appearance="minimal"
                 ref="xxf:binding('fr-dropdown-select1-search')"
                 id="select1"
+                xbl:attr="xxf:encrypt-item-values autocomplete xxf:readonly-appearance"
                 data-placeholder="{
                     if ($disable-placeholder) then
                         ''

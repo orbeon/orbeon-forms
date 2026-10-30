@@ -37,34 +37,45 @@ object Select2 {
     val width              : String
     val tags               : Boolean
     val minimumInputLength : Int
+    val matcher            : js.UndefOr[js.Function2[ParamsData, Option, Option]]                 = js.undefined
+    val sorter             : js.UndefOr[js.Function1[js.Array[Option], js.Array[Option]]]         = js.undefined
+    val templateResult     : js.UndefOr[js.Function2[Option, html.Element, String]]               = js.undefined
   }
 
   implicit class OptionsOps(val o: Options) extends AnyVal {
     def copy(
-      newPlaceholder: js.UndefOr[Option] = o.placeholder,
-      newAjax: Ajax = o.ajax,
-      newAllowClear: Boolean = o.allowClear,
-      newDropdownParent: js.UndefOr[html.Element] = o.dropdownParent,
-      newWidth: String = o.width,
-      newTags: Boolean = o.tags,
-      newMinimumInputLength: Int = o.minimumInputLength
+      newPlaceholder        : js.UndefOr[Option]                                           = o.placeholder,
+      newAjax               : Ajax                                                         = o.ajax,
+      newAllowClear         : Boolean                                                      = o.allowClear,
+      newDropdownParent     : js.UndefOr[html.Element]                                     = o.dropdownParent,
+      newWidth              : String                                                       = o.width,
+      newTags               : Boolean                                                      = o.tags,
+      newMinimumInputLength : Int                                                          = o.minimumInputLength,
+      newMatcher            : js.UndefOr[js.Function2[ParamsData, Option, Option]]         = o.matcher,
+      newSorter             : js.UndefOr[js.Function1[js.Array[Option], js.Array[Option]]] = o.sorter,
+      newTemplateResult     : js.UndefOr[js.Function2[Option, html.Element, String]]       = o.templateResult
     ): Options = {
       new Options {
-        val placeholder = newPlaceholder
-        val ajax = newAjax
-        val allowClear = newAllowClear
-        val dropdownParent = newDropdownParent
-        val width = newWidth
-        val tags = newTags
+        val placeholder        = newPlaceholder
+        val ajax               = newAjax
+        val allowClear         = newAllowClear
+        val dropdownParent     = newDropdownParent
+        val width              = newWidth
+        val tags               = newTags
         val minimumInputLength = newMinimumInputLength
+        override val matcher        = newMatcher
+        override val sorter         = newSorter
+        override val templateResult = newTemplateResult
       }
     }
   }
 
   trait Option extends js.Object {
-    val id    : String
-    val text  : String
-    val title : js.UndefOr[String] = js.undefined
+    val id       : String
+    val text     : String
+    val title    : js.UndefOr[String]           = js.undefined
+    val element  : js.UndefOr[html.Element]     = js.undefined
+    val children : js.UndefOr[js.Array[Option]] = js.undefined
   }
 
   trait ParamsData extends js.Object {

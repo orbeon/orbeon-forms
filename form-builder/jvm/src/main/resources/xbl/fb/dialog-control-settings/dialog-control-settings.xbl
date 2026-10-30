@@ -939,7 +939,7 @@
                 <xf:bind
                     ref="autocomplete-allowed"
                     calculate="
-                        $i/control-local-name = ('currency', 'input', 'number', 'secret', 'time', 'us-phone', 'us-state')             or
+                        $i/control-local-name = ('country', 'currency', 'input', 'number', 'secret', 'time', 'us-phone', 'us-state')  or
                         ($i/control-local-name = ('date', 'dropdown-date', 'fields-date') and $i/appearances/@selection = '')         or
                         ($i/control-local-name = 'databound-select1'                      and $i/appearances/@selection = '')         or
                         ($i/control-local-name = 'select1'                                and $i/appearances/@selection = 'dropdown') or

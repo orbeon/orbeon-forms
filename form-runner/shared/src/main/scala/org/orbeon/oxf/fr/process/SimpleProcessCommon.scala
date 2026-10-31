@@ -19,14 +19,13 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.process.ProcessInterpreter.Action
 import org.orbeon.oxf.fr.process.ProcessParser.Combinator
-import org.orbeon.oxf.fr.{DataStatus, FormRunnerParams, Names}
+import org.orbeon.oxf.fr.{DataStatus, FormRunnerParams, FormRunnerParamsOpt, Names}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FunctionContext, IndentedLogger, LoggerFactory, XPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
-import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.model.XFormsInstanceSupport
 import org.orbeon.saxon.functions.FunctionLibrary
@@ -86,6 +85,9 @@ trait SimpleProcessCommon
 
   override def processError(t: Throwable): Unit =
     tryErrorMessage(Map(Some("resource") -> "process-error"))
+
+  override def findErrorContext: List[(String, String)] =
+    FormRunnerParamsOpt().toList.flatMap(_.debugPairs)
 
   def writeSuspendedProcess(processId: String, process: String): Unit =
     setvalue(topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement, List(processId, process).mkString("|"))

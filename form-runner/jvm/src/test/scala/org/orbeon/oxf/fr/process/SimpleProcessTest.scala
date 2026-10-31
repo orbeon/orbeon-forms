@@ -577,4 +577,133 @@ extends DocumentTestBase
       assert(interpreter.capturedDateTime1.get.compareTo(interpreter.capturedDateTime2.get) <= 0)
     }
   }
+  describe("Error logging (#7907)") {
+
+    class ErrorCapturingInterpreter extends TestProcessInterpreter {
+
+      val loggedErrors = mutable.ListBuffer[(String, List[(String, String)])]()
+
+      override def findErrorContext: List[(String, String)] =
+        List("app" -> "my-app", "form" -> "my-form")
+
+      override def error(message: => String, parameters: => Seq[(String, String)])(implicit logger: IndentedLogger): Unit =
+        loggedErrors += ((message, parameters.toList))
+
+      val subProcesses = Map(
+        "sub-with-unexpected-failure" -> """a1 then fail-unexpected(param = "v1")""",
+        "sub-nested"                  -> """sub-with-unexpected-failure"""
+      )
+
+      override def findProcessByName(scope: String, name: String): Option[String] =
+        subProcesses.get(name)
+
+      override def extensionActions: Iterable[(String, Action)] =
+        super.extensionActions ++ List(
+          "fail-unexpected" -> ((_: ActionParams) => ActionResult.trySync { throw new IllegalStateException("boom") }),
+          "fail-expected"   -> ((_: ActionParams) => ActionResult.trySync { throw ProcessFailure("expected failure") })
+        )
+    }
+
+    it("must log unexpected action failure with context and action, even when recovered") {
+      val interpreter = new ErrorCapturingInterpreter
+
+      val result = interpreter.runProcess("", """a1 then fail-unexpected(param = "v1") recover a2""")
+      assert(result.left.exists(_.isSuccess))
+      assert(interpreter.trace == "a1 a2")
+
+      assert(interpreter.loggedErrors.size == 1)
+      val (msg, params) = interpreter.loggedErrors.head
+      assert(msg == "process: error")
+      val paramsMap = params.toMap
+      assert(paramsMap.get("app").contains("my-app"))
+      assert(paramsMap.get("form").contains("my-form"))
+      assert(paramsMap.get("action").contains("""fail-unexpected(param = "v1")"""))
+      assert(paramsMap.get("throwable").exists(_.contains("boom")))
+    }
+
+    it("must not log expected `ProcessFailure` actions at error level") {
+      val interpreter = new ErrorCapturingInterpreter
+
+      interpreter.runProcess("", """fail-expected recover a1""")
+      interpreter.runProcess("", """continue-with-failure recover a2""")
+      interpreter.runProcess("", """terminate-with-failure""")
+
+      assert(interpreter.loggedErrors.isEmpty)
+    }
+
+    it("must log only the failing inner action once when a sub-process fails") {
+      val interpreter = new ErrorCapturingInterpreter
+
+      interpreter.runProcess("", """sub-nested recover a2""")
+      assert(interpreter.trace == "a1 a2")
+
+      assert(interpreter.loggedErrors.size == 1)
+      val (_, params) = interpreter.loggedErrors.head
+      assert(params.toMap.get("action").contains("""fail-unexpected(param = "v1")"""))
+    }
+
+    it("must log sub-process action when sub-process lookup fails") {
+      val interpreter = new ErrorCapturingInterpreter
+
+      interpreter.runProcess("", """non-existing-sub-process recover a1""")
+      assert(interpreter.trace == "a1")
+
+      assert(interpreter.loggedErrors.size == 1)
+      val (_, params) = interpreter.loggedErrors.head
+      assert(params.toMap.get("action").contains("non-existing-sub-process"))
+      assert(params.toMap.get("throwable").exists(_.contains("Non-existing process: non-existing-sub-process")))
+    }
+
+    it("must log only the failing inner action once when a resumed continuation fails") {
+      val interpreter = new ErrorCapturingInterpreter
+
+      interpreter.runProcess("", """a1 then suspend then fail-unexpected(param = "in-resume")""")
+      assert(interpreter.loggedErrors.isEmpty)
+
+      interpreter.runProcess("", """resume recover a2""")
+      assert(interpreter.loggedErrors.size == 1)
+      val (_, params) = interpreter.loggedErrors.head
+      assert(params.toMap.get("action").contains("""fail-unexpected(param = "in-resume")"""))
+
+      interpreter.loggedErrors.clear()
+      interpreter.runProcess("", """a1 then suspend then a2 recover a3""")
+      interpreter.runProcess("", """resume-with-failure""")
+      assert(interpreter.loggedErrors.isEmpty)
+    }
+
+    it("must log condition failure with context and serialized condition") {
+      val interpreter = new ErrorCapturingInterpreter
+
+      interpreter.runProcess("", """if ("invalid xpath ()(") then a1 else a2 recover a3""")
+
+      assert(interpreter.loggedErrors.size == 1)
+      val (msg, params) = interpreter.loggedErrors.head
+      assert(msg == "process: error")
+      val paramsMap = params.toMap
+      assert(paramsMap.get("app").contains("my-app"))
+      assert(paramsMap.get("form").contains("my-form"))
+      assert(paramsMap.get("condition").contains("""if ("invalid xpath ()(") then a1 else a2"""))
+      assert(paramsMap.contains("throwable"))
+    }
+
+    it("must include app/form in `SimpleProcess.findErrorContext` and use `ProcessFailure` for empty `navigate`") {
+      val (processorService, docOpt, _) = runFormRunner(
+        app        = "orbeon",
+        form       = "pta-remittance",
+        mode       = "edit",
+        documentId = Some("aed126ad8341b629f3b19ee7f3e9d4f7c83ebfe5")
+      )
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, docOpt.get) {
+          assert(SimpleProcess.findErrorContext == List("app" -> "orbeon", "form" -> "pta-remittance"))
+
+          val navResult = SimpleProcess.tryNavigate(Map(None -> "oxf.fr.detail.close.uri"))
+          assert(navResult match {
+            case ActionResult.Sync(Failure(_: ProcessFailure)) => true
+            case _                                             => false
+          })
+        }
+      }
+    }
+  }
 }

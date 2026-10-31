@@ -97,7 +97,7 @@ trait FormRunnerActionsCommon {
   def tryPendingUploads(params: ActionParams): ActionResult =
     ActionResult.trySync {
       if (inScopeContainingDocument.countPendingUploads > 0)
-        throw new OXFException("Pending uploads")
+        throw ProcessFailure("Pending uploads")
     }
 
   // Validate form data and fail if invalid
@@ -120,7 +120,7 @@ trait FormRunnerActionsCommon {
       inScopeContainingDocument.synchronizeAndRefresh()
 
       if (frc.countValidationsByLevel(level) > 0)
-        throw new OXFException(s"Data has failed validations for level ${level.entryName}")
+        throw ProcessFailure(s"Data has failed validations for level ${level.entryName}")
     }
 
   def tryUpdateCurrentWizardPageValidity(params: ActionParams): ActionResult =
@@ -134,7 +134,7 @@ trait FormRunnerActionsCommon {
       val isPrevAllowed = Wizard.isPrevAllowed
       dispatch(name = "fr-prev", targetId = Names.ViewComponent)
       if (! isPrevAllowed)
-        throw new UnsupportedOperationException
+        throw ProcessFailure()
     }
 
   def tryWizardNext(params: ActionParams): ActionResult =
@@ -143,7 +143,7 @@ trait FormRunnerActionsCommon {
       val isNextAllowed = Wizard.isNextAllowed
       dispatch(name = "fr-next", targetId = Names.ViewComponent)
       if (! isNextAllowed)
-        throw new UnsupportedOperationException
+        throw ProcessFailure()
     }
 
   // It makes sense to update all calculations as needed before saving data
@@ -450,7 +450,7 @@ trait FormRunnerActionsCommon {
         frc.formRunnerProperty(propertyName)(FormRunnerParams())
       }
 
-      val location     = fromParams orElse fromProperties map spc.evaluateValueTemplate flatMap trimAllToOpt get
+      val location     = fromParams orElse fromProperties map spc.evaluateValueTemplate flatMap trimAllToOpt getOrElse (throw ProcessFailure("No URL specified"))
       val targetOpt    = params.get(Some("target")) flatMap trimAllToOpt
       val showProgress = booleanParamByNameUseAvt(params, ShowProgressName, default = false)
 

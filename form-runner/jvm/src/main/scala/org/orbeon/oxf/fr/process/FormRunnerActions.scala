@@ -362,204 +362,205 @@ trait FormRunnerActions
       }.get
     }
 
-  def trySend(params: ActionParams): ActionResult = {
+  def trySend(params: ActionParams): ActionResult =
+    ActionResult.trySync {
 
-    implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
-    val FormRunnerParams(currentApp, currentForm, _, currentDocumentOpt, currentIsDraft, _) = formRunnerParams
-    val currentFormVersion = formRunnerParams.formVersion
+      implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
+      val FormRunnerParams(currentApp, currentForm, _, currentDocumentOpt, currentIsDraft, _) = formRunnerParams
+      val currentFormVersion = formRunnerParams.formVersion
 
-    implicit val xfcd           : XFormsContainingDocument = inScopeContainingDocument
-    implicit val propertySet    : PropertySet              = CoreCrossPlatformSupport.properties
-    implicit val externalContext: ExternalContext          = CoreCrossPlatformSupport.externalContext
+      implicit val xfcd           : XFormsContainingDocument = inScopeContainingDocument
+      implicit val propertySet    : PropertySet              = CoreCrossPlatformSupport.properties
+      implicit val externalContext: ExternalContext          = CoreCrossPlatformSupport.externalContext
 
-    val propertyPrefixOpt = paramByNameOrDefaultUseAvt(params, "property")
+      val propertyPrefixOpt = paramByNameOrDefaultUseAvt(params, "property")
 
-    def findParamValue(name: String): Option[String] = {
+      def findParamValue(name: String): Option[String] = {
 
-      def fromParam    = paramByNameUseAvt(params, name)
-      def fromProperty = propertyPrefixOpt.flatMap(prefix => formRunnerProperty(prefix + "." + name))
+        def fromParam    = paramByNameUseAvt(params, name)
+        def fromProperty = propertyPrefixOpt.flatMap(prefix => formRunnerProperty(prefix + "." + name))
 
-      fromParam.orElse(fromProperty).map(evaluateValueTemplate)
-    }
-
-    def updateUri(uri: String, parameters: List[String], dataFormatVersionNoneIfEdge: Option[DataFormatVersion]) = {
-
-      object SendProcessParams extends ProcessParams {
-        def runningProcessId  : String  = self.runningProcessId.get
-        def app               : String  = currentApp
-        def form              : String  = currentForm
-        def formVersion       : Int     = currentFormVersion
-        def document          : String  = currentDocumentOpt.get
-        def valid             : Boolean = FormRunner.dataValid
-        def language          : String  = FormRunner.currentLang
-        def dataFormatVersion : String  = dataFormatVersionNoneIfEdge.map(_.entryName).getOrElse("edge")
-        def workflowStage     : String  = FormRunner.documentWorkflowStage.getOrElse("")
+        fromParam.orElse(fromProperty).map(evaluateValueTemplate)
       }
 
-      FormRunnerActionsSupport.updateUriWithParams(
-        processParams       = SendProcessParams,
-        uri                 = uri,
-        requestedParamNames = parameters
-      )
-    }
+      def updateUri(uri: String, parameters: List[String], dataFormatVersionNoneIfEdge: Option[DataFormatVersion]) = {
 
-    // `ProcessParser` should handle all the escapes, but it doesn't right now. So, specifically for
-    // `headers`, we handle line breaks here.
-    // https://github.com/orbeon/orbeon-forms/issues/4295
-    def updateLineBreaks(s: String) =
-      s.replace("\\r\\n", "\n").replace("\\n", "\n")
-
-    val dataFormatVersionNoneIfEdge = findParamValue(DataFormatVersionName).map(DataFormatVersion.withNameNoneIfEdge)            .getOrElse(DataFormatVersion.V400.some)
-    val parameters                  = findParamValue("parameters").map(_.splitTo[List]())                                        .getOrElse(List("app", "form", "form-version", "document", "valid", "language", "process", DataFormatVersionName))
-
-    val uri                         = findParamValue("uri").map(updateUri(_, parameters, dataFormatVersionNoneIfEdge))           .getOrElse(throw new IllegalArgumentException("uri"))
-    val method                      = findParamValue("method").map(HttpMethod.withNameInsensitive)                               .getOrElse(HttpMethod.POST)
-    val headersOpt                  = findParamValue("headers").map(updateLineBreaks)
-    val serializationOpt            = findParamValue("serialization")
-    val pruneMetadataOpt            = findParamValue(PruneMetadataName).map(_.toBoolean)
-    val contentTypeOpt              = findParamValue(Headers.ContentTypeLower)
-    val showProgress                = findParamValue(ShowProgressName).map(_.toBoolean)                                          .getOrElse(true)
-    val formTargetOpt               = findParamValue(FormTargetName)
-    val pruneOpt                    = findParamValue("prune").map(_.toBoolean) // for backward compatibility
-    val relevanceHandling           = findParamValue(NonRelevantName).map(RelevanceHandling.withNameInsensitive)                 .getOrElse(RelevanceHandling.Remove)
-    val annotateWith                = findParamValue("annotate").map(_.splitTo[Set]())                                           .getOrElse(Set.empty)
-    val keepNonPersistedValues      = booleanParamByNameUseAvt(params, "keep-non-persisted-values", default = false)
-    val replace                     = findParamValue("replace")                                                                  .getOrElse(XFORMS_SUBMIT_REPLACE_NONE)
-    val contentToSend               = findParamValue("content").map(ContentToken.fromString).map(ContentToSend.fromContentTokens).getOrElse(ContentToSend.Single(ContentToken.Xml))
-
-    val distinctRenderedFormats = contentToSend match {
-      case ContentToSend.Single(ContentToken.Rendered(format, _)) => Set(format)
-      case ContentToSend.Multipart(parts)                         => parts collect { case ContentToken.Rendered(format, _) => format } toSet
-      case ContentToSend.NoContent | ContentToSend.Single(_)      => Set.empty[RenderedFormat]
-    }
-
-    // Handle defaults which depend on other properties
-    def getDefaultSerialization(method: HttpMethod): String =
-      (method, contentToSend) match {
-        case (HttpMethod.POST | HttpMethod.PUT, sd: SerializationDefaults) => sd.defaultSerialization
-        case _                                                             => "none"
-      }
-
-    def findDefaultContentType(method: HttpMethod): Option[String] =
-      (method, contentToSend) match {
-        case (HttpMethod.POST | HttpMethod.PUT, sd: SerializationDefaults) => Some(sd.defaultContentType)
-        case _                                                             => None
-      }
-
-    val effectiveSerialization =
-      serializationOpt.getOrElse(getDefaultSerialization(method))
-
-    val effectiveContentTypeOpt =
-      contentTypeOpt.orElse(findDefaultContentType(method))
-
-    val effectivePruneMetadata =
-      pruneMetadataOpt.getOrElse(dataFormatVersionNoneIfEdge.nonEmpty) // default: `edge` -> `None` -> `false`, else `true`
-
-    // Allow `prune` to override `nonrelevant` for backward compatibility
-    val effectiveRelevanceHandling =
-      pruneOpt match {
-        case Some(false) => RelevanceHandling.Keep
-        case Some(true)  => RelevanceHandling.Remove
-        case None        => relevanceHandling
-      }
-
-    // Create rendered format if needed
-    val renderedFormatTmpFileUris =
-      distinctRenderedFormats map { format =>
-        tryCreateRenderedFormatIfNeeded(
-          renderedFormatRequest(params, format),
-          createHardLinkIfPresent = false
-        ).get._1 -> format
-      }
-
-    // Create multipart if needed
-    val multipartTmpFileUriOpt =
-      contentToSend match {
-        case ContentToSend.Multipart(parts) =>
-
-          def maybeMigrateData(originalData: DocumentNodeInfoType): DocumentNodeInfoType =
-            GridDataMigration.dataMaybeMigratedFromEdge(
-              app                        = currentApp,
-              form                       = currentForm,
-              data                       = originalData,
-              metadataOpt                = frc.metadataInstanceImplicit.map(_.root),
-              dstDataFormatVersionString = FormRunnerPersistence.providerDataFormatVersionOrThrow(formRunnerParams.appForm).entryName,
-              pruneMetadata              = effectivePruneMetadata,
-              pruneTmpAttMetadata        = true
-            )
-
-          val basePath =
-            frc.createFormDataBasePath(
-              app               = currentApp,
-              form              = currentForm,
-              isDraft           = currentIsDraft.contains(true),
-              documentIdOrEmpty = currentDocumentOpt.getOrElse("")
-            )
-
-          Some(
-            FormRunnerActionsSupport.buildMultipartEntity(
-              dataMaybeLiveMaybeMigrated = maybeMigrateData(frc.formInstance.root),
-              parts                      = parts,
-              renderedFormatTmpFileUris  = renderedFormatTmpFileUris,
-              dataBasePaths              = List(basePath -> currentFormVersion),
-              relevanceHandling          = effectiveRelevanceHandling,
-              annotateWith               = annotateWith,
-              headersGetter              = xfcd.headersGetter
-            )
-          )
-        case _ => None
-      }
-
-    // If submitting binary (from the `xf:submission`'s point of view) find the URL
-    // For rendered formats, if there are multiple of them, we fall under the multipart case
-    def binaryContentUrlOpt =
-      multipartTmpFileUriOpt
-        .map(_._1)
-        .orElse {
-          renderedFormatTmpFileUris.headOption.flatMap { case (uri, format) =>
-            val isUrlOnly = contentToSend match {
-              case ContentToSend.Single(ContentToken.Rendered(_, true)) => true
-              case _                                                    => false
-            }
-            if (isUrlOnly && uri.getScheme == "file")
-              XFormsAssetServerRoute.proxyURI(
-                urlString   = uri.toString,
-                contentType = RenderedFormat.SupportedRenderFormatsMediatypes(format).some
-              )
-            else
-              uri.some
-          }
+        object SendProcessParams extends ProcessParams {
+          def runningProcessId  : String  = self.runningProcessId.get
+          def app               : String  = currentApp
+          def form              : String  = currentForm
+          def formVersion       : Int     = currentFormVersion
+          def document          : String  = currentDocumentOpt.get
+          def valid             : Boolean = FormRunner.dataValid
+          def language          : String  = FormRunner.currentLang
+          def dataFormatVersion : String  = dataFormatVersionNoneIfEdge.map(_.entryName).getOrElse("edge")
+          def workflowStage     : String  = FormRunner.documentWorkflowStage.getOrElse("")
         }
 
-    // Add the `boundary` parameter to the mediatype if needed
-    def multipartContentTypeOpt =
-      multipartTmpFileUriOpt.flatMap { case (_, boundary) => effectiveContentTypeOpt.map(ct => s"$ct; boundary=$boundary") }
+        FormRunnerActionsSupport.updateUriWithParams(
+          processParams       = SendProcessParams,
+          uri                 = uri,
+          requestedParamNames = parameters
+        )
+      }
 
-    val sendActionParams =
-      SendActionParams(
-        uri                    = uri,
-        method                 = method,
-        relevanceHandling      = effectiveRelevanceHandling,
-        annotateWith           = annotateWith,
-        keepNonPersistedValues = keepNonPersistedValues,
-        showProgress           = showProgress,
-        responseIsResource     = false,
-        formTargetOpt          = formTargetOpt,
-        contentToSend          = contentToSend,
-        dataFormatVersion      = dataFormatVersionNoneIfEdge.getOrElse(DataFormatVersion.Edge),
-        pruneMetadata          = effectivePruneMetadata,
-        pruneTmpAttMetadata    = true,
-        replace                = ReplaceType.withName(replace),
-        headersOpt             = headersOpt,
-        serialization          = effectiveSerialization,
-        binaryContentUrlOpt    = binaryContentUrlOpt,
-        contentTypeOpt         = multipartContentTypeOpt.orElse(effectiveContentTypeOpt),
-        isModeChange           = false,
-      )
+      // `ProcessParser` should handle all the escapes, but it doesn't right now. So, specifically for
+      // `headers`, we handle line breaks here.
+      // https://github.com/orbeon/orbeon-forms/issues/4295
+      def updateLineBreaks(s: String) =
+        s.replace("\\r\\n", "\n").replace("\\n", "\n")
 
-    debug(s"`send` action sending submission", List("params" -> sendActionParams.toString))
-    ActionResult.trySync(trySendImpl(sendActionParams))
-  }
+      val dataFormatVersionNoneIfEdge = findParamValue(DataFormatVersionName).map(DataFormatVersion.withNameNoneIfEdge)            .getOrElse(DataFormatVersion.V400.some)
+      val parameters                  = findParamValue("parameters").map(_.splitTo[List]())                                        .getOrElse(List("app", "form", "form-version", "document", "valid", "language", "process", DataFormatVersionName))
+
+      val uri                         = findParamValue("uri").map(updateUri(_, parameters, dataFormatVersionNoneIfEdge))           .getOrElse(throw new IllegalArgumentException("uri"))
+      val method                      = findParamValue("method").map(HttpMethod.withNameInsensitive)                               .getOrElse(HttpMethod.POST)
+      val headersOpt                  = findParamValue("headers").map(updateLineBreaks)
+      val serializationOpt            = findParamValue("serialization")
+      val pruneMetadataOpt            = findParamValue(PruneMetadataName).map(_.toBoolean)
+      val contentTypeOpt              = findParamValue(Headers.ContentTypeLower)
+      val showProgress                = findParamValue(ShowProgressName).map(_.toBoolean)                                          .getOrElse(true)
+      val formTargetOpt               = findParamValue(FormTargetName)
+      val pruneOpt                    = findParamValue("prune").map(_.toBoolean) // for backward compatibility
+      val relevanceHandling           = findParamValue(NonRelevantName).map(RelevanceHandling.withNameInsensitive)                 .getOrElse(RelevanceHandling.Remove)
+      val annotateWith                = findParamValue("annotate").map(_.splitTo[Set]())                                           .getOrElse(Set.empty)
+      val keepNonPersistedValues      = booleanParamByNameUseAvt(params, "keep-non-persisted-values", default = false)
+      val replace                     = findParamValue("replace")                                                                  .getOrElse(XFORMS_SUBMIT_REPLACE_NONE)
+      val contentToSend               = findParamValue("content").map(ContentToken.fromString).map(ContentToSend.fromContentTokens).getOrElse(ContentToSend.Single(ContentToken.Xml))
+
+      val distinctRenderedFormats = contentToSend match {
+        case ContentToSend.Single(ContentToken.Rendered(format, _)) => Set(format)
+        case ContentToSend.Multipart(parts)                         => parts collect { case ContentToken.Rendered(format, _) => format } toSet
+        case ContentToSend.NoContent | ContentToSend.Single(_)      => Set.empty[RenderedFormat]
+      }
+
+      // Handle defaults which depend on other properties
+      def getDefaultSerialization(method: HttpMethod): String =
+        (method, contentToSend) match {
+          case (HttpMethod.POST | HttpMethod.PUT, sd: SerializationDefaults) => sd.defaultSerialization
+          case _                                                             => "none"
+        }
+
+      def findDefaultContentType(method: HttpMethod): Option[String] =
+        (method, contentToSend) match {
+          case (HttpMethod.POST | HttpMethod.PUT, sd: SerializationDefaults) => Some(sd.defaultContentType)
+          case _                                                             => None
+        }
+
+      val effectiveSerialization =
+        serializationOpt.getOrElse(getDefaultSerialization(method))
+
+      val effectiveContentTypeOpt =
+        contentTypeOpt.orElse(findDefaultContentType(method))
+
+      val effectivePruneMetadata =
+        pruneMetadataOpt.getOrElse(dataFormatVersionNoneIfEdge.nonEmpty) // default: `edge` -> `None` -> `false`, else `true`
+
+      // Allow `prune` to override `nonrelevant` for backward compatibility
+      val effectiveRelevanceHandling =
+        pruneOpt match {
+          case Some(false) => RelevanceHandling.Keep
+          case Some(true)  => RelevanceHandling.Remove
+          case None        => relevanceHandling
+        }
+
+      // Create rendered format if needed
+      val renderedFormatTmpFileUris =
+        distinctRenderedFormats map { format =>
+          tryCreateRenderedFormatIfNeeded(
+            renderedFormatRequest(params, format),
+            createHardLinkIfPresent = false
+          ).get._1 -> format
+        }
+
+      // Create multipart if needed
+      val multipartTmpFileUriOpt =
+        contentToSend match {
+          case ContentToSend.Multipart(parts) =>
+
+            def maybeMigrateData(originalData: DocumentNodeInfoType): DocumentNodeInfoType =
+              GridDataMigration.dataMaybeMigratedFromEdge(
+                app                        = currentApp,
+                form                       = currentForm,
+                data                       = originalData,
+                metadataOpt                = frc.metadataInstanceImplicit.map(_.root),
+                dstDataFormatVersionString = FormRunnerPersistence.providerDataFormatVersionOrThrow(formRunnerParams.appForm).entryName,
+                pruneMetadata              = effectivePruneMetadata,
+                pruneTmpAttMetadata        = true
+              )
+
+            val basePath =
+              frc.createFormDataBasePath(
+                app               = currentApp,
+                form              = currentForm,
+                isDraft           = currentIsDraft.contains(true),
+                documentIdOrEmpty = currentDocumentOpt.getOrElse("")
+              )
+
+            Some(
+              FormRunnerActionsSupport.buildMultipartEntity(
+                dataMaybeLiveMaybeMigrated = maybeMigrateData(frc.formInstance.root),
+                parts                      = parts,
+                renderedFormatTmpFileUris  = renderedFormatTmpFileUris,
+                dataBasePaths              = List(basePath -> currentFormVersion),
+                relevanceHandling          = effectiveRelevanceHandling,
+                annotateWith               = annotateWith,
+                headersGetter              = xfcd.headersGetter
+              )
+            )
+          case _ => None
+        }
+
+      // If submitting binary (from the `xf:submission`'s point of view) find the URL
+      // For rendered formats, if there are multiple of them, we fall under the multipart case
+      def binaryContentUrlOpt =
+        multipartTmpFileUriOpt
+          .map(_._1)
+          .orElse {
+            renderedFormatTmpFileUris.headOption.flatMap { case (uri, format) =>
+              val isUrlOnly = contentToSend match {
+                case ContentToSend.Single(ContentToken.Rendered(_, true)) => true
+                case _                                                    => false
+              }
+              if (isUrlOnly && uri.getScheme == "file")
+                XFormsAssetServerRoute.proxyURI(
+                  urlString   = uri.toString,
+                  contentType = RenderedFormat.SupportedRenderFormatsMediatypes(format).some
+                )
+              else
+                uri.some
+            }
+          }
+
+      // Add the `boundary` parameter to the mediatype if needed
+      def multipartContentTypeOpt =
+        multipartTmpFileUriOpt.flatMap { case (_, boundary) => effectiveContentTypeOpt.map(ct => s"$ct; boundary=$boundary") }
+
+      val sendActionParams =
+        SendActionParams(
+          uri                    = uri,
+          method                 = method,
+          relevanceHandling      = effectiveRelevanceHandling,
+          annotateWith           = annotateWith,
+          keepNonPersistedValues = keepNonPersistedValues,
+          showProgress           = showProgress,
+          responseIsResource     = false,
+          formTargetOpt          = formTargetOpt,
+          contentToSend          = contentToSend,
+          dataFormatVersion      = dataFormatVersionNoneIfEdge.getOrElse(DataFormatVersion.Edge),
+          pruneMetadata          = effectivePruneMetadata,
+          pruneTmpAttMetadata    = true,
+          replace                = ReplaceType.withName(replace),
+          headersOpt             = headersOpt,
+          serialization          = effectiveSerialization,
+          binaryContentUrlOpt    = binaryContentUrlOpt,
+          contentTypeOpt         = multipartContentTypeOpt.orElse(effectiveContentTypeOpt),
+          isModeChange           = false,
+        )
+
+      debug(s"`send` action sending submission", List("params" -> sendActionParams.toString))
+      trySendImpl(sendActionParams)
+    }
 
   def trySendImpl(params: SendActionParams): Option[XFormsSubmitDoneEvent] = {
 

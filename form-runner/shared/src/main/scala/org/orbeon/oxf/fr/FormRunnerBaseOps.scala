@@ -68,6 +68,16 @@ case class FormRunnerParams(
   def modeType(customModes: Iterable[FormRunnerDetailMode.Custom]): ModeType =
     ModeType.modeTypeFromPublicName(mode, excludeSecondaryModes = true, customModes)
       .getOrElse(throw new IllegalArgumentException(s"Invalid mode: `$mode`"))
+
+  def debugPairs: List[(String, String)] =
+      List(
+        "app"      -> app.trimAllToOpt,
+        "form"     -> form.trimAllToOpt,
+        "version"  -> formVersion.toString.trimAllToOpt,
+        "document" -> document.flatMap(_.trimAllToOpt),
+        "draft"    -> isDraft.map(_.toString).flatMap(_.trimAllToOpt),
+        "mode"     -> mode.trimAllToOpt,
+      ).collect { case (k, Some(v)) => k -> v }
 }
 
 object FormRunnerParams {

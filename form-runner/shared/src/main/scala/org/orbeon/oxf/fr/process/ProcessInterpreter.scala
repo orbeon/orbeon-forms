@@ -66,6 +66,20 @@ trait ProcessInterpreter extends Logging {
   def extensionActions: Iterable[(String, Action)] = Nil
   def beforeProcess(isContinuation: Boolean): Try[Any] = Try(())
 //  def afterProcess():  Try[Any] = Try(())
+  def findErrorContext: List[(String, String)] = Nil
+
+  private def logUnexpectedError(t: Throwable, params: (String, String)*): Unit =
+    t match {
+      case _: ProcessFailure =>
+      case _ =>
+        error(
+          "process: error",
+          findErrorContext :::
+          params.toList    :::
+          ("throwable" -> OrbeonFormatter.format(t)) ::
+          Nil
+        )
+    }
 
   private object ProcessRuntime {
 
@@ -96,9 +110,6 @@ trait ProcessInterpreter extends Logging {
 
     // Keep stack frames for the execution of action. They can nest with sub-processes.
     val processStackDyn = new DynamicVariable[Process]
-
-    // Used to interrupt a process
-    case class ProcessFailure() extends Throwable with NoStackTrace
 
     // Scope an empty stack around a process execution
     def withEmptyStack[T](scope: String)(body: => T): T = {
@@ -145,9 +156,13 @@ trait ProcessInterpreter extends Logging {
         withDebug("process: running action", List("action" -> action.toString)) {
 
           val actionResult =
-            AllAllowedActions
-              .getOrElse(action.name, (_: ActionParams) => tryProcess(Map(Some("name") -> action.name)))
-              .apply(action.params)
+            Try(
+              AllAllowedActions
+                .getOrElse(action.name, (_: ActionParams) => tryProcess(Map(Some("name") -> action.name)))
+                .apply(action.params)
+            ).recover {
+              case t => ActionResult.Sync(Failure(t))
+            }.get
 
           actionResult match {
             case r @ ActionResult.Sync(Success(_)) =>
@@ -155,8 +170,17 @@ trait ProcessInterpreter extends Logging {
               r
             case r @ ActionResult.Sync(Failure(e)) =>
               debugResults(List("result" -> s"failed action: ${e.getMessage}"))
+              logUnexpectedError(e, "action" -> action.serialize)
               r
-            case ActionResult.Async(failure @ Failure(_)) =>
+            case ActionResult.SubProcess(Success((subProcess, subInitialTry))) =>
+              runSubProcess(subProcess, subInitialTry)
+            case ActionResult.SubProcess(failure @ Failure(e)) =>
+              debugResults(List("result" -> s"failed action: ${e.getMessage}"))
+              logUnexpectedError(e, "action" -> action.serialize)
+              ActionResult.Sync(failure)
+            case ActionResult.Async(failure @ Failure(e)) =>
+              debugResults(List("result" -> s"failed action: ${e.getMessage}"))
+              logUnexpectedError(e, "action" -> action.serialize)
               ActionResult.Sync(failure)
             case ActionResult.Async(Success((computation, continuation))) =>
               debugResults(List("result" -> "suspended asynchronous action"))
@@ -171,10 +195,12 @@ trait ProcessInterpreter extends Logging {
                     s"continuation of process $runningProcessId",
                     computation,
                     (xfcd: XFormsContainingDocument, computationResult: Try[Any]) => {
+                      val tried = Try(continuation(xfcd, computationResult)).flatten
+                      tried.failed.foreach(logUnexpectedError(_, "action" -> action.serialize))
                       runProcess(
                         processScope,
                         serializedContinuation._2,
-                        continuation(xfcd, computationResult),
+                        tried,
                         isContinuation = true
                       )
                     }
@@ -239,6 +265,7 @@ trait ProcessInterpreter extends Logging {
             ActionResult.Sync(Success(()))
           case (Failure(t), _) =>
             debug("process: condition failed", List("throwable" -> OrbeonFormatter.format(t)))
+            logUnexpectedError(t, "condition" -> condition.serialize)
             ActionResult.Sync(Failure(t))
         }
 
@@ -291,7 +318,7 @@ trait ProcessInterpreter extends Logging {
           .recoverWith { case t =>
             // Log and send a user error if there is one
             // NOTE: In the future, it would be good to provide the user with an error id.
-            error(OrbeonFormatter.format(t))
+            logUnexpectedError(t)
             Try(processError(t))
             Failure(t)
           } match {
@@ -329,12 +356,9 @@ trait ProcessInterpreter extends Logging {
 
   // Run a sub-process
   private def tryProcess(params: ActionParams): ActionResult =
-    Try(paramByNameOrDefaultUseAvt(params, "name").get)
-      .map(rawProcessByName(processStackDyn.value.get.scope, _)) match {
-      case Success(process) =>
-        runSubProcess(process, Success(()))
-      case failure @ Failure(_) =>
-        ActionResult.Sync(failure)
+    ActionResult.trySubProcess() {
+      val name = paramByNameOrDefaultUseAvt(params, "name").get
+      rawProcessByName(processStackDyn.value.get.scope, name)
     }
 
   // Suspend the process
@@ -343,8 +367,7 @@ trait ProcessInterpreter extends Logging {
       case Success(_) =>
         tryTerminateWithSuccess(EmptyActionParams) // this will not be caught by `Try.apply()`
         ActionResult.Interrupt(None, Left(Success(())))
-      case failure @ Failure(t) =>
-        error(s"error suspending process: `${t.getMessage}`")
+      case failure @ Failure(_) =>
         ActionResult.Sync(failure)
     }
 
@@ -356,14 +379,11 @@ trait ProcessInterpreter extends Logging {
     tryResumeWithTry(params, Failure(ProcessFailure()))
 
   private def tryResumeWithTry(params: ActionParams, initialTry: Try[Any]): ActionResult =
-    readSuspendedProcess match {
-      case Success((processId, continuation)) =>
-        // TODO: Restore processId
-        clearSuspendedProcess()
-        runSubProcess(continuation, initialTry)
-      case failure @ Failure(t) =>
-        error(s"error suspending process: `${t.getMessage}`")
-        ActionResult.Sync(failure)
+    ActionResult.trySubProcess(initialTry) {
+      val (processId, continuation) = readSuspendedProcess.get
+      // TODO: Restore processId
+      clearSuspendedProcess()
+      continuation
     }
 
   // Abort a suspended process
@@ -476,14 +496,19 @@ object ProcessInterpreter {
       )
     )
 
+  // Used to interrupt a process or signal an expected control-flow failure
+  case class ProcessFailure(message: String = null) extends RuntimeException(message) with NoStackTrace
+
   sealed trait ActionResult
   sealed trait InternalActionResult extends ActionResult
   object ActionResult {
     case class Sync(value: Try[Any])                                                         extends InternalActionResult
+    case class SubProcess(value: Try[(String, Try[Any])])                                    extends ActionResult
     case class Async[T](value: Try[(IO[T], (XFormsContainingDocument, Try[T]) => Try[Any])]) extends ActionResult
     case class Interrupt(message: Option[String], value: Either[Try[Any], Future[Any]])      extends InternalActionResult
 
     def trySync(body: => Any): ActionResult = ActionResult.Sync(Try(body))
+    def trySubProcess(initialTry: Try[Any] = Success(()))(body: => String): ActionResult = ActionResult.SubProcess(Try(body -> initialTry))
     def tryAsync[T](body: => (IO[T], (XFormsContainingDocument, Try[T]) => Try[Any])): ActionResult = ActionResult.Async(Try(body))
   }
 

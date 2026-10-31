@@ -38,6 +38,12 @@ object TinyMce {
     requestedLanguageOpt : Option[String]
   ): Unit = {
 
+    // Language files in `tinymce-i18n` call `tinymce.addI18n(...)`, while HugeRTE exposes `window.hugerte`.
+    // Use `g.window.tinymce` (which compiles to `window.tinymce`) rather than `g.tinymce` (which compiles to a bare
+    // `tinymce` identifier and throws a `ReferenceError` in strict mode when `tinymce` is not yet defined).
+    if (js.isUndefined(g.window.tinymce))
+      g.window.tinymce = GlobalTinyMce
+
     val resolvedLanguage =
       tinyMceConfig.language.toOption
         .orElse(requestedLanguageOpt.map(l => LanguageCodeMap.getOrElse(l, l)))
@@ -56,7 +62,7 @@ object TinyMce {
     js.JSON.parse(js.JSON.stringify(config)).asInstanceOf[TinyMceConfig]
 
   @js.native
-  @JSGlobal("tinymce")
+  @JSGlobal("hugerte")
   object GlobalTinyMce extends js.Object {
     var baseURL: String = js.native
     val EditorManager: TinyMceEditorManager = js.native
@@ -72,7 +78,7 @@ object TinyMce {
   }
 
   @js.native
-  @JSGlobal("tinymce.Editor")
+  @JSGlobal("hugerte.Editor")
   class TinyMceEditor(
     containerId   : String,
     config        : TinyMceConfig,
@@ -155,13 +161,13 @@ object TinyMce {
       "zh-TW" -> "zh-Hant"
     )
 
-    // Language packs are in the tinymce-i18n webjar, next to the tinymce webjar found in the base URL. In a portlet,
+    // Language packs are in the tinymce-i18n webjar, next to the hugerte webjar found in the base URL. In a portlet,
     // the resource path is percent-encoded inside a query parameter, so also match the encoded separator and keep it
     // for the path we append.
     def findLanguageUrl(tinyMceBaseUrl: String, language: String): Option[String] =
       tinyMceBaseUrl.trimAllToOpt.flatMap { url =>
         Iterator("/", "%2F", "%2f")
-          .map(slash => (slash, url.indexOf(s"${slash}webjars${slash}tinymce$slash")))
+          .map(slash => (slash, url.indexOf(s"${slash}webjars${slash}hugerte$slash")))
           .collectFirst { case (slash, markerIndex) if markerIndex >= 0 =>
             url.substring(0, markerIndex) +
               List("webjars", "tinymce-i18n", TinyMceI18nVersion, "langs6", s"$language.js").mkString(slash, slash, "")

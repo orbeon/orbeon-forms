@@ -22,11 +22,11 @@
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
     xmlns:f="http://orbeon.org/oxf/xml/formatting">
 
-    <xbl:script src="/webjars/tinymce/6.8.6/tinymce.min.js"/>
-    <xbl:script src="/webjars/tinymce/6.8.6/icons/default/icons.min.js"/>
-    <xbl:script src="/webjars/tinymce/6.8.6/themes/silver/theme.min.js"/>
-    <xbl:script src="/webjars/tinymce/6.8.6/plugins/lists/plugin.min.js"/>
-    <xbl:script src="/webjars/tinymce/6.8.6/plugins/link/plugin.min.js"/>
+    <xbl:script src="/webjars/hugerte/1.0.15/hugerte.min.js"/>
+    <xbl:script src="/webjars/hugerte/1.0.15/icons/default/icons.min.js"/>
+    <xbl:script src="/webjars/hugerte/1.0.15/themes/silver/theme.min.js"/>
+    <xbl:script src="/webjars/hugerte/1.0.15/plugins/lists/plugin.min.js"/>
+    <xbl:script src="/webjars/hugerte/1.0.15/plugins/link/plugin.min.js"/>
 
     <xbl:binding
         id="fr-tinymce"
@@ -93,7 +93,7 @@
                  - https://github.com/orbeon/orbeon-forms/issues/3473
                  - https://github.com/orbeon/orbeon-forms/issues/5440
              -->
-            <xbl:style src="/webjars/tinymce/6.8.6/skins/ui/oxide/skin.min.css"/>
+            <xbl:style src="/webjars/hugerte/1.0.15/skins/ui/oxide/skin.min.css"/>
         </xbl:resources>
         <xbl:template>
             <!-- In portlet mode, we want the resource id to be processed into a base URL, and we use a magic value to
@@ -108,7 +108,7 @@
             <xh:a
                 f:url-type="resource"
                 data-tinymce-config="{fr:component-param-value('config')}"
-                href="/webjars/tinymce/6.8.61b713b2e6d7fd45753f4b8a6270b776e.js"
+                href="/webjars/hugerte/1.0.151b713b2e6d7fd45753f4b8a6270b776e.js"
                 class="tinymce-base-url xforms-hidden"/>
 
             <xh:div

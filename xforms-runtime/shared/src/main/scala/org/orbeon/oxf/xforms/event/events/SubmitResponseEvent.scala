@@ -40,6 +40,7 @@ trait SubmitResponseEvent extends XFormsEvent {
 
   def connectionResult: Option[ConnectionResultT[?]]
   final def headers: Option[Map[String, List[String]]] = connectionResult map (_.headers)
+  def statusCodeOpt: Option[Int] = connectionResult.flatMap(c => Option(c.statusCode).filter(_ > 0))
 
   // For a given event, temporarily keep a reference to the body so that it's possible to call
   // `event('response-body')` multiple times.
@@ -183,6 +184,6 @@ private object SubmitResponseEvent {
     "response-body"          -> body,
     "body"                   -> body,
     "resource-uri"           -> (e => e.connectionResult flatMap (c => Option(c.url))),
-    "response-status-code"   -> (e => e.connectionResult flatMap (c => Option(c.statusCode) filter (_ > 0)))
+    "response-status-code"   -> (_.statusCodeOpt)
   )
 }

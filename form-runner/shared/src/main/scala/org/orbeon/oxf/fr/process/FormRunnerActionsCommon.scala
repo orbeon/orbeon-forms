@@ -97,7 +97,7 @@ trait FormRunnerActionsCommon {
   def tryPendingUploads(params: ActionParams): ActionResult =
     ActionResult.trySync {
       if (inScopeContainingDocument.countPendingUploads > 0)
-        throw ProcessFailure("Pending uploads")
+        throw ProcessError.normal("Pending uploads")
     }
 
   // Validate form data and fail if invalid
@@ -120,7 +120,7 @@ trait FormRunnerActionsCommon {
       inScopeContainingDocument.synchronizeAndRefresh()
 
       if (frc.countValidationsByLevel(level) > 0)
-        throw ProcessFailure(s"Data has failed validations for level ${level.entryName}")
+        throw ProcessError.normal(s"Data has failed validations for level ${level.entryName}")
     }
 
   def tryUpdateCurrentWizardPageValidity(params: ActionParams): ActionResult =
@@ -134,7 +134,7 @@ trait FormRunnerActionsCommon {
       val isPrevAllowed = Wizard.isPrevAllowed
       dispatch(name = "fr-prev", targetId = Names.ViewComponent)
       if (! isPrevAllowed)
-        throw ProcessFailure()
+        throw ProcessError.normal()
     }
 
   def tryWizardNext(params: ActionParams): ActionResult =
@@ -143,7 +143,7 @@ trait FormRunnerActionsCommon {
       val isNextAllowed = Wizard.isNextAllowed
       dispatch(name = "fr-next", targetId = Names.ViewComponent)
       if (! isNextAllowed)
-        throw ProcessFailure()
+        throw ProcessError.normal()
     }
 
   // It makes sense to update all calculations as needed before saving data
@@ -285,7 +285,10 @@ trait FormRunnerActionsCommon {
                 ).toMap
               )
 
-              if (conflictDetected) Success(()) else Failure(t)
+              if (conflictDetected)
+                Success(())
+              else
+                Failure(ProcessError.fromThrowable(t, defaultErrorType = ProcessErrorType.Database))
           }
         } .flatten
 
@@ -295,7 +298,9 @@ trait FormRunnerActionsCommon {
   def tryRelinquishLease(params: ActionParams): ActionResult = ActionResult.trySync {
     val leaseState = frc.persistenceInstance.rootElement / "lease-state"
     if (leaseState.stringValue == "current-user") {
-      sendThrowOnError("fr-relinquish-lease-submission", Nil)
+      Try(sendThrowOnError("fr-relinquish-lease-submission", Nil))
+        .failed
+        .foreach(t => throw ProcessError.fromThrowable(t, defaultErrorType = ProcessErrorType.Database))
       setvalue(leaseState, "relinquished")
     }
   }
@@ -450,7 +455,7 @@ trait FormRunnerActionsCommon {
         frc.formRunnerProperty(propertyName)(FormRunnerParams())
       }
 
-      val location     = fromParams orElse fromProperties map spc.evaluateValueTemplate flatMap trimAllToOpt getOrElse (throw ProcessFailure("No URL specified"))
+      val location     = fromParams orElse fromProperties map spc.evaluateValueTemplate flatMap trimAllToOpt getOrElse (throw ProcessError.normal("No URL specified"))
       val targetOpt    = params.get(Some("target")) flatMap trimAllToOpt
       val showProgress = booleanParamByNameUseAvt(params, ShowProgressName, default = false)
 

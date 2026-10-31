@@ -18,12 +18,14 @@ import org.orbeon.oxf.fr.process.ProcessInterpreter.*
 import org.orbeon.oxf.fr.process.ProcessParser.*
 import org.orbeon.oxf.fr.process.TestProcessInterpreter.ConstantProcessId
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerSupport, Names}
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.{executionContext, runtime}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{FunctionContext, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.{Item, NodeInfo}
@@ -577,7 +579,8 @@ extends DocumentTestBase
       assert(interpreter.capturedDateTime1.get.compareTo(interpreter.capturedDateTime2.get) <= 0)
     }
   }
-  describe("Error logging (#7907)") {
+
+  describe("Error logging and classification (#7907, #7908)") {
 
     class ErrorCapturingInterpreter extends TestProcessInterpreter {
 
@@ -600,11 +603,20 @@ extends DocumentTestBase
       override def extensionActions: Iterable[(String, Action)] =
         super.extensionActions ++ List(
           "fail-unexpected" -> ((_: ActionParams) => ActionResult.trySync { throw new IllegalStateException("boom") }),
-          "fail-expected"   -> ((_: ActionParams) => ActionResult.trySync { throw ProcessFailure("expected failure") })
+          "fail-expected"   -> ((_: ActionParams) => ActionResult.trySync { throw ProcessError.normal("expected failure") }),
+          "fail-database"   -> ((_: ActionParams) => ActionResult.trySync {
+            throw ProcessError.fromThrowable(HttpStatusCodeException(StatusCode.InternalServerError), defaultErrorType = ProcessErrorType.Database)
+          }),
+          "fail-db-perm"    -> ((_: ActionParams) => ActionResult.trySync {
+            throw ProcessError.fromThrowable(HttpStatusCodeException(StatusCode.Forbidden), defaultErrorType = ProcessErrorType.Database)
+          }),
+          "fail-email"      -> ((_: ActionParams) => ActionResult.trySync {
+            throw ProcessError.fromThrowable(new RuntimeException("SMTP failure"), defaultErrorType = ProcessErrorType.Email)
+          })
         )
     }
 
-    it("must log unexpected action failure with context and action, even when recovered") {
+    it("must log unexpected action failure with context, error-type, and action, even when recovered") {
       val interpreter = new ErrorCapturingInterpreter
 
       val result = interpreter.runProcess("", """a1 then fail-unexpected(param = "v1") recover a2""")
@@ -617,17 +629,22 @@ extends DocumentTestBase
       val paramsMap = params.toMap
       assert(paramsMap.get("app").contains("my-app"))
       assert(paramsMap.get("form").contains("my-form"))
+      assert(paramsMap.get("error-type").contains("internal"))
       assert(paramsMap.get("action").contains("""fail-unexpected(param = "v1")"""))
       assert(paramsMap.get("throwable").exists(_.contains("boom")))
     }
 
-    it("must not log expected `ProcessFailure` actions at error level") {
+    it("must not log expected `ProcessErrorType.Normal` actions at error level") {
       val interpreter = new ErrorCapturingInterpreter
 
       interpreter.runProcess("", """fail-expected recover a1""")
       interpreter.runProcess("", """continue-with-failure recover a2""")
-      interpreter.runProcess("", """terminate-with-failure""")
+      val termResult = interpreter.runProcess("", """terminate-with-failure""")
 
+      assert(termResult match {
+        case Left(Failure(ProcessError(ProcessErrorType.Normal, _, _, _, _, _))) => true
+        case _                                                                   => false
+      })
       assert(interpreter.loggedErrors.isEmpty)
     }
 
@@ -651,6 +668,7 @@ extends DocumentTestBase
       assert(interpreter.loggedErrors.size == 1)
       val (_, params) = interpreter.loggedErrors.head
       assert(params.toMap.get("action").contains("non-existing-sub-process"))
+      assert(params.toMap.get("error-type").contains("internal"))
       assert(params.toMap.get("throwable").exists(_.contains("Non-existing process: non-existing-sub-process")))
     }
 
@@ -682,11 +700,12 @@ extends DocumentTestBase
       val paramsMap = params.toMap
       assert(paramsMap.get("app").contains("my-app"))
       assert(paramsMap.get("form").contains("my-form"))
+      assert(paramsMap.get("error-type").contains("internal"))
       assert(paramsMap.get("condition").contains("""if ("invalid xpath ()(") then a1 else a2"""))
       assert(paramsMap.contains("throwable"))
     }
 
-    it("must include app/form in `SimpleProcess.findErrorContext` and use `ProcessFailure` for empty `navigate`") {
+    it("must include app/form in `SimpleProcess.findErrorContext` and use `ProcessErrorType.Normal` for empty `navigate`") {
       val (processorService, docOpt, _) = runFormRunner(
         app        = "orbeon",
         form       = "pta-remittance",
@@ -695,13 +714,88 @@ extends DocumentTestBase
       )
       withTestExternalContext { _ =>
         withFormRunnerDocument(processorService, docOpt.get) {
-          assert(SimpleProcess.findErrorContext == List("app" -> "orbeon", "form" -> "pta-remittance"))
+          assert(
+            SimpleProcess.findErrorContext ==
+              List(
+                "app"      -> "orbeon",
+                "form"     -> "pta-remittance",
+                "version"  -> "1",
+                "document" -> "aed126ad8341b629f3b19ee7f3e9d4f7c83ebfe5",
+                "mode"     -> "edit"
+              )
+          )
 
           val navResult = SimpleProcess.tryNavigate(Map(None -> "oxf.fr.detail.close.uri"))
           assert(navResult match {
-            case ActionResult.Sync(Failure(_: ProcessFailure)) => true
-            case _                                             => false
+            case ActionResult.Sync(Failure(ProcessError(ProcessErrorType.Normal, _, _, _, _, _))) => true
+            case _                                                                                => false
           })
+        }
+      }
+    }
+
+    it("must classify and log `Database`, `Permissions`, `Network`, `Email`, and `Internal` errors (#7908)") {
+      val interpreter = new ErrorCapturingInterpreter
+
+      val dbResult = interpreter.runProcess("", """fail-database""")
+      assert(dbResult match {
+        case Left(Failure(ProcessError(ProcessErrorType.Database, _, Some(500), Some("fail-database"), _, _))) => true
+        case _                                                                                                 => false
+      })
+      assert(interpreter.loggedErrors.last._2.toMap.get("error-type").contains("database"))
+      assert(interpreter.loggedErrors.last._2.toMap.get("status-code").contains("500"))
+
+      val permResult = interpreter.runProcess("", """fail-db-perm""")
+      assert(permResult match {
+        case Left(Failure(ProcessError(ProcessErrorType.Permissions, _, Some(403), Some("fail-db-perm"), _, _))) => true
+        case _                                                                                                   => false
+      })
+      assert(interpreter.loggedErrors.last._2.toMap.get("error-type").contains("permissions"))
+      assert(interpreter.loggedErrors.last._2.toMap.get("status-code").contains("403"))
+
+      val emailResult = interpreter.runProcess("", """fail-email""")
+      assert(emailResult match {
+        case Left(Failure(ProcessError(ProcessErrorType.Email, _, None, Some("fail-email"), _, _))) => true
+        case _                                                                                      => false
+      })
+      assert(interpreter.loggedErrors.last._2.toMap.get("error-type").contains("email"))
+    }
+
+    it("must classify `SubmitException` errors accurately via `ProcessError.fromThrowable` (#7908)") {
+      val (processorService, docOpt, _) = runFormRunner(
+        app        = "orbeon",
+        form       = "pta-remittance",
+        mode       = "edit",
+        documentId = Some("aed126ad8341b629f3b19ee7f3e9d4f7c83ebfe5")
+      )
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, docOpt.get) {
+          val target = docOpt.get.models.head
+
+          val submit401 = new XFormsAPI.SubmitException(
+            new XFormsSubmitErrorEvent(target, Some("http://example.org"), ErrorType.ResourceError, StatusCode.Unauthorized, None)
+          )
+          val pe401 = ProcessError.fromThrowable(submit401)
+          assert(pe401.errorType == ProcessErrorType.Permissions)
+          assert(pe401.statusCodeOpt.contains(StatusCode.Unauthorized))
+
+          val submit502 = new XFormsAPI.SubmitException(
+            new XFormsSubmitErrorEvent(target, Some("http://example.org"), ErrorType.ResourceError, StatusCode.BadGateway, None)
+          )
+          val pe502 = ProcessError.fromThrowable(submit502)
+          assert(pe502.errorType == ProcessErrorType.Network)
+          assert(pe502.statusCodeOpt.contains(StatusCode.BadGateway))
+
+          val peRelinquish502 = ProcessError.fromThrowable(submit502, defaultErrorType = ProcessErrorType.Database)
+          assert(peRelinquish502.errorType == ProcessErrorType.Database)
+          assert(peRelinquish502.statusCodeOpt.contains(StatusCode.BadGateway))
+
+          val submitValidationError = new XFormsAPI.SubmitException(
+            new XFormsSubmitErrorEvent(target, ErrorType.ValidationError, None, None)
+          )
+          val peValidation = ProcessError.fromThrowable(submitValidationError)
+          assert(peValidation.errorType == ProcessErrorType.Internal)
+          assert(peValidation.statusCodeOpt.isEmpty)
         }
       }
     }

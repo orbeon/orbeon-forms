@@ -382,7 +382,10 @@ object XFormsAPI {
 //    }
 //  }
 
-  class SubmitException(e: XFormsSubmitErrorEvent) extends RuntimeException
+  class SubmitException(val e: XFormsSubmitErrorEvent)
+    extends RuntimeException(
+      s"Submission error: ${e.errorType.entryName}${e.statusCodeOpt.map(c => s" (status code: $c)").getOrElse("")}"
+    )
 
   // xf:send which throws a SubmitException in case of error
   def sendThrowOnError(submissionId: String, props: List[PropertyValue] = Nil)(implicit xfcd: XFormsContainingDocument = inScopeContainingDocument): Option[XFormsSubmitDoneEvent] =

@@ -14,15 +14,20 @@
 package org.orbeon.oxf.fr.process
 
 import cats.effect.IO
+import enumeratum.EnumEntry.Hyphencase
+import enumeratum.{Enum, EnumEntry}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.fr.FormRunnerCommon.spc
 import org.orbeon.oxf.fr.process.ProcessParser.*
 import org.orbeon.oxf.fr.{FormRunnerRename, XMLNames}
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util as u
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FunctionContext, IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.event.events.ErrorType
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_PREFIX, XHTML_SHORT_PREFIX, XML_PREFIX, XSD_PREFIX}
 import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.saxon.functions.FunctionLibrary
@@ -68,18 +73,19 @@ trait ProcessInterpreter extends Logging {
 //  def afterProcess():  Try[Any] = Try(())
   def findErrorContext: List[(String, String)] = Nil
 
-  private def logUnexpectedError(t: Throwable, params: (String, String)*): Unit =
-    t match {
-      case _: ProcessFailure =>
-      case _ =>
-        error(
-          "process: error",
-          findErrorContext :::
-          params.toList    :::
-          ("throwable" -> OrbeonFormatter.format(t)) ::
-          Nil
-        )
-    }
+  private def logUnexpectedError(pe: ProcessError, extraParams: (String, String)*): Unit =
+    if (pe.errorType != ProcessErrorType.Normal)
+      error(
+        "process: error",
+        findErrorContext                                                   :::
+        ("error-type" -> pe.errorType.entryName)                           ::
+        pe.statusCodeOpt.map("status-code" -> _.toString).toList           :::
+        pe.actionOpt.map("action" -> _).toList                             :::
+        pe.params.toList                                                   :::
+        extraParams.toList                                                 :::
+        ("throwable" -> OrbeonFormatter.format(pe.causeOpt.getOrElse(pe))) ::
+        Nil
+      )
 
   private object ProcessRuntime {
 
@@ -168,20 +174,23 @@ trait ProcessInterpreter extends Logging {
             case r @ ActionResult.Sync(Success(_)) =>
               debugResults(List("result" -> "successful action"))
               r
-            case r @ ActionResult.Sync(Failure(e)) =>
-              debugResults(List("result" -> s"failed action: ${e.getMessage}"))
-              logUnexpectedError(e, "action" -> action.serialize)
-              r
+            case ActionResult.Sync(Failure(e)) =>
+              val pe = ProcessError.fromThrowable(e, actionOpt = Some(action.serialize))
+              debugResults(List("result" -> s"failed action: ${pe.getMessage}"))
+              logUnexpectedError(pe)
+              ActionResult.Sync(Failure(pe))
             case ActionResult.SubProcess(Success((subProcess, subInitialTry))) =>
               runSubProcess(subProcess, subInitialTry)
-            case ActionResult.SubProcess(failure @ Failure(e)) =>
-              debugResults(List("result" -> s"failed action: ${e.getMessage}"))
-              logUnexpectedError(e, "action" -> action.serialize)
-              ActionResult.Sync(failure)
-            case ActionResult.Async(failure @ Failure(e)) =>
-              debugResults(List("result" -> s"failed action: ${e.getMessage}"))
-              logUnexpectedError(e, "action" -> action.serialize)
-              ActionResult.Sync(failure)
+            case ActionResult.SubProcess(Failure(e)) =>
+              val pe = ProcessError.fromThrowable(e, actionOpt = Some(action.serialize))
+              debugResults(List("result" -> s"failed action: ${pe.getMessage}"))
+              logUnexpectedError(pe)
+              ActionResult.Sync(Failure(pe))
+            case ActionResult.Async(Failure(e)) =>
+              val pe = ProcessError.fromThrowable(e, actionOpt = Some(action.serialize))
+              debugResults(List("result" -> s"failed action: ${pe.getMessage}"))
+              logUnexpectedError(pe)
+              ActionResult.Sync(Failure(pe))
             case ActionResult.Async(Success((computation, continuation))) =>
               debugResults(List("result" -> "suspended asynchronous action"))
               val serializedContinuation = serializeContinuation
@@ -195,8 +204,14 @@ trait ProcessInterpreter extends Logging {
                     s"continuation of process $runningProcessId",
                     computation,
                     (xfcd: XFormsContainingDocument, computationResult: Try[Any]) => {
-                      val tried = Try(continuation(xfcd, computationResult)).flatten
-                      tried.failed.foreach(logUnexpectedError(_, "action" -> action.serialize))
+                      val tried =
+                        Try(continuation(xfcd, computationResult))
+                          .flatten
+                          .recoverWith { case e =>
+                            val pe = ProcessError.fromThrowable(e, actionOpt = Some(action.serialize))
+                            logUnexpectedError(pe)
+                            Failure(pe)
+                          }
                       runProcess(
                         processScope,
                         serializedContinuation._2,
@@ -264,9 +279,10 @@ trait ProcessInterpreter extends Logging {
           case (Success(false), None) =>
             ActionResult.Sync(Success(()))
           case (Failure(t), _) =>
+            val pe = ProcessError.fromThrowable(t)
             debug("process: condition failed", List("throwable" -> OrbeonFormatter.format(t)))
-            logUnexpectedError(t, "condition" -> condition.serialize)
-            ActionResult.Sync(Failure(t))
+            logUnexpectedError(pe, "condition" -> condition.serialize)
+            ActionResult.Sync(Failure(pe))
         }
 
       def runExpr(expr: ExprNode): InternalActionResult =
@@ -318,9 +334,10 @@ trait ProcessInterpreter extends Logging {
           .recoverWith { case t =>
             // Log and send a user error if there is one
             // NOTE: In the future, it would be good to provide the user with an error id.
-            logUnexpectedError(t)
-            Try(processError(t))
-            Failure(t)
+            val pe = ProcessError.fromThrowable(t)
+            logUnexpectedError(pe)
+            Try(processError(pe))
+            Failure(pe)
           } match {
             case Success(ActionResult.Sync(tried)) =>
               Left(tried)
@@ -352,7 +369,7 @@ trait ProcessInterpreter extends Logging {
 
   // Interrupt the process and complete with a failure
   private def tryTerminateWithFailure(params: ActionParams): ActionResult =
-    ActionResult.Interrupt(paramByNameUseAvt(params, "message"), Left(Failure(ProcessFailure())))
+    ActionResult.Interrupt(paramByNameUseAvt(params, "message"), Left(Failure(ProcessError.normal())))
 
   // Run a sub-process
   private def tryProcess(params: ActionParams): ActionResult =
@@ -376,7 +393,7 @@ trait ProcessInterpreter extends Logging {
     tryResumeWithTry(params, Success(()))
 
   private def tryResumeWithFailure(params: ActionParams): ActionResult =
-    tryResumeWithTry(params, Failure(ProcessFailure()))
+    tryResumeWithTry(params, Failure(ProcessError.normal()))
 
   private def tryResumeWithTry(params: ActionParams, initialTry: Try[Any]): ActionResult =
     ActionResult.trySubProcess(initialTry) {
@@ -406,7 +423,7 @@ trait ProcessInterpreter extends Logging {
     ActionResult.Sync(Success(()))
 
   private def tryContinueWithFailure(params: ActionParams): ActionResult =
-    ActionResult.Sync(Failure(ProcessFailure()))
+    ActionResult.Sync(Failure(ProcessError.normal()))
 
   private def evaluateBoolean(expr: String, item: om.Item = xpathContext): Boolean =
     evaluateOne(
@@ -496,8 +513,92 @@ object ProcessInterpreter {
       )
     )
 
-  // Used to interrupt a process or signal an expected control-flow failure
-  case class ProcessFailure(message: String = null) extends RuntimeException(message) with NoStackTrace
+  sealed trait ProcessErrorType extends EnumEntry with Hyphencase
+
+  object ProcessErrorType extends Enum[ProcessErrorType] {
+
+    val values = findValues
+
+    case object Normal      extends ProcessErrorType
+    case object Internal    extends ProcessErrorType
+    case object Database    extends ProcessErrorType
+    case object Permissions extends ProcessErrorType
+    case object Network     extends ProcessErrorType
+    case object Email       extends ProcessErrorType
+  }
+
+  case class ProcessError(
+    errorType    : ProcessErrorType,
+    messageOpt   : Option[String]      = None,
+    statusCodeOpt: Option[Int]         = None,
+    actionOpt    : Option[String]      = None,
+    causeOpt     : Option[Throwable]   = None,
+    params       : Map[String, String] = Map.empty
+  ) extends RuntimeException(
+    messageOpt.orElse(causeOpt.flatMap(c => Option(c.getMessage))).orNull,
+    causeOpt.orNull
+  ) with NoStackTrace
+
+  object ProcessError {
+
+    def normal(message: String = null): ProcessError =
+      ProcessError(errorType = ProcessErrorType.Normal, messageOpt = Option(message))
+
+    def isPermissionStatusCode(code: Int): Boolean =
+      code == StatusCode.Unauthorized || code == StatusCode.Forbidden
+
+    def fromThrowable(
+      t               : Throwable,
+      defaultErrorType: ProcessErrorType = ProcessErrorType.Internal,
+      actionOpt       : Option[String]   = None
+    ): ProcessError =
+      t match {
+        case pe: ProcessError =>
+          if (pe.actionOpt.isEmpty && actionOpt.isDefined) pe.copy(actionOpt = actionOpt) else pe
+        case HttpStatusCodeException(code, _, _) if isPermissionStatusCode(code) =>
+          ProcessError(
+            errorType     = ProcessErrorType.Permissions,
+            statusCodeOpt = Some(code),
+            actionOpt     = actionOpt,
+            causeOpt      = Some(t)
+          )
+        case HttpStatusCodeException(code, _, _) =>
+          ProcessError(
+            errorType     = defaultErrorType,
+            statusCodeOpt = Some(code),
+            actionOpt     = actionOpt,
+            causeOpt      = Some(t)
+          )
+        case se: XFormsAPI.SubmitException =>
+          val statusCodeOpt = se.e.statusCodeOpt
+          val errorType =
+            if (statusCodeOpt.exists(isPermissionStatusCode))
+              ProcessErrorType.Permissions
+            else if (defaultErrorType != ProcessErrorType.Internal)
+              defaultErrorType
+            else if (
+              se.e.errorType == ErrorType.ResourceError       ||
+              se.e.errorType == ErrorType.ResultErrorResponse ||
+              statusCodeOpt.isDefined
+            )
+              ProcessErrorType.Network
+            else
+              ProcessErrorType.Internal
+
+          ProcessError(
+            errorType     = errorType,
+            statusCodeOpt = statusCodeOpt,
+            actionOpt     = actionOpt,
+            causeOpt      = Some(t)
+          )
+        case _ =>
+          ProcessError(
+            errorType = defaultErrorType,
+            actionOpt = actionOpt,
+            causeOpt  = Some(t)
+          )
+      }
+  }
 
   sealed trait ActionResult
   sealed trait InternalActionResult extends ActionResult

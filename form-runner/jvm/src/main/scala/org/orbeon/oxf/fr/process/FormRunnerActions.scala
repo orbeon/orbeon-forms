@@ -51,11 +51,13 @@ import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.route.XFormsAssetServerRoute
 import org.orbeon.xml.NamespaceMapping
+import software.amazon.awssdk.core.exception.SdkException
 import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.S3Exception
 
 import java.net.URI
 import scala.language.postfixOps
-import scala.util.Try
+import scala.util.{Failure, Try}
 
 
 trait FormRunnerActions
@@ -154,7 +156,14 @@ trait FormRunnerActions
       val sendEmail = booleanParamByNameUseAvt(params, "send-email", default = true)
 
       if (sendEmail)
-        emailContentsFromTemplates.headOption.foreach(EmailTransport.send(_).get)
+        emailContentsFromTemplates.headOption.foreach { emailContent =>
+          EmailTransport
+            .send(emailContent)
+            .recoverWith { case t =>
+              Failure(ProcessError.fromThrowable(t, defaultErrorType = ProcessErrorType.Email))
+            }
+            .get
+        }
 
       val s3Store = booleanParamByNameUseAvt(params, "s3-store", default = false)
 
@@ -178,11 +187,16 @@ trait FormRunnerActions
 
     ensureDataCalculationsAreUpToDate()
 
-    val formDefinition = PersistenceApi.readPublishedFormDefinition(
-      appName  = formRunnerParams.app,
-      formName = formRunnerParams.form,
-      version  = FormDefinitionVersion.Specific(formRunnerParams.formVersion)
-    ).get._1._2
+    val formDefinition =
+      PersistenceApi.readPublishedFormDefinition(
+        appName  = formRunnerParams.app,
+        formName = formRunnerParams.form,
+        version  = FormDefinitionVersion.Specific(formRunnerParams.formVersion)
+      )
+      .recoverWith { case t =>
+        Failure(ProcessError.fromThrowable(t, defaultErrorType = ProcessErrorType.Database))
+      }
+      .get._1._2
 
     implicit val ctx            : InDocFormRunnerDocContext = new InDocFormRunnerDocContext(formDefinition)
     implicit val externalContext: ExternalContext           = CoreCrossPlatformSupport.externalContext
@@ -269,10 +283,35 @@ trait FormRunnerActions
       .orElse(formRunnerPropertyWithNs(s"oxf.fr.$propertyPrefix.$name"))
       .getOrElse((default, defaultNamespaces))
 
-  private def withS3FromProperties[T](s3ConfigName: String)(body: (S3Config, S3Client) => T): Try[T] =
-    S3Config.fromProperties(s3ConfigName).map { s3Config =>
-      S3.withS3Client(body(s3Config, _))(s3Config)
-    }
+  private def withS3FromProperties[T](s3ConfigName: String)(body: (S3Config, S3Client) => Try[T]): Try[T] =
+    for {
+      s3Config <- S3Config.fromProperties(s3ConfigName)
+      result   <-
+        Try(S3.withS3Client(body(s3Config, _))(s3Config))
+          .flatten
+          .recoverWith {
+            case e: S3Exception =>
+              val statusCodeOpt = Option(e.statusCode()).filter(_ > 0)
+              Failure(
+                ProcessError(
+                  errorType     =
+                    if (statusCodeOpt.exists(ProcessError.isPermissionStatusCode))
+                      ProcessErrorType.Permissions
+                    else
+                      ProcessErrorType.Network,
+                  statusCodeOpt = statusCodeOpt,
+                  causeOpt      = Some(e)
+                )
+              )
+            case e: SdkException =>
+              Failure(
+                ProcessError(
+                  errorType = ProcessErrorType.Network,
+                  causeOpt  = Some(e)
+                )
+              )
+          }
+    } yield result
 
   private def storeEmailContentsToS3(
     params                    : ActionParams,
@@ -303,7 +342,7 @@ trait FormRunnerActions
           s3PathPrefix <- s3PathPrefixTry
           _            <- emailContent.storeToS3(s3PathPrefix)(s3Config, s3Client)
         } yield ()
-      }
+      }.map(_ => ())
     }
   }
 
@@ -572,10 +611,26 @@ trait FormRunnerActions
     if (params.replace == ReplaceType.All)
       setvalue(persistenceInstance.rootElement / "data-safe-override", "true")
 
-    sendThrowOnError(
-      s"fr-send-submission",
-      params.toPropertyValues
-    )
+    Try(
+      sendThrowOnError(
+        s"fr-send-submission",
+        params.toPropertyValues
+      )
+    ).recoverWith {
+      case se: SubmitException if params.isModeChange =>
+        val statusCodeOpt = se.e.statusCodeOpt
+        Failure(
+          ProcessError(
+            errorType     =
+              if (statusCodeOpt.exists(ProcessError.isPermissionStatusCode))
+                ProcessErrorType.Permissions
+              else
+                ProcessErrorType.Internal,
+            statusCodeOpt = statusCodeOpt,
+            causeOpt      = Some(se)
+          )
+        )
+    }.get
   }
 
   private def tryChangeModeImpl(

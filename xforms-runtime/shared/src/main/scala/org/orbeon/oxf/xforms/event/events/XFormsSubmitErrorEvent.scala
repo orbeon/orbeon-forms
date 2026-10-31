@@ -38,6 +38,7 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
         tunnelProperties.getOrElse(EmptyGetter)
     )
     _errorType = errorType
+    _statusCodeOpt = Some(statusCode).filter(_ > 0)
   }
 
   // 20 callers
@@ -58,6 +59,9 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
 
   private var _connectionResult: Option[ConnectionResultT[?]] = None
   def connectionResult: Option[ConnectionResultT[?]] = _connectionResult
+
+  private var _statusCodeOpt: Option[Int] = None
+  override def statusCodeOpt: Option[Int] = super.statusCodeOpt.orElse(_statusCodeOpt)
 
   def logMessage(throwable: Throwable): Unit =
     if (errorType != ErrorType.ValidationError)

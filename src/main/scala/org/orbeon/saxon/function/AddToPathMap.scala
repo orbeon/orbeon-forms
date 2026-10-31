@@ -37,6 +37,9 @@ trait AddToPathMap {
         if (dependsOnFocus) pathMapNodeSet else null
     }
 
+    if ((getIntrinsicDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0)
+      attachmentPoint.setAtomized()
+
     val resultNodeSet = new PathMap.PathMapNodeSet
     for (child <- iterateSubExpressions.asScala)
       resultNodeSet.addNodeSet(child.asInstanceOf[Expression].addToPathMap(pathMap, attachmentPoint))

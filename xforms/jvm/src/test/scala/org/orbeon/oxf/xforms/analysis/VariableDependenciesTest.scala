@@ -69,4 +69,43 @@ class VariableDependenciesTest
       }
     }
   }
+
+  describe("#7982: variable with context-dependent function without argument") {
+
+    val TestDoc =
+      <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+           xmlns:xf="http://www.w3.org/2002/xforms"
+           xmlns:ev="http://www.w3.org/2001/xml-events"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+        <xh:head>
+          <xf:model id="model" xxf:encrypt-item-values="false" xxf:xpath-analysis="true">
+            <xf:instance id="instance">
+              <form>
+                <checkboxes>1</checkboxes>
+              </form>
+            </xf:instance>
+            <xf:var name="checkboxes" value="checkboxes"/>
+          </xf:model>
+        </xh:head>
+        <xh:body>
+          <xf:input id="my-input" ref="checkboxes"/>
+          <xf:output id="my-output" value="$checkboxes/xxf:split() = '2'"/>
+        </xh:body>
+      </xh:html>.toDocument
+
+    it("must update output when variable dependency changes") {
+      assume(Version.isPE)
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(TestDoc)) {
+
+          assert(getControlValue("my-output") == "false")
+
+          setControlValue("my-input", "1 2")
+
+          assert(getControlValue("my-output") == "true")
+        }
+      }
+    }
+  }
 }

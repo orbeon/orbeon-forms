@@ -30,7 +30,7 @@
 
     <xbl:binding
         id="fr-tinymce"
-        element="fr|tinymce, xf|textarea[mediatype = 'text/html']"
+        element="fr|tinymce, xf|textarea[mediatype = 'text/html'], xf|textarea:xxf-type('xf:HTMLFragment')"
         xxbl:mode="lhha binding value external-value focus javascript-lifecycle"
         xxbl:serialize-external-value="frf:sanitizeHtml(.)"
         xxbl:deserialize-external-value="frf:sanitizeHtml(.)"

@@ -3,64 +3,264 @@
 .orbeon {
     .xbl-fr-formula-debugger {
 
-        .fr-formula-filter {
-            margin-bottom: 10px;
-        }
-
-        .fr-formula-legend {
-            margin-bottom: 10px;
-            display: inline-flex;
-            width: 100%;
-            border: 1px solid var(--orbeon-table-border-color);
-            border-radius: var(--orbeon-body-decorations-border-radius);
-            overflow: hidden;
-            div {
-                width: 12em;
-                font-weight: bold;
-                text-align: center;
-                flex-grow: 1;
-                flex-basis: 0;
-                padding: 4px;
-            }
+        .fr-transitive-dependency {
+            --fr-formula-highlight-bg    : #dff2fe;
+            --fr-formula-highlight-border: #7dd3fc;
         }
 
         .fr-direct-dependency {
-            background-color: #0081C7;
-        }
-
-        .fr-direct-influence {
-            background-color: #FABB01;
-        }
-
-        .fr-transitive-dependency {
-            background-color: #48BCD7;
+            --fr-formula-highlight-bg    : #b8e1ff;
+            --fr-formula-highlight-border: #38bdf8;
         }
 
         .fr-transitive-influence {
-            background-color: #FFEA48;
+            --fr-formula-highlight-bg    : #fef3c7;
+            --fr-formula-highlight-border: #fcd34d;
+        }
+
+        .fr-direct-influence {
+            --fr-formula-highlight-bg    : #fde0a6;
+            --fr-formula-highlight-border: #f59e0b;
         }
 
         .xforms-repeat-selected-item-1 {
-            background-color: #F25930;
+            &, .fr-grid-tr {
+                --fr-formula-highlight-bg    : #e4d9ff;
+                --fr-formula-highlight-border: #a78bfa;
+            }
+        }
+
+        .fr-formula-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px 20px;
+            margin-bottom: 12px;
+
+            .fr-formula-controls {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 10px 18px;
+            }
+
+            .fr-mip-filter {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                margin: 0;
+
+                .xforms-label {
+                    font-weight: var(--orbeon-label-font-weight);
+                    margin: 0;
+                    white-space: nowrap;
+                }
+
+                select {
+                    width: auto;
+                    margin: 0;
+                }
+            }
+
+            .fr-formula-filter {
+                display: inline-flex;
+                align-items: center;
+                margin: 0;
+
+                .xforms-items {
+                    padding: 0;
+                }
+
+                label.checkbox {
+                    margin: 0;
+                }
+            }
+        }
+
+        .fr-formula-legend {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 14px;
+
+            div {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 0.93em;
+                color: var(--orbeon-base-color);
+                white-space: nowrap;
+
+                &::before {
+                    content: "";
+                    display: inline-block;
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 3px;
+                    background-color: var(--fr-formula-highlight-bg);
+                    border: 1px solid var(--fr-formula-highlight-border);
+                    box-sizing: border-box;
+                    flex-shrink: 0;
+                }
+            }
+        }
+
+        .xbl-fr-grid .fr-grid.fr-repeat {
+            .fr-grid-head {
+                background-color: var(--orbeon-table-header-background-color);
+
+                .fr-grid-th, .fr-repeat-column-number {
+                    vertical-align: middle;
+                    border-bottom: 1px solid var(--orbeon-table-header-border-color);
+                }
+
+                .fr-grid-th .xforms-label {
+                    font-weight: var(--orbeon-table-header-font-weight);
+                }
+            }
+
+            .fr-grid-repeat-iteration {
+                .fr-grid-td, .fr-repeat-column-number {
+                    vertical-align: middle;
+                }
+
+                .fr-grid-tr {
+                    cursor: pointer;
+
+                    &.fr-transitive-dependency,
+                    &.fr-direct-dependency,
+                    &.fr-transitive-influence,
+                    &.fr-direct-influence {
+                        background-color: var(--fr-formula-highlight-bg);
+                    }
+                }
+
+                &:not(.xforms-repeat-selected-item-1) .fr-grid-tr:not(.fr-transitive-dependency):not(.fr-direct-dependency):not(.fr-transitive-influence):not(.fr-direct-influence):hover {
+                    background-color: var(--orbeon-table-hover-background-color);
+                }
+
+                &.xforms-repeat-selected-item-1 {
+                    &, .fr-grid-tr, .fr-repeat-column-number {
+                        background-color: var(--fr-formula-highlight-bg);
+                    }
+                }
+            }
+
+            .xforms-input input:not([type="checkbox"]):not([type="radio"]) {
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+                margin-bottom: 0;
+            }
+        }
+
+        .fr-control-name {
+            &.xforms-output.xforms-output-appearance-minimal output {
+                font-weight: 500;
+                overflow-wrap: break-word;
+            }
         }
 
         .fr-xpath-expr, .fr-xpath-deps, .fr-xpath-analysis {
             &.xforms-output.xforms-output-appearance-minimal output {
                 white-space: pre-wrap;
-
             }
         }
 
         .fr-xpath-expr {
             &.xforms-output.xforms-output-appearance-minimal output {
-                font-family: monospace;
-                font-size: 90%;
+                font-family: var(--orbeon-code-font-family);
+                font-size: var(--orbeon-code-font-size);
+                overflow-wrap: anywhere;
             }
         }
 
-        .fr-xpath-analysis ul {
-            list-style-type: decimal;
+        .fr-xpath-deps {
+            &.xforms-output.xforms-output-appearance-minimal output {
+                font-family: var(--orbeon-code-font-family);
+                font-size: var(--orbeon-code-font-size);
+                overflow-wrap: break-word;
+            }
         }
 
+        .fr-control-type {
+            &.xforms-output.xforms-output-appearance-minimal output {
+                font-family: var(--orbeon-code-font-family);
+                font-size: var(--orbeon-code-font-size);
+                color: var(--orbeon-label-read-only-color);
+                overflow-wrap: break-word;
+            }
+        }
+
+        .fr-path-deps-output {
+            .fr-path-deps-ok {
+                color: #198754;
+                font-size: 1.1em;
+            }
+
+            .fr-path-deps-error {
+                color: var(--orbeon-error-color);
+                font-size: 1.1em;
+            }
+        }
+
+        .fr-xpath-analysis {
+            ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+                font-family: var(--orbeon-code-font-family);
+                font-size: var(--orbeon-code-font-size);
+            }
+
+            li {
+                overflow-wrap: anywhere;
+
+                & + li {
+                    margin-top: 2px;
+                }
+
+                &.fr-xpath-flagged {
+                    color: var(--orbeon-error-color);
+                    font-weight: 500;
+                }
+            }
+        }
     }
+
+    .dark-mode({
+        .xbl-fr-formula-debugger {
+            .fr-transitive-dependency {
+                --fr-formula-highlight-bg    : oklch(29% 0.055 235);
+                --fr-formula-highlight-border: oklch(50% 0.11 235);
+            }
+
+            .fr-direct-dependency {
+                --fr-formula-highlight-bg    : oklch(36% 0.095 240);
+                --fr-formula-highlight-border: oklch(60% 0.14 240);
+            }
+
+            .fr-transitive-influence {
+                --fr-formula-highlight-bg    : oklch(29% 0.055 85);
+                --fr-formula-highlight-border: oklch(50% 0.11 85);
+            }
+
+            .fr-direct-influence {
+                --fr-formula-highlight-bg    : oklch(36% 0.09 75);
+                --fr-formula-highlight-border: oklch(60% 0.14 75);
+            }
+
+            .xforms-repeat-selected-item-1 {
+                &, .fr-grid-tr {
+                    --fr-formula-highlight-bg    : oklch(35% 0.095 295);
+                    --fr-formula-highlight-border: oklch(60% 0.15 295);
+                }
+            }
+
+            .fr-path-deps-output .fr-path-deps-ok {
+                color: oklch(72% 0.15 150);
+            }
+        }
+    });
 }

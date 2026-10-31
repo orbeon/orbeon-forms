@@ -124,8 +124,8 @@
                         <fr:section collapsible="false">
                             <xf:label ref="xxf:r('buttons.test-formulas', '|fr-fr-resources|')" mediatype="text/html"/>
 
-                            <fr:grid>
-                                <fr:c y="1" x="1" w="2">
+                            <xh:div class="fr-formula-toolbar">
+                                <xh:div class="fr-formula-controls">
                                     <xf:select1 appearance="minimal" id="fr-mip-filter" ref="$fr-formulas-local/@mip" class="fr-mip-filter">
                                         <xf:label ref="'Formula Type'"/>
                                         <xf:item>
@@ -154,22 +154,18 @@
                                             <xf:value>readonly</xf:value>
                                         </xf:item>
                                     </xf:select1>
-                                </fr:c>
-                                <fr:c y="2" x="1" w="12">
                                     <fr:checkbox-input id="fr-check" ref="$fr-formulas-local/@filter" appearance="minimal" class="fr-formula-filter">
                                         <xf:label ref="'Show related rows only'"/>
                                     </fr:checkbox-input>
-                                </fr:c>
-                                <fr:c y="3" x="1" w="12">
-                                    <xh:div class="fr-formula-legend">
-                                        <xh:div class="fr-transitive-dependency">Transitive dependency</xh:div>
-                                        <xh:div class="fr-direct-dependency">Direct dependency</xh:div>
-                                        <xh:div class="xforms-repeat-selected-item-1">Current selection</xh:div>
-                                        <xh:div class="fr-direct-influence">Direct influence</xh:div>
-                                        <xh:div class="fr-transitive-influence">Transitive influence</xh:div>
-                                    </xh:div>
-                                </fr:c>
-                            </fr:grid>
+                                </xh:div>
+                                <xh:div class="fr-formula-legend">
+                                    <xh:div class="fr-transitive-dependency">Transitive dependency</xh:div>
+                                    <xh:div class="fr-direct-dependency">Direct dependency</xh:div>
+                                    <xh:div class="xforms-repeat-selected-item-1">Current selection</xh:div>
+                                    <xh:div class="fr-direct-influence">Direct influence</xh:div>
+                                    <xh:div class="fr-transitive-influence">Transitive influence</xh:div>
+                                </xh:div>
+                            </xh:div>
 
                             <!-- TODO: show sections/grids/repeats information, and whether `$foo` resolves to *all* or a subset of values -->
                             <!-- TODO: help for selection controls; how to show options? like in Form Runner Summary page? -->
@@ -204,33 +200,43 @@
                                             ]
                                         )
                                     }}">
-                                    <xh:td colspan="1">
-                                        <xf:output id="fr-control-name-output" ref="name" appearance="minimal">
+                                    <xh:td colspan="2">
+                                        <xf:output id="fr-control-name-output" class="fr-control-name" ref="name" appearance="minimal">
                                             <xf:label ref="'Control Name'"/>
                                         </xf:output>
                                     </xh:td>
-                                    <xh:td colspan="4">
+                                    <xh:td colspan="3">
                                         <xf:output id="fr-control-expr-output" class="fr-xpath-expr" ref="expr" appearance="minimal">
                                             <xf:label ref="'Formula'"/>
                                         </xf:output>
                                     </xh:td>
                                     <xh:td colspan="2">
-                                        <xf:output id="fr-control-deps-output" class="fr-xpath-deps" ref=".[exists(refs/ref)]" value="string-join(refs/ref, '&#x0a;')" appearance="minimal">
+                                        <xf:output id="fr-control-deps-output" class="fr-xpath-deps" value="string-join(refs/ref, '&#x0a;')" appearance="minimal">
                                             <xf:label ref="'Control Dependencies'"/>
                                         </xf:output>
                                     </xh:td>
-                                    <xh:td>
-                                        <xf:output id="fr-control-type" ref="xxf:type(bind($fr-bind-name))" appearance="minimal">
+                                    <xh:td colspan="1">
+                                        <xf:output id="fr-control-type" class="fr-control-type" value="xxf:type(bind($fr-bind-name))" appearance="minimal">
                                             <xf:label ref="'Type'"/>
                                         </xf:output>
                                     </xh:td>
-                                    <xh:td>
+                                    <xh:td colspan="2">
                                         <xf:input id="fr-control-value-input" ref="bind($fr-bind-name)">
                                             <xf:label ref="'Control'"/>
                                         </xf:input>
                                     </xh:td>
-                                    <xh:td colspan="3">
-                                        <xf:output id="fr-path-deps-output" value="if (xxf:is-blank(expr)) then () else if (@projectionDeps = true()) then '🟢' else '🔴'" appearance="minimal">
+                                    <xh:td colspan="2">
+                                        <xf:output
+                                            id="fr-path-deps-output"
+                                            class="fr-path-deps-output"
+                                            mediatype="text/html"
+                                            value="
+                                                if (xxf:is-blank(expr)) then
+                                                    ''
+                                                else if (@projectionDeps = true()) then
+                                                    '&lt;i class=&quot;fa fa-fw fa-check-circle fr-path-deps-ok&quot; title=&quot;Path dependencies optimized&quot; aria-label=&quot;Path dependencies optimized&quot;>&lt;/i>'
+                                                else
+                                                    '&lt;i class=&quot;fa fa-fw fa-exclamation-circle fr-path-deps-error&quot; title=&quot;Path dependencies not optimized&quot; aria-label=&quot;Path dependencies not optimized&quot;>&lt;/i>'">
                                             <xf:label ref="'Path Dependencies'"/>
                                         </xf:output>
                                         <xf:output
@@ -248,7 +254,7 @@
                                                             return
                                                                 (
                                                                     if ($flag) then
-                                                                        '&lt;li style=&quot;color: red&quot;>'
+                                                                        '&lt;li class=&quot;fr-xpath-flagged&quot;>'
                                                                     else
                                                                         '&lt;li>',
                                                                     $path,

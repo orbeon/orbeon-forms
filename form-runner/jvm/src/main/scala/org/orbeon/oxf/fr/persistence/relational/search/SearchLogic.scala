@@ -143,35 +143,34 @@ object SearchLogic {
           }
         }
 
-        // To order the results by control value, we need to join with orbeon_i_control_text
-        val (orderByJoin, orderByStatementPartOpt) = request.orderQuery match {
-          case ControlQuery(controlPath, _, _) => (
-            "LEFT JOIN orbeon_i_control_text t ON t.data_id = s.data_id AND t.control = ?",
-            Some(StatementPart("", List[Setter]((ps, i) => ps.setString(i, controlPath))))
-          )
-          case _                               => ("", None)
-        }
+        val orderDirection = request.orderQuery.orderDirection.get
 
         // We'll refer to the order by column as "sort_column"
-        val orderByTableAlias = request.orderQuery match {
-          case _: ControlQuery => "t" // Control value => comes from orbeon_i_control_text t
-          case _               => "c" // Form metadata => comes from orbeon_i_current c
-        }
-        val orderByAliasing   = s"$orderByTableAlias.${request.orderQuery.sqlColumn} AS sort_column"
-
-        // First order by clause (specified by request), with CAST if necessary
-        val firstOrderByColumn         = "d.sort_column"
-        val firstOrderByColumnWithCast = request.orderQuery match {
-          case  _: ControlQuery =>
+        val (orderByAliasing, orderByStatementPartOpt) = request.orderQuery match {
+          case controlQuery @ ControlQuery(controlPath, _, _) =>
+            val aggregateFunction = orderDirection match {
+              case Ascending  => "MIN"
+              case Descending => "MAX"
+            }
+            val controlColumn = s"t.${controlQuery.sqlColumn}"
             // DB2, Oracle, and SQL Server use CLOB/NTEXT data types for control values, which cannot be used in ORDER
             // BY clauses, so we cast them to VARCHAR.
-            request.provider match {
-              case _         => firstOrderByColumn
+            val controlColumnWithCast = request.provider match {
+              case _         => controlColumn
             }
-          case _                =>
-            firstOrderByColumn
+            (
+              s"(SELECT $aggregateFunction($controlColumnWithCast) FROM orbeon_i_control_text t WHERE t.data_id = s.data_id AND t.control = ?) AS sort_column",
+              Some(StatementPart("", List[Setter]((ps, i) => ps.setString(i, controlPath))))
+            )
+          case _ =>
+            (
+              s"c.${request.orderQuery.sqlColumn} AS sort_column",
+              None
+            )
         }
-        val firstOrderByClause         = s"$firstOrderByColumnWithCast ${request.orderQuery.orderDirection.get.sql}"
+
+        // First order by clause (specified by request), with CAST if necessary
+        val firstOrderByClause = s"d.sort_column ${orderDirection.sql}"
 
         // Second order by clause (we order by last_modified_time DESC as well, if it makes sense)
         val secondOrderByClause = request.orderQuery match {
@@ -232,7 +231,6 @@ object SearchLogic {
              |                INNER JOIN
              |                    orbeon_i_current c
              |                    ON c.data_id = s.data_id
-             |                $orderByJoin
              |            ) d
              |        $rowNumOrderBy
              |    ) c
@@ -248,7 +246,7 @@ object SearchLogic {
         }
         debug(s"search items query\n$sql")
 
-        val allStatementParts            = statementParts ::: orderByStatementPartOpt.toList
+        val allStatementParts            = orderByStatementPartOpt.toList ::: statementParts
         val rawDocumentMetadataAndValues = executeQuery(connection, sql, allStatementParts) { documentsResultSet =>
 
           Iterator.iterateWhile(

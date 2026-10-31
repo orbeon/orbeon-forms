@@ -786,6 +786,7 @@ lazy val portletSupport = (project in file("portlet-support"))
   )
 
 lazy val formRunner = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("form-runner"))
+  .dependsOn(xpathFormatter)
   .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-form-runner",

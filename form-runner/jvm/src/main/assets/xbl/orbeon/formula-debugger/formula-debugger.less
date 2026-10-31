@@ -163,21 +163,22 @@
         }
 
         .fr-xpath-expr, .fr-xpath-deps, .fr-xpath-analysis {
-            &.xforms-output.xforms-output-appearance-minimal output {
+            &.xforms-output.xforms-output-appearance-minimal .xforms-output-output {
                 white-space: pre-wrap;
             }
         }
 
         .fr-xpath-expr {
-            &.xforms-output.xforms-output-appearance-minimal output {
+            &.xforms-output.xforms-output-appearance-minimal .xforms-output-output {
                 font-family: var(--orbeon-code-font-family);
                 font-size: var(--orbeon-code-font-size);
                 overflow-wrap: anywhere;
+                .xpath-syntax-highlighting();
             }
         }
 
         .fr-xpath-deps {
-            &.xforms-output.xforms-output-appearance-minimal output {
+            &.xforms-output.xforms-output-appearance-minimal .xforms-output-output {
                 font-family: var(--orbeon-code-font-family);
                 font-size: var(--orbeon-code-font-size);
                 overflow-wrap: break-word;
@@ -185,7 +186,7 @@
         }
 
         .fr-control-type {
-            &.xforms-output.xforms-output-appearance-minimal output {
+            &.xforms-output.xforms-output-appearance-minimal .xforms-output-output {
                 font-family: var(--orbeon-code-font-family);
                 font-size: var(--orbeon-code-font-size);
                 color: var(--orbeon-label-read-only-color);

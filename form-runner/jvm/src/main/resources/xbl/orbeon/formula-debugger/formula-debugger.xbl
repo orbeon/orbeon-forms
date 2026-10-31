@@ -206,7 +206,7 @@
                                         </xf:output>
                                     </xh:td>
                                     <xh:td colspan="3">
-                                        <xf:output id="fr-control-expr-output" class="fr-xpath-expr" ref="expr" appearance="minimal">
+                                        <xf:output id="fr-control-expr-output" class="fr-xpath-expr" ref="expr" mediatype="text/html" appearance="minimal">
                                             <xf:label ref="'Formula'"/>
                                         </xf:output>
                                     </xh:td>

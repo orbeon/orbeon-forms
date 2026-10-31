@@ -2,7 +2,9 @@ package org.orbeon.oxf.fr.xbl
 
 import org.orbeon.oxf.fr.Names.FormModel
 import org.orbeon.oxf.fr.{FormRunner, Names}
+import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis
 import org.orbeon.oxf.xforms.analysis.model.DependencyAnalyzer.Vertex
@@ -11,9 +13,29 @@ import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.{AtomicValue, EmptySequence, SequenceExtent}
 import org.orbeon.scaxon.Implicits.*
+import org.orbeon.xpath.formatter.{Span, XPathFormatter, XPathFormatterOptions, XPathHighlighter}
+
+import scala.util.Try
 
 
 object FormRunnerFormulaDebugger {
+
+  private val InspectorFormatterOptions = XPathFormatterOptions(
+    indentSize                     = 2,
+    maxLineLength                  = 55,
+    functionArgsOnNewlineThreshold = 3
+  )
+
+  def formatAndHighlightExpr(rawExpr: String): String =
+    rawExpr.trimAllToOpt match {
+      case Some(nonEmptyExpr) =>
+        val unwrapped = StaticXPath.tryToUnwrapExpression(nonEmptyExpr)
+        Try(XPathFormatter.formatToHtml(unwrapped, InspectorFormatterOptions))
+          .orElse(Try(XPathHighlighter.highlightToHtml(unwrapped)))
+          .getOrElse(Span.escapeHtml(unwrapped))
+      case None =>
+        ""
+    }
 
   // Return an `array(xs:string+)` where:
   //
@@ -52,7 +74,7 @@ object FormRunnerFormulaDebugger {
         SaxonUtils.newMapItem(
           Map[AtomicValue, ValueRepresentationType](
             (SaxonUtils.fixStringValue("name"), name),
-            (SaxonUtils.fixStringValue("expr"), expr),
+            (SaxonUtils.fixStringValue("expr"), expr.map(formatAndHighlightExpr)),
             (SaxonUtils.fixStringValue("projectionDeps"), xpa.exists(_.figuredOutDependencies)),
             (SaxonUtils.fixStringValue("xpath-analysis"), xpa.map(XPathAnalysis.toTinyTree(_, path => path.startsWith(instanceString) && ! allBindPathsSet(path))).getOrElse(EmptySequence.getInstance)),
             (SaxonUtils.fixStringValue("refs"), new SequenceExtent(refs.map(_.name).toList)),

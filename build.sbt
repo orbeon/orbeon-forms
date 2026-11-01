@@ -121,7 +121,7 @@ val WebJarDependencies = Seq(
   "org.webjars.npm" % "mousetrap"        % "1.6.5",
   "org.webjars"     % "nprogress"        % "0.2.0",
   "org.webjars.npm" % "orbeon__wpaint"   % "1.13.1-orbeon.1",
-  "org.webjars.npm" % "select2"          % "4.0.13",
+  "org.webjars.npm" % "select2"          % "4.1.0",
   "org.webjars.npm" % "hugerte"          % "1.0.15",
   "org.webjars.npm" % "tinymce-i18n"     % "25.6.2",
   "org.webjars.npm" % "whatwg-fetch"     % "3.0.0",

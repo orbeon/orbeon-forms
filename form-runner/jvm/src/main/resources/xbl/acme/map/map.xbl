@@ -16,6 +16,7 @@
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:acme="http://www.acme.com/xbl">
 
     <xbl:script src="/xbl/acme/map/map.js"/>
@@ -57,7 +58,7 @@
 
         <xbl:template>
             <!-- Div in which Google Maps does its rendering -->
-            <xh:div class="acme-map-google" data-google-maps-key="{fr:component-param-value('api-key')}"/>
+            <xh:div class="acme-map-google" data-google-maps-key="{fr:component-param-value('key')}"/>
         </xbl:template>
     </xbl:binding>
 

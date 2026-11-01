@@ -694,32 +694,34 @@
 
     <!-- Description in chosen language or first one if not found -->
     <xsl:template match="fr:description" name="fr-description">
-        <xh:div class="row{if ($fluid) then '-fluid' else ''}">
-            <xh:div class="span12">
+        <xsl:if test="not($view-appearance-opt = 'fr:formula-debugger')">
+            <xh:div class="row{if ($fluid) then '-fluid' else ''}">
+                <xh:div class="span12">
 
-                <xf:var
-                    name="description"
-                    value="
-                        (
-                            xxf:instance('fr-form-metadata')/description[@xml:lang = xxf:instance('fr-language-instance')],
-                            xxf:instance('fr-form-metadata')/description
-                        )[1]"/>
+                    <xf:var
+                        name="description"
+                        value="
+                            (
+                                xxf:instance('fr-form-metadata')/description[@xml:lang = xxf:instance('fr-language-instance')],
+                                xxf:instance('fr-form-metadata')/description
+                            )[1]"/>
 
-                <xf:group
-                    xxf:element="div"
-                    ref=".[
-                        xxf:non-blank($description) and
-                        xxf:is-blank($_fr-persistence-instance/found-document-message-to-show)
-                    ]"
-                    class="alert fr-form-description">
-                    <!-- Don't allow closing as that removes the markup and the XForms engine might attempt to update the nested
-                         xf:output, which will cause an error. -->
-                    <xf:var name="is-html" value="$description/@mediatype = 'text/html'"/>
-                    <xf:output ref=".[$is-html]"      value="$description" mediatype="text/html"/>
-                    <xf:output ref=".[not($is-html)]" value="$description"/>
-                </xf:group>
+                    <xf:group
+                        xxf:element="div"
+                        ref=".[
+                            xxf:non-blank($description) and
+                            xxf:is-blank($_fr-persistence-instance/found-document-message-to-show)
+                        ]"
+                        class="alert fr-form-description">
+                        <!-- Don't allow closing as that removes the markup and the XForms engine might attempt to update the nested
+                             xf:output, which will cause an error. -->
+                        <xf:var name="is-html" value="$description/@mediatype = 'text/html'"/>
+                        <xf:output ref=".[$is-html]"      value="$description" mediatype="text/html"/>
+                        <xf:output ref=".[not($is-html)]" value="$description"/>
+                    </xf:group>
+                </xh:div>
             </xh:div>
-        </xh:div>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template match="fr:logo">

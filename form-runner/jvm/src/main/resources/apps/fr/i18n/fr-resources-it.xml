@@ -77,7 +77,7 @@
         <conflict-dialog-discard-reload>Scarta e ricarica</conflict-dialog-discard-reload>
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Prova</test>
-        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Ispeziona formule (Beta)</test-formulas>
+        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Ispeziona formule</test-formulas>
         <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Prova offline</test-offline>
         <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Esporta in Excel</excel-export>
         <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Esporta in Excel</excel-export-with-search>

@@ -77,7 +77,7 @@
         <conflict-dialog-discard-reload>Değişiklikleri At ve Yeniden Yükle</conflict-dialog-discard-reload>
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
-        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Formülleri İncele (Beta)</test-formulas>
+        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Formülleri İncele</test-formulas>
         <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Çevrimdışı Test Et</test-offline>
         <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel'e Aktar</excel-export>
         <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel'e Aktar</excel-export-with-search>

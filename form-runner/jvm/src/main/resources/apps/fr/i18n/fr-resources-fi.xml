@@ -77,7 +77,7 @@
         <conflict-dialog-discard-reload>Hylkää ja lataa uudelleen</conflict-dialog-discard-reload>
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testaa</test>
-        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Tarkastele kaavoja (beta)</test-formulas>
+        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Tarkastele kaavoja</test-formulas>
         <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Testaa offline-tilassa</test-offline>
         <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel-vienti</excel-export>
         <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel-vienti</excel-export-with-search>

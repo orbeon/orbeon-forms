@@ -77,7 +77,7 @@
         <conflict-dialog-discard-reload>丟棄並重新加載</conflict-dialog-discard-reload>
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; 測試</test>
-        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; 檢查公式（測試版）</test-formulas>
+        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; 檢查公式</test-formulas>
         <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; 測試離線</test-offline>
         <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel導出</excel-export>
         <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Excel導出</excel-export-with-search>

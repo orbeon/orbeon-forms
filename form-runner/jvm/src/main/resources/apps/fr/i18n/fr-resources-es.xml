@@ -80,7 +80,7 @@
         <conflict-dialog-discard-reload>Descartar y recargar</conflict-dialog-discard-reload>
 
         <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Validar</test>
-        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspector de formulas (Beta)</test-formulas>
+        <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspector de formulas</test-formulas>
         <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Probar Offline</test-offline>
         <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt; Exportar a Excel</excel-export>
         <excel-export-with-search>&lt;i class="fa fa-fw fa-file-excel-o"&gt;&lt;/i&gt;

@@ -185,6 +185,59 @@ class XPathFormatterTest extends AnyFunSpec with Matchers {
           |else 0""".stripMargin
       formatted shouldBe expected
     }
+
+    it("formats if-then-else with long string-join and sequence vertically") {
+      val input =
+        "if ($service-address-same/string() = 'true') then $mailing-address-combined else string-join(($service-us-address-street-1[. != ''], $service-us-address-street-2[. != ''], $service-us-address-city[. != ''], $service-us-address-state[. != ''], $service-us-address-zip[. != '']), ' / ')"
+      val formatted = XPathFormatter.format(input)
+      val expected =
+        """if ($service-address-same/string() = 'true') then
+          |  $mailing-address-combined
+          |else
+          |  string-join(
+          |    (
+          |      $service-us-address-street-1[. != ''],
+          |      $service-us-address-street-2[. != ''],
+          |      $service-us-address-city[. != ''],
+          |      $service-us-address-state[. != ''],
+          |      $service-us-address-zip[. != '']
+          |    ),
+          |    ' / '
+          |  )""".stripMargin
+      formatted shouldBe expected
+    }
+  }
+
+  describe("Function calls and sequences") {
+    it("formats short function calls and sequences inline") {
+      val input = "string-join(($a, $b, $c), ' / ')"
+      XPathFormatter.format(input) shouldBe "string-join(($a, $b, $c), ' / ')"
+    }
+
+    it("formats function calls with more arguments than threshold on separate lines") {
+      val input = "concat($a, $b, $c, $d)"
+      val formatted = XPathFormatter.format(input)
+      val expected =
+        """concat(
+          |  $a,
+          |  $b,
+          |  $c,
+          |  $d
+          |)""".stripMargin
+      formatted shouldBe expected
+    }
+
+    it("formats long sequences on separate lines when exceeding maxLineLength") {
+      val input = "($first-long-variable-name, $second-long-variable-name, $third-long-variable-name)"
+      val formatted = XPathFormatter.format(input)
+      val expected =
+        """(
+          |  $first-long-variable-name,
+          |  $second-long-variable-name,
+          |  $third-long-variable-name
+          |)""".stripMargin
+      formatted shouldBe expected
+    }
   }
 
   describe("Arrow expressions (=>)") {

@@ -375,14 +375,12 @@ class XPathFormatter(val options: XPathFormatterOptions = XPathFormatterOptions.
     val targetSpans = formatExprSpans(target, level)
     if (options.arrowOnNewline && steps.nonEmpty) {
       val stepLines = steps.map { step =>
-        val argsSpans = joinSpans(step.args.map(a => formatExprSpans(a, level + 1)), List(punc(","), pl(" ")))
-        List(pl(indent(level + 1)), op("=>"), pl(" "), fn(step.functionName), punc("(")) ::: (argsSpans :+ punc(")"))
+        List(pl(indent(level + 1)), op("=>"), pl(" ")) ::: formatFunctionCall(step.functionName, step.args, level + 1)
       }
       targetSpans ::: List(pl(nl)) ::: joinLines(stepLines)
     } else {
       val stepsSpans = steps.flatMap { step =>
-        val argsSpans = joinSpans(step.args.map(a => formatExprSpans(a, level)), List(punc(","), pl(" ")))
-        List(pl(" "), op("=>"), pl(" "), fn(step.functionName), punc("(")) ::: (argsSpans :+ punc(")"))
+        List(pl(" "), op("=>"), pl(" ")) ::: formatFunctionCall(step.functionName, step.args, level)
       }
       targetSpans ::: stepsSpans
     }
@@ -443,11 +441,31 @@ class XPathFormatter(val options: XPathFormatterOptions = XPathFormatterOptions.
     if (items.isEmpty) {
       List(punc("()"))
     } else if (items.length == 1) {
-      punc("(") :: (formatExprSpans(items.head, level) :+ punc(")"))
+      val innerInline = formatExprSpans(items.head, level)
+      val innerText = innerInline.toPlainText
+      if (innerText.contains("\n")) {
+        val innerMulti = ensureIndented(formatExprSpans(items.head, level + 1), level + 1)
+        punc("(") :: pl(nl) :: innerMulti ::: List(pl(nl), pl(indent(level)), punc(")"))
+      } else {
+        punc("(") :: (innerInline :+ punc(")"))
+      }
     } else {
       val commaSpans = if (options.spaceAfterComma) List(punc(","), pl(" ")) else List(punc(","))
       val itemsSpans = joinSpans(items.map(i => formatExprSpans(i, level)), commaSpans)
-      punc("(") :: (itemsSpans :+ punc(")"))
+      val inline = punc("(") :: (itemsSpans :+ punc(")"))
+      val inlineText = inline.toPlainText
+
+      val shouldWrap =
+        inlineText.contains("\n") ||
+        indent(level).length + inlineText.length > options.maxLineLength
+
+      if (shouldWrap) {
+        val itemLines = items.map(i => ensureIndented(formatExprSpans(i, level + 1), level + 1))
+        val multiLineItems = joinLinesWithSuffix(itemLines, List(punc(",")))
+        punc("(") :: pl(nl) :: multiLineItems ::: List(pl(nl), pl(indent(level)), punc(")"))
+      } else {
+        inline
+      }
     }
   }
 
@@ -456,9 +474,17 @@ class XPathFormatter(val options: XPathFormatterOptions = XPathFormatterOptions.
     val commaSpans = if (options.spaceAfterComma) List(punc(","), pl(" ")) else List(punc(","))
     val inlineArgs = joinSpans(args.map(a => formatExprSpans(a, level)), commaSpans)
     val inline = fn(name) :: punc("(") :: (inlineArgs :+ punc(")"))
+    val inlineText = inline.toPlainText
 
-    if (options.functionArgsOnNewlineThreshold > 0 && args.length > options.functionArgsOnNewlineThreshold) {
-      val argLines = args.map(a => pl(indent(level + 1)) :: formatExprSpans(a, level + 1))
+    val shouldWrap =
+      args.nonEmpty && (
+        (options.functionArgsOnNewlineThreshold > 0 && args.length > options.functionArgsOnNewlineThreshold) ||
+        inlineText.contains("\n") ||
+        indent(level).length + inlineText.length > options.maxLineLength
+      )
+
+    if (shouldWrap) {
+      val argLines = args.map(a => ensureIndented(formatExprSpans(a, level + 1), level + 1))
       val multiLineArgs = joinLinesWithSuffix(argLines, List(punc(",")))
       fn(name) :: punc("(") :: pl(nl) :: multiLineArgs ::: List(pl(nl), pl(indent(level)), punc(")"))
     } else {
@@ -470,20 +496,29 @@ class XPathFormatter(val options: XPathFormatterOptions = XPathFormatterOptions.
   private def formatMap(entries: List[MapEntry], level: Int): List[Span] = {
     if (entries.isEmpty) {
       List(kw("map"), pl(" "), punc("{}"))
-    } else if (options.mapEntriesOnNewline && entries.length > 1) {
-      val colonSpans = if (options.spaceAroundMapColon) List(pl(" "), punc(":"), pl(" ")) else List(punc(":"), pl(" "))
-      val entryLines = entries.map { e =>
-        pl(indent(level + 1)) :: formatExprSpans(e.key, level + 1) ::: colonSpans ::: formatExprSpans(e.value, level + 1)
-      }
-      val joinedEntries = joinLinesWithSuffix(entryLines, List(punc(",")))
-      kw("map") :: pl(" ") :: punc("{") :: pl(nl) :: joinedEntries ::: List(pl(nl), pl(indent(level)), punc("}"))
     } else {
       val colonSpans = if (options.spaceAroundMapColon) List(pl(" "), punc(":"), pl(" ")) else List(punc(":"), pl(" "))
       val commaSpans = if (options.spaceAfterComma) List(punc(","), pl(" ")) else List(punc(","))
       val entrySpans = joinSpans(entries.map { e =>
         formatExprSpans(e.key, level) ::: colonSpans ::: formatExprSpans(e.value, level)
       }, commaSpans)
-      kw("map") :: pl(" ") :: punc("{") :: pl(" ") :: entrySpans ::: List(pl(" "), punc("}"))
+      val inline = kw("map") :: pl(" ") :: punc("{") :: pl(" ") :: entrySpans ::: List(pl(" "), punc("}"))
+      val inlineText = inline.toPlainText
+
+      val shouldWrap =
+        (options.mapEntriesOnNewline && entries.length > 1) ||
+        inlineText.contains("\n") ||
+        indent(level).length + inlineText.length > options.maxLineLength
+
+      if (shouldWrap) {
+        val entryLines = entries.map { e =>
+          ensureIndented(formatExprSpans(e.key, level + 1), level + 1) ::: colonSpans ::: formatExprSpans(e.value, level + 1)
+        }
+        val joinedEntries = joinLinesWithSuffix(entryLines, List(punc(",")))
+        kw("map") :: pl(" ") :: punc("{") :: pl(nl) :: joinedEntries ::: List(pl(nl), pl(indent(level)), punc("}"))
+      } else {
+        inline
+      }
     }
   }
 
@@ -491,14 +526,46 @@ class XPathFormatter(val options: XPathFormatterOptions = XPathFormatterOptions.
   private def formatArray(items: List[Expr], isSquare: Boolean, level: Int): List[Span] = {
     val commaSpans = if (options.spaceAfterComma) List(punc(","), pl(" ")) else List(punc(","))
     if (isSquare) {
-      val itemsSpans = joinSpans(items.map(i => formatExprSpans(i, level)), commaSpans)
-      punc("[") :: (itemsSpans :+ punc("]"))
+      if (items.isEmpty) {
+        List(punc("[]"))
+      } else {
+        val itemsSpans = joinSpans(items.map(i => formatExprSpans(i, level)), commaSpans)
+        val inline = punc("[") :: (itemsSpans :+ punc("]"))
+        val inlineText = inline.toPlainText
+
+        val shouldWrap =
+          (options.arrayEntriesOnNewline && items.length > 1) ||
+          inlineText.contains("\n") ||
+          indent(level).length + inlineText.length > options.maxLineLength
+
+        if (shouldWrap) {
+          val itemLines = items.map(i => ensureIndented(formatExprSpans(i, level + 1), level + 1))
+          val multiLineItems = joinLinesWithSuffix(itemLines, List(punc(",")))
+          punc("[") :: pl(nl) :: multiLineItems ::: List(pl(nl), pl(indent(level)), punc("]"))
+        } else {
+          inline
+        }
+      }
     } else {
       if (items.isEmpty) {
         List(kw("array"), pl(" "), punc("{}"))
       } else {
         val itemsSpans = joinSpans(items.map(i => formatExprSpans(i, level)), commaSpans)
-        kw("array") :: pl(" ") :: punc("{") :: pl(" ") :: itemsSpans ::: List(pl(" "), punc("}"))
+        val inline = kw("array") :: pl(" ") :: punc("{") :: pl(" ") :: itemsSpans ::: List(pl(" "), punc("}"))
+        val inlineText = inline.toPlainText
+
+        val shouldWrap =
+          (options.arrayEntriesOnNewline && items.length > 1) ||
+          inlineText.contains("\n") ||
+          indent(level).length + inlineText.length > options.maxLineLength
+
+        if (shouldWrap) {
+          val itemLines = items.map(i => ensureIndented(formatExprSpans(i, level + 1), level + 1))
+          val multiLineItems = joinLinesWithSuffix(itemLines, List(punc(",")))
+          kw("array") :: pl(" ") :: punc("{") :: pl(nl) :: multiLineItems ::: List(pl(nl), pl(indent(level)), punc("}"))
+        } else {
+          inline
+        }
       }
     }
   }

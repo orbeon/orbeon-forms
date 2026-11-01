@@ -89,7 +89,7 @@ val AwsNettyVersion                  = "4.2.19.Final"
 val InfinispanVersion                = "16.2.3"
 val SqliteJdbcVersion                = "3.53.4.0"
 val PostgresqlVersion                = "42.7.14"
-val OracleJdbcVersion                = "23.26.3.0.0"
+val OracleJdbcVersion                = "23.26.4.0.0"
 val JsoupVersion                     = "1.23.1"
 val LibPhoneNumberVersion            = "9.0.42"
 

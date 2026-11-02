@@ -2,10 +2,11 @@
     .fr-datetime-fields {
 
         display: flex;
-        column-gap: .25em;
+        flex-wrap: wrap; // time below the date when they don't fit side by side
+        gap: .25em;
 
         .xbl-fr-date, .xbl-fr-time {
-            flex-grow: 1;
+            flex: 1 1 9em;
         }
 
         .fr-view &.fr-field-width-full, .fr-view &.fr-field-width-natural {
@@ -27,7 +28,7 @@
             }
         }
         &.fr-field-width-natural {
-            max-width: 260px; // Q: Where does this width come from?
+            max-width: 22.25em;
         }
     }
 }

@@ -630,7 +630,9 @@
 
     .fr-mode-view, .fr-mode-pdf {
 
-        .xforms-textarea.xforms-static > pre, .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html > .xforms-output-output {
+        .xforms-textarea.xforms-static > pre,
+        .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html > .xforms-output-output,
+        .xbl-xf-textarea .xforms-output.xforms-mediatype-text-html > .xforms-output-output { // `xf:textarea[mediatype = 'text/html']`
 
             font-family: @sansFontFamily;   // use regular font, not monospaced font
             cursor: not-allowed;
@@ -640,12 +642,9 @@
             word-wrap: break-word; // keep also `word-wrap`, even if it's deprecated in favor of `overflow-wrap`, for the PDF renderer
             word-break: normal;             // Bootstrap overrides word-break (`word-break` is generally used for for CJK)
 
-            min-height: @fixedControlMinHeight;
-            @media screen {
-                min-height: @fluidControlMinHeight;
-            }
+            min-height: var(--orbeon-control-height);
             box-sizing: border-box;
-            padding: 4px 6px;
+            padding: var(--orbeon-control-padding);
             margin: 0;
         }
 
@@ -653,7 +652,8 @@
             white-space: pre-wrap;
         }
 
-        .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html {
+        .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html,
+        .xbl-xf-textarea .xforms-output.xforms-mediatype-text-html {
             padding: 0; // no field padding for the formatted-text output
         }
     }
@@ -661,7 +661,8 @@
     // In view mode, in case the fr:tinymce output contains `pre` elements, we enable horizontal scrolling like in the edit mode.
     // https://github.com/orbeon/orbeon-forms/issues/3974
     .fr-mode-view {
-        .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html > .xforms-output-output {
+        .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html > .xforms-output-output,
+        .xbl-xf-textarea .xforms-output.xforms-mediatype-text-html > .xforms-output-output {
             overflow-x: auto;
         }
     }
@@ -669,7 +670,8 @@
     // In print modes, we obviously don't want a scrollbar. So we must wrap even the content of `pre` elements.
     // https://github.com/orbeon/orbeon-forms/issues/3974
     .fr-mode-pdf {
-        .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html > .xforms-output-output pre {
+        .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html > .xforms-output-output pre,
+        .xbl-xf-textarea .xforms-output.xforms-mediatype-text-html > .xforms-output-output pre {
             white-space: normal;
             overflow-wrap: break-word;
             // https://github.com/orbeon/orbeon-forms/issues/5716
@@ -718,7 +720,8 @@
             }
 
             // Fixed line height for the formatted-text output (Bootstrap 2 inherited 20px from the body)
-            .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html > .xforms-output-output {
+            .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html > .xforms-output-output,
+            .xbl-xf-textarea .xforms-output.xforms-mediatype-text-html > .xforms-output-output {
                 line-height: @fixedLineHeight;
             }
 

@@ -12,7 +12,8 @@
 
 @import (reference)  "../../../apps/fr/style/form-runner-common";
 
-.xbl-fr-tinymce {
+// The component is bound to `fr:tinymce` and to `xf:textarea[mediatype = 'text/html']`, whose container class is `xbl-xf-textarea`
+.xbl-fr-tinymce, .xbl-xf-textarea {
     &.xforms-readonly {
         .xbl-fr-tinymce-div {
             background-color: var(--orbeon-control-read-only-background-color); // Q: Restrict to `.fr-grid`?

@@ -372,6 +372,14 @@
     // Default button background, like Bootstrap 2 (Bootstrap 5's #f8f9fa is lighter)
     background-color: var(--orbeon-button-background-color);
     color: var(--orbeon-button-color);
+
+    .badge {
+      margin-left: 2px;
+    }
+  }
+
+  .btn .badge {
+    top: var(--orbeon-badge-in-button-top);
   }
 
   .fr-summary-selection .dropdown-menu {
@@ -386,7 +394,7 @@
     font-size: 0.9em;
     font-weight: bold;
     line-height: 1.2; // about Bootstrap 2's 14px at the 13px base, unitless so it scales with the font
-    padding: 2px 9px;
+    padding: var(--orbeon-badge-padding);
     border-radius: var(--orbeon-badge-border-radius);
     background-color: var(--orbeon-status-background-color);
     border: 0; // neither Bootstrap version sets one, so a host's .badge border would show through when embedded (e.g. Liferay)

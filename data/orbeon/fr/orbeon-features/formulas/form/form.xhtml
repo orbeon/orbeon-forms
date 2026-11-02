@@ -18,12 +18,9 @@
         <xh:title>Orbeon Demo: Examples of Formulas</xh:title>
         <xh:style>
             .orbeon .xbl-fr-explanation {
-            	background-color: #eee;
+            	background-color: var(--orbeon-control-read-only-background-color);
             	padding: 1em;
             	border-radius: .5em;
-            }
-            .orbeon .fr-color-scheme-dark .xbl-fr-explanation {
-                background-color: #333;
             }
         </xh:style>
         <xf:model xxf:custom-mips="fr:persist" id="fr-form-model" xxf:expose-xpath-types="true"
@@ -335,7 +332,7 @@
                         </control-12>
                         <control-29>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
-                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;if ($checkboxes/xxf:split() = '2') then 'Yes' else 'No'&lt;/span&gt;&lt;/div&gt;</text>
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: var(--orbeon-fb-xpath-variable-color);"&gt;if ($checkboxes/xxf:split() = '2') then 'Yes' else 'No'&lt;/span&gt;&lt;/div&gt;</text>
                         </control-29>
 
                         <checkboxes>
@@ -367,7 +364,7 @@
                         </control-14>
                         <control-30>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
-                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;count(xxf:split($checkboxes-max)) &amp;lt;= 2&lt;/span&gt;&lt;/div&gt;</text>
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;count(xxf:split($checkboxes-max)) &amp;lt;= 2&lt;/span&gt;&lt;/div&gt;</text>
                         </control-30>
                         <checkboxes-max>
                             <label>Checkboxes</label>
@@ -396,7 +393,7 @@
                         </control-8>
                         <control-26>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
-                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;matches(., $regex)&lt;/span&gt;&lt;/div&gt;</text>
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;matches(., $regex)&lt;/span&gt;&lt;/div&gt;</text>
                         </control-26>
 
                         <regex>
@@ -429,7 +426,7 @@
                         </control-35>
                         <control-36>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
-                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;count(&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;for $i in 1 to days-from-duration($date-5-business-days - current-date()) return&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;let $current_date := current-date() + xs:dayTimeDuration(concat('P', $i, 'D')),&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;$is_business :=  xs:integer(format-date($current_date, '[F1]')) &amp;lt;= 5&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;return if ($is_business) then $i else ()&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;) &amp;gt;= 5&lt;/span&gt;&lt;/div&gt;</text>
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;count(&lt;/span&gt;&lt;br&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;for $i in 1 to days-from-duration($date-5-business-days - current-date()) return&lt;/span&gt;&lt;br&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;let $current_date := current-date() + xs:dayTimeDuration(concat('P', $i, 'D')),&lt;/span&gt;&lt;br&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;$is_business :=  xs:integer(format-date($current_date, '[F1]')) &amp;lt;= 5&lt;/span&gt;&lt;br&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;return if ($is_business) then $i else ()&lt;/span&gt;&lt;br&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;) &amp;gt;= 5&lt;/span&gt;&lt;/div&gt;</text>
                         </control-36>
                         <date-5-business-days>
                             <label>Date</label>
@@ -441,28 +438,28 @@
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
                                   xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;Yes/No selection.&lt;/strong&gt; This formula tells whether the user selected a "Yes" answer using radio buttons.&lt;/div&gt;
 &lt;div&gt; &lt;/div&gt;
-&lt;div&gt;Here is a technical explanation for the use of the &lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;string()&lt;/span&gt; function:&lt;/div&gt;
+&lt;div&gt;Here is a technical explanation for the use of the &lt;span style="font-family: 'andale mono', monospace; color: var(--orbeon-fb-xpath-variable-color);"&gt;string()&lt;/span&gt; function:&lt;/div&gt;
 &lt;div&gt; &lt;/div&gt;
 &lt;ul&gt;
-&lt;li&gt;Why not just write &lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;$yes-no&lt;/span&gt;?
+&lt;li&gt;Why not just write &lt;span style="font-family: 'andale mono', monospace; color: var(--orbeon-fb-xpath-variable-color);"&gt;$yes-no&lt;/span&gt;?
 &lt;ul&gt;
-&lt;li&gt;If you do, the expression will always evaluate to &lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;true()&lt;/span&gt;, because Orbeon Forms evaluates the formula as &lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;boolean($yes-no)&lt;/span&gt;.&lt;/li&gt;
-&lt;li&gt;Since &lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;$yes-no&lt;/span&gt; points to an &lt;em&gt;element node&lt;/em&gt;, the function &lt;a href="https://www.w3.org/TR/xpath-functions-3/#func-boolean" target="_blank" rel="noopener"&gt;always returns true&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;If you do, the expression will always evaluate to &lt;span style="font-family: 'andale mono', monospace; color: var(--orbeon-fb-xpath-variable-color);"&gt;true()&lt;/span&gt;, because Orbeon Forms evaluates the formula as &lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;boolean($yes-no)&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;Since &lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;$yes-no&lt;/span&gt; points to an &lt;em&gt;element node&lt;/em&gt;, the function &lt;a href="https://www.w3.org/TR/xpath-functions-3/#func-boolean" target="_blank" rel="noopener"&gt;always returns true&lt;/a&gt;.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
-&lt;li&gt;Why not write &lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;$yes-no = true()&lt;/span&gt;?
+&lt;li&gt;Why not write &lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;$yes-no = true()&lt;/span&gt;?
 &lt;ul&gt;
-&lt;li&gt;In this case, since &lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;$yes-no&lt;/span&gt; is compared to an &lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;xs:boolean&lt;/span&gt; value, it is first &lt;a href="https://www.w3.org/TR/xpath-30/#id-atomization" target="_blank" rel="noopener"&gt;atomized&lt;/a&gt;. The node pointed to by &lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;$yes-no&lt;/span&gt; is of type &lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;xs:boolean&lt;/span&gt;, so the atomization process takes the node &lt;em&gt;typed value&lt;/em&gt;.&lt;/li&gt;
-&lt;li&gt;When the node contains the string &lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;'true'&lt;/span&gt; or &lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;'false'&lt;/span&gt;, this expression works as expected.&lt;/li&gt;
-&lt;li&gt;However, if it contains an empty string, then the expression fails. For the purpose of determining whether a field is valid, readonly, or visible, when the expression fails the result will be considered to be &lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;false()&lt;/span&gt;, so it will work if the expression is used on its own.&lt;/li&gt;
-&lt;li&gt;However, if the expression is used in an &lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;or&lt;/span&gt; clause (&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;$yes-no = true() or something&lt;/span&gt;), if the &lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;$yes-no = true()&lt;/span&gt; part is evaluated first, the expression as a whole will fail and return &lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;false()&lt;/span&gt;, which is incorrect in case the other part of the &lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;or&lt;/span&gt; clause is &lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;true()&lt;/span&gt;. Also, in the case of a calculated value, the result will be the empty string, instead of &lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;'false'&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;In this case, since &lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;$yes-no&lt;/span&gt; is compared to an &lt;span style="font-family: 'andale mono', monospace; color: var(--orbeon-fb-xpath-variable-color);"&gt;xs:boolean&lt;/span&gt; value, it is first &lt;a href="https://www.w3.org/TR/xpath-30/#id-atomization" target="_blank" rel="noopener"&gt;atomized&lt;/a&gt;. The node pointed to by &lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;$yes-no&lt;/span&gt; is of type &lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;xs:boolean&lt;/span&gt;, so the atomization process takes the node &lt;em&gt;typed value&lt;/em&gt;.&lt;/li&gt;
+&lt;li&gt;When the node contains the string &lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;'true'&lt;/span&gt; or &lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;'false'&lt;/span&gt;, this expression works as expected.&lt;/li&gt;
+&lt;li&gt;However, if it contains an empty string, then the expression fails. For the purpose of determining whether a field is valid, readonly, or visible, when the expression fails the result will be considered to be &lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;false()&lt;/span&gt;, so it will work if the expression is used on its own.&lt;/li&gt;
+&lt;li&gt;However, if the expression is used in an &lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;or&lt;/span&gt; clause (&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;$yes-no = true() or something&lt;/span&gt;), if the &lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;$yes-no = true()&lt;/span&gt; part is evaluated first, the expression as a whole will fail and return &lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;false()&lt;/span&gt;, which is incorrect in case the other part of the &lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;or&lt;/span&gt; clause is &lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;true()&lt;/span&gt;. Also, in the case of a calculated value, the result will be the empty string, instead of &lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;'false'&lt;/span&gt;.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ul&gt;</text>
                         </control-7>
                         <control-21>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
-                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;$yes-no/string() = 'true'&lt;/span&gt;&lt;/div&gt;</text>
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: var(--orbeon-fb-xpath-variable-color);"&gt;$yes-no/string() = 'true'&lt;/span&gt;&lt;/div&gt;</text>
                         </control-21>
                         <control-6>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -472,7 +469,7 @@
                         </control-6>
                         <control-23>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
-                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;let $date1        := $birthdate,&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    $date2        := current-date(),&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    $months-days1 := substring(xs:string($date1), 6, 11),&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    $months-days2 := substring(xs:string($date2), 6, 11)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;return&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    if ($months-days2 &amp;gt; $months-days1) then&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;        year-from-date($date2) - year-from-date($date1)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;    else&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;        year-from-date($date2) - year-from-date($date1) - 1&lt;/span&gt;&lt;/div&gt;</text>
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: var(--orbeon-fb-xpath-variable-color);"&gt;let $date1        := $birthdate,&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: var(--orbeon-fb-xpath-variable-color);"&gt;    $date2        := current-date(),&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: var(--orbeon-fb-xpath-variable-color);"&gt;    $months-days1 := substring(xs:string($date1), 6, 11),&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: var(--orbeon-fb-xpath-variable-color);"&gt;    $months-days2 := substring(xs:string($date2), 6, 11)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: var(--orbeon-fb-xpath-variable-color);"&gt;return&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: var(--orbeon-fb-xpath-variable-color);"&gt;    if ($months-days2 &amp;gt; $months-days1) then&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: var(--orbeon-fb-xpath-variable-color);"&gt;        year-from-date($date2) - year-from-date($date1)&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: var(--orbeon-fb-xpath-variable-color);"&gt;    else&lt;/span&gt;&lt;br&gt;&lt;span style="font-family: 'andale mono', monospace; color: var(--orbeon-fb-xpath-variable-color);"&gt;        year-from-date($date2) - year-from-date($date1) - 1&lt;/span&gt;&lt;/div&gt;</text>
                         </control-23>
 
                         <birthdate>
@@ -489,7 +486,7 @@
                         </control-24>
                         <control-9>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
-                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;current-date()&lt;/span&gt;&lt;/div&gt;</text>
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;current-date()&lt;/span&gt;&lt;/div&gt;</text>
                         </control-9>
                         <current-date>
                             <label>Current date</label>
@@ -502,7 +499,7 @@
                         </control-18>
                         <control-25>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
-                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;for&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $start          in $first-date,&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $end            in $second-date,&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $startW         in xs:integer(format-date($start, '[F1]')),&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $endW           in xs:integer(format-date($end, '[F1]')),&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $days           in days-from-duration($end - $start),&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    $daysNoWeekends in $days - (floor($days div 7) * 2)&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;return&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    if ($days mod 7 != 0 and ($startW = 7 or $endW = 7)) then $daysNoWeekends - 1&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    else if ($endW &amp;lt; $startW) then $daysNoWeekends - 2&lt;/span&gt;&lt;br&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;    else $daysNoWeekends&lt;/span&gt;&lt;/div&gt;</text>
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;for&lt;/span&gt;&lt;br&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;    $start          in $first-date,&lt;/span&gt;&lt;br&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;    $end            in $second-date,&lt;/span&gt;&lt;br&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;    $startW         in xs:integer(format-date($start, '[F1]')),&lt;/span&gt;&lt;br&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;    $endW           in xs:integer(format-date($end, '[F1]')),&lt;/span&gt;&lt;br&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;    $days           in days-from-duration($end - $start),&lt;/span&gt;&lt;br&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;    $daysNoWeekends in $days - (floor($days div 7) * 2)&lt;/span&gt;&lt;br&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;return&lt;/span&gt;&lt;br&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;    if ($days mod 7 != 0 and ($startW = 7 or $endW = 7)) then $daysNoWeekends - 1&lt;/span&gt;&lt;br&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;    else if ($endW &amp;lt; $startW) then $daysNoWeekends - 2&lt;/span&gt;&lt;br&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;    else $daysNoWeekends&lt;/span&gt;&lt;/div&gt;</text>
                         </control-25>
 
                         <first-date>
@@ -526,11 +523,11 @@
                         <control-22>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                   xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                                  xmlns:xbl="http://www.w3.org/ns/xbl">&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;$number-1 =  $number-2&lt;/span&gt;&lt;/div&gt;
-&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;$number-1 != $number-2&lt;/span&gt;&lt;/div&gt;
-&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;$number-1 &amp;gt;  $number-2&lt;br&gt;$number-1 &amp;gt;= $number-2&lt;br&gt;&lt;/span&gt;&lt;/div&gt;
-&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;$number-1 &amp;lt;  $number-2&lt;/span&gt;&lt;/div&gt;
-&lt;div&gt;&lt;span style="color: rgb(35, 111, 161); font-family: 'andale mono', monospace;"&gt;$number-1 &amp;lt;= $number-2&lt;/span&gt;&lt;/div&gt;</text>
+                                  xmlns:xbl="http://www.w3.org/ns/xbl">&lt;div&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;$number-1 =  $number-2&lt;/span&gt;&lt;/div&gt;
+&lt;div&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;$number-1 != $number-2&lt;/span&gt;&lt;/div&gt;
+&lt;div&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;$number-1 &amp;gt;  $number-2&lt;br&gt;$number-1 &amp;gt;= $number-2&lt;br&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;div&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;$number-1 &amp;lt;  $number-2&lt;/span&gt;&lt;/div&gt;
+&lt;div&gt;&lt;span style="color: var(--orbeon-fb-xpath-variable-color); font-family: 'andale mono', monospace;"&gt;$number-1 &amp;lt;= $number-2&lt;/span&gt;&lt;/div&gt;</text>
                         </control-22>
 
 
@@ -607,7 +604,7 @@
                         <control-19>
                             <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                   xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                                  xmlns:xbl="http://www.w3.org/ns/xbl">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;hours-from-duration(xs:time($end-time) - xs:time($start-time))&lt;/span&gt;&lt;/div&gt;</text>
+                                  xmlns:xbl="http://www.w3.org/ns/xbl">&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: var(--orbeon-fb-xpath-variable-color);"&gt;hours-from-duration(xs:time($end-time) - xs:time($start-time))&lt;/span&gt;&lt;/div&gt;</text>
                         </control-19>
                         <start-time>
                             <label>Start</label>
@@ -634,7 +631,7 @@
 
                         </control-11>
                         <control-20>
-                            <text>&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: rgb(35, 111, 161);"&gt;current-time()&lt;/span&gt;&lt;/div&gt;</text>
+                            <text>&lt;div&gt;&lt;span style="font-family: 'andale mono', monospace; color: var(--orbeon-fb-xpath-variable-color);"&gt;current-time()&lt;/span&gt;&lt;/div&gt;</text>
 
                         </control-20>
                         <current-time>

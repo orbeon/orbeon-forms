@@ -34,7 +34,7 @@
         .fr-repeat-menu {
             box-sizing: content-box; // the 22px is a content width; border-box would make the 20px menu button overflow
             width: 22px;
-            padding: 2px 2px 0 2px;
+            padding: 4px 2px 0 2px;
 
             background-color: var(--orbeon-repeat-menu-background-color);
             border: 1px solid var(--orbeon-base-border-color);
@@ -139,12 +139,21 @@
             }
         }
 
+        .fr-repeat-menu .dropdown > .fr-repeater-dropdown-button {
+            // Center the dropdown menu button in its column
+            display: flex;
+            margin: 0 auto;
+        }
+
         // Update caret icon with Font Awesome
         .dropdown .fa-caret-down {
             width: 8px;
             height: 12px;
             margin: 4px auto;
-            line-height: 1em; // Allow the icon to be vertically centered
+            // Center the caret in the dropdown menu button
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     }
 

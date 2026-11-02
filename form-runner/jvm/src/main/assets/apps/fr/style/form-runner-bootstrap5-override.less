@@ -317,7 +317,7 @@
   .xbl-fr-drop-trigger {
     .dropdown-menu {
       padding: 5px 0;   // Bootstrap 2's menu padding
-      min-width: 160px; // roughly Bootstrap 2's 160px content-box minimum
+      min-width: @dropdownMenuMinWidth;
     }
     // Fixed item line height like Bootstrap 2; otherwise it inherits e.g. 54px from .fr-buttons
     .dropdown-menu > li {
@@ -362,6 +362,10 @@
   // Restore drop-trigger.less's flex item layout (label + shortcut hint), which display: block above out-specifies
   .xbl-fr-drop-trigger .dropdown-menu > li > a {
     display: inline-flex;
+  }
+
+  .xbl-fr-drop-trigger .dropdown-menu {
+    min-width: max(@dropdownMenuMinWidth, 100%);
   }
 
   .fr-summary-selection .dropdown-toggle {

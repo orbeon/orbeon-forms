@@ -29,3 +29,12 @@
         padding-bottom: 1px;
     }
 }
+
+// #8022: we have to override this outside of .xbl-fr-date, as the datepicker is inserted under the closest .orbeon or dialog
+.orbeon .datepicker {
+    td.day, td span, .datepicker-switch, .prev, .next {
+        &:is(:hover, .focused):not(.active, .today, .disabled) {
+            background: var(--orbeon-table-hover-background-color);
+        }
+    }
+}

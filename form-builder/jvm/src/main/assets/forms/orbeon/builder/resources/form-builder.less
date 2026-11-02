@@ -2174,6 +2174,13 @@ body.orbeon {
             vertical-align: top;
             background-color: @fbButtonsBackground;
             white-space: nowrap;
+
+            .xforms-trigger, .xforms-submit, .xbl-fr-drop-trigger {
+                button[class ~= btn]:first-of-type, .btn-group {
+                    // Reset the non-null bottom margin from buttons-bar.less
+                    margin-bottom: 0;
+                }
+            }
         }
     }
 

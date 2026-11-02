@@ -45,9 +45,12 @@
         .fr-repeat-content {
             display: block;
             width: 100%;
-
-            padding-left: 5px;
             padding-bottom: 4px;
+        }
+
+        .fr-repeat-menu + .fr-repeat-content {
+            // Padding between repeat menu and content: only when there is actually a menu (i.e. not in read-only)
+            padding-left: 5px;
         }
 
         .xforms-repeat-selected-item-1,

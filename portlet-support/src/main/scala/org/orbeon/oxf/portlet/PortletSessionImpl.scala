@@ -13,7 +13,6 @@
   */
 package org.orbeon.oxf.portlet
 
-import javax.portlet.PortletSession
 import scala.jdk.CollectionConverters.*
 import org.orbeon.oxf.externalcontext.{ExternalContext, SessionListeners}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
@@ -21,6 +20,9 @@ import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 
 class PortletSessionImpl(portletSession: PortletSession)
   extends ExternalContext.Session {
+
+  def this(portletSession: javax.portlet.PortletSession)   = this(PortletSession(portletSession))
+  def this(portletSession: jakarta.portlet.PortletSession) = this(PortletSession(portletSession))
 
   import PortletSession.*
 
@@ -64,5 +66,5 @@ class PortletSessionImpl(portletSession: PortletSession)
       case _ =>
     }
 
-  def getNativeSession: AnyRef = portletSession
+  def getNativeSession: AnyRef = portletSession.getNativePortletSession
 }

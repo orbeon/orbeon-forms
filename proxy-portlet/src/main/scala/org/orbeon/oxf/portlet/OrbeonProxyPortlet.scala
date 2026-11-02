@@ -20,6 +20,7 @@ import org.orbeon.fr.FormRunnerPath
 import org.orbeon.oxf.fr.embedding.*
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.portlet.liferay.{LiferayAPI, LiferaySupport}
+import org.orbeon.oxf.servlet.HttpServletRequest
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringUtils.*
@@ -27,19 +28,32 @@ import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms.Constants
 
 import java.net.URL
-import javax.portlet.*
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import scala.jdk.CollectionConverters.*
 import scala.util.control.NonFatal
 import scala.util.matching.Regex
 
+
+// For backward compatibility
+class OrbeonProxyPortlet extends JavaxOrbeonProxyPortlet
+
+class JavaxOrbeonProxyPortlet extends JavaxGenericPortlet {
+  override val genericPortlet: GenericPortlet = new OrbeonProxyPortletImpl(this) with WithJavaxPortletException
+}
+
+class JakartaOrbeonProxyPortlet extends JakartaGenericPortlet {
+  override val genericPortlet: GenericPortlet = new OrbeonProxyPortletImpl(this) with WithJakartaPortletException
+}
 
 /**
  * Orbeon Forms Form Runner proxy portlet.
  *
  * This portlet allows access to a remote Form Runner instance.
  */
-class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with BufferedPortlet {
+abstract class OrbeonProxyPortletImpl(portletContextProvider: PortletContextProvider)
+  extends GenericPortlet
+     with ProxyPortletEdit
+     with BufferedPortlet
+     with WithPortletException {
 
   import OrbeonProxyPortlet.*
 
@@ -77,8 +91,10 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
       }
   }
 
-  // For BufferedPortlet
-  def findTitle(request: RenderRequest): Option[String] = Option(getTitle(request))
+  // For BufferedPortlet and ProxyPortletEdit
+  def findTitle(request: RenderRequest): Option[String] = Option(portletContextProvider.getTitle(request))
+  override implicit def portletContext: PortletContext  = portletContextProvider.getOrbeonPortletContext
+  override def getInitParameter(name: String): String   = portletContextProvider.getInitParameter(name)
 
   private var settingsOpt: Option[PortletSettings] = None
 
@@ -134,11 +150,11 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
   // Portlet render
   override def doView(request: RenderRequest, response: RenderResponse): Unit =
     settingsOpt foreach { settings =>
-      withRootException("view render", new PortletException(_)) {
+      withRootException("view render", newPortletException) {
 
         implicit val ctx: ProxyPortletEmbeddingContextWithResponse = new ProxyPortletEmbeddingContextWithResponse(
           settings,
-          getPortletContext,
+          portletContext,
           request,
           response,
           settings.httpClient
@@ -170,9 +186,9 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
   private def doViewAction(request: ActionRequest, response: ActionResponse): Unit =
     settingsOpt foreach { settings =>
-      withRootException("view action", new PortletException(_)) {
+      withRootException("view action", newPortletException) {
         implicit val ctx: PortletEmbeddingContext = new PortletEmbeddingContext(
-          getPortletContext,
+          portletContext,
           request,
           response,
           settings.httpClient
@@ -188,12 +204,12 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
   // Portlet resource
   override def serveResource(request: ResourceRequest, response: ResourceResponse): Unit =
     settingsOpt foreach { settings =>
-      withRootException("resource", new PortletException(_)) {
+      withRootException("resource", newPortletException) {
 
         // Use this context so that URLs in XML responses are rewritten with `keep-parameters` as well
         implicit val ctx: ProxyPortletEmbeddingContextWithResponse = new ProxyPortletEmbeddingContextWithResponse(
           settings,
-          getPortletContext,
+          portletContext,
           request,
           response,
           settings.httpClient
@@ -222,7 +238,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
           case None =>
             // What were the Portlet API designers thinking?
-            response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpServletResponse.SC_NOT_FOUND.toString)
+            response.setProperty(response.HttpStatusCode, StatusCode.NotFound.toString)
         }
       }
     }
@@ -253,7 +269,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
   private def getPreferenceOrRequestedOrThrow(request: PortletRequest, pref: Pref): String =
     getPreferenceOrRequested(request, pref)
-      .getOrElse(throw new PortletException(s"Preference `${pref.nameLabel.name}` is required"))
+      .getOrElse(throw newPortletException(s"Preference `${pref.nameLabel.name}` is required"))
 
   private def createRequestDetails(settings: PortletSettings, request: PortletRequest, namespace: String): RequestDetails = {
 
@@ -299,7 +315,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
           path
         )
       case None =>
-        throw new PortletException(s"Unsupported incoming path: `$incomingOrDefaultPath` (for configured page `${getPreferenceOrRequestedOrThrow(request, Page)}`)")
+        throw newPortletException(s"Unsupported incoming path: `$incomingOrDefaultPath` (for configured page `${getPreferenceOrRequestedOrThrow(request, Page)}`)")
     }
   }
 
@@ -374,7 +390,6 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     val servletReqHeaders =
       findServletRequest(request)
         .toList
-        .map(org.orbeon.oxf.servlet.HttpServletRequest.apply)
         .flatMap(_.headerNamesWithValues)
 
     def portletRequestHeadersIt =
@@ -476,7 +491,7 @@ private[portlet] object OrbeonProxyPortlet {
 
     val sanitizedPath =
       APISupport.sanitizeAsUrlNoParents(incomingPath)
-        .getOrElse(throw new PortletException(s"Invalid incoming path: `$incomingPath`"))
+        .getOrElse(throw new IllegalArgumentException(s"Invalid incoming path: `$incomingPath`"))
 
     (sanitizedPath, configuredPage) match {
       case (path @ Constants.XFormsServerSubmit, _) =>

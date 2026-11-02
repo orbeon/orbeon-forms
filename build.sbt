@@ -104,7 +104,8 @@ ThisBuild / dependencyOverrides += "org.apache.pdfbox" % "fontbox" % PdfBoxVersi
 // "Provided" Java libraries
 val JavaxServletApiVersion           = "4.0.1"
 val JakartaServletApiVersion         = "6.1.0"
-val PortletApiVersion                = "3.0.1"
+val JavaxPortletApiVersion           = "3.0.1"
+val JakartaPortletApiVersion         = "3.0.1.JAKARTA-LIFERAY-PATCHED-1"
 val LiferayPortalServiceVersion      = "6.2.5"
 val LiferayPortalKernelVersion       = "166.0.0"
 val WildFlyElytronHttpOidcVersion    = "2.9.4.Final"
@@ -199,7 +200,8 @@ val CoreLibraryDependencies = Seq(
 
   "javax.servlet"               % "javax.servlet-api"               % JavaxServletApiVersion   % Provided,
   "jakarta.servlet"             % "jakarta.servlet-api"             % JakartaServletApiVersion % Provided,
-  "javax.portlet"               % "portlet-api"                     % PortletApiVersion        % Provided
+  "javax.portlet"               % "portlet-api"                     % JavaxPortletApiVersion   % Provided,
+  "com.liferay"                 % "javax.portlet"                   % JakartaPortletApiVersion % Provided
 ) map
   (_.exclude("commons-logging", "commons-logging")) map // because we have jcl-over-slf4j
   (_.exclude("javax.servlet"  , "servlet-api")) map     // because `jcifs` depends on this and we want it provided
@@ -213,6 +215,9 @@ val RedisLibraryDependencies = Seq(
 
 val ExplodedWarLibPath            = "build/orbeon-war/WEB-INF/lib"
 val LiferayWarLibPath             = "/Users/ebruchez/OF/liferay-portal-6.2-ce-ga6/tomcat-7.0.62/webapps/proxy-portlet/WEB-INF/lib"
+val DefaultLiferayDeployDir       = sys.props("user.home") + "/Downloads/liferay-dxp/deploy"
+val DefaultLiferayFormRunnerUrl   = "http://localhost:9090/orbeon"
+val DefaultLiferayPackages        = "jakarta"
 
 val LocalResourcesPath            = "resources-local"
 
@@ -225,6 +230,7 @@ val copyDependenciesToExplodedWar  = taskKey[Unit]("Copy managed library JAR fil
 val fastOptJSToLocalResources      = taskKey[Unit]("Copy fast-optimized JavaScript files to local resources.")
 val fullOptJSToLocalResources      = taskKey[Unit]("Copy full-optimized JavaScript files to local resources.")
 val copyJarToLiferayWar            = taskKey[Option[File]]("Copy JAR file to Liferay WEB-INF/lib for development.")
+val deployProxyPortletWar          = taskKey[File]("Package and copy the Form Runner proxy portlet WAR to the local Liferay deploy directory.")
 val fastOrFullOptJS                = taskKey[Attributed[File]]("Performs either fast or full Scala.js optimization.")
 
 val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version from system properties.")
@@ -233,6 +239,9 @@ val preferFastOptJS                = settingKey[Boolean]("Prefer fast Scala.js-s
 val skipUglify                     = settingKey[Boolean]("Skip JavaScript minification with Uglify")
 val lintCss                        = taskKey[Unit]("Lint compiled CSS with stylelint")
 val skipLintCss                    = settingKey[Boolean]("Skip CSS linting with stylelint")
+val liferayDeployDir               = settingKey[File]("Local Liferay deploy directory for publishing the proxy portlet WAR.")
+val liferayFormRunnerUrl           = settingKey[String]("Local Form Runner URL configured in the proxy portlet WAR.")
+val liferayPackages                = settingKey[String]("Packages to use in the proxy portlet WAR ('javax' or 'jakarta').")
 
 // "ThisBuild is a Scope encompassing all projects"
 ThisBuild / scalaVersion                := mainScalaVersion
@@ -244,6 +253,9 @@ ThisBuild / historyPath                 := Some((LocalRootProject / target).valu
 ThisBuild / preferFastOptJS             := sys.props.get("orbeon.prefer-fast-opt-js").isDefined
 ThisBuild / skipUglify                  := sys.props.get("orbeon.skip-uglify"       ).isDefined
 ThisBuild / skipLintCss                 := sys.props.get("orbeon.skip-lint-css"     ).isDefined
+ThisBuild / liferayDeployDir            := file(sys.props.getOrElse("orbeon.liferay.deploy-dir", DefaultLiferayDeployDir))
+ThisBuild / liferayFormRunnerUrl        := sys.props.getOrElse("orbeon.liferay.form-runner-url", DefaultLiferayFormRunnerUrl)
+ThisBuild / liferayPackages             := sys.props.getOrElse("orbeon.liferay.packages",        DefaultLiferayPackages)
 
 // Restrict the number of concurrent linker processes so we don't run out of memory
 Global / concurrentRestrictions += Tags.limit(ScalaJSTags.Link, 1)
@@ -737,11 +749,12 @@ lazy val fullPortlet = (project in file("full-portlet"))
   .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-full-portlet",
-    libraryDependencies += "javax.portlet"      % "portlet-api"               % PortletApiVersion           % Provided,
-    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % JavaxServletApiVersion      % Provided,
-    libraryDependencies += "jakarta.servlet"    % "jakarta.servlet-api"       % JakartaServletApiVersion    % Provided,
-    libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
-    libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
+    libraryDependencies += "javax.portlet"       % "portlet-api"               % JavaxPortletApiVersion      % Provided,
+    libraryDependencies += "com.liferay"         % "javax.portlet"             % JakartaPortletApiVersion    % Provided,
+    libraryDependencies += "javax.servlet"               % "javax.servlet-api"               % JavaxServletApiVersion      % Provided,
+    libraryDependencies += "jakarta.servlet"             % "jakarta.servlet-api"             % JakartaServletApiVersion    % Provided,
+    libraryDependencies += "com.liferay.portal"          % "portal-service"                  % LiferayPortalServiceVersion % Provided,
+    libraryDependencies += "com.liferay.portal"          % "com.liferay.portal.kernel"       % LiferayPortalKernelVersion  % Provided
   )
 
 lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
@@ -752,37 +765,99 @@ lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
   .settings(
     name := "orbeon-proxy-portlet",
 
-    libraryDependencies += "javax.portlet"          %  "portlet-api"              % PortletApiVersion           % Provided,
-    libraryDependencies += "javax.servlet"          % "javax.servlet-api"         % JavaxServletApiVersion      % Provided,
-    libraryDependencies += "jakarta.servlet"        % "jakarta.servlet-api"       % JakartaServletApiVersion    % Provided,
-    libraryDependencies += "com.liferay.portal"     % "portal-service"            % LiferayPortalServiceVersion % Provided,
-    libraryDependencies += "com.liferay.portal"     % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided,
-    libraryDependencies += "org.scala-lang.modules" %% "scala-xml"                % ScalaXmlVersion,
+    libraryDependencies += "javax.portlet"       % "portlet-api"               % JavaxPortletApiVersion      % Provided,
+    libraryDependencies += "com.liferay"         % "javax.portlet"             % JakartaPortletApiVersion    % Provided,
+    libraryDependencies += "javax.servlet"               % "javax.servlet-api"               % JavaxServletApiVersion      % Provided,
+    libraryDependencies += "jakarta.servlet"             % "jakarta.servlet-api"             % JakartaServletApiVersion    % Provided,
+    libraryDependencies += "com.liferay.portal"          % "portal-service"                  % LiferayPortalServiceVersion % Provided,
+    libraryDependencies += "com.liferay.portal"          % "com.liferay.portal.kernel"       % LiferayPortalKernelVersion  % Provided,
+    libraryDependencies += "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
   )
 
 lazy val formRunnerProxyPortletWar = (project in file("proxy-portlet-war"))
-  .settings(
-    name := "orbeon-proxy-portlet-war",
-
-    // Exclude log4j JAR files to avoid conflicts with Liferay's log4j
-    Runtime / fullClasspath := (Runtime / fullClasspath).value.filterNot(_.data.getName.contains("log4j")),
-  )
   .dependsOn(
     formRunnerProxyPortlet
   )
   .settings(OrbeonWebappPlugin.projectSettings*)
   .settings(scala2CommonSettings*)
+  .settings(
+    name := "orbeon-proxy-portlet-war",
+
+    // Exclude log4j JAR files to avoid conflicts with Liferay's log4j
+    Runtime / fullClasspath := (Runtime / fullClasspath).value.filterNot(_.data.getName.contains("log4j")),
+
+    OrbeonWebappPlugin.autoImport.webappPostProcess := {
+      val srcPortletXml = (OrbeonWebappPlugin.autoImport.webappPrepare / sourceDirectory).value / "WEB-INF" / "portlet.xml"
+      val formRunnerUrl = liferayFormRunnerUrl.value
+      val packages      = liferayPackages.value
+      val log           = streams.value.log
+
+      val (portletClass, filterClass) = packages.toLowerCase match {
+        case "jakarta" =>
+          (
+            "org.orbeon.oxf.portlet.JakartaOrbeonProxyPortlet",
+            "org.orbeon.oxf.portlet.liferay.JakartaAddLiferayUserHeadersFilter"
+          )
+        case "javax" =>
+          (
+            "org.orbeon.oxf.portlet.OrbeonProxyPortlet",
+            "org.orbeon.oxf.portlet.liferay.AddLiferayUserHeadersFilter"
+          )
+        case other =>
+          sys.error(s"Invalid `liferayPackages` value: '$other' (expected 'javax' or 'jakarta')")
+      }
+
+      webappTarget => {
+        val targetPortletXml = webappTarget / "WEB-INF" / "portlet.xml"
+        val srcContent       = IO.read(srcPortletXml)
+        val updatedContent   =
+          srcContent
+            .replace(
+              "<portlet-class>org.orbeon.oxf.portlet.OrbeonProxyPortlet</portlet-class>",
+              s"<portlet-class>$portletClass</portlet-class>"
+            )
+            .replace(
+              "<filter-class>org.orbeon.oxf.portlet.liferay.AddLiferayUserHeadersFilter</filter-class>",
+              s"<filter-class>$filterClass</filter-class>"
+            )
+            .replaceAll(
+              """(<name>form-runner-url</name>\s*<value>)[^<]*(</value>)""",
+              s"$$1${scala.util.matching.Regex.quoteReplacement(formRunnerUrl)}$$2"
+            )
+
+        if (! targetPortletXml.exists() || IO.read(targetPortletXml) != updatedContent) {
+          log.info(s"Updating ${targetPortletXml.absolutePath} (packages=$packages, form-runner-url=$formRunnerUrl)")
+          IO.write(targetPortletXml, updatedContent)
+        }
+      }
+    },
+
+    deployProxyPortletWar := {
+      val log       = streams.value.log
+      val warFile   = (Keys.`package`).value
+      val deployDir = liferayDeployDir.value
+
+      if (! deployDir.exists())
+        sys.error(s"Liferay deploy directory does not exist: ${deployDir.absolutePath}")
+
+      val targetWarFile = deployDir / "orbeon-proxy-portlet.war"
+      log.info(s"Deploying ${targetWarFile.absolutePath} (packages=${liferayPackages.value}, form-runner-url=${liferayFormRunnerUrl.value})")
+      IO.copyFile(warFile, targetWarFile, preserveLastModified = false)
+      targetWarFile
+    }
+  )
 
 lazy val portletSupport = (project in file("portlet-support"))
   .dependsOn(embedding)
   .settings(scala2CommonSettings*)
   .settings(
     name := "orbeon-portlet-support",
-    libraryDependencies += "javax.portlet"      %  "portlet-api"              % PortletApiVersion           % Provided,
-    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % JavaxServletApiVersion      % Provided,
-    libraryDependencies += "jakarta.servlet"    % "jakarta.servlet-api"       % JakartaServletApiVersion    % Provided,
-    libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
-    libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
+    libraryDependencies += "javax.portlet"       % "portlet-api"               % JavaxPortletApiVersion      % Provided,
+    libraryDependencies += "com.liferay"         % "javax.portlet"             % JakartaPortletApiVersion    % Provided,
+    libraryDependencies += "javax.servlet"               % "javax.servlet-api"               % JavaxServletApiVersion      % Provided,
+    libraryDependencies += "jakarta.servlet"             % "jakarta.servlet-api"             % JakartaServletApiVersion    % Provided,
+    libraryDependencies += "com.liferay.portal"          % "portal-service"                  % LiferayPortalServiceVersion % Provided,
+    libraryDependencies += "com.liferay.portal"          % "com.liferay.portal.kernel"       % LiferayPortalKernelVersion  % Provided
   )
 
 lazy val formRunner = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("form-runner"))
@@ -839,7 +914,8 @@ lazy val formRunnerJVM = formRunner.jvm
   ).settings(
     libraryDependencies += "javax.servlet"        % "javax.servlet-api"         % JavaxServletApiVersion   % Provided,
     libraryDependencies += "jakarta.servlet"      % "jakarta.servlet-api"       % JakartaServletApiVersion % Provided,
-    libraryDependencies += "javax.portlet"        % "portlet-api"               % PortletApiVersion        % Provided,
+    libraryDependencies += "javax.portlet"        % "portlet-api"               % JavaxPortletApiVersion   % Provided,
+    libraryDependencies += "com.liferay"          % "javax.portlet"             % JakartaPortletApiVersion % Provided,
 
     libraryDependencies += "org.wildfly.security" % "wildfly-elytron-http-oidc" % WildFlyElytronHttpOidcVersion % Provided,
 
@@ -1734,5 +1810,6 @@ lazy val root = (project in file("."))
     ThisProject / sourceDirectory := baseDirectory.value / "root", // until we have a more standard layout
     publish                       := {},
     publishLocal                  := {},
+    deployProxyPortletWar         := (formRunnerProxyPortletWar / deployProxyPortletWar).value,
     crossScalaVersions            := Nil // "crossScalaVersions must be set to Nil on the aggregating project"
   )

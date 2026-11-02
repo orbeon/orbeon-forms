@@ -4,6 +4,8 @@
     <!-- Orbeon Forms proxy portlet (to access a remote Form Runner instance) -->
     <portlet>
         <portlet-name>orbeon-forms-proxy-portlet</portlet-name>
+        <!-- For Liferay 2025.Q3+ (Jakarta EE), use `org.orbeon.oxf.portlet.JakartaOrbeonProxyPortlet`
+             (and `org.orbeon.oxf.portlet.liferay.JakartaAddLiferayUserHeadersFilter` for `<filter-class>` below) -->
         <portlet-class>org.orbeon.oxf.portlet.OrbeonProxyPortlet</portlet-class>
 
         <!-- Basic configuration -->
@@ -173,6 +175,7 @@
     <!-- Add Orbeon-Liferay-* headers -->
     <filter>
         <filter-name>orbeon-add-liferay-user-headers-portlet-filter</filter-name>
+        <!-- For Liferay 2025.Q3+ (Jakarta EE), use `org.orbeon.oxf.portlet.liferay.JakartaAddLiferayUserHeadersFilter` -->
         <filter-class>org.orbeon.oxf.portlet.liferay.AddLiferayUserHeadersFilter</filter-class>
         <lifecycle>RENDER_PHASE</lifecycle>
         <lifecycle>ACTION_PHASE</lifecycle>

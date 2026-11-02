@@ -26,7 +26,17 @@ import org.orbeon.oxf.portlet.Portlet2ExternalContext.BufferedResponseImpl
 import org.orbeon.oxf.webapp.ServletPortlet.*
 import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet}
 
-import javax.portlet.*
+import javax.portlet.{
+  ActionRequest as JActionRequest,
+  ActionResponse as JActionResponse,
+  GenericPortlet as JGenericPortlet,
+  PortletException,
+  PortletRequest as JPortletRequest,
+  RenderRequest as JRenderRequest,
+  RenderResponse as JRenderResponse,
+  ResourceRequest as JResourceRequest,
+  ResourceResponse as JResourceResponse
+}
 import scala.jdk.CollectionConverters.*
 
 // For backward compatibility
@@ -50,13 +60,13 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet
  * - implement improved caching of page with replay of XForms events, see:
  *   http://wiki.orbeon.com/forms/projects/xforms-improved-portlet-support#TOC-XForms-aware-caching-of-portlet-out
  */
-class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPortlet {
+class OrbeonPortlet extends JGenericPortlet with ServletPortlet with BufferedPortlet {
 
   private implicit val logger: Logger = ProcessorService.Logger
 
   // For BufferedPortlet
-  def findTitle(request: RenderRequest) = Option(getTitle(request))
-  def portletContext = getPortletContext
+  def findTitle(request: RenderRequest) = Option(getTitle(request.getNativePortletRequest.asInstanceOf[JRenderRequest]))
+  def portletContext = PortletContext(getPortletContext)
 
   // For ServletPortlet
   def logPrefix = "Portlet"
@@ -87,33 +97,33 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
     }
 
   // Portlet render
-  override def render(request: RenderRequest, response: RenderResponse): Unit =
+  override def render(request: JRenderRequest, response: JRenderResponse): Unit =
     ProcessorService.withProcessorService(processorService) {
       withRootException("render", new PortletException(_)) {
-        implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response, null)
-        bufferedRender(request, response, callService(directContext(request)))
+        implicit val ctx = new PortletEmbeddingContextWithResponse(portletContext, RenderRequest(request), RenderResponse(response), null)
+        bufferedRender(RenderRequest(request), RenderResponse(response), callService(directContext(request)))
       }
     }
 
   // Portlet action
-  override def processAction(request: ActionRequest, response: ActionResponse): Unit =
+  override def processAction(request: JActionRequest, response: JActionResponse): Unit =
     ProcessorService.withProcessorService(processorService) {
       withRootException("action", new PortletException(_)) {
-        implicit val ctx = new PortletEmbeddingContext(getPortletContext, request, response, null)
-        bufferedProcessAction(request, response, callService(directContext(request)))
+        implicit val ctx = new PortletEmbeddingContext(portletContext, ActionRequest(request), ActionResponse(response), null)
+        bufferedProcessAction(ActionRequest(request), ActionResponse(response), callService(directContext(request)))
       }
     }
 
   // Portlet resource
-  override def serveResource(request: ResourceRequest, response: ResourceResponse): Unit =
+  override def serveResource(request: JResourceRequest, response: JResourceResponse): Unit =
     ProcessorService.withProcessorService(processorService) {
       withRootException("resource", new PortletException(_)) {
-        implicit val ctx = new PortletEmbeddingContextWithResponse(getPortletContext, request, response, null)
+        implicit val ctx = new PortletEmbeddingContextWithResponse(portletContext, ResourceRequest(request), ResourceResponse(response), null)
         directServeResource(request, response)
       }
     }
 
-  private def directContext(request: PortletRequest): AsyncContext = {
+  private def directContext(request: JPortletRequest): AsyncContext = {
     val pipelineContext = new PipelineContext("OrbeonPortlet.directContext()")
     val externalContext = new Portlet2ExternalContext(pipelineContext, webAppContext, request, true)
 
@@ -127,7 +137,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
     context.externalContext.getResponse.asInstanceOf[BufferedResponseImpl].responseContent
   }
 
-  private def directServeResource(request: ResourceRequest, response: ResourceResponse)(implicit ctx: EmbeddingContextWithResponse): Unit = {
+  private def directServeResource(request: JResourceRequest, response: JResourceResponse)(implicit ctx: EmbeddingContextWithResponse): Unit = {
     InitUtils.withNewPipelineContext("OrbeonPortlet.directServeResource()") { pipelineContext =>
 
       val externalContext = new Portlet2ExternalContext(pipelineContext, webAppContext, request, true)

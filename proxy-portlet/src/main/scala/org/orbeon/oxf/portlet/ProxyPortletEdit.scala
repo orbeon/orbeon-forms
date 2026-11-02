@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.portlet
 
-import javax.portlet.*
 import scala.xml.Elem
 
 
 // Preference editor for the proxy portlet
-trait ProxyPortletEdit extends GenericPortlet {
+trait ProxyPortletEdit extends GenericPortlet with WithPortletException {
 
   import OrbeonProxyPortlet.*
-  implicit def portletContext: PortletContext = getPortletContext
+  implicit def portletContext: PortletContext
+  def getInitParameter(name: String): String
 
   case class NameLabel(name: String, label: String, publicName: String)
 
@@ -97,17 +97,17 @@ trait ProxyPortletEdit extends GenericPortlet {
   // Return the value of the preference if set, otherwise the value of the initialization parameter
   // NOTE: We should be able to use portlet.xml portlet-preferences/preference, but somehow this doesn't work properly
   def getPreference(request: PortletRequest, pref: Pref): Option[String] =
-    Option(request.getPreferences.getValue(pref.nameLabel.name, getPortletConfig.getInitParameter(pref.nameLabel.name)))
+    Option(request.getPreferences.getValue(pref.nameLabel.name, getInitParameter(pref.nameLabel.name)))
 
   def getPreferenceOrThrow(request: PortletRequest, pref: Pref): String =
-    getPreference(request, pref).getOrElse(throw new PortletException(s"Preference `${pref.nameLabel.name}` not set"))
+    getPreference(request, pref).getOrElse(throw newPortletException(s"Preference `${pref.nameLabel.name}` not set"))
 
   def getBooleanPreference(request: PortletRequest, pref: Pref): Boolean =
     getPreference(request, pref).contains(true.toString)
 
   // Very simple preferences editor
   override def doEdit(request: RenderRequest, response: RenderResponse): Unit =
-    withRootException("edit render", new PortletException(_)) {
+    withRootException("edit render", newPortletException) {
 
       response.setTitle("Orbeon Forms Preferences")
       response.getWriter.write(
@@ -120,7 +120,7 @@ trait ProxyPortletEdit extends GenericPortlet {
             .orbeon-pref-form hr {{ clear: both }}
             .orbeon-pref-form fieldset {{ padding-bottom: 0 }}
           </style>
-          <form action={response.createActionURL.toString} method="post" class="orbeon-pref-form">
+          <form action={response.createActionURL().toString} method="post" class="orbeon-pref-form">
             <fieldset>
               <legend>Form Runner Portlet Settings</legend>
               {
@@ -140,7 +140,7 @@ trait ProxyPortletEdit extends GenericPortlet {
 
   // Handle preferences editor save/cancel
   def doEditAction(request: ActionRequest, response: ActionResponse): Unit =
-    withRootException("view action", new PortletException(_)) {
+    withRootException("view action", newPortletException) {
       request.getParameter("save") match {
         case "save" =>
           def setPreference(pref: Pref, value: String): Unit =

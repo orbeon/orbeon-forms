@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.portlet.liferay
 
-import javax.portlet.*
+import org.orbeon.oxf.portlet.*
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.*
 import org.orbeon.wsrp.WSRPSupport
@@ -57,7 +57,7 @@ object LiferayURL {
   def wsrpToPortletURL(encodedURL: String, response: MimeResponse): String = {
 
     def createResourceURL(resourceId: String) = {
-      val url = response.createResourceURL
+      val url = response.createResourceURL()
       url.setResourceID(resourceId)
       url.setCacheability(ResourceURL.PAGE)
       moveMagicResourceId(url.toString)
@@ -78,8 +78,8 @@ object LiferayURL {
     WSRPSupport.decodeURL(
       encodedURL,
       createResourceURL,
-      createPortletURL(response.createActionURL, _, _, _),
-      createPortletURL(response.createRenderURL, _, _, _)
+      createPortletURL(response.createActionURL(), _, _, _),
+      createPortletURL(response.createRenderURL(), _, _, _)
     )
   }
 }

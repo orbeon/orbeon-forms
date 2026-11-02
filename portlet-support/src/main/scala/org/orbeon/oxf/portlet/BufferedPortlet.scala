@@ -27,7 +27,6 @@ import org.orbeon.wsrp.WSRPSupport.PathParameterName
 
 import java.io.{OutputStream, PrintWriter, Writer}
 import java.util as ju
-import javax.portlet.*
 import scala.jdk.CollectionConverters.*
 import scala.util.{Failure, Success, Try}
 

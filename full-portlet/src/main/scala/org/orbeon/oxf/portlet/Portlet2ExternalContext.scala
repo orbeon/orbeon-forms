@@ -21,7 +21,6 @@ import org.orbeon.oxf.externalcontext.*
 import org.orbeon.oxf.fr.embedding.APISupport.{Redirect, StreamedContentOrRedirect}
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.PathUtils.*
 import org.orbeon.oxf.util.StringUtils.*
@@ -32,7 +31,7 @@ import shapeless.syntax.typeable.*
 import java.io.*
 import java.util.Locale
 import java.util as ju
-import javax.portlet.*
+import javax.portlet.{ClientDataRequest, PortletRequest, ResourceRequest}
 import scala.jdk.CollectionConverters.*
 
 

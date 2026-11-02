@@ -14,37 +14,33 @@
 package org.orbeon.oxf.portlet.liferay
 
 import org.orbeon.oxf.fr.FormRunnerAuth
-import org.orbeon.oxf.portlet.PortletSessionImpl
+import org.orbeon.oxf.portlet.*
 import org.orbeon.oxf.properties.PropertyLoader
 
-import javax.portlet.*
-import javax.portlet.filter.*
 import scala.jdk.CollectionConverters.*
 
 
-class AddOrbeonAuthHeadersFilter
-  extends PortletFilter
-     with RenderFilter
-     with ActionFilter
-     with ResourceFilter
-     with EventFilter {
+// For backward compatibility
+class AddOrbeonAuthHeadersFilter extends JavaxAddOrbeonAuthHeadersFilter
+
+class JavaxAddOrbeonAuthHeadersFilter   extends JavaxPortletFilter(new AddOrbeonAuthHeadersFilterImpl)
+class JakartaAddOrbeonAuthHeadersFilter extends JakartaPortletFilter(new AddOrbeonAuthHeadersFilterImpl)
+
+class AddOrbeonAuthHeadersFilterImpl extends PortletFilter {
 
   import FormRunnerAuthFilter.wrapWithOrbeonAuthHeaders
 
-  def doFilter(req: RenderRequest, res: RenderResponse, chain: FilterChain): Unit =
+  override def doFilter(req: RenderRequest, res: RenderResponse, chain: FilterChain): Unit =
     chain.doFilter(wrapWithOrbeonAuthHeaders(req), res)
 
-  def doFilter(req: ActionRequest, res: ActionResponse, chain: FilterChain): Unit =
+  override def doFilter(req: ActionRequest, res: ActionResponse, chain: FilterChain): Unit =
     chain.doFilter(wrapWithOrbeonAuthHeaders(req), res)
 
-  def doFilter(req: ResourceRequest, res: ResourceResponse, chain: FilterChain): Unit =
+  override def doFilter(req: ResourceRequest, res: ResourceResponse, chain: FilterChain): Unit =
     chain.doFilter(wrapWithOrbeonAuthHeaders(req), res)
 
-  def doFilter(req: EventRequest, res: EventResponse, chain: FilterChain): Unit =
+  override def doFilter(req: EventRequest, res: EventResponse, chain: FilterChain): Unit =
     chain.doFilter(wrapWithOrbeonAuthHeaders(req), res)
-
-  def init(filterConfig: filter.FilterConfig) = ()
-  def destroy() = ()
 }
 
 object FormRunnerAuthFilter {

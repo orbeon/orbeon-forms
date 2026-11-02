@@ -1,36 +1,31 @@
 package org.orbeon.oxf.portlet.liferay
 
 import cats.data.NonEmptyList
-import org.orbeon.oxf.portlet.{RequestPrependHeaders, RequestRemoveHeaders}
+import org.orbeon.oxf.portlet.*
 import org.orbeon.oxf.util.CollectionUtils
 
-import javax.portlet.filter.*
-import javax.portlet.*
 
+// For backward compatibility
+class AddLiferayUserHeadersFilter extends JavaxAddLiferayUserHeadersFilter
 
-class AddLiferayUserHeadersFilter
-  extends PortletFilter
-     with RenderFilter
-     with ActionFilter
-     with ResourceFilter
-     with EventFilter {
+class JavaxAddLiferayUserHeadersFilter   extends JavaxPortletFilter(new AddLiferayUserHeadersFilterImpl)
+class JakartaAddLiferayUserHeadersFilter extends JakartaPortletFilter(new AddLiferayUserHeadersFilterImpl)
+
+class AddLiferayUserHeadersFilterImpl extends PortletFilter {
 
   import AddLiferayUserHeadersFilter.*
 
-  def doFilter(req: RenderRequest, res: RenderResponse, chain: FilterChain): Unit =
+  override def doFilter(req: RenderRequest, res: RenderResponse, chain: FilterChain): Unit =
     chain.doFilter(amendRequestWithUser(req)(wrapWithLiferayUserHeaders), res)
 
-  def doFilter(req: ActionRequest, res: ActionResponse, chain: FilterChain): Unit =
+  override def doFilter(req: ActionRequest, res: ActionResponse, chain: FilterChain): Unit =
     chain.doFilter(amendRequestWithUser(req)(wrapWithLiferayUserHeaders), res)
 
-  def doFilter(req: ResourceRequest, res: ResourceResponse, chain: FilterChain): Unit =
+  override def doFilter(req: ResourceRequest, res: ResourceResponse, chain: FilterChain): Unit =
     chain.doFilter(amendRequestWithUser(req)(wrapWithLiferayUserHeaders), res)
 
-  def doFilter(req: EventRequest, res: EventResponse, chain: FilterChain): Unit =
+  override def doFilter(req: EventRequest, res: EventResponse, chain: FilterChain): Unit =
     chain.doFilter(amendRequestWithUser(req)(wrapWithLiferayUserHeaders), res)
-
-  def init(filterConfig: filter.FilterConfig) = ()
-  def destroy() = ()
 }
 
 object AddLiferayUserHeadersFilter {

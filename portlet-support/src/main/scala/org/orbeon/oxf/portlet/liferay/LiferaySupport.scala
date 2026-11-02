@@ -13,9 +13,8 @@
  */
 package org.orbeon.oxf.portlet.liferay
 
-import javax.portlet.*
-import com.liferay.portal.kernel.language.LanguageUtil
 import org.orbeon.oxf.externalcontext.{Credentials, CredentialsSerializer, Organization, ParametrizedRole, SimpleRole, UserAndGroup}
+import org.orbeon.oxf.portlet.PortletRequest
 import org.orbeon.oxf.util.StringUtils.*
 
 import scala.jdk.CollectionConverters.*
@@ -99,8 +98,8 @@ object LiferaySupport {
   val AllHeaderNamesLowerToCapitalized = AllHeaderNamesLowerList zip AllHeaderNamesList toMap
 
   // TODO: Use LanguageUtil.getBCP47LanguageId.
-  def languageHeader(req: PortletRequest) =
-    LanguageUtil.getLanguageId(req).trimAllToOpt map ("Orbeon-Liferay-Language" ->)
+  def languageHeader(req: PortletRequest): Option[(String, String)] =
+    Option(getLanguageId(req)).flatMap(_.trimAllToOpt).map("Orbeon-Liferay-Language" -> _)
 
   def userHeaders(user: UserFacade, company: CompanyFacade, tests: Boolean): List[(String, String)] =
     for {

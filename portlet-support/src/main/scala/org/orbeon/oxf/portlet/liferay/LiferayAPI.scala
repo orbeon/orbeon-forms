@@ -13,10 +13,10 @@
   */
 package org.orbeon.oxf.portlet.liferay
 
-import java.{lang as jl, util as ju}
-import javax.portlet.PortletRequest
-import javax.servlet.http.HttpServletRequest
+import org.orbeon.oxf.portlet.PortletRequest
+import org.orbeon.oxf.servlet.HttpServletRequest
 
+import java.{lang as jl, util as ju}
 import scala.jdk.CollectionConverters.*
 import scala.util.{Success, Try}
 
@@ -47,6 +47,9 @@ trait LiferayAPI {
   case  object LiferayUserIdAuthType       extends LiferayAuthType { override val name = "userId"       }
   case  object LiferayScreenNameAuthType   extends LiferayAuthType { override val name = "screenName"   }
 
+  private val PortletRequestClassNames     = List("javax.portlet.PortletRequest", "jakarta.portlet.PortletRequest")
+  private val HttpServletRequestClassNames = List("javax.servlet.http.HttpServletRequest", "jakarta.servlet.http.HttpServletRequest")
+
   private def liferayClass(suffix: String) =
     LiferayPackages.iterator                      map
       (_ + '.' + suffix)                          map
@@ -56,26 +59,38 @@ trait LiferayAPI {
   private def liferayMethod(suffix: String, name: String, types: Class[?]*) =
     liferayClass(suffix).getMethod(name, types*)
 
+  private def liferayMethodByClassNames(suffix: String, name: String, typeNames: List[String]) = {
+    val clazz = liferayClass(suffix)
+    typeNames.iterator
+      .map(typeName => Try(clazz.getMethod(name, Class.forName(typeName))))
+      .collectFirst { case Success(method) => method }
+      .get
+  }
+
   // Static methods. We can't use structural types as the methods are static.
-  private lazy val getHttpServletRequestMethod     = liferayMethod("util.PortalUtil",                       "getHttpServletRequest",     classOf[PortletRequest])
-  private lazy val getOriginalServletRequestMethod = liferayMethod("util.PortalUtil",                       "getOriginalServletRequest", classOf[HttpServletRequest])
-  private lazy val getUserMethod                   = liferayMethod("util.PortalUtil",                       "getUser",                   classOf[HttpServletRequest])
-  private lazy val getCompanyMethod                = liferayMethod("util.PortalUtil",                       "getCompany",                classOf[HttpServletRequest])
+  private lazy val getHttpServletRequestMethod     = liferayMethodByClassNames("util.PortalUtil",           "getHttpServletRequest",     PortletRequestClassNames)
+  private lazy val getOriginalServletRequestMethod = liferayMethodByClassNames("util.PortalUtil",           "getOriginalServletRequest", HttpServletRequestClassNames)
+  private lazy val getUserMethod                   = liferayMethodByClassNames("util.PortalUtil",           "getUser",                   HttpServletRequestClassNames)
+  private lazy val getCompanyMethod                = liferayMethodByClassNames("util.PortalUtil",           "getCompany",                HttpServletRequestClassNames)
+  private lazy val getLanguageIdMethod             = liferayMethodByClassNames("language.LanguageUtil",     "getLanguageId",             PortletRequestClassNames)
   private lazy val getUserOrganizationsMethod      = liferayMethod("service.OrganizationLocalServiceUtil",  "getUserOrganizations",      classOf[Long])
   private lazy val getUserGroupRolesMethod         = liferayMethod("service.UserGroupRoleLocalServiceUtil", "getUserGroupRoles",         classOf[Long])
   private lazy val hasUserGroupRoleMethod          = liferayMethod("service.UserGroupRoleLocalServiceUtil", "hasUserGroupRole",          classOf[Long], classOf[Long], classOf[String])
 
   def getHttpServletRequest(req: PortletRequest): HttpServletRequest =
-    getHttpServletRequestMethod.invoke(null, req).asInstanceOf[HttpServletRequest]
+    Option(getHttpServletRequestMethod.invoke(null, req.getNativePortletRequest)).map(HttpServletRequest.fromAnyRef).orNull
 
   def getOriginalServletRequest(req: HttpServletRequest): HttpServletRequest =
-    getOriginalServletRequestMethod.invoke(null, req).asInstanceOf[HttpServletRequest]
+    Option(getOriginalServletRequestMethod.invoke(null, req.getNativeServletRequest)).map(HttpServletRequest.fromAnyRef).orNull
 
   def getUser(req: HttpServletRequest): UserFacade =
-    getUserMethod.invoke(null, req).asInstanceOf[UserFacade]
+    getUserMethod.invoke(null, req.getNativeServletRequest).asInstanceOf[UserFacade]
 
   def getCompany(req: HttpServletRequest): CompanyFacade =
-    getCompanyMethod.invoke(null, req).asInstanceOf[CompanyFacade]
+    getCompanyMethod.invoke(null, req.getNativeServletRequest).asInstanceOf[CompanyFacade]
+
+  def getLanguageId(req: PortletRequest): String =
+    getLanguageIdMethod.invoke(null, req.getNativePortletRequest).asInstanceOf[String]
 
   // A user can belong to multiple organizations. Each such organization can be part of
   // a hierarchy. Users can be part of more than one organization which is part of the

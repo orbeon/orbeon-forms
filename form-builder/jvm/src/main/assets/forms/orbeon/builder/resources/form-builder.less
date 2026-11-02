@@ -2152,8 +2152,6 @@ body.orbeon {
         width: 100%;
         box-sizing: border-box;
         height: @fbBottomHeight;
-        line-height: @fbBottomHeight;
-        vertical-align: middle;
         text-align: right; // Message and buttons to show on the right
         padding: 0 @fbGutter;
 
@@ -2164,10 +2162,6 @@ body.orbeon {
 
         .fr-messages {
             white-space: nowrap;
-
-            .toast-container {
-                line-height: var(--bs-body-line-height) // restore from `.fb-bottom`
-            }
         }
 
         // Override Form Runner defaults

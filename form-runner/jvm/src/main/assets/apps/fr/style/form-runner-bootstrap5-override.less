@@ -483,10 +483,23 @@
     }
   }
 
+  // Use exactly the same dropdown caret on select as on select2 dropdowns
+  select {
+    appearance: none;
+    padding-right: 22px;
+    background-image: conic-gradient(from -38.66deg at 50% 100%, var(--orbeon-dropdown-search-caret-color) 0 77.32deg, transparent 77.32deg);
+    background-size: 8px 5px;
+    background-repeat: no-repeat;
+    background-position: right 7px center;
+  }
+
   select[multiple],
   .xforms-select1-appearance-compact select,
   .xforms-select-appearance-compact select {
     height: var(--orbeon-multiple-select-height);
+    appearance: auto;
+    background-image: none;
+    padding: var(--orbeon-control-padding);
   }
 
   // .xforms-field shows a read-only / calculated value as a grey boxed field; port of the former Bootstrap 2 override.

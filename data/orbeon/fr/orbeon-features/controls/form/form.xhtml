@@ -2386,7 +2386,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                 <fr:section id="selection-controls-section" bind="selection-controls-bind">
                     <xf:label ref="$form-resources/selection-controls/label"/>
                     <fr:grid columns="3" id="grid-5-grid" bind="grid-5-bind">
-                        <fr:c y="1" x="1" w="3">
+                        <fr:c y="2" x="1" w="4">
                             <xf:select1 bind="dropdown-bind" id="dropdown-control" ref="" appearance="dropdown">
                                 <xf:label ref="$form-resources/dropdown/label"/>
                                 <xf:hint ref="$form-resources/dropdown/hint"/>
@@ -2397,7 +2397,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 </xf:itemset>
                             </xf:select1>
                         </fr:c>
-                        <fr:c x="4" y="1" w="3">
+                        <fr:c x="1" y="1" w="6">
                             <fr:open-select1 id="dropdown-with-other-control" appearance="minimal" bind="dropdown-with-other-bind">
                                 <xf:label ref="$form-resources/dropdown-with-other/label"/>
                                 <xf:hint ref="$form-resources/dropdown-with-other/hint"/>
@@ -2409,7 +2409,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 </xf:itemset>
                             </fr:open-select1>
                         </fr:c>
-                        <fr:c x="7" y="1" w="3">
+                        <fr:c x="5" y="2" w="4">
                             <xf:select1 bind="dropdown-with-search-bind" id="dropdown-with-search-control" appearance="search" ref="">
                                 <xf:label ref="$form-resources/dropdown-with-search/label"/>
                                 <xf:hint ref="$form-resources/dropdown-with-search/hint"/>
@@ -2420,7 +2420,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 </xf:itemset>
                             </xf:select1>
                         </fr:c>
-                        <fr:c x="10" y="1" w="3">
+                        <fr:c x="7" y="1" w="6">
                             <fr:databound-select id="dynamic-multiselect-control" bind="dynamic-multiselect-bind" appearance="search" resource="/fr/service/custom/orbeon/controls/countries?all=true">
                                 <xf:label ref="$form-resources/dynamic-multiselect/label"/>
                                 <xf:hint ref="$form-resources/dynamic-multiselect/hint"/>
@@ -2431,7 +2431,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 </xf:itemset>
                             </fr:databound-select>
                         </fr:c>
-                        <fr:c x="1" y="2" w="3">
+                        <fr:c x="9" y="2" w="4">
                             <fr:databound-select1 id="dynamic-dropdown-control" resource="/fr/service/custom/orbeon/controls/countries?all=true" bind="dynamic-dropdown-bind">
                                 <xf:label ref="$form-resources/dynamic-dropdown/label" mediatype="text/html"/>
                                 <xf:hint ref="$form-resources/dynamic-dropdown/hint"/>
@@ -2443,7 +2443,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             </fr:databound-select1>
 
                         </fr:c>
-                        <fr:c x="4" y="2" w="3">
+                        <fr:c x="1" y="3" w="4">
                             <fr:databound-select1 selection="{if ($open-selection-1) then 'open' else ''}" id="dynamic-dropdown-with-search-by-ui-control" bind="dynamic-dropdown-with-search-by-ui-bind" appearance="search" resource="/fr/service/custom/orbeon/controls/countries?all=true" ref="" service-performs-search="false" service-supports-paging="false" is-last-page="">
                                 <xf:label ref="$form-resources/dynamic-dropdown-with-search-by-ui/label" mediatype="text/html"/>
                                 <xf:hint ref="$form-resources/dynamic-dropdown-with-search-by-ui/hint"/>
@@ -2457,7 +2457,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             </fr:databound-select1>
 
                         </fr:c>
-                        <fr:c x="7" y="2" w="3" h="1">
+                        <fr:c x="5" y="3" w="4" h="1">
                             <fr:databound-select1 selection="{if ($open-selection-2) then 'open' else ''}" id="dynamic-dropdown-with-search-by-service-control" bind="dynamic-dropdown-with-search-by-service-bind" appearance="search" resource="/fr/service/custom/orbeon/controls/countries?country-name={$fr-search-value}" ref="" service-performs-search="true" service-supports-paging="false" is-last-page="">
                                 <xf:label ref="$form-resources/dynamic-dropdown-with-search-by-service/label" mediatype="text/html"/>
                                 <xf:hint ref="$form-resources/dynamic-dropdown-with-search-by-service/hint"/>
@@ -2469,7 +2469,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 </xf:itemset>
                             </fr:databound-select1>
                         </fr:c>
-                        <fr:c x="10" y="2" w="3">
+                        <fr:c x="9" y="3" w="4">
                             <fr:databound-select1 selection="{if ($open-selection-3) then 'open' else ''}" id="dynamic-dropdown-with-search-and-paging-by-service-control" bind="dynamic-dropdown-with-search-and-paging-by-service-bind" appearance="search" resource="https://rickandmortyapi.com/api/character?name={$fr-search-value}&amp;page={$fr-search-page}" ref="" service-performs-search="true" service-supports-paging="true" is-last-page="/json/info/next/@type = 'null'">
                                 <xf:label ref="$form-resources/dynamic-dropdown-with-search-and-paging-by-service/label" mediatype="text/html"/>
                                 <xf:hint ref="$form-resources/dynamic-dropdown-with-search-and-paging-by-service/hint"/>
@@ -2483,8 +2483,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
                         </fr:c>
-                        <fr:c x="1" y="3" w="3"/>
-                        <fr:c x="4" y="3" w="3">
+                        <fr:c x="1" y="4" w="4">
                             <fr:checkbox-input id="open-selection-1-control" bind="open-selection-1-bind">
                                 <xf:label ref="$form-resources/open-selection-1/label"/>
                                 <xf:hint ref="$form-resources/open-selection-1/hint"/>
@@ -2493,7 +2492,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                             </fr:checkbox-input>
                         </fr:c>
-                        <fr:c x="7" y="3" w="3" h="1">
+                        <fr:c x="5" y="4" w="4" h="1">
                             <fr:checkbox-input id="open-selection-2-control" bind="open-selection-2-bind">
                                 <xf:label ref="$form-resources/open-selection-2/label"/>
                                 <xf:hint ref="$form-resources/open-selection-2/hint"/>
@@ -2502,7 +2501,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                             </fr:checkbox-input>
                         </fr:c>
-                        <fr:c x="10" y="3" w="3">
+                        <fr:c x="9" y="4" w="4">
                             <fr:checkbox-input id="open-selection-3-control" bind="open-selection-3-bind">
                                 <xf:label ref="$form-resources/open-selection-3/label"/>
                                 <xf:hint ref="$form-resources/open-selection-3/hint"/>
@@ -2515,7 +2514,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                        <fr:c y="4" x="1" w="4">
+                        <fr:c y="5" x="1" w="4">
                             <xf:select appearance="full" bind="checkboxes-bind" id="checkboxes-control">
                                 <xf:label ref="$form-resources/checkboxes/label"/>
                                 <xf:hint ref="$form-resources/checkboxes/hint"/>
@@ -2526,7 +2525,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 </xf:itemset>
                             </xf:select>
                         </fr:c>
-                        <fr:c x="5" y="4" w="4">
+                        <fr:c x="5" y="5" w="4">
                             <xf:select bind="scrollable-checkboxes-bind" id="scrollable-checkboxes-control" appearance="scroll">
                                 <xf:label ref="$form-resources/scrollable-checkboxes/label"/>
                                 <xf:hint ref="$form-resources/scrollable-checkboxes/hint"/>
@@ -2537,14 +2536,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 </xf:itemset>
                             </xf:select>
                         </fr:c>
-                        <fr:c y="4" x="9" w="4">
+                        <fr:c y="5" x="9" w="4">
                             <fr:checkbox-input bind="checkbox-input-bind" id="checkbox-input-control">
                                 <xf:label ref="$form-resources/checkbox-input/label"/>
                                 <xf:hint ref="$form-resources/checkbox-input/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:checkbox-input>
                         </fr:c>
-                        <fr:c y="5" x="1" w="4">
+                        <fr:c y="6" x="1" w="4">
                             <xf:select1 appearance="full" bind="radio-buttons-bind" id="radio-buttons-control">
                                 <xf:label ref="$form-resources/radio-buttons/label"/>
                                 <xf:hint ref="$form-resources/radio-buttons/hint"/>
@@ -2555,7 +2554,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 </xf:itemset>
                             </xf:select1>
                         </fr:c>
-                        <fr:c x="5" y="5" w="4">
+                        <fr:c x="5" y="6" w="4">
                             <fr:open-select1 id="radio-buttons-with-other-control" bind="radio-buttons-with-other-bind" appearance="full">
                                 <xf:label ref="$form-resources/radio-buttons-with-other/label"/>
                                 <xf:hint ref="$form-resources/radio-buttons-with-other/hint"/>
@@ -2566,14 +2565,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 </xf:itemset>
                             </fr:open-select1>
                         </fr:c>
-                        <fr:c y="5" x="9" w="4">
+                        <fr:c y="6" x="9" w="4">
                             <fr:yesno-input bind="yesno-input-bind" id="yesno-input-control">
                                 <xf:label ref="$form-resources/yesno-input/label"/>
                                 <xf:hint ref="$form-resources/yesno-input/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:yesno-input>
                         </fr:c>
-                        <fr:c x="1" y="6" w="6">
+                        <fr:c x="1" y="7" w="6">
                             <xf:select appearance="full" bind="checkboxes-horizontal-bind" id="checkboxes-horizontal-control" class="xforms-select-appearance-xxforms-horizontal">
                                 <xf:label ref="$form-resources/checkboxes-horizontal/label"/>
                                 <xf:hint ref="$form-resources/checkboxes-horizontal/hint"/>
@@ -2585,7 +2584,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 </xf:itemset>
                             </xf:select>
                         </fr:c>
-                        <fr:c x="7" y="6" w="6">
+                        <fr:c x="7" y="7" w="6">
                             <xf:select1 appearance="full" bind="radio-buttons-horizontal-bind" id="radio-buttons-horizontal-control" class="xforms-select1-appearance-xxforms-horizontal">
                                 <xf:label ref="$form-resources/radio-buttons-horizontal/label"/>
                                 <xf:hint ref="$form-resources/radio-buttons-horizontal/hint"/>

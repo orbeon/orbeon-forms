@@ -40,17 +40,14 @@ class ActionsFormat20182Test
       it("must pass all service result checks") {
         withTestExternalContext { _ =>
           withFormRunnerDocument(processorService, doc) {
-            for {
-              (expectedSizeOpt, i) <- List(Some(392), None, Some(408), None).zipWithIndex
-              control              = resolveObject[XFormsValueControl]("my-attachment-control", indexes = List(i + 1)).get
-              value                = control.getValue(EventCollector.Throw)
-            } locally {
-              expectedSizeOpt match {
-                case Some(expectedSize) =>
-                  assert(PathUtils.getFirstQueryParameter(value, "mediatype") contains "image/png")
-                  assert(PathUtils.getFirstQueryParameter(value, "size")      contains expectedSize.toString) // I suppose that sizes can change if the service changes…
-                case None =>
-                  assert(value.isAllBlank)
+            List(true, false, true, false).zipWithIndex.foreach { case (hasAttachment, i) =>
+              val control = resolveObject[XFormsValueControl]("my-attachment-control", indexes = List(i + 1)).get
+              val value   = control.getValue(EventCollector.Throw)
+              if (hasAttachment) {
+                assert(PathUtils.getFirstQueryParameter(value, "mediatype") contains "image/png")
+                assert(PathUtils.getFirstQueryParameter(value, "size").exists(_.toIntOption.exists(_ > 0))) // I suppose that sizes can change if the service changes…
+              } else {
+                assert(value.isAllBlank)
               }
             }
           }

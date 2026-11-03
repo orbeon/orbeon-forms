@@ -588,6 +588,19 @@
                             </xf:action>
                         </fr:trigger>
 
+                        <!-- Check Form -->
+                        <fr:trigger
+                                id="open-check-form-trigger"
+                                bind="fb-toolbox-check-form-bind"
+                                name="toolbox.open-check-form"
+                                class="fb-check-form-button">
+                            <xf:label>
+                                <xh:i class="fa fa-check-circle fa-fw"/>
+                                <xf:output value="$form-resources/dialog-check-form/label"/>
+                            </xf:label>
+                            <xxf:show event="DOMActivate" dialog="fb-check-form-dialog"/>
+                        </fr:trigger>
+
                         <!-- Edit Source -->
                         <fr:trigger
                                 id="open-edit-source-trigger"

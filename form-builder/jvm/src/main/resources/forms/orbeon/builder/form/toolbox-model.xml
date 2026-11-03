@@ -265,6 +265,7 @@
             <schema/>
             <css/>
             <pdf/>
+            <check-form/>
             <edit-source/>
             <reload-components/>
             <workflow/>
@@ -293,6 +294,7 @@
         <xf:bind ref="relevant"              id="fb-relevant-bind"/>
         <xf:bind ref="schema"                id="fb-toolbox-schema-bind"                 relevant="xxf:property('oxf.fb.menu.schema')"/>
         <xf:bind ref="pdf"                   id="fb-toolbox-pdf-bind"                    relevant="xxf:property('oxf.fb.menu.pdf')"/>
+        <xf:bind ref="check-form"            id="fb-toolbox-check-form-bind"             relevant="xxf:property('oxf.fb.menu.check-form')"/>
         <xf:bind ref="edit-source"           id="fb-toolbox-edit-bind"                   relevant="xxf:property('oxf.fb.menu.edit-source')"/>
         <xf:bind ref="reload-components"     id="fb-toolbox-reload-components-bind"      readonly="fr:is-readonly-mode()"/>
         <xf:bind ref="workflow"              id="fb-toolbox-workflow-bind"               relevant="xxf:property('oxf.fb.menu.workflow')"/>

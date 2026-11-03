@@ -545,7 +545,7 @@
                 <fr:section id="details-section" bind="details-bind">
                     <xf:label ref="$form-resources/details/label"/>
                     <xf:help ref="$form-resources/details/help"/>
-                    <fr:grid columns="3" id="details-grid-grid" bind="details-grid-bind">
+                    <fr:grid id="details-grid-grid" bind="details-grid-bind">
                         <fr:c y="1" x="1" w="4">
                                 <xf:input id="title-control" bind="title-bind">
                                 <fr:index>
@@ -635,7 +635,7 @@
                                 </xf:input>
                             </fr:c>
                     </fr:grid>
-                    <fr:grid columns="1" id="review-grid-grid" bind="review-grid-bind">
+                    <fr:grid id="review-grid-grid" bind="review-grid-bind">
                         <fr:c y="1" x="1" w="12">
                                 <fr:tinymce id="review-control" bind="review-bind">
                                     <xf:label ref="$form-resources/review/label"/>

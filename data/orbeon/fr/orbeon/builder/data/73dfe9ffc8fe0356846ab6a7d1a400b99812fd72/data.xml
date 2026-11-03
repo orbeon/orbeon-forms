@@ -1035,8 +1035,7 @@
                                               xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                               xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
                                               xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
-                                              id="project-information-address-section-content-control"
-                                              bind="project-information-address-section-content-bind"/>
+                                              id="project-information-address-section-content-control"/>
                     </fr:section>
                 </fr:section>
                 <fr:section id="project-contact-section-section" bind="project-contact-section-bind">
@@ -1117,8 +1116,7 @@
                                                   xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                                   xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
                                                   xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
-                                                  id="property-owner-address-content-control"
-                                                  bind="property-owner-address-content-bind"/>
+                                                  id="property-owner-address-content-control"/>
                         </fr:section>
                     </fr:section>
                     <fr:section collapsible="false" id="contractor-section-section"
@@ -1284,8 +1282,7 @@
                                                   xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                                   xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
                                                   xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
-                                                  id="contractor-address-section-content-control"
-                                                  bind="contractor-address-section-content-bind"/>
+                                                  id="contractor-address-section-content-control"/>
                         </fr:section>
                     </fr:section>
                     <fr:section collapsible="false" id="architect-section-section"
@@ -1383,8 +1380,7 @@
                                                   xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                                   xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
                                                   xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
-                                                  id="architect-address-section-content-control"
-                                                  bind="architect-address-section-content-bind"/>
+                                                  id="architect-address-section-content-control"/>
                         </fr:section>
                     </fr:section>
                 </fr:section>

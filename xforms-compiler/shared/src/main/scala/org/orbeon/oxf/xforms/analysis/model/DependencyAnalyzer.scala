@@ -33,11 +33,13 @@ object DependencyAnalyzer {
 
   val Logger = LoggerFactory.createLogger("org.orbeon.xforms.analysis.calculate")
 
-  private case class BindDetails(
-    staticBind : StaticBind,
-    name       : Option[String],
-    refs       : Set[String]
+  case class BindNode[T](
+    item: T,
+    name: Option[String],
+    refs: Set[String]
   )
+
+  private type BindDetails = BindNode[StaticBind]
 
   case class Vertex(name: String, refs: Set[Vertex], expr: Option[String], xpa: Option[XPathAnalysis]) {
     def transitiveRefs: Set[Vertex] = refs ++ refs.flatMap(_.transitiveRefs)
@@ -57,7 +59,7 @@ object DependencyAnalyzer {
 
       val referencedVariableNamesIt = SaxonUtils.iterateExternalVariableReferences(expr) filter validBindNames
 
-      BindDetails(staticBind, staticBind.nameOpt, referencedVariableNamesIt.to(Set))
+      BindNode(staticBind, staticBind.nameOpt, referencedVariableNamesIt.to(Set))
     }
   }
 
@@ -66,6 +68,35 @@ object DependencyAnalyzer {
 
   def containsVariableReference(expr: Expression, name: String): Boolean =
     SaxonUtils.iterateExternalVariableReferences(expr) contains name
+
+  // NOTE: We would like to follow the original bind order as closely as possible, but currently we don't: the
+  // order consists of nodes without references first, followed by the order or nodes with one reference, etc.
+  // We might need to do a different algorithm to preserve the order.
+  // Return `Right(orderedItems)` in topological evaluation order, or `Left(itemsInCycle)` if a dependency cycle is found.
+  def sortTopologically[T](bindsForSort: List[BindNode[T]]): Either[List[T], List[T]] = {
+    @tailrec
+    def visit(bindDetails: List[BindNode[T]], done: List[T]): Either[List[T], List[T]] =
+      bindDetails partition (_.refs.isEmpty) match {
+        case (Nil, Nil) =>
+          Right(done.reverse)
+        case (Nil, _) =>
+          val progressivelyRemoveNonReferenced = Iterator.iterate(bindDetails) { bindDetails =>
+            val allRefs = bindDetails flatMap (_.refs)
+            bindDetails filter (b => b.name.exists(allRefs.contains(_)))
+          }
+          val pairedWithNext = progressivelyRemoveNonReferenced.zip(progressivelyRemoveNonReferenced.drop(1))
+          val bindsInCycle   = pairedWithNext.find { case (current, next) => current.length == next.length }.get._1
+          Left(bindsInCycle.map(_.item))
+        case (noRefs, withRefs) =>
+          visit(
+            bindDetails = withRefs map (b => b.copy(refs = b.refs -- (noRefs flatMap (_.name)))),
+            done        = noRefs.map(_.item).reverse ::: done
+          )
+      }
+
+    val knownNames = bindsForSort.flatMap(_.name).toSet
+    visit(bindsForSort.map(b => b.copy(refs = b.refs.intersect(knownNames))), Nil)
+  }
 
   //
   // Return an evaluation order or a `ValidationException` if there is a cycle.
@@ -104,38 +135,7 @@ object DependencyAnalyzer {
         name       <- namesToAdd.toList
         staticBind <- allBindsByName.get(name)
       } yield
-        BindDetails(staticBind, staticBind.nameOpt, Set.empty)
-    }
-
-    // NOTE: We would like to follow the original bind order as closely as possible, but currently we don't: the
-    // order consists of nodes without references first, followed by the order or nodes with one reference, etc.
-    // We might need to do a different algorithm to preserve the order.
-    def sortTopologically(bindsForSort: List[BindDetails]) = {
-      @tailrec
-      def visit(bindDetails: List[BindDetails], done: List[StaticBind]): List[StaticBind] =
-        bindDetails partition (_.refs.isEmpty) match {
-          case (Nil, Nil) =>
-            done
-          case (Nil, head :: _) =>
-            val progressivelyRemoveNonReferenced = Iterator.iterate(bindDetails) { bindDetails =>
-              val allRefs = bindDetails flatMap (_.refs)
-              bindDetails filter (b => b.name.exists(allRefs.contains(_)))
-            }
-            val pairedWithNext = progressivelyRemoveNonReferenced.zip(progressivelyRemoveNonReferenced.drop(1))
-            val bindsInCycle   = pairedWithNext.find { case (current, next) => current.length == next.length }.get._1
-            val idsInCycle     = bindsInCycle map (b => s"`${b.staticBind.staticId}`") mkString ", "
-            throw new ValidationException(
-              s"MIP dependency cycle found for bind ids $idsInCycle",
-              head.staticBind.locationData
-            )
-          case (noRefs, withRefs) =>
-            visit(
-              bindDetails = withRefs map (b => b.copy(refs = b.refs -- (noRefs flatMap (_.name)))),
-              done        = noRefs.map(_.staticBind).reverse ::: done
-            )
-        }
-
-      visit(bindsForSort, Nil).reverse
+        BindNode(staticBind, staticBind.nameOpt, Set.empty)
     }
 
     def logResult(explanation: List[Vertex]): Unit = {
@@ -155,16 +155,16 @@ object DependencyAnalyzer {
 
     def buildExplanationGraph(result: List[StaticBind]): List[Vertex] = {
 
-      val idsToRefs = bindsDetailsForGivenMip map (b => b.staticBind.staticId -> b.refs) toMap
+      val idsToRefs = bindsDetailsForGivenMip map (b => b.item.staticId -> b.refs) toMap
 
       var verticesByIds: Map[String, Vertex] =
         otherBindDetails.map(d =>
-          d.staticBind.staticId ->
+          d.item.staticId ->
             Vertex(
               d.name.get,
               Set.empty,
               None,
-              d.staticBind.firstXPathMipByName(mip) collect {
+              d.item.firstXPathMipByName(mip) collect {
                 case m if m.analysis.figuredOutDependencies => m.analysis
               }
             )
@@ -189,9 +189,19 @@ object DependencyAnalyzer {
     }
 
     // We are only interested in the binds containing the MIP
-    val idsToKeep = bindsDetailsForGivenMip map (_.staticBind.staticId) toSet
+    val idsToKeep = bindsDetailsForGivenMip map (_.item.staticId) toSet
 
-    val resultWithOther = sortTopologically(bindsDetailsForGivenMip ++ otherBindDetails)
+    val resultWithOther =
+      sortTopologically(bindsDetailsForGivenMip ++ otherBindDetails) match {
+        case Right(ordered) =>
+          ordered
+        case Left(bindsInCycle) =>
+          val idsInCycle = bindsInCycle map (b => s"`${b.staticId}`") mkString ", "
+          throw new ValidationException(
+            s"MIP dependency cycle found for bind ids $idsInCycle",
+            bindsInCycle.head.locationData
+          )
+      }
     val resultFiltered  = resultWithOther filter (b => idsToKeep(b.staticId))
 
     lazy val explanation = buildExplanationGraph(resultWithOther)

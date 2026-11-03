@@ -3503,6 +3503,70 @@ body.orbeon {
         .fb-dialog-section { display: block; margin-left: 1em }
     }
 
+    // Shared validation callouts and Form Checker styles
+    .fb-validation-callout {
+        --fb-validation-accent-color: var(--orbeon-info-color);
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: var(--orbeon-alert-border-radius);
+        border: 1px solid color-mix(in oklab, var(--fb-validation-accent-color) 32%, var(--orbeon-base-border-color));
+        border-left: 3px solid var(--fb-validation-accent-color);
+        background-color: color-mix(in oklab, var(--fb-validation-accent-color) 9%, var(--orbeon-dialog-background-color));
+        color: var(--orbeon-base-color);
+        line-height: 1.45;
+
+        &.fb-validation-error {
+            --fb-validation-accent-color: var(--orbeon-error-color);
+        }
+        &.fb-validation-warning {
+            --fb-validation-accent-color: var(--orbeon-warning-color);
+        }
+        &.fb-validation-info {
+            --fb-validation-accent-color: var(--orbeon-info-color);
+        }
+        &.fb-validation-success {
+            --fb-validation-accent-color: #198754;
+        }
+
+        @media (forced-colors: active) {
+            border-color: CanvasText;
+        }
+
+        .fb-validation-callout-icon {
+            flex-shrink: 0;
+            margin-top: 2px;
+            font-size: 14px;
+            color: var(--fb-validation-accent-color);
+        }
+
+        .fb-validation-callout-content {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .fb-validation-callout-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .fb-validation-callout-list {
+            margin: 0;
+            padding-left: 18px;
+            max-height: 160px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+
+            > .xforms-repeat-begin-end,
+            > .xforms-repeat-delimiter {
+                display: none !important;
+            }
+        }
+    }
+
     .fb-edit-source-dialog {
         width: 900px;
         max-width: none;
@@ -3515,8 +3579,19 @@ body.orbeon {
                 padding: 10px;
             }
         }
+        .fb-edit-source-validation-banner {
+            flex-shrink: 0;
+            margin: 0;
+            border-radius: 0;
+            border-top: none;
+            border-right: none;
+            padding: 10px 14px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
         .xbl-fr-code-mirror {
             flex-grow: 1;
+            min-height: 0;
             position: relative;
 
             .CodeMirror {
@@ -3532,7 +3607,8 @@ body.orbeon {
 
     // Publish dialog
     .fb-publish-dialog {
-        width: 500px;
+        width: 540px;
+        max-width: ~"calc(100vw - 48px)";
 
         .xforms-switch {
             display: flex;
@@ -3560,8 +3636,141 @@ body.orbeon {
             }
         }
 
+        .fb-publish-validation-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            > .xforms-group:not(.xforms-disabled) {
+                display: block;
+            }
+        }
+
         .alert {
             display: block;
+        }
+    }
+
+    // Check Form dialog
+    .fb-check-form-dialog {
+        width: 640px;
+        max-width: ~"calc(100vw - 48px)";
+
+        .fb-check-form-dialog-body {
+            max-height: ~"min(65vh, 520px)";
+            overflow-y: auto;
+
+            > .xforms-group:not(.xforms-disabled) {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+
+        .fb-validation-group {
+            --fb-group-accent: var(--orbeon-info-color);
+            border: 1px solid var(--orbeon-base-border-color);
+            border-radius: var(--orbeon-alert-border-radius);
+            background-color: var(--orbeon-form-background-color);
+            overflow: hidden;
+
+            &.fb-validation-group-error {
+                --fb-group-accent: var(--orbeon-error-color);
+            }
+            &.fb-validation-group-warning {
+                --fb-group-accent: var(--orbeon-warning-color);
+            }
+            &.fb-validation-group-info {
+                --fb-group-accent: var(--orbeon-info-color);
+            }
+
+            @media (forced-colors: active) {
+                border-color: CanvasText;
+            }
+        }
+
+        .fb-validation-group-header {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 12px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--orbeon-base-color);
+            background-color: color-mix(in oklab, var(--fb-group-accent) 10%, var(--orbeon-dialog-background-color));
+            border-bottom: 1px solid var(--orbeon-base-border-color);
+
+            i.fa {
+                color: var(--fb-group-accent);
+                font-size: 13px;
+            }
+
+            .fb-validation-count-badge {
+                margin-left: auto;
+                padding: 1px 7px;
+                border-radius: 999px;
+                font-size: 11px;
+                font-weight: 600;
+                line-height: 1.35;
+                color: var(--orbeon-base-color);
+                background-color: color-mix(in oklab, var(--fb-group-accent) 16%, var(--orbeon-dialog-background-color));
+                border: 1px solid color-mix(in oklab, var(--fb-group-accent) 36%, var(--orbeon-base-border-color));
+
+                @media (forced-colors: active) {
+                    border-color: CanvasText;
+                }
+            }
+        }
+
+        .fb-validation-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+
+            > .xforms-repeat-begin-end,
+            > .xforms-repeat-delimiter {
+                display: none !important;
+            }
+        }
+
+        .fb-validation-item {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            padding: 8px 12px;
+            color: var(--orbeon-base-color);
+            line-height: 1.45;
+            border-left: 3px solid var(--fb-group-accent);
+
+            & + .fb-validation-item {
+                border-top: 1px solid var(--orbeon-base-border-color);
+            }
+
+            .fb-validation-item-message {
+                flex: 1 1 auto;
+                min-width: 0;
+                overflow-wrap: anywhere;
+            }
+
+            .fb-validation-control-pill {
+                flex-shrink: 0;
+                margin-left: auto;
+                padding: 1px 6px;
+                border-radius: var(--orbeon-control-border-radius);
+                border: 1px solid var(--orbeon-base-border-color);
+                background-color: var(--orbeon-dialog-background-color);
+                color: var(--orbeon-hint-color);
+                font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                font-size: 11px;
+                line-height: 1.4;
+                white-space: nowrap;
+
+                @media (forced-colors: active) {
+                    border-color: CanvasText;
+                }
+            }
         }
     }
 

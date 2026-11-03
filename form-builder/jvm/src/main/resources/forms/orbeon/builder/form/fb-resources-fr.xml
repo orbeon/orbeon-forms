@@ -2013,6 +2013,31 @@
         <show-cell-badges>Afficher les badges des contrôles</show-cell-badges>
         <show-toolbar>Afficher la barre d'outils</show-toolbar>
     </control-settings-toolbar>
+    <dialog-check-form>
+        <label>Vérifier le formulaire</label>
+        <no-issues>Aucun problème n'a été détecté dans cette définition de formulaire.</no-issues>
+        <blocking-errors>Veuillez corriger les erreurs de dépendance circulaire avant de publier.</blocking-errors>
+        <structural-errors>Veuillez corriger les erreurs structurelles suivantes dans le code source du formulaire :</structural-errors>
+        <errors>Erreurs</errors>
+        <warnings>Avertissements</warnings>
+        <compatibility>
+            <compatible>La structure des données de ce formulaire est compatible avec les données existantes pour la version {0,number,integer}.</compatible>
+            <migration-required>Des modifications structurelles ont été détectées par rapport à la version {0,number,integer} (contrôles ajoutés, supprimés ou déplacés). Assurez-vous que la migration simple des données est activée s'il existe des données dans la base de données.</migration-required>
+            <incompatible>Des modifications incompatibles de structure ou de type de données ont été détectées par rapport à la version {0,number,integer}. Écraser cette version peut poser problème avec les données existantes.</incompatible>
+        </compatibility>
+        <issue>
+            <circular-dependency-calculate>Dépendance circulaire dans les formules de valeur calculée impliquant les contrôles : {0}</circular-dependency-calculate>
+            <circular-dependency-default>Dépendance circulaire dans les formules de valeur initiale impliquant les contrôles : {0}</circular-dependency-default>
+            <invalid-xpath>Expression XPath invalide dans {0} ({1}) : {2}</invalid-xpath>
+            <unresolved-variable>Référence à une variable inconnue « ${2} » dans {0} ({1})</unresolved-variable>
+            <unresolved-control>Référence à un contrôle inconnu « {2} » dans {0} ({1})</unresolved-control>
+            <token-without-permissions>Le lien avec jeton pour le mode « {2} » dans {0} ({1}) requiert la permission « Jetons requis » pour : {3}</token-without-permissions>
+            <container-repeat-changed>Le conteneur « {0} » a changé de paramètre de répétition ({1} vers {2})</container-repeat-changed>
+            <control-repeat-ancestry-changed>Le contrôle « {0} » a été déplacé à travers une limite de répétition ({1} vers {2})</control-repeat-ancestry-changed>
+            <incompatible-datatype-change>Le contrôle « {0} » a changé de type de données de « {1} » vers « {2} »</incompatible-datatype-change>
+            <data-migration-required>Modifications de la structure des données par rapport à la version publiée ({0})</data-migration-required>
+        </issue>
+    </dialog-check-form>
     <section-focus>
         <focus>Isoler la section</focus>
         <unfocus>Quitter le mode isolé</unfocus>

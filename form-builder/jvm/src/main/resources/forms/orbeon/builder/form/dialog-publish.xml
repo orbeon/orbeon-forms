@@ -19,6 +19,7 @@
     xmlns:array="http://www.w3.org/2005/xpath-functions/array"
     xmlns:fr  = "http://orbeon.org/oxf/xml/form-runner"
     xmlns:frf = "java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:fbf = "java:org.orbeon.oxf.fb.FormBuilderXPathApi"
 
     id        = "fb-publish-dialog"
     level     = "modal"
@@ -42,6 +43,11 @@
         <xf:setvalue ref="instance()/latest-version"        value="-1"/>
         <xf:setvalue ref="instance()/selected-version"/><!-- https://github.com/orbeon/orbeon-forms/issues/5001 -->
         <xf:setvalue ref="instance()/selected-comment"/>
+
+        <xf:delete ref="instance()/validation"/>
+        <xf:insert
+            context="instance()"
+            origin="fbf:validateForm(xxf:instance('fb-form-instance'), (), $form-resources)"/>
 
         <xf:dispatch name="fr-read-versions" targetid="fr-versioning-model">
             <xf:property name="app"                        value="event('app')"/>
@@ -136,10 +142,14 @@
                                                 ref="instance()/selected-comment"
                                                 value="../existing-comment"/>
                                         </xf:action>
-                                        <!-- If "next" version, then clear comment -->
-                                        <xf:setvalue
-                                            if="event('xxf:item-value')[. = 'next']"
-                                            ref="instance()/selected-comment"/>
+                                        <!-- If "next" version, then clear comment and reset validation without published form comparison -->
+                                        <xf:action if="event('xxf:item-value')[. = 'next']">
+                                            <xf:setvalue ref="instance()/selected-comment"/>
+                                            <xf:delete ref="instance()/validation"/>
+                                            <xf:insert
+                                                context="instance()"
+                                                origin="fbf:validateForm(xxf:instance('fb-form-instance'), (), $form-resources)"/>
+                                        </xf:action>
                                     </xf:action>
 
                                 </xf:select1>
@@ -168,14 +178,104 @@
                     </xh:tr>
                     <xh:tr>
                         <xh:td>
-                            <xf:output
-                                ref=".[$latest-version gt 0 and $versioning-supported and instance()/selected-version = 'next']"
-                                class="alert alert-warning"
-                                value="$form-resources/dialog-publish/create-new-version-help/normalize-space()"/>
-                            <xf:output
-                                ref=".[$latest-version gt 0 and ($versioning-supported and instance()/selected-version != 'next' or not($versioning-supported))]"
-                                class="alert alert-warning"
-                                value="$form-resources/dialog-publish/overwrite-version-help/normalize-space()"/>
+                            <xh:div class="fb-publish-validation-stack">
+                                <xf:group ref=".[exists(instance()/validation/issue[@severity = 'error'])]">
+                                    <xf:var name="pub-errors" value="instance()/validation/issue[@severity = 'error']"/>
+                                    <xh:div class="fb-validation-callout fb-validation-error">
+                                        <xh:i class="fa fa-circle-exclamation fb-validation-callout-icon" aria-hidden="true"/>
+                                        <xh:div class="fb-validation-callout-content">
+                                            <xh:div class="fb-validation-callout-title">
+                                                <xf:output value="
+                                                    if (instance()/validation/@blocking = 'true') then
+                                                        $form-resources/dialog-check-form/blocking-errors
+                                                    else
+                                                        xxf:format-message($form-resources/error-summary/label, (0, count($pub-errors)))"/>
+                                            </xh:div>
+                                            <xh:ul role="list" class="fb-validation-callout-list">
+                                                <xf:repeat ref="$pub-errors">
+                                                    <xh:li><xf:output value="."/></xh:li>
+                                                </xf:repeat>
+                                            </xh:ul>
+                                        </xh:div>
+                                    </xh:div>
+                                </xf:group>
+                                <xf:group ref=".[exists(instance()/validation/issue[@severity = 'warning'])]">
+                                    <xf:var name="pub-warnings" value="instance()/validation/issue[@severity = 'warning']"/>
+                                    <xh:div class="fb-validation-callout fb-validation-warning">
+                                        <xh:i class="fa fa-triangle-exclamation fb-validation-callout-icon" aria-hidden="true"/>
+                                        <xh:div class="fb-validation-callout-content">
+                                            <xh:div class="fb-validation-callout-title">
+                                                <xf:output value="xxf:format-message($form-resources/error-summary/label, (1, count($pub-warnings)))"/>
+                                            </xh:div>
+                                            <xh:ul role="list" class="fb-validation-callout-list">
+                                                <xf:repeat ref="$pub-warnings">
+                                                    <xh:li><xf:output value="."/></xh:li>
+                                                </xf:repeat>
+                                            </xh:ul>
+                                        </xh:div>
+                                    </xh:div>
+                                </xf:group>
+                                <xf:group ref=".[exists(instance()/validation/issue[@severity = 'info'])]">
+                                    <xf:var name="pub-infos" value="instance()/validation/issue[@severity = 'info']"/>
+                                    <xh:div class="fb-validation-callout fb-validation-info">
+                                        <xh:i class="fa fa-circle-info fb-validation-callout-icon" aria-hidden="true"/>
+                                        <xh:div class="fb-validation-callout-content">
+                                            <xh:div class="fb-validation-callout-title">
+                                                <xf:output value="xxf:format-message($form-resources/error-summary/label, (2, count($pub-infos)))"/>
+                                            </xh:div>
+                                            <xh:ul role="list" class="fb-validation-callout-list">
+                                                <xf:repeat ref="$pub-infos">
+                                                    <xh:li><xf:output value="."/></xh:li>
+                                                </xf:repeat>
+                                            </xh:ul>
+                                        </xh:div>
+                                    </xh:div>
+                                </xf:group>
+                                <xf:group ref=".[$latest-version gt 0 and $versioning-supported and instance()/selected-version = 'next']">
+                                    <xh:div class="fb-validation-callout fb-validation-warning">
+                                        <xh:i class="fa fa-triangle-exclamation fb-validation-callout-icon" aria-hidden="true"/>
+                                        <xh:div class="fb-validation-callout-content">
+                                            <xf:output value="$form-resources/dialog-publish/create-new-version-help/normalize-space()"/>
+                                        </xh:div>
+                                    </xh:div>
+                                </xf:group>
+                                <xf:group ref=".[$latest-version gt 0 and ($versioning-supported and instance()/selected-version != 'next' or not($versioning-supported))]">
+                                    <xf:var name="compat" value="instance()/validation/@data-compatibility/string()"/>
+                                    <xf:var name="ver"    value="if (instance()/existing-version gt 0) then instance()/existing-version/data(.) else 1"/>
+                                    <xf:group ref=".[$compat = 'compatible']">
+                                        <xh:div class="fb-validation-callout fb-validation-success">
+                                            <xh:i class="fa fa-circle-check fb-validation-callout-icon" aria-hidden="true"/>
+                                            <xh:div class="fb-validation-callout-content">
+                                                <xf:output value="xxf:format-message($form-resources/dialog-check-form/compatibility/compatible, $ver)"/>
+                                            </xh:div>
+                                        </xh:div>
+                                    </xf:group>
+                                    <xf:group ref=".[$compat = 'migration-required']">
+                                        <xh:div class="fb-validation-callout fb-validation-warning">
+                                            <xh:i class="fa fa-triangle-exclamation fb-validation-callout-icon" aria-hidden="true"/>
+                                            <xh:div class="fb-validation-callout-content">
+                                                <xf:output value="xxf:format-message($form-resources/dialog-check-form/compatibility/migration-required, $ver)"/>
+                                            </xh:div>
+                                        </xh:div>
+                                    </xf:group>
+                                    <xf:group ref=".[$compat = 'incompatible']">
+                                        <xh:div class="fb-validation-callout fb-validation-error">
+                                            <xh:i class="fa fa-circle-exclamation fb-validation-callout-icon" aria-hidden="true"/>
+                                            <xh:div class="fb-validation-callout-content">
+                                                <xf:output value="xxf:format-message($form-resources/dialog-check-form/compatibility/incompatible, $ver)"/>
+                                            </xh:div>
+                                        </xh:div>
+                                    </xf:group>
+                                    <xf:group ref=".[$compat = '']">
+                                        <xh:div class="fb-validation-callout fb-validation-warning">
+                                            <xh:i class="fa fa-triangle-exclamation fb-validation-callout-icon" aria-hidden="true"/>
+                                            <xh:div class="fb-validation-callout-content">
+                                                <xf:output value="$form-resources/dialog-publish/overwrite-version-help/normalize-space()"/>
+                                            </xh:div>
+                                        </xh:div>
+                                    </xf:group>
+                                </xf:group>
+                            </xh:div>
                         </xh:td>
                     </xh:tr>
                 </fr:grid>
@@ -183,9 +283,9 @@
             <xh:div class="fr-dialog-buttons">
                 <xf:group>
                     <!-- Publish button -->
-                    <xf:trigger xxf:modal="true" id="fb-publish-publish" appearance="xxf:primary">
+                    <xf:trigger xxf:modal="true" id="fb-publish-publish" ref="instance()/publish-trigger" appearance="xxf:primary">
                         <xf:label value="$form-resources/dialog-publish/publish"/>
-                        <xf:action event="DOMActivate" if="valid(instance())">
+                        <xf:action event="DOMActivate" if="valid(instance()) and not(instance()/validation/@blocking = 'true')">
                             <xf:dispatch name="fb-publish-form" targetid="fr-form-model">
                                 <xf:property name="doc"                      value="xxf:instance('fb-form-instance')"/>
                                 <xf:property name="app"                      value="$app"/>
@@ -360,6 +460,11 @@
                                 array:get($v, 1)
                             )
                         )"/>
+            <xf:action if="not(instance()/versioning-supported = 'true') and event('latest-version') gt 0">
+                <xf:send submission="fb-read-form-definition">
+                    <xf:property name="form-version" value="event('latest-version')"/>
+                </xf:send>
+            </xf:action>
         </xf:action>
 
         <!-- Clean-up upon close -->
@@ -388,6 +493,9 @@
                 <available>true</available>
                 <selected-version/>
                 <selected-comment/>
+
+                <publish-trigger/>
+                <validation valid="true" blocking="false" error-count="0" warning-count="0" info-count="0" data-compatibility=""/>
             </publish>
         </xf:instance>
 
@@ -399,6 +507,10 @@
             ref="selected-version"
             required="$versioning-supported"
             readonly="not($version-selection-enabled)"/>
+
+        <xf:bind
+            ref="publish-trigger"
+            readonly="../validation/@blocking = 'true'"/>
 
         <xf:var name="app"                       value="instance()/app/string()"/>
         <xf:var name="form"                      value="instance()/form/string()"/>
@@ -441,6 +553,10 @@
                 <xf:setvalue
                     ref="instance()/available"
                     value="not($response-metadata/available = 'false')"/>
+                <xf:delete ref="instance()/validation"/>
+                <xf:insert
+                    context="instance()"
+                    origin="fbf:validateForm(xxf:instance('fb-form-instance'), event('response-body'), xxf:get-variable('fr-form-model', 'form-resources'))"/>
             </xf:action>
 
             <xf:action event="xforms-submit-error" if="event('response-status-code') = (404, 410)">

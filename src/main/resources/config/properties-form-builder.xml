@@ -135,6 +135,7 @@
 
     <property as="xs:boolean" name="oxf.fb.menu.schema"                                         value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.pdf"                                            value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.check-form"                                     value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.edit-source"                                    value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.permissions"                                    value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.permissions.token"                              value="true"/>

@@ -186,7 +186,7 @@
                     <component:contact-information xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" id="contact-information-content-control"/>
                 </fr:section>
                 <fr:section id="contact-address-section" bind="contact-address-bind">
-                    <component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" id="contact-address-content-control" bind="contact-address-content-bind"/>
+                    <component:address-us xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/_/library" xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" id="contact-address-content-control"/>
                 </fr:section>
                 <fr:section id="signature-section-section" bind="signature-section-bind">
                     <fr:grid id="grid-2-grid" bind="grid-2-bind">

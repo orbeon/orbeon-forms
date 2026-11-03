@@ -1421,6 +1421,50 @@ object FormBuilderXPathApi {
     else
       false
 
+  //@XPathFunction
+  def hasCircularDependency(
+    elemOrAtt   : NodeInfo,
+    mipName     : String,
+    originalName: String,
+    newName     : String
+  ): Boolean =
+    if (elemOrAtt.stringValue.trimAllToOpt.nonEmpty)
+      Try {
+        implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+        FormDefinitionValidator.hasCircularDependencyForControl(
+          formDefinitionRootElem = ctx.formDefinitionRootElem,
+          controlName            = newName.trimAllToOpt.getOrElse(originalName),
+          mipName                = mipName,
+          expressionOpt          = elemOrAtt.stringValue.trimAllToOpt,
+          originalControlNameOpt = originalName.trimAllToOpt
+        )
+      }.getOrElse(false)
+    else
+      false
+
+  //@XPathFunction
+  def validateForm(
+    formDefinitionRootElem               : NodeInfo,
+    publishedFormDefinitionRootElemOrNull: NodeInfo,
+    resourcesElemOrNull                  : NodeInfo
+  ): NodeInfo =
+    FormDefinitionValidator.validateFormAsXml(
+      formDefinitionRootElem         = formDefinitionRootElem,
+      publishedFormDefinitionRootOpt = Option(publishedFormDefinitionRootElemOrNull),
+      resourcesElemOpt               = Option(resourcesElemOrNull),
+      includeStructureCheck          = true
+    )
+
+  //@XPathFunction
+  def validateFormStructure(
+    formDefinitionRootElem: NodeInfo,
+    resourcesElemOrNull   : NodeInfo
+  ): NodeInfo =
+    FormDefinitionValidator.validateFormStructureAsXml(
+      formDefinitionRootElem = formDefinitionRootElem,
+      resourcesElemOpt       = Option(resourcesElemOrNull)
+    )
+
   // Simple suggestion logic from a text label to a control name
   //@XPathFunction
   def controlNameSuggestionFromLabel(

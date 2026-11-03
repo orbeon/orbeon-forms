@@ -1975,6 +1975,31 @@
         <show-cell-badges todo="true">Show Control Badges</show-cell-badges>
         <show-toolbar todo="true">Show Toolbar</show-toolbar>
     </control-settings-toolbar>
+    <dialog-check-form>
+        <label todo="true">Check Form</label>
+        <no-issues todo="true">No issues were found in this form definition.</no-issues>
+        <blocking-errors todo="true">Please fix the circular dependency errors before publishing.</blocking-errors>
+        <structural-errors todo="true">Please fix the following structural errors in the form source:</structural-errors>
+        <errors todo="true">Errors</errors>
+        <warnings todo="true">Warnings</warnings>
+        <compatibility>
+            <compatible todo="true">The data structure of this form is compatible with existing data for version {0,number,integer}.</compatible>
+            <migration-required todo="true">Structural changes were detected compared to version {0,number,integer} (added, removed, or moved controls). Make sure Simple Data Migration is enabled if there is existing data in the database.</migration-required>
+            <incompatible todo="true">Incompatible structural or data type changes were detected compared to version {0,number,integer}. Overwriting this version may cause issues with existing data in the database.</incompatible>
+        </compatibility>
+        <issue>
+            <circular-dependency-calculate todo="true">Circular dependency in Calculated Value formulas involving controls: {0}</circular-dependency-calculate>
+            <circular-dependency-default todo="true">Circular dependency in Initial Value formulas involving controls: {0}</circular-dependency-default>
+            <invalid-xpath todo="true">Invalid XPath expression in {0} ({1}): {2}</invalid-xpath>
+            <unresolved-variable todo="true">Reference to unknown variable "${2}" in {0} ({1})</unresolved-variable>
+            <unresolved-control todo="true">Reference to unknown control "{2}" in {0} ({1})</unresolved-control>
+            <token-without-permissions todo="true">Link with token for "{2}" mode in {0} ({1}) requires "Require token" permission for: {3}</token-without-permissions>
+            <container-repeat-changed todo="true">Container "{0}" changed repeat setting ({1} to {2})</container-repeat-changed>
+            <control-repeat-ancestry-changed todo="true">Control "{0}" moved across repeat boundaries ({1} to {2})</control-repeat-ancestry-changed>
+            <incompatible-datatype-change todo="true">Control "{0}" changed data type from "{1}" to "{2}"</incompatible-datatype-change>
+            <data-migration-required todo="true">Data structure changes compared to published version ({0})</data-migration-required>
+        </issue>
+    </dialog-check-form>
     <section-focus>
         <focus todo="true">Focus on Section</focus>
         <unfocus todo="true">Exit Section Focus</unfocus>

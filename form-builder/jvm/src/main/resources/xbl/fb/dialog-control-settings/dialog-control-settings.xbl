@@ -1332,10 +1332,19 @@
                 </xf:bind>
 
                 <xf:bind
-                    ref="relevant | readonly | default | calculate"
+                    ref="relevant | readonly"
                     type="xxf:XPath2"
                     xxf:whitespace="trim"
                     constraint="not(fbf:hasUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"
+                    required="false()"/>
+
+                <xf:bind
+                    ref="default | calculate"
+                    type="xxf:XPath2"
+                    xxf:whitespace="trim"
+                    constraint="
+                        not(fbf:hasUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name)) and
+                        not(fbf:hasCircularDependency(., local-name(), $i/original-control-name, $i/control-name))"
                     required="false()"/>
 
                 <xf:bind

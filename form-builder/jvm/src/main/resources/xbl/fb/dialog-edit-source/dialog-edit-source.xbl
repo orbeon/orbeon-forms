@@ -19,7 +19,8 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-    xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
 
     <xbl:binding
         id="fb-dialog-edit-source"
@@ -28,6 +29,9 @@
 
         <xbl:handlers>
             <xbl:handler event="xxforms-dialog-open">
+
+                <xf:delete ref="instance()/validation/*"/>
+                <xf:setvalue ref="instance()/validation/@valid" value="'true'"/>
 
                 <xf:setvalue
                     ref="source"
@@ -46,14 +50,24 @@
             </xbl:handler>
 
             <xbl:handler event="DOMActivate" observer="apply-trigger code-mirror" if="valid(source)">
-                <xf:dispatch targetid="fb-dialog-edit-source" name="fr-save">
-                    <xf:property name="value" value="xf:parse(instance()/source)/root()"/>
-                </xf:dispatch>
-                <xf:setvalue ref="source"/>
-                <xxf:hide dialog="dialog"/>
+                <xf:var name="parsed" value="xf:parse(instance()/source)"/>
+                <xf:delete ref="instance()/validation"/>
+                <xf:insert
+                    context="instance()"
+                    origin="fbf:validateFormStructure($parsed, xxf:get-variable('fr-form-model', 'form-resources'))"/>
+
+                <xf:action if="instance()/validation/@valid = 'true'">
+                    <xf:dispatch targetid="fb-dialog-edit-source" name="fr-save">
+                        <xf:property name="value" value="$parsed/root()"/>
+                    </xf:dispatch>
+                    <xf:setvalue ref="source"/>
+                    <xxf:hide dialog="dialog"/>
+                </xf:action>
             </xbl:handler>
 
             <xbl:handler event="DOMActivate" observer="cancel-trigger">
+                <xf:delete ref="instance()/validation/*"/>
+                <xf:setvalue ref="instance()/validation/@valid" value="'true'"/>
                 <xf:setvalue ref="source"/>
                 <xxf:hide dialog="dialog"/>
             </xbl:handler>
@@ -66,6 +80,7 @@
                     <source-editor>
                         <source/>
                         <apply-trigger/>
+                        <validation valid="true" blocking="false" error-count="0" warning-count="0" info-count="0" data-compatibility=""/>
                     </source-editor>
                 </xf:instance>
 
@@ -93,6 +108,22 @@
                 class="fb-edit-source-dialog">
 
                 <xf:label ref="$resources/dialog-edit-source/label"/>
+
+                <xf:group ref=".[exists(instance()/validation/issue)]">
+                    <xh:div class="fb-edit-source-validation-banner fb-validation-callout fb-validation-error" role="alert">
+                        <xh:i class="fa fa-circle-exclamation fb-validation-callout-icon" aria-hidden="true"/>
+                        <xh:div class="fb-validation-callout-content">
+                            <xh:div class="fb-validation-callout-title">
+                                <xf:output value="$resources/dialog-check-form/structural-errors"/>
+                            </xh:div>
+                            <xh:ul role="list" class="fb-validation-callout-list">
+                                <xf:repeat ref="instance()/validation/issue">
+                                    <xh:li><xf:output value="."/></xh:li>
+                                </xf:repeat>
+                            </xh:ul>
+                        </xh:div>
+                    </xh:div>
+                </xf:group>
 
                 <fr:code-mirror ref="source" id="code-mirror">
                     <xf:alert ref="$resources/dialog-edit-source/source/alert"/>

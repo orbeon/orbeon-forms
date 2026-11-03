@@ -2012,6 +2012,31 @@
         <show-cell-badges>Show Control Badges</show-cell-badges>
         <show-toolbar>Show Toolbar</show-toolbar>
     </control-settings-toolbar>
+    <dialog-check-form>
+        <label>Check Form</label>
+        <no-issues>No issues were found in this form definition.</no-issues>
+        <blocking-errors>Please fix the circular dependency errors before publishing.</blocking-errors>
+        <structural-errors>Please fix the following structural errors in the form source:</structural-errors>
+        <errors>Errors</errors>
+        <warnings>Warnings</warnings>
+        <compatibility>
+            <compatible>The data structure of this form is compatible with existing data for version {0,number,integer}.</compatible>
+            <migration-required>Structural changes were detected compared to version {0,number,integer} (added, removed, or moved controls). Make sure Simple Data Migration is enabled if there is existing data in the database.</migration-required>
+            <incompatible>Incompatible structural or data type changes were detected compared to version {0,number,integer}. Overwriting this version may cause issues with existing data in the database.</incompatible>
+        </compatibility>
+        <issue>
+            <circular-dependency-calculate>Circular dependency in Calculated Value formulas involving controls: {0}</circular-dependency-calculate>
+            <circular-dependency-default>Circular dependency in Initial Value formulas involving controls: {0}</circular-dependency-default>
+            <invalid-xpath>Invalid XPath expression in {0} ({1}): {2}</invalid-xpath>
+            <unresolved-variable>Reference to unknown variable "${2}" in {0} ({1})</unresolved-variable>
+            <unresolved-control>Reference to unknown control "{2}" in {0} ({1})</unresolved-control>
+            <token-without-permissions>Link with token for "{2}" mode in {0} ({1}) requires "Require token" permission for: {3}</token-without-permissions>
+            <container-repeat-changed>Container "{0}" changed repeat setting ({1} to {2})</container-repeat-changed>
+            <control-repeat-ancestry-changed>Control "{0}" moved across repeat boundaries ({1} to {2})</control-repeat-ancestry-changed>
+            <incompatible-datatype-change>Control "{0}" changed data type from "{1}" to "{2}"</incompatible-datatype-change>
+            <data-migration-required>Data structure changes compared to published version ({0})</data-migration-required>
+        </issue>
+    </dialog-check-form>
     <section-focus>
         <focus>Focus on Section</focus>
         <unfocus>Exit Section Focus</unfocus>

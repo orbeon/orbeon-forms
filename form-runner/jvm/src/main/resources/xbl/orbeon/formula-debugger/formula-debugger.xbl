@@ -45,6 +45,22 @@
 
                 <xf:bind ref="@filter" type="xs:boolean"/>
 
+                <xf:action event="xforms-model-construct-done">
+                    <xf:setvalue
+                        xmlns:FormRunnerFormulaDebugger="java:org.orbeon.oxf.fr.xbl.FormRunnerFormulaDebugger"
+                        ref="@mip"
+                        value="
+                            (
+                                for $m in ('default', 'calculate', 'relevant', 'required', 'readonly')
+                                return
+                                    if (array:size(FormRunnerFormulaDebugger:explainModel($m)) gt 0) then
+                                        $m
+                                    else
+                                        (),
+                                'default'
+                            )[1]"/>
+                </xf:action>
+
                 <xf:action event="xforms-ready fr-refresh-data">
                     <xf:delete ref="*"/>
                     <xf:setvalue ref="@filter">false</xf:setvalue>

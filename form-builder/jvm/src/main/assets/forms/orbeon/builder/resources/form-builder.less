@@ -711,6 +711,7 @@ body.orbeon {
             .navbar {
                 margin: 0;
                 background-color: transparent;
+                border-bottom: none;
                 padding: 0;
                 --orbeon-button-color: var(--orbeon-base-color);
                 --orbeon-navbar-dropdown-open-toggle-background-color: transparent;
@@ -719,9 +720,13 @@ body.orbeon {
                     padding-bottom: 0;
                     padding-right: 10px;
                     background-color: transparent;
-                    .nav > li > a {
-                        padding: 5px 10px;
+                    .fr-language-choice {
                         background-color: var(--orbeon-dialog-title-background-color); // To show over text of a long label
+                    }
+                    .dropdown-toggle {
+                        padding: 5px 10px;
+                        line-height: @baseLineHeight;
+                        border: none;
                     }
                 }
             }

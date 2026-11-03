@@ -289,13 +289,14 @@
     <!-- Trigger continuation if needed -->
     <xsl:template match="fr:data-iterate-end-marker" mode="within-action-2018.2">
 
+        <xsl:param tunnel="yes" name="model-id"              as="xs:string"/>
         <xsl:param tunnel="yes" name="action-name"           as="xs:string"/>
         <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
 
         <xf:dispatch
             if="xxf:get-document-attribute($current-action-id, '{fr:build-is-last-iteration-param(.)}') = true()"
             name="{$continuation-event-prefix}{fr:continuation-id($action-name, $continuation-position + 1)}"
-            targetid="fr-form-model">
+            targetid="{$model-id}">
             <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
         </xf:dispatch>
 
@@ -304,12 +305,13 @@
     <!-- Trigger continuation -->
     <xsl:template match="fr:if-end-marker" mode="within-action-2018.2">
 
+        <xsl:param tunnel="yes" name="model-id"              as="xs:string"/>
         <xsl:param tunnel="yes" name="action-name"           as="xs:string"/>
         <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
 
         <xf:dispatch
             name="{$continuation-event-prefix}{fr:continuation-id($action-name, $continuation-position + 1)}"
-            targetid="fr-form-model">
+            targetid="{$model-id}">
             <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
         </xf:dispatch>
 
@@ -453,7 +455,7 @@
                              `<fr:if>` block. The continuation reacts to an explicit event dispatch and evaluates in the context
                              of the preceding service call or enclosing iteration, whichever comes first. -->
                         <xf:action
-                            observer="fr-form-model"
+                            observer="{$model-id}"
                             event="{$continuation-event-prefix}{$current-continuation-id}">
 
                             <xsl:variable
@@ -638,6 +640,7 @@
     </xsl:template>
 
     <xsl:template match="fr:data-iterate" mode="within-action-2018.2">
+        <xsl:param tunnel="yes" name="model-id"              as="xs:string"/>
         <xsl:param tunnel="yes" name="action-name"           as="xs:string"/>
         <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
         <xsl:param tunnel="yes" name="library-name"          as="xs:string?"/>
@@ -675,7 +678,7 @@
         <xf:action if="empty(${$var-name})">
             <xf:dispatch
                 name="{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}"
-                targetid="fr-form-model">
+                targetid="{$model-id}">
                 <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
             </xf:dispatch>
         </xf:action>
@@ -706,6 +709,7 @@
 
     <xsl:template match="fr:if" mode="within-action-2018.2">
 
+        <xsl:param tunnel="yes" name="model-id"              as="xs:string"/>
         <xsl:param tunnel="yes" name="action-name"           as="xs:string"/>
         <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
         <xsl:param tunnel="yes" name="library-name"          as="xs:string?"/>
@@ -750,7 +754,7 @@
         <xf:action if="not(${$var-name})">
             <xf:dispatch
                 name="{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}"
-                targetid="fr-form-model">
+                targetid="{$model-id}">
                 <xf:property name="fr-action-id" value="$current-action-id" xxf:tunnel="true"/>
             </xf:dispatch>
         </xf:action>

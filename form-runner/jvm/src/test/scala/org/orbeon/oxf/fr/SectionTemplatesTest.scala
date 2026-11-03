@@ -156,4 +156,38 @@ class SectionTemplatesTest
       }
     }
   }
+
+  describe("`<fr:if>` in section template actions") {
+
+    it("must execute all `<fr:if>` branches and continuations inside a section template") {
+
+      val (processorService, Some(xfcd), _) =
+        runFormRunner("tests", "section-template-actions", "new")
+
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, xfcd) {
+
+          def resolveInSection(staticId: String): XFormsValueControl =
+            resolveObjectInsideComponent[XFormsValueControl](
+              componentStaticOrAbsoluteId = "my-section-content-control",
+              targetStaticOrAbsoluteId    = staticId
+            ).get
+
+          val choiceControl  = resolveInSection("choice-control")
+          val outControl     = resolveInSection("out-control")
+          val afterIfControl = resolveInSection("after-if-control")
+
+          List(
+            ("1", "one", "done-1"),
+            ("2", "two", "done-2"),
+            ("3", "",    "done-3")
+          ).foreach { case (choice, expectedOut, expectedAfterIf) =>
+            setControlValueWithEventSearchNested(choiceControl.effectiveId, choice)
+            assert(outControl.getValue(EventCollector.Throw) == expectedOut)
+            assert(afterIfControl.getValue(EventCollector.Throw) == expectedAfterIf)
+          }
+        }
+      }
+    }
+  }
 }

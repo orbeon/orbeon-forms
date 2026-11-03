@@ -1286,6 +1286,45 @@
                             else
                                 concat('+', $i/control-name, ' -', $i/original-control-name)"/>
 
+                    <xf:var
+                        name="show-pdf-field-name-in-basic"
+                        value="exists(frf:inlineInstanceRootElem($form, 'fr-form-attachments')/pdf[xxf:non-blank()])"/>
+
+                    <xsl:variable name="pdf-field-name-control">
+                        <xf:select1 ref="pdf-field-name/@type" appearance="full xxf:horizontal">
+                            <xf:label ref="$resources/dialog-control-settings/pdf-field-name/label"/>
+                            <xf:itemset ref="$resources/dialog-control-settings/pdf-field-name/item">
+                                <xf:label ref="."/>
+                                <xf:value ref="if (@id = 0) then 'automatic' else if (@id = 1) then 'custom' else error()"/>
+                            </xf:itemset>
+                        </xf:select1>
+                        <xf:output ref="pdf-field-name[@type = 'automatic']" value="fbf:findPdfFieldName($i/original-control-name, $i/control-name)">
+                            <xf:label appearance="minimal">automatic</xf:label>
+                        </xf:output>
+                        <xf:select1 selection="open" appearance="minimal" ref="$i/pdf-field-name[@type = 'custom']">
+                            <xf:label appearance="minimal">custom</xf:label>
+                            <xf:alert validation="unknown-pdf-field-name" ref="$resources/dialog-control-settings/pdf-field-name/alert"/>
+                            <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
+                            <xf:itemset ref="xxf:instance('pdf-field-names-instance')//(_ | field)">
+                                <xf:label
+                                    ref="
+                                        (
+                                            @label,
+                                            if (empty(@alternate-field-name)) then
+                                                 @fully-qualified-name
+                                            else
+                                               concat(@alternate-field-name, ' (', @name, ')')
+                                        )[1]"/>
+                                <xf:value ref="@fully-qualified-name"/>
+                            </xf:itemset>
+                            <!-- https://github.com/orbeon/orbeon-forms/issues/6932 -->
+                            <xf:dispatch
+                                event="xforms-enabled"
+                                name="fb-process-pdf-template-field-names"
+                                targetid="fb-dialog-control-settings"/>
+                        </xf:select1>
+                    </xsl:variable>
+
                     <fb:language-choice ref="$li/lang"/>
 
                     <fr:tabbable id="fb-tabbable">
@@ -1333,241 +1372,18 @@
                                         </xh:tr>
                                         <xh:tr>
                                             <xh:td>
-                                                <xf:group ref=".[exists($items-to-show)]" class="fb-control-settings-options">
-                                                    <xf:repeat ref="$items-to-show" id="items-to-show-repeat">
-                                                        <xf:var name="item-to-show"  value="."/>
-                                                        <xf:var name="current-value" value="$item-to-show/value/string()"/>
-                                                        <xf:var name="base-binding"  value="$i/*[local-name() = $current-value][1]"/>
-
-                                                        <xf:var
-                                                            name="checkbox-disabled"
-                                                            value="xxf:readonly($base-binding/@enabled)"/>
-
-                                                        <xf:var
-                                                            name="checkbox-binding"
-                                                            value="$base-binding/(if ($checkbox-disabled) then @enabled/string() else @enabled)"/>
-                                                        <xf:var
-                                                            name="select-binding"
-                                                            value="$base-binding/(if ($checkbox-disabled) then @legacy/string() else @legacy)"/>
-
-                                                        <xf:var name="fr-index-sub-values"        value="$current-value = ('fr-summary-show', 'fr-allow-bulk-edit', 'fr-default-sort-column')"/>
-                                                        <xf:var name="fr-summary-show-sub-values" value="$current-value = ('fr-allow-bulk-edit', 'fr-default-sort-column')"/>
-                                                        <xf:var name="base-class-name"            value="concat('fb-control-settings-', substring-after($current-value, 'fr-'))"/>
-
-                                                        <xh:div class="{{if ($fr-index-sub-values) then $base-class-name else ''}}">
-                                                            <xf:switch caseref="not(exists($base-binding/@legacy)) or xxf:is-blank($base-binding/@legacy)">
-                                                                <xf:case value="true()">
-                                                                    <!-- Normal case: do not expose 'column only' and 'search only' options -->
-                                                                    <fr:checkbox-input ref="$checkbox-binding" class="{{concat($base-class-name, '-checkbox')}}">
-                                                                        <xf:label ref="$item-to-show/label"/>
-
-                                                                        <xf:alert
-                                                                            ref="xxf:format-message(
-                                                                                    $resources/dialog-control-settings/default-sort-column/conflict,
-                                                                                    fbf:controlsWithSorting($i/original-control-name)
-                                                                                 )"
-                                                                            validation="default-sort-column-validation"/>
-
-                                                                        <xf:help ref="$item-to-show/help" mediatype="text/html"/>
-
-                                                                        <!--
-                                                                            We don't like to update values of another checkbox when one is selected, but
-                                                                            we accept this way of doing things here as we indent the Summary checkboxes
-                                                                            under the `fr-index` checkbox, which makes it clear to the user what is
-                                                                            happening.
-                                                                        -->
-                                                                        <xf:action event="xforms-select" if="not($current-value = 'fr-persist')">
-                                                                            <xf:setvalue ref="$i/fr-persist/@enabled" value="true()"/>
-                                                                        </xf:action>
-                                                                        <xf:action event="xforms-select" if="$fr-index-sub-values">
-                                                                            <xf:setvalue ref="$i/fr-index/@enabled" value="true()"/>
-                                                                        </xf:action>
-                                                                        <xf:action event="xforms-select" if="$fr-summary-show-sub-values">
-                                                                            <xf:setvalue ref="$i/fr-summary-show/@enabled" value="true()"/>
-                                                                        </xf:action>
-                                                                        <xf:action event="xforms-deselect" if="$fr-index-sub-values">
-                                                                            <xf:setvalue ref="$base-binding/@role-required" value="false()"/>
-                                                                            <xf:delete   ref="$base-binding/require-role"/>
-                                                                        </xf:action>
-                                                                        <xf:action event="xforms-deselect" if="$current-value = 'fr-allow-bulk-edit'">
-                                                                            <xf:setvalue ref="$base-binding/@action" value="'save-data'"/>
-                                                                            <xf:setvalue ref="$base-binding/@process"/>
-                                                                        </xf:action>
-                                                                        <xf:action event="xforms-deselect" if="$current-value = 'fr-default-sort-column'">
-                                                                            <xf:setvalue ref="$base-binding/@direction" value="'asc'"/>
-                                                                        </xf:action>
-                                                                    </fr:checkbox-input>
-                                                                </xf:case>
-                                                                <xf:case value="false()">
-                                                                    <!-- Legacy case: expose 'column only' and 'search only' options -->
-                                                                    <xf:select1 ref="$select-binding" class="fb-control-settings-{{substring-after($current-value, 'fr-')}}">
-                                                                        <xf:item>
-                                                                            <xf:label ref="$resources/dialog-control-settings/summary-show/do-not-show"/>
-                                                                            <xf:value>do-not-show</xf:value>
-                                                                        </xf:item>
-                                                                        <xf:item>
-                                                                            <xf:label ref="$resources/dialog-control-settings/summary-show/show"/>
-                                                                            <xf:value>show</xf:value>
-                                                                        </xf:item>
-                                                                        <xf:item>
-                                                                            <xf:label ref="$resources/dialog-control-settings/summary-show/column-only"/>
-                                                                            <xf:value>column-only</xf:value>
-                                                                        </xf:item>
-                                                                        <xf:item>
-                                                                            <xf:label ref="$resources/dialog-control-settings/summary-show/search-only"/>
-                                                                            <xf:value>search-only</xf:value>
-                                                                        </xf:item>
-
-                                                                        <xf:action event="xforms-value-changed">
-                                                                            <xf:setvalue ref="$checkbox-binding" value="$select-binding != 'do-not-show'"/>
-                                                                            <xf:setvalue if="$select-binding = 'do-not-show'" ref="$base-binding/@role-required" value="false()"/>
-                                                                            <xf:delete   if="$select-binding = 'do-not-show'" ref="$base-binding/require-role"/>
-                                                                        </xf:action>
-                                                                    </xf:select1>
-                                                                </xf:case>
-                                                            </xf:switch>
-
-                                                            <xf:switch caseref="$fr-index-sub-values">
-                                                                <xf:case value="true()">
-                                                                    <!-- Summary settings can have required roles -->
-                                                                    <xh:div class="fb-role-required-checkbox">
-                                                                        <xh:div>
-                                                                            <fr:checkbox-input ref="$base-binding/@role-required">
-                                                                                <xf:label ref="$resources/role-restriction/restrict"/>
-                                                                                <xf:action event="xforms-select" if="not($current-value = 'fr-persist')">
-                                                                                    <xf:setvalue ref="$i/fr-persist/@enabled" value="true()"/>
-                                                                                </xf:action>
-                                                                                <xf:action event="xforms-select">
-                                                                                    <xf:insert
-                                                                                        if="count($base-binding/require-role) = 0"
-                                                                                        context="$base-binding"
-                                                                                        origin="xf:element('require-role')"/>
-                                                                                    <xf:setvalue ref="$i/fr-index/@enabled"        value="true()"/>
-                                                                                    <xf:setvalue ref="$i/fr-summary-show/@enabled" value="true()"/>
-                                                                                </xf:action>
-                                                                                <xf:action event="xforms-deselect">
-                                                                                    <xf:delete ref="$base-binding/require-role"/>
-                                                                                </xf:action>
-                                                                            </fr:checkbox-input>
-                                                                        </xh:div>
-                                                                        <xh:div>
-                                                                            <xf:var
-                                                                                name="can-remove-param"
-                                                                                value="count($base-binding/require-role) gt 1"/>
-
-                                                                            <xf:switch caseref="count($base-binding/require-role) gt 1" class="fb-roles-any-or-all">
-                                                                                <xf:case value="true()">
-                                                                                    <xh:div>
-                                                                                        <xf:select1 ref="$base-binding/@require-role-constraint">
-                                                                                            <xf:item>
-                                                                                                <xf:label ref="$resources/role-restriction/all"/>
-                                                                                                <xf:value>all</xf:value>
-                                                                                            </xf:item>
-                                                                                            <xf:item>
-                                                                                                <xf:label ref="$resources/role-restriction/any"/>
-                                                                                                <xf:value>any</xf:value>
-                                                                                            </xf:item>
-                                                                                        </xf:select1>
-                                                                                        <xf:output ref="$resources/role-restriction/of-the-following"/>
-                                                                                    </xh:div>
-                                                                                </xf:case>
-                                                                                <xf:case value="false()"/>
-                                                                            </xf:switch>
-
-                                                                            <fr:dnd-repeat ref="
-                                                                                    if (count($base-binding/require-role) gt 0) then
-                                                                                        $base-binding/require-role
-                                                                                    else
-                                                                                        ()">
-                                                                                <xf:var name="current-role" value="."/>
-
-                                                                                <xf:var name="can-move" value="count($base-binding/require-role) gt 1"/>
-                                                                                <xh:div class="{{'fb-role-row', 'xforms-dnd-item', 'xforms-dnd-moves'[$can-move]}}">
-                                                                                    <xh:div>
-                                                                                        <xf:input ref="$current-role" class="fb-control-settings-summary-role">
-                                                                                            <xf:alert validation="role-non-empty" ref="$resources/role-restriction/empty"/>
-                                                                                            <xf:alert validation="role-non-duplicated" ref="$resources/role-restriction/duplicate"/>
-                                                                                        </xf:input>
-                                                                                    </xh:div>
-                                                                                    <xh:div class="fb-param-buttons">
-                                                                                        <xh:i class="fa fa-fw fa-bars fb-param-grab"/>
-                                                                                        <xf:trigger
-                                                                                                appearance="minimal"
-                                                                                                ref="if ($can-remove-param) then $current-role else ''">
-                                                                                            <xf:label><xh:i class="fa fa-fw fa-minus-circle"/></xf:label>
-                                                                                            <xf:action event="DOMActivate">
-                                                                                                <xf:delete ref="$current-role"/>
-                                                                                            </xf:action>
-                                                                                        </xf:trigger>
-                                                                                        <xf:trigger appearance="minimal">
-                                                                                            <xf:label><xh:i class="fa fa-fw fa-plus-circle"/></xf:label>
-                                                                                            <xf:action event="DOMActivate">
-                                                                                                <xf:insert
-                                                                                                    context="$base-binding"
-                                                                                                    ref="$current-role[parent::* is $base-binding]"
-                                                                                                    position="after"
-                                                                                                    origin="xf:element('require-role')"/>
-                                                                                            </xf:action>
-                                                                                        </xf:trigger>
-                                                                                    </xh:div>
-                                                                                </xh:div>
-                                                                            </fr:dnd-repeat>
-                                                                        </xh:div>
-                                                                    </xh:div>
-                                                                    <xf:switch caseref="$current-value = 'fr-allow-bulk-edit' and $i/fr-allow-bulk-edit/@enabled = true()" class="fb-save-or-process">
-                                                                        <xf:case value="true()">
-                                                                            <!-- Bulk edit: save data or run process -->
-                                                                            <xf:select1 appearance="full xxf:horizontal" ref="$i/fr-allow-bulk-edit/@action">
-                                                                                <xf:item>
-                                                                                    <xf:label ref="$resources/dialog-control-settings/bulk-edit-actions/save-data"/>
-                                                                                    <xf:value>save-data</xf:value>
-                                                                                </xf:item>
-                                                                                <xf:item>
-                                                                                    <xf:label ref="$resources/dialog-control-settings/bulk-edit-actions/run-process"/>
-                                                                                    <xf:value>run-process</xf:value>
-                                                                                </xf:item>
-                                                                                <xf:action event="xforms-value-changed">
-                                                                                    <xf:setvalue ref="$i/fr-allow-bulk-edit/@process"/>
-                                                                                </xf:action>
-                                                                            </xf:select1>
-                                                                            <!-- Available processes to run -->
-                                                                            <xf:switch caseref="count(instance('processes')/*) gt 0">
-                                                                                <xf:case value="true()">
-                                                                                    <xf:select1 selection="open" appearance="minimal" ref="$i/fr-allow-bulk-edit/@process[$i/fr-allow-bulk-edit/@action = 'run-process']">
-                                                                                        <xf:itemset ref="xxf:sort(instance('processes')/*, (string(.)), 'text', 'ascending')">
-                                                                                            <xf:label ref="string(.)" />
-                                                                                            <xf:value ref="local-name(.)"/>
-                                                                                        </xf:itemset>
-                                                                                    </xf:select1>
-                                                                                </xf:case>
-                                                                                <xf:case value="false()" class="fb-custom-process">
-                                                                                    <xf:input ref="$i/fr-allow-bulk-edit/@process[$i/fr-allow-bulk-edit/@action = 'run-process']"/>
-                                                                                </xf:case>
-                                                                            </xf:switch>
-                                                                        </xf:case>
-                                                                        <xf:case value="false()"/>
-                                                                    </xf:switch>
-
-                                                                    <xf:switch caseref="$current-value = 'fr-default-sort-column' and $i/fr-default-sort-column/@enabled = true()" class="fb-direction">
-                                                                        <xf:case value="true()">
-                                                                            <xf:select1 appearance="full xxf:horizontal" ref="$i/fr-default-sort-column/@direction">
-                                                                                <xf:item>
-                                                                                    <xf:label ref="$resources/dialog-control-settings/default-sort-column/ascending"/>
-                                                                                    <xf:value>asc</xf:value>
-                                                                                </xf:item>
-                                                                                <xf:item>
-                                                                                    <xf:label ref="$resources/dialog-control-settings/default-sort-column/descending"/>
-                                                                                    <xf:value>desc</xf:value>
-                                                                                </xf:item>
-                                                                            </xf:select1>
-                                                                        </xf:case>
-                                                                        <xf:case value="false()"/>
-                                                                    </xf:switch>
-                                                                </xf:case>
-                                                                <xf:case value="false()"/>
-                                                            </xf:switch>
-                                                        </xh:div>
-                                                    </xf:repeat>
+                                                <fb:boolean-or-formula
+                                                    ref="$i/validations/validation[@type = 'required']/required"
+                                                    xpath-completion-updates="{{$xpath-completion-updates}}">
+                                                    <xf:label ref="$resources/dialog-control-settings/required/label"/>
+                                                    <xf:hint  ref="$resources/dialog-control-settings/required/hint"/>
+                                                </fb:boolean-or-formula>
+                                            </xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <xf:group ref=".[$show-pdf-field-name-in-basic]">
+                                                    <xsl:copy-of select="$pdf-field-name-control"/>
                                                 </xf:group>
                                             </xh:td>
                                         </xh:tr>
@@ -1587,82 +1403,6 @@
                                         value="not($toggle) and count($i/appearances/appearance) gt 1"/>
 
                                     <fr:grid>
-                                        <xh:tr>
-                                            <xh:td>
-                                                <xf:select1 ref="pdf-field-name/@type" appearance="full xxf:horizontal">
-                                                    <xf:label ref="$resources/dialog-control-settings/pdf-field-name/label"/>
-                                                    <xf:itemset ref="$resources/dialog-control-settings/pdf-field-name/item">
-                                                        <xf:label ref="."/>
-                                                        <xf:value ref="if (@id = 0) then 'automatic' else if (@id = 1) then 'custom' else error()"/>
-                                                    </xf:itemset>
-                                                </xf:select1>
-                                                <xf:output ref="pdf-field-name[@type = 'automatic']" value="fbf:findPdfFieldName($i/original-control-name, $i/control-name)">
-                                                    <xf:label appearance="minimal">automatic</xf:label>
-                                                </xf:output>
-                                                <xf:select1 selection="open" appearance="minimal" ref="$i/pdf-field-name[@type = 'custom']">
-                                                    <xf:label appearance="minimal">custom</xf:label>
-                                                    <xf:alert validation="unknown-pdf-field-name" ref="$resources/dialog-control-settings/pdf-field-name/alert"/>
-                                                    <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
-                                                    <xf:itemset ref="xxf:instance('pdf-field-names-instance')//(_ | field)">
-                                                        <xf:label
-                                                            ref="
-                                                                (
-                                                                    @label,
-                                                                    if (empty(@alternate-field-name)) then
-                                                                         @fully-qualified-name
-                                                                    else
-                                                                       concat(@alternate-field-name, ' (', @name, ')')
-                                                                )[1]"/>
-                                                        <xf:value ref="@fully-qualified-name"/>
-                                                    </xf:itemset>
-                                                    <!-- https://github.com/orbeon/orbeon-forms/issues/6932 -->
-                                                    <xf:dispatch
-                                                        event="xforms-enabled"
-                                                        name="fb-process-pdf-template-field-names"
-                                                        targetid="fb-dialog-control-settings"/>
-                                                </xf:select1>
-                                            </xh:td>
-                                        </xh:tr>
-                                        <xh:tr>
-                                            <xh:td>
-                                                <xf:output value="fbf:getExcelRangeName($i/control-name)">
-                                                    <xf:label ref="$resources/dialog-control-settings/excel-field-name/label"/>
-                                                </xf:output>
-                                            </xh:td>
-                                        </xh:tr>
-                                        <xh:tr>
-                                            <xh:td>
-                                                <!-- Custom classes -->
-                                                <xf:input ref="$i/custom-classes">
-                                                    <xf:label ref="$resources/classes/label"/>
-                                                </xf:input>
-                                            </xh:td>
-                                        </xh:tr>
-                                        <xh:tr>
-                                            <xh:td>
-                                                <xf:select1 ref="if ($i/autocomplete-allowed = true()) then $i/autocomplete-attribute else ''">
-                                                    <xf:label ref="$resources/autocomplete/label"/>
-                                                    <xf:item>
-                                                        <xf:label/>
-                                                        <xf:value/>
-                                                    </xf:item>
-                                                    <xf:itemset
-                                                        ref="
-                                                            instance('autocomplete-values')//(
-                                                                group[empty(@disabled) or @disabled != 'true']
-                                                                |
-                                                                autocomplete[empty(@disabled) or @disabled != 'true']
-                                                            )">
-                                                        <xf:label ref="
-                                                            if (self::group) then
-                                                                xxf:r(@name, '|fr-form-resources|')
-                                                            else
-                                                                @value"/>
-                                                        <xf:value ref="if (self::group) then ()    else @value"/>
-                                                    </xf:itemset>
-                                                </xf:select1>
-                                            </xh:td>
-                                        </xh:tr>
                                         <xh:tr>
                                             <xh:td>
                                                 <xf:group ref=".[$multi or $toggle]">
@@ -2058,60 +1798,368 @@
                                 </xh:tr>
                             </fr:grid>
                         </fr:tab>
-                        <fr:tab id="label-hint-help-tab" ref="(text, label, hint, help)[@supported = 'true']">
+                        <fr:tab
+                            id="label-hint-help-tab"
+                            visible="exists($i/(text, label, hint, help)[@supported = 'true'])">
                             <fr:label
-                                ref="
-                                    $resources/dialog-control-settings/*[
-                                        name() = concat('control-', local-name(context()))
-                                    ]/label"/>
-
-                            <xf:var
-                                name="lhh"
-                                value="local-name(context())"/>
-                            <xf:var
-                                name="resource"
                                 value="
-                                    $resources/dialog-control-settings/*[
-                                        name() = concat('control-', $lhh)
-                                    ]"/>
+                                    string-join(
+                                        for $e in $i/(text, label, hint, help)[@supported = 'true']
+                                        return
+                                            $resources/dialog-control-settings/*[
+                                                name() = concat('control-', local-name($e))
+                                            ]/label,
+                                        ' / '
+                                    )"/>
 
-                            <fr:grid>
-                                <fr:c x="1" y="1" w="12">
-                                    <!-- Automatic hint for now only shown for attachment controls -->
-                                    <xf:select1 ref="@automatic[$is-attachment]" appearance="full xxf:horizontal">
-                                        <xf:label ref="$resources/dialog-control-settings/automatic-hint/label"/>
-                                        <xf:hint  ref="$resources/dialog-control-settings/automatic-hint/hint"/>
-                                        <xf:itemset ref="$resources/dialog-control-settings/default-yes-no/item">
-                                            <xf:label ref="."/>
-                                            <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
-                                        </xf:itemset>
-                                    </xf:select1>
-                                </fr:c>
-                                <fr:c x="1" y="2" w="12">
-                                    <fr:checkbox-input ref=".[$lhh != 'text']/@isHTML">
-                                        <xf:label ref="$resources/dialog-control-settings/use-html"/>
-                                    </fr:checkbox-input>
-                                    <xf:var name="is-html" value="@isHTML = 'true'"/>
-                                    <xf:input ref=".[not($is-html) and $lhh = ('label', 'hint')]/value[@lang = $li/lang]">
-                                        <xf:label ref="$resource/label"/>
-                                        <xf:hint  ref="$resource/hint"/>
-                                    </xf:input>
-                                    <xf:textarea ref=".[not($is-html) and not($lhh = ('label', 'hint'))]/value[@lang = $li/lang]">
-                                        <xf:label ref="$resource/label"/>
-                                        <xf:hint  ref="$resource/hint"/>
-                                    </xf:textarea>
-                                    <fr:tinymce ref=".[$is-html]/value[@lang = $li/lang]">
-                                        <xf:label ref="$resource/label"/>
-                                        <xf:hint  ref="$resource/hint"/>
-                                    </fr:tinymce>
-                                </fr:c>
-                                <fr:c x="1" y="3" w="12">
-                                    <fb:parameters-editor ref="." resources-ref="$resources" form-runner-links="true" xpath-completion-updates="{{$xpath-completion-updates}}">
-                                        <xf:label ref="$resources/dialog-control-settings/parameters"/>
-                                    </fb:parameters-editor>
-                                </fr:c>
-                            </fr:grid>
+                            <xf:repeat ref="(text, label, hint, help)[@supported = 'true']">
+                                <xf:var
+                                    name="lhh"
+                                    value="local-name(context())"/>
+                                <xf:var
+                                    name="resource"
+                                    value="
+                                        $resources/dialog-control-settings/*[
+                                            name() = concat('control-', $lhh)
+                                        ]"/>
 
+                                <fr:grid>
+                                    <fr:c x="1" y="1" w="12">
+                                        <!-- Automatic hint for now only shown for attachment controls -->
+                                        <xf:select1 ref="@automatic[$is-attachment]" appearance="full xxf:horizontal">
+                                            <xf:label ref="$resources/dialog-control-settings/automatic-hint/label"/>
+                                            <xf:hint  ref="$resources/dialog-control-settings/automatic-hint/hint"/>
+                                            <xf:itemset ref="$resources/dialog-control-settings/default-yes-no/item">
+                                                <xf:label ref="."/>
+                                                <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
+                                            </xf:itemset>
+                                        </xf:select1>
+                                    </fr:c>
+                                    <fr:c x="1" y="2" w="12">
+                                        <fr:checkbox-input ref=".[$lhh != 'text']/@isHTML">
+                                            <xf:label ref="$resources/dialog-control-settings/use-html"/>
+                                        </fr:checkbox-input>
+                                        <xf:var name="is-html" value="@isHTML = 'true'"/>
+                                        <xf:input ref=".[not($is-html) and $lhh = ('label', 'hint')]/value[@lang = $li/lang]">
+                                            <xf:label ref="$resource/label"/>
+                                            <xf:hint  ref="$resource/hint"/>
+                                        </xf:input>
+                                        <xf:textarea ref=".[not($is-html) and not($lhh = ('label', 'hint'))]/value[@lang = $li/lang]">
+                                            <xf:label ref="$resource/label"/>
+                                            <xf:hint  ref="$resource/hint"/>
+                                        </xf:textarea>
+                                        <fr:tinymce ref=".[$is-html]/value[@lang = $li/lang]">
+                                            <xf:label ref="$resource/label"/>
+                                            <xf:hint  ref="$resource/hint"/>
+                                        </fr:tinymce>
+                                    </fr:c>
+                                    <fr:c x="1" y="3" w="12">
+                                        <fb:parameters-editor ref="." resources-ref="$resources" form-runner-links="true" xpath-completion-updates="{{$xpath-completion-updates}}">
+                                            <xf:label ref="$resources/dialog-control-settings/parameters"/>
+                                        </fb:parameters-editor>
+                                    </fr:c>
+                                </fr:grid>
+                            </xf:repeat>
+
+                        </fr:tab>
+
+                        <fr:tab id="advanced-tab">
+                            <fr:label ref="$resources/advanced/label"/>
+                            <xh:div class="fb-base-tab-div">
+                                <xh:div class="fb-base-tab-left">
+                                    <fr:grid>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <xf:group ref=".[exists($items-to-show)]" class="fb-control-settings-options">
+                                                    <xf:repeat ref="$items-to-show" id="items-to-show-repeat">
+                                                        <xf:var name="item-to-show"  value="."/>
+                                                        <xf:var name="current-value" value="$item-to-show/value/string()"/>
+                                                        <xf:var name="base-binding"  value="$i/*[local-name() = $current-value][1]"/>
+
+                                                        <xf:var
+                                                            name="checkbox-disabled"
+                                                            value="xxf:readonly($base-binding/@enabled)"/>
+
+                                                        <xf:var
+                                                            name="checkbox-binding"
+                                                            value="$base-binding/(if ($checkbox-disabled) then @enabled/string() else @enabled)"/>
+                                                        <xf:var
+                                                            name="select-binding"
+                                                            value="$base-binding/(if ($checkbox-disabled) then @legacy/string() else @legacy)"/>
+
+                                                        <xf:var name="fr-index-sub-values"        value="$current-value = ('fr-summary-show', 'fr-allow-bulk-edit', 'fr-default-sort-column')"/>
+                                                        <xf:var name="fr-summary-show-sub-values" value="$current-value = ('fr-allow-bulk-edit', 'fr-default-sort-column')"/>
+                                                        <xf:var name="base-class-name"            value="concat('fb-control-settings-', substring-after($current-value, 'fr-'))"/>
+
+                                                        <xh:div class="{{if ($fr-index-sub-values) then $base-class-name else ''}}">
+                                                            <xf:switch caseref="not(exists($base-binding/@legacy)) or xxf:is-blank($base-binding/@legacy)">
+                                                                <xf:case value="true()">
+                                                                    <!-- Normal case: do not expose 'column only' and 'search only' options -->
+                                                                    <fr:checkbox-input ref="$checkbox-binding" class="{{concat($base-class-name, '-checkbox')}}">
+                                                                        <xf:label ref="$item-to-show/label"/>
+
+                                                                        <xf:alert
+                                                                            ref="xxf:format-message(
+                                                                                    $resources/dialog-control-settings/default-sort-column/conflict,
+                                                                                    fbf:controlsWithSorting($i/original-control-name)
+                                                                                 )"
+                                                                            validation="default-sort-column-validation"/>
+
+                                                                        <xf:help ref="$item-to-show/help" mediatype="text/html"/>
+
+                                                                        <!--
+                                                                            We don't like to update values of another checkbox when one is selected, but
+                                                                            we accept this way of doing things here as we indent the Summary checkboxes
+                                                                            under the `fr-index` checkbox, which makes it clear to the user what is
+                                                                            happening.
+                                                                        -->
+                                                                        <xf:action event="xforms-select" if="not($current-value = 'fr-persist')">
+                                                                            <xf:setvalue ref="$i/fr-persist/@enabled" value="true()"/>
+                                                                        </xf:action>
+                                                                        <xf:action event="xforms-select" if="$fr-index-sub-values">
+                                                                            <xf:setvalue ref="$i/fr-index/@enabled" value="true()"/>
+                                                                        </xf:action>
+                                                                        <xf:action event="xforms-select" if="$fr-summary-show-sub-values">
+                                                                            <xf:setvalue ref="$i/fr-summary-show/@enabled" value="true()"/>
+                                                                        </xf:action>
+                                                                        <xf:action event="xforms-deselect" if="$fr-index-sub-values">
+                                                                            <xf:setvalue ref="$base-binding/@role-required" value="false()"/>
+                                                                            <xf:delete   ref="$base-binding/require-role"/>
+                                                                        </xf:action>
+                                                                        <xf:action event="xforms-deselect" if="$current-value = 'fr-allow-bulk-edit'">
+                                                                            <xf:setvalue ref="$base-binding/@action" value="'save-data'"/>
+                                                                            <xf:setvalue ref="$base-binding/@process"/>
+                                                                        </xf:action>
+                                                                        <xf:action event="xforms-deselect" if="$current-value = 'fr-default-sort-column'">
+                                                                            <xf:setvalue ref="$base-binding/@direction" value="'asc'"/>
+                                                                        </xf:action>
+                                                                    </fr:checkbox-input>
+                                                                </xf:case>
+                                                                <xf:case value="false()">
+                                                                    <!-- Legacy case: expose 'column only' and 'search only' options -->
+                                                                    <xf:select1 ref="$select-binding" class="fb-control-settings-{{substring-after($current-value, 'fr-')}}">
+                                                                        <xf:item>
+                                                                            <xf:label ref="$resources/dialog-control-settings/summary-show/do-not-show"/>
+                                                                            <xf:value>do-not-show</xf:value>
+                                                                        </xf:item>
+                                                                        <xf:item>
+                                                                            <xf:label ref="$resources/dialog-control-settings/summary-show/show"/>
+                                                                            <xf:value>show</xf:value>
+                                                                        </xf:item>
+                                                                        <xf:item>
+                                                                            <xf:label ref="$resources/dialog-control-settings/summary-show/column-only"/>
+                                                                            <xf:value>column-only</xf:value>
+                                                                        </xf:item>
+                                                                        <xf:item>
+                                                                            <xf:label ref="$resources/dialog-control-settings/summary-show/search-only"/>
+                                                                            <xf:value>search-only</xf:value>
+                                                                        </xf:item>
+
+                                                                        <xf:action event="xforms-value-changed">
+                                                                            <xf:setvalue ref="$checkbox-binding" value="$select-binding != 'do-not-show'"/>
+                                                                            <xf:setvalue if="$select-binding = 'do-not-show'" ref="$base-binding/@role-required" value="false()"/>
+                                                                            <xf:delete   if="$select-binding = 'do-not-show'" ref="$base-binding/require-role"/>
+                                                                        </xf:action>
+                                                                    </xf:select1>
+                                                                </xf:case>
+                                                            </xf:switch>
+
+                                                            <xf:switch caseref="$fr-index-sub-values">
+                                                                <xf:case value="true()">
+                                                                    <!-- Summary settings can have required roles -->
+                                                                    <xh:div class="fb-role-required-checkbox">
+                                                                        <xh:div>
+                                                                            <fr:checkbox-input ref="$base-binding/@role-required">
+                                                                                <xf:label ref="$resources/role-restriction/restrict"/>
+                                                                                <xf:action event="xforms-select" if="not($current-value = 'fr-persist')">
+                                                                                    <xf:setvalue ref="$i/fr-persist/@enabled" value="true()"/>
+                                                                                </xf:action>
+                                                                                <xf:action event="xforms-select">
+                                                                                    <xf:insert
+                                                                                        if="count($base-binding/require-role) = 0"
+                                                                                        context="$base-binding"
+                                                                                        origin="xf:element('require-role')"/>
+                                                                                    <xf:setvalue ref="$i/fr-index/@enabled"        value="true()"/>
+                                                                                    <xf:setvalue ref="$i/fr-summary-show/@enabled" value="true()"/>
+                                                                                </xf:action>
+                                                                                <xf:action event="xforms-deselect">
+                                                                                    <xf:delete ref="$base-binding/require-role"/>
+                                                                                </xf:action>
+                                                                            </fr:checkbox-input>
+                                                                        </xh:div>
+                                                                        <xh:div>
+                                                                            <xf:var
+                                                                                name="can-remove-param"
+                                                                                value="count($base-binding/require-role) gt 1"/>
+
+                                                                            <xf:switch caseref="count($base-binding/require-role) gt 1" class="fb-roles-any-or-all">
+                                                                                <xf:case value="true()">
+                                                                                    <xh:div>
+                                                                                        <xf:select1 ref="$base-binding/@require-role-constraint">
+                                                                                            <xf:item>
+                                                                                                <xf:label ref="$resources/role-restriction/all"/>
+                                                                                                <xf:value>all</xf:value>
+                                                                                            </xf:item>
+                                                                                            <xf:item>
+                                                                                                <xf:label ref="$resources/role-restriction/any"/>
+                                                                                                <xf:value>any</xf:value>
+                                                                                            </xf:item>
+                                                                                        </xf:select1>
+                                                                                        <xf:output ref="$resources/role-restriction/of-the-following"/>
+                                                                                    </xh:div>
+                                                                                </xf:case>
+                                                                                <xf:case value="false()"/>
+                                                                            </xf:switch>
+
+                                                                            <fr:dnd-repeat ref="
+                                                                                    if (count($base-binding/require-role) gt 0) then
+                                                                                        $base-binding/require-role
+                                                                                    else
+                                                                                        ()">
+                                                                                <xf:var name="current-role" value="."/>
+
+                                                                                <xf:var name="can-move" value="count($base-binding/require-role) gt 1"/>
+                                                                                <xh:div class="{{'fb-role-row', 'xforms-dnd-item', 'xforms-dnd-moves'[$can-move]}}">
+                                                                                    <xh:div>
+                                                                                        <xf:input ref="$current-role" class="fb-control-settings-summary-role">
+                                                                                            <xf:alert validation="role-non-empty" ref="$resources/role-restriction/empty"/>
+                                                                                            <xf:alert validation="role-non-duplicated" ref="$resources/role-restriction/duplicate"/>
+                                                                                        </xf:input>
+                                                                                    </xh:div>
+                                                                                    <xh:div class="fb-param-buttons">
+                                                                                        <xh:i class="fa fa-fw fa-bars fb-param-grab"/>
+                                                                                        <xf:trigger
+                                                                                                appearance="minimal"
+                                                                                                ref="if ($can-remove-param) then $current-role else ''">
+                                                                                            <xf:label><xh:i class="fa fa-fw fa-minus-circle"/></xf:label>
+                                                                                            <xf:action event="DOMActivate">
+                                                                                                <xf:delete ref="$current-role"/>
+                                                                                            </xf:action>
+                                                                                        </xf:trigger>
+                                                                                        <xf:trigger appearance="minimal">
+                                                                                            <xf:label><xh:i class="fa fa-fw fa-plus-circle"/></xf:label>
+                                                                                            <xf:action event="DOMActivate">
+                                                                                                <xf:insert
+                                                                                                    context="$base-binding"
+                                                                                                    ref="$current-role[parent::* is $base-binding]"
+                                                                                                    position="after"
+                                                                                                    origin="xf:element('require-role')"/>
+                                                                                            </xf:action>
+                                                                                        </xf:trigger>
+                                                                                    </xh:div>
+                                                                                </xh:div>
+                                                                            </fr:dnd-repeat>
+                                                                        </xh:div>
+                                                                    </xh:div>
+                                                                    <xf:switch caseref="$current-value = 'fr-allow-bulk-edit' and $i/fr-allow-bulk-edit/@enabled = true()" class="fb-save-or-process">
+                                                                        <xf:case value="true()">
+                                                                            <!-- Bulk edit: save data or run process -->
+                                                                            <xf:select1 appearance="full xxf:horizontal" ref="$i/fr-allow-bulk-edit/@action">
+                                                                                <xf:item>
+                                                                                    <xf:label ref="$resources/dialog-control-settings/bulk-edit-actions/save-data"/>
+                                                                                    <xf:value>save-data</xf:value>
+                                                                                </xf:item>
+                                                                                <xf:item>
+                                                                                    <xf:label ref="$resources/dialog-control-settings/bulk-edit-actions/run-process"/>
+                                                                                    <xf:value>run-process</xf:value>
+                                                                                </xf:item>
+                                                                                <xf:action event="xforms-value-changed">
+                                                                                    <xf:setvalue ref="$i/fr-allow-bulk-edit/@process"/>
+                                                                                </xf:action>
+                                                                            </xf:select1>
+                                                                            <!-- Available processes to run -->
+                                                                            <xf:switch caseref="count(instance('processes')/*) gt 0">
+                                                                                <xf:case value="true()">
+                                                                                    <xf:select1 selection="open" appearance="minimal" ref="$i/fr-allow-bulk-edit/@process[$i/fr-allow-bulk-edit/@action = 'run-process']">
+                                                                                        <xf:itemset ref="xxf:sort(instance('processes')/*, (string(.)), 'text', 'ascending')">
+                                                                                            <xf:label ref="string(.)" />
+                                                                                            <xf:value ref="local-name(.)"/>
+                                                                                        </xf:itemset>
+                                                                                    </xf:select1>
+                                                                                </xf:case>
+                                                                                <xf:case value="false()" class="fb-custom-process">
+                                                                                    <xf:input ref="$i/fr-allow-bulk-edit/@process[$i/fr-allow-bulk-edit/@action = 'run-process']"/>
+                                                                                </xf:case>
+                                                                            </xf:switch>
+                                                                        </xf:case>
+                                                                        <xf:case value="false()"/>
+                                                                    </xf:switch>
+
+                                                                    <xf:switch caseref="$current-value = 'fr-default-sort-column' and $i/fr-default-sort-column/@enabled = true()" class="fb-direction">
+                                                                        <xf:case value="true()">
+                                                                            <xf:select1 appearance="full xxf:horizontal" ref="$i/fr-default-sort-column/@direction">
+                                                                                <xf:item>
+                                                                                    <xf:label ref="$resources/dialog-control-settings/default-sort-column/ascending"/>
+                                                                                    <xf:value>asc</xf:value>
+                                                                                </xf:item>
+                                                                                <xf:item>
+                                                                                    <xf:label ref="$resources/dialog-control-settings/default-sort-column/descending"/>
+                                                                                    <xf:value>desc</xf:value>
+                                                                                </xf:item>
+                                                                            </xf:select1>
+                                                                        </xf:case>
+                                                                        <xf:case value="false()"/>
+                                                                    </xf:switch>
+                                                                </xf:case>
+                                                                <xf:case value="false()"/>
+                                                            </xf:switch>
+                                                        </xh:div>
+                                                    </xf:repeat>
+                                                </xf:group>
+                                            </xh:td>
+                                        </xh:tr>
+                                    </fr:grid>
+                                </xh:div>
+                                <xh:div class="fb-base-tab-right">
+                                    <fr:grid>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <xsl:copy-of select="$pdf-field-name-control"/>
+                                            </xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <xf:output value="fbf:getExcelRangeName($i/control-name)">
+                                                    <xf:label ref="$resources/dialog-control-settings/excel-field-name/label"/>
+                                                </xf:output>
+                                            </xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <!-- Custom classes -->
+                                                <xf:input ref="$i/custom-classes">
+                                                    <xf:label ref="$resources/classes/label"/>
+                                                </xf:input>
+                                            </xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
+                                                <xf:select1 ref="if ($i/autocomplete-allowed = true()) then $i/autocomplete-attribute else ''">
+                                                    <xf:label ref="$resources/autocomplete/label"/>
+                                                    <xf:item>
+                                                        <xf:label/>
+                                                        <xf:value/>
+                                                    </xf:item>
+                                                    <xf:itemset
+                                                        ref="
+                                                            instance('autocomplete-values')//(
+                                                                group[empty(@disabled) or @disabled != 'true']
+                                                                |
+                                                                autocomplete[empty(@disabled) or @disabled != 'true']
+                                                            )">
+                                                        <xf:label ref="
+                                                            if (self::group) then
+                                                                xxf:r(@name, '|fr-form-resources|')
+                                                            else
+                                                                @value"/>
+                                                        <xf:value ref="if (self::group) then ()    else @value"/>
+                                                    </xf:itemset>
+                                                </xf:select1>
+                                            </xh:td>
+                                        </xh:tr>
+                                    </fr:grid>
+                                </xh:div>
+                            </xh:div>
                         </fr:tab>
 
                         <!-- Custom control settings -->

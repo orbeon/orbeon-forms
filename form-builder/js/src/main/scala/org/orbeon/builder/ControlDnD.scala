@@ -53,7 +53,7 @@ private object ControlDnD {
 
         // Can only drop into an empty cell
         override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): UndefOr[Boolean] =
-          target.querySelectorOpt(":scope > :not(.gu-mirror, .gu-transit, .fb-control-editor-left)").isEmpty
+          target.querySelectorOpt(":scope > :not(.gu-mirror, .gu-transit, .fb-control-editor-left, .fb-control-cell-badges)").isEmpty
 
         override def copy(el: html.Element, source: html.Element): UndefOr[Boolean] = {
           el.classList.add(if (shiftPressed) CopyClass else MoveClass)
@@ -86,7 +86,7 @@ private object ControlDnD {
 
         // Can only drop into an empty cell
         override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): UndefOr[Boolean] =
-          target.querySelectorOpt(":scope > :not(.gu-mirror, .gu-transit, .fb-control-editor-left)").isEmpty
+          target.querySelectorOpt(":scope > :not(.gu-mirror, .gu-transit, .fb-control-editor-left, .fb-control-cell-badges)").isEmpty
 
         override def copy(el: html.Element, source: html.Element): UndefOr[Boolean] = {
           el.classList.add(CopyClass)

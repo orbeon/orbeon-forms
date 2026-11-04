@@ -4,8 +4,12 @@ import org.orbeon.dom.Document
 import org.orbeon.oxf.fr.FormRunnerSupport
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.PartAnalysisBuilder
-import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl
+import org.orbeon.oxf.xforms.analysis.controls.AttributeControl
+import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.control.controls.{XFormsGroupControl, XXFormsAttributeControl, XXFormsDynamicControl}
+import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.scaxon.NodeConversions
 import org.orbeon.xforms.xbl.Scope
@@ -15,7 +19,8 @@ class FormBuilderRestrictedFunctionsTest
   extends DocumentTestBase
      with ResourceManagerSupport
      with AnyFunSpecLike
-     with FormRunnerSupport {
+     with FormRunnerSupport
+     with FormBuilderSupport {
 
   describe("Form Builder Restricted Functions (#7266)") {
 
@@ -246,6 +251,81 @@ class FormBuilderRestrictedFunctionsTest
           rootCause.exists(rc => rc.isInstanceOf[XPathException] && rc.getMessage.contains("is not allowed in user-defined form expressions"))
         }
       })
+    }
+  }
+
+  describe("Form Builder Cell Badges (#3109)") {
+
+    it("must update cell badges when control formulas and MIPs change") {
+
+      def findBadgesGroup(root: XFormsControl): Option[XFormsGroupControl] =
+        Iterator.iterate(List(root))(_.flatMap {
+          case c: org.orbeon.oxf.xforms.control.XFormsContainerControl => c.children
+          case _                                                       => Nil
+        }).takeWhile(_.nonEmpty).flatten.collectFirst {
+          case g: XFormsGroupControl if g.staticControl.element.attributeValue("class") == "fb-control-cell-badges" => g
+        }
+
+      def childAttributeValues(group: XFormsGroupControl, attrName: String): List[String] =
+        group.children.collect {
+          case a: XXFormsAttributeControl if a.staticControl.asInstanceOf[AttributeControl].attributeName == attrName =>
+            a.getValue(EventCollector.Throw)
+        }.toList
+
+      val fbDocWithDynamic: Document = {
+        val doc = formBuilderDoc(TemplateWithSingleControlDoc)
+        val body = doc.getRootElement.element("body")
+        val dynamicElem = NodeConversions.elemToOrbeonDom(
+          <xxf:dynamic xmlns:xxf="http://orbeon.org/oxf/xml/xforms" id="fb" ref="instance('fb-form-instance')"/>
+        ).getRootElement.detach()
+        body.add(dynamicElem)
+        doc
+      }
+
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(fbDocWithDynamic)) {
+          val fbDynamicControl = resolveObject[XXFormsDynamicControl]("fb").get
+
+          // Initially `control-1` has no formulas or constraints, so the badges group is non-relevant
+          val badgesGroup0 = findBadgesGroup(fbDynamicControl)
+          assert(badgesGroup0.isDefined)
+          assert(! badgesGroup0.get.isRelevant)
+
+          // Set a Calculated Value on `control-1`
+          FormBuilderXPathApi.setControlCalculatedMipFromToolbar("control-1", "calculate", "40 + 2")
+          XFormsAPI.refresh("fr-form-model")
+
+          val badgesGroup1 = findBadgesGroup(fbDynamicControl).get
+          assert(badgesGroup1.isRelevant)
+
+          val titles1  = childAttributeValues(badgesGroup1, "title")
+          val classes1 = childAttributeValues(badgesGroup1, "class")
+
+          assert(titles1.contains("Calculated Value: 40 + 2"))
+          assert(titles1.find(_.startsWith("Read-Only:")).isDefined)
+          assert(classes1.exists(c => c.contains("fb-badge-calculate") && ! c.contains("xforms-hidden")))
+          assert(classes1.exists(c => c.contains("fb-badge-readonly")  && ! c.contains("xforms-hidden")))
+          assert(classes1.exists(c => c.contains("fb-badge-default")   && c.contains("xforms-hidden")))
+
+          // Set an Initial Value, make Visibility false(), and clear Calculated Value
+          FormBuilderXPathApi.setControlCalculatedMipFromToolbar("control-1", "default", "'hello'")
+          FormBuilderXPathApi.setControlCalculatedMipFromToolbar("control-1", "relevant", "false()")
+          FormBuilderXPathApi.setControlCalculatedMipFromToolbar("control-1", "calculate", "")
+          XFormsAPI.refresh("fr-form-model")
+
+          val badgesGroup2 = findBadgesGroup(fbDynamicControl).get
+          assert(badgesGroup2.isRelevant)
+
+          val titles2  = childAttributeValues(badgesGroup2, "title")
+          val classes2 = childAttributeValues(badgesGroup2, "class")
+
+          assert(titles2.contains("Initial Value: 'hello'"))
+          assert(titles2.find(_.startsWith("Visibility:")).isDefined)
+          assert(classes2.exists(c => c.contains("fb-badge-default")    && ! c.contains("xforms-hidden")))
+          assert(classes2.exists(c => c.contains("fb-badge-visibility") && ! c.contains("xforms-hidden")))
+          assert(classes2.exists(c => c.contains("fb-badge-calculate")  && c.contains("xforms-hidden")))
+        }
+      }
     }
   }
 }

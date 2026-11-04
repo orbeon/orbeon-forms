@@ -1207,7 +1207,7 @@
 
     <!-- Control settings mini-toolbar (#6484) -->
     <xf:instance id="fb-toolbar-instance">
-        <toolbar visible="true">
+        <toolbar visible="true" show-cell-badges="true">
             <tracked-state/>
             <tracked-control-name/>
             <control-name/>

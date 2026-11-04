@@ -435,6 +435,10 @@ body.orbeon {
             top: @fbNavbarHeight + @fbGutter + @fbControlToolbarHeight + @fbGutter;
         }
 
+        &.fb-hide-cell-badges .fb-main-inner .fr-body .xbl-fr-grid .fr-grid.fr-editable .fr-grid-td > .xforms-group.fb-control-cell-badges {
+            display: none;
+        }
+
         .fb-main-inner {
             background-color: var(--orbeon-fb-form-area-background-color);
             box-sizing: border-box;
@@ -819,7 +823,7 @@ body.orbeon {
 
                 &.fb-toolbox-top-icons {
                     display: grid;
-                    grid-template-columns: repeat(7, 1fr);
+                    grid-template-columns: repeat(8, 1fr);
                     align-items: center;
                     gap: 2px;
                     height: @fbControlToolbarHeight;
@@ -839,8 +843,10 @@ body.orbeon {
                     .fb-paste-button             { grid-row-start: 1; grid-column-start: 4; }
                     .fb-undo-button              { grid-row-start: 1; grid-column-start: 5; }
                     .fb-redo-button              { grid-row-start: 1; grid-column-start: 6; }
-                    .fb-toggle-toolbar-button    { grid-row-start: 1; grid-column-start: 7; }
+                    .fb-toggle-badges-button     { grid-row-start: 1; grid-column-start: 7; }
+                    .fb-toggle-toolbar-button    { grid-row-start: 1; grid-column-start: 8; }
 
+                    .fb-toggle-badges-button.active,
                     .fb-toggle-toolbar-button.active {
                         button,
                         .xforms-trigger-appearance-minimal:not(.xforms-readonly):hover button {
@@ -2437,6 +2443,8 @@ body.orbeon {
                 // Even if the label or hint is empty, we still want space for 1 line to be reserved
                 // In regular grid content
                 .fr-grid-td {
+                    position: relative;
+
                     & > .xbl-component, & > .xforms-control {
                         // At design-time, the cells also have internal padding for the icons.
                         margin: @densityMarginTopBottom @densityMarginLeftRight;
@@ -2446,6 +2454,98 @@ body.orbeon {
                             display: block;
                         }
                     }
+
+                    // Design-time cell badges (#3109)
+                    & > .fb-control-cell-badges {
+                        position: absolute;
+                        top: 4px + @densityMarginTopBottom;
+                        right: 34px + @densityMarginLeftRight;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 3px;
+                        z-index: 1;
+                        pointer-events: auto;
+                        line-height: 1;
+
+                        &.xforms-disabled {
+                            display: none;
+                        }
+
+                        .fb-control-cell-badge {
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 2px;
+                            height: 16px;
+                            padding: 0 4px;
+                            font-size: 10px;
+                            line-height: 14px;
+                            color: var(--orbeon-tab-active-bar-color, #0081C7);
+                            background-color: var(--orbeon-form-background-color, #ffffff);
+                            border: 1px solid var(--orbeon-base-border-color, #d0d7de);
+                            border-radius: 3px;
+                            box-sizing: border-box;
+                            white-space: nowrap;
+                            opacity: 0.85;
+                            transition: opacity 100ms ease, border-color 100ms ease;
+
+                            &:hover {
+                                opacity: 1;
+                                border-color: var(--orbeon-tab-active-bar-color, #0081C7);
+                            }
+
+                            &.xforms-hidden {
+                                display: none;
+                            }
+
+                            i.fa {
+                                font-size: 10px;
+                                line-height: 1;
+                            }
+
+                            .fb-badge-fx {
+                                font-family: Georgia, serif;
+                                font-style: italic;
+                                font-weight: bold;
+                                font-size: 10px;
+                                line-height: 1;
+
+                                &.xforms-hidden {
+                                    display: none;
+                                }
+                            }
+
+                            .fb-badge-req {
+                                color: var(--orbeon-error-color, #d9534f);
+                                font-weight: bold;
+                                font-size: 11px;
+                                line-height: 1;
+                            }
+
+                            .fb-badge-count {
+                                font-weight: 600;
+                                font-size: 10px;
+                                line-height: 1;
+
+                                &.xforms-disabled {
+                                    display: none;
+                                }
+                            }
+                        }
+                    }
+
+                    &:hover > .fb-control-cell-badges .fb-control-cell-badge,
+                    &.fb-selected > .fb-control-cell-badges .fb-control-cell-badge {
+                        opacity: 1;
+                        border-color: var(--orbeon-tab-active-bar-color, #0081C7);
+                    }
+
+                    & > .gu-transit ~ .fb-control-cell-badges {
+                        display: none;
+                    }
+                }
+
+                &.fr-repeat.fr-repeat-single-row .fr-grid-body .fr-grid-td > .fb-control-cell-badges {
+                    top: -8px;
                 }
 
                 // In grid header, for the repeat single line

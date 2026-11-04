@@ -191,6 +191,21 @@
 
                 <fr:trigger
                         appearance="minimal"
+                        ref="$toolbar/@show-cell-badges"
+                        class="fb-toggle-badges-button{' active'[$toolbar/@show-cell-badges = 'true']}"
+                        id="toggle-cell-badges-trigger"
+                        name="toolbox.toggle-cell-badges">
+                    <xf:label><xh:i class="fa fa-tags fa-fw"/></xf:label>
+                    <xf:hint ref="$form-resources/control-settings-toolbar/show-cell-badges"/>
+                    <xf:action ev:event="DOMActivate">
+                        <xf:setvalue
+                            ref="$toolbar/@show-cell-badges"
+                            value="if (. = 'true') then 'false' else 'true'"/>
+                    </xf:action>
+                </fr:trigger>
+
+                <fr:trigger
+                        appearance="minimal"
                         ref="$toolbar/@visible"
                         class="fb-toggle-toolbar-button{' active'[$toolbar/@visible = 'true']}"
                         id="toggle-control-toolbar-trigger"

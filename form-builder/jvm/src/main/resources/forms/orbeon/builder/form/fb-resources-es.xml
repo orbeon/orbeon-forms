@@ -1863,6 +1863,7 @@
         <validations todo="true">Validations</validations>
         <calculate todo="true">Calculated</calculate>
         <default todo="true">Initial</default>
+        <show-cell-badges todo="true">Show Control Badges</show-cell-badges>
         <show-toolbar todo="true">Show Toolbar</show-toolbar>
     </control-settings-toolbar>
 </resource>

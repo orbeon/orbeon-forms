@@ -51,7 +51,7 @@ trait FormBuilderSupport extends XFormsSupport {
   def prettyPrintElem(elem: NodeInfo): Unit =
     println(TransformerUtils.tinyTreeToOrbeonDom(elem).getRootElement.serializeToString(XMLWriter.PrettyFormat))
 
-  private def formBuilderDoc(url: String): Document =
+  protected def formBuilderDoc(url: String): Document =
     NodeConversions.elemToOrbeonDom(
       <xh:html
         xmlns:xh="http://www.w3.org/1999/xhtml"

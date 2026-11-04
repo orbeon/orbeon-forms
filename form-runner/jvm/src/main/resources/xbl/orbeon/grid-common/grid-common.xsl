@@ -17,6 +17,7 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
@@ -280,6 +281,114 @@
                                 </xsl:copy>
                             </xsl:for-each>
                         </xf:group>
+
+                        <!-- Design-time cell badges (#3109) -->
+                        <xsl:if test="$is-editable and exists($control/@bind)">
+                            <xf:group
+                                ref="
+                                    for $b in id('{$control/@bind}', xxf:instance('fb-form-instance'))
+                                    return
+                                        $b[
+                                            exists(
+                                                (
+                                                    (@fb:calculate, fb:calculate/@value)[xxf:non-blank()],
+                                                    (@fb:default,   fb:default/@value)[xxf:non-blank()],
+                                                    (@fb:relevant,  fb:relevant/@value)[xxf:non-blank() and xxf:trim() != 'true()'],
+                                                    (@fb:readonly,  fb:readonly/@value)[xxf:non-blank() and xxf:trim() != 'false()'],
+                                                    (@required,     xf:required/@value)[xxf:non-blank() and not(xxf:trim() = ('true()', 'false()'))],
+                                                    @fb:constraint,
+                                                    fb:constraint
+                                                )
+                                            )
+                                        ]"
+                                class="fb-control-cell-badges">
+
+                                <xf:var name="fb-resources"     value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
+                                <xf:var name="fr-resources"     value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')"/>
+
+                                <xf:var name="calc-val"         value="(@fb:calculate, fb:calculate/@value)[1]/string()"/>
+                                <xf:var name="def-val"          value="(@fb:default,   fb:default/@value)[1]/string()"/>
+                                <xf:var name="rel-raw"          value="(@fb:relevant,  fb:relevant/@value)[1]/string()"/>
+                                <xf:var name="rel-val"          value="if (xxf:non-blank($rel-raw)) then xxf:trim($rel-raw) else 'true()'"/>
+                                <xf:var name="ro-raw"           value="(@fb:readonly,  fb:readonly/@value)[1]/string()"/>
+                                <xf:var name="ro-val"           value="if (xxf:non-blank($ro-raw)) then xxf:trim($ro-raw) else if (xxf:non-blank($calc-val)) then 'true()' else 'false()'"/>
+                                <xf:var name="req-raw"          value="(@required,     xf:required/@value)[1]/string()"/>
+                                <xf:var name="req-is-formula"   value="xxf:non-blank($req-raw) and not(xxf:trim($req-raw) = ('true()', 'false()'))"/>
+                                <xf:var name="constraint-count" value="count(@fb:constraint | fb:constraint)"/>
+
+                                <xh:span
+                                    class="fb-control-cell-badge fb-badge-required{{' xforms-hidden'[not($req-is-formula)]}}"
+                                    title="{{if ($req-is-formula) then concat($fb-resources/dialog-control-settings/required/label, ': ', xxf:trim($req-raw)) else ''}}">
+                                    <xh:span class="fb-badge-req">*</xh:span>
+                                    <xh:span class="fb-badge-fx">fx</xh:span>
+                                </xh:span>
+
+                                <xh:span
+                                    class="fb-control-cell-badge fb-badge-visibility{{' xforms-hidden'[$rel-val = 'true()']}}"
+                                    title="{{
+                                        if ($rel-val = 'false()') then
+                                            concat($fb-resources/dialog-control-settings/visibility/label, ': ', $fr-resources/components/labels/no)
+                                        else if ($rel-val != 'true()') then
+                                            concat($fb-resources/dialog-control-settings/visibility/label, ': ', $rel-val)
+                                        else
+                                            ''
+                                    }}">
+                                    <xh:i class="fa {{if ($rel-val = 'false()') then 'fa-eye-slash' else 'fa-eye'}}"/>
+                                    <xh:span class="fb-badge-fx{{' xforms-hidden'[$rel-val = ('true()', 'false()')]}}">fx</xh:span>
+                                </xh:span>
+
+                                <xh:span
+                                    class="fb-control-cell-badge fb-badge-readonly{{' xforms-hidden'[$ro-val = 'false()']}}"
+                                    title="{{
+                                        if ($ro-val = 'true()') then
+                                            concat($fb-resources/dialog-control-settings/readonly/label, ': ', $fr-resources/components/labels/yes)
+                                        else if ($ro-val != 'false()') then
+                                            concat($fb-resources/dialog-control-settings/readonly/label, ': ', $ro-val)
+                                        else
+                                            ''
+                                    }}">
+                                    <xh:i class="fa fa-lock"/>
+                                    <xh:span class="fb-badge-fx{{' xforms-hidden'[$ro-val = ('true()', 'false()')]}}">fx</xh:span>
+                                </xh:span>
+
+                                <xh:span
+                                    class="fb-control-cell-badge fb-badge-validations{{' xforms-hidden'[$constraint-count le 0]}}"
+                                    title="{{
+                                        if ($constraint-count gt 0) then
+                                            concat($fb-resources/dialog-control-settings/tab-validations/label, ' (', $constraint-count, ')')
+                                        else
+                                            ''
+                                    }}">
+                                    <xh:i class="fa fa-check-circle"/>
+                                    <xf:output
+                                        ref=".[$constraint-count gt 1]"
+                                        class="fb-badge-count"
+                                        value="$constraint-count"/>
+                                </xh:span>
+
+                                <xh:span
+                                    class="fb-control-cell-badge fb-badge-calculate{{' xforms-hidden'[not(xxf:non-blank($calc-val))]}}"
+                                    title="{{
+                                        if (xxf:non-blank($calc-val)) then
+                                            concat($fb-resources/dialog-control-settings/calculate/label, ': ', $calc-val)
+                                        else
+                                            ''
+                                    }}">
+                                    <xh:span class="fb-badge-fx">= fx</xh:span>
+                                </xh:span>
+
+                                <xh:span
+                                    class="fb-control-cell-badge fb-badge-default{{' xforms-hidden'[not(xxf:non-blank($def-val))]}}"
+                                    title="{{
+                                        if (xxf:non-blank($def-val)) then
+                                            concat($fb-resources/dialog-control-settings/default/label, ': ', $def-val)
+                                        else
+                                            ''
+                                    }}">
+                                    <xh:span class="fb-badge-fx">⇥ fx</xh:span>
+                                </xh:span>
+                            </xf:group>
+                        </xsl:if>
                     </xsl:element>
                 </xsl:for-each>
             </xsl:variable><!-- $cells-content -->

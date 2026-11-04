@@ -513,6 +513,7 @@ lazy val commonScalaJsSettings = Seq(
 
   packageJSDependencies / skip   := false,
   scalaJSLinkerConfig            ~= (_.withSourceMap(false).withESFeatures(_.withESVersion(ESVersion.ES2018))),
+  scalaJSLinkerConfig            ~= (_.withBatchMode(sys.env.contains("CI"))),
 
 //  scalaJSLinkerConfig in (Compile, fastOrFullOptJS) ~= { _.withParallel(false) },
 //  scalaJSLinkerConfig ~= { _.withOptimizer(false) },

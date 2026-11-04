@@ -42,10 +42,10 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                border: 1px solid var(--orbeon-border-color, var(--orbeon-base-border-color, #ced4da));
-                border-radius: var(--orbeon-add-on-border-radius, 4px);
-                background-color: var(--orbeon-input-bg, #ffffff);
-                color: var(--orbeon-fb-placeholder-color, #6c757d);
+                border: 1px solid var(--orbeon-control-border-color);
+                border-radius: var(--orbeon-add-on-border-radius);
+                background-color: var(--orbeon-control-background-color);
+                color: var(--orbeon-fb-placeholder-color);
                 cursor: pointer;
                 opacity: 0.4;
                 font-size: 11px;
@@ -54,21 +54,21 @@
 
                 &:hover, &:focus {
                     opacity: 1;
-                    color: var(--orbeon-base-color, #212529);
-                    border-color: var(--orbeon-focus-border-color, #86b7fe);
-                    background-color: var(--orbeon-input-bg, #ffffff);
+                    color: var(--orbeon-base-color);
+                    border-color: var(--orbeon-focus-border-color);
+                    background-color: var(--orbeon-control-background-color);
                     outline: none;
                 }
 
                 &.fr-clipboard-copy-success {
-                    color: var(--orbeon-success-color, #198754) !important;
-                    border-color: var(--orbeon-success-color, #198754) !important;
+                    color: var(--orbeon-button-success-background-color) !important;
+                    border-color: var(--orbeon-button-success-background-color) !important;
                     opacity: 1 !important;
                 }
 
                 &.fr-clipboard-copy-error {
-                    color: var(--orbeon-error-color, #dc3545) !important;
-                    border-color: var(--orbeon-error-color, #dc3545) !important;
+                    color: var(--orbeon-error-color) !important;
+                    border-color: var(--orbeon-error-color) !important;
                     opacity: 1 !important;
                 }
             }

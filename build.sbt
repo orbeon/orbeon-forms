@@ -42,22 +42,22 @@ val ScalaJsJQueryVersion         = "3.4.0"
 val ScalaJsStubsVersion          = "1.1.0" // can be different from Scala.js version
 val ScalaJsWeakReferencesVersion = "1.0.0"
 val ScalaJsSecureRandomVersion   = "1.0.0"
-val ScalaJsTimeVersion           = "2.6.0"
-val ScalaJsLocalesVersion        = "1.5.4"
+val ScalaJsTimeVersion           = "2.7.0" // 2.8.0+ requires Scala 3.8+ (incompatible with `CrossVersion.for2_13Use3`)
+val ScalaJsLocalesVersion        = "1.5.4" // 1.6.0+ requires Scala 3.8+ (incompatible with `CrossVersion.for2_13Use3`)
 
 // Scala libraries for Scala JVM only
 val ScalaLoggingVersion              = "3.9.4"
 
 // Shared Scala libraries
 val CatsVersion                      = "2.13.0"
-val CatsFs2Version                   = "3.13.0"
+val CatsFs2Version                   = "3.14.0"
 val CatsRetryVersion                 = "3.1.3"
 val ScalaTestVersion                 = "3.2.20"
-val CirceVersion                     = "0.14.15"
-val EnumeratumVersion                = "1.9.7"
-val EnumeratumCirceVersion           = "1.9.7"
-val ShapelessVersion                 = "2.3.7"
-val ScalaXmlVersion                  = "2.4.0"
+val CirceVersion                     = "0.14.17"
+val EnumeratumVersion                = "1.9.8"
+val EnumeratumCirceVersion           = "1.9.8"
+val ShapelessVersion                 = "2.3.13"
+val ScalaXmlVersion                  = "2.5.0"
 val ScalaParallelCollectionsVersion  = "1.3.0"
 val ScalaAsyncVersion                = "1.0.1"
 val Parboiled2Version                = "2.5.1"

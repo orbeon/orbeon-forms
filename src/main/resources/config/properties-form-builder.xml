@@ -59,6 +59,9 @@
         oxf:/xbl/orbeon/datetime/datetime.xbl
         oxf:/xbl/orbeon/dropdown-date/dropdown-date.xbl
         oxf:/xbl/orbeon/fields-date/fields-date.xbl
+        oxf:/xbl/orbeon/year/year.xbl
+        oxf:/xbl/orbeon/dropdown-year/dropdown-year.xbl
+        oxf:/xbl/orbeon/dropdown-month-year/dropdown-month-year.xbl
         oxf:/xbl/orbeon/timestamp/timestamp.xbl
     </property>
 
@@ -308,6 +311,7 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.date.field-width.orbeon.builder"     value="full"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.time.field-width.orbeon.builder"     value="full"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.datetime.field-width.orbeon.builder" value="full"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.year.field-width.orbeon.builder"     value="full"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.us-phone.field-width.orbeon.builder" value="full"/>
 
     <property as="xs:string" name="oxf.fr.detail.form-definition-xhtml.filename.orbeon.builder">

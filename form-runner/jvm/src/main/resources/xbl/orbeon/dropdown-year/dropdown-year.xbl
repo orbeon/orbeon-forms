@@ -1,0 +1,394 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <!--
+        Component to represent a year control based on a drop-down menu.
+     -->
+    <xbl:binding
+        id="fr-dropdown-year-binding"
+        element="fr|dropdown-year, xf|input:xxf-type('xs:gYear')[appearance ~= dropdown]"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value"
+        xxbl:label-for="fr-dropdown-year-elem">
+
+        <!-- Orbeon Form Builder Component Metadata -->
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Dropdown Year</display-name>
+            <display-name lang="fr">Année avec menu</display-name>
+            <display-name lang="no">Rullegardinmeny for år</display-name>
+            <display-name lang="ru">Год выпадающим меню</display-name>
+            <display-name lang="it">Anno a tendina</display-name>
+            <display-name lang="de">Dropdown-Jahr</display-name>
+            <display-name lang="fi">Vuoden pudotusvalikko</display-name>
+            <display-name lang="es">Año Desplegable</display-name>
+            <display-name lang="nl">Selectie jaar</display-name>
+            <display-name lang="pt">Lista de Opções para Ano</display-name>
+            <display-name lang="sv">Årsväljare med rullgardinsmeny</display-name>
+            <display-name lang="ar">سنة منسدلة</display-name>
+            <display-name lang="pl">Rok w liście rozwijanej</display-name>
+            <display-name lang="ja">ドロップダウン年</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-calendar</icon-class>
+            </icon>
+            <templates>
+                <bind type="xf:gYear"/>
+                <view>
+                    <fr:dropdown-year>
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:dropdown-year>
+                </view>
+            </templates>
+            <custom-settings>
+                <setting name="start-year" type="xs:string"/>
+                <setting name="end-year" type="xs:string"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="">
+
+                    <xf:action event="xforms-model-construct-done">
+                        <xf:action iterate="instance('local')/*">
+                            <xf:var name="c" value="."/>
+                            <xf:setvalue
+                                ref="$c"
+                                value="(instance()/@*[name() = name($c)], $c/@default)[1]"/>
+                        </xf:action>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <start-year default=""/>
+                            <end-year   default=""/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="start-year | end-year"
+                            xxf:whitespace="trim"
+                            type="xxf:XPath2ValueTemplate"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <start-year>
+                                    <label>Start year</label>
+                                    <hint>Constant or XPath value template</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>End year</label>
+                                    <hint>Constant or XPath value template</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <start-year>
+                                    <label>Année de début</label>
+                                    <hint>Constante ou modèle XPath</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Année de fin</label>
+                                    <hint>Constante ou modèle XPath</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <start-year>
+                                    <label>سنة البداية</label>
+                                    <hint>قيمة ثابتة أو قالب XPath</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>سنة النهاية</label>
+                                    <hint>قيمة ثابتة أو قالب XPath</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="no">
+                                <start-year>
+                                    <label>Startår</label>
+                                    <hint>Konstant eller XPath-mal</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Sluttår</label>
+                                    <hint>Konstant eller XPath-mal</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <start-year>
+                                    <label>Начальный год</label>
+                                    <hint>Константа или шаблон значения XPath</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Конечный год</label>
+                                    <hint>Константа или шаблон значения XPath</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="it">
+                                <start-year>
+                                    <label>Anno iniziale</label>
+                                    <hint>Costante o modello di valore XPath</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Anno finale</label>
+                                    <hint>Costante o modello di valore XPath</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="de">
+                                <start-year>
+                                    <label>Startjahr</label>
+                                    <hint>Konstante oder XPath-Wertvorlage</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Endjahr</label>
+                                    <hint>Konstante oder XPath-Wertvorlage</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <start-year>
+                                    <label>Alkuvuosi</label>
+                                    <hint>Vakio tai XPath-arvopohja</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Loppuvuosi</label>
+                                    <hint>Vakio tai XPath-arvopohja</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="es">
+                                <start-year>
+                                    <label>Año inicial</label>
+                                    <hint>Constante o plantilla de valor XPath</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Año final</label>
+                                    <hint>Constante o plantilla de valor XPath</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <start-year>
+                                    <label>Startjaar</label>
+                                    <hint>Constante of XPath-waardesjabloon</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Eindjaar</label>
+                                    <hint>Constante of XPath-waardesjabloon</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <start-year>
+                                    <label>Ano inicial</label>
+                                    <hint>Constante ou modelo de valor XPath</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Ano final</label>
+                                    <hint>Constante ou modelo de valor XPath</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <start-year>
+                                    <label>Startår</label>
+                                    <hint>Konstant eller XPath-värdemall</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Slutår</label>
+                                    <hint>Konstant eller XPath-värdemall</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <start-year>
+                                    <label>Rok początkowy</label>
+                                    <hint>Stała lub szablon wartości XPath</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>Rok końcowy</label>
+                                    <hint>Stała lub szablon wartości XPath</hint>
+                                </end-year>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <start-year>
+                                    <label>開始年</label>
+                                    <hint>定数またはXPath値テンプレート</hint>
+                                </start-year>
+                                <end-year>
+                                    <label>終了年</label>
+                                    <hint>定数またはXPath値テンプレート</hint>
+                                </end-year>
+                            </resource>
+                        </_>
+                    </xf:instance>
+
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-dropdown-year-grid">
+                    <fr:c x="1" y="1" w="6">
+                        <xf:input ref="instance('local')/start-year" id="start-year-control" appearance="xpath-completion">
+                            <xf:label ref="xxf:r('start-year.label')"/>
+                            <xf:hint ref="xxf:r('start-year.hint')"/>
+                            <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
+                        </xf:input>
+                    </fr:c>
+                    <fr:c x="7" y="1" w="6">
+                        <xf:input ref="instance('local')/end-year" id="end-year-control" appearance="xpath-completion">
+                            <xf:label ref="xxf:r('end-year.label')"/>
+                            <xf:hint ref="xxf:r('end-year.hint')"/>
+                            <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
+                        </xf:input>
+                    </fr:c>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-dropdown-year-action"
+                    event="xforms-value-changed"
+                    observer="
+                        start-year-control
+                        end-year-control">
+
+                    <xf:var
+                        name="name"
+                        value="name(event('xxf:binding'))"/>
+
+                    <xf:var
+                        name="new-value"
+                        value="
+                            let $binding := event('xxf:binding'),
+                                $v       := string($binding),
+                                $default := $binding/@default/string()
+                            return
+                                if ($v != $default) then
+                                    $v
+                                else
+                                    ()
+                        "/>
+
+                    <xf:insert
+                        context="instance()"
+                        if="exists($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="empty($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/dropdown-year/dropdown-year.css"/>
+        </xbl:resources>
+        <xbl:handlers>
+            <!-- Propagate readonly -->
+            <xbl:handler event="xforms-enabled xforms-readonly xforms-readwrite" phase="target">
+                <xf:setvalue
+                    ref="instance('i')/is-readonly"
+                    value="xxf:is-control-readonly('fr-dropdown-year-binding')"/>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:implementation>
+            <!-- Local model -->
+            <xf:model id="year-model">
+                <xf:instance id="i">
+                    <_>
+                        <year/>
+                        <!-- Whether the values are readonly -->
+                        <is-readonly/>
+                    </_>
+                </xf:instance>
+
+                <!-- Make instance read-only when the form must be read-only -->
+                <xf:bind ref="." readonly="is-readonly = 'true'"/>
+
+                <xf:instance id="years-itemset">
+                    <_ start="" end=""/>
+                </xf:instance>
+
+                <!-- Initialize itemset upon initialization -->
+                <xf:action event="xxforms-instances-ready" if="empty(instance('years-itemset')/*)">
+
+                    <xf:action iterate="instance('years-itemset')/@*">
+                        <xf:var name="start-end" value="."/>
+                        <xf:setvalue
+                            ref="$start-end"
+                            value="
+                                let $param-name := concat(local-name($start-end), '-year'),
+                                    $r          := fr:component-param-value($param-name)
+                                return
+                                    if ($r castable as xs:integer) then
+                                        $r cast as xs:integer
+                                    else
+                                        xxf:evaluate($r)
+                            "/>
+                    </xf:action>
+
+                    <xf:var name="start-year" value="instance('years-itemset')/@start" as="xs:integer"/>
+                    <xf:var name="end-year"   value="instance('years-itemset')/@end  " as="xs:integer"/>
+
+                    <xf:action iterate="if ($start-year le $end-year) then ($start-year to $end-year) else reverse($end-year to $start-year)">
+                        <xf:var name="year" value="." as="xs:string"/>
+                        <xf:insert context="instance('years-itemset')" origin="xf:element('year', $year)"/>
+                    </xf:action>
+                </xf:action>
+            </xf:model>
+        </xbl:implementation>
+        <xbl:template>
+            <!-- Read external value -->
+            <xf:var
+                name="binding"
+                value="xxf:binding('fr-dropdown-year-binding')"/>
+            <xf:var
+                name="view"
+                value="is-readonly = 'true' and property('xxf:readonly-appearance') = 'static'"/>
+            <xf:var name="value" as="xs:string" value="xxf:value('fr-dropdown-year-binding')">
+                <xf:action event="xforms-value-changed xforms-enabled">
+                    <xf:setvalue
+                        ref="instance('i')/year"
+                        value="if ($value castable as xs:integer) then xs:integer($value) else ''"/>
+                </xf:action>
+            </xf:var>
+
+            <xh:div id="fr-dropdown-year-elem" class="fr-component-group" xxf:control="true">
+                <xf:group ref=".[not($view)]">
+                    <xf:select1 ref="year" id="select1" xbl:attr="navindex navindex=tabindex autocomplete xxf:encrypt-item-values">
+                        <xf:item>
+                            <xf:label/>
+                            <xf:value/>
+                        </xf:item>
+                        <xf:itemset ref="instance('years-itemset')/year">
+                            <xf:label ref="."/>
+                            <xf:value ref="."/>
+                        </xf:itemset>
+                    </xf:select1>
+
+                    <!-- React to update to local value -->
+                    <xf:action event="xforms-enabled xforms-value-changed">
+                        <xf:var name="empty" value="xxf:is-blank(year)" as="xs:boolean"/>
+                        <xf:action if="$empty">
+                            <xf:setvalue ref="$binding"/>
+                        </xf:action>
+                        <xf:action if="not($empty)">
+                            <xf:var name="y" value="if (year castable as xs:integer) then format-number(xs:integer(year), '0000') else '____'"/>
+                            <xf:setvalue ref="$binding" value="$y"/>
+                        </xf:action>
+                    </xf:action>
+                </xf:group>
+                <xf:group ref=".[$view]">
+                    <!-- Static readonly mode -->
+                    <xf:input ref="$binding"/>
+                </xf:group>
+            </xh:div>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

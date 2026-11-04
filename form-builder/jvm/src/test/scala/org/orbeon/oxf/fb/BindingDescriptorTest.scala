@@ -79,6 +79,24 @@ class BindingDescriptorTest
           </metadata>
         </xbl:binding>
 
+        <xbl:binding element="fr|year, xf|input:xxf-type('xs:gYear')">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Year</display-name>
+          </metadata>
+        </xbl:binding>
+
+        <xbl:binding element="fr|dropdown-year, xf|input:xxf-type('xs:gYear')[appearance ~= dropdown]">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Dropdown Year</display-name>
+          </metadata>
+        </xbl:binding>
+
+        <xbl:binding element="fr|dropdown-month-year, xf|input:xxf-type('xs:gYearMonth')[appearance ~= dropdowns]">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Dropdown Month/Year</display-name>
+          </metadata>
+        </xbl:binding>
+
         <xbl:binding element="xf|select1[appearance ~= full]">
           <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Radio Buttons</display-name>
@@ -201,6 +219,15 @@ class BindingDescriptorTest
     assertVaryTypes(FR -> "dropdown-date", XS -> "date"   , None                     , XS -> "date"   , Some("fields")           )(Some(FR -> "fields-date"  , None))
     assertVaryTypes(FR -> "dropdown-date", XS -> "date"   , None                     , XS -> "string" , Some("fields")           )(Some(XF -> "input"        , None))
 
+    assertVaryTypes(XF -> "input"        , XS -> "string" , None                     , XS -> "gYear"  , None                     )(Some(FR -> "year"         , None))
+    assertVaryTypes(XF -> "input"        , XS -> "string" , None                     , XS -> "gYear"  , Some("dropdown")         )(Some(FR -> "dropdown-year", None))
+    assertVaryTypes(FR -> "year"         , XS -> "gYear"  , None                     , XS -> "gYear"  , Some("dropdown")         )(Some(FR -> "dropdown-year", None))
+    assertVaryTypes(FR -> "dropdown-year", XS -> "gYear"  , None                     , XS -> "gYear"  , None                     )(Some(FR -> "year"         , None))
+    assertVaryTypes(FR -> "dropdown-year", XS -> "gYear"  , None                     , XS -> "string" , None                     )(Some(XF -> "input"        , None))
+
+    assertVaryTypes(XF -> "input"              , XS -> "string"    , None, XS -> "gYearMonth", Some("dropdowns"))(Some(FR -> "dropdown-month-year", None))
+    assertVaryTypes(FR -> "dropdown-month-year", XS -> "gYearMonth", None, XS -> "string"    , None             )(Some(XF -> "input"              , None))
+
     assertVaryTypes(XF -> "select1"      , XS -> "string" , Some("full")             , XS -> "string" , Some("dropdown")         )(Some(XF -> "select1"      , Some("dropdown")))
     assertVaryTypes(XF -> "select1"      , XS -> "string" , Some("dropdown")         , XS -> "string" , Some("full")             )(Some(XF -> "select1"      , Some("full")))
 
@@ -238,6 +265,8 @@ class BindingDescriptorTest
     assertVaryTypes(XF -> "textarea"  , XS -> "string" )(Seq(None         -> "Plain Text Area", Some("character-counter") -> "With Character Counter"))
     assertVaryTypes(XF -> "input"     , XS -> "decimal")(Seq(None         -> "Number"))
     assertVaryTypes(XF -> "input"     , XS -> "date"   )(Seq(None         -> "Date"           , Some("dropdowns")         -> "Dropdown Date"          , Some("fields") -> "Fields Date"))
+    assertVaryTypes(XF -> "input"     , XS -> "gYear"      )(Seq(None            -> "Year"               , Some("dropdown")  -> "Dropdown Year"))
+    assertVaryTypes(XF -> "input"     , XS -> "gYearMonth" )(Seq(Some("dropdowns") -> "Dropdown Month/Year"))
     assertVaryTypes(XF -> "select1"   , XS -> "string" )(Seq(Some("full") -> "Radio Buttons"  , Some("dropdown")          -> "Dropdown Menu"))
     assertVaryTypes(XF -> "input"     , XS -> "boolean")(Seq(Some("checkbox") -> "Single Checkbox", Some("switch") -> "Toggle Switch", Some("yesno") -> "Yes/No Answer"))
 

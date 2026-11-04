@@ -84,8 +84,11 @@ object ImportExportSupport {
     QName("country",  FRNamespace),
     QName("phone",    FRNamespace),
     QName("us-phone", FRNamespace),
-    QName("us-state", FRNamespace),
-    QName("color",    FRNamespace),
+    QName("us-state",     FRNamespace),
+    QName("color",        FRNamespace),
+    QName("year",                FRNamespace),
+    QName("dropdown-year",       FRNamespace),
+    QName("dropdown-month-year", FRNamespace),
   )
 
   // TODO: components

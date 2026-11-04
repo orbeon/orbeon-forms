@@ -182,6 +182,9 @@
         +fr:clipboard-copy
         +fr:dropdown-date
         +fr:fields-date
+        +fr:year
+        +fr:dropdown-year
+        +fr:dropdown-month-year
         +fr:date-picker
         +fr:attachment
         +fr:image-attachment
@@ -263,6 +266,9 @@
         +fr:clipboard-copy
         +fr:dropdown-date
         +fr:fields-date
+        +fr:year
+        +fr:dropdown-year
+        +fr:dropdown-month-year
         +fr:date-picker
         +fr:attachment
         +fr:image-attachment
@@ -395,6 +401,8 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-number.*"                       value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-currency.*"                     value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-date.*"                         value="input-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-year.*"                         value="input-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-dropdown-year.*"                value="select-value"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-time.*"                         value="input-time-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-phone.*"                        value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-us-phone.*"                     value="input-string"/>

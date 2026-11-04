@@ -129,8 +129,9 @@ object XFormsUI {
     findControlLHHA(control, lhhaType) match {
       case Some(lhhaElement) =>
         lhhaElement.innerHTML = message
-        // https://github.com/orbeon/orbeon-forms/issues/4062
-        if (lhhaType == "help")
+        // Help: https://github.com/orbeon/orbeon-forms/issues/4062
+        // Hint: setRelevant() runs before the hint text is set, so the class must be updated here (#8030)
+        if (lhhaType == "help" || lhhaType == "hint")
           lhhaElement.toggleClass("xforms-disabled", message.isAllBlank)
       case None =>
         // Handle placeholder

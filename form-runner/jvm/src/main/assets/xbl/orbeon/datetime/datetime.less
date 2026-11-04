@@ -6,7 +6,8 @@
         gap: .25em;
 
         .xbl-fr-date, .xbl-fr-time {
-            flex: 1 1 9em;
+            // 11em is the natural width of a date field: side by side only when both placeholders can show in full
+            flex: 1 1 11em;
         }
 
         .fr-view &.fr-field-width-full, .fr-view &.fr-field-width-natural {

@@ -192,7 +192,7 @@
     <property as="xs:string"  name="oxf.fr.detail.warn-when-data-unsafe.*.*"                       value="true"/>
 
     <!-- Functions allowed in user-defined form formulas and expressions -->
-    <property as="xs:string" name="oxf.fr.detail.formula.allowed-functions.private">
+    <property as="xs:string" name="oxf.fr.detail.formula.allowed-functions.private" xmlns:saxon="http://saxon.sf.net/">
         math:*
         fn:*
         xf:*
@@ -235,6 +235,8 @@
         -fr:run-process
         -fr:save-state
         -fr:transform-uploaded-image
+        +saxon:string-to-base64Binary
+        +saxon:base64Binary-to-string
     </property>
     <property as="xs:string"  name="oxf.fr.detail.formula.allowed-functions.*.*"                   value=""/>
 

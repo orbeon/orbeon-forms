@@ -32,6 +32,7 @@ import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
 import org.orbeon.oxf.xforms.analysis.ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
+import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.contentfilter.ContentFilter
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
@@ -532,9 +533,29 @@ private object FormRunnerFunctions {
           val context = getPathMapContext(pathMap)
 
           val boundElemOpt =
-            ancestorsIterator(context.element, includeSelf = false) collectFirst {
-              case c: ComponentControl => c
-            }
+            ancestorsIterator(context.element, includeSelf = false)
+              .collectFirst { case c: ComponentControl => c }
+              .orElse {
+                context.element match {
+                  case staticBind: StaticBind =>
+                    staticBind.nameOpt
+                      .orElse(frc.controlNameFromIdOpt(staticBind.staticId))
+                      .map(controlName => staticBind.scope.prefixedIdForStaticId(frc.controlId(controlName)))
+                      .flatMap(context.partAnalysisCtx.findControlAnalysis)
+                      .collect { case c: ComponentControl => c }
+                      .orElse {
+                        context.partAnalysisCtx.iterateControlsNoModels.collectFirst {
+                          case c: ComponentControl
+                            if c.scope == staticBind.scope && (
+                              c.bind.contains(staticBind.staticId) ||
+                              (c.bind.isEmpty && c.ref.isDefined && c.ref == staticBind.ref)
+                            ) => c
+                        }
+                      }
+                  case _ =>
+                    None
+                }
+              }
 
           // The following causes the use of `fr:component-param-value()` to be invalidated only if there is an
           // attribute and it might be an AVT. If the parameter is a literal, this makes sense, as it will never change.

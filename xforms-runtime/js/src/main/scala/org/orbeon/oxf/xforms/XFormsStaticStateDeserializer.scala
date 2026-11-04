@@ -645,10 +645,13 @@ object XFormsStaticStateDeserializer {
                   name       <- c.get[MipName.XPath]("name")
                   level      <- c.getOrElse[ValidationLevel]("level")(ValidationLevel.ErrorLevel)
                   expression <- c.get[String]("expression")
+                  nsRefOpt   <- c.getOrElse[Option[Int]]("nsRef")(None)
                   analysis   <- c.getOrElse[Option[XPathAnalysis]]("analysis")(None)
-                } yield
-                  StaticBind.XPathMIP(id, name, level, expression, namespaceMapping, null, functionLibrary) |!>
+                } yield {
+                  val mipNamespaceMapping = nsRefOpt.map(nsRef => NamespaceMapping(collectedNamespaces(nsRef))).getOrElse(namespaceMapping)
+                  StaticBind.XPathMIP(id, name, level, expression, mipNamespaceMapping, null, functionLibrary) |!>
                     (_.analysis = analysis.getOrElse(new NegativeAnalysis(expression)))
+                }
 
               // This will lose the prefix, is that ok?
               implicit val decodeCustomMipNameKey: KeyDecoder[MipName.Custom] =

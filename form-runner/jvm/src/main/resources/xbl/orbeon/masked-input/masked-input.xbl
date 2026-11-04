@@ -1,0 +1,263 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:MaskedInputSupport="java:org.orbeon.xbl.MaskedInputSupportJava">
+
+    <xbl:binding
+        id="fr-masked-input"
+        element="fr|masked-input"
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle allow-minimal-label-hint"
+        xxf:external-events="DOMActivate"
+        xxbl:label-for="input"
+        xxbl:type="xs:string"
+        xxbl:constraint="
+            MaskedInputSupport:isValid(
+                string(.),
+                string(fr:component-param-value('mask'))
+            )"
+        xxbl:format="
+            MaskedInputSupport:formatDisplayValue(
+                string(.),
+                string(fr:component-param-value('mask'))
+            )"
+        xxbl:deserialize-external-value="
+            MaskedInputSupport:toRawValue(
+                string(.),
+                string(fr:component-param-value('mask'))
+            )"
+    >
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Masked Input</display-name>
+            <display-name lang="fr">Saisie avec masque</display-name>
+            <display-name lang="no">Inndata med maske</display-name>
+            <display-name lang="ru">Поле с маской</display-name>
+            <display-name lang="it">Input con maschera</display-name>
+            <display-name lang="de">Eingabemaske</display-name>
+            <display-name lang="fi">Muotoiltu syöte</display-name>
+            <display-name lang="es">Entrada con máscara</display-name>
+            <display-name lang="nl">Invoermasker</display-name>
+            <display-name lang="pt">Entrada com máscara</display-name>
+            <display-name lang="sv">Inmatningsmask</display-name>
+            <display-name lang="ar">إدخال بقناع</display-name>
+            <display-name lang="pl">Pole z maską</display-name>
+            <display-name lang="ja">マスク入力</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-hashtag</icon-class>
+            </icon>
+            <templates>
+                <bind type="fr:masked-input"/>
+                <view>
+                    <fr:masked-input id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:masked-input>
+                </view>
+            </templates>
+            <custom-settings>
+                <setting name="mask" type="xs:string"/>
+                <setting name="field-width" type="xs:string" values="full natural"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-masked-input-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue
+                            ref="$c"
+                            value="instance()/@*[name() = name($c)]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <mask/>
+                            <field-width/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="mask"
+                            xxf:whitespace="trim"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true">
+                        <_>
+                            <resource xml:lang="en">
+                                <mask>Mask</mask>
+                                <mask-hint>9 = digit, A/a = upper/lowercase letter, * = alphanumeric, H = hex, [...] = optional (e.g. (999) 999-9999, A9A 9A9, 99999[-9999])</mask-hint>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <mask>Masque</mask>
+                                <mask-hint>9 = chiffre, A/a = lettre majuscule/minuscule, * = alphanumérique, H = hex, [...] = facultatif (ex. (999) 999-9999, A9A 9A9, 99999[-9999])</mask-hint>
+                            </resource>
+                            <resource xml:lang="no">
+                                <mask>Maske</mask>
+                                <mask-hint>9 = siffer, A/a = stor/liten bokstav, * = alfanumerisk, H = heks, [...] = valgfritt (f.eks. (999) 999-9999, A9A 9A9, 99999[-9999])</mask-hint>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <mask>Маска</mask>
+                                <mask-hint>9 = цифра, A/a = заглавная/строчная буква, * = буква или цифра, H = шестнадцатеричный, [...] = необязательно (напр. (999) 999-9999, A9A 9A9, 99999[-9999])</mask-hint>
+                            </resource>
+                            <resource xml:lang="it">
+                                <mask>Maschera</mask>
+                                <mask-hint>9 = cifra, A/a = lettera maiuscola/minuscola, * = alfanumerico, H = esadecimale, [...] = facoltativo (es. (999) 999-9999, A9A 9A9, 99999[-9999])</mask-hint>
+                            </resource>
+                            <resource xml:lang="de">
+                                <mask>Maske</mask>
+                                <mask-hint>9 = Ziffer, A/a = Groß-/Kleinbuchstabe, * = alphanumerisch, H = Hex, [...] = optional (z. B. (999) 999-9999, A9A 9A9, 99999[-9999])</mask-hint>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <mask>Maski</mask>
+                                <mask-hint>9 = numero, A/a = iso/pieni kirjain, * = aakkosnumeerinen, H = heksa, [...] = valinnainen (esim. (999) 999-9999, A9A 9A9, 99999[-9999])</mask-hint>
+                            </resource>
+                            <resource xml:lang="es">
+                                <mask>Máscara</mask>
+                                <mask-hint>9 = dígito, A/a = letra mayúscula/minúscula, * = alfanumérico, H = hex, [...] = opcional (p. ej. (999) 999-9999, A9A 9A9, 99999[-9999])</mask-hint>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <mask>Masker</mask>
+                                <mask-hint>9 = cijfer, A/a = hoofd-/kleine letter, * = alfanumeriek, H = hex, [...] = optioneel (bijv. (999) 999-9999, A9A 9A9, 99999[-9999])</mask-hint>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <mask>Máscara</mask>
+                                <mask-hint>9 = dígito, A/a = letra maiúscula/minúscula, * = alfanumérico, H = hex, [...] = opcional (ex. (999) 999-9999, A9A 9A9, 99999[-9999])</mask-hint>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <mask>Mask</mask>
+                                <mask-hint>9 = siffra, A/a = versal/gemen, * = alfanumerisk, H = hex, [...] = valfritt (t.ex. (999) 999-9999, A9A 9A9, 99999[-9999])</mask-hint>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <mask>القناع</mask>
+                                <mask-hint>9 = رقم، A/a = حرف كبير/صغير، * = حرف أو رقم، H = ست عشري، [...] = اختياري (مثل (999) 999-9999، A9A 9A9، 99999[-9999])</mask-hint>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <mask>Maska</mask>
+                                <mask-hint>9 = cyfra, A/a = wielka/mała litera, * = alfanumeryczny, H = szesnastkowy, [...] = opcjonalnie (np. (999) 999-9999, A9A 9A9, 99999[-9999])</mask-hint>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <mask>マスク</mask>
+                                <mask-hint>9 = 数字、A/a = 大文字/小文字の英字、* = 英数字、H = 16進数、[...] = 任意 (例: (999) 999-9999, A9A 9A9, 99999[-9999])</mask-hint>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-masked-input-grid">
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:input ref="instance('local')/mask" id="mask-control">
+                                <xf:label ref="xxf:r('mask')"/>
+                                <xf:hint ref="xxf:r('mask-hint')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:select1 ref="instance('local')/field-width" appearance="full xxf:horizontal" id="field-width-control">
+                                <xf:label ref="xxf:r('xbl-control-settings.field-width', '|fr-form-resources|')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.full', '|fr-form-resources|')"/>
+                                    <xf:value>full</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.natural', '|fr-form-resources|')"/>
+                                    <xf:value>natural</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-masked-input-action"
+                    event="xforms-value-changed"
+                    observer="mask-control field-width-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/masked-input/masked-input.css"/>
+        </xbl:resources>
+
+        <xbl:template>
+            <xf:var
+                name="mask"
+                value="string(fr:component-param-value('mask'))"/>
+
+            <xf:group
+                ref="xxf:binding('fr-masked-input')"
+                class="fr-field-width-{fr:component-param-value('field-width')}">
+                <xh:input
+                    id="input"
+                    class="fr-masked-input-field xbl-html-input xforms-input-input"
+                    xh:type="text"
+                    data-mask="{$mask}"
+                    data-inputmode="{MaskedInputSupport:inputMode($mask)}"
+                    maxlength="{MaskedInputSupport:maxLength($mask)}"
+                    placeholder="{MaskedInputSupport:placeholder($mask)}"
+                    xxf:control="true"
+                    xbl:attr="tabindex tabindex=navindex autocomplete"/>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+    <xbl:binding
+        id="fr-masked-input-output"
+        element="
+            fr|masked-input[fr|static-readonly = true],
+            fr|masked-input[fr|pdf-template = true]"
+        xxbl:mode="lhha binding value allow-minimal-label-hint"
+        xxbl:label-for="input"
+        xxbl:format="
+            MaskedInputSupport:formatDisplayValue(
+                string(xxf:binding('fr-masked-input-output')),
+                string(fr:component-param-value('mask'))
+            )"
+    >
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/masked-input/masked-input.css"/>
+        </xbl:resources>
+        <xbl:template>
+            <xf:input
+                id="input"
+                ref="xxf:binding('fr-masked-input-output')"
+                xxf:format="xxf:formatted-value('fr-masked-input-output')"/>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

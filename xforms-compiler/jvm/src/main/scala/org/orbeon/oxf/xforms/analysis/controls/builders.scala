@@ -637,21 +637,25 @@ object StaticBindBuilder {
     //    attribute  of `xxf:dynamic`. This should also allow providing feedback to the Form Builder user.
     // 2. When using `Try`, we should capture errors so that `xxf:dynamic` can report them.
     def createOrNone(
-      id        : String,
-      mipName   : MipName.XPath,
-      level     : ValidationLevel,
-      expression: String
+      id                  : String,
+      mipName             : MipName.XPath,
+      level               : ValidationLevel,
+      expression          : String,
+      mipNamespaceMapping : NamespaceMapping = namespaceMapping,
+      isXblConstraint     : Boolean          = false
     ): Option[XPathMIP] = {
       val isRestricted =
-        element.attributeValueOpt(XXFORMS_FUNCTIONS_QNAME).contains("restricted") ||
-        parent.exists(_.isFunctionsRestricted)
+        ! isXblConstraint && (
+          element.attributeValueOpt(XXFORMS_FUNCTIONS_QNAME).contains("restricted") ||
+          parent.exists(_.isFunctionsRestricted)
+        )
       val lib =
         if (isRestricted) partAnalysisCtx.whitelistedFunctionLibrary
         else partAnalysisCtx.functionLibrary
       if (partAnalysisCtx.isTopLevelPart && ! partAnalysisCtx.staticProperties.allowErrorRecoveryOnInit)
-        Some(XPathMIP(id, mipName, level, expression, namespaceMapping, xpathMipLocationData, lib))
+        Some(XPathMIP(id, mipName, level, expression, mipNamespaceMapping, xpathMipLocationData, lib))
       else
-        Try(XPathMIP(id, mipName, level, expression, namespaceMapping, xpathMipLocationData, lib)) match {
+        Try(XPathMIP(id, mipName, level, expression, mipNamespaceMapping, xpathMipLocationData, lib)) match {
           case Success(mip) =>
             Some(mip)
           case Failure(t)   =>
@@ -693,9 +697,9 @@ object StaticBindBuilder {
 
     val (newTypeMipOpt, newConstraintXPathMipOpt) = {
 
-      def findXblBindingValidations(typeQName: QName): Option[(Option[QName], Option[String])] =
+      def findXblBindingValidations(typeQName: QName): Option[(Option[QName], Option[String], NamespaceMapping)] =
         partAnalysisCtx.metadata.findBindingForQName(typeQName).map { binding =>
-          binding.datatypeOpt -> binding.constraintOpt
+          (binding.datatypeOpt, binding.constraintOpt, binding.namespaceMapping)
         }
 
       // Q: Should we also check that the type is not from an imported XML Schema? It is unlikely that there
@@ -708,7 +712,12 @@ object StaticBindBuilder {
 
       (
         newConstraintsOpt.flatMap(_._1).map(qName => new TypeMIP(staticId, qName)),
-        newConstraintsOpt.flatMap(_._2).flatMap(expr => createOrNone(staticId, MipName.Constraint, ValidationLevel.ErrorLevel, expr))
+        newConstraintsOpt.flatMap {
+          case (_, Some(expr), bindingNamespaceMapping) =>
+            createOrNone(staticId, MipName.Constraint, ValidationLevel.ErrorLevel, expr, bindingNamespaceMapping, isXblConstraint = true)
+          case _ =>
+            None
+        }
       )
     }
 

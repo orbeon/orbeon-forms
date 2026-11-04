@@ -174,6 +174,11 @@ object XFormsStaticStateSerializer {
         case e: ComponentControl =>
           distinct += e.namespaceMapping.mapping
           distinct += e.commonBinding.bindingElemNamespaceMapping.mapping
+        case e: StaticBind =>
+          distinct += e.namespaceMapping.mapping
+          e.allMipNamesToXPathMIP.values.flatten.foreach { mip =>
+            distinct += mip.namespaceMapping.mapping
+          }
         case e =>
           distinct += e.namespaceMapping.mapping
       }
@@ -524,6 +529,8 @@ object XFormsStaticStateSerializer {
             if (a.level != ValidationLevel.ErrorLevel)
               b += "level"      -> a.level.asJson
             b += "expression" -> Json.fromString(a.compiledExpression.string)
+            if (a.namespaceMapping != c.namespaceMapping)
+              b += "nsRef"      -> Json.fromInt(collectedNamespacesWithPositions(a.namespaceMapping.mapping))
             if (a.analysis.figuredOutDependencies)
               b += "analysis" -> a.analysis.some.asJson
 

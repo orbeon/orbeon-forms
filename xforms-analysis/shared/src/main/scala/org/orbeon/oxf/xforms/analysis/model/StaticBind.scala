@@ -186,6 +186,7 @@ object StaticBind {
     override val name     : MipName.XPath,
     override val level    : ValidationLevel,
     val compiledExpression: StaticXPath.CompiledExpression,
+    val namespaceMapping  : NamespaceMapping,
     var analysis          : XPathAnalysis
   ) extends MIP
 
@@ -224,6 +225,7 @@ object StaticBind {
         name,
         level,
         compiledExpression,
+        namespaceMapping,
         new NegativeAnalysis(expression) // default to `NegativeAnalysis`, `analyzeXPath()` can change that
       )
     }

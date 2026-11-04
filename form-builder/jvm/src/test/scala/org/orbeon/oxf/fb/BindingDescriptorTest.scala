@@ -151,6 +151,12 @@ class BindingDescriptorTest
           </metadata>
         </xbl:binding>
 
+        <xbl:binding element="fr|masked-input">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Masked Input</display-name>
+          </metadata>
+        </xbl:binding>
+
         <xbl:binding element="fr|checkbox-input, xf|input:xxf-type('xs:boolean')[appearance ~= checkbox]">
           <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Single Checkbox</display-name>
@@ -308,7 +314,9 @@ class BindingDescriptorTest
 
     assertVaryTypes(FR -> "us-ein",     XS -> "string" , None, Nil      )("US Employer Identification Number (EIN)")
     assertVaryTypes(FR -> "us-ein",     FR -> "us-ein" , None, Nil      )("US Employer Identification Number (EIN)")
-    assertVaryTypes(FR -> "color",      XS -> "string" , None, Nil      )("Color")
-    assertVaryTypes(FR -> "color",      FR -> "color"  , None, Nil      )("Color")
+    assertVaryTypes(FR -> "color",        XS -> "string"      , None, Nil      )("Color")
+    assertVaryTypes(FR -> "color",        FR -> "color"       , None, Nil      )("Color")
+    assertVaryTypes(FR -> "masked-input", XS -> "string"      , None, Nil      )("Masked Input")
+    assertVaryTypes(FR -> "masked-input", FR -> "masked-input", None, Nil      )("Masked Input")
   }
 }

@@ -367,9 +367,11 @@ object ControlAjaxSupport {
     referencedControlEffectiveId: String
   )(implicit
     xmlReceiver: XMLReceiver
-  ): Unit = {
-    lazy val placeHolderValueOpt = PlaceHolderInfo.placeHolderValueOpt(currentControl.staticControl, currentControl).map(_.value)
-    if (previousControlOpt.forall(pc => PlaceHolderInfo.placeHolderValueOpt(currentControl.staticControl, pc).map(_.value) != placeHolderValueOpt))
+  ): Unit =
+    for {
+      placeHolderInfo <- PlaceHolderInfo.placeHolderValueOpt(currentControl.staticControl, currentControl)
+      if previousControlOpt.forall(pc => ! PlaceHolderInfo.placeHolderValueOpt(currentControl.staticControl, pc).contains(placeHolderInfo))
+    } locally {
       element(
         "attribute",
         prefix = "xxf",
@@ -378,7 +380,7 @@ object ControlAjaxSupport {
           "name"  -> "placeholder",
           "for"   -> referencedControlEffectiveId,
         ),
-        text   = placeHolderValueOpt.getOrElse("")
+        text   = placeHolderInfo.value
       )
-  }
+    }
 }

@@ -290,6 +290,7 @@
         fr:year
         fr:number
         fr:color
+        fr:masked-input
         fr:handwritten-signature
         fr:timestamp
     </property>

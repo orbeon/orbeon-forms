@@ -27,37 +27,84 @@ object FRComponentParamSupport {
 
   import org.orbeon.scaxon.SimplePath.*
 
+  private def findStaticComponentFromBind(implicit xfc: XFormsFunction.Context): Option[ComponentControl] =
+    xfc.bindNodeOpt.flatMap { bindNode =>
+      val staticBind   = bindNode.parentBind.staticBind
+      val partAnalysis = xfc.container.partAnalysis
+
+      def byNameOpt: Option[ComponentControl] =
+        staticBind.nameOpt
+          .orElse(frc.controlNameFromIdOpt(staticBind.staticId))
+          .map(controlName => staticBind.scope.prefixedIdForStaticId(frc.controlId(controlName)))
+          .flatMap(partAnalysis.findControlAnalysis)
+          .collect { case c: ComponentControl => c }
+
+      def byBindOrRefOpt: Option[ComponentControl] =
+        partAnalysis.iterateControls.collectFirst {
+          case c: ComponentControl
+            if c.scope == staticBind.scope && (
+              c.bind.contains(staticBind.staticId) ||
+              (c.bind.isEmpty && c.ref.isDefined && c.ref == staticBind.ref)
+            ) => c
+        }
+
+      byNameOpt.orElse(byBindOrRefOpt)
+    }
+
   // Implementation of `fr:component-param-value()`
   def componentParamValue(
     paramName            : QName,
     sourceComponentIdOpt : Option[String],
     property             : String => Option[AtomicValue])(implicit
     xfc                  : XFormsFunction.Context
-  ): Option[AtomicValue] =
-    ComponentParamSupport.findSourceComponent(sourceComponentIdOpt) flatMap { sourceComponent =>
+  ): Option[AtomicValue] = {
 
-      val staticControl   = sourceComponent.staticControl
-      val concreteBinding = staticControl.bindingOrThrow
+    val sourceAndStaticOpt: Option[(Option[XFormsComponentControl], ComponentControl, PartAnalysisForStaticMetadataAndProperties)] =
+      if (sourceComponentIdOpt.isEmpty && xfc.bindNodeOpt.isDefined)
+        findStaticComponentFromBind.map(sc => (None, sc, xfc.container.partAnalysis))
+      else
+        ComponentParamSupport.findSourceComponent(sourceComponentIdOpt).map(c => (c.some, c.staticControl, c.container.partAnalysis))
+
+    sourceAndStaticOpt.flatMap { case (sourceComponentOpt, staticControl, partAnalysis) =>
+
+      val boundElementAtts: QName => Option[String] =
+        staticControl.bindingOpt.map(_.boundElementAtts.lift).getOrElse(staticControl.rootElem.attributeValueOpt)
 
       def fromAttributes: Option[AtomicValue] =
         ComponentParamSupport.fromElem(
-          atts        = concreteBinding.boundElementAtts.lift,
-          paramName   = paramName
+          atts      = boundElementAtts,
+          paramName = paramName
         )
 
       def fromMetadataAndProperties: Option[AtomicValue] =
         FRComponentParamSupport.fromMetadataAndProperties(
-          partAnalysis  = sourceComponent.container.partAnalysis,
+          partAnalysis  = partAnalysis,
           directNameOpt = staticControl.commonBinding.directName.orElse(staticControl.element.getQName.some), // https://github.com/orbeon/orbeon-forms/issues/6707
           paramName     = paramName,                                                                          // Ideally, we should know which selector picked the binding
           property      = property                                                                            // and use the element name from that.
         )
 
       fromAttributes orElse fromMetadataAndProperties flatMap {
-        case paramValue: StringValue => sourceComponent.evaluateAvt(paramValue.getStringValue, EventCollector.Throw).map(stringToStringValue)
-        case paramValue              => paramValue.some
+        case paramValue: StringValue =>
+          sourceComponentOpt match {
+            case Some(sourceComponent) =>
+              sourceComponent.evaluateAvt(paramValue.getStringValue, EventCollector.Throw).map(stringToStringValue)
+            case None =>
+              ControlXPathSupport.evaluateAvt(
+                attributeValue    = paramValue.getStringValue,
+                bindingContext    = xfc.bindingContext,
+                namespaceMappings = staticControl.namespaceMapping,
+                container         = xfc.container,
+                locationData      = staticControl.locationData,
+                eventTarget       = xfc.container.eventTarget,
+                collector         = EventCollector.Throw
+              ).map(stringToStringValue)
+          }
+        case paramValue =>
+          paramValue.some
       }
     }
+  }
 
   // Implementation of `fr:component-param-value-by-type()`
   // 2025-10-08:  undocumented, called from `fr:grid-multiple`.

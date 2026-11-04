@@ -89,6 +89,7 @@ object ImportExportSupport {
     QName("year",                FRNamespace),
     QName("dropdown-year",       FRNamespace),
     QName("dropdown-month-year", FRNamespace),
+    QName("masked-input", FRNamespace),
   )
 
   // TODO: components

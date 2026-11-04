@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.dom.QName
+import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xml.SaxSupport.*
 import org.orbeon.oxf.xml.XMLReceiverHelper
@@ -61,6 +62,16 @@ trait ControlExtensionAttributesSupport {
   def extensionAttributeValue(attributeName: QName): Option[String] =
     evaluatedExtensionAttributes.get(attributeName)
 
+  private def hasReferencingLhhaPlaceholder: Boolean =
+    referencingControl.exists { case (staticRc, _) =>
+      staticRc.hasLhhaPlaceholder(LHHA.Label) || staticRc.hasLhhaPlaceholder(LHHA.Hint)
+    }
+
+  private def shouldFilterAttribute(name: QName, namespaceURI: String): Boolean =
+    name.namespace.uri != namespaceURI ||
+      StandardAttributesToFilterOnHandler(name) ||
+      (name.namespace.uri.isEmpty && name.localName == "placeholder" && hasReferencingLhhaPlaceholder)
+
   // Add all non-null values to the given list of attributes, filtering by namespace URI
   // NOTE: The `class` attribute is excluded because handled separately.
   // NOTE: The `accept` attribute is also handled separately by the handler.
@@ -68,7 +79,7 @@ trait ControlExtensionAttributesSupport {
     for {
       (name, value) <- evaluatedExtensionAttributes
       if value ne null
-      if name.namespace.uri == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
+      if ! shouldFilterAttribute(name, namespaceURI)
       localName = name.localName
     } locally {
       attributesImpl.addOrReplace(localName, value)
@@ -81,7 +92,7 @@ trait ControlExtensionAttributesSupport {
   ): Unit =
     for {
       name <- staticControl.extensionAttributes.keys
-      if name.namespace.uri == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
+      if ! shouldFilterAttribute(name, namespaceURI)
     } locally {
       ControlAjaxSupport.outputAttributeElement(
         previousControlOpt = previousControlOpt,

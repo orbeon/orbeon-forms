@@ -50,6 +50,7 @@
         oxf:/xbl/orbeon/isin/isin.xbl
         oxf:/xbl/orbeon/iban/iban.xbl
         oxf:/xbl/orbeon/color/color.xbl
+        oxf:/xbl/orbeon/masked-input/masked-input.xbl
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.dateTime.uri.*.*">

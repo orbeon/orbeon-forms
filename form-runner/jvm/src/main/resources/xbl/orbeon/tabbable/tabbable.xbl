@@ -42,6 +42,14 @@
                     ORBEON.xforms.XBL.instanceForControl(this).selectTab(0);
                 </xf:action>
             </xbl:handler>
+            <xbl:handler event="fr-select-tab" phase="target">
+                <xf:action type="javascript">
+                    <xf:param name="tabIndex" value="(event('tab-index'), 0)[1]"/>
+                    <xf:body>
+                        ORBEON.xforms.XBL.instanceForControl(this).selectTab(parseInt(tabIndex));
+                    </xf:body>
+                </xf:action>
+            </xbl:handler>
         </xbl:handlers>
 
         <xbl:implementation>

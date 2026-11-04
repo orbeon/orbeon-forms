@@ -120,7 +120,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     )
   }
 
-  private def writeValidations(
+  def writeValidations(
     controlName: String,
     mip        : MipName.Validate,
     validations: List[Validation]

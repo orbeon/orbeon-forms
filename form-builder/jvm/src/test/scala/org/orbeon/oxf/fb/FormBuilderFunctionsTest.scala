@@ -1040,4 +1040,59 @@ class FormBuilderFunctionsTest
       assert(profiles == profiles.sorted)
     }
   }
+
+  describe("Control settings mini-toolbar operations (#6484)") {
+    it("must toggle required, MIPs, and summary-show with undo support") {
+      withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
+
+        implicit val formRunnerParams: FormRunnerParams =
+          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1.some, None, None, "new")
+
+        // Required mode: initially false
+        assert(FormBuilderXPathApi.readControlRequiredMode(Control1) == "false")
+
+        FormBuilderXPathApi.setControlRequired(Control1, required = true)
+        assert(FormBuilderXPathApi.readControlRequiredMode(Control1) == "true")
+        assert((findBindByName(Control1).get /@ "type").isEmpty)
+        assert(FormBuilderXPathApi.readValidationsAsXML(Control1).nonEmpty)
+
+        // Undo restores required = false
+        FormBuilderXPathApi.undoActionImpl()
+        assert(FormBuilderXPathApi.readControlRequiredMode(Control1) == "false")
+
+        // Builtin datatype requiredness sync (xf:decimal <-> xs:decimal)
+        FormBuilder.writeAndNormalizeMip(Some(Control1), org.orbeon.oxf.xforms.analysis.model.MipName.Type, "xf:decimal", iteration = false)
+        FormBuilderXPathApi.setControlRequired(Control1, required = true)
+        assert((findBindByName(Control1).get /@ "type").stringValue == "xs:decimal")
+        FormBuilderXPathApi.setControlRequired(Control1, required = false)
+        assert((findBindByName(Control1).get /@ "type").stringValue == "xf:decimal")
+
+        // Visibility and Read-Only MIPs from toolbar
+        assert(FormBuilderXPathApi.readDenormalizedCalculatedMip(Control1, "relevant") == "true()")
+        FormBuilderXPathApi.setControlCalculatedMipFromToolbar(Control1, "relevant", "false()")
+        assert(FormBuilderXPathApi.readDenormalizedCalculatedMip(Control1, "relevant") == "false()")
+        FormBuilderXPathApi.undoActionImpl()
+        assert(FormBuilderXPathApi.readDenormalizedCalculatedMip(Control1, "relevant") == "true()")
+
+        assert(FormBuilderXPathApi.readDenormalizedCalculatedMip(Control1, "readonly") == "false()")
+        FormBuilderXPathApi.setControlCalculatedMipFromToolbar(Control1, "readonly", "true()")
+        assert(FormBuilderXPathApi.readDenormalizedCalculatedMip(Control1, "readonly") == "true()")
+        FormBuilderXPathApi.undoActionImpl()
+        assert(FormBuilderXPathApi.readDenormalizedCalculatedMip(Control1, "readonly") == "false()")
+
+        // Summary show toggle
+        assert(!FormBuilderXPathApi.isControlSummaryShow(Control1))
+        FormBuilderXPathApi.setControlSummaryShow(Control1, enabled = true)
+        assert(FormBuilderXPathApi.isControlSummaryShow(Control1))
+
+        FormBuilderXPathApi.setControlSummaryShow(Control1, enabled = false)
+        assert(!FormBuilderXPathApi.isControlSummaryShow(Control1))
+        assert((findControlByName(Control1).get / "*:index").isEmpty)
+
+        // Appearances for toolbar
+        val appearances = FormBuilderXPathApi.possibleAppearancesForToolbarAsXML(Control1)
+        assert(appearances.exists(_.localname == "description"))
+      }
+    }
+  }
 }

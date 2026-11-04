@@ -1205,4 +1205,84 @@
         <_/>
     </xf:instance>
 
+    <!-- Control settings mini-toolbar (#6484) -->
+    <xf:instance id="fb-toolbar-instance">
+        <toolbar visible="true">
+            <tracked-state/>
+            <tracked-control-name/>
+            <control-name/>
+            <description/>
+            <appearances selection=""/>
+        </toolbar>
+    </xf:instance>
+    <xf:var name="toolbar" value="instance('fb-toolbar-instance')"/>
+    <xf:bind ref="$toolbar">
+        <xf:bind
+            ref="tracked-state"
+            calculate="
+                let $cell    := fbf:getCurrentlySelectedCell(),
+                    $control := $cell/*[1]
+                return
+                    if (exists($control/@id)) then
+                        string-join(
+                            (
+                                $cell/@id,
+                                $control/@id,
+                                name($control),
+                                $control/@appearance,
+                                $control/@mediatype,
+                                $fb-lang
+                            ),
+                            '|'
+                        )
+                    else
+                        string($cell/@id)"/>
+        <xf:bind
+            ref="tracked-control-name"
+            calculate="
+                let $c := fbf:getCurrentlySelectedCell()/*[1]/@id
+                return
+                    if (exists($c)) then frf:controlNameFromId($c) else ''"/>
+        <xf:bind
+            ref="control-name"
+            type="xs:NCName"
+            xxf:whitespace="trim"
+            readonly="$fr-mode = 'view' or $dialog-opened or ../tracked-control-name = ''"
+            constraint="
+                . = ../tracked-control-name or
+                not(
+                    ends-with(., '-iteration') or
+                    . = xxf:split(fbf:getAllNamesInUseAsString())
+                )"/>
+        <xf:bind
+            ref="appearances/@selection"
+            readonly="$fr-mode = 'view' or $dialog-opened or count(../appearance) le 1"/>
+    </xf:bind>
+
+    <xf:action event="fb-sync-toolbar">
+        <xf:var name="cname" value="$toolbar/tracked-control-name/string()"/>
+        <xf:setvalue ref="$toolbar/control-name" value="$cname"/>
+        <xf:delete ref="$toolbar/appearances/node()"/>
+        <xf:setvalue ref="$toolbar/description"/>
+        <xf:setvalue ref="$toolbar/appearances/@selection"/>
+        <xf:action if="$cname != ''">
+            <xf:var
+                name="desc-and-apps"
+                value="fbf:possibleAppearancesForToolbarAsXML($cname)"/>
+            <xf:setvalue
+                ref="$toolbar/description"
+                value="$desc-and-apps/self::description"/>
+            <xf:insert
+                context="$toolbar/appearances"
+                origin="$desc-and-apps/self::appearance"/>
+            <xf:setvalue
+                ref="$toolbar/appearances/@selection"
+                value="
+                    (
+                        $toolbar/appearances/appearance[@current = 'true'],
+                        $toolbar/appearances/appearance[1]
+                    )[1]/value"/>
+        </xf:action>
+    </xf:action>
+
 </xf:model>

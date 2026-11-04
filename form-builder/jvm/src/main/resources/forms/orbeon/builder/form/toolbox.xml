@@ -189,6 +189,21 @@
                     </xf:action>
                 </fr:trigger>
 
+                <fr:trigger
+                        appearance="minimal"
+                        ref="$toolbar/@visible"
+                        class="fb-toggle-toolbar-button{' active'[$toolbar/@visible = 'true']}"
+                        id="toggle-control-toolbar-trigger"
+                        name="toolbox.toggle-control-toolbar">
+                    <xf:label><xh:i class="fa fa-sliders fa-fw"/></xf:label>
+                    <xf:hint ref="$form-resources/control-settings-icon/label"/>
+                    <xf:action ev:event="DOMActivate">
+                        <xf:setvalue
+                            ref="$toolbar/@visible"
+                            value="if (. = 'true') then 'false' else 'true'"/>
+                    </xf:action>
+                </fr:trigger>
+
             </xh:div>
 
         </xh:div>

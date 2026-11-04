@@ -79,6 +79,12 @@
                             )
                         )
                     )[1]"/>
+            <xf:output id="fb-toolbar-tracked-state" model="fr-form-model" ref="$toolbar/tracked-state" class="xforms-hidden">
+                <xf:dispatch
+                    event="xforms-enabled xforms-value-changed"
+                    name="fb-sync-toolbar"
+                    targetid="fr-form-model"/>
+            </xf:output>
         </xh:div>
 
         <xh:div class="fb-navbar navbar navbar-fixed-top">
@@ -133,7 +139,363 @@
 
         <xi:include href="oxf:/forms/orbeon/builder/form/toolbox.xml" xxi:omit-xml-base="true"/>
 
-        <xh:div class="fb-main">
+        <!-- Control settings mini-toolbar (#6484) -->
+        <xf:group
+            id="fb-control-settings-toolbar"
+            model="fr-form-model"
+            class="fb-control-settings-toolbar{' fb-toolbar-hidden'[$toolbar/@visible != 'true']}">
+
+            <xf:var name="form-resources"    value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
+            <xf:var name="fr-resources"      value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')"/>
+
+            <xf:var name="current-cell"      value="fbf:getCurrentlySelectedCell()"/>
+            <xf:var name="in-section-tmpl"   value="exists($current-cell/ancestor::xbl:binding)"/>
+            <xf:var name="current-control"   value="if ($in-section-tmpl) then () else $current-cell/*[1]"/>
+            <xf:var name="has-control"       value="exists($current-control/@id)"/>
+            <xf:var name="control-id"        value="if ($has-control) then $current-control/@id/string() else ''"/>
+            <xf:var name="control-name"      value="if ($has-control) then frf:controlNameFromId($control-id) else ''"/>
+            <xf:var name="control-bind"      value="if ($has-control) then fbf:findBindByNameOrEmpty($control-name) else ()"/>
+            <xf:var name="has-bind"          value="exists($control-bind)"/>
+            <xf:var name="is-readonly"       value="$fr-mode = 'view' or $dialog-opened"/>
+
+            <xf:var name="enclosing-section" value="($current-cell/ancestor::fr:section)[last()]"/>
+            <xf:var name="enclosing-grid"    value="($current-cell/ancestor::fr:grid)[last()]"/>
+            <xf:var name="section-name"      value="if (exists($enclosing-section/@id)) then frf:controlNameFromId($enclosing-section/@id) else ''"/>
+            <xf:var name="section-label-raw" value="if ($section-name != '') then fbf:getControlLhhOrEmpty($section-name, 'label') else ''"/>
+            <xf:var name="section-label"     value="if (xxf:non-blank($section-label-raw)) then frf:removeHtmlTags($section-label-raw) else $section-name"/>
+            <xf:var name="is-repeat-grid"    value="exists($enclosing-grid/@id) and frf:isRepeat($enclosing-grid)"/>
+            <xf:var name="grid-name"         value="if ($is-repeat-grid) then frf:controlNameFromId($enclosing-grid/@id) else ''"/>
+
+            <!-- Enclosing Section / Repeated Grid context -->
+            <xh:div class="fb-toolbar-group fb-toolbar-group-container">
+                <xf:trigger
+                    ref=".[exists($enclosing-section/@id)]"
+                    appearance="minimal"
+                    class="fb-toolbar-pill fb-toolbar-container-pill">
+                    <xf:label>
+                        <xh:i class="fa fa-columns fa-fw"/>
+                        <xf:output value="$section-label" class="fb-toolbar-section-label"/>
+                        <xh:i class="fa fa-cog fa-fw fb-toolbar-subtle-icon"/>
+                    </xf:label>
+                    <xf:hint value="concat($form-resources/section-details-icon/label, ': ', $section-name)"/>
+                    <xf:dispatch event="DOMActivate" name="fb-show-dialog" targetid="dialog-container-settings">
+                        <xf:property name="container" value="$enclosing-section"/>
+                    </xf:dispatch>
+                </xf:trigger>
+                <xf:trigger
+                    ref=".[$is-repeat-grid]"
+                    appearance="minimal"
+                    class="fb-toolbar-pill fb-toolbar-container-pill">
+                    <xf:label>
+                        <xh:i class="fa fa-repeat fa-fw"/>
+                        <xf:output value="$grid-name" class="fb-toolbar-grid-label"/>
+                        <xh:i class="fa fa-cog fa-fw fb-toolbar-subtle-icon"/>
+                    </xf:label>
+                    <xf:hint value="concat($form-resources/section-details-icon/label, ': ', $grid-name)"/>
+                    <xf:dispatch event="DOMActivate" name="fb-show-dialog" targetid="dialog-container-settings">
+                        <xf:property name="container" value="$enclosing-grid"/>
+                    </xf:dispatch>
+                </xf:trigger>
+            </xh:div>
+
+            <!-- Empty cell fallback -->
+            <xf:group ref=".[not($has-control)]" class="fb-toolbar-empty-cell">
+                <xh:span class="fb-toolbar-empty-message">
+                    <xh:i class="fa fa-mouse-pointer fa-fw"/>
+                    <xf:output value="$form-resources/controls/label"/>
+                </xh:span>
+            </xf:group>
+
+            <!-- Selected Control Settings -->
+            <xf:group ref=".[$has-control]" class="fb-toolbar-control-groups">
+                <xf:var name="raw-label"      value="fbf:getControlLhhOrEmpty($control-name, 'label')"/>
+                <xf:var name="stripped-label" value="if (xxf:non-blank($raw-label)) then (if (fbf:isControlLhhatHtmlMediatype($control-name, 'label')) then frf:removeHtmlTags($raw-label) else $raw-label) else ''"/>
+                <xf:var name="suggestion"     value="if (matches($control-name, '^control-[\d]+$') and xxf:non-blank($stripped-label)) then fbf:controlNameSuggestionFromLabel($control-name, '', $stripped-label) else ()"/>
+
+                <xf:var name="req-mode"       value="if ($has-bind) then fbf:readControlRequiredMode($control-name) else 'false'"/>
+                <xf:var name="rel-val"        value="if ($has-bind) then fbf:readDenormalizedCalculatedMip($control-name, 'relevant') else 'true()'"/>
+                <xf:var name="rel-mode"       value="if ($rel-val = 'true()') then 'true' else if ($rel-val = 'false()') then 'false' else 'formula'"/>
+                <xf:var name="ro-val"         value="if ($has-bind) then fbf:readDenormalizedCalculatedMip($control-name, 'readonly') else 'false()'"/>
+                <xf:var name="ro-mode"        value="if ($ro-val = 'false()') then 'false' else if ($ro-val = 'true()') then 'true' else 'formula'"/>
+                <xf:var name="calc-val"       value="if ($has-bind) then fbf:readDenormalizedCalculatedMip($control-name, 'calculate') else ''"/>
+                <xf:var name="def-val"        value="if ($has-bind) then fbf:readDenormalizedCalculatedMip($control-name, 'default') else ''"/>
+                <xf:var name="is-summary"     value="fbf:isControlSummaryShow($control-name)"/>
+                <xf:var name="has-choices"    value="fbf:hasEditor($current-control, 'static-itemset')"/>
+
+                <xf:var
+                    name="constraint-count"
+                    value="
+                        if ($has-bind) then
+                            count($control-bind/@fb:constraint | $control-bind/fb:constraint) +
+                            (if (exists($control-bind/@type[not(. = ('xf:string', 'xs:string'))] | $control-bind/xf:type[not(. = ('xf:string', 'xs:string'))])) then 1 else 0)
+                        else
+                            0"/>
+                <xf:var
+                    name="formula-count"
+                    value="
+                        (if (xxf:non-blank($calc-val)) then 1 else 0) +
+                        (if (xxf:non-blank($def-val))  then 1 else 0) +
+                        (if ($rel-mode = 'formula')    then 1 else 0) +
+                        (if ($ro-mode  = 'formula')    then 1 else 0)"/>
+
+                <!-- Group 1: Control Name, Suggestion, and Appearance -->
+                <xh:div class="fb-toolbar-group fb-toolbar-group-identity">
+                    <xf:input
+                        id="fb-toolbar-control-name-input"
+                        ref="$toolbar/control-name"
+                        class="fb-toolbar-name-input">
+                        <xf:label ref="$form-resources/dialog-control-settings/control-name/label"/>
+                        <xf:alert ref="$form-resources/dialog-control-settings/control-name/alert"/>
+                        <xf:action
+                            event="xforms-value-changed DOMActivate"
+                            if="xxf:valid($toolbar/control-name) and $toolbar/control-name != $control-name and $control-name != ''"
+                            type="xpath">
+                            fbf:renameControlIfNeeded($control-name, $toolbar/control-name, true())
+                        </xf:action>
+                    </xf:input>
+
+                    <xf:trigger
+                        ref=".[not($is-readonly) and exists($suggestion) and $suggestion != $control-name]"
+                        appearance="minimal"
+                        class="fb-toolbar-pill fb-toolbar-suggestion-pill">
+                        <xf:label>
+                            <xh:i class="fa fa-magic fa-fw"/>
+                            <xf:output value="$suggestion"/>
+                        </xf:label>
+                        <xf:hint value="frf:removeHtmlTags(xxf:format-message(xxf:r('suggestion.label', '|fr-form-resources|'), $suggestion))"/>
+                        <xf:action event="DOMActivate">
+                            <xf:action type="xpath">
+                                fbf:renameControlIfNeeded($control-name, $suggestion, true())
+                            </xf:action>
+                            <xf:setvalue ref="$toolbar/control-name" value="$suggestion"/>
+                        </xf:action>
+                    </xf:trigger>
+
+                    <xf:select1
+                        ref="$toolbar/appearances[count(appearance) gt 1]/@selection"
+                        appearance="minimal"
+                        class="fb-toolbar-appearance-select">
+                        <xf:label ref="$form-resources/dialog-control-settings/control-appearance/label"/>
+                        <xf:itemset ref="../appearance">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                        </xf:itemset>
+                        <xf:action
+                            event="xforms-value-changed"
+                            if="$control-name != ''"
+                            type="xpath">
+                            fbf:setControlAppearanceFromToolbar($control-name, $toolbar/appearances/@selection)
+                        </xf:action>
+                    </xf:select1>
+
+                    <xf:output
+                        ref="$toolbar/description[count(../appearances/appearance) le 1 and xxf:non-blank()]"
+                        class="fb-toolbar-type-badge"/>
+                </xh:div>
+
+                <!-- Group 2: Essential MIPs & Summary -->
+                <xf:group ref=".[$has-bind]" class="fb-toolbar-group fb-toolbar-group-mips">
+                    <!-- Required: No | Yes | fx -->
+                    <xh:div class="fb-toolbar-segmented-item" title="{$form-resources/dialog-control-settings/required/label}">
+                        <xh:span class="fb-toolbar-item-label">
+                            <xh:span class="fb-toolbar-req-star">*</xh:span>
+                            <xf:output value="$form-resources/dialog-control-settings/required/label"/>
+                        </xh:span>
+                        <xh:div class="btn-group fb-toolbar-segmented">
+                            <xf:trigger
+                                appearance="minimal"
+                                class="fb-toolbar-seg-btn{' active'[$req-mode = 'false']}">
+                                <xf:label ref="$fr-resources/components/labels/no"/>
+                                <xf:action event="DOMActivate" if="not($is-readonly)" type="xpath">
+                                    fbf:setControlRequired($control-name, false())
+                                </xf:action>
+                            </xf:trigger>
+                            <xf:trigger
+                                appearance="minimal"
+                                class="fb-toolbar-seg-btn{' active'[$req-mode = 'true']}">
+                                <xf:label ref="$fr-resources/components/labels/yes"/>
+                                <xf:action event="DOMActivate" if="not($is-readonly)" type="xpath">
+                                    fbf:setControlRequired($control-name, true())
+                                </xf:action>
+                            </xf:trigger>
+                            <xf:trigger
+                                appearance="minimal"
+                                class="fb-toolbar-seg-btn fb-toolbar-fx-btn{' active'[$req-mode = 'formula']}">
+                                <xf:label>fx</xf:label>
+                                <xf:hint ref="$form-resources/dialog-control-settings/required/label"/>
+                                <xf:dispatch event="DOMActivate" name="fb-show-dialog" targetid="dialog-control-settings">
+                                    <xf:property name="control-id"    value="$control-id"/>
+                                    <xf:property name="initial-tab"   value="0"/>
+                                    <xf:property name="focus-formula" value="'required'"/>
+                                </xf:dispatch>
+                            </xf:trigger>
+                        </xh:div>
+                    </xh:div>
+
+                    <!-- Visibility: Yes | No | fx -->
+                    <xh:div class="fb-toolbar-segmented-item" title="{$form-resources/dialog-control-settings/visibility/label}">
+                        <xh:span class="fb-toolbar-item-label">
+                            <xh:i class="fa fa-eye fa-fw"/>
+                        </xh:span>
+                        <xh:div class="btn-group fb-toolbar-segmented">
+                            <xf:trigger
+                                appearance="minimal"
+                                class="fb-toolbar-seg-btn{' active'[$rel-mode = 'true']}">
+                                <xf:label ref="$fr-resources/components/labels/yes"/>
+                                <xf:hint  ref="$form-resources/dialog-control-settings/visibility/label"/>
+                                <xf:action event="DOMActivate" if="not($is-readonly)" type="xpath">
+                                    fbf:setControlCalculatedMipFromToolbar($control-name, 'relevant', 'true()')
+                                </xf:action>
+                            </xf:trigger>
+                            <xf:trigger
+                                appearance="minimal"
+                                class="fb-toolbar-seg-btn{' active'[$rel-mode = 'false']}">
+                                <xf:label ref="$fr-resources/components/labels/no"/>
+                                <xf:hint  ref="$form-resources/dialog-control-settings/visibility/label"/>
+                                <xf:action event="DOMActivate" if="not($is-readonly)" type="xpath">
+                                    fbf:setControlCalculatedMipFromToolbar($control-name, 'relevant', 'false()')
+                                </xf:action>
+                            </xf:trigger>
+                            <xf:trigger
+                                appearance="minimal"
+                                class="fb-toolbar-seg-btn fb-toolbar-fx-btn{' active'[$rel-mode = 'formula']}">
+                                <xf:label>fx</xf:label>
+                                <xf:hint value="if ($rel-mode = 'formula') then concat($form-resources/dialog-control-settings/visibility/label, ': ', $rel-val) else $form-resources/dialog-control-settings/visibility/label"/>
+                                <xf:dispatch event="DOMActivate" name="fb-show-dialog" targetid="dialog-control-settings">
+                                    <xf:property name="control-id"    value="$control-id"/>
+                                    <xf:property name="initial-tab"   value="2"/>
+                                    <xf:property name="focus-formula" value="'relevant'"/>
+                                </xf:dispatch>
+                            </xf:trigger>
+                        </xh:div>
+                    </xh:div>
+
+                    <!-- Read-Only: No | Yes | fx -->
+                    <xh:div class="fb-toolbar-segmented-item" title="{$form-resources/dialog-control-settings/readonly/label}">
+                        <xh:span class="fb-toolbar-item-label">
+                            <xh:i class="fa fa-lock fa-fw"/>
+                        </xh:span>
+                        <xh:div class="btn-group fb-toolbar-segmented">
+                            <xf:trigger
+                                appearance="minimal"
+                                class="fb-toolbar-seg-btn{' active'[$ro-mode = 'false']}">
+                                <xf:label ref="$fr-resources/components/labels/no"/>
+                                <xf:hint  ref="$form-resources/dialog-control-settings/readonly/label"/>
+                                <xf:action event="DOMActivate" if="not($is-readonly)" type="xpath">
+                                    fbf:setControlCalculatedMipFromToolbar($control-name, 'readonly', 'false()')
+                                </xf:action>
+                            </xf:trigger>
+                            <xf:trigger
+                                appearance="minimal"
+                                class="fb-toolbar-seg-btn{' active'[$ro-mode = 'true']}">
+                                <xf:label ref="$fr-resources/components/labels/yes"/>
+                                <xf:hint  ref="$form-resources/dialog-control-settings/readonly/label"/>
+                                <xf:action event="DOMActivate" if="not($is-readonly)" type="xpath">
+                                    fbf:setControlCalculatedMipFromToolbar($control-name, 'readonly', 'true()')
+                                </xf:action>
+                            </xf:trigger>
+                            <xf:trigger
+                                appearance="minimal"
+                                class="fb-toolbar-seg-btn fb-toolbar-fx-btn{' active'[$ro-mode = 'formula']}">
+                                <xf:label>fx</xf:label>
+                                <xf:hint value="if ($ro-mode = 'formula') then concat($form-resources/dialog-control-settings/readonly/label, ': ', $ro-val) else $form-resources/dialog-control-settings/readonly/label"/>
+                                <xf:dispatch event="DOMActivate" name="fb-show-dialog" targetid="dialog-control-settings">
+                                    <xf:property name="control-id"    value="$control-id"/>
+                                    <xf:property name="initial-tab"   value="2"/>
+                                    <xf:property name="focus-formula" value="'readonly'"/>
+                                </xf:dispatch>
+                            </xf:trigger>
+                        </xh:div>
+                    </xh:div>
+
+                    <!-- Show on Summary page toggle -->
+                    <xf:trigger
+                        appearance="minimal"
+                        class="fb-toolbar-pill fb-toolbar-toggle-pill{' active'[$is-summary]}">
+                        <xf:label>
+                            <xh:i class="fa fa-table fa-fw"/>
+                            <xh:span>Summary</xh:span>
+                        </xf:label>
+                        <xf:hint ref="$form-resources/dialog-control-settings/options/item[value = 'fr-summary-show']/label"/>
+                        <xf:action event="DOMActivate" if="not($is-readonly)" type="xpath">
+                            fbf:setControlSummaryShow($control-name, not($is-summary))
+                        </xf:action>
+                    </xf:trigger>
+                </xf:group>
+
+                <!-- Group 3: Deep-link Badges & Dialog Launchers -->
+                <xh:div class="fb-toolbar-group fb-toolbar-group-actions">
+                    <xf:trigger
+                        ref=".[$has-choices]"
+                        appearance="minimal"
+                        class="fb-toolbar-pill fb-toolbar-action-pill">
+                        <xf:label>
+                            <xh:i class="fa fa-th-list fa-fw"/>
+                            <xf:output value="$form-resources/edit-items/label"/>
+                        </xf:label>
+                        <xf:hint value="concat($form-resources/edit-items/label, ' (⌥↵)')"/>
+                        <xf:dispatch event="DOMActivate" name="fb-show-dialog" targetid="dialog-itemsets">
+                            <xf:property name="control-element"      value="$current-control"/>
+                            <xf:property name="control-effective-id" value="fbf:buildFormBuilderControlEffectiveIdOrEmpty($control-id)"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+
+                    <xf:trigger
+                        appearance="minimal"
+                        class="fb-toolbar-pill fb-toolbar-action-pill{' fb-toolbar-badge-active'[$constraint-count gt 0]}">
+                        <xf:label>
+                            <xh:i class="fa fa-check-circle fa-fw"/>
+                            <xf:output
+                                value="
+                                    if ($constraint-count gt 0) then
+                                        concat($form-resources/dialog-control-settings/tab-validations/label, ' (', $constraint-count, ')')
+                                    else
+                                        $form-resources/dialog-control-settings/tab-validations/label"/>
+                        </xf:label>
+                        <xf:hint ref="$form-resources/dialog-control-settings/tab-validations/label"/>
+                        <xf:dispatch event="DOMActivate" name="fb-show-dialog" targetid="dialog-control-settings">
+                            <xf:property name="control-id"  value="$control-id"/>
+                            <xf:property name="initial-tab" value="1"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+
+                    <xf:trigger
+                        appearance="minimal"
+                        class="fb-toolbar-pill fb-toolbar-action-pill{' fb-toolbar-badge-active'[$formula-count gt 0]}">
+                        <xf:label>
+                            <xh:span class="fb-toolbar-fx-icon">fx</xh:span>
+                            <xf:output
+                                value="
+                                    if ($formula-count gt 0) then
+                                        concat($form-resources/dialog-control-settings/tab-formulas/label, ' (', $formula-count, ')')
+                                    else
+                                        $form-resources/dialog-control-settings/tab-formulas/label"/>
+                        </xf:label>
+                        <xf:hint ref="$form-resources/dialog-control-settings/tab-formulas/label"/>
+                        <xf:dispatch event="DOMActivate" name="fb-show-dialog" targetid="dialog-control-settings">
+                            <xf:property name="control-id"    value="$control-id"/>
+                            <xf:property name="initial-tab"   value="2"/>
+                            <xf:property name="focus-formula" value="'calculate'"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+
+                    <xf:trigger
+                        appearance="minimal"
+                        class="fb-toolbar-pill fb-toolbar-action-pill fb-toolbar-settings-pill">
+                        <xf:label>
+                            <xh:i class="fa fa-cogs fa-fw"/>
+                        </xf:label>
+                        <xf:hint value="concat($form-resources/control-settings-icon/label, ' (⇧↵)')"/>
+                        <xf:dispatch event="DOMActivate" name="fb-show-dialog" targetid="dialog-control-settings">
+                            <xf:property name="control-id"  value="$control-id"/>
+                            <xf:property name="initial-tab" value="0"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                </xh:div>
+            </xf:group>
+        </xf:group>
+
+        <xh:div class="fb-main{' fb-has-control-toolbar'[xxf:instance('fb-toolbar-instance')/@visible = 'true']}">
 
             <!-- Lease message -->
             <fr:lease fr-resources-ref="$fr-resources"/>
@@ -1057,6 +1419,10 @@
                                 )"/>
                     </xf:action>
                 </xf:action>
+                <xf:dispatch
+                    event="fb-dialog-control-settings-closed"
+                    name="fb-sync-toolbar"
+                    targetid="fr-form-model"/>
             </fb:dialog-control-settings>
 
             <fb:dialog-container-settings id="dialog-container-settings" ref="$form"      resources-ref="$form-resources"/>

@@ -1417,6 +1417,127 @@ object FormBuilderXPathApi {
     ).noSpaces
   }
 
+  //@XPathFunction
+  def readControlRequiredMode(controlName: String): String = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    FormBuilder.RequiredValidation.fromForm(controlName).required match {
+      case Left(true)  => "true"
+      case Left(false) =>
+        FormBuilder.DatatypeValidation.fromForm(controlName).datatype match {
+          case Left((_, true)) => "true"
+          case _               => "false"
+        }
+      case Right(_)    => "formula"
+    }
+  }
+
+  //@XPathFunction
+  def setControlRequired(controlName: String, required: Boolean): Unit = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    if (readControlRequiredMode(controlName) != required.toString) {
+      saveControlToUndoStack(controlName, controlName)
+      val existingReq = FormBuilder.RequiredValidation.fromForm(controlName)
+      val updatedReq  = existingReq.copy(required = Left(required))
+      FormBuilder.writeValidations(controlName, MipName.Required, List(updatedReq))
+      val existingDt  = FormBuilder.DatatypeValidation.fromForm(controlName)
+      existingDt.datatype match {
+        case Left((qName, oldReq)) if oldReq != required =>
+          val updatedDatatype =
+            FormBuilder.DatatypeValidation.datatypeQNameFromStrings(
+              controlName    = controlName,
+              builtinTypeOpt = Some(qName.localName -> required),
+              schemaTypeOpt  = None
+            )
+          FormBuilder.writeValidations(controlName, MipName.Type, List(existingDt.copy(datatype = updatedDatatype)))
+        case _ =>
+      }
+    }
+  }
+
+  //@XPathFunction
+  def setControlCalculatedMipFromToolbar(controlName: String, mipName: String, mipValue: String): Unit =
+    if (readDenormalizedCalculatedMip(controlName, mipName) != mipValue) {
+      saveControlToUndoStack(controlName, controlName)
+      writeAndNormalizeCalculatedMip(controlName, mipName, mipValue)
+    }
+
+  //@XPathFunction
+  def isControlSummaryShow(controlName: String): Boolean = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    FormRunner.findControlByName(controlName).exists { controlElem =>
+      (controlElem / "*:index" / "*:summary-show").headOption.exists { summaryShow =>
+        ! (summaryShow.attValueOpt("column").contains("false") && summaryShow.attValueOpt("search").contains("false"))
+      }
+    }
+  }
+
+  //@XPathFunction
+  def setControlSummaryShow(controlName: String, enabled: Boolean): Unit = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    if (isControlSummaryShow(controlName) != enabled) {
+      FormRunner.findControlByName(controlName).foreach { controlElem =>
+        saveControlToUndoStack(controlName, controlName)
+        if (enabled) {
+          val indexElem =
+            (controlElem / "*:index").headOption.getOrElse {
+              insert(into = controlElem, origin = <fr:index xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>: NodeInfo).head
+            }
+          delete(indexElem / "*:summary-show")
+          insert(into = indexElem, origin = <fr:summary-show xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>: NodeInfo)
+          FormRunner.findBindByName(controlName).foreach { bindElem =>
+            delete(bindElem /@ "*:persist")
+          }
+        } else {
+          (controlElem / "*:index").headOption.foreach { indexElem =>
+            delete(indexElem / "*:summary-show")
+            if ((indexElem / *).isEmpty)
+              delete(indexElem)
+          }
+        }
+      }
+    }
+  }
+
+  //@XPathFunction
+  def possibleAppearancesForToolbarAsXML(controlName: String): Array[NodeInfo] = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    (
+      for {
+        controlElem <- FormRunner.findControlByName(controlName).toList
+        _           <- FormRunner.findBindByName(controlName).toList
+        dt          = FormBuilder.DatatypeValidation.fromForm(controlName)
+        datatypeStr = dt.datatype.fold(_._1.localName, _.qualifiedName)
+        elem        <- FormBuilder.possibleAppearancesByControlNameAsXML(
+          controlName        = controlName,
+          isInitialLoad      = true,
+          newDatatypeOrEmpty = datatypeStr,
+          desiredAppearance  = ""
+        )
+        if elem.localname == "description" ||
+           (elem.localname == "appearance" && (elem.attValue("deprecated") != "true" || elem.attValue("current") == "true"))
+      } yield elem
+    ).toArray
+  }
+
+  //@XPathFunction
+  def setControlAppearanceFromToolbar(controlName: String, newAppearance: String): Unit = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    if (FormRunner.findBindByName(controlName).isDefined) {
+      val currentAppearances = possibleAppearancesForToolbarAsXML(controlName)
+      val currentAppearance  =
+        currentAppearances
+          .find(e => e.localname == "appearance" && e.attValue("current") == "true")
+          .orElse(currentAppearances.find(_.localname == "appearance"))
+          .map(_.elemValue("value"))
+          .getOrElse("")
+      if (currentAppearance != newAppearance) {
+        saveControlToUndoStack(controlName, controlName)
+        val dt = FormBuilder.DatatypeValidation.fromForm(controlName)
+        dt.renameControlIfNeeded(controlName, newAppearance.trimAllToOpt)
+      }
+    }
+  }
+
   private def processUndoRedoAction(
     undoAction      : UndoAction)(implicit
     ctx             : FormBuilderDocContext,

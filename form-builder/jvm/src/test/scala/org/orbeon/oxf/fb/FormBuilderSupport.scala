@@ -155,6 +155,7 @@ trait FormBuilderSupport extends XFormsSupport {
           </xf:model>
           <xf:model id="fr-resources-model">
             <xf:var name="fr-form-resources" value="xxf:instance('fr-form-resources')/resource[@xml:lang = 'en']"/>
+            <xf:var name="lang"              value="$fr-form-resources/@xml:lang"/>
           </xf:model>
           <xf:model id="fr-persistence-model">
             <xf:instance id="fr-persistence-instance">

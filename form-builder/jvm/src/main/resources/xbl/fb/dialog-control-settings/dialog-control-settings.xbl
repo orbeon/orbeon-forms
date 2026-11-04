@@ -231,6 +231,21 @@
                 <xf:setvalue ref="$i/default"    value="fbf:readDenormalizedCalculatedMip($i/control-name, 'default')"/>
                 <xf:setvalue ref="$i/whitespace" value="fbf:readDenormalizedCalculatedMip($i/control-name, 'whitespace')"/>
 
+                <!-- If opening directly via a toolbar `fx` button, switch boolean MIPs to formula mode so the textarea is visible -->
+                <xf:var name="focus-formula" value="event('focus-formula')"/>
+                <xf:setvalue
+                    if="$focus-formula = 'required' and $validations/validation[@type = 'required']/required = ('true()', 'false()')"
+                    ref="$validations/validation[@type = 'required']/required"
+                    value="''"/>
+                <xf:setvalue
+                    if="$focus-formula = 'relevant' and $i/relevant = ('true()', 'false()')"
+                    ref="$i/relevant"
+                    value="''"/>
+                <xf:setvalue
+                    if="$focus-formula = 'readonly' and $i/readonly = ('true()', 'false()')"
+                    ref="$i/readonly"
+                    value="''"/>
+
                 <!-- Read Label/Hint/Help -->
                 <xf:action iterate="$i/(label, hint, help, text)[@supported = 'true']">
                     <xf:var name="lhh" value="local-name()"/>
@@ -278,10 +293,23 @@
 
 
                 <xf:action if="not(event('is-prev-or-next'))">
+                    <xf:setvalue ref="$i/initial-tab" value="(event('initial-tab'), 0)[1]"/>
                     <xxf:show dialog="dialog"/>
                     <xf:action type="javascript">
                         ORBEON.xforms.XBL.instanceForControl(this).dialogOpening();
                     </xf:action>
+                    <xf:dispatch
+                        if="$i/initial-tab != '' and $i/initial-tab != '0'"
+                        name="fr-select-tab"
+                        targetid="fb-tabbable">
+                        <xf:property name="tab-index" value="$i/initial-tab"/>
+                    </xf:dispatch>
+                    <xf:dispatch if="$focus-formula = 'required'"  name="fb-focus-formula" targetid="fb-required-control"/>
+                    <xf:dispatch if="$focus-formula = 'relevant'"  name="fb-focus-formula" targetid="fb-relevant-control"/>
+                    <xf:dispatch if="$focus-formula = 'readonly'"  name="fb-focus-formula" targetid="fb-readonly-control"/>
+                    <xf:setfocus if="$focus-formula = 'calculate'" control="fb-calculate-control"/>
+                    <xf:setfocus if="empty($focus-formula) and $i/initial-tab = '1'" control="validations-tab"/>
+                    <xf:setfocus if="empty($focus-formula) and $i/initial-tab = '2'" control="fb-calculate-control"/>
                 </xf:action>
 
                 <!-- Tell custom settings to initialize -->
@@ -700,8 +728,11 @@
                     <xf:property name="fb-save" value="false()"/>
                 </xxf:hide>
             </xbl:handler>
-            <xbl:handler event="xxforms-dialog-close" observer="dialog" type="javascript">
-                ORBEON.xforms.XBL.instanceForControl(this).dialogClosing();
+            <xbl:handler event="xxforms-dialog-close" observer="dialog">
+                <xf:action type="javascript">
+                    ORBEON.xforms.XBL.instanceForControl(this).dialogClosing();
+                </xf:action>
+                <xf:dispatch name="fb-dialog-control-settings-closed" targetid="fb-dialog-control-settings"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -871,6 +902,7 @@
 
                         <prev-control-id/>
                         <next-control-id/>
+                        <initial-tab/>
                         <save-button/>
                     </_>
                 </xf:instance>
@@ -933,7 +965,7 @@
                 <xf:instance id="autocomplete-values" src="oxf:/xbl/fb/dialog-control-settings/autocomplete-values.xml" xxf:readonly="true" xxf:cache="true"/>
 
                 <xf:bind
-                    ref="$i//* except (prev-control-id, next-control-id)"
+                    ref="$i//* except (prev-control-id, next-control-id, initial-tab)"
                     readonly="fr:is-readonly-mode()"/>
 
                 <xf:bind
@@ -1334,7 +1366,7 @@
                                 name="suggestion"
                                 value="
                                     if ((matches($i/control-name, '^control-[\d]+$') or xxf:is-blank($i/control-name)) and exists($stripped-label-opt)) then
-                                        fbf:controlNameSuggestionFromLabel(i/control-name, $xpath-completion-updates, $stripped-label-opt)
+                                        fbf:controlNameSuggestionFromLabel($i/control-name, $xpath-completion-updates, $stripped-label-opt)
                                     else
                                         ()"/>
                             <xh:div class="fb-base-tab-div">
@@ -1373,6 +1405,7 @@
                                         <xh:tr>
                                             <xh:td>
                                                 <fb:boolean-or-formula
+                                                    id="fb-required-control"
                                                     ref="$i/validations/validation[@type = 'required']/required"
                                                     xpath-completion-updates="{{$xpath-completion-updates}}">
                                                     <xf:label ref="$resources/dialog-control-settings/required/label"/>
@@ -1764,7 +1797,7 @@
                             <fr:grid>
                                 <xh:tr>
                                     <xh:td>
-                                        <xf:textarea ref="calculate" appearance="xpath-completion" xpath-completion-updates="{{$xpath-completion-updates}}">
+                                        <xf:textarea id="fb-calculate-control" ref="calculate" appearance="xpath-completion" xpath-completion-updates="{{$xpath-completion-updates}}">
                                             <xf:label ref="$resources/dialog-control-settings/calculate/label"/>
                                             <xf:alert ref="$resources/dialog-control-settings/calculate/alert"/>
                                             <xf:hint  ref="$resources/dialog-control-settings/calculate/hint"/>
@@ -1772,7 +1805,7 @@
                                         </xf:textarea>
                                     </xh:td>
                                     <xh:td>
-                                        <xf:textarea ref="default" appearance="xpath-completion" xpath-completion-updates="{{$xpath-completion-updates}}">
+                                        <xf:textarea id="fb-default-control" ref="default" appearance="xpath-completion" xpath-completion-updates="{{$xpath-completion-updates}}">
                                             <xf:label ref="$resources/dialog-control-settings/default/label"/>
                                             <xf:alert ref="$resources/dialog-control-settings/default/alert"/>
                                             <xf:hint  ref="$resources/dialog-control-settings/default/hint"/>
@@ -1782,14 +1815,14 @@
                                 </xh:tr>
                                 <xh:tr>
                                     <xh:td>
-                                        <fb:boolean-or-formula ref="relevant" xpath-completion-updates="{{$xpath-completion-updates}}">
+                                        <fb:boolean-or-formula id="fb-relevant-control" ref="relevant" xpath-completion-updates="{{$xpath-completion-updates}}">
                                             <xf:label ref="$resources/dialog-control-settings/visibility/label"/>
                                             <xf:hint  ref="$resources/dialog-control-settings/visibility/hint"/>
                                             <xf:help  ref="$resources/dialog-control-settings/visibility/help" mediatype="text/html"/>
                                         </fb:boolean-or-formula>
                                     </xh:td>
                                     <xh:td>
-                                        <fb:boolean-or-formula ref="readonly" xpath-completion-updates="{{$xpath-completion-updates}}">
+                                        <fb:boolean-or-formula id="fb-readonly-control" ref="readonly" xpath-completion-updates="{{$xpath-completion-updates}}">
                                             <xf:label ref="$resources/dialog-control-settings/readonly/label"/>
                                             <xf:hint  ref="$resources/dialog-control-settings/readonly/hint"/>
                                             <xf:help  ref="$resources/dialog-control-settings/readonly/help" mediatype="text/html"/>

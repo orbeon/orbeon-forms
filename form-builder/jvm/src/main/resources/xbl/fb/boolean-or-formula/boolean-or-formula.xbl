@@ -39,6 +39,9 @@
                     <xf:property name="xxf:value" value="xxf:binding('fb-boolean-or-formula')/string()"/>
                 </xf:dispatch>
             </xbl:handler>
+            <xbl:handler event="fb-focus-formula" phase="target">
+                <xf:setfocus control="xpath-textarea"/>
+            </xbl:handler>
         </xbl:handlers>
 
         <xbl:template>

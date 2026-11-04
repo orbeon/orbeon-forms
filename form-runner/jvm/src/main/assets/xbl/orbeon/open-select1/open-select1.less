@@ -20,9 +20,14 @@
                 width: 100%;
                 display: flex;
                 column-gap: 1em;
-                .xforms-select1 { flex-grow: 0; }
+                .xforms-select1 { flex: 0 1 auto; }
                 .xforms-select1:has(~ .xforms-input.xforms-disabled) { flex-grow: 1; } // allow the input to grow when the input field is disabled (view mode)
-                .xforms-input   { flex-grow: 1; }
+                // #7943: by default, the field next to the dropdown takes all the available width, so the dropdown becomes
+                // too narrow and its items are cut; with a 7em basis, the dropdown only becomes narrower once the field is 7em wide
+                .xforms-select1 ~ * {
+                    flex: 1 1 7em;
+                    min-width: 7em;
+                }
             }
         }
 

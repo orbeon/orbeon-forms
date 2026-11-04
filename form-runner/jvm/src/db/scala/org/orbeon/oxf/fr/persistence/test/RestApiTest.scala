@@ -820,6 +820,63 @@ class RestApiTest
         provider = "s3"
       )
     }
+
+    it("must keep non-draft document indexed when deleting draft (#8034)") {
+      withTestSafeRequestContext { implicit safeRequestCtx =>
+        Connect.withOrbeonTables("draft deletion index (#8034)") { (connection, provider) =>
+
+          val version  = Specific(1)
+          val testForm = TestForm(
+            provider = provider,
+            controls = Seq(TestForm.Control("control-1")),
+            formName = "draft-delete-8034"
+          )
+
+          testForm.putFormDefinition(version)
+
+          val docId    = "123"
+          val baseURL  = HttpCall.crudURLPrefix(testForm.appForm)
+          val dataURL  = baseURL + s"data/$docId/data.xml"
+          val draftURL = baseURL + s"draft/$docId/data.xml"
+
+          val nonDraftData = HttpCall.XML(testForm.formData(Seq("saved-value")))
+          val draftData    = HttpCall.XML(testForm.formData(Seq("draft-value")))
+
+          def readIndexedDraftAndValues(): Set[(String, String)] = {
+            val sql =
+              s"""SELECT cur.draft, c.val
+                 |  FROM orbeon_i_current cur
+                 |  JOIN orbeon_i_control_text c ON c.data_id = cur.data_id
+                 | WHERE cur.app         = '${testForm.appForm.app}'
+                 |   AND cur.form        = '${testForm.appForm.form}'
+                 |   AND cur.document_id = '$docId'
+                 |""".stripMargin
+            useAndClose(connection.prepareStatement(sql)) { ps =>
+              useAndClose(ps.executeQuery()) { rs =>
+                Iterator.iterateWhile(
+                  rs.next(),
+                  (rs.getString("draft"), rs.getString("val"))
+                ).toSet
+              }
+            }
+          }
+
+          // Save non-draft data, then save draft data for the same document id
+          HttpAssert.put(dataURL,  version, nonDraftData, StatusCode.Created)
+          HttpAssert.put(draftURL, version, draftData,    StatusCode.Created)
+
+          assert(readIndexedDraftAndValues() == Set(("N", "saved-value"), ("Y", "draft-value")))
+
+          // Delete draft data
+          HttpAssert.del(draftURL, version, StatusCode.NoContent)
+
+          // Draft is gone, non-draft is still readable and still indexed
+          HttpAssert.get(draftURL, version, HttpAssert.ExpectedCode(StatusCode.NotFound))
+          HttpAssert.get(dataURL,  version, HttpAssert.ExpectedBody(nonDraftData, AnyOperation, Some(version.version)))
+          assert(readIndexedDraftAndValues() == Set(("N", "saved-value")))
+        }
+      }
+    }
   }
 
   describe("Metadata extraction") {

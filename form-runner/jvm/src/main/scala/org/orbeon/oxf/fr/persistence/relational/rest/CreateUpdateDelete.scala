@@ -356,9 +356,13 @@ trait CreateUpdateDelete {
     val reqBodyOpt: Option[RequestReader.Body] =
       req.bodyStreamOpt.map(is => RequestReader.Body(useAndClose(is)(_.readAllBytes())))
 
+    val deletingDataDraft = delete && req.dataPart.exists(_.isDraft)
+    val forceDelete       = delete && req.dataPart.exists(_.forceDelete)
+
     val mightReindex =
-      ! req.forAttachment &&               // https://github.com/orbeon/orbeon-forms/issues/6913
-      ! req.dataPart.exists(_.forceDelete) // no need to reindex as we only `DELETE` historical data, which is not indexed
+      ! req.forAttachment && // https://github.com/orbeon/orbeon-forms/issues/6913
+      ! deletingDataDraft && // https://github.com/orbeon/orbeon-forms/issues/8034
+      ! forceDelete          // no need to reindex as we only `DELETE` historical data, which is not indexed
 
     sealed trait ReindexAction
     object ReindexAction {

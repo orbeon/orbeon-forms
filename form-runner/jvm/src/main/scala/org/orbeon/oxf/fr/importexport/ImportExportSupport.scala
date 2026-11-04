@@ -85,6 +85,7 @@ object ImportExportSupport {
     QName("phone",    FRNamespace),
     QName("us-phone", FRNamespace),
     QName("us-state", FRNamespace),
+    QName("color",    FRNamespace),
   )
 
   // TODO: components

@@ -1,0 +1,237 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fr-color"
+        element="fr|color"
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle allow-minimal-label-hint"
+        xxbl:label-for="input"
+        xxbl:type="xs:string"
+        xxbl:constraint="xxf:is-blank(.) or matches(., '^#[0-9a-fA-F]{6}$')"
+    >
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Color</display-name>
+            <display-name lang="fr">Couleur</display-name>
+            <display-name lang="no">Farge</display-name>
+            <display-name lang="ru">Цвет</display-name>
+            <display-name lang="it">Colore</display-name>
+            <display-name lang="de">Farbe</display-name>
+            <display-name lang="fi">Väri</display-name>
+            <display-name lang="es">Color</display-name>
+            <display-name lang="nl">Kleur</display-name>
+            <display-name lang="pt">Cor</display-name>
+            <display-name lang="sv">Färg</display-name>
+            <display-name lang="ar">لون</display-name>
+            <display-name lang="pl">Kolor</display-name>
+            <display-name lang="ja">色</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-tint</icon-class>
+            </icon>
+            <templates>
+                <bind type="fr:color"/>
+                <view>
+                    <fr:color id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:color>
+                </view>
+            </templates>
+            <custom-settings>
+                <setting name="preset-colors" type="xs:string"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-color-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue
+                            ref="$c"
+                            value="instance()/@*[name() = name($c)]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <preset-colors/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="preset-colors"
+                            xxf:whitespace="trim"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true">
+                        <_>
+                            <resource xml:lang="en">
+                                <preset-colors>Preset Colors</preset-colors>
+                                <preset-colors-hint>Space-separated hex colors (e.g. #ef4444 #3b82f6 #22c55e)</preset-colors-hint>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <preset-colors>Couleurs prédéfinies</preset-colors>
+                                <preset-colors-hint>Couleurs hexadécimales séparées par des espaces (ex. #ef4444 #3b82f6 #22c55e)</preset-colors-hint>
+                            </resource>
+                            <resource xml:lang="no">
+                                <preset-colors>Forhåndsdefinerte farger</preset-colors>
+                                <preset-colors-hint>Mellomromseparerte heksadesimale farger (f.eks. #ef4444 #3b82f6 #22c55e)</preset-colors-hint>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <preset-colors>Предустановленные цвета</preset-colors>
+                                <preset-colors-hint>Шестнадцатеричные цвета через пробел (например, #ef4444 #3b82f6 #22c55e)</preset-colors-hint>
+                            </resource>
+                            <resource xml:lang="it">
+                                <preset-colors>Colori predefiniti</preset-colors>
+                                <preset-colors-hint>Colori esadecimali separati da spazi (es. #ef4444 #3b82f6 #22c55e)</preset-colors-hint>
+                            </resource>
+                            <resource xml:lang="de">
+                                <preset-colors>Voreingestellte Farben</preset-colors>
+                                <preset-colors-hint>Durch Leerzeichen getrennte Hex-Farben (z. B. #ef4444 #3b82f6 #22c55e)</preset-colors-hint>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <preset-colors>Esiasetetut värit</preset-colors>
+                                <preset-colors-hint>Välilyönnein erotetut heksavärit (esim. #ef4444 #3b82f6 #22c55e)</preset-colors-hint>
+                            </resource>
+                            <resource xml:lang="es">
+                                <preset-colors>Colores predefinidos</preset-colors>
+                                <preset-colors-hint>Colores hexadecimales separados por espacios (p. ej. #ef4444 #3b82f6 #22c55e)</preset-colors-hint>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <preset-colors>Vooraf ingestelde kleuren</preset-colors>
+                                <preset-colors-hint>Door spaties gescheiden hex-kleuren (bijv. #ef4444 #3b82f6 #22c55e)</preset-colors-hint>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <preset-colors>Cores predefinidas</preset-colors>
+                                <preset-colors-hint>Cores hexadecimais separadas por espaço (ex. #ef4444 #3b82f6 #22c55e)</preset-colors-hint>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <preset-colors>Förinställda färger</preset-colors>
+                                <preset-colors-hint>Blankstegsavgränsade hexfärger (t.ex. #ef4444 #3b82f6 #22c55e)</preset-colors-hint>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <preset-colors>الألوان المحددة مسبقًا</preset-colors>
+                                <preset-colors-hint>ألوان ست عشرية مفصولة بمسافات (مثل #ef4444 #3b82f6 #22c55e)</preset-colors-hint>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <preset-colors>Predefiniowane kolory</preset-colors>
+                                <preset-colors-hint>Rozdzielone spacjami kolory szesnastkowe (np. #ef4444 #3b82f6 #22c55e)</preset-colors-hint>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <preset-colors>プリセットカラー</preset-colors>
+                                <preset-colors-hint>スペース区切りの16進カラーコード (例: #ef4444 #3b82f6 #22c55e)</preset-colors-hint>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-color-grid">
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:input ref="instance('local')/preset-colors" id="preset-colors-control">
+                                <xf:label ref="xxf:r('preset-colors')"/>
+                                <xf:hint ref="xxf:r('preset-colors-hint')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-color-action"
+                    event="xforms-value-changed"
+                    observer="preset-colors-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/color/color.css"/>
+        </xbl:resources>
+
+        <xbl:template>
+            <xf:var
+                name="preset-colors"
+                value="distinct-values(xxf:split(translate(lower-case(fr:component-param-value('preset-colors')), ',', ' '))[matches(., '^#[0-9a-f]{6}$')])"/>
+
+            <xf:group
+                ref="xxf:binding('fr-color')"
+                class="input-prepend fr-field-width-natural">
+                <xh:span class="add-on fr-color-swatch-addon fr-color-empty">
+                    <xh:input
+                        class="fr-color-picker"
+                        type="color"
+                        list="{xxf:client-id('datalist')}"
+                        tabindex="-1"
+                        aria-hidden="true"/>
+                </xh:span>
+                <xh:input
+                    id="input"
+                    class="fr-color-hex xbl-html-input xforms-input-input"
+                    xh:type="text"
+                    maxlength="7"
+                    placeholder="#000000"
+                    xxf:control="true"
+                    xbl:attr="tabindex tabindex=navindex autocomplete"/>
+                <xh:datalist id="datalist">
+                    <xf:repeat ref="$preset-colors">
+                        <xh:option value="{.}"/>
+                    </xf:repeat>
+                </xh:datalist>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+    <xbl:binding
+        id="fr-color-output"
+        element="
+            fr|color[fr|static-readonly = true],
+            fr|color[fr|pdf-template = true]"
+        xxbl:mode="lhha binding value allow-minimal-label-hint"
+        xxbl:label-for="input"
+    >
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/color/color.css"/>
+        </xbl:resources>
+        <xbl:template>
+            <xf:group ref="xxf:binding('fr-color-output')" class="fr-color-readonly-container fr-field-width-natural">
+                <xh:span
+                    class="fr-color-readonly-swatch{if (matches(., '^#[0-9a-fA-F]{6}$')) then '' else ' xforms-hidden'}"
+                    style="background-color: {if (matches(., '^#[0-9a-fA-F]{6}$')) then . else 'transparent'}"/>
+                <xf:input
+                    id="input"
+                    ref="."
+                    xbl:attr="xxf:readonly-appearance"/>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

@@ -85,6 +85,7 @@ object FormRunnerApp extends App {
     xbl.FrWizard
     xbl.Timestamp
     xbl.ContentFilter
+    xbl.Color
 
     DomSupport.atLeastDomReadyStateF(document, DomSupport.DomReadyState.Interactive) foreach { _ =>
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .navbar.fixed-top, .orbeon .navbar-fixed-top", addScrollPadding(_, "scroll-padding-top"))

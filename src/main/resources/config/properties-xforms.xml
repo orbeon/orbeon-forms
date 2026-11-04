@@ -247,6 +247,7 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.us-ssn.pdf-template-format"                value="partial"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.code-mirror.theme"                         value="solarized dark"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.color.preset-colors"                       value="#000000 #64748b #ef4444 #f97316 #eab308 #22c55e #14b8a6 #3b82f6 #6366f1 #a855f7 #ec4899 #ffffff"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.library" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
         fr:grid-single
@@ -276,6 +277,7 @@
         fr:time
         fr:datetime
         fr:number
+        fr:color
         fr:handwritten-signature
         fr:timestamp
     </property>

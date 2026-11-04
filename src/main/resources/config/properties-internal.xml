@@ -202,6 +202,7 @@
         +fr:us-phone
         +fr:us-state
         +fr:yesno-input
+        +fr:color
 
         <!-- Less common controls XBL components -->
         +fr:wpaint
@@ -284,6 +285,7 @@
         +fr:us-state
         +fr:yesno-input
         +fr:video
+        +fr:color
     </property>
 
     <!-- Theme name to CSS URI mapping -->
@@ -396,6 +398,7 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-time.*"                         value="input-time-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-phone.*"                        value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-us-phone.*"                     value="input-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-color.*"                        value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-dropdown-select1.*"             value="select-label"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-yesno-input.*"                  value="select-value"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-databound-select1.*"            value="select-label"/>

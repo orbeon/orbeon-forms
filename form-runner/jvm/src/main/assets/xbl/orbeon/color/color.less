@@ -1,0 +1,149 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+
+    .xbl-fr-color {
+
+        .fr-field-width-natural {
+            max-width: 10em;
+        }
+
+        .input-prepend {
+            .add-on.fr-color-swatch-addon {
+                position: relative;
+                flex-shrink: 0;
+                padding: 0 0.45em;
+
+                input[type="color"].fr-color-picker {
+                    flex-shrink: 0;
+                    width: 1.4em;
+                    min-width: 1.4em;
+                    height: 1.4em;
+                    padding: 0;
+                    border: 0;
+                    border-radius: 3px;
+                    background: transparent;
+                    cursor: pointer;
+
+                    &::-webkit-color-swatch-wrapper {
+                        padding: 0;
+                    }
+
+                    &::-webkit-color-swatch {
+                        border: 1px solid var(--orbeon-control-border-color);
+                        border-radius: 3px;
+                    }
+
+                    &::-moz-color-swatch {
+                        border: 1px solid var(--orbeon-control-border-color);
+                        border-radius: 3px;
+                    }
+
+                    &:focus {
+                        &::-webkit-color-swatch {
+                            border-color: var(--orbeon-focus-border-color);
+                        }
+
+                        &::-moz-color-swatch {
+                            border-color: var(--orbeon-focus-border-color);
+                        }
+                    }
+
+                    &:disabled {
+                        cursor: not-allowed;
+                    }
+                }
+
+                &.fr-color-empty {
+                    input[type="color"].fr-color-picker {
+                        position: relative;
+                        z-index: 1;
+
+                        &::-webkit-color-swatch {
+                            opacity: 0;
+                        }
+
+                        &::-moz-color-swatch {
+                            opacity: 0;
+                        }
+                    }
+
+                    &:has(input[type="color"].fr-color-picker:focus)::before {
+                        border-color: var(--orbeon-focus-border-color);
+                    }
+
+                    &::before {
+                        content: "";
+                        position: absolute;
+                        width: 1.4em;
+                        height: 1.4em;
+                        box-sizing: border-box;
+                        border: 1px solid var(--orbeon-control-border-color);
+                        border-radius: 3px;
+                        background-color: var(--orbeon-control-background-color);
+                        background-image: linear-gradient(
+                            to top left,
+                            transparent calc(50% - 1px),
+                            var(--orbeon-control-border-color) calc(50% - 1px),
+                            var(--orbeon-control-border-color) calc(50% + 1px),
+                            transparent calc(50% + 1px)
+                        );
+                        pointer-events: none;
+                    }
+                }
+            }
+
+            input[type="text"].fr-color-hex {
+                min-width: 0;
+                font-variant-numeric: tabular-nums;
+            }
+        }
+
+        .fr-color-readonly-container {
+            @media screen {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+
+                .xforms-input {
+                    flex-grow: 1;
+                }
+            }
+
+            .fr-color-readonly-swatch {
+                display: inline-block;
+                flex-shrink: 0;
+                width: 1.25em;
+                height: 1.25em;
+                vertical-align: middle;
+                border: 1px solid var(--orbeon-control-border-color);
+                border-radius: 3px;
+                margin-right: 4px;
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+        }
+
+        @media print {
+            display: inline;
+
+            .fr-color-readonly-container {
+                display: inline;
+            }
+        }
+    }
+}

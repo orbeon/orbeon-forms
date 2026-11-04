@@ -525,6 +525,7 @@ body.orbeon {
                 justify-content: center;
                 width: 20px;
                 height: 18px;
+                line-height: 18px;
                 padding: 0;
                 font-size: 12px;
                 color: var(--orbeon-fb-navbar-color);
@@ -2458,8 +2459,9 @@ body.orbeon {
                     // Design-time cell badges (#3109)
                     & > .fb-control-cell-badges {
                         position: absolute;
-                        top: 4px + @densityMarginTopBottom;
-                        right: 34px + @densityMarginLeftRight;
+                        top: 3px;
+                        right: 34px;
+                        margin: 0;
                         display: inline-flex;
                         align-items: center;
                         gap: 3px;

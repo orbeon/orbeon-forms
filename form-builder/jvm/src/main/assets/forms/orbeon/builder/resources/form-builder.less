@@ -273,10 +273,11 @@ body.orbeon {
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
+                    gap: 4px;
                     min-width: 22px;
                     height: 22px;
                     padding: 0 5px;
-                    font-size: 11px;
+                    font-size: 12px;
                     line-height: 20px;
                     color: var(--orbeon-base-color);
                     text-decoration: none;
@@ -292,6 +293,7 @@ body.orbeon {
                     font-family: Georgia, serif;
                     font-style: italic;
                     font-weight: 600;
+                    font-size: 11px;
                 }
 
                 &.active button.btn-link {
@@ -404,14 +406,20 @@ body.orbeon {
             }
         }
 
-        @media (max-width: 1400px) {
+        @media (max-width: 1560px) {
             .fb-toolbar-name-input .xforms-label,
             .fb-toolbar-appearance-select .xforms-label {
                 display: none;
             }
         }
 
-        @media (max-width: 1320px) {
+        @media (max-width: 1460px) {
+            .fb-toolbar-segmented .fb-toolbar-seg-btn button.btn-link .fb-toolbar-mip-text {
+                display: none;
+            }
+        }
+
+        @media (max-width: 1280px) {
             .fb-toolbar-pill.fb-toolbar-action-pill button.btn-link .fb-toolbar-pill-text {
                 display: none;
             }

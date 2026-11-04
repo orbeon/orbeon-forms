@@ -298,6 +298,9 @@
                             class="fb-toolbar-seg-btn fb-toolbar-mip-toggle{' active'[$req-mode = 'true']}">
                             <xf:label>
                                 <xh:span class="fb-toolbar-req-star">*</xh:span>
+                                <xh:span class="fb-toolbar-mip-text">
+                                    <xf:output value="$form-resources/dialog-control-settings/required/label"/>
+                                </xh:span>
                             </xf:label>
                             <xf:hint value="concat($form-resources/dialog-control-settings/required/label, ': ', if ($req-mode = 'true') then $fr-resources/components/labels/yes else if ($req-mode = 'false') then $fr-resources/components/labels/no else $req-val)"/>
                             <xf:action event="DOMActivate" if="not($is-readonly)" type="xpath">
@@ -324,6 +327,9 @@
                             class="fb-toolbar-seg-btn fb-toolbar-mip-toggle{' active'[$rel-mode = 'false']}">
                             <xf:label>
                                 <xh:i class="fa fa-fw {if ($rel-mode = 'false') then 'fa-eye-slash' else 'fa-eye'}"/>
+                                <xh:span class="fb-toolbar-mip-text">
+                                    <xf:output value="$form-resources/dialog-control-settings/visibility/label"/>
+                                </xh:span>
                             </xf:label>
                             <xf:hint value="concat($form-resources/dialog-control-settings/visibility/label, ': ', if ($rel-mode = 'true') then $fr-resources/components/labels/yes else if ($rel-mode = 'false') then $fr-resources/components/labels/no else $rel-val)"/>
                             <xf:action event="DOMActivate" if="not($is-readonly)" type="xpath">
@@ -350,6 +356,9 @@
                             class="fb-toolbar-seg-btn fb-toolbar-mip-toggle{' active'[$ro-mode = 'true']}">
                             <xf:label>
                                 <xh:i class="fa fa-lock fa-fw"/>
+                                <xh:span class="fb-toolbar-mip-text">
+                                    <xf:output value="$form-resources/dialog-control-settings/readonly/label"/>
+                                </xh:span>
                             </xf:label>
                             <xf:hint value="concat($form-resources/dialog-control-settings/readonly/label, ': ', if ($ro-mode = 'true') then $fr-resources/components/labels/yes else if ($ro-mode = 'false') then $fr-resources/components/labels/no else $ro-val)"/>
                             <xf:action event="DOMActivate" if="not($is-readonly)" type="xpath">

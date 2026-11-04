@@ -1,0 +1,33 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl">
+
+    <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+        <display-name lang="en">Number Controls</display-name>
+        <display-name lang="fr">Contrôles numériques</display-name>
+        <display-name lang="no">Tallkontroller</display-name>
+        <display-name lang="ru">Числовые элементы управления</display-name>
+        <display-name lang="it">Controlli numerici</display-name>
+        <display-name lang="de">Zahlen-Steuerelemente</display-name>
+        <display-name lang="fi">Numerokontrollit</display-name>
+        <display-name lang="es">Controles Numéricos</display-name>
+        <display-name lang="nl">Numerieke elementen</display-name>
+        <display-name lang="pt">Controlos Numéricos</display-name>
+        <display-name lang="sv">Nummerfält</display-name>
+        <display-name lang="ar">عناصر التحكم الرقمية</display-name>
+        <display-name lang="pl">Kontrolki liczbowe</display-name>
+        <display-name lang="ja">数値コントロール</display-name>
+    </metadata>
+
+</xbl:xbl>

@@ -15,6 +15,7 @@
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
+    <!-- Toolbox -->
     <property as="xs:string"  name="oxf.fb.toolbox.group.text.uri.*.*">
         oxf:/forms/orbeon/builder/xbl/text-controls.xbl
         oxf:/forms/orbeon/builder/xbl/text-input.xbl
@@ -22,48 +23,29 @@
         oxf:/xbl/orbeon/autosize-textarea/autosize-textarea.xbl
         oxf:/xbl/orbeon/tinymce/tinymce.xbl
         oxf:/forms/orbeon/builder/xbl/text-secret.xbl
+        oxf:/xbl/orbeon/masked-input/masked-input.xbl
         oxf:/xbl/orbeon/character-counter/character-counter.xbl
         oxf:/xbl/orbeon/content-filter/content-filter.xbl
         oxf:/xbl/orbeon/clipboard-copy/clipboard-copy.xbl
     </property>
 
-    <!-- Toolbox -->
-    <property as="xs:string"  name="oxf.fb.toolbox.group.special.uri.*.*">
-        oxf:/forms/orbeon/builder/xbl/utility-controls.xbl
-        oxf:/xbl/orbeon/explanation/explanation.xbl
-        oxf:/forms/orbeon/builder/xbl/text-output.xbl
-        oxf:/xbl/orbeon/hidden/hidden.xbl
-    </property>
-
-    <property as="xs:string"  name="oxf.fb.toolbox.group.typed.uri.*.*">
-        oxf:/forms/orbeon/builder/xbl/typed-controls.xbl
+    <property as="xs:string"  name="oxf.fb.toolbox.group.number.uri.*.*">
+        oxf:/forms/orbeon/builder/xbl/number-controls.xbl
         oxf:/xbl/orbeon/number/number.xbl
         oxf:/xbl/orbeon/currency/currency.xbl
         oxf:/xbl/orbeon/percentage/percentage.xbl
-        oxf:/forms/orbeon/builder/xbl/typed-email.xbl
-        oxf:/xbl/orbeon/country/country.xbl
-        oxf:/xbl/orbeon/us-phone/us-phone.xbl
-        oxf:/xbl/orbeon/phone/phone.xbl
-        oxf:/xbl/orbeon/us-state/us-state.xbl
-        oxf:/xbl/orbeon/us-ssn/us-ssn.xbl
-        oxf:/xbl/orbeon/us-ein/us-ein.xbl
-        oxf:/xbl/orbeon/lei/lei.xbl
-        oxf:/xbl/orbeon/isin/isin.xbl
-        oxf:/xbl/orbeon/iban/iban.xbl
-        oxf:/xbl/orbeon/color/color.xbl
-        oxf:/xbl/orbeon/masked-input/masked-input.xbl
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.dateTime.uri.*.*">
         oxf:/forms/orbeon/builder/xbl/date-time-controls.xbl
         oxf:/xbl/orbeon/date/date.xbl
-        oxf:/xbl/orbeon/time/time.xbl
-        oxf:/xbl/orbeon/datetime/datetime.xbl
         oxf:/xbl/orbeon/dropdown-date/dropdown-date.xbl
         oxf:/xbl/orbeon/fields-date/fields-date.xbl
+        oxf:/xbl/orbeon/dropdown-month-year/dropdown-month-year.xbl
         oxf:/xbl/orbeon/year/year.xbl
         oxf:/xbl/orbeon/dropdown-year/dropdown-year.xbl
-        oxf:/xbl/orbeon/dropdown-month-year/dropdown-month-year.xbl
+        oxf:/xbl/orbeon/time/time.xbl
+        oxf:/xbl/orbeon/datetime/datetime.xbl
         oxf:/xbl/orbeon/timestamp/timestamp.xbl
     </property>
 
@@ -82,8 +64,26 @@
         oxf:/xbl/orbeon/checkbox-input/checkbox-input.xbl
         oxf:/xbl/orbeon/switch-input/switch-input.xbl
         oxf:/xbl/orbeon/yesno-input/yesno-input.xbl
+        oxf:/xbl/orbeon/color/color.xbl
         oxf:/forms/orbeon/builder/xbl/selection-input-boolean.xbl
         oxf:/forms/orbeon/builder/xbl/selection-select1-minimal.xbl
+    </property>
+
+    <property as="xs:string"  name="oxf.fb.toolbox.group.international.uri.*.*">
+        oxf:/forms/orbeon/builder/xbl/international-controls.xbl
+        oxf:/forms/orbeon/builder/xbl/typed-email.xbl
+        oxf:/xbl/orbeon/phone/phone.xbl
+        oxf:/xbl/orbeon/country/country.xbl
+        oxf:/xbl/orbeon/iban/iban.xbl
+        oxf:/xbl/orbeon/lei/lei.xbl
+        oxf:/xbl/orbeon/isin/isin.xbl
+    </property>
+
+    <property as="xs:string"  name="oxf.fb.toolbox.group.us.uri.*.*">
+        oxf:/forms/orbeon/builder/xbl/us-controls.xbl
+        oxf:/xbl/orbeon/us-state/us-state.xbl
+        oxf:/xbl/orbeon/us-ssn/us-ssn.xbl
+        oxf:/xbl/orbeon/us-ein/us-ein.xbl
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.attachment.uri.*.*">
@@ -101,6 +101,14 @@
         oxf:/forms/orbeon/builder/xbl/button-controls.xbl
         oxf:/forms/orbeon/builder/xbl/button-trigger.xbl
         oxf:/forms/orbeon/builder/xbl/button-trigger-minimal.xbl
+        oxf:/xbl/orbeon/hyperlink/hyperlink.xbl
+    </property>
+
+    <property as="xs:string"  name="oxf.fb.toolbox.group.special.uri.*.*">
+        oxf:/forms/orbeon/builder/xbl/utility-controls.xbl
+        oxf:/xbl/orbeon/explanation/explanation.xbl
+        oxf:/forms/orbeon/builder/xbl/text-output.xbl
+        oxf:/xbl/orbeon/hidden/hidden.xbl
     </property>
 
     <property as="xs:string"  name="oxf.xforms.xbl.mapping.fb">

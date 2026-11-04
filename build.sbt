@@ -42,7 +42,7 @@ val ScalaJsJQueryVersion         = "3.4.0"
 val ScalaJsStubsVersion          = "1.1.0" // can be different from Scala.js version
 val ScalaJsWeakReferencesVersion = "1.0.0"
 val ScalaJsSecureRandomVersion   = "1.0.0"
-val ScalaJsTimeVersion           = "2.6.0"
+val ScalaJsTimeVersion           = "2.9.0"
 val ScalaJsLocalesVersion        = "1.5.4"
 
 // Scala libraries for Scala JVM only

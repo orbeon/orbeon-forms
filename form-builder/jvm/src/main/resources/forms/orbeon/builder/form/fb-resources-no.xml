@@ -1843,4 +1843,13 @@
         <empty>Tom rolle</empty>
         <duplicate>Duplikat rolle</duplicate>
     </role-restriction>
+    <control-settings-toolbar>
+        <control-name todo="true">Name</control-name>
+        <control-appearance todo="true">Appearance</control-appearance>
+        <choices todo="true">Choices</choices>
+        <validations todo="true">Validations</validations>
+        <calculate todo="true">Calculated</calculate>
+        <default todo="true">Initial</default>
+        <show-toolbar todo="true">Show Toolbar</show-toolbar>
+    </control-settings-toolbar>
 </resource>

@@ -1880,4 +1880,13 @@
         <empty>Empty role</empty>
         <duplicate>Duplicate role</duplicate>
     </role-restriction>
+    <control-settings-toolbar>
+        <control-name>Name</control-name>
+        <control-appearance>Appearance</control-appearance>
+        <choices>Choices</choices>
+        <validations>Validations</validations>
+        <calculate>Calculated</calculate>
+        <default>Initial</default>
+        <show-toolbar>Show Toolbar</show-toolbar>
+    </control-settings-toolbar>
 </resource>

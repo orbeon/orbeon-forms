@@ -308,6 +308,7 @@
                     <xf:dispatch if="$focus-formula = 'relevant'"  name="fb-focus-formula" targetid="fb-relevant-control"/>
                     <xf:dispatch if="$focus-formula = 'readonly'"  name="fb-focus-formula" targetid="fb-readonly-control"/>
                     <xf:setfocus if="$focus-formula = 'calculate'" control="fb-calculate-control"/>
+                    <xf:setfocus if="$focus-formula = 'default'"   control="fb-default-control"/>
                     <xf:setfocus if="empty($focus-formula) and $i/initial-tab = '1'" control="validations-tab"/>
                     <xf:setfocus if="empty($focus-formula) and $i/initial-tab = '2'" control="fb-calculate-control"/>
                 </xf:action>

@@ -196,7 +196,7 @@
                         id="toggle-control-toolbar-trigger"
                         name="toolbox.toggle-control-toolbar">
                     <xf:label><xh:i class="fa fa-sliders fa-fw"/></xf:label>
-                    <xf:hint ref="$form-resources/control-settings-icon/label"/>
+                    <xf:hint ref="$form-resources/control-settings-toolbar/show-toolbar"/>
                     <xf:action ev:event="DOMActivate">
                         <xf:setvalue
                             ref="$toolbar/@visible"

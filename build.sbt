@@ -233,11 +233,12 @@ val copyJarToLiferayWar            = taskKey[Option[File]]("Copy JAR file to Lif
 val deployProxyPortletWar          = taskKey[File]("Package and copy the Form Runner proxy portlet WAR to the local Liferay deploy directory.")
 val fullOptMinJS                   = taskKey[Attributed[File]]("Performs full Scala.js optimization and minifies the output with Terser.")
 val fastOrFullOptJS                = taskKey[Attributed[File]]("Performs either fast or full Scala.js optimization.")
+val terser                         = taskKey[com.typesafe.sbt.web.pipeline.Pipeline.Stage]("Minify JavaScript assets with Terser.")
 
 val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version from system properties.")
 val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
 val preferFastOptJS                = settingKey[Boolean]("Prefer fast Scala.js-specific optimizations (for development).")
-val skipUglify                     = settingKey[Boolean]("Skip JavaScript minification with Uglify")
+val skipUglify                     = settingKey[Boolean]("Skip JavaScript minification")
 val lintCss                        = taskKey[Unit]("Lint compiled CSS with stylelint")
 val skipLintCss                    = settingKey[Boolean]("Skip CSS linting with stylelint")
 val liferayDeployDir               = settingKey[File]("Local Liferay deploy directory for publishing the proxy portlet WAR.")
@@ -264,6 +265,24 @@ Global / concurrentRestrictions += Tags.exclusive(ScalaJSTags.Link)
 Assets / concurrentRestrictions += Tags.exclusive(Tags.All)
 TestAssets / concurrentRestrictions += Tags.exclusive(Tags.All)
 Global / parallelExecution := false
+
+def minifyWithTerser(rootDir: File, cacheDir: File, inputFile: File, outputFile: File, log: Logger): File = {
+  val cachedMinify = FileFunction.cached(cacheDir, FilesInfo.lastModified, FilesInfo.exists) { _ =>
+    import scala.sys.process._
+    IO.createDirectory(outputFile.getParentFile)
+    val terserBin = (rootDir / "node_modules" / ".bin" / "terser").getAbsolutePath
+    log.info(s"Minifying ${inputFile.name} with Terser...")
+    val exitCode = Process(
+      Seq(terserBin, inputFile.getAbsolutePath, "--compress", "--mangle", "--ecma", "2018", "--output", outputFile.getAbsolutePath),
+      rootDir
+    ).!
+    if (exitCode != 0)
+      throw new MessageOnlyException(s"Terser failed on ${inputFile.name} with exit code $exitCode")
+    Set(outputFile)
+  }
+  cachedMinify(Set(inputFile))
+  outputFile
+}
 
 def copyFilesToExplodedWarLib(files: Seq[Attributed[File]]): Unit =
   files map (_.data) foreach { file =>
@@ -510,22 +529,7 @@ lazy val commonScalaJsSettings = Seq(
       linkedFileAttr
     } else {
       val linkedFile   = linkedFileAttr.data
-      val minifiedFile = linkedFile.getParentFile / (linkedFile.base + ".min.js")
-
-      val cachedMinify = FileFunction.cached(cacheDir, FilesInfo.lastModified, FilesInfo.exists) { _ =>
-        import scala.sys.process._
-        val terser = (rootDir / "node_modules" / ".bin" / "terser").getAbsolutePath
-        log.info(s"Minifying ${linkedFile.name} with Terser...")
-        val exitCode = Process(
-          Seq(terser, linkedFile.getAbsolutePath, "--compress", "--mangle", "--ecma", "2018", "--output", minifiedFile.getAbsolutePath),
-          rootDir
-        ).!
-        if (exitCode != 0)
-          throw new MessageOnlyException(s"Terser failed on ${linkedFile.name} with exit code $exitCode")
-        Set(minifiedFile)
-      }
-
-      cachedMinify(Set(linkedFile))
+      val minifiedFile = minifyWithTerser(rootDir, cacheDir, linkedFile, linkedFile.getParentFile / (linkedFile.base + ".min.js"), log)
       linkedFileAttr.map(_ => minifiedFile)
     }
   },
@@ -546,22 +550,41 @@ lazy val assetsSettings = Seq(
   Assets / LessKeys.less / includeFilter   := "*.less",
   Assets / LessKeys.compress               := false,
 
-  // Uglify
-  Assets / pipelineStages                  := { if (skipUglify.value) Seq() else Seq(uglify) },
+  // Terser
+  Assets / pipelineStages                  := { if (skipUglify.value) Seq() else Seq(terser) },
 
   // Minify all JavaScript files which are not minified/debug and which don't already have a minified version
-  // NOTE: The default `excludeFilter in uglify` explicitly excludes files under `resourceDirectory in Assets`.
-  uglify / includeFilter                   := (uglify / includeFilter).value && FileHasNoMinifiedVersionFilter && -FileIsMinifiedVersionFilter,
+  terser / includeFilter                   := "*.js" && FileHasNoMinifiedVersionFilter && -FileIsMinifiedVersionFilter,
   // 2022-06-15: Tried to write the filter using `Glob`, etc. but can't seem to be able to convert that to a
   // `FileFilter`. So doing this "by hand".
-  uglify / excludeFilter                   := (uglify / excludeFilter).value || HiddenFileFilter || "*-debug.js" || new SimpleFileFilter(f =>
+  terser / excludeFilter                   := HiddenFileFilter || "*.min.js" || "*-debug.js" || new SimpleFileFilter(f =>
+    f.getPath.startsWith((Assets / WebKeys.webModuleDirectory).value.getPath)                        ||
     // Found out that: 1. `endsWith` is not type-safe 2. `Path.iterator` returns `Path`s :(
     f.toPath.iterator().asScala.map(_.toString).toList.endsWith("acme" :: "map" :: "map.js" :: Nil) ||
     f.toPath.iterator().asScala.map(_.toString).toList.endsWith("ponyfill.es2018.js" :: Nil)        ||
     f.toPath.iterator().asScala.map(_.toString).toList.endsWith("text-expander-element-bundle.js" :: Nil)
   ),
-  uglifyCompressOptions                    := Seq.empty,
-  //uglifyOps                                := UglifyOps.singleFile, // Disable source map generation (2026-02-12: not currently needed)
+  terser := {
+    val include   = (terser / includeFilter).value
+    val exclude   = (terser / excludeFilter).value
+    val rootDir   = (ThisBuild / baseDirectory).value
+    val targetDir = (Assets / WebKeys.webTarget).value / "terser" / "main"
+    val cacheDir  = streams.value.cacheDirectory / "assets-terser"
+    val log       = streams.value.log
+
+    mappings =>
+      val minMappings =
+        for {
+          (file, relativePath) <- mappings
+          if ! file.isDirectory && include.accept(file) && ! exclude.accept(file)
+        } yield {
+          val minPath      = relativePath.substring(0, relativePath.length - ".js".length) + ".min.js"
+          val minifiedFile = minifyWithTerser(rootDir, cacheDir / relativePath, file, targetDir / minPath, log)
+          minifiedFile -> minPath
+        }
+
+      mappings ++ minMappings
+  },
 
   // CSS linting (after LESS compilation)
   lintCss := {

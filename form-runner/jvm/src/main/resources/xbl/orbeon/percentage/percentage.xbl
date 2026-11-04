@@ -1,0 +1,797 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava">
+
+    <xbl:binding
+        id="fr-number"
+        element="
+            fr|percentage,
+            xf|input[appearance = 'xxf:percentage']:xxf-type('xs:decimal')"
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle allow-minimal-label-hint"
+        xxf:external-events="DOMActivate"
+        xxbl:label-for="html-input"
+        xxbl:format="
+            string-join(
+                (
+                    fr:component-param-value('prefix'),
+                    NumberSupport:getDisplayValueJava(
+                        xxf:binding('fr-number'),
+                        fr:component-param-value('decimal-separator'),
+                        fr:component-param-value('grouping-separator'),
+                        fr:component-param-value('prefix'),
+                        fr:component-param-value('digits-after-decimal'),
+                        string(fr:component-param-value('round-when-formatting')) = 'true',
+                        string(fr:component-param-value('round-when-storing'))    = 'true',
+                        2
+                    ),
+                    fr:component-param-value('suffix')
+                ),
+                ' '
+            )"
+
+        xxbl:serialize-external-value="
+            NumberSupport:serializeExternalValueJava(
+                xxf:binding('fr-number'),
+                fr:component-param-value('decimal-separator'),
+                fr:component-param-value('grouping-separator'),
+                fr:component-param-value('prefix'),
+                fr:component-param-value('digits-after-decimal'),
+                string(fr:component-param-value('round-when-formatting')) = 'true',
+                string(fr:component-param-value('round-when-storing'))    = 'true',
+                2
+            )"
+
+        xxbl:deserialize-external-value="
+            NumberSupport:deserializeExternalValueJava(
+                .,
+                xxf:binding('fr-number'),
+                fr:component-param-value('decimal-separator'),
+                fr:component-param-value('grouping-separator'),
+                fr:component-param-value('prefix'),
+                fr:component-param-value('digits-after-decimal'),
+                string(fr:component-param-value('round-when-formatting')) = 'true',
+                string(fr:component-param-value('round-when-storing'))    = 'true',
+                2
+            )"
+    >
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Percentage</display-name>
+            <display-name lang="fr">Pourcentage</display-name>
+            <display-name lang="no">Prosent</display-name>
+            <display-name lang="ru">Процент</display-name>
+            <display-name lang="it">Percentuale</display-name>
+            <display-name lang="de">Prozentsatz</display-name>
+            <display-name lang="fi">Prosentti</display-name>
+            <display-name lang="es">Porcentaje</display-name>
+            <display-name lang="nl">Percentage</display-name>
+            <display-name lang="pt">Percentagem</display-name>
+            <display-name lang="sv">Procent</display-name>
+            <display-name lang="ar">نسبة مئوية</display-name>
+            <display-name lang="pl">Procent</display-name>
+            <display-name lang="ja">パーセント</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-percent</icon-class>
+            </icon>
+            <templates>
+                <bind type="xf:decimal"/>
+                <view>
+                    <fr:percentage>
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:percentage>
+                </view>
+            </templates>
+            <!-- Duplicated from `fr:number` as `doc()` doesn't process XInclude -->
+            <custom-settings>
+                <setting name="prefix" type="xs:string"/>
+                <setting name="suffix" type="xs:string"/>
+                <setting name="decimal-separator" type="xs:string" max-length="1"/>
+                <setting name="grouping-separator" type="xs:string" max-length="1"/>
+                <setting name="digits-after-decimal" type="xs:integer" min="0"/>
+                <setting name="round-when-formatting" type="xs:boolean"/>
+                <setting name="round-when-storing" type="xs:boolean"/>
+                <setting name="field-width" type="xs:string" values="full natural"/>
+                <setting name="field-align" type="xs:string" values="left right"/>
+                <constraint test="empty(decimal-separator) or empty(grouping-separator) or decimal-separator != grouping-separator"
+                            message="Decimal and grouping separators must be different"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-number-model">
+
+                    <xf:action event="xforms-model-construct-done">
+                        <xf:action iterate="instance('local')/*">
+                            <xf:var name="c" value="."/>
+                            <xf:setvalue
+                                ref="$c"
+                                value="instance()/@*[name() = name($c)]"/>
+                        </xf:action>
+                        <!--
+                            Special values:
+                            &#2261; (≡) represents "use default",  applies to both grouping and decimal separators
+                            &#2262; (≢) represents "no separator", applies only to grouping separator
+                         -->
+                        <xf:setvalue
+                            ref="instance('local')/grouping-separator"
+                            value="
+                                if (empty(instance()/@grouping-separator)) then
+                                    '&#2261;'
+                                else if (instance()/@grouping-separator = '') then
+                                    '&#2262;'
+                                else
+                                    .
+                        "/>
+                        <xf:setvalue
+                            ref="instance('local')/decimal-separator"
+                            value="
+                                if (empty(instance()/@decimal-separator)) then
+                                    '&#2261;'
+                                else
+                                    .
+                        "/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <prefix/>
+                            <suffix/>
+                            <decimal-separator/>
+                            <grouping-separator/>
+                            <digits-after-decimal/>
+                            <round-when-formatting/>
+                            <round-when-storing/>
+                            <field-width/>
+                            <field-align/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind ref="prefix | suffix | digits-after-decimal" xxf:whitespace="trim"/>
+                        <xf:bind ref="digits-after-decimal" type="xf:integer"         constraint="xxf:is-blank() or xxf:non-negative()"/>
+                        <xf:bind ref="decimal-separator"    xxf:whitespace="trim"     constraint="xxf:max-length(1)" required="true()"/>
+                        <xf:bind ref="grouping-separator"   xxf:whitespace="preserve" constraint="xxf:max-length(1)" required="true()"/>
+                        <xf:bind ref="decimal-separator | grouping-separator">
+                            <xf:constraint
+                                id="separators-must-differ"
+                                value="(../decimal-separator  = '&#2261;') or
+                                       (../grouping-separator = '&#2261;') or
+                                       (../grouping-separator = '&#2262;') or
+                                       (../decimal-separator != ../grouping-separator)"/>
+                        </xf:bind>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true">
+                        <_>
+                            <resource xml:lang="en">
+                                <prefix>Prefix</prefix>
+                                <suffix>Suffix</suffix>
+                                <decimal-separator>Decimal Separator</decimal-separator>
+                                <grouping-separator>Grouping Separator</grouping-separator>
+                                <digits-after-decimal>Digits after decimal</digits-after-decimal>
+                                <round-when-formatting>Round when formatting</round-when-formatting>
+                                <round-when-storing>Round when storing</round-when-storing>
+                                <separators-must-differ>Decimal and grouping separators must be different</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Use default</item>
+                                    <item id="1">Yes</item>
+                                    <item id="2">No</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Use default</item>
+                                    <item id="4">Comma (,)</item>
+                                    <item id="5">Dot/Point (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Use default</item>
+                                    <item id="1">No separator</item>
+                                    <item id="2">Single space</item>
+                                    <item id="3">Apostrophe (')</item>
+                                    <item id="4">Comma (,)</item>
+                                    <item id="5">Dot/Point (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <prefix>Préfixe</prefix>
+                                <suffix>Suffixe</suffix>
+                                <decimal-separator>Séparateur décimal</decimal-separator>
+                                <grouping-separator>Séparateur de groupe</grouping-separator>
+                                <digits-after-decimal>Chiffres après la virgule</digits-after-decimal>
+                                <round-when-formatting>Arrondir au formattage</round-when-formatting>
+                                <round-when-storing>Arrondir au stockage</round-when-storing>
+                                <separators-must-differ>Les séparateurs décimal et de groupe doivent être différents</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Utiliser le défaut</item>
+                                    <item id="1">Oui</item>
+                                    <item id="2">Non</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Utiliser le défaut</item>
+                                    <item id="4">Virgule (,)</item>
+                                    <item id="5">Point (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Utiliser le défaut</item>
+                                    <item id="1">Aucun</item>
+                                    <item id="2">Un seul espace</item>
+                                    <item id="3">Apostrophe (')</item>
+                                    <item id="4">Virgule (,)</item>
+                                    <item id="5">Point (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="no">
+                                <prefix>Prefiks</prefix>
+                                <suffix>Suffiks</suffix>
+                                <decimal-separator>Desimalskilletegn</decimal-separator>
+                                <grouping-separator>Tusenskilletegn</grouping-separator>
+                                <digits-after-decimal>Antall desimaler</digits-after-decimal>
+                                <round-when-formatting>Avrund ved visning</round-when-formatting>
+                                <round-when-storing>Avrund ved lagring</round-when-storing>
+                                <separators-must-differ>Desimal- og tusenskilletegn må være forskjellige</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Bruk standard</item>
+                                    <item id="1">Ja</item>
+                                    <item id="2">Nei</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Bruk standard</item>
+                                    <item id="4">Komma (,)</item>
+                                    <item id="5">Punkt (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Bruk standard</item>
+                                    <item id="1">Ingen skilletegn</item>
+                                    <item id="2">Ett mellomrom</item>
+                                    <item id="3">Apostrof (')</item>
+                                    <item id="4">Komma (,)</item>
+                                    <item id="5">Punkt (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <prefix>Префикс</prefix>
+                                <suffix>Суффикс</suffix>
+                                <decimal-separator>Десятичный разделитель</decimal-separator>
+                                <grouping-separator>Разделитель групп</grouping-separator>
+                                <digits-after-decimal>Цифр после запятой</digits-after-decimal>
+                                <round-when-formatting>Округлять при форматировании</round-when-formatting>
+                                <round-when-storing>Округлять при сохранении</round-when-storing>
+                                <separators-must-differ>Десятичный и групповой разделители должны различаться</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">По умолчанию</item>
+                                    <item id="1">Да</item>
+                                    <item id="2">Нет</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">По умолчанию</item>
+                                    <item id="4">Запятая (,)</item>
+                                    <item id="5">Точка (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">По умолчанию</item>
+                                    <item id="1">Без разделителя</item>
+                                    <item id="2">Пробел</item>
+                                    <item id="3">Апостроф (')</item>
+                                    <item id="4">Запятая (,)</item>
+                                    <item id="5">Точка (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="it">
+                                <prefix>Prefisso</prefix>
+                                <suffix>Suffisso</suffix>
+                                <decimal-separator>Separatore decimale</decimal-separator>
+                                <grouping-separator>Separatore delle migliaia</grouping-separator>
+                                <digits-after-decimal>Cifre dopo la virgola</digits-after-decimal>
+                                <round-when-formatting>Arrotonda in formattazione</round-when-formatting>
+                                <round-when-storing>Arrotonda al salvataggio</round-when-storing>
+                                <separators-must-differ>Il separatore decimale e quello delle migliaia devono essere diversi</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Usa predefinito</item>
+                                    <item id="1">Sì</item>
+                                    <item id="2">No</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Usa predefinito</item>
+                                    <item id="4">Virgola (,)</item>
+                                    <item id="5">Punto (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Usa predefinito</item>
+                                    <item id="1">Nessun separatore</item>
+                                    <item id="2">Spazio singolo</item>
+                                    <item id="3">Apostrofo (')</item>
+                                    <item id="4">Virgola (,)</item>
+                                    <item id="5">Punto (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="de">
+                                <prefix>Präfix</prefix>
+                                <suffix>Suffix</suffix>
+                                <decimal-separator>Dezimaltrennzeichen</decimal-separator>
+                                <grouping-separator>Tausendertrennzeichen</grouping-separator>
+                                <digits-after-decimal>Stellen nach dem Komma</digits-after-decimal>
+                                <round-when-formatting>Runden beim Formatieren</round-when-formatting>
+                                <round-when-storing>Beim Speichern runden</round-when-storing>
+                                <separators-must-differ>Dezimal- und Tausendertrennzeichen müssen verschieden sein</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Standard verwenden</item>
+                                    <item id="1">Ja</item>
+                                    <item id="2">Nein</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Standard verwenden</item>
+                                    <item id="4">Komma (,)</item>
+                                    <item id="5">Punkt (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Standard verwenden</item>
+                                    <item id="1">Kein Trennzeichen</item>
+                                    <item id="2">Ein Leerzeichen</item>
+                                    <item id="3">Apostroph (')</item>
+                                    <item id="4">Komma (,)</item>
+                                    <item id="5">Punkt (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <prefix>Etuliite</prefix>
+                                <suffix>Pääte</suffix>
+                                <decimal-separator>Desimaalierotin</decimal-separator>
+                                <grouping-separator>Ryhmittelyerotin</grouping-separator>
+                                <digits-after-decimal>Numeroita desimaalin jälkeen</digits-after-decimal>
+                                <round-when-formatting>Pyöristä näytettäessä</round-when-formatting>
+                                <round-when-storing>Pyöristä tallennettaessa</round-when-storing>
+                                <separators-must-differ>Desimaali- ja ryhmittelyerottimen on oltava eri</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Käytä oletusta</item>
+                                    <item id="1">Kyllä</item>
+                                    <item id="2">Ei</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Käytä oletusta</item>
+                                    <item id="4">Pilkku (,)</item>
+                                    <item id="5">Piste (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Käytä oletusta</item>
+                                    <item id="1">Ei erotinta</item>
+                                    <item id="2">Yksi välilyönti</item>
+                                    <item id="3">Heittomerkki (')</item>
+                                    <item id="4">Pilkku (,)</item>
+                                    <item id="5">Piste (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="es">
+                                <prefix>Prefijo</prefix>
+                                <suffix>Sufijo</suffix>
+                                <decimal-separator>Separador decimal</decimal-separator>
+                                <grouping-separator>Separador de miles</grouping-separator>
+                                <digits-after-decimal>Cifras decimales</digits-after-decimal>
+                                <round-when-formatting>Redondear al formatear</round-when-formatting>
+                                <round-when-storing>Redondear al guardar</round-when-storing>
+                                <separators-must-differ>El separador decimal y de miles deben ser distintos</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Usar predeterminado</item>
+                                    <item id="1">Sí</item>
+                                    <item id="2">No</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Usar predeterminado</item>
+                                    <item id="4">Coma (,)</item>
+                                    <item id="5">Punto (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Usar predeterminado</item>
+                                    <item id="1">Sin separador</item>
+                                    <item id="2">Un espacio</item>
+                                    <item id="3">Apóstrofo (')</item>
+                                    <item id="4">Coma (,)</item>
+                                    <item id="5">Punto (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <prefix>Prefix</prefix>
+                                <suffix>Suffix</suffix>
+                                <decimal-separator>Decimaal scheidingsteken</decimal-separator>
+                                <grouping-separator>Groeperingsteken</grouping-separator>
+                                <digits-after-decimal>Cijfers na decimalen</digits-after-decimal>
+                                <round-when-formatting>Afronden bij opmaak</round-when-formatting>
+                                <round-when-storing>Afronden bij opslag</round-when-storing>
+                                <separators-must-differ>Decimaal- en groeperingsteken moeten verschillen</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Standaard gebruiken</item>
+                                    <item id="1">Ja</item>
+                                    <item id="2">Nee</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Standaard gebruiken</item>
+                                    <item id="4">Komma (,)</item>
+                                    <item id="5">Punt (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Standaard gebruiken</item>
+                                    <item id="1">Geen scheidingsteken</item>
+                                    <item id="2">Eén spatie</item>
+                                    <item id="3">Apostrof (')</item>
+                                    <item id="4">Komma (,)</item>
+                                    <item id="5">Punt (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <prefix>Prefixo</prefix>
+                                <suffix>Sufixo</suffix>
+                                <decimal-separator>Separador decimal</decimal-separator>
+                                <grouping-separator>Separador de milhar</grouping-separator>
+                                <digits-after-decimal>Casas decimais</digits-after-decimal>
+                                <round-when-formatting>Arredondar ao formatar</round-when-formatting>
+                                <round-when-storing>Arredondar ao gravar</round-when-storing>
+                                <separators-must-differ>Os separadores decimal e de milhar devem ser diferentes</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Usar padrão</item>
+                                    <item id="1">Sim</item>
+                                    <item id="2">Não</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Usar padrão</item>
+                                    <item id="4">Vírgula (,)</item>
+                                    <item id="5">Ponto (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Usar padrão</item>
+                                    <item id="1">Sem separador</item>
+                                    <item id="2">Um espaço</item>
+                                    <item id="3">Apóstrofo (')</item>
+                                    <item id="4">Vírgula (,)</item>
+                                    <item id="5">Ponto (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <prefix>Prefix</prefix>
+                                <suffix>Suffix</suffix>
+                                <decimal-separator>Decimaltecken</decimal-separator>
+                                <grouping-separator>Tusentalsavgränsare</grouping-separator>
+                                <digits-after-decimal>Siffror efter decimal</digits-after-decimal>
+                                <round-when-formatting>Avrunda vid formatering</round-when-formatting>
+                                <round-when-storing>Avrunda vid lagring</round-when-storing>
+                                <separators-must-differ>Decimal- och tusentalsavgränsare måste skilja sig åt</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Använd standard</item>
+                                    <item id="1">Ja</item>
+                                    <item id="2">Nej</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Använd standard</item>
+                                    <item id="4">Komma (,)</item>
+                                    <item id="5">Punkt (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Använd standard</item>
+                                    <item id="1">Ingen avgränsare</item>
+                                    <item id="2">Ett mellanslag</item>
+                                    <item id="3">Apostrof (')</item>
+                                    <item id="4">Komma (,)</item>
+                                    <item id="5">Punkt (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <prefix>بادئة</prefix>
+                                <suffix>لاحقة</suffix>
+                                <decimal-separator>فاصل عشري</decimal-separator>
+                                <grouping-separator>فاصل المجموعات</grouping-separator>
+                                <digits-after-decimal>أرقام بعد الفاصلة العشرية</digits-after-decimal>
+                                <round-when-formatting>تقريب عند التنسيق</round-when-formatting>
+                                <round-when-storing>تقريب عند التخزين</round-when-storing>
+                                <separators-must-differ>يجب أن يختلف الفاصل العشري عن فاصل المجموعات</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">استخدام الإعداد الافتراضي</item>
+                                    <item id="1">نعم</item>
+                                    <item id="2">لا</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">استخدام الإعداد الافتراضي</item>
+                                    <item id="4">فاصلة (,)</item>
+                                    <item id="5">نقطة (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">استخدام الإعداد الافتراضي</item>
+                                    <item id="1">بدون فاصل</item>
+                                    <item id="2">مسافة واحدة</item>
+                                    <item id="3">علامة اقتباس (')</item>
+                                    <item id="4">فاصلة (,)</item>
+                                    <item id="5">نقطة (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <prefix>Prefiks</prefix>
+                                <suffix>Sufiks</suffix>
+                                <decimal-separator>Separator dziesiętny</decimal-separator>
+                                <grouping-separator>Separator grupujący</grouping-separator>
+                                <digits-after-decimal>Liczba miejsc po przecinku</digits-after-decimal>
+                                <round-when-formatting>Zaokrąglaj przy formatowaniu</round-when-formatting>
+                                <round-when-storing>Zaokrąglaj przy zapisie</round-when-storing>
+                                <separators-must-differ>Separator dziesiętny i grupujący muszą się różnić</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">Użyj domyślnie</item>
+                                    <item id="1">Tak</item>
+                                    <item id="2">Nie</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">Użyj domyślnie</item>
+                                    <item id="4">Przecinek (,)</item>
+                                    <item id="5">Kropka (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">Użyj domyślnie</item>
+                                    <item id="1">Brak separatora</item>
+                                    <item id="2">Jedna spacja</item>
+                                    <item id="3">Apostrof (')</item>
+                                    <item id="4">Przecinek (,)</item>
+                                    <item id="5">Kropka (.)</item>
+                                </grouping-separators>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <prefix>プレフィックス</prefix>
+                                <suffix>サフィックス</suffix>
+                                <decimal-separator>小数点記号</decimal-separator>
+                                <grouping-separator>桁区切り記号</grouping-separator>
+                                <digits-after-decimal>小数点以下の桁数</digits-after-decimal>
+                                <round-when-formatting>表示時に丸める</round-when-formatting>
+                                <round-when-storing>保存時に丸める</round-when-storing>
+                                <separators-must-differ>小数点と桁区切り記号は異なる必要があります</separators-must-differ>
+                                <default-yes-no>
+                                    <item id="0">既定を使う</item>
+                                    <item id="1">はい</item>
+                                    <item id="2">いいえ</item>
+                                </default-yes-no>
+                                <decimal-separators>
+                                    <item id="0">既定を使う</item>
+                                    <item id="4">カンマ (,)</item>
+                                    <item id="5">ピリオド (.)</item>
+                                </decimal-separators>
+                                <grouping-separators>
+                                    <item id="0">既定を使う</item>
+                                    <item id="1">区切りなし</item>
+                                    <item id="2">スペース1つ</item>
+                                    <item id="3">アポストロフィ (')</item>
+                                    <item id="4">カンマ (,)</item>
+                                    <item id="5">ピリオド (.)</item>
+                                </grouping-separators>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-percentage-grid">
+                    <xh:tr>
+                        <xh:td colspan="2">
+                            <xf:input ref="instance('local')/prefix" id="prefix-control">
+                                <xf:label ref="xxf:r('prefix')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td colspan="2">
+                            <xf:input ref="instance('local')/suffix" id="suffix-control">
+                                <xf:label ref="xxf:r('suffix')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td colspan="2">
+                            <fr:number ref="instance('local')/digits-after-decimal" id="digits-after-decimal-control">
+                                <xf:label ref="xxf:r('digits-after-decimal')"/>
+                                <xf:alert/>
+                            </fr:number>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <fr:open-select1 ref="instance('local')/decimal-separator" id="decimal-separator-control" appearance="minimal">
+                                <xf:label ref="xxf:r('decimal-separator')"/>
+                                <xf:alert validation="separators-must-differ" ref="xxf:r('separators-must-differ')"/>
+                                <xf:itemset ref="xxf:resource-elements('decimal-separators.item')">
+                                    <xf:label ref="."/>
+                                    <xf:value ref="
+                                        if (@id = 0) then
+                                            '&#2261;'
+                                        else if (@id = 4) then
+                                            ','
+                                        else
+                                            '.'
+                                    "/>
+                                </xf:itemset>
+                            </fr:open-select1>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <fr:open-select1 ref="instance('local')/grouping-separator" id="grouping-separator-control" appearance="minimal">
+                                <xf:label ref="xxf:r('grouping-separator')"/>
+                                <xf:alert validation="separators-must-differ" ref="xxf:r('separators-must-differ')"/>
+                                <xf:itemset ref="xxf:resource-elements('grouping-separators.item')">
+                                    <xf:label ref="."/>
+                                    <xf:value ref="
+                                        if (@id = 0) then
+                                            '&#2261;'
+                                        else if (@id = 1) then
+                                            '&#2262;'
+                                        else if (@id = 2) then
+                                            ' '
+                                        else if (@id = 3) then
+                                            ''''
+                                        else if (@id = 4) then
+                                            ','
+                                        else
+                                            '.'
+                                    "/>
+                                </xf:itemset>
+                            </fr:open-select1>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/round-when-formatting" appearance="full" id="round-when-formatting-control">
+                                <xf:label ref="xxf:r('round-when-formatting')"/>
+                                <xf:alert/>
+                                <xf:itemset ref="xxf:resource-elements('default-yes-no.item')">
+                                    <xf:label ref="."/>
+                                    <xf:value ref="if (@id = 0) then '' else if (@id = 1) then 'true' else 'false'"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/round-when-storing" appearance="full" id="round-when-storing-control">
+                                <xf:label ref="xxf:r('round-when-storing')"/>
+                                <xf:alert/>
+                                <xf:itemset ref="xxf:resource-elements('default-yes-no.item')">
+                                    <xf:label ref="."/>
+                                    <xf:value ref="if (@id = 0) then '' else if (@id = 1) then 'true' else 'false'"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/field-width" appearance="full" id="field-width-control">
+                                <xf:label ref="xxf:r('xbl-control-settings.field-width', '|fr-form-resources|')"/>
+                                <xf:alert/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.full', '|fr-form-resources|')"/>
+                                    <xf:value>full</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.natural', '|fr-form-resources|')"/>
+                                    <xf:value>natural</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/field-align" appearance="full" id="field-align-control">
+                                <xf:label ref="xxf:r('xbl-control-settings.field-align', '|fr-form-resources|')"/>
+                                <xf:alert/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.left', '|fr-form-resources|')"/>
+                                    <xf:value>left</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.right', '|fr-form-resources|')"/>
+                                    <xf:value>right</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-number-action"
+                    event="xforms-value-changed"
+                    observer="
+                        prefix-control
+                        suffix-control
+                        decimal-separator-control
+                        grouping-separator-control
+                        digits-after-decimal-control
+                        round-when-formatting-control
+                        round-when-storing-control
+                        field-width-control
+                        field-align-control">
+
+                    <xf:var name="name" value="name(event('xxf:binding'))"/>
+
+                    <!-- Special value to indicate that the default must be used -->
+                    <xf:var
+                        name="new-value"
+                        value="
+                            let $v            := string(event('xxf:binding')),
+                                $has-encoding := event('xxf:targetid') = ('grouping-separator-control', 'decimal-separator-control'),
+                                $has-optional := event('xxf:targetid') = 'grouping-separator-control'
+                            return
+                                if ($has-encoding and $v = '&#2261;') then
+                                    ()
+                                else if ($has-encoding and $v = '&#2262;') then
+                                    ''
+                                else if (not($has-optional) and $v = '') then
+                                    ()
+                                else
+                                    $v
+                        "/>
+
+                    <xf:insert
+                        context="instance()"
+                        if="exists($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="empty($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/number/number.css"/>
+        </xbl:resources>
+        <!-- Delegate to `fr:number` -->
+        <xi:include
+            href="/xbl/orbeon/number/number.xbl"
+            xpointer="xpath(/xbl:xbl/xbl:binding/xbl:handlers, /xbl:xbl/xbl:binding/xbl:template)"/>
+    </xbl:binding>
+
+    <xbl:binding
+        id="fr-percentage-output"
+        element="
+            fr|percentage[fr|static-readonly = true],
+            fr|percentage[fr|pdf-template = true]"
+        xxbl:mode="lhha binding value allow-minimal-label-hint"
+        xxbl:label-for="input"
+        xxbl:format="
+            string-join(
+                (
+                    fr:component-param-value('prefix'),
+                    NumberSupport:getDisplayValueJava(
+                        xxf:binding('fr-percentage-output'),
+                        fr:component-param-value('decimal-separator'),
+                        fr:component-param-value('grouping-separator'),
+                        fr:component-param-value('prefix'),
+                        fr:component-param-value('digits-after-decimal'),
+                        string(fr:component-param-value('round-when-formatting')) = 'true',
+                        string(fr:component-param-value('round-when-storing'))    = 'true',
+                        2
+                    ),
+                    fr:component-param-value('suffix')
+                ),
+                ' '
+            )"
+    >
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/number/number.css"/>
+        </xbl:resources>
+        <xbl:template>
+            <xf:input
+                id="input"
+                class="{for $v in fr:component-param-value('field-align') return concat('fr-field-align-', $v)}"
+                ref="xxf:binding('fr-percentage-output')"
+                xxf:format="xxf:formatted-value('fr-percentage-output')"/>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

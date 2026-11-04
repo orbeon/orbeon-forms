@@ -208,4 +208,64 @@ class NumberSupportTest extends AnyFunSpec {
         assert(expected === TestNumberSupport.roundBigDecimal(scala.BigDecimal(value), precision).bigDecimal.toPlainString)
       }
   }
+
+  describe("Scaling with `scaleFactor = 2` (percentage)") {
+
+    val DisplayExpected = List[(String, Option[Int], Boolean, String, String)](
+      ("0.25",     None,    true,  "25",       "25"),
+      ("0.255",    None,    true,  "25.5",     "25.5"),
+      ("0.255",    Some(0), true,  "26",       "25.5"),
+      ("0.255",    Some(2), true,  "25.50",    "25.5"),
+      ("12.3475",  None,    true,  "1,234.75", "1234.75"),
+      ("0",        None,    true,  "0",        "0"),
+      ("abcd",     None,    true,  "abcd",     "abcd")
+    )
+
+    for (t @ (stored, digitsAfterDecimalOpt, roundWhenFormatting, expectedDisplay, expectedEdit) <- DisplayExpected)
+      it (s"must format display and edit values for $t") {
+
+        val data = TestNode(stored, None, Map.empty)
+
+        implicit val params = NumberConfig(
+          decimalSeparator    = '.',
+          groupingSeparator   = Some(','),
+          prefix              = "",
+          digitsAfterDecimal  = digitsAfterDecimalOpt,
+          roundWhenFormatting = roundWhenFormatting,
+          roundWhenStoring    = false,
+          scaleFactor         = 2
+        )
+
+        assert(expectedDisplay === TestNumberSupport.displayValue(data))
+        assert(expectedEdit    === TestNumberSupport.editValue(stored))
+      }
+
+    val StorageExpected = List[(String, Option[Int], Boolean, String)](
+      ("25",        None,    false, "0.25"),
+      ("25.5",      None,    false, "0.255"),
+      ("25.567",    Some(1), true,  "0.256"),
+      ("25.567",    Some(1), false, "0.25567"),
+      ("1,234.75",  None,    false, "12.3475"),
+      ("0",         None,    false, "0"),
+      ("abcd",      None,    false, "abcd")
+    )
+
+    for (t @ (input, digitsAfterDecimalOpt, roundWhenStoring, expectedStored) <- StorageExpected)
+      it (s"must compute storage value for $t") {
+
+        val data = TestNode("", None, Map.empty)
+
+        implicit val params = NumberConfig(
+          decimalSeparator    = '.',
+          groupingSeparator   = Some(','),
+          prefix              = "",
+          digitsAfterDecimal  = digitsAfterDecimalOpt,
+          roundWhenFormatting = true,
+          roundWhenStoring    = roundWhenStoring,
+          scaleFactor         = 2
+        )
+
+        assert(expectedStored === TestNumberSupport.storageValue(input, data))
+      }
+  }
 }

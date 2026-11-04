@@ -33,7 +33,8 @@ case class NumberConfig(
   prefix              : String,
   digitsAfterDecimal  : Option[Int],
   roundWhenFormatting : Boolean,
-  roundWhenStoring    : Boolean
+  roundWhenStoring    : Boolean,
+  scaleFactor         : Int = 0
 ) {
   val decimalSeparatorString  : String         = decimalSeparator.toString
   val groupingSeparatorString : Option[String] = groupingSeparator map (_.toString)
@@ -92,7 +93,7 @@ trait NumberSupport[Binding] {
       formatNumber(decimal, pictureString)
         .translate(".,", params.decimalSeparatorString + params.groupingSeparatorString.getOrElse(""))
 
-    (NumericValidation.tryParseAsLongOrBigDecimal(getStringValue(binding)), precisionForRoundingOpt) match {
+    (NumericValidation.tryParseAsLongOrBigDecimal(getStringValue(binding)) map (scaleParsedValue(_, params.scaleFactor)), precisionForRoundingOpt) match {
       case (Some(sl @ Left(_)),  _      ) => format(sl,                           picture(fractionDigitsOpt getOrElse 0))
       case (Some(Right(d)) ,     Some(p)) => format(Right(roundBigDecimal(d, p)), picture(p))
       case (Some(sd @ Right(d)), None   ) => format(sd,                           picture(significantFractionalDigits(d).max(fractionDigitsOpt getOrElse 0)))
@@ -137,10 +138,20 @@ trait NumberSupport[Binding] {
       if (params.roundWhenStoring) fractionDigitsFromValidationOrProp(binding) else None
 
     (NumericValidation.tryParseAsLongOrBigDecimal(withSeparatorsReplaced), precisionForRoundingOpt) match {
-      case (Some(Left(l)),  _      ) => l.toString // no decimal fraction to round
-      case (Some(Right(d)), Some(p)) => formatNumber(Right(roundBigDecimal(d, p)), pictureString(p,        group = false, zeroes = false))
-      case (Some(Right(d)), None   ) => formatNumber(Right(d),                     pictureString(d.scale , group = false, zeroes = false))
-      case (None,           _      ) => withInvalidPeriodEncoded
+      case (Some(Left(l)),  _      ) if params.scaleFactor == 0 =>
+        l.toString // no decimal fraction to round
+      case (Some(Left(l)),  _      ) =>
+        val scaled = scala.BigDecimal(java.math.BigDecimal.valueOf(l).scaleByPowerOfTen(-params.scaleFactor))
+        formatNumber(Right(scaled), pictureString(scaled.scale, group = false, zeroes = false))
+      case (Some(Right(d)), Some(p)) =>
+        val rounded = roundBigDecimal(d, p)
+        val scaled  = if (params.scaleFactor == 0) rounded else scala.BigDecimal(rounded.bigDecimal.scaleByPowerOfTen(-params.scaleFactor))
+        formatNumber(Right(scaled), pictureString(p + params.scaleFactor, group = false, zeroes = false))
+      case (Some(Right(d)), None   ) =>
+        val scaled = if (params.scaleFactor == 0) d else scala.BigDecimal(d.bigDecimal.scaleByPowerOfTen(-params.scaleFactor))
+        formatNumber(Right(scaled), pictureString(scaled.scale, group = false, zeroes = false))
+      case (None,           _      ) =>
+        withInvalidPeriodEncoded
     }
   }
 
@@ -167,7 +178,19 @@ trait NumberSupport[Binding] {
       fractionDigitsIfInteger(binding) orElse params.digitsAfterDecimal
 
     def fractionDigitsFromValidationOrProp(binding: Binding)(implicit params: NumberConfig): Option[Int] =
-      validationFractionDigitsOpt(binding) orElse propertyFractionDigitsOpt(binding)
+      validationFractionDigitsOpt(binding).map(d => (d - params.scaleFactor).max(0)) orElse propertyFractionDigitsOpt(binding)
+
+    def scaleParsedValue(v: Long Either scala.BigDecimal, powerOfTen: Int): Long Either scala.BigDecimal =
+      if (powerOfTen == 0) {
+        v
+      } else {
+        val bd = v match {
+          case Left(l)  => java.math.BigDecimal.valueOf(l)
+          case Right(d) => d.bigDecimal
+        }
+        val scaled = bd.scaleByPowerOfTen(powerOfTen)
+        Right(scala.BigDecimal(if (scaled.scale < 0) scaled.setScale(0) else scaled))
+      }
 
     def formatNumber(decimal: Long Either scala.BigDecimal, pictureString: String): String = {
       val decimalFormat = new DecimalFormat(pictureString, DefaultDecimalFormatSymbols)
@@ -188,8 +211,8 @@ trait NumberSupport[Binding] {
           "." + ((if (zeroes) "0" else "#") * precision)
       }
 
-    def tryParseAndPrintDecimalValue(value: String): Option[String] =
-      NumericValidation.tryParseAsLongOrBigDecimal(value) map printDecimalValue
+    def tryParseAndPrintDecimalValue(value: String)(implicit params: NumberConfig): Option[String] =
+      NumericValidation.tryParseAsLongOrBigDecimal(value) map (scaleParsedValue(_, params.scaleFactor)) map printDecimalValue
 
     def printDecimalValue(value: Long Either scala.BigDecimal): String =
       value.fold(_.toString, _.bigDecimal.toPlainString)
@@ -229,6 +252,28 @@ object NumberSupportJava extends NumberSupport[om.Item] {
     digitsAfterDecimal  : String,
     roundWhenFormatting : Boolean,
     roundWhenStoring    : Boolean
+  ): String =
+    getDisplayValueJava(
+      binding             = binding,
+      decimalSeparator    = decimalSeparator,
+      groupingSeparator   = groupingSeparator,
+      prefix              = prefix,
+      digitsAfterDecimal  = digitsAfterDecimal,
+      roundWhenFormatting = roundWhenFormatting,
+      roundWhenStoring    = roundWhenStoring,
+      scaleFactor         = 0
+    )
+
+  //@XPathFunction
+  def getDisplayValueJava(
+    binding             : om.Item,
+    decimalSeparator    : String,
+    groupingSeparator   : String,
+    prefix              : String,
+    digitsAfterDecimal  : String,
+    roundWhenFormatting : Boolean,
+    roundWhenStoring    : Boolean,
+    scaleFactor         : Int
   ): String = {
 
     implicit val params = NumberConfig(
@@ -237,7 +282,8 @@ object NumberSupportJava extends NumberSupport[om.Item] {
       prefix              = prefix,
       digitsAfterDecimal  = digitsAfterDecimal.toIntOption,
       roundWhenFormatting = roundWhenFormatting,
-      roundWhenStoring    = roundWhenStoring
+      roundWhenStoring    = roundWhenStoring,
+      scaleFactor         = scaleFactor
     )
 
     displayValue(binding)
@@ -252,6 +298,28 @@ object NumberSupportJava extends NumberSupport[om.Item] {
     digitsAfterDecimal  : String,
     roundWhenFormatting : Boolean,
     roundWhenStoring    : Boolean
+  ): String =
+    serializeExternalValueJava(
+      binding             = binding,
+      decimalSeparator    = decimalSeparator,
+      groupingSeparator   = groupingSeparator,
+      prefix              = prefix,
+      digitsAfterDecimal  = digitsAfterDecimal,
+      roundWhenFormatting = roundWhenFormatting,
+      roundWhenStoring    = roundWhenStoring,
+      scaleFactor         = 0
+    )
+
+  //@XPathFunction
+  def serializeExternalValueJava(
+    binding             : om.Item,
+    decimalSeparator    : String,
+    groupingSeparator   : String,
+    prefix              : String,
+    digitsAfterDecimal  : String,
+    roundWhenFormatting : Boolean,
+    roundWhenStoring    : Boolean,
+    scaleFactor         : Int
   ): String = {
 
     implicit val params = NumberConfig(
@@ -260,7 +328,8 @@ object NumberSupportJava extends NumberSupport[om.Item] {
       prefix              = prefix,
       digitsAfterDecimal  = digitsAfterDecimal.toIntOption,
       roundWhenFormatting = roundWhenFormatting,
-      roundWhenStoring    = roundWhenStoring
+      roundWhenStoring    = roundWhenStoring,
+      scaleFactor         = scaleFactor
     )
 
     import io.circe.syntax.*
@@ -282,6 +351,30 @@ object NumberSupportJava extends NumberSupport[om.Item] {
     digitsAfterDecimal  : String,
     roundWhenFormatting : Boolean,
     roundWhenStoring    : Boolean
+  ): String =
+    deserializeExternalValueJava(
+      externalValue       = externalValue,
+      binding             = binding,
+      decimalSeparator    = decimalSeparator,
+      groupingSeparator   = groupingSeparator,
+      prefix              = prefix,
+      digitsAfterDecimal  = digitsAfterDecimal,
+      roundWhenFormatting = roundWhenFormatting,
+      roundWhenStoring    = roundWhenStoring,
+      scaleFactor         = 0
+    )
+
+  //@XPathFunction
+  def deserializeExternalValueJava(
+    externalValue       : String,
+    binding             : om.Item,
+    decimalSeparator    : String,
+    groupingSeparator   : String,
+    prefix              : String,
+    digitsAfterDecimal  : String,
+    roundWhenFormatting : Boolean,
+    roundWhenStoring    : Boolean,
+    scaleFactor         : Int
   ): String = {
 
     import io.circe.parser
@@ -295,7 +388,8 @@ object NumberSupportJava extends NumberSupport[om.Item] {
       prefix              = prefix,
       digitsAfterDecimal  = digitsAfterDecimal.toIntOption,
       roundWhenFormatting = roundWhenFormatting,
-      roundWhenStoring    = roundWhenStoring
+      roundWhenStoring    = roundWhenStoring,
+      scaleFactor         = scaleFactor
     )
 
     storageValue(editValueFromClient, binding)

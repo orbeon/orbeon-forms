@@ -1480,6 +1480,9 @@
                                             <fr:currency ref=".[@control ='currency']" field-width="full">
                                                 <xf:label mediatype="text/html" value="$label"/>
                                             </fr:currency>
+                                            <fr:percentage ref=".[@control ='percentage']" field-width="full">
+                                                <xf:label mediatype="text/html" value="$label"/>
+                                            </fr:percentage>
                                             <fr:date ref=".[@control ='date']" field-width="full">
                                                 <xf:label mediatype="text/html" value="$label"/>
                                             </fr:date>
@@ -1576,6 +1579,7 @@
                                         <xf:var name="is-input-output" value="@control = ('input', 'inplace-input', 'output')"/>
                                         <xf:var name="is-number"       value="@control = 'number'"/>
                                         <xf:var name="is-currency"     value="@control = 'currency'"/>
+                                        <xf:var name="is-percentage"   value="@control = 'percentage'"/>
                                         <xf:var name="is-date"         value="@control = 'date'"/>
                                         <xf:var name="is-time"         value="@control = 'time'"/>
                                         <xf:var name="is-datetime"     value="@control = 'datetime'"/>
@@ -1586,7 +1590,7 @@
                                         <xf:var
                                             name="is-supported-control"
                                             value="
-                                                $is-input-output or $is-number or $is-currency or
+                                                $is-input-output or $is-number or $is-currency or $is-percentage or
                                                 $is-date or $is-time or $is-datetime or $is-textarea or
                                                 $is-select1 or $is-open-select1 or $is-select"/>
 
@@ -1605,6 +1609,9 @@
                                                 <fr:currency ref=".[$is-currency]" field-width="full">
                                                     <xf:label mediatype="text/html" value="$label"/>
                                                 </fr:currency>
+                                                <fr:percentage ref=".[$is-percentage]" field-width="full">
+                                                    <xf:label mediatype="text/html" value="$label"/>
+                                                </fr:percentage>
                                                 <fr:date ref=".[$is-date]" field-width="full">
                                                     <xf:label mediatype="text/html" value="$label"/>
                                                 </fr:date>
@@ -1749,7 +1756,7 @@
                                         </xf:group>
                                         <xf:repeat ref="instance('fr-search-labels-instance')/query[@summary-show = 'true']" id="fr-summary-repeat-column-number">
                                             <fr:sortable-th
-                                                class="{if (@control = ('number', 'currency')) then 'fr-align-right' else ''}"
+                                                class="{if (@control = ('number', 'currency', 'percentage')) then 'fr-align-right' else ''}"
                                                 label="resources[@lang = xxf:instance('fr-language-instance')]/label"
                                                 sort-supported="{$sort-supported}"
                                                 instance="instance('fr-order-by')"
@@ -1914,7 +1921,7 @@
                                                     <xf:var name="detail-position" value="."/>
                                                     <!-- Set context to current detail -->
                                                     <xf:group context="$document/details/detail[$detail-position]" appearance="xxf:internal">
-                                                        <xh:td class="fr-td {'fr-align-right'[instance('fr-search-instance')/query[@name][$detail-position]/@control = ('number', 'currency')]}">
+                                                        <xh:td class="fr-td {'fr-align-right'[instance('fr-search-instance')/query[@name][$detail-position]/@control = ('number', 'currency', 'percentage')]}">
                                                             <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->
                                                             <xf:var
                                                                 name="detail"

@@ -253,7 +253,7 @@
 
     <!-- See also `fb.ControlOps` for the renaming part -->
     <xsl:template
-        match="fr:number[exists(@prefix | @suffix)] | fr:currency[exists(@prefix | @suffix)]"
+        match="fr:number[exists(@prefix | @suffix)] | fr:currency[exists(@prefix | @suffix)] | fr:percentage[exists(@prefix | @suffix)]"
         mode="within-grid">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:copy>

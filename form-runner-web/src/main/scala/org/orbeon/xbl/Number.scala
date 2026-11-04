@@ -35,8 +35,9 @@ object Number {
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.Number")
   private val TestNum = 1.1
 
-  XFormsXbl.declareCompanion("fr|number",   js.constructorOf[NumberCompanion])
-  XFormsXbl.declareCompanion("fr|currency", js.constructorOf[NumberCompanion])
+  XFormsXbl.declareCompanion("fr|number",     js.constructorOf[NumberCompanion])
+  XFormsXbl.declareCompanion("fr|currency",   js.constructorOf[NumberCompanion])
+  XFormsXbl.declareCompanion("fr|percentage", js.constructorOf[NumberCompanion])
 
   private class NumberCompanion(containerElem: html.Element) extends XBLCompanionWithState(containerElem) {
 

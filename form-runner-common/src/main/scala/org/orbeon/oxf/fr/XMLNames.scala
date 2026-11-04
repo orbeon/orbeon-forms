@@ -85,6 +85,7 @@ object XMLNames {
 
   val FRNumberTest             : Test      = FR -> "number"
   val FRCurrencyTest           : Test      = FR -> "currency"
+  val FRPercentageTest         : Test      = FR -> "percentage"
 
   val ControlsTest             : Test      = QName("controls")
   val ControlTest              : Test      = QName("control")

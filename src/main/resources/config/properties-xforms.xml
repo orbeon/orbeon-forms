@@ -194,6 +194,16 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.field-width"                      value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.field-align"                      value=""/>
 
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.percentage.prefix"                         value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.percentage.suffix"                         value="%"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.percentage.digits-after-decimal"           value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.percentage.decimal-separator"              value="."/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.percentage.grouping-separator"             value=","/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.percentage.round-when-formatting"          value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.percentage.round-when-storing"             value="false"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.percentage.field-width"                    value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.percentage.field-align"                    value=""/>
+
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.prefix"                             value=""/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.suffix"                             value=""/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.digits-after-decimal"               value=""/>
@@ -289,6 +299,8 @@
         fr:datetime
         fr:year
         fr:number
+        fr:currency
+        fr:percentage
         fr:color
         fr:masked-input
         fr:handwritten-signature

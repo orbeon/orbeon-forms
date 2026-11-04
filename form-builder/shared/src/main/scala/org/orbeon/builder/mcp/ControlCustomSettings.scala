@@ -87,7 +87,7 @@ object ControlCustomSettings {
         }
         // Specific checks: decimal-separator and grouping-separator must differ if both set
         // This is currently a hack, as the constraint is not actually interpreted.
-        if (spec.localName == "number" || spec.localName == "currency" || spec.constraints.exists(_.test.contains("decimal-separator != grouping-separator"))) {
+        if (spec.localName == "number" || spec.localName == "currency" || spec.localName == "percentage" || spec.constraints.exists(_.test.contains("decimal-separator != grouping-separator"))) {
           val decOpt = findStringVal(spec, custom, "decimalSeparator")
           val grpOpt = findStringVal(spec, custom, "groupingSeparator")
           for {

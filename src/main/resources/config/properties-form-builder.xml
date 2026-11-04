@@ -39,6 +39,7 @@
         oxf:/forms/orbeon/builder/xbl/typed-controls.xbl
         oxf:/xbl/orbeon/number/number.xbl
         oxf:/xbl/orbeon/currency/currency.xbl
+        oxf:/xbl/orbeon/percentage/percentage.xbl
         oxf:/forms/orbeon/builder/xbl/typed-email.xbl
         oxf:/xbl/orbeon/country/country.xbl
         oxf:/xbl/orbeon/us-phone/us-phone.xbl
@@ -307,8 +308,9 @@
         value="fixed"/>
 
     <!-- For the Form Builder UI -->
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.field-width.orbeon.builder"   value="full"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.field-width.orbeon.builder" value="full"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.field-width.orbeon.builder"     value="full"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.field-width.orbeon.builder"   value="full"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.percentage.field-width.orbeon.builder" value="full"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.date.field-width.orbeon.builder"     value="full"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.time.field-width.orbeon.builder"     value="full"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.datetime.field-width.orbeon.builder" value="full"/>

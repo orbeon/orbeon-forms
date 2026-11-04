@@ -61,6 +61,12 @@ class BindingDescriptorTest
           </metadata>
         </xbl:binding>
 
+        <xbl:binding element="fr|percentage, xf|input[appearance = 'xxf:percentage']:xxf-type('xs:decimal')">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Percentage</display-name>
+          </metadata>
+        </xbl:binding>
+
         <xbl:binding element="xf|input:xxf-type('xs:date')">
           <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Date</display-name>
@@ -269,7 +275,7 @@ class BindingDescriptorTest
 
     assertVaryTypes(XF -> "input"     , XS -> "string" )(Seq(None         -> "Input Field"    , Some("character-counter") -> "With Character Counter"))
     assertVaryTypes(XF -> "textarea"  , XS -> "string" )(Seq(None         -> "Plain Text Area", Some("character-counter") -> "With Character Counter"))
-    assertVaryTypes(XF -> "input"     , XS -> "decimal")(Seq(None         -> "Number"))
+    assertVaryTypes(XF -> "input"     , XS -> "decimal")(Seq(None         -> "Number"          , Some("xxf:percentage")    -> "Percentage"))
     assertVaryTypes(XF -> "input"     , XS -> "date"   )(Seq(None         -> "Date"           , Some("dropdowns")         -> "Dropdown Date"          , Some("fields") -> "Fields Date"))
     assertVaryTypes(XF -> "input"     , XS -> "gYear"      )(Seq(None            -> "Year"               , Some("dropdown")  -> "Dropdown Year"))
     assertVaryTypes(XF -> "input"     , XS -> "gYearMonth" )(Seq(Some("dropdowns") -> "Dropdown Month/Year"))

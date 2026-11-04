@@ -45,6 +45,7 @@
             <display-name lang="ar">سنة منسدلة</display-name>
             <display-name lang="pl">Rok w liście rozwijanej</display-name>
             <display-name lang="ja">ドロップダウン年</display-name>
+            <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-calendar</icon-class>
             </icon>

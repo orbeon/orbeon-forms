@@ -44,6 +44,7 @@
             <display-name lang="ar">تاريخ بحقول منفصلة</display-name>
             <display-name lang="pl">Data w osobnych polach</display-name>
             <display-name lang="ja">日付（分割入力）</display-name>
+            <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-calendar</icon-class>
             </icon>

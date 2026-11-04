@@ -42,6 +42,7 @@
         <display-name lang="ar">إجابة نعم/لا</display-name>
         <display-name lang="pl">Odpowiedź Tak/Nie</display-name>
         <display-name lang="ja">はい／いいえ</display-name>
+            <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-circle-half-stroke</icon-class>
             </icon>

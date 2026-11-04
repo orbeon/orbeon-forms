@@ -45,6 +45,7 @@
         <display-name lang="ar">تاريخ منسدل</display-name>
         <display-name lang="pl">Data w liście rozwijanej</display-name>
         <display-name lang="ja">ドロップダウン日付</display-name>
+            <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-calendar</icon-class>
             </icon>

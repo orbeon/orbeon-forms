@@ -49,6 +49,7 @@
         <display-name lang="ar">خانات اختيار قابلة للتمرير</display-name>
         <display-name lang="pl">Przewijane pola wyboru</display-name>
         <display-name lang="ja">スクロール付きチェックボックス</display-name>
+            <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-check-square-o</icon-class>
             </icon>

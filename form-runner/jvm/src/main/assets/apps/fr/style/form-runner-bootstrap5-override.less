@@ -707,18 +707,9 @@
   @media (prefers-contrast: no-preference), (prefers-contrast: less) {
     input[type="radio"],
     input[type="checkbox"] {
-      appearance: none;
-      width: 1em;
-      height: 1em;
-      border: 1px solid var(--orbeon-checkable-border-color);
-      background-color: var(--orbeon-checkable-background-color);
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: contain;
-      -webkit-print-color-adjust: exact;
+      .checkableBox();
       &:checked {
-        background-color: var(--orbeon-checkable-checked-background-color);
-        border-color    : var(--orbeon-checkable-checked-border-color);
+        .checkableBoxChecked();
       }
       &:disabled {
         opacity: .5;
@@ -737,16 +728,16 @@
     }
 
     input[type="radio"] {
-      border-radius: 50%;
+      .checkableRadio();
       &:checked {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2' fill='%23fff'/%3e%3c/svg%3e");
+        .checkableRadioChecked();
       }
     }
 
     input[type="checkbox"] {
-      border-radius: 25%;
+      .checkableCheckbox();
       &:checked {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+        .checkableCheckboxChecked();
       }
     }
   }

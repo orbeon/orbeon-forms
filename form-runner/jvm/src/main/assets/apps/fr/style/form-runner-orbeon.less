@@ -521,9 +521,6 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
                     @media screen {
                         min-height: @fluidLineHeight;
                     }
-                    background-size: 1.5em;
-                    background-repeat: no-repeat;
-                    background-position: 0 0;
                     cursor: not-allowed;
                     display: block; // https://github.com/orbeon/orbeon-forms/issues/4044
 
@@ -535,23 +532,44 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
                         display: block; // https://github.com/orbeon/orbeon-forms/issues/5803
                         padding-left: 1.5em; // offset the label past the glyph (Bootstrap 2's .checkbox/.radio padding)
                     }
+
+                    @media screen {
+                        display: flex;
+                        column-gap: .5em;
+
+                        &::before {
+                            content: "";
+                            .checkableBox();
+                            flex-shrink: 0;
+                            margin-top: 3px; // same as `label.radio input` in form-runner-bootstrap5-override.less
+                        }
+
+                        .checkbox, .radio {
+                            padding-left: 0;
+                        }
+                    }
                 }
-                .xforms-selected {
-                    background-image: url("images/other/checkbox-selected-256.svg");
-                }
-                .xforms-deselected {
-                    background-image: url("images/other/checkbox-deselected-256.svg");
+                @media screen {
+                    .xforms-selected::before, .xforms-deselected::before {
+                        .checkableCheckbox();
+                    }
+                    .xforms-selected::before {
+                        .checkableBoxChecked();
+                        .checkableCheckboxChecked();
+                    }
                 }
             }
         }
 
         .xforms-select1-appearance-full {
             &.xforms-static {
-                .xforms-selected {
-                    background-image: url("images/other/radio-selected-256.svg");
-                }
-                .xforms-deselected {
-                    background-image: url("images/other/radio-deselected-256.svg");
+                @media screen {
+                    .xforms-selected::before, .xforms-deselected::before {
+                        .checkableRadio();
+                    }
+                    .xforms-selected::before {
+                        .checkableRadioChecked();
+                    }
                 }
             }
         }
@@ -569,19 +587,6 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
 // ***** Dark mode *****************************************************************************************************
 
 .dark-mode({
-    .xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean {
-        &.xforms-static {
-            .xforms-selected, .xforms-deselected {
-                filter: invert(1);
-
-                // TODO: is there a better way to do this than a double inversion?
-                .checkbox, .radio {
-                    filter: invert(1);
-                }
-            }
-        }
-    }
-
     .CodeMirror-scrollbar-filler {
         background-color: var(--orbeon-page-background-color);
     }

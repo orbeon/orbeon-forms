@@ -223,6 +223,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   def isBooleanSelectionControl(controlElem: om.NodeInfo, bindElem: => Option[om.NodeInfo]): Boolean =
     FormRunner.isYesNoInput(controlElem)      ||
       FormRunner.isCheckboxInput(controlElem) ||
+      FormRunner.isSwitchInput(controlElem)   ||
       bindElem.forall(FormRunner.isBooleanInput(controlElem, _))
 
   def isYesNoInput(controlElem: NodeInfo): Boolean =
@@ -230,6 +231,9 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
   def isCheckboxInput(controlElem: NodeInfo): Boolean =
     controlElem.resolveQName(controlElem.name) == FRCheckboxInputQName
+
+  def isSwitchInput(controlElem: NodeInfo): Boolean =
+    controlElem.resolveQName(controlElem.name) == FRSwitchInputQName
 
   def searchControlsInFormBySubElement(
     subElements       : Set[String],

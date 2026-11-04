@@ -1,0 +1,49 @@
+.orbeon .xbl-fr-switch-input {
+    &.xforms-required .checkbox span {
+        &:before {
+            // The following is copied from `form-runner-orbeon.less`
+            font-family    : FontAwesome;
+            content        : "\f005";
+            vertical-align : super;         // So the star doesn't show too high relative to the text of the label
+            line-height    : 1em;           // For the `super` not to change the line height, and keep the label vertical alignment
+            font-size      : var(--orbeon-required-icon-font-size);
+            margin-right   : 1ch;
+        }
+        > div:first-child {                 // Make the first `div`, in case of an HTML label, `inline`, so it shows
+            display: inline;                // on the same line as the star.
+        }
+    }
+    & > .xforms-select-appearance-full {
+        display: flex;
+        flex-direction: row-reverse;
+        width: fit-content;
+        align-items: center;
+    }
+    label.checkbox {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45em;
+
+        input[type="checkbox"] {
+            margin-top: 0;
+            flex-shrink: 0;
+        }
+    }
+    @media (prefers-contrast: no-preference), (prefers-contrast: less) {
+        input[type="checkbox"] {
+            width              : 2.25em;
+            height             : 1.25em;
+            border-radius      : 2em;
+            background-position: left center;
+            background-image   : url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%236e7277'/%3e%3c/svg%3e");
+            transition         : background-position var(--orbeon-transition-duration, 0.15s) var(--orbeon-transition-timing-function, ease-in-out),
+                                 background-color var(--orbeon-transition-duration, 0.15s) var(--orbeon-transition-timing-function, ease-in-out),
+                                 border-color var(--orbeon-transition-duration, 0.15s) var(--orbeon-transition-timing-function, ease-in-out);
+
+            &:checked {
+                background-position: right center;
+                background-image   : url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+            }
+        }
+    }
+}

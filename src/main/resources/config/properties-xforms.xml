@@ -261,6 +261,8 @@
         fr:clipboard-copy
         fr:bootstrap5-select1
         fr:boolean-input
+        fr:checkbox-input
+        fr:switch-input
         fr:yesno-input
         fr:tree-select1
         fr:dropdown-select1-search

@@ -127,6 +127,24 @@ class BindingDescriptorTest
           </metadata>
         </xbl:binding>
 
+        <xbl:binding element="fr|checkbox-input, xf|input:xxf-type('xs:boolean')[appearance ~= checkbox]">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Single Checkbox</display-name>
+          </metadata>
+        </xbl:binding>
+
+        <xbl:binding element="fr|switch-input, xf|input:xxf-type('xs:boolean')[appearance ~= switch]">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Toggle Switch</display-name>
+          </metadata>
+        </xbl:binding>
+
+        <xbl:binding element="fr|yesno-input, xf|input:xxf-type('xs:boolean')[appearance ~= yesno]">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Yes/No Answer</display-name>
+          </metadata>
+        </xbl:binding>
+
       </xbl:xbl>
     </components>
 
@@ -187,6 +205,10 @@ class BindingDescriptorTest
     assertVaryTypes(XF -> "input"        , XS -> "string" , Some("character-counter"), XS -> "double" , Some("character-counter"))(None)
 
     assertVaryTypes(FR -> "attachment"   , XS -> "string" , None                     , XS -> "string" , None)(None)
+
+    assertVaryTypes(FR -> "checkbox-input", XS -> "boolean", None                    , XS -> "boolean", Some("switch")  )(Some(FR -> "switch-input"  , None))
+    assertVaryTypes(FR -> "switch-input"  , XS -> "boolean", None                    , XS -> "boolean", Some("checkbox"))(Some(FR -> "checkbox-input", None))
+    assertVaryTypes(FR -> "switch-input"  , XS -> "boolean", None                    , XS -> "boolean", Some("yesno")   )(Some(FR -> "yesno-input"   , None))
   }
 
   describe("Possible appearances with label") {
@@ -211,6 +233,7 @@ class BindingDescriptorTest
     assertVaryTypes(XF -> "input"     , XS -> "decimal")(Seq(None         -> "Number"))
     assertVaryTypes(XF -> "input"     , XS -> "date"   )(Seq(None         -> "Date"           , Some("dropdowns")         -> "Dropdown Date"          , Some("fields") -> "Fields Date"))
     assertVaryTypes(XF -> "select1"   , XS -> "string" )(Seq(Some("full") -> "Radio Buttons"  , Some("dropdown")          -> "Dropdown Menu"))
+    assertVaryTypes(XF -> "input"     , XS -> "boolean")(Seq(Some("checkbox") -> "Single Checkbox", Some("switch") -> "Toggle Switch", Some("yesno") -> "Yes/No Answer"))
 
     assertVaryTypes(XF -> "textarea"  , XS -> "string" , List(QName("mediatype") -> "text/html"))(Seq(None-> "Formatted Text Area", Some("character-counter") -> "With Character Counter") )
     assertVaryTypes(FR -> "attachment", XS -> "string" , List(QName("mediatype") -> "text/html"))(Nil)

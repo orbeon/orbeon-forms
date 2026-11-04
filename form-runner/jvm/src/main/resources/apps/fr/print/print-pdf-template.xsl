@@ -79,7 +79,8 @@
                 'fr-dropdown-select1',
                 'fr-yesno-input',
                 'fr-databound-select1',
-                'fr-checkbox-input'
+                'fr-checkbox-input',
+                'fr-switch-input'
             "
         as="xs:string*"/>
 

@@ -119,6 +119,7 @@ object XMLNames {
 
   val FRYesNoInputQName             : QName = QName("yesno-input",              FRNamespace)
   val FRCheckboxInputQName          : QName = QName("checkbox-input",           FRNamespace)
+  val FRSwitchInputQName            : QName = QName("switch-input",             FRNamespace)
   val FRDataboundSelect1QName       : QName = QName("databound-select1",        FRNamespace)
   val FRDataboundSelect1SearchQName : QName = QName("databound-select1-search", FRNamespace)
 

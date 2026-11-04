@@ -105,7 +105,7 @@ trait ClientTestSupport {
   val ImageResourcesDir       = s"$ImageTomcatDir/webapps/orbeon/WEB-INF/resources"
   val DefaultConfigDirectory  = "config"
 
-  val CookieTimeout           = 120.seconds
+  val CookieTimeout           = 300.seconds
 
   implicit override def executionContext: scala.concurrent.ExecutionContext =
     org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global

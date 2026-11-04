@@ -29,55 +29,57 @@ class NumberSupportTest extends AnyFunSpec {
   describe("The `displayValue` function") {
 
     val Expected = List[(String, Char, Option[Char], Option[Int], Boolean, String)](
-      ("123456.789", '.', Some(','), Some(2), true,   "123,456.79"  ),
-      ("123456.789", '.', None     , Some(2), true,   "123456.79"   ),
+      ("123456.789", '.', Some(',') , Some(2), true ,  "123,456.79"  ),
+      ("123456.789", '.', None      , Some(2), true ,  "123456.79"   ),
 
-      ("123456.789", '.', Some(','), None   , true,   "123,456.789" ),
-      ("123456.789", '.', None     , None   , true,   "123456.789"  ),
+      ("123456.789", '.', Some(',') , None   , true ,  "123,456.789" ),
+      ("123456.789", '.', None      , None   , true ,  "123456.789"  ),
 
-      ("123456.789", '.', Some(','), None   , false,  "123,456.789" ),
-      ("123456.789", '.', None     , None   , false,  "123456.789"  ),
+      ("123456.789", '.', Some(',') , None   , false,  "123,456.789" ),
+      ("123456.789", '.', None      , None   , false,  "123456.789"  ),
 
-      ("123456.789", '.', Some(','), Some(4), true,   "123,456.7890"),
-      ("123456.789", '.', None     , Some(4), true,   "123456.7890" ),
+      ("123456.789", '.', Some(',') , Some(4), true ,  "123,456.7890"),
+      ("123456.789", '.', None      , Some(4), true ,  "123456.7890" ),
 
-      ("123456.789", '.', Some(','), Some(4), false,  "123,456.7890"),
-      ("123456.789", '.', None     , Some(4), false,  "123456.7890" ),
+      ("123456.789", '.', Some(',') , Some(4), false,  "123,456.7890"),
+      ("123456.789", '.', None      , Some(4), false,  "123456.7890" ),
 
-      ("123456."   , '.', Some(','), Some(2), true,   "123,456.00"  ),
-      ("123456."   , '.', None     , Some(2), true,   "123456.00"   ),
+      ("123456."   , '.', Some(',') , Some(2), true ,  "123,456.00"  ),
+      ("123456."   , '.', None      , Some(2), true ,  "123456.00"   ),
 
-      ("123456."   , '.', Some(','), Some(2), false,  "123,456.00"  ),
-      ("123456."   , '.', None     , Some(2), false,  "123456.00"   ),
+      ("123456."   , '.', Some(',') , Some(2), false,  "123,456.00"  ),
+      ("123456."   , '.', None      , Some(2), false,  "123456.00"   ),
 
-      ("123456."   , '.', Some(','), Some(4), true,   "123,456.0000"),
-      ("123456."   , '.', None     , Some(4), true,   "123456.0000" ),
+      ("123456."   , '.', Some(',') , Some(4), true ,  "123,456.0000"),
+      ("123456."   , '.', None      , Some(4), true ,  "123456.0000" ),
 
-      ("123456"    , '.', Some(','), Some(2), true,   "123,456.00"  ),
-      ("123456"    , '.', None     , Some(2), true,   "123456.00"   ),
+      ("123456"    , '.', Some(',') , Some(2), true ,  "123,456.00"  ),
+      ("123456"    , '.', None      , Some(2), true ,  "123456.00"   ),
 
-      ("123456"    , '.', Some(','), Some(2), false,  "123,456.00"  ),
-      ("123456"    , '.', None     , Some(2), false,  "123456.00"   ),
+      ("123456"    , '.', Some(',') , Some(2), false,  "123,456.00"  ),
+      ("123456"    , '.', None      , Some(2), false,  "123456.00"   ),
 
-      ("123456"    , '.', Some(','), Some(0), true,   "123,456"     ),
-      ("123456"    , '.', None     , Some(0), true,   "123456"      ),
+      ("123456"    , '.', Some(',') , Some(0), true ,  "123,456"     ),
+      ("123456"    , '.', None      , Some(0), true ,  "123456"      ),
 
-      ("123456"    , '.', Some(','), Some(0), false,  "123,456"     ),
-      ("123456"    , '.', None     , Some(0), false,  "123456"      ),
+      ("123456"    , '.', Some(',') , Some(0), false,  "123,456"     ),
+      ("123456"    , '.', None      , Some(0), false,  "123456"      ),
 
-      ("123456"    , '.', Some(','), Some(4), true,   "123,456.0000"),
-      ("123456"    , '.', None     , Some(4), true,   "123456.0000" ),
+      ("123456"    , '.', Some(',') , Some(4), true ,  "123,456.0000"),
+      ("123456"    , '.', None      , Some(4), true ,  "123456.0000" ),
 
-      ("123456,78" , '.', Some(','), Some(2), true,   "123456,78"   ), // ideal behavior unclear
-      ("123456,78" , '.', None     , Some(2), true,   "123456,78"   ), // ideal behavior unclear
+      ("123456,78" , '.', Some(',') , Some(2), true ,  "123456,78"   ), // ideal behavior unclear
+      ("123456,78" , '.', None      , Some(2), true ,  "123456,78"   ), // ideal behavior unclear
 
-      ("123456,78" , '.', Some(','), Some(2), false,  "123456,78"   ), // ideal behavior unclear
-      ("123456,78" , '.', None     , Some(2), false,  "123456,78"   ), // ideal behavior unclear
+      ("123456,78" , '.', Some(',') , Some(2), false,  "123456,78"   ), // ideal behavior unclear
+      ("123456,78" , '.', None      , Some(2), false,  "123456,78"   ), // ideal behavior unclear
 
-      ("abcd"      , '.', Some(','), Some(2), true,   "abcd"        ),
-      ("abcd"      , '.', Some(','), Some(2), false,  "abcd"        ),
+      ("abcd"      , '.', Some(',') , Some(2), true ,  "abcd"        ),
+      ("abcd"      , '.', Some(',') , Some(2), false,  "abcd"        ),
 
-      ("1234≡56"   , ',', None     , Some(2), false,  "1234.56"     )
+      ("1234≡56"   , ',', None      , Some(2), false,  "1234.56"     ),
+
+      ("1234.56"   , ',', Some('\''), None   , true ,  "1'234,56"    )  // #2548
     )
 
     for (t @ (stored, decimalSeparator, groupingSeparatorOpt, digitsAfterDecimalOpt, roundWhenFormatting, expected) <- Expected)

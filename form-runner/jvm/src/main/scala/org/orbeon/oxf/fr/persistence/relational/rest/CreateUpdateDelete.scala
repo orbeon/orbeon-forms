@@ -366,47 +366,48 @@ trait CreateUpdateDelete {
 
     sealed trait ReindexAction
     object ReindexAction {
-      sealed trait SomeAction extends ReindexAction {def clearOnly: Boolean }
-      case object FormDefinitionPutNoChange                                               extends ReindexAction
-      case class  FormDefinitionPutWithChanges(formStorageDetails: FormStorageDetails)    extends ReindexAction with SomeAction {val clearOnly: Boolean = false } // reindexing of data will be needed
-      case object FormDefinitionDelete                                                    extends ReindexAction with SomeAction {val clearOnly: Boolean = true }  // don't reindex data, see https://github.com/orbeon/orbeon-forms/issues/6915
-      case class  DataPutOrDelete(newIndexInfoOpt: Option[IndexInfo], clearOnly: Boolean) extends ReindexAction with SomeAction
+      sealed trait SomeAction extends ReindexAction { def clearOnly: Boolean }
+      case class  FormDefinitionPutNoChange   (formStorageDetails: FormStorageDetails)                                     extends ReindexAction
+      case class  FormDefinitionPutWithChanges(formStorageDetails: FormStorageDetails)                                     extends ReindexAction with SomeAction { val clearOnly: Boolean = false } // reindexing of data will be needed
+      case object FormDefinitionDelete                                                                                     extends ReindexAction with SomeAction { val clearOnly: Boolean = true  } // don't reindex data, see https://github.com/orbeon/orbeon-forms/issues/6915
+      case class  DataPutOrDelete             (documentId: String, newIndexInfoOpt: Option[IndexInfo], clearOnly: Boolean) extends ReindexAction with SomeAction
     }
 
     def getReindexAction(beforeIndexInfoOpt: Option[IndexInfo]): ReindexAction = {
       assert(mightReindex)
       assert(! req.forAttachment)
-      if (isFormDefinitionPut) {
-        // For `PUT` of form definition, compare the current list of controls to index with the previous list
-        // https://github.com/orbeon/orbeon-forms/issues/6914
+      req.dataPart match {
+        case None if ! delete =>
+          // For `PUT` of form definition, compare the current list of controls to index with the previous list
+          // https://github.com/orbeon/orbeon-forms/issues/6914
 
-        // Don't call `Index.indexedControlsXPaths()`, because it opens a connection, and we might already be in a
-        // connection, which can lead to nested connections and deadlocks. So we use the form definition document we
-        // already have, and compute the indexed controls XPaths from it and update the cache.
-        val formDefinitionDoc =
-          RequestReader
-            .xmlDocument(reqBodyOpt)
-            .getOrElse(throw HttpStatusCodeException(StatusCode.BadRequest)) // request must contain parsable XML
+          // Don't call `Index.indexedControlsXPaths()`, because it opens a connection, and we might already be in a
+          // connection, which can lead to nested connections and deadlocks. So we use the form definition document we
+          // already have, and compute the indexed controls XPaths from it and update the cache.
+          val formDefinitionDoc =
+            RequestReader
+              .xmlDocument(reqBodyOpt)
+              .getOrElse(throw HttpStatusCodeException(StatusCode.BadRequest)) // request must contain parsable XML
 
-        val afterStoreIndexInfo =
-          Try(PersistenceMetadataSupport.buildPublishedFormStorageDetails(formDefinitionDoc, appFormVersion._1))
-            .getOrElse(throw HttpStatusCodeException(StatusCode.BadRequest)) // can fail only if form definition provided in request is not valid
+          val afterStoreIndexInfo =
+            Try(PersistenceMetadataSupport.buildPublishedFormStorageDetails(formDefinitionDoc, appFormVersion._1))
+              .getOrElse(throw HttpStatusCodeException(StatusCode.BadRequest)) // can fail only if form definition provided in request is not valid
 
-        if (beforeIndexInfoOpt.contains_(afterStoreIndexInfo.indexedControlsXPaths.value)) {
-          debug("CRUD: indexed controls XPaths are the same, skipping reindexing for form definition `PUT`")
-          ReindexAction.FormDefinitionPutNoChange
-        } else {
-          debug("CRUD: indexed controls XPaths have changed, reindexing for form definition `PUT`")
-          ReindexAction.FormDefinitionPutWithChanges(afterStoreIndexInfo)
-        }
-      } else if (req.forForm) {
-        // Form definition `DELETE`
-        debug("CRUD: reindexing for form definition `DELETE`")
-        ReindexAction.FormDefinitionDelete // don't reindex data, see https://github.com/orbeon/orbeon-forms/issues/6915
-      } else {
-        // Data `PUT` or `DELETE` (but not `DELETE` of historical data, see `mightReindex` above)
-        debug("CRUD: reindexing for data `PUT` or `DELETE`")
-        ReindexAction.DataPutOrDelete(beforeIndexInfoOpt, clearOnly = delete) // don't reindex data if we `DELETE`
+          if (beforeIndexInfoOpt.contains_(afterStoreIndexInfo.indexedControlsXPaths.value)) {
+            debug("CRUD: indexed controls XPaths are the same, skipping reindexing for form definition `PUT`")
+            ReindexAction.FormDefinitionPutNoChange(afterStoreIndexInfo)
+          } else {
+            debug("CRUD: indexed controls XPaths have changed, reindexing for form definition `PUT`")
+            ReindexAction.FormDefinitionPutWithChanges(afterStoreIndexInfo)
+          }
+        case None =>
+          // Form definition `DELETE`
+          debug("CRUD: reindexing for form definition `DELETE`")
+          ReindexAction.FormDefinitionDelete // don't reindex data, see https://github.com/orbeon/orbeon-forms/issues/6915
+        case Some(dataPart) =>
+          // Data `PUT` or `DELETE` (but not `DELETE` of draft or historical data, see `mightReindex` above)
+          debug("CRUD: reindexing for data `PUT` or `DELETE`")
+          ReindexAction.DataPutOrDelete(dataPart.documentId, beforeIndexInfoOpt, clearOnly = delete) // don't reindex data if we `DELETE`
       }
     }
 
@@ -418,35 +419,27 @@ trait CreateUpdateDelete {
     ): Unit =
       if (mightReindex)
         getReindexAction(precomputedIndexedControlsXPathsOpt) match {
-          case ReindexAction.FormDefinitionPutNoChange =>
+          case ReindexAction.FormDefinitionPutNoChange(formStorageDetails) =>
+            // Update the cache (e.g. encrypted controls or singleton setting might have changed)
+            PersistenceMetadataSupport.updatePublishedFormStorageDetailsCache(appFormVersion._1, FormDefinitionVersion.Specific(appFormVersion._2), formStorageDetails)
             // Avoid reindexing as the list of indexed controls haven't changed
           case otherAction: ReindexAction.SomeAction =>
             // Update the index, whether by clearing it only, or clearing and then reindexing data
 
-            val (whatToReindex, newOrPrecomputedIndexedControlsXPathsOpt) = req.dataPart match {
-              case Some(dataPart) =>
-                // Data: update index for this document id
-                (WhatToReindex.DataForDocumentId(dataPart.documentId, appFormVersion), None)
-              case None =>
-                // Form definition: update index for this form version
-
-                val newOrPrecomputedIndexedControlsXPathsOpt =
-                  otherAction match {
-                    case ReindexAction.FormDefinitionPutWithChanges(formStorageDetails) =>
-                      // Update the cache with the new indexed controls XPaths
-                      PersistenceMetadataSupport.updatePublishedFormStorageDetailsCache(appFormVersion._1, FormDefinitionVersion.Specific(appFormVersion._2), formStorageDetails)
-                      formStorageDetails.indexedControlsXPaths.value.some
-                    case ReindexAction.FormDefinitionDelete =>
-                      // Invalidate the cache as there is no more form definition
-                      // TODO: could there be a race condition between store/read/cache?
-                      PersistenceMetadataSupport.maybeInvalidateCachesFor(appFormVersion)
-                      None
-                    case ReindexAction.DataPutOrDelete(someIndexInfo, _) =>
-                      someIndexInfo
-                  }
-
-                (WhatToReindex.DataForForm(appFormVersion), newOrPrecomputedIndexedControlsXPathsOpt)
-            }
+            val (whatToReindex, newOrPrecomputedIndexedControlsXPathsOpt) =
+              otherAction match {
+                case ReindexAction.FormDefinitionPutWithChanges(formStorageDetails) =>
+                  // Update the cache with the new indexed controls XPaths
+                  PersistenceMetadataSupport.updatePublishedFormStorageDetailsCache(appFormVersion._1, FormDefinitionVersion.Specific(appFormVersion._2), formStorageDetails)
+                  (WhatToReindex.DataForForm(appFormVersion), formStorageDetails.indexedControlsXPaths.value.some)
+                case ReindexAction.FormDefinitionDelete =>
+                  // Invalidate the cache as there is no more form definition
+                  // TODO: could there be a race condition between store/read/cache?
+                  PersistenceMetadataSupport.maybeInvalidateCachesFor(appFormVersion)
+                  (WhatToReindex.DataForForm(appFormVersion), None)
+                case ReindexAction.DataPutOrDelete(documentId, someIndexInfo, _) =>
+                  (WhatToReindex.DataForDocumentId(documentId, appFormVersion), someIndexInfo)
+              }
 
             val newIndexedControlsXPathsWithAppFormVersionOpt =
               newOrPrecomputedIndexedControlsXPathsOpt.map(appFormVersion -> _)
@@ -472,7 +465,7 @@ trait CreateUpdateDelete {
         }
 
     def findIndexedControlsXPathsIfNeeded: Option[IndexedControlsResult] =
-      (isFormDefinitionPut || (mightReindex && req.forData))
+      (isFormDefinitionPut || (mightReindex && req.forData && ! delete))
         .option(Index.indexedControlsXPaths(appFormVersion))
 
     // Pre-fetch the indexed controls XPaths before opening a database connection, to avoid nested

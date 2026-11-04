@@ -919,7 +919,7 @@
             <label>Anvisning</label>
         </control-hint>
         <control-help>
-            <label>Hjälpmeddelande</label>
+            <label>Hjälp</label>
             <hint>Visas när hjälp är aktivt</hint>
         </control-help>
         <control-text>

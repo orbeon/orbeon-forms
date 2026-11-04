@@ -899,7 +899,7 @@
             <label>Подсказка</label>
         </control-hint>
         <control-help>
-            <label>Справочное сообщение</label>
+            <label>Справка</label>
             <hint>Сообщение, отображаемое когда пользователи нажимают на значок справки рядом с названием</hint>
         </control-help>
         <control-text>

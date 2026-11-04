@@ -916,7 +916,7 @@
             <label>ヒント</label>
         </control-hint>
         <control-help>
-            <label>ヘルプメッセージ</label>
+            <label>ヘルプ</label>
             <hint>ヘルプ表示時に表示</hint>
         </control-help>
         <control-text>

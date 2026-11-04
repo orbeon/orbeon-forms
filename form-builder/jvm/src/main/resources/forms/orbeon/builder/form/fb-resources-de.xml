@@ -876,7 +876,7 @@
             <label>Hinweis</label>
         </control-hint>
         <control-help>
-            <label>Hilfsnachricht</label>
+            <label>Hilfe</label>
             <hint>Wird angezeigt, falls die Hilfe aktiviert wurde</hint>
         </control-help>
         <control-text>

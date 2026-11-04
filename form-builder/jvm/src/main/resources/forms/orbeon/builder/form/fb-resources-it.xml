@@ -880,7 +880,7 @@
             <label>Suggerimento</label>
         </control-hint>
         <control-help>
-            <label>Messaggio d'aiuto</label>
+            <label>Aiuto</label>
             <hint>Visualizzato quando l'aiuto viene attivato</hint>
         </control-help>
         <control-text>

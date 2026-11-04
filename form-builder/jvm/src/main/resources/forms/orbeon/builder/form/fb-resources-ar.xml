@@ -919,7 +919,7 @@
             <label>تلميح</label>
         </control-hint>
         <control-help>
-            <label>رسالة المساعدة</label>
+            <label>مساعدة</label>
             <hint>تُعرض عند تفعيل المساعدة</hint>
         </control-help>
         <control-text>

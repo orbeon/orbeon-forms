@@ -900,7 +900,7 @@
             <label>Dica</label>
         </control-hint>
         <control-help>
-            <label>Mensagem de Ajuda</label>
+            <label>Ajuda</label>
             <hint>É mostrada quando a ajuda é activada</hint>
         </control-help>
         <control-text>

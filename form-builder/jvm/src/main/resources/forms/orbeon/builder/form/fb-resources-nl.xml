@@ -900,7 +900,7 @@
             <label>Hint</label>
         </control-hint>
         <control-help>
-            <label>Help melding</label>
+            <label>Help</label>
             <hint>Wordt getoond wanneer hulp wordt geactiveerd</hint>
         </control-help>
         <control-text>

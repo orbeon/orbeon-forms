@@ -892,7 +892,7 @@
             <label>Ayuda</label>
         </control-hint>
         <control-help>
-            <label>Mensaje de Ayuda</label>
+            <label>Ayuda</label>
             <hint>Se muestra cuando se activa la ayuda</hint>
         </control-help>
         <control-text>

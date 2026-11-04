@@ -900,7 +900,7 @@
             <label>Hint</label>
         </control-hint>
         <control-help>
-            <label>Hjelpemelding</label>
+            <label>Hjelp</label>
             <hint>Melding som vises når brukere klikker på hjelpeikonet ved siden av etiketten</hint>
         </control-help>
         <control-text>

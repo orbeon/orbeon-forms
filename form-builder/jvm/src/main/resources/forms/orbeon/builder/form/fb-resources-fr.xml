@@ -937,7 +937,7 @@
             <label>Suggestion</label>
         </control-hint>
         <control-help>
-            <label>Message d'aide</label>
+            <label>Aide</label>
             <hint>Affiché lorsque l'aide est activée</hint>
         </control-help>
         <control-text>

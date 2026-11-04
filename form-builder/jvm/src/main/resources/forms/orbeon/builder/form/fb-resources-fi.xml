@@ -920,7 +920,7 @@
             <label>Vihje</label>
         </control-hint>
         <control-help>
-            <label>Ohjeviesti</label>
+            <label>Ohje</label>
             <hint>Viesti näytetään käyttäjän klikatessa ohje-kuvaketta nimikkeen vieressä</hint>
         </control-help>
         <control-text>

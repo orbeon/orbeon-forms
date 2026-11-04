@@ -937,7 +937,7 @@
             <label>Hint</label>
         </control-hint>
         <control-help>
-            <label>Help Message</label>
+            <label>Help</label>
             <hint>Displayed when help is activated</hint>
         </control-help>
         <control-text>

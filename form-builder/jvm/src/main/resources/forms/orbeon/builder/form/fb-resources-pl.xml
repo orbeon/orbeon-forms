@@ -918,7 +918,7 @@
             <label>Podpowiedź</label>
         </control-hint>
         <control-help>
-            <label>Tekst pomocy</label>
+            <label>Pomoc</label>
             <hint>Wyświetlany po włączeniu pomocy</hint>
         </control-help>
         <control-text>

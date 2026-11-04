@@ -231,6 +231,7 @@ val fastOptJSToLocalResources      = taskKey[Unit]("Copy fast-optimized JavaScri
 val fullOptJSToLocalResources      = taskKey[Unit]("Copy full-optimized JavaScript files to local resources.")
 val copyJarToLiferayWar            = taskKey[Option[File]]("Copy JAR file to Liferay WEB-INF/lib for development.")
 val deployProxyPortletWar          = taskKey[File]("Package and copy the Form Runner proxy portlet WAR to the local Liferay deploy directory.")
+val fullOptMinJS                   = taskKey[Attributed[File]]("Performs full Scala.js optimization and minifies the output with Terser.")
 val fastOrFullOptJS                = taskKey[Attributed[File]]("Performs either fast or full Scala.js optimization.")
 
 val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version from system properties.")
@@ -499,11 +500,40 @@ lazy val commonScalaJsSettings = Seq(
 
   Compile / scalaJSUseMainModuleInitializer := true,
   Test    / scalaJSUseMainModuleInitializer := false,
+  fullOptMinJS := {
+    val linkedFileAttr = (Compile / fullOptJS).value
+    val rootDir        = (ThisBuild / baseDirectory).value
+    val cacheDir       = streams.value.cacheDirectory / "scalajs-terser"
+    val log            = streams.value.log
+
+    if (skipUglify.value) {
+      linkedFileAttr
+    } else {
+      val linkedFile   = linkedFileAttr.data
+      val minifiedFile = linkedFile.getParentFile / (linkedFile.base + ".min.js")
+
+      val cachedMinify = FileFunction.cached(cacheDir, FilesInfo.lastModified, FilesInfo.exists) { _ =>
+        import scala.sys.process._
+        val terser = (rootDir / "node_modules" / ".bin" / "terser").getAbsolutePath
+        log.info(s"Minifying ${linkedFile.name} with Terser...")
+        val exitCode = Process(
+          Seq(terser, linkedFile.getAbsolutePath, "--compress", "--mangle", "--ecma", "2018", "--output", minifiedFile.getAbsolutePath),
+          rootDir
+        ).!
+        if (exitCode != 0)
+          throw new MessageOnlyException(s"Terser failed on ${linkedFile.name} with exit code $exitCode")
+        Set(minifiedFile)
+      }
+
+      cachedMinify(Set(linkedFile))
+      linkedFileAttr.map(_ => minifiedFile)
+    }
+  },
   fastOrFullOptJS := {
     if (preferFastOptJS.value)
       (Compile / fastOptJS).value
     else
-      (Compile / fullOptJS).value
+      fullOptMinJS.value
   }
 )
 
@@ -981,7 +1011,7 @@ lazy val formRunnerJS = formRunner.js
     ),
 
     fullOptJSToLocalResources := copyScalaJSToExplodedWar(
-      (Compile / fullOptJS).value.data,
+      (Compile / fullOptMinJS).value.data,
       (ThisBuild/ baseDirectory).value,
       FormRunnerResourcesPathInWar
     )
@@ -1024,7 +1054,7 @@ lazy val formRunnerCommonJS = formRunnerCommon.js
     ),
 
     fullOptJSToLocalResources := copyScalaJSToExplodedWar(
-      (Compile / fullOptJS).value.data,
+      (Compile / fullOptMinJS).value.data,
       (ThisBuild/ baseDirectory).value,
       FormRunnerResourcesPathInWar
     )
@@ -1100,7 +1130,7 @@ lazy val formRunnerWeb = (project in file("form-runner-web"))
     ),
 
     fullOptJSToLocalResources := copyScalaJSToExplodedWar(
-      (Compile / fullOptJS).value.data,
+      (Compile / fullOptMinJS).value.data,
       (ThisBuild/ baseDirectory).value,
       FormRunnerResourcesPathInWar
     )
@@ -1152,7 +1182,7 @@ lazy val formBuilderJS = formBuilder.js
     ),
 
     fullOptJSToLocalResources := copyScalaJSToExplodedWar(
-      (Compile / fullOptJS).value.data,
+      (Compile / fullOptMinJS).value.data,
       (ThisBuild / baseDirectory).value,
       FormBuilderResourcesPathInWar
     )
@@ -1217,7 +1247,7 @@ lazy val xformsJS = xforms.js
     ),
 
     fullOptJSToLocalResources := copyScalaJSToExplodedWar(
-      (Compile / fullOptJS).value.data,
+      (Compile / fullOptMinJS).value.data,
       (ThisBuild / baseDirectory).value,
       XFormsResourcesPathInWar
     )
@@ -1427,7 +1457,7 @@ lazy val xformsWeb = (project in file("xforms-web"))
     ),
 
     fullOptJSToLocalResources := copyScalaJSToExplodedWar(
-      (Compile / fullOptJS).value.data,
+      (Compile / fullOptMinJS).value.data,
       (ThisBuild / baseDirectory).value,
       XFormsResourcesPathInWar
     )

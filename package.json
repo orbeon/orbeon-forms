@@ -12,7 +12,8 @@
     "nwsapi": "2.2.23"
   },
   "devDependencies": {
-    "stylelint": "^16.26.1"
+    "stylelint": "^16.26.1",
+    "terser": "^5.51.2"
   },
   "scripts": {
     "lint:css": "stylelint '**/target/web/less/**/*.css'"

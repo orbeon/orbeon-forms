@@ -25,7 +25,7 @@ object Compat {
 
 object OrbeonSupport {
 
-  val MatchScalaJSFileNameFormatRE = """((.+)-(fastopt|opt)).js""".r
+  val MatchScalaJSFileNameFormatRE = """((.+)-(fastopt|opt))(?:\.min)?\.js""".r
   val MatchJarNameRE               = """(.+)\.jar""".r
   val MatchRawJarNameRE            = """([^_]+)(?:_.*)?\.jar""".r
 

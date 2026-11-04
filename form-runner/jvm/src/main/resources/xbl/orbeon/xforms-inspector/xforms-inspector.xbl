@@ -206,7 +206,7 @@
                     </xf:action>
                 </xf:group>
 
-                <xf:group id="inspector-content">
+                <xf:group id="inspector-content" class="fr-xforms-inspector-content">
 
                     <!-- Function selection-->
                     <xh:div class="fr-xforms-inspector-function">

@@ -20,7 +20,6 @@
         bottom: 0;
         right: 0;
         width: 600px; // TODO: different size depending on screen width
-        height: 100vh;
         display: flex;
         flex-direction: column;
         row-gap: .5em;
@@ -68,6 +67,15 @@
             }
         }
 
+        // #8012: allow the XForms Inspector content to grow and scroll instead of overflowing (without scrollbars)
+        .fr-xforms-inspector-content {
+            display: flex;
+            flex-direction: column;
+            row-gap: .5em;
+            flex-grow: 1;
+            min-height: 0;
+        }
+
         .fr-xforms-inspector-model-instance {
 
             .fr-xforms-inspector-model {
@@ -108,6 +116,7 @@
 
         .fr-xforms-inspector-source {
             flex-grow: 1;
+            min-height: 0;
             overflow: auto;
             border: 1px solid var(--orbeon-base-border-color);
             border-radius: 5px;
@@ -159,6 +168,7 @@
         }
 
         &.fr-xforms-inspector-open {
+            top: 0; // Don't let any horizontal scrollbar "push" the panel above the window
             border-top-left-radius    : 8px;
             border-bottom-left-radius : 8px;
         }

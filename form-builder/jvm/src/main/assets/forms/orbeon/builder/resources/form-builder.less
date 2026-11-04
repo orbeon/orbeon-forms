@@ -2965,23 +2965,38 @@ body.orbeon {
             background-color: var(--orbeon-fb-navbar-background-color);
             .container {
                 display: flex;
+                flex-wrap: nowrap;
                 align-items: center;
                 width: 100%;
                 max-width: none; // override Bootstrap 5 .container responsive max-widths
                 column-gap: 0;
+                &> :not(h1) {
+                    flex-shrink: 0;
+                }
                 h1 {
+                    min-width: 0;
                     color: var(--orbeon-fb-navbar-color);
                     margin: 0; // so align-items: center actually centers it
                 }
                 .nav {
+                    flex-wrap: nowrap;
+                    white-space: nowrap;
                     margin-left: auto; // show at the end of the line in flex layout
                     margin-right: 0;   // override excessive margin set by Bootstrap
                     margin-bottom: 0;
-                    gap: 1em;          // Bootstrap 2 spaced the items via link padding
+                    gap: 0;
                     align-items: center;
                     &> li {
                         padding-top: 0;
                         padding-bottom: 0;
+                        &:not(:has(> :not(.xforms-disabled))) {
+                            display: none;
+                        }
+                        &> a {
+                            display: inline-block;
+                            padding: 5px 15px;
+                            line-height: 1.5;
+                        }
                     }
                 }
                 // Bootstrap 2's navbar-link look (Bootstrap 5 leaves default blue underlined anchors)
@@ -3105,25 +3120,35 @@ body.orbeon {
         }
     }
 
-    // Top navbar language selector: same clickable zone, but a light open-state highlight for the light header. Deep
-    // selector to win over the generic .nav > li > a colors above.
-    .fb-navbar.navbar .navbar-inner .container .fr-language-choice .dropdown-toggle {
-        display: inline-block;
-        padding: 5px 15px;
-        border-radius: var(--orbeon-button-border-radius);
-        line-height: 1.5;
-        &:focus {
-            outline: 0;
-            box-shadow: none;
-        }
-        &:focus-visible:not(.show) {
-            .focusDecorations();
-        }
-        &.show,
-        &.show:hover,
-        &.show:focus {
-            background-color: var(--orbeon-dropdown-open-toggle-background-color);
-            color: var(--orbeon-fb-navbar-hover-color);
+    // Top navbar language and color scheme selectors: same clickable zone, but a light open-state highlight for the
+    // light header. Deep selector to win over the generic .nav > li > a and a.btn-secondary colors.
+    .fb-navbar.navbar .navbar-inner .container {
+        .fr-language-choice,
+        .fr-color-scheme-nav {
+            .dropdown-toggle {
+                display: inline-block;
+                padding: 5px 15px;
+                border-radius: var(--orbeon-button-border-radius);
+                line-height: 1.5;
+                color: var(--orbeon-fb-navbar-color);
+                &:hover,
+                &:focus {
+                    color: var(--orbeon-fb-navbar-hover-color);
+                }
+                &:focus {
+                    outline: 0;
+                    box-shadow: none;
+                }
+                &:focus-visible:not(.show) {
+                    .focusDecorations();
+                }
+                &.show,
+                &.show:hover,
+                &.show:focus {
+                    background-color: var(--orbeon-dropdown-open-toggle-background-color);
+                    color: var(--orbeon-fb-navbar-hover-color);
+                }
+            }
         }
     }
 

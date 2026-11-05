@@ -95,6 +95,7 @@ trait FormBuilderPermissionsOps {
     canAccessEverything || canAccessAppForm
   }
 
+  //@XPathFunction
   def isFormBuilderAuthorized: Boolean = {
     val configurationOpt = formBuilderPermissionsConfiguration
     findConfiguredRoles(configurationOpt).isEmpty ||

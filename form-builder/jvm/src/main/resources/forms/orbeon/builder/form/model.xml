@@ -378,7 +378,7 @@
             ref="instance('fr-form-instance')"
             origin="xf:element('_')"/>
         <xf:action type="xpath">
-            fr:run-process('oxf.fr.detail.process', 'set-data-status(status = "safe")')
+            fr:run-process('oxf.fr.detail.process', concat('set-data-status(status = "safe", draft = "', event('draft'), '")'))
         </xf:action>
 
     </xf:action>

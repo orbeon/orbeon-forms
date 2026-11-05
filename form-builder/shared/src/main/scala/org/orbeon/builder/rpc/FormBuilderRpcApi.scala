@@ -40,6 +40,7 @@ trait FormBuilderRpcApi {
 
   def sectionUpdateLabel  (sectionId: String, label: String): Future[Unit]
   def sectionMove         (sectionId: String, directionString: String): Future[Unit]
+  def containerMove       (containerId: String, intoSectionIdOpt: Option[String], afterContainerIdOpt: Option[String]): Future[Unit]
 
   def containerDelete     (containerId: String): Future[Unit]
   def containerEditDetails(containerId: String): Future[Unit]

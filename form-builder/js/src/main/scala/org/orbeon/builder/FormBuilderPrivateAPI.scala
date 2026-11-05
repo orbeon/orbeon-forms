@@ -84,6 +84,16 @@ object FormBuilderPrivateAPI extends js.Object {
       moveIntoViewIfNeeded(mainElem, mainInnerElem, selectedElem, margin = 50)
     }
 
+  def moveOutlineContainerIntoView(namespacedId: String): Unit =
+    for {
+      containerElem <- dom.document.getElementByIdOpt(namespacedId)
+      targetElem    = containerElem.querySelectorOpt(".fr-section-title").getOrElse(containerElem)
+      mainInnerElem <- dom.document.querySelectorOpt(".fb-main-inner")
+      mainElem      <- dom.document.querySelectorOpt(".fb-main")
+    } locally {
+      moveIntoViewIfNeeded(mainElem, mainInnerElem, targetElem, margin = 20)
+    }
+
   def copyItemsetToClipboard(tsvString: String): Unit =
     dom.window.navigator.clipboard.writeText(tsvString)
 

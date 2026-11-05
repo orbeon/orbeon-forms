@@ -196,6 +196,68 @@ trait ContainerOps extends ControlOps {
     }
   }
 
+  def moveContainerTo(
+    containerElem  : NodeInfo,
+    targetPosition : ContainerPosition
+  )(implicit
+    ctx            : FormBuilderDocContext
+  ): Option[UndoAction] = {
+
+    val containerId     = containerElem.id
+    val currentPosition = containerPosition(containerId)
+    val selfNameOpt     = getControlNameOpt(containerElem)
+
+    val isNoOp =
+      targetPosition == currentPosition ||
+      (targetPosition.into == currentPosition.into && targetPosition.after.isDefined && targetPosition.after == selfNameOpt)
+
+    val destParentOpt =
+      targetPosition.into match {
+        case None if IsSection(containerElem) =>
+          Some(ctx.bodyElem)
+        case None =>
+          None
+        case Some(intoName) =>
+          findControlByName(intoName).filter { intoElem =>
+            canMoveInto(intoElem) &&
+            ! findAncestorContainersLeafToRoot(intoElem, includeSelf = true).exists(_ isSameNodeInfo containerElem)
+          }
+      }
+
+    val canLeaveSource =
+      targetPosition.into == currentPosition.into || canDeleteContainer(containerElem)
+
+    if (! isNoOp && canLeaveSource) {
+      destParentOpt flatMap { destParentElem =>
+        val otherChildren = (destParentElem / * filter IsContainer).filterNot(_ isSameNodeInfo containerElem)
+
+        targetPosition.after match {
+          case Some(afterName) =>
+            otherChildren.find(c => getControlNameOpt(c).contains(afterName)).map { afterElem =>
+              moveContainer(containerElem, afterElem, moveElementAfter)
+              UndoAction.MoveContainer(containerId, currentPosition)
+            }
+          case None =>
+            otherChildren.headOption match {
+              case Some(firstChild) =>
+                moveContainer(containerElem, firstChild, moveElementBefore)
+                Some(UndoAction.MoveContainer(containerId, currentPosition))
+              case None if IsSection(destParentElem) =>
+                val destIsRepeat = isRepeat(destParentElem)
+                def moveCheckIteration(source: NodeInfo, dest: NodeInfo): NodeInfo =
+                  moveElementIntoAsLast(source, if (destIsRepeat && dest != destParentElem) dest child * head else dest)
+                moveContainer(containerElem, destParentElem, moveCheckIteration)
+                Some(UndoAction.MoveContainer(containerId, currentPosition))
+              case None =>
+                None
+            }
+        }
+      }
+    } else {
+      None
+    }
+  }
+
   // Whether it is possible to move an item into the given container
   // Currently: must be a section without section template content
   // Later: fr:tab (maybe fr:tabview), wizard

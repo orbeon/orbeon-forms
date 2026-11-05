@@ -83,12 +83,19 @@ object SectionGridEditor {
 
         def showMoveDeleteIcons(container: html.Element): Unit = {
 
+          var canMoveAnyDirection = false
+
           Direction.values foreach { direction =>
             val relevant = ! isViewMode && container.hasClass("fb-can-move-" + direction.entryName.toLowerCase)
             val trigger  = allIconsWith(".fb-container-move-" + direction.entryName.toLowerCase)
-            if (relevant)
+            if (relevant) {
+              canMoveAnyDirection = true
               trigger.foreach(_.show())
+            }
           }
+
+          if (canMoveAnyDirection)
+            allIconsWith(".fb-container-move-handle").foreach(_.show())
 
           if (! isViewMode && container.matches(".fb-can-delete"))
             Set(ContainerDelete, ContainerCut)

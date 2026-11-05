@@ -1228,16 +1228,16 @@ object FormBuilderXPathApi {
     processUndoRedoAction(undoAction)
 
   //@XPathFunction
-  def redoAction(): Unit = {
-    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
-    implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
+  def redoAction(): Unit =
+    redoActionImpl()(FormBuilderDocContext(), FormRunnerParams())
+
+  def redoActionImpl()(implicit ctx: FormBuilderDocContext, formRunnerParams: FormRunnerParams): Unit =
     for {
       redoAction <- Undo.popRedoAction()
       undoAction <- processUndoRedoAction(redoAction)
     } locally {
       Undo.pushAction(UndoOrRedo.Undo, undoAction, undoAction.name)
     }
-  }
 
   //@XPathFunction
   def migrateGridColumns(gridElem: NodeInfo, from: Int, to: Int): Unit =
@@ -1599,16 +1599,8 @@ object FormBuilderXPathApi {
           newUndoInsertAction <- processUndoRedoAction(insert)
         } yield
           MoveControl(newUndoDeleteAction, newUndoInsertAction)
-      case MoveContainer(sectionId, direction, position) =>
-
-        val container = FormBuilder.containerById(sectionId)
-
-        direction match {
-          case Direction.Up    => FormBuilder.moveSection(container, Direction.Down)
-          case Direction.Down  => FormBuilder.moveSection(container, Direction.Up)
-          case Direction.Left  => FormBuilder.moveSection(container, Direction.Right)
-          case Direction.Right => FormBuilder.moveSection(container, Direction.Left)
-        }
+      case MoveContainer(containerId, position) =>
+        FormBuilder.moveContainerTo(FormBuilder.containerById(containerId), position)
       case InsertSectionTemplate(sectionId) =>
         FormBuilder.deleteSectionByIdIfPossible(sectionId)
       case MergeSectionTemplate(sectionId, xcvElem, prefix, suffix) =>

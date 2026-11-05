@@ -179,4 +179,78 @@ class FormBuilderUndoTest
       }
     }
   }
+
+  describe("Move sections and grids with containerMove and undo/redo") {
+
+    val RepeatedSectionsDoc = "oxf:/org/orbeon/oxf/fr/template-for-repeated-sections.xhtml"
+
+    it("must move sections and grids and support undo/redo") {
+      withActionAndFBDoc(RepeatedSectionsDoc) { implicit ctx =>
+
+        implicit val formRunnerParams: FormRunnerParams =
+          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1.some, None, None, "new")
+
+        // Initial structure of `template-for-repeated-sections.xhtml`:
+        // - my-section (contains grid-1, my-grid)
+        // - other-section (contains grid-2)
+        val mySectionId    = findControlByName("my-section").get.id
+        val otherSectionId = findControlByName("other-section").get.id
+        val grid1Id        = findControlByName("grid-1").get.id
+        val myGridId       = findControlByName("my-grid").get.id
+        val grid2Id        = findControlByName("grid-2").get.id
+
+        assert(FormBuilder.containerPosition(mySectionId)    === ContainerPosition(None, None))
+        assert(FormBuilder.containerPosition(otherSectionId) === ContainerPosition(None, Some("my-section")))
+        assert(FormBuilder.containerPosition(grid1Id)        === ContainerPosition(Some("my-section"), None))
+        assert(FormBuilder.containerPosition(myGridId)       === ContainerPosition(Some("my-section"), Some("grid-1")))
+        assert(FormBuilder.containerPosition(grid2Id)        === ContainerPosition(Some("other-section"), None))
+
+        // 1. Reorder `other-section` before `my-section` at top-level
+        FormBuilderRpcApiImpl.containerMove(otherSectionId, None, None)
+        assert(FormBuilder.containerPosition(otherSectionId) === ContainerPosition(None, None))
+        assert(FormBuilder.containerPosition(mySectionId)    === ContainerPosition(None, Some("other-section")))
+
+        // Undo and redo
+        FormBuilderXPathApi.undoActionImpl()
+        assert(FormBuilder.containerPosition(mySectionId)    === ContainerPosition(None, None))
+        assert(FormBuilder.containerPosition(otherSectionId) === ContainerPosition(None, Some("my-section")))
+
+        FormBuilderXPathApi.redoActionImpl()
+        assert(FormBuilder.containerPosition(otherSectionId) === ContainerPosition(None, None))
+        assert(FormBuilder.containerPosition(mySectionId)    === ContainerPosition(None, Some("other-section")))
+
+        // Restore initial order
+        FormBuilderXPathApi.undoActionImpl()
+
+        // 2. Move `other-section` into `my-section` between `grid-1` and `my-grid`
+        FormBuilderRpcApiImpl.containerMove(otherSectionId, Some(mySectionId), Some(grid1Id))
+        assert(FormBuilder.containerPosition(otherSectionId) === ContainerPosition(Some("my-section"), Some("grid-1")))
+        assert(FormBuilder.containerPosition(myGridId)       === ContainerPosition(Some("my-section"), Some("other-section")))
+
+        // Undo must restore `other-section` to top-level after `my-section`
+        FormBuilderXPathApi.undoActionImpl()
+        assert(FormBuilder.containerPosition(otherSectionId) === ContainerPosition(None, Some("my-section")))
+
+        // 3. Move `grid-1` into `other-section` as first child (before `grid-2`)
+        FormBuilderRpcApiImpl.containerMove(grid1Id, Some(otherSectionId), None)
+        assert(FormBuilder.containerPosition(grid1Id)  === ContainerPosition(Some("other-section"), None))
+        assert(FormBuilder.containerPosition(grid2Id)  === ContainerPosition(Some("other-section"), Some("grid-1")))
+        assert(FormBuilder.containerPosition(myGridId) === ContainerPosition(Some("my-section"), None))
+
+        // 4. Disallow moving `my-grid` out of `my-section` when it is now the sole remaining container in `my-section`
+        FormBuilderRpcApiImpl.containerMove(myGridId, Some(otherSectionId), Some(grid2Id))
+        assert(FormBuilder.containerPosition(myGridId) === ContainerPosition(Some("my-section"), None))
+
+        // 5. Disallow moving a grid to top-level (`intoSectionIdOpt = None`)
+        FormBuilderRpcApiImpl.containerMove(grid1Id, None, None)
+        assert(FormBuilder.containerPosition(grid1Id) === ContainerPosition(Some("other-section"), None))
+
+        // Undo moving `grid-1` into `other-section`
+        FormBuilderXPathApi.undoActionImpl()
+        assert(FormBuilder.containerPosition(grid1Id)  === ContainerPosition(Some("my-section"), None))
+        assert(FormBuilder.containerPosition(myGridId) === ContainerPosition(Some("my-section"), Some("grid-1")))
+        assert(FormBuilder.containerPosition(grid2Id)  === ContainerPosition(Some("other-section"), None))
+      }
+    }
+  }
 }

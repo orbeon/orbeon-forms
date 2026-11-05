@@ -103,8 +103,8 @@ object Position {
       val left = pointerPos.left + Position.scrollLeft
       val dialogVisible = dom.document.querySelectorAll("dialog[open]").length > 0
       val newContainer =
-        if (dialogVisible)
-          // Ignore container under the pointer if a dialog is visible
+        if (dialogVisible || ContainerDnD.isDragging)
+          // Ignore container under the pointer if a dialog is visible or a container is being dragged
           None
         else
           findInCache(containerCache, top, left)

@@ -189,6 +189,28 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
       Undo.pushUserUndoAction
   }
 
+  def containerMove(
+    containerId         : String,
+    intoSectionIdOpt    : Option[String],
+    afterContainerIdOpt : Option[String]
+  ): Future[Unit] = Future.successful {
+
+    implicit val ctx = FormBuilderDocContext()
+
+    def resolveContainerNameOpt(idOpt: Option[String]): Option[Option[String]] =
+      idOpt match {
+        case None     => Some(None)
+        case Some(id) => FormBuilder.findContainerById(id).flatMap(FormRunner.getControlNameOpt).map(Some.apply)
+      }
+
+    for {
+      containerElem <- FormBuilder.findContainerById(containerId)
+      intoOpt       <- resolveContainerNameOpt(intoSectionIdOpt)
+      afterOpt      <- resolveContainerNameOpt(afterContainerIdOpt)
+      undoAction    <- FormBuilder.moveContainerTo(containerElem, ContainerPosition(intoOpt, afterOpt))
+    } Undo.pushUserUndoAction(undoAction)
+  }
+
   def containerDelete(containerId: String): Future[Unit] = Future.successful {
     implicit val ctx = FormBuilderDocContext()
     containerDeleteImpl(containerId)

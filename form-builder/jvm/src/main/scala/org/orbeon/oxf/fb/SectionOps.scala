@@ -41,7 +41,7 @@ trait SectionOps extends ContainerOps {
       case Direction.Right => moveSectionRight(container)
     }
 
-    Some(MoveContainer(sectionId, direction, position))
+    Some(MoveContainer(sectionId, position))
   }
 
   // Move the section up if possible

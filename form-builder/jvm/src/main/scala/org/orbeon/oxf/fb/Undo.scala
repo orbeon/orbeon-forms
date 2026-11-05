@@ -48,7 +48,6 @@ object UndoAction {
 
   case class MoveControl           (insert     : UndoAction,        delete  : UndoAction) extends UndoAction
   case class MoveContainer         (containerId: String,
-                                    direction  : Direction,
                                     position   : ContainerPosition)                       extends UndoAction
 
   case class InsertControl         (controlId  : String)                                  extends UndoAction

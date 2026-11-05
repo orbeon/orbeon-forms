@@ -3,6 +3,7 @@ package org.orbeon.oxf.fr
 import io.circe.syntax.*
 import io.circe.{Decoder, Encoder}
 import org.orbeon.io.CharsetNames
+import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.permission.{Operation, Operations}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.StringUtils.*
@@ -106,12 +107,13 @@ object FormRunnerMcpToken extends FormRunnerMcpTokenTrait with FormRunnerTokenJv
   def encryptToken(
     validity   : java.time.Duration,
     operations : Set[Operation],
+    credentials: Option[Credentials]
   ): Option[String] =
     encryptToken(
       (),
       TokenPayload(
         exp = java.time.Instant.now.plus(validity),
-        ops = Operations.inDefinitionOrder(operations)
+        ops = (Operations.inDefinitionOrder(operations), credentials)
       ),
       SecureUtils.KeyUsage.McpToken
     )

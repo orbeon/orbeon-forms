@@ -139,6 +139,23 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
 
       assert(amendedRequest.getSession(true) == session)
       assert(CredentialsSupport.findCredentialsInRequest(amendedRequest.getAttribute(_)).contains(testCredentials))
+      assert(CredentialsSupport.findCredentialsInSession(new ServletSessionImpl(session)).contains(testCredentials))
+    }
+
+    it("must use Orbeon-* credential headers for non-service calls when valid Orbeon-Token is passed") {
+
+      val testToken = "test-token"
+      val mockContext = newMockServletContext(Map(Headers.OrbeonTokenLower -> testToken))
+      val headersWithToken = testOrbeonHeaders + (Headers.OrbeonToken -> List(testToken))
+      val (amendedRequest, session) = newAmendedRequest(
+        "/xforms-server",
+        headersWithToken,
+        servletContext = Some(mockContext)
+      )
+
+      assert(amendedRequest.getSession(true) == session)
+      assert(CredentialsSupport.findCredentialsInRequest(amendedRequest.getAttribute(_)).contains(testCredentials))
+      assert(CredentialsSupport.findCredentialsInSession(new ServletSessionImpl(session)).contains(testCredentials))
     }
 
     it("must prevent session creation for services when fr-keep-form-session=true is passed without valid Orbeon-Token") {
@@ -198,16 +215,16 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
         }
 
       // Valid token + keep-form-session
-      assert(FormRunnerAuthFilterImpl.preserveSession(newMockRequest(Some("fr-keep-form-session=true"), Some(testToken))))
+      assert(FormRunnerAuthFilterImpl.preserveSessionRequestedWithToken(newMockRequest(Some("fr-keep-form-session=true"), Some(testToken))))
 
       // Wrong token
-      assert(! FormRunnerAuthFilterImpl.preserveSession(newMockRequest(Some("fr-keep-form-session=true"), Some("wrong-token"))))
+      assert(! FormRunnerAuthFilterImpl.preserveSessionRequestedWithToken(newMockRequest(Some("fr-keep-form-session=true"), Some("wrong-token"))))
 
       // Missing token
-      assert(! FormRunnerAuthFilterImpl.preserveSession(newMockRequest(Some("fr-keep-form-session=true"), None)))
+      assert(! FormRunnerAuthFilterImpl.preserveSessionRequestedWithToken(newMockRequest(Some("fr-keep-form-session=true"), None)))
 
       // Valid token but no keep-form-session
-      assert(! FormRunnerAuthFilterImpl.preserveSession(newMockRequest(None, Some(testToken))))
+      assert(! FormRunnerAuthFilterImpl.preserveSessionRequestedWithToken(newMockRequest(None, Some(testToken))))
     }
   }
 

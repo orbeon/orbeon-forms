@@ -1,5 +1,6 @@
 package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.permission.{Operation, Operations}
 
 
@@ -45,9 +46,10 @@ trait FormRunnerMcpTokenTrait extends FormRunnerTokenTrait {
   def encryptToken(
     validity   : java.time.Duration,
     operations : Set[Operation],
+    credentials: Option[Credentials]
   ): Option[String]
 
-  type TokenPayloadType = List[Operation]
+  type TokenPayloadType = (List[Operation], Option[Credentials])
 }
 
 trait FormRunnerTokenTrait {

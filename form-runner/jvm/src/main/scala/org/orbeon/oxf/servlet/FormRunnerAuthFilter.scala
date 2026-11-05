@@ -85,6 +85,9 @@ object FormRunnerAuthFilterImpl {
   def isService(servletRequest: HttpServletRequest): Boolean =
     servletRequest.getRequestPathInfo.startsWith("/fr/service/")
 
+  private def isStatelessService(servletRequest: HttpServletRequest): Boolean =
+    isService(servletRequest) && ! preserveSessionRequestedWithToken(servletRequest)
+
   private def hasValidToken(servletRequest: HttpServletRequest): Boolean = {
     val incomingToken = servletRequest.headerFirstValueOpt(Headers.OrbeonToken)
     val appToken      = Option(servletRequest.getServletContext)
@@ -94,7 +97,7 @@ object FormRunnerAuthFilterImpl {
     incomingToken.isDefined && incomingToken == appToken
   }
 
-  def preserveSession(servletRequest: HttpServletRequest): Boolean = {
+  def preserveSessionRequestedWithToken(servletRequest: HttpServletRequest): Boolean = {
     val path = servletRequest.getRequestPathInfo
     val url  = Option(servletRequest.getQueryString).fold(path)(qs => s"$path?$qs")
 
@@ -102,7 +105,7 @@ object FormRunnerAuthFilterImpl {
   }
 
   def amendResponse(servletRequest: HttpServletRequest, servletResponse: HttpServletResponse): HttpServletResponse =
-    if (isService(servletRequest) && ! preserveSession(servletRequest))
+    if (isStatelessService(servletRequest))
       new StatelessHttpServletResponse(servletResponse)
     else
       servletResponse
@@ -111,14 +114,16 @@ object FormRunnerAuthFilterImpl {
 
     logger.debug(s"incoming headers:\n${servletRequest.headersAsStringForDebug}")
 
-    val isService = this.isService(servletRequest)
+    val isService           = this.isService(servletRequest)
+    val isMcpStatefulUpdate = servletRequest.getRequestPathInfo == "/xforms-server" && hasValidToken(servletRequest)
 
     // The Form Runner service path is hardcoded but that's ok. When we are filtering a service, we don't retrieve the
     // credentials, which would be provided by the container or by incoming headers. Instead, credentials are provided
     // directly with `Orbeon-*` headers. See https://github.com/orbeon/orbeon-forms/issues/2275
     // For service calls, do not create or use a session (#6780), unless the session must be preserved.
     val requestWithAmendedHeaders =
-      if (isService) {
+      if (isService || isMcpStatefulUpdate) {
+        // A. Service calls or stateful MCP update calls (which require a session)
         val getHttpHeaders = (name: String) => servletRequest.headerValuesList(name)
         val credentialsOpt = FormRunnerAuth.fromHeaderValues(
           credentialsOpt = servletRequest.headerFirstValueOpt(Headers.OrbeonCredentials),
@@ -131,16 +136,22 @@ object FormRunnerAuthFilterImpl {
           servletRequest.removeAttribute,
           credentialsOpt
         )
-        if (preserveSession(servletRequest))
-          servletRequest
-        else
+        if (isStatelessService(servletRequest)) {
           new StatelessHttpServletRequest(servletRequest)
+        } else {
+          CredentialsSupport.storeCredentialsInSession(
+            new ServletSessionImpl(servletRequest.getSession(true)),
+            credentialsOpt
+          )
+          servletRequest
+        }
+
       } else {
-        // Do not create a session for fonts, source maps, or OPTIONS requests
         val createSession = ! (servletRequest.isFont || servletRequest.isSourceMap || servletRequest.isOptions)
         if (! createSession) {
-          // Don't amend headers if we're not creating a session, as there may be no session to retrieve
-          // credentials from, which would cause a NullPointerException.
+          // B. Fonts, source maps, or `OPTIONS` requests
+          // 1. Do not create a session
+          // 2. Don't amend headers
           servletRequest
         } else {
           val httpSession    = new ServletSessionImpl(servletRequest.getSession(true))

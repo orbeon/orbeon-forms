@@ -116,8 +116,9 @@ trait FormBuilderPermissionsOps {
   ): String = {
     val validityMinutes = CoreCrossPlatformSupport.properties.getIntOpt("oxf.fb.mcp.token.validity").getOrElse(0)
     FormRunnerMcpToken.encryptToken(
-      validity   = java.time.Duration.ofMinutes(validityMinutes),
-      operations = if (readwrite) Set(Operation.Read, Operation.Update) else Set(Operation.Read)
+      validity    = java.time.Duration.ofMinutes(validityMinutes),
+      operations  = if (readwrite) Set(Operation.Read, Operation.Update) else Set(Operation.Read),
+      credentials = CoreCrossPlatformSupport.externalContext.getRequest.credentials
     ).getOrElse(throw new IllegalStateException("could not create MCP token"))
   }
 

@@ -223,6 +223,9 @@ object XPathCompletion {
       updateHighlights()
     }
 
+    override def isMarkedReadonly: Boolean =
+      containerElem.hasClass("xforms-readonly")
+
     override def xformsGetValue(): String =
       valueOpt.getOrElse("")
 
@@ -232,8 +235,10 @@ object XPathCompletion {
       js.undefined
     }
 
-    override def xformsUpdateReadonly(readonly: Boolean): Unit =
+    override def xformsUpdateReadonly(readonly: Boolean): Unit = {
+      containerElem.toggleClass("xforms-readonly", readonly)
       updateHighlights()
+    }
 
     override def destroy(): Unit = {
       collapse()
@@ -252,11 +257,17 @@ object XPathCompletion {
     private val ExpandedTitle      = "Restore (Esc)"
     private val ExpandedInsetPx    = 10.0
 
+    private def isBlank(valueOpt: Option[String] = None): Boolean =
+      valueOpt.getOrElse(getFieldValue).trimAllToOpt.isEmpty
+
+    private def canExpand(valueOpt: Option[String] = None): Boolean =
+      ! (isMarkedReadonly && isBlank(valueOpt))
+
     private def toggleExpand(): Unit =
       if (isExpanded) collapse() else expand()
 
     private def expand(): Unit =
-      if (!isExpanded) {
+      if (!isExpanded && canExpand()) {
         backdropOpt.flatMap(_.wrapperElemOpt).foreach { wrapperElem =>
           val inlineRect = wrapperElem.getBoundingClientRect()
 
@@ -280,7 +291,7 @@ object XPathCompletion {
         }
       }
 
-    private def collapse(): Unit =
+    private def collapse(valueOpt: Option[String] = None): Unit =
       if (isExpanded) {
         isExpanded = false
         backdropOpt.flatMap(_.wrapperElemOpt).foreach { wrapperElem =>
@@ -295,7 +306,7 @@ object XPathCompletion {
         }
         placeholderElemOpt = None
         updateExpandButtonState()
-        updateHighlights()
+        updateHighlights(valueOpt)
       }
 
     private def updateExpandedBounds(): Unit =
@@ -481,8 +492,14 @@ object XPathCompletion {
         }, 1000)
       }
 
-    private def updateHighlights(valueOpt: Option[String] = None): Unit =
-      backdropOpt.foreach(_.updateHighlights(XPathHighlighter.highlightToHtml(_), valueOpt))
+    private def updateHighlights(valueOpt: Option[String] = None): Unit = {
+      val blank = isBlank(valueOpt)
+      backdropOpt.flatMap(_.wrapperElemOpt).foreach(_.toggleClass("fb-xpath-completion-empty", blank))
+      if (isExpanded && !canExpand(valueOpt))
+        collapse(valueOpt)
+      else
+        backdropOpt.foreach(_.updateHighlights(XPathHighlighter.highlightToHtml(_), valueOpt))
+    }
 
     // Callback from the server
     def returnCompletions(jsonText: String): Unit = {

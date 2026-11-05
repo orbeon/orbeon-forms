@@ -96,8 +96,9 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <time-12hour-noseconds/>
                             <time-24hour-noseconds/>
                             <native-time-noseconds/>
+                            <dropdown-year/><year/><month-year/>
                             <datetime/>
-                            <timestamp/><dropdown-year/><year/><month-year/>
+                            <timestamp/>
 
                         </grid-4>
                     </date-time-controls>
@@ -261,7 +262,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="date-time-controls-bind" ref="date-time-controls" name="date-time-controls">
-                    <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4"><xf:bind id="date-us-bind" ref="date-us" name="date-us" type="xf:date" xxf:default="adjust-date-to-timezone(current-date(), ())"/><xf:bind id="date-eu-bind" ref="date-eu" name="date-eu" type="xf:date" xxf:default="xs:date('2026-08-01')" constraint="xxf:excluded-dates(xs:date('2026-08-20'))"/><xf:bind id="date-iso-bind" ref="date-iso" name="date-iso" type="xf:date" xxf:default="adjust-date-to-timezone(current-date(), ())"/><xf:bind id="dropdown-date-bind" ref="dropdown-date" type="xf:date" name="dropdown-date" xxf:default="adjust-date-to-timezone(current-date(), ())"/><xf:bind id="fields-date-bind" ref="fields-date" type="xf:date" name="fields-date" xxf:default="adjust-date-to-timezone(current-date(), ())"/><xf:bind id="native-date-bind" ref="native-date" type="xf:date" name="native-date" xxf:default="adjust-date-to-timezone(current-date(), ())"/><xf:bind id="time-bind" ref="time" type="xf:time" name="time" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/><xf:bind id="time-24hour-bind" ref="time-24hour" type="xf:time" name="time-24hour" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/><xf:bind id="native-time-bind" ref="native-time" name="native-time" type="xf:time" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/><xf:bind id="time-12hour-noseconds-bind" ref="time-12hour-noseconds" type="xf:time" name="time-12hour-noseconds" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/><xf:bind id="time-24hour-noseconds-bind" ref="time-24hour-noseconds" type="xf:time" name="time-24hour-noseconds" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/><xf:bind id="native-time-noseconds-bind" ref="native-time-noseconds" name="native-time-noseconds" type="xf:time" xxf:default="let $t := adjust-time-to-timezone(current-time(), ()),     $s := seconds-from-time($t),     $d := xs:dayTimeDuration(concat('PT', $s, 'S')) return     $t - $d"/><xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime" xxf:default="adjust-dateTime-to-timezone(current-dateTime(), ())"/><xf:bind id="timestamp-bind" ref="timestamp" name="timestamp" type="xf:dateTime" xxf:default="current-dateTime()"/><xf:bind id="dropdown-year-bind" ref="dropdown-year" name="dropdown-year" type="xf:gYear" xxf:default="year-from-date(current-date())"/><xf:bind id="year-bind" ref="year" name="year" type="xf:gYear" xxf:default="year-from-date(current-date())"/><xf:bind id="month-year-bind" ref="month-year" name="month-year" type="xf:gYearMonth" xxf:default="substring(string(current-date()), 1, 7)"/>
+                    <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4"><xf:bind id="date-us-bind" ref="date-us" name="date-us" type="xf:date" xxf:default="adjust-date-to-timezone(current-date(), ())"/><xf:bind id="date-eu-bind" ref="date-eu" name="date-eu" type="xf:date" xxf:default="xs:date('2026-08-01')" constraint="xxf:excluded-dates(xs:date('2026-08-20'))"/><xf:bind id="date-iso-bind" ref="date-iso" name="date-iso" type="xf:date" xxf:default="adjust-date-to-timezone(current-date(), ())"/><xf:bind id="dropdown-date-bind" ref="dropdown-date" type="xf:date" name="dropdown-date" xxf:default="adjust-date-to-timezone(current-date(), ())"/><xf:bind id="fields-date-bind" ref="fields-date" type="xf:date" name="fields-date" xxf:default="adjust-date-to-timezone(current-date(), ())"/><xf:bind id="native-date-bind" ref="native-date" type="xf:date" name="native-date" xxf:default="adjust-date-to-timezone(current-date(), ())"/><xf:bind id="time-bind" ref="time" type="xf:time" name="time" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/><xf:bind id="time-24hour-bind" ref="time-24hour" type="xf:time" name="time-24hour" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/><xf:bind id="native-time-bind" ref="native-time" name="native-time" type="xf:time" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/><xf:bind id="time-12hour-noseconds-bind" ref="time-12hour-noseconds" type="xf:time" name="time-12hour-noseconds" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/><xf:bind id="time-24hour-noseconds-bind" ref="time-24hour-noseconds" type="xf:time" name="time-24hour-noseconds" xxf:default="string(adjust-time-to-timezone(current-time(), ()))"/><xf:bind id="native-time-noseconds-bind" ref="native-time-noseconds" name="native-time-noseconds" type="xf:time" xxf:default="let $t := adjust-time-to-timezone(current-time(), ()),     $s := seconds-from-time($t),     $d := xs:dayTimeDuration(concat('PT', $s, 'S')) return     $t - $d"/><xf:bind id="dropdown-year-bind" ref="dropdown-year" name="dropdown-year" type="xf:gYear" xxf:default="year-from-date(current-date())"/><xf:bind id="year-bind" ref="year" name="year" type="xf:gYear" xxf:default="year-from-date(current-date())"/><xf:bind id="month-year-bind" ref="month-year" name="month-year" type="xf:gYearMonth" xxf:default="substring(string(current-date()), 1, 7)"/><xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime" xxf:default="adjust-dateTime-to-timezone(current-dateTime(), ())"/><xf:bind id="timestamp-bind" ref="timestamp" name="timestamp" type="xf:dateTime" xxf:default="current-dateTime()"/>
 
 
 
@@ -2469,7 +2470,23 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             </fr:time>
 
                         </fr:c>
-                        <fr:c x="1" y="5" w="4">
+                        <fr:c x="1" y="5" w="3"><fr:dropdown-year id="dropdown-year-control" bind="dropdown-year-bind" class="">
+                        <xf:label xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:oxf="http://www.orbeon.com/oxf/processors" ref="$form-resources/dropdown-year/label"/>
+                        <xf:hint xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:oxf="http://www.orbeon.com/oxf/processors" ref="$form-resources/dropdown-year/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:dropdown-year></fr:c><fr:c x="4" y="5" w="1"/><fr:c x="5" y="5" w="4" h="1"><fr:year id="year-control" bind="year-bind" ref="" field-width="natural" class="">
+                        <xf:label xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:oxf="http://www.orbeon.com/oxf/processors" ref="$form-resources/year/label"/>
+                        <xf:hint xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:oxf="http://www.orbeon.com/oxf/processors" ref="$form-resources/year/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                    </fr:year></fr:c><fr:c x="9" y="5" w="4"><fr:dropdown-month-year id="month-year-control" bind="month-year-bind">
+                        <xf:label ref="$form-resources/month-year/label"/>
+                        <xf:hint ref="$form-resources/month-year/hint"/>
+
+                        <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                    </fr:dropdown-month-year></fr:c>
+                        <fr:c x="1" y="6" w="6">
                             <fr:datetime bind="datetime-bind" id="datetime-control" field-width="natural">
                                 <xf:label ref="$form-resources/datetime/label"/>
                                 <xf:hint ref="$form-resources/datetime/hint"/>
@@ -2478,7 +2495,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                             </fr:datetime>
                         </fr:c>
-                        <fr:c x="5" y="5" w="4">
+                        <fr:c x="7" y="6" w="6">
                             <fr:timestamp id="timestamp-control" bind="timestamp-bind">
                                 <xf:label ref="$form-resources/timestamp/label"/>
                                 <xf:hint ref="$form-resources/timestamp/hint"/>
@@ -2487,22 +2504,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                             </fr:timestamp>
                         </fr:c>
-                        <fr:c x="9" y="5" w="4"/><fr:c x="1" y="6" w="3"><fr:dropdown-year id="dropdown-year-control" bind="dropdown-year-bind" class="">
-                        <xf:label xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:oxf="http://www.orbeon.com/oxf/processors" ref="$form-resources/dropdown-year/label"/>
-                        <xf:hint xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:oxf="http://www.orbeon.com/oxf/processors" ref="$form-resources/dropdown-year/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-                    </fr:dropdown-year></fr:c><fr:c x="4" y="6" w="1"/><fr:c x="5" y="6" w="4" h="1"><fr:year id="year-control" bind="year-bind" ref="" field-width="natural" class="">
-                        <xf:label xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:oxf="http://www.orbeon.com/oxf/processors" ref="$form-resources/year/label"/>
-                        <xf:hint xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:oxf="http://www.orbeon.com/oxf/processors" ref="$form-resources/year/hint"/><xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-                    </fr:year></fr:c><fr:c x="9" y="6" w="4"><fr:dropdown-month-year id="month-year-control" bind="month-year-bind">
-                        <xf:label ref="$form-resources/month-year/label"/>
-                        <xf:hint ref="$form-resources/month-year/hint"/>
-
-                        <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                    </fr:dropdown-month-year></fr:c>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="selection-controls-section" bind="selection-controls-bind">

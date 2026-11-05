@@ -23,16 +23,7 @@
 @fbGridRowMinHeight: 84px;
 
 // Retro Summer #2 Color Scheme
-@color1: #FFEA48; // Gargoyle Gas
-@color2: #FABB01; // Selective Yellow
-@color3: #F25930; // Portland Orange
-@color4: #0B3D6F; // Ateneo Blue
-@color5: #0081C7; // NCS Blue
-@color6: #48BCD7; // Sea Serpent
-
-@wallAccentLight:  @color2;
-@wallAccentBright: @color3;
-@cellHighlight: @color5;
+@color2: #FABB01; // Selective Yellow (used by .fb-console-title)
 
 @fbButtonsBackground: var(--orbeon-fb-navbar-background-color); // so that the borderless buttons look good
 
@@ -716,23 +707,228 @@ body.orbeon {
     .gu-mirror { padding-right: 24px }
 
     .fb-grid-dnd-wall-container {
-
-        &.fb-grid-dnd-wall-vertical   { width : 8px }
-        &.fb-grid-dnd-wall-horizontal { height: 8px }
-
+        
         position: absolute;
-        background-color: @wallAccentLight;
-        &:hover                 { background-color: @wallAccentBright } // Cue container can be grabbed
-        &.fb-grid-dnd-wall-drop { background-color: @wallAccentBright } // On drop, wall will be moved here
+        box-sizing: border-box;
+        background-color: transparent;
+        z-index: 2; // Above cell selection highlight (.fb-selected has z-index: 1) and drag shadow
+
+        &.fb-grid-dnd-wall-vertical   { width : 8px; }
+        &.fb-grid-dnd-wall-horizontal { height: 8px; }
+
+        &:hover,
+        &.fb-grid-dnd-wall-drop {
+            z-index: 3;
+        }
+
+        // Full-length guide line (expands on hover, dashed on possible drop targets, solid glowing on active drop target)
+        &::before,
+        // Centered pill handle
+        &::after {
+            content: "";
+            position: absolute;
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+
+        &::before {
+            border-radius: 9999px;
+            opacity: 0;
+            transition:
+                opacity          var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out),
+                transform        var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out),
+                background-color var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out),
+                box-shadow       var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out);
+        }
+
+        &::after {
+            border-radius: 9999px;
+            background-color: var(--orbeon-focus-border-color);
+            box-shadow: 0 0 0 1px var(--orbeon-form-background-color);
+            opacity: 0.85;
+            transition:
+                width            var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out),
+                height           var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out),
+                opacity          var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out),
+                transform        var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out),
+                box-shadow       var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out);
+        }
+
+        &.fb-grid-dnd-wall-vertical {
+            &::before {
+                top: 4px;
+                bottom: 4px;
+                left: 50%;
+                width: 2px;
+                transform: translateX(-50%) scaleY(0.35);
+            }
+            &::after {
+                top: 50%;
+                left: 50%;
+                width: 4px;
+                height: 24px;
+                max-height: calc(100% - 12px);
+                transform: translate(-50%, -50%);
+            }
+
+            &.fb-grid-dnd-wall-side-left {
+                &::before,
+                &::after {
+                    left: 3px;
+                }
+            }
+            &.fb-grid-dnd-wall-side-right {
+                &::before,
+                &::after {
+                    left: calc(100% - 3px);
+                }
+            }
+        }
+
+        &.fb-grid-dnd-wall-horizontal {
+            &::before {
+                left: 4px;
+                right: 4px;
+                top: 50%;
+                height: 2px;
+                transform: translateY(-50%) scaleX(0.35);
+            }
+            &::after {
+                left: 50%;
+                top: 50%;
+                height: 4px;
+                width: 24px;
+                max-width: calc(100% - 12px);
+                transform: translate(-50%, -50%);
+            }
+
+            &.fb-grid-dnd-wall-side-up {
+                &::before,
+                &::after {
+                    top: 3px;
+                }
+            }
+            &.fb-grid-dnd-wall-side-down {
+                &::before,
+                &::after {
+                    top: calc(100% - 3px);
+                }
+            }
+        }
+
+        // Hovering a movable wall handle: expand line to full length and enlarge/glow pill
+        &:not(.fb-grid-dnd-wall-target):hover {
+            &::before {
+                background-color: var(--orbeon-focus-border-color);
+                box-shadow: 0 0 0 2px var(--orbeon-focus-highlight-color);
+                opacity: 1;
+            }
+            &::after {
+                opacity: 1;
+                box-shadow: 0 0 0 1px var(--orbeon-form-background-color), 0 0 0 4px var(--orbeon-focus-highlight-color);
+            }
+            &.fb-grid-dnd-wall-vertical {
+                &::before {
+                    transform: translateX(-50%) scaleY(1);
+                }
+                &::after {
+                    width: 6px;
+                    height: 32px;
+                    max-height: calc(100% - 8px);
+                }
+            }
+            &.fb-grid-dnd-wall-horizontal {
+                &::before {
+                    transform: translateY(-50%) scaleX(1);
+                }
+                &::after {
+                    height: 6px;
+                    width: 32px;
+                    max-width: calc(100% - 8px);
+                }
+            }
+        }
+
+        // Possible drop locations while dragging (non-active targets): dashed accent guide line
+        &.fb-grid-dnd-wall-target:not(.fb-grid-dnd-wall-drop) {
+            &::before {
+                background-color: transparent;
+                border-radius: 0;
+                opacity: 0.5;
+            }
+            &::after {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            &.fb-grid-dnd-wall-vertical::before {
+                width: 0;
+                border-left: 2px dashed var(--orbeon-focus-border-color);
+                transform: translateX(-50%) scaleY(1);
+            }
+            &.fb-grid-dnd-wall-horizontal::before {
+                height: 0;
+                border-top: 2px dashed var(--orbeon-focus-border-color);
+                transform: translateY(-50%) scaleX(1);
+            }
+        }
+
+        // Active / closest drop target while dragging: solid glowing snap bar + pill
+        &.fb-grid-dnd-wall-drop {
+            &::before {
+                background-color: var(--orbeon-focus-border-color);
+                box-shadow: 0 0 0 3px var(--orbeon-focus-highlight-color);
+                opacity: 1;
+            }
+            &::after {
+                opacity: 1;
+                box-shadow: 0 0 0 1px var(--orbeon-form-background-color), 0 0 0 4px var(--orbeon-focus-highlight-color);
+            }
+            &.fb-grid-dnd-wall-vertical {
+                &::before {
+                    width: 3px;
+                    transform: translateX(-50%) scaleY(1);
+                }
+                &::after {
+                    width: 6px;
+                    height: 32px;
+                    max-height: calc(100% - 8px);
+                }
+            }
+            &.fb-grid-dnd-wall-horizontal {
+                &::before {
+                    height: 3px;
+                    transform: translateY(-50%) scaleX(1);
+                }
+                &::after {
+                    height: 6px;
+                    width: 32px;
+                    max-width: calc(100% - 8px);
+                }
+            }
+        }
 
         .fb-grid-dnd-wall-handle {
+            width: 100%;
             height: 100%;
+
+            &.gu-transit {
+                display: none;
+            }
         }
-        z-index: 2; // For containers to be above the shadow
     }
 
-    .fb-grid-dnd-wall-vertical   .fb-grid-dnd-wall-handle { cursor: col-resize }
-    .fb-grid-dnd-wall-horizontal .fb-grid-dnd-wall-handle { cursor: row-resize }
+    .fb-grid-dnd-wall-handle.gu-mirror {
+        display: none;
+    }
+
+    .fb-grid-dnd-wall-vertical   .fb-grid-dnd-wall-handle,
+    .fb-grid-dnd-wall-veil.fb-grid-dnd-wall-vertical {
+        cursor: col-resize;
+    }
+    .fb-grid-dnd-wall-horizontal .fb-grid-dnd-wall-handle,
+    .fb-grid-dnd-wall-veil.fb-grid-dnd-wall-horizontal {
+        cursor: row-resize;
+    }
 
     .fb-grid-dnd-wall-veil {
         z-index: 1;         // Veil prevents hover on elements in the grid during D&D
@@ -740,8 +936,33 @@ body.orbeon {
     }
     .fb-grid-dnd-wall-shadow {
         position: absolute;
-        background-color: var(--orbeon-fb-dnd-background-color);
+        background-color: transparent;
+        pointer-events: none;
         z-index: 1; // For shadow to be above controls
+
+        &::before {
+            content: "";
+            position: absolute;
+            border-radius: 9999px;
+            background-color: var(--orbeon-focus-border-color);
+            opacity: 0.3;
+        }
+
+        &.fb-grid-dnd-wall-vertical::before {
+            top: 4px;
+            bottom: 4px;
+            left: 50%;
+            width: 2px;
+            transform: translateX(-50%);
+        }
+
+        &.fb-grid-dnd-wall-horizontal::before {
+            left: 4px;
+            right: 4px;
+            top: 50%;
+            height: 2px;
+            transform: translateY(-50%);
+        }
     }
 
     // ***** Toolbox ***************************************************************************************************

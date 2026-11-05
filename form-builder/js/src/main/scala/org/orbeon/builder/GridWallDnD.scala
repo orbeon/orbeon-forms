@@ -48,6 +48,11 @@ object GridWallDnD {
     val WallContainerClass  = "fb-grid-dnd-wall-container"
     val WallVerticalClass   = "fb-grid-dnd-wall-vertical"
     val WallHorizontalClass = "fb-grid-dnd-wall-horizontal"
+    val WallTargetClass     = "fb-grid-dnd-wall-target"
+    val WallSideLeftClass   = "fb-grid-dnd-wall-side-left"
+    val WallSideRightClass  = "fb-grid-dnd-wall-side-right"
+    val WallSideUpClass     = "fb-grid-dnd-wall-side-up"
+    val WallSideDownClass   = "fb-grid-dnd-wall-side-down"
     val WallHandleClass     = "fb-grid-dnd-wall-handle"
     val WallShadowClass     = "fb-grid-dnd-wall-shadow"
     val WallDropClass       = "fb-grid-dnd-wall-drop"
@@ -131,6 +136,16 @@ object GridWallDnD {
             dom.document.createElementT("div")
               .tap(_.classList.add(WallContainerClass))
               .tap(_.classList.add(orientationClass))
+              .tap { el =>
+                if (DndShadow.isDragging)
+                  el.classList.add(WallTargetClass)
+                side.foreach {
+                  case Direction.Left  => el.classList.add(WallSideLeftClass)
+                  case Direction.Right => el.classList.add(WallSideRightClass)
+                  case Direction.Up    => el.classList.add(WallSideUpClass)
+                  case Direction.Down  => el.classList.add(WallSideDownClass)
+                }
+              }
               .tap(_.dataset += DatasetIndexKey -> index.toString)
               .tap(_.appendChild(dndHandleElem))
 
@@ -196,6 +211,7 @@ object GridWallDnD {
       def hideAll(): Unit = {
         walls.foreach(_.remove())
         walls.clear()
+        dropTarget = None
         mouseOnWall = false
         ControlEditor.unmask()
       }
@@ -237,11 +253,14 @@ object GridWallDnD {
       def show(containerElem: html.Element): Unit = {
 
         val frGridElem = containerElem.parentElement
+        val orientationClass =
+          if (containerElem.hasClass(WallVerticalClass)) WallVerticalClass else WallHorizontalClass
 
         // Create veil
         val dndVeilElem =
           dom.document.createElementT("div")
             .tap(_.classList.add(WallVeilClass))
+            .tap(_.classList.add(orientationClass))
 
         dndVeilOpt = Some(dndVeilElem)
         frGridElem.appendChild(dndVeilElem)
@@ -254,6 +273,7 @@ object GridWallDnD {
         val dndShadowElem =
           dom.document.createElementT("div")
             .tap(_.classList.add(WallShadowClass))
+            .tap(_.classList.add(orientationClass))
 
         dndShadowOpt = Some(dndShadowElem)
         frGridElem.appendChild(dndShadowElem)
@@ -269,7 +289,7 @@ object GridWallDnD {
         dndShadowOpt = None
       }
 
-      Position.onUnderPointerChange(() =>
+      def updateShadowPositionAndDropTarget(): Unit =
         dndShadowOpt.foreach { dndShadowElem =>
           startCellOpt.foreach { case StartCell(_, startSide, _) =>
             DndWall.wallOrientation(startSide) match {
@@ -286,7 +306,8 @@ object GridWallDnD {
             }
           }
         }
-      )
+
+      Position.onUnderPointerChange(() => updateShadowPositionAndDropTarget())
     }
 
     // Handle D&D
@@ -322,6 +343,7 @@ object GridWallDnD {
             val gridModel = Cell.analyze12ColumnGridAndFillHoles(gridBody, simplify = false, transpose = false)
             val wallOrientation = DndWall.wallOrientation(startSide)
             possibleTargets.all.foreach(DndWall.show(gridModel, _, wallOrientation, None))
+            DndShadow.updateShadowPositionAndDropTarget()
           }
         }
       }

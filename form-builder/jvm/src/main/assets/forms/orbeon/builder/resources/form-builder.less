@@ -546,6 +546,11 @@ body.orbeon {
                     opacity: 0.35;
                 }
 
+                &.active {
+                    color: var(--orbeon-fb-active-color);
+                    background-color: var(--orbeon-fb-hover-background-color);
+                }
+
                 &:not([class ~= 'disabled']):hover {
                     color: var(--orbeon-base-color);
                     background-color: var(--orbeon-fb-hover-background-color);
@@ -3014,7 +3019,8 @@ body.orbeon {
                 .fr-navbar-home-link a i {
                     color: inherit;
                 }
-                .btn-link {
+                &> .xforms-trigger .btn-link,
+                .fr-revision-history .btn-link {
                     display      : inline-block;
                     padding      : 5px 15px;
                     border       : 0;
@@ -3051,7 +3057,7 @@ body.orbeon {
                             }
                         }
                         &.show {
-                            background-color: var(--orbeon-dropdown-open-toggle-background-color);
+                            background-color: var(--orbeon-fb-hover-background-color);
                         }
                     }
                 }
@@ -3145,7 +3151,7 @@ body.orbeon {
                 &.show,
                 &.show:hover,
                 &.show:focus {
-                    background-color: var(--orbeon-dropdown-open-toggle-background-color);
+                    background-color: var(--orbeon-fb-hover-background-color);
                     color: var(--orbeon-fb-navbar-hover-color);
                 }
             }

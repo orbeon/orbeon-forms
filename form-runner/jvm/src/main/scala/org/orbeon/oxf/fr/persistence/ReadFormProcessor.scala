@@ -128,6 +128,7 @@ class ReadFormProcessor extends ProcessorImpl {
             element("form",         text = updatedParams.form)
             element("form-version", text = updatedParams.formVersion.toString) // version can be missing for example when retrieving the Form Builder form definition
             element("document",     text = updatedParams.document.getOrElse(""))
+            element("draft",        text = updatedParams.isDraft.map(_.toString).getOrElse(""))
             element("mode",         text = updatedParams.mode)
           }
         }

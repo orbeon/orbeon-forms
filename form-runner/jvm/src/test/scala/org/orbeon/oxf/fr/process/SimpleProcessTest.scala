@@ -721,6 +721,7 @@ extends DocumentTestBase
                 "form"     -> "pta-remittance",
                 "version"  -> "1",
                 "document" -> "aed126ad8341b629f3b19ee7f3e9d4f7c83ebfe5",
+                "draft"    -> "false",
                 "mode"     -> "edit"
               )
           )

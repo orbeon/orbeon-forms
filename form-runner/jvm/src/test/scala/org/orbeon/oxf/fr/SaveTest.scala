@@ -109,6 +109,75 @@ class SaveTest
         }
       }
     }
+
+    it("must update draft state and remove `draft` URL parameter after saving explicitly") {
+
+      withTempSQLite { connection =>
+
+        val AddDataSql =
+          """|INSERT INTO orbeon_form_data (
+             |    created, last_modified_time,
+             |    app, form, form_version, document_id, draft,
+             |    deleted, xml
+             |) VALUES (
+             |    ?, ?,
+             |    ?, ?, ?, ?, ?,
+             |    ?, ?
+             |)""".stripMargin
+        useAndClose(connection.prepareStatement(AddDataSql)) { ps =>
+          val now = new java.sql.Timestamp(System.currentTimeMillis())
+          ps.setTimestamp(1, now)
+          ps.setTimestamp(2, now)
+          ps.setString   (3, "issue")
+          ps.setString   (4, "7343")
+          ps.setInt      (5, 1)
+          ps.setString   (6, DocumentId)
+          ps.setString   (7, "Y")
+          ps.setString   (8, "N")
+          ps.setString   (9, """<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0"><file/></form>""")
+          ps.executeUpdate()
+        }
+
+        val (processorService, docOpt, _) =
+          runFormRunner(
+            app        = "issue",
+            form       = "7343",
+            mode       = "edit",
+            documentId = Some(DocumentId),
+            query      = List("draft" -> "true")
+          )
+
+        val doc = docOpt.get
+
+        withTestExternalContext { _ =>
+          withFormRunnerDocument(processorService, doc) {
+            assert(FormRunnerParams().isDraft.contains(true))
+
+            SimpleProcess.runProcessByName("oxf.fr.detail.process", "save-final")
+            doc.afterExternalEvents(None)
+
+            assert(FormRunnerParams().isDraft.contains(false))
+            assert(
+              doc.getScriptsToRun.exists {
+                case Right(Left(si)) => si.script.shared.body.contains("""ORBEON.fr.private.API.removeUrlParameter("draft")""")
+                case _               => false
+              }
+            )
+          }
+        }
+
+        // Loading the document without `draft=true` must now succeed
+        val (_, reloadedDocOpt, _) =
+          runFormRunner(
+            app        = "issue",
+            form       = "7343",
+            mode       = "edit",
+            documentId = Some(DocumentId)
+          )
+
+        assert(reloadedDocOpt.isDefined)
+      }
+    }
   }
 }
 

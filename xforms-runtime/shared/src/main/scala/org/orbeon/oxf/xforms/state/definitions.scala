@@ -1,9 +1,11 @@
 package org.orbeon.oxf.xforms.state
 
+import org.orbeon.dom.QName
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.model.XFormsInstance.InstanceDocument
 import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
+import org.orbeon.oxf.xforms.xbl.CommonBinding
 
 import java.util.concurrent.locks.Lock
 
@@ -47,8 +49,8 @@ case class InstanceState(
 
 sealed trait ContainersState
 object ContainersState {
-  case object All                           extends ContainersState
-  case class  Some(containers: Set[String]) extends ContainersState
+  case object All                                                                               extends ContainersState
+  case class  Some(containers: Set[(String, CommonBinding, Option[Map[QName, String]])])        extends ContainersState
 }
 
 case class InstancesControls(containers: ContainersState, instances: List[InstanceState], controls: Map[String, ControlState])

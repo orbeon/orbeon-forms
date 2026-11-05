@@ -323,7 +323,16 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     )
 
     InstancesControls(
-      containers = ContainersState.Some(containerOpt.map(_.iterateRelevantDescendantOrSelfContainers.map(_.effectiveId).toSet).getOrElse(Set.empty)),
+      containers = ContainersState.Some(
+        (
+          for {
+            rootContainer <- containerOpt.iterator
+            container     <- rootContainer.iterateRelevantDescendantOrSelfContainers
+            cc            <- container.associatedControlOpt.collect { case cc: XFormsComponentControl => cc }
+          } yield
+            (container.effectiveId, cc.staticControl.commonBinding, cc.staticControl.bindingOpt.map(_.boundElementAtts))
+        ).toSet
+      ),
       instances  = Controls.iterateInstancesToSerialize(containerOpt, mustSerializeInstance).toList,
       controls   = gatherRelevantSwitchState(start)
     )

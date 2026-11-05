@@ -319,7 +319,8 @@ class XFormsComponentControl(
       case Some(InstancesControls(ContainersState.All, instances, _)) =>
         // Case of a full state restoration of the `DynamicState`
         restoreModels(instances)
-      case Some(InstancesControls(ContainersState.Some(containers), instances, _)) if containers(nestedContainer.effectiveId) =>
+      case Some(InstancesControls(ContainersState.Some(containers), instances, _))
+        if containers((nestedContainer.effectiveId, staticControl.commonBinding, staticControl.bindingOpt.map(_.boundElementAtts))) =>
         // Case of an `xxf:dynamic` state restoration where only some containers must be restored
         restoreModels(instances)
       case _ =>

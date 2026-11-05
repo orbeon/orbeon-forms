@@ -1,17 +1,19 @@
 package org.orbeon.oxf.fb
 
-import org.orbeon.dom.Document
-import org.orbeon.oxf.fr.FormRunnerSupport
+import org.orbeon.dom.{Document, QName}
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerSupport, NodeInfoCell}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
+import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.PartAnalysisBuilder
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl
-import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.control.controls.{XFormsGroupControl, XXFormsAttributeControl, XXFormsDynamicControl}
+import org.orbeon.oxf.xforms.control.{XFormsContainerControl, XFormsControl}
+import org.orbeon.oxf.xforms.control.controls.{XFormsGroupControl, XFormsSelect1Control, XXFormsAttributeControl, XXFormsDynamicControl}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.scaxon.NodeConversions
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.xbl.Scope
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -324,6 +326,54 @@ class FormBuilderRestrictedFunctionsTest
           assert(classes2.exists(c => c.contains("fb-badge-default")    && ! c.contains("xforms-hidden")))
           assert(classes2.exists(c => c.contains("fb-badge-visibility") && ! c.contains("xforms-hidden")))
           assert(classes2.exists(c => c.contains("fb-badge-calculate")  && c.contains("xforms-hidden")))
+        }
+      }
+    }
+
+    it("must populate years itemset when switching fr:year appearance to fr:dropdown-year") {
+
+      val fbDocWithDynamic: Document = {
+        val doc = formBuilderDoc(TemplateWithSingleControlDoc)
+        val body = doc.getRootElement.element("body")
+        val dynamicElem = NodeConversions.elemToOrbeonDom(
+          <xxf:dynamic xmlns:xxf="http://orbeon.org/oxf/xml/xforms" id="fb" ref="instance('fb-form-instance')"/>
+        ).getRootElement.detach()
+        body.add(dynamicElem)
+        doc
+      }
+
+      withTestExternalContext { _ =>
+        withActionAndDoc(setupDocument(fbDocWithDynamic)) {
+          implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+
+          val firstTd = FormBuilder.findSelectedCell.orElse((ctx.bodyElem descendant NodeInfoCell.GridTest descendant NodeInfoCell.CellTest).headOption).get
+          FormBuilder.selectCell(firstTd)
+
+          val yearBinding = ctx.bindingIndex.iterateDescriptors.flatMap(_.binding).find(_.attValueOpt("id").contains("fr-year")).get
+          val yearName    = ToolboxOps.insertNewControl(yearBinding).get
+          XFormsAPI.refresh("fr-form-model")
+
+          FormBuilderXPathApi.setControlAppearanceFromToolbar(yearName, "dropdown")
+          XFormsAPI.refresh("fr-form-model")
+
+          val fbDynamicControl = resolveObject[XXFormsDynamicControl]("fb").get
+          def findSelect1Labels: List[String] =
+            Iterator.iterate(List[XFormsControl](fbDynamicControl))(_.flatMap {
+              case c: XFormsContainerControl => c.children
+              case _                         => Nil
+            }).takeWhile(_.nonEmpty).flatten.collectFirst {
+              case s: XFormsSelect1Control if s.effectiveId.contains(s"$yearName-control") =>
+                s.getItemset(EventCollector.Throw).allItemsIterator.map(_.label.label).toList
+            }.getOrElse(Nil)
+
+          assert(findSelect1Labels.size > 1)
+
+          val controlElem = FormRunner.findControlByName(yearName).get
+          XFormsAPI.insert(into = List(controlElem), origin = List(NodeInfoFactory.attributeInfo(QName("start-year"), "2020")))
+          XFormsAPI.insert(into = List(controlElem), origin = List(NodeInfoFactory.attributeInfo(QName("end-year"),   "2022")))
+          XFormsAPI.refresh("fr-form-model")
+
+          assert(findSelect1Labels == List("", "2022", "2021", "2020"))
         }
       }
     }

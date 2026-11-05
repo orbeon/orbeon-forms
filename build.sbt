@@ -55,7 +55,7 @@ val ScalaTestVersion                 = "3.2.20"
 val CirceVersion                     = "0.14.15"
 val EnumeratumVersion                = "1.9.7"
 val EnumeratumCirceVersion           = "1.9.7"
-val ShapelessVersion                 = "2.3.7"
+val ShapelessVersion                 = "2.3.13"
 val ScalaXmlVersion                  = "2.4.0"
 val ScalaParallelCollectionsVersion  = "1.3.0"
 val ScalaAsyncVersion                = "1.0.1"
@@ -82,12 +82,12 @@ val AngusMailVersion                 = "2.0.5"
 val JavaActivationVersion            = "2.0.1"
 val AntVersion                       = "1.10.11"
 val ThumbnailatorVersion             = "0.4.16"
-val AwsSdkVersion                    = "2.57.3"
+val AwsSdkVersion                    = "2.57.8"
 val AwsNettyVersion                  = "4.2.19.Final"
 val InfinispanVersion                = "14.0.35.Final"
-val SqliteJdbcVersion                = "3.53.4.0"
+val SqliteJdbcVersion                = "3.54.1.0"
 val PostgresqlVersion                = "42.7.14"
-val OracleJdbcVersion                = "23.26.3.0.0"
+val OracleJdbcVersion                = "23.26.4.0.0"
 
 // "Provided" Java libraries
 val JavaxServletApiVersion           = "4.0.1"
@@ -827,7 +827,7 @@ lazy val formRunnerJS = formRunner.js
       "org.scala-lang.modules" %%% "scala-xml"    % ScalaXmlVersion
     ),
 
-    jsDependencies                      += "org.webjars" % "jquery" % "3.6.1" / "jquery.js",
+    jsDependencies                      += "org.webjars" % "jquery" % "3.6.4" / "jquery.js",
     Test / jsDependencies               += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
     Test / unmanagedResourceDirectories += (xformsWeb / baseDirectory).value / "src" / "main" / "assets",
 
@@ -1256,7 +1256,7 @@ lazy val xformsWeb = (project in file("xforms-web"))
       ("io.github.cquiroz"     %%% "scala-java-time"  % ScalaJsTimeVersion).cross(CrossVersion.for2_13Use3),
     ),
 
-    jsDependencies                      += "org.webjars" % "jquery" % "3.6.1" / "jquery.js",
+    jsDependencies                      += "org.webjars" % "jquery" % "3.6.4" / "jquery.js",
     Test / jsDependencies               += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
     Test / unmanagedResourceDirectories += baseDirectory.value / "src" / "main" / "assets",
 
@@ -1354,10 +1354,10 @@ lazy val coreCrossPlatformJS = coreCrossPlatform.js
   .settings(commonScalaJsSettings)
   .settings(
     libraryDependencies ++= Seq(
-      ("org.xml"      %% "sax"         % SaxVersion).cross(CrossVersion.for2_13Use3),
+      ("org.xml"     %%% "sax"         % SaxVersion).cross(CrossVersion.for2_13Use3),
       ("org.orbeon"  %%% "saxon-xpath" % SaxonJsVersion).cross(CrossVersion.for2_13Use3),
       ("org.orbeon"  %%% "xerces"      % XercesVersion).cross(CrossVersion.for2_13Use3),
-      "com.chuusai"   %% "shapeless"   % ShapelessVersion,
+      "com.chuusai"  %%  "shapeless"   % ShapelessVersion,
       "org.scala-js" %%% "scalajs-dom" % ScalaJsDomVersion,
     ),
     Compile / unmanagedJars      := Nil,

@@ -1834,6 +1834,7 @@
                         </fr:tab>
                         <fr:tab
                             id="label-hint-help-tab"
+                            class="fb-label-hint-help-tab"
                             visible="exists($i/(text, label, hint, help)[@supported = 'true'])">
                             <fr:label
                                 value="
@@ -1870,7 +1871,7 @@
                                         </xf:select1>
                                     </fr:c>
                                     <fr:c x="1" y="2" w="12">
-                                        <fr:checkbox-input ref=".[$lhh != 'text']/@isHTML">
+                                        <fr:checkbox-input ref=".[$lhh != 'text']/@isHTML" class="fb-lhh-use-html">
                                             <xf:label ref="$resources/dialog-control-settings/use-html"/>
                                         </fr:checkbox-input>
                                         <xf:var name="is-html" value="@isHTML = 'true'"/>

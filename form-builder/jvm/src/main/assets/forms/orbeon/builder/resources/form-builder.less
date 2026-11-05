@@ -2189,6 +2189,51 @@ body.orbeon {
             }
         }
 
+        .fb-label-hint-help-tab {
+            & > .xbl-fr-grid {
+                border: 1px solid var(--orbeon-base-border-color);
+                border-radius: var(--orbeon-body-decorations-border-radius);
+                padding: 6px 10px 10px 10px;
+                margin-bottom: 12px;
+
+                &:last-of-type {
+                    margin-bottom: 0;
+                }
+
+                .fr-grid-non-empty {
+                    margin-bottom: 0;
+                }
+
+                .fb-lhh-use-html {
+                    float: right;
+                    width: auto;
+                    margin-top: 5px;
+                    margin-bottom: 0;
+
+                    label.checkbox {
+                        margin-bottom: 0;
+                        padding-top: 0;
+                    }
+                }
+
+                .fr-grid-td {
+                    & > .xforms-input,
+                    & > .xforms-textarea,
+                    & > .xbl-fr-tinymce {
+                        & > .xforms-label {
+                            font-weight: bold;
+                        }
+                        & > input,
+                        & > textarea,
+                        & > .xbl-fr-tinymce-div,
+                        & > .tox-tinymce {
+                            clear: both;
+                        }
+                    }
+                }
+            }
+        }
+
         .fb-alert-template-parameters-dialog {
             width: 750px;
             max-width: none;

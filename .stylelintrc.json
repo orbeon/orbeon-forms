@@ -1,5 +1,15 @@
 {
   "rules": {
-    "declaration-property-value-no-unknown": true
+    "declaration-property-value-no-unknown": true,
+    "declaration-property-value-disallowed-list": [
+      {
+        "/.*/": [
+          "/var\\(--orbeon-(?!card-columns\\b)[a-z0-9-]+\\s*,/"
+        ]
+      },
+      {
+        "message": "No fallback value in var(--orbeon-...): declare the variable in both themes instead (--orbeon-card-columns is set at run time and is the only exception)"
+      }
+    ]
   }
 }

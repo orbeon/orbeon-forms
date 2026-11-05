@@ -181,7 +181,7 @@ body.orbeon {
             }
 
             &.xforms-invalid input.xforms-input-input {
-                border-color: var(--orbeon-error-color, #b94a48);
+                border-color: var(--orbeon-error-color);
             }
 
             .xforms-alert {
@@ -251,7 +251,7 @@ body.orbeon {
             gap: 1px;
 
             .fb-toolbar-req-star {
-                color: var(--orbeon-error-color, #d9534f);
+                color: var(--orbeon-error-color);
                 font-size: 14px;
                 font-weight: bold;
                 line-height: 1;
@@ -288,13 +288,13 @@ body.orbeon {
                 }
 
                 &.active button.btn-link {
-                    background-color: var(--orbeon-tab-active-bar-color, #0081C7);
-                    color: #ffffff;
+                    background-color: var(--orbeon-fb-active-color);
+                    color: var(--orbeon-fb-active-text-color);
                     font-weight: 600;
 
                     i.fa,
                     .fb-toolbar-req-star {
-                        color: #ffffff;
+                        color: var(--orbeon-fb-active-text-color);
                     }
                 }
             }
@@ -355,7 +355,7 @@ body.orbeon {
             &.fb-toolbar-suggestion-pill {
                 button.btn-link {
                     border-style: dashed;
-                    color: var(--orbeon-tab-active-bar-color, #0081C7);
+                    color: var(--orbeon-fb-active-color);
                     font-weight: 600;
 
                     .xforms-output,
@@ -366,23 +366,23 @@ body.orbeon {
             }
 
             &.fb-toolbar-toggle-pill.active button.btn-link {
-                background-color: var(--orbeon-tab-active-bar-color, #0081C7);
-                border-color: var(--orbeon-tab-active-bar-color, #0081C7);
-                color: #ffffff;
+                background-color: var(--orbeon-fb-active-color);
+                border-color: var(--orbeon-fb-active-color);
+                color: var(--orbeon-fb-active-text-color);
                 font-weight: 600;
 
                 i.fa {
-                    color: #ffffff;
+                    color: var(--orbeon-fb-active-text-color);
                 }
             }
 
             &.fb-toolbar-badge-active button.btn-link {
-                border-color: var(--orbeon-tab-active-bar-color, #0081C7);
-                color: var(--orbeon-tab-active-bar-color, #0081C7);
+                border-color: var(--orbeon-fb-active-color);
+                color: var(--orbeon-fb-active-color);
                 font-weight: 600;
 
                 i.fa {
-                    color: var(--orbeon-tab-active-bar-color, #0081C7);
+                    color: var(--orbeon-fb-active-color);
                 }
             }
 
@@ -589,9 +589,9 @@ body.orbeon {
             padding: 2px 6px;
             font-size: 12px;
             line-height: 16px;
-            color: var(--orbeon-tab-active-bar-color, #0081C7);
-            background-color: var(--orbeon-form-background-color, #ffffff);
-            border: 1px solid var(--orbeon-tab-active-bar-color, #0081C7);
+            color: var(--orbeon-fb-active-color);
+            background-color: var(--orbeon-form-background-color);
+            border: 1px solid var(--orbeon-fb-active-color);
             border-radius: 3px;
         }
     }
@@ -735,10 +735,10 @@ body.orbeon {
             border-radius: 9999px;
             opacity: 0;
             transition:
-                opacity          var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out),
-                transform        var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out),
-                background-color var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out),
-                box-shadow       var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out);
+                opacity          var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                transform        var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                box-shadow       var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
         }
 
         &::after {
@@ -747,11 +747,11 @@ body.orbeon {
             box-shadow: 0 0 0 1px var(--orbeon-form-background-color);
             opacity: 0.85;
             transition:
-                width            var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out),
-                height           var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out),
-                opacity          var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out),
-                transform        var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out),
-                box-shadow       var(--orbeon-transition-duration, 150ms) var(--orbeon-transition-timing-function, ease-in-out);
+                width            var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                height           var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                opacity          var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                transform        var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                box-shadow       var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
         }
 
         &.fb-grid-dnd-wall-vertical {
@@ -1081,12 +1081,12 @@ body.orbeon {
                     .fb-toggle-toolbar-button.active {
                         button,
                         .xforms-trigger-appearance-minimal:not(.xforms-readonly):hover button {
-                            color: var(--orbeon-tab-active-bar-color, #0081C7);
+                            color: var(--orbeon-fb-active-color);
                             background-color: var(--orbeon-form-background-color);
-                            box-shadow: inset 0 0 0 1px var(--orbeon-tab-active-bar-color, #0081C7);
+                            box-shadow: inset 0 0 0 1px var(--orbeon-fb-active-color);
 
                             i.fa {
-                                color: var(--orbeon-tab-active-bar-color, #0081C7);
+                                color: var(--orbeon-fb-active-color);
                             }
                         }
                     }
@@ -2756,9 +2756,9 @@ body.orbeon {
                             padding: 0 4px;
                             font-size: 10px;
                             line-height: 14px;
-                            color: var(--orbeon-tab-active-bar-color, #0081C7);
-                            background-color: var(--orbeon-form-background-color, #ffffff);
-                            border: 1px solid var(--orbeon-base-border-color, #d0d7de);
+                            color: var(--orbeon-fb-active-color);
+                            background-color: var(--orbeon-form-background-color);
+                            border: 1px solid var(--orbeon-base-border-color);
                             border-radius: 3px;
                             box-sizing: border-box;
                             white-space: nowrap;
@@ -2767,7 +2767,7 @@ body.orbeon {
 
                             &:hover {
                                 opacity: 1;
-                                border-color: var(--orbeon-tab-active-bar-color, #0081C7);
+                                border-color: var(--orbeon-fb-active-color);
                             }
 
                             &.xforms-hidden {
@@ -2792,7 +2792,7 @@ body.orbeon {
                             }
 
                             .fb-badge-req {
-                                color: var(--orbeon-error-color, #d9534f);
+                                color: var(--orbeon-error-color);
                                 font-weight: bold;
                                 font-size: 11px;
                                 line-height: 1;
@@ -2813,7 +2813,7 @@ body.orbeon {
                     &:hover > .fb-control-cell-badges .fb-control-cell-badge,
                     &.fb-selected > .fb-control-cell-badges .fb-control-cell-badge {
                         opacity: 1;
-                        border-color: var(--orbeon-tab-active-bar-color, #0081C7);
+                        border-color: var(--orbeon-fb-active-color);
                     }
 
                     & > .gu-transit ~ .fb-control-cell-badges {

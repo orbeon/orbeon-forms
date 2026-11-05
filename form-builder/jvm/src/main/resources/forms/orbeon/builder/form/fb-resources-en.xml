@@ -102,6 +102,9 @@
     <form-structure>
         <label>Form Structure</label>
     </form-structure>
+    <outline>
+        <label>Outline</label>
+    </outline>
     <controls>
         <label>Controls</label>
     </controls>

@@ -82,6 +82,9 @@
     <form-structure>
         <label>Skjemastruktur</label>
     </form-structure>
+    <outline>
+        <label>Oversikt</label>
+    </outline>
     <controls>
         <label>Skjemaelementer</label>
     </controls>

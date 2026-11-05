@@ -1154,6 +1154,67 @@
 
     </xf:action>
 
+    <xf:action event="fb-select-outline-container">
+        <xf:var name="container" value="fbf:containerById(event('container-id'))"/>
+        <xf:action if="exists($container)">
+
+            <xf:action
+                iterate="
+                    let $ids :=
+                        for $elem in reverse(
+                            frf:findAncestorSectionsLeafToRoot(
+                                $container,
+                                true()
+                            )
+                        )
+                        return
+                            $elem/@id
+                    return
+                        for $i in 1 to count($ids)
+                        return
+                            concat(
+                                '|',
+                                string-join(
+                                    (
+                                        'fb',
+                                        subsequence(
+                                            $ids,
+                                            1,
+                                            $i
+                                        )
+                                    ),
+                                    '≡'
+                                ),
+                                '|'
+                            )">
+                <xf:dispatch
+                    name="fr-expand"
+                    targetid="{.}"/>
+                <xf:recalculate/>
+                <xf:refresh/>
+            </xf:action>
+
+            <xf:var name="first-cell" value="($container/descendant::*:c | $container/descendant::*:td)[1]"/>
+            <xf:action if="exists($first-cell)">
+                <xf:setvalue ref="$selected-cell" value="$first-cell/@id"/>
+                <xf:setvalue ref="$starting-cell" value="$first-cell/@id"/>
+            </xf:action>
+
+            <xf:var
+                name="namespaced-id"
+                value="fbf:buildFormBuilderControlNamespacedIdOrEmpty($container/@id)"/>
+            <xf:action type="javascript">
+                <xf:param
+                    name="namespacedId"
+                    value="$namespaced-id"/>
+                <xf:body>
+                    ORBEON.builder.private.API.moveOutlineContainerIntoView(namespacedId);
+                </xf:body>
+            </xf:action>
+
+        </xf:action>
+    </xf:action>
+
     <!-- Schema upload dialog -->
     <xf:instance id="fb-schema-upload-instance">
         <_>
@@ -1210,9 +1271,9 @@
         <_/>
     </xf:instance>
 
-    <!-- Control settings mini-toolbar (#6484) -->
+    <!-- Control settings mini-toolbar (#6484) and outline (#7857) -->
     <xf:instance id="fb-toolbar-instance">
-        <toolbar visible="true" show-cell-badges="true">
+        <toolbar visible="true" show-cell-badges="true" outline-visible="true">
             <tracked-state/>
             <tracked-control-name/>
             <control-name/>

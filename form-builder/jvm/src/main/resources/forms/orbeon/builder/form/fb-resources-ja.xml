@@ -102,6 +102,9 @@
     <form-structure>
         <label>フォーム構成</label>
     </form-structure>
+    <outline>
+        <label>アウトライン</label>
+    </outline>
     <controls>
         <label>コントロール</label>
     </controls>

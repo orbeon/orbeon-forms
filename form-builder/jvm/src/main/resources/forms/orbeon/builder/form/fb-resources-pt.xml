@@ -83,6 +83,9 @@
     <form-structure>
         <label>Estrutura do Formulário</label>
     </form-structure>
+    <outline>
+        <label>Estrutura</label>
+    </outline>
     <controls>
         <label>Controlos</label>
     </controls>

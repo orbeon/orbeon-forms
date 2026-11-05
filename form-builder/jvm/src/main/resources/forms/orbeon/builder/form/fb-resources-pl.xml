@@ -102,6 +102,9 @@
     <form-structure>
         <label>Struktura formularza</label>
     </form-structure>
+    <outline>
+        <label>Konspekt</label>
+    </outline>
     <controls>
         <label>Kontrolki</label>
     </controls>

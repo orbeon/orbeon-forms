@@ -1,0 +1,144 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xf:group
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+
+    id="fb-outline-container"
+    model="fr-form-model"
+    class="fb-outline-container">
+
+    <xf:var name="form-resources"     value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
+    <xf:var name="current-cell"       value="fbf:getCurrentlySelectedCell()"/>
+    <xf:var name="active-section-ids" value="$current-cell/ancestor::fr:section/@id/string()"/>
+    <xf:var name="active-grid-id"     value="$current-cell/ancestor::fr:grid[1]/@id/string()"/>
+
+    <!-- Right tool window bar (#7857) -->
+    <xh:div class="fb-tool-window-bar fb-tool-window-bar-right">
+        <xf:trigger
+            id="toggle-outline-trigger"
+            appearance="minimal"
+            ref="$toolbar/@outline-visible"
+            class="fb-toggle-outline-button{' active'[$toolbar/@outline-visible = 'true']}">
+            <xf:label><xh:i class="fa fa-list-ul fa-fw"/></xf:label>
+            <xf:hint ref="$form-resources/outline/label"/>
+            <xf:action event="DOMActivate">
+                <xf:setvalue
+                    ref="$toolbar/@outline-visible"
+                    value="if (. = 'true') then 'false' else 'true'"/>
+            </xf:action>
+        </xf:trigger>
+    </xh:div>
+
+    <!-- Outline tool window panel (#7857) -->
+    <xh:div class="fb-outline{' fb-outline-hidden'[$toolbar/@outline-visible != 'true']}">
+        <xh:div class="fb-outline-inside">
+            <xh:div class="fb-outline-card">
+                <xh:div class="fb-outline-header">
+                    <xh:span class="fb-outline-header-title">
+                        <xf:output value="$form-resources/outline/label"/>
+                    </xh:span>
+                    <xf:trigger
+                        id="close-outline-trigger"
+                        appearance="minimal"
+                        class="fb-outline-close-button">
+                        <xf:label><xh:i class="fa fa-times fa-fw"/></xf:label>
+                        <xf:hint ref="$form-resources/close/label"/>
+                        <xf:action event="DOMActivate">
+                            <xf:setvalue ref="$toolbar/@outline-visible" value="'false'"/>
+                        </xf:action>
+                    </xf:trigger>
+                </xh:div>
+
+                <xh:div class="fb-outline-body">
+                    <xf:repeat
+                        ref="$body/descendant::*[self::fr:section or self::fr:grid]"
+                        id="fb-outline-repeat">
+
+                        <xf:var name="is-section"          value="local-name(.) = 'section'"/>
+                        <xf:var name="container-id"        value="@id/string()"/>
+                        <xf:var name="container-name"      value="frf:controlNameFromId($container-id)"/>
+                        <xf:var name="parent-section-id"   value="ancestor::fr:section[1]/@id/string()"/>
+                        <xf:var name="level"               value="count(ancestor::fr:section) + 1"/>
+                        <xf:var name="is-repeat"           value="frf:isRepeat(.)"/>
+                        <xf:var name="is-section-template" value="$is-section and exists(*[frf:isSectionTemplateContent(.)])"/>
+                        <xf:var name="can-move-into"       value="$is-section and not($is-section-template)"/>
+                        <xf:var name="can-move"            value="exists((preceding-sibling::* | following-sibling::*)[self::fr:section or self::fr:grid])"/>
+                        <xf:var name="is-active-section"   value="$is-section and ($container-id = $active-section-ids)"/>
+                        <xf:var name="is-active-grid"      value="not($is-section) and ($container-id = $active-grid-id)"/>
+
+                        <xf:var name="section-label-raw"   value="if ($is-section) then fbf:getControlLhhOrEmpty($container-name, 'label') else ''"/>
+                        <xf:var name="section-label"       value="if (xxf:non-blank($section-label-raw)) then frf:removeHtmlTags($section-label-raw) else ''"/>
+
+                        <xf:var name="grid-cols"           value="if (not($is-section)) then (if (@columns = '24') then 24 else 12) else 0"/>
+                        <xf:var name="grid-rows"           value="if (not($is-section)) then max((for $c in fr:c return ($c/@y/xs:integer(.), 1)[1] + ($c/@h/xs:integer(.), 1)[1] - 1, 0)) else 0"/>
+                        <xf:var name="grid-size"           value="if (not($is-section)) then concat($grid-cols, '×', $grid-rows) else ''"/>
+
+                        <xf:var name="item-title"          value="if ($is-section) then $section-label else $grid-size"/>
+                        <xf:var name="item-tooltip"        value="if (xxf:non-blank($item-title)) then concat($item-title, ' (', $container-name, ')') else concat('(', $container-name, ')')"/>
+
+                        <xh:div
+                            class="fb-outline-row fb-outline-level-{$level}{if ($is-section) then ' fb-outline-section' else ' fb-outline-grid'}{' fb-outline-can-move'[$can-move]}{' fb-outline-active-section'[$is-active-section]}{' fb-outline-active'[$is-active-grid]}"
+                            style="--fb-outline-level: {$level}"
+                            data-orbeon-container-id="{$container-id}"
+                            data-orbeon-parent-id="{$parent-section-id}"
+                            data-orbeon-container-type="{if ($is-section) then 'section' else 'grid'}"
+                            data-orbeon-can-move-into="{$can-move-into}"
+                            data-orbeon-can-move="{$can-move}"
+                            data-orbeon-level="{$level}">
+                            <xf:trigger
+                                appearance="minimal"
+                                class="fb-outline-item">
+                                <xf:label>
+                                    <xh:span class="fb-outline-item-content" title="{$item-tooltip}">
+                                        <xh:i
+                                            class="fa fa-fw fb-outline-item-icon {
+                                                if ($is-section-template) then
+                                                    'fa-puzzle-piece'
+                                                else if ($is-repeat) then
+                                                    'fa-repeat'
+                                                else if ($is-section) then
+                                                    'fa-columns'
+                                                else
+                                                    'fa-table'
+                                            }"/>
+                                        <xf:output
+                                            ref=".[xxf:non-blank($item-title)]"
+                                            class="fb-outline-item-title"
+                                            value="$item-title"/>
+                                        <xf:output
+                                            class="fb-outline-item-name"
+                                            value="concat('(', $container-name, ')')"/>
+                                    </xh:span>
+                                </xf:label>
+                                <xf:dispatch
+                                    event="DOMActivate"
+                                    name="fb-select-outline-container"
+                                    targetid="fr-form-model">
+                                    <xf:property name="container-id" value="$container-id"/>
+                                </xf:dispatch>
+                            </xf:trigger>
+                        </xh:div>
+                    </xf:repeat>
+                </xh:div>
+            </xh:div>
+        </xh:div>
+    </xh:div>
+</xf:group>

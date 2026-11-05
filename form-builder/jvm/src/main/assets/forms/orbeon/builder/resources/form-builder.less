@@ -15,6 +15,8 @@
 
 @fbGutter: 6px;
 @fbToolbarWidth: 224px;
+@fbOutlineWidth: @fbToolbarWidth;
+@fbWindowBarWidth: 32px;
 @fbNavbarHeight: 44px;
 @fbBottomHeight: 54px;
 @fbControlToolbarHeight: 38px;
@@ -79,7 +81,7 @@ body.orbeon {
         gap: 8px;
         position: absolute;
         top: @fbNavbarHeight + @fbGutter;
-        right: @fbGutter;
+        right: @fbGutter + @fbWindowBarWidth + @fbGutter;
         left: @fbGutter + @fbToolbarWidth + (@fbGutter/2);
         height: @fbControlToolbarHeight;
         box-sizing: border-box;
@@ -96,7 +98,11 @@ body.orbeon {
         opacity: 1;
         transform: translateY(0);
         visibility: visible;
-        transition: opacity 160ms ease, transform 160ms ease, visibility 0ms linear 0ms;
+        transition: opacity 160ms ease, transform 160ms ease, right 160ms ease, visibility 0ms linear 0ms;
+
+        &.fb-has-outline {
+            right: @fbGutter + @fbWindowBarWidth + @fbGutter + @fbOutlineWidth + (@fbGutter / 2);
+        }
 
         &::-webkit-scrollbar {
             display: none;
@@ -107,7 +113,7 @@ body.orbeon {
             transform: translateY(-6px);
             visibility: hidden;
             pointer-events: none;
-            transition: opacity 140ms ease, transform 140ms ease, visibility 0ms linear 140ms;
+            transition: opacity 140ms ease, transform 140ms ease, right 160ms ease, visibility 0ms linear 140ms;
         }
 
         // Override Form Runner's `white-space: normal` on `.xforms-trigger button` and `.xforms-output-output`
@@ -422,16 +428,20 @@ body.orbeon {
         flex-direction: column;
         position: absolute;
         top: @fbNavbarHeight + @fbGutter;
-        right: @fbGutter;
+        right: @fbGutter + @fbWindowBarWidth + @fbGutter;
         left: @fbGutter + @fbToolbarWidth + (@fbGutter/2); // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
         bottom: @fbBottomHeight + @fbGutter;
         overflow-y: auto;
         border-radius: var(--orbeon-body-decorations-border-radius);
         border: 1px solid var(--orbeon-base-border-color);
-        transition: top 160ms ease;
+        transition: top 160ms ease, right 160ms ease;
 
         &.fb-has-control-toolbar {
             top: @fbNavbarHeight + @fbGutter + @fbControlToolbarHeight + @fbGutter;
+        }
+
+        &.fb-has-outline {
+            right: @fbGutter + @fbWindowBarWidth + @fbGutter + @fbOutlineWidth + (@fbGutter / 2);
         }
 
         &.fb-hide-cell-badges .fb-main-inner .fr-body .xbl-fr-grid .fr-grid.fr-editable .fr-grid-td > .xforms-group.fb-control-cell-badges {
@@ -1364,6 +1374,295 @@ body.orbeon {
             .xbl-fr-alert-dialog {display: none } // because w/ Chrome, a DIV of the dialog remains under the toolbox DIV and causes the toolbox to scroll
 
             .fr-orbeon-version { color: white; }
+        }
+    }
+
+    // Right tool window bar and Outline tool window (#7857)
+    .fb-tool-window-bar {
+        position: absolute;
+        top: @fbNavbarHeight + @fbGutter;
+        bottom: @fbBottomHeight + @fbGutter;
+        width: @fbWindowBarWidth;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 4px 2px;
+        gap: 4px;
+        background-color: var(--orbeon-tab-background-color);
+        border: var(--orbeon-tab-border-width) solid var(--orbeon-tab-border-color);
+        border-radius: var(--orbeon-body-decorations-border-radius);
+        z-index: 3;
+
+        &.fb-tool-window-bar-right {
+            right: @fbGutter;
+        }
+
+        .xforms-trigger-appearance-minimal {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+
+            button {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 24px;
+                height: 24px;
+                padding: 0;
+                color: var(--orbeon-base-color);
+                border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+                text-decoration: none;
+                transition: background-color 100ms ease, box-shadow 100ms ease, color 100ms ease;
+
+                &:hover {
+                    background-color: var(--orbeon-fb-hover-background-color);
+                }
+
+                &:focus {
+                    outline: none;
+                    box-shadow: none;
+                }
+            }
+
+            &.active button,
+            &.active:not(.xforms-readonly):hover button {
+                color: var(--orbeon-fb-active-color);
+                background-color: var(--orbeon-form-background-color);
+                box-shadow: inset 0 0 0 1px var(--orbeon-fb-active-color);
+
+                i.fa {
+                    color: var(--orbeon-fb-active-color);
+                }
+            }
+        }
+    }
+
+    .fb-outline {
+        position: absolute;
+        right: @fbGutter + @fbWindowBarWidth + @fbGutter;
+        top: @fbNavbarHeight + @fbGutter;
+        bottom: @fbBottomHeight + @fbGutter;
+        width: @fbOutlineWidth;
+        box-sizing: border-box;
+        z-index: 2;
+        opacity: 1;
+        transform: translateX(0);
+        visibility: visible;
+        transition: opacity 160ms ease, transform 160ms ease, visibility 0ms linear 0ms;
+
+        &.fb-outline-hidden {
+            opacity: 0;
+            transform: translateX(8px);
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 140ms ease, transform 140ms ease, visibility 0ms linear 140ms;
+        }
+
+        .fb-outline-inside {
+            width: 100%;
+            height: 100%;
+            padding: 0 0 0 (@fbGutter / 2);
+            box-sizing: border-box;
+        }
+
+        .fb-outline-card {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            background-color: var(--orbeon-tab-background-color);
+            border: var(--orbeon-tab-border-width) solid var(--orbeon-tab-border-color);
+            border-radius: var(--orbeon-body-decorations-border-radius);
+            overflow: hidden;
+        }
+
+        .fb-outline-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: @fbControlToolbarHeight;
+            padding: 0 6px 0 12px;
+            box-sizing: border-box;
+            border-bottom: 1px solid var(--orbeon-base-border-color);
+
+            .fb-outline-header-title {
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--orbeon-base-color);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .fb-outline-close-button {
+                margin: 0;
+
+                button {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 24px;
+                    height: 24px;
+                    padding: 0;
+                    color: var(--orbeon-hint-color);
+                    border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+                    text-decoration: none;
+                    transition: background-color 100ms ease, color 100ms ease;
+
+                    &:hover {
+                        color: var(--orbeon-base-color);
+                        background-color: var(--orbeon-fb-hover-background-color);
+                    }
+
+                    &:focus {
+                        outline: none;
+                        box-shadow: none;
+                    }
+                }
+            }
+        }
+
+        .fb-outline-body {
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 6px;
+
+            .fb-outline-row {
+                padding-left: calc((var(--fb-outline-level, 1) - 1) * 14px);
+                margin-bottom: 1px;
+                -webkit-user-select: none;
+                user-select: none;
+
+                .fb-outline-item {
+                    display: block;
+                    width: 100%;
+                    margin: 0;
+
+                    button.btn-link {
+                        display: block;
+                        width: 100%;
+                        padding: 4px 8px;
+                        margin: 0;
+                        box-sizing: border-box;
+                        text-align: left;
+                        text-decoration: none;
+                        color: var(--orbeon-base-color);
+                        border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+                        cursor: pointer;
+                        transition: background-color 100ms ease, color 100ms ease;
+
+                        &:hover {
+                            background-color: var(--orbeon-fb-hover-background-color);
+                        }
+
+                        &:focus {
+                            outline: none;
+                            box-shadow: none;
+                        }
+                    }
+                }
+
+                &.fb-outline-can-move .fb-outline-item button.btn-link {
+                    cursor: grab;
+                }
+
+                &.fb-outline-dnd-drop-into .fb-outline-item button.btn-link {
+                    outline: 1px dashed var(--orbeon-focus-border-color);
+                    outline-offset: -1px;
+                    background-color: var(--orbeon-fb-hover-background-color);
+                }
+
+                .fb-outline-item-content {
+                    display: flex;
+                    align-items: baseline;
+                    gap: 5px;
+                    width: 100%;
+                    min-width: 0;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    font-size: 12px;
+                    line-height: 18px;
+                }
+
+                .fb-outline-item-icon {
+                    flex-shrink: 0;
+                    font-size: 11px;
+                    color: var(--orbeon-hint-color);
+                    align-self: center;
+                }
+
+                .fb-outline-item-title:not(.xforms-disabled) {
+                    &,
+                    .xforms-output-output {
+                        display: inline-block;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        vertical-align: bottom;
+                    }
+
+                    min-width: 0;
+                    flex-shrink: 1;
+                }
+
+                .fb-outline-item-name:not(.xforms-disabled) {
+                    &,
+                    .xforms-output-output {
+                        display: inline-block;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        vertical-align: bottom;
+                    }
+
+                    color: var(--orbeon-hint-color);
+                    font-size: 11px;
+                    font-weight: 400;
+                    min-width: 0;
+                    flex-shrink: 2;
+                }
+
+                &.fb-outline-section {
+                    margin-top: 2px;
+
+                    &:first-of-type {
+                        margin-top: 0;
+                    }
+
+                    .fb-outline-item-title {
+                        font-weight: 600;
+                    }
+                }
+
+                &.fb-outline-grid {
+                    .fb-outline-item-title {
+                        font-weight: 400;
+                    }
+                }
+
+                &.fb-outline-active-section {
+                    .fb-outline-item-icon,
+                    .fb-outline-item-title {
+                        color: var(--orbeon-fb-active-color);
+                    }
+                }
+
+                &.fb-outline-active {
+                    .fb-outline-item button.btn-link {
+                        background-color: var(--orbeon-fb-hover-background-color);
+                        box-shadow: inset 2px 0 0 0 var(--orbeon-fb-active-color);
+                    }
+
+                    .fb-outline-item-icon,
+                    .fb-outline-item-title {
+                        color: var(--orbeon-fb-active-color);
+                        font-weight: 600;
+                    }
+                }
+            }
         }
     }
 

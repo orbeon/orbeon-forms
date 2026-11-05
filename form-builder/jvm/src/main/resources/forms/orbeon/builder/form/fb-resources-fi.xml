@@ -102,6 +102,9 @@
     <form-structure>
         <label>Lomakerakenne</label>
     </form-structure>
+    <outline>
+        <label>Jäsennys</label>
+    </outline>
     <controls>
         <label>Kontrolli</label>
     </controls>

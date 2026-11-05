@@ -82,6 +82,9 @@
     <form-structure>
         <label>Структура формы</label>
     </form-structure>
+    <outline>
+        <label>Структура</label>
+    </outline>
     <controls>
         <label>Элементы</label>
     </controls>

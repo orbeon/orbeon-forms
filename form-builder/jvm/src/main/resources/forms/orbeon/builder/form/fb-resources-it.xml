@@ -90,6 +90,9 @@
     <form-structure>
         <label>Struttura del modulo</label>
     </form-structure>
+    <outline>
+        <label>Struttura</label>
+    </outline>
     <controls>
         <label>Controlli</label>
     </controls>

@@ -102,6 +102,9 @@
     <form-structure>
         <label>هيكل النموذج</label>
     </form-structure>
+    <outline>
+        <label>مخطط تفصيلي</label>
+    </outline>
     <controls>
         <label>عناصر التحكم</label>
     </controls>

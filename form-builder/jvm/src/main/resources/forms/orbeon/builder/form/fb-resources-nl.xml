@@ -83,6 +83,9 @@
     <form-structure>
         <label>Form structuur</label>
     </form-structure>
+    <outline>
+        <label>Overzicht</label>
+    </outline>
     <controls>
         <label>Controls</label>
     </controls>

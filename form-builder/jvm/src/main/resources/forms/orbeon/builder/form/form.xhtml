@@ -138,12 +138,13 @@
         </xh:div>
 
         <xi:include href="oxf:/forms/orbeon/builder/form/toolbox.xml" xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/forms/orbeon/builder/form/outline.xml" xxi:omit-xml-base="true"/>
 
         <!-- Control settings mini-toolbar (#6484) -->
         <xf:group
             id="fb-control-settings-toolbar"
             model="fr-form-model"
-            class="fb-control-settings-toolbar{' fb-toolbar-hidden'[$toolbar/@visible != 'true']}">
+            class="fb-control-settings-toolbar{' fb-toolbar-hidden'[$toolbar/@visible != 'true']}{' fb-has-outline'[$toolbar/@outline-visible = 'true']}">
 
             <xf:var name="form-resources"    value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
             <xf:var name="fr-resources"      value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')"/>
@@ -480,7 +481,7 @@
             </xf:group>
         </xf:group>
 
-        <xh:div class="fb-main{' fb-has-control-toolbar'[xxf:instance('fb-toolbar-instance')/@visible = 'true']}{' fb-hide-cell-badges'[xxf:instance('fb-toolbar-instance')/@show-cell-badges = 'false']}">
+        <xh:div class="fb-main{' fb-has-control-toolbar'[xxf:instance('fb-toolbar-instance')/@visible = 'true']}{' fb-hide-cell-badges'[xxf:instance('fb-toolbar-instance')/@show-cell-badges = 'false']}{' fb-has-outline'[xxf:instance('fb-toolbar-instance')/@outline-visible = 'true']}">
 
             <!-- Lease message -->
             <fr:lease fr-resources-ref="$fr-resources"/>

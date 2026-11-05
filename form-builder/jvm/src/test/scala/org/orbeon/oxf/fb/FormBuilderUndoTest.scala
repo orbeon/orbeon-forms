@@ -227,6 +227,10 @@ class FormBuilderUndoTest
         assert(FormBuilder.containerPosition(otherSectionId) === ContainerPosition(Some("my-section"), Some("grid-1")))
         assert(FormBuilder.containerPosition(myGridId)       === ContainerPosition(Some("my-section"), Some("other-section")))
 
+        // Disallow moving `grid-2` out of nested `other-section` when it is the sole grid in `other-section`
+        FormBuilderRpcApiImpl.containerMove(grid2Id, Some(mySectionId), Some(grid1Id))
+        assert(FormBuilder.containerPosition(grid2Id) === ContainerPosition(Some("other-section"), None))
+
         // Undo must restore `other-section` to top-level after `my-section`
         FormBuilderXPathApi.undoActionImpl()
         assert(FormBuilder.containerPosition(otherSectionId) === ContainerPosition(None, Some("my-section")))

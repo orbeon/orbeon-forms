@@ -94,6 +94,9 @@
     <form-structure>
         <label>Struktur des Formulars</label>
     </form-structure>
+    <outline>
+        <label>Gliederung</label>
+    </outline>
     <controls>
         <label>Standard</label>
     </controls>

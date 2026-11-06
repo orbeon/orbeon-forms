@@ -1,15 +1,21 @@
 package org.orbeon.oxf.fr
 
+import cats.data.NonEmptyList
 import cats.syntax.option.*
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.io.RandomAccessReadBuffer
 import org.apache.pdfbox.text.PDFTextStripper
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.common.Version
+import org.orbeon.oxf.properties.{CombinedPropertyStore, PropertyLoader, PropertyStore}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.xml.dom.IOSupport
 import org.scalatest.funspec.AnyFunSpecLike
 
+import java.io.File
+import java.nio.file.Files
 import scala.jdk.CollectionConverters.IterableHasAsScala
+import scala.sys.process.*
 import scala.util.chaining.*
 
 
@@ -18,6 +24,9 @@ class PdfProductionTest
      with ResourceManagerSupport
      with AnyFunSpecLike
      with FormRunnerSupport {
+
+  // Data for the `tests/pdf-production` form: a Feedback form with a WebP photo attachment
+  private val PdfProductionDocumentId = "9eff349bfd95aab8d4d5e048bd25a815"
 
   describe("Form Runner PDF production") {
 
@@ -47,7 +56,7 @@ class PdfProductionTest
       )
 
       val (_, content, _) =
-        runFormRunnerReturnContent("tests", "pdf-production", "pdf", documentId = "9eff349bfd95aab8d4d5e048bd25a815".some)
+        runFormRunnerReturnContent("tests", "pdf-production", "pdf", documentId = PdfProductionDocumentId.some)
 
       withTestExternalContext { _ =>
 
@@ -66,7 +75,7 @@ class PdfProductionTest
 
     it("PDF must contain WebP image attachment") {
       val (_, content, _) =
-        runFormRunnerReturnContent("tests", "pdf-production", "pdf", documentId = "9eff349bfd95aab8d4d5e048bd25a815".some)
+        runFormRunnerReturnContent("tests", "pdf-production", "pdf", documentId = PdfProductionDocumentId.some)
       withTestExternalContext { _ =>
         useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(content.stream))) { pdd =>
           // The test that follows assumes there is only one page
@@ -250,5 +259,82 @@ class PdfProductionTest
         }
       }
     }
+  }
+
+  describe("Form Runner PDF/A production") {
+
+    // `oxf.fr.pdf.pdf/a` is a global property, so override it for the request only, with a combined property store
+    def pdfAPropertyStore(flavour: String): PropertyStore =
+      CombinedPropertyStore.combine(NonEmptyList.of(
+        Some(PropertyLoader.getPropertyStore(None)),
+        Some(PropertyStore.parse(IOSupport.readOrbeonDom(
+          s"""<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+             |    <property as="xs:string" name="oxf.fr.pdf.pdf/a" value="$flavour"/>
+             |</properties>""".stripMargin), ""))
+      )).get
+
+    for (flavour <- List("1a", "1b", "2a", "2b", "2u", "3a", "3b", "3u")) {
+      it(s"automatic PDF must be a valid PDF/A-$flavour") {
+
+        assume(PdfAValidator.isAvailable, "the PDF/A validator classpath is only set when running tests with sbt")
+
+        val (_, content, _) =
+          runFormRunnerReturnContent(
+            "tests",
+            "pdf-production",
+            "pdf",
+            documentId = PdfProductionDocumentId.some,
+            attributes = Map(PropertyLoader.RequestPropertiesAttributeName -> pdfAPropertyStore(flavour))
+          )
+
+        val (compliant, report) = PdfAValidator.validate(content.body, flavour)
+        assert(compliant, s"veraPDF report:\n$report")
+      }
+    }
+
+    it("automatic PDF without `oxf.fr.pdf.pdf/a` must not be a valid PDF/A-1b") {
+
+      assume(PdfAValidator.isAvailable, "the PDF/A validator classpath is only set when running tests with sbt")
+
+      val (_, content, _) =
+        runFormRunnerReturnContent("tests", "pdf-production", "pdf", documentId = PdfProductionDocumentId.some)
+
+      val (compliant, report) = PdfAValidator.validate(content.body, "1b")
+      assert(! compliant)
+      assert(report.startsWith("NOT COMPLIANT"), s"veraPDF report:\n$report")
+    }
+  }
+}
+
+// Run PdfAValidatorMain in a separate JVM, as veraPDF depends on Saxon-HE, which shares its packages with Orbeon's Saxon
+object PdfAValidator {
+
+  private val ClasspathPropertyName = "orbeon.test.pdfa-validator.classpath"
+
+  def isAvailable: Boolean =
+    Option(System.getProperty(ClasspathPropertyName)).exists(_.nonEmpty)
+
+  def validate(pdf: Array[Byte], flavour: String): (Boolean, String) = {
+    val file = File.createTempFile("pdfa-", ".pdf")
+    try {
+      Files.write(file.toPath, pdf)
+      val java   = new File(System.getProperty("java.home"), "bin/java").getAbsolutePath
+      val output = new StringBuilder
+      val exitCode =
+        Process(
+          List(
+            java,
+            "-Xmx256m",
+            "-cp",
+            System.getProperty(ClasspathPropertyName),
+            "org.orbeon.pdfa.PdfAValidatorMain",
+            file.getAbsolutePath,
+            flavour
+          )
+        ).!(ProcessLogger(line => output.append(line).append('\n')))
+
+      (exitCode == 0, output.toString)
+    } finally
+      file.delete()
   }
 }

@@ -10,7 +10,7 @@ import scala.util.chaining.*
 
 trait PropertyLoaderTrait {
 
-  private val RequestPropertiesAttributeName = "orbeon.request.property-store"
+  private[orbeon] val RequestPropertiesAttributeName = "orbeon.request.property-store"
 
   val logger: Logger = LoggerFactory.createLogger("org.orbeon.properties")
 

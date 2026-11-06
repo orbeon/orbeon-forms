@@ -77,6 +77,7 @@ val Log4j2Version                    = "2.25.4"
 val CommonsIoVersion                 = "2.15.1"
 val OpenHtmlToPdfVersion             = "1.1.94"
 val PdfBoxVersion                    = "3.0.8-orbeon.1" // Patched version with PDFBOX-6220 backport
+val VeraPdfVersion                   = "1.30.3"
 val TinkVersion                      = "1.20.0"
 val JacksonVersion                   = "2.22.3"
 val JavaMailApiVersion               = "2.1.3"
@@ -960,6 +961,10 @@ lazy val formRunnerJVM = formRunner.jvm
   .settings(jUnitTestOptions*)
   .settings(s3TestSettings)
   .settings(
+    Test / javaOptions += "-Dorbeon.test.pdfa-validator.classpath=" +
+      (pdfaValidator / Runtime / fullClasspath).value.files.map(_.getAbsolutePath).mkString(java.io.File.pathSeparator)
+  )
+  .settings(
     DebugTest / sourceDirectory         := (Test / sourceDirectory).value,
     DebugTest / javaOptions             += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005",
 
@@ -1485,6 +1490,13 @@ lazy val xformsWeb = (project in file("xforms-web"))
       (ThisBuild / baseDirectory).value,
       XFormsResourcesPathInWar
     )
+  )
+
+lazy val pdfaValidator = (project in file("pdfa-validator"))
+  .settings(scala2CommonSettings*)
+  .settings(
+    name := "pdfa-validator",
+    libraryDependencies += "org.verapdf" % "validation-model" % VeraPdfVersion
   )
 
 lazy val fileScanExample = (project in file("file-scan-example"))

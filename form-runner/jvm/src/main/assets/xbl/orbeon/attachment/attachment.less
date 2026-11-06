@@ -192,5 +192,10 @@
                 }
             }
         }
+
+        // #7998: do not produce FA icons (Unicode Private Use Area) in PDF/A-2a and -3a
+        .fr-pdf-no-private-use-glyphs .xbl-fr-attachment .fr-attachment-icon {
+            display: none;
+        }
     }
 }

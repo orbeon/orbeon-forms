@@ -474,6 +474,8 @@
                         not(xxf:property(string-join(('oxf.fr.keyboard-shortcuts.show-hints', fr:app-name(), fr:form-name()), '.')) = true())
                     ]
                 }}{{
+                    ' fr-pdf-no-private-use-glyphs'[xxf:property('oxf.fr.pdf.pdf/a') = ('2a', '3a')]
+                }}{{
                     let $color-scheme-opt := frf:effectiveColorScheme()[. = ('light', 'dark', 'system')]
                     return
                         if (exists($color-scheme-opt)) then

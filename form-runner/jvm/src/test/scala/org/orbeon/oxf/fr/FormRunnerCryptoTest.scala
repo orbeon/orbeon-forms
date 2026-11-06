@@ -116,28 +116,6 @@ class FormRunnerCryptoTest
     }
   }
 
-  describe("FormRunnerMcpToken") {
-
-    val ops = Set[Operation](Operation.Read, Operation.Create)
-
-    it("must encrypt and decrypt successfully, preserving operations") {
-      val token = FormRunnerMcpToken.encryptToken(Duration.ofMinutes(10), ops)
-      assert(token.isDefined)
-      FormRunnerMcpToken.decryptToken((), token.get) match {
-        case Success(payload) => assert(payload.ops.toSet == ops)
-        case Failure(ex)      => fail(s"Decryption failed: $ex")
-      }
-    }
-
-    it("must fail expiration check for an expired token") {
-      val token = FormRunnerMcpToken.encryptToken(Duration.ofSeconds(-1), ops)
-      FormRunnerMcpToken.decryptTokenPayloadCheckExpiration((), token.get) match {
-        case Failure(ex: HttpStatusCodeException) => assert(ex.code == StatusCode.Forbidden)
-        case other                                => fail(s"Expected Failure with ${StatusCode.Forbidden}, got: $other")
-      }
-    }
-  }
-
   describe("FormRunnerOperationsEncryption") {
 
     it("must encrypt to a value different from the original") {

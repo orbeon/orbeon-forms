@@ -11,7 +11,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{DateUtils, IndentedLogger}
+import org.orbeon.oxf.util.{ContentTypes, DateUtils, IndentedLogger}
 import org.orbeon.oxf.xml.DeferredXMLReceiver
 
 import scala.util.matching.Regex

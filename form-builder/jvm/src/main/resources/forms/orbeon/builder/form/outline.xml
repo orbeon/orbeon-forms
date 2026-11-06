@@ -43,6 +43,7 @@
                 <xf:setvalue
                     ref="$toolbar/@outline-visible"
                     value="if (. = 'true') then 'false' else 'true'"/>
+                <xf:dispatch name="fb-update-toolbar-preferences" targetid="fr-form-model"/>
             </xf:action>
         </xf:trigger>
     </xh:div>
@@ -63,6 +64,7 @@
                         <xf:hint ref="$form-resources/close/label"/>
                         <xf:action event="DOMActivate">
                             <xf:setvalue ref="$toolbar/@outline-visible" value="'false'"/>
+                            <xf:dispatch name="fb-update-toolbar-preferences" targetid="fr-form-model"/>
                         </xf:action>
                     </xf:trigger>
                 </xh:div>

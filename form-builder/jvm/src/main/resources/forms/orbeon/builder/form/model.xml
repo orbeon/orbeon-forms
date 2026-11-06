@@ -1325,6 +1325,27 @@
             readonly="$fr-mode = 'view' or $dialog-opened or count(../appearance) le 1"/>
     </xf:bind>
 
+    <xf:action
+        event="xforms-model-construct-done"
+        type="xpath">
+        fbf:initializeToolbarFromPreferences($toolbar)
+    </xf:action>
+
+    <xf:action
+        event="fb-update-toolbar-preferences"
+        type="javascript">
+        <xf:param name="controlSettingsToolbarVisible" value="$toolbar/@visible = 'true'"/>
+        <xf:param name="showCellBadges"                value="$toolbar/@show-cell-badges = 'true'"/>
+        <xf:param name="outlineVisible"                value="$toolbar/@outline-visible = 'true'"/>
+        <xf:body>
+            ORBEON.builder.private.API.updateToolbarPreferences(
+                controlSettingsToolbarVisible === "true",
+                showCellBadges === "true",
+                outlineVisible === "true"
+            );
+        </xf:body>
+    </xf:action>
+
     <xf:action event="fb-sync-toolbar">
         <xf:var name="cname" value="$toolbar/tracked-control-name/string()"/>
         <xf:setvalue ref="$toolbar/control-name" value="$cname"/>

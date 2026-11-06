@@ -16,6 +16,7 @@ package org.orbeon.oxf.fb
 import cats.effect.IO
 import io.circe.{Json, parser}
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
+import org.orbeon.builder.FormBuilderPreferences
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.datatypes.{AboveBelow, Direction, MediatypeRange}
 import org.orbeon.oxf.fb.FormBuilder.*
@@ -1669,4 +1670,28 @@ object FormBuilderXPathApi {
       case MigrateGridColumns(gridId, from, to) =>
         FormBuilder.migrateGridColumns(FormBuilderRpcApiImpl.resolveId(gridId).get, to, from)
     }
+
+  //@XPathFunction
+  def initializeToolbarFromPreferences(toolbarElem: NodeInfo): Unit = {
+    import org.orbeon.oxf.util.JvmUrlEncoderDecoder
+
+    val xfcd = inScopeContainingDocument
+
+    val fromIncomingCookies =
+      Option(CoreCrossPlatformSupport.externalContext)
+        .flatMap(ec => Option(ec.getRequest))
+        .flatMap(req => Option(req.incomingCookies))
+        .flatMap(_.find(_._1 == FormBuilderPreferences.PreferencesCookieName).map(_._2.trimAllToEmpty))
+        .flatMap(FormBuilderPreferences.fromCookieValue)
+
+    val fromCookieHeader =
+      xfcd.getFirstHeaderIgnoreCase(Headers.Cookie)
+        .flatMap(FormBuilderPreferences.fromCookieHeader)
+
+    val prefs = fromIncomingCookies.orElse(fromCookieHeader).getOrElse(FormBuilderPreferences.Default)
+
+    setvalue(toolbarElem /@ "visible",          prefs.controlSettingsToolbarVisible.toString)
+    setvalue(toolbarElem /@ "show-cell-badges", prefs.showCellBadges.toString)
+    setvalue(toolbarElem /@ "outline-visible",  prefs.outlineVisible.toString)
+  }
 }

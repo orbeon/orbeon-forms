@@ -96,6 +96,22 @@ object FormBuilderPrivateAPI extends js.Object {
       moveIntoViewIfNeeded(mainElem, mainInnerElem, targetElem, margin = 20)
     }
 
+  def updateToolbarPreferences(
+    controlSettingsToolbarVisible: Boolean,
+    showCellBadges               : Boolean,
+    outlineVisible               : Boolean
+  ): Unit = {
+    import org.orbeon.oxf.util.JsUrlEncoderDecoder
+
+    val prefs = FormBuilderPreferences(
+      controlSettingsToolbarVisible = controlSettingsToolbarVisible,
+      showCellBadges                = showCellBadges,
+      outlineVisible                = outlineVisible
+    )
+    val cookieValue = FormBuilderPreferences.toCookieValue(prefs)
+    dom.document.cookie = s"${FormBuilderPreferences.PreferencesCookieName}=$cookieValue; path=/; max-age=31536000; SameSite=Lax"
+  }
+
   def copyItemsetToClipboard(tsvString: String): Unit =
     dom.window.navigator.clipboard.writeText(tsvString)
 

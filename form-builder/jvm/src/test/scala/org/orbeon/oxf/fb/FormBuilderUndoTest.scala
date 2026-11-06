@@ -257,4 +257,64 @@ class FormBuilderUndoTest
       }
     }
   }
+
+  describe("FormBuilderPreferences cookie serialization and initialization") {
+
+    it("must round-trip preferences via cookie value and header") {
+      import org.orbeon.builder.FormBuilderPreferences
+      import org.orbeon.oxf.util.JvmUrlEncoderDecoder
+
+      val prefs = FormBuilderPreferences(
+        controlSettingsToolbarVisible = false,
+        showCellBadges                = true,
+        outlineVisible                = false
+      )
+      val cookieValue = FormBuilderPreferences.toCookieValue(prefs)
+      assert(FormBuilderPreferences.fromCookieValue(cookieValue).contains(prefs))
+
+      val cookieHeader = s"other-cookie=123; ${FormBuilderPreferences.PreferencesCookieName}=$cookieValue; theme=dark"
+      assert(FormBuilderPreferences.fromCookieHeader(cookieHeader).contains(prefs))
+    }
+
+    it("must default missing keys and initialize fb-toolbar-instance from request cookie") {
+      import org.orbeon.builder.FormBuilderPreferences
+      import org.orbeon.oxf.util.JvmUrlEncoderDecoder
+
+      // Partial JSON (only `outline-visible` specified)
+      val partialEncoded = JvmUrlEncoderDecoder.encode("""{"outline-visible":false}""")
+      assert(
+        FormBuilderPreferences.fromCookieValue(partialEncoded).contains(
+          FormBuilderPreferences(
+            controlSettingsToolbarVisible = true,
+            showCellBadges                = true,
+            outlineVisible                = false
+          )
+        )
+      )
+
+      withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx =>
+        val model = ctx.formBuilderModel.get
+        val doc   = model.containingDocument
+        val cookieValue = FormBuilderPreferences.toCookieValue(
+          FormBuilderPreferences(
+            controlSettingsToolbarVisible = false,
+            showCellBadges                = false,
+            outlineVisible                = false
+          )
+        )
+        doc.setRequestInformation(
+          doc.getRequestInformation.copy(
+            requestHeaders = Map("cookie" -> List(s"${FormBuilderPreferences.PreferencesCookieName}=$cookieValue"))
+          )
+        )
+
+        val toolbarRoot = model.findInstance("fb-toolbar-instance").get.rootElement
+        FormBuilderXPathApi.initializeToolbarFromPreferences(toolbarRoot)
+
+        assert(toolbarRoot.attValue("visible")          === "false")
+        assert(toolbarRoot.attValue("show-cell-badges") === "false")
+        assert(toolbarRoot.attValue("outline-visible")  === "false")
+      }
+    }
+  }
 }

@@ -197,10 +197,11 @@
                         name="toolbox.toggle-cell-badges">
                     <xf:label><xh:i class="fa fa-tags fa-fw"/></xf:label>
                     <xf:hint ref="$form-resources/control-settings-toolbar/show-cell-badges"/>
-                    <xf:action ev:event="DOMActivate">
+                    <xf:action event="DOMActivate">
                         <xf:setvalue
                             ref="$toolbar/@show-cell-badges"
                             value="if (. = 'true') then 'false' else 'true'"/>
+                        <xf:dispatch name="fb-update-toolbar-preferences" targetid="fr-form-model"/>
                     </xf:action>
                 </fr:trigger>
 
@@ -212,10 +213,11 @@
                         name="toolbox.toggle-control-toolbar">
                     <xf:label><xh:i class="fa fa-sliders fa-fw"/></xf:label>
                     <xf:hint ref="$form-resources/control-settings-toolbar/show-toolbar"/>
-                    <xf:action ev:event="DOMActivate">
+                    <xf:action event="DOMActivate">
                         <xf:setvalue
                             ref="$toolbar/@visible"
                             value="if (. = 'true') then 'false' else 'true'"/>
+                        <xf:dispatch name="fb-update-toolbar-preferences" targetid="fr-form-model"/>
                     </xf:action>
                 </fr:trigger>
 

@@ -153,7 +153,6 @@ trait ClientTestSupport {
       s"""
         |${network.map(n => s"--network=$n ").getOrElse("")}-it
         |--mount type=bind,src=$$BASE_DIRECTORY/orbeon-war/jvm/target/webapp,dst=$ImageTomcatDir/webapps/orbeon
-        |--mount type=bind,src=$$HOME/.orbeon/license.xml,dst=/root/.orbeon/license.xml,ro
         |--mount type=bind,src=$$BASE_DIRECTORY/orbeon-war/js/src/test/resources/tomcat/orbeon.xml,dst=$ImageTomcatDir/conf/Catalina/localhost/orbeon.xml,ro
         |--mount type=bind,src=$LocalOrbeonResourcesDir/forms,dst=$ImageTomcatDir/webapps/orbeon/WEB-INF/test-resources/forms,ro
         |--mount type=bind,src=$LocalOrbeonResourcesDir/$configDirectory,dst=$ImageTomcatDir/webapps/orbeon/WEB-INF/test-resources/config,ro

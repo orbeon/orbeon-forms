@@ -1322,8 +1322,8 @@
 
         <xsl:param tunnel="yes" name="view-elem"             as="element()"/>
 
-        <xsl:variable name="left-names"  select="fr:map/@left/string()"  as="xs:string*"/>
-        <xsl:variable name="right-names" select="fr:map/@right/string()" as="xs:string*"/>
+        <xsl:variable name="left-names"  select="for $a in fr:map/@left  return fr:check-ncname($a)" as="xs:string*"/>
+        <xsl:variable name="right-names" select="for $a in fr:map/@right return fr:check-ncname($a)" as="xs:string*"/>
 
         <xsl:variable
             name="left-repeat-names"
@@ -1481,8 +1481,8 @@
         <!-- TODO: improve by grouping all source/destination controls within the same source/destination repeats, and
               adjust the iterations once only. -->
         <xsl:for-each select="fr:map">
-            <xsl:variable name="left-name"         select="@left"                                                    as="xs:string"/>
-            <xsl:variable name="right-name"        select="@right"                                                   as="xs:string"/>
+            <xsl:variable name="left-name"         select="fr:check-ncname(@left)"                                   as="xs:string"/>
+            <xsl:variable name="right-name"        select="fr:check-ncname(@right)"                                  as="xs:string"/>
             <xsl:variable name="right-at"          select="@right-at/string()"                                       as="xs:string?"/>
 
             <xsl:variable name="left-control"      select="frf:findControlByNameUnderXPath($left-name,  $view-elem)" as="element()?"/>

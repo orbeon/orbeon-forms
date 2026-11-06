@@ -13,7 +13,20 @@
   -->
 <xsl:stylesheet
     version="2.0"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xsl:function name="fr:check-ncname" as="xs:string">
+        <xsl:param name="name" as="xs:string"/>
+        <xsl:sequence
+            select="
+                if (matches($name, '^[\i-[:]][\c-[:]]*$')) then
+                    $name
+                else
+                    error((), concat('Invalid NCName: ', $name))
+            "/>
+    </xsl:function>
 
     <xsl:variable
         name="form-load-fr-action-names"

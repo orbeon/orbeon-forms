@@ -113,6 +113,13 @@ class FormRunnerRestrictedFunctionsTest
       assert(docOpt.isEmpty)
     }
 
+    it("must reject non-NCName @left/@right in fr:synchronize-repeated-content at compile time") {
+      val (_, docOpt, _) =
+        runFormRunner("tests", "restricted-functions-sync-disallowed", "new")
+
+      assert(docOpt.isEmpty)
+    }
+
     it("must allow Summary page to load without restrictions") {
       val (_, docOpt, _) =
         runFormRunner("tests", "restricted-functions-allowed", "summary")

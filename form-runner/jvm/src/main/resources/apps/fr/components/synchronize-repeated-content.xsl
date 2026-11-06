@@ -32,8 +32,8 @@
                     generate-id() = $sync-actions-ids
                 ]">
 
-        <xsl:variable name="left-name"  select="@left"/>
-        <xsl:variable name="right-name" select="@right"/>
+        <xsl:variable name="left-name"  select="fr:check-ncname(@left)"  as="xs:string"/>
+        <xsl:variable name="right-name" select="fr:check-ncname(@right)" as="xs:string"/>
 
         <xsl:variable
             name="right-control"
@@ -97,9 +97,11 @@
                     <xf:var name="p" value="."/>
 
                     <xsl:for-each select="fr:map">
+                        <xsl:variable name="map-left"  select="fr:check-ncname(@left)"  as="xs:string"/>
+                        <xsl:variable name="map-right" select="fr:check-ncname(@right)" as="xs:string"/>
                         <xf:action>
-                            <xf:var name="src" context="$left-container/*[$p]"  value="(.//{@left})[1]"/>
-                            <xf:var name="dst" context="$right-container/*[$p]" value="(.//{@right})[1]"/>
+                            <xf:var name="src" context="$left-container/*[$p]"  value="(.//{$map-left})[1]"/>
+                            <xf:var name="dst" context="$right-container/*[$p]" value="(.//{$map-right})[1]"/>
 
                             <xf:setvalue
                                 ref="$dst"
@@ -113,9 +115,11 @@
 
         <!-- Propagate value changes -->
         <xsl:for-each select="fr:map">
+            <xsl:variable name="map-left"  select="fr:check-ncname(@left)"  as="xs:string"/>
+            <xsl:variable name="map-right" select="fr:check-ncname(@right)" as="xs:string"/>
             <xf:action
                 event="xforms-value-changed"
-                observer="{@left}-control"
+                observer="{$map-left}-control"
                 target="#observer">
 
                 <xf:var
@@ -133,7 +137,7 @@
 
                 <xf:setvalue
                     context="$right-context"
-                    ref="(.//{@right})[1]"
+                    ref="(.//{$map-right})[1]"
                     value="event('xxf:value')"/>
 
             </xf:action>
@@ -214,9 +218,11 @@
                         value="bind(frf:bindId('{$right-name}'))"/>
 
                     <xsl:for-each select="fr:map">
+                        <xsl:variable name="map-left"  select="fr:check-ncname(@left)"  as="xs:string"/>
+                        <xsl:variable name="map-right" select="fr:check-ncname(@right)" as="xs:string"/>
                         <xf:action>
-                            <xf:var name="src" context="$left-container/*[$new-p]"  value="bind(frf:bindId('{@left}'))"/>
-                            <xf:var name="dst" context="$right-container/*[$new-p]" value="bind(frf:bindId('{@right}'))"/>
+                            <xf:var name="src" context="$left-container/*[$new-p]"  value="bind(frf:bindId('{$map-left}'))"/>
+                            <xf:var name="dst" context="$right-container/*[$new-p]" value="bind(frf:bindId('{$map-right}'))"/>
 
                             <xf:setvalue
                                 ref="$dst"

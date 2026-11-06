@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.hmacURL
 import org.orbeon.oxf.xml.dom.Converter.*
-import org.orbeon.xforms.Constants.DummyImageUri
+import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.scalatest.funspec.AnyFunSpecLike
 
 
@@ -36,7 +36,7 @@ class XFormsOutputControlTest
             <xf:instance id="instance">
               <values>
                 <oxf>oxf:/config/properties-base.xml</oxf>
-                <data>{DummyImageUri}</data>
+                <data>{DUMMY_IMAGE_URI}</data>
                 <http>http://example.org/foo/bar.png</http>
                 <path>/foo/bar.png</path>
                 <unsigned-file>file:/foo/tmp1.tmp</unsigned-file>
@@ -58,8 +58,8 @@ class XFormsOutputControlTest
     it("must refuse `oxf:` and unsigned `file:` values and proxy the other values") {
       withTestExternalContext { _ =>
         withXFormsDocument(doc) { _ =>
-          assert(getControlExternalValue("oxf-output")           == DummyImageUri)
-          assert(getControlExternalValue("unsigned-file-output") == DummyImageUri)
+          assert(getControlExternalValue("oxf-output")           == DUMMY_IMAGE_URI)
+          assert(getControlExternalValue("unsigned-file-output") == DUMMY_IMAGE_URI)
           for (id <- List("data-output", "http-output", "path-output", "signed-file-output"))
             assert(getControlExternalValue(id).startsWith("/xforms-server/dynamic/"), id)
         }

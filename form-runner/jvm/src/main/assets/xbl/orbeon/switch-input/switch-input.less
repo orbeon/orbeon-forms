@@ -48,3 +48,9 @@
         }
     }
 }
+
+// #7998: in PDF/A-2a and 3a, replace the FontAwesome star (U+F005, Unicode Private Use Area, forbidden) with a regular
+// star (U+2B50), which is allowed
+.orbeon .fr-pdf-no-private-use-glyphs .xbl-fr-switch-input.xforms-required .checkbox span:before {
+    content: "\2b50";
+}

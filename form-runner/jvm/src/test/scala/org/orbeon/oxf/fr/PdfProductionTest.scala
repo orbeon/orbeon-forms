@@ -38,7 +38,7 @@ class PdfProductionTest
 
   private def requiredStars(pdf: Array[Byte]): String =
     useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(pdf))) { pdd =>
-      (new PDFTextStripper).getText(pdd).filter(_ == '\uF005')
+      (new PDFTextStripper).getText(pdd).filter(c => c == '\uF005' || c == '\u2B50')
     }
 
   describe("Form Runner PDF production") {
@@ -370,6 +370,31 @@ class PdfProductionTest
 
           val pdf = pdfContent(flavour.some).body
           assert(! hasFontAwesome(pdf))
+
+          val (compliant, report) = PdfAValidator.validate(pdf, flavour)
+          assert(compliant, s"veraPDF report:\n$report")
+        }
+      }
+    }
+
+    // The required star is a Font Awesome glyph too: in PDF/A-2a and 3a, it uses U+2B50, which is not in the Private Use Area
+    describe("required star") {
+      for (flavour <- List("1a", "1b", "2a", "2b", "2u", "3a", "3b", "3u")) {
+        it(s"must show in a PDF/A-$flavour, which must be valid") {
+
+          assume(PdfAValidator.isAvailable, "the PDF/A validator classpath is only set when running tests with sbt")
+
+          val pdf =
+            runFormRunnerReturnContent(
+              "tests",
+              "pdf-required-star",
+              "pdf",
+              documentId = PdfRequiredStarDocumentId.some,
+              attributes = propertiesOverride(pdfAProperty(flavour), ShowRequiredProperty)
+            )._2.body
+
+          val expectedStar = if (Set("2a", "3a")(flavour)) "\u2B50" else "\uF005"
+          assert(requiredStars(pdf) == expectedStar * 3)
 
           val (compliant, report) = PdfAValidator.validate(pdf, flavour)
           assert(compliant, s"veraPDF report:\n$report")

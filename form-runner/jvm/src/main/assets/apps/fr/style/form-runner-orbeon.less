@@ -467,6 +467,15 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
         }
     }
 
+    // #7998: in PDF/A-2a and 3a, replace the FontAwesome star (U+F005, Unicode Private Use Area, forbidden) with
+    // a regular star (U+2B50), which is allowed
+    .fr-pdf-no-private-use-glyphs.fr-static-readonly-required.fr-mode-pdf .xforms-required {
+        &.xforms-label, .xforms-label {
+            &:before { content: "\2b50"; }
+            &:after  { content: "\00a0\2b50"; }
+        }
+    }
+
     // Upload control information
     .xforms-upload-info { background-color: transparent }
 

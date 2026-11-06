@@ -221,6 +221,8 @@ object XFormsResourceRewriter {
     inputStreamIterator foreach { is =>
       IOUtils.copyStreamAndClose(is, os, doCloseOut = false)
       os.write('\n')
+      os.write(';')
+      os.write('\n')
     }
 
     outputWriter.write(

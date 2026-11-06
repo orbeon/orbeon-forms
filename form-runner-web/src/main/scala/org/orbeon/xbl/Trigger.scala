@@ -35,9 +35,11 @@ object Trigger {
 
       def updateDisplay(shortcut: String, kbd: html.Element): Unit =
         if (isMinimal) {
-          val suffix = s"($shortcut)"
-          if (! buttonOrAnchor.title.endsWith(suffix))
-            buttonOrAnchor.title = s"${buttonOrAnchor.title} $suffix"
+          if (shortcut.nonEmpty) {
+            val suffix = s"($shortcut)"
+            if (! buttonOrAnchor.title.endsWith(suffix))
+              buttonOrAnchor.title = s"${buttonOrAnchor.title} $suffix"
+          }
         } else
           kbd.innerHTML = shortcut
 

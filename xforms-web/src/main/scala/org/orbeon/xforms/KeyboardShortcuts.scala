@@ -6,14 +6,22 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport.*
 import org.scalajs.dom
 import org.scalajs.dom.ext.*
-import org.scalajs.dom.html
+import org.scalajs.dom.{MutationObserver, MutationObserverInit, html}
 
+import scala.collection.mutable
 import scala.scalajs.js
 
 
 object KeyboardShortcuts {
 
   val KeyBoardIconCharacter = "⌨\uFE0F"
+
+  private val KbdSelector        = "kbd[data-orbeon-keyboard-shortcut]"
+  private val ShortcutAttributes = js.Array("data-orbeon-keyboard-shortcut", "data-orbeon-keyboard-shortcut-condition")
+
+  // Track which `<kbd>` element currently owns each Mousetrap command so that an async unbind on a previous `<kbd>`
+  // does not unbind a command that was already rebound by another `<kbd>`.
+  private var activeKbdByCommand: Map[String, html.Element] = Map.empty
 
   lazy val isAppleOs: Boolean =
     Bowser.osname.exists(Set("macOS", "iOS"))
@@ -81,7 +89,7 @@ object KeyboardShortcuts {
     updateDisplay : (String, html.Element) => Unit
   ): Option[dom.MutationObserver] = {
 
-    var registeredMousetrapCommandOpt: Option[String] = None
+    val registeredCommandByKbd = mutable.Map.empty[html.Element, String]
 
     def makeMousetrapCommand(token: String, convert: Char => Char): String =
       if (ModifiersCharacters.exists(token.contains))
@@ -95,16 +103,31 @@ object KeyboardShortcuts {
       else
         (KeyBoardIconCharacter +: token.map(_.toString)).mkString(" ")
 
-    def registerMouseTrapCommand(token: String, convert: Char => Char, condition: Option[js.Function0[Boolean]]): String = {
+    def unbindKbd(kbd: html.Element): Unit =
+      registeredCommandByKbd.remove(kbd).foreach { command =>
+        if (activeKbdByCommand.get(command).contains(kbd)) {
+          activeKbdByCommand -= command
+          Mousetrap.unbind(command)
+        }
+      }
+
+    def registerMouseTrapCommand(
+      clickElem: html.Element,
+      kbd      : html.Element,
+      token    : String,
+      convert  : Char => Char,
+      condition: Option[js.Function0[Boolean]]
+    ): String = {
       val mousetrapCommand = makeMousetrapCommand(token, convert)
+      activeKbdByCommand += mousetrapCommand -> kbd
       Mousetrap.bind(
         mousetrapCommand,
         (e: dom.KeyboardEvent, _: String) => {
           if (condition.forall(_.apply())) {
             e.preventDefault()
             dom.document.activeElementOpt.foreach { activeElem =>
-              if (activeElem == buttonOrAnchor) {
-                buttonOrAnchor.click()
+              if (activeElem == clickElem) {
+                clickElem.click()
               } else {
                 // We need to tell the server about any changes to the control that currently has focus before
                 // triggering the click. Otherwise we might lose that value change, for example if the click closes
@@ -112,7 +135,7 @@ object KeyboardShortcuts {
                 activeElem.dispatchEvent(new dom.Event("change", new dom.EventInit {
                   bubbles = true
                 }))
-                buttonOrAnchor.click()
+                clickElem.click()
               }
             }
           }
@@ -121,46 +144,84 @@ object KeyboardShortcuts {
       mousetrapCommand
     }
 
-    buttonOrAnchor.querySelectorAllT("kbd[data-orbeon-keyboard-shortcut]").nonEmpty.option(
-      org.orbeon.web.DomSupport.onElementFoundOrAdded(
-        container = buttonOrAnchor,
-        selector  = "kbd[data-orbeon-keyboard-shortcut]",
-        listener  = (kbd: html.Element) => {
+    def bindOrUpdateKbd(kbd: html.Element): Unit = {
 
-          // Unbind any previously registered shortcut
-          registeredMousetrapCommandOpt.foreach(command => Mousetrap.unbind(command))
+      // Unbind any previously registered shortcut for this `<kbd>` or any detached `<kbd>`
+      unbindKbd(kbd)
+      registeredCommandByKbd.keys.filterNot(buttonOrAnchor.contains).toList.foreach(unbindKbd)
 
-          // Read the raw shortcut from the data attribute
-          val rawShortcut = kbd.dataset("orbeonKeyboardShortcut")
+      val clickElem = kbd.closestOpt("button, a").getOrElse(buttonOrAnchor)
 
-          // Read the optional condition
-          val condition =
-            kbd.dataset.get("orbeonKeyboardShortcutCondition")
-              .filter(_ == "clipboard-empty")
-              .map(_ => (() => dom.window.getSelection().toString.isEmpty): js.Function0[Boolean])
+      // Read the optional condition
+      val condition =
+        kbd.dataset.get("orbeonKeyboardShortcutCondition")
+          .filter(_ == "clipboard-empty")
+          .map(_ => (() => dom.window.getSelection().toString.isEmpty): js.Function0[Boolean])
 
-          // Register the new shortcut if present
-          registeredMousetrapCommandOpt =
-            rawShortcut.trimAllToOpt.flatMap { rawShortcut =>
-              rawShortcut.splitTo[List]() match {
-                case all   :: Nil                     =>
-                  val command = registerMouseTrapCommand(all, convert = convertIfNotApple, condition)
-                  updateDisplay(makeDisplayCommand(all, convertIfNotApple), kbd)
-                  Some(command)
-                case apple :: _     :: _ if isAppleOs =>
-                  val command = registerMouseTrapCommand(apple, convert = identity, condition)
-                  updateDisplay(makeDisplayCommand(apple, identity), kbd)
-                  Some(command)
-                case _     :: other :: _              =>
-                  val command = registerMouseTrapCommand(other, convert = identity, condition)
-                  updateDisplay(makeDisplayCommand(other, identity), kbd)
-                  Some(command)
-                case Nil                              =>
-                  None
-              }
+      // Register the new shortcut if present, or clear the display if empty
+      val registeredCommandOpt =
+        kbd.dataset.get("orbeonKeyboardShortcut").flatMap(_.trimAllToOpt).flatMap { rawShortcut =>
+          rawShortcut.splitTo[List]() match {
+            case all   :: Nil                     =>
+              val command = registerMouseTrapCommand(clickElem, kbd, all, convert = convertIfNotApple, condition)
+              updateDisplay(makeDisplayCommand(all, convertIfNotApple), kbd)
+              Some(command)
+            case apple :: _     :: _ if isAppleOs =>
+              val command = registerMouseTrapCommand(clickElem, kbd, apple, convert = identity, condition)
+              updateDisplay(makeDisplayCommand(apple, identity), kbd)
+              Some(command)
+            case _     :: other :: _              =>
+              val command = registerMouseTrapCommand(clickElem, kbd, other, convert = identity, condition)
+              updateDisplay(makeDisplayCommand(other, identity), kbd)
+              Some(command)
+            case Nil                              =>
+              None
+          }
+        }
+
+      registeredCommandOpt match {
+        case Some(command) =>
+          registeredCommandByKbd(kbd) = command
+        case None          =>
+          updateDisplay("", kbd)
+      }
+    }
+
+    val initialKbds = buttonOrAnchor.querySelectorAllT(KbdSelector)
+    initialKbds.nonEmpty.option {
+      initialKbds.foreach(bindOrUpdateKbd)
+      val observer = new MutationObserver((mutations, _) => {
+        mutations.foreach { mutation =>
+          if (mutation.`type` == "childList") {
+            mutation.removedNodes.foreach {
+              case element: html.Element =>
+                element.queryNestedElems(KbdSelector, includeSelf = true).foreach(unbindKbd)
+              case _ =>
             }
+            mutation.addedNodes.foreach {
+              case element: html.Element =>
+                element.queryNestedElems(KbdSelector, includeSelf = true).foreach(bindOrUpdateKbd)
+              case _ =>
+            }
+          } else if (mutation.`type` == "attributes") {
+            mutation.target match {
+              case kbd: html.Element if kbd.matches(KbdSelector) =>
+                bindOrUpdateKbd(kbd)
+              case _ =>
+            }
+          }
+        }
+      })
+      observer.observe(
+        buttonOrAnchor,
+        new MutationObserverInit {
+          childList       = true
+          subtree         = true
+          attributes      = true
+          attributeFilter = ShortcutAttributes
         }
       )
-    )
+      observer
+    }
   }
 }

@@ -21,7 +21,7 @@ object DropTrigger {
   private val ListenerSelector = "button[data-orbeon-value], a[data-orbeon-value]"
   private class DropTriggerCompanion(containerElem: html.Element) extends XBLCompanion {
 
-    private var observers: List[dom.MutationObserver] = Nil
+    private var observerOpt: Option[dom.MutationObserver] = None
 
     private val onActivate: dom.Event => Unit = (e: dom.Event) =>
       e.target.asInstanceOf[html.Element]
@@ -43,20 +43,16 @@ object DropTrigger {
     override def init(): Unit = {
       logger.debug("init")
       containerElem.addEventListener("click", onActivate)
-      observers =
-        containerElem.querySelectorAllT(ListenerSelector)
-          .flatMap { buttonOrA =>
-            KeyboardShortcuts.bindShortcutFromKbd(
-              buttonOrAnchor = buttonOrA,
-              updateDisplay  = (shortcut, kbd) => kbd.innerHTML = shortcut
-            )
-          }
-          .toList
+      observerOpt =
+        KeyboardShortcuts.bindShortcutFromKbd(
+          buttonOrAnchor = containerElem,
+          updateDisplay  = (shortcut, kbd) => kbd.innerHTML = shortcut
+        )
     }
 
     override def destroy(): Unit = {
       logger.debug("destroy")
-      observers.foreach(_.disconnect())
+      observerOpt.foreach(_.disconnect())
       containerElem.removeEventListener("click", onActivate)
     }
   }

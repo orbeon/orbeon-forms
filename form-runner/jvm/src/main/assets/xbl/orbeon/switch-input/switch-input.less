@@ -1,18 +1,18 @@
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+    .required-star-modes({
+        .xbl-fr-switch-input.xforms-required .checkbox span:before {
+            .required-star();
+            content      : "\f005";
+            margin-right : 1ch;
+        }
+    });
+}
+
 .orbeon .xbl-fr-switch-input {
-    &.xforms-required .checkbox span {
-        &:before {
-            // The following is copied from `form-runner-orbeon.less`
-            font-family    : "Font Awesome 6 Free";
-            font-weight    : 900;
-            content        : "\f005";
-            vertical-align : super;         // So the star doesn't show too high relative to the text of the label
-            line-height    : 1em;           // For the `super` not to change the line height, and keep the label vertical alignment
-            font-size      : var(--orbeon-required-icon-font-size);
-            margin-right   : 1ch;
-        }
-        > div:first-child {                 // Make the first `div`, in case of an HTML label, `inline`, so it shows
-            display: inline;                // on the same line as the star.
-        }
+    &.xforms-required .checkbox span > div:first-child { // Make the first `div`, in case of an HTML label, `inline`, so it shows
+        display: inline;                                 // on the same line as the star.
     }
     & > .xforms-select-appearance-full {
         display: flex;
@@ -51,6 +51,6 @@
 
 // #7998: in PDF/A-2a and 3a, replace the FontAwesome star (U+F005, Unicode Private Use Area, forbidden) with a regular
 // star (U+2B50), which is allowed
-.orbeon .fr-pdf-no-private-use-glyphs .xbl-fr-switch-input.xforms-required .checkbox span:before {
+.orbeon .fr-pdf-no-private-use-glyphs.fr-static-readonly-required.fr-mode-pdf .xbl-fr-switch-input.xforms-required .checkbox span:before {
     content: "\2b50";
 }

@@ -327,6 +327,27 @@
     }
 }
 
+// Star of required fields, without its content and position
+.required-star() {
+    font-family    : "Font Awesome 6 Free";
+    font-weight    : 900;
+    vertical-align : super;         // So the star doesn't show too high relative to the text of the label
+    line-height    : 1em;           // For the `super` not to change the line height, and keep the label vertical alignment
+    font-size      : var(--orbeon-required-icon-font-size);
+}
+
+// Modes in which the star of required fields shows. To be used in .orbeon contexts.
+.required-star-modes(@rules) {
+    .fr-mode-new,
+    .fr-mode-edit,
+    .fr-mode-test,
+    .fr-static-readonly-required.fr-mode-view, // https://github.com/orbeon/orbeon-forms/issues/5959
+    .fr-static-readonly-required.fr-mode-pdf,  // https://github.com/orbeon/orbeon-forms/issues/5959
+    .xforms-dialog {
+        @rules();
+    }
+}
+
 // XPath 3.1 syntax highlighting tokens (light and dark values come from the theme)
 .xpath-syntax-highlighting() {
     .xpath-keyword {

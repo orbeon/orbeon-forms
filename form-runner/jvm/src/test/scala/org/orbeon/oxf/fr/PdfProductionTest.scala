@@ -276,6 +276,12 @@ class PdfProductionTest
 
   describe("Form Runner PDF required star") {
 
+    it("must not show without `oxf.fr.detail.static-readonly-required`") {
+      val (_, content, _) =
+        runFormRunnerReturnContent("tests", "pdf-required-star", "pdf", documentId = PdfRequiredStarDocumentId.some)
+      assert(requiredStars(content.body).isEmpty)
+    }
+
     it("must show with `oxf.fr.detail.static-readonly-required`") {
       val (_, content, _) =
         runFormRunnerReturnContent(

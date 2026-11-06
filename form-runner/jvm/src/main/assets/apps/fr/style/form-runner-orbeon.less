@@ -429,21 +429,12 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
 
     // Add a star before the label of required fields, but only in new/edit modes
     // NOTE: Also cover Form Builder classes here instead of form-builder.css, so we don't miss changes done here
-    .fr-mode-new,
-    .fr-mode-edit,
-    .fr-mode-test,
-    .fr-static-readonly-required.fr-mode-view, // https://github.com/orbeon/orbeon-forms/issues/5959
-    .fr-static-readonly-required.fr-mode-pdf,  // https://github.com/orbeon/orbeon-forms/issues/5959
-    .xforms-dialog {
+    .required-star-modes({
         .xforms-required {
             &.xforms-label, .xforms-label {
                 &:before,
                 &:after {
-                    font-family    : "Font Awesome 6 Free";
-                    font-weight    : 900;
-                    vertical-align : super;         // So the star doesn't show too high relative to the text of the label
-                    line-height    : 1em;           // For the `super` not to change the line height, and keep the label vertical alignment
-                    font-size      : var(--orbeon-required-icon-font-size);
+                    .required-star();
                     white-space    : nowrap;
                 }
                 &:before {
@@ -465,7 +456,7 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
                 color: var(--orbeon-error-color);                      // Error-red when empty
             }
         }
-    }
+    });
 
     // #7998: in PDF/A-2a and 3a, replace the FontAwesome star (U+F005, Unicode Private Use Area, forbidden) with
     // a regular star (U+2B50), which is allowed

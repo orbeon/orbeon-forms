@@ -1,0 +1,7 @@
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <section>
+        <grid>
+            <control filename="sample.pdf" mediatype="application/pdf" size="329">/fr/service/persistence/crud/tests/pdf-a-attachment/data/5f1c7998b2d34e6f8a90c1d2e3f40718/7998a2x5q8n1p4r6t3w9y2z5a8c1e4g7.bin</control>
+        </grid>
+    </section>
+</form>

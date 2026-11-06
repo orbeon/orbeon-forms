@@ -28,6 +28,9 @@ class PdfProductionTest
   // Data for the `tests/pdf-production` form: a Feedback form with a WebP photo attachment
   private val PdfProductionDocumentId = "9eff349bfd95aab8d4d5e048bd25a815"
 
+  // Data for the `tests/pdf-a-attachment` form: a single attachment control, whose value is shown with a mediatype icon
+  private val PdfAAttachmentDocumentId = "5f1c7998b2d34e6f8a90c1d2e3f40718"
+
   describe("Form Runner PDF production") {
 
     it("automatic PDF must contain metadata and data text") {
@@ -302,6 +305,57 @@ class PdfProductionTest
       val (compliant, report) = PdfAValidator.validate(content.body, "1b")
       assert(! compliant)
       assert(report.startsWith("NOT COMPLIANT"), s"veraPDF report:\n$report")
+    }
+
+    // The attachment mediatype icon is a Font Awesome glyph, which PDF/A-2a and 3a reject without an ActualText entry
+    describe("attachment mediatype icon") {
+
+      def pdfContent(flavour: Option[String]) =
+        runFormRunnerReturnContent(
+          "tests",
+          "pdf-a-attachment",
+          "pdf",
+          documentId = PdfAAttachmentDocumentId.some,
+          attributes = flavour.map(f => PropertyLoader.RequestPropertiesAttributeName -> pdfAPropertyStore(f)).toMap
+        )._2
+
+      def hasFontAwesome(pdf: Array[Byte]): Boolean =
+        useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(pdf))) { pdd =>
+          pdd.getPages.asScala.exists { page =>
+            val resources = page.getResources
+            resources.getFontNames.asScala.exists(name => resources.getFont(name).getName.contains("FontAwesome"))
+          }
+        }
+
+      it("must show in a PDF which is not a PDF/A") {
+        assert(hasFontAwesome(pdfContent(None).body))
+      }
+
+      for (flavour <- List("1a", "1b", "2b", "2u", "3b", "3u")) {
+        it(s"must show in a PDF/A-$flavour, which must be valid") {
+
+          assume(PdfAValidator.isAvailable, "the PDF/A validator classpath is only set when running tests with sbt")
+
+          val pdf = pdfContent(flavour.some).body
+          assert(hasFontAwesome(pdf))
+
+          val (compliant, report) = PdfAValidator.validate(pdf, flavour)
+          assert(compliant, s"veraPDF report:\n$report")
+        }
+      }
+
+      for (flavour <- List("2a", "3a")) {
+        it(s"must not show in a PDF/A-$flavour, which must be valid") {
+
+          assume(PdfAValidator.isAvailable, "the PDF/A validator classpath is only set when running tests with sbt")
+
+          val pdf = pdfContent(flavour.some).body
+          assert(! hasFontAwesome(pdf))
+
+          val (compliant, report) = PdfAValidator.validate(pdf, flavour)
+          assert(compliant, s"veraPDF report:\n$report")
+        }
+      }
     }
   }
 }

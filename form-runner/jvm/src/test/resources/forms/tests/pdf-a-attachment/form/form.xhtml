@@ -1,0 +1,69 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+  <xh:head>
+    <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+      <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+        <form>
+          <section>
+            <grid>
+              <control/>
+            </grid>
+          </section>
+        </form>
+      </xf:instance>
+      <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+        <xf:bind id="section-bind" name="section" ref="section">
+          <xf:bind id="grid-bind" ref="grid" name="grid">
+            <xf:bind id="control-bind" ref="control" name="control" type="xf:anyURI"/>
+          </xf:bind>
+        </xf:bind>
+      </xf:bind>
+      <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+        <metadata>
+          <application-name>tests</application-name>
+          <form-name>pdf-a-attachment</form-name>
+          <title xml:lang="en">PDF/A output is not conformant #7998</title>
+          <description xml:lang="en"/>
+          <grid-tab-order>default</grid-tab-order>
+          <created-with-version>2026.1-SNAPSHOT PE</created-with-version>
+          <updated-with-version>2026.1-SNAPSHOT PE</updated-with-version>
+        </metadata>
+      </xf:instance>
+      <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+        <resources>
+          <resource xml:lang="en">
+            <section>
+              <label>Section</label>
+            </section>
+            <grid/>
+            <control>
+              <label>Attachment</label>
+              <hint/>
+            </control>
+          </resource>
+        </resources>
+      </xf:instance>
+    </xf:model>
+  </xh:head>
+  <xh:body>
+    <fr:view>
+      <fr:body>
+        <fr:section id="section-section" bind="section-bind">
+          <xf:label ref="$form-resources/section/label"/>
+          <fr:grid id="grid-grid" bind="grid-bind">
+            <fr:c y="1" x="1" w="12">
+              <fr:attachment id="control-control" class="fr-attachment" bind="control-bind">
+                <xf:label ref="$form-resources/control/label"/>
+                <xf:hint ref="$form-resources/control/hint"/>
+                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+              </fr:attachment>
+            </fr:c>
+          </fr:grid>
+        </fr:section>
+      </fr:body>
+    </fr:view>
+  </xh:body>
+</xh:html>

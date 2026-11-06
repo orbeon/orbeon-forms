@@ -169,7 +169,7 @@ class PropertiesTest extends AnyFunSpecLike with ResourceManagerSupport {
 
     it("must filter PropertySet.propertyParams") {
       val ps =
-        PropertySet.forTests(
+        PropertySet(
           List(
             PropertyParams(Map.empty, "oxf.crypto.password",           XS_STRING_QNAME, "secret"),
             PropertyParams(Map.empty, "oxf.xforms.format.output.date", XS_STRING_QNAME, "[M]/[D]/[Y]"),

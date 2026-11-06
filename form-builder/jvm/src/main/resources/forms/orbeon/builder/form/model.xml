@@ -380,6 +380,11 @@
 
     <!-- Form is ready -->
     <xf:action ev:event="xforms-ready">
+
+        <xf:action if="$mode = 'new' and not(frf:isFormBuilderAuthorized())" type="xpath">
+            frf:sendError(403)
+        </xf:action>
+
         <!-- Open form settings if mode is "new" only -->
         <xf:action if="$mode = 'new'">
 

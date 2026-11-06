@@ -1,15 +1,14 @@
 package org.orbeon.oxf.fr
 
-import cats.data.NonEmptyList
 import cats.syntax.option.*
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.io.RandomAccessReadBuffer
 import org.apache.pdfbox.text.PDFTextStripper
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.properties.{CombinedPropertyStore, PropertyLoader, PropertyStore}
+import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.xml.dom.IOSupport
+import org.orbeon.oxf.xml.XMLConstants
 import org.scalatest.funspec.AnyFunSpecLike
 
 import java.io.File
@@ -30,6 +29,17 @@ class PdfProductionTest
 
   // Data for the `tests/pdf-a-attachment` form: a single attachment control, whose value is shown with a mediatype icon
   private val PdfAAttachmentDocumentId = "5f1c7998b2d34e6f8a90c1d2e3f40718"
+
+  // Data for the `tests/pdf-required-star` form: a required text field, single checkbox and toggle switch
+  private val PdfRequiredStarDocumentId = "a1b2c3d4e5f60718293a4b5c6d7e8f90"
+
+  private val ShowRequiredProperty =
+    PropertyParams(Map.empty, "oxf.fr.detail.static-readonly-required.*.*", XMLConstants.XS_BOOLEAN_QNAME, "true")
+
+  private def requiredStars(pdf: Array[Byte]): String =
+    useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(pdf))) { pdd =>
+      (new PDFTextStripper).getText(pdd).filter(_ == '\uF005')
+    }
 
   describe("Form Runner PDF production") {
 
@@ -264,17 +274,26 @@ class PdfProductionTest
     }
   }
 
+  describe("Form Runner PDF required star") {
+
+    it("must show with `oxf.fr.detail.static-readonly-required`") {
+      val (_, content, _) =
+        runFormRunnerReturnContent(
+          "tests",
+          "pdf-required-star",
+          "pdf",
+          documentId = PdfRequiredStarDocumentId.some,
+          attributes = propertiesOverride(ShowRequiredProperty)
+        )
+      // One star each for the text field, the single checkbox and the toggle switch
+      assert(requiredStars(content.body) == "\uF005" * 3)
+    }
+  }
+
   describe("Form Runner PDF/A production") {
 
-    // `oxf.fr.pdf.pdf/a` is a global property, so override it for the request only, with a combined property store
-    def pdfAPropertyStore(flavour: String): PropertyStore =
-      CombinedPropertyStore.combine(NonEmptyList.of(
-        Some(PropertyLoader.getPropertyStore(None)),
-        Some(PropertyStore.parse(IOSupport.readOrbeonDom(
-          s"""<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
-             |    <property as="xs:string" name="oxf.fr.pdf.pdf/a" value="$flavour"/>
-             |</properties>""".stripMargin), ""))
-      )).get
+    def pdfAProperty(flavour: String) =
+      PropertyParams(Map.empty, "oxf.fr.pdf.pdf/a", XMLConstants.XS_STRING_QNAME, flavour)
 
     for (flavour <- List("1a", "1b", "2a", "2b", "2u", "3a", "3b", "3u")) {
       it(s"automatic PDF must be a valid PDF/A-$flavour") {
@@ -287,7 +306,7 @@ class PdfProductionTest
             "pdf-production",
             "pdf",
             documentId = PdfProductionDocumentId.some,
-            attributes = Map(PropertyLoader.RequestPropertiesAttributeName -> pdfAPropertyStore(flavour))
+            attributes = propertiesOverride(pdfAProperty(flavour))
           )
 
         val (compliant, report) = PdfAValidator.validate(content.body, flavour)
@@ -316,7 +335,7 @@ class PdfProductionTest
           "pdf-a-attachment",
           "pdf",
           documentId = PdfAAttachmentDocumentId.some,
-          attributes = flavour.map(f => PropertyLoader.RequestPropertiesAttributeName -> pdfAPropertyStore(f)).toMap
+          attributes = flavour.map(f => propertiesOverride(pdfAProperty(f))).getOrElse(Map.empty)
         )._2
 
       def hasFontAwesome(pdf: Array[Byte]): Boolean =

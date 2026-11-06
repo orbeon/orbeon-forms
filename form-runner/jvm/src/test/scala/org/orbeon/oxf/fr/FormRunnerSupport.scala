@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import cats.data.NonEmptyList
 import org.apache.commons.io.IOUtils
 import org.orbeon.connection.{BufferedContent, StreamedContent}
 import org.orbeon.fr.FormRunnerPath
@@ -24,6 +25,8 @@ import org.orbeon.oxf.fr.FormRunnerSupport.*
 import org.orbeon.oxf.fr.persistence.relational.SqlReader
 import org.orbeon.oxf.http.HttpMethod.{GET, POST}
 import org.orbeon.oxf.http.HttpResponse
+import org.orbeon.oxf.properties.PropertySet.PropertyParams
+import org.orbeon.oxf.properties.{CombinedPropertyStore, PropertyLoader, PropertySet, SimplePropertyStore}
 import org.orbeon.oxf.test.TestHttpClient.CacheEvent
 import org.orbeon.oxf.test.{DocumentTestBase, TestHttpClient}
 import org.orbeon.oxf.webapp.ProcessorService
@@ -82,6 +85,16 @@ trait FormRunnerSupport extends DocumentTestBase {
 
   def setFormRunnerLanguage(lang: String): Unit =
     setControlValueWithEventSearchNested("fr-language-selector-select", lang)
+
+  // Override global properties for a single request: pass the result as the `attributes` parameter of `runFormRunner*()`
+  def propertiesOverride(properties: PropertyParams*): Map[String, AnyRef] =
+    Map(
+      PropertyLoader.RequestPropertiesAttributeName ->
+        CombinedPropertyStore.combine(NonEmptyList.of(
+          Some(PropertyLoader.getPropertyStore(None)),
+          Some(SimplePropertyStore(PropertySet.forTests(properties), Map.empty))
+        )).get
+    )
 
   def runFormRunner(
     app        : String,

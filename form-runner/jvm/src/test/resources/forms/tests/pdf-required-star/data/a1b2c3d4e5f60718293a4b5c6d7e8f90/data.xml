@@ -1,0 +1,9 @@
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <section>
+        <grid>
+            <input>Homer</input>
+            <checkbox>true</checkbox>
+            <switch>true</switch>
+        </grid>
+    </section>
+</form>

@@ -1,0 +1,95 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+  <xh:head>
+    <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+      <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+        <form>
+          <section>
+            <grid>
+              <input/>
+              <checkbox/>
+              <switch/>
+            </grid>
+          </section>
+        </form>
+      </xf:instance>
+      <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+        <xf:bind id="section-bind" name="section" ref="section">
+          <xf:bind id="grid-bind" ref="grid" name="grid">
+            <xf:bind id="input-bind" ref="input" name="input" required="true()"/>
+            <xf:bind id="checkbox-bind" ref="checkbox" name="checkbox" type="xs:boolean" required="true()"/>
+            <xf:bind id="switch-bind" ref="switch" name="switch" type="xs:boolean" required="true()"/>
+          </xf:bind>
+        </xf:bind>
+      </xf:bind>
+      <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+        <metadata>
+          <application-name>tests</application-name>
+          <form-name>pdf-required-star</form-name>
+          <title xml:lang="en">Required star in the PDF</title>
+          <description xml:lang="en"/>
+          <grid-tab-order>default</grid-tab-order>
+          <created-with-version>2026.1-SNAPSHOT PE</created-with-version>
+          <updated-with-version>2026.1-SNAPSHOT PE</updated-with-version>
+        </metadata>
+      </xf:instance>
+      <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+        <resources>
+          <resource xml:lang="en">
+            <section>
+              <label>Section</label>
+            </section>
+            <grid/>
+            <input>
+              <label>Text field</label>
+              <hint/>
+            </input>
+            <checkbox>
+              <label>Single checkbox</label>
+              <hint/>
+            </checkbox>
+            <switch>
+              <label>Toggle switch</label>
+              <hint/>
+            </switch>
+          </resource>
+        </resources>
+      </xf:instance>
+    </xf:model>
+  </xh:head>
+  <xh:body>
+    <fr:view>
+      <fr:body>
+        <fr:section id="section-section" bind="section-bind">
+          <xf:label ref="$form-resources/section/label"/>
+          <fr:grid id="grid-grid" bind="grid-bind">
+            <fr:c y="1" x="1" w="4">
+              <xf:input id="input-control" bind="input-bind">
+                <xf:label ref="$form-resources/input/label"/>
+                <xf:hint ref="$form-resources/input/hint"/>
+                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+              </xf:input>
+            </fr:c>
+            <fr:c y="1" x="5" w="4">
+              <fr:checkbox-input id="checkbox-control" bind="checkbox-bind">
+                <xf:label ref="$form-resources/checkbox/label"/>
+                <xf:hint ref="$form-resources/checkbox/hint"/>
+                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+              </fr:checkbox-input>
+            </fr:c>
+            <fr:c y="1" x="9" w="4">
+              <fr:switch-input id="switch-control" bind="switch-bind">
+                <xf:label ref="$form-resources/switch/label"/>
+                <xf:hint ref="$form-resources/switch/hint"/>
+                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+              </fr:switch-input>
+            </fr:c>
+          </fr:grid>
+        </fr:section>
+      </fr:body>
+    </fr:view>
+  </xh:body>
+</xh:html>

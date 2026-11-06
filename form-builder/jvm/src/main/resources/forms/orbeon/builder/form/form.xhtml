@@ -828,6 +828,17 @@
                                 </xf:switch>
                             </xf:group>
 
+                            <xh:div class="fb-section-focus-banner xforms-hidden" role="status" aria-live="polite">
+                                <xh:span class="fb-section-focus-banner-info">
+                                    <xh:i class="fa fa-crosshairs fa-fw" aria-hidden="true"/>
+                                    <xf:output class="fb-section-focus-banner-prefix" ref="$form-resources/section-focus/focused-on"/>
+                                    <xh:strong class="fb-section-focus-banner-title"/>
+                                </xh:span>
+                                <xh:button type="button" class="btn btn-mini fb-section-focus-banner-exit">
+                                    <xf:output ref="$form-resources/section-focus/show-all"/>
+                                </xh:button>
+                            </xh:div>
+
                             <xf:group class="fb fb-hide-alert">
                                 <!-- Dynamically display the form being edited -->
                                 <xxf:dynamic id="fb" ref="instance('fb-form-instance')"/>
@@ -913,11 +924,17 @@
                             <xh:div class="fb-section-grid-editor">
                                 <xf:output class="fb-enter-section-title-label xforms-hidden" ref="$form-resources/enter-section-title/label"/>
                                 <xf:output class="fb-type-section-title-label xforms-hidden"  ref="$form-resources/type-section-title/label"/>
+                                <xf:output class="fb-focus-section-label xforms-hidden"       ref="$form-resources/section-focus/focus"/>
+                                <xf:output class="fb-unfocus-section-label xforms-hidden"     ref="$form-resources/section-focus/unfocus"/>
                                 <xh:div>
                                     <xh:i
                                         class="fb-container-edit-details fa fa-cogs fa-fw"
                                         role="button"
                                         title="{$fb-resources/section-details-icon/label}"/>
+                                    <xh:i
+                                        class="fb-container-focus fa fa-crosshairs fa-fw"
+                                        role="button"
+                                        title="{$fb-resources/section-focus/focus}"/>
                                     <xh:i
                                         class="fb-container-delete fa fa-minus-circle fa-fw"
                                         role="button"

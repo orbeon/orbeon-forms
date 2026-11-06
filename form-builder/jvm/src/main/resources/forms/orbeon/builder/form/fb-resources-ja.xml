@@ -1867,4 +1867,10 @@
         <show-cell-badges todo="true">Show Control Badges</show-cell-badges>
         <show-toolbar todo="true">Show Toolbar</show-toolbar>
     </control-settings-toolbar>
+    <section-focus>
+        <focus todo="true">Focus on Section</focus>
+        <unfocus todo="true">Exit Section Focus</unfocus>
+        <focused-on todo="true">Focused on:</focused-on>
+        <show-all todo="true">Show All Sections</show-all>
+    </section-focus>
 </resource>

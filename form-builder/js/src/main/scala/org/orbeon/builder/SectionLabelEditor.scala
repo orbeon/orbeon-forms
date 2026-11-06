@@ -63,6 +63,7 @@ object SectionLabelEditor {
       for {
         _           <- AjaxClient.allEventsProcessedF("sectionAdded")
         sectionEl   <- dom.document.getElementByIdOpt(sectionNamespacedId)
+        _           =  SectionFocus.ensureVisible(sectionEl)
         interceptor <- labelClickInterceptors.find { interceptor =>
           val offset = Position.adjustedOffset(interceptor)
           Position.findInCache(BlockCache.sectionGridCache, offset.top, offset.left).exists { block =>
@@ -74,6 +75,35 @@ object SectionLabelEditor {
       }
     })
 
+    def toggleOtherSectionsAndScroll(sectionId: String): Unit = {
+      SectionFocus.clearFocus()
+      FormBuilderRpcClient.api.sectionToggleOtherSections(sectionId).foreach { _ =>
+        AjaxClient.allEventsProcessedF("sectionToggleOtherSections").foreach { _ =>
+          FormBuilderPrivateAPI.moveOutlineContainerIntoView(sectionId)
+        }
+      }
+    }
+
+    // Intercept Option/Alt-click on the section disclosure triangle (caret) or title bar to solo / expand all sections
+    dom.document.addEventListener(
+      "click",
+      (e: dom.MouseEvent) => {
+        if (e.altKey && ! e.ctrlKey && ! e.metaKey && ! e.shiftKey) {
+          for {
+            targetEl  <- Option(e.target).collect { case el: html.Element => el }
+            if ! FormRunnerUtils.isViewMode(targetEl) && ! BlockCache.isElemInSectionTemplate(targetEl)
+            _         <- targetEl.closestOpt(".fb-main .fr-section-title")
+            sectionEl <- targetEl.closestOpt(BlockCache.SectionSelector)
+          } locally {
+            e.preventDefault()
+            e.stopPropagation()
+            toggleOtherSectionsAndScroll(sectionEl.id)
+          }
+        }
+      },
+      useCapture = true
+    )
+
     def sendNewLabelValue(): Unit = {
 
       val newLabelValue    = labelInputOpt.get.value
@@ -82,6 +112,7 @@ object SectionLabelEditor {
       val sectionId        = section.el.id
 
       section.el.querySelectorT(SectionLabelSelector).textContent = newLabelValue
+      SectionFocus.syncDom()
 
       FormBuilderRpcClient.api.sectionUpdateLabel(sectionId, newLabelValue)
 
@@ -193,10 +224,20 @@ object SectionLabelEditor {
               container.className = "fb-section-label-editor-click-interceptor"
               container.addEventListener(
                 "click",
-                (e: dom.Event) => {
+                (e: dom.MouseEvent) => {
                   val isViewMode = FormRunnerUtils.isViewMode(e.targetT)
-                  if (! isViewMode)
-                    showLabelEditor(e.targetT)
+                  if (! isViewMode) {
+                    if (e.altKey && ! e.ctrlKey && ! e.metaKey && ! e.shiftKey) {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      val offset = Position.adjustedOffset(e.targetT)
+                      Position.findInCache(BlockCache.sectionGridCache, offset.top, offset.left).foreach { section =>
+                        toggleOtherSectionsAndScroll(section.el.id)
+                      }
+                    } else {
+                      showLabelEditor(e.targetT)
+                    }
+                  }
                 }
               )
               container.addEventListener(

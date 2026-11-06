@@ -66,10 +66,18 @@ object BlockCache {
     )
   }
 
+  def isElemInSectionTemplate(elem: html.Element): Boolean =
+    elem
+      .ancestorOrSelfElem(".fr-section-component", includeSelf = false)
+      .nextOption()
+      .nonEmpty
+
   locally {
 
     // Keep caches current
     Position.onOffsetMayHaveChanged(() => {
+
+      SectionFocus.syncDom()
 
       locally {
 
@@ -106,8 +114,10 @@ object BlockCache {
       locally {
 
         val gridBodiesIt =
-          for (gridBody <- collectElems(s".fr-grid.fr-editable $GridBodySelector"))
-            yield Block(gridBody)
+          for {
+            gridBody <- collectElems(s".fr-grid.fr-editable $GridBodySelector")
+            if gridBody.isVisible
+          } yield Block(gridBody)
 
         gridBodyCache._elems = gridBodiesIt.toList
       }
@@ -115,8 +125,10 @@ object BlockCache {
       locally {
 
         val cellsIt =
-        for (cell <- collectElems(".fr-grid.fr-editable .fr-grid-td"))
-        yield Block(cell)
+          for {
+            cell <- collectElems(".fr-grid.fr-editable .fr-grid-td")
+            if cell.isVisible
+          } yield Block(cell)
 
         cellCache._elems = cellsIt.toList
       }
@@ -126,11 +138,5 @@ object BlockCache {
 
     def collectElems(selector: String): collection.Seq[html.Element] =
       dom.window.document.querySelectorAllT(selector)
-
-    def isElemInSectionTemplate(elem: html.Element): Boolean =
-      elem
-        .ancestorOrSelfElem(".fr-section-component", includeSelf = false)
-        .nextOption()
-        .nonEmpty
   }
 }

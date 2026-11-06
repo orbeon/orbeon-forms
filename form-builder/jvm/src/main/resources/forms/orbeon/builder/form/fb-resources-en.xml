@@ -1893,4 +1893,10 @@
         <show-cell-badges>Show Control Badges</show-cell-badges>
         <show-toolbar>Show Toolbar</show-toolbar>
     </control-settings-toolbar>
+    <section-focus>
+        <focus>Focus on Section</focus>
+        <unfocus>Exit Section Focus</unfocus>
+        <focused-on>Focused on:</focused-on>
+        <show-all>Show All Sections</show-all>
+    </section-focus>
 </resource>

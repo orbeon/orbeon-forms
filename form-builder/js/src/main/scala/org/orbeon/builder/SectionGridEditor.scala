@@ -22,6 +22,7 @@ import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 import org.orbeon.fr.FormRunnerUtils
 import org.orbeon.web.DomSupport
 import org.orbeon.web.DomSupport.*
+import org.orbeon.xforms.XFormsUI
 import org.scalajs.dom.html
 
 
@@ -50,6 +51,7 @@ object SectionGridEditor {
       case object ContainerMoveLeft    extends ContainerEditor
       case object ContainerDelete      extends ContainerEditor
       case object ContainerEditDetails extends ContainerEditor
+      case object ContainerFocus       extends ContainerEditor
       case object ContainerCopy        extends ContainerEditor
       case object ContainerCut         extends ContainerEditor
       case object ContainerMerge       extends ContainerEditor
@@ -113,6 +115,20 @@ object SectionGridEditor {
         if (sectionGridBody.el.matches(BlockCache.SectionSelector)) {
           val container = sectionGridBody.el.childrenT(".fr-section-container").head
           showMoveDeleteIcons(container)
+          if (! isViewMode) {
+            val isFocused = SectionFocus.isFocused(sectionGridBody.el)
+            val labelOutputSelector = if (isFocused) ".fb-unfocus-section-label" else ".fb-focus-section-label"
+            val titleOpt =
+              sectionGridEditorContainer
+                .childrenT(labelOutputSelector)
+                .headOption
+                .flatMap(XFormsUI.getCurrentValue(_).toOption)
+            allIconsWith(ContainerFocus.className).foreach { icon =>
+              icon.classList.toggle("active", isFocused)
+              titleOpt.foreach(icon.title = _)
+              icon.show()
+            }
+          }
           if (! isViewMode && container.queryNestedElems[html.Element](".fr-section-component", includeSelf = false).nonEmpty)
             allIconsWith(ContainerMerge.className).foreach(_.show())
         }
@@ -148,6 +164,7 @@ object SectionGridEditor {
             case ContainerMoveLeft    => client.sectionMove         (sectionGridId, Direction.Left.entryName)
             case ContainerDelete      => client.containerDelete     (sectionGridId)
             case ContainerEditDetails => client.containerEditDetails(sectionGridId)
+            case ContainerFocus       => SectionFocus.toggleFocus   (currentSectionGrid.el)
             case ContainerCopy        => client.containerCopy       (sectionGridId)
             case ContainerCut         => client.containerCut        (sectionGridId)
             case ContainerMerge       => client.containerMerge      (sectionGridId)

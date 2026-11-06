@@ -1894,4 +1894,10 @@
         <show-cell-badges>Afficher les badges des contrôles</show-cell-badges>
         <show-toolbar>Afficher la barre d'outils</show-toolbar>
     </control-settings-toolbar>
+    <section-focus>
+        <focus>Isoler la section</focus>
+        <unfocus>Quitter le mode isolé</unfocus>
+        <focused-on>Section isolée :</focused-on>
+        <show-all>Afficher toutes les sections</show-all>
+    </section-focus>
 </resource>

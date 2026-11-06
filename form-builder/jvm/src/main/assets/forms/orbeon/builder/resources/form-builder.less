@@ -634,6 +634,61 @@ body.orbeon {
         background-color: var(--orbeon-fb-editable-hover-background-color);
     }
 
+    .fb-section-focus-hidden {
+        display: none !important;
+    }
+
+    .fb-section-focus-banner {
+        position: sticky;
+        top: 0;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+        padding: 6px 10px;
+        font-size: 13px;
+        line-height: 18px;
+        color: var(--orbeon-base-color);
+        background-color: var(--orbeon-tab-background-color);
+        border: 1px solid var(--orbeon-fb-active-color);
+        border-left-width: 3px;
+        border-radius: var(--orbeon-body-decorations-border-radius);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+
+        &.xforms-hidden {
+            display: none;
+        }
+
+        .fb-section-focus-banner-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+
+            .fa {
+                color: var(--orbeon-fb-active-color);
+                flex-shrink: 0;
+            }
+
+            .fb-section-focus-banner-prefix .xforms-output-output {
+                color: var(--orbeon-fb-navbar-color);
+                white-space: nowrap;
+            }
+
+            .fb-section-focus-banner-title {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+
+        .fb-section-focus-banner-exit {
+            flex-shrink: 0;
+        }
+    }
+
     .fb-delete-grid-trigger {
         position: absolute; // Its left/right set in JS relative to the current grid
         display: none;      // Shown in JS when mouse over grid

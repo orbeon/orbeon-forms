@@ -50,6 +50,7 @@ object FormBuilderApp extends App {
     FormRunnerApp.onPageContainsFormsMarkup()
 
     BlockCache
+    SectionFocus
 
     DialogItemset
     DialogPublish

@@ -375,6 +375,9 @@ trait GridOps extends ContainerOps {
   def selectCell(newCellElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
     setvalue(selectedCellVar, newCellElem.id)
 
+  def selectStartCell(newCellElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
+    setvalue(startingCellVar, newCellElem.id)
+
   def selectCellForControlName(controlName: String)(implicit ctx: FormBuilderDocContext): Unit =
     FormRunner.findControlByName(controlName)
       .toList

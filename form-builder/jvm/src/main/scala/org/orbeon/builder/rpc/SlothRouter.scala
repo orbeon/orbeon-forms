@@ -17,3 +17,4 @@ object SlothRouter extends SlothRouterBase {
     Router[Json, Future]
       .route[FormBuilderRpcApi](FormBuilderRpcApiImpl)
 }
+

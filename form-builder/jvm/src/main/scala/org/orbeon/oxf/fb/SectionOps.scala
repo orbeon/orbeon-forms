@@ -17,7 +17,14 @@ import org.orbeon.datatypes.Direction
 import org.orbeon.oxf.fb.UndoAction.MoveContainer
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerDocContext
+import org.orbeon.oxf.fr.NodeInfoCell.CellTest
+import org.orbeon.oxf.fr.XMLNames.FRSectionTest
 import org.orbeon.oxf.xforms.action.XFormsAPI.*
+import org.orbeon.oxf.xforms.action.actions.XFormsDispatchAction
+import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
+import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl
+import org.orbeon.oxf.xforms.event.{EventCollector, XFormsEvent}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.*
 
@@ -82,4 +89,92 @@ trait SectionOps extends ContainerOps {
   // 2022-02-02: Unused except by test.
   def findSectionName(controlName: String)(implicit ctx: FormRunnerDocContext): Option[String] =
     findControlByName(controlName) map findSectionName
+
+  def toggleOtherSections(sectionId: String)(implicit ctx: FormBuilderDocContext): Unit =
+    findContainerById(sectionId).filter(IsSection).foreach { targetSectionElem =>
+
+      val allSections = (ctx.bodyElem descendant FRSectionTest).toList
+
+      val activeSectionIds =
+        (
+          (targetSectionElem ancestor FRSectionTest) ++
+          List(targetSectionElem)                    ++
+          (targetSectionElem descendant FRSectionTest)
+        ).map(_.id).toSet
+
+      val otherSections = allSections.filterNot(s => activeSectionIds(s.id))
+
+      val targetAndAncestorsOpen =
+        ((targetSectionElem ancestor FRSectionTest) :+ targetSectionElem).forall(isSectionOpen)
+
+      val otherSectionsClosed =
+        otherSections.forall(s => ! isSectionOpen(s))
+
+      if (otherSections.nonEmpty && targetAndAncestorsOpen && otherSectionsClosed) {
+        // Already soloed -> expand all sections in document order (top-down so parent sections open before subsections)
+        allSections.foreach(setSectionOpen(_, open = true))
+      } else {
+        // Solo target section -> expand target hierarchy in document order, collapse all other sections
+        allSections.filter(s => activeSectionIds(s.id)).foreach(setSectionOpen(_, open = true))
+        otherSections.foreach(setSectionOpen(_, open = false))
+        selectFirstCellInSectionIfNeeded(targetSectionElem)
+      }
+    }
+
+  def expandAndSelectSection(sectionId: String)(implicit ctx: FormBuilderDocContext): Unit =
+    findContainerById(sectionId).filter(IsSection).foreach { targetSectionElem =>
+      val targetWasOpen = isSectionOpen(targetSectionElem)
+      val sectionsToOpen =
+        ((targetSectionElem ancestor FRSectionTest).reverse :+ targetSectionElem) ++
+        (if (! targetWasOpen) (targetSectionElem descendant FRSectionTest).toList else Nil)
+
+      sectionsToOpen.foreach(setSectionOpen(_, open = true))
+      selectFirstCellInSectionIfNeeded(targetSectionElem)
+    }
+
+  def isSectionOpen(sectionElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Boolean = {
+    val controls = findSectionControls(sectionElem.id).filter(_.isRelevant)
+    controls.nonEmpty && controls.forall(isSectionControlOpen)
+  }
+
+  private def selectFirstCellInSectionIfNeeded(sectionElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
+    if (! findSelectedCell.exists(c => c.hasChildElement && (c ancestor * exists (_ isSameNodeInfo sectionElem)))) {
+      val cells = sectionElem descendant CellTest
+      cells.find(_.hasChildElement).orElse(cells.headOption).foreach { cell =>
+        selectCell(cell)
+        selectStartCell(cell)
+      }
+    }
+
+  private def findSectionControls(staticId: String)(implicit ctx: FormBuilderDocContext): Iterable[XFormsControl] =
+    inScopeContainingDocumentOpt.toList.flatMap { doc =>
+      buildFormBuilderControlEffectiveId(staticId).flatMap(doc.findControlByEffectiveId) match {
+        case Some(control) => List(control)
+        case None          => doc.controls.getCurrentControlTree.effectiveIdsToControls.values.filter(_.getId == staticId)
+      }
+    }
+
+  private def isSectionControlOpen(sectionControl: XFormsControl): Boolean =
+    ControlsIterator(sectionControl, includeSelf = false)
+      .collectFirst { case s: XFormsSwitchControl if s.getId == "switch" => s }
+      .flatMap(_.selectedCaseIfRelevantOpt)
+      .exists(_.getId == "case-open")
+
+  private def setSectionOpen(sectionElem: NodeInfo, open: Boolean)(implicit ctx: FormBuilderDocContext): Unit = {
+    val eventName = if (open) "fr-expand" else "fr-collapse"
+    findSectionControls(sectionElem.id).foreach { control =>
+      if (control.isRelevant && isSectionControlOpen(control) != open)
+        XFormsDispatchAction.dispatch(
+          eventName       = eventName,
+          target          = control,
+          bubbles         = true,
+          cancelable      = true,
+          properties      = XFormsEvent.EmptyGetter,
+          delayOpt        = None,
+          showProgress    = true,
+          allowDuplicates = false,
+          collector       = EventCollector.Throw
+        )
+    }
+  }
 }

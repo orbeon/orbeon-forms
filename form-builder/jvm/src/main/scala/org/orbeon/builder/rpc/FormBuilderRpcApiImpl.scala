@@ -189,6 +189,16 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
       Undo.pushUserUndoAction
   }
 
+  def sectionToggleOtherSections(sectionId: String): Future[Unit] = Future.successful {
+    implicit val ctx = FormBuilderDocContext()
+    FormBuilder.toggleOtherSections(sectionId)
+  }
+
+  def sectionExpandAndSelect(sectionId: String): Future[Unit] = Future.successful {
+    implicit val ctx = FormBuilderDocContext()
+    FormBuilder.expandAndSelectSection(sectionId)
+  }
+
   def containerMove(
     containerId         : String,
     intoSectionIdOpt    : Option[String],

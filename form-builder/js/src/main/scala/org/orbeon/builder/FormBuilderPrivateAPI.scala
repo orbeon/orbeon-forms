@@ -78,6 +78,7 @@ object FormBuilderPrivateAPI extends js.Object {
   def moveFocusedCellIntoView(): Unit =
     for {
       selectedElem  <- dom.document.querySelectorOpt(".fb-main .fb-selected")
+      _             =  SectionFocus.ensureVisible(selectedElem)
       mainInnerElem <- dom.document.querySelectorOpt(".fb-main-inner")
       mainElem      <- dom.document.querySelectorOpt(".fb-main")
     } locally {
@@ -87,6 +88,7 @@ object FormBuilderPrivateAPI extends js.Object {
   def moveOutlineContainerIntoView(namespacedId: String): Unit =
     for {
       containerElem <- dom.document.getElementByIdOpt(namespacedId)
+      _             =  SectionFocus.ensureVisible(containerElem)
       targetElem    = containerElem.querySelectorOpt(".fr-section-title").getOrElse(containerElem)
       mainInnerElem <- dom.document.querySelectorOpt(".fb-main-inner")
       mainElem      <- dom.document.querySelectorOpt(".fb-main")

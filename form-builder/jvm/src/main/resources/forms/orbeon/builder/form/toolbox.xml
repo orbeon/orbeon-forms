@@ -671,9 +671,10 @@
                                 <xf:var name="action-name" value="@name/string()"/>
                                 <xf:trigger>
                                     <xf:label value="$action-name"/>
-                                    <xxf:show ev:event="DOMActivate" dialog="fb-action-dialog">
+                                    <xxf:show ev:event="DOMActivate" if="$is-pe" dialog="fb-action-dialog">
                                         <xf:property name="action-name" value="$action-name"/>
                                     </xxf:show>
+                                    <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                                 </xf:trigger>
                             </xh:div>
                         </fr:dnd-repeat>
@@ -705,9 +706,10 @@
                                 <xf:trigger>
                                     <xf:label value="$submission-name"/>
 
-                                    <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-http-services">
+                                    <xf:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" targetid="dialog-http-services">
                                         <xf:property name="submission-name" value="$submission-name"/>
                                     </xf:dispatch>
+                                    <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                                 </xf:trigger>
                             </xh:div>
                         </fr:dnd-repeat>
@@ -740,9 +742,10 @@
                                 <xf:var name="submission-name" value="substring-before(@id, '-submission')"/>
                                 <xf:trigger>
                                     <xf:label value="$submission-name"/>
-                                    <xxf:show ev:event="DOMActivate" dialog="fb-database-service-dialog">
+                                    <xxf:show ev:event="DOMActivate" if="$is-pe" dialog="fb-database-service-dialog">
                                         <xf:property name="submission-name" value="$submission-name"/>
                                     </xxf:show>
+                                    <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                                 </xf:trigger>
                             </xh:div>
                         </fr:dnd-repeat>

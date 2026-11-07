@@ -103,7 +103,20 @@
         </xsl:copy>
     </xsl:template>
 
+    <!-- Expand `xi:include` inside `fb:metadata` (as `doc()` uses `ParserConfiguration.Plain` which doesn't run XInclude) -->
+    <xsl:template
+        match="fb:metadata/xi:include[@href and starts-with(@xpointer, 'xpath(')]"
+        xmlns:xi="http://www.w3.org/2001/XInclude">
+        <xsl:variable name="target-doc" select="doc(@href)"/>
+        <xsl:variable name="xpath-expr" select="substring(@xpointer, 7, string-length(@xpointer) - 7)"/>
+        <xsl:for-each select="$target-doc">
+            <xsl:apply-templates select="p:evaluate($xpath-expr)"/>
+        </xsl:for-each>
+    </xsl:template>
+
     <!--  Filter out unneeded elements -->
-    <xsl:template match="xbl:resources | xbl:handlers | xbl:implementation | xbl:template"/>
+    <xsl:template
+        match="xbl:resources | xbl:handlers | xbl:implementation | xbl:template | xbl:binding/xi:include"
+        xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
 </xsl:transform>

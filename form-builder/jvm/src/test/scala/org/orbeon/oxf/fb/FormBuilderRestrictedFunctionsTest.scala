@@ -374,6 +374,14 @@ class FormBuilderRestrictedFunctionsTest
           XFormsAPI.refresh("fr-form-model")
 
           assert(findSelect1Labels == List("", "2022", "2021", "2020"))
+
+          for (viewName <- List("fr:percentage", "fr:currency")) {
+            val binding = ctx.bindingIndex.iterateDescriptors.flatMap(_.binding).find { b =>
+              (b / "*:metadata" / "*:templates" / "*:view" / *).headOption.exists(_.name == viewName)
+            }.get
+            assert((binding / "*:metadata" / "*:custom-settings").nonEmpty)
+            assert((binding / "*:metadata" / "*:control-details").nonEmpty)
+          }
         }
       }
     }

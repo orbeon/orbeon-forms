@@ -193,5 +193,37 @@ class ControlCustomSettingsParserTest
       assert(spec.findSetting("showCode").exists(_.settingType == BooleanType))
       assert(spec.findSetting("showFlag").exists(_.settingType == BooleanType))
     }
+
+    it("must parse `<fr:percentage>` and `<fr:currency>` custom settings XIncluded from `number.xbl`") {
+      import org.orbeon.scaxon.SimplePath.*
+
+      for (path <- List(
+        "/xbl/orbeon/percentage/percentage.xbl",
+        "/xbl/orbeon/currency/currency.xbl"
+      )) {
+        val docWrapper = new org.orbeon.dom.saxon.DocumentWrapper(
+          org.orbeon.oxf.resources.ResourceManagerWrapper.instance.getContentAsOrbeonDom(path),
+          null,
+          org.orbeon.oxf.util.XPath.GlobalConfiguration
+        )
+        val binding = (docWrapper.rootElement / "*:binding").head
+        val specOpt = ControlCustomSettingsParser.fromBinding(binding)
+        assert(specOpt.isDefined)
+        val spec = specOpt.get
+        assert(spec.localName == "number")
+        assert(spec.settings.map(_.name) == List(
+          "prefix",
+          "suffix",
+          "decimalSeparator",
+          "groupingSeparator",
+          "digitsAfterDecimal",
+          "roundWhenFormatting",
+          "roundWhenStoring",
+          "fieldWidth",
+          "fieldAlign"
+        ))
+        assert((binding / "*:metadata" / "*:control-details").nonEmpty)
+      }
+    }
   }
 }

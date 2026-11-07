@@ -640,10 +640,19 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
         case _                                   => throw new IllegalArgumentException
       }
 
+    val currentModelOpt =
+      Option(XFormsFunction.context).flatMap(_.modelOpt)
+
+    val currentInstanceOpt =
+      currentModelOpt.flatMap(_.findInstance(Names.FormInstance)) orElse
+        topLevelInstance(Names.FormModel, Names.FormInstance)
+
     val parentContextElemOpt =
-      containerDetails.init.foldLeft(formInstance.rootElement.some) {
-        case (Some(elem), (name, isRepeat, position)) => processOne(elem, name, isRepeat, position)
-        case (None, _) => None
+      currentInstanceOpt.flatMap { currentInstance =>
+        containerDetails.init.foldLeft(currentInstance.rootElement.some) {
+          case (Some(elem), (name, isRepeat, position)) => processOne(elem, name, isRepeat, position)
+          case (None, _)                                => None
+        }
       }
 
     parentContextElemOpt flatMap { parentContextElem =>
@@ -657,8 +666,10 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
   def repeatAddIteration(containerDetailsString: String, applyDefaults: Boolean): Unit =
     for {
       (repeatContextElem, repeatName, position) <- findInsertDeleteElem(containerDetailsString)
-      templateInstance                          <- topLevelInstance(Names.FormModel, templateId(repeatName))
-      repeatTemplate                            = templateInstance.rootElement
+      currentModelOpt                           =  Option(XFormsFunction.context).flatMap(_.modelOpt)
+      templateInstance                          <- currentModelOpt.flatMap(_.findInstance(templateId(repeatName))) orElse
+                                                     topLevelInstance(Names.FormModel, templateId(repeatName))
+      repeatTemplate                            =  templateInstance.rootElement
     } locally {
       XFormsAPI.insert(
         origin               = updateTemplateFromInScopeItemsetMaps(startNode = repeatContextElem, template = repeatTemplate),
@@ -706,8 +717,12 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     ctx                       : FormRunnerDocContext
   ): Iterator[String] = {
 
+    val controlOpt =
+      frc.findControlByNameUnderXPath(repeatedGridOrSectionName, inDoc) orElse
+      frc.findControlByName(repeatedGridOrSectionName)
+
     val namesWithIsRepeat =
-      frc.findControlByName(repeatedGridOrSectionName).toList  flatMap
+      controlOpt.toList  flatMap
         (frc.findAncestorContainersLeafToRoot(_, includeSelf = true)) map
         (e => (frc.controlNameFromId(e.id), frc.isRepeat(e)))
 

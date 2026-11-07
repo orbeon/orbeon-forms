@@ -190,4 +190,44 @@ class SectionTemplatesTest
       }
     }
   }
+
+  describe("`<fr:repeat-*>` actions in section template") {
+
+    it("must add, remove, and clear iterations of a repeated grid inside a section template") {
+
+      val (processorService, Some(xfcd), _) =
+        runFormRunner("tests", "section-template-repeat-actions", "new")
+
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, xfcd) {
+
+          def repControlExists(index: Int): Boolean =
+            resolveObjectInsideComponent[XFormsValueControl](
+              componentStaticOrAbsoluteId = "my-section-content-control",
+              targetStaticOrAbsoluteId    = "rep-control-control",
+              targetIndexes               = List(index)
+            ).isDefined
+
+          val choiceControl =
+            resolveObjectInsideComponent[XFormsValueControl](
+              componentStaticOrAbsoluteId = "my-section-content-control",
+              targetStaticOrAbsoluteId    = "choice-control"
+            ).get
+
+          assert(repControlExists(1))
+          assert(! repControlExists(2))
+
+          setControlValueWithEventSearchNested(choiceControl.effectiveId, "add")
+          assert(repControlExists(2))
+
+          setControlValueWithEventSearchNested(choiceControl.effectiveId, "remove")
+          assert(! repControlExists(2))
+          assert(repControlExists(1))
+
+          setControlValueWithEventSearchNested(choiceControl.effectiveId, "clear")
+          assert(! repControlExists(1))
+        }
+      }
+    }
+  }
 }

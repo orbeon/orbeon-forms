@@ -762,6 +762,8 @@
 
     <xsl:template match="fr:repeat-clear" mode="within-action-2018.2">
 
+        <xsl:param tunnel="yes" name="view-elem" as="element()"/>
+
         <xsl:variable name="repeat-name" select="@repeat/string()" as="xs:string"/>
         <xsl:variable name="at"          select="@at/string()"     as="xs:string?"/>
 
@@ -776,7 +778,7 @@
          </xxf:log>
 
         <xf:action type="xpath" class="fr-action-impl">
-            frf:repeatClear('<xsl:value-of select="frf:findContainerDetailsCompileTime($fr-form-model, $repeat-name, $at, true())"/>')
+            frf:repeatClear('<xsl:value-of select="frf:findContainerDetailsCompileTime($view-elem, $repeat-name, $at, true())"/>')
         </xf:action>
 
     </xsl:template>
@@ -814,12 +816,14 @@
         </xxf:log>
 
         <xf:action type="xpath" class="fr-action-impl">
-            frf:repeatAddIteration('<xsl:value-of select="frf:findContainerDetailsCompileTime($fr-form-model, $repeat-name, $at, false())"/>', <xsl:value-of select="$apply-defaults"/>())
+            frf:repeatAddIteration('<xsl:value-of select="frf:findContainerDetailsCompileTime($view-elem, $repeat-name, $at, false())"/>', <xsl:value-of select="$apply-defaults"/>())
         </xf:action>
 
     </xsl:template>
 
     <xsl:template match="fr:repeat-remove-iteration" mode="within-action-2018.2">
+
+        <xsl:param tunnel="yes" name="view-elem" as="element()"/>
 
         <xsl:variable name="repeat-name" select="@repeat/string()" as="xs:string"/>
         <xsl:variable name="at"          select="@at/string()"     as="xs:string?"/>
@@ -835,7 +839,7 @@
         </xxf:log>
 
         <xf:action type="xpath" class="fr-action-impl">
-            frf:repeatRemoveIteration('<xsl:value-of select="frf:findContainerDetailsCompileTime($fr-form-model, $repeat-name, $at, false())"/>')
+            frf:repeatRemoveIteration('<xsl:value-of select="frf:findContainerDetailsCompileTime($view-elem, $repeat-name, $at, false())"/>')
         </xf:action>
 
     </xsl:template>

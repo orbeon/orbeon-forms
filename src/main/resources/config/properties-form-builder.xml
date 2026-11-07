@@ -101,7 +101,6 @@
         oxf:/forms/orbeon/builder/xbl/button-controls.xbl
         oxf:/forms/orbeon/builder/xbl/button-trigger.xbl
         oxf:/forms/orbeon/builder/xbl/button-trigger-minimal.xbl
-        oxf:/xbl/orbeon/hyperlink/hyperlink.xbl
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.special.uri.*.*">

@@ -1566,7 +1566,15 @@
         <service-response-actions>إجراءات استجابة الخدمة</service-response-actions>
 
         <set-control-value>تعيين قيمة عنصر التحكم</set-control-value>
+        <clear-control-value>مسح قيمة عنصر التحكم</clear-control-value>
         <set-control-itemset>تعيين خيارات عنصر التحكم</set-control-itemset>
+        <set-control-focus>تعيين التركيز على عنصر التحكم</set-control-focus>
+        <set-control-visited>تحديد عنصر التحكم كتمت زيارته</set-control-visited>
+        <visited-status>
+            <label>حالة الزيارة</label>
+            <visited>تمت زيارته</visited>
+            <unvisited>لم تتم زيارته</unvisited>
+        </visited-status>
         <save-to-dataset>حفظ في مجموعة البيانات</save-to-dataset>
         <dataset-name>اسم مجموعة البيانات</dataset-name>
         <show-message>إظهار رسالة</show-message>

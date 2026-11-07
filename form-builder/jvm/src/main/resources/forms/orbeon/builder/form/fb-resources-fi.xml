@@ -1560,7 +1560,15 @@
         <service-response-actions>Palveluvastauksen toiminnot</service-response-actions>
 
         <set-control-value>Aseta kontrollin arvo</set-control-value>
+        <clear-control-value>Tyhjennä ohjausobjektin arvo</clear-control-value>
         <set-control-itemset>Aseta kontrollin kohdejoukko</set-control-itemset>
+        <set-control-focus>Aseta kohdistus ohjausobjektiin</set-control-focus>
+        <set-control-visited>Merkitse ohjausobjekti vierailluksi</set-control-visited>
+        <visited-status>
+            <label>Vierailun tila</label>
+            <visited>Vierailtu</visited>
+            <unvisited>Ei vierailtu</unvisited>
+        </visited-status>
         <save-to-dataset>Tallenna tietojoukkoon</save-to-dataset>
         <dataset-name>Tietojoukon nimi</dataset-name>
         <show-message>Näytä viesti</show-message>

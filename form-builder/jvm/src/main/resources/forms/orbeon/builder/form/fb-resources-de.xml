@@ -1516,7 +1516,15 @@
         <service-response-actions>Aktionen bei Serviceantwort</service-response-actions>
 
         <set-control-value>Kontrollwert festlegen</set-control-value>
+        <clear-control-value>Kontrollwert löschen</clear-control-value>
         <set-control-itemset>Elementemenge des Steuerelements festlegen</set-control-itemset>
+        <set-control-focus>Fokus auf Steuerelement setzen</set-control-focus>
+        <set-control-visited>Steuerelement als besucht markieren</set-control-visited>
+        <visited-status>
+            <label>Besuchsstatus</label>
+            <visited>Besucht</visited>
+            <unvisited>Nicht besucht</unvisited>
+        </visited-status>
         <save-to-dataset>In Dataset speichern</save-to-dataset>
         <dataset-name>Dataset-Name</dataset-name>
         <show-message>Nachricht anzeigen</show-message>

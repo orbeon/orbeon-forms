@@ -1563,7 +1563,15 @@
         <service-response-actions>Akcje odpowiedzi usługi</service-response-actions>
 
         <set-control-value>Ustaw wartość kontrolki</set-control-value>
+        <clear-control-value>Wyczyść wartość kontrolki</clear-control-value>
         <set-control-itemset>Ustaw wybory kontrolki</set-control-itemset>
+        <set-control-focus>Ustaw fokus na kontrolce</set-control-focus>
+        <set-control-visited>Oznacz kontrolkę jako odwiedzoną</set-control-visited>
+        <visited-status>
+            <label>Status odwiedzenia</label>
+            <visited>Odwiedzona</visited>
+            <unvisited>Nieodwiedzona</unvisited>
+        </visited-status>
         <save-to-dataset>Zapisz w zbiorze danych</save-to-dataset>
         <dataset-name>Nazwa zbioru danych</dataset-name>
         <show-message>Wyświetl komunikat</show-message>

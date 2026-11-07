@@ -1560,7 +1560,15 @@
         <service-response-actions>Acciones de respuesta del servicio</service-response-actions>
 
         <set-control-value>Establecer valor de control</set-control-value>
+        <clear-control-value>Borrar valor del control</clear-control-value>
         <set-control-itemset>Establecer conjunto de ítems del control</set-control-itemset>
+        <set-control-focus>Establecer foco del control</set-control-focus>
+        <set-control-visited>Marcar control como visitado</set-control-visited>
+        <visited-status>
+            <label>Estado de visita</label>
+            <visited>Visitado</visited>
+            <unvisited>No visitado</unvisited>
+        </visited-status>
         <save-to-dataset>Guardar en dataset</save-to-dataset>
         <dataset-name>Nombre del dataset</dataset-name>
         <show-message>Mostrar mensaje</show-message>

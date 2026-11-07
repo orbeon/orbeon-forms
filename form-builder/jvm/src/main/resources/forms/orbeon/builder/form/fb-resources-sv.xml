@@ -1594,7 +1594,15 @@
         <service-response-actions>Tjänstsvar-kommandon</service-response-actions>
 
         <set-control-value>Ange kontrollvärde</set-control-value>
+        <clear-control-value>Rensa kontrollvärde</clear-control-value>
         <set-control-itemset>Ange kontrollval</set-control-itemset>
+        <set-control-focus>Sätt fokus på kontroll</set-control-focus>
+        <set-control-visited>Markera kontroll som besökt</set-control-visited>
+        <visited-status>
+            <label>Besöksstatus</label>
+            <visited>Besökt</visited>
+            <unvisited>Inte besökt</unvisited>
+        </visited-status>
         <save-to-dataset>Spara till dataset</save-to-dataset>
         <dataset-name>Dataset-namn</dataset-name>
         <show-message>Visa meddelande</show-message>

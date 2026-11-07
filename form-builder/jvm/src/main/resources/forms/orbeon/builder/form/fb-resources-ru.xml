@@ -1546,7 +1546,15 @@
         <service-response-actions>Действия ответа сервиса</service-response-actions>
 
         <set-control-value>Установить значение элемента управления</set-control-value>
+        <clear-control-value>Очистить значение элемента</clear-control-value>
         <set-control-itemset>Установить список вариантов элемента</set-control-itemset>
+        <set-control-focus>Установить фокус на элемент</set-control-focus>
+        <set-control-visited>Отметить элемент как посещенный</set-control-visited>
+        <visited-status>
+            <label>Статус посещения</label>
+            <visited>Посещен</visited>
+            <unvisited>Не посещен</unvisited>
+        </visited-status>
         <save-to-dataset>Сохранить в набор данных</save-to-dataset>
         <dataset-name>Название набора данных</dataset-name>
         <show-message>Показать сообщение</show-message>

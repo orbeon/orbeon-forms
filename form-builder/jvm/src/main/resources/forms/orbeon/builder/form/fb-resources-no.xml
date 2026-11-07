@@ -1547,7 +1547,15 @@
         <service-response-actions>Tjenesteresponshandlinger</service-response-actions>
 
         <set-control-value>Angi kontrollverdi</set-control-value>
+        <clear-control-value>Tøm kontrollverdi</clear-control-value>
         <set-control-itemset>Angi kontrollvalg</set-control-itemset>
+        <set-control-focus>Sett fokus på kontroll</set-control-focus>
+        <set-control-visited>Marker kontroll som besøkt</set-control-visited>
+        <visited-status>
+            <label>Besøksstatus</label>
+            <visited>Besøkt</visited>
+            <unvisited>Ikke besøkt</unvisited>
+        </visited-status>
         <save-to-dataset>Lagre til datasett</save-to-dataset>
         <dataset-name>Datasettnavn</dataset-name>
         <show-message>Vis melding</show-message>

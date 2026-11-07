@@ -1547,7 +1547,15 @@
         <service-response-actions>Service response acties</service-response-actions>
 
         <set-control-value>Bedieningswaarde instellen</set-control-value>
+        <clear-control-value>Waarde van besturingselement wissen</clear-control-value>
         <set-control-itemset>Stel control-keuzes in</set-control-itemset>
+        <set-control-focus>Focus instellen op besturingselement</set-control-focus>
+        <set-control-visited>Besturingselement als bezocht markeren</set-control-visited>
+        <visited-status>
+            <label>Bezoekstatus</label>
+            <visited>Bezocht</visited>
+            <unvisited>Niet bezocht</unvisited>
+        </visited-status>
         <save-to-dataset>Bewaar in dataset</save-to-dataset>
         <dataset-name>Dataset naam</dataset-name>
         <show-message>Bericht weergeven</show-message>

@@ -1584,7 +1584,15 @@
         <service-response-actions>Service Response Actions</service-response-actions>
 
         <set-control-value>Set Control Value</set-control-value>
+        <clear-control-value>Clear Control Value</clear-control-value>
         <set-control-itemset>Set Control Choices</set-control-itemset>
+        <set-control-focus>Set Control Focus</set-control-focus>
+        <set-control-visited>Set Control Visited</set-control-visited>
+        <visited-status>
+            <label>Visited status</label>
+            <visited>Visited</visited>
+            <unvisited>Unvisited</unvisited>
+        </visited-status>
         <save-to-dataset>Save to Dataset</save-to-dataset>
         <dataset-name>Dataset Name</dataset-name>
         <show-message>Show Message</show-message>

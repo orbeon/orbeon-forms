@@ -1585,7 +1585,15 @@
         <service-response-actions>Actions de la réponse</service-response-actions>
 
         <set-control-value>Définir la valeur du contrôle</set-control-value>
+        <clear-control-value>Effacer la valeur du contrôle</clear-control-value>
         <set-control-itemset>Définir la liste de choix du contrôle</set-control-itemset>
+        <set-control-focus>Donner le focus au contrôle</set-control-focus>
+        <set-control-visited>Marquer le contrôle comme visité</set-control-visited>
+        <visited-status>
+            <label>État de visite</label>
+            <visited>Visité</visited>
+            <unvisited>Non visité</unvisited>
+        </visited-status>
         <save-to-dataset>Sauvegarder dans un dataset</save-to-dataset>
         <dataset-name>Nom du dataset</dataset-name>
         <show-message>Afficher un message</show-message>

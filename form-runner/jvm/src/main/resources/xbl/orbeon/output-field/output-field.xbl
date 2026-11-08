@@ -15,6 +15,7 @@
                 xf|input[appearance ~= character-counter][fr|pdf-template = true],
                 xf|textarea[appearance ~= character-counter][fr|pdf-template = true],
                 xf|textarea[appearance ~= 'xxf:autosize'][fr|pdf-template = true],
+                xf|input[appearance ~= clipboard-copy][fr|pdf-template = true],
                 xf|textarea[appearance ~= clipboard-copy][fr|pdf-template = true],
                 xf|output[appearance ~= clipboard-copy][fr|pdf-template = true],
                 fr|us-ein[fr|static-readonly = true],

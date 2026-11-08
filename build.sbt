@@ -42,7 +42,7 @@ val ScalaJsJQueryVersion         = "3.4.0"
 val ScalaJsStubsVersion          = "1.1.0" // can be different from Scala.js version
 val ScalaJsWeakReferencesVersion = "1.0.0"
 val ScalaJsSecureRandomVersion   = "1.0.0"
-val ScalaJsTimeVersion           = "2.7.0" // 2.8.0+ requires Scala 3.8+ (incompatible with `CrossVersion.for2_13Use3`)
+val ScalaJsTimeVersion           = "2.9.0" // 2.8.0+ requires Scala 3.8+ (incompatible with `CrossVersion.for2_13Use3`)
 val ScalaJsLocalesVersion        = "1.5.4" // 1.6.0+ requires Scala 3.8+ (incompatible with `CrossVersion.for2_13Use3`)
 
 // Scala libraries for Scala JVM only

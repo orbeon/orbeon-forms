@@ -20,9 +20,24 @@
             width: 100%;
         }
 
-        .fr-repeat-container:not(.fr-repeater-paging) {
+        &:not(.xforms-repeater-appearance-minimal) {
             .fr-repeater-repeat-iteration {
-                border-bottom: 3px solid var(--orbeon-base-border-color);
+                margin-top: var(--orbeon-repeater-iteration-margin-top);
+                border: var(--orbeon-repeater-iteration-border);
+                border-radius: var(--orbeon-repeater-iteration-border-radius);
+                overflow: hidden;
+            }
+
+            .fr-section-iteration-title + .fr-repeater-repeat-iteration {
+                margin-top: 0;
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+            }
+
+            .fr-repeat-container:not(.fr-repeater-paging) {
+                .fr-repeater-repeat-iteration {
+                    border-bottom: var(--orbeon-repeater-iteration-border-bottom);
+                }
             }
         }
 
@@ -32,12 +47,14 @@
         }
 
         .fr-repeat-menu {
-            box-sizing: content-box; // the 22px is a content width; border-box would make the 20px menu button overflow
-            width: 22px;
-            padding: 4px 2px 0 2px;
+            box-sizing: border-box;
+            width: 35px;
+            flex-shrink: 0;
+            padding: @frGridCellPadding + 2px @frGridCellPadding;
 
             background-color: var(--orbeon-repeat-menu-background-color);
-            border: 1px solid var(--orbeon-base-border-color);
+            border-left: var(--orbeon-repeat-menu-border-left);
+            border-right: var(--orbeon-repeat-border-width) var(--orbeon-repeat-border-style) var(--orbeon-base-border-color);
             border-top: none;
             border-bottom: none;
         }
@@ -45,19 +62,23 @@
         .fr-repeat-content {
             display: block;
             width: 100%;
+            min-width: 0;
             padding-bottom: 4px;
         }
 
         .fr-repeat-menu + .fr-repeat-content {
             // Padding between repeat menu and content: only when there is actually a menu (i.e. not in read-only)
-            padding-left: 5px;
+            padding: var(--orbeon-repeater-content-padding);
         }
 
         .xforms-repeat-selected-item-1,
         .xforms-repeat-selected-item-2,
         .xforms-repeat-selected-item-3,
         .xforms-repeat-selected-item-4 {
-            &.fr-repeater-repeat-iteration {
+            &.fr-repeater-repeat-iteration > .fr-repeat-menu {
+                @media not print {
+                    background-color: var(--orbeon-repetition-selected-background-color);
+                }
             }
         }
 
@@ -66,6 +87,12 @@
             .fr-repeat-container {
                 display: block;
                 width: 100%;
+            }
+
+            .fr-repeat-container:not(.fr-repeater-paging) {
+                .fr-repeater-repeat-iteration {
+                    border-bottom: var(--orbeon-repeat-separator-width) var(--orbeon-repeat-separator-style) var(--orbeon-base-border-color);
+                }
             }
 
             .fr-repeater-repeat-iteration {
@@ -92,15 +119,15 @@
             align-items: center;
 
             margin-bottom: 0;
-            padding-bottom: 4px;
-            border-bottom: 3px solid var(--orbeon-base-border-color);
+            padding-bottom: var(--orbeon-repeater-top-buttons-padding-bottom);
+            border-bottom: var(--orbeon-repeater-top-buttons-border-bottom);
 
             .fr-repeater-add button {
                 font-size: var(--orbeon-repeater-add-button-font-size);
                 font-family: var(--orbeon-repeater-add-button-font-family);
                 font-weight: var(--orbeon-repeater-add-button-font-weight);
                 color: var(--orbeon-repeater-add-button-color);
-                padding: 4px;
+                padding: var(--orbeon-repeater-add-button-padding);
 
                 i {
                     margin-right: 4px;

@@ -296,6 +296,7 @@
   --orbeon-section-title-border-radius          : @radius-box;
   --orbeon-section-gap                          : 20px;
   --orbeon-section-content-padding              : 10px 16px; // 16px: title padding minus grid cell padding
+  --orbeon-section-iteration-title-margin       : 10px 0 0 0;
   --orbeon-section-iteration-title-padding      : 0 0 0 10px;
   --orbeon-section-title-border-top             : none;         // the card's border is above the title
   --orbeon-section-title-border-bottom          : @base-border;
@@ -305,7 +306,16 @@
   --orbeon-repeater-add-button-font-family      : var(--orbeon-base-font-family);
   --orbeon-repeater-add-button-font-weight      : var(--orbeon-base-font-weight);
   --orbeon-repeater-add-button-color            : var(--orbeon-base-color);
+  --orbeon-repeater-add-button-padding          : var(--orbeon-button-small-padding);
+  --orbeon-repeater-top-buttons-padding-bottom  : 0;
+  --orbeon-repeater-top-buttons-border-bottom   : none;
+  --orbeon-repeater-iteration-border            : @base-border;
+  --orbeon-repeater-iteration-border-bottom     : @base-border;
+  --orbeon-repeater-iteration-border-radius     : @radius-box;
+  --orbeon-repeater-iteration-margin-top        : 10px;
+  --orbeon-repeater-content-padding             : 6px 6px 4px 6px;
   --orbeon-repeat-menu-background-color         : @gray-98;
+  --orbeon-repeat-menu-border-left              : none;
   --orbeon-repeat-border-width                  : 1px; // full appearance
   --orbeon-repeat-border-style                  : solid;
   --orbeon-repeat-separator-width               : 2px; // minimal appearance
@@ -811,6 +821,9 @@
       --orbeon-section-title-color                             : black;
       --orbeon-section-title-background-color                  : white;
       --orbeon-subsection-title-border                         : none;
+      --orbeon-repeater-iteration-border                       : none;
+      --orbeon-repeater-iteration-border-bottom                : 3px solid var(--orbeon-base-border-color);
+      --orbeon-repeater-iteration-border-radius                : 0;
       --orbeon-repeat-menu-background-color                    : white;
       --orbeon-toc-color                                       : black;
       --orbeon-navbar-title-color                              : black;

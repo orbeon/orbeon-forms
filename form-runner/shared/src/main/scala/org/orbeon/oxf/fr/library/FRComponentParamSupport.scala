@@ -5,6 +5,7 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.util.CollectionUtils.*
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -59,11 +60,13 @@ object FRComponentParamSupport {
     xfc                  : XFormsFunction.Context
   ): Option[AtomicValue] = {
 
+    def fromBind = (sourceComponentIdOpt.isEmpty && xfc.bindNodeOpt.isDefined)
+        .flatOption (findStaticComponentFromBind.map(sc => (None, sc, xfc.container.partAnalysis)))
+    def fromComponent =
+      ComponentParamSupport.findSourceComponent(sourceComponentIdOpt).map(c => (c.some, c.staticControl, c.container.partAnalysis))
+
     val sourceAndStaticOpt: Option[(Option[XFormsComponentControl], ComponentControl, PartAnalysisForStaticMetadataAndProperties)] =
-      if (sourceComponentIdOpt.isEmpty && xfc.bindNodeOpt.isDefined)
-        findStaticComponentFromBind.map(sc => (None, sc, xfc.container.partAnalysis))
-      else
-        ComponentParamSupport.findSourceComponent(sourceComponentIdOpt).map(c => (c.some, c.staticControl, c.container.partAnalysis))
+      fromBind orElse fromComponent
 
     sourceAndStaticOpt.flatMap { case (sourceComponentOpt, staticControl, partAnalysis) =>
 

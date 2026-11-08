@@ -506,6 +506,8 @@
             <delete-remote>リモートフォームを削除</delete-remote>
             <reencrypt>フォーム定義を再暗号化</reencrypt>
             <reload-resources>リソースを再読み込み</reload-resources>
+            <configuration>設定</configuration>
+            <reload-properties>プロパティを再読み込み</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>フォームの公開状態の変更を確認</publish-confirmation>

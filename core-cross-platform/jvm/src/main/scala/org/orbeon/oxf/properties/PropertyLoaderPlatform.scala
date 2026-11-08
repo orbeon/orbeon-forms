@@ -187,6 +187,25 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
   private def findCache: Option[CacheApi] =
     CacheSupport.findCache(ProviderEtagCacheName, store = false)
 
+  def getBootPropertyStoreOpt: Option[PropertyStore] =
+    findCache
+      .flatMap(_.get(BootPropertyProviderClassName))
+      .map(_.asInstanceOf[CacheEntry]._2)
+
+  def invalidateProviderCache(providerClassNameToInvalidate: String, requestOpt: Option[Request]): Unit = {
+    requestOpt.foreach(_.getAttributesMap.remove(RequestPropertiesAttributeName))
+    findCache.foreach(_.remove(providerClassNameToInvalidate))
+  }
+
+  def invalidateAllProvidersCache(requestOpt: Option[Request]): Unit = {
+    requestOpt.foreach(_.getAttributesMap.remove(RequestPropertiesAttributeName))
+    propertyProvidersInIncreasingPriorityOpt.foreach { providersNel =>
+      providersNel.toList.foreach { provider =>
+        findCache.foreach(_.remove(providerClassName(provider)))
+      }
+    }
+  }
+
   def getPropertyStoreImpl(requestOpt: Option[Request]): PropertyStore = {
     stats.recordRequest(requestOpt)
     if (initialized)

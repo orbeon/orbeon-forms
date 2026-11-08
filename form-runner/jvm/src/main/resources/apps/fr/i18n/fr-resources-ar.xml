@@ -519,6 +519,8 @@
             <delete-remote>حذف النماذج البعيدة</delete-remote>
             <reencrypt>إعادة تشفير تعريفات النماذج</reencrypt>
             <reload-resources>إعادة تحميل الموارد</reload-resources>
+            <configuration>الإعدادات</configuration>
+            <reload-properties>إعادة تحميل الخصائص</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>تأكيد تغيير توفر النموذج</publish-confirmation>

@@ -28,6 +28,10 @@
     <property as="xs:string"  name="oxf.crypto.preferred-provider"                   value="SunJCE"/>
 
     <!-- Global properties -->
+    <property as="xs:string"  name="oxf.properties.providers.classnames"             value="org.orbeon.oxf.fr.persistence.PersistencePropertyProvider org.orbeon.oxf.properties.ResourcesPropertyProvider"/>
+    <property as="xs:string"  name="oxf.properties.persistence.document-id"          value="_"/>
+    <property as="xs:integer" name="oxf.properties.persistence.reload-delay"         value="5000"/>
+
     <property as="xs:anyURI"  name="oxf.log4j-config"                                value="oxf:/config/log4j.xml"/>
     <property as="xs:anyURI"  name="oxf.log4j2-config"                               value="oxf:/config/log4j2.xml"/>
     <property as="xs:boolean" name="oxf.log4j.thread-context.http-headers"           value="false"/>

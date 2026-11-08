@@ -138,7 +138,8 @@ case class AppForm(app: String, form: String) {
 }
 
 object AppForm {
-  val FormBuilder: AppForm = AppForm("orbeon", "builder")
+  val FormBuilder      : AppForm = AppForm("orbeon", "builder")
+  val FormConfiguration: AppForm = AppForm("orbeon", "configuration")
 
   def isSpecificPart(part: String): Boolean =
     part != "*" && part.nonEmpty
@@ -833,8 +834,9 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
     }
   }
 
-  def isFormBuilder(implicit p: FormRunnerParams) : Boolean = AppForm(p.app, p.form) == AppForm.FormBuilder
-  def isReadonlyMode(implicit p: FormRunnerParams): Boolean = isReadonlyModeFromString(p.app, p.form, p.mode)
+  def isFormBuilder(implicit p: FormRunnerParams)      : Boolean = AppForm(p.app, p.form) == AppForm.FormBuilder
+  def isFormConfiguration(implicit p: FormRunnerParams): Boolean = AppForm(p.app, p.form) == AppForm.FormConfiguration
+  def isReadonlyMode(implicit p: FormRunnerParams)     : Boolean = isReadonlyModeFromString(p.app, p.form, p.mode)
 
   private val DesignTimeModes: Set[String] = Set("new", "edit", "view")
 

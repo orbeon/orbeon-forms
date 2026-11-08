@@ -519,6 +519,8 @@
             <delete-remote>Apagar formulários remotos</delete-remote>
             <reencrypt>Re-encriptar definições de formulário</reencrypt>
             <reload-resources>Recarregar recursos</reload-resources>
+            <configuration>Configuração</configuration>
+            <reload-properties>Recarregar propriedades</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>Confirmar (Não)Publicação de Formulário</publish-confirmation>

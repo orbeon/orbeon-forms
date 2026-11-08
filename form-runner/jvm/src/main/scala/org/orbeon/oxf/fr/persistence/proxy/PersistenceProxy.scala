@@ -276,9 +276,10 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     // Throws if there is an incompatibility
     checkDataFormatVersionIfNeeded(indentedLogger, request, appForm, formOrData)
 
-    val isDataXmlRequest = formOrData == FormOrData.Data && filename.contains(DataXml)
-    val isFormBuilder    = appForm == AppForm.FormBuilder
-    val isAttachment     = ! isDataXmlRequest && filename.isDefined
+    val isDataXmlRequest    = formOrData == FormOrData.Data && filename.contains(DataXml)
+    val isFormBuilder       = appForm == AppForm.FormBuilder
+    val isFormConfiguration = appForm == AppForm.FormConfiguration
+    val isAttachment        = ! isDataXmlRequest && filename.isDefined
 
     // Get persistence implementation target URL and configuration headers
     //
@@ -534,7 +535,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
 
     val responseTransforms =
       if (formOrData == FormOrData.Data && request.getMethod == HttpMethod.GET) {
-        if (isDataXmlRequest && ! isFormBuilder) {
+        if (isDataXmlRequest && ! isFormBuilder && ! isFormConfiguration) {
 
           // Prune non-relevant nodes, if we're asked to do it
           // https://doc.orbeon.com/form-runner/apis/persistence-api/crud#url-parameters
@@ -555,6 +556,8 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
 
         } else if (isDataXmlRequest && isFormBuilder) {
           maybeMigrateFormDefinition.toList
+        } else if (isDataXmlRequest && isFormConfiguration) {
+          Nil
         } else {
           // Decrypt attachment if we're told to do so
           filename.isDefined.flatList {
@@ -575,7 +578,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     // https://github.com/orbeon/orbeon-forms/issues/5741
     val existingFormOrDataHeaders =
       responseHeadersOpt.map(ResponseHeaders.toHeaders).getOrElse(Nil)
-
+    
     if (
       request.getMethod == HttpMethod.PUT &&
       isAttachment &&
@@ -594,9 +597,9 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
           isFormBuilder    = isFormBuilder,
           appForm          = appForm,
           encrypt          = formOrData match {
-            case FormOrData.Form                  => false // don't encrypt form definitions
-            case FormOrData.Data if isFormBuilder => false // don't encrypt Form Builder form data
-            case FormOrData.Data                  => true
+            case FormOrData.Form                                         => false // don't encrypt form definitions
+            case FormOrData.Data if isFormBuilder || isFormConfiguration => false // don't encrypt Form Builder or Configuration form data
+            case FormOrData.Data                                         => true
           }
         )
 

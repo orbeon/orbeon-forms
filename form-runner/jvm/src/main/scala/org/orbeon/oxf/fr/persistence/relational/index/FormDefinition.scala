@@ -81,6 +81,9 @@ trait FormDefinition {
     indentedLogger: IndentedLogger
   ): SearchableValues = {
 
+    if (appForm == AppForm.FormConfiguration)
+      return SearchableValues(Nil, Nil, Nil, Nil)
+
     implicit val ctx = new InDocFormRunnerDocContext(formDoc) {
       override lazy val bodyElemOpt: Option[om.NodeInfo] = {
 

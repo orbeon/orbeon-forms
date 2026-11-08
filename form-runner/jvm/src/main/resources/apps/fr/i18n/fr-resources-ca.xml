@@ -533,6 +533,8 @@
             <delete-remote>Esborrar formularis remots</delete-remote>
             <reencrypt>Re encriptar definicions de formularis</reencrypt>
             <reload-resources>Recarregar recursos</reload-resources>
+            <configuration>Configuració</configuration>
+            <reload-properties>Recarregar propietats</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>Confirmar Publicació/Despublicació</publish-confirmation>

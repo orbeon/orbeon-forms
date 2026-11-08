@@ -519,6 +519,8 @@
             <delete-remote>Remote-Formulare löschen</delete-remote>
             <reencrypt>Formulardefinitionen neu verschlüsseln</reencrypt>
             <reload-resources>Ressourcen neu laden</reload-resources>
+            <configuration>Konfiguration</configuration>
+            <reload-properties>Eigenschaften neu laden</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>Veröffentlichen/Verbergen bestätigen</publish-confirmation>

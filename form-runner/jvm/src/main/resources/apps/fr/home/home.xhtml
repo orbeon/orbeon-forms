@@ -1383,6 +1383,19 @@
                                     </xf:trigger>
 
                                 </xf:group>
+                                <span class="fr-toolbar-divider" aria-hidden="true"/>
+
+                                <xf:trigger class="btn-group">
+                                    <xf:label mediatype="text/html" value="concat('&lt;i class=&quot;fa fa-fw fa-gear&quot;&gt;&lt;/i&gt; ', $fr-resources/home/buttons/configuration)"/>
+                                    <xf:load event="DOMActivate" resource="/fr/orbeon/configuration/new"/>
+                                </xf:trigger>
+
+                                <xf:trigger class="btn-group">
+                                    <xf:label ref="$fr-resources/home/buttons/reload-properties"/>
+                                    <xf:action event="DOMActivate" type="xpath">
+                                        frf:invalidatePersistencePropertiesCache()
+                                    </xf:action>
+                                </xf:trigger>
                             </xf:group>
 
                             <!-- Progress bars for reindexing -->

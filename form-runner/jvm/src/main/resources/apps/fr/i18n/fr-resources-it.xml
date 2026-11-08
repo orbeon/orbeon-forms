@@ -519,6 +519,8 @@
             <delete-remote>Elimina moduli remoti</delete-remote>
             <reencrypt>Ri-cifra definizioni modulo</reencrypt>
             <reload-resources>Ricarica risorse</reload-resources>
+            <configuration>Configurazione</configuration>
+            <reload-properties>Ricarica proprietà</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>Conferma la modifica della disponibilità del modulo</publish-confirmation>

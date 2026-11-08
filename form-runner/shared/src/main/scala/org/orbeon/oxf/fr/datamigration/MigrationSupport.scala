@@ -231,7 +231,7 @@ object MigrationSupport {
     pruneTmpAttMetadata: Boolean
   ): Option[DocumentWrapper] =
     appForm match {
-      case AppForm.FormBuilder => None
+      case AppForm.FormBuilder | AppForm.FormConfiguration => None
       case _ =>
         val mutableData = copyDocumentKeepInstanceData(data)
 

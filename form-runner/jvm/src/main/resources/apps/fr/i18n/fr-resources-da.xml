@@ -510,6 +510,8 @@
             <delete-remote>Slet centrale blanketter</delete-remote>
             <reencrypt>Krypter blanketdefinitioner igen</reencrypt>
             <reload-resources>Genindlæs ressourcer</reload-resources>
+            <configuration>Konfiguration</configuration>
+            <reload-properties>Genindlæs egenskaber</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>Bekræft blanket-offentliggørelse/afpublisering</publish-confirmation>

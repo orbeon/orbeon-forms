@@ -520,6 +520,8 @@
             <delete-remote>Delete remote forms</delete-remote>
             <reencrypt>Re-encrypt form definitions</reencrypt>
             <reload-resources>Reload resources</reload-resources>
+            <configuration>Configuration</configuration>
+            <reload-properties>Reload properties</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>Confirm Form Availability Change</publish-confirmation>

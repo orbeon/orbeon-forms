@@ -508,6 +508,8 @@
             <delete-remote>Удалить удаленные формы</delete-remote>
             <reencrypt>Перешифровать определения форм</reencrypt>
             <reload-resources>Перезагрузить ресурсы</reload-resources>
+            <configuration>Конфигурация</configuration>
+            <reload-properties>Перезагрузить свойства</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>Подтверждение публикации/отмены публикации формы</publish-confirmation>

@@ -517,6 +517,8 @@
             <delete-remote>Uzak formları sil</delete-remote>
             <reencrypt>Form tanımlarını yeniden şifrele</reencrypt>
             <reload-resources>Kaynakları yeniden yükle</reload-resources>
+            <configuration>Yapılandırma</configuration>
+            <reload-properties>Özellikleri yeniden yükle</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>Form Kullanılabilirlik Değişikliğini Onayla</publish-confirmation>

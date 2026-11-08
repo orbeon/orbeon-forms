@@ -7,6 +7,8 @@ import org.orbeon.oxf.externalcontext.ExternalContext.Request
 // This is unused on the JS platform for now
 trait PropertyLoaderPlatform extends PropertyLoaderTrait {
   def initialize(): Unit = ()
+  def invalidateProviderCache(providerClassName: String, requestOpt: Option[Request]): Unit = ()
+  def invalidateAllProvidersCache(requestOpt: Option[Request]): Unit = ()
   def getPropertyStoreImpl(requestOpt: Option[Request]): PropertyStore =
     _combinedPropertyStore
 

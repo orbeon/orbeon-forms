@@ -519,6 +519,8 @@
             <delete-remote>Poista etälomakkeet</delete-remote>
             <reencrypt>Salaa lomakemääritykset uudelleen</reencrypt>
             <reload-resources>Lataa resurssit uudelleen</reload-resources>
+            <configuration>Asetukset</configuration>
+            <reload-properties>Lataa ominaisuudet uudelleen</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>Vahvista lomakkeen tilamuutos</publish-confirmation>

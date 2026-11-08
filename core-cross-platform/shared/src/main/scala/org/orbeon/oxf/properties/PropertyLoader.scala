@@ -16,6 +16,9 @@ trait PropertyLoaderTrait {
 
   def initialize(): Unit
 
+  def invalidateProviderCache(providerClassName: String, requestOpt: Option[Request]): Unit
+  def invalidateAllProvidersCache(requestOpt: Option[Request]): Unit
+
   protected def getPropertyStoreImpl(requestOpt: Option[Request]): PropertyStore
 
   // This method caches the property store in the request attributes map, if a request is provided. This avoids

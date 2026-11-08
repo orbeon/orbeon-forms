@@ -516,6 +516,8 @@
             <delete-remote>Slett eksterne skjema</delete-remote>
             <reencrypt>Krypter skjemadefinisjoner på nytt</reencrypt>
             <reload-resources>Last ressurser på nytt</reload-resources>
+            <configuration>Konfigurasjon</configuration>
+            <reload-properties>Last egenskaper på nytt</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>Bekreft skjemapublisering/Opphev skjemapublisering</publish-confirmation>

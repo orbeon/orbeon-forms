@@ -519,6 +519,8 @@
             <delete-remote>Ta bort formulär på servern</delete-remote>
             <reencrypt>Kryptera om formulärdefinitioner</reencrypt>
             <reload-resources>Läs in resurser igen</reload-resources>
+            <configuration>Konfiguration</configuration>
+            <reload-properties>Läs in egenskaper igen</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>Bekräfta ändring av formulärtillgänglighet</publish-confirmation>

@@ -520,6 +520,8 @@
             <delete-remote>Usuń zdalne formularze</delete-remote>
             <reencrypt>Ponownie zaszyfruj definicje formularzy</reencrypt>
             <reload-resources>Przeładuj zasoby</reload-resources>
+            <configuration>Konfiguracja</configuration>
+            <reload-properties>Przeładuj właściwości</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>Potwierdź publikację/cofnięcie publikacji formularza</publish-confirmation>

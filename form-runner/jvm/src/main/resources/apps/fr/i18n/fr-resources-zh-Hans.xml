@@ -514,6 +514,8 @@
             <delete-remote>删除远程表单</delete-remote>
             <reencrypt>重新加密表单定义</reencrypt>
             <reload-resources>重新加载资源</reload-resources>
+            <configuration>配置</configuration>
+            <reload-properties>重新加载属性</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>确认表单可用性更改</publish-confirmation>

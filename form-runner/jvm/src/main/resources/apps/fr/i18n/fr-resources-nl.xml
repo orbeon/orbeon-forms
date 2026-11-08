@@ -519,6 +519,8 @@
             <delete-remote>Externe forms verwijderen</delete-remote>
             <reencrypt>Formdefinities opnieuw versleutelen</reencrypt>
             <reload-resources>Resources opnieuw laden</reload-resources>
+            <configuration>Configuratie</configuration>
+            <reload-properties>Eigenschappen opnieuw laden</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>Bevestigen publiceren/publicatie verwijderen</publish-confirmation>

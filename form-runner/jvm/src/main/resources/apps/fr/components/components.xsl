@@ -84,12 +84,13 @@
     <xsl:variable name="is-import-page"      select="exists(doc('input:form-runner-config')/*/is-import-page[. = 'true'])" as="xs:boolean"/>
     <xsl:variable name="is-validate"         select="$major-mode = 'validate'"              as="xs:boolean"/>
 
-    <xsl:variable name="is-form-builder"     select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
+    <xsl:variable name="is-form-builder"       select="$app = 'orbeon' and $form = 'builder'"       as="xs:boolean"/>
+    <xsl:variable name="is-form-configuration" select="$app = 'orbeon' and $form = 'configuration'" as="xs:boolean"/>
 
-    <!-- Function restrictions apply only to user forms, excluding internal pages: Form Builder, Landing, Summary, Forms/Admin, Import page -->
+    <!-- Function restrictions apply only to user forms, excluding internal pages: Form Builder, Form Configuration, Landing, Summary, Forms/Admin, Import page -->
     <xsl:variable
         name="is-restricted-form"
-        select="not($is-form-builder or $is-landing or $is-summary or $is-home or $is-import-page)"
+        select="not($is-form-builder or $is-form-configuration or $is-landing or $is-summary or $is-home or $is-import-page)"
         as="xs:boolean"/>
 
     <xsl:variable name="input-data" select="/*" as="element(xh:html)"/>

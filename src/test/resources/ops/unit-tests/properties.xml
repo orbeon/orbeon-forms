@@ -61,6 +61,7 @@
 
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.*.form"              value="resource"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.*.data"              value="resource"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.configuration.data"  value="sqlite"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.issue.*.form"               value="resource"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.issue.*.data"               value="resource"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.tests.*.form"               value="resource"/>
@@ -162,4 +163,9 @@
         then control-setvalue(control-name = "us-address-zip",               value = "'99999'",                 section-name = "address-us")
     </property>
 
+    <!-- Custom property providers for tests -->
+    <property
+        as="xs:string"
+        name="oxf.properties.providers.classnames"
+        value=".*PersistencePropertyProvider .*TestPropertyProvider"/>
 </properties>

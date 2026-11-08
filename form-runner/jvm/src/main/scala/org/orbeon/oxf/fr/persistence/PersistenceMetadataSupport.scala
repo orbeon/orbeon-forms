@@ -64,14 +64,23 @@ object PersistenceMetadataSupport {
     indentedLogger: IndentedLogger,
     propertySet   : PropertySet
   ): Try[FormStorageDetails] =
-    readMaybeFromCache(appForm, version, formDefinitionCache, forceStore = false) {
-      implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
-      withDebug("reading published form for storage details") {
-        PersistenceApi.readPublishedFormDefinition(appForm.app, appForm.form, version) map { case ((_, formDefinitionDoc), _) =>
-          buildPublishedFormStorageDetails(formDefinitionDoc, appForm)
+    if (appForm == AppForm.FormConfiguration)
+      Success(
+        FormStorageDetails(
+          encryptedControlsPaths = Eval.now(Nil),
+          indexedControlsXPaths  = Eval.now(Set.empty),
+          isSingleton            = true
+        )
+      )
+    else
+      readMaybeFromCache(appForm, version, formDefinitionCache, forceStore = false) {
+        implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
+        withDebug("reading published form for storage details") {
+          PersistenceApi.readPublishedFormDefinition(appForm.app, appForm.form, version) map { case ((_, formDefinitionDoc), _) =>
+            buildPublishedFormStorageDetails(formDefinitionDoc, appForm)
+          }
         }
       }
-    }
 
   def updatePublishedFormStorageDetailsCache(
     appForm           : AppForm,
@@ -121,13 +130,16 @@ object PersistenceMetadataSupport {
     )
   }
 
-  def readLatestVersion(appForm: AppForm)(implicit indentedLogger: IndentedLogger): Option[Int] = {
-    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
+  def readLatestVersion(appForm: AppForm)(implicit indentedLogger: IndentedLogger): Option[Int] =
+    if (appForm == AppForm.FormConfiguration) {
+      Some(1)
+    } else {
+      implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
 
-    PersistenceApi.readFormMetadataOpt(appForm, FormDefinitionVersion.Latest)._2
-      .flatMap(_.firstChildOpt(Names.FormVersion))
-      .map(_.getStringValue.toInt)
-  }
+      PersistenceApi.readFormMetadataOpt(appForm, FormDefinitionVersion.Latest)._2
+        .flatMap(_.firstChildOpt(Names.FormVersion))
+        .map(_.getStringValue.toInt)
+    }
 
   def isInternalAdminUser(requestParam: String => Option[String]): Boolean =
     requestParam(FormRunner.InternalAdminTokenParam)
@@ -157,12 +169,15 @@ object PersistenceMetadataSupport {
     ) |!>
       (formPermissions => debug("CRUD: form permissions", List("permissions" -> formPermissions.toString)))
 
-  private def readFormPermissions(appForm: AppForm, version: FormDefinitionVersion)(implicit indentedLogger: IndentedLogger): Option[NodeInfo] = {
-    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
-    PersistenceApi.readFormMetadataOpt(appForm, version)
-      ._2
-      .flatMap(_.firstChildOpt(Names.Permissions))
-  }
+  private def readFormPermissions(appForm: AppForm, version: FormDefinitionVersion)(implicit indentedLogger: IndentedLogger): Option[NodeInfo] =
+    if (appForm == AppForm.FormConfiguration) {
+      None
+    } else {
+      implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
+      PersistenceApi.readFormMetadataOpt(appForm, version)
+        ._2
+        .flatMap(_.firstChildOpt(Names.Permissions))
+    }
 
   // The persistence proxy should pre-process and post-process the information, see:
   // https://github.com/orbeon/orbeon-forms/issues/5741

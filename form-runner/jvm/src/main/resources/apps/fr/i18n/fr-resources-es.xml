@@ -546,6 +546,8 @@
             <delete-remote>Borrar formularios remotos</delete-remote>
             <reencrypt>Encriptar definiciones de formularios</reencrypt>
             <reload-resources>Recargar recursos</reload-resources>
+            <configuration>Configuración</configuration>
+            <reload-properties>Recargar propiedades</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>Confirmar Publicación/Despublicación</publish-confirmation>

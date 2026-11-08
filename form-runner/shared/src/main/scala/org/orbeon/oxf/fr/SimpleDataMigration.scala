@@ -590,7 +590,7 @@ object SimpleDataMigration {
       implicit val indentedLogger   = new IndentedLogger(logger)
 
       val behavior =
-        if (frc.isFormBuilder) // case of Form Builder itself, as well as form being edited within Form Builder
+        if (frc.isFormBuilder || frc.isFormConfiguration) // case of Form Builder / Configuration itself, as well as form being edited within Form Builder
           DataMigrationBehavior.Disabled
         else
           fromMetadataAndPropertiesEvaluateAvt(

@@ -60,13 +60,19 @@ trait FormRunnerSupport extends DocumentTestBase {
   def withTempSQLite[T](thunk: Connection => T): T = {
     val sqliteFile = java.nio.file.Files.createTempFile("orbeon-bg-sqlite-", ".sqlite")
     System.setProperty("orbeon.test.sqlite.path", sqliteFile.toAbsolutePath.toString)
-    Class.forName("org.sqlite.JDBC")
-    useAndClose(DriverManager.getConnection(s"jdbc:sqlite:${sqliteFile.toAbsolutePath}?busy_timeout=60000")) { connection =>
-      val stringStatements = SqlReader.read("2026.1/sqlite-2026_1.sql")
-      useAndClose(connection.createStatement()) { sqlStatement =>
-        stringStatements.foreach(sqlStatement.executeUpdate)
+    org.orbeon.oxf.fr.persistence.PersistencePropertyProvider.invalidateCache()
+    try {
+      Class.forName("org.sqlite.JDBC")
+      useAndClose(DriverManager.getConnection(s"jdbc:sqlite:${sqliteFile.toAbsolutePath}?busy_timeout=60000")) { connection =>
+        val stringStatements = SqlReader.read("2026.1/sqlite-2026_1.sql")
+        useAndClose(connection.createStatement()) { sqlStatement =>
+          stringStatements.foreach(sqlStatement.executeUpdate)
+        }
+        thunk(connection)
       }
-      thunk(connection)
+    } finally {
+      System.clearProperty("orbeon.test.sqlite.path")
+      org.orbeon.oxf.fr.persistence.PersistencePropertyProvider.invalidateCache()
     }
   }
 

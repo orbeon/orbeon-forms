@@ -519,6 +519,8 @@
             <delete-remote>Távoli űrlapok törlése</delete-remote>
             <reencrypt>Űrlapdefiníciók újratitkosítása</reencrypt>
             <reload-resources>Erőforrások újratöltése</reload-resources>
+            <configuration>Konfiguráció</configuration>
+            <reload-properties>Tulajdonságok újratöltése</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>Űrlap elérhetőségi változtatásának megerősítése</publish-confirmation>

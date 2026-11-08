@@ -757,4 +757,25 @@
         +fr:autosize-textarea
     </property>
 
+    <!-- ==== Internal Configuration form properties ============================================================== -->
+
+    <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.configuration"          value="full"/>
+    <property as="xs:string"  name="oxf.fr.detail.label.appearance.orbeon.configuration"        value="full"/>
+    <property as="xs:string"  name="oxf.fr.detail.hint.appearance.orbeon.configuration"         value="full"/>
+    <property as="xs:boolean" name="oxf.fr.detail.hide-logo.orbeon.configuration"               value="false"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.configuration.form"      value="resource"/>
+    <property as="xs:boolean" name="oxf.fr.detail.singleton.enabled.orbeon.configuration"       value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.captcha.orbeon.configuration"                 value=""/>
+    <property as="xs:boolean" name="oxf.fr.navbar.revision-history.enable.orbeon.configuration" value="false"/>
+    <property as="xs:boolean" name="oxf.fr.navbar.workflow-stage.enable.orbeon.configuration"   value="false"/>
+    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.configuration"                 value="home save-final"/>
+    <property as="xs:string"  name="oxf.fr.detail.process.save-final.orbeon.configuration">
+        require-uploads
+        then validate-all
+        then save
+        then xf:dispatch(name = "fr-configuration-saved", targetid = "fr-form-model")
+        then success-message("save-success")
+        recover error-message("database-error")
+    </property>
+
 </properties>

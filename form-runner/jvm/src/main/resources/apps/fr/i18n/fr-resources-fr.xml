@@ -524,6 +524,8 @@
             <delete-remote>Supprimer les formulaires distants</delete-remote>
             <reencrypt>Réencrypter les formulaires</reencrypt>
             <reload-resources>Recharger les resources</reload-resources>
+            <configuration>Configuration</configuration>
+            <reload-properties>Recharger les propriétés</reload-properties>
         </buttons>
         <titles>
             <publish-confirmation>Confirmer le changement de disponibilité de formulaires</publish-confirmation>

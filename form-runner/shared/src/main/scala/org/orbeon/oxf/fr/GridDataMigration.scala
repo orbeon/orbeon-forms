@@ -153,7 +153,7 @@ object GridDataMigration {
 
     require(migratedOrDuplicatedDataElem.isElement)
 
-    if (appForm != AppForm.FormBuilder)
+    if (appForm != AppForm.FormBuilder && appForm != AppForm.FormConfiguration)
       insert(
         into       = List(migratedOrDuplicatedDataElem),
         origin     = List(NodeInfoFactory.attributeInfo(XMLNames.FRDataFormatVersionQName, dataFormatVersion.entryName)),

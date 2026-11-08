@@ -1,0 +1,261 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fr-resources-editor"
+        element="fr|resources-editor"
+        xxbl:mode="binding lhha focus">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/resources-editor/resources-editor.css"/>
+        </xbl:resources>
+
+        <xbl:handlers>
+            <xbl:handler event="xforms-focus" phase="target">
+                <xf:setfocus control="fr-resources-editor-language-select"/>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:implementation>
+            <xf:model id="model">
+                <xf:instance id="i" xxf:exclude-result-prefixes="#all" xxbl:mirror="true">
+                    <_/>
+                </xf:instance>
+
+                <xf:instance id="template" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <message xml:lang="" name="" html="false"/>
+                    </_>
+                </xf:instance>
+
+                <xf:instance id="languages-count" xxf:exclude-result-prefixes="#all">
+                    <_>2</_>
+                </xf:instance>
+
+                <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <resource xml:lang="en">
+                            <language-header>Language</language-header>
+                            <name-header>Name</name-header>
+                            <use-html>Use HTML</use-html>
+                            <value-header>Value</value-header>
+                            <all-languages>All languages (*)</all-languages>
+                        </resource>
+                        <resource xml:lang="fr">
+                            <language-header>Langue</language-header>
+                            <name-header>Nom</name-header>
+                            <use-html>En HTML</use-html>
+                            <value-header>Valeur</value-header>
+                            <all-languages>Toutes les langues (*)</all-languages>
+                        </resource>
+                        <resource xml:lang="de">
+                            <language-header>Sprache</language-header>
+                            <name-header>Name</name-header>
+                            <use-html>HTML verwenden</use-html>
+                            <value-header>Wert</value-header>
+                            <all-languages>Alle Sprachen (*)</all-languages>
+                        </resource>
+                        <resource xml:lang="es">
+                            <language-header>Idioma</language-header>
+                            <name-header>Nombre</name-header>
+                            <use-html>Usa HTML</use-html>
+                            <value-header>Valor</value-header>
+                            <all-languages>Todos los idiomas (*)</all-languages>
+                        </resource>
+                        <resource xml:lang="it">
+                            <language-header>Lingua</language-header>
+                            <name-header>Nome</name-header>
+                            <use-html>Usa HTML</use-html>
+                            <value-header>Valore</value-header>
+                            <all-languages>Tutte le lingue (*)</all-languages>
+                        </resource>
+                        <resource xml:lang="pt">
+                            <language-header>Idioma</language-header>
+                            <name-header>Nome</name-header>
+                            <use-html>Usar HTML</use-html>
+                            <value-header>Valor</value-header>
+                            <all-languages>Todos os idiomas (*)</all-languages>
+                        </resource>
+                        <resource xml:lang="sv">
+                            <language-header>Språk</language-header>
+                            <name-header>Namn</name-header>
+                            <use-html>Använd HTML</use-html>
+                            <value-header>Värde</value-header>
+                            <all-languages>Alla språk (*)</all-languages>
+                        </resource>
+                        <resource xml:lang="fi">
+                            <language-header>Kieli</language-header>
+                            <name-header>Nimi</name-header>
+                            <use-html>Käytä HTML</use-html>
+                            <value-header>Arvo</value-header>
+                            <all-languages>Kaikki kielet (*)</all-languages>
+                        </resource>
+                        <resource xml:lang="nl">
+                            <language-header>Taal</language-header>
+                            <name-header>Naam</name-header>
+                            <use-html>Gebruik HTML</use-html>
+                            <value-header>Waarde</value-header>
+                            <all-languages>Alle talen (*)</all-languages>
+                        </resource>
+                        <resource xml:lang="no">
+                            <language-header>Språk</language-header>
+                            <name-header>Navn</name-header>
+                            <use-html>Bruk HTML</use-html>
+                            <value-header>Verdi</value-header>
+                            <all-languages>Alle språk (*)</all-languages>
+                        </resource>
+                        <resource xml:lang="pl">
+                            <language-header>Język</language-header>
+                            <name-header>Nazwa</name-header>
+                            <use-html>Użyj HTML</use-html>
+                            <value-header>Wartość</value-header>
+                            <all-languages>Wszystkie języki (*)</all-languages>
+                        </resource>
+                        <resource xml:lang="ru">
+                            <language-header>Язык</language-header>
+                            <name-header>Название</name-header>
+                            <use-html>Использовать HTML</use-html>
+                            <value-header>Значение</value-header>
+                            <all-languages>Все языки (*)</all-languages>
+                        </resource>
+                        <resource xml:lang="ja">
+                            <language-header>言語</language-header>
+                            <name-header>名前</name-header>
+                            <use-html>HTMLを使用</use-html>
+                            <value-header>値</value-header>
+                            <all-languages>すべての言語 (*)</all-languages>
+                        </resource>
+                        <resource xml:lang="ar">
+                            <language-header>اللغة</language-header>
+                            <name-header>الاسم</name-header>
+                            <use-html>استخدام HTML</use-html>
+                            <value-header>القيمة</value-header>
+                            <all-languages>جميع اللغات (*)</all-languages>
+                        </resource>
+                    </_>
+                </xf:instance>
+
+                <xf:var name="i"  value="instance('i')"/>
+                <xf:var name="ti" value="instance('template')"/>
+
+                <xf:bind
+                    ref="$i//*"
+                    readonly="fr:is-readonly-mode() or xxf:readonly(xxf:binding('fr-resources-editor'))"/>
+
+                <xf:bind ref="$i/message">
+                    <xf:bind ref="@xml:lang" readonly="xs:integer(instance('languages-count')) le 1"/>
+                    <xf:bind ref="@name, ."  xxf:whitespace="trim" readonly="false()" required="true()"/>
+
+                    <!-- No duplicate resource names for a given language -->
+                    <xf:bind ref="@name"     constraint="for $l in string(../@xml:lang) return
+                                                         not(($i/message[@xml:lang = $l]/@name except .) = .)"/>
+
+                    <xf:bind ref="@html"     type="xs:boolean"/>
+                </xf:bind>
+
+                <xf:bind ref="$ti/message" readonly="true()"/>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:group appearance="xxf:internal">
+                <xf:var name="languages" as="xs:string*"><xxf:value xxbl:scope="outer" xbl:attr="model context value=languages-ref"/></xf:var>
+                <xf:var name="items"     as="xs:string*"><xxf:value xxbl:scope="outer" xbl:attr="model context value=items-ref"/></xf:var>
+                <xf:var name="valid-ref" as="item()?"   ><xxf:value value="." xxbl:scope="outer" xbl:attr="model context ref=valid-ref"/></xf:var>
+
+                <xf:var name="default-lang" value="$languages[1]">
+                    <xf:setvalue
+                        event="xforms-enabled xforms-value-changed"
+                        ref="$ti/message/@xml:lang"
+                        value="$default-lang"/>
+                </xf:var>
+
+                <xf:var name="lang-count" value="count($languages)">
+                    <xf:setvalue
+                        event="xforms-enabled xforms-value-changed"
+                        ref="instance('languages-count')"
+                        value="$lang-count"/>
+                </xf:var>
+
+                <xf:var name="is-valid" value="valid($i)">
+                    <xf:setvalue
+                        event="xforms-enabled xforms-value-changed"
+                        if="exists($valid-ref)"
+                        ref="$valid-ref"
+                        value="$is-valid"/>
+                </xf:var>
+
+                <fr:grid
+                    id="fr-resources-editor-repeat"
+                    repeat="content"
+                    ref="$i"
+                    iteration-name="message"
+                    template="$ti/message">
+                    <xh:tr>
+                        <xh:td class="fr-resources-editor-language-column">
+                            <xf:select1 id="fr-resources-editor-language-select" ref="@xml:lang">
+                                <xf:label ref="fr:r('language-header')"/>
+
+                                <xf:itemset ref="$languages">
+                                    <xf:label
+                                        ref="
+                                            if (context() = '*') then
+                                                fr:r('all-languages')
+                                            else
+                                                (
+                                                    xxf:instance('fr-languages-instance')/language[@code = context()]/@native-name,
+                                                    context()
+                                                )[1]"/>
+                                    <xf:value ref="context()"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </xh:td>
+                        <xh:td class="fr-resources-editor-name-column">
+                            <fr:open-select1 id="fr-resources-editor-name-select" class="fr-resources-editor-name-select" ref="@name" appearance="minimal">
+                                <xf:label ref="fr:r('name-header')"/>
+
+                                <xf:itemset ref="$items">
+                                    <xf:label ref="context()"/>
+                                    <xf:value ref="context()"/>
+                                </xf:itemset>
+                            </fr:open-select1>
+                        </xh:td>
+                        <xh:td class="fr-resources-editor-html-column">
+                            <fr:checkbox-input id="fr-resources-editor-html" ref="@html">
+                                <xf:label ref="fr:r('use-html')"/>
+                            </fr:checkbox-input>
+                        </xh:td>
+                        <xh:td class="fr-resources-editor-value-column">
+                            <xf:var name="text" value="."/>
+                            <xf:input id="fr-resources-editor-value-input" ref="$text[@html = false()]" class="fr-resources-editor-value-input">
+                                <xf:label ref="fr:r('value-header')"/>
+                            </xf:input>
+                            <xf:textarea id="fr-resources-editor-value-textarea" ref="$text[@html = true()]" mediatype="text/html" class="fr-resources-editor-value-textarea">
+                                <xf:label ref="fr:r('value-header')"/>
+                            </xf:textarea>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

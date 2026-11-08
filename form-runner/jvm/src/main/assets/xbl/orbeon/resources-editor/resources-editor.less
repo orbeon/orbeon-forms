@@ -1,0 +1,86 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+.orbeon {
+
+    .xbl-fr-resources-editor {
+
+        .fr-grid.fr-grid-table {
+            table-layout: fixed;
+            width: 100%;
+
+            th.fr-repeat-column-left,
+            td.fr-repeat-column-left {
+                width: 36px;
+            }
+        }
+
+        .fr-resources-editor-language-column {
+            width: 150px;
+
+            select {
+                width: 100%;
+            }
+        }
+
+        .fr-resources-editor-name-column {
+            width: 42%;
+
+            .xbl-fr-open-select1 {
+                .fr-component-group {
+                    .xforms-select1 {
+                        flex: 1 1 100%;
+                        min-width: 0;
+
+                        select {
+                            width: 100%;
+                        }
+                    }
+
+                    .xforms-select1:has(~ .xforms-input:not(.xforms-readonly)) {
+                        flex: 0 0 100px;
+                    }
+
+                    .xforms-input:not(.xforms-readonly) {
+                        flex: 1 1 auto;
+                        min-width: 0;
+                    }
+                }
+
+                &:not(.xforms-readonly) .xforms-input.xforms-readonly {
+                    display: none;
+                }
+            }
+        }
+
+        .fr-resources-editor-html-column {
+            width: 85px;
+            white-space: nowrap;
+
+            span.xforms-items {
+                align-items: center;
+            }
+
+            .checkbox {
+                margin: 0;
+            }
+
+            .checkbox > span {
+                display: none;
+            }
+        }
+
+        .fr-resources-editor-value-column {
+            width: auto;
+        }
+    }
+}

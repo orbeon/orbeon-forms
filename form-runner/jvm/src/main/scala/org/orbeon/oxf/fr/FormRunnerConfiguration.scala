@@ -81,6 +81,14 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     processorName: String
   )
 
+  case class ResourceOverrideKey(
+    lang: String,
+    name: String
+  )
+
+  private val ResourcePropertyPrefix = "oxf.fr.resource."
+  private val HtmlSuffix             = "html"
+
   val Categories: List[String] =
     List(
       "system",
@@ -1566,6 +1574,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     "xbl"   -> "http://www.w3.org/ns/xbl",
     "xxbl"  -> "http://orbeon.org/oxf/xml/xbl",
     "fr"    -> "http://orbeon.org/oxf/xml/form-runner",
+    "fb"    -> "http://orbeon.org/oxf/xml/form-builder",
     "frf"   -> "java:org.orbeon.oxf.fr.FormRunner",
     "saxon" -> "http://saxon.sf.net/"
   )
@@ -1573,16 +1582,77 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
   def propertiesDomToConfigurationDom(propertiesDoc: Document): Document = {
     val rootOpt = Option(propertiesDoc.getRootElement)
 
-    val globalCuratedValues = mutable.Map.empty[String, String]
-    val appFormOverrides    = mutable.LinkedHashMap.empty[OverrideScope, mutable.Map[String, String]]
-    val customProperties    = mutable.ListBuffer.empty[CustomProperty]
-    val customNamespaces    = mutable.LinkedHashMap.empty[String, String]
+    val globalCuratedValues  = mutable.Map.empty[String, String]
+    val globalResourceValues = mutable.LinkedHashMap.empty[ResourceOverrideKey, String]
+    val globalResourceHtml   = mutable.Map.empty[ResourceOverrideKey, Boolean]
+    val appFormOverrides     = mutable.LinkedHashMap.empty[OverrideScope, mutable.Map[String, String]]
+    val appFormResources     = mutable.LinkedHashMap.empty[OverrideScope, mutable.LinkedHashMap[ResourceOverrideKey, String]]
+    val appFormResourceHtml  = mutable.Map.empty[OverrideScope, mutable.Map[ResourceOverrideKey, Boolean]]
+    val customProperties     = mutable.ListBuffer.empty[CustomProperty]
+    val customNamespaces     = mutable.LinkedHashMap.empty[String, String]
 
     def collectNamespaces(elem: Element): Unit =
       for {
         ns <- elem.declaredNamespacesIterator
         if ! StandardNamespacePrefixes(ns.prefix) && ns.uri.nonEmpty
       } customNamespaces.put(ns.prefix, ns.uri)
+
+    def tryMatchResourceProperty(
+      name         : String,
+      asType       : String,
+      value        : String,
+      profiles     : String,
+      processorName: String
+    ): Boolean =
+      if (profiles.isEmpty && processorName.isEmpty && name.startsWith(ResourcePropertyPrefix)) {
+        val suffix = name.substring(ResourcePropertyPrefix.length)
+        suffix.splitTo[List](".") match {
+          case app :: form :: lang :: rest
+            if app.nonEmpty && form.nonEmpty && lang.nonEmpty && rest.nonEmpty &&
+               AppForm(app, form) != AppForm.FormBuilder &&
+               AppForm(app, form) != AppForm.FormConfiguration =>
+            if (asType == "xs:boolean" && rest.length >= 2 && rest.last == HtmlSuffix) {
+              val key    = ResourceOverrideKey(lang, rest.init.mkString("."))
+              val isHtml = value.trim == "true"
+              if (app == "*" && form == "*") {
+                if (! globalResourceHtml.contains(key))
+                  globalResourceHtml.put(key, isHtml)
+              } else {
+                val scope   = OverrideScope(app, form, "")
+                val htmlMap = appFormResourceHtml.getOrElseUpdate(scope, mutable.Map.empty)
+                if (! htmlMap.contains(key))
+                  htmlMap.put(key, isHtml)
+              }
+              true
+            } else if (asType == "xs:string" && ! (rest.length >= 2 && rest.last == HtmlSuffix)) {
+              val key = ResourceOverrideKey(lang, rest.mkString("."))
+              if (app == "*" && form == "*") {
+                if (! globalResourceValues.contains(key)) {
+                  globalResourceValues.put(key, value)
+                  true
+                } else {
+                  false
+                }
+              } else {
+                val scope = OverrideScope(app, form, "")
+                appFormOverrides.getOrElseUpdate(scope, mutable.Map.empty)
+                val resMap = appFormResources.getOrElseUpdate(scope, mutable.LinkedHashMap.empty)
+                if (! resMap.contains(key)) {
+                  resMap.put(key, value)
+                  true
+                } else {
+                  false
+                }
+              }
+            } else {
+              false
+            }
+          case _ =>
+            false
+        }
+      } else {
+        false
+      }
 
     rootOpt.foreach { root =>
       collectNamespaces(root)
@@ -1596,57 +1666,59 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
         val profiles      = propElem.attributeValueOpt("profiles").orElse(propElem.attributeValueOpt("profile")).map(_.splitTo[List]().mkString(" ")).getOrElse("")
         val processorName = propElem.attributeValueOpt("processor-name").flatMap(_.trimAllToOpt).getOrElse("")
 
-        val matchedGlobal =
-          if (profiles.isEmpty && processorName.isEmpty)
-            CuratedByGlobalName.get(name).filter(c => c.xsType == asType && ! globalCuratedValues.contains(c.key))
-          else
-            None
+        if (! tryMatchResourceProperty(name, asType, value, profiles, processorName)) {
+          val matchedGlobal =
+            if (profiles.isEmpty && processorName.isEmpty)
+              CuratedByGlobalName.get(name).filter(c => c.xsType == asType && ! globalCuratedValues.contains(c.key))
+            else
+              None
 
-        matchedGlobal match {
-          case Some(curated) =>
-            globalCuratedValues.put(curated.key, value)
-          case None =>
-            val matchedAppForm =
-              if (processorName.isEmpty)
-                CuratedAppFormList.view.flatMap { c =>
-                  val prefix = c.baseName + "."
-                  if (c.xsType == asType && (profiles.isEmpty || c.hasProfiles) && name.startsWith(prefix)) {
-                    val suffix = name.substring(prefix.length)
-                    suffix.splitTo[List](".") match {
-                      case List(app, form)
-                        if app.nonEmpty && form.nonEmpty &&
-                           (app != "*" || form != "*" || profiles.nonEmpty) &&
-                           AppForm(app, form) != AppForm.FormBuilder        &&
-                           AppForm(app, form) != AppForm.FormConfiguration =>
-                        val scope = OverrideScope(app, form, profiles)
-                        if (! appFormOverrides.get(scope).exists(_.contains(c.key)))
-                          Some((scope, c, value))
-                        else
+          matchedGlobal match {
+            case Some(curated) =>
+              globalCuratedValues.put(curated.key, value)
+            case None =>
+              val matchedAppForm =
+                if (processorName.isEmpty)
+                  CuratedAppFormList.view.flatMap { c =>
+                    val prefix = c.baseName + "."
+                    if (c.xsType == asType && (profiles.isEmpty || c.hasProfiles) && name.startsWith(prefix)) {
+                      val suffix = name.substring(prefix.length)
+                      suffix.splitTo[List](".") match {
+                        case List(app, form)
+                          if app.nonEmpty && form.nonEmpty &&
+                             (app != "*" || form != "*" || profiles.nonEmpty) &&
+                             AppForm(app, form) != AppForm.FormBuilder        &&
+                             AppForm(app, form) != AppForm.FormConfiguration =>
+                          val scope = OverrideScope(app, form, profiles)
+                          if (! appFormOverrides.get(scope).exists(_.contains(c.key)))
+                            Some((scope, c, value))
+                          else
+                            None
+                        case _ =>
                           None
-                      case _ =>
-                        None
+                      }
+                    } else {
+                      None
                     }
-                  } else {
-                    None
-                  }
-                }.headOption
-              else
-                None
+                  }.headOption
+                else
+                  None
 
-            matchedAppForm match {
-              case Some((scope, curated, v)) =>
-                val map = appFormOverrides.getOrElseUpdate(scope, mutable.Map.empty)
-                map.put(curated.key, v)
-              case None =>
-                if (name.nonEmpty)
-                  customProperties += CustomProperty(
-                    name          = name,
-                    xsType        = asType,
-                    value         = value,
-                    profiles      = profiles,
-                    processorName = processorName
-                  )
-            }
+              matchedAppForm match {
+                case Some((scope, curated, v)) =>
+                  val map = appFormOverrides.getOrElseUpdate(scope, mutable.Map.empty)
+                  map.put(curated.key, v)
+                case None =>
+                  if (name.nonEmpty)
+                    customProperties += CustomProperty(
+                      name          = name,
+                      xsType        = asType,
+                      value         = value,
+                      profiles      = profiles,
+                      processorName = processorName
+                    )
+              }
+          }
         }
       }
     }
@@ -1686,8 +1758,24 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       }
     }
 
-    // 1. Global curated properties
+    def appendResourcesBlock(
+      parent   : Element,
+      resources: scala.collection.Map[ResourceOverrideKey, String],
+      htmlMap  : scala.collection.Map[ResourceOverrideKey, Boolean]
+    ): Unit = {
+      val resourcesElem = parent.addElement("resources")
+      for ((key, v) <- resources) {
+        val msgElem = resourcesElem.addElement("message")
+        msgElem.addAttribute(XMLConstants.XML_LANG_QNAME, key.lang)
+        msgElem.addAttribute("name", key.name)
+        msgElem.addAttribute("html", htmlMap.getOrElse(key, false).toString)
+        msgElem.setText(v)
+      }
+    }
+
+    // 1. Global curated properties & global resource overrides
     appendCuratedBlock(configRoot, globalCuratedValues, appFormOnly = false)
+    appendResourcesBlock(configRoot, globalResourceValues, globalResourceHtml)
 
     // 2. Application / Form / Profile overrides
     val overridesElem = configRoot.addElement("app-form-overrides")
@@ -1697,6 +1785,11 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       overrideElem.addAttribute("form", scope.form)
       overrideElem.addAttribute("profiles", scope.profiles)
       appendCuratedBlock(overrideElem, values, appFormOnly = true)
+      appendResourcesBlock(
+        overrideElem,
+        appFormResources.getOrElse(scope, Map.empty),
+        appFormResourceHtml.getOrElse(scope, Map.empty)
+      )
     }
 
     // 3. Custom properties
@@ -1725,6 +1818,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     templateOverride.addAttribute("form", "*")
     templateOverride.addAttribute("profiles", "")
     appendCuratedBlock(templateOverride, Map.empty, appFormOnly = true)
+    appendResourcesBlock(templateOverride, Map.empty, Map.empty)
 
     val templateProp = templatesElem.addElement("property")
     templateProp.addAttribute("name", "")
@@ -1777,8 +1871,32 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
         propElem.addAttribute("value", value)
     }
 
+    def appendResourceProperties(resourcesElemOpt: Option[Element], app: String, form: String): Unit =
+      for {
+        resourcesElem <- resourcesElemOpt.toList
+        msgElem       <- resourcesElem.elements("message")
+        lang          <- msgElem.attributeValueOpt(XMLConstants.XML_LANG_QNAME).orElse(msgElem.attributeValueOpt("lang")).flatMap(_.trimAllToOpt)
+        resName       <- msgElem.attributeValueOpt("name").flatMap(_.trimAllToOpt)
+      } {
+        val isHtml       = msgElem.attributeValueOpt("html").exists(_.trim == "true")
+        val value        = msgElem.getText
+        val fullPropName = s"$ResourcePropertyPrefix$app.$form.$lang.$resName"
+
+        appendProperty(
+          name   = fullPropName,
+          xsType = "xs:string",
+          value  = value
+        )
+        if (isHtml)
+          appendProperty(
+            name   = s"$fullPropName.$HtmlSuffix",
+            xsType = "xs:boolean",
+            value  = "true"
+          )
+      }
+
     configRootOpt.foreach { configRoot =>
-      // 1. Global curated properties
+      // 1. Global curated properties & global resource overrides
       for {
         curatedElem <- Option(configRoot.element("curated")).toList
         c           <- CuratedProperties
@@ -1791,25 +1909,33 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
         value  = propElem.attributeValueOpt("value").getOrElse(propElem.getText)
       )
 
+      appendResourceProperties(Option(configRoot.element("resources")), "*", "*")
+
       // 2. Application / Form / Profile overrides
       for {
         overridesElem <- Option(configRoot.element("app-form-overrides")).toList
         overrideElem  <- overridesElem.elements("override")
         app           <- overrideElem.attributeValueOpt("app").flatMap(_.trimAllToOpt)
         form          <- overrideElem.attributeValueOpt("form").flatMap(_.trimAllToOpt)
-        profiles      = overrideElem.attributeValueOpt("profiles").map(_.splitTo[List]().mkString(" ")).getOrElse("")
-        curatedElem   <- Option(overrideElem.element("curated")).toList
-        c             <- CuratedProperties
-        if c.hasAppForm && (profiles.isEmpty || c.hasProfiles)
-        catElem       <- Option(curatedElem.element(c.category)).toList
-        propElem      <- Option(catElem.element(c.key)).toList
-        if propElem.attributeValueOpt("override").contains("true")
-      } appendProperty(
-        name     = c.appFormPropertyName(app, form),
-        xsType   = c.xsType,
-        value    = propElem.attributeValueOpt("value").getOrElse(propElem.getText),
-        profiles = profiles
-      )
+      } {
+        val profiles = overrideElem.attributeValueOpt("profiles").map(_.splitTo[List]().mkString(" ")).getOrElse("")
+        for {
+          curatedElem <- Option(overrideElem.element("curated")).toList
+          c           <- CuratedProperties
+          if c.hasAppForm && (profiles.isEmpty || c.hasProfiles)
+          catElem     <- Option(curatedElem.element(c.category)).toList
+          propElem    <- Option(catElem.element(c.key)).toList
+          if propElem.attributeValueOpt("override").contains("true")
+        } appendProperty(
+          name     = c.appFormPropertyName(app, form),
+          xsType   = c.xsType,
+          value    = propElem.attributeValueOpt("value").getOrElse(propElem.getText),
+          profiles = profiles
+        )
+
+        if (profiles.isEmpty)
+          appendResourceProperties(Option(overrideElem.element("resources")), app, form)
+      }
 
       // 3. Custom properties
       for {

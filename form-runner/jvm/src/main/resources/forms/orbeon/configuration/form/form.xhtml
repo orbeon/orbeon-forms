@@ -128,7 +128,7 @@
                 border-radius: 10px;
             }
             /* Hide non-relevant property cells in overrides (e.g. non-profile properties when profiles is set) */
-            .orbeon .fr-config-app-form-overrides-section .fr-grid-td:not(:has(.xforms-control:not(.xforms-disabled))) {
+            .orbeon .fr-config-app-form-overrides-section .fr-grid-css &gt; .fr-grid-body &gt; .fr-grid-td:not(:has(.xforms-control:not(.xforms-disabled))) {
                 display: none !important;
             }
             .orbeon .fr-config-app-form-overrides-section .fr-config-category-tabs {
@@ -277,9 +277,10 @@
                     origin="frf:configurationXmlToProperties(instance('fr-configuration-instance'))"/>
             </xf:action>
 
-            <!-- Immediately invalidate local PersistencePropertyProvider cache when saved -->
-            <xf:action event="fr-data-save-done fr-configuration-saved" type="xpath">
-                frf:invalidatePersistencePropertiesCache()
+            <!-- Immediately invalidate local PersistencePropertyProvider cache and shared instances when saved -->
+            <xf:action event="fr-data-save-done fr-configuration-saved">
+                <xf:action type="xpath">frf:invalidatePersistencePropertiesCache()</xf:action>
+                <xxf:invalidate-instances/>
             </xf:action>
 
             <!-- Metadata -->
@@ -371,6 +372,9 @@
                         <security-section>
                             <label>Authentication &amp; Security</label>
                         </security-section>
+                        <resources-section>
+                            <label>Resources</label>
+                        </resources-section>
                         <app-form-overrides-section>
                             <label>Application / Form Overrides</label>
                             <add-override>Add Application / Form Override</add-override>
@@ -2456,6 +2460,9 @@
                         <security-section>
                             <label>Authentification et sécurité</label>
                         </security-section>
+                        <resources-section>
+                            <label>Ressources</label>
+                        </resources-section>
                         <app-form-overrides-section>
                             <label>Surcharges par application / formulaire</label>
                             <add-override>Ajouter une surcharge application / formulaire</add-override>
@@ -4483,6 +4490,35 @@
     <xh:body>
         <fr:view>
             <fr:body>
+                <xf:var
+                    name="resource-override-items"
+                    value="
+                        (
+                            for $m in xxf:sort($fr-resources/detail/messages/*, local-name(), 'text', 'ascending')
+                            return concat('detail.messages.', local-name($m)),
+                            for $b in xxf:sort($fr-resources/buttons/*, local-name(), 'text', 'ascending')
+                            return concat('buttons.', local-name($b)),
+                            for $l in xxf:sort($fr-resources/detail/labels/*, local-name(), 'text', 'ascending')
+                            return concat('detail.labels.', local-name($l)),
+                            'xbl.fr:attachment.cancel',
+                            'xbl.fr:attachment.download',
+                            'xbl.fr:attachment.drag-multiple',
+                            'xbl.fr:attachment.drag-single',
+                            'xbl.fr:attachment.empty',
+                            'xbl.fr:attachment.remove',
+                            'xbl.fr:attachment.uploading',
+                            'xbl.fr:clipboard-copy.copied',
+                            'xbl.fr:clipboard-copy.copy',
+                            'xbl.fr:confirmation.message',
+                            'xbl.fr:confirmation.title',
+                            'xbl.fr:content-filter.alert',
+                            'xbl.fr:date.alert',
+                            'xbl.fr:on-premise-captcha.new-image',
+                            'xbl.fr:on-premise-captcha.type-text',
+                            'xbl.fr:time.alert',
+                            'xbl.fr:us-ssn.hide',
+                            'xbl.fr:us-ssn.show'
+                        )"/>
                 <fr:tabbable id="fr-configuration-tabs" class="fr-config-main-tabs">
 
                     <!-- Tab 1: Global Settings -->
@@ -4490,7 +4526,9 @@
                         <xf:label
                             mediatype="text/html"
                             value="
-                                let $c := count(instance('fr-configuration-instance')/curated/*/*[string(@override) = 'true'])
+                                let $c :=
+                                    count(instance('fr-configuration-instance')/curated/*/*[string(@override) = 'true']) +
+                                    count(instance('fr-configuration-instance')/resources/message)
                                 return concat(
                                     $form-resources/tabs/global-settings,
                                     if ($c gt 0) then concat(' &lt;span class=&quot;badge fr-config-tab-badge&quot;&gt;', $c, '&lt;/span&gt;') else ''
@@ -7118,6 +7156,28 @@
                                     </fr:c>
                                 </fr:grid>
                             </fr:tab>
+
+                            <!-- Resources -->
+                            <fr:tab id="resources-tab">
+                                <xf:label
+                                    mediatype="text/html"
+                                    value="
+                                        let $c := count(instance('fr-configuration-instance')/resources/message)
+                                        return concat(
+                                            $form-resources/resources-section/label,
+                                            if ($c gt 0) then concat(' &lt;span class=&quot;badge fr-config-tab-badge&quot;&gt;', $c, '&lt;/span&gt;') else ''
+                                        )"/>
+                                <xh:div class="fr-config-category-header">
+                                    <xh:h3 class="fr-config-category-title">
+                                        <xf:output ref="$form-resources/resources-section/label"/>
+                                    </xh:h3>
+                                </xh:div>
+                                <fr:resources-editor
+                                    id="global-resources-editor"
+                                    ref="instance('fr-configuration-instance')/resources"
+                                    languages-ref="('*', xxf:instance('fr-languages-instance')/language[not(@exclude = 'true')]/@code/string())"
+                                    items-ref="$resource-override-items"/>
+                            </fr:tab>
                             </fr:tabbable>
                         </xf:group>
                     </fr:tab>
@@ -9073,6 +9133,28 @@
                                         </xf:input>
                                     </fr:c>
                                 </fr:grid>
+                            </fr:tab>
+
+                            <!-- Resources (App/Form) -->
+                            <fr:tab id="app-form-resources-tab" visible="xxf:is-blank(ancestor-or-self::override/@profiles)">
+                                <xf:label
+                                    mediatype="text/html"
+                                    value="
+                                        let $c := count(resources/message[xxf:is-blank(ancestor-or-self::override/@profiles)])
+                                        return concat(
+                                            $form-resources/resources-section/label,
+                                            if ($c gt 0) then concat(' &lt;span class=&quot;badge fr-config-tab-badge&quot;&gt;', $c, '&lt;/span&gt;') else ''
+                                        )"/>
+                                <xh:div class="fr-config-category-header">
+                                    <xh:h3 class="fr-config-category-title">
+                                        <xf:output ref="$form-resources/resources-section/label"/>
+                                    </xh:h3>
+                                </xh:div>
+                                <fr:resources-editor
+                                    id="app-form-resources-editor"
+                                    ref="resources"
+                                    languages-ref="('*', xxf:instance('fr-languages-instance')/language[not(@exclude = 'true')]/@code/string())"
+                                    items-ref="$resource-override-items"/>
                             </fr:tab>
                             </fr:tabbable>
                         </fr:section>

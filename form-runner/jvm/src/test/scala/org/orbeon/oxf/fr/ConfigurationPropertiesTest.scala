@@ -170,6 +170,64 @@ class ConfigurationPropertiesTest
       assert(byName("oxf.fr.summary.page-size.*.*").getProfiles.asScala.toList == List("internal"))
       assert(byName("oxf.fr.permissions.hr.onboarding").getProfiles.asScala.toList == List("internal"))
     }
+
+    it("must round-trip global and app/form Form Runner and XBL component resource overrides, including HTML flags") {
+      val inputPropsXml =
+        """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          |    <property as="xs:string"  name="oxf.fr.resource.*.*.en.detail.messages.save-success"         value="&lt;b&gt;Saved!&lt;/b&gt;"/>
+          |    <property as="xs:boolean" name="oxf.fr.resource.*.*.en.detail.messages.save-success.html"    value="true"/>
+          |    <property as="xs:string"  name="oxf.fr.resource.*.*.en.xbl.fr:content-filter.alert"          value="Inappropriate content."/>
+          |    <property as="xs:string"  name="oxf.fr.resource.acme.order.fr.buttons.save-final"            value="Enregistrer la commande"/>
+          |    <property as="xs:string"  name="oxf.fr.resource.acme.order.fr.xbl.fr:attachment.empty"       value="Aucun fichier joint"/>
+          |</properties>""".stripMargin
+
+      val inputPropsDoc = IOSupport.readOrbeonDom(inputPropsXml)
+      val configDoc     = FormRunnerConfiguration.propertiesDomToConfigurationDom(inputPropsDoc)
+      val configRoot    = configDoc.getRootElement
+
+      // 1. Check global <resources>
+      val globalMessages = configRoot.element("resources").elements("message")
+      assert(globalMessages.size == 2)
+
+      val msg1 = globalMessages.head
+      assert(msg1.attributeValue(org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME) == "en")
+      assert(msg1.attributeValue("name") == "detail.messages.save-success")
+      assert(msg1.attributeValue("html") == "true")
+      assert(msg1.getText == "<b>Saved!</b>")
+
+      val msg2 = globalMessages(1)
+      assert(msg2.attributeValue(org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME) == "en")
+      assert(msg2.attributeValue("name") == "xbl.fr:content-filter.alert")
+      assert(msg2.attributeValue("html") == "false")
+      assert(msg2.getText == "Inappropriate content.")
+
+      // 2. Check app/form <override><resources>
+      val overrides = configRoot.element("app-form-overrides").elements("override")
+      assert(overrides.size == 1)
+      val acmeOrder = overrides.head
+      assert(acmeOrder.attributeValue("app") == "acme")
+      assert(acmeOrder.attributeValue("form") == "order")
+      val acmeMessages = acmeOrder.element("resources").elements("message")
+      assert(acmeMessages.size == 2)
+      assert(acmeMessages.head.attributeValue("name") == "buttons.save-final")
+      assert(acmeMessages.head.getText == "Enregistrer la commande")
+      assert(acmeMessages(1).attributeValue("name") == "xbl.fr:attachment.empty")
+      assert(acmeMessages(1).getText == "Aucun fichier joint")
+
+      // 3. Round-trip back to <properties>
+      val roundTripPropsDoc = FormRunnerConfiguration.configurationDomToPropertiesDom(configDoc)
+      val defs              = PropertyStore.parseToPropertyDefinitions(roundTripPropsDoc).asScala
+      assert(defs.size == 5)
+
+      val byName = defs.map(d => d.getName -> d).toMap
+      assert(byName("oxf.fr.resource.*.*.en.detail.messages.save-success").getValue == "<b>Saved!</b>")
+      assert(byName("oxf.fr.resource.*.*.en.detail.messages.save-success.html").getValue == "true")
+      assert(byName("oxf.fr.resource.*.*.en.detail.messages.save-success.html").getType == "boolean")
+      assert(byName("oxf.fr.resource.*.*.en.xbl.fr:content-filter.alert").getValue == "Inappropriate content.")
+      assert(byName("oxf.fr.resource.*.*.en.xbl.fr:content-filter.alert").getNamespaces.get("fr") == "http://orbeon.org/oxf/xml/form-runner")
+      assert(byName("oxf.fr.resource.acme.order.fr.buttons.save-final").getValue == "Enregistrer la commande")
+      assert(byName("oxf.fr.resource.acme.order.fr.xbl.fr:attachment.empty").getValue == "Aucun fichier joint")
+    }
   }
 
   describe("PersistencePropertyProvider and built-in orbeon/configuration form") {

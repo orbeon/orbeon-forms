@@ -1593,13 +1593,27 @@
             <visited>Visited</visited>
             <unvisited>Unvisited</unvisited>
         </visited-status>
+        <set-attachment-content>Set Attachment Content</set-attachment-content>
+        <set-attachment-filename>Set Attachment Filename</set-attachment-filename>
+        <set-attachment-mediatype>Set Attachment Mediatype</set-attachment-mediatype>
+        <set-attachment-size>Set Attachment Size</set-attachment-size>
         <save-to-dataset>Save to Dataset</save-to-dataset>
         <dataset-name>Dataset Name</dataset-name>
+        <clear-dataset>Clear Dataset</clear-dataset>
         <show-message>Show Message</show-message>
         <message>
             <label>Message</label>
             <hint>For instance, "Name: {$name}"</hint>
         </message>
+        <run-process>Run Process</run-process>
+        <process-name>Process Name</process-name>
+        <navigate>Navigate</navigate>
+        <location>URL or Path</location>
+        <target>
+            <label>Target</label>
+            <same-window>Same window</same-window>
+            <new-window>New window</new-window>
+        </target>
         <set-control-value-unavailable>Set Control Value is only available when "after the controls are ready" is selected</set-control-value-unavailable>
 
     </dialog-actions>

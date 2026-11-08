@@ -1555,13 +1555,27 @@
             <visited>Visitado</visited>
             <unvisited>Não visitado</unvisited>
         </visited-status>
+        <set-attachment-content>Definir conteúdo do anexo</set-attachment-content>
+        <set-attachment-filename>Definir nome de ficheiro do anexo</set-attachment-filename>
+        <set-attachment-mediatype>Definir tipo de conteúdo do anexo</set-attachment-mediatype>
+        <set-attachment-size>Definir tamanho do anexo</set-attachment-size>
         <save-to-dataset>Guardar no Conjunto de Dados</save-to-dataset>
         <dataset-name>Nome do Conjunto de Dados</dataset-name>
+        <clear-dataset>Limpar conjunto de dados</clear-dataset>
         <show-message>Mostrar mensagem</show-message>
         <message>
             <label>Mensagem</label>
             <hint>Por exemplo, "Nome: {$name}"</hint>
         </message>
+        <run-process>Executar Processo</run-process>
+        <process-name>Nome do processo</process-name>
+        <navigate>Navegar</navigate>
+        <location>URL ou caminho</location>
+        <target>
+            <label>Destino</label>
+            <same-window>Mesma janela</same-window>
+            <new-window>Nova janela</new-window>
+        </target>
         <set-control-value-unavailable>Definir valor de controle está disponível apenas quando "após os controles estarem prontos" estiver selecionado</set-control-value-unavailable>
 
     </dialog-actions>

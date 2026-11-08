@@ -1572,13 +1572,27 @@
             <visited>Odwiedzona</visited>
             <unvisited>Nieodwiedzona</unvisited>
         </visited-status>
+        <set-attachment-content>Ustaw zawartość załącznika</set-attachment-content>
+        <set-attachment-filename>Ustaw nazwę pliku załącznika</set-attachment-filename>
+        <set-attachment-mediatype>Ustaw typ mediów załącznika</set-attachment-mediatype>
+        <set-attachment-size>Ustaw rozmiar załącznika</set-attachment-size>
         <save-to-dataset>Zapisz w zbiorze danych</save-to-dataset>
         <dataset-name>Nazwa zbioru danych</dataset-name>
+        <clear-dataset>Wyczyść zbiór danych</clear-dataset>
         <show-message>Wyświetl komunikat</show-message>
         <message>
             <label>Komunikat</label>
             <hint>Na przykład "Imię: {$name}"</hint>
         </message>
+        <run-process>Uruchom proces</run-process>
+        <process-name>Nazwa procesu</process-name>
+        <navigate>Przejdź</navigate>
+        <location>URL lub ścieżka</location>
+        <target>
+            <label>Cel</label>
+            <same-window>To samo okno</same-window>
+            <new-window>Nowe okno</new-window>
+        </target>
         <set-control-value-unavailable>Ustaw wartość kontrolki jest dostępne tylko, gdy wybrano opcję "po przygotowaniu kontrolek"</set-control-value-unavailable>
 
     </dialog-actions>

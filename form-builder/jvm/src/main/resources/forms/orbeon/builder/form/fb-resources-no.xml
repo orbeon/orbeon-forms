@@ -1556,13 +1556,27 @@
             <visited>Besøkt</visited>
             <unvisited>Ikke besøkt</unvisited>
         </visited-status>
+        <set-attachment-content>Angi vedleggsinnhold</set-attachment-content>
+        <set-attachment-filename>Angi filnavn for vedlegg</set-attachment-filename>
+        <set-attachment-mediatype>Angi mediatype for vedlegg</set-attachment-mediatype>
+        <set-attachment-size>Angi vedleggsstørrelse</set-attachment-size>
         <save-to-dataset>Lagre til datasett</save-to-dataset>
         <dataset-name>Datasettnavn</dataset-name>
+        <clear-dataset>Tøm datasett</clear-dataset>
         <show-message>Vis melding</show-message>
         <message>
             <label>Melding</label>
             <hint>For eksempel "Navn: {$name}"</hint>
         </message>
+        <run-process>Kjør prosess</run-process>
+        <process-name>Prosessnavn</process-name>
+        <navigate>Naviger</navigate>
+        <location>URL eller bane</location>
+        <target>
+            <label>Mål</label>
+            <same-window>Samme vindu</same-window>
+            <new-window>Nytt vindu</new-window>
+        </target>
         <set-control-value-unavailable>Angi kontrollverdi er bare tilgjengelig når "etter at kontrollene er klare" er valgt</set-control-value-unavailable>
 
     </dialog-actions>

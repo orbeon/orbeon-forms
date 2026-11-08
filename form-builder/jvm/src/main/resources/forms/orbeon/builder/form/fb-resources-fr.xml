@@ -1594,13 +1594,27 @@
             <visited>Visité</visited>
             <unvisited>Non visité</unvisited>
         </visited-status>
+        <set-attachment-content>Définir le contenu de la pièce jointe</set-attachment-content>
+        <set-attachment-filename>Définir le nom de fichier de la pièce jointe</set-attachment-filename>
+        <set-attachment-mediatype>Définir le type de média de la pièce jointe</set-attachment-mediatype>
+        <set-attachment-size>Définir la taille de la pièce jointe</set-attachment-size>
         <save-to-dataset>Sauvegarder dans un dataset</save-to-dataset>
         <dataset-name>Nom du dataset</dataset-name>
+        <clear-dataset>Vider le dataset</clear-dataset>
         <show-message>Afficher un message</show-message>
         <message>
             <label>Message</label>
             <hint>Par exemple, "Nom&#8239;: {$name}"</hint>
         </message>
+        <run-process>Exécuter le processus</run-process>
+        <process-name>Nom du processus</process-name>
+        <navigate>Naviguer</navigate>
+        <location>URL ou chemin</location>
+        <target>
+            <label>Cible</label>
+            <same-window>Même fenêtre</same-window>
+            <new-window>Nouvelle fenêtre</new-window>
+        </target>
         <set-control-value-unavailable>Définir la valeur du contrôle est uniquement disponible lorsque "après la préparation des contrôles" est sélectionné</set-control-value-unavailable>
 
     </dialog-actions>

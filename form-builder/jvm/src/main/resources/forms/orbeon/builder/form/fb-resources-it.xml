@@ -1528,13 +1528,27 @@
             <visited>Visitato</visited>
             <unvisited>Non visitato</unvisited>
         </visited-status>
+        <set-attachment-content>Imposta contenuto allegato</set-attachment-content>
+        <set-attachment-filename>Imposta nome file allegato</set-attachment-filename>
+        <set-attachment-mediatype>Imposta tipo di media allegato</set-attachment-mediatype>
+        <set-attachment-size>Imposta dimensione allegato</set-attachment-size>
         <save-to-dataset>Salva nel dataset</save-to-dataset>
         <dataset-name>Nome del dataset</dataset-name>
+        <clear-dataset>Cancella dataset</clear-dataset>
         <show-message>Mostra messaggio</show-message>
         <message>
             <label>Messaggio</label>
             <hint>Per esempio, "Nome: {$name}"</hint>
         </message>
+        <run-process>Esegui processo</run-process>
+        <process-name>Nome processo</process-name>
+        <navigate>Naviga</navigate>
+        <location>URL o percorso</location>
+        <target>
+            <label>Destinazione</label>
+            <same-window>Stessa finestra</same-window>
+            <new-window>Nuova finestra</new-window>
+        </target>
         <set-control-value-unavailable>Imposta valore di controllo è disponibile solo quando è selezionato "dopo che i controlli sono pronti"</set-control-value-unavailable>
 
     </dialog-actions>

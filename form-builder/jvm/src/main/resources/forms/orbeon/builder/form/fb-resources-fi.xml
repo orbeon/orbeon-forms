@@ -1569,13 +1569,27 @@
             <visited>Vierailtu</visited>
             <unvisited>Ei vierailtu</unvisited>
         </visited-status>
+        <set-attachment-content>Aseta liitteen sisältö</set-attachment-content>
+        <set-attachment-filename>Aseta liitteen tiedostonimi</set-attachment-filename>
+        <set-attachment-mediatype>Aseta liitteen mediatyyppi</set-attachment-mediatype>
+        <set-attachment-size>Aseta liitteen koko</set-attachment-size>
         <save-to-dataset>Tallenna tietojoukkoon</save-to-dataset>
         <dataset-name>Tietojoukon nimi</dataset-name>
+        <clear-dataset>Tyhjennä tietoaineisto</clear-dataset>
         <show-message>Näytä viesti</show-message>
         <message>
             <label>Viesti</label>
             <hint>Esimerkiksi "Nimi: {$name}"</hint>
         </message>
+        <run-process>Suorita prosessi</run-process>
+        <process-name>Prosessin nimi</process-name>
+        <navigate>Siirry</navigate>
+        <location>URL tai polku</location>
+        <target>
+            <label>Kohde</label>
+            <same-window>Sama ikkuna</same-window>
+            <new-window>Uusi ikkuna</new-window>
+        </target>
         <set-control-value-unavailable>Aseta kontrollin arvo on käytettävissä vain, kun "kontrollien valmistumisen jälkeen" on valittu</set-control-value-unavailable>
 
     </dialog-actions>

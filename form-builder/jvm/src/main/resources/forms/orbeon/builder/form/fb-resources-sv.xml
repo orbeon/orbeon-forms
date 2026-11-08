@@ -1603,13 +1603,27 @@
             <visited>Besökt</visited>
             <unvisited>Inte besökt</unvisited>
         </visited-status>
+        <set-attachment-content>Ange bilageinnehåll</set-attachment-content>
+        <set-attachment-filename>Ange bilagefilnamn</set-attachment-filename>
+        <set-attachment-mediatype>Ange bilagemediatyp</set-attachment-mediatype>
+        <set-attachment-size>Ange bilagestorlek</set-attachment-size>
         <save-to-dataset>Spara till dataset</save-to-dataset>
         <dataset-name>Dataset-namn</dataset-name>
+        <clear-dataset>Rensa dataset</clear-dataset>
         <show-message>Visa meddelande</show-message>
         <message>
             <label>Meddelande</label>
             <hint>Till exempel "Namn: {$name}"</hint>
         </message>
+        <run-process>Kör process</run-process>
+        <process-name>Processnamn</process-name>
+        <navigate>Navigera</navigate>
+        <location>URL eller sökväg</location>
+        <target>
+            <label>Mål</label>
+            <same-window>Samma fönster</same-window>
+            <new-window>Nytt fönster</new-window>
+        </target>
         <set-control-value-unavailable>Ange kontrollvärde är endast tillgängligt när "efter att kontrollerna är klara" har valts</set-control-value-unavailable>
 
     </dialog-actions>

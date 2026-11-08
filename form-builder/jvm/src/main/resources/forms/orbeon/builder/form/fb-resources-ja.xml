@@ -1567,13 +1567,27 @@
             <visited>訪問済み</visited>
             <unvisited>未訪問</unvisited>
         </visited-status>
+        <set-attachment-content>添付ファイルの内容を設定</set-attachment-content>
+        <set-attachment-filename>添付ファイル名を設定</set-attachment-filename>
+        <set-attachment-mediatype>添付ファイルのメディアタイプを設定</set-attachment-mediatype>
+        <set-attachment-size>添付ファイルのサイズを設定</set-attachment-size>
         <save-to-dataset>データセットに保存</save-to-dataset>
         <dataset-name>データセット名</dataset-name>
+        <clear-dataset>データセットをクリア</clear-dataset>
         <show-message>メッセージを表示</show-message>
         <message>
             <label>メッセージ</label>
             <hint>例: "名前: {$name}"</hint>
         </message>
+        <run-process>プロセスを実行</run-process>
+        <process-name>プロセス名</process-name>
+        <navigate>移動</navigate>
+        <location>URLまたはパス</location>
+        <target>
+            <label>ターゲット</label>
+            <same-window>同じウィンドウ</same-window>
+            <new-window>新しいウィンドウ</new-window>
+        </target>
         <set-control-value-unavailable>「コントロール準備後」の場合のみコントロール値の設定が可能です</set-control-value-unavailable>
 
     </dialog-actions>

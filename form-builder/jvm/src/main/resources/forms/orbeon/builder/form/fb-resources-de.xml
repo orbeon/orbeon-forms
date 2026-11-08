@@ -1525,13 +1525,27 @@
             <visited>Besucht</visited>
             <unvisited>Nicht besucht</unvisited>
         </visited-status>
+        <set-attachment-content>Anhangsinhalt festlegen</set-attachment-content>
+        <set-attachment-filename>Anhangsdateinamen festlegen</set-attachment-filename>
+        <set-attachment-mediatype>Anhangsmediatyp festlegen</set-attachment-mediatype>
+        <set-attachment-size>Anhangsgröße festlegen</set-attachment-size>
         <save-to-dataset>In Dataset speichern</save-to-dataset>
         <dataset-name>Dataset-Name</dataset-name>
+        <clear-dataset>Dataset leeren</clear-dataset>
         <show-message>Nachricht anzeigen</show-message>
         <message>
             <label>Nachricht</label>
             <hint>Zum Beispiel "Name: {$name}"</hint>
         </message>
+        <run-process>Prozess ausführen</run-process>
+        <process-name>Prozessname</process-name>
+        <navigate>Navigieren</navigate>
+        <location>URL oder Pfad</location>
+        <target>
+            <label>Ziel</label>
+            <same-window>Gleiches Fenster</same-window>
+            <new-window>Neues Fenster</new-window>
+        </target>
         <set-control-value-unavailable>Kontrollwert festlegen ist nur verfügbar, wenn "nachdem die Steuerelemente bereit sind" ausgewählt ist</set-control-value-unavailable>
 
     </dialog-actions>

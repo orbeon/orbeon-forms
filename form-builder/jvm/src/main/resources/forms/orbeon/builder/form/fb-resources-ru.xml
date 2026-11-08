@@ -1555,13 +1555,27 @@
             <visited>Посещен</visited>
             <unvisited>Не посещен</unvisited>
         </visited-status>
+        <set-attachment-content>Установить содержимое вложения</set-attachment-content>
+        <set-attachment-filename>Установить имя файла вложения</set-attachment-filename>
+        <set-attachment-mediatype>Установить медиатип вложения</set-attachment-mediatype>
+        <set-attachment-size>Установить размер вложения</set-attachment-size>
         <save-to-dataset>Сохранить в набор данных</save-to-dataset>
         <dataset-name>Название набора данных</dataset-name>
+        <clear-dataset>Очистить набор данных</clear-dataset>
         <show-message>Показать сообщение</show-message>
         <message>
             <label>Сообщение</label>
             <hint>Например, "Имя: {$name}"</hint>
         </message>
+        <run-process>Выполнить процесс</run-process>
+        <process-name>Название процесса</process-name>
+        <navigate>Перейти</navigate>
+        <location>URL или путь</location>
+        <target>
+            <label>Цель</label>
+            <same-window>То же окно</same-window>
+            <new-window>Новое окно</new-window>
+        </target>
         <set-control-value-unavailable>Установить значение элемента управления доступно только при выборе «после подготовки элементов управления»</set-control-value-unavailable>
 
     </dialog-actions>

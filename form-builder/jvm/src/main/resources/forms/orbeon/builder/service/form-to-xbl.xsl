@@ -149,7 +149,8 @@
                             fr:control-setfocus      |
                             fr:control-setattachment |
                             fr:control-setfilename   |
-                            fr:control-setmediatype
+                            fr:control-setmediatype  |
+                            fr:control-setsize
                         )/@control
                     )
                 )"/>

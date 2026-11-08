@@ -1556,13 +1556,27 @@
             <visited>Bezocht</visited>
             <unvisited>Niet bezocht</unvisited>
         </visited-status>
+        <set-attachment-content>Bijlage-inhoud instellen</set-attachment-content>
+        <set-attachment-filename>Bijlagebestandsnaam instellen</set-attachment-filename>
+        <set-attachment-mediatype>Bijlagemediatype instellen</set-attachment-mediatype>
+        <set-attachment-size>Bijlagegrootte instellen</set-attachment-size>
         <save-to-dataset>Bewaar in dataset</save-to-dataset>
         <dataset-name>Dataset naam</dataset-name>
+        <clear-dataset>Dataset wissen</clear-dataset>
         <show-message>Bericht weergeven</show-message>
         <message>
             <label>Bericht</label>
             <hint>Bijvoorbeeld "Naam: {$name}"</hint>
         </message>
+        <run-process>Proces uitvoeren</run-process>
+        <process-name>Procesnaam</process-name>
+        <navigate>Navigeren</navigate>
+        <location>URL of pad</location>
+        <target>
+            <label>Doel</label>
+            <same-window>Zelfde venster</same-window>
+            <new-window>Nieuw venster</new-window>
+        </target>
         <set-control-value-unavailable>Bedieningswaarde instellen is alleen beschikbaar wanneer "nadat de besturingselementen klaar zijn" is geselecteerd</set-control-value-unavailable>
 
     </dialog-actions>

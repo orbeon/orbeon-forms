@@ -892,20 +892,53 @@ object FormBuilderXPathApi {
       Some(FormBuilder.currentResources.child(*).map(r => r.localname -> r).toMap) // accelerate resources lookups
 
     FormRunner.getAllControlsWithIdsExcludeContainers.map { controlElem =>
-      val controlId    = controlElem.id
-      val controlName  = FormRunner.controlNameFromId(controlId)
-      val controlLabel =
+      val controlId       = controlElem.id
+      val controlName     = FormRunner.controlNameFromId(controlId)
+      val controlLabel    =
         FormBuilder.getControlResourceOrEmpty(
           controlName,
           "label",
           removeHtmlTags  = true,
           resourcesMapOpt = someResourcesMap
         )
+      val ancestorRepeats =
+        FormRunner.findAncestorRepeatNames(controlElem, includeSelf = false).reverse.mkString(" ")
       <item
         label={s"$controlLabel ($controlName)"}
         value={controlName}
-        local-name={controlElem.localname}/>
+        local-name={controlElem.localname}
+        ancestor-repeats={ancestorRepeats}/>
     }.map(elemToNodeInfo)
+  }
+
+  //@XPathFunction
+  def getRepeatsLabelValueItemset(): Iterable[NodeInfo] = {
+
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+
+    val someResourcesMap =
+      Some(FormBuilder.currentResources.child(*).map(r => r.localname -> r).toMap)
+
+    FormRunner.getAllContainersWithIds
+      .filter(FormRunner.isRepeat)
+      .flatMap { repeatElem =>
+        FormRunner.getControlNameOpt(repeatElem).map { repeatName =>
+          val repeatLabel =
+            FormBuilder.getControlResourceOrEmpty(
+              repeatName,
+              "label",
+              removeHtmlTags  = true,
+              resourcesMapOpt = someResourcesMap
+            )
+          val label = if (repeatLabel.nonEmpty) s"$repeatLabel ($repeatName)" else repeatName
+          val ancestorRepeats =
+            FormRunner.findAncestorRepeatNames(repeatElem, includeSelf = false).reverse.mkString(" ")
+          <item
+            label={label}
+            value={repeatName}
+            ancestor-repeats={ancestorRepeats}/>
+        }
+      }.map(elemToNodeInfo)
   }
 
   //@XPathFunction

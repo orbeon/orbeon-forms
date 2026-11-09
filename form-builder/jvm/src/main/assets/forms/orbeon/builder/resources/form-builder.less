@@ -2454,12 +2454,16 @@ body.orbeon {
 
     // Bindings editor dialog
     .fb-action-dialog {
-        width: 800px;
-        max-width: none;
+        width: 950px;
+        max-width: ~"calc(100vw - 20px)";
 
         .fb-dialog-body {
             min-height: 0;
             .dialog-scrollable();
+        }
+
+        .fb-indent-spacers:not(.fb-indent-spacer).xforms-update-full:empty {
+            display: none; // hide extra blank repeat spans so they don't contribute as flex items
         }
 
         .fb-service-call-request-actions {
@@ -2550,16 +2554,9 @@ body.orbeon {
                 box-sizing: border-box;
             }
 
-            @optionsWidth : 700px;
-            @2colWidth    : (@optionsWidth / 2);
-            @3colWidth    : (@optionsWidth / 3);
-
-            // So all the options are on the same line
-            min-width: @optionsWidth;
-
-            .fb-action-option-2-col-span-1 { width: @2colWidth }
-            .fb-action-option-3-col-span-1 { width: @3colWidth }
-            .fb-action-option-3-col-span-2 { width: @3colWidth * 2 }
+            .fb-action-option-2-col-span-1 { width: 50%; }
+            .fb-action-option-3-col-span-1 { width: 33.333%; }
+            .fb-action-option-3-col-span-2 { width: 66.666%; }
 
             // Wider dropdown to accommodate group labels
             .fb-request-param-or-header-select { min-width: 200px }
@@ -2577,26 +2574,166 @@ body.orbeon {
         }
 
         .xbl-fr-dnd-repeat {
-            display: table;
+            display: block;
             width: 100%;
 
             // A reorderable line
             .fb-action-iteration {
-                display: table-row;
+                display: flex;
+                width: 100%;
+                justify-content: flex-start;
+                align-items: flex-start;
+                margin-bottom: 5px;
+
+                .fb-action-row-spacers {
+                    flex-grow: 0;
+                    pointer-events: none;
+
+                    &:has(.fb-indent-spacer) {
+                        white-space: nowrap;
+                        height: stretch;
+                    }
+
+                    .fb-indent-spacer {
+                        display: inline-block;
+                        width: 1.2em;
+                        height: stretch;
+                        pointer-events: none;
+                    }
+                }
+
+                .fb-action-row-content-outer {
+                    width: 100%;
+                    flex-grow: 1;
+                    min-width: 0;
+                }
+
+                .fb-action-row-content {
+                    padding: 3px;
+                }
+
+                .fb-action-row-content-start-row > .fb-action-row-content {
+                    border-top-left-radius: 5px;
+                    border-top-right-radius: 5px;
+                }
+
+                .fb-action-row-content-end-row > .fb-action-row-content {
+                    border-bottom-left-radius: 5px;
+                    border-bottom-right-radius: 5px;
+                }
+
+                .fb-action-row-content-indent-1 > .fb-action-row-content, .fb-indent-spacer-position-2, .fb-action-row-content-indent-2 {
+                    background-color: #ededed;
+                }
+
+                .fb-action-row-content-indent-2 > .fb-action-row-content, .fb-indent-spacer-position-3, .fb-action-row-content-indent-3 {
+                    background-color: #dfdfdf;
+                }
+
+                .fb-action-row-content-indent-3 > .fb-action-row-content, .fb-indent-spacer-position-4, .fb-action-row-content-indent-4 {
+                    background-color: #d1d1d1;
+                }
 
                 // On the right, the buttons to reorder, remove, and add rows
                 .fb-action-buttons {
-                    // Use a minimal amount of horizontal space, leaving space for the "options"
-                    width: 1%;
-                    padding-top: 3px;
-                    text-align: right;
+                    flex-grow: 0;
+                    flex-shrink: 0;
                     white-space: nowrap;
-                    vertical-align: top;
+                    text-align: right;
+                    padding-top: 3px;
+                    margin-left: 6px;
+
+                    .xforms-trigger-appearance-minimal i {
+                        font-size: 14px;
+                        margin-left: 2px;
+                    }
                 }
 
-                .fb-action-options, .fb-action-buttons {
-                    display: table-cell;
-                    padding-bottom: 5px;
+                .fb-action-options {
+                    display: block;
+                    width: 100%;
+                    min-width: 0;
+                    &:after {
+                        content: "";
+                        display: table;
+                        clear: both;
+                    }
+                }
+            }
+        }
+
+        .fb-action-at-group {
+            margin-top: 4px;
+
+            .fb-action-at-repeat {
+                display: block;
+
+                .fb-action-at-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    margin-bottom: 2px;
+
+                    .fb-action-at-type-select {
+                        flex: 1 1 auto;
+                        min-width: 0;
+                        select {
+                            width: 100%;
+                        }
+                    }
+
+                    .fb-action-at-index-input {
+                        flex: 0 0 50px;
+                        width: 50px;
+                        input {
+                            width: 100%;
+                            text-align: center;
+                        }
+                    }
+                }
+            }
+        }
+
+        .fb-expression-context-checkbox {
+            margin-top: 4px;
+            font-size: 0.9em;
+
+            .xforms-items {
+                display: flex;
+                align-items: center;
+            }
+        }
+
+        .fb-copy-content-maps {
+            clear: both;
+            padding-top: 6px;
+            margin-left: 20px;
+
+            .fb-copy-content-map-row {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding-bottom: 4px;
+
+                .fb-copy-content-map-col {
+                    flex: 1 1 0;
+                    min-width: 0;
+
+                    input, select {
+                        width: 100%;
+                        box-sizing: border-box;
+                    }
+
+                    .select2-container {
+                        display: block;
+                        width: 100% !important;
+                    }
+                }
+
+                .fb-copy-content-map-buttons {
+                    flex: 0 0 auto;
+                    white-space: nowrap;
+                    text-align: right;
                 }
             }
         }

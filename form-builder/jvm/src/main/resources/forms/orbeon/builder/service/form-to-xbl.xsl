@@ -142,16 +142,20 @@
                     $action-20182//(
                         fr:*/@repeat-name,
                         (
-                            fr:control-setvalue      |
-                            fr:control-clear         |
-                            fr:control-setitems      |
-                            fr:control-setvisited    |
-                            fr:control-setfocus      |
-                            fr:control-setattachment |
-                            fr:control-setfilename   |
-                            fr:control-setmediatype  |
-                            fr:control-setsize
-                        )/@control
+                            fr:control-setvalue        |
+                            fr:control-clear           |
+                            fr:control-setitems        |
+                            fr:control-setvisited      |
+                            fr:control-setfocus        |
+                            fr:control-setattachment   |
+                            fr:control-setfilename     |
+                            fr:control-setmediatype    |
+                            fr:control-setsize         |
+                            fr:repeat-clear            |
+                            fr:repeat-add-iteration    |
+                            fr:repeat-remove-iteration
+                        )/(@control, @repeat)          |
+                        fr:copy-content/fr:map/@right
                     )
                 )"/>
     </xsl:function>

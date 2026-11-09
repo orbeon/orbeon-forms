@@ -1616,6 +1616,47 @@
             <new-window>New window</new-window>
         </target>
         <set-control-value-unavailable>Set Control Value is only available when "after the controls are ready" is selected</set-control-value-unavailable>
+        <data-iterate>Iterate over data</data-iterate>
+        <if>Run only if condition is met</if>
+        <repeat-clear>Clear repeat</repeat-clear>
+        <repeat-add-iteration>Add repeat iteration</repeat-add-iteration>
+        <repeat-remove-iteration>Remove repeat iteration</repeat-remove-iteration>
+        <copy-content>Copy content</copy-content>
+        <iteration-xpath>
+            <label>Items XPath</label>
+        </iteration-xpath>
+        <condition-xpath>
+            <label>Condition XPath</label>
+        </condition-xpath>
+        <expression-context-current-iteration>Relative to current iteration</expression-context-current-iteration>
+        <destination-repeat>
+            <label>Target repeat</label>
+        </destination-repeat>
+        <apply-defaults>
+            <label>Apply initial value formulas</label>
+        </apply-defaults>
+        <at>
+            <label>Iteration</label>
+            <end>Last iteration</end>
+            <start>First iteration</start>
+            <all>All iterations</all>
+            <index>Specific iteration</index>
+            <position>Iteration number</position>
+        </at>
+        <copy-content-warn>
+            <label>Warn if target data will be overwritten</label>
+        </copy-content-warn>
+        <source-control>
+            <label>Source control</label>
+        </source-control>
+        <wrap-iterate>Wrap in Iteration</wrap-iterate>
+        <wrap-if>Wrap in Condition</wrap-if>
+        <ungroup>Ungroup</ungroup>
+        <event-mode>
+            <label>Run the action in the following case</label>
+            <always>Always</always>
+            <new-only>In the "new" mode only</new-only>
+        </event-mode>
 
     </dialog-actions>
     <dialog-test>

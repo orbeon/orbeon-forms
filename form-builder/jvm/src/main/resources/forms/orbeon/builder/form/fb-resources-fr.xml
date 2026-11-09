@@ -1617,6 +1617,47 @@
             <new-window>Nouvelle fenêtre</new-window>
         </target>
         <set-control-value-unavailable>Définir la valeur du contrôle est uniquement disponible lorsque "après la préparation des contrôles" est sélectionné</set-control-value-unavailable>
+        <data-iterate>Itérer sur des données</data-iterate>
+        <if>Exécuter seulement si la condition est remplie</if>
+        <repeat-clear>Vider la répétition</repeat-clear>
+        <repeat-add-iteration>Ajouter une itération</repeat-add-iteration>
+        <repeat-remove-iteration>Supprimer une itération</repeat-remove-iteration>
+        <copy-content>Copier le contenu</copy-content>
+        <iteration-xpath>
+            <label>XPath des éléments</label>
+        </iteration-xpath>
+        <condition-xpath>
+            <label>XPath de la condition</label>
+        </condition-xpath>
+        <expression-context-current-iteration>Relatif à l'itération courante</expression-context-current-iteration>
+        <destination-repeat>
+            <label>Répétition cible</label>
+        </destination-repeat>
+        <apply-defaults>
+            <label>Appliquer les formules de valeur initiale</label>
+        </apply-defaults>
+        <at>
+            <label>Itération</label>
+            <end>Dernière itération</end>
+            <start>Première itération</start>
+            <all>Toutes les itérations</all>
+            <index>Itération spécifique</index>
+            <position>Numéro d'itération</position>
+        </at>
+        <copy-content-warn>
+            <label>Avertir si des données cibles seront écrasées</label>
+        </copy-content-warn>
+        <source-control>
+            <label>Contrôle source</label>
+        </source-control>
+        <wrap-iterate>Englober dans une itération</wrap-iterate>
+        <wrap-if>Englober dans une condition</wrap-if>
+        <ungroup>Dégrouper</ungroup>
+        <event-mode>
+            <label>Exécuter l'action dans le cas suivant</label>
+            <always>Toujours</always>
+            <new-only>En mode «&#8239;nouveau&#8239;» seulement</new-only>
+        </event-mode>
 
     </dialog-actions>
     <dialog-test>

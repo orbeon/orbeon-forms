@@ -25,6 +25,9 @@ RUN mkdir -p /tmp/orbeon_forms
 WORKDIR /tmp/orbeon_forms
 
 # Download Orbeon Forms and extract WAR file
+# Cleanup and permissions are done in the same layer, as files changed or removed in a later layer are still stored in this one
+# Use jboss user at runtime
+# Make it arbitrary-UID friendly, OpenShift's restricted security policy, which launches containers as a random, non-root UID
 RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
     && echo "${sha256_checksum} $file" | sha256sum -c - \
     && jar xf $file \
@@ -40,26 +43,21 @@ RUN wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
     && jar xf orbeon-embedding.war \
     && sed -i 's|<filter-class>org.orbeon.oxf.fr.embedding.servlet.ServletFilter</filter-class>|<filter-class>org.orbeon.oxf.fr.embedding.servlet.JakartaServletFilter</filter-class>|g' /docker-entrypoint-wildfly.d/orbeon-embedding.war/WEB-INF/web.xml \
     && rm orbeon-embedding.war \
-    && popd
-
-# Mark orbeon.war for deployment
-RUN touch $DEPLOYMENT_DIR/orbeon.war.dodeploy
+    && popd \
+    && rm -rf /tmp/orbeon_forms/* \
+    && touch $DEPLOYMENT_DIR/orbeon.war.dodeploy \
+    && mkdir -p /tmp/orbeon \
+    && chown -R jboss:0 $WILDFLY_HOME /docker-entrypoint-wildfly.d /docker-entrypoint-wildfly.sh /tmp \
+    && chmod -R g=u     $WILDFLY_HOME /docker-entrypoint-wildfly.d /docker-entrypoint-wildfly.sh /tmp
 
 # Enable gzip compression
-COPY standalone.gzip.xml $CONFIG_DIR/standalone.xml
+COPY --chown=jboss:0 --chmod=664 standalone.gzip.xml $CONFIG_DIR/standalone.xml
 
 # We might want to use WildFly's deployment overlays to customize the Orbeon Forms WAR instead of exploding it
 
 # Cleanup
 RUN rm -rf /tmp/orbeon_forms
 
-# Prevent permission errors at runtime (Ehcache, etc.)
-RUN mkdir -p /tmp/orbeon
-
-# Use jboss user at runtime
-# Make it arbitrary-UID friendly, OpenShift's restricted security policy, which launches containers as a random, non-root UID
-RUN chown -R jboss:0 $WILDFLY_HOME /docker-entrypoint-wildfly.d /docker-entrypoint-wildfly.sh /tmp
-RUN chmod -R g=u     $WILDFLY_HOME /docker-entrypoint-wildfly.d /docker-entrypoint-wildfly.sh /tmp
 USER jboss
 
 EXPOSE 8080

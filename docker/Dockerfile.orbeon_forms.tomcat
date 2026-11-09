@@ -23,7 +23,7 @@ RUN mkdir -p /docker-entrypoint-tomcat.d
 RUN mkdir -p /tmp/orbeon_forms
 WORKDIR /tmp/orbeon_forms
 
-# Download Orbeon Forms and extract WAR file
+# Download Orbeon Forms and extract WAR file (cleanup in the same layer to keep the image small)
 RUN apt-get update && apt-get upgrade -y && apt-get install -y wget && rm -rf /var/lib/apt/lists/* \
     && wget https://github.com/orbeon/orbeon-forms/releases/download/$tag/$file \
     && apt-get purge -y wget && apt-get autoremove -y \
@@ -43,7 +43,8 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y wget && rm -rf /v
          cp *.jar $TOMCAT_HOME/lib/; \
          popd; \
          rm -rf /tmp/redis-jars; \
-       fi
+       fi \
+    && rm -rf /tmp/orbeon_forms/*
 
 # Cleanup
 RUN rm -rf /tmp/orbeon_forms

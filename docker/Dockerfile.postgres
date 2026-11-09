@@ -1,4 +1,7 @@
 FROM postgres:17
 
+# Pick up security updates not yet in the base image
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
+
 # SQL scripts to create Orbeon Forms tables and indexes, as well as demo forms data
 COPY *.sql /docker-entrypoint-initdb.d/

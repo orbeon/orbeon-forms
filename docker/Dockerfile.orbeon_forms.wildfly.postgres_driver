@@ -6,8 +6,8 @@ RUN mkdir -p /tmp/orbeon_forms
 WORKDIR /tmp/orbeon_forms
 
 # JDBC driver for PostgreSQL
-RUN wget https://jdbc.postgresql.org/download/postgresql-42.7.3.jar
-RUN mv postgresql-42.7.3.jar /opt/jboss/wildfly/standalone/deployments
+RUN wget https://jdbc.postgresql.org/download/postgresql-42.7.14.jar
+RUN mv postgresql-42.7.14.jar /opt/jboss/wildfly/standalone/deployments
 
 # Cleanup
 RUN rm -rf /tmp/orbeon_forms

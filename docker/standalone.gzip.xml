@@ -32,11 +32,11 @@
         <extension module="org.wildfly.extension.elytron-oidc-client"/>
         <extension module="org.wildfly.extension.health"/>
         <extension module="org.wildfly.extension.io"/>
+        <extension module="org.wildfly.extension.jakarta.data"/>
         <extension module="org.wildfly.extension.metrics"/>
         <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
         <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
         <extension module="org.wildfly.extension.request-controller"/>
-        <extension module="org.wildfly.extension.security.manager"/>
         <extension module="org.wildfly.extension.undertow"/>
     </extensions>
     <management>
@@ -54,7 +54,7 @@
             </logger>
         </audit-log>
         <management-interfaces>
-            <http-interface http-authentication-factory="management-http-authentication">
+            <http-interface http-authentication-factory="management-http-authentication" console-enabled="true">
                 <http-upgrade enabled="true" sasl-authentication-factory="management-sasl-authentication"/>
                 <socket-binding http="management-http"/>
             </http-interface>
@@ -146,20 +146,26 @@
             <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" runtime-failure-causes-rollback="${jboss.deployment.scanner.rollback.on.failure:false}"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:discovery:1.0"/>
-        <subsystem xmlns="urn:jboss:domain:distributable-ejb:1.0" default-bean-management="default">
-            <infinispan-bean-management name="default" max-active-beans="10000" cache-container="ejb" cache="passivation"/>
+        <subsystem xmlns="urn:jboss:domain:distributable-ejb:3.0">
+            <bean-management default="default">
+                <infinispan-bean-management name="default" max-active-beans="10000" cache-container="ejb" cache="passivation"/>
+            </bean-management>
             <local-client-mappings-registry/>
-            <infinispan-timer-management name="persistent" cache-container="ejb" cache="persistent" max-active-timers="10000"/>
-            <infinispan-timer-management name="transient" cache-container="ejb" cache="transient" max-active-timers="10000"/>
+            <infinispan-timer-management name="persistent" cache-container="ejb" cache="persistent"/>
+            <infinispan-timer-management name="transient" cache-container="ejb" cache="transient"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:distributable-web:4.0" default-session-management="default" default-single-sign-on-management="default">
-            <infinispan-session-management name="default" cache-container="web" granularity="SESSION">
-                <local-affinity/>
-            </infinispan-session-management>
-            <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
+        <subsystem xmlns="urn:jboss:domain:distributable-web:6.0">
+            <session-management default="default">
+                <infinispan-session-management name="default" cache-container="web" granularity="SESSION">
+                    <local-affinity/>
+                </infinispan-session-management>
+            </session-management>
+            <single-sign-on-management default="default">
+                <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
+            </single-sign-on-management>
             <local-routing/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:ee:6.0">
+        <subsystem xmlns="urn:jboss:domain:ee:7.0">
             <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
             <concurrent>
                 <context-services>
@@ -178,7 +184,7 @@
             <default-bindings context-service="java:jboss/ee/concurrency/context/default" datasource="java:jboss/datasources/ExampleDS" managed-executor-service="java:jboss/ee/concurrency/executor/default" managed-scheduled-executor-service="java:jboss/ee/concurrency/scheduler/default" managed-thread-factory="java:jboss/ee/concurrency/factory/default"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:ee-security:1.0"/>
-        <subsystem xmlns="urn:jboss:domain:ejb3:10.0">
+        <subsystem xmlns="urn:jboss:domain:ejb3:11.0">
             <session-bean>
                 <stateless>
                     <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
@@ -221,7 +227,7 @@
             <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
             <log-system-exceptions value="true"/>
         </subsystem>
-        <subsystem xmlns="urn:wildfly:elytron:community:18.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+        <subsystem xmlns="urn:wildfly:elytron:community:19.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
             <providers>
                 <aggregate-providers name="combined-providers">
                     <providers name="elytron"/>
@@ -345,14 +351,11 @@
                     <server-ssl-context name="applicationSSC" key-manager="applicationKM"/>
                 </server-ssl-contexts>
             </tls>
-            <policy name="jacc">
-                <jacc-policy/>
-            </policy>
         </subsystem>
-        <subsystem xmlns="urn:wildfly:elytron-oidc-client:2.0"/>
+        <subsystem xmlns="urn:wildfly:elytron-oidc-client:community:2.0"/>
         <subsystem xmlns="urn:wildfly:health:1.0" security-enabled="false"/>
-        <subsystem xmlns="urn:jboss:domain:infinispan:14.0">
-            <cache-container name="hibernate" marshaller="JBOSS" modules="org.infinispan.hibernate-cache">
+        <subsystem xmlns="urn:jboss:domain:infinispan:17.0">
+            <cache-container name="hibernate" modules="org.infinispan.hibernate-cache" marshaller="JBOSS">
                 <local-cache name="entity">
                     <heap-memory size="10000"/>
                     <expiration max-idle="100000"/>
@@ -368,7 +371,7 @@
                     <expiration max-idle="60000"/>
                 </local-cache>
             </cache-container>
-            <cache-container name="ejb" default-cache="passivation" marshaller="PROTOSTREAM" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
+            <cache-container name="ejb" default-cache="passivation" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan" marshaller="PROTOSTREAM">
                 <local-cache name="passivation">
                     <expiration interval="0"/>
                     <file-store passivation="true"/>
@@ -386,7 +389,7 @@
                     <file-store passivation="true" purge="true"/>
                 </local-cache>
             </cache-container>
-            <cache-container name="web" default-cache="passivation" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.web.infinispan">
+            <cache-container name="web" default-cache="passivation" modules="org.wildfly.clustering.web.infinispan" marshaller="PROTOSTREAM">
                 <local-cache name="passivation">
                     <expiration interval="0"/>
                     <file-store passivation="true"/>
@@ -399,7 +402,8 @@
         <subsystem xmlns="urn:jboss:domain:io:4.0" default-worker="default">
             <worker name="default"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:jaxrs:4.0"/>
+        <subsystem xmlns="urn:wildfly:jakarta-data:community:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:jaxrs:5.0"/>
         <subsystem xmlns="urn:jboss:domain:jca:6.0">
             <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
             <bean-validation enabled="true"/>
@@ -441,31 +445,24 @@
             <remote-naming/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
-        <subsystem xmlns="urn:jboss:domain:remoting:7.0">
+        <subsystem xmlns="urn:jboss:domain:remoting:8.0">
             <endpoint worker="default"/>
             <http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-sasl-authentication"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
         <subsystem xmlns="urn:jboss:domain:resource-adapters:7.1"/>
         <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
-        <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
-            <deployment-permissions>
-                <maximum-set>
-                    <permission class="java.security.AllPermission"/>
-                </maximum-set>
-            </deployment-permissions>
-        </subsystem>
-        <subsystem xmlns="urn:jboss:domain:transactions:6.0">
+        <subsystem xmlns="urn:jboss:domain:transactions:7.0">
             <core-environment node-identifier="${jboss.tx.node.id:1}">
                 <process-id>
                     <uuid/>
                 </process-id>
             </core-environment>
-            <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
+            <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager" transactions-recovery-graceful-shutdown="ignore"/>
             <coordinator-environment statistics-enabled="${wildfly.transactions.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
             <object-store path="tx-object-store" relative-to="jboss.server.data.dir"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:undertow:14.0" default-virtual-host="default-host" default-servlet-container="default" default-server="default-server" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}" default-security-domain="other">
+        <subsystem xmlns="urn:jboss:domain:undertow:15.0" default-virtual-host="default-host" default-servlet-container="default" default-server="default-server" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}" default-security-domain="other">
             <byte-buffer-pool name="default"/>
             <buffer-cache name="default"/>
             <server name="default-server">
@@ -512,7 +509,6 @@
         </interface>
     </interfaces>
     <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
-        <socket-binding name="ajp" port="${jboss.ajp.port:8009}"/>
         <socket-binding name="http" port="${jboss.http.port:8080}"/>
         <socket-binding name="https" port="${jboss.https.port:8443}"/>
         <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:9990}"/>

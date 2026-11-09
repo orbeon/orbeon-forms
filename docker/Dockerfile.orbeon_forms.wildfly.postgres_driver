@@ -7,6 +7,7 @@ WORKDIR /tmp/orbeon_forms
 
 # JDBC driver for PostgreSQL
 RUN wget https://jdbc.postgresql.org/download/postgresql-42.7.14.jar \
+    && echo "73914527305a40cce504b0d3d90b23caf565136912d607ae8ae7c5895512332c  postgresql-42.7.14.jar" | sha256sum -c - \
     && mv postgresql-42.7.14.jar /opt/jboss/wildfly/standalone/deployments
 
 # Cleanup

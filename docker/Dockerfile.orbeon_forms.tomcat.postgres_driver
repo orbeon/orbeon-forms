@@ -8,6 +8,7 @@ WORKDIR /tmp/orbeon_forms
 # JDBC driver for PostgreSQL
 RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/* \
   && wget https://jdbc.postgresql.org/download/postgresql-42.7.14.jar \
+  && echo "73914527305a40cce504b0d3d90b23caf565136912d607ae8ae7c5895512332c  postgresql-42.7.14.jar" | sha256sum -c - \
   && apt-get purge -y wget && apt-get autoremove -y \
   && mv postgresql-42.7.14.jar /usr/local/tomcat/lib/
 

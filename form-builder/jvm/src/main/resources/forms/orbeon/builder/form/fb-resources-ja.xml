@@ -1557,6 +1557,7 @@
         <service-request-actions>サービス呼び出し前</service-request-actions>
         <service-response-actions>サービス応答後</service-response-actions>
 
+        <call-service>サービスを呼び出す</call-service>
         <set-control-value>コントロール値を設定</set-control-value>
         <clear-control-value>コントロールの値をクリア</clear-control-value>
         <set-control-itemset>コントロールの選択肢を設定</set-control-itemset>

@@ -1546,6 +1546,7 @@
         <service-request-actions>Service request acties</service-request-actions>
         <service-response-actions>Service response acties</service-response-actions>
 
+        <call-service>Service aanroepen</call-service>
         <set-control-value>Bedieningswaarde instellen</set-control-value>
         <clear-control-value>Waarde van besturingselement wissen</clear-control-value>
         <set-control-itemset>Stel control-keuzes in</set-control-itemset>

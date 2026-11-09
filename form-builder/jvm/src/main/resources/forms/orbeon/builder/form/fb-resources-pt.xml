@@ -1545,6 +1545,7 @@
         <service-request-actions>Acções de Pedido de Serviço</service-request-actions>
         <service-response-actions>Acções de Resposta de Serviço</service-response-actions>
 
+        <call-service>Chamar serviço</call-service>
         <set-control-value>Definir valor de controle</set-control-value>
         <clear-control-value>Limpar valor do controlo</clear-control-value>
         <set-control-itemset>Definir Lista de Items do Controlo</set-control-itemset>

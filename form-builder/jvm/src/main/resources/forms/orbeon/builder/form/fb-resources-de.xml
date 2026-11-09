@@ -1515,6 +1515,7 @@
         <service-request-actions>Aktionen bei Serviceanfrage</service-request-actions>
         <service-response-actions>Aktionen bei Serviceantwort</service-response-actions>
 
+        <call-service>Dienst aufrufen</call-service>
         <set-control-value>Kontrollwert festlegen</set-control-value>
         <clear-control-value>Kontrollwert löschen</clear-control-value>
         <set-control-itemset>Elementemenge des Steuerelements festlegen</set-control-itemset>

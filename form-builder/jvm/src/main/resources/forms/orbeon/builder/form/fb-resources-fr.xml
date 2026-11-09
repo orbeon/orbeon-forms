@@ -1584,6 +1584,7 @@
         <service-request-actions>Actions de la requête</service-request-actions>
         <service-response-actions>Actions de la réponse</service-response-actions>
 
+        <call-service>Appeler un service</call-service>
         <set-control-value>Définir la valeur du contrôle</set-control-value>
         <clear-control-value>Effacer la valeur du contrôle</clear-control-value>
         <set-control-itemset>Définir la liste de choix du contrôle</set-control-itemset>

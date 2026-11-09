@@ -1559,6 +1559,7 @@
         <service-request-actions>Palvelupyynnön toiminnot</service-request-actions>
         <service-response-actions>Palveluvastauksen toiminnot</service-response-actions>
 
+        <call-service>Kutsu palvelua</call-service>
         <set-control-value>Aseta kontrollin arvo</set-control-value>
         <clear-control-value>Tyhjennä ohjausobjektin arvo</clear-control-value>
         <set-control-itemset>Aseta kontrollin kohdejoukko</set-control-itemset>

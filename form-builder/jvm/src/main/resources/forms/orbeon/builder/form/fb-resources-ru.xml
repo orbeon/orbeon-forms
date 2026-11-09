@@ -1545,6 +1545,7 @@
         <service-request-actions>Действия запроса к сервису</service-request-actions>
         <service-response-actions>Действия ответа сервиса</service-response-actions>
 
+        <call-service>Вызвать сервис</call-service>
         <set-control-value>Установить значение элемента управления</set-control-value>
         <clear-control-value>Очистить значение элемента</clear-control-value>
         <set-control-itemset>Установить список вариантов элемента</set-control-itemset>

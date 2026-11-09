@@ -1518,6 +1518,7 @@
         <service-request-actions>Azioni richiesta servizio</service-request-actions>
         <service-response-actions>Azioni risposta servizio</service-response-actions>
 
+        <call-service>Chiama servizio</call-service>
         <set-control-value>Imposta valore di controllo</set-control-value>
         <clear-control-value>Cancella valore del controllo</clear-control-value>
         <set-control-itemset>Imposta l'insieme di elementi del controllo</set-control-itemset>

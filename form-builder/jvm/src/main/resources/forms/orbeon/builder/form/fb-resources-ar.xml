@@ -1565,6 +1565,7 @@
         <service-request-actions>إجراءات طلب الخدمة</service-request-actions>
         <service-response-actions>إجراءات استجابة الخدمة</service-response-actions>
 
+        <call-service>استدعاء الخدمة</call-service>
         <set-control-value>تعيين قيمة عنصر التحكم</set-control-value>
         <clear-control-value>مسح قيمة عنصر التحكم</clear-control-value>
         <set-control-itemset>تعيين خيارات عنصر التحكم</set-control-itemset>

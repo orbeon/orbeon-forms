@@ -1546,6 +1546,7 @@
         <service-request-actions>Tjenesteforespørselshandlinger</service-request-actions>
         <service-response-actions>Tjenesteresponshandlinger</service-response-actions>
 
+        <call-service>Kall tjeneste</call-service>
         <set-control-value>Angi kontrollverdi</set-control-value>
         <clear-control-value>Tøm kontrollverdi</clear-control-value>
         <set-control-itemset>Angi kontrollvalg</set-control-itemset>

@@ -1593,6 +1593,7 @@
         <service-request-actions>Tjänstbegäran-kommandon</service-request-actions>
         <service-response-actions>Tjänstsvar-kommandon</service-response-actions>
 
+        <call-service>Anropa tjänst</call-service>
         <set-control-value>Ange kontrollvärde</set-control-value>
         <clear-control-value>Rensa kontrollvärde</clear-control-value>
         <set-control-itemset>Ange kontrollval</set-control-itemset>

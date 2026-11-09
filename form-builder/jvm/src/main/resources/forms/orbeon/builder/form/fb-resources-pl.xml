@@ -1562,6 +1562,7 @@
         <service-request-actions>Akcje żądania usługi</service-request-actions>
         <service-response-actions>Akcje odpowiedzi usługi</service-response-actions>
 
+        <call-service>Wywołaj usługę</call-service>
         <set-control-value>Ustaw wartość kontrolki</set-control-value>
         <clear-control-value>Wyczyść wartość kontrolki</clear-control-value>
         <set-control-itemset>Ustaw wybory kontrolki</set-control-itemset>

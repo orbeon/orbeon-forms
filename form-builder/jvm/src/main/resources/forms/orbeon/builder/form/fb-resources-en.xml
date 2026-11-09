@@ -1583,6 +1583,7 @@
         <service-request-actions>Service Request Actions</service-request-actions>
         <service-response-actions>Service Response Actions</service-response-actions>
 
+        <call-service>Call Service</call-service>
         <set-control-value>Set Control Value</set-control-value>
         <clear-control-value>Clear Control Value</clear-control-value>
         <set-control-itemset>Set Control Choices</set-control-itemset>

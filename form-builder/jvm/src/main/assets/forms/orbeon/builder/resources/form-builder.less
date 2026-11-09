@@ -2457,6 +2457,52 @@ body.orbeon {
         width: 800px;
         max-width: none;
 
+        .fb-dialog-body {
+            min-height: 0;
+            .dialog-scrollable();
+        }
+
+        .fb-service-call-request-actions {
+            clear: both;
+            padding-top: 5px;
+            margin-left: 20px;
+
+            .fb-service-call-parameter-row {
+                display: flex;
+                align-items: center;
+                padding-bottom: 5px;
+
+                .fb-service-call-parameter-fields {
+                    display: flex;
+                    flex: 1 1 auto;
+                    min-width: 0;
+
+                    .fb-service-call-param-col {
+                        flex: 1 1 0;
+                        min-width: 0;
+                        padding-right: 10px;
+                        box-sizing: border-box;
+
+                        input, select, textarea {
+                            width: 100%;
+                            box-sizing: border-box;
+                        }
+
+                        .select2-container {
+                            display: block;
+                            width: 100% !important;
+                        }
+                    }
+                }
+
+                .fb-service-call-parameter-buttons {
+                    flex: 0 0 auto;
+                    white-space: nowrap;
+                    text-align: right;
+                }
+            }
+        }
+
         .fb-action-phrase-outer > .xforms-label {
             border-bottom: none;
             &:after {
@@ -2669,7 +2715,6 @@ body.orbeon {
     .fb-dialog-control-settings,
     .fb-dialog-form-settings,
     .fb-dialog-container-settings,
-    .fb-action-dialog,
     .fb-dialog-http-services,
     .fb-dialog-keyboard-shortcuts {
         .xbl-fr-tabbable {

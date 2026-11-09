@@ -39,6 +39,7 @@ SQL_DATA_FILE='02-orbeon-postgresql-data.sql'
 DOCKER_TAG_BASE="$VERSION"
 DOCKER_TAG_TOMCAT="$DOCKER_TAG_BASE"
 DOCKER_TAG_WILDFLY="$DOCKER_TAG_BASE-wildfly"
+DOCKER_TAG_WILDFLY_39="$DOCKER_TAG_BASE-wildfly39"
 
 # Image names
 POSTGRES_IMAGE="orbeon/postgres:$DOCKER_TAG_BASE"
@@ -46,6 +47,14 @@ ORBEON_FORMS_TOMCAT_BASE_IMAGE="orbeon/orbeon-forms-base:$DOCKER_TAG_TOMCAT"
 ORBEON_FORMS_TOMCAT_IMAGE="orbeon/orbeon-forms:$DOCKER_TAG_TOMCAT"
 ORBEON_FORMS_WILDFLY_BASE_IMAGE="orbeon/orbeon-forms-base:$DOCKER_TAG_WILDFLY"
 ORBEON_FORMS_WILDFLY_IMAGE="orbeon/orbeon-forms:$DOCKER_TAG_WILDFLY"
+
+# Transitional WildFly 39 images, for users whose custom standalone.xml has not been migrated to the current WildFly version
+# They use the previous WildFly configuration and the previous name of the PostgreSQL JDBC driver
+WILDFLY_39_VERSION='39.0.1.Final-2'
+WILDFLY_39_DRIVER_VERSION='42.7.3'
+WILDFLY_39_DRIVER_SHA256_CHECKSUM='a2644cbfba1baa145ff7e8c8ef582a6eed7a7ec4ca792f7f054122bdec756268'
+ORBEON_FORMS_WILDFLY_39_BASE_IMAGE="orbeon/orbeon-forms-base:$DOCKER_TAG_WILDFLY_39"
+ORBEON_FORMS_WILDFLY_39_IMAGE="orbeon/orbeon-forms:$DOCKER_TAG_WILDFLY_39"
 
 # Image/container names for demo forms import/export
 DEMO_FORMS_POSTGRES_IMAGE="orbeon/postgres-demo-forms:$DOCKER_TAG_BASE"
@@ -135,6 +144,13 @@ main() {
   docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.wildfly.postgres_driver --build-arg base_image="$ORBEON_FORMS_WILDFLY_BASE_IMAGE" -t "$ORBEON_FORMS_WILDFLY_IMAGE" .
   scan_image "$ORBEON_FORMS_WILDFLY_IMAGE"
 
+  # Build Orbeon Forms image (WildFly 39, base image)
+  docker build --pull --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.wildfly --build-arg wildfly_version="$WILDFLY_39_VERSION" --build-arg standalone_file=standalone.gzip.wildfly39.xml --build-arg tag="$RELEASE_TAG" --build-arg file="$FILE" --build-arg sha256_checksum="$SHA256_CHECKSUM" -t "$ORBEON_FORMS_WILDFLY_39_BASE_IMAGE" .
+
+  # Build Orbeon Forms image (WildFly 39, including PostgreSQL JDBC driver)
+  docker build --platform="$PLATFORMS" -f Dockerfile.orbeon_forms.wildfly.postgres_driver --build-arg base_image="$ORBEON_FORMS_WILDFLY_39_BASE_IMAGE" --build-arg driver_version="$WILDFLY_39_DRIVER_VERSION" --build-arg driver_sha256_checksum="$WILDFLY_39_DRIVER_SHA256_CHECKSUM" --build-arg driver_deployment_name="postgresql-$WILDFLY_39_DRIVER_VERSION.jar" -t "$ORBEON_FORMS_WILDFLY_39_IMAGE" .
+  scan_image "$ORBEON_FORMS_WILDFLY_39_IMAGE"
+
   # Do not import demo forms into PostgreSQL, just use SQLite
   ## Import demo forms into PostgreSQL database and export them to SQL script
   #create_demo_forms_sql_script
@@ -148,6 +164,7 @@ main() {
   if $REMOTE_PUBLISH; then
     docker push "$ORBEON_FORMS_TOMCAT_IMAGE"
     docker push "$ORBEON_FORMS_WILDFLY_IMAGE"
+    docker push "$ORBEON_FORMS_WILDFLY_39_IMAGE"
     docker push "$POSTGRES_IMAGE"
   fi
 }
@@ -223,7 +240,7 @@ cleanup() {
     fi
   done
 
-  images=("$POSTGRES_IMAGE" "$ORBEON_FORMS_TOMCAT_BASE_IMAGE" "$ORBEON_FORMS_TOMCAT_IMAGE" "$ORBEON_FORMS_WILDFLY_BASE_IMAGE" "$ORBEON_FORMS_WILDFLY_IMAGE" "$DEMO_FORMS_POSTGRES_IMAGE" )
+  images=("$POSTGRES_IMAGE" "$ORBEON_FORMS_TOMCAT_BASE_IMAGE" "$ORBEON_FORMS_TOMCAT_IMAGE" "$ORBEON_FORMS_WILDFLY_BASE_IMAGE" "$ORBEON_FORMS_WILDFLY_IMAGE" "$ORBEON_FORMS_WILDFLY_39_BASE_IMAGE" "$ORBEON_FORMS_WILDFLY_39_IMAGE" "$DEMO_FORMS_POSTGRES_IMAGE" )
   for image in "${images[@]}"; do
     if [ "$(docker images -q "$image")" ]; then
       docker rmi "$image"

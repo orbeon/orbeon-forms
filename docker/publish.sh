@@ -68,7 +68,12 @@ scan_image() {
     local plat_slug="${plat//\//-}"
     local out="$SCAN_REPORT_DIR/${image_slug}__${plat_slug}.txt"
     echo "[scan] $image ($plat) -> $out"
-    docker scout cves --platform="$plat" --only-severity critical,high "$image" > "$out" 2>&1 || true
+    # Scan a saved archive, as `docker scout` fails on the non-native platform of a local multi-platform image
+    local archive_dir
+    archive_dir=$(mktemp -d)
+    docker save --platform "$plat" -o "$archive_dir/image.tar" "$image" \
+      && docker scout cves --platform="$plat" --only-severity critical,high "archive://$archive_dir/image.tar" > "$out" 2>&1 || true
+    rm -rf "$archive_dir"
     local counts
     counts=$(grep -oE '[0-9]+C[[:space:]]+[0-9]+H' "$out" | head -1 || true)
     SCAN_RESULTS+=("$image|$plat|$counts")

@@ -2,13 +2,20 @@ ARG base_image=default
 
 FROM $base_image
 
+# Version and SHA-256 checksum of the PostgreSQL JDBC driver, and name under which it is deployed
+# Data sources refer to the driver by its deployment name in standalone.xml: <driver>postgresql.jar</driver>
+# A name without a version means that data sources keep working when the driver is upgraded
+ARG driver_version=42.7.14
+ARG driver_sha256_checksum=73914527305a40cce504b0d3d90b23caf565136912d607ae8ae7c5895512332c
+ARG driver_deployment_name=postgresql.jar
+
 RUN mkdir -p /tmp/orbeon_forms
 WORKDIR /tmp/orbeon_forms
 
 # JDBC driver for PostgreSQL
-RUN wget https://jdbc.postgresql.org/download/postgresql-42.7.14.jar \
-    && echo "73914527305a40cce504b0d3d90b23caf565136912d607ae8ae7c5895512332c  postgresql-42.7.14.jar" | sha256sum -c - \
-    && mv postgresql-42.7.14.jar /opt/jboss/wildfly/standalone/deployments
+RUN wget https://jdbc.postgresql.org/download/postgresql-$driver_version.jar \
+    && echo "$driver_sha256_checksum  postgresql-$driver_version.jar" | sha256sum -c - \
+    && mv postgresql-$driver_version.jar /opt/jboss/wildfly/standalone/deployments/$driver_deployment_name
 
 # Cleanup
 RUN rm -rf /tmp/orbeon_forms

@@ -39,8 +39,8 @@ class Property extends DefaultFunctionSupport with RuntimeDependentFunction with
 object Property {
 
   // Also in `CoreSupport`  in `xformsRuntimeJS`
-  def property(propertyName: String, profileOpt: Option[String]): Option[AtomicValue] =
-    if (PropertySet.isSensitivePropertyName(propertyName))
+  def property(propertyName: String, profileOpt: Option[String], checkSensitive: Boolean = true): Option[AtomicValue] =
+    if (checkSensitive && PropertySet.isSensitivePropertyName(propertyName))
       None
     else
       CoreCrossPlatformSupport

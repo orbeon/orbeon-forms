@@ -10,8 +10,8 @@ import shapeless.syntax.typeable.*
 object CoreSupport {
 
   // Also in `object Property` in `core`
-  def property(propertyName: String, profileOpt: Option[String]): Option[AtomicValue] =
-    if (PropertySet.isSensitivePropertyName(propertyName))
+  def property(propertyName: String, profileOpt: Option[String], checkSensitive: Boolean = true): Option[AtomicValue] =
+    if (checkSensitive && PropertySet.isSensitivePropertyName(propertyName))
       None
     else
       CoreCrossPlatformSupport

@@ -56,7 +56,7 @@ object FRComponentParamSupport {
   def componentParamValue(
     paramName            : QName,
     sourceComponentIdOpt : Option[String],
-    property             : String => Option[AtomicValue])(implicit
+    property             : (String, Boolean) => Option[AtomicValue])(implicit
     xfc                  : XFormsFunction.Context
   ): Option[AtomicValue] = {
 
@@ -84,7 +84,7 @@ object FRComponentParamSupport {
           partAnalysis  = partAnalysis,
           directNameOpt = staticControl.commonBinding.directName.orElse(staticControl.element.getQName.some), // https://github.com/orbeon/orbeon-forms/issues/6707
           paramName     = paramName,                                                                          // Ideally, we should know which selector picked the binding
-          property      = property                                                                            // and use the element name from that.
+          property      = property(_, ! (sourceComponentOpt.isDefined && sourceComponentIdOpt.isEmpty))       // and use the element name from that.
         )
 
       fromAttributes orElse fromMetadataAndProperties flatMap {

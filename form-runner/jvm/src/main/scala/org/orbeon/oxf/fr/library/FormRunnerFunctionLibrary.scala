@@ -517,7 +517,7 @@ private object FormRunnerFunctions {
       FRComponentParamSupport.componentParamValue(
         paramName            = QName(stringArgument(0)),
         sourceComponentIdOpt = stringArgumentOpt(1),
-        property             = Property.property(_, xfc.containingDocument.staticState.propertyProfileOpt)
+        property             = Property.property(_, xfc.containingDocument.staticState.propertyProfileOpt, _)
       ).orNull
     }
 

@@ -1647,9 +1647,6 @@
         <copy-content-warn>
             <label>Avertir si des données cibles seront écrasées</label>
         </copy-content-warn>
-        <source-control>
-            <label>Contrôle source</label>
-        </source-control>
         <wrap-iterate>Englober dans une itération</wrap-iterate>
         <wrap-if>Englober dans une condition</wrap-if>
         <ungroup>Dégrouper</ungroup>

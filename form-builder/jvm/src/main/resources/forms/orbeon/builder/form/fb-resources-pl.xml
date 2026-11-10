@@ -1625,9 +1625,6 @@
         <copy-content-warn>
             <label>Warn if target data will be overwritten</label>
         </copy-content-warn>
-        <source-control>
-            <label>Source control</label>
-        </source-control>
         <wrap-iterate>Wrap in Iteration</wrap-iterate>
         <wrap-if>Wrap in Condition</wrap-if>
         <ungroup>Ungroup</ungroup>

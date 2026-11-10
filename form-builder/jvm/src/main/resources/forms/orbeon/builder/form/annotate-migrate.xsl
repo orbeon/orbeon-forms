@@ -22,6 +22,7 @@
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils"
+    xmlns:saxon="http://saxon.sf.net/"
     xmlns:array="http://www.w3.org/2005/xpath-functions/array"
     xmlns:map="http://www.w3.org/2005/xpath-functions/map">
 
@@ -382,6 +383,52 @@
 
     <!-- Remove service instances, comment, and newlines in the middle -->
     <xsl:template match="xf:model/node()[generate-id() = $service-nodes-all-ids]" mode="within-model"/>
+
+    <xsl:variable
+        name="get-delete-service-instance-ids"
+        select="
+            for $s in $model/xf:submission[
+                ends-with(@id, '-submission') and
+                @method = ('get', 'delete')
+            ]
+            return
+                concat(substring($s/@id, 1, string-length($s/@id) - string-length('-submission')), '-instance')"/>
+
+    <!-- Migrate GET/DELETE service parameters from `<params><my-name>value</my-name></params>` to
+         `<params><param name="my-name">value</param></params>`. -->
+    <xsl:template
+        match="
+            xf:model/xf:instance[
+                p:has-class('fr-service') and
+                @id = $get-delete-service-instance-ids
+            ]/body"
+        mode="within-model">
+        <xsl:variable name="params-root" select="if (normalize-space(.) != '') then saxon:parse(string(.))/params else ()"/>
+        <xsl:choose>
+            <xsl:when test="exists($params-root/*[empty(@name)])">
+                <xsl:variable name="migrated-params">
+                    <params>
+                        <xsl:for-each select="$params-root/*">
+                            <param name="{(@name, local-name())[1]}"><xsl:value-of select="."/></param>
+                        </xsl:for-each>
+                    </params>
+                </xsl:variable>
+                <xsl:variable name="serialization-options">
+                    <xsl:element name="xsl:output" namespace="http://www.w3.org/1999/XSL/Transform">
+                        <xsl:attribute name="method" select="'xml'"/>
+                        <xsl:attribute name="omit-xml-declaration" select="'yes'"/>
+                    </xsl:element>
+                </xsl:variable>
+                <xsl:copy>
+                    <xsl:copy-of select="@*"/>
+                    <xsl:value-of select="saxon:serialize($migrated-params/*, $serialization-options/*)"/>
+                </xsl:copy>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:next-match/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
 
     <!--
         Remove actions implementations as they are unneeded (and can be out of date). See also:

@@ -416,7 +416,7 @@ object XFormsUploadControl {
         None
     }
 
-  private val Base64BinaryQNames = Set(XS_BASE64BINARY_QNAME, XFORMS_BASE64BINARY_QNAME)
+  val Base64BinaryQNames: Set[QName] = Set(XS_BASE64BINARY_QNAME, XFORMS_BASE64BINARY_QNAME)
 
   private def prepareValueAsBase64OrUri(
     newValueUri : URI,

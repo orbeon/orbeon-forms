@@ -32,8 +32,10 @@ import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.tinyTreeToOrbeonDom
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
-import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, Mediatypes, PathUtils}
+import org.orbeon.oxf.util.{Base64, ContentTypes, CoreCrossPlatformSupportTrait, IndentedLogger, Mediatypes, PathUtils}
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps, *}
 import software.amazon.awssdk.services.s3.S3Client
@@ -189,7 +191,19 @@ object Attachment {
     val tmpFileOpt   = (attachment /@ "*:tmp-file").headOption.flatMap(_.stringValue.trimAllToOpt)
     val valueOpt     = tmpFileOpt.orElse(attachment.getStringValue.trimAllToOpt)
     valueOpt.flatMap { value =>
-      if (isUploadedFileOrPersistenceURL(value)) {
+      if (tmpFileOpt.isEmpty && Option(InstanceData.getType(attachment)).exists(XFormsUploadControl.Base64BinaryQNames)) {
+        Option(Base64.decode(value)) match {
+          case Some(bytes) =>
+            Attachment(
+              filename       = filenameOpt.getOrElse("unknown"),
+              contentType    = contentType,
+              contentFactory = () => StreamedContent.fromBytes(bytes, contentType.some)
+            ).some
+          case None =>
+            warn("ignoring email attachment with invalid `base64Binary` content", List("value" -> value))
+            None
+        }
+      } else if (isUploadedFileOrPersistenceURL(value)) {
         val uri = new URI(value)
         Attachment(
           filename       = filenameOpt.orElse(uri.getPath.splitTo[List]("/").lastOption).getOrElse("unknown"),

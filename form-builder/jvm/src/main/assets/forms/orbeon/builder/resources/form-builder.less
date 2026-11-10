@@ -761,7 +761,8 @@ body.orbeon {
         transition: opacity 120ms ease;
     }
 
-    .fr-section-container.fb-dnd-drop-into {
+    .fr-section-container.fb-dnd-drop-into,
+    .fb-action-iteration.fb-dnd-drop-into > .fb-action-row-content-outer > .fb-action-row-content {
         outline: 1px dashed var(--orbeon-focus-border-color);
         outline-offset: -1px;
     }
@@ -2457,6 +2458,13 @@ body.orbeon {
         width: 950px;
         max-width: ~"calc(100vw - 20px)";
 
+        &.fb-dragging-container {
+            cursor: grabbing !important;
+            * {
+                cursor: grabbing !important;
+            }
+        }
+
         .fb-dialog-body {
             min-height: 0;
             .dialog-scrollable();
@@ -2547,8 +2555,20 @@ body.orbeon {
         // On the left, taking most of the space, all for the fields for one line
         .fb-action-options {
 
-            input, textarea, select {
+            input:not([type="checkbox"]):not([type="radio"]), textarea, select {
                 width: 100%;
+            }
+
+            input[type="checkbox"], input[type="radio"] {
+                width: 1em;
+                height: 1em;
+                margin-right: 6px;
+                vertical-align: middle;
+            }
+
+            .xbl-fr-checkbox-input {
+                margin-top: 6px;
+                display: inline-block;
             }
 
             // `N-col-span-M` means that the option take M/N of the available space
@@ -2582,91 +2602,92 @@ body.orbeon {
             }
         }
 
+        .fb-action-repeat,
         .xbl-fr-dnd-repeat {
             display: block;
             width: 100%;
+        }
 
-            // A reorderable line
-            .fb-action-iteration {
-                display: flex;
-                width: 100%;
-                justify-content: flex-start;
-                align-items: flex-start;
-                margin-bottom: 5px;
+        // A reorderable line
+        .fb-action-iteration {
+            display: flex;
+            width: 100%;
+            justify-content: flex-start;
+            align-items: flex-start;
+            margin-bottom: 5px;
 
-                .fb-action-row-spacers {
-                    flex-grow: 0;
-                    pointer-events: none;
+            .fb-action-row-spacers {
+                flex-grow: 0;
+                pointer-events: none;
 
-                    &:has(.fb-indent-spacer) {
-                        white-space: nowrap;
-                        height: stretch;
-                    }
-
-                    .fb-indent-spacer {
-                        display: inline-block;
-                        width: 1.2em;
-                        height: stretch;
-                        pointer-events: none;
-                    }
-                }
-
-                .fb-action-row-content-outer {
-                    width: 100%;
-                    flex-grow: 1;
-                    min-width: 0;
-                }
-
-                .fb-action-row-content {
-                    padding: 3px;
-                }
-
-                .fb-action-row-content-start-row > .fb-action-row-content {
-                    border-top-left-radius: 5px;
-                    border-top-right-radius: 5px;
-                }
-
-                .fb-action-row-content-end-row > .fb-action-row-content {
-                    border-bottom-left-radius: 5px;
-                    border-bottom-right-radius: 5px;
-                }
-
-                .fb-action-row-content-indent-1 > .fb-action-row-content, .fb-indent-spacer-position-2, .fb-action-row-content-indent-2 {
-                    background-color: #ededed;
-                }
-
-                .fb-action-row-content-indent-2 > .fb-action-row-content, .fb-indent-spacer-position-3, .fb-action-row-content-indent-3 {
-                    background-color: #dfdfdf;
-                }
-
-                .fb-action-row-content-indent-3 > .fb-action-row-content, .fb-indent-spacer-position-4, .fb-action-row-content-indent-4 {
-                    background-color: #d1d1d1;
-                }
-
-                // On the right, the buttons to reorder, remove, and add rows
-                .fb-action-buttons {
-                    flex-grow: 0;
-                    flex-shrink: 0;
+                &:has(.fb-indent-spacer) {
                     white-space: nowrap;
-                    text-align: right;
-                    padding-top: 3px;
-                    margin-left: 6px;
-
-                    .xforms-trigger-appearance-minimal i {
-                        font-size: 14px;
-                        margin-left: 2px;
-                    }
+                    height: stretch;
                 }
 
-                .fb-action-options {
-                    display: block;
-                    width: 100%;
-                    min-width: 0;
-                    &:after {
-                        content: "";
-                        display: table;
-                        clear: both;
-                    }
+                .fb-indent-spacer {
+                    display: inline-block;
+                    width: 1.2em;
+                    height: stretch;
+                    pointer-events: none;
+                }
+            }
+
+            .fb-action-row-content-outer {
+                width: 100%;
+                flex-grow: 1;
+                min-width: 0;
+            }
+
+            .fb-action-row-content {
+                padding: 3px;
+            }
+
+            .fb-action-row-content-start-row > .fb-action-row-content {
+                border-top-left-radius: 5px;
+                border-top-right-radius: 5px;
+            }
+
+            .fb-action-row-content-end-row > .fb-action-row-content {
+                border-bottom-left-radius: 5px;
+                border-bottom-right-radius: 5px;
+            }
+
+            .fb-action-row-content-indent-1 > .fb-action-row-content, .fb-indent-spacer-position-2, .fb-action-row-content-indent-2 {
+                background-color: #ededed;
+            }
+
+            .fb-action-row-content-indent-2 > .fb-action-row-content, .fb-indent-spacer-position-3, .fb-action-row-content-indent-3 {
+                background-color: #dfdfdf;
+            }
+
+            .fb-action-row-content-indent-3 > .fb-action-row-content, .fb-indent-spacer-position-4, .fb-action-row-content-indent-4 {
+                background-color: #d1d1d1;
+            }
+
+            // On the right, the buttons to reorder, remove, and add rows
+            .fb-action-buttons {
+                flex-grow: 0;
+                flex-shrink: 0;
+                white-space: nowrap;
+                text-align: right;
+                padding-top: 3px;
+                margin-left: 6px;
+
+                .xforms-trigger-appearance-minimal i {
+                    font-size: 14px;
+                    margin-left: 2px;
+                }
+            }
+
+            .fb-action-options {
+                display: block;
+                width: 100%;
+                min-width: 0;
+                &:after {
+                    content: "";
+                    display: table;
+                    clear: both;
                 }
             }
         }
@@ -2766,6 +2787,9 @@ body.orbeon {
         }
     }
 
+    .fb-action-dialog,
+    .fb-action-iteration,
+    .fb-action-repeat,
     .xbl-fr-dnd-repeat {
 
         // Hide buttons while dragging as they get moved to the left (which maybe could be fixed?)
@@ -2777,11 +2801,19 @@ body.orbeon {
 
         .fb-action-grab {
             display: inline-block;
-            opacity: 0.1;
+            cursor: grab;
+            opacity: 0.5;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+
+            &:hover {
+                opacity: 1;
+            }
         }
 
         .xforms-dnd-moves .fb-action-grab {
-            cursor: move;
+            cursor: grab;
             opacity: 0.5;
         }
     }

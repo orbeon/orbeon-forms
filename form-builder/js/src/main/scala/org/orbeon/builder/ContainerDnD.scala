@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.ControlOps
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{AjaxClient, AjaxEvent, XFormsId}
 import org.scalajs.dom
 import org.scalajs.dom.html
 
@@ -34,11 +34,13 @@ object ContainerDnD {
   private val OutlineAutoScrollEdgePx  = 36.0
   private val OutlineAutoScrollStepPx  = 8.0
   private val OutlineIndentStepPx      = 14.0
+  private val ActionIndentStepPx       = 18.0
 
   private sealed trait DragSource
   private object DragSource {
-    case class Canvas(block: Block)     extends DragSource
-    case class Outline(row: OutlineRow) extends DragSource
+    case class Canvas(block: Block)  extends DragSource
+    case class Outline(row: TreeRow) extends DragSource
+    case class Action(row: TreeRow)  extends DragSource
   }
 
   private case class DropTarget(
@@ -49,43 +51,43 @@ object ContainerDnD {
     width             : Double
   )
 
-  private case class OutlineRow(
+  private case class TreeRow(
     el          : html.Element,
-    containerId : String,
+    id          : String,
     parentIdOpt : Option[String],
-    isSection   : Boolean,
+    isContainer : Boolean,
     canMoveInto : Boolean,
     level       : Int
   )
 
-  private case class OutlineDropTarget(
-    intoSectionOpt      : Option[OutlineRow],
-    afterContainerIdOpt : Option[String],
-    level               : Int,
-    boundaryTop         : Double,
-    anchorTop           : Double,
-    left                : Double,
-    width               : Double
+  private case class TreeDropTarget(
+    intoContainerOpt : Option[TreeRow],
+    afterIdOpt      : Option[String],
+    level            : Int,
+    boundaryTop      : Double,
+    anchorTop        : Double,
+    left             : Double,
+    width            : Double
   )
 
   private var _isDragging: Boolean = false
   def isDragging: Boolean = _isDragging
 
-  private var dragSourceOpt              : Option[DragSource]        = None
-  private var startClientX               : Double                    = 0.0
-  private var startClientY               : Double                    = 0.0
-  private var lastClientX                : Double                    = 0.0
-  private var lastClientY                : Double                    = 0.0
-  private var dropTargets                : List[DropTarget]          = Nil
-  private var activeDropTargetOpt        : Option[DropTarget]        = None
-  private var outlineDropTargets         : List[OutlineDropTarget]   = Nil
-  private var activeOutlineDropTargetOpt : Option[OutlineDropTarget] = None
-  private var ghostElOpt                 : Option[html.Element]      = None
-  private var indicatorElOpt             : Option[html.Element]      = None
-  private var highlightedSectionOpt      : Option[html.Element]      = None
-  private var highlightedOutlineRowOpt   : Option[html.Element]      = None
-  private var dimmedOutlineRows          : List[html.Element]        = Nil
-  private var autoScrollTimerOpt         : Option[Int]               = None
+  private var dragSourceOpt           : Option[DragSource]     = None
+  private var startClientX            : Double                 = 0.0
+  private var startClientY            : Double                 = 0.0
+  private var lastClientX             : Double                 = 0.0
+  private var lastClientY             : Double                 = 0.0
+  private var dropTargets             : List[DropTarget]       = Nil
+  private var activeDropTargetOpt     : Option[DropTarget]     = None
+  private var treeDropTargets         : List[TreeDropTarget]   = Nil
+  private var activeTreeDropTargetOpt : Option[TreeDropTarget] = None
+  private var ghostElOpt              : Option[html.Element]   = None
+  private var indicatorElOpt          : Option[html.Element]   = None
+  private var highlightedSectionOpt   : Option[html.Element]   = None
+  private var highlightedTreeRowOpt   : Option[html.Element]   = None
+  private var dimmedTreeRows          : List[html.Element]     = Nil
+  private var autoScrollTimerOpt      : Option[Int]            = None
 
   private val onPointerMoveFn: js.Function1[dom.PointerEvent, Unit]  = onPointerMove(_)
   private val onPointerUpFn  : js.Function1[dom.PointerEvent, Unit]  = onPointerUp(_)
@@ -123,7 +125,23 @@ object ContainerDnD {
             else
               None
 
-          canvasSourceOpt.orElse(outlineSourceOpt).foreach { source =>
+          val actionSourceOpt =
+            if (canvasSourceOpt.isEmpty && outlineSourceOpt.isEmpty)
+              event.targetOpt
+                .flatMap(_.closestOpt(".fb-action-dialog .fb-action-grab, #fb-action-dialog .fb-action-grab"))
+                .flatMap { grabEl =>
+                  event.preventDefault()
+                  val rowElOpt = grabEl.closestOpt(".fb-action-iteration")
+                  val allRows  = actionRowsInDialog()
+                  rowElOpt.flatMap(rowEl => allRows.find(_.el == rowEl)).filter { _ =>
+                    allRows.length > 1
+                  }
+                }
+                .map(DragSource.Action.apply)
+            else
+              None
+
+          canvasSourceOpt.orElse(outlineSourceOpt).orElse(actionSourceOpt).foreach { source =>
             dragSourceOpt = Some(source)
             startClientX  = event.clientX
             startClientY  = event.clientY
@@ -271,7 +289,7 @@ object ContainerDnD {
       }
       .getOrElse(1)
 
-  private def outlineRowsInPanel(): List[OutlineRow] = {
+  private def outlineRowsInPanel(): List[TreeRow] = {
     val rawElems =
       dom.document
         .querySelectorAllT(".fb-outline-body .fb-outline-row")
@@ -297,11 +315,11 @@ object ContainerDnD {
           if (isSection)
             sectionByLevel = sectionByLevel.filter { case (lvl, _) => lvl < level } + (level -> containerId)
 
-          OutlineRow(
+          TreeRow(
             el          = el,
-            containerId = containerId,
+            id          = containerId,
             parentIdOpt = parentIdOpt,
-            isSection   = isSection,
+            isContainer = isSection,
             canMoveInto = canMoveInto,
             level       = level
           )
@@ -309,10 +327,66 @@ object ContainerDnD {
     }
   }
 
-  private def isOutlineDescendantOrSelf(
+  private def actionRowsInDialog(): List[TreeRow] = {
+    val rawElems =
+      dom.document
+        .querySelectorAllT(".fb-action-dialog .fb-action-iteration, #fb-action-dialog .fb-action-iteration")
+        .iterator
+        .filter(el => el.isVisible && ! FormRunnerUtils.isViewMode(el))
+        .toList
+
+    var containerByLevel = Map.empty[Int, String]
+
+    rawElems.zipWithIndex.flatMap { case (el, idx) =>
+      val rowId =
+        Option(el.getAttribute("data-orbeon-index"))
+          .flatMap(_.trimAllToOpt)
+          .getOrElse((idx + 1).toString)
+
+      val level =
+        Option(el.getAttribute("data-orbeon-level"))
+          .flatMap(_.toIntOption)
+          .orElse {
+            Option(el.getAttribute("class"))
+              .toList
+              .flatMap(_.splitTo[List]())
+              .collectFirst { case s if s.startsWith("xforms-dnd-level-") => s.stripPrefix("xforms-dnd-level-").toIntOption.map(_ + 1) }
+              .flatten
+          }
+          .getOrElse(1)
+
+      val isContainer =
+        el.getAttribute("data-orbeon-can-move-into") == "true" ||
+        el.getAttribute("data-orbeon-is-container") == "true" ||
+        Option(el.getAttribute("data-orbeon-action-type")).exists(t => t == "if" || t == "data-iterate") ||
+        el.querySelectorOpt(".fb-action-options select option[value='if']:checked, .fb-action-options select option[value='data-iterate']:checked").isDefined
+
+      val parentIdOpt =
+        if (level > 1)
+          containerByLevel.get(level - 1)
+        else
+          None
+
+      if (isContainer)
+        containerByLevel = containerByLevel.filter { case (lvl, _) => lvl < level } + (level -> rowId)
+
+      Some(
+        TreeRow(
+          el          = el,
+          id          = rowId,
+          parentIdOpt = parentIdOpt,
+          isContainer = isContainer,
+          canMoveInto = isContainer,
+          level       = level
+        )
+      )
+    }
+  }
+
+  private def isTreeDescendantOrSelf(
     candidateId : String,
     ancestorId  : String,
-    rowById     : Map[String, OutlineRow]
+    rowById     : Map[String, TreeRow]
   ): Boolean = {
     @scala.annotation.tailrec
     def loop(currId: String): Boolean =
@@ -327,49 +401,49 @@ object ContainerDnD {
     loop(candidateId)
   }
 
-  private def computeOutlineDropTargets(
-    draggedRow : OutlineRow,
-    allRows    : List[OutlineRow]
-  ): List[OutlineDropTarget] = {
-    val rowById               = allRows.map(r => r.containerId -> r).toMap
-    val canLeaveCurrentParent =
-      draggedRow.el.getAttribute("data-orbeon-can-move") != "false" &&
-      allRows.count(_.parentIdOpt == draggedRow.parentIdOpt) > 1
+  private def computeTreeDropTargets(
+    draggedRow     : TreeRow,
+    allRows        : List[TreeRow],
+    indentStepPx   : Double,
+    canBeTopLevel  : Boolean,
+    canLeaveParent : Boolean
+  ): List[TreeDropTarget] = {
+    val rowById = allRows.map(r => r.id -> r).toMap
 
-    def lastDescendantOrSelfRow(row: OutlineRow): OutlineRow =
+    def lastDescendantOrSelfRow(row: TreeRow): TreeRow =
       allRows
-        .filter(c => isOutlineDescendantOrSelf(c.containerId, row.containerId, rowById))
+        .filter(c => isTreeDescendantOrSelf(c.id, row.id, rowById))
         .lastOption
         .getOrElse(row)
 
-    val eligibleParents: List[Option[OutlineRow]] =
-      if (! canLeaveCurrentParent) {
+    val eligibleParents: List[Option[TreeRow]] =
+      if (! canLeaveParent) {
         List(draggedRow.parentIdOpt.flatMap(rowById.get))
       } else {
-        val topLevelOpt = if (draggedRow.isSection) List(None) else Nil
-        val sectionParents =
+        val topLevelOpt = if (canBeTopLevel) List(None) else Nil
+        val containerParents =
           allRows.collect {
             case sec
-              if sec.isSection &&
+              if sec.isContainer &&
                  sec.canMoveInto &&
-                 ! isOutlineDescendantOrSelf(sec.containerId, draggedRow.containerId, rowById) =>
+                 ! isTreeDescendantOrSelf(sec.id, draggedRow.id, rowById) =>
               Some(sec)
           }
-        topLevelOpt ++ sectionParents
+        topLevelOpt ++ containerParents
       }
 
     val rawTargets =
       eligibleParents.flatMap { intoOpt =>
-        val intoIdOpt    = intoOpt.map(_.containerId)
+        val intoIdOpt    = intoOpt.map(_.id)
         val targetLevel  = intoOpt.map(_.level + 1).getOrElse(1)
         val children     = allRows.filter(_.parentIdOpt == intoIdOpt)
         val isSameParent = intoIdOpt == draggedRow.parentIdOpt
-        val draggedIdx   = if (isSameParent) children.indexWhere(_.containerId == draggedRow.containerId) else -1
+        val draggedIdx   = if (isSameParent) children.indexWhere(_.id == draggedRow.id) else -1
 
         val refRowElOpt = intoOpt.orElse(allRows.headOption).map(_.el)
         val slotLeft =
           refRowElOpt
-            .map(el => el.getOffset.left + (targetLevel - 1) * OutlineIndentStepPx)
+            .map(el => el.getOffset.left + (targetLevel - 1) * indentStepPx)
             .getOrElse(0.0)
         val slotRight =
           refRowElOpt
@@ -383,8 +457,8 @@ object ContainerDnD {
           else {
             val firstBoundaryTop =
               intoOpt match {
-                case Some(parentSec) =>
-                  val parentBottom = parentSec.el.getOffset.top + parentSec.el.outerHeight
+                case Some(parentContainer) =>
+                  val parentBottom = parentContainer.el.getOffset.top + parentContainer.el.outerHeight
                   children.headOption match {
                     case Some(firstChild) => (parentBottom + firstChild.el.getOffset.top) / 2.0
                     case None             => parentBottom
@@ -394,14 +468,14 @@ object ContainerDnD {
               }
 
             Some(
-              OutlineDropTarget(
-                intoSectionOpt      = intoOpt,
-                afterContainerIdOpt = None,
-                level               = targetLevel,
-                boundaryTop         = firstBoundaryTop,
-                anchorTop           = firstBoundaryTop,
-                left                = slotLeft,
-                width               = slotWidth
+              TreeDropTarget(
+                intoContainerOpt = intoOpt,
+                afterIdOpt      = None,
+                level            = targetLevel,
+                boundaryTop      = firstBoundaryTop,
+                anchorTop        = firstBoundaryTop,
+                left             = slotLeft,
+                width            = slotWidth
               )
             )
           }
@@ -414,7 +488,7 @@ object ContainerDnD {
               val child         = children(idx)
               val lastRow       = lastDescendantOrSelfRow(child)
               val lastRowBottom = lastRow.el.getOffset.top + lastRow.el.outerHeight
-              val nextRowOpt    = allRows.dropWhile(_.containerId != lastRow.containerId).drop(1).headOption
+              val nextRowOpt    = allRows.dropWhile(_.id != lastRow.id).drop(1).headOption
               val boundaryTop =
                 nextRowOpt match {
                   case Some(nextRow) => (lastRowBottom + nextRow.el.getOffset.top) / 2.0
@@ -422,14 +496,14 @@ object ContainerDnD {
                 }
 
               Some(
-                OutlineDropTarget(
-                  intoSectionOpt      = intoOpt,
-                  afterContainerIdOpt = Some(child.containerId),
-                  level               = targetLevel,
-                  boundaryTop         = boundaryTop,
-                  anchorTop           = boundaryTop,
-                  left                = slotLeft,
-                  width               = slotWidth
+                TreeDropTarget(
+                  intoContainerOpt = intoOpt,
+                  afterIdOpt      = Some(child.id),
+                  level            = targetLevel,
+                  boundaryTop      = boundaryTop,
+                  anchorTop        = boundaryTop,
+                  left             = slotLeft,
+                  width            = slotWidth
                 )
               )
             }
@@ -493,6 +567,36 @@ object ContainerDnD {
     (iconClass, labelText)
   }
 
+  private def actionGhostLabel(rowEl: html.Element): (String, String) = {
+    val (iconClass, fallbackLabel) = Option(rowEl.getAttribute("data-orbeon-action-type")) match {
+      case Some("service-call")            => ("fa-exchange", "Call Service")
+      case Some("if")                      => ("fa-code-fork", "Condition")
+      case Some("data-iterate")           => ("fa-repeat", "Repeat for Each Item")
+      case Some("control-setvalue")        => ("fa-pencil", "Set Control Value")
+      case Some("control-clear")           => ("fa-eraser", "Clear Control Value")
+      case Some("control-setitems")        => ("fa-list", "Set Control Items")
+      case Some("control-setfocus")        => ("fa-crosshairs", "Set Control Focus")
+      case Some("control-setvisited")      => ("fa-check-square-o", "Set Control Visited")
+      case Some("alert")                   => ("fa-exclamation-triangle", "Show Message")
+      case Some("navigate")                => ("fa-external-link", "Navigate")
+      case Some("process-call")            => ("fa-cogs", "Call Process")
+      case Some("repeat-add-iteration")    => ("fa-plus-circle", "Add Iteration")
+      case Some("repeat-remove-iteration") => ("fa-minus-circle", "Remove Iteration")
+      case Some("repeat-clear")            => ("fa-trash-o", "Clear Iterations")
+      case _                               => ("fa-bolt", "Action")
+    }
+
+    val labelText =
+      rowEl.querySelectorOpt(".fb-action-options select option:checked")
+        .flatMap(el => Option(el.textContent))
+        .orElse(rowEl.querySelectorOpt(".select2-selection__rendered").flatMap(el => Option(el.textContent)))
+        .orElse(rowEl.querySelectorOpt(".xforms-select1-entry-selected").flatMap(el => Option(el.textContent)))
+        .flatMap(_.trimAllToOpt)
+        .getOrElse(fallbackLabel)
+
+    (iconClass, labelText)
+  }
+
   private def orbeonRootEl: html.Element =
     dom.document.querySelectorOpt(".orbeon").getOrElse(dom.document.body)
 
@@ -505,13 +609,40 @@ object ContainerDnD {
 
         case DragSource.Outline(sourceRow) =>
           val allRows      = outlineRowsInPanel()
-          val refreshedRow = allRows.find(_.containerId == sourceRow.containerId).getOrElse(sourceRow)
-          outlineDropTargets = computeOutlineDropTargets(refreshedRow, allRows)
-          if (outlineDropTargets.nonEmpty) {
-            val rowById = allRows.map(r => r.containerId -> r).toMap
-            dimmedOutlineRows =
+          val refreshedRow = allRows.find(_.id == sourceRow.id).getOrElse(sourceRow)
+          treeDropTargets  = computeTreeDropTargets(
+            draggedRow     = refreshedRow,
+            allRows        = allRows,
+            indentStepPx   = OutlineIndentStepPx,
+            canBeTopLevel  = refreshedRow.isContainer,
+            canLeaveParent = allRows.count(_.parentIdOpt == refreshedRow.parentIdOpt) > 1
+          )
+          if (treeDropTargets.nonEmpty) {
+            val rowById = allRows.map(r => r.id -> r).toMap
+            dimmedTreeRows =
               allRows
-                .filter(r => isOutlineDescendantOrSelf(r.containerId, refreshedRow.containerId, rowById))
+                .filter(r => isTreeDescendantOrSelf(r.id, refreshedRow.id, rowById))
+                .map(_.el)
+            true
+          } else {
+            false
+          }
+
+        case DragSource.Action(sourceRow) =>
+          val allRows      = actionRowsInDialog()
+          val refreshedRow = allRows.find(_.id == sourceRow.id).getOrElse(sourceRow)
+          treeDropTargets  = computeTreeDropTargets(
+            draggedRow     = refreshedRow,
+            allRows        = allRows,
+            indentStepPx   = ActionIndentStepPx,
+            canBeTopLevel  = true,
+            canLeaveParent = true
+          )
+          if (treeDropTargets.nonEmpty) {
+            val rowById = allRows.map(r => r.id -> r).toMap
+            dimmedTreeRows =
+              allRows
+                .filter(r => isTreeDescendantOrSelf(r.id, refreshedRow.id, rowById))
                 .map(_.el)
             true
           } else {
@@ -527,8 +658,16 @@ object ContainerDnD {
       SectionGridEditor.sectionGridEditorContainer.hide()
       dom.document.querySelectorOpt(".fb-row-editor").foreach(_.hide())
 
-      val rootEl = orbeonRootEl
-      rootEl.classList.add("fb-dragging-container")
+      val targetDialogOpt =
+        source match {
+          case DragSource.Action(_) =>
+            dom.document.querySelectorOpt(".fb-action-dialog, #fb-action-dialog")
+          case _ =>
+            None
+        }
+      val rootEl = targetDialogOpt.getOrElse(orbeonRootEl)
+      orbeonRootEl.classList.add("fb-dragging-container")
+      targetDialogOpt.foreach(_.classList.add("fb-dragging-container"))
 
       val (iconClass, labelText) =
         source match {
@@ -539,8 +678,12 @@ object ContainerDnD {
             containerGhostLabel(sourceBlock.el)
 
           case DragSource.Outline(sourceRow) =>
-            dimmedOutlineRows.foreach(_.classList.add("fb-dnd-source"))
+            dimmedTreeRows.foreach(_.classList.add("fb-dnd-source"))
             outlineGhostLabel(sourceRow.el)
+
+          case DragSource.Action(sourceRow) =>
+            dimmedTreeRows.foreach(_.classList.add("fb-dnd-source"))
+            actionGhostLabel(sourceRow.el)
         }
 
       val ghostEl        = dom.document.createDivElement
@@ -601,21 +744,29 @@ object ContainerDnD {
           }
         }
 
-      case Some(DragSource.Outline(_)) =>
+      case Some(DragSource.Outline(_) | DragSource.Action(_)) =>
         val pointerDocX = clientX + dom.window.pageXOffset
         val pointerDocY = clientY + dom.window.pageYOffset
 
-        activeOutlineDropTargetOpt =
-          outlineDropTargets.minByOption { t =>
+        activeTreeDropTargetOpt =
+          treeDropTargets.minByOption { t =>
             Math.abs(pointerDocY - t.anchorTop) + Math.abs(pointerDocX - (t.left + 16.0)) * 0.15
           }
 
-        highlightedOutlineRowOpt.foreach(_.classList.remove("fb-outline-dnd-drop-into"))
-        highlightedOutlineRowOpt = activeOutlineDropTargetOpt.flatMap(_.intoSectionOpt).map(_.el)
-        highlightedOutlineRowOpt.foreach(_.classList.add("fb-outline-dnd-drop-into"))
+        highlightedTreeRowOpt.foreach { el =>
+          el.classList.remove("fb-outline-dnd-drop-into")
+          el.classList.remove("fb-dnd-drop-into")
+        }
+        highlightedTreeRowOpt = activeTreeDropTargetOpt.flatMap(_.intoContainerOpt).map(_.el)
+        highlightedTreeRowOpt.foreach { el =>
+          if (el.hasClass("fb-outline-row"))
+            el.classList.add("fb-outline-dnd-drop-into")
+          else
+            el.classList.add("fb-dnd-drop-into")
+        }
 
         indicatorElOpt.foreach { indicatorEl =>
-          activeOutlineDropTargetOpt match {
+          activeTreeDropTargetOpt match {
             case Some(target) =>
               indicatorEl.show()
               indicatorEl.setOffset(
@@ -634,73 +785,92 @@ object ContainerDnD {
     }
   }
 
+  private def autoScrollContainer(
+    scrollElemOpt : Option[html.Element],
+    clientY       : Double,
+    edgePx        : Double,
+    stepPx        : Double,
+    onScrolled    : () => Unit
+  ): Unit =
+    scrollElemOpt.foreach { scrollElem =>
+      val rect = scrollElem.getBoundingClientRect()
+      val delta =
+        if (clientY < rect.top + edgePx)
+          -stepPx
+        else if (clientY > rect.bottom - edgePx)
+          stepPx
+        else
+          0.0
+
+      if (delta != 0.0) {
+        if (autoScrollTimerOpt.isEmpty) {
+          val timerId = dom.window.setInterval(
+            () => {
+              scrollElemOpt.foreach { elem =>
+                val prevScrollTop = elem.scrollTop
+                elem.scrollTop = prevScrollTop + delta
+                if (elem.scrollTop != prevScrollTop)
+                  onScrolled()
+              }
+            },
+            16.0
+          )
+          autoScrollTimerOpt = Some(timerId)
+        }
+      } else {
+        stopAutoScroll()
+      }
+    }
+
   private def updateAutoScroll(clientY: Double): Unit =
     dragSourceOpt match {
       case Some(DragSource.Canvas(sourceBlock)) =>
-        dom.document.querySelectorOpt(".fb-main").foreach { fbMain =>
-          val rect = fbMain.getBoundingClientRect()
-          val delta =
-            if (clientY < rect.top + AutoScrollEdgePx)
-              -AutoScrollStepPx
-            else if (clientY > rect.bottom - AutoScrollEdgePx)
-              AutoScrollStepPx
-            else
-              0.0
-
-          if (delta != 0.0) {
-            if (autoScrollTimerOpt.isEmpty) {
-              val timerId = dom.window.setInterval(
-                () => {
-                  dom.document.querySelectorOpt(".fb-main").foreach { mainEl =>
-                    val prevScrollTop = mainEl.scrollTop
-                    mainEl.scrollTop = prevScrollTop + delta
-                    if (mainEl.scrollTop != prevScrollTop) {
-                      dropTargets = computeDropTargets(sourceBlock.el)
-                      updateGhostAndIndicator(lastClientX, lastClientY)
-                    }
-                  }
-                },
-                16.0
-              )
-              autoScrollTimerOpt = Some(timerId)
-            }
-          } else {
-            stopAutoScroll()
+        autoScrollContainer(
+          scrollElemOpt = dom.document.querySelectorOpt(".fb-main"),
+          clientY       = clientY,
+          edgePx        = AutoScrollEdgePx,
+          stepPx        = AutoScrollStepPx,
+          onScrolled    = () => {
+            dropTargets = computeDropTargets(sourceBlock.el)
+            updateGhostAndIndicator(lastClientX, lastClientY)
           }
-        }
+        )
 
       case Some(DragSource.Outline(sourceRow)) =>
-        dom.document.querySelectorOpt(".fb-outline-body").foreach { outlineBody =>
-          val rect = outlineBody.getBoundingClientRect()
-          val delta =
-            if (clientY < rect.top + OutlineAutoScrollEdgePx)
-              -OutlineAutoScrollStepPx
-            else if (clientY > rect.bottom - OutlineAutoScrollEdgePx)
-              OutlineAutoScrollStepPx
-            else
-              0.0
-
-          if (delta != 0.0) {
-            if (autoScrollTimerOpt.isEmpty) {
-              val timerId = dom.window.setInterval(
-                () => {
-                  dom.document.querySelectorOpt(".fb-outline-body").foreach { bodyEl =>
-                    val prevScrollTop = bodyEl.scrollTop
-                    bodyEl.scrollTop = prevScrollTop + delta
-                    if (bodyEl.scrollTop != prevScrollTop) {
-                      outlineDropTargets = computeOutlineDropTargets(sourceRow, outlineRowsInPanel())
-                      updateGhostAndIndicator(lastClientX, lastClientY)
-                    }
-                  }
-                },
-                16.0
-              )
-              autoScrollTimerOpt = Some(timerId)
-            }
-          } else {
-            stopAutoScroll()
+        autoScrollContainer(
+          scrollElemOpt = dom.document.querySelectorOpt(".fb-outline-body"),
+          clientY       = clientY,
+          edgePx        = OutlineAutoScrollEdgePx,
+          stepPx        = OutlineAutoScrollStepPx,
+          onScrolled    = () => {
+            treeDropTargets = computeTreeDropTargets(
+              draggedRow     = sourceRow,
+              allRows        = outlineRowsInPanel(),
+              indentStepPx   = OutlineIndentStepPx,
+              canBeTopLevel  = sourceRow.isContainer,
+              canLeaveParent = true
+            )
+            updateGhostAndIndicator(lastClientX, lastClientY)
           }
-        }
+        )
+
+      case Some(DragSource.Action(sourceRow)) =>
+        autoScrollContainer(
+          scrollElemOpt = dom.document.querySelectorOpt(".fb-action-dialog .fb-dialog-body, #fb-action-dialog .fb-dialog-body"),
+          clientY       = clientY,
+          edgePx        = OutlineAutoScrollEdgePx,
+          stepPx        = OutlineAutoScrollStepPx,
+          onScrolled    = () => {
+            treeDropTargets = computeTreeDropTargets(
+              draggedRow     = sourceRow,
+              allRows        = actionRowsInDialog(),
+              indentStepPx   = ActionIndentStepPx,
+              canBeTopLevel  = true,
+              canLeaveParent = true
+            )
+            updateGhostAndIndicator(lastClientX, lastClientY)
+          }
+        )
 
       case None =>
         stopAutoScroll()
@@ -743,10 +913,10 @@ object ContainerDnD {
   }
 
   private def onPointerUp(event: dom.PointerEvent): Unit = {
-    val wasDragging          = _isDragging
-    val sourceOpt            = dragSourceOpt
-    val canvasDropTargetOpt  = activeDropTargetOpt
-    val outlineDropTargetOpt = activeOutlineDropTargetOpt
+    val wasDragging         = _isDragging
+    val sourceOpt           = dragSourceOpt
+    val canvasDropTargetOpt = activeDropTargetOpt
+    val treeDropTargetOpt   = activeTreeDropTargetOpt
 
     cleanupDrag()
 
@@ -764,11 +934,28 @@ object ContainerDnD {
           }
 
         case Some(DragSource.Outline(sourceRow)) =>
-          outlineDropTargetOpt.foreach { target =>
+          treeDropTargetOpt.foreach { target =>
             FormBuilderRpcClient.api.containerMove(
-              containerId         = sourceRow.containerId,
-              intoSectionIdOpt    = target.intoSectionOpt.map(_.containerId),
-              afterContainerIdOpt = target.afterContainerIdOpt
+              containerId         = sourceRow.id,
+              intoSectionIdOpt    = target.intoContainerOpt.map(_.id),
+              afterContainerIdOpt = target.afterIdOpt
+            )
+          }
+
+        case Some(DragSource.Action(sourceRow)) =>
+          treeDropTargetOpt.foreach { target =>
+            val intoId  = target.intoContainerOpt.fold("")(_.id)
+            val afterId = target.afterIdOpt.getOrElse("")
+            AjaxClient.fireEvent(
+              AjaxEvent(
+                eventName  = "fb-action-move",
+                targetId   = "fb-action-dialog",
+                properties = Map[String, js.Any](
+                  "source-index" -> sourceRow.id,
+                  "into-index"   -> intoId,
+                  "after-index"  -> afterId
+                )
+              )
             )
           }
 
@@ -797,28 +984,33 @@ object ContainerDnD {
     }
 
     orbeonRootEl.classList.remove("fb-dragging-container")
+    dom.document.querySelectorOpt(".fb-action-dialog, #fb-action-dialog").foreach(_.classList.remove("fb-dragging-container"))
     dragSourceOpt.foreach {
       case DragSource.Canvas(sourceBlock) => sourceBlock.el.classList.remove("fb-dnd-source")
       case DragSource.Outline(_)          =>
+      case DragSource.Action(_)           =>
     }
-    dimmedOutlineRows.foreach(_.classList.remove("fb-dnd-source"))
+    dimmedTreeRows.foreach(_.classList.remove("fb-dnd-source"))
     highlightedSectionOpt.foreach { sec =>
       sec.childrenT(".fr-section-container").foreach(_.classList.remove("fb-dnd-drop-into"))
     }
-    highlightedOutlineRowOpt.foreach(_.classList.remove("fb-outline-dnd-drop-into"))
+    highlightedTreeRowOpt.foreach { el =>
+      el.classList.remove("fb-outline-dnd-drop-into")
+      el.classList.remove("fb-dnd-drop-into")
+    }
 
     ghostElOpt.foreach(el => Option(el.parentNode).foreach(_.removeChild(el)))
     indicatorElOpt.foreach(el => Option(el.parentNode).foreach(_.removeChild(el)))
 
-    dragSourceOpt              = None
-    dropTargets                = Nil
-    activeDropTargetOpt        = None
-    outlineDropTargets         = Nil
-    activeOutlineDropTargetOpt = None
-    ghostElOpt                 = None
-    indicatorElOpt             = None
-    highlightedSectionOpt      = None
-    highlightedOutlineRowOpt   = None
-    dimmedOutlineRows          = Nil
+    dragSourceOpt           = None
+    dropTargets             = Nil
+    activeDropTargetOpt     = None
+    treeDropTargets         = Nil
+    activeTreeDropTargetOpt = None
+    ghostElOpt              = None
+    indicatorElOpt          = None
+    highlightedSectionOpt   = None
+    highlightedTreeRowOpt   = None
+    dimmedTreeRows          = Nil
   }
 }

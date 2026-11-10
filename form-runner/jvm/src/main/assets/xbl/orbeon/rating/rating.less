@@ -1,0 +1,262 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+
+    .xbl-fr-rating {
+        --rating-star-color        : var(--orbeon-hint-color);
+        --rating-star-filled-color : #d97706;
+        --rating-star-preview-color: #f59e0b;
+
+        .xbl-dark-mode({
+            --rating-star-filled-color : #fbbf24;
+            --rating-star-preview-color: #fcd34d;
+        });
+
+        .fr-rating-container {
+            width: 100%;
+
+            .fr-rating-row {
+                display    : flex;
+                flex-wrap  : wrap;
+                align-items: center;
+                gap        : 0.6rem;
+                min-height : var(--orbeon-control-height);
+            }
+
+            .fr-rating-group {
+                display    : inline-flex;
+                flex-wrap  : wrap;
+                align-items: center;
+                gap        : 0.15rem;
+            }
+
+            label.fr-rating-item {
+                position       : relative;
+                display        : inline-flex;
+                align-items    : center;
+                justify-content: center;
+                margin         : 0;
+                padding        : 0.15rem;
+                min-inline-size: 28px;
+                min-block-size : 28px;
+                border-radius  : var(--orbeon-control-border-radius);
+                cursor         : pointer;
+                user-select    : none;
+                transition     : transform var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+                @media (pointer: coarse) {
+                    min-inline-size: 44px;
+                    min-block-size : 44px;
+                }
+
+                input.fr-rating-radio.visually-hidden {
+                    position   : absolute;
+                    clip-path  : inset(50%);
+                    overflow   : hidden;
+                    inline-size: 1px;
+                    block-size : 1px;
+                    width      : 1px;
+                    height     : 1px;
+                    margin     : -1px;
+                    padding    : 0;
+                    border     : 0;
+                    white-space: nowrap;
+                }
+
+                .fr-rating-star {
+                    font-size  : 1.35em;
+                    line-height: 1;
+                    color      : var(--rating-star-color);
+                    transition : color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                 transform var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+                    &.fr-rating-star-filled {
+                        color: var(--rating-star-filled-color);
+                    }
+
+                    &.fr-rating-star-preview {
+                        color    : var(--rating-star-preview-color);
+                        transform: scale(1.08);
+                    }
+
+                    @media (forced-colors: active) {
+                        color: ButtonText;
+
+                        &.fr-rating-star-filled,
+                        &.fr-rating-star-preview {
+                            color: Highlight;
+                        }
+                    }
+                }
+
+                &:has(input.fr-rating-radio:focus-visible) {
+                    outline       : 2px solid var(--orbeon-focus-border-color);
+                    outline-offset: 2px;
+                    box-shadow    : var(--orbeon-focus-ring);
+                }
+
+                &:has(input.fr-rating-radio:disabled) {
+                    cursor : not-allowed;
+                    opacity: 0.65;
+                }
+
+                &:not(:has(input.fr-rating-radio:disabled)):active .fr-rating-star {
+                    transform: scale(0.92);
+                }
+            }
+
+            .fr-rating-value-group {
+                display    : inline-flex;
+                align-items: center;
+                gap        : 0.2rem;
+                flex-shrink: 0;
+
+                &:not(:has(> :not(.xforms-hidden))) {
+                    display: none;
+                }
+            }
+
+            .fr-rating-value-wrapper {
+                display    : inline-flex;
+                align-items: center;
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+
+            .fr-rating-value {
+                font-variant-numeric: tabular-nums;
+                font-weight         : 600;
+                min-width           : 3ch;
+                white-space         : nowrap;
+                color               : var(--orbeon-control-color);
+
+                &.fr-rating-value-empty {
+                    color      : var(--orbeon-control-placeholder-color);
+                    font-weight: normal;
+                }
+            }
+
+            .btn.fr-rating-clear {
+                display        : inline-flex;
+                align-items    : center;
+                justify-content: center;
+                padding        : 0.15rem;
+                min-inline-size: 24px;
+                min-block-size : 24px;
+                border         : 0;
+                border-radius  : var(--orbeon-control-border-radius);
+                background     : transparent;
+                box-shadow     : none;
+                color          : var(--orbeon-control-placeholder-color);
+                text-decoration: none;
+                cursor         : pointer;
+
+                @media (pointer: coarse) {
+                    min-inline-size: 44px;
+                    min-block-size : 44px;
+                }
+
+                &:hover, &:focus {
+                    color          : var(--orbeon-base-color);
+                    text-decoration: none;
+                    background     : transparent;
+                }
+
+                &:focus-visible {
+                    outline       : 2px solid var(--orbeon-focus-border-color);
+                    outline-offset: 2px;
+                    box-shadow    : var(--orbeon-focus-ring);
+                }
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+        }
+
+        &.xforms-invalid.xforms-visited {
+            .fr-rating-container .fr-rating-star:not(.fr-rating-star-filled):not(.fr-rating-star-preview) {
+                color: var(--orbeon-invalid-control-border-color);
+            }
+        }
+
+        .fr-rating-readonly-container {
+            @media screen {
+                display    : inline-flex;
+                align-items: center;
+                gap        : 0.5rem;
+
+                &.fr-rating-readonly-hide-value .xforms-input {
+                    display: none;
+                }
+            }
+
+            .fr-rating-readonly-stars {
+                display       : inline-block;
+                vertical-align: middle;
+                white-space   : nowrap;
+                margin-right  : 6px;
+
+                @media screen {
+                    display     : inline-flex;
+                    align-items : center;
+                    gap         : 0.15rem;
+                    margin-right: 0;
+                }
+
+                & > .xforms-repeat-begin-end,
+                & > .xforms-repeat-delimiter {
+                    display: none;
+                }
+
+                .fr-rating-star {
+                    font-size     : 1.15em;
+                    line-height   : 1;
+                    color         : var(--rating-star-color);
+                    margin-right  : 2px;
+                    vertical-align: middle;
+
+                    @media screen {
+                        margin-right: 0;
+                    }
+
+                    &.fr-rating-star-filled {
+                        color: var(--rating-star-filled-color);
+                    }
+                }
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+        }
+
+        @media print {
+            display: inline;
+
+            .fr-rating-readonly-container {
+                display: inline;
+            }
+        }
+    }
+
+    // #7998: do not produce FontAwesome icons (Unicode Private Use Area) in PDF/A-2a and -3a;
+    // the formatted "N / max" text value still renders alongside.
+    .fr-pdf-no-private-use-glyphs .xbl-fr-rating .fr-rating-readonly-stars {
+        display: none;
+    }
+}

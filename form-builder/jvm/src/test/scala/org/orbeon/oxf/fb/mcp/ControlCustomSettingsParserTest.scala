@@ -253,5 +253,32 @@ class ControlCustomSettingsParserTest
       assert(spec.findSetting("showEndpoints").exists(_.defaultVal.contains(Json.fromBoolean(false))))
       assert(spec.constraints.size == 2)
     }
+
+    it("must parse `<fr:rating>` and `<fr:scale>` custom settings and constraints") {
+      import org.orbeon.scaxon.SimplePath.*
+
+      val ratingDoc = new org.orbeon.dom.saxon.DocumentWrapper(
+        org.orbeon.oxf.resources.ResourceManagerWrapper.instance.getContentAsOrbeonDom("/xbl/orbeon/rating/rating.xbl"),
+        null,
+        org.orbeon.oxf.util.XPath.GlobalConfiguration
+      )
+      val ratingSpec = ControlCustomSettingsParser.fromBinding((ratingDoc.rootElement / "*:binding").head).get
+      assert(ratingSpec.localName == "rating")
+      assert(ratingSpec.settings.map(_.name) == List("max", "showValue", "allowClear"))
+      assert(ratingSpec.findSetting("showValue").exists(_.defaultVal.contains(Json.fromBoolean(true))))
+      assert(ratingSpec.findSetting("allowClear").exists(_.defaultVal.contains(Json.fromBoolean(true))))
+      assert(ratingSpec.constraints.size == 1)
+
+      val scaleDoc = new org.orbeon.dom.saxon.DocumentWrapper(
+        org.orbeon.oxf.resources.ResourceManagerWrapper.instance.getContentAsOrbeonDom("/xbl/orbeon/scale/scale.xbl"),
+        null,
+        org.orbeon.oxf.util.XPath.GlobalConfiguration
+      )
+      val scaleSpec = ControlCustomSettingsParser.fromBinding((scaleDoc.rootElement / "*:binding").head).get
+      assert(scaleSpec.localName == "scale")
+      assert(scaleSpec.settings.map(_.name) == List("start", "end", "startLabel", "endLabel", "allowClear"))
+      assert(scaleSpec.findSetting("allowClear").exists(_.defaultVal.contains(Json.fromBoolean(true))))
+      assert(scaleSpec.constraints.size == 1)
+    }
   }
 }

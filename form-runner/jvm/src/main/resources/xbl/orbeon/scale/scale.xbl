@@ -1,0 +1,459 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:RatingScaleSupport="java:org.orbeon.xbl.RatingScaleSupportJava">
+
+    <xbl:binding
+        id="fr-scale"
+        element="fr|scale"
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle allow-minimal-label-hint"
+        xxf:external-events="DOMActivate"
+        xxbl:label-for="scale-group"
+        xxbl:type="xf:integer"
+        xxbl:constraint="
+            RatingScaleSupport:isScaleValueInRange(
+                string(.),
+                string(fr:component-param-value('start')),
+                string(fr:component-param-value('end'))
+            )"
+        xxbl:format="
+            RatingScaleSupport:formatScaleDisplayValue(
+                string(xxf:binding('fr-scale')),
+                string(fr:component-param-value('start')),
+                string(fr:component-param-value('end'))
+            )"
+    >
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Linear Scale</display-name>
+            <display-name lang="fr">Échelle linéaire</display-name>
+            <display-name lang="no">Lineær skala</display-name>
+            <display-name lang="ru">Линейная шкала</display-name>
+            <display-name lang="it">Scala lineare</display-name>
+            <display-name lang="de">Lineare Skala</display-name>
+            <display-name lang="fi">Lineaarinen asteikko</display-name>
+            <display-name lang="es">Escala lineal</display-name>
+            <display-name lang="nl">Lineaire schaal</display-name>
+            <display-name lang="pt">Escala linear</display-name>
+            <display-name lang="sv">Linjär skala</display-name>
+            <display-name lang="ar">مقياس خطي</display-name>
+            <display-name lang="pl">Skala liniowa</display-name>
+            <display-name lang="ja">均等目盛</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-ruler-horizontal</icon-class>
+            </icon>
+            <templates>
+                <bind type="fr:scale"/>
+                <view>
+                    <fr:scale id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:scale>
+                </view>
+            </templates>
+            <custom-settings>
+                <setting name="start" type="xs:string"/>
+                <setting name="end" type="xs:string"/>
+                <setting name="start-label" type="xs:string"/>
+                <setting name="end-label" type="xs:string"/>
+                <setting name="allow-clear" type="xs:boolean" default="true"/>
+                <constraint
+                    test="not(start castable as xs:integer and end castable as xs:integer) or (xs:integer(start) lt xs:integer(end) and (xs:integer(end) - xs:integer(start)) le 20)"
+                    message="Maximum must be greater than minimum (at most 21 steps)"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-scale-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue
+                            ref="$c"
+                            value="instance()/@*[name() = name($c)]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <start/>
+                            <end/>
+                            <start-label/>
+                            <end-label/>
+                            <allow-clear/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="start | end | start-label | end-label"
+                            xxf:whitespace="trim"
+                            type="xxf:XPath2ValueTemplate"/>
+                        <xf:bind ref="end">
+                            <xf:constraint
+                                id="end-constraint"
+                                value="not(../start castable as xs:integer and . castable as xs:integer) or (xs:integer(../start) lt xs:integer(.) and (xs:integer(.) - xs:integer(../start)) le 20)"/>
+                        </xf:bind>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <start>Minimum</start>
+                                <start-hint>Default: 1 (e.g. 0 for NPS)</start-hint>
+                                <end>Maximum</end>
+                                <end-hint>Default: 5 (e.g. 10 for NPS)</end-hint>
+                                <end-constraint>Maximum must be greater than minimum (at most 21 steps)</end-constraint>
+                                <start-label>Low Label</start-label>
+                                <end-label>High Label</end-label>
+                                <allow-clear>Allow Clearing</allow-clear>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <start>Minimum</start>
+                                <start-hint>Défaut : 1 (ex. 0 pour NPS)</start-hint>
+                                <end>Maximum</end>
+                                <end-hint>Défaut : 5 (ex. 10 pour NPS)</end-hint>
+                                <end-constraint>Le maximum doit être supérieur au minimum (au plus 21 niveaux)</end-constraint>
+                                <start-label>Libellé inférieur</start-label>
+                                <end-label>Libellé supérieur</end-label>
+                                <allow-clear>Permettre la réinitialisation</allow-clear>
+                            </resource>
+                            <resource xml:lang="no">
+                                <start>Minimum</start>
+                                <start-hint>Standard: 1 (f.eks. 0 for NPS)</start-hint>
+                                <end>Maksimum</end>
+                                <end-hint>Standard: 5 (f.eks. 10 for NPS)</end-hint>
+                                <end-constraint>Maksimum må være større enn minimum (høyst 21 trinn)</end-constraint>
+                                <start-label>Lav etikett</start-label>
+                                <end-label>Høy etikett</end-label>
+                                <allow-clear>Tillat tømming</allow-clear>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <start>Минимум</start>
+                                <start-hint>По умолчанию: 1 (напр., 0 для NPS)</start-hint>
+                                <end>Максимум</end>
+                                <end-hint>По умолчанию: 5 (напр., 10 для NPS)</end-hint>
+                                <end-constraint>Максимум должен быть больше минимума (не более 21 шага)</end-constraint>
+                                <start-label>Нижняя подпись</start-label>
+                                <end-label>Верхняя подпись</end-label>
+                                <allow-clear>Разрешить очистку</allow-clear>
+                            </resource>
+                            <resource xml:lang="it">
+                                <start>Minimo</start>
+                                <start-hint>Predefinito: 1 (es. 0 per NPS)</start-hint>
+                                <end>Massimo</end>
+                                <end-hint>Predefinito: 5 (es. 10 per NPS)</end-hint>
+                                <end-constraint>Il massimo deve essere maggiore del minimo (al massimo 21 livelli)</end-constraint>
+                                <start-label>Etichetta inferiore</start-label>
+                                <end-label>Etichetta superiore</end-label>
+                                <allow-clear>Consenti cancellazione</allow-clear>
+                            </resource>
+                            <resource xml:lang="de">
+                                <start>Minimum</start>
+                                <start-hint>Standard: 1 (z. B. 0 für NPS)</start-hint>
+                                <end>Maximum</end>
+                                <end-hint>Standard: 5 (z. B. 10 für NPS)</end-hint>
+                                <end-constraint>Das Maximum muss größer als das Minimum sein (höchstens 21 Stufen)</end-constraint>
+                                <start-label>Untere Beschriftung</start-label>
+                                <end-label>Obere Beschriftung</end-label>
+                                <allow-clear>Löschen erlauben</allow-clear>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <start>Minimi</start>
+                                <start-hint>Oletus: 1 (esim. 0 NPS:lle)</start-hint>
+                                <end>Maksimi</end>
+                                <end-hint>Oletus: 5 (esim. 10 NPS:lle)</end-hint>
+                                <end-constraint>Maksimin on oltava suurempi kuin minimi (enintään 21 porrasta)</end-constraint>
+                                <start-label>Alapään selite</start-label>
+                                <end-label>Yläpään selite</end-label>
+                                <allow-clear>Salli tyhjennys</allow-clear>
+                            </resource>
+                            <resource xml:lang="es">
+                                <start>Mínimo</start>
+                                <start-hint>Predeterminado: 1 (p. ej., 0 para NPS)</start-hint>
+                                <end>Máximo</end>
+                                <end-hint>Predeterminado: 5 (p. ej., 10 para NPS)</end-hint>
+                                <end-constraint>El máximo debe ser mayor que el mínimo (máximo 21 niveles)</end-constraint>
+                                <start-label>Etiqueta inferior</start-label>
+                                <end-label>Etiqueta superior</end-label>
+                                <allow-clear>Permitir borrar</allow-clear>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <start>Minimum</start>
+                                <start-hint>Standaard: 1 (bijv. 0 voor NPS)</start-hint>
+                                <end>Maximum</end>
+                                <end-hint>Standaard: 5 (bijv. 10 voor NPS)</end-hint>
+                                <end-constraint>Het maximum moet groter zijn dan het minimum (maximaal 21 stappen)</end-constraint>
+                                <start-label>Laag label</start-label>
+                                <end-label>Hoog label</end-label>
+                                <allow-clear>Wissen toestaan</allow-clear>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <start>Mínimo</start>
+                                <start-hint>Padrão: 1 (ex.: 0 para NPS)</start-hint>
+                                <end>Máximo</end>
+                                <end-hint>Padrão: 5 (ex.: 10 para NPS)</end-hint>
+                                <end-constraint>O máximo deve ser maior que o mínimo (no máximo 21 níveis)</end-constraint>
+                                <start-label>Rótulo inferior</start-label>
+                                <end-label>Rótulo superior</end-label>
+                                <allow-clear>Permitir limpar</allow-clear>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <start>Minimum</start>
+                                <start-hint>Standard: 1 (t.ex. 0 för NPS)</start-hint>
+                                <end>Maximum</end>
+                                <end-hint>Standard: 5 (t.ex. 10 för NPS)</end-hint>
+                                <end-constraint>Maximum måste vara större än minimum (högst 21 steg)</end-constraint>
+                                <start-label>Låg etikett</start-label>
+                                <end-label>Hög etikett</end-label>
+                                <allow-clear>Tillåt rensning</allow-clear>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <start>الحد الأدنى</start>
+                                <start-hint>الافتراضي: 1 (مثل 0 لـ NPS)</start-hint>
+                                <end>الحد الأقصى</end>
+                                <end-hint>الافتراضي: 5 (مثل 10 لـ NPS)</end-hint>
+                                <end-constraint>يجب أن يكون الحد الأقصى أكبر من الحد الأدنى (21 مستوى كحد أقصى)</end-constraint>
+                                <start-label>التسمية الدنيا</start-label>
+                                <end-label>التسمية العليا</end-label>
+                                <allow-clear>السماح بالمسح</allow-clear>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <start>Minimum</start>
+                                <start-hint>Domyślnie: 1 (np. 0 dla NPS)</start-hint>
+                                <end>Maksimum</end>
+                                <end-hint>Domyślnie: 5 (np. 10 dla NPS)</end-hint>
+                                <end-constraint>Maksimum musi być większe od minimum (maksymalnie 21 stopni)</end-constraint>
+                                <start-label>Etykieta dolna</start-label>
+                                <end-label>Etykieta górna</end-label>
+                                <allow-clear>Zezwalaj na czyszczenie</allow-clear>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <start>最小値</start>
+                                <start-hint>デフォルト: 1 (NPSは0など)</start-hint>
+                                <end>最大値</end>
+                                <end-hint>デフォルト: 5 (NPSは10など)</end-hint>
+                                <end-constraint>最大値は最小値より大きい必要があります（最大21段階）</end-constraint>
+                                <start-label>下限ラベル</start-label>
+                                <end-label>上限ラベル</end-label>
+                                <allow-clear>クリアを許可</allow-clear>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-scale-grid">
+                    <xh:tr>
+                        <xh:td colspan="2">
+                            <xf:input ref="instance('local')/start" id="start-control" appearance="xpath-completion">
+                                <xf:label ref="xxf:r('start')"/>
+                                <xf:hint ref="xxf:r('start-hint')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td colspan="2">
+                            <xf:input ref="instance('local')/end" id="end-control" appearance="xpath-completion">
+                                <xf:label ref="xxf:r('end')"/>
+                                <xf:hint ref="xxf:r('end-hint')"/>
+                                <xf:alert ref="xxf:r('end-constraint')" validation="end-constraint"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td colspan="2">
+                            <xf:select1 ref="instance('local')/allow-clear" appearance="full xxf:horizontal" id="allow-clear-control">
+                                <xf:label ref="xxf:r('allow-clear')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
+                                    <xf:value>true</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
+                                    <xf:value>false</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <xf:input ref="instance('local')/start-label" id="start-label-control" appearance="xpath-completion">
+                                <xf:label ref="xxf:r('start-label')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <xf:input ref="instance('local')/end-label" id="end-label-control" appearance="xpath-completion">
+                                <xf:label ref="xxf:r('end-label')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-scale-action"
+                    event="xforms-value-changed"
+                    observer="start-control end-control start-label-control end-label-control allow-clear-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/scale/scale.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <resource xml:lang="en"><clear-value>Clear Value</clear-value></resource>
+                        <resource xml:lang="fr"><clear-value>Réinitialiser</clear-value></resource>
+                        <resource xml:lang="ar"><clear-value>مسح القيمة</clear-value></resource>
+                        <resource xml:lang="ca"><clear-value>Netejar valors</clear-value></resource>
+                        <resource xml:lang="da"><clear-value>Ryd værdi</clear-value></resource>
+                        <resource xml:lang="de"><clear-value>Wert löschen</clear-value></resource>
+                        <resource xml:lang="es"><clear-value>Limpiar valores</clear-value></resource>
+                        <resource xml:lang="fi"><clear-value>Tyhjennä arvo</clear-value></resource>
+                        <resource xml:lang="hu"><clear-value>Érték törlése</clear-value></resource>
+                        <resource xml:lang="it"><clear-value>Cancella valore</clear-value></resource>
+                        <resource xml:lang="ja"><clear-value>値をクリア</clear-value></resource>
+                        <resource xml:lang="nl"><clear-value>Waarde wissen</clear-value></resource>
+                        <resource xml:lang="no"><clear-value>Tøm verdi</clear-value></resource>
+                        <resource xml:lang="pl"><clear-value>Wyczyść wartość</clear-value></resource>
+                        <resource xml:lang="pt"><clear-value>Limpar valor</clear-value></resource>
+                        <resource xml:lang="ru"><clear-value>Очистить значение</clear-value></resource>
+                        <resource xml:lang="sv"><clear-value>Rensa värde</clear-value></resource>
+                        <resource xml:lang="tr"><clear-value>Değeri Temizle</clear-value></resource>
+                        <resource xml:lang="zh-Hans"><clear-value>清除值</clear-value></resource>
+                        <resource xml:lang="zh-Hant"><clear-value>清除值</clear-value></resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:var name="binding"         value="xxf:binding('fr-scale')"/>
+            <xf:var name="start-param"     value="string(fr:component-param-value('start'))"/>
+            <xf:var name="end-param"       value="string(fr:component-param-value('end'))"/>
+            <xf:var name="start-label"     value="string(fr:component-param-value('start-label'))"/>
+            <xf:var name="end-label"       value="string(fr:component-param-value('end-label'))"/>
+            <xf:var name="allow-clear"     value="string(fr:component-param-value('allow-clear')) = 'true'"/>
+            <xf:var name="effective-start" value="RatingScaleSupport:effectiveScaleStart($start-param)"/>
+            <xf:var name="effective-end"   value="RatingScaleSupport:effectiveScaleEnd($start-param, $end-param)"/>
+            <xf:var name="has-endpoints"   value="xxf:non-blank($start-label) or xxf:non-blank($end-label)"/>
+
+            <xf:group
+                ref="$binding"
+                class="fr-scale-container fr-scale-empty">
+                <xh:div class="fr-scale-row">
+                    <xh:div class="fr-scale-track-group">
+                        <xh:div
+                            id="scale-group"
+                            class="fr-scale-group"
+                            role="radiogroup"
+                            data-start="{$effective-start}"
+                            data-end="{$effective-end}"
+                            data-start-label="{$start-label}"
+                            data-end-label="{$end-label}"
+                            data-allow-clear="{$allow-clear}"
+                            xxf:control="true"
+                            xbl:attr="data-tabindex=tabindex data-tabindex=navindex"/>
+                        <xh:div
+                            class="fr-scale-endpoints{' xforms-hidden'[not($has-endpoints)]}"
+                            aria-hidden="true">
+                            <xh:span class="fr-scale-endpoint-start">
+                                <xf:output value="$start-label"/>
+                            </xh:span>
+                            <xh:span class="fr-scale-endpoint-end">
+                                <xf:output value="$end-label"/>
+                            </xh:span>
+                        </xh:div>
+                    </xh:div>
+                    <xh:button
+                        type="button"
+                        class="btn btn-link fr-scale-clear xforms-hidden"
+                        title="{fr:r('clear-value')}"
+                        aria-label="{fr:r('clear-value')}">
+                        <xh:i class="fa fa-fw fa-times-circle" aria-hidden="true"/>
+                    </xh:button>
+                </xh:div>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+    <xbl:binding
+        id="fr-scale-output"
+        element="
+            fr|scale[fr|static-readonly = true],
+            fr|scale[fr|pdf-template = true]"
+        xxbl:mode="lhha binding value allow-minimal-label-hint"
+        xxbl:label-for="input"
+        xxbl:format="
+            RatingScaleSupport:formatScaleDisplayValue(
+                string(xxf:binding('fr-scale-output')),
+                string(fr:component-param-value('start')),
+                string(fr:component-param-value('end'))
+            )"
+    >
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/scale/scale.css"/>
+        </xbl:resources>
+        <xbl:template>
+            <xf:var name="start-param"     value="string(fr:component-param-value('start'))"/>
+            <xf:var name="end-param"       value="string(fr:component-param-value('end'))"/>
+            <xf:var name="effective-start" value="RatingScaleSupport:effectiveScaleStart($start-param)"/>
+            <xf:var name="effective-end"   value="RatingScaleSupport:effectiveScaleEnd($start-param, $end-param)"/>
+            <xf:group ref="xxf:binding('fr-scale-output')" class="fr-scale-readonly-container">
+                <xf:var
+                    name="has-int-val"
+                    value="string(.) castable as xs:integer"/>
+                <xf:var
+                    name="int-val"
+                    value="if ($has-int-val) then xs:integer(string(.)) else 0"/>
+                <xh:span
+                    class="fr-scale-readonly-pills{if ($has-int-val and $int-val ge $effective-start and $int-val le $effective-end) then '' else ' xforms-hidden'}"
+                    aria-hidden="true">
+                    <xf:repeat ref="$effective-start to $effective-end">
+                        <xh:span class="fr-scale-readonly-pill{if (. = $int-val) then ' fr-scale-readonly-pill-selected' else ''}">
+                            <xf:output value="."/>
+                        </xh:span>
+                    </xf:repeat>
+                </xh:span>
+                <xf:input
+                    id="input"
+                    ref="."
+                    xxf:format="xxf:formatted-value('fr-scale-output')"
+                    xbl:attr="xxf:readonly-appearance"/>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

@@ -1,0 +1,258 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+
+    .xbl-fr-scale {
+
+        .fr-scale-container {
+            width: 100%;
+
+            .fr-scale-row {
+                display    : flex;
+                align-items: flex-start;
+                gap        : 0.5rem;
+                width      : 100%;
+            }
+
+            .fr-scale-track-group {
+                display       : inline-flex;
+                flex-direction: column;
+                gap           : 0.3rem;
+                max-width     : 100%;
+                min-width     : 0;
+            }
+
+            .fr-scale-group {
+                display    : flex;
+                flex-wrap  : wrap;
+                align-items: center;
+                gap        : 0.35rem;
+            }
+
+            label.fr-scale-item {
+                position            : relative;
+                box-sizing          : border-box;
+                display             : inline-flex;
+                align-items         : center;
+                justify-content     : center;
+                margin              : 0;
+                padding             : 0.25rem 0.55rem;
+                min-inline-size     : var(--orbeon-control-height);
+                min-block-size      : var(--orbeon-control-height);
+                border              : 1px solid var(--orbeon-control-border-color);
+                border-radius       : var(--orbeon-control-border-radius);
+                background-color    : var(--orbeon-control-background-color);
+                color               : var(--orbeon-control-color);
+                font-variant-numeric: tabular-nums;
+                font-weight         : 500;
+                line-height         : 1;
+                cursor              : pointer;
+                user-select         : none;
+                transition          : background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                      border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                      color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                      box-shadow var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                      transform var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+                @media (pointer: coarse) {
+                    min-inline-size: 44px;
+                    min-block-size : 44px;
+                }
+
+                input.fr-scale-radio.visually-hidden {
+                    position   : absolute;
+                    clip-path  : inset(50%);
+                    overflow   : hidden;
+                    inline-size: 1px;
+                    block-size : 1px;
+                    width      : 1px;
+                    height     : 1px;
+                    margin     : -1px;
+                    padding    : 0;
+                    border     : 0;
+                    white-space: nowrap;
+                }
+
+                &:not(.fr-scale-item-selected):not(:has(input.fr-scale-radio:disabled)):hover {
+                    background-color: var(--orbeon-add-on-background-color);
+                    border-color    : var(--orbeon-focus-border-color);
+                }
+
+                &.fr-scale-item-selected {
+                    background-color: var(--orbeon-button-primary-background-color);
+                    border-color    : var(--orbeon-button-primary-background-color);
+                    color           : var(--orbeon-button-primary-color);
+                    font-weight     : 700;
+                    box-shadow      : inset 0 0 0 1px var(--orbeon-button-primary-background-color);
+
+                    @media (forced-colors: active) {
+                        background-color   : Highlight;
+                        border-color       : Highlight;
+                        color              : HighlightText;
+                        forced-color-adjust: none;
+                    }
+                }
+
+                &:has(input.fr-scale-radio:focus-visible) {
+                    outline       : 2px solid var(--orbeon-focus-border-color);
+                    outline-offset: 2px;
+                    box-shadow    : var(--orbeon-focus-ring);
+                }
+
+                &:has(input.fr-scale-radio:disabled) {
+                    cursor : not-allowed;
+                    opacity: 0.65;
+                }
+
+                &:not(:has(input.fr-scale-radio:disabled)):active {
+                    transform: scale(0.96);
+                }
+            }
+
+            .fr-scale-endpoints {
+                display        : flex;
+                justify-content: space-between;
+                align-items    : flex-start;
+                gap            : 1rem;
+                font-size      : smaller;
+                line-height    : 1.25;
+                color          : var(--orbeon-hint-color);
+
+                .fr-scale-endpoint-end {
+                    text-align : right;
+                    margin-left: auto;
+                }
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+
+            .btn.fr-scale-clear {
+                display        : inline-flex;
+                align-items    : center;
+                justify-content: center;
+                padding        : 0.15rem;
+                min-inline-size: 24px;
+                min-block-size : var(--orbeon-control-height);
+                border         : 0;
+                border-radius  : var(--orbeon-control-border-radius);
+                background     : transparent;
+                box-shadow     : none;
+                color          : var(--orbeon-control-placeholder-color);
+                text-decoration: none;
+                cursor         : pointer;
+                flex-shrink    : 0;
+
+                @media (pointer: coarse) {
+                    min-inline-size: 44px;
+                    min-block-size : 44px;
+                }
+
+                &:hover, &:focus {
+                    color          : var(--orbeon-base-color);
+                    text-decoration: none;
+                    background     : transparent;
+                }
+
+                &:focus-visible {
+                    outline       : 2px solid var(--orbeon-focus-border-color);
+                    outline-offset: 2px;
+                    box-shadow    : var(--orbeon-focus-ring);
+                }
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+        }
+
+        &.xforms-invalid.xforms-visited {
+            .fr-scale-container label.fr-scale-item:not(.fr-scale-item-selected) {
+                border-color: var(--orbeon-invalid-control-border-color);
+            }
+        }
+
+        .fr-scale-readonly-container {
+            @media screen {
+                display    : inline-flex;
+                flex-wrap  : wrap;
+                align-items: center;
+                gap        : 0.55rem;
+            }
+
+            .fr-scale-readonly-pills {
+                display       : inline-block;
+                vertical-align: middle;
+                margin-right  : 6px;
+
+                @media screen {
+                    display     : inline-flex;
+                    flex-wrap   : wrap;
+                    align-items : center;
+                    gap         : 0.25rem;
+                    margin-right: 0;
+                }
+
+                & > .xforms-repeat-begin-end,
+                & > .xforms-repeat-delimiter {
+                    display: none;
+                }
+
+                .fr-scale-readonly-pill {
+                    display             : inline-block;
+                    box-sizing          : border-box;
+                    min-width           : 1.75em;
+                    padding             : 2px 6px;
+                    margin-right        : 3px;
+                    text-align          : center;
+                    vertical-align      : middle;
+                    font-size           : 0.9em;
+                    font-variant-numeric: tabular-nums;
+                    line-height         : 1.2;
+                    border              : 1px solid var(--orbeon-control-border-color);
+                    border-radius       : var(--orbeon-control-border-radius);
+                    background-color    : var(--orbeon-control-background-color);
+                    color               : var(--orbeon-hint-color);
+
+                    @media screen {
+                        margin-right: 0;
+                    }
+
+                    &.fr-scale-readonly-pill-selected {
+                        background-color          : var(--orbeon-button-primary-background-color);
+                        border-color              : var(--orbeon-button-primary-background-color);
+                        color                     : var(--orbeon-button-primary-color);
+                        font-weight               : 700;
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust        : exact;
+                    }
+                }
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+        }
+
+        @media print {
+            display: inline;
+
+            .fr-scale-readonly-container {
+                display: inline;
+            }
+        }
+    }
+}

@@ -1,0 +1,391 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:RatingScaleSupport="java:org.orbeon.xbl.RatingScaleSupportJava">
+
+    <xbl:binding
+        id="fr-rating"
+        element="fr|rating"
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle allow-minimal-label-hint"
+        xxf:external-events="DOMActivate"
+        xxbl:label-for="rating-group"
+        xxbl:type="xf:integer"
+        xxbl:constraint="
+            RatingScaleSupport:isRatingValueInRange(
+                string(.),
+                string(fr:component-param-value('max'))
+            )"
+        xxbl:format="
+            RatingScaleSupport:formatRatingDisplayValue(
+                string(xxf:binding('fr-rating')),
+                string(fr:component-param-value('max'))
+            )"
+    >
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Star Rating</display-name>
+            <display-name lang="fr">Évaluation par étoiles</display-name>
+            <display-name lang="no">Stjernevurdering</display-name>
+            <display-name lang="ru">Оценка звёздами</display-name>
+            <display-name lang="it">Valutazione a stelle</display-name>
+            <display-name lang="de">Sternebewertung</display-name>
+            <display-name lang="fi">Tähtiarviointi</display-name>
+            <display-name lang="es">Valoración por estrellas</display-name>
+            <display-name lang="nl">Sterrenbeoordeling</display-name>
+            <display-name lang="pt">Classificação por estrelas</display-name>
+            <display-name lang="sv">Stjärnbetyg</display-name>
+            <display-name lang="ar">التقييم بالنجوم</display-name>
+            <display-name lang="pl">Ocena gwiazdkowa</display-name>
+            <display-name lang="ja">星評価</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-star</icon-class>
+            </icon>
+            <templates>
+                <bind type="fr:rating"/>
+                <view>
+                    <fr:rating id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:rating>
+                </view>
+            </templates>
+            <custom-settings>
+                <setting name="max" type="xs:string"/>
+                <setting name="show-value" type="xs:boolean" default="true"/>
+                <setting name="allow-clear" type="xs:boolean" default="true"/>
+                <constraint
+                    test="not(max castable as xs:integer) or (xs:integer(max) ge 2 and xs:integer(max) le 10)"
+                    message="Number of stars must be between 2 and 10"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-rating-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue
+                            ref="$c"
+                            value="instance()/@*[name() = name($c)]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <max/>
+                            <show-value/>
+                            <allow-clear/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="max"
+                            xxf:whitespace="trim"
+                            type="xxf:XPath2ValueTemplate">
+                            <xf:constraint
+                                id="max-constraint"
+                                value="not(. castable as xs:integer) or (xs:integer(.) ge 2 and xs:integer(.) le 10)"/>
+                        </xf:bind>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <max>Number of Stars</max>
+                                <max-hint>Default: 5 (2–10)</max-hint>
+                                <max-constraint>Number of stars must be between 2 and 10</max-constraint>
+                                <show-value>Show Value</show-value>
+                                <allow-clear>Allow Clearing</allow-clear>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <max>Nombre d'étoiles</max>
+                                <max-hint>Défaut : 5 (2–10)</max-hint>
+                                <max-constraint>Le nombre d'étoiles doit être compris entre 2 et 10</max-constraint>
+                                <show-value>Afficher la valeur</show-value>
+                                <allow-clear>Permettre la réinitialisation</allow-clear>
+                            </resource>
+                            <resource xml:lang="no">
+                                <max>Antall stjerner</max>
+                                <max-hint>Standard: 5 (2–10)</max-hint>
+                                <max-constraint>Antall stjerner må være mellom 2 og 10</max-constraint>
+                                <show-value>Vis verdi</show-value>
+                                <allow-clear>Tillat tømming</allow-clear>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <max>Количество звёзд</max>
+                                <max-hint>По умолчанию: 5 (2–10)</max-hint>
+                                <max-constraint>Количество звёзд должно быть от 2 до 10</max-constraint>
+                                <show-value>Показывать значение</show-value>
+                                <allow-clear>Разрешить очистку</allow-clear>
+                            </resource>
+                            <resource xml:lang="it">
+                                <max>Numero di stelle</max>
+                                <max-hint>Predefinito: 5 (2–10)</max-hint>
+                                <max-constraint>Il numero di stelle deve essere compreso tra 2 e 10</max-constraint>
+                                <show-value>Mostra valore</show-value>
+                                <allow-clear>Consenti cancellazione</allow-clear>
+                            </resource>
+                            <resource xml:lang="de">
+                                <max>Anzahl der Sterne</max>
+                                <max-hint>Standard: 5 (2–10)</max-hint>
+                                <max-constraint>Die Anzahl der Sterne muss zwischen 2 und 10 liegen</max-constraint>
+                                <show-value>Wert anzeigen</show-value>
+                                <allow-clear>Löschen erlauben</allow-clear>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <max>Tähtien määrä</max>
+                                <max-hint>Oletus: 5 (2–10)</max-hint>
+                                <max-constraint>Tähtien määrän on oltava välillä 2–10</max-constraint>
+                                <show-value>Näytä arvo</show-value>
+                                <allow-clear>Salli tyhjennys</allow-clear>
+                            </resource>
+                            <resource xml:lang="es">
+                                <max>Número de estrellas</max>
+                                <max-hint>Predeterminado: 5 (2–10)</max-hint>
+                                <max-constraint>El número de estrellas debe estar entre 2 y 10</max-constraint>
+                                <show-value>Mostrar valor</show-value>
+                                <allow-clear>Permitir borrar</allow-clear>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <max>Aantal sterren</max>
+                                <max-hint>Standaard: 5 (2–10)</max-hint>
+                                <max-constraint>Het aantal sterren moet tussen 2 en 10 liggen</max-constraint>
+                                <show-value>Waarde tonen</show-value>
+                                <allow-clear>Wissen toestaan</allow-clear>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <max>Número de estrelas</max>
+                                <max-hint>Padrão: 5 (2–10)</max-hint>
+                                <max-constraint>O número de estrelas deve estar entre 2 e 10</max-constraint>
+                                <show-value>Mostrar valor</show-value>
+                                <allow-clear>Permitir limpar</allow-clear>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <max>Antal stjärnor</max>
+                                <max-hint>Standard: 5 (2–10)</max-hint>
+                                <max-constraint>Antalet stjärnor måste vara mellan 2 och 10</max-constraint>
+                                <show-value>Visa värde</show-value>
+                                <allow-clear>Tillåt rensning</allow-clear>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <max>عدد النجوم</max>
+                                <max-hint>الافتراضي: 5 (2–10)</max-hint>
+                                <max-constraint>يجب أن يكون عدد النجوم بين 2 و 10</max-constraint>
+                                <show-value>إظهار القيمة</show-value>
+                                <allow-clear>السماح بالمسح</allow-clear>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <max>Liczba gwiazdek</max>
+                                <max-hint>Domyślnie: 5 (2–10)</max-hint>
+                                <max-constraint>Liczba gwiazdek musi wynosić od 2 do 10</max-constraint>
+                                <show-value>Pokaż wartość</show-value>
+                                <allow-clear>Zezwalaj na czyszczenie</allow-clear>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <max>星の数</max>
+                                <max-hint>デフォルト: 5 (2–10)</max-hint>
+                                <max-constraint>星の数は2から10の間である必要があります</max-constraint>
+                                <show-value>値を表示</show-value>
+                                <allow-clear>クリアを許可</allow-clear>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-rating-grid">
+                    <xh:tr>
+                        <xh:td colspan="2">
+                            <xf:input ref="instance('local')/max" id="max-control" appearance="xpath-completion">
+                                <xf:label ref="xxf:r('max')"/>
+                                <xf:hint ref="xxf:r('max-hint')"/>
+                                <xf:alert ref="xxf:r('max-constraint')" validation="max-constraint"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td colspan="2">
+                            <xf:select1 ref="instance('local')/show-value" appearance="full xxf:horizontal" id="show-value-control">
+                                <xf:label ref="xxf:r('show-value')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
+                                    <xf:value>true</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
+                                    <xf:value>false</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                        <xh:td colspan="2">
+                            <xf:select1 ref="instance('local')/allow-clear" appearance="full xxf:horizontal" id="allow-clear-control">
+                                <xf:label ref="xxf:r('allow-clear')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
+                                    <xf:value>true</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
+                                    <xf:value>false</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-rating-action"
+                    event="xforms-value-changed"
+                    observer="max-control show-value-control allow-clear-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/rating/rating.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <resource xml:lang="en"><clear-value>Clear Value</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="fr"><clear-value>Réinitialiser</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="ar"><clear-value>مسح القيمة</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="ca"><clear-value>Netejar valors</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="da"><clear-value>Ryd værdi</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="de"><clear-value>Wert löschen</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="es"><clear-value>Limpiar valores</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="fi"><clear-value>Tyhjennä arvo</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="hu"><clear-value>Érték törlése</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="it"><clear-value>Cancella valore</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="ja"><clear-value>値をクリア</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="nl"><clear-value>Waarde wissen</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="no"><clear-value>Tøm verdi</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="pl"><clear-value>Wyczyść wartość</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="pt"><clear-value>Limpar valor</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="ru"><clear-value>Очистить значение</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="sv"><clear-value>Rensa värde</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="tr"><clear-value>Değeri Temizle</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="zh-Hans"><clear-value>清除值</clear-value><star-label>{0} / {1}</star-label></resource>
+                        <resource xml:lang="zh-Hant"><clear-value>清除值</clear-value><star-label>{0} / {1}</star-label></resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:var name="binding"       value="xxf:binding('fr-rating')"/>
+            <xf:var name="max-param"     value="string(fr:component-param-value('max'))"/>
+            <xf:var name="show-value"    value="string(fr:component-param-value('show-value')) = 'true'"/>
+            <xf:var name="allow-clear"   value="string(fr:component-param-value('allow-clear')) = 'true'"/>
+            <xf:var name="effective-max" value="RatingScaleSupport:effectiveRatingMax($max-param)"/>
+
+            <xf:group
+                ref="$binding"
+                class="fr-rating-container fr-rating-empty">
+                <xh:div class="fr-rating-row">
+                    <xh:div
+                        id="rating-group"
+                        class="fr-rating-group"
+                        role="radiogroup"
+                        data-max="{$effective-max}"
+                        data-allow-clear="{$allow-clear}"
+                        data-star-label="{fr:r('star-label')}"
+                        xxf:control="true"
+                        xbl:attr="data-tabindex=tabindex data-tabindex=navindex"/>
+                    <xh:div class="fr-rating-value-group">
+                        <xh:span class="fr-rating-value-wrapper{' xforms-hidden'[not($show-value)]}">
+                            <xh:span class="fr-rating-value fr-rating-value-empty">—</xh:span>
+                        </xh:span>
+                        <xh:button
+                            type="button"
+                            class="btn btn-link fr-rating-clear xforms-hidden"
+                            title="{fr:r('clear-value')}"
+                            aria-label="{fr:r('clear-value')}">
+                            <xh:i class="fa fa-fw fa-times-circle" aria-hidden="true"/>
+                        </xh:button>
+                    </xh:div>
+                </xh:div>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+    <xbl:binding
+        id="fr-rating-output"
+        element="
+            fr|rating[fr|static-readonly = true],
+            fr|rating[fr|pdf-template = true]"
+        xxbl:mode="lhha binding value allow-minimal-label-hint"
+        xxbl:label-for="input"
+        xxbl:format="
+            RatingScaleSupport:formatRatingDisplayValue(
+                string(xxf:binding('fr-rating-output')),
+                string(fr:component-param-value('max'))
+            )"
+    >
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/rating/rating.css"/>
+        </xbl:resources>
+        <xbl:template>
+            <xf:var
+                name="effective-max"
+                value="RatingScaleSupport:effectiveRatingMax(string(fr:component-param-value('max')))"/>
+            <xf:var
+                name="show-value"
+                value="string(fr:component-param-value('show-value')) = 'true'"/>
+            <xf:group
+                ref="xxf:binding('fr-rating-output')"
+                class="fr-rating-readonly-container{' fr-rating-readonly-hide-value'[not($show-value)]}">
+                <xf:var
+                    name="int-val"
+                    value="if (string(.) castable as xs:integer) then xs:integer(string(.)) else 0"/>
+                <xh:span
+                    class="fr-rating-readonly-stars{if ($int-val ge 1 and $int-val le $effective-max) then '' else ' xforms-hidden'}"
+                    aria-hidden="true">
+                    <xf:repeat ref="1 to $effective-max">
+                        <xh:i class="{if (. le $int-val) then 'fa-solid fa-star fr-rating-star fr-rating-star-filled' else 'fa-regular fa-star fr-rating-star'}"/>
+                    </xf:repeat>
+                </xh:span>
+                <xf:input
+                    id="input"
+                    ref="."
+                    xxf:format="xxf:formatted-value('fr-rating-output')"
+                    xbl:attr="xxf:readonly-appearance"/>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

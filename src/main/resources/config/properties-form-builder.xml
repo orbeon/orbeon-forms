@@ -67,6 +67,8 @@
         oxf:/xbl/orbeon/switch-input/switch-input.xbl
         oxf:/xbl/orbeon/yesno-input/yesno-input.xbl
         oxf:/xbl/orbeon/color/color.xbl
+        oxf:/xbl/orbeon/rating/rating.xbl
+        oxf:/xbl/orbeon/scale/scale.xbl
         oxf:/forms/orbeon/builder/xbl/selection-input-boolean.xbl
         oxf:/forms/orbeon/builder/xbl/selection-select1-minimal.xbl
     </property>

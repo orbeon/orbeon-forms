@@ -94,6 +94,8 @@ object ImportExportSupport {
     QName("url",                 FRNamespace),
     QName("range",               FRNamespace),
     xfQName("range"),
+    QName("rating",              FRNamespace),
+    QName("scale",               FRNamespace),
   )
 
   // TODO: components

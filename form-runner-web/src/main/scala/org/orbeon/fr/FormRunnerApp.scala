@@ -89,6 +89,8 @@ object FormRunnerApp extends App {
     xbl.MaskedInput
     xbl.Url
     xbl.FrRange
+    xbl.FrRating
+    xbl.FrScale
 
     DomSupport.atLeastDomReadyStateF(document, DomSupport.DomReadyState.Interactive) foreach { _ =>
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .navbar.fixed-top, .orbeon .navbar-fixed-top", addScrollPadding(_, "scroll-padding-top"))

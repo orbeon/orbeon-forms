@@ -212,6 +212,8 @@
         +fr:url
         +fr:hyperlink
         +fr:range
+        +fr:rating
+        +fr:scale
 
         <!-- Less common controls XBL components -->
         +fr:wpaint
@@ -304,6 +306,8 @@
         +fr:url
         +fr:hyperlink
         +fr:range
+        +fr:rating
+        +fr:scale
     </property>
 
     <!-- Theme name to CSS URI mapping -->
@@ -426,6 +430,8 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-range.*"                        value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xf-range.*"                        value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-range.*"                    value="input-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-rating.*"                       value="input-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-scale.*"                        value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-dropdown-select1.*"             value="select-label"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-yesno-input.*"                  value="select-value"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-databound-select1.*"            value="select-label"/>

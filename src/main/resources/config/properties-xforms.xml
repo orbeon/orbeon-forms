@@ -278,6 +278,14 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.range.suffix"                              value=""/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.range.show-value"                          value="true"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.range.show-endpoints"                      value="false"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.rating.max"                                value="5"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.rating.show-value"                         value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.rating.allow-clear"                        value="true"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.scale.start"                               value="1"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.scale.end"                                 value="5"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.scale.start-label"                         value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.scale.end-label"                           value=""/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.scale.allow-clear"                         value="true"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.library" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
         fr:grid-single
@@ -305,6 +313,8 @@
         fb:xpath-completion
         fr:hyperlink
         fr:range
+        fr:rating
+        fr:scale
         <!-- For static readonly output bindings -->
         fr:output-field
         fr:date

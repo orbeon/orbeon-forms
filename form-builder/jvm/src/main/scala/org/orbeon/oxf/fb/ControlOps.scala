@@ -978,6 +978,8 @@ trait ControlOps extends ResourcesOps {
     (FRContainerTest                                                      , isRepeat,  List("min", "max", "freeze", "remove-constraint", "clear-constraint"), Nil),
     (FRNumberTest || FRCurrencyTest || FRPercentageTest                   , _ => true, List("prefix", "suffix")                                             , Nil),
     ((FRRangeQName: Test) || xfQName("range")                             , _ => true, List("start", "end", "step", "prefix", "suffix")                     , Nil),
+    (FRRatingQName                                                        , _ => true, List("max")                                                          , Nil),
+    (FRScaleQName                                                         , _ => true, List("start", "end", "start-label", "end-label")                     , Nil),
     (FRHyperlinkQName                                                     , _ => true, List("href")                                                         , Nil),
     (FRDataboundSelect1QName || FRDataboundSelect1SearchQName             , _ => true, List("resource")                                                     , Nil),
     // These are a little different from `controls.xsl` as in the XSLT we use a mode, `within-databound-itemset`, and

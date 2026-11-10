@@ -78,7 +78,6 @@ val CommonsIoVersion                 = "2.15.1"
 val OpenHtmlToPdfVersion             = "1.1.113"
 val PdfBoxVersion                    = "3.0.8-orbeon.1" // Patched version with PDFBOX-6220 backport
 val VeraPdfVersion                   = "1.30.3"
-val TinkVersion                      = "1.20.0"
 val JacksonVersion                   = "2.22.4"
 val JavaMailApiVersion               = "2.1.3"
 val AngusMailVersion                 = "2.0.5"
@@ -177,11 +176,7 @@ val CoreLibraryDependencies = Seq(
   "org.apache.logging.log4j"    % "log4j-slf4j2-impl"               % Log4j2Version,
   "org.apache.logging.log4j"    % "log4j-api"                       % Log4j2Version,
   "org.apache.logging.log4j"    % "log4j-core"                      % Log4j2Version,
-  "com.google.crypto.tink"      % "tink"                            % TinkVersion excludeAll (
-    ExclusionRule(organization = "com.amazonaws"),
-    ExclusionRule(organization = "com.fasterxml.jackson.core")
-  ),
-  "com.fasterxml.jackson.core"  % "jackson-databind"                % JacksonVersion, // for Tink, Sendgrid, Infinispan, also pulls `jackson-annotations` and `jackson-core`
+  "com.fasterxml.jackson.core"  % "jackson-databind"                % JacksonVersion, // for Sendgrid, Infinispan, also pulls `jackson-annotations` and `jackson-core`
   "me.gosimple"                 % "nbvcxz"                          % "1.5.1",
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,
   "com.icegreen"                % "greenmail"                       % "2.1.3"           % Test,
@@ -198,7 +193,7 @@ val CoreLibraryDependencies = Seq(
   "io.github.openhtmltopdf"     % "openhtmltopdf-java2d"            % OpenHtmlToPdfVersion,
   "org.apache.pdfbox"           % "pdfbox"                          % PdfBoxVersion,
   "com.github.librepdf"         % "openpdf"                         % "1.3.26",
-  "org.bouncycastle"            % "bcmail-jdk18on"                  % "1.87",   // for `openpdf`, also pulls `bcprov` and `bcpkix`
+  "org.bouncycastle"            % "bcpkix-jdk18on"                  % "1.87",   // for `openpdf`, also pulls `bcprov`
   "com.drewnoakes"              % "metadata-extractor"              % "2.19.0",
   "com.twelvemonkeys.imageio"   % "imageio-webp"                    % "3.12.0",
   "com.twelvemonkeys.imageio"   % "imageio-core"                    % "3.12.0",

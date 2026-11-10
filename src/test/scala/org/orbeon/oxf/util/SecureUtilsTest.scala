@@ -146,6 +146,34 @@ class SecureUtilsTest
     }
   }
 
+  describe("AES-GCM (Tink-compatible field encryption)") {
+
+    val TestPassword = "ForTestsOnly-1!T42mMw*pgH9.EfTZx!4r"
+
+    it("must round-trip encrypt and decrypt across sizes") {
+      for (size <- Sizes) {
+        val bytes     = randomBytes(size)
+        val encrypted = SecureUtils.AesGcm.encryptWithPassword(TestPassword, bytes)
+        val decrypted = SecureUtils.AesGcm.decryptWithPassword(TestPassword, encrypted)
+        assert(bytes sameElements decrypted)
+        assert(encrypted.length == 12 + size + 16)
+      }
+    }
+
+    it("must decrypt ciphertext produced by Google Tink AesGcmJce") {
+      val expectedText   = "Hello, Orbeon Forms! Testing Tink backward compatibility."
+      val tinkCiphertext = "7eFI2d4BL5WqHPs7yf2iEfM0hnnKgVfNe8cUqIZCA+B9nAOlT7JIRosHdZ4wyWOvQoE+FWUEz/hiOIRyubF6t13gH/LPt171Cr+g/ZnSpcWio/1l+w=="
+
+      assert(SecureUtils.AesGcm.decryptWithPassword(TestPassword, tinkCiphertext) == expectedText)
+    }
+
+    it("must fail when tampering with AES-GCM ciphertext") {
+      val encrypted = SecureUtils.AesGcm.encryptWithPassword(TestPassword, randomBytes(64))
+      encrypted(encrypted.length - 1) = (encrypted(encrypted.length - 1) ^ 0x01).toByte
+      assert(Try(SecureUtils.AesGcm.decryptWithPassword(TestPassword, encrypted)).isFailure)
+    }
+  }
+
   private def randomBytes(n: Int) = {
     val bytes = new Array[Byte](n)
     (new SecureRandom).nextBytes(bytes)

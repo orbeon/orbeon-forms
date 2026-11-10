@@ -13,16 +13,15 @@
  */
 package org.orbeon.oxf.util
 
-import com.google.crypto.tink.subtle.{AesGcmJce, Base64 as TinkBase64}
 import org.apache.commons.pool.BasePoolableObjectFactory
 import org.log4s.Logger
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.common.ConfigurationException
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
 
-import java.security.{MessageDigest, SecureRandom, Security}
-import javax.crypto.spec.{IvParameterSpec, PBEKeySpec, SecretKeySpec}
+import java.security.{GeneralSecurityException, MessageDigest, Provider, SecureRandom, Security}
+import java.util.Base64 as JBase64
+import javax.crypto.spec.{GCMParameterSpec, IvParameterSpec, PBEKeySpec, SecretKeySpec}
 import javax.crypto.{Cipher, Mac, SecretKey, SecretKeyFactory}
 
 
@@ -64,10 +63,15 @@ object SecureUtils extends SecureUtilsTrait {
 
   private val KeyCipherAlgorithm = "PBKDF2WithHmacSHA1"
   private val EncryptionCipherTransformation = "AES/CBC/PKCS5Padding"
+  private val AesGcmCipherTransformation = "AES/GCM/NoPadding"
   private val DigestAlgorithm = "SHA-256"
 
   private val AESBlockSize = 128
   private val AESIVSize    = AESBlockSize / 8
+
+  private val AesGcmIvSize        = 12
+  private val AesGcmTagByteLength = 16
+  private val AesGcmTagBitLength  = AesGcmTagByteLength * 8
 
   private def getPassword(keyUsage: KeyUsage): String = {
 
@@ -120,7 +124,7 @@ object SecureUtils extends SecureUtilsTrait {
 
       val spec = new PBEKeySpec(getPassword(keyUsage).toCharArray, salt, 65536, getKeyLength)
 
-      val factory = SecretKeyFactory.getInstance(KeyCipherAlgorithm)
+      val factory = getSecretKeyFactory(KeyCipherAlgorithm)
       new SecretKeySpec(factory.generateSecret(spec).getEncoded, "AES")
     }
 
@@ -128,55 +132,89 @@ object SecureUtils extends SecureUtilsTrait {
   }
 
   // 2023-04-12: Used by `FieldEncryption` only
-  object Tink {
+  object AesGcm {
 
-    private def createAead(keyUsage: KeyUsage): AesGcmJce = {
-      val messageDigest = MessageDigest.getInstance(DigestAlgorithm)
-      messageDigest.update(getPassword(keyUsage).getBytes(CharsetNames.Utf8))
+    private val aesGcmSecretKeys: java.util.concurrent.ConcurrentHashMap[String, SecretKey] =
+      new java.util.concurrent.ConcurrentHashMap
+
+    private def computeSecretKey(password: String): SecretKey = {
+      val messageDigest = getMessageDigest(DigestAlgorithm)
+      messageDigest.update(password.getBytes(CharsetNames.Utf8))
       val key256Bit = messageDigest.digest()
-      // 128-bit key needed by implementation
+      // 128-bit key needed for backward compatibility with data encrypted using Tink `AesGcmJce`
       // Shortening is ok https://security.stackexchange.com/a/34797/49208
       val key128Bit = key256Bit.take(16)
-      new AesGcmJce(key128Bit)
+      new SecretKeySpec(key128Bit, "AES")
     }
 
-    // Primary encryption/decryption object
-    private lazy val hasFallbackPassword = checkPasswordForKeyUsage(KeyUsage.FieldEncryptionFallback)
+    private def getOrComputeSecretKey(keyUsage: KeyUsage): SecretKey =
+      aesGcmSecretKeys.computeIfAbsent(getPassword(keyUsage), computeSecretKey)
 
-    private lazy val generalAead                 = createAead(KeyUsage.GeneralNoCheck)
-    private lazy val fieldEncryptionAead         = createAead(KeyUsage.FieldEncryption)
-    private lazy val fieldEncryptionFallbackAead = hasFallbackPassword.option(createAead(KeyUsage.FieldEncryptionFallback))
-    private lazy val shareTokenAead              = createAead(KeyUsage.Token)
-    private lazy val mcpTokenAead                = createAead(KeyUsage.McpToken)
+    private val aesGcmPool = new SoftReferenceObjectPool(new BasePoolableObjectFactory[Cipher] {
+      def makeObject(): Cipher = getCipher(AesGcmCipherTransformation)
+    })
 
-    def encrypt(plaintext: Array[Byte], keyUsage: KeyUsage): Array[Byte] =
+    private def withAesGcmCipher[T](body: Cipher => T): T = {
+      val cipher = aesGcmPool.borrowObject()
+      try body(cipher)
+      finally aesGcmPool.returnObject(cipher)
+    }
+
+    private def encryptWithKey(plaintext: Array[Byte], secretKey: SecretKey): Array[Byte] = {
+      val iv = new Array[Byte](AesGcmIvSize)
+      secureRandom.nextBytes(iv)
+      withAesGcmCipher { cipher =>
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, new GCMParameterSpec(AesGcmTagBitLength, iv))
+        iv ++ cipher.doFinal(plaintext)
+      }
+    }
+
+    private def decryptWithKey(ciphertext: Array[Byte], secretKey: SecretKey): Array[Byte] = {
+      if (ciphertext.length < AesGcmIvSize + AesGcmTagByteLength)
+        throw new GeneralSecurityException("ciphertext too short")
+      withAesGcmCipher { cipher =>
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, new GCMParameterSpec(AesGcmTagBitLength, ciphertext, 0, AesGcmIvSize))
+        cipher.doFinal(ciphertext, AesGcmIvSize, ciphertext.length - AesGcmIvSize)
+      }
+    }
+
+    def encrypt(plaintext: Array[Byte], keyUsage: KeyUsage = KeyUsage.FieldEncryption): Array[Byte] =
       keyUsage match {
-        case KeyUsage.GeneralNoCheck          => generalAead.encrypt(plaintext, null) // for external mode and admin tokens
-        case KeyUsage.General                 => throw new IllegalArgumentException(s"Unsupported key usage for Tink encryption: `$keyUsage`")
-        case KeyUsage.Token                   => shareTokenAead.encrypt(plaintext, null)
-        case KeyUsage.McpToken                => mcpTokenAead.encrypt(plaintext, null)
-        case KeyUsage.FieldEncryption         => fieldEncryptionAead.encrypt(plaintext, null)
-        case KeyUsage.FieldEncryptionFallback => throw new IllegalArgumentException(s"Unsupported key usage for Tink encryption: `$keyUsage`")
+        case KeyUsage.GeneralNoCheck | KeyUsage.Token | KeyUsage.McpToken | KeyUsage.FieldEncryption =>
+          encryptWithKey(plaintext, getOrComputeSecretKey(keyUsage))
+        case KeyUsage.General | KeyUsage.FieldEncryptionFallback =>
+          throw new IllegalArgumentException(s"Unsupported key usage for AES-GCM encryption: `$keyUsage`")
       }
 
-    def decrypt(ciphertext : Array[Byte], keyUsage: KeyUsage): Array[Byte] =
+    def decrypt(ciphertext: Array[Byte], keyUsage: KeyUsage = KeyUsage.FieldEncryption): Array[Byte] =
       keyUsage match {
-        case KeyUsage.GeneralNoCheck          => generalAead.decrypt(ciphertext, null) // for external mode and admin tokens
-        case KeyUsage.General                 => throw new IllegalArgumentException(s"Unsupported key usage for Tink encryption: `$keyUsage`")
-        case KeyUsage.Token                   => shareTokenAead.decrypt(ciphertext, null)
-        case KeyUsage.McpToken                => mcpTokenAead.decrypt(ciphertext, null)
-        case KeyUsage.FieldEncryption         =>
+        case KeyUsage.GeneralNoCheck | KeyUsage.Token | KeyUsage.McpToken =>
+          decryptWithKey(ciphertext, getOrComputeSecretKey(keyUsage))
+        case KeyUsage.FieldEncryption =>
           try {
-            fieldEncryptionAead.decrypt(ciphertext, null)
+            decryptWithKey(ciphertext, getOrComputeSecretKey(KeyUsage.FieldEncryption))
           } catch {
-            case _: java.security.GeneralSecurityException if hasFallbackPassword =>
-              fieldEncryptionFallbackAead.get.decrypt(ciphertext, null)
+            case _: GeneralSecurityException if checkPasswordForKeyUsage(KeyUsage.FieldEncryptionFallback) =>
+              decryptWithKey(ciphertext, getOrComputeSecretKey(KeyUsage.FieldEncryptionFallback))
           }
-        case KeyUsage.FieldEncryptionFallback => throw new IllegalArgumentException(s"Unsupported key usage for Tink decryption: `$keyUsage`")
+        case KeyUsage.General | KeyUsage.FieldEncryptionFallback =>
+          throw new IllegalArgumentException(s"Unsupported key usage for AES-GCM decryption: `$keyUsage`")
       }
 
-    def encrypt(plaintext : String, keyUsage: KeyUsage): String = TinkBase64.encode(encrypt(plaintext.getBytes(CharsetNames.Utf8), keyUsage))
-    def decrypt(ciphertext: String, keyUsage: KeyUsage): String = new String(decrypt(TinkBase64.decode(ciphertext), keyUsage), CharsetNames.Utf8)
+    def encrypt(plaintext : String, keyUsage: KeyUsage = KeyUsage.FieldEncryption): String =
+      JBase64.getEncoder.encodeToString(encrypt(plaintext.getBytes(CharsetNames.Utf8), keyUsage))
+
+    def decrypt(ciphertext: String, keyUsage: KeyUsage = KeyUsage.FieldEncryption): String =
+      new String(decrypt(JBase64.getMimeDecoder.decode(ciphertext), keyUsage), CharsetNames.Utf8)
+
+    private[util] def encryptWithPassword(password: String, plaintext: Array[Byte]): Array[Byte] =
+      encryptWithKey(plaintext, aesGcmSecretKeys.computeIfAbsent(password, computeSecretKey))
+
+    private[util] def decryptWithPassword(password: String, ciphertext: Array[Byte]): Array[Byte] =
+      decryptWithKey(ciphertext, aesGcmSecretKeys.computeIfAbsent(password, computeSecretKey))
+
+    private[util] def decryptWithPassword(password: String, ciphertext: String): String =
+      new String(decryptWithPassword(password, JBase64.getMimeDecoder.decode(ciphertext)), CharsetNames.Utf8)
   }
 
   private def checkPasswordStrengthProperty: Boolean =
@@ -192,18 +230,33 @@ object SecureUtils extends SecureUtilsTrait {
     Properties.instance.getPropertySet.getNonBlankString(PreferredProviderProperty)
 
   // See: https://github.com/orbeon/orbeon-forms/pull/1745
-  private lazy val preferredProviderOpt =
+  private[oxf] def preferredProviderOpt(serviceType: String, algorithm: String): Option[Provider] = {
+    val baseAlgorithm = algorithm.takeWhile(_ != '/')
     getPreferredProvider flatMap { preferredProvider =>
-      Security.getProviders find (_.getName == preferredProvider)
+      Security.getProviders find { provider =>
+        provider.getName == preferredProvider &&
+          ((provider.getService(serviceType, algorithm) ne null) ||
+           (provider.getService(serviceType, baseAlgorithm) ne null))
+      }
     }
+  }
+
+  private def getCipher(transformation: String): Cipher =
+    preferredProviderOpt("Cipher", transformation).fold(Cipher.getInstance(transformation))(Cipher.getInstance(transformation, _))
+
+  private def getSecretKeyFactory(algorithm: String): SecretKeyFactory =
+    preferredProviderOpt("SecretKeyFactory", algorithm).fold(SecretKeyFactory.getInstance(algorithm))(SecretKeyFactory.getInstance(algorithm, _))
+
+  private def getMessageDigest(algorithm: String): MessageDigest =
+    preferredProviderOpt("MessageDigest", algorithm).fold(MessageDigest.getInstance(algorithm))(MessageDigest.getInstance(algorithm, _))
+
+  private def getMac(algorithm: String): Mac =
+    preferredProviderOpt("Mac", algorithm).fold(Mac.getInstance(algorithm))(Mac.getInstance(algorithm, _))
 
   // Cipher is not thread-safe, see:
   // https://stackoverflow.com/questions/6957406/is-cipher-thread-safe
   private val pool = new SoftReferenceObjectPool(new BasePoolableObjectFactory[Cipher] {
-    def makeObject(): Cipher = preferredProviderOpt match {
-      case Some(preferred) => Cipher.getInstance(EncryptionCipherTransformation, preferred)
-      case None            => Cipher.getInstance(EncryptionCipherTransformation)
-    }
+    def makeObject(): Cipher = getCipher(EncryptionCipherTransformation)
   })
 
   private def withCipher[T](body: Cipher => T) = {
@@ -275,7 +328,7 @@ object SecureUtils extends SecureUtilsTrait {
     digestBytes(bytes, getHashAlgorithm, encoding)
 
   def digestBytes(bytes: Array[Byte], algorithm: String, encoding: ByteEncoding): String = {
-    val messageDigest = MessageDigest.getInstance(algorithm)
+    val messageDigest = getMessageDigest(algorithm)
     messageDigest.update(bytes)
     withEncoding(messageDigest.digest, encoding)
   }
@@ -284,7 +337,7 @@ object SecureUtils extends SecureUtilsTrait {
     inputStream : java.io.InputStream,
     algorithm   : String = getHashAlgorithm
   ): String = {
-    val messageDigest = MessageDigest.getInstance(algorithm)
+    val messageDigest = getMessageDigest(algorithm)
     val buffer        = new Array[Byte](8192) // 8KB buffer
 
     Iterator
@@ -315,7 +368,7 @@ object SecureUtils extends SecureUtilsTrait {
     // https://docs.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html
     val fullAlgorithmName = "Hmac" + algorithm.toUpperCase.replace("-", "")
 
-    val mac = Mac.getInstance(fullAlgorithmName)
+    val mac = getMac(fullAlgorithmName)
     mac.init(new SecretKeySpec(key, fullAlgorithmName))
 
     val digestBytes = mac.doFinal(bytes)
@@ -356,5 +409,5 @@ object SecureUtils extends SecureUtilsTrait {
 
   // Get a new message digest with the default algorithm
   def defaultMessageDigest: MessageDigest =
-    MessageDigest.getInstance(getHashAlgorithm)
+    getMessageDigest(getHashAlgorithm)
 }

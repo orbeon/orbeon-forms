@@ -25,6 +25,9 @@
       </element>
       
       <element name="signature">
+        <optional>
+          <attribute name="algorithm"/>
+        </optional>
         <data type="base64Binary"/>
       </element>
     </element>

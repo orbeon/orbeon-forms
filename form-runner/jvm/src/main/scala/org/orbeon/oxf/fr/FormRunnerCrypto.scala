@@ -145,7 +145,7 @@ trait FormRunnerTokenJvmTrait extends FormRunnerTokenTrait {
     en2: Encoder[TokenHmac]
   ): Option[String] = {
     val toEncryptJsonString = tokenPayload.asJson.noSpaces
-    Some(s"${createTokenHmac(tokenHmac, keyUsage)}.${SecureUtils.Tink.encrypt(toEncryptJsonString, keyUsage)}")
+    Some(s"${createTokenHmac(tokenHmac, keyUsage)}.${SecureUtils.AesGcm.encrypt(toEncryptJsonString, keyUsage)}")
   }
 
   protected def decryptToken(
@@ -161,7 +161,7 @@ trait FormRunnerTokenJvmTrait extends FormRunnerTokenTrait {
         if (createTokenHmac(tokenHmac, keyUsage) != hmac)
           Failure(new IllegalArgumentException("Invalid token"))
         else
-          Try(SecureUtils.Tink.decrypt(encrypted, keyUsage)).flatMap { decrypted =>
+          Try(SecureUtils.AesGcm.decrypt(encrypted, keyUsage)).flatMap { decrypted =>
             io.circe.parser.decode[TokenPayload](decrypted).fold(Failure.apply, Success.apply)
           }
       case _ =>

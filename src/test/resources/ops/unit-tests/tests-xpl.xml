@@ -197,6 +197,77 @@
         </output>
     </test>
 
+    <test description="Key pair generator, signature and verification (SHA256withRSA and multi-key)" name="oxf:pipeline">
+        <input name="data">
+            <a>
+                <b/>
+            </a>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="input" name="data"/>
+                <p:param type="output" name="data"/>
+
+                <p:processor name="oxf:key-pair">
+                    <p:output name="data" id="dsa-keys"/>
+                </p:processor>
+
+                <p:processor name="oxf:key-pair">
+                    <p:input name="config">
+                        <config>
+                            <algorithm>SHA256withRSA</algorithm>
+                        </config>
+                    </p:input>
+                    <p:output name="data" id="rsa-keys"/>
+                </p:processor>
+
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#rsa-keys"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0">
+                            <xsl:template match="/">
+                                <xsl:copy-of select="/key-pair/private-key"/>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" id="private-key"/>
+                </p:processor>
+
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="aggregate('root', #dsa-keys, #rsa-keys)"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0">
+                            <xsl:template match="/">
+                                <public-keys>
+                                    <xsl:copy-of select="/root/key-pair/public-key"/>
+                                </public-keys>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" id="public-keys"/>
+                </p:processor>
+
+                <p:processor name="oxf:signature">
+                    <p:input name="data" href="#data"/>
+                    <p:input name="private-key" href="#private-key"/>
+                    <p:output name="data" id="signed"/>
+                </p:processor>
+
+                <p:processor name="oxf:signature-verifier">
+                    <p:input name="data" href="#signed"/>
+                    <p:input name="public-key" href="#public-keys"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="data">
+            <a>
+                <b/>
+            </a>
+        </output>
+    </test>
+
     <test description="Scope serializer and generator" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">

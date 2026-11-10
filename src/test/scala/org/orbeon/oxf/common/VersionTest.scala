@@ -323,4 +323,92 @@ class VersionTest
         assert(VersionSupport.majorMinor(s).contains(majorMinor))
       }
   }
+
+  describe("KeyPairGenerator, SignatureProcessor, and SignatureVerifierProcessor (DSA and SHA256withRSA)") {
+
+    import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
+    import org.orbeon.oxf.processor.ProcessorImpl.{INPUT_CONFIG, INPUT_DATA, OUTPUT_DATA}
+    import org.orbeon.oxf.processor.generator.{DOMGenerator, KeyPairGenerator}
+    import org.orbeon.oxf.processor.{DOMSerializer, SignatureProcessor, SignatureVerifierProcessor}
+    import org.orbeon.oxf.util.PipelineUtils.connect
+
+    def generateKeyPair(algorithmOpt: Option[String]): Document = {
+      val keyPairGen = new KeyPairGenerator
+      algorithmOpt.foreach { alg =>
+        val configDoc = <config><algorithm>{alg}</algorithm></config>.toDocument
+        val configGen = new DOMGenerator(configDoc, "key-pair-config", DOMGenerator.ZeroValidity, "oxf:/key-pair-config.xml")
+        connect(configGen, OUTPUT_DATA, keyPairGen, INPUT_CONFIG)
+      }
+      val serializer = new DOMSerializer
+      connect(keyPairGen, OUTPUT_DATA, serializer, INPUT_DATA)
+      withPipelineContext { pipelineContext =>
+        serializer.reset(pipelineContext)
+        serializer.runGetDocument(pipelineContext)
+      }
+    }
+
+    def signDocument(dataDoc: Document, privateKeyDoc: Document): Document = {
+      val dataGen      = new DOMGenerator(dataDoc, "data", DOMGenerator.ZeroValidity, "oxf:/data.xml")
+      val privKeyGen   = new DOMGenerator(privateKeyDoc, "private-key", DOMGenerator.ZeroValidity, "oxf:/private-key.xml")
+      val sigProcessor = new SignatureProcessor
+      connect(dataGen,    OUTPUT_DATA, sigProcessor, INPUT_DATA)
+      connect(privKeyGen, OUTPUT_DATA, sigProcessor, "private-key")
+      val serializer = new DOMSerializer
+      connect(sigProcessor, OUTPUT_DATA, serializer, INPUT_DATA)
+      withPipelineContext { pipelineContext =>
+        serializer.reset(pipelineContext)
+        serializer.runGetDocument(pipelineContext)
+      }
+    }
+
+    def verifyDocument(signedDoc: Document, publicKeyDoc: Document): Document = {
+      val signedGen         = new DOMGenerator(signedDoc, "signed", DOMGenerator.ZeroValidity, "oxf:/signed.xml")
+      val pubKeyGen         = new DOMGenerator(publicKeyDoc, "public-key", DOMGenerator.ZeroValidity, "oxf:/public-key.xml")
+      val verifierProcessor = new SignatureVerifierProcessor
+      connect(signedGen, OUTPUT_DATA, verifierProcessor, INPUT_DATA)
+      connect(pubKeyGen, OUTPUT_DATA, verifierProcessor, SignatureVerifierProcessor.INPUT_PUBLIC_KEY)
+      val serializer = new DOMSerializer
+      connect(verifierProcessor, OUTPUT_DATA, serializer, INPUT_DATA)
+      withPipelineContext { pipelineContext =>
+        serializer.reset(pipelineContext)
+        serializer.runGetDocument(pipelineContext)
+      }
+    }
+
+    it("must sign and verify with both default DSA and SHA256withRSA using multi-key <public-keys>") {
+      val dsaKeysDoc = generateKeyPair(None)
+      val rsaKeysDoc = generateKeyPair(Some("SHA256withRSA"))
+
+      val dsaPrivElem = dsaKeysDoc.getRootElement.element("private-key")
+      val dsaPubElem  = dsaKeysDoc.getRootElement.element("public-key")
+      val rsaPrivElem = rsaKeysDoc.getRootElement.element("private-key")
+      val rsaPubElem  = rsaKeysDoc.getRootElement.element("public-key")
+
+      assert(dsaPrivElem.attributeValueOpt("algorithm").isEmpty)
+      assert(rsaPrivElem.attributeValueOpt("algorithm").contains("SHA256withRSA"))
+      assert(rsaPubElem.attributeValueOpt("algorithm").contains("SHA256withRSA"))
+
+      val multiPublicKeysDoc =
+        <public-keys>
+          <public-key>{dsaPubElem.getStringValue}</public-key>
+          <public-key algorithm="SHA256withRSA">{rsaPubElem.getStringValue}</public-key>
+        </public-keys>.toDocument
+
+      val samplePayload = <license><licensor>Orbeon, Inc.</licensor><licensee>FIPS Customer</licensee></license>.toDocument
+
+      // 1. Verify legacy DSA signature against multiPublicKeysDoc
+      val dsaPrivDoc = Document(dsaPrivElem.createCopy)
+      val dsaSigned  = signDocument(samplePayload, dsaPrivDoc)
+      assert(dsaSigned.getRootElement.element("signature").attributeValueOpt("algorithm").isEmpty)
+      val dsaVerified = verifyDocument(dsaSigned, multiPublicKeysDoc)
+      assert(dsaVerified.getRootElement.element("licensee").getStringValue == "FIPS Customer")
+
+      // 2. Verify SHA256withRSA signature against multiPublicKeysDoc
+      val rsaPrivDoc = Document(rsaPrivElem.createCopy)
+      val rsaSigned  = signDocument(samplePayload, rsaPrivDoc)
+      assert(rsaSigned.getRootElement.element("signature").attributeValueOpt("algorithm").contains("SHA256withRSA"))
+      val rsaVerified = verifyDocument(rsaSigned, multiPublicKeysDoc)
+      assert(rsaVerified.getRootElement.element("licensee").getStringValue == "FIPS Customer")
+    }
+  }
 }

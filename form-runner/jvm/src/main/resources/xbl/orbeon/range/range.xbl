@@ -1,0 +1,546 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:RangeSupport="java:org.orbeon.xbl.RangeSupportJava">
+
+    <xbl:binding
+        id="fr-range"
+        element="fr|range, xf|range"
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle allow-minimal-label-hint"
+        xxf:external-events="DOMActivate"
+        xxbl:label-for="range-input"
+        xxbl:type="xf:decimal"
+        xxbl:constraint="
+            RangeSupport:isValueInRange(
+                string(.),
+                string(fr:component-param-value('start')),
+                string(fr:component-param-value('end'))
+            )"
+        xxbl:format="
+            RangeSupport:formatDisplayValue(
+                string(xxf:binding('fr-range')),
+                string(fr:component-param-value('prefix')),
+                string(fr:component-param-value('suffix'))
+            )"
+    >
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Slider</display-name>
+            <display-name lang="fr">Curseur</display-name>
+            <display-name lang="no">Glidebryter</display-name>
+            <display-name lang="ru">Ползунок</display-name>
+            <display-name lang="it">Cursore</display-name>
+            <display-name lang="de">Schieberegler</display-name>
+            <display-name lang="fi">Liukusäädin</display-name>
+            <display-name lang="es">Control deslizante</display-name>
+            <display-name lang="nl">Schuifregelaar</display-name>
+            <display-name lang="pt">Controlo deslizante</display-name>
+            <display-name lang="sv">Skjutreglage</display-name>
+            <display-name lang="ar">شريط التمرير</display-name>
+            <display-name lang="pl">Suwak</display-name>
+            <display-name lang="ja">スライダー</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-sliders</icon-class>
+            </icon>
+            <templates>
+                <bind type="fr:range"/>
+                <view>
+                    <fr:range id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:range>
+                </view>
+            </templates>
+            <custom-settings>
+                <setting name="start" type="xs:string"/>
+                <setting name="end" type="xs:string"/>
+                <setting name="step" type="xs:string"/>
+                <setting name="prefix" type="xs:string"/>
+                <setting name="suffix" type="xs:string"/>
+                <setting name="show-value" type="xs:boolean" default="true"/>
+                <setting name="show-endpoints" type="xs:boolean" default="false"/>
+                <constraint
+                    test="not(start castable as xs:decimal and end castable as xs:decimal) or xs:decimal(start) le xs:decimal(end)"
+                    message="Maximum must be greater than or equal to minimum"/>
+                <constraint
+                    test="not(step castable as xs:decimal) or xs:decimal(step) gt 0"
+                    message="Step must be greater than zero"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-range-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue
+                            ref="$c"
+                            value="instance()/@*[name() = name($c)]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <start/>
+                            <end/>
+                            <step/>
+                            <prefix/>
+                            <suffix/>
+                            <show-value/>
+                            <show-endpoints/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="start | end | step | prefix | suffix"
+                            xxf:whitespace="trim"
+                            type="xxf:XPath2ValueTemplate"/>
+                        <xf:bind ref="end">
+                            <xf:constraint
+                                id="end-constraint"
+                                value="not(../start castable as xs:decimal and . castable as xs:decimal) or xs:decimal(../start) le xs:decimal(.)"/>
+                        </xf:bind>
+                        <xf:bind ref="step">
+                            <xf:constraint
+                                id="step-constraint"
+                                value="not(. castable as xs:decimal) or xs:decimal(.) gt 0"/>
+                        </xf:bind>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <start>Minimum</start>
+                                <start-hint>Default: 0</start-hint>
+                                <end>Maximum</end>
+                                <end-hint>Default: 100</end-hint>
+                                <end-constraint>Maximum must be greater than or equal to minimum</end-constraint>
+                                <step>Step</step>
+                                <step-hint>Default: 1</step-hint>
+                                <step-constraint>Step must be greater than zero</step-constraint>
+                                <prefix>Prefix</prefix>
+                                <suffix>Suffix</suffix>
+                                <show-value>Show Value</show-value>
+                                <show-endpoints>Show Min / Max</show-endpoints>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <start>Minimum</start>
+                                <start-hint>Défaut : 0</start-hint>
+                                <end>Maximum</end>
+                                <end-hint>Défaut : 100</end-hint>
+                                <end-constraint>Le maximum doit être supérieur ou égal au minimum</end-constraint>
+                                <step>Pas</step>
+                                <step-hint>Défaut : 1</step-hint>
+                                <step-constraint>Le pas doit être supérieur à zéro</step-constraint>
+                                <prefix>Préfixe</prefix>
+                                <suffix>Suffixe</suffix>
+                                <show-value>Afficher la valeur</show-value>
+                                <show-endpoints>Afficher min / max</show-endpoints>
+                            </resource>
+                            <resource xml:lang="no">
+                                <start>Minimum</start>
+                                <start-hint>Standard: 0</start-hint>
+                                <end>Maksimum</end>
+                                <end-hint>Standard: 100</end-hint>
+                                <end-constraint>Maksimum må være større enn eller lik minimum</end-constraint>
+                                <step>Trinn</step>
+                                <step-hint>Standard: 1</step-hint>
+                                <step-constraint>Trinn må være større enn null</step-constraint>
+                                <prefix>Prefiks</prefix>
+                                <suffix>Suffiks</suffix>
+                                <show-value>Vis verdi</show-value>
+                                <show-endpoints>Vis min / maks</show-endpoints>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <start>Минимум</start>
+                                <start-hint>По умолчанию: 0</start-hint>
+                                <end>Максимум</end>
+                                <end-hint>По умолчанию: 100</end-hint>
+                                <end-constraint>Максимум должен быть больше или равен минимуму</end-constraint>
+                                <step>Шаг</step>
+                                <step-hint>По умолчанию: 1</step-hint>
+                                <step-constraint>Шаг должен быть больше нуля</step-constraint>
+                                <prefix>Префикс</prefix>
+                                <suffix>Суффикс</suffix>
+                                <show-value>Показывать значение</show-value>
+                                <show-endpoints>Показывать мин / макс</show-endpoints>
+                            </resource>
+                            <resource xml:lang="it">
+                                <start>Minimo</start>
+                                <start-hint>Predefinito: 0</start-hint>
+                                <end>Massimo</end>
+                                <end-hint>Predefinito: 100</end-hint>
+                                <end-constraint>Il massimo deve essere maggiore o uguale al minimo</end-constraint>
+                                <step>Passo</step>
+                                <step-hint>Predefinito: 1</step-hint>
+                                <step-constraint>Il passo deve essere maggiore di zero</step-constraint>
+                                <prefix>Prefisso</prefix>
+                                <suffix>Suffisso</suffix>
+                                <show-value>Mostra valore</show-value>
+                                <show-endpoints>Mostra min / max</show-endpoints>
+                            </resource>
+                            <resource xml:lang="de">
+                                <start>Minimum</start>
+                                <start-hint>Standard: 0</start-hint>
+                                <end>Maximum</end>
+                                <end-hint>Standard: 100</end-hint>
+                                <end-constraint>Das Maximum muss größer oder gleich dem Minimum sein</end-constraint>
+                                <step>Schrittweite</step>
+                                <step-hint>Standard: 1</step-hint>
+                                <step-constraint>Die Schrittweite muss größer als null sein</step-constraint>
+                                <prefix>Präfix</prefix>
+                                <suffix>Suffix</suffix>
+                                <show-value>Wert anzeigen</show-value>
+                                <show-endpoints>Min / Max anzeigen</show-endpoints>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <start>Minimi</start>
+                                <start-hint>Oletus: 0</start-hint>
+                                <end>Maksimi</end>
+                                <end-hint>Oletus: 100</end-hint>
+                                <end-constraint>Maksimin on oltava suurempi tai yhtä suuri kuin minimi</end-constraint>
+                                <step>Askel</step>
+                                <step-hint>Oletus: 1</step-hint>
+                                <step-constraint>Askeleen on oltava suurempi kuin nolla</step-constraint>
+                                <prefix>Etuliite</prefix>
+                                <suffix>Jälkiliite</suffix>
+                                <show-value>Näytä arvo</show-value>
+                                <show-endpoints>Näytä min / max</show-endpoints>
+                            </resource>
+                            <resource xml:lang="es">
+                                <start>Mínimo</start>
+                                <start-hint>Predeterminado: 0</start-hint>
+                                <end>Máximo</end>
+                                <end-hint>Predeterminado: 100</end-hint>
+                                <end-constraint>El máximo debe ser mayor o igual que el mínimo</end-constraint>
+                                <step>Paso</step>
+                                <step-hint>Predeterminado: 1</step-hint>
+                                <step-constraint>El paso debe ser mayor que cero</step-constraint>
+                                <prefix>Prefijo</prefix>
+                                <suffix>Sufijo</suffix>
+                                <show-value>Mostrar valor</show-value>
+                                <show-endpoints>Mostrar mín / máx</show-endpoints>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <start>Minimum</start>
+                                <start-hint>Standaard: 0</start-hint>
+                                <end>Maximum</end>
+                                <end-hint>Standaard: 100</end-hint>
+                                <end-constraint>Het maximum moet groter zijn dan of gelijk zijn aan het minimum</end-constraint>
+                                <step>Stap</step>
+                                <step-hint>Standaard: 1</step-hint>
+                                <step-constraint>De stap moet groter zijn dan nul</step-constraint>
+                                <prefix>Voorvoegsel</prefix>
+                                <suffix>Achtervoegsel</suffix>
+                                <show-value>Waarde tonen</show-value>
+                                <show-endpoints>Min / max tonen</show-endpoints>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <start>Mínimo</start>
+                                <start-hint>Padrão: 0</start-hint>
+                                <end>Máximo</end>
+                                <end-hint>Padrão: 100</end-hint>
+                                <end-constraint>O máximo deve ser maior ou igual ao mínimo</end-constraint>
+                                <step>Passo</step>
+                                <step-hint>Padrão: 1</step-hint>
+                                <step-constraint>O passo deve ser maior que zero</step-constraint>
+                                <prefix>Prefixo</prefix>
+                                <suffix>Sufixo</suffix>
+                                <show-value>Mostrar valor</show-value>
+                                <show-endpoints>Mostrar mín / máx</show-endpoints>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <start>Minimum</start>
+                                <start-hint>Standard: 0</start-hint>
+                                <end>Maximum</end>
+                                <end-hint>Standard: 100</end-hint>
+                                <end-constraint>Maximum måste vara större än eller lika med minimum</end-constraint>
+                                <step>Steg</step>
+                                <step-hint>Standard: 1</step-hint>
+                                <step-constraint>Steget måste vara större än noll</step-constraint>
+                                <prefix>Prefix</prefix>
+                                <suffix>Suffix</suffix>
+                                <show-value>Visa värde</show-value>
+                                <show-endpoints>Visa min / max</show-endpoints>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <start>الحد الأدنى</start>
+                                <start-hint>الافتراضي: 0</start-hint>
+                                <end>الحد الأقصى</end>
+                                <end-hint>الافتراضي: 100</end-hint>
+                                <end-constraint>يجب أن يكون الحد الأقصى أكبر من أو يساوي الحد الأدنى</end-constraint>
+                                <step>الخطوة</step>
+                                <step-hint>الافتراضي: 1</step-hint>
+                                <step-constraint>يجب أن تكون الخطوة أكبر من الصفر</step-constraint>
+                                <prefix>بادئة</prefix>
+                                <suffix>لاحقة</suffix>
+                                <show-value>إظهار القيمة</show-value>
+                                <show-endpoints>إظهار الأدنى / الأقصى</show-endpoints>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <start>Minimum</start>
+                                <start-hint>Domyślnie: 0</start-hint>
+                                <end>Maksimum</end>
+                                <end-hint>Domyślnie: 100</end-hint>
+                                <end-constraint>Maksimum musi być większe lub równe minimum</end-constraint>
+                                <step>Krok</step>
+                                <step-hint>Domyślnie: 1</step-hint>
+                                <step-constraint>Krok musi być większy od zera</step-constraint>
+                                <prefix>Prefiks</prefix>
+                                <suffix>Sufiks</suffix>
+                                <show-value>Pokaż wartość</show-value>
+                                <show-endpoints>Pokaż min / maks</show-endpoints>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <start>最小値</start>
+                                <start-hint>デフォルト: 0</start-hint>
+                                <end>最大値</end>
+                                <end-hint>デフォルト: 100</end-hint>
+                                <end-constraint>最大値は最小値以上である必要があります</end-constraint>
+                                <step>ステップ</step>
+                                <step-hint>デフォルト: 1</step-hint>
+                                <step-constraint>ステップは0より大きい必要があります</step-constraint>
+                                <prefix>プレフィックス</prefix>
+                                <suffix>サフィックス</suffix>
+                                <show-value>値を表示</show-value>
+                                <show-endpoints>最小 / 最大を表示</show-endpoints>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-range-grid">
+                    <xh:tr>
+                        <xh:td colspan="2">
+                            <xf:input ref="instance('local')/start" id="start-control" appearance="xpath-completion">
+                                <xf:label ref="xxf:r('start')"/>
+                                <xf:hint ref="xxf:r('start-hint')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td colspan="2">
+                            <xf:input ref="instance('local')/end" id="end-control" appearance="xpath-completion">
+                                <xf:label ref="xxf:r('end')"/>
+                                <xf:hint ref="xxf:r('end-hint')"/>
+                                <xf:alert ref="xxf:r('end-constraint')" validation="end-constraint"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td colspan="2">
+                            <xf:input ref="instance('local')/step" id="step-control" appearance="xpath-completion">
+                                <xf:label ref="xxf:r('step')"/>
+                                <xf:hint ref="xxf:r('step-hint')"/>
+                                <xf:alert ref="xxf:r('step-constraint')" validation="step-constraint"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <xf:input ref="instance('local')/prefix" id="prefix-control" appearance="xpath-completion">
+                                <xf:label ref="xxf:r('prefix')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <xf:input ref="instance('local')/suffix" id="suffix-control" appearance="xpath-completion">
+                                <xf:label ref="xxf:r('suffix')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/show-value" appearance="full xxf:horizontal" id="show-value-control">
+                                <xf:label ref="xxf:r('show-value')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
+                                    <xf:value>true</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
+                                    <xf:value>false</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/show-endpoints" appearance="full xxf:horizontal" id="show-endpoints-control">
+                                <xf:label ref="xxf:r('show-endpoints')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
+                                    <xf:value>true</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
+                                    <xf:value>false</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-range-action"
+                    event="xforms-value-changed"
+                    observer="start-control end-control step-control prefix-control suffix-control show-value-control show-endpoints-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/range/range.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <resource xml:lang="en"><clear-value>Clear Value</clear-value><not-set>Not set</not-set></resource>
+                        <resource xml:lang="fr"><clear-value>Réinitialiser</clear-value><not-set>Non défini</not-set></resource>
+                        <resource xml:lang="ar"><clear-value>مسح القيمة</clear-value><not-set>غير محدد</not-set></resource>
+                        <resource xml:lang="ca"><clear-value>Netejar valors</clear-value><not-set>No definit</not-set></resource>
+                        <resource xml:lang="da"><clear-value>Ryd værdi</clear-value><not-set>Ikke angivet</not-set></resource>
+                        <resource xml:lang="de"><clear-value>Wert löschen</clear-value><not-set>Nicht festgelegt</not-set></resource>
+                        <resource xml:lang="es"><clear-value>Limpiar valores</clear-value><not-set>Sin definir</not-set></resource>
+                        <resource xml:lang="fi"><clear-value>Tyhjennä arvo</clear-value><not-set>Ei asetettu</not-set></resource>
+                        <resource xml:lang="hu"><clear-value>Érték törlése</clear-value><not-set>Nincs megadva</not-set></resource>
+                        <resource xml:lang="it"><clear-value>Cancella valore</clear-value><not-set>Non impostato</not-set></resource>
+                        <resource xml:lang="ja"><clear-value>値をクリア</clear-value><not-set>未設定</not-set></resource>
+                        <resource xml:lang="nl"><clear-value>Waarde wissen</clear-value><not-set>Niet ingesteld</not-set></resource>
+                        <resource xml:lang="no"><clear-value>Tøm verdi</clear-value><not-set>Ikke angitt</not-set></resource>
+                        <resource xml:lang="pl"><clear-value>Wyczyść wartość</clear-value><not-set>Nie ustawiono</not-set></resource>
+                        <resource xml:lang="pt"><clear-value>Limpar valor</clear-value><not-set>Não definido</not-set></resource>
+                        <resource xml:lang="ru"><clear-value>Очистить значение</clear-value><not-set>Не задано</not-set></resource>
+                        <resource xml:lang="sv"><clear-value>Rensa värde</clear-value><not-set>Ej angivet</not-set></resource>
+                        <resource xml:lang="tr"><clear-value>Değeri Temizle</clear-value><not-set>Ayarlanmadı</not-set></resource>
+                        <resource xml:lang="zh-Hans"><clear-value>清除值</clear-value><not-set>未设置</not-set></resource>
+                        <resource xml:lang="zh-Hant"><clear-value>清除值</clear-value><not-set>未設定</not-set></resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:var name="binding"        value="xxf:binding('fr-range')"/>
+            <xf:var name="start-param"    value="string(fr:component-param-value('start'))"/>
+            <xf:var name="end-param"      value="string(fr:component-param-value('end'))"/>
+            <xf:var name="step-param"     value="string(fr:component-param-value('step'))"/>
+            <xf:var name="prefix"         value="string(fr:component-param-value('prefix'))"/>
+            <xf:var name="suffix"         value="string(fr:component-param-value('suffix'))"/>
+            <xf:var name="show-value"     value="string(fr:component-param-value('show-value')) = 'true'"/>
+            <xf:var name="show-endpoints" value="string(fr:component-param-value('show-endpoints')) = 'true'"/>
+
+            <xf:var name="min-attr"       value="RangeSupport:effectiveStart($start-param)"/>
+            <xf:var name="max-attr"       value="RangeSupport:effectiveEnd($start-param, $end-param)"/>
+            <xf:var name="step-attr"      value="RangeSupport:effectiveStep($step-param)"/>
+            <xf:var name="formatted-min"  value="RangeSupport:formatDisplayValue($min-attr, $prefix, $suffix)"/>
+            <xf:var name="formatted-max"  value="RangeSupport:formatDisplayValue($max-attr, $prefix, $suffix)"/>
+
+            <xf:group
+                ref="$binding"
+                class="fr-range-container fr-range-empty">
+                <xh:div class="fr-range-row">
+                    <xh:div class="fr-range-track-group">
+                        <xh:input
+                            id="range-input"
+                            class="fr-range-input"
+                            xh:type="range"
+                            min="{$min-attr}"
+                            max="{$max-attr}"
+                            step="{$step-attr}"
+                            data-prefix="{$prefix}"
+                            data-suffix="{$suffix}"
+                            data-not-set-label="{fr:r('not-set')}"
+                            xxf:control="true"
+                            xbl:attr="tabindex tabindex=navindex"/>
+                        <xh:div
+                            class="fr-range-endpoints{' xforms-hidden'[not($show-endpoints)]}"
+                            aria-hidden="true">
+                            <xh:span class="fr-range-endpoint-start">
+                                <xf:output value="$formatted-min"/>
+                            </xh:span>
+                            <xh:span class="fr-range-endpoint-end">
+                                <xf:output value="$formatted-max"/>
+                            </xh:span>
+                        </xh:div>
+                    </xh:div>
+                    <xh:div class="fr-range-value-group">
+                        <xh:span class="fr-range-value-wrapper{' xforms-hidden'[not($show-value)]}">
+                            <xh:span class="fr-range-value fr-range-value-empty">—</xh:span>
+                        </xh:span>
+                        <xh:button
+                            type="button"
+                            class="btn btn-link fr-range-clear xforms-hidden"
+                            title="{fr:r('clear-value')}"
+                            aria-label="{fr:r('clear-value')}">
+                            <xh:i class="fa fa-fw fa-times-circle" aria-hidden="true"/>
+                        </xh:button>
+                    </xh:div>
+                </xh:div>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+    <xbl:binding
+        id="fr-range-output"
+        element="
+            fr|range[fr|static-readonly = true],
+            xf|range[fr|static-readonly = true],
+            fr|range[fr|pdf-template = true],
+            xf|range[fr|pdf-template = true]"
+        xxbl:mode="lhha binding value allow-minimal-label-hint"
+        xxbl:label-for="input"
+        xxbl:format="
+            RangeSupport:formatDisplayValue(
+                string(xxf:binding('fr-range-output')),
+                string(fr:component-param-value('prefix')),
+                string(fr:component-param-value('suffix'))
+            )"
+    >
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/range/range.css"/>
+        </xbl:resources>
+        <xbl:template>
+            <xf:input
+                id="input"
+                ref="xxf:binding('fr-range-output')"
+                xxf:format="xxf:formatted-value('fr-range-output')"
+                xbl:attr="xxf:readonly-appearance"/>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

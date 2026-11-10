@@ -92,6 +92,8 @@ object ImportExportSupport {
     QName("dropdown-month-year", FRNamespace),
     QName("masked-input",        FRNamespace),
     QName("url",                 FRNamespace),
+    QName("range",               FRNamespace),
+    xfQName("range"),
   )
 
   // TODO: components

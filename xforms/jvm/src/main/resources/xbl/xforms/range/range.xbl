@@ -8,29 +8,29 @@
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
     <xbl:binding
-        id="fr-range"
+        id="xf-range"
         element="xf|range"
         xxbl:mode="lhha binding value external-value focus javascript-lifecycle"
-        xxf:label-for="fr-range-elem"
+        xxbl:label-for="fr-range-elem"
     >
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-                    <display-name lang="en">Range</display-name>
-        <display-name lang="fr">Plage</display-name>
-        <display-name lang="no">Område</display-name>
-        <display-name lang="ru">Диапазон</display-name>
-        <display-name lang="it">Intervallo</display-name>
-        <display-name lang="de">Schieberegler</display-name>
-        <display-name lang="fi">Alue</display-name>
-        <display-name lang="es">Rango</display-name>
-        <display-name lang="nl">Bereik</display-name>
-        <display-name lang="pt">Intervalo</display-name>
-        <display-name lang="sv">Intervall</display-name>
-        <display-name lang="ar">نطاق</display-name>
-        <display-name lang="pl">Zakres</display-name>
-        <display-name lang="ja">スライダー</display-name>
+            <display-name lang="en">Slider</display-name>
+            <display-name lang="fr">Curseur</display-name>
+            <display-name lang="no">Glidebryter</display-name>
+            <display-name lang="ru">Ползунок</display-name>
+            <display-name lang="it">Cursore</display-name>
+            <display-name lang="de">Schieberegler</display-name>
+            <display-name lang="fi">Liukusäädin</display-name>
+            <display-name lang="es">Control deslizante</display-name>
+            <display-name lang="nl">Schuifregelaar</display-name>
+            <display-name lang="pt">Controlo deslizante</display-name>
+            <display-name lang="sv">Skjutreglage</display-name>
+            <display-name lang="ar">شريط التمرير</display-name>
+            <display-name lang="pl">Suwak</display-name>
+            <display-name lang="ja">スライダー</display-name>
             <icon>
-                <icon-class>fa fa-fw fa-calendar</icon-class>
+                <icon-class>fa fa-fw fa-sliders</icon-class>
             </icon>
             <templates>
                 <bind type="xf:decimal"/>
@@ -46,7 +46,11 @@
         </metadata>
 
         <xbl:template>
-            <xh:input id="fr-range-elem" type="range" xbl:attr="min=start max=end"/>
+            <xh:input
+                id="fr-range-elem"
+                xh:type="range"
+                xxf:control="true"
+                xbl:attr="min=start max=end step=step tabindex tabindex=navindex"/>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

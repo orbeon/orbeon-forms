@@ -94,9 +94,22 @@ object FRComponentParamSupport {
             case Some(sourceComponent) =>
               sourceComponent.evaluateAvt(paramValue.getStringValue, EventCollector.Throw).map(stringToStringValue)
             case None =>
+              val effectiveBindingContext =
+                xfc.bindNodeOpt match {
+                  case Some(bindNode) =>
+                    xfc.bindingContext.copy(
+                      bind        = bindNode.parentBind,
+                      nodeset     = bindNode.parentBind.items,
+                      position    = bindNode.position,
+                      newBind     = true,
+                      contextItem = bindNode.item
+                    )
+                  case None =>
+                    xfc.bindingContext
+                }
               ControlXPathSupport.evaluateAvt(
                 attributeValue    = paramValue.getStringValue,
-                bindingContext    = xfc.bindingContext,
+                bindingContext    = effectiveBindingContext,
                 namespaceMappings = staticControl.namespaceMapping,
                 container         = xfc.container,
                 locationData      = staticControl.locationData,

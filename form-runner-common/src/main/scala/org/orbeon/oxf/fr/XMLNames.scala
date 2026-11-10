@@ -125,6 +125,7 @@ object XMLNames {
   val FRDataboundSelect1SearchQName : QName = QName("databound-select1-search", FRNamespace)
   val FRUrlQName                    : QName = QName("url",                      FRNamespace)
   val FRHyperlinkQName              : QName = QName("hyperlink",                FRNamespace)
+  val FRRangeQName                  : QName = QName("range",                    FRNamespace)
 
   val FRPdfAutomaticQName           : QName  = QName("pdf-automatic",           FRNamespace)
   val FRPdfTemplateQName            : QName  = QName("pdf-template",            FRNamespace)

@@ -271,6 +271,13 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.code-mirror.theme"                         value="solarized dark"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.color.preset-colors"                       value="#000000 #64748b #ef4444 #f97316 #eab308 #22c55e #14b8a6 #3b82f6 #6366f1 #a855f7 #ec4899 #ffffff"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.hyperlink.open-in-new-tab"                 value="true"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.range.start"                               value="0"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.range.end"                                 value="100"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.range.step"                                value="1"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.range.prefix"                              value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.range.suffix"                              value=""/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.range.show-value"                          value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.range.show-endpoints"                      value="false"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.library" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
         fr:grid-single
@@ -297,6 +304,7 @@
         fr:autosize-textarea
         fb:xpath-completion
         fr:hyperlink
+        fr:range
         <!-- For static readonly output bindings -->
         fr:output-field
         fr:date

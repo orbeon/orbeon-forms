@@ -225,5 +225,33 @@ class ControlCustomSettingsParserTest
         assert((binding / "*:metadata" / "*:control-details").nonEmpty)
       }
     }
+
+    it("must parse `<fr:range>` custom settings and constraints from `range.xbl`") {
+      import org.orbeon.scaxon.SimplePath.*
+
+      val docWrapper = new org.orbeon.dom.saxon.DocumentWrapper(
+        org.orbeon.oxf.resources.ResourceManagerWrapper.instance.getContentAsOrbeonDom("/xbl/orbeon/range/range.xbl"),
+        null,
+        org.orbeon.oxf.util.XPath.GlobalConfiguration
+      )
+      val binding = (docWrapper.rootElement / "*:binding").head
+      val specOpt = ControlCustomSettingsParser.fromBinding(binding)
+      assert(specOpt.isDefined)
+
+      val spec = specOpt.get
+      assert(spec.localName == "range")
+      assert(spec.settings.map(_.name) == List(
+        "start",
+        "end",
+        "step",
+        "prefix",
+        "suffix",
+        "showValue",
+        "showEndpoints"
+      ))
+      assert(spec.findSetting("showValue").exists(_.defaultVal.contains(Json.fromBoolean(true))))
+      assert(spec.findSetting("showEndpoints").exists(_.defaultVal.contains(Json.fromBoolean(false))))
+      assert(spec.constraints.size == 2)
+    }
   }
 }

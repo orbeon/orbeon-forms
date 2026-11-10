@@ -35,6 +35,7 @@
         oxf:/xbl/orbeon/number/number.xbl
         oxf:/xbl/orbeon/currency/currency.xbl
         oxf:/xbl/orbeon/percentage/percentage.xbl
+        oxf:/xbl/orbeon/range/range.xbl
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.dateTime.uri.*.*">

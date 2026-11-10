@@ -277,6 +277,32 @@
 
     <!-- See also `fb.ControlOps` for the renaming part -->
     <xsl:template
+        match="fr:range[exists(@start | @end | @step | @prefix | @suffix)] | xf:range[exists(@start | @end | @step | @prefix | @suffix)]"
+        mode="within-grid">
+        <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
+        <xsl:copy>
+            <xsl:choose>
+                <xsl:when test="$is-static-readonly">
+                    <xsl:attribute name="fr:static-readonly">true</xsl:attribute>
+                    <xsl:if test="$is-pdf-mode and $has-pdf-automatic-binding">
+                        <xsl:attribute name="fr:pdf-automatic">true</xsl:attribute>
+                    </xsl:if>
+                </xsl:when>
+                <xsl:when test="$use-pdf-template">
+                    <xsl:attribute name="fr:pdf-template">true</xsl:attribute>
+                </xsl:when>
+            </xsl:choose>
+            <!-- As calls below can generate `frf:controlVariableValue()` -->
+            <xsl:namespace name="frf" select="'java:org.orbeon.oxf.fr.FormRunner'"/>
+            <xsl:for-each select="@start | @end | @step | @prefix | @suffix">
+                <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCallsFromString(., ., true(), $library-name, ())"/>
+            </xsl:for-each>
+            <xsl:apply-templates select="@* except (@start | @end | @step | @prefix | @suffix) | node()" mode="#current"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <!-- See also `fb.ControlOps` for the renaming part -->
+    <xsl:template
         match="fr:hyperlink[exists(@href)]"
         mode="within-grid">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>

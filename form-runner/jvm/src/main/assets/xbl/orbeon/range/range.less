@@ -1,0 +1,266 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+
+    .xbl-fr-range {
+
+        .fr-range-container {
+            width: 100%;
+
+            .fr-range-row {
+                display: flex;
+                align-items: flex-start;
+                gap: 0.65rem;
+                width: 100%;
+            }
+
+            .fr-range-track-group {
+                flex: 1 1 auto;
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+            }
+
+            input[type="range"].fr-range-input {
+                --slider-track-size  : 0.45rem;
+                --slider-thumb-size  : 1.15rem;
+                --slider-track-radius: 999px;
+                --slider-thumb-radius: 50%;
+                --slider-track-color : var(--orbeon-control-border-color);
+                --slider-fill-color  : var(--orbeon-checkable-checked-background-color);
+                --slider-thumb-color : var(--slider-fill-color);
+                --slider-thumb-border: 2px solid var(--slider-fill-color);
+                --slider-direction   : to right;
+                --slider-progress    : 0%;
+
+                &:dir(rtl) {
+                    --slider-direction: to left;
+                }
+
+                -webkit-appearance: none;
+                appearance        : none;
+                accent-color      : var(--slider-fill-color);
+                display           : block;
+                inline-size       : 100%;
+                width             : 100%;
+                block-size        : var(--orbeon-control-height);
+                min-height        : 2rem;
+                margin            : 0;
+                padding           : 0;
+                border            : 0;
+                border-radius     : 0;
+                background        : transparent;
+                box-shadow        : none;
+                cursor            : pointer;
+
+                &:focus {
+                    outline   : none;
+                    box-shadow: none;
+                }
+
+                &:focus-visible {
+                    outline       : 2px solid transparent;
+                    outline-offset: 2px;
+                }
+
+                &:disabled {
+                    cursor : not-allowed;
+                    opacity: 0.6;
+                }
+            }
+
+            // WebKit / Blink track and thumb (kept separate from Firefox rules per spec)
+            input[type="range"].fr-range-input::-webkit-slider-runnable-track {
+                block-size   : var(--slider-track-size);
+                height       : var(--slider-track-size);
+                border       : 0;
+                border-radius: var(--slider-track-radius);
+                background   : linear-gradient(
+                    var(--slider-direction),
+                    var(--slider-fill-color) var(--slider-progress),
+                    var(--slider-track-color) var(--slider-progress)
+                );
+            }
+
+            input[type="range"].fr-range-input::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance        : none;
+                box-sizing        : border-box;
+                inline-size       : var(--slider-thumb-size);
+                width             : var(--slider-thumb-size);
+                block-size        : var(--slider-thumb-size);
+                height            : var(--slider-thumb-size);
+                margin-block-start: calc(~"(var(--slider-track-size) - var(--slider-thumb-size)) / 2");
+                border            : var(--slider-thumb-border);
+                border-radius     : var(--slider-thumb-radius);
+                background        : var(--slider-thumb-color);
+                box-shadow        : 0 1px 2px rgba(0, 0, 0, 0.2);
+                transition        : background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                    border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                    box-shadow var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                    transform var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+            }
+
+            input[type="range"].fr-range-input:focus-visible::-webkit-slider-thumb {
+                box-shadow: var(--orbeon-focus-ring);
+            }
+
+            input[type="range"].fr-range-input:not(:disabled):active::-webkit-slider-thumb {
+                transform: scale(1.08);
+            }
+
+            // Firefox track, progress, and thumb
+            input[type="range"].fr-range-input::-moz-range-track {
+                block-size   : var(--slider-track-size);
+                height       : var(--slider-track-size);
+                border       : 0;
+                border-radius: var(--slider-track-radius);
+                background   : var(--slider-track-color);
+            }
+
+            input[type="range"].fr-range-input::-moz-range-progress {
+                block-size   : var(--slider-track-size);
+                height       : var(--slider-track-size);
+                border-radius: var(--slider-track-radius);
+                background   : var(--slider-fill-color);
+            }
+
+            input[type="range"].fr-range-input::-moz-range-thumb {
+                box-sizing   : border-box;
+                inline-size  : var(--slider-thumb-size);
+                width        : var(--slider-thumb-size);
+                block-size   : var(--slider-thumb-size);
+                height       : var(--slider-thumb-size);
+                border       : var(--slider-thumb-border);
+                border-radius: var(--slider-thumb-radius);
+                background   : var(--slider-thumb-color);
+                box-shadow   : 0 1px 2px rgba(0, 0, 0, 0.2);
+                transition   : background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                               border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                               box-shadow var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                               transform var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+            }
+
+            input[type="range"].fr-range-input:focus-visible::-moz-range-thumb {
+                box-shadow: var(--orbeon-focus-ring);
+            }
+
+            input[type="range"].fr-range-input:not(:disabled):active::-moz-range-thumb {
+                transform: scale(1.08);
+            }
+
+            // Unset / empty value state: hollow thumb, no active fill
+            &.fr-range-empty {
+                input[type="range"].fr-range-input {
+                    --slider-fill-color  : var(--slider-track-color);
+                    --slider-thumb-color : var(--orbeon-control-background-color);
+                    --slider-thumb-border: 2px solid var(--orbeon-control-placeholder-color);
+                }
+            }
+
+            .fr-range-endpoints {
+                display            : flex;
+                justify-content    : space-between;
+                align-items        : center;
+                gap                : 0.5rem;
+                margin-top         : -2px;
+                font-size          : smaller;
+                line-height        : 1.2;
+                color              : var(--orbeon-hint-color);
+                font-variant-numeric: tabular-nums;
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+
+            .fr-range-value-group {
+                display    : inline-flex;
+                align-items: center;
+                gap        : 0.2rem;
+                flex-shrink: 0;
+                min-height : var(--orbeon-control-height);
+
+                &:not(:has(> :not(.xforms-hidden))) {
+                    display: none;
+                }
+            }
+
+            .fr-range-value-wrapper {
+                display    : inline-flex;
+                align-items: center;
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+
+            .fr-range-value {
+                font-variant-numeric: tabular-nums;
+                font-weight         : 600;
+                min-width           : 2.25ch;
+                text-align          : right;
+                white-space         : nowrap;
+                color               : var(--orbeon-control-color);
+
+                &.fr-range-value-empty {
+                    color      : var(--orbeon-control-placeholder-color);
+                    font-weight: normal;
+                }
+            }
+
+            .btn.fr-range-clear {
+                display        : inline-flex;
+                align-items    : center;
+                justify-content: center;
+                padding        : 0.15rem;
+                min-width      : 1.6rem;
+                min-height     : 1.6rem;
+                border         : 0;
+                border-radius  : var(--orbeon-control-border-radius);
+                background     : transparent;
+                box-shadow     : none;
+                color          : var(--orbeon-control-placeholder-color);
+                text-decoration: none;
+                cursor         : pointer;
+
+                &:hover, &:focus {
+                    color          : var(--orbeon-base-color);
+                    text-decoration: none;
+                    background     : transparent;
+                }
+
+                &:focus-visible {
+                    outline   : 0;
+                    box-shadow: var(--orbeon-focus-ring);
+                }
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+        }
+
+        &.xforms-invalid.xforms-visited {
+            .fr-range-container input[type="range"].fr-range-input {
+                --slider-thumb-border: 2px solid var(--orbeon-invalid-control-border-color);
+            }
+        }
+
+        @media print {
+            display: inline;
+        }
+    }
+}

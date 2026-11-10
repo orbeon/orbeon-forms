@@ -99,17 +99,7 @@ object XFormsModelBinds {
   // 1. Doesn't check whether a TLD is known, as there are two many of those now (2015) and changing constantly.
   // 2. Doesn't support IP addresses (we probably could, but we don't care right now).
   //
-  object EmailValidatorNoDomainValidation extends EmailValidator(allowLocal = false) {
-
-    private val DomainLabelRegex = "\\p{Alnum}(?>[\\p{Alnum}-]*\\p{Alnum})*"
-    private val TopLabelRegex    = "\\p{Alpha}{2,}"
-    private val DomainNameRegex  = "^(?:" + DomainLabelRegex + "\\.)+" + "(" + TopLabelRegex + ")$"
-
-    private val DomainRegex = new RegexValidator(DomainNameRegex)
-
-    override def isValidDomain(domain: String): Boolean =
-      Option(DomainRegex.matches(domain)) exists (_.nonEmpty)
-  }
+  object EmailValidatorNoDomainValidation extends EmailValidator(None, None)
 
   def isEmptyValue(value: String): Boolean = "" == value
 

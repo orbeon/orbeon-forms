@@ -17,144 +17,73 @@
 package org.orbeon.oxf.xforms.model
 
 import java.io.Serializable
-import java.util.regex.Pattern
+import java.util.concurrent.ConcurrentHashMap
+import java.util.regex.{Pattern, PatternSyntaxException}
 
 
-/**
- * Perform email validations.
- *
- * Based on a script by Sandeep V. Tamhankar.
- *
- * This implementation is not guaranteed to catch all possible errors in an email address.
- */
+// Based on a script by Sandeep V. Tamhankar.
 object EmailValidator {
 
   private val SPECIAL_CHARS     = "\\p{Cntrl}\\(\\)<>@,;:'\\\\\\\"\\.\\[\\]"
   private val VALID_CHARS       = "(\\\\.)|[^\\s" + SPECIAL_CHARS + "]"
   private val QUOTED_USER       = "(\"(\\\\\"|[^\"])*\")"
-  private val WORD =            "((" + VALID_CHARS + "|')+|" + QUOTED_USER + ")"
+  private val WORD              = "((" + VALID_CHARS + "|')+|" + QUOTED_USER + ")"
   private val EMAIL_REGEX       = "^(.+)@(\\S+)$"
-// ORBEON: Remove support for `DomainValidator`.
-//  private val IP_DOMAIN_REGEX   = "^\\[(.*)\\]$"
   private val USER_REGEX        = "^" + WORD + "(\\." + WORD + ")*$"
   private val EMAIL_PATTERN     = Pattern.compile(EMAIL_REGEX)
-// ORBEON: Remove support for `DomainValidator`.
-//  private val IP_DOMAIN_PATTERN = Pattern.compile(IP_DOMAIN_REGEX)
   private val USER_PATTERN      = Pattern.compile(USER_REGEX)
   private val MAX_USERNAME_LEN  = 64
 
-  /**
-   * Singleton instance of this class, which
-   * doesn't consider local addresses as valid.
-   */
-  private val EMAIL_VALIDATOR = new EmailValidator(false, false)
-  private val EMAIL_VALIDATOR_WITH_TLD = new EmailValidator(false, true)
-  /**
-   * Singleton instance of this class, which does
-   * consider local addresses valid.
-   */
-  private val EMAIL_VALIDATOR_WITH_LOCAL = new EmailValidator(true, false)
-  private val EMAIL_VALIDATOR_WITH_LOCAL_WITH_TLD = new EmailValidator(true, true)
+  private val DomainLabelRegex  = "\\p{Alnum}(?>[\\p{Alnum}-]*\\p{Alnum})*"
+  private val TopLabelRegex     = "\\p{Alpha}{2,}"
+  private val DomainNameRegex   = "^(?:" + DomainLabelRegex + "\\.)+" + "(" + TopLabelRegex + ")$"
+  private val DOMAIN_PATTERN    = Pattern.compile(DomainNameRegex)
 
-  /**
-   * Returns the Singleton instance of this validator.
-   *
-   * @return singleton instance of this validator.
-   */
-  def getInstance: EmailValidator = EMAIL_VALIDATOR
+  val Default = new EmailValidator(None, None)
 
-  /**
-   * Returns the Singleton instance of this validator,
-   * with local validation as required.
-   *
-   * @param allowLocal Should local addresses be considered valid?
-   * @param allowTld   Should TLDs be allowed?
-   * @return singleton instance of this validator
-   */
-  def getInstance(allowLocal: Boolean, allowTld: Boolean): EmailValidator =
-    if (allowLocal)
-      if (allowTld)
-        EMAIL_VALIDATOR_WITH_LOCAL_WITH_TLD
-      else
-        EMAIL_VALIDATOR_WITH_LOCAL
-    else if (allowTld)
-      EMAIL_VALIDATOR_WITH_TLD
-    else
-      EMAIL_VALIDATOR
+  private val cache = new ConcurrentHashMap[(Option[String], Option[String]), EmailValidator]()
 
-  /**
-   * Returns the Singleton instance of this validator,
-   * with local validation as required.
-   *
-   * @param allowLocal Should local addresses be considered valid?
-   * @return singleton instance of this validator
-   */
-  def getInstance(allowLocal: Boolean): EmailValidator = getInstance(allowLocal, allowTld = false)
+  def apply(localPartRegexOpt: Option[String] = None, domainRegexOpt: Option[String] = None): EmailValidator =
+    (localPartRegexOpt, domainRegexOpt) match {
+      case (None, None) => Default
+      case key          => cache.computeIfAbsent(key, { case (l, d) => new EmailValidator(l, d) })
+    }
+
+  def getInstance: EmailValidator = Default
+
+  def getInstance(allowLocal: Boolean, allowTld: Boolean): EmailValidator = Default
+
+  def getInstance(allowLocal: Boolean): EmailValidator = Default
 }
 
-class EmailValidator extends Serializable {
+class EmailValidator(
+  val localPartRegexOpt: Option[String] = None,
+  val domainRegexOpt   : Option[String] = None
+) extends Serializable {
 
-  final private var allowTld = false
-// ORBEON: Remove support for `DomainValidator`.
-//  final private var domainValidator: DomainValidator = null
+  def this(allowLocal: Boolean, allowTld: Boolean) = this(None, None)
+  def this(allowLocal: Boolean) = this(None, None)
 
-//  /**
-//   * constructor for creating instances with the specified domainValidator
-//   *
-//   * @param allowLocal      Should local addresses be considered valid?
-//   * @param allowTld        Should TLDs be allowed?
-//   * @param domainValidator allow override of the DomainValidator.
-//   *                        The instance must have the same allowLocal setting.
-//   * @since 1.7
-//   */
-//  def this(allowLocal: Boolean, allowTld: Boolean, domainValidator: DomainValidator) {
-//    this()
-//    this.allowTld = allowTld
-//    if (domainValidator == null)
-//      throw new IllegalArgumentException("DomainValidator cannot be null")
-//    else {
-//      if (domainValidator.isAllowLocal != allowLocal)
-//        throw new IllegalArgumentException("DomainValidator must agree with allowLocal setting")
-//      this.domainValidator = domainValidator
-//    }
-//  }
+  private val localPartPatternOpt: Option[Pattern] =
+    localPartRegexOpt.map(compileRegex("local part", _))
 
-  /**
-   * Protected constructor for subclasses to use.
-   *
-   * @param allowLocal Should local addresses be considered valid?
-   * @param allowTld   Should TLDs be allowed?
-   */
-  def this(allowLocal: Boolean, allowTld: Boolean) = {
-    this()
-    this.allowTld = allowTld
-//    this.domainValidator = DomainValidator.getInstance(allowLocal)
-  }
+  private val domainPatternOpt: Option[Pattern] =
+    domainRegexOpt.map(compileRegex("domain", _))
 
-  /**
-   * Protected constructor for subclasses to use.
-   *
-   * @param allowLocal Should local addresses be considered valid?
-   */
-  def this(allowLocal: Boolean) =
-    this(allowLocal, allowTld = false)
+  private def compileRegex(partName: String, regex: String): Pattern =
+    try Pattern.compile(regex)
+    catch {
+      case e: PatternSyntaxException =>
+        throw new IllegalArgumentException(s"Invalid regular expression '$regex' configured for email $partName validation: ${e.getMessage}", e)
+    }
 
-  /**
-   * <p>Checks if a field has a valid e-mail address.</p>
-   *
-   * @param email The value validation is being performed on.  A <code>null</code>
-   *              value is considered invalid.
-   * @return true if the email address is valid.
-   */
   def isValid(email: String): Boolean = {
-
     if (email == null)
       return false
 
-    if (email.endsWith("."))  // check this first - it's cheap!
+    if (email.endsWith("."))
       return false
 
-    // Check the whole email address structure
     val emailMatcher = EmailValidator.EMAIL_PATTERN.matcher(email)
     if (! emailMatcher.matches)
       false
@@ -166,37 +95,20 @@ class EmailValidator extends Serializable {
       true
   }
 
-  /**
-   * Returns true if the domain component of an email address is valid.
-   *
-   * @param domain being validated, may be in IDN format
-   * @return true if the email address's domain is valid.
-   */
-  protected def isValidDomain(domain: String): Boolean = {
-    throw new NotImplementedError("isValidDomain")
-// ORBEON: Remove support for `DomainValidator`.
-//    // see if domain is an IP address in brackets
-//    val ipDomainMatcher = EmailValidator.IP_DOMAIN_PATTERN.matcher(domain)
-//    if (ipDomainMatcher.matches) {
-//      val inetAddressValidator = InetAddressValidator.getInstance
-//      return inetAddressValidator.isValid(ipDomainMatcher.group(1))
-//    }
-//    // Domain is symbolic name
-//    if (allowTld)
-//      domainValidator.isValid(domain) || (!domain.startsWith(".") && domainValidator.isValidTld(domain))
-//    else
-//      domainValidator.isValid(domain)
-  }
+  protected def isValidDomain(domain: String): Boolean =
+    isValidBuiltInDomain(domain) &&
+      domainPatternOpt.forall(_.matcher(domain).matches())
 
-  /**
-   * Returns true if the user component of an email address is valid.
-   *
-   * @param user being validated
-   * @return true if the user name is valid.
-   */
-  protected def isValidUser(user: String): Boolean = {
-    if (user == null || user.length > EmailValidator.MAX_USERNAME_LEN)
-      return false
-    EmailValidator.USER_PATTERN.matcher(user).matches
-  }
+  private def isValidBuiltInDomain(domain: String): Boolean =
+    domain != null &&
+      EmailValidator.DOMAIN_PATTERN.matcher(domain).matches()
+
+  protected def isValidUser(user: String): Boolean =
+    isValidBuiltInUser(user) &&
+      localPartPatternOpt.forall(_.matcher(user).matches())
+
+  private def isValidBuiltInUser(user: String): Boolean =
+    user != null &&
+      user.length <= EmailValidator.MAX_USERNAME_LEN &&
+      EmailValidator.USER_PATTERN.matcher(user).matches()
 }

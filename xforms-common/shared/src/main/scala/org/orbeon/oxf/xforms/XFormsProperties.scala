@@ -85,6 +85,9 @@ object XFormsProperties {
 
   val ShowRecoverableErrorsProperty                   = "show-recoverable-errors"
 
+  val EmailLocalPartRegexProperty                     = "email.local-part-regex"
+  val EmailDomainRegexProperty                        = "email.domain-regex"
+
   val LoginPageDetectionRegexpProperty                = "login-page-detection-regexp"
 
   val SessionHeartbeatProperty                        = "session-heartbeat"
@@ -249,6 +252,9 @@ object XFormsProperties {
       PropertyDefinition(TimeFormatInputProperty,                         "[h]:[m]:[s] [P]",           propagateToClient = true),
       PropertyDefinition(ShowErrorDialogProperty,                         true,                        propagateToClient = true),
       PropertyDefinition(LoginPageDetectionRegexpProperty,                "",                          propagateToClient = true),
+
+      PropertyDefinition(EmailLocalPartRegexProperty,                     "",                          propagateToClient = false),
+      PropertyDefinition(EmailDomainRegexProperty,                        "",                          propagateToClient = false),
 
       PropertyDefinition(PropertyProfileProperty,                         "",                          propagateToClient = false),
   )

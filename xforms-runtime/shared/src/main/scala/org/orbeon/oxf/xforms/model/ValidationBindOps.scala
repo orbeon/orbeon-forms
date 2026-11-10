@@ -14,7 +14,9 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{Logging, XPath}
+import org.orbeon.oxf.xforms.XFormsProperties.{EmailDomainRegexProperty, EmailLocalPartRegexProperty}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.XPathMIP
 import org.orbeon.oxf.xforms.analysis.model.{MipName, Types}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -82,6 +84,12 @@ trait ValidationBindOps extends Logging {
       val validator = new XFormsModelSchemaValidator("oxf:/org/orbeon/oxf/xforms/xforms-types.xsd")
       validator.loadSchemas(containingDocument)
       validator
+    }
+
+    lazy val emailValidator = {
+      val localPartRegexOpt = containingDocument.staticState.staticStringProperty(EmailLocalPartRegexProperty).trimAllToOpt
+      val domainRegexOpt    = containingDocument.staticState.staticStringProperty(EmailDomainRegexProperty).trimAllToOpt
+      EmailValidator(localPartRegexOpt, domainRegexOpt)
     }
 
     def validateTypeAndRequired(bindNode: BindNode, invalidInstances: m.Set[String]): Unit = {
@@ -181,7 +189,7 @@ trait ValidationBindOps extends Logging {
         // Don't consider the node invalid if the string is empty with `xf:*` types
         true
       } else if (isBuiltInXFormsType && typeLocalname == "email") {
-        EmailValidatorNoDomainValidation.isValid(nodeValue)
+        emailValidator.isValid(nodeValue)
       } else if (isBuiltInXFormsType && (typeLocalname == "HTMLFragment")) {
         // Just a marker type
         true

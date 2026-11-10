@@ -61,7 +61,8 @@ object FRComponentParamSupport {
   ): Option[AtomicValue] = {
 
     def fromBind = (sourceComponentIdOpt.isEmpty && xfc.bindNodeOpt.isDefined)
-        .flatOption (findStaticComponentFromBind.map(sc => (None, sc, xfc.container.partAnalysis)))
+      .flatOption(findStaticComponentFromBind.map(sc => (None, sc, xfc.container.partAnalysis)))
+
     def fromComponent =
       ComponentParamSupport.findSourceComponent(sourceComponentIdOpt).map(c => (c.some, c.staticControl, c.container.partAnalysis))
 

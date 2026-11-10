@@ -96,7 +96,7 @@ object XFormsModelBinds {
 
   // Modified email validator which:
   //
-  // 1. Doesn't check whether a TLD is known, as there are two many of those now (2015) and changing constantly.
+  // 1. Doesn't check whether a TLD is known, as there are too many of those now (2015) and changing constantly.
   // 2. Doesn't support IP addresses (we probably could, but we don't care right now).
   //
   object EmailValidatorNoDomainValidation extends EmailValidator(None, None)

@@ -16,12 +16,14 @@ package org.orbeon.oxf.fr
 import com.icegreen.greenmail.util.{GreenMail, ServerSetup}
 import jakarta.mail.Message
 import jakarta.mail.internet.InternetAddress
+import org.orbeon.io.IOUtils
 import org.orbeon.oxf.fr.FormRunnerCommon.*
 import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.fr.email.*
 import org.orbeon.oxf.fr.email.EmailMetadata.HeaderName
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils.*
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.scaxon.NodeConversions
@@ -30,6 +32,7 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport.readTinyTreeFromUrl
 import org.scalatest.funspec.AnyFunSpecLike
 
 import java.net.{ServerSocket, URI}
+import java.nio.charset.StandardCharsets
 
 class EmailTest
   extends DocumentTestBase
@@ -423,5 +426,24 @@ class EmailTest
       it(s"must ${if (expected) "accept" else "refuse"} `$value`") {
         assert(FormRunner.isUploadedFileOrPersistenceURL(value) == expected)
       }
+
+    describe("`data:` URL attachments") {
+      implicit val logger                  : IndentedLogger       = new IndentedLogger(LoggerFactory.createLogger(classOf[EmailTest]))
+      implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
+      implicit val formRunnerParams        : FormRunnerParams     = FormRunnerParams(AppForm("acme", "order"), "email")
+
+      it("must decode valid `data:` URLs") {
+        val holder = NodeConversions.elemToNodeInfo(
+          <license-data-url filename="license.xml" mediatype="application/xml">data:;base64,PGxpY2Vuc2UvPg==</license-data-url>
+        )
+        val attachmentOpt = Attachment.attachmentFromHolder(holder)
+        assert(attachmentOpt.isDefined)
+        val attachment = attachmentOpt.get
+        assert(attachment.filename == "license.xml")
+        assert(attachment.contentType == "application/xml")
+        val content = IOUtils.readStreamAsStringAndClose(attachment.contentFactory().stream, Some(StandardCharsets.UTF_8.name))
+        assert(content == "<license/>")
+      }
+    }
   }
 }

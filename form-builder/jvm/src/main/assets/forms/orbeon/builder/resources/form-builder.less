@@ -796,6 +796,10 @@ body.orbeon {
         pointer-events: none;
         z-index: 9999;
 
+        &.fb-process-drop-indicator {
+            position: fixed;
+        }
+
         &::before {
             content: "";
             position: absolute;
@@ -2124,7 +2128,7 @@ body.orbeon {
             color: #333;
         }
 
-        .xbl-fr-dnd-repeat {
+        .fb-process-steps-list {
             display: block;
             width: 100%;
 
@@ -2138,68 +2142,74 @@ body.orbeon {
                 //padding-top: 2px;
                 //padding-bottom: 2px;
 
-                .fb-process-row-spacers {
-                    flex-grow: 0;
-
-                    &:has(.fb-indent-spacer) {
-                        //border-right: 1px dashed #ddd;
-                        grid-row-start: 1;
-                        grid-row-end: 100;
-                        grid-column-start: 1;
-                        white-space: nowrap;
-                        //background-color: white;
-                        height: stretch;
-                    }
-
-                    .fb-indent-spacer {
-                        display: inline-block;
-                        width: 1em;
-                        height: stretch;
-                    }
+                .fb-process-row-main {
+                    position: relative;
+                    flex-grow: 1;
+                    min-width: 0;
+                    align-self: stretch;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
                 }
 
-                .fb-process-row-content-outer {
-                    width: 100%;
-                    flex-grow: 1;
+                .fb-process-box-slice {
+                    position: absolute;
+                    top: 0;
+                    bottom: 0;
+                    left: var(--fb-box-inset);
+                    right: var(--fb-box-inset);
+                    background-color: color-mix(in oklab, var(--orbeon-base-color) 8%, transparent);
+                    pointer-events: none;
+
+                    &.fb-process-box-start {
+                        top: 2px;
+                        border-top-left-radius: var(--orbeon-body-decorations-border-radius);
+                        border-top-right-radius: var(--orbeon-body-decorations-border-radius);
+                    }
+
+                    &.fb-process-box-end {
+                        bottom: calc(2px + var(--fb-outer-closing) * 6px);
+                        border-bottom-left-radius: var(--orbeon-body-decorations-border-radius);
+                        border-bottom-right-radius: var(--orbeon-body-decorations-border-radius);
+                    }
                 }
 
                 .fb-process-row-content {
+                    position: relative;
                     display: grid;
-                    grid-template-columns: min-content 1fr auto;
+                    grid-template-columns: 1fr auto;
                     column-gap: 4px;
-                    padding: 2px;
+                    margin-left: calc(var(--fb-indent-level) * 20px);
+                    margin-right: calc(var(--fb-indent-level) * 20px);
+                    padding: 2px 6px calc(2px + var(--fb-extra-closing) * 6px) 6px;
+
+                    &.fb-process-has-combinator {
+                        grid-template-columns: min-content 1fr auto;
+
+                        .fb-process-row-content-params {
+                            grid-column-start: 3;
+                            grid-column-end: 4;
+                        }
+                    }
                 }
 
-                .fb-process-row-content-start-row > .fb-process-row-content {
-                    border-top-left-radius: 5px;
-                    border-top-right-radius: 5px;
+                &.fb-process-row-opening-box {
+                    > .fb-process-row-main > .fb-process-row-content {
+                        padding-top: 6px;
+                    }
+
+                    > .fb-process-row-buttons {
+                        margin-top: 6px;
+                    }
                 }
 
-                .fb-process-row-content-end-row > .fb-process-row-content {
-                    border-bottom-left-radius: 5px;
-                    border-bottom-right-radius: 5px;
-                }
-
-                .fb-process-row-content-indent-1 > .fb-process-row-content, .fb-indent-spacer-position-2, .fb-process-row-content-indent-2 {
-                    background-color: #ddd;
-                }
-
-                .fb-process-row-content-indent-2 > .fb-process-row-content, .fb-indent-spacer-position-3, .fb-process-row-content-indent-3 {
-                    background-color: #bbb;
-                }
-
-                .fb-process-row-content-indent-3 > .fb-process-row-content, .fb-indent-spacer-position-4, .fb-process-row-content-indent-4 {
-                    background-color: #999;
-                }
-
-                .fb-process-row-buttons {
-                    display: flex;
-                    justify-content: flex-start;
+                &.fb-process-row-closing-box > .fb-process-row-main > .fb-process-row-content {
+                    padding-bottom: calc(6px + var(--fb-extra-closing) * 6px);
                 }
 
                 .fb-process-row-content-params {
-                    grid-column-start: 3;
-                    grid-column-end: 4;
+                    grid-column-start: 2;
+                    grid-column-end: 3;
                     grid-row-start: 1;
                     grid-row-end: 3;
                 }
@@ -2222,50 +2232,55 @@ body.orbeon {
                 }
 
                 .fb-process-row-buttons {
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
                     white-space: nowrap;
                     width: 200px;
-                    align-items: center;
+                    min-height: 34px;
+                    margin-top: 2px;
+                    margin-bottom: 2px;
                     flex-grow: 0;
                     flex-shrink: 0;
                 }
 
                 // DnD
-                &.gu-mirror {
-                    .fb-process-row-buttons {
-                        display: none;
-                    }
+                &.fb-process-dnd-drop-into > .fb-process-row-main > .fb-process-row-content {
+                    outline: 1px dashed var(--orbeon-focus-border-color);
+                    outline-offset: -1px;
+                    border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+                    background-color: var(--orbeon-fb-hover-background-color);
                 }
 
                 .fb-process-grab {
-                    display: none;
+                    display: inline-block;
+                    visibility: hidden;
                     margin-right: 6px;
                 }
 
-                &.xforms-dnd-moves .fb-process-grab {
-                    display: inline-block;
-                    cursor: move;
+                &.fb-process-can-move .fb-process-grab {
+                    visibility: visible;
+                    cursor: grab;
                     opacity: 0.5;
+                    touch-action: none;
+                    -webkit-user-select: none;
+                    user-select: none;
                 }
 
-                &:hover .fb-process-grab {
+                &.fb-process-can-move:hover .fb-process-grab {
                     opacity: 0.8;
                 }
             }
 
-            .fb-indent-spacers:not(.fb-indent-spacer).xforms-update-full:empty {
-                display: none; // hide extra blank repeat spans so they don't contribute as flex items
-            }
+            .fb-process-combinator-select1 {
+                select {
+                    width: auto;
+                    display: inline-block;
+                }
 
-            // Match last spacer at end of spacers repeat
-            //.fb-indent-spacer:has(+ .fb-indent-spacers + .xforms-repeat-begin-end) {
-            //    border-right: 1px dashed #ddd;
-            //}
-
-            .fb-process-combinator-select1 select {
-                width: auto;
-                display: inline-block;
-                &[disabled] {
-                    opacity: 0;
+                &.fb-process-combinator-placeholder {
+                    visibility: hidden;
+                    pointer-events: none;
                 }
             }
 

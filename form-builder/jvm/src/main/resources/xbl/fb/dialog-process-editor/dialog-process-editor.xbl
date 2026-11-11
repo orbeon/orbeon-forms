@@ -25,7 +25,10 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <xbl:binding id="fb-dialog-process-editor" element="fb|dialog-process-editor">
+    <xbl:binding
+        id="fb-dialog-process-editor"
+        element="fb|dialog-process-editor"
+        xxf:external-events="fb-move-process-step">
 
         <xbl:handlers>
 
@@ -63,6 +66,61 @@
 
             <xbl:handler event="DOMActivate" observer="fb-save-trigger" if="not(instance('validity-instance') = 'true')">
                 <xxf:setvisited control="dialog" recurse="true"/>
+            </xbl:handler>
+
+            <xbl:handler event="fb-move-process-step" phase="target">
+                <xf:var name="process"     value="instance()/process[xs:integer(event('process-index'))]"/>
+                <xf:var name="all-rows"    value="$process//*[self::step or self::else]"/>
+                <xf:var name="source-step" value="$all-rows[xs:integer(event('source-index'))][self::step]"/>
+                <xf:var name="into-row"    value="if (xxf:non-blank(event('into-index'))) then $all-rows[xs:integer(event('into-index'))] else ()"/>
+                <xf:var name="dest-parent" value="
+                    if (empty($into-row)) then
+                        $process
+                    else if ($into-row/self::step[@type = 'condition']) then
+                        $into-row/then
+                    else if ($into-row/self::step[@type = 'group'] or $into-row/self::else) then
+                        $into-row
+                    else
+                        ()
+                "/>
+                <xf:var name="after-step"  value="if (xxf:non-blank(event('after-index'))) then $all-rows[xs:integer(event('after-index'))][self::step] else ()"/>
+                <xf:var name="is-noop"     value="
+                    if (empty($after-step)) then
+                        $dest-parent/step[1] is $source-step
+                    else
+                        $after-step/following-sibling::step[1] is $source-step
+                "/>
+
+                <xf:action if="
+                    exists($source-step) and
+                    count($source-step/../step) gt 1 and
+                    exists($dest-parent) and
+                    empty($dest-parent/ancestor-or-self::* intersect $source-step) and
+                    (empty($after-step) or (($after-step/.. is $dest-parent) and not($after-step is $source-step))) and
+                    not($is-noop)
+                ">
+                    <xf:insert
+                        if="exists($after-step)"
+                        ref="$after-step"
+                        position="after"
+                        origin="$source-step"/>
+                    <xf:insert
+                        if="empty($after-step) and exists($dest-parent/step)"
+                        ref="$dest-parent/step[1]"
+                        position="before"
+                        origin="$source-step"/>
+                    <xf:insert
+                        if="empty($after-step) and empty($dest-parent/step)"
+                        context="$dest-parent"
+                        origin="$source-step"/>
+
+                    <xf:delete ref="$source-step"/>
+
+                    <xf:setvalue
+                        iterate="$process//step[empty(preceding-sibling::step) and @combinator != 'then']"
+                        ref="@combinator"
+                        value="'then'"/>
+                </xf:action>
             </xbl:handler>
 
         </xbl:handlers>
@@ -166,7 +224,9 @@
 
                                             <!-- Visual editor rows -->
                                             <xf:group ref=".[exists(step)]">
-                                                <fr:dnd-repeat ref=".//*[self::step or self::else]">
+                                                <xf:var name="process-index" value="count(preceding-sibling::process) + 1"/>
+                                                <xh:div class="fb-process-steps-list" data-orbeon-process-index="{$process-index}">
+                                                <xf:repeat ref=".//*[self::step or self::else]">
 
                                                     <xf:var
                                                         name="current"
@@ -175,55 +235,93 @@
                                                         name="step-type"
                                                         value="if (self::else) then 'else' else (@type, 'action')[1]"/>
                                                     <xf:var
+                                                        name="ancestor-body-boxes"
+                                                        value="ancestor::*[self::step[@type = 'group'] or self::then or self::else]"/>
+                                                    <xf:var
+                                                        name="active-boxes"
+                                                        value="ancestor::*[self::step[@type = ('group', 'condition')] or self::then or self::else] | self::step[@type = 'condition']"/>
+                                                    <xf:var
                                                         name="indent-level"
-                                                        value="
-                                                            if (self::else) then
-                                                                count(ancestor::step[@type = ('group', 'condition')]) - 1
-                                                            else if (@type = ('group', 'condition')) then
-                                                                count(ancestor::step[@type = ('group', 'condition')])
-                                                            else
-                                                                count(ancestor::step[@type = ('group', 'condition')])
-                                                    "/>
+                                                        value="count($ancestor-body-boxes)"/>
+                                                    <xf:var
+                                                        name="active-boxes-count"
+                                                        value="count($active-boxes)"/>
+                                                    <xf:var
+                                                        name="has-opening-box"
+                                                        value="exists($active-boxes[if (self::step[@type = 'condition']) then (. is $current) else ($current is step[1])])"/>
+                                                    <xf:var
+                                                        name="closing-boxes-count"
+                                                        value="count($active-boxes[$current is (descendant::*[self::step or self::else])[last()]])"/>
+                                                    <xf:var
+                                                        name="first-closing-box"
+                                                        value="$active-boxes-count - $closing-boxes-count + 1"/>
+                                                    <xf:var
+                                                        name="extra-closing-levels"
+                                                        value="max(($closing-boxes-count - 1, 0))"/>
 <!--                                                    xxx indent:-->
 <!--                                                    <xf:output value="$indent-level"/>-->
                                                     <xf:var
-                                                        name="is-first-step"
-                                                        value="empty(preceding-sibling::step) and not(parent::then or parent::else) and empty(ancestor::step)"/>
+                                                        name="has-combinator"
+                                                        value="self::step and exists(preceding-sibling::step)"/>
                                                     <xf:var
-                                                        name="is-first-step-in-group"
-                                                        value="empty(preceding-sibling::step)"/>
+                                                        name="has-combinator-slot"
+                                                        value="exists(ancestor::*[self::process or self::step[@type = 'group'] or self::then or self::else][count(step) gt 1])"/>
+                                                    <xf:var
+                                                        name="can-move"
+                                                        value="self::step and count(../step) gt 1 and not(fr:is-readonly-mode())"/>
 
-                                                    <xf:var
-                                                        name="is-first-line-in-block"
-                                                        value="empty(preceding-sibling::step) and $step-type != 'else'"/>
-                                                    <xf:var
-                                                        name="is-last-line-in-block"
-                                                        value="empty(following-sibling::step) and $step-type != 'condition' and $step-type != 'else'"/>
-
-                                                    <xh:div class="{
-                                                        'fb-process-iteration',
-                                                        concat('xforms-dnd-level-', max(($indent-level, 0))),
-                                                        'xforms-dnd-item',
-                                                        'xforms-dnd-moves'
-                                                    }">
-                                                        <!-- Indentation spacers -->
-                                                        <!-- ⤑ ⋯ ↦ -->
-                                                        <xh:div class="fb-process-row-spacers">
-                                                            <xf:repeat ref="1 to $indent-level" class="fb-indent-spacers"><xh:span class="fb-indent-spacer fb-indent-spacer-position-{position()}"/></xf:repeat>
-                                                        </xh:div>
-                                                        <xh:div class="fb-process-row-content-outer {'fb-process-row-content-start-row'[$is-first-line-in-block]} {'fb-process-row-content-end-row'[$is-last-line-in-block]} fb-process-row-content-indent-{$indent-level}">
-                                                        <xh:div class="fb-process-row-content">
+                                                    <xh:div
+                                                        class="{
+                                                            'fb-process-iteration',
+                                                            'fb-process-can-move'[$can-move],
+                                                            'fb-process-row-opening-box'[$has-opening-box],
+                                                            'fb-process-row-closing-box'[$closing-boxes-count gt 0]
+                                                        }"
+                                                        data-orbeon-row-index="{position()}"
+                                                        data-orbeon-step-type="{$step-type}"
+                                                        data-orbeon-level="{$indent-level}"
+                                                        data-orbeon-can-move="{$can-move}">
+                                                        <xh:div class="fb-process-row-main">
+                                                            <xf:repeat ref="$active-boxes">
+                                                                <xf:var name="box-pos"              value="position()"/>
+                                                                <xf:var name="is-cond-box"          value="exists(self::step[@type = 'condition'])"/>
+                                                                <xf:var name="box-depth"            value="count(ancestor::*[self::step[@type = 'group'] or self::then or self::else])"/>
+                                                                <xf:var name="box-inset-px"         value="$box-depth * 20 + (if ($is-cond-box) then 0 else 12)"/>
+                                                                <xf:var name="is-box-start"         value="if ($is-cond-box) then (. is $current) else ($current is step[1])"/>
+                                                                <xf:var name="is-box-end"           value="$box-pos ge $first-closing-box"/>
+                                                                <xf:var name="outer-closing-levels" value="if ($is-box-end) then $box-pos - $first-closing-box else 0"/>
+                                                                <xh:div
+                                                                    class="{
+                                                                        'fb-process-box-slice',
+                                                                        'fb-process-box-condition'[$is-cond-box],
+                                                                        'fb-process-box-start'[$is-box-start],
+                                                                        'fb-process-box-end'[$is-box-end]
+                                                                    }"
+                                                                    data-orbeon-box-depth="{$box-depth}"
+                                                                    data-orbeon-body-level="{if ($is-cond-box) then '' else $box-depth + 1}"
+                                                                    style="--fb-box-inset: {$box-inset-px}px; --fb-outer-closing: {$outer-closing-levels}"/>
+                                                            </xf:repeat>
+                                                            <xh:div
+                                                                class="{
+                                                                    'fb-process-row-content',
+                                                                    'fb-process-has-combinator'[$has-combinator-slot]
+                                                                }"
+                                                                style="--fb-indent-level: {$indent-level}; --fb-extra-closing: {$extra-closing-levels}">
 <!--                                                            <xh:div class="fb-process-row-content-inner">-->
 
                                                                 <!-- Combinator dropdown (then / recover) -->
                                                                 <xf:select1
                                                                     ref="
-                                                                        if ($is-first-step-in-group) then
-                                                                            'start'
+                                                                        if ($has-combinator) then
+                                                                            $current/@combinator
+                                                                        else if ($has-combinator-slot) then
+                                                                            'then'
                                                                         else
-                                                                            $current[self::step]/@combinator"
-                                                                    class="fb-process-combinator-select1">
-                                                                    <xf:itemset ref=".[$is-first-step-in-group]"><xf:label/><xf:value>start</xf:value></xf:itemset>
+                                                                            ()"
+                                                                    class="{
+                                                                        'fb-process-combinator-select1',
+                                                                        'fb-process-combinator-placeholder'[not($has-combinator)]
+                                                                    }">
                                                                     <xf:item><xf:label>then</xf:label><xf:value>then</xf:value></xf:item>
                                                                     <xf:item><xf:label>recover</xf:label><xf:value>recover</xf:value></xf:item>
                                                                 </xf:select1>
@@ -290,10 +388,7 @@
                                                                     </xf:switch>
                                                                 </xh:div>
 <!--                                                            </xh:div>-->
-                                                        </xh:div>
-                                                        </xh:div>
-                                                        <xh:div class="fb-process-row-spacers">
-                                                            <xf:repeat ref="1 to $indent-level" class="fb-indent-spacers"><xh:span class="fb-indent-spacer fb-indent-spacer-position-{$indent-level - position() + 1}"/></xf:repeat>
+                                                            </xh:div>
                                                         </xh:div>
 
                                                         <!-- Row action buttons on the right -->
@@ -393,7 +488,8 @@
                                                             </xf:trigger>
                                                         </xh:div>
                                                     </xh:div>
-                                                </fr:dnd-repeat>
+                                                </xf:repeat>
+                                                </xh:div>
                                             </xf:group>
 
                                             <!-- When process has NO steps -->

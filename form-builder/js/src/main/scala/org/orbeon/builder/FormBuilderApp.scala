@@ -56,6 +56,7 @@ object FormBuilderApp extends App {
     DialogPublish
     ControlDnD
     ContainerDnD
+    ProcessEditorDnD
     SectionGridEditor
     RowEditor
     SectionLabelEditor

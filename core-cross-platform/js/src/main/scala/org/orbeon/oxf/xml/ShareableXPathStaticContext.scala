@@ -73,8 +73,8 @@ class ShareableXPathStaticContext(
       } else
         namespaceMapping.mapping.getOrElse(prefix, null)
 
-    def iteratePrefixes: ju.Iterator[String] =
-      namespaceMapping.mapping.keySet.iterator.asJava
+    def iteratePrefixes: Iterator[String] =
+      namespaceMapping.mapping.keySet.iterator
   }
 
   def getNamespaceResolver: NamespaceResolver = NSResolver

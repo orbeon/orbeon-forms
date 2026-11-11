@@ -24,7 +24,6 @@ import org.orbeon.saxon.expr.{EarlyEvaluationContext, Expression, StringLiteral}
 import org.orbeon.saxon.functions.DeepEqual
 import org.orbeon.saxon.ma.arrays.ImmutableArrayItem
 import org.orbeon.saxon.ma.map.HashTrieMap
-import org.orbeon.saxon.ma.parray.ImmList
 import org.orbeon.saxon.model.{AtomicType, BuiltInType, Converter, Type}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.*
@@ -47,7 +46,7 @@ object SaxonUtils extends SaxonUtilsTrait {
 
   def iterateExpressionTree(e: Expression): Iterator[Expression] =
     Iterator.single(e) ++
-      (e.operands.iterator.asScala flatMap (o => iterateExpressionTree(o.getChildExpression)))
+      (e.operands.iterator flatMap (o => iterateExpressionTree(o.getChildExpression)))
 
   def iterateExternalVariableReferences(expr: Expression): Iterator[String] = {
     iterateExpressionTree(expr) collect {
@@ -226,7 +225,7 @@ object SaxonUtils extends SaxonUtilsTrait {
   }
 
   def newArrayItem(v: collection.Seq[ValueRepresentationType]): Item =
-    new ImmutableArrayItem(ImmList.fromList(v.asJava))
+    new ImmutableArrayItem(v.toVector)
 
   def hasXPathNumberer(lang: String): Boolean = {
     val lettersOnlyLang = lang.filter(_.isLetter)

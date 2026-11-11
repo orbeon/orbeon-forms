@@ -357,7 +357,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       templateParamsOpt.collect {
         case params: MapItem =>
 
-          val javaNamedParamsIt = params.keyValuePairs.iterator.asScala.map {
+          val javaNamedParamsIt = params.keyValuePairs.iterator.map {
             case org.orbeon.saxon.ma.map.KeyValuePair(key, value) =>
               val javaParamOpt = (value.asIterable.iterator.asScala map SequenceTool.convertToJava).nextOption()
               key.getStringValue -> javaParamOpt.orNull

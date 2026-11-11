@@ -1,0 +1,92 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fr-cards-select1"
+        element="fr|cards-select1, xf|select1[appearance ~= cards]"
+        xxbl:mode="lhha binding value selection"
+        xxbl:container="span"
+        xxbl:label-for="select-elem">
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Choice Cards</display-name>
+            <display-name lang="fr">Cartes de choix</display-name>
+            <display-name lang="no">Valgkort</display-name>
+            <display-name lang="ru">Карточки выбора</display-name>
+            <display-name lang="it">Schede di scelta</display-name>
+            <display-name lang="de">Auswahlkarten</display-name>
+            <display-name lang="fi">Valintakortit</display-name>
+            <display-name lang="es">Tarjetas de opción</display-name>
+            <display-name lang="nl">Keuzekaarten</display-name>
+            <display-name lang="pt">Cartões de opção</display-name>
+            <display-name lang="sv">Valkort</display-name>
+            <display-name lang="ar">بطاقات الاختيار</display-name>
+            <display-name lang="pl">Karty wyboru</display-name>
+            <display-name lang="ja">選択カード</display-name>
+            <toolbox show="false"/>
+            <icon>
+                <icon-class>fa fa-fw fa-th-large</icon-class>
+            </icon>
+            <editors static-itemset="true" item-hint="true"/>
+            <templates>
+                <!-- Provide a view template for Form Builder so that CSS resources are loaded -->
+                <view>
+                    <xf:select1 id="" ref="" appearance="cards" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                        <xf:itemset ref="">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                            <xf:hint ref="hint"/>
+                        </xf:itemset>
+                    </xf:select1>
+                </view>
+            </templates>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/cards-select1/cards-select1.css"/>
+        </xbl:resources>
+
+        <xbl:handlers>
+            <!-- As done for XForms selection controls, consider the control visited on selection -->
+            <xbl:handler event="xforms-select xforms-deselect" observer="select-elem">
+                <xxf:setvisited control="fr-cards-select1"/>
+                <xf:dispatch name="{event('xxf:type')}" targetid="fr-cards-select1">
+                    <xf:property name="xxf:item-value" value="event('xxf:item-value')"/>
+                </xf:dispatch>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:template>
+            <xf:select1
+                id="select-elem"
+                appearance="full"
+                ref="xxf:binding('fr-cards-select1')"
+                xbl:attr="xxf:encrypt-item-values">
+                <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+            </xf:select1>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

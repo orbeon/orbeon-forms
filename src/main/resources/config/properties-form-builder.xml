@@ -60,9 +60,12 @@
         oxf:/xbl/orbeon/databound-select1-search/databound-select1-search.xbl
         oxf:/xbl/orbeon/databound-select-search/databound-select-search.xbl
         oxf:/forms/orbeon/builder/xbl/selection-select1-full.xbl
+        oxf:/xbl/orbeon/segmented-select1/segmented-select1.xbl
+        oxf:/xbl/orbeon/cards-select1/cards-select1.xbl
         oxf:/xbl/orbeon/open-select1/open-select1.xbl
         oxf:/forms/orbeon/builder/xbl/selection-select-full.xbl
         oxf:/xbl/orbeon/box-select/box-select.xbl
+        oxf:/xbl/orbeon/cards-select/cards-select.xbl
         oxf:/xbl/orbeon/checkbox-input/checkbox-input.xbl
         oxf:/xbl/orbeon/switch-input/switch-input.xbl
         oxf:/xbl/orbeon/yesno-input/yesno-input.xbl

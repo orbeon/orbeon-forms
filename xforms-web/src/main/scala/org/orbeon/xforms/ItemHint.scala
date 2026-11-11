@@ -21,6 +21,7 @@ object ItemHint {
   dom.document.addEventListener("mouseover", (event: dom.Event) =>
     event.targetT
       .closestOpt(".xforms-form .xforms-items .xforms-hint-region")
+      .filter(_.closestOpt(".xbl-fr-cards-select1, .xbl-fr-cards-select").isEmpty)
       .foreach { hintRegionEl =>
 
       // `UndefOr` to try to avoid occasional error with fastOptJS but that doesn't seem to work; `.html()` is meant to

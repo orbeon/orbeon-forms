@@ -109,9 +109,39 @@ class BindingDescriptorTest
           </metadata>
         </xbl:binding>
 
+        <xbl:binding element="fr|segmented-select1, xf|select1[appearance ~= segmented]">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Segmented Buttons</display-name>
+          </metadata>
+        </xbl:binding>
+
+        <xbl:binding element="fr|cards-select1, xf|select1[appearance ~= cards]">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Choice Cards</display-name>
+          </metadata>
+        </xbl:binding>
+
         <xbl:binding element="fr|dropdown-select1, xf|select1[appearance ~= dropdown]">
           <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Dropdown Menu</display-name>
+          </metadata>
+        </xbl:binding>
+
+        <xbl:binding element="xf|select[appearance ~= full]">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Checkboxes</display-name>
+          </metadata>
+        </xbl:binding>
+
+        <xbl:binding element="fr|box-select, xf|select[appearance ~= scroll]">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Scrollable Checkboxes</display-name>
+          </metadata>
+        </xbl:binding>
+
+        <xbl:binding element="fr|cards-select, xf|select[appearance ~= cards]">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Choice Cards</display-name>
           </metadata>
         </xbl:binding>
 
@@ -242,6 +272,10 @@ class BindingDescriptorTest
 
     assertVaryTypes(XF -> "select1"      , XS -> "string" , Some("full")             , XS -> "string" , Some("dropdown")         )(Some(XF -> "select1"      , Some("dropdown")))
     assertVaryTypes(XF -> "select1"      , XS -> "string" , Some("dropdown")         , XS -> "string" , Some("full")             )(Some(XF -> "select1"      , Some("full")))
+    assertVaryTypes(XF -> "select1"      , XS -> "string" , Some("full")             , XS -> "string" , Some("segmented")        )(Some(XF -> "select1"      , Some("segmented")))
+    assertVaryTypes(XF -> "select1"      , XS -> "string" , Some("segmented")        , XS -> "string" , Some("cards")            )(Some(XF -> "select1"      , Some("cards")))
+    assertVaryTypes(XF -> "select"       , XS -> "string" , Some("full")             , XS -> "string" , Some("cards")            )(Some(XF -> "select"       , Some("cards")))
+    assertVaryTypes(XF -> "select"       , XS -> "string" , Some("cards")            , XS -> "string" , Some("scroll")           )(Some(XF -> "select"       , Some("scroll")))
 
     assertVaryTypes(XF -> "input"        , XS -> "string" , None                     , XS -> "string" , Some("character-counter"))(Some(XF -> "input"        , Some("character-counter")))
     assertVaryTypes(XF -> "textarea"     , XS -> "string" , None                     , XS -> "string" , Some("character-counter"))(Some(XF -> "textarea"     , Some("character-counter")))
@@ -279,7 +313,8 @@ class BindingDescriptorTest
     assertVaryTypes(XF -> "input"     , XS -> "date"   )(Seq(None         -> "Date"           , Some("dropdowns")         -> "Dropdown Date"          , Some("fields") -> "Fields Date"))
     assertVaryTypes(XF -> "input"     , XS -> "gYear"      )(Seq(None            -> "Year"               , Some("dropdown")  -> "Dropdown Year"))
     assertVaryTypes(XF -> "input"     , XS -> "gYearMonth" )(Seq(Some("dropdowns") -> "Dropdown Month/Year"))
-    assertVaryTypes(XF -> "select1"   , XS -> "string" )(Seq(Some("full") -> "Radio Buttons"  , Some("dropdown")          -> "Dropdown Menu"))
+    assertVaryTypes(XF -> "select1"   , XS -> "string" )(Seq(Some("full") -> "Radio Buttons", Some("segmented") -> "Segmented Buttons", Some("cards") -> "Choice Cards", Some("dropdown") -> "Dropdown Menu"))
+    assertVaryTypes(XF -> "select"    , XS -> "string" )(Seq(Some("full") -> "Checkboxes", Some("scroll") -> "Scrollable Checkboxes", Some("cards") -> "Choice Cards"))
     assertVaryTypes(XF -> "input"     , XS -> "boolean")(Seq(Some("checkbox") -> "Single Checkbox", Some("switch") -> "Toggle Switch", Some("yesno") -> "Yes/No Answer"))
 
     assertVaryTypes(XF -> "textarea"  , XS -> "string" , List(QName("mediatype") -> "text/html"))(Seq(None-> "Formatted Text Area", Some("character-counter") -> "With Character Counter") )
@@ -309,8 +344,13 @@ class BindingDescriptorTest
     assertVaryTypes(XF -> "textarea"  , XS -> "string" , None            )("Plain Text Area")
     assertVaryTypes(XF -> "input"     , XS -> "decimal", None            )("Number")
     assertVaryTypes(XF -> "input"     , XS -> "date"   , None            )("Date")
-    assertVaryTypes(XF -> "select1"   , XS -> "string" , Some("full")    )("Radio Buttons")
-    assertVaryTypes(XF -> "select1"   , XS -> "string" , Some("dropdown"))("Dropdown Menu")
+    assertVaryTypes(XF -> "select1"   , XS -> "string" , Some("full")     )("Radio Buttons")
+    assertVaryTypes(XF -> "select1"   , XS -> "string" , Some("segmented"))("Segmented Buttons")
+    assertVaryTypes(XF -> "select1"   , XS -> "string" , Some("cards")    )("Choice Cards")
+    assertVaryTypes(XF -> "select1"   , XS -> "string" , Some("dropdown") )("Dropdown Menu")
+    assertVaryTypes(XF -> "select"    , XS -> "string" , Some("full")     )("Checkboxes")
+    assertVaryTypes(XF -> "select"    , XS -> "string" , Some("scroll")   )("Scrollable Checkboxes")
+    assertVaryTypes(XF -> "select"    , XS -> "string" , Some("cards")    )("Choice Cards")
 
     assertVaryTypes(XF -> "textarea"  , XS -> "string" , None, List(QName("mediatype") -> "text/html") )("Formatted Text Area")
     assertVaryTypes(XF -> "textarea"  , XS -> "string" , None, List(QName("mediatype") -> "text/plain"))("Plain Text Area")

@@ -1,0 +1,280 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+
+    .xbl-fr-cards-select1,
+    .xbl-fr-cards-select {
+
+        .xforms-select1-appearance-full,
+        .xforms-select-appearance-full {
+
+            .xforms-items {
+                @media screen {
+                    display              : grid;
+                    grid-template-columns: 1fr;
+                    gap                  : 0.5rem;
+                    width                : 100%;
+                }
+            }
+
+            &:not(.xforms-static) {
+                .xforms-selected,
+                .xforms-deselected {
+                    @media screen {
+                        display: flex;
+                    }
+                }
+
+                label.radio,
+                label.checkbox {
+                    box-sizing           : border-box;
+                    display              : grid;
+                    grid-template-columns: auto 1fr;
+                    column-gap           : 0.65rem;
+                    row-gap              : 0.15rem;
+                    align-items          : start;
+                    width                : 100%;
+                    min-block-size       : var(--orbeon-control-height);
+                    margin               : 0;
+                    padding              : 0.65rem 0.85rem;
+                    border               : 1px solid var(--orbeon-control-border-color);
+                    border-radius        : var(--orbeon-control-border-radius);
+                    background-color     : var(--orbeon-control-background-color);
+                    color                : var(--orbeon-control-color);
+                    cursor               : pointer;
+                    transition           : background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                           border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                           box-shadow var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+                    @media (pointer: coarse) {
+                        min-block-size: 44px;
+                    }
+
+                    > input[type="radio"],
+                    > input[type="checkbox"] {
+                        grid-column: 1;
+                        grid-row   : 1;
+                        margin-top : 0.2em;
+                    }
+
+                    > span:not(.xforms-hint):not(.xforms-help) {
+                        grid-column  : 2;
+                        font-weight  : 600;
+                        line-height  : 1.35;
+                        border-bottom: none;
+                    }
+
+                    > span.xforms-help {
+                        grid-column: 2;
+                    }
+
+                    // Render item hints inline as the card's subtitle/description
+                    // Avoid `:not(:empty)` for compatibility with the PDF renderer
+                    > span.xforms-hint {
+                        display    : block;
+                        grid-column: 2;
+                        width      : auto;
+                        clear      : none;
+                        margin-top : 0.1rem;
+                        font-size  : smaller;
+                        font-weight: normal;
+                        line-height: 1.35;
+                        color      : var(--orbeon-hint-color);
+                    }
+
+                    > span.xforms-hint:empty {
+                        display: none;
+                    }
+                }
+
+                .xforms-deselected > label.radio:not(:has(> input:disabled)):hover,
+                .xforms-deselected > label.checkbox:not(:has(> input:disabled)):hover {
+                    border-color    : var(--orbeon-focus-border-color);
+                    background-color: var(--orbeon-add-on-background-color);
+                }
+
+                // Keep border-width, padding, and font-weight unchanged on selection so cards never jump
+                .xforms-selected > label.radio,
+                .xforms-selected > label.checkbox,
+                label.radio:has(> input:checked),
+                label.checkbox:has(> input:checked) {
+                    border-color    : var(--orbeon-focus-border-color);
+                    box-shadow      : inset 0 0 0 1px var(--orbeon-focus-border-color);
+                    background-color: color-mix(in srgb, var(--orbeon-button-primary-background-color) 8%, var(--orbeon-control-background-color));
+
+                    @media (forced-colors: active) {
+                        border-color  : Highlight;
+                        outline       : 2px solid Highlight;
+                        outline-offset: -2px;
+                    }
+                }
+
+                label.radio:has(> input:focus-visible),
+                label.checkbox:has(> input:focus-visible) {
+                    outline       : 2px solid var(--orbeon-focus-border-color);
+                    outline-offset: 2px;
+                    box-shadow    : var(--orbeon-focus-ring);
+                }
+
+                label.radio:has(> input:disabled),
+                label.checkbox:has(> input:disabled) {
+                    cursor : not-allowed;
+                    opacity: 0.65;
+                }
+            }
+
+            &.xforms-static {
+                @media screen {
+                    .xforms-selected,
+                    .xforms-deselected {
+                        box-sizing      : border-box;
+                        align-items     : flex-start;
+                        column-gap      : 0.65rem;
+                        padding         : 0.65rem 0.85rem;
+                        border          : 1px solid var(--orbeon-control-border-color);
+                        border-radius   : var(--orbeon-control-border-radius);
+                        background-color: var(--orbeon-control-background-color);
+                        color           : var(--orbeon-control-color);
+
+                        > span.radio,
+                        > span.checkbox {
+                            display       : flex;
+                            flex-direction: column;
+                            row-gap       : 0.15rem;
+                            flex          : 1;
+                            min-width     : 0;
+                            padding-left  : 0;
+
+                            > span:first-child {
+                                font-weight  : 600;
+                                line-height  : 1.35;
+                                border-bottom: none;
+                            }
+
+                            > span.xforms-hint {
+                                display    : block;
+                                width      : auto;
+                                clear      : none;
+                                font-size  : smaller;
+                                font-weight: normal;
+                                line-height: 1.35;
+                                color      : var(--orbeon-hint-color);
+                            }
+
+                            > span.xforms-hint:empty {
+                                display: none;
+                            }
+                        }
+                    }
+
+                    .xforms-selected {
+                        border-color    : var(--orbeon-focus-border-color);
+                        box-shadow      : inset 0 0 0 1px var(--orbeon-focus-border-color);
+                        background-color: color-mix(in srgb, var(--orbeon-button-primary-background-color) 8%, var(--orbeon-control-background-color));
+
+                        @media (forced-colors: active) {
+                            border-color  : Highlight;
+                            outline       : 2px solid Highlight;
+                            outline-offset: -2px;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Support horizontal multi-column card grid when `appearance="xxf:horizontal"` is also present
+        &.xforms-select1-appearance-xxforms-horizontal,
+        &.xforms-cards-select1-appearance-xxforms-horizontal,
+        &.xforms-select-appearance-xxforms-horizontal,
+        &.xforms-cards-select-appearance-xxforms-horizontal {
+            .xforms-select1-appearance-full,
+            .xforms-select-appearance-full {
+                .xforms-items {
+                    @media screen {
+                        grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+                    }
+                }
+            }
+        }
+
+        &.xforms-invalid.xforms-visited {
+            .xforms-select1-appearance-full:not(.xforms-static),
+            .xforms-select-appearance-full:not(.xforms-static) {
+                .xforms-deselected > label.radio,
+                .xforms-deselected > label.checkbox {
+                    border-color: var(--orbeon-invalid-control-border-color);
+                }
+            }
+        }
+
+        @media print {
+            .xforms-select1-appearance-full,
+            .xforms-select-appearance-full {
+                .xforms-items {
+                    display: block;
+                    float  : none;
+                    clear  : none;
+                    width  : 100%;
+                }
+
+                .xforms-selected,
+                .xforms-deselected {
+                    display            : block;
+                    float              : none;
+                    clear              : none;
+                    box-sizing         : border-box;
+                    width              : 100%;
+                    margin-bottom      : 6px;
+                    padding            : 6px 10px;
+                    border             : 1px solid var(--orbeon-control-border-color);
+                    border-radius      : var(--orbeon-control-border-radius);
+                    background-color   : var(--orbeon-control-background-color);
+                    background-position: 8px 9px !important;
+                }
+
+                .xforms-selected {
+                    border-color: var(--orbeon-focus-border-color);
+                }
+
+                label.radio,
+                label.checkbox,
+                span.radio,
+                span.checkbox {
+                    display     : block;
+                    padding-left: 20px;
+
+                    > span {
+                        display      : block;
+                        margin-left  : 0;
+                        font-weight  : 600;
+                        border-bottom: none;
+                    }
+
+                    > span.xforms-hint {
+                        display    : block;
+                        margin-top : 2px;
+                        font-size  : smaller;
+                        font-weight: normal;
+                        color      : var(--orbeon-hint-color);
+                    }
+
+                    > span.xforms-hint:empty {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+}

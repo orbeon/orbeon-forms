@@ -197,6 +197,9 @@
         +fr:autosize-textarea
         +fr:tinymce
         +fr:box-select
+        +fr:segmented-select1
+        +fr:cards-select1
+        +fr:cards-select
         +fr:checkbox-input
         +fr:switch-input
         +fr:databound-select1
@@ -290,6 +293,9 @@
         +fr:autosize-textarea
         +fr:tinymce
         +fr:box-select
+        +fr:segmented-select1
+        +fr:cards-select1
+        +fr:cards-select
         +fr:checkbox-input
         +fr:switch-input
         +fr:databound-select1

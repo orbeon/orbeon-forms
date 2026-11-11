@@ -297,6 +297,9 @@
         fr:dropdown-month-year
         fr:fields-date
         fr:box-select
+        fr:segmented-select1
+        fr:cards-select1
+        fr:cards-select
         fr:character-counter
         fr:content-filter
         fr:clipboard-copy

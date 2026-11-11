@@ -1,0 +1,187 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+
+    .xbl-fr-segmented-select1 {
+
+        .xforms-select1-appearance-full {
+
+            .xforms-items {
+                @media screen {
+                    display         : inline-flex;
+                    flex-direction  : row;
+                    flex-wrap       : wrap;
+                    align-items     : stretch;
+                    gap             : 0.2rem;
+                    padding         : 0.2rem;
+                    max-width       : 100%;
+                    box-sizing      : border-box;
+                    border          : 1px solid var(--orbeon-control-border-color);
+                    border-radius   : var(--orbeon-control-border-radius);
+                    background-color: var(--orbeon-add-on-background-color);
+                }
+            }
+
+            .xforms-selected,
+            .xforms-deselected {
+                @media screen {
+                    display   : inline-flex;
+                    min-height: 0;
+
+                    &::before {
+                        display: none;
+                        content: none;
+                    }
+                }
+            }
+
+            label.radio,
+            span.radio {
+                position        : relative;
+                box-sizing      : border-box;
+                display         : inline-flex;
+                align-items     : center;
+                justify-content : center;
+                column-gap      : 0.35rem;
+                width           : auto;
+                min-block-size  : ~"calc(var(--orbeon-control-height) - 6px)";
+                margin          : 0;
+                padding         : 0.25rem 0.75rem;
+                border          : 1px solid transparent;
+                border-radius   : ~"calc(var(--orbeon-control-border-radius) - 1px)";
+                background-color: transparent;
+                color           : var(--orbeon-control-color);
+                font-weight     : 500;
+                line-height     : 1.25;
+                cursor          : pointer;
+                user-select     : none;
+                transition      : background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                  border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                  color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                  box-shadow var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+                @media (pointer: coarse) {
+                    min-inline-size: 44px;
+                    min-block-size : 44px;
+                }
+
+                > input[type="radio"] {
+                    position   : absolute;
+                    clip-path  : inset(50%);
+                    overflow   : hidden;
+                    inline-size: 1px;
+                    block-size : 1px;
+                    width      : 1px;
+                    height     : 1px;
+                    margin     : -1px;
+                    padding    : 0;
+                    border     : 0;
+                    white-space: nowrap;
+                }
+            }
+
+            span.radio {
+                cursor: default;
+            }
+
+            .xforms-deselected > label.radio:not(:has(> input[type="radio"]:disabled)):hover {
+                background-color: var(--orbeon-control-background-color);
+                border-color    : var(--orbeon-control-border-color);
+            }
+
+            // Keep border-width, padding, and font-weight unchanged on selection so segments never shift layout
+            .xforms-selected > label.radio,
+            .xforms-selected > span.radio,
+            label.radio:has(> input[type="radio"]:checked) {
+                background-color: var(--orbeon-button-primary-background-color);
+                border-color    : var(--orbeon-button-primary-background-color);
+                color           : var(--orbeon-button-primary-color);
+                box-shadow      : inset 0 0 0 1px var(--orbeon-button-primary-background-color),
+                                  0 1px 2px rgba(0, 0, 0, 0.12);
+
+                @media (forced-colors: active) {
+                    background-color   : Highlight;
+                    border-color       : Highlight;
+                    color              : HighlightText;
+                    outline            : 2px solid Highlight;
+                    outline-offset     : -2px;
+                    forced-color-adjust: none;
+                }
+            }
+
+            label.radio:has(> input[type="radio"]:focus-visible) {
+                outline       : 2px solid var(--orbeon-focus-border-color);
+                outline-offset: 1px;
+                box-shadow    : var(--orbeon-focus-ring);
+                z-index       : 1;
+            }
+
+            label.radio:has(> input[type="radio"]:disabled) {
+                cursor : not-allowed;
+                opacity: 0.65;
+            }
+        }
+
+        &.xforms-invalid.xforms-visited {
+            .xforms-select1-appearance-full .xforms-items {
+                border-color: var(--orbeon-invalid-control-border-color);
+            }
+        }
+
+        @media print {
+            .xforms-select1-appearance-full {
+                .xforms-items {
+                    display         : inline-block;
+                    float           : none;
+                    clear           : none;
+                    padding         : 2px;
+                    border          : 1px solid var(--orbeon-control-border-color);
+                    border-radius   : var(--orbeon-control-border-radius);
+                    background-color: var(--orbeon-add-on-background-color);
+                }
+
+                .xforms-selected,
+                .xforms-deselected {
+                    display         : inline-block;
+                    float           : none;
+                    clear           : none;
+                    margin-right    : 2px;
+                    background-image: none !important;
+                }
+
+                label.radio,
+                span.radio {
+                    display: inline-block;
+                    padding: 2px 8px;
+                    margin : 0;
+
+                    > span {
+                        display    : inline;
+                        margin-left: 0;
+                    }
+                }
+
+                .xforms-selected > label.radio,
+                .xforms-selected > span.radio {
+                    background-color          : var(--orbeon-button-primary-background-color) !important;
+                    border-color              : var(--orbeon-button-primary-background-color) !important;
+                    color                     : var(--orbeon-button-primary-color) !important;
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust        : exact;
+                }
+            }
+        }
+    }
+}

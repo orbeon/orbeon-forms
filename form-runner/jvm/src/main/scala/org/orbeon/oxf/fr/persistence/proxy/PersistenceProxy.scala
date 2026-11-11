@@ -576,27 +576,29 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     val existingFormOrDataHeaders =
       responseHeadersOpt.map(ResponseHeaders.toHeaders).getOrElse(Nil)
 
-    val bodyContentOpt =
-      bodyContent(
-        request          = request,
-        isDataXmlRequest = isDataXmlRequest,
-        isFormBuilder    = isFormBuilder,
-        appForm          = appForm,
-        encrypt          = formOrData match {
-          case FormOrData.Form                  => false // don't encrypt form definitions
-          case FormOrData.Data if isFormBuilder => false // don't encrypt Form Builder form data
-          case FormOrData.Data                  => true
-        }
-      )
-
     if (
       request.getMethod == HttpMethod.PUT &&
       isAttachment &&
       responseHeadersOpt.isDefined
     ) {
+      // Drain the request body before returning so HTTP/2 clients don't stall on flow control or receive RST_STREAM
+      IOUtils.copyStreamAndClose(request.getInputStream, OutputStream.nullOutputStream())
       // Don't create a duplicate if the attachment already exists
       response.setStatus(StatusCode.NoContent)
     } else {
+
+      val bodyContentOpt =
+        bodyContent(
+          request          = request,
+          isDataXmlRequest = isDataXmlRequest,
+          isFormBuilder    = isFormBuilder,
+          appForm          = appForm,
+          encrypt          = formOrData match {
+            case FormOrData.Form                  => false // don't encrypt form definitions
+            case FormOrData.Data if isFormBuilder => false // don't encrypt Form Builder form data
+            case FormOrData.Data                  => true
+          }
+        )
 
       def establishConnection(bodyContent: Option[StreamedContent]): ConnectionResult = {
         val passSingletonHeader = isDataXmlRequest && request.getMethod == HttpMethod.PUT

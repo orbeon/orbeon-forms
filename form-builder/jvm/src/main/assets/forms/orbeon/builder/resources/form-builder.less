@@ -762,7 +762,7 @@ body.orbeon {
     }
 
     .fr-section-container.fb-dnd-drop-into,
-    .fb-action-iteration.fb-dnd-drop-into > .fb-action-row-content-outer > .fb-action-row-content {
+    .fb-action-step-iteration.fb-dnd-drop-into > .fb-action-step-row-content-outer > .fb-action-step-row-content {
         outline: 1px dashed var(--orbeon-focus-border-color);
         outline-offset: -1px;
     }
@@ -2499,7 +2499,7 @@ body.orbeon {
             display: none; // hide extra blank repeat spans so they don't contribute as flex items
         }
 
-        .fb-service-call-request-actions {
+        .fb-service-call-parameters {
             clear: both;
             padding-top: 5px;
             margin-left: 20px;
@@ -2514,13 +2514,13 @@ body.orbeon {
                     flex: 1 1 auto;
                     min-width: 0;
 
-                    .fb-service-call-param-col {
+                    .fb-service-call-parameter-column {
                         flex: 1 1 0;
                         min-width: 0;
                         padding-right: 10px;
                         box-sizing: border-box;
 
-                        &.fb-service-call-param-col-type {
+                        &.fb-service-call-parameter-column-type {
                             flex: 0 0 140px;
                         }
 
@@ -2578,7 +2578,7 @@ body.orbeon {
         }
 
         // On the left, taking most of the space, all for the fields for one line
-        .fb-action-options {
+        .fb-action-step-options {
 
             input:not([type="checkbox"]):not([type="radio"]), textarea, select {
                 width: 100%;
@@ -2599,21 +2599,21 @@ body.orbeon {
             // `N-col-span-M` means that the option take M/N of the available space
             // E.g. `3-col-span-2` takes 2/3 of the available space for options
 
-            .fb-action-option-2-col-span-1,
-            .fb-action-option-3-col-span-1,
-            .fb-action-option-3-col-span-2 {
+            .fb-action-step-option-2-col-span-1,
+            .fb-action-step-option-3-col-span-1,
+            .fb-action-step-option-3-col-span-2 {
                 float: left;
                 margin: 0;
                 padding-right: 10px;
                 box-sizing: border-box;
             }
 
-            .fb-action-option-2-col-span-1 { width: 50%; }
-            .fb-action-option-3-col-span-1 { width: 33.333%; }
-            .fb-action-option-3-col-span-2 { width: 66.666%; }
+            .fb-action-step-option-2-col-span-1 { width: 50%; }
+            .fb-action-step-option-3-col-span-1 { width: 33.333%; }
+            .fb-action-step-option-3-col-span-2 { width: 66.666%; }
 
             // Wider dropdown to accommodate group labels
-            .fb-request-param-or-header-select { min-width: 200px }
+            .fb-parameter-or-header-select { min-width: 200px }
 
             // Copied from grid.less, as we are not in a grid
             // https://github.com/orbeon/orbeon-forms/issues/6893
@@ -2627,21 +2627,21 @@ body.orbeon {
             }
         }
 
-        .fb-action-repeat,
+        .fb-action-step-repeat,
         .xbl-fr-dnd-repeat {
             display: block;
             width: 100%;
         }
 
         // A reorderable line
-        .fb-action-iteration {
+        .fb-action-step-iteration {
             display: flex;
             width: 100%;
             justify-content: flex-start;
             align-items: flex-start;
             margin-bottom: 5px;
 
-            .fb-action-row-spacers {
+            .fb-action-step-row-spacers {
                 flex-grow: 0;
                 pointer-events: none;
 
@@ -2658,40 +2658,40 @@ body.orbeon {
                 }
             }
 
-            .fb-action-row-content-outer {
+            .fb-action-step-row-content-outer {
                 width: 100%;
                 flex-grow: 1;
                 min-width: 0;
             }
 
-            .fb-action-row-content {
+            .fb-action-step-row-content {
                 padding: 3px;
             }
 
-            .fb-action-row-content-start-row > .fb-action-row-content {
+            .fb-action-step-row-content-start-row > .fb-action-step-row-content {
                 border-top-left-radius: 5px;
                 border-top-right-radius: 5px;
             }
 
-            .fb-action-row-content-end-row > .fb-action-row-content {
+            .fb-action-step-row-content-end-row > .fb-action-step-row-content {
                 border-bottom-left-radius: 5px;
                 border-bottom-right-radius: 5px;
             }
 
-            .fb-action-row-content-indent-1 > .fb-action-row-content, .fb-indent-spacer-position-2, .fb-action-row-content-indent-2 {
+            .fb-action-step-row-content-indent-1 > .fb-action-step-row-content, .fb-indent-spacer-position-2, .fb-action-step-row-content-indent-2 {
                 background-color: #ededed;
             }
 
-            .fb-action-row-content-indent-2 > .fb-action-row-content, .fb-indent-spacer-position-3, .fb-action-row-content-indent-3 {
+            .fb-action-step-row-content-indent-2 > .fb-action-step-row-content, .fb-indent-spacer-position-3, .fb-action-step-row-content-indent-3 {
                 background-color: #dfdfdf;
             }
 
-            .fb-action-row-content-indent-3 > .fb-action-row-content, .fb-indent-spacer-position-4, .fb-action-row-content-indent-4 {
+            .fb-action-step-row-content-indent-3 > .fb-action-step-row-content, .fb-indent-spacer-position-4, .fb-action-step-row-content-indent-4 {
                 background-color: #d1d1d1;
             }
 
             // On the right, the buttons to reorder, remove, and add rows
-            .fb-action-buttons {
+            .fb-action-step-buttons {
                 flex-grow: 0;
                 flex-shrink: 0;
                 white-space: nowrap;
@@ -2705,7 +2705,7 @@ body.orbeon {
                 }
             }
 
-            .fb-action-options {
+            .fb-action-step-options {
                 display: block;
                 width: 100%;
                 min-width: 0;
@@ -2717,19 +2717,19 @@ body.orbeon {
             }
         }
 
-        .fb-action-at-group {
+        .fb-action-step-at-group {
             margin-top: 4px;
 
-            .fb-action-at-repeat {
+            .fb-action-step-at-repeat {
                 display: block;
 
-                .fb-action-at-item {
+                .fb-action-step-at-item {
                     display: flex;
                     align-items: center;
                     gap: 4px;
                     margin-bottom: 2px;
 
-                    .fb-action-at-type-select {
+                    .fb-action-step-at-type-select {
                         flex: 1 1 auto;
                         min-width: 0;
                         select {
@@ -2737,7 +2737,7 @@ body.orbeon {
                         }
                     }
 
-                    .fb-action-at-index-input {
+                    .fb-action-step-at-index-input {
                         flex: 0 0 50px;
                         width: 50px;
                         input {
@@ -2770,7 +2770,7 @@ body.orbeon {
                 gap: 8px;
                 padding-bottom: 4px;
 
-                .fb-copy-content-map-col {
+                .fb-copy-content-map-column {
                     flex: 1 1 0;
                     min-width: 0;
 
@@ -2793,7 +2793,7 @@ body.orbeon {
             }
         }
 
-        .fb-action-xpath {
+        .fb-action-step-xpath {
 
             &> textarea {
                 //width: 100%;
@@ -2805,7 +2805,7 @@ body.orbeon {
             cursor: pointer;
         }
 
-        .fb-action-options {
+        .fb-action-step-options {
             .select2-container {
                 display: block;
             }
@@ -2813,17 +2813,19 @@ body.orbeon {
     }
 
     .fb-action-dialog,
-    .fb-action-iteration,
-    .fb-action-repeat,
+    .fb-action-step-iteration,
+    .fb-action-step-repeat,
     .xbl-fr-dnd-repeat {
 
         // Hide buttons while dragging as they get moved to the left (which maybe could be fixed?)
         .gu-mirror {
+            .fb-action-step-buttons,
             .fb-action-buttons {
                 display: none;
             }
         }
 
+        .fb-action-step-grab,
         .fb-action-grab {
             display: inline-block;
             cursor: grab;
@@ -2837,6 +2839,7 @@ body.orbeon {
             }
         }
 
+        .xforms-dnd-moves .fb-action-step-grab,
         .xforms-dnd-moves .fb-action-grab {
             cursor: grab;
             opacity: 0.5;

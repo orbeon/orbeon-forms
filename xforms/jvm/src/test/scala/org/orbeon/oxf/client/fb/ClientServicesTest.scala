@@ -65,15 +65,15 @@ trait ClientServicesTest extends FormBuilderOps with XFormsOps {
 
           // Fill action dialog
           _ <- clickOn(cssSelector("#fb-add-action button"))
-          _ <- textField(cssSelector("#fb-action-grid≡fb-binding-name-input input")).ensuring(_.isDisplayed).value = "my-action"
+          _ <- textField(cssSelector("#fb-action-grid≡fb-action-name-input input")).ensuring(_.isDisplayed).value = "my-action"
           _ <- singleSel(cssSelector("#fb-action-grid≡fb-action-react-to select")).selectByVisibleText("Form Load")
           _ <- singleSel(cssSelector("#fb-action-grid≡fb-bindings-submission-select select")).selectByVisibleText("my-service")
           _ <- clickOn(cssSelector("#fb-bindings-itemset-repeat≡fr-grid-add a"))
           _ <- singleSel(cssSelector("#fb-bindings-itemset-repeat≡fb-actions-control⊙1 select")).ensuring(_.isDisplayed).selectByVisibleText("(my-dropdown)")
-          _ <- textField(cssSelector("#fb-bindings-itemset-repeat≡fb-actions-items⊙1 input")).ensuring(_.isDisplayed).value = "/response/row[lang = $fr-lang]"
-          _ <- textField(cssSelector("#fb-bindings-itemset-repeat≡fb-actions-label⊙1 input")).value = "label"
-          _ <- textField(cssSelector("#fb-bindings-itemset-repeat≡fb-actions-value⊙1 input")).value = "value"
-          _ <- clickOn(cssSelector("#fb-actions-save button").element.ensuring(_.isEnabled))
+          _ <- textField(cssSelector("#fb-bindings-itemset-repeat≡fb-action-step-items⊙1 input")).ensuring(_.isDisplayed).value = "/response/row[lang = $fr-lang]"
+          _ <- textField(cssSelector("#fb-bindings-itemset-repeat≡fb-action-step-label⊙1 input")).value = "label"
+          _ <- textField(cssSelector("#fb-bindings-itemset-repeat≡fb-action-step-value⊙1 input")).value = "value"
+          _ <- clickOn(cssSelector("#fb-action-save button").element.ensuring(_.isEnabled))
 
           // Add French as a language
           _ <- clickOn(cssSelector("#fb-add-language a"))

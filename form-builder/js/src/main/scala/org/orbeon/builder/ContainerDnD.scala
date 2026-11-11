@@ -34,13 +34,13 @@ object ContainerDnD {
   private val OutlineAutoScrollEdgePx  = 36.0
   private val OutlineAutoScrollStepPx  = 8.0
   private val OutlineIndentStepPx      = 14.0
-  private val ActionIndentStepPx       = 18.0
+  private val ActionStepIndentStepPx   = 18.0
 
   private sealed trait DragSource
   private object DragSource {
-    case class Canvas(block: Block)  extends DragSource
-    case class Outline(row: TreeRow) extends DragSource
-    case class Action(row: TreeRow)  extends DragSource
+    case class Canvas(block: Block)     extends DragSource
+    case class Outline(row: TreeRow)    extends DragSource
+    case class ActionStep(row: TreeRow) extends DragSource
   }
 
   private case class DropTarget(
@@ -125,23 +125,23 @@ object ContainerDnD {
             else
               None
 
-          val actionSourceOpt =
+          val actionStepSourceOpt =
             if (canvasSourceOpt.isEmpty && outlineSourceOpt.isEmpty)
               event.targetOpt
-                .flatMap(_.closestOpt(".fb-action-dialog .fb-action-grab, #fb-action-dialog .fb-action-grab"))
+                .flatMap(_.closestOpt(".fb-action-dialog .fb-action-step-grab, #fb-action-dialog .fb-action-step-grab"))
                 .flatMap { grabEl =>
                   event.preventDefault()
-                  val rowElOpt = grabEl.closestOpt(".fb-action-iteration")
-                  val allRows  = actionRowsInDialog()
+                  val rowElOpt = grabEl.closestOpt(".fb-action-step-iteration")
+                  val allRows  = actionStepRowsInDialog()
                   rowElOpt.flatMap(rowEl => allRows.find(_.el == rowEl)).filter { _ =>
                     allRows.length > 1
                   }
                 }
-                .map(DragSource.Action.apply)
+                .map(DragSource.ActionStep.apply)
             else
               None
 
-          canvasSourceOpt.orElse(outlineSourceOpt).orElse(actionSourceOpt).foreach { source =>
+          canvasSourceOpt.orElse(outlineSourceOpt).orElse(actionStepSourceOpt).foreach { source =>
             dragSourceOpt = Some(source)
             startClientX  = event.clientX
             startClientY  = event.clientY
@@ -327,10 +327,10 @@ object ContainerDnD {
     }
   }
 
-  private def actionRowsInDialog(): List[TreeRow] = {
+  private def actionStepRowsInDialog(): List[TreeRow] = {
     val rawElems =
       dom.document
-        .querySelectorAllT(".fb-action-dialog .fb-action-iteration, #fb-action-dialog .fb-action-iteration")
+        .querySelectorAllT(".fb-action-dialog .fb-action-step-iteration, #fb-action-dialog .fb-action-step-iteration")
         .iterator
         .filter(el => el.isVisible && ! FormRunnerUtils.isViewMode(el))
         .toList
@@ -358,8 +358,8 @@ object ContainerDnD {
       val isContainer =
         el.getAttribute("data-orbeon-can-move-into") == "true" ||
         el.getAttribute("data-orbeon-is-container") == "true" ||
-        Option(el.getAttribute("data-orbeon-action-type")).exists(t => t == "if" || t == "data-iterate") ||
-        el.querySelectorOpt(".fb-action-options select option[value='if']:checked, .fb-action-options select option[value='data-iterate']:checked").isDefined
+        Option(el.getAttribute("data-orbeon-step-type")).exists(t => t == "if" || t == "data-iterate") ||
+        el.querySelectorOpt(".fb-action-step-options select option[value='if']:checked, .fb-action-step-options select option[value='data-iterate']:checked").isDefined
 
       val parentIdOpt =
         if (level > 1)
@@ -567,8 +567,8 @@ object ContainerDnD {
     (iconClass, labelText)
   }
 
-  private def actionGhostLabel(rowEl: html.Element): (String, String) = {
-    val (iconClass, fallbackLabel) = Option(rowEl.getAttribute("data-orbeon-action-type")) match {
+  private def actionStepGhostLabel(rowEl: html.Element): (String, String) = {
+    val (iconClass, fallbackLabel) = Option(rowEl.getAttribute("data-orbeon-step-type")) match {
       case Some("service-call")            => ("fa-exchange", "Call Service")
       case Some("if")                      => ("fa-code-fork", "Condition")
       case Some("data-iterate")           => ("fa-repeat", "Repeat for Each Item")
@@ -583,11 +583,11 @@ object ContainerDnD {
       case Some("repeat-add-iteration")    => ("fa-plus-circle", "Add Iteration")
       case Some("repeat-remove-iteration") => ("fa-minus-circle", "Remove Iteration")
       case Some("repeat-clear")            => ("fa-trash-o", "Clear Iterations")
-      case _                               => ("fa-bolt", "Action")
+      case _                               => ("fa-bolt", "Step")
     }
 
     val labelText =
-      rowEl.querySelectorOpt(".fb-action-options select option:checked")
+      rowEl.querySelectorOpt(".fb-action-step-options select option:checked")
         .flatMap(el => Option(el.textContent))
         .orElse(rowEl.querySelectorOpt(".select2-selection__rendered").flatMap(el => Option(el.textContent)))
         .orElse(rowEl.querySelectorOpt(".xforms-select1-entry-selected").flatMap(el => Option(el.textContent)))
@@ -628,13 +628,13 @@ object ContainerDnD {
             false
           }
 
-        case DragSource.Action(sourceRow) =>
-          val allRows      = actionRowsInDialog()
+        case DragSource.ActionStep(sourceRow) =>
+          val allRows      = actionStepRowsInDialog()
           val refreshedRow = allRows.find(_.id == sourceRow.id).getOrElse(sourceRow)
           treeDropTargets  = computeTreeDropTargets(
             draggedRow     = refreshedRow,
             allRows        = allRows,
-            indentStepPx   = ActionIndentStepPx,
+            indentStepPx   = ActionStepIndentStepPx,
             canBeTopLevel  = true,
             canLeaveParent = true
           )
@@ -660,7 +660,7 @@ object ContainerDnD {
 
       val targetDialogOpt =
         source match {
-          case DragSource.Action(_) =>
+          case DragSource.ActionStep(_) =>
             dom.document.querySelectorOpt(".fb-action-dialog, #fb-action-dialog")
           case _ =>
             None
@@ -681,9 +681,9 @@ object ContainerDnD {
             dimmedTreeRows.foreach(_.classList.add("fb-dnd-source"))
             outlineGhostLabel(sourceRow.el)
 
-          case DragSource.Action(sourceRow) =>
+          case DragSource.ActionStep(sourceRow) =>
             dimmedTreeRows.foreach(_.classList.add("fb-dnd-source"))
-            actionGhostLabel(sourceRow.el)
+            actionStepGhostLabel(sourceRow.el)
         }
 
       val ghostEl        = dom.document.createDivElement
@@ -744,7 +744,7 @@ object ContainerDnD {
           }
         }
 
-      case Some(DragSource.Outline(_) | DragSource.Action(_)) =>
+      case Some(DragSource.Outline(_) | DragSource.ActionStep(_)) =>
         val pointerDocX = clientX + dom.window.pageXOffset
         val pointerDocY = clientY + dom.window.pageYOffset
 
@@ -854,7 +854,7 @@ object ContainerDnD {
           }
         )
 
-      case Some(DragSource.Action(sourceRow)) =>
+      case Some(DragSource.ActionStep(sourceRow)) =>
         autoScrollContainer(
           scrollElemOpt = dom.document.querySelectorOpt(".fb-action-dialog .fb-dialog-body, #fb-action-dialog .fb-dialog-body"),
           clientY       = clientY,
@@ -863,8 +863,8 @@ object ContainerDnD {
           onScrolled    = () => {
             treeDropTargets = computeTreeDropTargets(
               draggedRow     = sourceRow,
-              allRows        = actionRowsInDialog(),
-              indentStepPx   = ActionIndentStepPx,
+              allRows        = actionStepRowsInDialog(),
+              indentStepPx   = ActionStepIndentStepPx,
               canBeTopLevel  = true,
               canLeaveParent = true
             )
@@ -942,13 +942,13 @@ object ContainerDnD {
             )
           }
 
-        case Some(DragSource.Action(sourceRow)) =>
+        case Some(DragSource.ActionStep(sourceRow)) =>
           treeDropTargetOpt.foreach { target =>
             val intoId  = target.intoContainerOpt.fold("")(_.id)
             val afterId = target.afterIdOpt.getOrElse("")
             AjaxClient.fireEvent(
               AjaxEvent(
-                eventName  = "fb-action-move",
+                eventName  = "fb-action-step-move",
                 targetId   = "fb-action-dialog",
                 properties = Map[String, js.Any](
                   "source-index" -> sourceRow.id,
@@ -988,7 +988,7 @@ object ContainerDnD {
     dragSourceOpt.foreach {
       case DragSource.Canvas(sourceBlock) => sourceBlock.el.classList.remove("fb-dnd-source")
       case DragSource.Outline(_)          =>
-      case DragSource.Action(_)           =>
+      case DragSource.ActionStep(_)       =>
     }
     dimmedTreeRows.foreach(_.classList.remove("fb-dnd-source"))
     highlightedSectionOpt.foreach { sec =>

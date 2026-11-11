@@ -1424,7 +1424,7 @@
         </test>
     </dialog-database-services>
     <dialog-actions>
-        <label>Acties-editor</label>
+        <label>Actie-editor</label>
         <service-name>
             <label>Actie naam</label>
             <hint>Kies een unieke naam voor deze actie</hint>
@@ -1620,6 +1620,9 @@
             <always>Always</always>
             <new-only>In the "new" mode only</new-only>
         </event-mode>
+        <steps>
+            <label>Steps</label>
+        </steps>
 
     </dialog-actions>
     <dialog-test>

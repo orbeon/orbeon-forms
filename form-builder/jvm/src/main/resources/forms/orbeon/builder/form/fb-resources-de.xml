@@ -1393,7 +1393,7 @@
         </test>
     </dialog-database-services>
     <dialog-actions>
-        <label>Aktionen-Editor</label>
+        <label>Aktions-Editor</label>
         <service-name>
             <label>Name der Aktion</label>
             <hint>Wähle einen einzigartigen Namen für diese Aktion</hint>
@@ -1589,6 +1589,9 @@
             <always>Always</always>
             <new-only>In the "new" mode only</new-only>
         </event-mode>
+        <steps>
+            <label>Steps</label>
+        </steps>
 
     </dialog-actions>
     <dialog-test>

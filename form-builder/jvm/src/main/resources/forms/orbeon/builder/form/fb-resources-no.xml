@@ -1620,6 +1620,9 @@
             <always>Always</always>
             <new-only>In the "new" mode only</new-only>
         </event-mode>
+        <steps>
+            <label>Steps</label>
+        </steps>
 
     </dialog-actions>
     <dialog-test>

@@ -735,6 +735,7 @@
                     <type label="Tijd">time</type>
                     <type label="Datum en tijd">dateTime</type>
                     <type label="Duur">duration</type>
+                    <type label="Duur">dayTimeDuration</type>
                     <type label="Jaar en maand">gYearMonth</type>
                     <type label="Maand en dag">gMonthDay</type>
                     <type label="Jaar">gYear</type>

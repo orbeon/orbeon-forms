@@ -742,6 +742,7 @@
                     <type label="Ora">time</type>
                     <type label="Data e ora">dateTime</type>
                     <type label="Durata">duration</type>
+                    <type label="Durata">dayTimeDuration</type>
                     <type label="Anno e mese">gYearMonth</type>
                     <type label="Mese e giorno">gMonthDay</type>
                     <type label="Anno">gYear</type>

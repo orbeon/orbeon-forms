@@ -755,6 +755,7 @@
                     <type label="Kellonaika">time</type>
                     <type label="Päivämäärä ja kellonaika">dateTime</type>
                     <type label="Kesto">duration</type>
+                    <type label="Kesto">dayTimeDuration</type>
                     <type label="Vuosi ja kuukausi">gYearMonth</type>
                     <type label="Kuukausi ja päivä">gMonthDay</type>
                     <type label="Vuosi">gYear</type>

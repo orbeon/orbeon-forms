@@ -1,0 +1,624 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:DurationSupport="java:org.orbeon.xbl.DurationSupportJava">
+
+    <xbl:binding
+        id="fr-duration"
+        element="fr|duration, xf|input:xxf-type('xs:dayTimeDuration')"
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle allow-minimal-label-hint"
+        xxf:external-events="DOMActivate"
+        xxbl:label-for="fr-duration-elem"
+        xxbl:format="
+            DurationSupport:formatReadonly(
+                string(xxf:binding('fr-duration')),
+                string(fr:component-param-value('fields')),
+                fr:r('days-unit'),
+                fr:r('hours-unit'),
+                fr:r('minutes-unit'),
+                fr:r('seconds-unit')
+            )"
+    >
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Duration</display-name>
+            <display-name lang="fr">Durée</display-name>
+            <display-name lang="no">Varighet</display-name>
+            <display-name lang="ru">Длительность</display-name>
+            <display-name lang="it">Durata</display-name>
+            <display-name lang="de">Dauer</display-name>
+            <display-name lang="fi">Kesto</display-name>
+            <display-name lang="es">Duración</display-name>
+            <display-name lang="nl">Duur</display-name>
+            <display-name lang="pt">Duração</display-name>
+            <display-name lang="sv">Varaktighet</display-name>
+            <display-name lang="ar">المدة</display-name>
+            <display-name lang="pl">Czas trwania</display-name>
+            <display-name lang="ja">期間</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-hourglass-half</icon-class>
+            </icon>
+            <templates>
+                <bind type="xf:dayTimeDuration"/>
+                <view>
+                    <fr:duration id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:duration>
+                </view>
+            </templates>
+            <custom-settings>
+                <setting name="fields" type="xs:string" default="hours minutes"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-duration-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue
+                            ref="$c"
+                            value="(instance()/@*[name() = name($c)][xxf:non-blank()], $c/@default)[1]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <fields default="hours minutes"/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <fields>
+                                    <label>Units</label>
+                                    <days>Days</days>
+                                    <hours>Hours</hours>
+                                    <minutes>Minutes</minutes>
+                                    <seconds>Seconds</seconds>
+                                </fields>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <fields>
+                                    <label>Unités</label>
+                                    <days>Jours</days>
+                                    <hours>Heures</hours>
+                                    <minutes>Minutes</minutes>
+                                    <seconds>Secondes</seconds>
+                                </fields>
+                            </resource>
+                            <resource xml:lang="no">
+                                <fields>
+                                    <label>Enheter</label>
+                                    <days>Dager</days>
+                                    <hours>Timer</hours>
+                                    <minutes>Minutter</minutes>
+                                    <seconds>Sekunder</seconds>
+                                </fields>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <fields>
+                                    <label>Единицы</label>
+                                    <days>Дни</days>
+                                    <hours>Часы</hours>
+                                    <minutes>Минуты</minutes>
+                                    <seconds>Секунды</seconds>
+                                </fields>
+                            </resource>
+                            <resource xml:lang="it">
+                                <fields>
+                                    <label>Unità</label>
+                                    <days>Giorni</days>
+                                    <hours>Ore</hours>
+                                    <minutes>Minuti</minutes>
+                                    <seconds>Secondi</seconds>
+                                </fields>
+                            </resource>
+                            <resource xml:lang="de">
+                                <fields>
+                                    <label>Einheiten</label>
+                                    <days>Tage</days>
+                                    <hours>Stunden</hours>
+                                    <minutes>Minuten</minutes>
+                                    <seconds>Sekunden</seconds>
+                                </fields>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <fields>
+                                    <label>Yksiköt</label>
+                                    <days>Päivät</days>
+                                    <hours>Tunnit</hours>
+                                    <minutes>Minuutit</minutes>
+                                    <seconds>Sekunnit</seconds>
+                                </fields>
+                            </resource>
+                            <resource xml:lang="es">
+                                <fields>
+                                    <label>Unidades</label>
+                                    <days>Días</days>
+                                    <hours>Horas</hours>
+                                    <minutes>Minutos</minutes>
+                                    <seconds>Segundos</seconds>
+                                </fields>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <fields>
+                                    <label>Eenheden</label>
+                                    <days>Dagen</days>
+                                    <hours>Uren</hours>
+                                    <minutes>Minuten</minutes>
+                                    <seconds>Seconden</seconds>
+                                </fields>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <fields>
+                                    <label>Unidades</label>
+                                    <days>Dias</days>
+                                    <hours>Horas</hours>
+                                    <minutes>Minutos</minutes>
+                                    <seconds>Segundos</seconds>
+                                </fields>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <fields>
+                                    <label>Enheter</label>
+                                    <days>Dagar</days>
+                                    <hours>Timmar</hours>
+                                    <minutes>Minuter</minutes>
+                                    <seconds>Sekunder</seconds>
+                                </fields>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <fields>
+                                    <label>الوحدات</label>
+                                    <days>أيام</days>
+                                    <hours>ساعات</hours>
+                                    <minutes>دقائق</minutes>
+                                    <seconds>ثوانٍ</seconds>
+                                </fields>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <fields>
+                                    <label>Jednostki</label>
+                                    <days>Dni</days>
+                                    <hours>Godziny</hours>
+                                    <minutes>Minuty</minutes>
+                                    <seconds>Sekundy</seconds>
+                                </fields>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <fields>
+                                    <label>単位</label>
+                                    <days>日</days>
+                                    <hours>時間</hours>
+                                    <minutes>分</minutes>
+                                    <seconds>秒</seconds>
+                                </fields>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-duration-grid">
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:select ref="instance('local')/fields" appearance="full xxf:horizontal" id="fields-control">
+                                <xf:label ref="xxf:r('fields.label')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('fields.days')"/>
+                                    <xf:value>days</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('fields.hours')"/>
+                                    <xf:value>hours</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('fields.minutes')"/>
+                                    <xf:value>minutes</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('fields.seconds')"/>
+                                    <xf:value>seconds</xf:value>
+                                </xf:item>
+                            </xf:select>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-duration-action"
+                    event="xforms-value-changed"
+                    observer="fields-control">
+
+                    <xf:var name="binding"   value="event('xxf:binding')"/>
+                    <xf:var name="name"      value="name($binding)"/>
+                    <xf:var name="default"   value="$binding/@default/string()"/>
+                    <xf:var name="tokens"    value="xxf:split(string($binding))"/>
+                    <xf:var name="ordered"   value="string-join(('days', 'hours', 'minutes', 'seconds')[. = $tokens], ' ')"/>
+                    <xf:var name="new-value" value="if (xxf:non-blank($ordered) and $ordered != $default) then $ordered else ()"/>
+
+                    <xf:insert
+                        context="instance()"
+                        if="exists($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="empty($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/duration/duration.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model id="duration-model">
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
+                    <_>
+                        <resource xml:lang="en">
+                            <days-label>Days</days-label>
+                            <hours-label>Hours</hours-label>
+                            <minutes-label>Minutes</minutes-label>
+                            <seconds-label>Seconds</seconds-label>
+                            <days-unit>d</days-unit>
+                            <hours-unit>h</hours-unit>
+                            <minutes-unit>min</minutes-unit>
+                            <seconds-unit>sec</seconds-unit>
+                        </resource>
+                        <resource xml:lang="fr">
+                            <days-label>Jours</days-label>
+                            <hours-label>Heures</hours-label>
+                            <minutes-label>Minutes</minutes-label>
+                            <seconds-label>Secondes</seconds-label>
+                            <days-unit>j</days-unit>
+                            <hours-unit>h</hours-unit>
+                            <minutes-unit>min</minutes-unit>
+                            <seconds-unit>s</seconds-unit>
+                        </resource>
+                        <resource xml:lang="es">
+                            <days-label>Días</days-label>
+                            <hours-label>Horas</hours-label>
+                            <minutes-label>Minutos</minutes-label>
+                            <seconds-label>Segundos</seconds-label>
+                            <days-unit>d</days-unit>
+                            <hours-unit>h</hours-unit>
+                            <minutes-unit>min</minutes-unit>
+                            <seconds-unit>s</seconds-unit>
+                        </resource>
+                        <resource xml:lang="de">
+                            <days-label>Tage</days-label>
+                            <hours-label>Stunden</hours-label>
+                            <minutes-label>Minuten</minutes-label>
+                            <seconds-label>Sekunden</seconds-label>
+                            <days-unit>T</days-unit>
+                            <hours-unit>Std</hours-unit>
+                            <minutes-unit>Min</minutes-unit>
+                            <seconds-unit>Sek</seconds-unit>
+                        </resource>
+                        <resource xml:lang="it">
+                            <days-label>Giorni</days-label>
+                            <hours-label>Ore</hours-label>
+                            <minutes-label>Minuti</minutes-label>
+                            <seconds-label>Secondi</seconds-label>
+                            <days-unit>g</days-unit>
+                            <hours-unit>h</hours-unit>
+                            <minutes-unit>min</minutes-unit>
+                            <seconds-unit>s</seconds-unit>
+                        </resource>
+                        <resource xml:lang="nl">
+                            <days-label>Dagen</days-label>
+                            <hours-label>Uren</hours-label>
+                            <minutes-label>Minuten</minutes-label>
+                            <seconds-label>Seconden</seconds-label>
+                            <days-unit>d</days-unit>
+                            <hours-unit>u</hours-unit>
+                            <minutes-unit>min</minutes-unit>
+                            <seconds-unit>s</seconds-unit>
+                        </resource>
+                        <resource xml:lang="pt">
+                            <days-label>Dias</days-label>
+                            <hours-label>Horas</hours-label>
+                            <minutes-label>Minutos</minutes-label>
+                            <seconds-label>Segundos</seconds-label>
+                            <days-unit>d</days-unit>
+                            <hours-unit>h</hours-unit>
+                            <minutes-unit>min</minutes-unit>
+                            <seconds-unit>s</seconds-unit>
+                        </resource>
+                        <resource xml:lang="sv">
+                            <days-label>Dagar</days-label>
+                            <hours-label>Timmar</hours-label>
+                            <minutes-label>Minuter</minutes-label>
+                            <seconds-label>Sekunder</seconds-label>
+                            <days-unit>d</days-unit>
+                            <hours-unit>tim</hours-unit>
+                            <minutes-unit>min</minutes-unit>
+                            <seconds-unit>s</seconds-unit>
+                        </resource>
+                        <resource xml:lang="no">
+                            <days-label>Dager</days-label>
+                            <hours-label>Timer</hours-label>
+                            <minutes-label>Minutter</minutes-label>
+                            <seconds-label>Sekunder</seconds-label>
+                            <days-unit>d</days-unit>
+                            <hours-unit>t</hours-unit>
+                            <minutes-unit>min</minutes-unit>
+                            <seconds-unit>s</seconds-unit>
+                        </resource>
+                        <resource xml:lang="fi">
+                            <days-label>Päivät</days-label>
+                            <hours-label>Tunnit</hours-label>
+                            <minutes-label>Minuutit</minutes-label>
+                            <seconds-label>Sekunnit</seconds-label>
+                            <days-unit>pv</days-unit>
+                            <hours-unit>t</hours-unit>
+                            <minutes-unit>min</minutes-unit>
+                            <seconds-unit>s</seconds-unit>
+                        </resource>
+                        <resource xml:lang="da">
+                            <days-label>Dage</days-label>
+                            <hours-label>Timer</hours-label>
+                            <minutes-label>Minutter</minutes-label>
+                            <seconds-label>Sekunder</seconds-label>
+                            <days-unit>d</days-unit>
+                            <hours-unit>t</hours-unit>
+                            <minutes-unit>min</minutes-unit>
+                            <seconds-unit>s</seconds-unit>
+                        </resource>
+                        <resource xml:lang="ru">
+                            <days-label>Дни</days-label>
+                            <hours-label>Часы</hours-label>
+                            <minutes-label>Минуты</minutes-label>
+                            <seconds-label>Секунды</seconds-label>
+                            <days-unit>д</days-unit>
+                            <hours-unit>ч</hours-unit>
+                            <minutes-unit>мин</minutes-unit>
+                            <seconds-unit>с</seconds-unit>
+                        </resource>
+                        <resource xml:lang="pl">
+                            <days-label>Dni</days-label>
+                            <hours-label>Godziny</hours-label>
+                            <minutes-label>Minuty</minutes-label>
+                            <seconds-label>Sekundy</seconds-label>
+                            <days-unit>d</days-unit>
+                            <hours-unit>godz</hours-unit>
+                            <minutes-unit>min</minutes-unit>
+                            <seconds-unit>s</seconds-unit>
+                        </resource>
+                        <resource xml:lang="hu">
+                            <days-label>Nap</days-label>
+                            <hours-label>Óra</hours-label>
+                            <minutes-label>Perc</minutes-label>
+                            <seconds-label>Másodperc</seconds-label>
+                            <days-unit>n</days-unit>
+                            <hours-unit>ó</hours-unit>
+                            <minutes-unit>p</minutes-unit>
+                            <seconds-unit>mp</seconds-unit>
+                        </resource>
+                        <resource xml:lang="tr">
+                            <days-label>Gün</days-label>
+                            <hours-label>Saat</hours-label>
+                            <minutes-label>Dakika</minutes-label>
+                            <seconds-label>Saniye</seconds-label>
+                            <days-unit>g</days-unit>
+                            <hours-unit>sa</hours-unit>
+                            <minutes-unit>dk</minutes-unit>
+                            <seconds-unit>sn</seconds-unit>
+                        </resource>
+                        <resource xml:lang="ca">
+                            <days-label>Dies</days-label>
+                            <hours-label>Hores</hours-label>
+                            <minutes-label>Minuts</minutes-label>
+                            <seconds-label>Segons</seconds-label>
+                            <days-unit>d</days-unit>
+                            <hours-unit>h</hours-unit>
+                            <minutes-unit>min</minutes-unit>
+                            <seconds-unit>s</seconds-unit>
+                        </resource>
+                        <resource xml:lang="ar">
+                            <days-label>أيام</days-label>
+                            <hours-label>ساعات</hours-label>
+                            <minutes-label>دقائق</minutes-label>
+                            <seconds-label>ثوانٍ</seconds-label>
+                            <days-unit>ي</days-unit>
+                            <hours-unit>س</hours-unit>
+                            <minutes-unit>د</minutes-unit>
+                            <seconds-unit>ث</seconds-unit>
+                        </resource>
+                        <resource xml:lang="ja">
+                            <days-label>日</days-label>
+                            <hours-label>時間</hours-label>
+                            <minutes-label>分</minutes-label>
+                            <seconds-label>秒</seconds-label>
+                            <days-unit>日</days-unit>
+                            <hours-unit>時間</hours-unit>
+                            <minutes-unit>分</minutes-unit>
+                            <seconds-unit>秒</seconds-unit>
+                        </resource>
+                        <resource xml:lang="zh-Hans">
+                            <days-label>天</days-label>
+                            <hours-label>小时</hours-label>
+                            <minutes-label>分钟</minutes-label>
+                            <seconds-label>秒</seconds-label>
+                            <days-unit>天</days-unit>
+                            <hours-unit>时</hours-unit>
+                            <minutes-unit>分</minutes-unit>
+                            <seconds-unit>秒</seconds-unit>
+                        </resource>
+                        <resource xml:lang="zh-Hant">
+                            <days-label>天</days-label>
+                            <hours-label>小時</hours-label>
+                            <minutes-label>分鐘</minutes-label>
+                            <seconds-label>秒</seconds-label>
+                            <days-unit>天</days-unit>
+                            <hours-unit>時</hours-unit>
+                            <minutes-unit>分</minutes-unit>
+                            <seconds-unit>秒</seconds-unit>
+                        </resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:var name="binding"       value="xxf:binding('fr-duration')"/>
+            <xf:var name="raw-tokens"    value="xxf:split(fr:component-param-value('fields'))[. = ('days', 'hours', 'minutes', 'seconds')]"/>
+            <xf:var name="active-tokens" value="if (exists($raw-tokens)) then $raw-tokens else ('hours', 'minutes')"/>
+
+            <xf:group
+                id="fr-duration-elem"
+                ref="$binding"
+                class="fr-duration-container"
+                role="group"
+                data-fr-fields="{string-join($active-tokens, ' ')}">
+
+                <xh:span class="input-append fr-duration-field fr-duration-field-days{' xforms-hidden'[not($active-tokens = 'days')]}">
+                    <xh:input
+                        id="days-input"
+                        type="text"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        autocorrect="off"
+                        autocapitalize="none"
+                        spellcheck="false"
+                        class="fr-duration-input fr-duration-days"
+                        aria-label="{fr:r('days-label')}"
+                        placeholder="0"/>
+                    <xh:span class="add-on" aria-hidden="true">
+                        <xf:output value="fr:r('days-unit')"/>
+                    </xh:span>
+                </xh:span>
+
+                <xh:span class="input-append fr-duration-field fr-duration-field-hours{' xforms-hidden'[not($active-tokens = 'hours')]}">
+                    <xh:input
+                        id="hours-input"
+                        type="text"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        autocorrect="off"
+                        autocapitalize="none"
+                        spellcheck="false"
+                        class="fr-duration-input fr-duration-hours"
+                        aria-label="{fr:r('hours-label')}"
+                        placeholder="0"/>
+                    <xh:span class="add-on" aria-hidden="true">
+                        <xf:output value="fr:r('hours-unit')"/>
+                    </xh:span>
+                </xh:span>
+
+                <xh:span class="input-append fr-duration-field fr-duration-field-minutes{' xforms-hidden'[not($active-tokens = 'minutes')]}">
+                    <xh:input
+                        id="minutes-input"
+                        type="text"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        autocorrect="off"
+                        autocapitalize="none"
+                        spellcheck="false"
+                        class="fr-duration-input fr-duration-minutes"
+                        aria-label="{fr:r('minutes-label')}"
+                        placeholder="0"/>
+                    <xh:span class="add-on" aria-hidden="true">
+                        <xf:output value="fr:r('minutes-unit')"/>
+                    </xh:span>
+                </xh:span>
+
+                <xh:span class="input-append fr-duration-field fr-duration-field-seconds{' xforms-hidden'[not($active-tokens = 'seconds')]}">
+                    <xh:input
+                        id="seconds-input"
+                        type="text"
+                        inputmode="numeric"
+                        pattern="[0-9.]*"
+                        autocorrect="off"
+                        autocapitalize="none"
+                        spellcheck="false"
+                        class="fr-duration-input fr-duration-seconds"
+                        aria-label="{fr:r('seconds-label')}"
+                        placeholder="0"/>
+                    <xh:span class="add-on" aria-hidden="true">
+                        <xf:output value="fr:r('seconds-unit')"/>
+                    </xh:span>
+                </xh:span>
+
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+    <xbl:binding
+        id="fr-duration-output"
+        element="
+            fr|duration[fr|static-readonly = true],
+            fr|duration[fr|pdf-template = true],
+            xf|input:xxf-type('xs:dayTimeDuration')[fr|static-readonly = true],
+            xf|input:xxf-type('xs:dayTimeDuration')[fr|pdf-template = true]"
+        xxbl:mode="lhha binding value allow-minimal-label-hint"
+        xxbl:label-for="input"
+        xxbl:format="
+            DurationSupport:formatReadonly(
+                string(xxf:binding('fr-duration-output')),
+                string(fr:component-param-value('fields')),
+                fr:r('days-unit'),
+                fr:r('hours-unit'),
+                fr:r('minutes-unit'),
+                fr:r('seconds-unit')
+            )"
+    >
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/duration/duration.css"/>
+        </xbl:resources>
+        <xbl:implementation>
+            <xf:model id="duration-output-model">
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
+                    <_>
+                        <resource xml:lang="en"><days-unit>d</days-unit><hours-unit>h</hours-unit><minutes-unit>min</minutes-unit><seconds-unit>sec</seconds-unit></resource>
+                        <resource xml:lang="fr"><days-unit>j</days-unit><hours-unit>h</hours-unit><minutes-unit>min</minutes-unit><seconds-unit>s</seconds-unit></resource>
+                        <resource xml:lang="es"><days-unit>d</days-unit><hours-unit>h</hours-unit><minutes-unit>min</minutes-unit><seconds-unit>s</seconds-unit></resource>
+                        <resource xml:lang="de"><days-unit>T</days-unit><hours-unit>Std</hours-unit><minutes-unit>Min</minutes-unit><seconds-unit>Sek</seconds-unit></resource>
+                        <resource xml:lang="it"><days-unit>g</days-unit><hours-unit>h</hours-unit><minutes-unit>min</minutes-unit><seconds-unit>s</seconds-unit></resource>
+                        <resource xml:lang="nl"><days-unit>d</days-unit><hours-unit>u</hours-unit><minutes-unit>min</minutes-unit><seconds-unit>s</seconds-unit></resource>
+                        <resource xml:lang="pt"><days-unit>d</days-unit><hours-unit>h</hours-unit><minutes-unit>min</minutes-unit><seconds-unit>s</seconds-unit></resource>
+                        <resource xml:lang="sv"><days-unit>d</days-unit><hours-unit>tim</hours-unit><minutes-unit>min</minutes-unit><seconds-unit>s</seconds-unit></resource>
+                        <resource xml:lang="no"><days-unit>d</days-unit><hours-unit>t</hours-unit><minutes-unit>min</minutes-unit><seconds-unit>s</seconds-unit></resource>
+                        <resource xml:lang="fi"><days-unit>pv</days-unit><hours-unit>t</hours-unit><minutes-unit>min</minutes-unit><seconds-unit>s</seconds-unit></resource>
+                        <resource xml:lang="da"><days-unit>d</days-unit><hours-unit>t</hours-unit><minutes-unit>min</minutes-unit><seconds-unit>s</seconds-unit></resource>
+                        <resource xml:lang="ru"><days-unit>д</days-unit><hours-unit>ч</hours-unit><minutes-unit>мин</minutes-unit><seconds-unit>с</seconds-unit></resource>
+                        <resource xml:lang="pl"><days-unit>d</days-unit><hours-unit>godz</hours-unit><minutes-unit>min</minutes-unit><seconds-unit>s</seconds-unit></resource>
+                        <resource xml:lang="hu"><days-unit>n</days-unit><hours-unit>ó</hours-unit><minutes-unit>p</minutes-unit><seconds-unit>mp</seconds-unit></resource>
+                        <resource xml:lang="tr"><days-unit>g</days-unit><hours-unit>sa</hours-unit><minutes-unit>dk</minutes-unit><seconds-unit>sn</seconds-unit></resource>
+                        <resource xml:lang="ca"><days-unit>d</days-unit><hours-unit>h</hours-unit><minutes-unit>min</minutes-unit><seconds-unit>s</seconds-unit></resource>
+                        <resource xml:lang="ar"><days-unit>ي</days-unit><hours-unit>س</hours-unit><minutes-unit>د</minutes-unit><seconds-unit>ث</seconds-unit></resource>
+                        <resource xml:lang="ja"><days-unit>日</days-unit><hours-unit>時間</hours-unit><minutes-unit>分</minutes-unit><seconds-unit>秒</seconds-unit></resource>
+                        <resource xml:lang="zh-Hans"><days-unit>天</days-unit><hours-unit>时</hours-unit><minutes-unit>分</minutes-unit><seconds-unit>秒</seconds-unit></resource>
+                        <resource xml:lang="zh-Hant"><days-unit>天</days-unit><hours-unit>時</hours-unit><minutes-unit>分</minutes-unit><seconds-unit>秒</seconds-unit></resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+        <xbl:template>
+            <xf:input
+                id="input"
+                ref="xxf:binding('fr-duration-output')"
+                xxf:format="xxf:formatted-value('fr-duration-output')"
+                xbl:attr="xxf:readonly-appearance"/>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

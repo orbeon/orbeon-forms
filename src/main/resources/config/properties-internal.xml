@@ -178,6 +178,7 @@
         +fr:percentage
         +fr:time
         +fr:datetime
+        +fr:duration
         +fr:hidden
         +fr:character-counter
         +fr:content-filter
@@ -274,6 +275,7 @@
         +fr:percentage
         +fr:time
         +fr:datetime
+        +fr:duration
         +fr:hidden
         +fr:character-counter
         +fr:clipboard-copy
@@ -428,6 +430,7 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-year.*"                         value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-dropdown-year.*"                value="select-value"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-time.*"                         value="input-time-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-duration.*"                     value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-phone.*"                        value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-us-phone.*"                     value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-color.*"                        value="input-string"/>

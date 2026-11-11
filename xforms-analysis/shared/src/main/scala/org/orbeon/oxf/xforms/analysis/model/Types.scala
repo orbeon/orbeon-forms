@@ -54,6 +54,8 @@ object Types {
       "dateTime",
       "time",
       "date",
+      "dayTimeDuration",
+      "yearMonthDuration",
       "gYearMonth",
       "gYear",
       "gMonthDay",
@@ -104,8 +106,6 @@ object Types {
     val XForms11TypeNames = Set(
       "listItem",
       "listItems",
-      "dayTimeDuration",
-      "yearMonthDuration",
       "email",
       "card-number"
     )

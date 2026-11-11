@@ -734,6 +734,7 @@
                     <type label="Время">time</type>
                     <type label="Дата и время">dateTime</type>
                     <type label="Длительность">duration</type>
+                    <type label="Длительность">dayTimeDuration</type>
                     <type label="Год и месяц">gYearMonth</type>
                     <type label="Месяц и день">gMonthDay</type>
                     <type label="Год">gYear</type>

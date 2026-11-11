@@ -754,6 +754,7 @@
                     <type label="وقت">time</type>
                     <type label="تاريخ ووقت">dateTime</type>
                     <type label="مدة">duration</type>
+                    <type label="مدة">dayTimeDuration</type>
                     <type label="سنة وشهر">gYearMonth</type>
                     <type label="شهر ويوم">gMonthDay</type>
                     <type label="سنة">gYear</type>

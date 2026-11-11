@@ -103,6 +103,12 @@ class BindingDescriptorTest
           </metadata>
         </xbl:binding>
 
+        <xbl:binding element="fr|duration, xf|input:xxf-type('xs:dayTimeDuration')">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Duration</display-name>
+          </metadata>
+        </xbl:binding>
+
         <xbl:binding element="xf|select1[appearance ~= full]">
           <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Radio Buttons</display-name>
@@ -270,6 +276,9 @@ class BindingDescriptorTest
     assertVaryTypes(XF -> "input"              , XS -> "string"    , None, XS -> "gYearMonth", Some("dropdowns"))(Some(FR -> "dropdown-month-year", None))
     assertVaryTypes(FR -> "dropdown-month-year", XS -> "gYearMonth", None, XS -> "string"    , None             )(Some(XF -> "input"              , None))
 
+    assertVaryTypes(XF -> "input"   , XS -> "string"         , None, XS -> "dayTimeDuration", None)(Some(FR -> "duration", None))
+    assertVaryTypes(FR -> "duration", XS -> "dayTimeDuration", None, XS -> "string"         , None)(Some(XF -> "input"   , None))
+
     assertVaryTypes(XF -> "select1"      , XS -> "string" , Some("full")             , XS -> "string" , Some("dropdown")         )(Some(XF -> "select1"      , Some("dropdown")))
     assertVaryTypes(XF -> "select1"      , XS -> "string" , Some("dropdown")         , XS -> "string" , Some("full")             )(Some(XF -> "select1"      , Some("full")))
     assertVaryTypes(XF -> "select1"      , XS -> "string" , Some("full")             , XS -> "string" , Some("segmented")        )(Some(XF -> "select1"      , Some("segmented")))
@@ -311,8 +320,9 @@ class BindingDescriptorTest
     assertVaryTypes(XF -> "textarea"  , XS -> "string" )(Seq(None         -> "Plain Text Area", Some("character-counter") -> "With Character Counter"))
     assertVaryTypes(XF -> "input"     , XS -> "decimal")(Seq(None         -> "Number"          , Some("xxf:percentage")    -> "Percentage"))
     assertVaryTypes(XF -> "input"     , XS -> "date"   )(Seq(None         -> "Date"           , Some("dropdowns")         -> "Dropdown Date"          , Some("fields") -> "Fields Date"))
-    assertVaryTypes(XF -> "input"     , XS -> "gYear"      )(Seq(None            -> "Year"               , Some("dropdown")  -> "Dropdown Year"))
-    assertVaryTypes(XF -> "input"     , XS -> "gYearMonth" )(Seq(Some("dropdowns") -> "Dropdown Month/Year"))
+    assertVaryTypes(XF -> "input"     , XS -> "gYear"          )(Seq(None            -> "Year"               , Some("dropdown")  -> "Dropdown Year"))
+    assertVaryTypes(XF -> "input"     , XS -> "gYearMonth"     )(Seq(Some("dropdowns") -> "Dropdown Month/Year"))
+    assertVaryTypes(XF -> "input"     , XS -> "dayTimeDuration")(Seq(None            -> "Duration"))
     assertVaryTypes(XF -> "select1"   , XS -> "string" )(Seq(Some("full") -> "Radio Buttons", Some("segmented") -> "Segmented Buttons", Some("cards") -> "Choice Cards", Some("dropdown") -> "Dropdown Menu"))
     assertVaryTypes(XF -> "select"    , XS -> "string" )(Seq(Some("full") -> "Checkboxes", Some("scroll") -> "Scrollable Checkboxes", Some("cards") -> "Choice Cards"))
     assertVaryTypes(XF -> "input"     , XS -> "boolean")(Seq(Some("checkbox") -> "Single Checkbox", Some("switch") -> "Toggle Switch", Some("yesno") -> "Yes/No Answer"))
@@ -343,7 +353,8 @@ class BindingDescriptorTest
     assertVaryTypes(XF -> "input"     , XS -> "string" , None            )("Input Field")
     assertVaryTypes(XF -> "textarea"  , XS -> "string" , None            )("Plain Text Area")
     assertVaryTypes(XF -> "input"     , XS -> "decimal", None            )("Number")
-    assertVaryTypes(XF -> "input"     , XS -> "date"   , None            )("Date")
+    assertVaryTypes(XF -> "input"     , XS -> "date"           , None            )("Date")
+    assertVaryTypes(XF -> "input"     , XS -> "dayTimeDuration", None            )("Duration")
     assertVaryTypes(XF -> "select1"   , XS -> "string" , Some("full")     )("Radio Buttons")
     assertVaryTypes(XF -> "select1"   , XS -> "string" , Some("segmented"))("Segmented Buttons")
     assertVaryTypes(XF -> "select1"   , XS -> "string" , Some("cards")    )("Choice Cards")

@@ -754,6 +754,7 @@
                     <type label="Tid">time</type>
                     <type label="Datum och tid">dateTime</type>
                     <type label="Tidsintervall">duration</type>
+                    <type label="Tidsintervall">dayTimeDuration</type>
                     <type label="År och månad">gYearMonth</type>
                     <type label="Månad och dag">gMonthDay</type>
                     <type label="År">gYear</type>

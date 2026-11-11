@@ -48,6 +48,7 @@
         oxf:/xbl/orbeon/dropdown-year/dropdown-year.xbl
         oxf:/xbl/orbeon/time/time.xbl
         oxf:/xbl/orbeon/datetime/datetime.xbl
+        oxf:/xbl/orbeon/duration/duration.xbl
         oxf:/xbl/orbeon/timestamp/timestamp.xbl
     </property>
 

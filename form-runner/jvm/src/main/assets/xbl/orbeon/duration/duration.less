@@ -1,0 +1,77 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+
+    .xbl-component.xbl-fr-duration {
+
+        .fr-duration-container {
+            display    : inline-flex;
+            flex-wrap  : wrap;
+            align-items: center;
+            gap        : 8px;
+            max-width  : 100%;
+
+            // Higher specificity than `.orbeon .fr-density-* .xbl-fr-grid .fr-grid .input-append { width: 100% }`
+            // and `input[type="text"] { width: 100% }` in `grid.less`, and reset `flex-grow: 1` from
+            // `.input-append > :not(.add-on)` in `form-runner-bootstrap5-override.less`.
+            span.input-append.fr-duration-field {
+                display      : inline-flex;
+                flex         : 0 0 auto;
+                align-items  : stretch;
+                width        : auto;
+                margin-bottom: 0;
+
+                &.xforms-hidden {
+                    display: none;
+                }
+
+                input.fr-duration-input,
+                input[type="text"].fr-duration-input {
+                    flex                : 0 0 auto;
+                    width               : 4em;
+                    min-inline-size     : 3rem;
+                    margin              : 0;
+                    text-align          : right;
+                    font-variant-numeric: tabular-nums;
+                    border-radius       : var(--orbeon-control-border-radius) 0 0 var(--orbeon-control-border-radius);
+
+                    &:focus,
+                    &:focus-visible {
+                        position: relative;
+                        z-index : 2;
+                    }
+
+                    &:focus-visible {
+                        outline       : 2px solid var(--orbeon-focus-border-color);
+                        outline-offset: -1px;
+                    }
+                }
+
+                .add-on {
+                    display        : inline-flex;
+                    align-items    : center;
+                    justify-content: center;
+                    width          : auto;
+                    min-inline-size: 2.25rem;
+                    padding        : 0 0.5rem;
+                    margin-left    : -1px;
+                    border-radius  : 0 var(--orbeon-control-border-radius) var(--orbeon-control-border-radius) 0;
+                    user-select    : none;
+                    white-space    : nowrap;
+                }
+            }
+        }
+    }
+}

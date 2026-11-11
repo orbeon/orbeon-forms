@@ -735,6 +735,7 @@
                     <type label="Klokkeslett">time</type>
                     <type label="Dato og klokkeslett">dateTime</type>
                     <type label="Varighet">duration</type>
+                    <type label="Varighet">dayTimeDuration</type>
                     <type label="År og måned">gYearMonth</type>
                     <type label="Måned og dag">gMonthDay</type>
                     <type label="År">gYear</type>

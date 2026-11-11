@@ -754,6 +754,7 @@
                     <type label="時刻">time</type>
                     <type label="日時">dateTime</type>
                     <type label="期間">duration</type>
+                    <type label="期間">dayTimeDuration</type>
                     <type label="年と月">gYearMonth</type>
                     <type label="月と日">gMonthDay</type>
                     <type label="年">gYear</type>

@@ -286,6 +286,7 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.scale.start-label"                         value=""/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.scale.end-label"                           value=""/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.scale.allow-clear"                         value="true"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.duration.fields"                           value="hours minutes"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.library" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
         fr:grid-single
@@ -323,6 +324,7 @@
         fr:date
         fr:time
         fr:datetime
+        fr:duration
         fr:year
         fr:number
         fr:currency

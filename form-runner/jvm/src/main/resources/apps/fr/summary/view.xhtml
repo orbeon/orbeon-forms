@@ -1985,27 +1985,29 @@
                                                                                         $raw
                                                                                 else if ($type = 'dayTimeDuration') then
                                                                                     if ($raw castable as xs:dayTimeDuration) then
-                                                                                        string-join(
-                                                                                            (
-                                                                                                if (days-from-duration($raw) = 0) then
-                                                                                                    ()
-                                                                                                else
-                                                                                                    concat(days-from-duration($raw), ' d'),
-                                                                                                if (hours-from-duration($raw) = 0) then
-                                                                                                    ()
-                                                                                                else
-                                                                                                    concat(hours-from-duration($raw), ' h'),
-                                                                                                if (minutes-from-duration($raw) = 0) then
-                                                                                                    ()
-                                                                                                else
-                                                                                                    concat(minutes-from-duration($raw), ' min'),
-                                                                                                if (seconds-from-duration($raw) = 0) then
-                                                                                                    ()
-                                                                                                else
-                                                                                                    concat(seconds-from-duration($raw), ' sec')
-                                                                                             ),
-                                                                                             ' '
+                                                                                        let $parts := (
+                                                                                            if (days-from-duration($raw) = 0) then
+                                                                                                ()
+                                                                                            else
+                                                                                                concat(days-from-duration($raw), ' d'),
+                                                                                            if (hours-from-duration($raw) = 0) then
+                                                                                                ()
+                                                                                            else
+                                                                                                concat(hours-from-duration($raw), ' h'),
+                                                                                            if (minutes-from-duration($raw) = 0) then
+                                                                                                ()
+                                                                                            else
+                                                                                                concat(minutes-from-duration($raw), ' min'),
+                                                                                            if (seconds-from-duration($raw) = 0) then
+                                                                                                ()
+                                                                                            else
+                                                                                                concat(seconds-from-duration($raw), ' sec')
                                                                                         )
+                                                                                        return
+                                                                                            if (empty($parts)) then
+                                                                                                '0 min'
+                                                                                            else
+                                                                                                string-join($parts, ' ')
                                                                                     else
                                                                                         $raw
                                                                                 else

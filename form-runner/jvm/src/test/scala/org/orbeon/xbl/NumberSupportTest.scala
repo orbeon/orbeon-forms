@@ -268,4 +268,29 @@ class NumberSupportTest extends AnyFunSpec {
         assert(expectedStored === TestNumberSupport.storageValue(input, data))
       }
   }
+
+  describe("NumberStepperSupport arithmetic and bounds") {
+
+    it("must step up and down with exact BigDecimal arithmetic and custom decimal separator") {
+      assert(NumberStepperSupport.stepEditValue("", '.', 1, BigDecimal(1), None, None).contains("1"))
+      assert(NumberStepperSupport.stepEditValue("", '.', -1, BigDecimal(1), None, None).contains("-1"))
+      assert(NumberStepperSupport.stepEditValue("", '.', -1, BigDecimal(1), Some(BigDecimal(0)), None).contains("0"))
+      assert(NumberStepperSupport.stepEditValue("0.1", '.', 1, BigDecimal("0.2"), None, None).contains("0.3"))
+      assert(NumberStepperSupport.stepEditValue("1,25", ',', 1, BigDecimal("0.25"), None, None).contains("1,5"))
+      assert(NumberStepperSupport.stepEditValue("10", '.', 1, BigDecimal(1), Some(BigDecimal(0)), Some(BigDecimal(10))).isEmpty)
+      assert(NumberStepperSupport.stepEditValue("0", '.', -1, BigDecimal(1), Some(BigDecimal(0)), Some(BigDecimal(10))).isEmpty)
+      assert(NumberStepperSupport.stepEditValue("9", '.', 1, BigDecimal(5), Some(BigDecimal(0)), Some(BigDecimal(10))).contains("10"))
+    }
+
+    it("must report canStep accurately at min and max bounds") {
+      val minOpt = Some(BigDecimal(0))
+      val maxOpt = Some(BigDecimal(5))
+      assert(! NumberStepperSupport.canStep("0", '.', -1, minOpt, maxOpt))
+      assert(NumberStepperSupport.canStep("0", '.', 1, minOpt, maxOpt))
+      assert(NumberStepperSupport.canStep("5", '.', -1, minOpt, maxOpt))
+      assert(! NumberStepperSupport.canStep("5", '.', 1, minOpt, maxOpt))
+      assert(NumberStepperSupport.canStep("", '.', -1, minOpt, maxOpt))
+      assert(NumberStepperSupport.canStep("", '.', 1, minOpt, maxOpt))
+    }
+  }
 }

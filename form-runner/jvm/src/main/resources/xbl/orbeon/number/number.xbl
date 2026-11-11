@@ -762,6 +762,7 @@
                     'xforms-help-popover-control',
                     'input-prepend'[xxf:non-blank($prefix)],
                     'input-append' [xxf:non-blank($suffix)],
+                    'fr-number-stepper'[xxf:split(fr:component-param-value('appearance')) = 'stepper'],
                     concat('fr-field-width-', fr:component-param-value('field-width')),
                     for $v in fr:component-param-value('field-align') return concat('fr-field-align-', $v)
                 }"
@@ -789,6 +790,15 @@
                 <xf:group fr:keep-if-param-non-blank="prefix" class="add-on" ref=".[xxf:non-blank($prefix)]">
                     <xf:output id="prefix" value="$prefix"/>
                 </xf:group>
+                <xh:button
+                    id="stepper-down"
+                    fr:keep-if-param-non-blank="appearance"
+                    type="button"
+                    class="btn xbl-fr-number-stepper-button xbl-fr-number-stepper-down{' xforms-hidden'[not(xxf:split(fr:component-param-value('appearance')) = 'stepper')]}"
+                    aria-label="{if (exists(xxf:instance('orbeon-resources'))) then fr:r('decrement') else 'Decrease value'}"
+                    data-step="{(fr:component-param-value('step')[xxf:non-blank()], '1')[1]}"
+                    data-min="{(fr:component-param-value('min')[xxf:non-blank()], '0'[xxf:custom-mip($binding, 'non-negative') = 'true'])[1]}"
+                    data-max="{fr:component-param-value('max')}">−</xh:button>
                 <xh:input
                     id="html-input"
                     xxf:control="true"
@@ -815,6 +825,12 @@
                 <xf:group fr:keep-if-param-non-blank="suffix" class="add-on" ref=".[xxf:non-blank($suffix)]">
                     <xf:output id="suffix" value="$suffix"/>
                 </xf:group>
+                <xh:button
+                    id="stepper-up"
+                    fr:keep-if-param-non-blank="appearance"
+                    type="button"
+                    class="btn xbl-fr-number-stepper-button xbl-fr-number-stepper-up{' xforms-hidden'[not(xxf:split(fr:component-param-value('appearance')) = 'stepper')]}"
+                    aria-label="{if (exists(xxf:instance('orbeon-resources'))) then fr:r('increment') else 'Increase value'}">+</xh:button>
             </xf:group>
 
         </xbl:template>
@@ -824,8 +840,10 @@
         id="fr-number-output"
         element="
             fr|number[fr|static-readonly = true],
+            fr|number-stepper[fr|static-readonly = true],
             fr|currency[fr|static-readonly = true],
             fr|number[fr|pdf-template = true],
+            fr|number-stepper[fr|pdf-template = true],
             fr|currency[fr|pdf-template = true]"
         xxbl:mode="lhha binding value allow-minimal-label-hint"
         xxbl:label-for="input"

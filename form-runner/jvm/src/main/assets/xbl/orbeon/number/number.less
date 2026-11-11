@@ -14,9 +14,137 @@
 
 .orbeon {
 
-    .xbl-fr-number, .xbl-fr-currency, .xbl-fr-percentage {
+    .xbl-fr-number, .xbl-fr-number-stepper, .xbl-fr-currency, .xbl-fr-percentage {
         .fr-field-width-natural input {
             max-width: 142px;
+        }
+
+        .fr-number-stepper {
+            display    : inline-flex;
+            align-items: stretch;
+            max-width  : 100%;
+
+            &.fr-field-width-full {
+                display: flex;
+                width  : 100%;
+
+                input.xbl-fr-number-visible-input {
+                    flex     : 1 1 auto;
+                    width    : 100%;
+                    max-width: none;
+                }
+            }
+
+            &.fr-field-width-natural {
+                input.xbl-fr-number-visible-input {
+                    width    : 6.5rem;
+                    max-width: 100%;
+                }
+            }
+
+            &:not(.fr-field-align-left):not(.fr-field-align-right) {
+                input.xbl-fr-number-visible-input {
+                    text-align: center;
+                }
+            }
+
+            input.xbl-fr-number-visible-input {
+                border-radius     : 0;
+                min-inline-size   : 3.5rem;
+                margin            : 0;
+                font-variant-numeric: tabular-nums;
+
+                &:focus,
+                &:focus-visible {
+                    position: relative;
+                    z-index : 2;
+                }
+            }
+
+            .add-on {
+                border-radius: 0;
+                margin-left  : -1px;
+                margin-right : -1px;
+            }
+
+            .xbl-fr-number-stepper-button {
+                display         : inline-flex;
+                align-items     : center;
+                justify-content : center;
+                box-sizing      : border-box;
+                min-inline-size : 34px;
+                min-block-size  : var(--orbeon-control-height);
+                padding         : 0 0.65rem;
+                margin          : 0;
+                border          : 1px solid var(--orbeon-control-border-color);
+                background-color: var(--orbeon-add-on-background-color);
+                color           : var(--orbeon-control-color);
+                font-size       : 1.1rem;
+                font-weight     : 600;
+                line-height     : 1;
+                cursor          : pointer;
+                user-select     : none;
+                transition      : background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                  border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                  color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                  box-shadow var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+                @media (pointer: coarse) {
+                    min-inline-size: 44px;
+                    min-block-size : 44px;
+                }
+
+                &.xbl-fr-number-stepper-down {
+                    border-radius: var(--orbeon-control-border-radius) 0 0 var(--orbeon-control-border-radius);
+                    margin-right : -1px;
+                }
+
+                &.xbl-fr-number-stepper-up {
+                    border-radius: 0 var(--orbeon-control-border-radius) var(--orbeon-control-border-radius) 0;
+                    margin-left  : -1px;
+                }
+
+                &:not(:disabled):hover {
+                    background-color: var(--orbeon-control-background-color);
+                    border-color    : var(--orbeon-control-border-color);
+                    z-index         : 1;
+                }
+
+                &:not(:disabled):active {
+                    background-color: var(--orbeon-button-primary-background-color);
+                    border-color    : var(--orbeon-button-primary-background-color);
+                    color           : var(--orbeon-button-primary-color);
+                    z-index         : 2;
+                }
+
+                &:focus-visible {
+                    outline       : 2px solid var(--orbeon-focus-border-color);
+                    outline-offset: 1px;
+                    box-shadow    : var(--orbeon-focus-ring);
+                    z-index       : 3;
+                }
+
+                &:disabled {
+                    cursor : not-allowed;
+                    opacity: 0.45;
+                }
+
+                @media print {
+                    display: none !important;
+                }
+            }
+        }
+
+        &.xforms-invalid.xforms-visited {
+            .fr-number-stepper .xbl-fr-number-stepper-button {
+                border-color: var(--orbeon-invalid-control-border-color);
+            }
+        }
+
+        &.fr-field-align-left, .fr-field-align-left {
+            input, .xforms-field {
+                text-align: left;
+            }
         }
 
         &.fr-field-align-right, .fr-field-align-right {

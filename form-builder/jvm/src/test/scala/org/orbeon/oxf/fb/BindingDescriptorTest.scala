@@ -55,9 +55,15 @@ class BindingDescriptorTest
           </metadata>
         </xbl:binding>
 
-        <xbl:binding element="fr|number, xf|input:xxf-type('xs:decimal')">
+        <xbl:binding element="fr|number, xf|input:xxf-type('xs:decimal'), xf|input:xxf-type('xs:integer')">
           <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Number</display-name>
+          </metadata>
+        </xbl:binding>
+
+        <xbl:binding element="fr|number-stepper, xf|input:xxf-type('xs:decimal')[appearance ~= stepper], xf|input:xxf-type('xs:integer')[appearance ~= stepper]">
+          <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Numeric Stepper</display-name>
           </metadata>
         </xbl:binding>
 
@@ -252,10 +258,15 @@ class BindingDescriptorTest
         }
       }
 
-    assertVaryTypes(XF -> "input"        , XS -> "string" , None                     , XS -> "decimal", None                     )(Some((FR -> "number"      , None)))
-    assertVaryTypes(FR -> "number"       , XS -> "string" , None                     , XS -> "string" , None                     )(None)
-    assertVaryTypes(FR -> "number"       , XS -> "decimal", None                     , XS -> "string" , None                     )(Some((XF -> "input"       , None)))
-    assertVaryTypes(FR -> "number"       , XS -> "decimal", None                     , XS -> "boolean", None                     )(Some((XF -> "input"       , None)))
+    assertVaryTypes(XF -> "input"         , XS -> "string" , None                     , XS -> "decimal", None                     )(Some((FR -> "number"        , None)))
+    assertVaryTypes(XF -> "input"         , XS -> "string" , None                     , XS -> "decimal", Some("stepper")          )(Some((FR -> "number-stepper", None)))
+    assertVaryTypes(FR -> "number"        , XS -> "decimal", None                     , XS -> "decimal", Some("stepper")          )(Some((FR -> "number-stepper", None)))
+    assertVaryTypes(FR -> "number-stepper", XS -> "decimal", None                     , XS -> "decimal", None                     )(Some((FR -> "number"        , None)))
+    assertVaryTypes(FR -> "number"        , XS -> "integer", None                     , XS -> "integer", Some("stepper")          )(Some((FR -> "number-stepper", None)))
+    assertVaryTypes(FR -> "number-stepper", XS -> "integer", None                     , XS -> "integer", None                     )(Some((FR -> "number"        , None)))
+    assertVaryTypes(FR -> "number"        , XS -> "string" , None                     , XS -> "string" , None                     )(None)
+    assertVaryTypes(FR -> "number"        , XS -> "decimal", None                     , XS -> "string" , None                     )(Some((XF -> "input"         , None)))
+    assertVaryTypes(FR -> "number"        , XS -> "decimal", None                     , XS -> "boolean", None                     )(Some((XF -> "input"         , None)))
     assertVaryTypes(XF -> "input"        , XS -> "string" , None                     , XS -> "boolean", None                     )(None)
     assertVaryTypes(XF -> "input"        , XS -> "boolean", None                     , XS -> "boolean", None                     )(None)
 
@@ -318,7 +329,8 @@ class BindingDescriptorTest
 
     assertVaryTypes(XF -> "input"     , XS -> "string" )(Seq(None         -> "Input Field"    , Some("character-counter") -> "With Character Counter"))
     assertVaryTypes(XF -> "textarea"  , XS -> "string" )(Seq(None         -> "Plain Text Area", Some("character-counter") -> "With Character Counter"))
-    assertVaryTypes(XF -> "input"     , XS -> "decimal")(Seq(None         -> "Number"          , Some("xxf:percentage")    -> "Percentage"))
+    assertVaryTypes(XF -> "input"     , XS -> "decimal")(Seq(None         -> "Number"          , Some("xxf:percentage")    -> "Percentage", Some("stepper") -> "Numeric Stepper"))
+    assertVaryTypes(XF -> "input"     , XS -> "integer")(Seq(None         -> "Number"          , Some("stepper")           -> "Numeric Stepper"))
     assertVaryTypes(XF -> "input"     , XS -> "date"   )(Seq(None         -> "Date"           , Some("dropdowns")         -> "Dropdown Date"          , Some("fields") -> "Fields Date"))
     assertVaryTypes(XF -> "input"     , XS -> "gYear"          )(Seq(None            -> "Year"               , Some("dropdown")  -> "Dropdown Year"))
     assertVaryTypes(XF -> "input"     , XS -> "gYearMonth"     )(Seq(Some("dropdowns") -> "Dropdown Month/Year"))
@@ -353,6 +365,8 @@ class BindingDescriptorTest
     assertVaryTypes(XF -> "input"     , XS -> "string" , None            )("Input Field")
     assertVaryTypes(XF -> "textarea"  , XS -> "string" , None            )("Plain Text Area")
     assertVaryTypes(XF -> "input"     , XS -> "decimal", None            )("Number")
+    assertVaryTypes(XF -> "input"     , XS -> "decimal", Some("stepper") )("Numeric Stepper")
+    assertVaryTypes(XF -> "input"     , XS -> "integer", Some("stepper") )("Numeric Stepper")
     assertVaryTypes(XF -> "input"     , XS -> "date"           , None            )("Date")
     assertVaryTypes(XF -> "input"     , XS -> "dayTimeDuration", None            )("Duration")
     assertVaryTypes(XF -> "select1"   , XS -> "string" , Some("full")     )("Radio Buttons")

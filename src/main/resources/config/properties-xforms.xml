@@ -216,6 +216,19 @@
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.number.round-when-storing"                 value="false"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.field-width"                        value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.field-align"                        value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.step"                               value="1"/>
+
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number-stepper.appearance"                 value="stepper"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number-stepper.prefix"                     value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number-stepper.suffix"                     value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number-stepper.digits-after-decimal"       value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number-stepper.decimal-separator"          value="."/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number-stepper.grouping-separator"         value=","/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.number-stepper.round-when-formatting"      value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.number-stepper.round-when-storing"         value="false"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number-stepper.field-width"                value="natural"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number-stepper.field-align"                value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number-stepper.step"                       value="1"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.date.field-width"                          value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.date.output-format"                        value=""/>
@@ -327,6 +340,7 @@
         fr:duration
         fr:year
         fr:number
+        fr:number-stepper
         fr:currency
         fr:percentage
         fr:color

@@ -33,6 +33,7 @@
     <property as="xs:string"  name="oxf.fb.toolbox.group.number.uri.*.*">
         oxf:/forms/orbeon/builder/xbl/number-controls.xbl
         oxf:/xbl/orbeon/number/number.xbl
+        oxf:/xbl/orbeon/number-stepper/number-stepper.xbl
         oxf:/xbl/orbeon/currency/currency.xbl
         oxf:/xbl/orbeon/percentage/percentage.xbl
         oxf:/xbl/orbeon/range/range.xbl

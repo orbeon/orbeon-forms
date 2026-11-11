@@ -35,9 +35,10 @@ object Number {
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.Number")
   private val TestNum = 1.1
 
-  XFormsXbl.declareCompanion("fr|number",     js.constructorOf[NumberCompanion])
-  XFormsXbl.declareCompanion("fr|currency",   js.constructorOf[NumberCompanion])
-  XFormsXbl.declareCompanion("fr|percentage", js.constructorOf[NumberCompanion])
+  XFormsXbl.declareCompanion("fr|number",         js.constructorOf[NumberCompanion])
+  XFormsXbl.declareCompanion("fr|number-stepper", js.constructorOf[NumberCompanion])
+  XFormsXbl.declareCompanion("fr|currency",       js.constructorOf[NumberCompanion])
+  XFormsXbl.declareCompanion("fr|percentage",     js.constructorOf[NumberCompanion])
 
   private class NumberCompanion(containerElem: html.Element) extends XBLCompanionWithState(containerElem) {
 
@@ -53,7 +54,9 @@ object Number {
     val stateDecoder: Decoder[State] = implicitly[Decoder[State]]
     private object EventSupport extends EventListenerSupport
 
-    var visibleInputElemOpt: Option[html.Input] = None
+    var visibleInputElemOpt: Option[html.Input]  = None
+    var downButtonOpt      : Option[html.Button] = None
+    var upButtonOpt        : Option[html.Button] = None
 
     override def init(): Unit = {
 
@@ -61,6 +64,49 @@ object Number {
 
       val visibleInputElem = containerElem.querySelector(".xbl-fr-number-visible-input").asInstanceOf[html.Input]
       companion.visibleInputElemOpt = Some(visibleInputElem)
+
+      companion.downButtonOpt =
+        containerElem
+          .querySelectorOpt(".xbl-fr-number-stepper-down:not(.xforms-hidden)")
+          .map(_.asInstanceOf[html.Button])
+      companion.upButtonOpt =
+        containerElem
+          .querySelectorOpt(".xbl-fr-number-stepper-up:not(.xforms-hidden)")
+          .map(_.asInstanceOf[html.Button])
+
+      companion.downButtonOpt.foreach { downButton =>
+        EventSupport.addListener(downButton, DomEventNames.Click, (_: dom.Event) => {
+          if (! isMarkedReadonly)
+            stepBy(-1)
+        })
+      }
+
+      companion.upButtonOpt.foreach { upButton =>
+        EventSupport.addListener(upButton, DomEventNames.Click, (_: dom.Event) => {
+          if (! isMarkedReadonly)
+            stepBy(1)
+        })
+      }
+
+      if (companion.downButtonOpt.isDefined || companion.upButtonOpt.isDefined) {
+        EventSupport.addListener(visibleInputElem, DomEventNames.KeyDown, (e: dom.KeyboardEvent) => {
+          if (! isMarkedReadonly && visibleInputElem.`type` != "number") {
+            e.key match {
+              case "ArrowUp" =>
+                e.preventDefault()
+                stepBy(1)
+              case "ArrowDown" =>
+                e.preventDefault()
+                stepBy(-1)
+              case _ =>
+            }
+          }
+        })
+
+        EventSupport.addListener(visibleInputElem, "input", (_: dom.Event) => {
+          updateStepperButtons()
+        })
+      }
 
       // Switch the input type after cleaning up the value for edition
       EventSupport.addListeners(visibleInputElem, List(DomEventNames.FocusIn), (e: dom.Event) => {
@@ -124,12 +170,16 @@ object Number {
           }
         }
       })
+
+      updateStepperButtons()
     }
 
     override def destroy(): Unit = {
       logger.debug("destroy")
       EventSupport.clearAllListeners()
       companion.visibleInputElemOpt = None
+      companion.downButtonOpt       = None
+      companion.upButtonOpt         = None
     }
 
     override def xformsUpdateReadonly(readonly: Boolean): Unit = {
@@ -168,12 +218,81 @@ object Number {
       private def mobileConversionNeeded(input: html.Input, decimalSeparator: Char): Boolean =
         input.`type` == "number" && decimalSeparator != '.'
 
-      def updateReadonly(readonly: Boolean): Unit =
+      def updateReadonly(readonly: Boolean): Unit = {
         visibleInputElemOpt foreach { visibleInputElem =>
           if (readonly)
             visibleInputElem.setAttribute("readonly", "readonly")
           else
             visibleInputElem.removeAttribute("readonly")
+        }
+        updateStepperButtons()
+      }
+
+      def stepperBounds: (BigDecimal, Option[BigDecimal], Option[BigDecimal]) = {
+        val step =
+          downButtonOpt
+            .flatMap(_.dataset.get("step"))
+            .map(NumberStepperSupport.effectiveStep)
+            .getOrElse(NumberStepperSupport.DefaultStep)
+        val minOpt =
+          downButtonOpt
+            .flatMap(_.dataset.get("min"))
+            .flatMap(NumberStepperSupport.parseParamDecimal)
+        val maxOpt =
+          downButtonOpt
+            .flatMap(_.dataset.get("max"))
+            .flatMap(NumberStepperSupport.parseParamDecimal)
+        (step, minOpt, maxOpt)
+      }
+
+      def updateStepperButtons(): Unit =
+        if (downButtonOpt.isDefined || upButtonOpt.isDefined) {
+          if (companion.isMarkedReadonly) {
+            downButtonOpt.foreach(_.disabled = true)
+            upButtonOpt.foreach(_.disabled   = true)
+          } else {
+            val (_, minOpt, maxOpt) = stepperBounds
+            val decimalSep          = stateOpt.map(_.decimalSeparator).getOrElse('.')
+            val currentVal          =
+              visibleInputElemOpt match {
+                case Some(visibleInputElem) if visibleInputElem eq dom.document.activeElement =>
+                  readValue(visibleInputElem, decimalSep)
+                case _ =>
+                  stateOpt.map(_.editValue).orElse(visibleInputElemOpt.map(_.value)).getOrElse("")
+              }
+            downButtonOpt.foreach(_.disabled = ! NumberStepperSupport.canStep(currentVal, decimalSep, -1, minOpt, maxOpt))
+            upButtonOpt.foreach(_.disabled   = ! NumberStepperSupport.canStep(currentVal, decimalSep,  1, minOpt, maxOpt))
+          }
+        }
+
+      def stepBy(direction: Int): Unit =
+        visibleInputElemOpt.foreach { visibleInputElem =>
+          stateOpt.foreach { state =>
+            val (step, minOpt, maxOpt) = stepperBounds
+            val hasFocus               = visibleInputElem eq dom.document.activeElement
+            val currentEditValue       =
+              if (hasFocus)
+                readValue(visibleInputElem, state.decimalSeparator)
+              else
+                state.editValue
+
+            NumberStepperSupport.stepEditValue(
+              currentEditValue = currentEditValue,
+              decimalSeparator = state.decimalSeparator,
+              direction        = direction,
+              step             = step,
+              minOpt           = minOpt,
+              maxOpt           = maxOpt
+            ).foreach { nextEditValue =>
+              writeValue(visibleInputElem, state.decimalSeparator, nextEditValue)
+              updateStateAndSendValueToServer((_, _) => nextEditValue)
+              updateStepperButtons()
+              AjaxClient.allEventsProcessedF("number") foreach { _ =>
+                updateVisibleValue()
+                updateStepperButtons()
+              }
+            }
+          }
         }
 
       def updateStateAndSendValueToServer(read: (html.Input, Char) => String): Unit =
@@ -190,6 +309,8 @@ object Number {
 
             if (! stateUpdated)
               updateVisibleValue()
+
+            updateStepperButtons()
           }
         }
 

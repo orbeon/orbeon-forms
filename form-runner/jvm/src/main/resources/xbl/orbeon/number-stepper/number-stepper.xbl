@@ -1,0 +1,149 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava">
+
+    <xbl:binding
+        id="fr-number"
+        element="
+            fr|number-stepper,
+            xf|input:xxf-type('xs:decimal')[appearance ~= stepper],
+            xf|input:xxf-type('xs:integer')[appearance ~= stepper]"
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle allow-minimal-label-hint"
+        xxf:external-events="DOMActivate"
+        xxbl:label-for="html-input"
+        xxbl:format="
+            string-join(
+                (
+                    fr:component-param-value('prefix'),
+                    NumberSupport:getDisplayValueJava(
+                        xxf:binding('fr-number'),
+                        fr:component-param-value('decimal-separator'),
+                        fr:component-param-value('grouping-separator'),
+                        fr:component-param-value('prefix'),
+                        fr:component-param-value('digits-after-decimal'),
+                        string(fr:component-param-value('round-when-formatting')) = 'true',
+                        string(fr:component-param-value('round-when-storing'))    = 'true'
+                    ),
+                    fr:component-param-value('suffix')
+                ),
+                ' '
+            )"
+
+        xxbl:serialize-external-value="
+            NumberSupport:serializeExternalValueJava(
+                xxf:binding('fr-number'),
+                fr:component-param-value('decimal-separator'),
+                fr:component-param-value('grouping-separator'),
+                fr:component-param-value('prefix'),
+                fr:component-param-value('digits-after-decimal'),
+                string(fr:component-param-value('round-when-formatting')) = 'true',
+                string(fr:component-param-value('round-when-storing'))    = 'true'
+            )"
+
+        xxbl:deserialize-external-value="
+            NumberSupport:deserializeExternalValueJava(
+                .,
+                xxf:binding('fr-number'),
+                fr:component-param-value('decimal-separator'),
+                fr:component-param-value('grouping-separator'),
+                fr:component-param-value('prefix'),
+                fr:component-param-value('digits-after-decimal'),
+                string(fr:component-param-value('round-when-formatting')) = 'true',
+                string(fr:component-param-value('round-when-storing'))    = 'true'
+            )"
+    >
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Numeric Stepper</display-name>
+            <display-name lang="fr">Sélecteur numérique</display-name>
+            <display-name lang="no">Numerisk trinnvelger</display-name>
+            <display-name lang="ru">Числовой счётчик</display-name>
+            <display-name lang="it">Selettore numerico</display-name>
+            <display-name lang="de">Numerischer Schrittregler</display-name>
+            <display-name lang="fi">Numeerinen askellin</display-name>
+            <display-name lang="es">Selector numérico</display-name>
+            <display-name lang="nl">Numerieke stappenkiezer</display-name>
+            <display-name lang="pt">Seletor numérico</display-name>
+            <display-name lang="sv">Numerisk stegväljare</display-name>
+            <display-name lang="ar">عداد رقمي</display-name>
+            <display-name lang="pl">Licznik krokowy</display-name>
+            <display-name lang="ja">数値ステッパー</display-name>
+            <toolbox show="false"/>
+            <icon>
+                <icon-class>fa fa-fw fa-plus-square-o</icon-class>
+            </icon>
+            <templates>
+                <bind type="xf:decimal"/>
+                <view>
+                    <fr:number-stepper>
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:number-stepper>
+                </view>
+            </templates>
+            <xi:include
+                xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                href="/xbl/orbeon/number/number.xbl"
+                xpointer="xpath(/xbl:xbl/xbl:binding/fb:metadata/(fb:custom-settings, fb:control-details))"/>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/number/number.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <resource xml:lang="en"><decrement>Decrease value</decrement><increment>Increase value</increment></resource>
+                        <resource xml:lang="fr"><decrement>Diminuer la valeur</decrement><increment>Augmenter la valeur</increment></resource>
+                        <resource xml:lang="ar"><decrement>إنقاص القيمة</decrement><increment>زيادة القيمة</increment></resource>
+                        <resource xml:lang="ca"><decrement>Disminuir el valor</decrement><increment>Augmentar el valor</increment></resource>
+                        <resource xml:lang="da"><decrement>Formindsk værdi</decrement><increment>Forøg værdi</increment></resource>
+                        <resource xml:lang="de"><decrement>Wert verringern</decrement><increment>Wert erhöhen</increment></resource>
+                        <resource xml:lang="es"><decrement>Disminuir valor</decrement><increment>Aumentar valor</increment></resource>
+                        <resource xml:lang="fi"><decrement>Pienennä arvoa</decrement><increment>Suurenna arvoa</increment></resource>
+                        <resource xml:lang="hu"><decrement>Érték csökkentése</decrement><increment>Érték növelése</increment></resource>
+                        <resource xml:lang="it"><decrement>Diminuisci valore</decrement><increment>Aumenta valore</increment></resource>
+                        <resource xml:lang="ja"><decrement>値を減らす</decrement><increment>値を増やす</increment></resource>
+                        <resource xml:lang="nl"><decrement>Waarde verlagen</decrement><increment>Waarde verhogen</increment></resource>
+                        <resource xml:lang="no"><decrement>Reduser verdi</decrement><increment>Øk verdi</increment></resource>
+                        <resource xml:lang="pl"><decrement>Zmniejsz wartość</decrement><increment>Zwiększ wartość</increment></resource>
+                        <resource xml:lang="pt"><decrement>Diminuir valor</decrement><increment>Aumentar valor</increment></resource>
+                        <resource xml:lang="ru"><decrement>Уменьшить значение</decrement><increment>Увеличить значение</increment></resource>
+                        <resource xml:lang="sv"><decrement>Minska värde</decrement><increment>Öka värde</increment></resource>
+                        <resource xml:lang="tr"><decrement>Değeri azalt</decrement><increment>Değeri artır</increment></resource>
+                        <resource xml:lang="zh-Hans"><decrement>减小值</decrement><increment>增大值</increment></resource>
+                        <resource xml:lang="zh-Hant"><decrement>減小值</decrement><increment>增大值</increment></resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <!-- Delegate to `fr:number` -->
+        <xi:include
+            href="/xbl/orbeon/number/number.xbl"
+            xpointer="xpath(/xbl:xbl/xbl:binding/xbl:handlers, /xbl:xbl/xbl:binding/xbl:template)"/>
+    </xbl:binding>
+</xbl:xbl>

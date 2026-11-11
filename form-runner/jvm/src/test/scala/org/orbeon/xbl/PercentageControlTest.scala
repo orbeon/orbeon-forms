@@ -91,5 +91,59 @@ class PercentageControlTest
         }
       }
     }
+
+    it("must bind fr:number-stepper and fr:number[appearance ~= stepper] and format values") {
+
+      val xhtml =
+        <xh:html
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xh:head>
+            <xf:model xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+              <xf:instance id="fr-form-instance">
+                <form>
+                  <qty>3</qty>
+                  <guests>2</guests>
+                </form>
+              </xf:instance>
+              <xf:bind ref="qty" type="xf:integer" xxf:non-negative="true()"/>
+              <xf:bind ref="guests" type="xf:decimal"/>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <fr:number-stepper id="qty-control" ref="qty" suffix="items">
+              <xf:label>Quantity</xf:label>
+            </fr:number-stepper>
+            <fr:number id="guests-control" ref="guests" appearance="stepper" step="0.5" min="0" max="10">
+              <xf:label>Guests</xf:label>
+            </fr:number>
+          </xh:body>
+        </xh:html>.toDocument
+
+      def externalJson(v: String): String =
+        NumberExternalValue(v, v, '.').asJson.noSpaces
+
+      withTestExternalContext { _ =>
+        withXFormsDocument(xhtml) { doc =>
+          val qtyComponent    = doc.resolveObjectByIdInScope("#document", "qty-control", None).get.asInstanceOf[XFormsValueComponentControl]
+          val guestsComponent = doc.resolveObjectByIdInScope("#document", "guests-control", None).get.asInstanceOf[XFormsValueComponentControl]
+
+          assert(qtyComponent.getValue(EventCollector.Throw) == "3")
+          assert(qtyComponent.getFormattedValue(EventCollector.Throw).contains("3 items"))
+          assert(qtyComponent.getExternalValue(EventCollector.Throw) == NumberExternalValue("3", "3", '.').asJson.noSpaces)
+
+          setControlValueWithEventSearchNested(qtyComponent.effectiveId, externalJson("4"))
+          assert(qtyComponent.getValue(EventCollector.Throw) == "4")
+          assert(qtyComponent.getFormattedValue(EventCollector.Throw).contains("4 items"))
+
+          assert(guestsComponent.getValue(EventCollector.Throw) == "2")
+          setControlValueWithEventSearchNested(guestsComponent.effectiveId, externalJson("2.5"))
+          assert(guestsComponent.getValue(EventCollector.Throw) == "2.5")
+          assert(guestsComponent.getExternalValue(EventCollector.Throw) == NumberExternalValue("2.5", "2.5", '.').asJson.noSpaces)
+        }
+      }
+    }
   }
 }

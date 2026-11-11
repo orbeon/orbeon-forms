@@ -149,7 +149,7 @@
                 <xf:var
                     name="possible-values"
                     value="$new-itemset-holder/choices[1]/item/value/string()"/>
-                <xf:action if="frf:isMultipleSelectionControl($element-name)">
+                <xf:action if="not($element-name = 'open-select') and frf:isMultipleSelectionControl($element-name)">
                     <xf:action iterate="$resolved-data-holders">
                         <xf:var name="bind" value="."/>
                         <xf:setvalue

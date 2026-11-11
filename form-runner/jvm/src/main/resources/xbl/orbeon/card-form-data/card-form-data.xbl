@@ -5,7 +5,8 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:OpenSelectSupport="java:org.orbeon.xbl.OpenSelectSupportJava">
 
     <xbl:binding
         id="fr-card-form-data"
@@ -376,7 +377,10 @@
                                                 else if (frf:isMultipleSelectionControl($control)) then
                                                     string-join(
                                                         for $code in xxf:split($raw) return
-                                                            ($form-resources/*[local-name() = $query/@name]/item[value = $code]/label, $code)[1],
+                                                            (
+                                                                $form-resources/*[local-name() = $query/@name]/item[value = $code]/label,
+                                                                if ($control = 'open-select') then OpenSelectSupport:decodeToken($code) else $code
+                                                            )[1],
                                                         ', '
                                                     )
                                                 else if (frf:isSingleSelectionControl($control)) then

@@ -1,0 +1,224 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+
+    .xbl-component.xbl-fr-open-select {
+
+        .fr-component-group {
+            padding: 4px 6px;
+        }
+
+        .fr-open-select-tags-wrapper {
+            width     : 100%;
+            margin-top: 6px;
+
+            &.xforms-hidden {
+                display: none;
+            }
+        }
+
+        button.fr-open-select-add-custom {
+            display        : inline-flex;
+            align-items    : center;
+            position       : relative;
+            min-height     : 20px;
+            padding        : 0 0 0 20px;
+            margin         : 0;
+            border         : 0;
+            background     : transparent;
+            box-shadow     : none;
+            color          : var(--orbeon-checkable-checked-background-color);
+            font-size      : var(--orbeon-control-font-size);
+            font-weight    : normal;
+            line-height    : 20px;
+            text-decoration: none;
+            cursor         : pointer;
+
+            > i.fa-plus-circle {
+                position  : absolute;
+                left      : 0;
+                width     : 13px;
+                font-size : 1.15em;
+                line-height: 1;
+                text-align: center;
+                color     : inherit;
+            }
+
+            .fr-open-select-add-custom-label,
+            .fr-open-select-add-custom-label .xforms-output-output {
+                color      : inherit;
+                font-weight: normal;
+            }
+
+            &:hover:not(:disabled) {
+                text-decoration: none;
+                opacity        : 0.85;
+
+                .fr-open-select-add-custom-label {
+                    text-decoration: underline;
+                }
+            }
+
+            &:focus-visible {
+                .focusDecorations();
+                border-radius: var(--orbeon-control-border-radius);
+            }
+
+            &.xforms-hidden {
+                display: none;
+            }
+        }
+
+        .fr-open-select-tags-container {
+            display         : flex;
+            flex-wrap       : wrap;
+            align-items     : center;
+            gap             : 4px;
+            width           : 100%;
+            min-height      : var(--orbeon-control-height);
+            margin-top      : 0;
+            padding         : 3px 6px;
+            box-sizing      : border-box;
+            background-color: var(--orbeon-control-background-color);
+            color           : var(--orbeon-control-color);
+            .fieldDecorations();
+            cursor          : text;
+            transition      : border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                              box-shadow   var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+            &.xforms-hidden {
+                display: none;
+            }
+
+            &:focus-within:not(.fr-open-select-tags-disabled) {
+                border-color: var(--orbeon-focus-border-color);
+                .focusDecorations();
+            }
+
+            &.fr-open-select-tags-disabled {
+                background-color: var(--orbeon-control-read-only-background-color);
+                cursor          : not-allowed;
+            }
+
+            .fr-open-select-pills,
+            .fr-open-select-static-pills,
+            .fr-open-select-static-pills .xforms-repeat-delimiter {
+                display: contents;
+            }
+
+            .fr-open-select-pills.xforms-hidden,
+            .fr-open-select-static-pills.xforms-hidden {
+                display: none;
+            }
+
+            .fr-open-select-pill {
+                display         : inline-flex;
+                align-items     : center;
+                gap             : 4px;
+                max-width       : 100%;
+                padding         : 1px 8px;
+                font-size       : var(--orbeon-control-font-size);
+                line-height     : 1.4;
+                color           : var(--orbeon-add-on-color);
+                background-color: var(--orbeon-add-on-background-color);
+                border          : 1px solid var(--orbeon-control-border-color);
+                border-radius   : var(--orbeon-control-border-radius);
+                box-sizing      : border-box;
+                overflow-wrap   : anywhere;
+
+                .fr-open-select-pill-remove {
+                    display        : inline-flex;
+                    align-items    : center;
+                    justify-content: center;
+                    padding        : 0 2px;
+                    margin         : 0 -2px 0 0;
+                    border         : 0;
+                    background     : transparent;
+                    color          : inherit;
+                    font-size      : 1.1em;
+                    line-height    : 1;
+                    cursor         : pointer;
+                    opacity        : 0.7;
+
+                    &:hover:not(:disabled),
+                    &:focus-visible:not(:disabled) {
+                        opacity: 1;
+                    }
+
+                    &:disabled {
+                        display: none;
+                    }
+                }
+            }
+
+            input.fr-open-select-tags-input,
+            input[type="text"].fr-open-select-tags-input {
+                flex            : 1 1 6em;
+                width           : auto;
+                min-width       : 4em;
+                height          : auto;
+                min-height      : 1.5em;
+                padding         : 0;
+                margin          : 0;
+                border          : 0;
+                border-radius   : 0;
+                box-shadow      : none;
+                outline         : none;
+                background-color: transparent;
+                color           : inherit;
+                font-size       : var(--orbeon-control-font-size);
+
+                &:disabled {
+                    cursor: not-allowed;
+                }
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+        }
+    }
+
+    @media print {
+        .xbl-component.xbl-fr-open-select {
+            .fr-component-group {
+                .xforms-select-appearance-full .xforms-items {
+                    float: none;
+                    .xforms-selected,
+                    .xforms-deselected {
+                        float: none;
+                    }
+                }
+            }
+
+            button.fr-open-select-add-custom {
+                display: none;
+            }
+
+            .fr-open-select-tags-container:not(.xforms-hidden) {
+                display: block;
+
+                .fr-open-select-static-pills {
+                    display: inline;
+                }
+
+                .fr-open-select-pill {
+                    display     : inline-block;
+                    margin-right: 4px;
+                }
+            }
+        }
+    }
+}

@@ -1815,8 +1815,8 @@ body.orbeon {
             }
         }
 
-        // Indent all radio controls, except in open select1, which adds its own padding on .fr-component-group
-        .xforms-select1-appearance-full:not(.xbl-fr-open-select1 *) .xforms-items,
+        // Indent all radio controls, except in open select1 / open select, which add their own padding on .fr-component-group
+        .xforms-select1-appearance-full:not(.xbl-fr-open-select1 *, .xbl-fr-open-select *) .xforms-items,
         .xbl-fb-boolean-or-formula .fr-component-group .xforms-textarea {
             padding: 4px 6px;
         }

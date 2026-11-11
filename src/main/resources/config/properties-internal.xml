@@ -207,6 +207,7 @@
         +fr:databound-select1
         +fr:explanation
         +fr:open-select1
+        +fr:open-select
         +fr:country
         +fr:phone
         +fr:us-phone
@@ -305,6 +306,7 @@
         +fr:databound-select1
         +fr:explanation
         +fr:open-select1
+        +fr:open-select
         +fr:country
         +fr:phone
         +fr:us-phone

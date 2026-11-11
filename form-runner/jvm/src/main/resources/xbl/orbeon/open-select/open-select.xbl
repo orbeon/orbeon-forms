@@ -1,0 +1,245 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:OpenSelectSupport="java:org.orbeon.xbl.OpenSelectSupportJava">
+
+    <xbl:binding
+        id="fr-open-select"
+        element="
+            fr|open-select,
+            fr|open-select[appearance ~= full],
+            xf|select[selection = open],
+            xf|select[selection = open][appearance ~= full]"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value selection javascript-lifecycle"
+        xxbl:label-for="fr-open-select-elem">
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Checkboxes with "Other"</display-name>
+            <display-name lang="fr">Cases à cocher avec "Autre"</display-name>
+            <display-name lang="no">Avkrysningsbokser med "Annet"</display-name>
+            <display-name lang="ru">Флажки с вариантом "Другое"</display-name>
+            <display-name lang="it">Caselle di controllo con "Altro"</display-name>
+            <display-name lang="de">Kontrollkästchen mit "Andere"</display-name>
+            <display-name lang="fi">Valintaruudut "Muu"-vaihtoehdolla</display-name>
+            <display-name lang="es">Casillas de verificación con "Otros"</display-name>
+            <display-name lang="nl">Selectievakjes met "Andere"</display-name>
+            <display-name lang="pt">Caixas de seleção com "Outro"</display-name>
+            <display-name lang="sv">Kryssrutor med "Annat"</display-name>
+            <display-name lang="ar">مربعات اختيار مع "آخر"</display-name>
+            <display-name lang="pl">Pola wyboru z "Inne"</display-name>
+            <display-name lang="ja">「その他」付きチェックボックス</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-check-square-o</icon-class>
+            </icon>
+            <editors static-itemset="true" item-hint="true"/>
+            <templates>
+                <view>
+                    <fr:open-select id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                        <xf:itemset ref="">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                            <xf:hint  ref="hint"/>
+                        </xf:itemset>
+                    </fr:open-select>
+                </view>
+            </templates>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/open-select/open-select.css"/>
+        </xbl:resources>
+
+        <xbl:handlers>
+            <xbl:handler event="xforms-select xforms-deselect" observer="select">
+                <xxf:setvisited control="fr-open-select"/>
+            </xbl:handler>
+            <xbl:handler event="xforms-enabled xforms-readonly xforms-readwrite" phase="target">
+                <xf:setvalue
+                    ref="instance('i')/readonly"
+                    value="xxf:is-control-readonly('fr-open-select')"/>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:implementation>
+            <xf:model id="open-select-model">
+                <xf:instance id="i" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <selected-items/>
+                        <open-tokens/>
+                        <readonly>false</readonly>
+                    </_>
+                </xf:instance>
+                <xf:bind ref="selected-items" readonly="../readonly = 'true'"/>
+                <xf:bind ref="open-tokens"    readonly="../readonly = 'true'"/>
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
+                    <_>
+                        <resource xml:lang="en"><add-custom>Add custom</add-custom></resource>
+                        <resource xml:lang="fr"><add-custom>Ajouter une valeur</add-custom></resource>
+                        <resource xml:lang="es"><add-custom>Añadir personalizado</add-custom></resource>
+                        <resource xml:lang="de"><add-custom>Eigene hinzufügen</add-custom></resource>
+                        <resource xml:lang="it"><add-custom>Aggiungi personalizzato</add-custom></resource>
+                        <resource xml:lang="nl"><add-custom>Aangepast toevoegen</add-custom></resource>
+                        <resource xml:lang="pt"><add-custom>Adicionar personalizado</add-custom></resource>
+                        <resource xml:lang="sv"><add-custom>Lägg till eget</add-custom></resource>
+                        <resource xml:lang="no"><add-custom>Legg til egendefinert</add-custom></resource>
+                        <resource xml:lang="fi"><add-custom>Lisää mukautettu</add-custom></resource>
+                        <resource xml:lang="da"><add-custom>Tilføj brugerdefineret</add-custom></resource>
+                        <resource xml:lang="ru"><add-custom>Добавить свой вариант</add-custom></resource>
+                        <resource xml:lang="pl"><add-custom>Dodaj własną wartość</add-custom></resource>
+                        <resource xml:lang="hu"><add-custom>Egyéni hozzáadása</add-custom></resource>
+                        <resource xml:lang="tr"><add-custom>Özel ekle</add-custom></resource>
+                        <resource xml:lang="ca"><add-custom>Afegir personalitzat</add-custom></resource>
+                        <resource xml:lang="ar"><add-custom>إضافة مخصص</add-custom></resource>
+                        <resource xml:lang="ja"><add-custom>カスタムを追加</add-custom></resource>
+                        <resource xml:lang="zh-Hans"><add-custom>添加自定义</add-custom></resource>
+                        <resource xml:lang="zh-Hant"><add-custom>新增自訂</add-custom></resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:group appearance="xxf:internal">
+
+                <xf:var name="binding" value="xxf:binding('fr-open-select')"/>
+                <xf:var
+                    name="view"
+                    value="
+                        property('xxf:readonly-appearance') = 'static' or
+                        fr:mode() = 'pdf'
+                    "/>
+
+                <xf:select id="hidden-select" ref="$binding" appearance="xxf:internal">
+                    <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+                </xf:select>
+
+                <xf:var name="items"              value="xxf:itemset('hidden-select', 'xml')//item"/>
+                <xf:var name="item-values-joined" value="string-join($items/value/string(), ' ')"/>
+
+                <!-- Sync external bound value & itemset changes into local instance -->
+                <xf:var
+                    name="bound-and-items"
+                    value="concat(string($binding), '|', $item-values-joined)">
+                    <xf:action event="xforms-enabled xforms-value-changed">
+                        <xf:var name="bound-str"  value="string($binding)"/>
+                        <xf:var name="closed-str" value="OpenSelectSupport:closedTokensJoined($bound-str, $item-values-joined)"/>
+                        <xf:var name="open-str"   value="OpenSelectSupport:openTokensJoined($bound-str, $item-values-joined)"/>
+                        <xf:setvalue
+                            ref="instance('i')/open-tokens"
+                            value="$open-str"/>
+                        <xf:setvalue
+                            ref="instance('i')/selected-items"
+                            value="$closed-str"/>
+                    </xf:action>
+                </xf:var>
+
+                <xh:div id="fr-open-select-elem" class="fr-component-group" xxf:control="true">
+                    <xf:select
+                        id="select"
+                        ref="instance('i')/selected-items"
+                        appearance="full"
+                        xbl:attr="xxf:encrypt-item-values"
+                        class="xxforms-events-mode-default">
+
+                        <xf:itemset ref="$items">
+                            <xf:label ref="label"/>
+                            <xf:hint  ref="hint"/>
+                            <xf:value ref="value"/>
+                        </xf:itemset>
+
+                        <xf:action event="xforms-value-changed">
+                            <xf:var
+                                name="closed-selected"
+                                value="OpenSelectSupport:closedTokensJoined(instance('i')/selected-items, $item-values-joined)"/>
+                            <xf:var
+                                name="new-bound"
+                                value="OpenSelectSupport:combineTokens($closed-selected, instance('i')/open-tokens)"/>
+                            <xf:setvalue
+                                if="string($binding) != $new-bound"
+                                ref="$binding"
+                                value="$new-bound"/>
+                        </xf:action>
+                    </xf:select>
+
+                    <xh:div
+                        class="fr-open-select-tags-wrapper{' xforms-hidden'[($view or instance('i')/readonly = 'true') and xxf:is-blank(instance('i')/open-tokens)]}"
+                        data-fr-open-tokens="{instance('i')/open-tokens}"
+                        data-fr-readonly="{instance('i')/readonly = 'true'}"
+                        data-fr-view="{$view}">
+
+                        <xh:button
+                            type="button"
+                            class="btn btn-link fr-open-select-add-custom{' xforms-hidden'[$view or instance('i')/readonly = 'true' or xxf:non-blank(instance('i')/open-tokens)]}">
+                            <xh:i class="fa fa-plus-circle" aria-hidden="true"/>
+                            <xh:span class="fr-open-select-add-custom-label">
+                                <xf:output value="fr:r('add-custom')"/>
+                            </xh:span>
+                        </xh:button>
+
+                        <xh:div class="fr-open-select-tags-container{' xforms-hidden'[xxf:is-blank(instance('i')/open-tokens)]}{' fr-open-select-tags-disabled'[instance('i')/readonly = 'true']}">
+                            <!-- Client-side pills container for interactive mode -->
+                            <xh:span class="fr-open-select-pills{' xforms-hidden'[$view]}"/>
+
+                            <!-- Server-rendered static pills for view / Automatic PDF modes -->
+                            <xh:span class="fr-open-select-static-pills{' xforms-hidden'[not($view)]}">
+                                <xf:repeat ref="xxf:split(instance('i')/open-tokens)[$view]">
+                                    <xh:span class="fr-open-select-pill">
+                                        <xf:output class="fr-open-select-pill-label" value="OpenSelectSupport:decodeToken(.)"/>
+                                    </xh:span>
+                                </xf:repeat>
+                            </xh:span>
+
+                            <xh:input
+                                type="text"
+                                class="fr-open-select-tags-input{' xforms-hidden'[$view]}"
+                                aria-label="{fr:r('add-custom')}"
+                                autocomplete="off"/>
+                        </xh:div>
+
+                        <xf:input
+                            id="open-tokens-input"
+                            ref="instance('i')/open-tokens"
+                            class="fr-open-select-hidden-input xforms-hidden">
+                            <xf:label class="xforms-hidden" ref="fr:r('add-custom')"/>
+                            <xf:action event="xforms-value-changed">
+                                <xxf:setvisited control="fr-open-select"/>
+                                <xf:var
+                                    name="closed-selected"
+                                    value="OpenSelectSupport:closedTokensJoined(instance('i')/selected-items, $item-values-joined)"/>
+                                <xf:var
+                                    name="new-bound"
+                                    value="OpenSelectSupport:combineTokens($closed-selected, instance('i')/open-tokens)"/>
+                                <xf:setvalue
+                                    if="string($binding) != $new-bound"
+                                    ref="$binding"
+                                    value="$new-bound"/>
+                            </xf:action>
+                        </xf:input>
+                    </xh:div>
+                </xh:div>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

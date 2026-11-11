@@ -68,6 +68,7 @@
         oxf:/forms/orbeon/builder/xbl/selection-select-full.xbl
         oxf:/xbl/orbeon/box-select/box-select.xbl
         oxf:/xbl/orbeon/cards-select/cards-select.xbl
+        oxf:/xbl/orbeon/open-select/open-select.xbl
         oxf:/xbl/orbeon/checkbox-input/checkbox-input.xbl
         oxf:/xbl/orbeon/switch-input/switch-input.xbl
         oxf:/xbl/orbeon/yesno-input/yesno-input.xbl

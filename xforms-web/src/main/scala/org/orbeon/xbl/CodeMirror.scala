@@ -6,7 +6,7 @@ import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.web.DomSupport.*
 import org.orbeon.xforms.facade.XBLCompanion
 import org.orbeon.xforms.{AjaxClient, AjaxEvent, DocumentAPI, XFormsXbl}
-import org.scalajs.dom.html
+import org.scalajs.dom.{ResizeObserver, html}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.concurrent.{Future, Promise}
@@ -21,10 +21,11 @@ object CodeMirror {
 
   private class CodeMirrorCompanion(containerElem: html.Element) extends XBLCompanion {
 
-    private var editor                   : facades.CodeMirror = null
+    private var editor                   : facades.CodeMirror         = null
     private var handlers                 : js.Dictionary[js.Function] = js.Dictionary()
-    private var hasFocus                 : Boolean = false
-    private var userChangedSinceLastBlur : Boolean = false
+    private var resizeObserverOpt        : Option[ResizeObserver]     = None
+    private var hasFocus                 : Boolean                    = false
+    private var userChangedSinceLastBlur : Boolean                    = false
 
     override def init(): Unit = {
       val editorElement = containerElem.querySelectorT(".xbl-fr-code-mirror-editor")
@@ -56,10 +57,19 @@ object CodeMirror {
 
       this.handlers.foreach { case (key, value) => this.editor.on(key, value) }
 
+      val resizeObserver = new ResizeObserver((_, _) =>
+        if (this.editor != null && editorElement.clientWidth > 0 && editorElement.clientHeight > 0)
+          this.editor.refresh()
+      )
+      resizeObserver.observe(editorElement)
+      this.resizeObserverOpt = Some(resizeObserver)
+
       this.xformsUpdateReadonly(isMarkedReadonly)
     }
 
     override def destroy(): Unit = {
+      this.resizeObserverOpt.foreach(_.disconnect())
+      this.resizeObserverOpt = None
       this.handlers.foreach { case (key, value) => this.editor.off(key, value) }
       this.handlers.clear()
       this.editor = null

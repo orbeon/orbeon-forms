@@ -55,11 +55,12 @@ object XFormsControls {
       control.childrenT(".xforms-output-output, .xforms-field").headOption.foreach {
         case img: html.Image if control.hasClass("xforms-mediatype-image") =>
           img.src = newControlValue
-        case video: html.Video if control.hasClass("xforms-mediatype-video") =>
-          video.queryNestedElems[html.Source]("source", includeSelf = false).headOption.foreach { source =>
+        case media: html.Media if (media.isInstanceOf[html.Video] && control.hasClass("xforms-mediatype-video")) ||
+                                  (media.isInstanceOf[html.Audio] && control.hasClass("xforms-mediatype-audio")) =>
+          media.queryNestedElems[html.Source]("source", includeSelf = false).headOption.foreach { source =>
             source.src = newControlValue
-            video.toggleClass("empty-source", newControlValue == "")
-            video.load()
+            media.toggleClass("empty-source", newControlValue == "")
+            media.load()
           }
         case elem if control.hasClass("xforms-mediatype-text-html") =>
           elem.innerHTML = newControlValue

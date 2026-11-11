@@ -68,8 +68,8 @@ object Position {
     XFormsUiEvents.componentChangedLayoutCB.add(_ => fn())
 
     val ElementWhichChangeDynamically = List(
-      ".fb > *",                // The `<xxf:dynamic id="fb">` content changes during full updates
-      "img", "video", "canvas", // Changes when the media is loaded
+      ".fb > *",                         // The `<xxf:dynamic id="fb">` content changes during full updates
+      "img", "video", "audio", "canvas", // Changes when the media is loaded
       ".fb-main",               // Especially with embedding, when Form Builder is moved or resized
       ".xbl-fr-tinymce"         // TinyMCE is rendered asynchronously
     )

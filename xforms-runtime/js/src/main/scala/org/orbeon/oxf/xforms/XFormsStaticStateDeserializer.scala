@@ -694,6 +694,7 @@ object XFormsStaticStateDeserializer {
                 for {
                   isImageMediatype     <- c.getOrElse[Boolean]("isImageMediatype")(false)
                   isVideoMediatype     <- c.getOrElse[Boolean]("isVideoMediatype")(false)
+                  isAudioMediatype     <- c.getOrElse[Boolean]("isAudioMediatype")(false)
                   isHtmlMediatype      <- c.getOrElse[Boolean]("isHtmlMediatype")(false)
                   isDownloadAppearance <- c.getOrElse[Boolean]("isDownloadAppearance")(false)
                   staticValue          <- c.getOrElse[Option[String]]("staticValue")(None)
@@ -716,6 +717,7 @@ object XFormsStaticStateDeserializer {
                   )(
                     isImageMediatype     = isImageMediatype,
                     isVideoMediatype     = isVideoMediatype,
+                    isAudioMediatype     = isAudioMediatype,
                     isHtmlMediatype      = isHtmlMediatype,
                     isDownloadAppearance = isDownloadAppearance,
                     staticValue          = staticValue,

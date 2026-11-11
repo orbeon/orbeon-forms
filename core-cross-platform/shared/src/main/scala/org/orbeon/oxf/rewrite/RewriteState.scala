@@ -414,6 +414,8 @@ class RewriteState private[rewrite] (
         if (ret != null) return ret
         ret = handleEltWithResource("video", Rewrite.SRC_ATT, ns, lnam, qnam, atts)
         if (ret != null) return ret
+        ret = handleEltWithResource("audio", Rewrite.SRC_ATT, ns, lnam, qnam, atts)
+        if (ret != null) return ret
         ret = handleEltWithResource("source", Rewrite.SRC_ATT, ns, lnam, qnam, atts)
         if (ret != null) return ret
         ret = handleEltWithResource("source", Rewrite.SRCSET_ATT, ns, lnam, qnam, atts)

@@ -556,6 +556,8 @@ object XFormsStaticStateSerializer {
             b += "isImageMediatype"     -> Json.fromBoolean(c.isImageMediatype)
           if (c.isVideoMediatype)
             b += "isVideoMediatype"     -> Json.fromBoolean(c.isVideoMediatype)
+          if (c.isAudioMediatype)
+            b += "isAudioMediatype"     -> Json.fromBoolean(c.isAudioMediatype)
           if (c.isHtmlMediatype)
             b += "isHtmlMediatype"      -> Json.fromBoolean(c.isHtmlMediatype)
           if (c.isDownloadAppearance)

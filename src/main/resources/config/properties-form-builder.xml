@@ -96,8 +96,10 @@
         oxf:/forms/orbeon/builder/xbl/attachment-multiple.xbl
         oxf:/xbl/orbeon/image-attachment/image-attachment.xbl
         oxf:/xbl/orbeon/video-attachment/video-attachment.xbl
+        oxf:/xbl/orbeon/audio-attachment/audio-attachment.xbl
         oxf:/xbl/orbeon/image/image.xbl
         oxf:/xbl/orbeon/video/video.xbl
+        oxf:/xbl/orbeon/audio/audio.xbl
         oxf:/xbl/orbeon/wpaint/wpaint.xbl
     </property>
 
@@ -513,4 +515,8 @@
         as="xs:string"
         name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-fr-video-attachment"
         value="IAV"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.insert-control-fr-audio-attachment"
+        value="IAA"/>
 </properties>

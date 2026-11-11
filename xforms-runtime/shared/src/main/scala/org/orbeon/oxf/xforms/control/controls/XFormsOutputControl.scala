@@ -31,7 +31,7 @@ import org.orbeon.oxf.xforms.submission.{SubmissionHeaders, SubmissionUtils}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath.*
-import org.orbeon.xforms.Constants.{DummyImageUri, DummyVideoUri}
+import org.orbeon.xforms.Constants.{DummyAudioUri, DummyImageUri, DummyVideoUri}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xforms.XFormsNames.*
 import org.xml.sax.helpers.AttributesImpl
@@ -120,7 +120,7 @@ class XFormsOutputControl(
         findTmpFileValue.getOrElse(internalValue) // use `@*:tmp-file` if present and points to a temporary file
 
     val updatedValue =
-      if (staticControlOpt exists (c => c.isDownloadAppearance || c.isVideoMediatype)) {
+      if (staticControlOpt exists (c => c.isDownloadAppearance || c.isVideoMediatype || c.isAudioMediatype)) {
         proxyValueIfNeeded(internalValueMaybeFromTmpFile, "", filename(collector), fileMediatype(collector) orElse mediatype, collector, forDownload = staticControlOpt.exists(_.isDownloadAppearance))
       } else if (staticControlOpt exists (_.isImageMediatype)) {
         proxyValueIfNeeded(internalValueMaybeFromTmpFile, DummyImageUri, filename(collector), fileMediatype(collector) orElse mediatype, collector, forDownload = false)
@@ -248,7 +248,7 @@ class XFormsOutputControl(
     }
 
   protected override def getRelevantEscapedExternalValue(collector: ErrorEventCollector): String =
-    if (staticControlOpt exists (c => c.isDownloadAppearance || c.isImageMediatype || c.isVideoMediatype)) {
+    if (staticControlOpt exists (c => c.isDownloadAppearance || c.isImageMediatype || c.isVideoMediatype || c.isAudioMediatype)) {
       val externalValue = getExternalValue(collector)
       if (externalValue.nonAllBlank) {
         // External value is not blank, rewrite as absolute path. Two cases:
@@ -347,6 +347,8 @@ object XFormsOutputControl {
       DummyImageUri
     else if ((mediatypeValue ne null) && mediatypeValue.startsWith("video/"))
       DummyVideoUri
+    else if ((mediatypeValue ne null) && mediatypeValue.startsWith("audio/"))
+      DummyAudioUri
     else
       // Default for other mediatypes
       null

@@ -585,6 +585,7 @@ object XFormsUI {
       control.querySelectorOpt(".xforms-output-output, .xforms-field") match {
         case Some(output: html.Image) if control.hasClass("xforms-mediatype-image")        => output.src
         case Some(output: html.Video) if control.hasClass("xforms-mediatype-video")        => output.childrenT.head.getAttribute("src")
+        case Some(output: html.Audio) if control.hasClass("xforms-mediatype-audio")        => output.childrenT.head.getAttribute("src")
         case Some(_)      if control.hasClass("xforms-output-appearance-xxforms-download") => null
         case Some(output) if control.hasClass("xforms-mediatype-text-html")                => output.innerHTML
         case Some(output)                                                                  => output.textContent

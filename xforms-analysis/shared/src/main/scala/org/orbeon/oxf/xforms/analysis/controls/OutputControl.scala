@@ -36,6 +36,7 @@ class OutputControl(
 )(
   val isImageMediatype     : Boolean,
   val isVideoMediatype     : Boolean,
+  val isAudioMediatype     : Boolean,
   val isHtmlMediatype      : Boolean,
   val isDownloadAppearance : Boolean,
   val staticValue          : Option[String], // TODO: `expressionOrConstant`

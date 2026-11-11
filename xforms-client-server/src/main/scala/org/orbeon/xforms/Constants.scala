@@ -48,6 +48,7 @@ object Constants {
   //     data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E
   val DummyImageUri  = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="                 // smallest GIF 1x1 transparent image
   val DummyVideoUri  = "data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAAHBtZGF0AAAA" // minimal valid MP4
+  val DummyAudioUri  = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA="         // minimal valid WAV
   val DummyIframeUri = "about:blank"
   val DummyScriptUri = "data:text/javascript;base64,KGZ1bmN0aW9uKCl7fSgpKTsK"                                       // empty self-calling function
 

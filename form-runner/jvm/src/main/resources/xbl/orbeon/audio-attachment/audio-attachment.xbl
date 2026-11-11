@@ -1,0 +1,100 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fr-audio-attachment"
+        element="fr|audio-attachment"
+        xxbl:mode="binding lhha value"
+        xxbl:container="span"
+        xxbl:label-for="fr-audio-attachment-elem">
+
+        <!-- Orbeon Form Builder Component Metadata -->
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Audio Attachment</display-name>
+            <display-name lang="fr">Audio joint</display-name>
+            <display-name lang="no">Lydvedlegg</display-name>
+            <display-name lang="ru">Аудиовложение</display-name>
+            <display-name lang="it">Audio allegato</display-name>
+            <display-name lang="de">Audio-Anhang</display-name>
+            <display-name lang="fi">Äänitiedoston liittäminen</display-name>
+            <display-name lang="es">Archivo de audio adjunto</display-name>
+            <display-name lang="nl">Audiobijlage</display-name>
+            <display-name lang="pt">Anexo de áudio</display-name>
+            <display-name lang="sv">Ljudbilaga</display-name>
+            <display-name lang="ar">مرفق صوتي</display-name>
+            <display-name lang="pl">Załącznik audio</display-name>
+            <display-name lang="ja">音声添付</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-file-audio-o</icon-class>
+            </icon>
+            <templates>
+                <bind type="xf:anyURI" constraint="xxf:upload-mediatypes('audio/*')"/>
+                <instance filename="" mediatype="" size=""/>
+                <view>
+                    <fr:audio-attachment id="" ref="" class="fr-attachment">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:audio-attachment>
+                </view>
+            </templates>
+        </metadata>
+
+        <xbl:template>
+            <xf:var
+                name="binding"
+                value="xxf:binding('fr-audio-attachment')"/>
+
+            <xh:div id="fr-audio-attachment-elem" xxf:control="true">
+                <fr:attachment
+                    ref="$binding"
+                    accept="{(xxf:custom-mip($binding, 'upload-mediatypes')[xxf:non-blank()], 'audio/*')[1]}">
+
+                    <xf:filename  ref="@filename"  xxbl:scope="outer"/>
+                    <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
+                    <xxf:size     ref="@size"      xxbl:scope="outer"/>
+
+                    <!-- Retarget of upload events -->
+                    <!-- NOTE: Duplicated logic in attachment.xbl -->
+                    <xf:dispatch
+                        event="xxforms-upload-start xxforms-upload-cancel"
+                        targetid="fr-audio-attachment"
+                        name="{event('xxf:type')}"/>
+
+                    <xf:dispatch
+                        event="xxforms-upload-done"
+                        targetid="fr-audio-attachment"
+                        name="{event('xxf:type')}"
+                        propagate="stop"
+                        defaultAction="cancel">
+                        <xf:property name="filename"       value="event('filename')"/>
+                        <xf:property name="content-type"   value="event('content-type')"/>
+                        <xf:property name="content-length" value="event('content-length')"/>
+                    </xf:dispatch>
+
+                </fr:attachment>
+                <fr:audio ref="$binding[xxf:non-blank()]"/>
+            </xh:div>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

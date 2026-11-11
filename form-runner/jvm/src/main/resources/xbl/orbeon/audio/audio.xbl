@@ -1,0 +1,83 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding id="fr-audio" element="fr|audio" xxbl:mode="binding lhha" xxbl:container="span" class="fb-upload">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/audio/audio.css"/>
+        </xbl:resources>
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Static Audio</display-name>
+            <display-name lang="fr">Audio fixe</display-name>
+            <display-name lang="no">Statisk lyd</display-name>
+            <display-name lang="ru">Статическое аудио</display-name>
+            <display-name lang="it">Audio statico</display-name>
+            <display-name lang="de">Statisches Audio</display-name>
+            <display-name lang="fi">Staattinen ääni</display-name>
+            <display-name lang="es">Audio estático</display-name>
+            <display-name lang="nl">Statische audio</display-name>
+            <display-name lang="pt">Áudio estático</display-name>
+            <display-name lang="sv">Statiskt ljud</display-name>
+            <display-name lang="ar">صوت ثابت</display-name>
+            <display-name lang="pl">Dźwięk statyczny</display-name>
+            <display-name lang="ja">固定音声</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-file-audio-o</icon-class>
+            </icon>
+            <templates>
+                <bind type="xf:anyURI"/>
+                <!-- NOTE: `mediatype` so we can serve it, and `filename` for information. See:
+                     https://github.com/orbeon/orbeon-forms/issues/3042 -->
+                <instance filename="" mediatype=""/>
+                <view>
+                    <fr:audio id="" ref="" class="fr-static-attachment">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help  ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:audio>
+                </view>
+            </templates>
+        </metadata>
+
+        <xbl:template>
+            <xf:output ref="xxf:binding('fr-audio')" mediatype="audio/*">
+                <xf:filename  ref="@filename"  xxbl:scope="outer"/>
+                <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
+                <xf:header ref="fr:attachment-form-version()">
+                    <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                    <xf:value value="."/>
+                </xf:header>
+            </xf:output>
+            <xf:group
+                fr:keep-if-design-time="true"
+                ref=".[xxf:is-blank(xxf:binding('fr-audio'))]">
+                <xh:i class="fa fa-fw fa-lg fa-file-audio-o" aria-hidden="true"/>
+            </xf:group>
+            <fr:attachment
+                fr:keep-if-design-time="true"
+                class="fr-audio-attach"
+                accept="audio/*"
+                ref="xxf:binding('fr-audio')"/>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

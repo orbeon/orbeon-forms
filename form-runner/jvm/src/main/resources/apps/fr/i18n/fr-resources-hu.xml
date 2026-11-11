@@ -360,7 +360,7 @@
             <upload-mediatypes>Csak {0} fájlok elfogadottak.</upload-mediatypes>
             <upload-image>kép</upload-image>
             <upload-video>videó</upload-video>
-            <upload-audio>hang</upload-audio>`
+            <upload-audio>hang</upload-audio>
         </hints>
         <view>
             <explanation>

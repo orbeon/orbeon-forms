@@ -236,14 +236,15 @@ class XFormsOutputImageHandler(
   override def getForEffectiveIdWithNs(lhhaAnalysis: LHHAAnalysis): Option[String] = None
 }
 
-// xf:output[starts-with(@appearance, 'video/')]
-class XFormsOutputVideoHandler(
-  uri            : String,
-  localname      : String,
-  qName          : String,
-  localAtts      : Attributes,
-  matched        : ElementAnalysis,
-  handlerContext : HandlerContext
+abstract class XFormsOutputMediaHandler(
+  uri              : String,
+  localname        : String,
+  qName            : String,
+  localAtts        : Attributes,
+  matched          : ElementAnalysis,
+  handlerContext   : HandlerContext,
+  mediaElementName : String,
+  preloadOpt       : Option[String]
 ) extends XFormsControlLifecycleHandler(
   uri,
   localname,
@@ -251,7 +252,7 @@ class XFormsOutputVideoHandler(
   localAtts,
   matched,
   handlerContext,
-  repeating = false,
+  repeating  = false,
   forwarding = false
 ) with XFormsOutputHandler {
 
@@ -268,6 +269,7 @@ class XFormsOutputVideoHandler(
 
     val containerAttributes = getContainerAttributes(getEffectiveId, outputControl, isField = false)
     containerAttributes.addOrReplace("controls", "")
+    preloadOpt.foreach(containerAttributes.addOrReplace("preload", _))
     if (srcValue.isEmpty) {
       containerAttributes.appendToClassAttribute("empty-source")
     }
@@ -275,7 +277,7 @@ class XFormsOutputVideoHandler(
     XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes, handlerContext)
     currentControl.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)
 
-    withElement("video", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
+    withElement(mediaElementName, prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
       val sourceAttributes = new AttributesImpl()
       sourceAttributes.addOrReplace("src", srcValue)
       specificMediaType.foreach(sourceAttributes.addOrReplace("type", _))
@@ -287,6 +289,44 @@ class XFormsOutputVideoHandler(
   // Don't use @for as we are not pointing to an HTML control
   override def getForEffectiveIdWithNs(lhhaAnalysis: LHHAAnalysis): Option[String] = None
 }
+
+// xf:output[starts-with(@mediatype, 'video/')]
+class XFormsOutputVideoHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  localAtts      : Attributes,
+  matched        : ElementAnalysis,
+  handlerContext : HandlerContext
+) extends XFormsOutputMediaHandler(
+  uri              = uri,
+  localname        = localname,
+  qName            = qName,
+  localAtts        = localAtts,
+  matched          = matched,
+  handlerContext   = handlerContext,
+  mediaElementName = "video",
+  preloadOpt       = None
+)
+
+// xf:output[starts-with(@mediatype, 'audio/')]
+class XFormsOutputAudioHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  localAtts      : Attributes,
+  matched        : ElementAnalysis,
+  handlerContext : HandlerContext
+) extends XFormsOutputMediaHandler(
+  uri              = uri,
+  localname        = localname,
+  qName            = qName,
+  localAtts        = localAtts,
+  matched          = matched,
+  handlerContext   = handlerContext,
+  mediaElementName = "audio",
+  preloadOpt       = Some("metadata")
+)
 
 // xf:output[@appearance = 'xxf:text']
 class XFormsOutputTextHandler(

@@ -838,6 +838,17 @@ object XFormsResponse {
         }
       }
 
+      if (documentElement.hasAnyClass("xforms-mediatype-video", "xforms-mediatype-audio")) {
+        elem.attValueOpt("mediatype").foreach { mediatype =>
+          documentElement.queryNestedElems[html.Source]("source", includeSelf = false).headOption.foreach { source =>
+            mediatype.trimAllToOpt match {
+              case Some(nonEmptyMediatype) => source.setAttribute("type", nonEmptyMediatype)
+              case None                    => source.removeAttribute("type")
+            }
+          }
+        }
+      }
+
       if (documentElement.hasClass("xforms-output-appearance-xxforms-download")) {
         elem.attValueOpt("download").foreach { download =>
           val aElem = documentElement.querySelector(".xforms-output-output").asInstanceOf[html.Anchor]

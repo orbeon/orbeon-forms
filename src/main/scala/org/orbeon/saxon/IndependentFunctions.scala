@@ -222,6 +222,10 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
       Arg(NODE_TYPE, ALLOWS_ZERO_OR_ONE)
     )
 
+    Fun("format-json", classOf[FormatJsonString], op = 0, min = 0, STRING, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
+    )
+
     Fun("csv-to-xml", classOf[CsvStringToXml], op = 0, min = 0, NODE_TYPE, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, ALLOWS_ZERO_OR_ONE),
       Arg(BOOLEAN, ALLOWS_ZERO_OR_ONE)

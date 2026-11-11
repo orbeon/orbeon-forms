@@ -1408,6 +1408,9 @@
         <response-body>
             <label>Svar</label>
         </response-body>
+        <json-response-body>
+            <label>JSON-svarskropp</label>
+        </json-response-body>
         <xml-response-body>
             <label>XML-svarskropp</label>
         </xml-response-body>

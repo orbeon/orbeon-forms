@@ -1408,6 +1408,9 @@
         <response-body>
             <label>محتوى الاستجابة الأصلي</label>
         </response-body>
+        <json-response-body>
+            <label>محتوى استجابة JSON</label>
+        </json-response-body>
         <xml-response-body>
             <label>محتوى استجابة XML</label>
         </xml-response-body>

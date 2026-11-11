@@ -1427,6 +1427,9 @@
         <response-body>
             <label>Corps de la réponse original</label>
         </response-body>
+        <json-response-body>
+            <label>Corps de la réponse en JSON</label>
+        </json-response-body>
         <xml-response-body>
             <label>Corps de la réponse en XML</label>
         </xml-response-body>

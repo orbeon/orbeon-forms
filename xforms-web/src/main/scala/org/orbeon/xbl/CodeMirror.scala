@@ -29,11 +29,12 @@ object CodeMirror {
 
     override def init(): Unit = {
       val editorElement = containerElem.querySelectorT(".xbl-fr-code-mirror-editor")
-      val theme = editorElement.dataset.get("codeMirrorTheme").flatMap(_.trimAllToOpt).getOrElse("default")
+      val theme     = editorElement.dataset.get("codeMirrorTheme").flatMap(_.trimAllToOpt).getOrElse("default")
+      val mediatype = editorElement.dataset.get("codeMirrorMediatype").flatMap(_.trimAllToOpt).getOrElse("application/xml")
       this.editor = new facades.CodeMirror(
         editorElement,
         js.Dictionary(
-          "mode"         -> "xml",
+          "mode"         -> mediatype,
           "lineNumbers"  -> true,
           "lineWrapping" -> true,
           "indentUnit"   -> 4,

@@ -1405,6 +1405,9 @@
         <response-body>
             <label>Oryginalna treść odpowiedzi</label>
         </response-body>
+        <json-response-body>
+            <label>Treść odpowiedzi JSON</label>
+        </json-response-body>
         <xml-response-body>
             <label>Treść odpowiedzi XML</label>
         </xml-response-body>

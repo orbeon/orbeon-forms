@@ -1402,6 +1402,9 @@
         <response-body>
             <label>Ohjelmakoodin vastaus</label>
         </response-body>
+        <json-response-body>
+            <label>JSON-vastauksen runko</label>
+        </json-response-body>
         <xml-response-body>
             <label>XML-vastauksen runko</label>
         </xml-response-body>

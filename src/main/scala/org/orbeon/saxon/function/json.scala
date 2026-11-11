@@ -34,3 +34,8 @@ class XmlToJsonString extends DefaultFunctionSupport with DependsOnContextItemIf
   override def evaluateItem(xpathContext: XPathContext): StringValue =
     itemArgumentOrContextOpt(0)(xpathContext) map (i => Converter.xmlToJsonString(i.asInstanceOf[NodeInfo], strict = false))
 }
+
+class FormatJsonString extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
+  override def evaluateItem(xpathContext: XPathContext): StringValue =
+    stringArgumentOrContextOpt(0)(xpathContext).flatMap(Converter.formatJsonString)
+}

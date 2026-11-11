@@ -1426,6 +1426,9 @@
         <response-body>
             <label>Original Response Body</label>
         </response-body>
+        <json-response-body>
+            <label>JSON Response Body</label>
+        </json-response-body>
         <xml-response-body>
             <label>XML Response Body</label>
         </xml-response-body>

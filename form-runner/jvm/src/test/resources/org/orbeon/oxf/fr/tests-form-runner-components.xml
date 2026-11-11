@@ -101,9 +101,11 @@
                 <xh:script src="/ops/javascript/scalajs/orbeon-xforms-web.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/codemirror/5.65.20/lib/codemirror.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/codemirror/5.65.20/mode/xml/xml.js" class="xforms-baseline"/>
+                <xh:script src="/webjars/codemirror/5.65.20/mode/javascript/javascript.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/codemirror/5.65.20/addon/fold/foldcode.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/codemirror/5.65.20/addon/fold/foldgutter.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/codemirror/5.65.20/addon/fold/xml-fold.js" class="xforms-baseline"/>
+                <xh:script src="/webjars/codemirror/5.65.20/addon/fold/brace-fold.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/codemirror/5.65.20/addon/dialog/dialog.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/codemirror/5.65.20/addon/search/searchcursor.js" class="xforms-baseline"/>
                 <xh:script src="/webjars/codemirror/5.65.20/addon/search/search.js" class="xforms-baseline"/>

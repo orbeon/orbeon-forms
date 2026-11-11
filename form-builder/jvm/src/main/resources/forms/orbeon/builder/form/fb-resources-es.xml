@@ -1374,6 +1374,9 @@
         <response-body>
             <label>Cuerpo de la Respuesta</label>
         </response-body>
+        <json-response-body>
+            <label>Cuerpo de la respuesta JSON</label>
+        </json-response-body>
         <xml-response-body>
             <label>Cuerpo de la respuesta XML</label>
         </xml-response-body>

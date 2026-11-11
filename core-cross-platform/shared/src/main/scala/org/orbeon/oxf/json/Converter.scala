@@ -93,6 +93,9 @@ object Converter extends XmlToJsonAlgorithm with JsonToXmlAlgorithm {
   def xmlToJsonString(root: XmlElem, strict: Boolean): String =
     xmlToJson(root, strict).noSpaces
 
+  def formatJsonString(source: String): Option[String] =
+    parser.parse(source).toOption.map(_.spaces4)
+
   // Convert an XML tree to a JSON AST
   def xmlToJson(root: XmlElem, strict: Boolean): Json =
     xmlToJsonImpl(

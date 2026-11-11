@@ -1389,6 +1389,9 @@
         <response-body>
             <label>Responsbody</label>
         </response-body>
+        <json-response-body>
+            <label>JSON-responsbody</label>
+        </json-response-body>
         <xml-response-body>
             <label>XML-responsbody</label>
         </xml-response-body>

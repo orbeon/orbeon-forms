@@ -1400,6 +1400,9 @@
         <response-body>
             <label>元のレスポンス本文</label>
         </response-body>
+        <json-response-body>
+            <label>JSONレスポンス本文</label>
+        </json-response-body>
         <xml-response-body>
             <label>XMLレスポンス本文</label>
         </xml-response-body>

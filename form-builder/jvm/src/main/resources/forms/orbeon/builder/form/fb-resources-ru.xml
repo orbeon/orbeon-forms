@@ -1388,6 +1388,9 @@
         <response-body>
             <label>Тело ответа</label>
         </response-body>
+        <json-response-body>
+            <label>Тело ответа JSON</label>
+        </json-response-body>
         <xml-response-body>
             <label>Тело ответа XML</label>
         </xml-response-body>

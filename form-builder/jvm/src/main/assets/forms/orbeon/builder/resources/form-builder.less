@@ -2446,11 +2446,18 @@ body.orbeon {
             border-color: green;
         }
 
+        .tab-content, .tab-pane.active, .tab-pane.active > div:not(.xbl-fr-grid) {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
         .fb-submission-response-body {
-            textarea, .CodeMirror {
+            textarea {
                 height: 200px;
             }
             .CodeMirror {
+                height: auto;
                 font-size: 12px;
             }
         }

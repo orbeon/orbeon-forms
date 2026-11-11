@@ -1358,6 +1358,9 @@
         <response-body>
             <label>Haupteil der Antwort</label>
         </response-body>
+        <json-response-body>
+            <label>JSON-Antworttext</label>
+        </json-response-body>
         <xml-response-body>
             <label>XML-Antworttext</label>
         </xml-response-body>

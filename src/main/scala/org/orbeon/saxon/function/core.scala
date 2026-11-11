@@ -37,7 +37,10 @@ class Property extends DefaultFunctionSupport with RuntimeDependentFunction with
 object Property {
 
   def property(propertyName: String): Option[AtomicValue] =
-    if (PropertySet.isSensitivePropertyName(propertyName))
+    property(propertyName, checkSensitive = true)
+
+  def property(propertyName: String, checkSensitive: Boolean): Option[AtomicValue] =
+    if (checkSensitive && PropertySet.isSensitivePropertyName(propertyName))
       None
     else {
       CoreCrossPlatformSupport.properties.getObjectOpt(propertyName) map

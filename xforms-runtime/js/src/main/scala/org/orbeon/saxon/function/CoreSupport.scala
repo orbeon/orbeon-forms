@@ -11,7 +11,10 @@ import shapeless.syntax.typeable.*
 object CoreSupport {
 
   def property(propertyName: String): Option[AtomicValue] =
-    if (PropertySet.isSensitivePropertyName(propertyName))
+    property(propertyName, checkSensitive = true)
+
+  def property(propertyName: String, checkSensitive: Boolean): Option[AtomicValue] =
+    if (checkSensitive && PropertySet.isSensitivePropertyName(propertyName))
       None
     else {
       CoreCrossPlatformSupport.properties.getObjectOpt(propertyName) map

@@ -25,6 +25,7 @@
     <xbl:script src="/webjars/hugerte/1.0.15/hugerte.min.js"/>
     <xbl:script src="/webjars/hugerte/1.0.15/icons/default/icons.min.js"/>
     <xbl:script src="/webjars/hugerte/1.0.15/themes/silver/theme.min.js"/>
+    <xbl:script src="/webjars/hugerte/1.0.15/models/dom/model.min.js"/>
     <xbl:script src="/webjars/hugerte/1.0.15/plugins/lists/plugin.min.js"/>
     <xbl:script src="/webjars/hugerte/1.0.15/plugins/link/plugin.min.js"/>
 

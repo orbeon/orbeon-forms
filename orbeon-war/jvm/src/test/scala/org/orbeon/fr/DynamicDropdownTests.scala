@@ -1,15 +1,13 @@
 package org.orbeon.fr
 
+import io.circe.parser.parse
+import org.orbeon.fr.PlaywrightDomSupport.*
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.web.DomSupport.*
-import org.scalatest.funspec.FixtureAsyncFunSpecLike
-
-import scala.async.Async.async
-import scala.scalajs.js
+import org.scalatest.funspec.FixtureAnyFunSpecLike
 
 
 trait DynamicDropdownTests {
-  this: FixtureAsyncFunSpecLike & ClientTestSupport =>
+  this: FixtureAnyFunSpecLike & ClientTestSupport =>
 
   describe("The Dynamic Dropdown With Search control") {
 
@@ -65,57 +63,55 @@ trait DynamicDropdownTests {
 
     it("must find correct initial labels for all control setups") { _ =>
       withFormReady(app = "tests", form = "databound-select1") { case FormRunnerWindow(_, formRunnerApi) =>
-        async {
-          val form = formRunnerApi.getForm(js.undefined)
+        val form = formRunnerApi.getForm
 
-          controlSetups.foreach { controlSetup =>
-            val controlName = controlSetup.controlName
+        controlSetups.foreach { controlSetup =>
+          val controlName = controlSetup.controlName
 
-            val mustHaveAfghanistanDataLabel =
-              ! controlSetup.hasInitialValueInData && controlSetup.autoSelectUniqueChoice && controlSetup.serviceReturnsSingleItem && ! controlSetup.readonly
+          val mustHaveAfghanistanDataLabel =
+            ! controlSetup.hasInitialValueInData && controlSetup.autoSelectUniqueChoice && controlSetup.serviceReturnsSingleItem && ! controlSetup.readonly
 
-            val mustHaveSwitzerlandDataLabel =
-              controlSetup.hasInitialValueInData && controlSetup.autoSelectUniqueChoice && ! controlSetup.serviceReturnsSingleItem && ! controlSetup.storeLabel
+          val mustHaveSwitzerlandDataLabel =
+            controlSetup.hasInitialValueInData && controlSetup.autoSelectUniqueChoice && ! controlSetup.serviceReturnsSingleItem && ! controlSetup.storeLabel
 
-            val labelToFind =
-              if (mustHaveAfghanistanDataLabel)
-                Some("Afghanistan")
-              else if (mustHaveSwitzerlandDataLabel)
-                Some("Switzerland")
-              else
-                None
+          val labelToFind =
+            if (mustHaveAfghanistanDataLabel)
+              Some("Afghanistan")
+            else if (mustHaveSwitzerlandDataLabel)
+              Some("Switzerland")
+            else
+              None
 
-            val labelAttMustHoldValue =
-              labelToFind.isDefined && controlSetup.storeLabel && ! controlSetup.readonly
+          val labelAttMustHoldValue =
+            labelToFind.isDefined && controlSetup.storeLabel && ! controlSetup.readonly
 
-            val controls = form.findControlsByName(controlName)
-            assert(controls.nonEmpty, s"Expected controls for `$controlName`")
+          val controls = form.findControlsByName(controlName)
+          assert(controls.nonEmpty, s"Expected controls for `$controlName`")
 
-            // Check the initial label value as set into the `data-selected-items` attribute
-            val selectedItemsElem = controls.head.querySelectorT("[data-selected-items]")
-            val selectedItemsAttr = selectedItemsElem.getAttribute("data-selected-items")
-            val selectedItems     = js.JSON.parse(selectedItemsAttr).asInstanceOf[js.Array[js.Dynamic]]
-            assert(
-              labelToFind match {
-                case Some(label) => selectedItems.nonEmpty && selectedItems(0).text.asInstanceOf[String] == label
-                case None        => selectedItems.isEmpty
-              },
-              s"Unexpected data-selected-items for `$controlName`"
-            )
+          // Check the initial label value as set into the `data-selected-items` attribute
+          val selectedItemsElem = controls.head.querySelectorT("[data-selected-items]")
+          val selectedItemsAttr = selectedItemsElem.getAttribute("data-selected-items")
+          val selectedItems     = parse(selectedItemsAttr).toOption.flatMap(_.asArray).getOrElse(Vector.empty)
+          assert(
+            labelToFind match {
+              case Some(label) => selectedItems.nonEmpty && selectedItems.head.hcursor.get[String]("text").contains(label)
+              case None        => selectedItems.isEmpty
+            },
+            s"Unexpected data-selected-items for `$controlName`"
+          )
 
-            // Check the initial label value as set into the `label` attribute on the server, as reflected by the
-            // `*-labelatt` output controls
-            assert(
-              labelToFind match {
-                case Some(label) if labelAttMustHoldValue => form.getControlValue(s"$controlName-labelatt").contains(label)
-                case _                                    => true
-              },
-              s"Unexpected labelatt value for `$controlName`"
-            )
-          }
-
-          succeed
+          // Check the initial label value as set into the `label` attribute on the server, as reflected by the
+          // `*-labelatt` output controls
+          assert(
+            labelToFind match {
+              case Some(label) if labelAttMustHoldValue => form.getControlValue(s"$controlName-labelatt").contains(label)
+              case _                                    => true
+            },
+            s"Unexpected labelatt value for `$controlName`"
+          )
         }
+
+        succeed
       }
     }
   }

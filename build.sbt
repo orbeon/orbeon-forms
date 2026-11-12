@@ -93,6 +93,7 @@ val PostgresqlVersion                = "42.7.14"
 val OracleJdbcVersion                = "23.26.4.0.0"
 val JsoupVersion                     = "1.23.2"
 val LibPhoneNumberVersion            = "9.0.42"
+val PlaywrightVersion                = "1.64.0"
 
 // Only on PE for now
 val ApachePOIVersion                 = "5.5.1"
@@ -1530,19 +1531,6 @@ lazy val contentFilterJS = contentFilter.js
     Compile / unmanagedClasspath := Nil
   )
 
-lazy val nodeFacades = (project in file("node-facades"))
-  .enablePlugins(ScalaJSPlugin)
-  .settings(scala2CommonSettings*)
-  .settings(
-    name := "orbeon-node-facades",
-
-    Test / parallelExecution                := false,
-    Test / scalaJSUseMainModuleInitializer  := false,
-    Test / jsEnv                            := new org.scalajs.jsenv.nodejs.NodeJSEnv(),
-
-    scalaJSLinkerConfig                     ~= { _.withModuleKind(ModuleKind.CommonJSModule) }
-  )
-
 lazy val webFacades = (project in file("web-facades"))
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(commonJS)
@@ -1678,13 +1666,7 @@ lazy val demoSqliteDatabase = (project in file("demo-sqlite-database"))
     fork := true // Fork so that the Java options are taken into account
   )
 
-lazy val orbeonWar = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Dummy) in file("orbeon-war"))
-  .settings(
-    name := "orbeon-war",
-    exportJars := false
-  )
-
-lazy val orbeonWarJVM = orbeonWar.jvm
+lazy val orbeonWarJVM = (project in file("orbeon-war/jvm"))
   .dependsOn(
     commonJVM,
     domJVM,
@@ -1698,45 +1680,26 @@ lazy val orbeonWarJVM = orbeonWar.jvm
   .settings(OrbeonWebappPlugin.projectSettings*)
   .settings(scala2CommonSettings*)
   .settings(
+    name       := "orbeon-war",
     exportJars := false
   )
   .settings(WebJarPatcher.settings*)
   .settings(
     Compile / resourceGenerators += DemoSqliteDatabaseGenerator.task.taskValue,
 
-    libraryDependencies ++= WebJarDependencies
-  )
+    libraryDependencies ++= WebJarDependencies,
+    libraryDependencies += "com.microsoft.playwright" % "playwright" % PlaywrightVersion % Test,
 
-lazy val orbeonWarJS = orbeonWar.js
-  .enablePlugins(BuildInfoPlugin)
-  .settings(scala2CommonSettings*)
-  .dependsOn(
-    commonJS,
-    nodeFacades,
-    webSupport
-  )
-  .settings(
+    Test / sourceGenerators += Def.task {
+      val file = (Test / sourceManaged).value / "org" / "orbeon" / "fr" / "TestParametersFromSbt.scala"
+      IO.write(file, s"""package org.orbeon.fr\nobject TestParametersFromSbt { val baseDirectory: String = "${(ThisBuild / baseDirectory).value.getAbsolutePath}" }\n""")
+      Seq(file)
+    }.taskValue,
 
-    // Poor man's way to pass parameters to the test suite
-    buildInfoPackage               := "org.orbeon.fr",
-    buildInfoObject                := "TestParametersFromSbt",
-    buildInfoKeys                  := Seq[BuildInfoKey](
-      "baseDirectory" -> (ThisBuild / baseDirectory).value.getAbsolutePath
-    ),
-
-    libraryDependencies            ++= Seq(
-      "org.scala-js"           %%% "scalajs-dom"  % ScalaJsDomVersion,
-      "io.udash"               %%% "udash-jquery" % ScalaJsJQueryVersion,
-      "org.scala-lang.modules" %%%  "scala-async" % ScalaAsyncVersion,
-    ),
-
-    Test / parallelExecution                := false,
-    Test / scalaJSUseMainModuleInitializer  := false,
-    Test / jsEnv                            := new org.scalajs.jsenv.nodejs.NodeJSEnv(),
-    scalaJSLinkerConfig                     ~= { _.withModuleKind(ModuleKind.CommonJSModule) },
-
-    Test / testOptions                      += {
-      val packageFile = (orbeonWarJVM / Keys.`package`).value
+    Test / parallelExecution := false,
+    Test / testOptions       += Tests.Argument(TestFrameworks.ScalaTest, "-oF"),
+    Test / testOptions       += {
+      val packageFile = (Compile / Keys.`package`).value
       Tests.Setup(() => OrbeonSupport.dummyDependency(packageFile))
     }
   )
@@ -1869,7 +1832,6 @@ lazy val root = (project in file("."))
     servletContainerInitializer,
     demoSqliteDatabase,
     orbeonWarJVM,
-    orbeonWarJS,
     orbeonRedisJars,
     dbToS3AttachmentMigration
   )

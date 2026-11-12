@@ -8,7 +8,6 @@
   },
   "dependencies": {
     "jsdom": "28.1.0",
-    "node-fetch": "2.7.0",
     "nwsapi": "2.2.23"
   },
   "devDependencies": {

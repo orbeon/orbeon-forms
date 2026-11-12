@@ -261,14 +261,14 @@
                 <fr:grid xmlns="" id="fb-editor-scale-grid">
                     <xh:tr>
                         <xh:td colspan="2">
-                            <xf:input ref="instance('local')/start" id="start-control" appearance="xpath-completion">
+                            <xf:input ref="instance('local')/start" id="start-control" appearance="xpath-completion" avt="true">
                                 <xf:label ref="xxf:r('start')"/>
                                 <xf:hint ref="xxf:r('start-hint')"/>
                                 <xf:alert/>
                             </xf:input>
                         </xh:td>
                         <xh:td colspan="2">
-                            <xf:input ref="instance('local')/end" id="end-control" appearance="xpath-completion">
+                            <xf:input ref="instance('local')/end" id="end-control" appearance="xpath-completion" avt="true">
                                 <xf:label ref="xxf:r('end')"/>
                                 <xf:hint ref="xxf:r('end-hint')"/>
                                 <xf:alert ref="xxf:r('end-constraint')" validation="end-constraint"/>
@@ -295,13 +295,13 @@
                     </xh:tr>
                     <xh:tr>
                         <xh:td colspan="3">
-                            <xf:input ref="instance('local')/start-label" id="start-label-control" appearance="xpath-completion">
+                            <xf:input ref="instance('local')/start-label" id="start-label-control" appearance="xpath-completion" avt="true">
                                 <xf:label ref="xxf:r('start-label')"/>
                                 <xf:alert/>
                             </xf:input>
                         </xh:td>
                         <xh:td colspan="3">
-                            <xf:input ref="instance('local')/end-label" id="end-label-control" appearance="xpath-completion">
+                            <xf:input ref="instance('local')/end-label" id="end-label-control" appearance="xpath-completion" avt="true">
                                 <xf:label ref="xxf:r('end-label')"/>
                                 <xf:alert/>
                             </xf:input>

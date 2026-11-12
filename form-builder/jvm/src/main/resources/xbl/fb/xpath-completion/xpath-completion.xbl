@@ -40,6 +40,14 @@
 
         <xbl:template xxbl:transform="oxf:xslt">
             <xh:span xsl:version="2.0" class="fb-xpath-completion-wrapper">
+                <xsl:choose>
+                    <xsl:when test="/*/@avt = ('true', 'false')">
+                        <xsl:attribute name="data-avt" select="/*/@avt"/>
+                    </xsl:when>
+                    <xsl:when test="exists(/*/@avt)">
+                        <xsl:attribute name="data-avt">{fr:component-param-value('avt') = 'true'}</xsl:attribute>
+                    </xsl:when>
+                </xsl:choose>
 
                 <xf:var
                     name="binding"
@@ -70,14 +78,16 @@
                             tabindex="-1">
                             <xh:i class="fa fa-expand fa-fw"/>
                         </xh:button>
-                        <xh:button
-                            type="button"
-                            class="fb-xpath-completion-format-button"
-                            title="Format XPath expression (Shift+Alt+F)"
-                            aria-label="Format XPath expression"
-                            tabindex="-1">
-                            <xh:i class="fa fa-wand-magic-sparkles fa-fw"/>
-                        </xh:button>
+                        <xsl:if test="not(/*/@avt = 'true')">
+                            <xh:button
+                                type="button"
+                                class="fb-xpath-completion-format-button"
+                                title="Format XPath expression (Shift+Alt+F)"
+                                aria-label="Format XPath expression"
+                                tabindex="-1">
+                                <xh:i class="fa fa-wand-magic-sparkles fa-fw"/>
+                            </xh:button>
+                        </xsl:if>
                         <xh:button
                             type="button"
                             class="fb-xpath-completion-copy-button"

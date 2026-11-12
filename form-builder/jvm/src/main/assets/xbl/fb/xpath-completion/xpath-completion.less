@@ -31,6 +31,12 @@
       display: inline-block;
       width: 100%;
 
+      &[data-avt = "true"] {
+        .fb-xpath-completion-format-button {
+          display: none;
+        }
+      }
+
       &.fb-xpath-completion-expanded {
         position: fixed;
         z-index: 1050;
@@ -129,6 +135,7 @@
           border: none !important;
           margin: 0;
           width: 100%;
+          color: var(--orbeon-base-color);
           font-family: monospace;
           font-size: small;
           white-space: pre-wrap;

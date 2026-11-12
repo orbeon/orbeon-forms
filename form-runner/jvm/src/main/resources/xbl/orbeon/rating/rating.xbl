@@ -212,7 +212,7 @@
                 <fr:grid xmlns="" id="fb-editor-rating-grid">
                     <xh:tr>
                         <xh:td colspan="2">
-                            <xf:input ref="instance('local')/max" id="max-control" appearance="xpath-completion">
+                            <xf:input ref="instance('local')/max" id="max-control" appearance="xpath-completion" avt="true">
                                 <xf:label ref="xxf:r('max')"/>
                                 <xf:hint ref="xxf:r('max-hint')"/>
                                 <xf:alert ref="xxf:r('max-constraint')" validation="max-constraint"/>

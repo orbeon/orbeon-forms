@@ -329,14 +329,14 @@
                 <fr:grid xmlns="" id="fb-editor-range-grid">
                     <xh:tr>
                         <xh:td colspan="2">
-                            <xf:input ref="instance('local')/start" id="start-control" appearance="xpath-completion">
+                            <xf:input ref="instance('local')/start" id="start-control" appearance="xpath-completion" avt="true">
                                 <xf:label ref="xxf:r('start')"/>
                                 <xf:hint ref="xxf:r('start-hint')"/>
                                 <xf:alert/>
                             </xf:input>
                         </xh:td>
                         <xh:td colspan="2">
-                            <xf:input ref="instance('local')/end" id="end-control" appearance="xpath-completion">
+                            <xf:input ref="instance('local')/end" id="end-control" appearance="xpath-completion" avt="true">
                                 <xf:label ref="xxf:r('end')"/>
                                 <xf:hint ref="xxf:r('end-hint')"/>
                                 <xf:alert ref="xxf:r('end-constraint')" validation="end-constraint"/>
@@ -344,7 +344,7 @@
                             </xf:input>
                         </xh:td>
                         <xh:td colspan="2">
-                            <xf:input ref="instance('local')/step" id="step-control" appearance="xpath-completion">
+                            <xf:input ref="instance('local')/step" id="step-control" appearance="xpath-completion" avt="true">
                                 <xf:label ref="xxf:r('step')"/>
                                 <xf:hint ref="xxf:r('step-hint')"/>
                                 <xf:alert ref="xxf:r('step-constraint')" validation="step-constraint"/>
@@ -354,13 +354,13 @@
                     </xh:tr>
                     <xh:tr>
                         <xh:td colspan="3">
-                            <xf:input ref="instance('local')/prefix" id="prefix-control" appearance="xpath-completion">
+                            <xf:input ref="instance('local')/prefix" id="prefix-control" appearance="xpath-completion" avt="true">
                                 <xf:label ref="xxf:r('prefix')"/>
                                 <xf:alert/>
                             </xf:input>
                         </xh:td>
                         <xh:td colspan="3">
-                            <xf:input ref="instance('local')/suffix" id="suffix-control" appearance="xpath-completion">
+                            <xf:input ref="instance('local')/suffix" id="suffix-control" appearance="xpath-completion" avt="true">
                                 <xf:label ref="xxf:r('suffix')"/>
                                 <xf:alert/>
                             </xf:input>

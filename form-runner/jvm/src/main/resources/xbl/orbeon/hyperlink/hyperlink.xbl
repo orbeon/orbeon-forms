@@ -165,7 +165,7 @@
                 <fr:grid xmlns="" id="fb-editor-hyperlink-grid">
                     <xh:tr>
                         <xh:td colspan="6">
-                            <xf:input ref="instance('local')/href" id="href-control" appearance="xpath-completion">
+                            <xf:input ref="instance('local')/href" id="href-control" appearance="xpath-completion" avt="true">
                                 <xf:label ref="xxf:r('href')"/>
                                 <xf:hint ref="xxf:r('href-hint')"/>
                                 <xf:alert/>

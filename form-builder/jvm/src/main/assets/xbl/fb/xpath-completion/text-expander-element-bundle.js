@@ -172,7 +172,7 @@ function inViewport(container, element) {
     return top >= scrollTop && bottom <= containerBottom;
 }
 
-const boundary = /\s|\(|\[/;
+const boundary = /\s|\(|\[|\{/;// ORBEON
 function query(text, key, cursor, { multiWord, lookBackIndex, lastMatchPosition } = {
     multiWord: false,
     lookBackIndex: 0,

@@ -27,16 +27,20 @@ object XPathCompletion {
     private var textExpanderActive: Boolean                     = false
     private var stoppedChangeEvent: Boolean                     = false
 
-    private var backdropOpt             : Option[HighlightBackdrop] = None
-    private var expandButtonOpt         : Option[dom.html.Element]  = None
-    private var formatButtonOpt         : Option[dom.html.Element]  = None
-    private var copyButtonOpt           : Option[dom.html.Element]  = None
-    private var placeholderElemOpt      : Option[dom.html.Element]  = None
-    private var isExpanded              : Boolean                   = false
-    private var suppressNextOutsideClick: Boolean                   = false
-    private var valueOpt                : Option[String]            = None
+    private var backdropOpt             : Option[HighlightBackdrop]    = None
+    private var avtObserverOpt          : Option[dom.MutationObserver] = None
+    private var expandButtonOpt         : Option[dom.html.Element]     = None
+    private var formatButtonOpt         : Option[dom.html.Element]     = None
+    private var copyButtonOpt           : Option[dom.html.Element]     = None
+    private var placeholderElemOpt      : Option[dom.html.Element]     = None
+    private var isExpanded              : Boolean                      = false
+    private var suppressNextOutsideClick: Boolean                      = false
+    private var valueOpt                : Option[String]               = None
 
     private object EventSupport extends EventListenerSupport
+
+    private def isAvt: Boolean =
+      backdropOpt.flatMap(_.wrapperElemOpt).flatMap(_.attValueOpt("data-avt")).contains("true")
 
     private def fieldElemOpt: Option[dom.html.Element] =
       backdropOpt.flatMap(_.fieldElemOpt)
@@ -54,6 +58,20 @@ object XPathCompletion {
         onInput       = () => updateHighlights()
       )
       backdropOpt = Some(backdrop)
+
+      if (!js.isUndefined(js.Dynamic.global.MutationObserver)) {
+        backdrop.wrapperElemOpt.foreach { wrapperElem =>
+          val observer = new dom.MutationObserver((_, _) => updateHighlights())
+          observer.observe(
+            wrapperElem,
+            new dom.MutationObserverInit {
+              attributes      = true
+              attributeFilter = js.Array("data-avt")
+            }
+          )
+          avtObserverOpt = Some(observer)
+        }
+      }
 
       expandButtonOpt = containerElem.querySelectorOpt(".fb-xpath-completion-expand-button")
       formatButtonOpt = containerElem.querySelectorOpt(".fb-xpath-completion-format-button")
@@ -144,7 +162,7 @@ object XPathCompletion {
 
         // Listen for reformat keyboard shortcut (Shift+Alt+F or Cmd/Ctrl+Option+L) and Esc to restore expanded view
         EventSupport.addListener(fieldElem, DomEventNames.KeyDown, (event: dom.KeyboardEvent) => {
-          if (isFormatShortcut(event)) {
+          if (!isAvt && isFormatShortcut(event)) {
             event.preventDefault()
             event.stopPropagation()
             reformatExpression()
@@ -243,6 +261,8 @@ object XPathCompletion {
     override def destroy(): Unit = {
       collapse()
       EventSupport.clearAllListeners()
+      avtObserverOpt.foreach(_.disconnect())
+      avtObserverOpt     = None
       backdropOpt.foreach(_.destroy())
       backdropOpt        = None
       pendingPromiseOpt  = None
@@ -364,7 +384,7 @@ object XPathCompletion {
     }
 
     private def reformatExpression(): Unit =
-      if (!isMarkedReadonly) {
+      if (!isMarkedReadonly && !isAvt) {
         val isTextarea = fieldElemOpt.exists(_.isInstanceOf[dom.html.TextArea])
         if (isTextarea) {
           val currentValue = getFieldValue
@@ -494,11 +514,12 @@ object XPathCompletion {
 
     private def updateHighlights(valueOpt: Option[String] = None): Unit = {
       val blank = isBlank(valueOpt)
+      val avt   = isAvt
       backdropOpt.flatMap(_.wrapperElemOpt).foreach(_.toggleClass("fb-xpath-completion-empty", blank))
       if (isExpanded && !canExpand(valueOpt))
         collapse(valueOpt)
       else
-        backdropOpt.foreach(_.updateHighlights(XPathHighlighter.highlightToHtml(_), valueOpt))
+        backdropOpt.foreach(_.updateHighlights(XPathHighlighter.highlightToHtml(_, avt = avt), valueOpt))
     }
 
     // Callback from the server

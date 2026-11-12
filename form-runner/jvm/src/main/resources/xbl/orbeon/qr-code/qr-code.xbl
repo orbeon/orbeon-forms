@@ -201,7 +201,7 @@
                 <fr:grid xmlns="" id="fb-editor-qr-code-grid">
                     <xh:tr>
                         <xh:td colspan="6">
-                            <xf:input ref="instance('local')/content" id="content-control" appearance="xpath-completion">
+                            <xf:input ref="instance('local')/content" id="content-control" appearance="xpath-completion" avt="true">
                                 <xf:label ref="xxf:r('content')"/>
                                 <xf:hint ref="xxf:r('content-hint')"/>
                                 <xf:alert/>

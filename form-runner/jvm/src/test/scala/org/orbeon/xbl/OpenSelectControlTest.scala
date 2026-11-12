@@ -134,4 +134,56 @@ class OpenSelectControlTest
       }
     }
   }
+
+  describe("fr:tags-input control") {
+
+    it("must synchronize space-escaped tokens with the bound element") {
+
+      val xhtml =
+        <xh:html
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xh:head>
+            <xf:model xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+              <xf:instance id="fr-form-instance">
+                <form>
+                  <keywords>urgent Q4+review C%2B%2B</keywords>
+                </form>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <fr:tags-input id="keywords-control" ref="keywords">
+              <xf:label>Keywords</xf:label>
+            </fr:tags-input>
+          </xh:body>
+        </xh:html>.toDocument
+
+      withTestExternalContext { _ =>
+        withXFormsDocument(xhtml) { doc =>
+          withActionAndDoc(doc) {
+            val component       = doc.getControlByEffectiveId("keywords-control").asInstanceOf[XFormsValueComponentControl]
+            val openTokensInput = doc.getControlByEffectiveId("keywords-control≡open-tokens-input").asInstanceOf[XFormsValueControl]
+
+            assert(component.getValue(EventCollector.Throw)       == "urgent Q4+review C%2B%2B")
+            assert(openTokensInput.getValue(EventCollector.Throw) == "urgent Q4+review C%2B%2B")
+
+            // Client-side companion updates open-tokens-input
+            setControlValueWithEventSearchNested(openTokensInput.effectiveId, "urgent Q4+review 100%25+ready")
+            assert(component.getValue(EventCollector.Throw) == "urgent Q4+review 100%25+ready")
+
+            // External setvalue updates open-tokens-input
+            withAction {
+              XFormsAPI.setvalue(component.boundNodeOpt.toList, "alpha+release")
+            }
+            assert(component.getValue(EventCollector.Throw)       == "alpha+release")
+            assert(openTokensInput.getValue(EventCollector.Throw) == "alpha+release")
+          }
+        }
+      }
+    }
+  }
 }

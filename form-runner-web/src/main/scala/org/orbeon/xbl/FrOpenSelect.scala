@@ -31,6 +31,7 @@ object FrOpenSelect {
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.FrOpenSelect")
 
   XFormsXbl.declareCompanion("fr|open-select", js.constructorOf[FrOpenSelectCompanion])
+  XFormsXbl.declareCompanion("fr|tags-input",  js.constructorOf[FrOpenSelectCompanion])
 
   private class FrOpenSelectCompanion(containerElem: html.Element) extends XBLCompanion {
 
@@ -245,8 +246,9 @@ object FrOpenSelect {
       isUpdatingDom = true
       try {
         val enabled           = isInteractive
-        val showTagsContainer = currentTokens.nonEmpty || (isEditingCustom && enabled)
-        val showAddCustomBtn  = ! showTagsContainer && enabled
+        val hasAddCustomBtn   = addCustomBtnOpt.isDefined
+        val showTagsContainer = ! hasAddCustomBtn || currentTokens.nonEmpty || (isEditingCustom && enabled)
+        val showAddCustomBtn  = hasAddCustomBtn && ! showTagsContainer && enabled
 
         addCustomBtnOpt.foreach { btn =>
           btn.disabled = ! enabled

@@ -14,7 +14,8 @@
 
 .orbeon {
 
-    .xbl-component.xbl-fr-open-select {
+    .xbl-component.xbl-fr-open-select,
+    .xbl-component.xbl-fr-tags-input {
 
         .fr-component-group {
             padding: 4px 6px;
@@ -27,6 +28,10 @@
             &.xforms-hidden {
                 display: none;
             }
+        }
+
+        &.xbl-fr-tags-input .fr-open-select-tags-wrapper {
+            margin-top: 0;
         }
 
         button.fr-open-select-add-custom {
@@ -192,7 +197,8 @@
     }
 
     @media print {
-        .xbl-component.xbl-fr-open-select {
+        .xbl-component.xbl-fr-open-select,
+        .xbl-component.xbl-fr-tags-input {
             .fr-component-group {
                 .xforms-select-appearance-full .xforms-items {
                     float: none;

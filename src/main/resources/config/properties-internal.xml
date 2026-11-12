@@ -208,6 +208,7 @@
         +fr:explanation
         +fr:open-select1
         +fr:open-select
+        +fr:tags-input
         +fr:country
         +fr:phone
         +fr:us-phone
@@ -307,6 +308,7 @@
         +fr:explanation
         +fr:open-select1
         +fr:open-select
+        +fr:tags-input
         +fr:country
         +fr:phone
         +fr:us-phone

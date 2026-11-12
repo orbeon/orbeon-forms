@@ -383,6 +383,12 @@
                                                             )[1],
                                                         ', '
                                                     )
+                                                else if ($control = 'tags-input') then
+                                                    string-join(
+                                                        for $code in xxf:split($raw) return
+                                                            OpenSelectSupport:decodeToken($code),
+                                                        ', '
+                                                    )
                                                 else if (frf:isSingleSelectionControl($control)) then
                                                     for $code in $raw return
                                                         ($form-resources/*[local-name() = $query/@name]/item[value = $code]/label, $code)[1]

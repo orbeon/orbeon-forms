@@ -762,7 +762,7 @@ body.orbeon {
     }
 
     .fr-section-container.fb-dnd-drop-into,
-    .fb-action-step-iteration.fb-dnd-drop-into > .fb-action-step-row-content-outer > .fb-action-step-row-content {
+    .fb-action-step-iteration.fb-dnd-drop-into > .fb-action-step-row-main > .fb-action-step-row-content {
         outline: 1px dashed var(--orbeon-focus-border-color);
         outline-offset: -1px;
     }
@@ -2109,6 +2109,83 @@ body.orbeon {
         max-width: none;
     }
 
+    .fb-dialog-process-editor .fb-process-steps-list .fb-process-iteration,
+    .fb-action-dialog .fb-action-step-iteration {
+        display: flex;
+        width: 100%;
+        justify-content: flex-start;
+        align-items: flex-start;
+
+        .fb-process-row-main,
+        .fb-action-step-row-main {
+            position: relative;
+            flex-grow: 1;
+            min-width: 0;
+            align-self: stretch;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .fb-process-box-slice,
+        .fb-action-step-box-slice {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: var(--fb-box-inset);
+            right: var(--fb-box-inset);
+            background-color: color-mix(in oklab, var(--orbeon-base-color) 8%, transparent);
+            pointer-events: none;
+
+            &.fb-process-box-start,
+            &.fb-action-step-box-start {
+                top: 2px;
+                border-top-left-radius: var(--orbeon-body-decorations-border-radius);
+                border-top-right-radius: var(--orbeon-body-decorations-border-radius);
+            }
+
+            &.fb-process-box-end,
+            &.fb-action-step-box-end {
+                bottom: calc(2px + var(--fb-outer-closing) * 6px);
+                border-bottom-left-radius: var(--orbeon-body-decorations-border-radius);
+                border-bottom-right-radius: var(--orbeon-body-decorations-border-radius);
+            }
+        }
+
+        .fb-process-row-content,
+        .fb-action-step-row-content {
+            position: relative;
+            margin-left: calc(var(--fb-indent-level) * 20px);
+            margin-right: calc(var(--fb-indent-level) * 20px);
+            padding: 2px 6px calc(2px + var(--fb-extra-closing) * 6px) 6px;
+        }
+
+        &.fb-process-row-opening-box,
+        &.fb-action-step-row-opening-box {
+            > .fb-process-row-main > .fb-process-row-content,
+            > .fb-action-step-row-main > .fb-action-step-row-content {
+                padding-top: 6px;
+            }
+
+            > .fb-process-row-buttons,
+            > .fb-action-step-buttons {
+                margin-top: 6px;
+            }
+        }
+
+        &.fb-process-row-closing-box > .fb-process-row-main > .fb-process-row-content,
+        &.fb-action-step-row-closing-box > .fb-action-step-row-main > .fb-action-step-row-content {
+            padding-bottom: calc(6px + var(--fb-extra-closing) * 6px);
+        }
+
+        .fb-process-row-buttons,
+        .fb-action-step-buttons {
+            flex-grow: 0;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+    }
+
     .fb-dialog-process-editor {
         width: 1130px;
         max-width: calc(100vw - 20px);
@@ -2133,55 +2210,10 @@ body.orbeon {
             width: 100%;
 
             .fb-process-iteration {
-                display: flex;
-                width: 100%;
-                justify-content: flex-start;
-                align-items: flex-start;
-
-                //border-bottom: thin dashed #ddd;
-                //padding-top: 2px;
-                //padding-bottom: 2px;
-
-                .fb-process-row-main {
-                    position: relative;
-                    flex-grow: 1;
-                    min-width: 0;
-                    align-self: stretch;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                }
-
-                .fb-process-box-slice {
-                    position: absolute;
-                    top: 0;
-                    bottom: 0;
-                    left: var(--fb-box-inset);
-                    right: var(--fb-box-inset);
-                    background-color: color-mix(in oklab, var(--orbeon-base-color) 8%, transparent);
-                    pointer-events: none;
-
-                    &.fb-process-box-start {
-                        top: 2px;
-                        border-top-left-radius: var(--orbeon-body-decorations-border-radius);
-                        border-top-right-radius: var(--orbeon-body-decorations-border-radius);
-                    }
-
-                    &.fb-process-box-end {
-                        bottom: calc(2px + var(--fb-outer-closing) * 6px);
-                        border-bottom-left-radius: var(--orbeon-body-decorations-border-radius);
-                        border-bottom-right-radius: var(--orbeon-body-decorations-border-radius);
-                    }
-                }
-
                 .fb-process-row-content {
-                    position: relative;
                     display: grid;
                     grid-template-columns: 1fr auto;
                     column-gap: 4px;
-                    margin-left: calc(var(--fb-indent-level) * 20px);
-                    margin-right: calc(var(--fb-indent-level) * 20px);
-                    padding: 2px 6px calc(2px + var(--fb-extra-closing) * 6px) 6px;
 
                     &.fb-process-has-combinator {
                         grid-template-columns: min-content 1fr auto;
@@ -2191,20 +2223,6 @@ body.orbeon {
                             grid-column-end: 4;
                         }
                     }
-                }
-
-                &.fb-process-row-opening-box {
-                    > .fb-process-row-main > .fb-process-row-content {
-                        padding-top: 6px;
-                    }
-
-                    > .fb-process-row-buttons {
-                        margin-top: 6px;
-                    }
-                }
-
-                &.fb-process-row-closing-box > .fb-process-row-main > .fb-process-row-content {
-                    padding-bottom: calc(6px + var(--fb-extra-closing) * 6px);
                 }
 
                 .fb-process-row-content-params {
@@ -2235,13 +2253,10 @@ body.orbeon {
                     display: flex;
                     justify-content: flex-start;
                     align-items: center;
-                    white-space: nowrap;
                     width: 200px;
                     min-height: 34px;
                     margin-top: 2px;
                     margin-bottom: 2px;
-                    flex-grow: 0;
-                    flex-shrink: 0;
                 }
 
                 // DnD
@@ -2495,14 +2510,11 @@ body.orbeon {
             .dialog-scrollable();
         }
 
-        .fb-indent-spacers:not(.fb-indent-spacer).xforms-update-full:empty {
-            display: none; // hide extra blank repeat spans so they don't contribute as flex items
-        }
-
         .fb-service-call-parameters {
             clear: both;
             padding-top: 5px;
             margin-left: 20px;
+            margin-right: 10px;
 
             .fb-service-call-parameter-row {
                 display: flex;
@@ -2635,67 +2647,11 @@ body.orbeon {
 
         // A reorderable line
         .fb-action-step-iteration {
-            display: flex;
-            width: 100%;
-            justify-content: flex-start;
-            align-items: flex-start;
-            margin-bottom: 5px;
-
-            .fb-action-step-row-spacers {
-                flex-grow: 0;
-                pointer-events: none;
-
-                &:has(.fb-indent-spacer) {
-                    white-space: nowrap;
-                    height: stretch;
-                }
-
-                .fb-indent-spacer {
-                    display: inline-block;
-                    width: 1.2em;
-                    height: stretch;
-                    pointer-events: none;
-                }
-            }
-
-            .fb-action-step-row-content-outer {
-                width: 100%;
-                flex-grow: 1;
-                min-width: 0;
-            }
-
-            .fb-action-step-row-content {
-                padding: 3px;
-            }
-
-            .fb-action-step-row-content-start-row > .fb-action-step-row-content {
-                border-top-left-radius: 5px;
-                border-top-right-radius: 5px;
-            }
-
-            .fb-action-step-row-content-end-row > .fb-action-step-row-content {
-                border-bottom-left-radius: 5px;
-                border-bottom-right-radius: 5px;
-            }
-
-            .fb-action-step-row-content-indent-1 > .fb-action-step-row-content, .fb-indent-spacer-position-2, .fb-action-step-row-content-indent-2 {
-                background-color: #ededed;
-            }
-
-            .fb-action-step-row-content-indent-2 > .fb-action-step-row-content, .fb-indent-spacer-position-3, .fb-action-step-row-content-indent-3 {
-                background-color: #dfdfdf;
-            }
-
-            .fb-action-step-row-content-indent-3 > .fb-action-step-row-content, .fb-indent-spacer-position-4, .fb-action-step-row-content-indent-4 {
-                background-color: #d1d1d1;
-            }
 
             // On the right, the buttons to reorder, remove, and add rows
             .fb-action-step-buttons {
-                flex-grow: 0;
-                flex-shrink: 0;
-                white-space: nowrap;
-                text-align: right;
+                width: 155px;
+                text-align: left;
                 padding-top: 3px;
                 margin-left: 6px;
 
@@ -2707,7 +2663,7 @@ body.orbeon {
 
             .fb-action-step-options {
                 display: block;
-                width: 100%;
+                width: calc(100% + 10px);
                 min-width: 0;
                 &:after {
                     content: "";
@@ -2763,6 +2719,7 @@ body.orbeon {
             clear: both;
             padding-top: 6px;
             margin-left: 20px;
+            margin-right: 10px;
 
             .fb-copy-content-map-row {
                 display: flex;

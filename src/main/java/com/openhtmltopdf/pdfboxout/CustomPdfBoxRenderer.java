@@ -199,6 +199,7 @@ public class CustomPdfBoxRenderer implements Closeable, PageSupplier {
             _outputDevice.setSharedContext(_sharedContext);
 
             fontResolver = new PdfBoxFontResolver(_sharedContext, _pdfDoc, state._caches.get(CacheStore.PDF_FONT_METRICS), state._pdfAConformance, state._pdfUaConform);
+            fontResolver.setDefaultFontKerning(state._useFontKerning);
             _sharedContext.setFontResolver(fontResolver);
 
             PdfBoxReplacedElementFactory replacedElementFactory = new PdfBoxReplacedElementFactory(_outputDevice, state._svgImpl, state._objectDrawerFactory, state._mathmlImpl);

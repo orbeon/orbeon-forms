@@ -1994,6 +1994,16 @@
                                                                                     OpenSelectSupport:decodeToken($code),
                                                                                 ', '
                                                                             )
+                                                                        else if ($control = 'date-range') then
+                                                                            let $parts := tokenize($raw, '/') return
+                                                                            if (count($parts) = 2 and $parts[1] castable as xs:date and $parts[2] castable as xs:date) then
+                                                                                concat(
+                                                                                    format-date(xs:date($parts[1]), $fr-resources/summary/formats/date, $datelang, (), ()),
+                                                                                    ' – ',
+                                                                                    format-date(xs:date($parts[2]), $fr-resources/summary/formats/date, $datelang, (), ())
+                                                                                )
+                                                                            else
+                                                                                $raw
                                                                         else if (frf:isSingleSelectionControl($control)) then
                                                                             for $code in $raw return
                                                                                 ($form-resources/*[local-name() = $query/@name]/item[value = $code]/label, $code)[1]

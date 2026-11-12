@@ -1,0 +1,356 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:DateRangeSupport="java:org.orbeon.xbl.DateRangeSupportJava">
+
+    <xbl:binding
+        id="fr-date-range"
+        element="fr|date-range"
+        xxbl:mode="lhha binding value focus"
+        xxbl:type="xs:string"
+        xxbl:label-for="fr-date-range-elem"
+        xxbl:constraint="
+            DateRangeSupport:isValidDateRange(
+                string(.),
+                string(fr:component-param-value('min-days')),
+                string(fr:component-param-value('max-days'))
+            )">
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Date Range</display-name>
+            <display-name lang="fr">Plage de dates</display-name>
+            <display-name lang="no">Datointervall</display-name>
+            <display-name lang="ru">Диапазон дат</display-name>
+            <display-name lang="it">Intervallo di date</display-name>
+            <display-name lang="de">Datumsbereich</display-name>
+            <display-name lang="fi">Päivämääräväli</display-name>
+            <display-name lang="es">Rango de fechas</display-name>
+            <display-name lang="nl">Datumbereik</display-name>
+            <display-name lang="pt">Intervalo de datas</display-name>
+            <display-name lang="sv">Datumintervall</display-name>
+            <display-name lang="ar">نطاق التاريخ</display-name>
+            <display-name lang="pl">Zakres dat</display-name>
+            <display-name lang="ja">日付範囲</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-calendar</icon-class>
+            </icon>
+            <templates>
+                <bind type="fr:date-range"/>
+                <view>
+                    <fr:date-range id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:date-range>
+                </view>
+            </templates>
+            <custom-settings>
+                <setting name="field-width" type="xs:string" values="full natural"/>
+                <setting name="min-days"    type="xs:nonNegativeInteger"/>
+                <setting name="max-days"    type="xs:nonNegativeInteger"/>
+                <constraint
+                    test="not(min-days castable as xs:integer and max-days castable as xs:integer) or xs:integer(min-days) le xs:integer(max-days)"
+                    message="Maximum range must be greater than or equal to minimum range"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-date-range-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue ref="$c" value="instance()/@*[name() = name($c)]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <field-width/>
+                            <min-days/>
+                            <max-days/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind ref="min-days | max-days" type="xf:nonNegativeInteger"/>
+                        <xf:bind
+                            ref="max-days"
+                            constraint="not(../min-days castable as xs:integer and . castable as xs:integer) or xs:integer(../min-days) le xs:integer(.)"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <min-days>Minimum Range (Days)</min-days>
+                                <max-days>Maximum Range (Days)</max-days>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <min-days>Durée minimale (jours)</min-days>
+                                <max-days>Durée maximale (jours)</max-days>
+                            </resource>
+                            <resource xml:lang="no">
+                                <min-days>Minimum varighet (dager)</min-days>
+                                <max-days>Maksimum varighet (dager)</max-days>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <min-days>Минимальный диапазон (дней)</min-days>
+                                <max-days>Максимальный диапазон (дней)</max-days>
+                            </resource>
+                            <resource xml:lang="it">
+                                <min-days>Intervallo minimo (giorni)</min-days>
+                                <max-days>Intervallo massimo (giorni)</max-days>
+                            </resource>
+                            <resource xml:lang="de">
+                                <min-days>Mindestdauer (Tage)</min-days>
+                                <max-days>Höchstdauer (Tage)</max-days>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <min-days>Vähimmäiskesto (päivää)</min-days>
+                                <max-days>Enimmäiskesto (päivää)</max-days>
+                            </resource>
+                            <resource xml:lang="es">
+                                <min-days>Rango mínimo (días)</min-days>
+                                <max-days>Rango máximo (días)</max-days>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <min-days>Minimumbereik (dagen)</min-days>
+                                <max-days>Maximumbereik (dagen)</max-days>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <min-days>Intervalo mínimo (dias)</min-days>
+                                <max-days>Intervalo máximo (dias)</max-days>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <min-days>Minsta intervall (dagar)</min-days>
+                                <max-days>Största intervall (dagar)</max-days>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <min-days>الحد الأدنى للنطاق (أيام)</min-days>
+                                <max-days>الحد الأقصى للنطاق (أيام)</max-days>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <min-days>Minimalny zakres (dni)</min-days>
+                                <max-days>Maksymalny zakres (dni)</max-days>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <min-days>最小日数</min-days>
+                                <max-days>最大日数</max-days>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-date-range-grid">
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:select1 ref="instance('local')/field-width" appearance="full xxf:horizontal" id="field-width-control">
+                                <xf:label ref="xxf:r('xbl-control-settings.field-width', '|fr-form-resources|')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.full', '|fr-form-resources|')"/>
+                                    <xf:value>full</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.natural', '|fr-form-resources|')"/>
+                                    <xf:value>natural</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <fr:number ref="instance('local')/min-days" id="min-days-control">
+                                <xf:label ref="xxf:r('min-days')"/>
+                            </fr:number>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <fr:number ref="instance('local')/max-days" id="max-days-control">
+                                <xf:label ref="xxf:r('max-days')"/>
+                            </fr:number>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-date-range-action"
+                    event="xforms-value-changed"
+                    observer="field-width-control min-days-control max-days-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/date-range/date-range.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+
+            <xf:model id="date-range-model">
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
+                    <_>
+                        <resource xml:lang="en"><start-date>Start date</start-date><end-date>End date</end-date></resource>
+                        <resource xml:lang="es"><start-date>Fecha de inicio</start-date><end-date>Fecha de fin</end-date></resource>
+                        <resource xml:lang="fi"><start-date>Alkamispäivä</start-date><end-date>Päättymispäivä</end-date></resource>
+                        <resource xml:lang="fr"><start-date>Date de début</start-date><end-date>Date de fin</end-date></resource>
+                        <resource xml:lang="ru"><start-date>Дата начала</start-date><end-date>Дата окончания</end-date></resource>
+                        <resource xml:lang="de"><start-date>Startdatum</start-date><end-date>Enddatum</end-date></resource>
+                        <resource xml:lang="it"><start-date>Data di inizio</start-date><end-date>Data di fine</end-date></resource>
+                        <resource xml:lang="nl"><start-date>Startdatum</start-date><end-date>Einddatum</end-date></resource>
+                        <resource xml:lang="sv"><start-date>Startdatum</start-date><end-date>Slutdatum</end-date></resource>
+                        <resource xml:lang="pt"><start-date>Data de início</start-date><end-date>Data de fim</end-date></resource>
+                        <resource xml:lang="pl"><start-date>Data początkowa</start-date><end-date>Data końcowa</end-date></resource>
+                        <resource xml:lang="ar"><start-date>تاريخ البدء</start-date><end-date>تاريخ الانتهاء</end-date></resource>
+                        <resource xml:lang="ca"><start-date>Data d'inici</start-date><end-date>Data de fi</end-date></resource>
+                        <resource xml:lang="da"><start-date>Startdato</start-date><end-date>Slutdato</end-date></resource>
+                        <resource xml:lang="hu"><start-date>Kezdő dátum</start-date><end-date>Záró dátum</end-date></resource>
+                        <resource xml:lang="ja"><start-date>開始日</start-date><end-date>終了日</end-date></resource>
+                        <resource xml:lang="no"><start-date>Startdato</start-date><end-date>Sluttdato</end-date></resource>
+                        <resource xml:lang="tr"><start-date>Başlangıç tarihi</start-date><end-date>Bitiş tarihi</end-date></resource>
+                        <resource xml:lang="zh-Hans"><start-date>开始日期</start-date><end-date>结束日期</end-date></resource>
+                        <resource xml:lang="zh-Hant"><start-date>開始日期</start-date><end-date>結束日期</end-date></resource>
+                    </_>
+                </xf:instance>
+                <xf:instance id="i">
+                    <_>
+                        <start-date/>
+                        <end-date/>
+                        <is-readonly/>
+                    </_>
+                </xf:instance>
+                <xf:bind ref="instance('i')">
+                    <xf:bind
+                        ref="start-date"
+                        type="xf:date"
+                        readonly="../is-readonly = 'true'"/>
+                    <xf:bind
+                        ref="end-date"
+                        type="xf:date"
+                        readonly="../is-readonly = 'true'"
+                        constraint="
+                            not(
+                                string(.) castable as xs:date and
+                                ../start-date/string() castable as xs:date and
+                                xs:date(string(.)) lt xs:date(../start-date/string())
+                            )"/>
+                </xf:bind>
+            </xf:model>
+
+        </xbl:implementation>
+
+        <xbl:handlers>
+            <xbl:handler event="xforms-readonly xforms-readwrite xforms-enabled" phase="target">
+                <xf:setvalue
+                    ref="instance('i')/is-readonly"
+                    value="xxf:is-control-readonly('fr-date-range')"/>
+            </xbl:handler>
+            <xbl:handler event="DOMActivate" observer="start-date end-date">
+                <xf:dispatch name="DOMActivate" targetid="fr-date-range"/>
+            </xbl:handler>
+            <xbl:handler
+                event="DOMActivate DOMFocusOut"
+                phase="target">
+                <xf:setvalue
+                    ref="xxf:binding('fr-date-range')"
+                    value="
+                        DateRangeSupport:combineStartEnd(
+                            instance('i')/start-date/string(),
+                            instance('i')/end-date/string()
+                        )"/>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:template>
+
+            <xf:var name="local-start" value="instance('i')/start-date"/>
+            <xf:var name="local-end"   value="instance('i')/end-date"/>
+
+            <!-- Update local start and end dates from bound node -->
+            <xf:var name="value" as="xs:string" value="xxf:value('fr-date-range')">
+                <xf:action event="xforms-value-changed xforms-enabled">
+                    <xf:setvalue ref="$local-start" value="DateRangeSupport:startPart($value)"/>
+                    <xf:setvalue ref="$local-end"   value="DateRangeSupport:endPart($value)"/>
+                </xf:action>
+            </xf:var>
+
+            <!-- Update bound node immediately when both dates are valid or both are empty -->
+            <xf:action event="xforms-value-changed" observer="start-date end-date">
+                <xf:var
+                    name="both-valid-or-both-empty"
+                    value="
+                        ($local-start/string() castable as xs:date and $local-end/string() castable as xs:date) or
+                        ($local-start/string() = '' and $local-end/string() = '')"/>
+                <xf:setvalue
+                    if="$both-valid-or-both-empty"
+                    ref="xxf:binding('fr-date-range')"
+                    value="DateRangeSupport:combineStartEnd($local-start/string(), $local-end/string())"/>
+            </xf:action>
+
+            <xh:div
+                id="fr-date-range-elem"
+                class="fr-date-range-fields fr-field-width-{fr:component-param-value('field-width')}"
+                xxf:control="true">
+                <fr:date ref="$local-start" id="start-date">
+                    <xf:label ref="fr:r('start-date')"/>
+                </fr:date>
+                <xh:span class="fr-date-range-separator" aria-hidden="true">–</xh:span>
+                <fr:date ref="$local-end" id="end-date">
+                    <xf:label ref="fr:r('end-date')"/>
+                </fr:date>
+            </xh:div>
+        </xbl:template>
+
+    </xbl:binding>
+
+    <xbl:binding
+        id="fr-date-range-output"
+        element="
+            fr|date-range[fr|static-readonly = true],
+            fr|date-range[fr|pdf-template = true]"
+        xxbl:mode="lhha binding value"
+        xxbl:label-for="input">
+        <xbl:template>
+            <xf:input
+                id="input"
+                ref="xxf:binding('fr-date-range-output')"
+                xbl:attr="xxf:readonly-appearance"
+                xxf:format="
+                    DateRangeSupport:formatReadonlyModeDateRange(
+                        .,
+                        (
+                            fr:component-param-value('output-format')[xxf:non-blank()],
+                            xxf:property(string-join(('oxf.xforms.xbl.fr.date.output-format', fr:app-name(), fr:form-name()), '.'))[xxf:non-blank()],
+                            xxf:property('oxf.xforms.xbl.fr.date.output-format')[xxf:non-blank()],
+                            property('xxf:format.input.date')
+                        )[1]
+                    )"/>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

@@ -179,6 +179,7 @@
         +fr:percentage
         +fr:time
         +fr:datetime
+        +fr:date-range
         +fr:duration
         +fr:hidden
         +fr:character-counter
@@ -280,6 +281,7 @@
         +fr:percentage
         +fr:time
         +fr:datetime
+        +fr:date-range
         +fr:duration
         +fr:hidden
         +fr:character-counter

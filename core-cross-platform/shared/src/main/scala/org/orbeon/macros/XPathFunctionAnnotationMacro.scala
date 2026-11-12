@@ -101,13 +101,14 @@ object XPathFunctionAnnotationMacro {
 
       def resolveSimpleType(tpt: Tree): String =
         tpt match {
-          case tq"Int" | tq"Long"                   => "int"
-          case tq"Double"                           => "double"
-          case tq"String"                           => "string"
-          case tq"Boolean"                          => "boolean"
-          case tq"java.time.Instant" | tq"Instant"  => "instant"
-          case tq"org.orbeon.dom.QName" | tq"QName" => "qname"
-          case _                                    => "item"
+          case tq"Int" | tq"Long"                                   => "int"
+          case tq"Double"                                           => "double"
+          case tq"String"                                           => "string"
+          case tq"Boolean"                                          => "boolean"
+          case tq"java.time.Instant" | tq"Instant"                  => "instant"
+          case tq"org.orbeon.saxon.value.DateValue" | tq"DateValue" => "date"
+          case tq"org.orbeon.dom.QName" | tq"QName"                 => "qname"
+          case _                                                    => "item"
         }
 
       def resolveType(tpt: Tree): (Boolean, Boolean, String) =
@@ -161,6 +162,7 @@ object XPathFunctionAnnotationMacro {
           case "string"  => q"""org.orbeon.saxon.model.BuiltInAtomicType.STRING"""
           case "boolean" => q"""org.orbeon.saxon.model.BuiltInAtomicType.BOOLEAN"""
           case "instant" => q"""org.orbeon.saxon.model.BuiltInAtomicType.DATE_TIME"""
+          case "date"    => q"""org.orbeon.saxon.model.BuiltInAtomicType.DATE"""
           case "qname"   => q"""org.orbeon.saxon.model.BuiltInAtomicType.QNAME"""
           case "item"    => q"""org.orbeon.saxon.model.AnyItemType"""
         }

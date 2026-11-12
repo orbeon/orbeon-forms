@@ -1,0 +1,45 @@
+.xbl-fr-date-range {
+    .fr-date-range-fields {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: .4em;
+
+        .xbl-fr-date,
+        .fr-view & .xbl-fr-date,
+        .fr-grid & .xbl-fr-date,
+        .fr-view .fr-grid & .xbl-fr-date {
+            flex: 1 1 0;
+            min-width: 0;
+            margin-bottom: 0;
+
+            // Labels for start-date and end-date are for screen readers
+            > .xforms-label {
+                overflow: hidden;
+                display: block;
+                height: 0;
+                width: 0;
+                margin: 0;
+            }
+        }
+
+        .fr-date-range-separator {
+            flex: 0 0 auto;
+            color: var(--orbeon-hint-color);
+            user-select: none;
+            padding: 0 .1em;
+        }
+
+        &.fr-field-width-full {
+            .xbl-fr-date {
+                .fr-field-width-natural {
+                    max-width: none;
+                }
+            }
+        }
+
+        &.fr-field-width-natural {
+            max-width: 23em;
+        }
+    }
+}

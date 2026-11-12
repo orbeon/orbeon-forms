@@ -4,7 +4,7 @@ import org.orbeon.dom.QName
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{Chain, SequenceTool}
-import org.orbeon.saxon.value.{AtomicValue, BooleanValue, DateTimeValue, DoubleValue, EmptySequence, Int64Value, QNameValue, StringValue}
+import org.orbeon.saxon.value.{AtomicValue, BooleanValue, DateTimeValue, DateValue, DoubleValue, EmptySequence, Int64Value, QNameValue, StringValue}
 import org.orbeon.scaxon.Implicits
 
 import java.time.Instant
@@ -115,6 +115,7 @@ object FunctionSupport2 {
   implicit val ItemEncode        : Encode[om.Item]     = (v: om.Item)     => new om.One(v)
   implicit val NodeInfoEncode    : Encode[om.NodeInfo] = (v: om.NodeInfo) => new om.One(v)
   implicit val AtomicValueEncode : Encode[AtomicValue] = (v: AtomicValue) => new om.One(v)
+  implicit val DateValueEncode   : Encode[DateValue]   = (v: DateValue)   => new om.One(v)
   implicit val InstantEncode     : Encode[Instant]     = (v: Instant)     => new om.One(DateTimeValue.fromJavaInstant(v))
   implicit val QNameEncode       : Encode[QName]       = (v: QName)       => new om.One(new QNameValue(v.namespace.prefix, v.namespace.uri, v.localName))
 

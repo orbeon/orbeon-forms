@@ -280,5 +280,19 @@ class ControlCustomSettingsParserTest
       assert(scaleSpec.findSetting("allowClear").exists(_.defaultVal.contains(Json.fromBoolean(true))))
       assert(scaleSpec.constraints.size == 1)
     }
+
+    it("must parse `<fr:date-range>` custom settings and constraints") {
+      import org.orbeon.scaxon.SimplePath.*
+
+      val dateRangeDoc = new org.orbeon.dom.saxon.DocumentWrapper(
+        org.orbeon.oxf.resources.ResourceManagerWrapper.instance.getContentAsOrbeonDom("/xbl/orbeon/date-range/date-range.xbl"),
+        null,
+        org.orbeon.oxf.util.XPath.GlobalConfiguration
+      )
+      val dateRangeSpec = ControlCustomSettingsParser.fromBinding((dateRangeDoc.rootElement / "*:binding").head).get
+      assert(dateRangeSpec.localName == "date-range")
+      assert(dateRangeSpec.settings.map(_.name) == List("fieldWidth", "minDays", "maxDays"))
+      assert(dateRangeSpec.constraints.size == 1)
+    }
   }
 }

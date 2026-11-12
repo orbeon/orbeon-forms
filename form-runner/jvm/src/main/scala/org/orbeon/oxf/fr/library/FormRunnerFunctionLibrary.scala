@@ -59,7 +59,7 @@ import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
 import org.orbeon.scaxon.Implicits
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps}
-import org.orbeon.xbl.{ErrorSummary, Wizard}
+import org.orbeon.xbl.{DateRangeSupport, ErrorSummary, Wizard}
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_URI
 import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
@@ -258,6 +258,16 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     Fun("errors", classOf[FRErrors], op = 0, min = 0, ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
     Fun("validation-errors-to-csv", classOf[FRValidationErrorsToCSV], op = 0, min = 1, STRING, EXACTLY_ONE,
       Arg(ITEM_TYPE, EXACTLY_ONE),
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
+    )
+
+    Fun("date-range-start", classOf[FRDateRangeStart], op = 0, min = 1, DATE, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
+    )
+    Fun("date-range-end", classOf[FRDateRangeEnd], op = 0, min = 1, DATE, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
+    )
+    Fun("date-range-days", classOf[FRDateRangeDays], op = 0, min = 1, INTEGER, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, ALLOWS_ZERO_OR_ONE)
     )
   }
@@ -1196,5 +1206,35 @@ class FRValidationErrorsToCSV extends FunctionSupport with RuntimeDependentFunct
     val csvContent = "\uFEFF" + allLines.map(line => line.map(escapeCsvField).mkString(",")).mkString("\r\n")
     val base64 = java.util.Base64.getEncoder.encodeToString(csvContent.getBytes(java.nio.charset.StandardCharsets.UTF_8))
     new StringValue(s"data:text/csv;charset=utf-8;base64,$base64")
+  }
+}
+
+class FRDateRangeStart extends FunctionSupport with DefaultFunctionSupport {
+  override def evaluateItem(xpathContext: XPathContext): DateValue = {
+    implicit val xpc: XPathContext = xpathContext
+    stringArgumentOpt(0)
+      .flatMap(DateRangeSupport.startIsoDateOpt)
+      .map(iso => new DateValue(iso.toIsoString))
+      .orNull
+  }
+}
+
+class FRDateRangeEnd extends FunctionSupport with DefaultFunctionSupport {
+  override def evaluateItem(xpathContext: XPathContext): DateValue = {
+    implicit val xpc: XPathContext = xpathContext
+    stringArgumentOpt(0)
+      .flatMap(DateRangeSupport.endIsoDateOpt)
+      .map(iso => new DateValue(iso.toIsoString))
+      .orNull
+  }
+}
+
+class FRDateRangeDays extends FunctionSupport with DefaultFunctionSupport {
+  override def evaluateItem(xpathContext: XPathContext): Int64Value = {
+    implicit val xpc: XPathContext = xpathContext
+    stringArgumentOpt(0)
+      .flatMap(DateRangeSupport.daysBetweenOpt)
+      .map(new Int64Value(_))
+      .orNull
   }
 }

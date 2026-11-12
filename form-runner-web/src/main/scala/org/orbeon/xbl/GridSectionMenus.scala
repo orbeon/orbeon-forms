@@ -20,6 +20,8 @@ import org.orbeon.xforms.{AjaxClient, AjaxEvent, XFormsId}
 import org.scalajs.dom
 import org.scalajs.dom.{KeyboardEvent, KeyboardEventInit, html}
 
+import scala.scalajs.js.timers
+
 
 object GridSectionMenus {
   sealed trait Operation extends EnumEntry with Hyphencase
@@ -50,6 +52,24 @@ trait GridSectionMenus {
   // This transiently holds information between a click on the menu and a subsequent action in the menu.
   // Not nice but we don't have FRP at this point.
   private var currentComponentOpt: Option[CurrentComponent] = None
+  private var suppressNextClick  : Boolean                  = false
+
+  def onDragStart(): Unit = {
+    suppressNextClick = true
+    if (
+      (globalMenuElem ne null) && (
+        globalMenuElem.hasClass("open") ||
+        globalMenuElem.querySelectorOpt(".dropdown-menu.show").nonEmpty
+      )
+    ) {
+      globalMenuElem.querySelectorT(".dropdown-toggle").click()
+    }
+  }
+
+  def onDragEnd(): Unit =
+    timers.setTimeout(0) {
+      suppressNextClick = false
+    }
 
   // Initialization
   if (globalMenuElem != null) {
@@ -63,9 +83,18 @@ trait GridSectionMenus {
       "click",
       (event: dom.Event) => {
 
-        val target  = event.targetT
-        if (target.closestOpt(s".fr-$componentName-dropdown-button").nonEmpty) moveAndShowMenuHandler(event)
-        if (target.closestOpt(s".fr-$componentName-remove-button").nonEmpty  ) removeIterationHandler(event)
+        val target = event.targetT
+        if (target.closestOpt(s".fr-$componentName-dropdown-button").nonEmpty) {
+          if (suppressNextClick) {
+            suppressNextClick = false
+            event.preventDefault()
+            event.stopPropagation()
+          } else {
+            moveAndShowMenuHandler(event)
+          }
+        }
+        if (target.closestOpt(s".fr-$componentName-remove-button").nonEmpty)
+          removeIterationHandler(event)
 
         // Menu actions
         Operation.values.foreach { op =>

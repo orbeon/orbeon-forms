@@ -533,7 +533,7 @@
                 <xh:span id="my-new-upload⊙1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-empty xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-upload≡xforms-input⊙1">My label</xh:label>
                     <xh:span id="my-new-upload≡≡c⊙1">
-                    <xh:input class="xforms-upload-select" type="file" id="my-new-upload≡xforms-input⊙1" name="my-new-upload⊙1" unselectable="on" accept=".asf,.asx,.avi,.dl,.fli,.gl,.mng,.mov,.movie,.mp4,.mpe,.mpeg,.mpg,.mxu,.ogv,.qt,.webm,.wmv" aria-describedby="my-new-upload≡≡t⊙1 my-new-upload≡≡p⊙1" aria-errormessage="my-new-upload≡≡a⊙1"/>
+                    <xh:input class="xforms-upload-select" type="file" id="my-new-upload≡xforms-input⊙1" name="my-new-upload⊙1" unselectable="on" accept="video/*" aria-describedby="my-new-upload≡≡t⊙1 my-new-upload≡≡p⊙1" aria-errormessage="my-new-upload≡≡a⊙1"/>
                         <xh:span class="xforms-upload-info">
                             <xh:span class="xforms-upload-filename"/>
                             <xh:span class="xforms-upload-mediatype"/>
@@ -552,7 +552,7 @@
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-upload-2⊙1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-empty xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:span id="my-new-upload-2≡≡c⊙1">
-                        <xh:input class="xforms-upload-select" type="file" id="my-new-upload-2≡xforms-input⊙1" name="my-new-upload-2⊙1" unselectable="on" accept=".jpe,.jpeg,.jpg" aria-describedby="xf-6⊙1 xf-7⊙1" aria-errormessage="xf-8⊙1"/>
+                        <xh:input class="xforms-upload-select" type="file" id="my-new-upload-2≡xforms-input⊙1" name="my-new-upload-2⊙1" unselectable="on" accept=".jfif,.jpe,.jpeg,.jpg" aria-describedby="xf-6⊙1 xf-7⊙1" aria-errormessage="xf-8⊙1"/>
                         <xh:span class="xforms-upload-info">
                             <xh:span class="xforms-upload-filename"/>
                             <xh:span class="xforms-upload-mediatype"/>

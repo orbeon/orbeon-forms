@@ -492,19 +492,22 @@ object XFormsUploadControl {
     }
   }
 
+  private val HtmlWildcardTypes = Set("audio", "video", "image")
+
   def buildExtensionsListAcceptValue(s: String): Option[String] =
     AllowedMediatypes.unapply(s).flatMap {
       case AllowedMediatypes.AllowedAnyMediatype => None // no `accept` value if all area allowed
       case AllowedMediatypes.AllowedSomeMediatypes(mediatypes) =>
-        val extensions =
+        val acceptTokens =
           mediatypes
             .toSortedSet
             .flatMap {
-              case MediatypeRange.WildcardTypeMediatypeRange(typ)    => Mediatypes.findExtensionsForSpecificType(typ) // for `audio/*`, `video/*`, `image/*`
-              case MediatypeRange.SingletonMediatypeRange(mediatype) => Mediatypes.findExtensionsForMediatype(mediatype.toString)
-              case MediatypeRange.WildcardMediatypeRange             => throw new IllegalStateException
+              case r @ MediatypeRange.WildcardTypeMediatypeRange(typ) if HtmlWildcardTypes(typ.value) => List(r.toString) // for `audio/*`, `video/*`, `image/*`
+              case MediatypeRange.WildcardTypeMediatypeRange(typ)                                     => Mediatypes.findExtensionsForSpecificType(typ).map("." + _)
+              case MediatypeRange.SingletonMediatypeRange(mediatype)                                  => Mediatypes.findExtensionsForMediatype(mediatype.toString).map("." + _)
+              case MediatypeRange.WildcardMediatypeRange                                              => throw new IllegalStateException
             }
 
-        extensions.nonEmpty.option(extensions.mkString(".", ",.", ""))
+        acceptTokens.nonEmpty.option(acceptTokens.mkString(","))
     }
 }

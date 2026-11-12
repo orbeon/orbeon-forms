@@ -24,9 +24,6 @@
 @fbIconsHeight: 18px;
 @fbGridRowMinHeight: 84px;
 
-// Retro Summer #2 Color Scheme
-@color2: #FABB01; // Selective Yellow (used by .fb-console-title)
-
 @fbButtonsBackground: var(--orbeon-fb-navbar-background-color); // so that the borderless buttons look good
 
 // Case of non-embedded Form Builder: size body to take the whole viewport
@@ -3354,15 +3351,19 @@ body.orbeon {
                 flex-grow: 0;
 
                 .fb-console-title {
-                    background-color: @color2;
+                    background-color: var(--orbeon-fb-console-title-background-color);
                     margin: 0 -1px;
                     border: none;
                     font-size: 14px;
                     line-height: 32px;                                     // was 2rem (16px root)
                     padding: 0 10px;
                     font-weight: bold;
-                    color: var(--orbeon-base-color);
+                    color: var(--orbeon-fb-console-title-color);
                     border-top: 2px solid var(--orbeon-base-border-color); // see `.fr-dialog-buttons`
+
+                    .fa {
+                        color: var(--orbeon-fb-console-title-color);
+                    }
                 }
 
                 .fb-console-close {

@@ -1699,7 +1699,7 @@ lazy val orbeonWarJVM = (project in file("orbeon-war/jvm"))
     Test / parallelExecution := false,
     Test / testOptions       += Tests.Argument(TestFrameworks.ScalaTest, "-oF"),
     Test / testOptions       += {
-      val packageFile = (Compile / Keys.`package`).value
+      val packageFile = (Keys.`package`).value
       Tests.Setup(() => OrbeonSupport.dummyDependency(packageFile))
     }
   )

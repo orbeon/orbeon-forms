@@ -465,8 +465,9 @@ object Connection extends ConnectionTrait {
                   .orElse(contentTypeFromQueryParameters)
                   .map(ct => ContentType -> List(ct))
 
+              // Capitalize header names (e.g. `FileURLConnection` uses lowercase) so `contentTypeHeader` and `rangeHeaders` override them
               val headersFromConnection =
-                urlConnection.getHeaderFields.asScala map { case (k, v) => k -> v.asScala.to(List) } toMap
+                urlConnection.getHeaderFields.asScala map { case (k, v) => capitalizeCommonOrSplitHeader(k) -> v.asScala.to(List) } toMap
 
               val headersWithContentType =
                 headersFromConnection ++ contentTypeHeader.toList

@@ -156,6 +156,15 @@ class HighlightBackdrop(
       backdropElem   <- backdropElemOpt
       highlightsElem <- highlightsElemOpt
     } locally {
+      val computed = dom.window.getComputedStyle(fieldElem)
+      val isInput  = fieldElem.isInstanceOf[html.Input]
+
+      def pxValue(prop: String): Double =
+        Option(computed.getPropertyValue(prop))
+          .map(v => js.Dynamic.global.parseFloat(v).asInstanceOf[Double])
+          .filter(! _.isNaN)
+          .getOrElse(0.0)
+
       val width  = fieldElem.clientWidth
       val height = fieldElem.clientHeight
 
@@ -164,19 +173,44 @@ class HighlightBackdrop(
         val wrapperRect = wrapperElem.getBoundingClientRect()
         val fieldRect   = fieldElem.getBoundingClientRect()
 
-        val left = fieldRect.left - wrapperRect.left - wrapperElem.clientLeft + fieldElem.clientLeft
+        // For `<input>`, position the backdrop at the horizontal content box (inside `padding-left` and
+        // `padding-right`) and set horizontal padding on `highlightsElem` to `0px`. Indeed, in Blink,
+        // `input.clientLeft` already includes `padding-left` and `input.clientWidth` excludes horizontal
+        // padding, so copying `padding-left`/`padding-right` to `highlightsElem` would apply horizontal
+        // padding twice; and in all browsers, single-line `<input>` clips horizontal scrolling at the
+        // content box edges.
+        val (fieldLeftOffset, effectiveWidth) =
+          if (isInput) {
+            val borderLeft   = pxValue("border-left-width")
+            val borderRight  = pxValue("border-right-width")
+            val paddingLeft  = pxValue("padding-left")
+            val paddingRight = pxValue("padding-right")
+            (
+              borderLeft + paddingLeft,
+              math.max(0.0, fieldRect.width - borderLeft - borderRight - paddingLeft - paddingRight)
+            )
+          } else {
+            (
+              fieldElem.clientLeft.toDouble,
+              width.toDouble
+            )
+          }
+
+        val left = fieldRect.left - wrapperRect.left - wrapperElem.clientLeft + fieldLeftOffset
         val top  = fieldRect.top  - wrapperRect.top  - wrapperElem.clientTop  + fieldElem.clientTop
 
         backdropElem.style.left   = s"${left}px"
         backdropElem.style.top    = s"${top}px"
-        backdropElem.style.width  = s"${width}px"
+        backdropElem.style.width  = s"${effectiveWidth}px"
         backdropElem.style.height = s"${height}px"
       }
 
-      val computed = dom.window.getComputedStyle(fieldElem)
-
       for (prop <- HighlightBackdrop.RelevantStyles) {
-        val value = computed.getPropertyValue(prop)
+        val value =
+          if (isInput && (prop == "padding-left" || prop == "padding-right"))
+            "0px"
+          else
+            computed.getPropertyValue(prop)
         if (value != null && value.nonEmpty)
           highlightsElem.style.setProperty(prop, value)
       }

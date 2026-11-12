@@ -457,4 +457,142 @@ class XPathFormatterTest extends AnyFunSpec with Matchers {
       html should include("""<span class="xpath-keyword">return</span> <span class="xpath-variable">$x</span> <span class="xpath-operator">+</span> <span class="xpath-variable">$y</span>""")
     }
   }
+
+  describe("AVT syntax highlighting") {
+    import Span.*
+
+    it("keeps non-AVT highlighting by default (avt = false)") {
+      val input = "for $x in 1 to 2 return map { 'k': $x }"
+      XPathHighlighter.highlight(input) shouldBe XPathHighlighter.highlight(input, avt = false)
+      XPathHighlighter.highlight(input).head shouldBe Span("for", XPathTokenType.Keyword)
+    }
+
+    it("highlights plain literal text without curly brackets as Plain when avt = true") {
+      XPathHighlighter.highlight("", avt = true) shouldBe Nil
+
+      val input = "https://example.com/path/for/items"
+      val spans = XPathHighlighter.highlight(input, avt = true)
+      spans shouldBe List(Span(input, XPathTokenType.Plain))
+      spans.toPlainText shouldBe input
+    }
+
+    it("highlights single and multiple embedded XPath expressions") {
+      val input = "https://example.com/verify/{$id}?lang={upper-case('en')}"
+      val spans = XPathHighlighter.highlight(input, avt = true)
+
+      spans shouldBe List(
+        Span("https://example.com/verify/", XPathTokenType.Plain),
+        Span("{", XPathTokenType.Punctuation),
+        Span("$id", XPathTokenType.Variable),
+        Span("}", XPathTokenType.Punctuation),
+        Span("?lang=", XPathTokenType.Plain),
+        Span("{", XPathTokenType.Punctuation),
+        Span("upper-case", XPathTokenType.FunctionCall),
+        Span("(", XPathTokenType.Punctuation),
+        Span("'en'", XPathTokenType.StringLiteral),
+        Span(")", XPathTokenType.Punctuation),
+        Span("}", XPathTokenType.Punctuation)
+      )
+      spans.toPlainText shouldBe input
+    }
+
+    it("handles escaped {{ and }} curly brackets in literal text while preserving exact text") {
+      val input = "Literal {{braces}}, {{$notVar}}, and {{{1 + 2}}}"
+      val spans = XPathHighlighter.highlight(input, avt = true)
+
+      spans shouldBe List(
+        Span("Literal {{braces}}, {{$notVar}}, and {{", XPathTokenType.Plain),
+        Span("{", XPathTokenType.Punctuation),
+        Span("1", XPathTokenType.NumberLiteral),
+        Span(" ", XPathTokenType.Plain),
+        Span("+", XPathTokenType.Operator),
+        Span(" ", XPathTokenType.Plain),
+        Span("2", XPathTokenType.NumberLiteral),
+        Span("}", XPathTokenType.Punctuation),
+        Span("}}", XPathTokenType.Plain)
+      )
+      spans.toPlainText shouldBe input
+    }
+
+    it("ignores curly brackets inside XPath string literals and nested comments") {
+      val input = """Prefix {'a } '' } b'} and {"c } "" d"} and {(: outer (: } :) } :) $x + 1} suffix"""
+      val spans = XPathHighlighter.highlight(input, avt = true)
+
+      spans shouldBe List(
+        Span("Prefix ", XPathTokenType.Plain),
+        Span("{", XPathTokenType.Punctuation),
+        Span("'a } '' } b'", XPathTokenType.StringLiteral),
+        Span("}", XPathTokenType.Punctuation),
+        Span(" and ", XPathTokenType.Plain),
+        Span("{", XPathTokenType.Punctuation),
+        Span(""""c } "" d"""", XPathTokenType.StringLiteral),
+        Span("}", XPathTokenType.Punctuation),
+        Span(" and ", XPathTokenType.Plain),
+        Span("{", XPathTokenType.Punctuation),
+        Span("(: outer (: } :) } :)", XPathTokenType.Comment),
+        Span(" ", XPathTokenType.Plain),
+        Span("$x", XPathTokenType.Variable),
+        Span(" ", XPathTokenType.Plain),
+        Span("+", XPathTokenType.Operator),
+        Span(" ", XPathTokenType.Plain),
+        Span("1", XPathTokenType.NumberLiteral),
+        Span("}", XPathTokenType.Punctuation),
+        Span(" suffix", XPathTokenType.Plain)
+      )
+      spans.toPlainText shouldBe input
+    }
+
+    it("handles nested curly brackets inside XPath 3.1 expressions (maps, inline functions, EQNames)") {
+      val input = "Value: {let $m := map{'a': 1} return $m?a} / {(function($n) { $n * 2 })(21)} / {Q{http://example.org}item}"
+      val spans = XPathHighlighter.highlight(input, avt = true)
+
+      spans.toPlainText shouldBe input
+      spans.head shouldBe Span("Value: ", XPathTokenType.Plain)
+      spans.last shouldBe Span("}", XPathTokenType.Punctuation)
+      spans should contain(Span("let", XPathTokenType.Keyword))
+      spans should contain(Span("map", XPathTokenType.Keyword))
+      spans should contain(Span("function", XPathTokenType.Keyword))
+      spans should contain(Span("Q{http://example.org}item", XPathTokenType.NodeTest))
+    }
+
+    it("gracefully highlights incomplete or malformed AVTs while typing without losing characters") {
+      val incompleteInputs = List(
+        "{",
+        "}",
+        "{}",
+        "{{{",
+        "}}}",
+        "Hello {$x + ",
+        "Hello } {$x}",
+        "Hello {'unclosed}",
+        "Hello {(: unclosed }",
+        "Hello {$ + 1}"
+      )
+
+      for (input <- incompleteInputs) {
+        val spans = XPathHighlighter.highlight(input, avt = true)
+        spans.toPlainText shouldBe input
+      }
+
+      XPathHighlighter.highlight("Hello {$x + 1", avt = true) shouldBe List(
+        Span("Hello ", XPathTokenType.Plain),
+        Span("{", XPathTokenType.Punctuation),
+        Span("$x", XPathTokenType.Variable),
+        Span(" ", XPathTokenType.Plain),
+        Span("+", XPathTokenType.Operator),
+        Span(" ", XPathTokenType.Plain),
+        Span("1", XPathTokenType.NumberLiteral)
+      )
+    }
+
+    it("renders AVTs to HTML and ANSI when avt = true") {
+      val input = "https://example.com?a=1&b={$x}"
+
+      val html = XPathHighlighter.highlightToHtml(input, avt = true)
+      html shouldBe """https://example.com?a=1&amp;b=<span class="xpath-punctuation">{</span><span class="xpath-variable">$x</span><span class="xpath-punctuation">}</span>"""
+
+      val ansi = XPathHighlighter.highlightToAnsi("ID: {$x}", avt = true)
+      ansi shouldBe s"ID: ${XPathTokenType.Punctuation.ansiColor}{${XPathTokenType.AnsiReset}${XPathTokenType.Variable.ansiColor}$$x${XPathTokenType.AnsiReset}${XPathTokenType.Punctuation.ansiColor}}${XPathTokenType.AnsiReset}"
+    }
+  }
 }

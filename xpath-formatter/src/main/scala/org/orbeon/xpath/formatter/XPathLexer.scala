@@ -41,7 +41,8 @@ class XPathLexer(val input: String) {
         tokens += readStringLiteral(ch)
       } else if (ch == '$') {
         pos += 1 // skip $
-        skipWhitespaceAndComments()
+        if (!includeWhitespaceAndComments)
+          skipWhitespaceAndComments()
         val name = readQName()
         tokens += XPathToken.VarRef(name)
       } else if (ch >= '0' && ch <= '9') {

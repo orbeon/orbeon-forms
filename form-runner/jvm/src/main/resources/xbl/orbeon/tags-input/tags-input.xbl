@@ -24,8 +24,16 @@
         id="fr-tags-input"
         element="fr|tags-input"
         xxbl:container="span"
-        xxbl:mode="lhha binding value focus javascript-lifecycle"
-        xxbl:label-for="tags-input">
+        xxbl:mode="lhha binding value focus javascript-lifecycle allow-minimal-label-hint"
+        xxbl:label-for="tags-input"
+        xxbl:type="xs:string"
+        xxbl:constraint="
+            OpenSelectSupport:isValidTags(
+                string(.),
+                string(fr:component-param-value('validation-type')),
+                string(fr:component-param-value('pattern')),
+                string(fr:component-param-value('max-tags'))
+            )">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Tags</display-name>
@@ -46,6 +54,7 @@
                 <icon-class>fa fa-fw fa-tags</icon-class>
             </icon>
             <templates>
+                <bind type="fr:tags-input"/>
                 <view>
                     <fr:tags-input id="" ref="" xmlns="">
                         <xf:label ref=""/>
@@ -55,6 +64,262 @@
                     </fr:tags-input>
                 </view>
             </templates>
+            <custom-settings>
+                <setting name="validation-type" type="xs:string" values="email url number pattern"/>
+                <setting name="pattern"         type="xs:string"/>
+                <setting name="max-tags"        type="xs:integer" min="1"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-tags-input-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue
+                            ref="$c"
+                            value="instance()/@*[name() = name($c)]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <validation-type/>
+                            <pattern/>
+                            <max-tags/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="validation-type"
+                            xxf:whitespace="trim"/>
+                        <xf:bind
+                            ref="pattern"
+                            xxf:whitespace="trim"
+                            relevant="../validation-type = 'pattern'"/>
+                        <xf:bind
+                            ref="max-tags"
+                            xxf:whitespace="trim"
+                            constraint=". = '' or (. castable as xs:integer and xs:integer(.) ge 1)"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <validation-type>Tag Format</validation-type>
+                                <validation-any>Any text</validation-any>
+                                <validation-email>Email address</validation-email>
+                                <validation-url>Web address (URL)</validation-url>
+                                <validation-number>Number</validation-number>
+                                <validation-pattern>Regular expression</validation-pattern>
+                                <pattern>Regular Expression</pattern>
+                                <pattern-hint>Each tag must match this regular expression, e.g. [A-Z]{2}[0-9]{4}</pattern-hint>
+                                <max-tags>Maximum Number of Tags</max-tags>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <validation-type>Format des étiquettes</validation-type>
+                                <validation-any>Tout texte</validation-any>
+                                <validation-email>Adresse e-mail</validation-email>
+                                <validation-url>Adresse web (URL)</validation-url>
+                                <validation-number>Nombre</validation-number>
+                                <validation-pattern>Expression régulière</validation-pattern>
+                                <pattern>Expression régulière</pattern>
+                                <pattern-hint>Chaque étiquette doit correspondre à cette expression régulière, ex. [A-Z]{2}[0-9]{4}</pattern-hint>
+                                <max-tags>Nombre maximum d'étiquettes</max-tags>
+                            </resource>
+                            <resource xml:lang="no">
+                                <validation-type>Stikkordformat</validation-type>
+                                <validation-any>Vilkårlig tekst</validation-any>
+                                <validation-email>E-postadresse</validation-email>
+                                <validation-url>Nettadresse (URL)</validation-url>
+                                <validation-number>Tall</validation-number>
+                                <validation-pattern>Regulært uttrykk</validation-pattern>
+                                <pattern>Regulært uttrykk</pattern>
+                                <pattern-hint>Hvert stikkord må samsvare med dette regulære uttrykket, f.eks. [A-Z]{2}[0-9]{4}</pattern-hint>
+                                <max-tags>Maksimalt antall stikkord</max-tags>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <validation-type>Формат тегов</validation-type>
+                                <validation-any>Любой текст</validation-any>
+                                <validation-email>Адрес электронной почты</validation-email>
+                                <validation-url>Веб-адрес (URL)</validation-url>
+                                <validation-number>Число</validation-number>
+                                <validation-pattern>Регулярное выражение</validation-pattern>
+                                <pattern>Регулярное выражение</pattern>
+                                <pattern-hint>Каждый тег должен соответствовать этому регулярному выражению, напр. [A-Z]{2}[0-9]{4}</pattern-hint>
+                                <max-tags>Максимальное количество тегов</max-tags>
+                            </resource>
+                            <resource xml:lang="it">
+                                <validation-type>Formato dei tag</validation-type>
+                                <validation-any>Qualsiasi testo</validation-any>
+                                <validation-email>Indirizzo email</validation-email>
+                                <validation-url>Indirizzo web (URL)</validation-url>
+                                <validation-number>Numero</validation-number>
+                                <validation-pattern>Espressione regolare</validation-pattern>
+                                <pattern>Espressione regolare</pattern>
+                                <pattern-hint>Ogni tag deve corrispondere a questa espressione regolare, es. [A-Z]{2}[0-9]{4}</pattern-hint>
+                                <max-tags>Numero massimo di tag</max-tags>
+                            </resource>
+                            <resource xml:lang="de">
+                                <validation-type>Schlagwortformat</validation-type>
+                                <validation-any>Beliebiger Text</validation-any>
+                                <validation-email>E-Mail-Adresse</validation-email>
+                                <validation-url>Webadresse (URL)</validation-url>
+                                <validation-number>Zahl</validation-number>
+                                <validation-pattern>Regulärer Ausdruck</validation-pattern>
+                                <pattern>Regulärer Ausdruck</pattern>
+                                <pattern-hint>Jedes Schlagwort muss diesem regulären Ausdruck entsprechen, z. B. [A-Z]{2}[0-9]{4}</pattern-hint>
+                                <max-tags>Maximale Anzahl an Schlagwörtern</max-tags>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <validation-type>Tunnisteen muoto</validation-type>
+                                <validation-any>Mikä tahansa teksti</validation-any>
+                                <validation-email>Sähköpostiosoite</validation-email>
+                                <validation-url>Verkko-osoite (URL)</validation-url>
+                                <validation-number>Numero</validation-number>
+                                <validation-pattern>Säännöllinen lauseke</validation-pattern>
+                                <pattern>Säännöllinen lauseke</pattern>
+                                <pattern-hint>Jokaisen tunnisteen on vastattava tätä säännöllistä lauseketta, esim. [A-Z]{2}[0-9]{4}</pattern-hint>
+                                <max-tags>Tunnisteiden enimmäismäärä</max-tags>
+                            </resource>
+                            <resource xml:lang="es">
+                                <validation-type>Formato de las etiquetas</validation-type>
+                                <validation-any>Cualquier texto</validation-any>
+                                <validation-email>Dirección de correo electrónico</validation-email>
+                                <validation-url>Dirección web (URL)</validation-url>
+                                <validation-number>Número</validation-number>
+                                <validation-pattern>Expresión regular</validation-pattern>
+                                <pattern>Expresión regular</pattern>
+                                <pattern-hint>Cada etiqueta debe coincidir con esta expresión regular, p. ej. [A-Z]{2}[0-9]{4}</pattern-hint>
+                                <max-tags>Número máximo de etiquetas</max-tags>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <validation-type>Tag-indeling</validation-type>
+                                <validation-any>Willekeurige tekst</validation-any>
+                                <validation-email>E-mailadres</validation-email>
+                                <validation-url>Webadres (URL)</validation-url>
+                                <validation-number>Getal</validation-number>
+                                <validation-pattern>Reguliere expressie</validation-pattern>
+                                <pattern>Reguliere expressie</pattern>
+                                <pattern-hint>Elke tag moet overeenkomen met deze reguliere expressie, bijv. [A-Z]{2}[0-9]{4}</pattern-hint>
+                                <max-tags>Maximaal aantal tags</max-tags>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <validation-type>Formato das etiquetas</validation-type>
+                                <validation-any>Qualquer texto</validation-any>
+                                <validation-email>Endereço de e-mail</validation-email>
+                                <validation-url>Endereço web (URL)</validation-url>
+                                <validation-number>Número</validation-number>
+                                <validation-pattern>Expressão regular</validation-pattern>
+                                <pattern>Expressão regular</pattern>
+                                <pattern-hint>Cada etiqueta deve corresponder a esta expressão regular, ex. [A-Z]{2}[0-9]{4}</pattern-hint>
+                                <max-tags>Número máximo de etiquetas</max-tags>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <validation-type>Taggformat</validation-type>
+                                <validation-any>Valfri text</validation-any>
+                                <validation-email>E-postadress</validation-email>
+                                <validation-url>Webbadress (URL)</validation-url>
+                                <validation-number>Nummer</validation-number>
+                                <validation-pattern>Reguljärt uttryck</validation-pattern>
+                                <pattern>Reguljärt uttryck</pattern>
+                                <pattern-hint>Varje tagg måste matcha detta reguljära uttryck, t.ex. [A-Z]{2}[0-9]{4}</pattern-hint>
+                                <max-tags>Maximalt antal taggar</max-tags>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <validation-type>تنسيق الوسوم</validation-type>
+                                <validation-any>أي نص</validation-any>
+                                <validation-email>عنوان البريد الإلكتروني</validation-email>
+                                <validation-url>عنوان ويب (URL)</validation-url>
+                                <validation-number>رقم</validation-number>
+                                <validation-pattern>تعبير نمطي</validation-pattern>
+                                <pattern>التعبير النمطي</pattern>
+                                <pattern-hint>يجب أن يطابق كل وسم هذا التعبير النمطي، مثل [A-Z]{2}[0-9]{4}</pattern-hint>
+                                <max-tags>الحد الأقصى لعدد الوسوم</max-tags>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <validation-type>Format tagów</validation-type>
+                                <validation-any>Dowolny tekst</validation-any>
+                                <validation-email>Adres e-mail</validation-email>
+                                <validation-url>Adres internetowy (URL)</validation-url>
+                                <validation-number>Liczba</validation-number>
+                                <validation-pattern>Wyrażenie regularne</validation-pattern>
+                                <pattern>Wyrażenie regularne</pattern>
+                                <pattern-hint>Każdy tag musi pasować do tego wyrażenia regularnego, np. [A-Z]{2}[0-9]{4}</pattern-hint>
+                                <max-tags>Maksymalna liczba tagów</max-tags>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <validation-type>タグの形式</validation-type>
+                                <validation-any>任意のテキスト</validation-any>
+                                <validation-email>メールアドレス</validation-email>
+                                <validation-url>Webアドレス (URL)</validation-url>
+                                <validation-number>数値</validation-number>
+                                <validation-pattern>正規表現</validation-pattern>
+                                <pattern>正規表現</pattern>
+                                <pattern-hint>各タグはこの正規表現に一致する必要があります (例: [A-Z]{2}[0-9]{4})</pattern-hint>
+                                <max-tags>タグの最大数</max-tags>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-tags-input-grid">
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <fr:dropdown-select1 ref="instance('local')/validation-type" id="validation-type-control">
+                                <xf:label ref="xxf:r('validation-type')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('validation-any')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('validation-email')"/>
+                                    <xf:value>email</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('validation-url')"/>
+                                    <xf:value>url</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('validation-number')"/>
+                                    <xf:value>number</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('validation-pattern')"/>
+                                    <xf:value>pattern</xf:value>
+                                </xf:item>
+                            </fr:dropdown-select1>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <xf:input ref="instance('local')/max-tags" id="max-tags-control">
+                                <xf:label ref="xxf:r('max-tags')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:input ref="instance('local')/pattern" id="pattern-control">
+                                <xf:label ref="xxf:r('pattern')"/>
+                                <xf:hint ref="xxf:r('pattern-hint')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-tags-input-action"
+                    event="xforms-value-changed"
+                    observer="validation-type-control pattern-control max-tags-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
         </metadata>
 
         <xbl:resources>
@@ -76,13 +341,41 @@
                         <readonly>false</readonly>
                     </_>
                 </xf:instance>
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
+                    <_>
+                        <resource xml:lang="en"><add-custom>Add custom</add-custom></resource>
+                        <resource xml:lang="fr"><add-custom>Ajouter une valeur</add-custom></resource>
+                        <resource xml:lang="es"><add-custom>Añadir personalizado</add-custom></resource>
+                        <resource xml:lang="de"><add-custom>Eigene hinzufügen</add-custom></resource>
+                        <resource xml:lang="it"><add-custom>Aggiungi personalizzato</add-custom></resource>
+                        <resource xml:lang="nl"><add-custom>Aangepast toevoegen</add-custom></resource>
+                        <resource xml:lang="pt"><add-custom>Adicionar personalizado</add-custom></resource>
+                        <resource xml:lang="sv"><add-custom>Lägg till eget</add-custom></resource>
+                        <resource xml:lang="no"><add-custom>Legg til egendefinert</add-custom></resource>
+                        <resource xml:lang="fi"><add-custom>Lisää mukautettu</add-custom></resource>
+                        <resource xml:lang="da"><add-custom>Tilføj brugerdefineret</add-custom></resource>
+                        <resource xml:lang="ru"><add-custom>Добавить свой вариант</add-custom></resource>
+                        <resource xml:lang="pl"><add-custom>Dodaj własną wartość</add-custom></resource>
+                        <resource xml:lang="hu"><add-custom>Egyéni hozzáadása</add-custom></resource>
+                        <resource xml:lang="tr"><add-custom>Özel ekle</add-custom></resource>
+                        <resource xml:lang="ca"><add-custom>Afegir personalitzat</add-custom></resource>
+                        <resource xml:lang="ar"><add-custom>إضافة مخصص</add-custom></resource>
+                        <resource xml:lang="ja"><add-custom>カスタムを追加</add-custom></resource>
+                        <resource xml:lang="zh-Hans"><add-custom>添加自定义</add-custom></resource>
+                        <resource xml:lang="zh-Hant"><add-custom>新增自訂</add-custom></resource>
+                    </_>
+                </xf:instance>
             </xf:model>
         </xbl:implementation>
 
         <xbl:template>
             <xf:group appearance="xxf:internal">
 
-                <xf:var name="binding" value="xxf:binding('fr-tags-input')"/>
+                <xf:var name="binding"         value="xxf:binding('fr-tags-input')"/>
+                <xf:var name="collapsible"     value="string(fr:component-param-value('collapsible')) = 'true'"/>
+                <xf:var name="validation-type" value="string(fr:component-param-value('validation-type'))"/>
+                <xf:var name="pattern"         value="string(fr:component-param-value('pattern'))"/>
+                <xf:var name="max-tags"        value="string(fr:component-param-value('max-tags'))"/>
                 <xf:var
                     name="view"
                     value="
@@ -91,12 +384,26 @@
                     "/>
 
                 <xh:div
-                    class="fr-open-select-tags-wrapper"
+                    class="fr-open-select-tags-wrapper{' xforms-hidden'[$collapsible and ($view or instance('i')/readonly = 'true') and xxf:is-blank($binding)]}"
                     data-fr-open-tokens="{string($binding)}"
                     data-fr-readonly="{instance('i')/readonly = 'true'}"
-                    data-fr-view="{$view}">
+                    data-fr-view="{$view}"
+                    data-fr-collapsible="{$collapsible}"
+                    data-fr-validation-type="{$validation-type}"
+                    data-fr-pattern="{$pattern}"
+                    data-fr-max-tags="{$max-tags}"
+                    xbl:attr="xxf:placeholder=data-fr-placeholder placeholder=data-fr-placeholder">
 
-                    <xh:div class="fr-open-select-tags-container{' fr-open-select-tags-disabled'[$view or instance('i')/readonly = 'true']}">
+                    <xh:button
+                        type="button"
+                        class="btn btn-link fr-open-select-add-custom{' xforms-hidden'[not($collapsible) or $view or instance('i')/readonly = 'true' or xxf:non-blank($binding)]}">
+                        <xh:i class="fa fa-plus-circle" aria-hidden="true"/>
+                        <xh:span class="fr-open-select-add-custom-label">
+                            <xf:output value="fr:r('add-custom')"/>
+                        </xh:span>
+                    </xh:button>
+
+                    <xh:div class="fr-open-select-tags-container{' xforms-hidden'[$collapsible and xxf:is-blank($binding)]}{' fr-open-select-tags-disabled'[$view or instance('i')/readonly = 'true']}">
                         <!-- Client-side pills container for interactive mode -->
                         <xh:span class="fr-open-select-pills{' xforms-hidden'[$view]}"/>
 
@@ -114,6 +421,7 @@
                             type="text"
                             class="fr-open-select-tags-input{' xforms-hidden'[$view]}"
                             xxf:control="true"
+                            aria-label="{if ($collapsible) then fr:r('add-custom') else xxf:label('fr-tags-input')}"
                             autocomplete="off"/>
                     </xh:div>
 
@@ -121,7 +429,7 @@
                         id="open-tokens-input"
                         ref="$binding"
                         class="fr-open-select-hidden-input xforms-hidden">
-                        <xf:label class="xforms-hidden"/>
+                        <xf:label class="xforms-hidden" ref="fr:r('add-custom')"/>
                         <xf:action event="xforms-value-changed">
                             <xxf:setvisited control="fr-tags-input"/>
                         </xf:action>

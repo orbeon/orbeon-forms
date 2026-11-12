@@ -23,15 +23,15 @@
 
         .fr-open-select-tags-wrapper {
             width     : 100%;
-            margin-top: 6px;
+            margin-top: 0;
+
+            &[data-fr-collapsible="true"] {
+                margin-top: 6px;
+            }
 
             &.xforms-hidden {
                 display: none;
             }
-        }
-
-        &.xbl-fr-tags-input .fr-open-select-tags-wrapper {
-            margin-top: 0;
         }
 
         button.fr-open-select-add-custom {
@@ -142,6 +142,30 @@
                 border-radius   : var(--orbeon-control-border-radius);
                 box-sizing      : border-box;
                 overflow-wrap   : anywhere;
+
+                &.fr-open-select-pill-selected {
+                    border-color: var(--orbeon-focus-border-color);
+                    box-shadow  : 0 0 0 1px var(--orbeon-focus-border-color);
+                }
+
+                &.fr-open-select-pill-invalid {
+                    border-color: @error;
+                }
+
+                .fr-open-select-pill-edit-input {
+                    min-width       : 3em;
+                    height          : auto;
+                    padding         : 0;
+                    margin          : 0;
+                    border          : 0;
+                    border-radius   : 0;
+                    box-shadow      : none;
+                    outline         : none;
+                    background-color: transparent;
+                    color           : inherit;
+                    font-size       : var(--orbeon-control-font-size);
+                    line-height     : 1.4;
+                }
 
                 .fr-open-select-pill-remove {
                     display        : inline-flex;

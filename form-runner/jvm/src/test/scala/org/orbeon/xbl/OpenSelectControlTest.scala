@@ -57,6 +57,23 @@ class OpenSelectControlTest
       assert(closed == List("apple", "orange"))
       assert(open   == List("Ice+cream", "Dark+chocolate"))
     }
+
+    it("must validate individual tags and token lists according to validation-type, pattern, and max-tags") {
+      assert(OpenSelectSupport.isValidTag("Alice Smith", "", ""))
+      assert(OpenSelectSupport.isValidTag("alice@example.com", "email", ""))
+      assert(! OpenSelectSupport.isValidTag("not-an-email", "email", ""))
+      assert(OpenSelectSupport.isValidTag("https://www.orbeon.com/forms", "url", ""))
+      assert(! OpenSelectSupport.isValidTag("ftp://invalid", "url", ""))
+      assert(OpenSelectSupport.isValidTag("-42.5", "number", ""))
+      assert(! OpenSelectSupport.isValidTag("42a", "number", ""))
+      assert(OpenSelectSupport.isValidTag("INV-1024", "pattern", "INV-[0-9]{4}"))
+      assert(! OpenSelectSupport.isValidTag("INV-99", "pattern", "INV-[0-9]{4}"))
+
+      assert(OpenSelectSupport.isValidTags("alice@example.com bob@example.org", "email", "", "2"))
+      assert(! OpenSelectSupport.isValidTags("alice@example.com bob@example.org charlie@example.net", "email", "", "2"))
+      assert(! OpenSelectSupport.isValidTags("alice@example.com invalid-email", "email", "", "5"))
+      assert(OpenSelectSupport.isValidTags("", "email", "", "2"))
+    }
   }
 
   describe("fr:open-select control") {
@@ -181,6 +198,64 @@ class OpenSelectControlTest
             }
             assert(component.getValue(EventCollector.Throw)       == "alpha+release")
             assert(openTokensInput.getValue(EventCollector.Throw) == "alpha+release")
+          }
+        }
+      }
+    }
+
+    it("must enforce validation-type and max-tags constraints on fr:tags-input") {
+
+      val xhtml =
+        <xh:html
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xh:head>
+            <xf:model
+              id="fr-form-model"
+              xxf:lang="en"
+              xxf:xpath-analysis="true"
+              xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+              <xf:instance id="fr-form-instance">
+                <form>
+                  <emails>alice@example.com bob@example.org</emails>
+                </form>
+              </xf:instance>
+              <xf:bind id="emails-bind" name="emails" ref="emails" type="fr:tags-input" xxf:functions="restricted"/>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <fr:tags-input id="emails-control" bind="emails-bind" validation-type="email" max-tags="2">
+              <xf:label>CC Emails</xf:label>
+            </fr:tags-input>
+          </xh:body>
+        </xh:html>.toDocument
+
+      withTestExternalContext { _ =>
+        withXFormsDocument(xhtml) { doc =>
+          withActionAndDoc(doc) {
+            val component = doc.getControlByEffectiveId("emails-control").asInstanceOf[XFormsValueComponentControl]
+            assert(isValid("emails-control"))
+
+            // Invalid email tag
+            withAction {
+              XFormsAPI.setvalue(component.boundNodeOpt.toList, "alice@example.com bad-email")
+            }
+            assert(! isValid("emails-control"))
+
+            // Valid emails but exceeds max-tags="2"
+            withAction {
+              XFormsAPI.setvalue(component.boundNodeOpt.toList, "a@example.com b@example.com c@example.com")
+            }
+            assert(! isValid("emails-control"))
+
+            // Back to 2 valid emails
+            withAction {
+              XFormsAPI.setvalue(component.boundNodeOpt.toList, "a@example.com b@example.com")
+            }
+            assert(isValid("emails-control"))
           }
         }
       }

@@ -15,8 +15,13 @@ package org.orbeon.xbl
 
 import org.orbeon.oxf.util.StringUtils.*
 
+import scala.util.Try
+
 
 object OpenSelectSupport {
+
+  private val EmailRegex  = """^[^\s@]+@[^\s@]+\.[^\s@]{2,}$""".r
+  private val NumberRegex = """^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$""".r
 
   def encodeToken(raw: String): Option[String] =
     Option(raw).flatMap(_.trimAllToOpt).map { trimmed =>
@@ -91,6 +96,39 @@ object OpenSelectSupport {
     val open   = Option(openTokensJoined).getOrElse("").splitTo[List]()
     (closed ++ open).distinct.mkString(" ")
   }
+
+  def isValidTag(decoded: String, validationType: String, pattern: String): Boolean = {
+    val trimmed    = Option(decoded).flatMap(_.trimAllToOpt).getOrElse("")
+    val normType   = Option(validationType).flatMap(_.trimAllToOpt).getOrElse("")
+    val rawPattern = Option(pattern).flatMap(_.trimAllToOpt)
+
+    if (trimmed.isEmpty)
+      false
+    else
+      normType match {
+        case "" | "text" => true
+        case "email"     => EmailRegex.matches(trimmed)
+        case "url"       => UrlSupport.isValidWebUrl(trimmed)
+        case "number"    => NumberRegex.matches(trimmed)
+        case "pattern"   => rawPattern.forall(p => Try(trimmed.matches(p)).getOrElse(false))
+        case _           => true
+      }
+  }
+
+  def parseMaxTags(maxTagsStr: String): Option[Int] =
+    Option(maxTagsStr).flatMap(_.trimAllToOpt).flatMap(_.toIntOption).filter(_ > 0)
+
+  def isValidTags(
+    boundValue    : String,
+    validationType: String,
+    pattern       : String,
+    maxTagsStr    : String
+  ): Boolean = {
+    val tokens    = Option(boundValue).getOrElse("").splitTo[List]().distinct
+    val maxTagsOk = parseMaxTags(maxTagsStr).forall(tokens.size <= _)
+    val allTagsOk = tokens.forall(t => isValidTag(decodeToken(t), validationType, pattern))
+    maxTagsOk && allTagsOk
+  }
 }
 
 object OpenSelectSupportJava {
@@ -110,4 +148,13 @@ object OpenSelectSupportJava {
   //@XPathFunction
   def combineTokens(closedTokensJoined: String, openTokensJoined: String): String =
     OpenSelectSupport.combineTokens(closedTokensJoined, openTokensJoined)
+
+  //@XPathFunction
+  def isValidTags(
+    boundValue    : String,
+    validationType: String,
+    pattern       : String,
+    maxTagsStr    : String
+  ): Boolean =
+    OpenSelectSupport.isValidTags(boundValue, validationType, pattern, maxTagsStr)
 }

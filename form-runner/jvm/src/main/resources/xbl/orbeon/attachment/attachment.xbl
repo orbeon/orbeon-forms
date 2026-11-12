@@ -868,8 +868,8 @@
                                 xxf:format-message(
                                     fr:r(if ($multiple) then 'drag-multiple' else 'drag-single'),
                                     (
-                                        '&lt;a href=&quot;javascript:void(0)&quot; class=&quot;fr-attachment-select&quot; role=&quot;button&quot;&gt;',
-                                        '&lt;/a&gt;'
+                                        '&lt;span class=&quot;fr-attachment-select&quot;&gt;',
+                                        '&lt;/span&gt;'
                                     )
                                 )"
                             mediatype="text/html"/>

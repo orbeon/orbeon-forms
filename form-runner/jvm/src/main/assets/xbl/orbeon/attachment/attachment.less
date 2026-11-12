@@ -65,10 +65,29 @@
         .fr-attachment-drop {
 
             border-style: var(--orbeon-attachment-drop-border-style);
+            cursor: pointer;
+            user-select: none;
+
+            .fr-attachment-select {
+                color: var(--orbeon-link-color);
+                text-decoration: underline;
+            }
+
+            &:hover {
+                background-color: var(--orbeon-attachment-drop-hover-background-color);
+
+                .fr-attachment-select {
+                    color: var(--orbeon-link-hover-color);
+                }
+            }
 
             &.fr-attachment-dragover {
                 background-color: var(--orbeon-attachment-dragover-background-color);
                 color: var(--orbeon-attachment-dragover-color);
+
+                .fr-attachment-select {
+                    color: inherit;
+                }
             }
         }
 
@@ -98,12 +117,6 @@
 
             .close:hover {
                 opacity: 1;
-            }
-        }
-
-        .fr-attachment-select {
-            &:hover {
-                cursor: pointer;
             }
         }
 

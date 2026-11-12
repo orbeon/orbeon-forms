@@ -579,7 +579,7 @@
                 name="binding"
                 value="xxf:binding('fr-image-attachment')"/>
 
-            <xh:div id="fr-image-attachment-elem" xxf:control="true">
+            <xh:div id="fr-image-attachment-elem" xxf:control="true" tabindex="-1">
                 <fr:attachment
                     ref="$binding"
                     accept="{(xxf:custom-mip($binding, 'upload-mediatypes')[xxf:non-blank()], 'image/*')[1]}">

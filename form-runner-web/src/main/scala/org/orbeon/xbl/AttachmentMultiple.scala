@@ -69,8 +69,6 @@ object AttachmentMultiple {
 
     private object Private {
 
-      val SelectAnchorClass = ".fr-attachment-select"
-
       def dropElem          = containerElem.querySelectorT(".fr-attachment-drop")
       def uploadControlElem = containerElem.querySelectorT(".xforms-upload")
       def uploadInputOpt    = Option(containerElem.querySelector(".xforms-upload-select").asInstanceOf[html.Input])
@@ -160,10 +158,7 @@ object AttachmentMultiple {
         EventSupport.addListener(
           dropElem, // https://github.com/orbeon/orbeon-forms/issues/7203
           DomEventNames.Click,
-          (ev: dom.MouseEvent) => ev.target match {
-            case a: html.Anchor if a.matches(SelectAnchorClass) => uploadInputOpt.foreach(_.click())
-            case _ => // ignore
-          }
+          (_: dom.MouseEvent) => uploadInputOpt.foreach(_.click())
         )
       }
     }

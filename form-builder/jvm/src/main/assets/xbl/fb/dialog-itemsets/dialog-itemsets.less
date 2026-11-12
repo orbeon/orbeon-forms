@@ -32,7 +32,9 @@
 
         .fb-itemset-hint-cell { width: 200px }                          // Make hint section wider than the label/value
         .fr-grid-2-columns .xforms-input input { width: 13em }
-        .xforms-invalid .xforms-input-input { border-color: #df731b }   // Show errors also for fields that aren't visited
+        .xforms-invalid .xforms-input-input {
+            border-color: var(--orbeon-error-color);                    // Show errors also for fields that aren't visited
+        }
 
         .navbar {
             margin-bottom: 10px;

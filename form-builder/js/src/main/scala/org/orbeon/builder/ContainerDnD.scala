@@ -19,7 +19,7 @@ import org.orbeon.oxf.fr.ControlOps
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.{AjaxClient, AjaxEvent, XFormsId}
+import org.orbeon.xforms.{AjaxClient, AjaxEvent, XFormsId, XFormsUI}
 import org.scalajs.dom
 import org.scalajs.dom.html
 
@@ -186,7 +186,7 @@ object ContainerDnD {
       .childrenT(".fr-section-container")
       .headOption
       .flatMap(_.querySelectorOpt(".fr-section-content"))
-      .exists(_.isVisible)
+      .exists(el => el.isVisible && ! el.hasClass(XFormsUI.CaseCollapsingClass))
 
   private def isSectionTemplate(sectionEl: html.Element): Boolean =
     sectionEl
@@ -201,6 +201,7 @@ object ContainerDnD {
       .filter { el =>
         el.isVisible &&
         ! FormRunnerUtils.isViewMode(el) &&
+        ! BlockCache.isElemInCollapsingCase(el) &&
         el.ancestorOrSelfElem(".fr-section-component", includeSelf = false).nextOption().isEmpty
       }
       .toList

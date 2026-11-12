@@ -252,35 +252,46 @@ object XFormsUI {
     control.toggleClass("xforms-filled", isRequired && emptyAttr == "false")
   }
 
+  val CaseSelectedClass   = "xforms-case-selected"
+  val CaseDeselectedClass = "xforms-case-deselected"
+  val CaseCollapsingClass = "xforms-case-collapsing"
+
+  def hasActiveCaseAnimations: Boolean =
+    activeCaseAnimations.nonEmpty
+
+  def afterCaseAnimationsF: Future[Unit] =
+    if (activeCaseAnimations.isEmpty)
+      Future.unit
+    else
+      Future.sequence(activeCaseAnimations.values.map(_.promise.future).toList).map(_ => ())
+
+  def beginControlDetails(): Unit = {
+    inControlDetailsBatch = true
+    pendingCaseAnimations = Nil
+  }
+
+  def endControlDetails(): Unit = {
+    val batch = pendingCaseAnimations
+    inControlDetailsBatch = false
+    pendingCaseAnimations = Nil
+
+    if (batch.nonEmpty)
+      runPendingCaseAnimations(batch)
+  }
+
   def toggleCase(controlId: String, visible: Boolean): Unit = {
 
     val caseBeginId = s"xforms-case-begin-$controlId"
     val caseEndId   = s"xforms-case-end-$controlId"
-
-    def updateClasses(el: html.Element): Unit = {
-      el.toggleClass("xforms-case-selected",   visible)
-      el.toggleClass("xforms-case-deselected", ! visible)
-    }
-
-    val caseBegin = dom.document.getElementByIdT(caseBeginId)
+    val caseBegin   = dom.document.getElementByIdT(caseBeginId)
 
     (Iterator(caseBegin) ++ caseBegin.nextElementSiblings.takeWhile(_.id != caseEndId))
       .foreach { el =>
-        if (el.id != caseBeginId && el.hasClass("xxforms-animate")) {
-          if (visible) {
-            updateClasses(el)
-            el.asInstanceOf[js.Dynamic].animate(
-              js.Dynamic.literal(height = "show"),
-              js.Dynamic.literal(duration = 200)
-            )
-          } else {
-            el.asInstanceOf[js.Dynamic].animate(
-              js.Dynamic.literal(height = "hide"),
-              js.Dynamic.literal(duration = 200, complete = (() => updateClasses(el)): js.Function0[Unit])
-            )
-          }
+        if (el.id != caseBeginId && el.hasClass("xxforms-animate") && inControlDetailsBatch && canAnimate(el)) {
+          recordPendingCaseAnimation(el, visible)
         } else {
-          updateClasses(el)
+          stopActiveAnimation(el, flushDom = true)
+          updateCaseClasses(el, visible)
         }
       }
   }
@@ -846,6 +857,279 @@ object XFormsUI {
   }
 
   private object Private {
+
+    private val CaseAnimationDurationMs = 160.0
+    private val CaseAnimationEasing     = "cubic-bezier(0.22, 1, 0.36, 1)"
+
+    case class ActiveCaseAnimation(
+      el        : html.Element,
+      visible   : Boolean,
+      animation : js.Dynamic,
+      onFlushDom: () => Unit,
+      promise   : Promise[Unit]
+    )
+
+    case class PendingCaseAnimation(
+      el              : html.Element,
+      visible         : Boolean,
+      startHeightOpt  : Option[Double],
+      startPadTopOpt  : Option[String],
+      startPadBotOpt  : Option[String],
+      alreadyDisabled : Set[html.Element]
+    )
+
+    var inControlDetailsBatch : Boolean                               = false
+    var pendingCaseAnimations : List[PendingCaseAnimation]            = Nil
+    var activeCaseAnimations  : Map[html.Element, ActiveCaseAnimation] = Map.empty
+
+    def updateCaseClasses(el: html.Element, visible: Boolean): Unit = {
+      el.toggleClass(CaseSelectedClass,   visible)
+      el.toggleClass(CaseDeselectedClass, ! visible)
+    }
+
+    private def prefersReducedMotion: Boolean = {
+      val winDyn = dom.window.asInstanceOf[js.Dynamic]
+      (! js.isUndefined(winDyn.matchMedia)) &&
+        winDyn.matchMedia("(prefers-reduced-motion: reduce)").matches.asInstanceOf[Boolean]
+    }
+
+    def canAnimate(el: html.Element): Boolean =
+      ! js.isUndefined(el.asInstanceOf[js.Dynamic].animate) && ! prefersReducedMotion
+
+    def stopActiveAnimation(animEl: html.Element, flushDom: Boolean): Unit =
+      activeCaseAnimations.get(animEl).foreach { active =>
+        activeCaseAnimations -= animEl
+        if (flushDom)
+          active.onFlushDom()
+        active.animation.cancel()
+        active.promise.trySuccess(())
+      }
+
+    def recordPendingCaseAnimation(el: html.Element, visible: Boolean): Unit = {
+
+      // If any descendant or ancestor has an active animation from a previous batch, stop it first
+      activeCaseAnimations.keys.toList.foreach { activeEl =>
+        if (activeEl != el && (el.contains(activeEl) || activeEl.contains(el)))
+          stopActiveAnimation(activeEl, flushDom = true)
+      }
+
+      val (interruptedHeightOpt, interruptedPadTopOpt, interruptedPadBotOpt) =
+        activeCaseAnimations.get(el) match {
+          case Some(_) =>
+            val h      = el.getBoundingClientRect().height
+            val cs     = dom.window.getComputedStyle(el)
+            val padTop = cs.paddingTop
+            val padBot = cs.paddingBottom
+            stopActiveAnimation(el, flushDom = true)
+            (Some(h), Some(padTop), Some(padBot))
+          case None =>
+            (None, None, None)
+        }
+
+      val (startHeightOpt, startPadTopOpt, startPadBotOpt, alreadyDisabled) =
+        if (! visible) {
+          val h = interruptedHeightOpt.getOrElse(el.getBoundingClientRect().height)
+          val (padTop, padBot) =
+            (interruptedPadTopOpt, interruptedPadBotOpt) match {
+              case (Some(pt), Some(pb)) => (pt, pb)
+              case _ =>
+                val cs = dom.window.getComputedStyle(el)
+                (cs.paddingTop, cs.paddingBottom)
+            }
+          val disabled =
+            (el :: el.querySelectorAllT(".xforms-disabled").toList)
+              .filter(_.hasClass("xforms-disabled"))
+              .toSet
+          (Some(h), Some(padTop), Some(padBot), disabled)
+        } else {
+          // Apply `xforms-case-selected` now (unless an ancestor in this batch is collapsing) so that any child XBL
+          // components initialized later in `handleControlDetails` see their container as visible.
+          if (! pendingCaseAnimations.exists(p => ! p.visible && p.el.contains(el)))
+            updateCaseClasses(el, visible = true)
+          (interruptedHeightOpt, interruptedPadTopOpt, interruptedPadBotOpt, Set.empty[html.Element])
+        }
+
+      pendingCaseAnimations =
+        pendingCaseAnimations.filterNot(_.el == el) :+
+          PendingCaseAnimation(
+            el              = el,
+            visible         = visible,
+            startHeightOpt  = startHeightOpt,
+            startPadTopOpt  = startPadTopOpt,
+            startPadBotOpt  = startPadBotOpt,
+            alreadyDisabled = alreadyDisabled
+          )
+    }
+
+    def runPendingCaseAnimations(batch: List[PendingCaseAnimation]): Unit = {
+
+      val (innerItems, outerItems) =
+        batch.partition { item =>
+          batch.exists(other => (other.el ne item.el) && other.el.contains(item.el))
+        }
+
+      case class PreparedCaseAnimation(
+        el        : html.Element,
+        visible   : Boolean,
+        fromFrame : js.Object,
+        toFrame   : js.Object,
+        onFlushDom: () => Unit
+      )
+
+      // Pass 1: apply DOM class updates before reading layout
+      val ExpandItemsWithDescendants =
+        outerItems.collect {
+          case outer if outer.visible =>
+            val descendantItems = innerItems.filter(inner => outer.el.contains(inner.el))
+            descendantItems.foreach(d => updateCaseClasses(d.el, d.visible))
+            updateCaseClasses(outer.el, visible = true)
+            outer
+        }
+
+      val CollapseItemsWithFlush =
+        outerItems.collect {
+          case outer if ! outer.visible =>
+            val descendantItems = innerItems.filter(inner => outer.el.contains(inner.el))
+            val startHeight     = outer.startHeightOpt.getOrElse(0.0)
+            val flushClasses    = () => {
+              descendantItems.foreach(d => updateCaseClasses(d.el, d.visible))
+              updateCaseClasses(outer.el, visible = false)
+            }
+
+            if (! outer.el.isConnected || startHeight <= 0.5) {
+              flushClasses()
+              None
+            } else {
+              val newlyDisabled =
+                (outer.el :: outer.el.querySelectorAllT(".xforms-disabled").toList)
+                  .filter(e => e.hasClass("xforms-disabled") && ! outer.alreadyDisabled.contains(e))
+
+              newlyDisabled.foreach(_.classList.remove("xforms-disabled"))
+              outer.el.classList.add(CaseCollapsingClass)
+              outer.el.setAttribute("inert", "")
+
+              var flushed = false
+              val onFlushDom = () =>
+                if (! flushed) {
+                  flushed = true
+                  outer.el.classList.remove(CaseCollapsingClass)
+                  outer.el.removeAttribute("inert")
+                  newlyDisabled.foreach(_.classList.add("xforms-disabled"))
+                  flushClasses()
+                }
+
+              val startPadTop = outer.startPadTopOpt.getOrElse("0px")
+              val startPadBot = outer.startPadBotOpt.getOrElse("0px")
+
+              Some(
+                PreparedCaseAnimation(
+                  el         = outer.el,
+                  visible    = false,
+                  fromFrame  = js.Dynamic.literal(
+                    height        = s"${startHeight}px",
+                    paddingTop    = startPadTop,
+                    paddingBottom = startPadBot,
+                    opacity       = 1.0,
+                    overflow      = "hidden"
+                  ),
+                  toFrame    = js.Dynamic.literal(
+                    height        = "0px",
+                    paddingTop    = "0px",
+                    paddingBottom = "0px",
+                    opacity       = 0.0,
+                    overflow      = "hidden"
+                  ),
+                  onFlushDom = onFlushDom
+                )
+              )
+            }
+        }.flatten
+
+      // Pass 2: measure target heights/paddings for expanding items in a single layout pass
+      val PreparedExpandItems =
+        ExpandItemsWithDescendants.flatMap { outer =>
+          if (outer.el.isConnected) {
+            val targetHeight = outer.el.getBoundingClientRect().height
+            if (targetHeight > 0.5) {
+              val cs           = dom.window.getComputedStyle(outer.el)
+              val targetPadTop = cs.paddingTop
+              val targetPadBot = cs.paddingBottom
+              val fromHeight   = outer.startHeightOpt.map(h => Math.min(h, targetHeight)).getOrElse(0.0)
+              val fromPadTop   = outer.startPadTopOpt.getOrElse("0px")
+              val fromPadBot   = outer.startPadBotOpt.getOrElse("0px")
+              val fromOpacity  = if (targetHeight > 0.0) Math.min(1.0, fromHeight / targetHeight) else 0.0
+
+              Some(
+                PreparedCaseAnimation(
+                  el         = outer.el,
+                  visible    = true,
+                  fromFrame  = js.Dynamic.literal(
+                    height        = s"${fromHeight}px",
+                    paddingTop    = fromPadTop,
+                    paddingBottom = fromPadBot,
+                    opacity       = fromOpacity,
+                    overflow      = "hidden"
+                  ),
+                  toFrame    = js.Dynamic.literal(
+                    height        = s"${targetHeight}px",
+                    paddingTop    = targetPadTop,
+                    paddingBottom = targetPadBot,
+                    opacity       = 1.0,
+                    overflow      = "hidden"
+                  ),
+                  onFlushDom = () => ()
+                )
+              )
+            } else {
+              None
+            }
+          } else {
+            None
+          }
+        }
+
+      // Pass 3: start all WAAPI animations
+      (PreparedExpandItems ++ CollapseItemsWithFlush).foreach { prepared =>
+        startWaapiCaseAnimation(
+          el         = prepared.el,
+          visible    = prepared.visible,
+          fromFrame  = prepared.fromFrame,
+          toFrame    = prepared.toFrame,
+          onFlushDom = prepared.onFlushDom
+        )
+      }
+    }
+
+    private def startWaapiCaseAnimation(
+      el        : html.Element,
+      visible   : Boolean,
+      fromFrame : js.Object,
+      toFrame   : js.Object,
+      onFlushDom: () => Unit
+    ): Unit = {
+      val promise = Promise[Unit]()
+      val anim    = el.asInstanceOf[js.Dynamic].animate(
+        js.Array(fromFrame, toFrame),
+        js.Dynamic.literal(
+          duration = CaseAnimationDurationMs,
+          easing   = CaseAnimationEasing
+        )
+      )
+
+      activeCaseAnimations += (el -> ActiveCaseAnimation(el, visible, anim, onFlushDom, promise))
+
+      val onComplete: js.Function1[js.Any, js.Any] = (_: js.Any) => {
+        if (activeCaseAnimations.get(el).exists(_.animation eq anim)) {
+          activeCaseAnimations -= el
+          onFlushDom()
+          promise.trySuccess(())
+          if (activeCaseAnimations.isEmpty)
+            XFormsUiEvents.componentChangedLayoutCB.fire(())
+        }
+        ()
+      }
+      anim.finished.`then`(onComplete, onComplete)
+    }
 
     // Global information about the last checkbox to check
     // TODO: This be by form.

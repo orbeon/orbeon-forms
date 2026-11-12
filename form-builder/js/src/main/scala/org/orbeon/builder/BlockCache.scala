@@ -15,6 +15,7 @@ package org.orbeon.builder
 
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.web.DomSupport.*
+import org.orbeon.xforms.XFormsUI
 import org.scalajs.dom
 import org.scalajs.dom.html
 
@@ -73,6 +74,11 @@ object BlockCache {
       .nextOption()
       .nonEmpty
 
+  def isElemInCollapsingCase(elem: html.Element): Boolean =
+    elem
+      .closestOpt(s".${XFormsUI.CaseCollapsingClass}")
+      .isDefined
+
   locally {
 
     // Keep caches current
@@ -85,7 +91,7 @@ object BlockCache {
         val sectionsIt =
           for {
             section <- collectElems(SectionSelector)
-            if section.isVisible && ! isElemInSectionTemplate(section)
+            if section.isVisible && ! isElemInSectionTemplate(section) && ! isElemInCollapsingCase(section)
             outermostSection =
               section.ancestorOrSelfElem(SectionSelector, includeSelf = false)
                 .lastOption()
@@ -105,7 +111,7 @@ object BlockCache {
         val gridsIt =
           for {
             grid <- collectElems(GridSelector).iterator
-            if grid.isVisible && ! isElemInSectionTemplate(grid)
+            if grid.isVisible && ! isElemInSectionTemplate(grid) && ! isElemInCollapsingCase(grid)
           } yield {
             val block = Block(grid)
             block.copy(width = block.width + GridRightGutterWidth)
@@ -119,7 +125,7 @@ object BlockCache {
         val gridBodiesIt =
           for {
             gridBody <- collectElems(s".fr-grid.fr-editable $GridBodySelector")
-            if gridBody.isVisible
+            if gridBody.isVisible && ! isElemInCollapsingCase(gridBody)
           } yield Block(gridBody)
 
         gridBodyCache._elems = gridBodiesIt.toList
@@ -130,7 +136,7 @@ object BlockCache {
         val cellsIt =
           for {
             cell <- collectElems(".fr-grid.fr-editable .fr-grid-td")
-            if cell.isVisible
+            if cell.isVisible && ! isElemInCollapsingCase(cell)
           } yield Block(cell)
 
         cellCache._elems = cellsIt.toList

@@ -217,7 +217,7 @@
                                             </xf:group>
                                         </xsl:if>
                                         <xf:group
-                                            class="fr-section-content{ if (not($editable) and $animate) then ' xxforms-animate' else ''}"
+                                            class="fr-section-content{ if ($animate) then ' xxforms-animate' else ''}"
                                             xxbl:scope="outer"
                                             xxf:element="div">
                                             <xsl:choose>

@@ -239,7 +239,7 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
     }
 
     // Same for the bottom corners when the section is collapsed
-    .fr-view-appearance-full > .xbl-fr-section h2.fr-section-title:has(.fr-section-closed) {
+    .fr-view-appearance-full > .xbl-fr-section h2.fr-section-title:has(.fr-section-closed):not(:has(+ .xforms-switch > .xforms-case-collapsing)) {
         border-bottom-left-radius : calc(var(--orbeon-section-border-radius) - @frBodyDecorationsBorderWidth);
         border-bottom-right-radius: calc(var(--orbeon-section-border-radius) - @frBodyDecorationsBorderWidth);
         border-bottom: 0;
@@ -255,7 +255,7 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
     }
 
     // A collapsed last section's title touches the container's bottom border: don't double it
-    .fr-wizard-body .xbl-fr-section:last-child:has(.fr-section-closed) h2.fr-section-title {
+    .fr-wizard-body .xbl-fr-section:last-child:has(.fr-section-closed) h2.fr-section-title:not(:has(+ .xforms-switch > .xforms-case-collapsing)) {
         border-bottom: 0;
     }
 

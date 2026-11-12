@@ -628,8 +628,10 @@ body.orbeon {
 
     .fb-section-move-handle {
         position: absolute;
-        top: 0;
-        left: 0;
+        top: 50%;
+        right: 6px;
+        left: auto;
+        transform: translateY(-50%);
         display: none;
         z-index: 2;
 
@@ -664,8 +666,12 @@ body.orbeon {
         .focusHighlight();
     }
 
-    .xbl-fr-section .fr-section-title.hover {                               // .hover added by CS on mouse over click interceptor
-        background-color: var(--orbeon-fb-editable-hover-background-color);
+    .xbl-fr-section .fr-section-title {
+        position: relative;
+
+        &.hover {                                                           // .hover added by CS on mouse over click interceptor
+            background-color: var(--orbeon-fb-editable-hover-background-color);
+        }
     }
 
     .fb-section-focus-hidden {

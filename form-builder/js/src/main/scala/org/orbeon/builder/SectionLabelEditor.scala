@@ -341,7 +341,6 @@ object SectionLabelEditor {
 
           val fbMain = dom.document.querySelector(".fb-main")
           newInterceptors.foreach(fbMain.appendChild)
-          newMoveHandles.foreach(fbMain.appendChild)
 
           labelClickInterceptors :::= newInterceptors
           sectionMoveHandles     :::= newMoveHandles
@@ -373,21 +372,13 @@ object SectionLabelEditor {
 
           val labelOffset = sectionLabel.getOffset
           val titleOffset = sectionTitle.getOffset
-          val titleHeight = sectionTitle.outerHeight
-          val titleWidth  = sectionTitle.outerWidth
 
           val handleReservedWidth =
             if (canMove) {
+              if (moveHandle.parentElement != sectionTitle)
+                sectionTitle.appendChild(moveHandle)
               moveHandle.show()
-              val handleWidth  = moveHandle.outerWidth
-              val handleHeight = moveHandle.outerHeight
-              moveHandle.setOffset(
-                DomSupport.Offset(
-                  top  = titleOffset.top + (titleHeight - handleHeight) / 2.0,
-                  left = titleOffset.left + titleWidth - handleWidth - 6.0
-                )
-              )
-              handleWidth + 8.0
+              32.0
             } else {
               moveHandle.hide()
               0.0

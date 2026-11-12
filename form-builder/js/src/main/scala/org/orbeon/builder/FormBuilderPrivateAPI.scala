@@ -15,7 +15,7 @@ package org.orbeon.builder
 
 import org.orbeon.builder.rpc.FormBuilderRpcClient
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.{AjaxClient, AjaxEvent, CallbackList, Support}
+import org.orbeon.xforms.{AjaxClient, AjaxEvent, CallbackList, Support, XFormsUI}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
@@ -75,26 +75,34 @@ object FormBuilderPrivateAPI extends js.Object {
   // below the Form Builder main area, we scroll enough to make it visible at the bottom, and vice-versa if the
   // control is above the main area.
   // Right now this doesn't handle scrolling horizontally.
-  def moveFocusedCellIntoView(): Unit =
-    for {
-      selectedElem  <- dom.document.querySelectorOpt(".fb-main .fb-selected")
-      _             =  SectionFocus.ensureVisible(selectedElem)
-      mainInnerElem <- dom.document.querySelectorOpt(".fb-main-inner")
-      mainElem      <- dom.document.querySelectorOpt(".fb-main")
-    } locally {
-      moveIntoViewIfNeeded(mainElem, mainInnerElem, selectedElem, margin = 50)
+  def moveFocusedCellIntoView(): Unit = {
+    dom.document.querySelectorOpt(".fb-main .fb-selected").foreach(SectionFocus.ensureVisible)
+    XFormsUI.afterCaseAnimationsF.foreach { _ =>
+      for {
+        selectedElem  <- dom.document.querySelectorOpt(".fb-main .fb-selected")
+        _             =  SectionFocus.ensureVisible(selectedElem)
+        mainInnerElem <- dom.document.querySelectorOpt(".fb-main-inner")
+        mainElem      <- dom.document.querySelectorOpt(".fb-main")
+      } locally {
+        moveIntoViewIfNeeded(mainElem, mainInnerElem, selectedElem, margin = 50)
+      }
     }
+  }
 
-  def moveOutlineContainerIntoView(namespacedId: String): Unit =
-    for {
-      containerElem <- dom.document.getElementByIdOpt(namespacedId)
-      _             =  SectionFocus.ensureVisible(containerElem)
-      targetElem    = containerElem.querySelectorOpt(".fr-section-title").getOrElse(containerElem)
-      mainInnerElem <- dom.document.querySelectorOpt(".fb-main-inner")
-      mainElem      <- dom.document.querySelectorOpt(".fb-main")
-    } locally {
-      moveIntoViewIfNeeded(mainElem, mainInnerElem, targetElem, margin = 20)
+  def moveOutlineContainerIntoView(namespacedId: String): Unit = {
+    dom.document.getElementByIdOpt(namespacedId).foreach(SectionFocus.ensureVisible)
+    XFormsUI.afterCaseAnimationsF.foreach { _ =>
+      for {
+        containerElem <- dom.document.getElementByIdOpt(namespacedId)
+        _             =  SectionFocus.ensureVisible(containerElem)
+        targetElem    = containerElem.querySelectorOpt(".fr-section-title").getOrElse(containerElem)
+        mainInnerElem <- dom.document.querySelectorOpt(".fb-main-inner")
+        mainElem      <- dom.document.querySelectorOpt(".fb-main")
+      } locally {
+        moveIntoViewIfNeeded(mainElem, mainInnerElem, targetElem, margin = 20)
+      }
     }
+  }
 
   def updateToolbarPreferences(
     controlSettingsToolbarVisible: Boolean,

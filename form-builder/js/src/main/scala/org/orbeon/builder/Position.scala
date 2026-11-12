@@ -17,7 +17,7 @@ import org.orbeon.datatypes.Orientation
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomSupport
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.{AjaxClient, XFormsUiEvents}
+import org.orbeon.xforms.{AjaxClient, XFormsUI, XFormsUiEvents}
 import org.scalajs.dom
 import org.scalajs.dom.{ResizeObserver, html}
 
@@ -50,35 +50,44 @@ object Position {
 
   // Calls listener when what is under the pointer has potentially changed
   def onUnderPointerChange(fn: () => Unit): Unit = {
-    dom.document.addEventListener("mousemove", (_: dom.Event) => fn())
+    dom.document.addEventListener("mousemove", (_: dom.Event) => {
+      if (! XFormsUI.hasActiveCaseAnimations)
+        fn()
+    })
     onOffsetMayHaveChanged(fn)
   }
 
   private var offsetMayHaveChangedListeners: List[() => Unit] = Nil
+  private var offsetListenersInitialized   : Boolean          = false
 
   def notifyOffsetMayHaveChanged(): Unit =
-    offsetMayHaveChangedListeners.foreach(_())
+    if (! XFormsUI.hasActiveCaseAnimations)
+      offsetMayHaveChangedListeners.foreach(_())
 
   // Call listener when anything on the page that could change element positions happened
   // 2026-05-13: 4 callers.
   def onOffsetMayHaveChanged(fn: () => Unit): Unit = {
     offsetMayHaveChangedListeners :+= fn
-    XFormsUiEvents.orbeonLoadedEvent.subscribe(fn) // TODO: not great for nth embedding of Form Builder
-    AjaxClient.ajaxResponseProcessed.add(_ => fn())
-    XFormsUiEvents.componentChangedLayoutCB.add(_ => fn())
+    if (! offsetListenersInitialized) {
+      offsetListenersInitialized = true
 
-    val ElementWhichChangeDynamically = List(
-      ".fb > *",                         // The `<xxf:dynamic id="fb">` content changes during full updates
-      "img", "video", "audio", "canvas", // Changes when the media is loaded
-      ".fb-main",               // Especially with embedding, when Form Builder is moved or resized
-      ".xbl-fr-tinymce"         // TinyMCE is rendered asynchronously
-    )
-    val resizeObserver = new ResizeObserver((_, _) => fn())
-    DomSupport.onElementFoundOrAdded(
-      container = dom.document.body,
-      selector  = ElementWhichChangeDynamically.mkString(", "),
-      listener  = (elem: html.Element) => resizeObserver.observe(elem)
-    )
+      XFormsUiEvents.orbeonLoadedEvent.subscribe(() => notifyOffsetMayHaveChanged()) // TODO: not great for nth embedding of Form Builder
+      AjaxClient.ajaxResponseProcessed.add(_ => notifyOffsetMayHaveChanged())
+      XFormsUiEvents.componentChangedLayoutCB.add(_ => notifyOffsetMayHaveChanged())
+
+      val ElementWhichChangeDynamically = List(
+        ".fb > *",                         // The `<xxf:dynamic id="fb">` content changes during full updates
+        "img", "video", "audio", "canvas", // Changes when the media is loaded
+        ".fb-main",               // Especially with embedding, when Form Builder is moved or resized
+        ".xbl-fr-tinymce"         // TinyMCE is rendered asynchronously
+      )
+      val resizeObserver = new ResizeObserver((_, _) => notifyOffsetMayHaveChanged())
+      DomSupport.onElementFoundOrAdded(
+        container = dom.document.body,
+        selector  = ElementWhichChangeDynamically.mkString(", "),
+        listener  = (elem: html.Element) => resizeObserver.observe(elem)
+      )
+    }
   }
 
   // Finds the container, if any, based on a vertical position

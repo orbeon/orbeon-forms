@@ -280,26 +280,31 @@ object XFormsResponse {
     val recreatedInputs             = js.Dictionary.empty[html.Element]
     val controlsWithUpdatedItemsets = js.Dictionary.empty[Boolean]
 
-    controlValuesElements.foreach { controlValuesElement =>
-      controlValuesElement.childrenT.foreach { childElem =>
-        childElem.localName match {
-          case "control" =>
-            handleControl(childElem, recreatedInputs, controlsWithUpdatedItemsets, formId)
-          case "init" =>
-            handleInit(childElem, controlsWithUpdatedItemsets)
-          case "inner-html" =>
-            handleInnerHtml(childElem)
-          case "attribute" =>
-            handleAttribute(childElem)
-          case "text" =>
-            handleText(childElem)
-          case "repeat-iteration" =>
-            handleRepeatIteration(childElem, formId)
-          case "dialog" =>
-            handleDialog(childElem, formId)
-          case _ => // handled by `handleOtherActions()`
+    XFormsUI.beginControlDetails()
+    try {
+      controlValuesElements.foreach { controlValuesElement =>
+        controlValuesElement.childrenT.foreach { childElem =>
+          childElem.localName match {
+            case "control" =>
+              handleControl(childElem, recreatedInputs, controlsWithUpdatedItemsets, formId)
+            case "init" =>
+              handleInit(childElem, controlsWithUpdatedItemsets)
+            case "inner-html" =>
+              handleInnerHtml(childElem)
+            case "attribute" =>
+              handleAttribute(childElem)
+            case "text" =>
+              handleText(childElem)
+            case "repeat-iteration" =>
+              handleRepeatIteration(childElem, formId)
+            case "dialog" =>
+              handleDialog(childElem, formId)
+            case _ => // handled by `handleOtherActions()`
+          }
         }
       }
+    } finally {
+      XFormsUI.endControlDetails()
     }
   }
 

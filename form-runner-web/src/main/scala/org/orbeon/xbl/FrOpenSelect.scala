@@ -40,10 +40,11 @@ object FrOpenSelect {
     private var addCustomBtnOpt  : Option[html.Button]          = None
     private var tagsContainerOpt : Option[html.Element]         = None
     private var pillsContainerOpt: Option[html.Element]         = None
-    private var tagsInputOpt     : Option[html.Input]           = None
-    private var hiddenInputOpt   : Option[html.Element]         = None
-    private var observerOpt      : Option[dom.MutationObserver] = None
-    private var currentTokens    : List[String]                 = Nil
+    private var tagsInputOpt           : Option[html.Input]           = None
+    private var hiddenInputOpt         : Option[html.Element]         = None
+    private var observerOpt            : Option[dom.MutationObserver] = None
+    private var initialPlaceholderOpt  : Option[String]               = None
+    private var currentTokens          : List[String]                 = Nil
     private var selectedPillIndex: Option[Int]                  = None
     private var editingPillIndex : Option[Int]                  = None
     private var isEditingCustom  : Boolean                      = false
@@ -69,8 +70,9 @@ object FrOpenSelect {
       addCustomBtnOpt   = containerElem.queryNestedElems[html.Button]("button.fr-open-select-add-custom").headOption
       tagsContainerOpt  = containerElem.querySelectorOpt(".fr-open-select-tags-container")
       pillsContainerOpt = containerElem.querySelectorOpt(".fr-open-select-pills")
-      tagsInputOpt      = containerElem.queryNestedElems[html.Input]("input.fr-open-select-tags-input").headOption
-      hiddenInputOpt    = containerElem.querySelectorOpt(".fr-open-select-hidden-input")
+      tagsInputOpt          = containerElem.queryNestedElems[html.Input]("input.fr-open-select-tags-input").headOption
+      hiddenInputOpt        = containerElem.querySelectorOpt(".fr-open-select-hidden-input")
+      initialPlaceholderOpt = tagsInputOpt.flatMap(inp => Option(inp.getAttribute("placeholder"))).flatMap(_.trimAllToOpt)
 
       if (! isViewMode) {
         syncFromDataset()
@@ -390,7 +392,12 @@ object FrOpenSelect {
         val collapsible       = isCollapsible
         val showTagsContainer = ! collapsible || currentTokens.nonEmpty || (isEditingCustom && enabled)
         val showAddCustomBtn  = collapsible && ! showTagsContainer && enabled
-        val placeholderText   = wrapperElemOpt.flatMap(_.dataset.get("frPlaceholder")).getOrElse("")
+        val placeholderText =
+          wrapperElemOpt
+            .flatMap(_.dataset.get("frPlaceholder"))
+            .flatMap(_.trimAllToOpt)
+            .orElse(initialPlaceholderOpt)
+            .getOrElse("")
 
         addCustomBtnOpt.foreach { btn =>
           btn.disabled = ! enabled

@@ -17,7 +17,7 @@
     .xbl-component.xbl-fr-open-select,
     .xbl-component.xbl-fr-tags-input {
 
-        .fr-component-group {
+        .fr-component-group[role = group][tabindex = '0'] {
             padding: 4px 6px;
         }
 
@@ -87,21 +87,8 @@
         }
 
         .fr-open-select-tags-container {
-            display         : flex;
-            flex-wrap       : wrap;
-            align-items     : center;
-            gap             : 4px;
-            width           : 100%;
-            min-height      : var(--orbeon-control-height);
-            margin-top      : 0;
-            padding         : 3px 6px;
-            box-sizing      : border-box;
-            background-color: var(--orbeon-control-background-color);
-            color           : var(--orbeon-control-color);
-            .fieldDecorations();
-            cursor          : text;
-            transition      : border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
-                              box-shadow   var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+            .fr-pill-container();
+            margin-top: 0;
 
             &.xforms-hidden {
                 display: none;
@@ -129,19 +116,7 @@
             }
 
             .fr-open-select-pill {
-                display         : inline-flex;
-                align-items     : center;
-                gap             : 4px;
-                max-width       : 100%;
-                padding         : 1px 8px;
-                font-size       : var(--orbeon-control-font-size);
-                line-height     : 1.4;
-                color           : var(--orbeon-add-on-color);
-                background-color: var(--orbeon-add-on-background-color);
-                border          : 1px solid var(--orbeon-control-border-color);
-                border-radius   : var(--orbeon-control-border-radius);
-                box-sizing      : border-box;
-                overflow-wrap   : anywhere;
+                .fr-pill();
 
                 &.fr-open-select-pill-selected {
                     border-color: var(--orbeon-focus-border-color);
@@ -149,42 +124,17 @@
                 }
 
                 &.fr-open-select-pill-invalid {
-                    border-color: @error;
+                    border-color: var(--orbeon-invalid-control-border-color);
                 }
 
                 .fr-open-select-pill-edit-input {
-                    min-width       : 3em;
-                    height          : auto;
-                    padding         : 0;
-                    margin          : 0;
-                    border          : 0;
-                    border-radius   : 0;
-                    box-shadow      : none;
-                    outline         : none;
-                    background-color: transparent;
-                    color           : inherit;
-                    font-size       : var(--orbeon-control-font-size);
-                    line-height     : 1.4;
+                    .fr-pill-input();
+                    min-width : 3em;
+                    min-height: 0;
                 }
 
                 .fr-open-select-pill-remove {
-                    display        : inline-flex;
-                    align-items    : center;
-                    justify-content: center;
-                    padding        : 0 2px;
-                    margin         : 0 -2px 0 0;
-                    border         : 0;
-                    background     : transparent;
-                    color          : inherit;
-                    font-size      : 1.1em;
-                    line-height    : 1;
-                    cursor         : pointer;
-                    opacity        : 0.7;
-
-                    &:hover:not(:disabled),
-                    &:focus-visible:not(:disabled) {
-                        opacity: 1;
-                    }
+                    .fr-pill-remove();
 
                     &:disabled {
                         display: none;
@@ -194,20 +144,10 @@
 
             input.fr-open-select-tags-input,
             input[type="text"].fr-open-select-tags-input {
-                flex            : 1 1 6em;
-                width           : auto;
-                min-width       : 4em;
-                height          : auto;
-                min-height      : 1.5em;
-                padding         : 0;
-                margin          : 0;
-                border          : 0;
-                border-radius   : 0;
-                box-shadow      : none;
-                outline         : none;
-                background-color: transparent;
-                color           : inherit;
-                font-size       : var(--orbeon-control-font-size);
+                .fr-pill-input();
+                flex     : 1 1 6em;
+                width    : auto;
+                min-width: 4em;
 
                 &:disabled {
                     cursor: not-allowed;
@@ -216,6 +156,13 @@
                 &.xforms-hidden {
                     display: none;
                 }
+            }
+        }
+
+        &.xforms-invalid.xforms-visited {
+            .fr-open-select-tags-container:not(:focus-within) {
+                border-color: var(--orbeon-invalid-control-border-color);
+                border-width: var(--orbeon-invalid-control-border-width);
             }
         }
     }

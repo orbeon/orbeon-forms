@@ -588,7 +588,8 @@
 
                         <xsl:variable name="service-performs-search" select="@service-performs-search/string() = 'true'"/>
                         <xf:var       name="binding"                 value="xxf:binding('{$binding-id}')"/>
-                        <xf:var       name="view"                    value="fr:mode() = ('view', 'pdf')"/>
+                        <xf:var       name="view"                    value="property('xxf:readonly-appearance') = 'static' or fr:mode() = ('view', 'pdf')"/>
+                        <xf:var       name="disable-placeholder"     value="fr:component-param-value('disable-placeholder') = 'true'"/>
                         <xf:var       name="min-input-length"        value="fr:component-param-value('min-input-length')"/>
                         <xf:var
                             name="selected-items-json"
@@ -608,6 +609,12 @@
                                                                 xf:attribute('type', 'object'),
                                                                 xf:element('id',   string($matched[1]/xxf:evaluate(instance('local')/value-ref))),
                                                                 xf:element('text', string($matched[1]/xxf:evaluate(instance('local')/label-ref)))
+                                                            ))
+                                                        else if ($is-open-selection) then
+                                                            xf:element('_', (
+                                                                xf:attribute('type', 'object'),
+                                                                xf:element('id',   $v),
+                                                                xf:element('text', $v)
                                                             ))
                                                         else ()
                                         ) else if (xxf:non-blank($binding)) then
@@ -656,6 +663,8 @@
                             data-placeholder="{{
                                 if (xxf:label-appearance('{$binding-id}') = 'minimal') then
                                     xxf:label('{$binding-id}')
+                                else if ($disable-placeholder) then
+                                    ''
                                 else
                                     xxf:r('components.labels.please-select', '|fr-fr-resources|')
                             }}"
@@ -670,7 +679,18 @@
                         </xf:group>
                         <xsl:choose>
                             <xsl:when test="$is-multiple">
-                                <xf:input ref="if ($view) then string-join(for $v in xxf:split($binding) return xxf:itemset('internal-select1', 'xml')/itemset/choices/item[value = $v]/label/string(), ', ') else ()"/>
+                                <xh:div class="fr-databound-select-pills-container{{' xforms-hidden'[not($view)]}}">
+                                    <xh:span class="fr-databound-select-static-pills">
+                                        <xf:repeat ref="xxf:split(string($binding))[$view]">
+                                            <xf:var name="v" value="."/>
+                                            <xh:span class="fr-databound-select-pill">
+                                                <xf:output
+                                                    class="fr-databound-select-pill-label"
+                                                    value="(xxf:itemset('internal-select1', 'xml')/itemset/choices/item[value = $v]/label/string(), $v)[1]"/>
+                                            </xh:span>
+                                        </xf:repeat>
+                                    </xh:span>
+                                </xh:div>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xf:input ref="if ($view) then instance('local')/label/string() else ()"/>

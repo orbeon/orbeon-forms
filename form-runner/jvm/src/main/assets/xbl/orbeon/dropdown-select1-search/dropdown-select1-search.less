@@ -20,11 +20,7 @@
         ul                 { margin: initial }
         .select2-selection {
             border-radius: var(--orbeon-control-border-radius);
-            // Select2 sets `line-height: 28px`, which is 2px too much, since the parent also
-            // has a `line-height: 28px` and a `border: 1px`, which caused an irregularity in
-            // the bottom part of the highlight on Safari
             .select2-selection__rendered {
-                line-height: 26px;
                 .select2-selection__placeholder {
                     color: var(--orbeon-control-placeholder-color);
                 }
@@ -57,47 +53,64 @@
             }
 
             .select2-selection--multiple {
-                background-color: var(--orbeon-control-background-color);
-                min-height: var(--orbeon-control-height);
+                .fr-pill-container();
+
                 .select2-selection__rendered {
-                    display: flex;        // For content to be vertically centered
-                    flex-wrap: wrap;
-                    align-items: center;
-                    gap: 4px;
-                    padding: 4px 5px;     // Equal to gap so spacing above, below, and between rows is uniform
+                    display      : flex;
+                    flex-wrap    : wrap;
+                    align-items  : center;
+                    gap          : 4px;
+                    padding      : 0;
+                    margin       : 0;
+                    width        : 100%;
+                    line-height  : inherit;
+                    white-space  : normal;
+                    overflow     : visible;
+                    text-overflow: clip;
+
                     .select2-selection__choice {
-                        margin: 0;
-                        border-color: var(--orbeon-control-border-color);
-                        background-color: var(--orbeon-control-read-only-background-color);
+                        .fr-pill();
+                        float: none;
+
+                        .select2-selection__choice__remove {
+                            .fr-pill-remove();
+                            order: 1;
+                        }
                     }
+
                     .select2-selection__clear {
-                        order: 9999;       // Select2 uses float: right, which flex ignores; push to last position
-                        margin-top: 0;
+                        order      : 9999; // Select2 uses float: right, which flex ignores; push to last position
+                        margin-top : 0;
                         margin-left: auto; // Push to the right end of the flex line
                     }
+
+                    .select2-search--inline {
+                        float      : none;
+                        display    : inline-flex;
+                        align-items: center;
+                    }
+
                     .select2-search__field {
-                        height: auto;
-                        margin-top: 0;
-                        padding-left: 4px;
-                        color: var(--orbeon-control-color);
-                        border: none;
-                        box-shadow: none;
-                        outline: none;
-                        &::placeholder {
-                            color: var(--orbeon-control-placeholder-color);
-                        }
+                        .fr-pill-input();
                     }
                 }
             }
 
-            &.select2-container--focus .select2-selection--multiple {
-                border-color: var(--orbeon-focus-border-color);
+            &.select2-container--focus .select2-selection--multiple,
+            &.select2-container--open .select2-selection--multiple {
+                border       : var(--orbeon-control-border-width) var(--orbeon-control-border-style) var(--orbeon-focus-border-color);
+                border-radius: var(--orbeon-control-border-radius);
                 .focusDecorations();
             }
 
             &.select2-container--disabled .select2-selection--multiple {
                 background-color: var(--orbeon-control-read-only-background-color);
-                .select2-selection__clear { display: none; }
+                cursor          : not-allowed;
+
+                .select2-selection__clear,
+                .select2-selection__choice__remove {
+                    display: none;
+                }
             }
 
             .select2-results__option[aria-selected=true] {
@@ -154,5 +167,46 @@
           var(--orbeon-stripe-color-2) 5px,
           var(--orbeon-stripe-color-2) 10px
         );
+    }
+
+    .xforms-invalid.xforms-visited {
+        .select2-container:not(.select2-container--focus):not(.select2-container--open) .select2-selection {
+            border-color: var(--orbeon-invalid-control-border-color);
+            border-width: var(--orbeon-invalid-control-border-width);
+        }
+    }
+
+    .fr-databound-select-pills-container {
+        .fr-pill-container();
+        background-color: var(--orbeon-control-read-only-background-color);
+        cursor          : not-allowed;
+
+        &.xforms-hidden {
+            display: none;
+        }
+
+        .fr-databound-select-static-pills,
+        .fr-databound-select-static-pills .xforms-repeat-delimiter {
+            display: contents;
+        }
+
+        .fr-databound-select-pill {
+            .fr-pill();
+        }
+    }
+
+    @media print {
+        .fr-databound-select-pills-container:not(.xforms-hidden) {
+            display: block;
+
+            .fr-databound-select-static-pills {
+                display: inline;
+            }
+
+            .fr-databound-select-pill {
+                display     : inline-block;
+                margin-right: 4px;
+            }
+        }
     }
 }

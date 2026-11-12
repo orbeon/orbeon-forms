@@ -854,12 +854,48 @@
     @media not print {
         .xbl-fr-grid .fr-grid.fr-repeat {
             .can-move-up, .can-move-down {
-                & > .fr-repeat-column-left .dropdown > .fr-grid-dropdown-button,
-                & > .fr-grid-tr > .fr-repeat-column-left .dropdown > .fr-grid-dropdown-button {
+                & > .fr-repeat-column-left,
+                & > .fr-grid-tr > .fr-repeat-column-left {
+                    position: relative;
                     cursor: grab;
                     touch-action: none;
                     -webkit-user-select: none;
                     user-select: none;
+
+                    &::before {
+                        content: "";
+                        position: absolute;
+                        inset: 4px;
+                        background-image: radial-gradient(circle, currentColor 1px, transparent 1.2px);
+                        background-size: 5px 5px;
+                        background-position: center;
+                        opacity: 0.22;
+                        pointer-events: none;
+                        transition: opacity var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+                    }
+
+                    &:hover::before {
+                        opacity: 0.42;
+                    }
+
+                    .dropdown {
+                        position: relative;
+                        z-index: 1;
+
+                        & > .fr-grid-dropdown-button {
+                            cursor: grab;
+                            box-shadow: 0 0 0 2px var(--orbeon-body-background-color);
+                        }
+                    }
+                }
+
+                &.xforms-repeat-selected-item-1 {
+                    & > .fr-repeat-column-left,
+                    & > .fr-grid-tr > .fr-repeat-column-left {
+                        .dropdown > .fr-grid-dropdown-button {
+                            box-shadow: 0 0 0 2px var(--orbeon-repetition-selected-background-color);
+                        }
+                    }
                 }
             }
 
@@ -870,6 +906,7 @@
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
                 cursor: grabbing;
 
+                .fr-repeat-column-left,
                 .fr-repeat-column-left .dropdown > .fr-grid-dropdown-button {
                     cursor: grabbing;
                 }

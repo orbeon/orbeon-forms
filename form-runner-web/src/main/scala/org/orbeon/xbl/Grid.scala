@@ -61,8 +61,9 @@ object Grid {
               override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): UndefOr[Boolean] =
                 el.matches(IsMovableIterationSelector) &&
                   (handle ne null) &&
+                  handle.closestOpt(".fr-grid-dropdown-menu").isEmpty &&
                   handle
-                    .closestOpt(".fr-repeat-column-left .fr-grid-dropdown-button")
+                    .closestOpt(".fr-repeat-column-left")
                     .exists(_.closestOpt(".fr-grid-repeat-iteration").contains(el))
 
               override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): UndefOr[Boolean] =

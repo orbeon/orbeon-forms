@@ -839,7 +839,8 @@ public class CustomPdfBoxRenderer implements Closeable, PageSupplier {
     private void setDidValues(PDDocument doc) {
         PDDocumentInformation info = new PDDocumentInformation();
 
-        info.setCreationDate(Calendar.getInstance());
+        // Not `Calendar.getInstance()`, which follows the JVM locale (e.g. Buddhist calendar with `th_TH`)
+        info.setCreationDate(new GregorianCalendar());
 
         if (_producer == null) {
             info.setProducer("openhtmltopdf.com");

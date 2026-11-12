@@ -218,6 +218,7 @@
         +fr:masked-input
         +fr:url
         +fr:hyperlink
+        +fr:qr-code
         +fr:range
         +fr:rating
         +fr:scale
@@ -320,6 +321,7 @@
         +fr:masked-input
         +fr:url
         +fr:hyperlink
+        +fr:qr-code
         +fr:range
         +fr:rating
         +fr:scale

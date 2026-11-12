@@ -1,0 +1,332 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:QrCodeSupport="java:org.orbeon.xbl.QrCodeSupportJava">
+
+    <xbl:binding
+        id="fr-qr-code"
+        element="fr|qr-code"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value">
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">QR Code</display-name>
+            <display-name lang="fr">Code QR</display-name>
+            <display-name lang="no">QR-kode</display-name>
+            <display-name lang="ru">QR-код</display-name>
+            <display-name lang="it">Codice QR</display-name>
+            <display-name lang="de">QR-Code</display-name>
+            <display-name lang="fi">QR-koodi</display-name>
+            <display-name lang="es">Código QR</display-name>
+            <display-name lang="nl">QR-code</display-name>
+            <display-name lang="pt">Código QR</display-name>
+            <display-name lang="sv">QR-kod</display-name>
+            <display-name lang="ar">رمز QR</display-name>
+            <display-name lang="pl">Kod QR</display-name>
+            <display-name lang="ja">QRコード</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-qrcode</icon-class>
+            </icon>
+            <templates>
+                <bind fr:persist="false()"/>
+                <view>
+                    <fr:qr-code id="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:qr-code>
+                </view>
+            </templates>
+            <custom-settings>
+                <setting name="content"          type="xs:string"/>
+                <setting name="size"             type="xs:integer" min="64" max="512" default="160"/>
+                <setting name="error-correction" type="xs:string"  values="L M Q H"   default="M"/>
+                <setting name="show-value"       type="xs:boolean" default="false"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-qr-code-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue
+                            ref="$c"
+                            value="instance()/@*[name() = name($c)]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <content/>
+                            <size/>
+                            <error-correction/>
+                            <show-value/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="content"
+                            xxf:whitespace="trim"
+                            type="xxf:XPath2ValueTemplate"/>
+                        <xf:bind
+                            ref="size"
+                            xxf:whitespace="trim"
+                            constraint=". = '' or (. castable as xs:integer and xs:integer(.) ge 64 and xs:integer(.) le 512)"/>
+                        <xf:bind
+                            ref="error-correction"
+                            xxf:whitespace="trim"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <content>Content or URL</content>
+                                <content-hint>Text, URL, or XPath value template (e.g. https://example.com/verify/{$id}); if blank, uses the control's calculated/bound value</content-hint>
+                                <size>Size (px)</size>
+                                <error-correction>Error Correction Level</error-correction>
+                                <show-value>Show Encoded Value Below QR Code</show-value>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <content>Contenu ou URL</content>
+                                <content-hint>Texte, URL ou modèle de valeur XPath (ex. https://example.com/verify/{$id}) ; si vide, utilise la valeur calculée/liée du contrôle</content-hint>
+                                <size>Taille (px)</size>
+                                <error-correction>Niveau de correction d'erreur</error-correction>
+                                <show-value>Afficher la valeur encodée sous le code QR</show-value>
+                            </resource>
+                            <resource xml:lang="no">
+                                <content>Innhold eller URL</content>
+                                <content-hint>Tekst, URL eller XPath-verdimal (f.eks. https://example.com/verify/{$id}); hvis tom, brukes kontrollens beregnede/bundne verdi</content-hint>
+                                <size>Størrelse (px)</size>
+                                <error-correction>Feilkorrigeringsnivå</error-correction>
+                                <show-value>Vis kodet verdi under QR-koden</show-value>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <content>Содержимое или URL</content>
+                                <content-hint>Текст, URL или шаблон значения XPath (напр. https://example.com/verify/{$id}); если пусто, используется вычисленное значение</content-hint>
+                                <size>Размер (пикс.)</size>
+                                <error-correction>Уровень коррекции ошибок</error-correction>
+                                <show-value>Показывать закодированное значение под QR-кодом</show-value>
+                            </resource>
+                            <resource xml:lang="it">
+                                <content>Contenuto o URL</content>
+                                <content-hint>Testo, URL o modello di valore XPath (es. https://example.com/verify/{$id}); se vuoto, usa il valore calcolato/collegato del controllo</content-hint>
+                                <size>Dimensione (px)</size>
+                                <error-correction>Livello di correzione errori</error-correction>
+                                <show-value>Mostra valore codificato sotto il codice QR</show-value>
+                            </resource>
+                            <resource xml:lang="de">
+                                <content>Inhalt oder URL</content>
+                                <content-hint>Text, URL oder XPath-Wertvorlage (z. B. https://example.com/verify/{$id}); wenn leer, wird der berechnete/gebundene Wert verwendet</content-hint>
+                                <size>Größe (px)</size>
+                                <error-correction>Fehlerkorrekturstufe</error-correction>
+                                <show-value>Kodierten Wert unter dem QR-Code anzeigen</show-value>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <content>Sisältö tai URL</content>
+                                <content-hint>Teksti, URL tai XPath-arvomalli (esim. https://example.com/verify/{$id}); jos tyhjä, käytetään ohjaimen laskettua arvoa</content-hint>
+                                <size>Koko (px)</size>
+                                <error-correction>Virheenkorjaustaso</error-correction>
+                                <show-value>Näytä koodattu arvo QR-koodin alla</show-value>
+                            </resource>
+                            <resource xml:lang="es">
+                                <content>Contenido o URL</content>
+                                <content-hint>Texto, URL o plantilla de valor XPath (p. ej. https://example.com/verify/{$id}); si está vacío, usa el valor calculado del control</content-hint>
+                                <size>Tamaño (px)</size>
+                                <error-correction>Nivel de corrección de errores</error-correction>
+                                <show-value>Mostrar el valor codificado debajo del código QR</show-value>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <content>Inhoud of URL</content>
+                                <content-hint>Tekst, URL of XPath-waardesjabloon (bijv. https://example.com/verify/{$id}); indien leeg wordt de berekende waarde gebruikt</content-hint>
+                                <size>Grootte (px)</size>
+                                <error-correction>Foutcorrectieniveau</error-correction>
+                                <show-value>Gecodeerde waarde onder QR-code tonen</show-value>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <content>Conteúdo ou URL</content>
+                                <content-hint>Texto, URL ou modelo de valor XPath (ex. https://example.com/verify/{$id}); se vazio, usa o valor calculado do controlo</content-hint>
+                                <size>Tamanho (px)</size>
+                                <error-correction>Nível de correção de erros</error-correction>
+                                <show-value>Mostrar valor codificado abaixo do código QR</show-value>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <content>Innehåll eller URL</content>
+                                <content-hint>Text, URL eller XPath-värdemall (t.ex. https://example.com/verify/{$id}); om tomt används kontrollens beräknade värde</content-hint>
+                                <size>Storlek (px)</size>
+                                <error-correction>Felkorrigeringsnivå</error-correction>
+                                <show-value>Visa kodat värde under QR-koden</show-value>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <content>المحتوى أو عنوان URL</content>
+                                <content-hint>نص أو عنوان URL أو قالب قيمة XPath (مثل https://example.com/verify/{$id})؛ إذا كان فارغًا، تُستخدم القيمة المحسوبة</content-hint>
+                                <size>الحجم (بكسل)</size>
+                                <error-correction>مستوى تصحيح الأخطاء</error-correction>
+                                <show-value>إظهار القيمة المرمّزة أسفل رمز QR</show-value>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <content>Zawartość lub URL</content>
+                                <content-hint>Tekst, URL lub szablon wartości XPath (np. https://example.com/verify/{$id}); jeśli puste, używana jest wartość wyliczona</content-hint>
+                                <size>Rozmiar (px)</size>
+                                <error-correction>Poziom korekcji błędów</error-correction>
+                                <show-value>Pokaż zakodowaną wartość pod kodem QR</show-value>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <content>内容またはURL</content>
+                                <content-hint>テキスト、URL、またはXPath値テンプレート (例: https://example.com/verify/{$id})。空の場合は計算値を使用します</content-hint>
+                                <size>サイズ (px)</size>
+                                <error-correction>誤り訂正レベル</error-correction>
+                                <show-value>QRコードの下にエンコードされた値を表示</show-value>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-qr-code-grid">
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:input ref="instance('local')/content" id="content-control" appearance="xpath-completion">
+                                <xf:label ref="xxf:r('content')"/>
+                                <xf:hint ref="xxf:r('content-hint')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <xf:input ref="instance('local')/size" id="size-control">
+                                <xf:label ref="xxf:r('size')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <fr:dropdown-select1 ref="instance('local')/error-correction" id="error-correction-control">
+                                <xf:label ref="xxf:r('error-correction')"/>
+                                <xf:item>
+                                    <xf:label>L (~7%)</xf:label>
+                                    <xf:value>L</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>M (~15%)</xf:label>
+                                    <xf:value>M</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>Q (~25%)</xf:label>
+                                    <xf:value>Q</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>H (~30%)</xf:label>
+                                    <xf:value>H</xf:value>
+                                </xf:item>
+                            </fr:dropdown-select1>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:select1 ref="instance('local')/show-value" appearance="full xxf:horizontal" id="show-value-control">
+                                <xf:label ref="xxf:r('show-value')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
+                                    <xf:value>true</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
+                                    <xf:value>false</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-qr-code-action"
+                    event="xforms-value-changed"
+                    observer="content-control size-control error-correction-control show-value-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/qr-code/qr-code.css"/>
+        </xbl:resources>
+
+        <xbl:template>
+            <xf:group appearance="xxf:internal">
+                <xf:var
+                    name="content-param"
+                    value="if (fr:is-design-time()) then '' else string(fr:component-param-value('content'))"/>
+                <xf:var
+                    name="raw-value"
+                    value="
+                        if (xxf:non-blank($content-param)) then
+                            $content-param
+                        else
+                            string(xxf:binding('fr-qr-code'))"/>
+                <xf:var
+                    name="effective-value"
+                    value="
+                        if (fr:is-design-time()) then
+                            'https://www.orbeon.com/'
+                        else if (xxf:non-blank($raw-value)) then
+                            $raw-value
+                        else
+                            ''"/>
+                <xf:var
+                    name="size-px"
+                    value="QrCodeSupport:normalizeSizePx(string(fr:component-param-value('size')))"/>
+                <xf:var
+                    name="error-correction"
+                    value="string(fr:component-param-value('error-correction'))"/>
+                <xf:var
+                    name="show-value"
+                    value="string(fr:component-param-value('show-value')) = 'true'"/>
+                <xf:var
+                    name="png-uri"
+                    value="QrCodeSupport:toPngDataUri($effective-value, $error-correction, string($size-px))"/>
+
+                <xf:group ref=".[xxf:non-blank($png-uri)]" xxf:element="span" class="fr-qr-code-container">
+                    <xh:img
+                        class="fr-qr-code-image"
+                        src="{$png-uri}"
+                        width="{$size-px}"
+                        height="{$size-px}"
+                        style="width: {$size-px}px; height: {$size-px}px;"
+                        alt="{xxf:label('fr-qr-code')}"/>
+                    <xf:group ref=".[$show-value and xxf:non-blank($effective-value)]" xxf:element="span" class="fr-qr-code-caption">
+                        <xf:output id="qr-caption" class="fr-qr-code-value" value="$effective-value"/>
+                    </xf:group>
+                </xf:group>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

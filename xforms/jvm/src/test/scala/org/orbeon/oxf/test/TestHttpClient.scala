@@ -24,7 +24,7 @@ import org.orbeon.oxf.pipeline.api.ProcessorDefinition
 import org.orbeon.oxf.processor.XPLConstants.OXF_PROCESSORS_NAMESPACE
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, SecureUtils, URLRewriterUtils}
+import org.orbeon.oxf.util.*
 import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache.CacheTracer
@@ -102,11 +102,16 @@ object TestHttpClient {
 
           val webAppContext  = new TestWebAppContext(Logger, ServerState.serverAttributes)
 
+          val isStatelessService =
+            providedSession.isEmpty &&
+            PathUtils.splitQuery(url)._1.startsWith("/fr/service/") &&
+            ! PathUtils.splitQueryDecodeParams(url)._2.contains("fr-keep-form-session" -> "true")
+
           val request = LocalRequest(
             safeRequestCtx     =
               SafeRequestContext(
                 webAppContext,
-                makeBaseRequest(attributes, credentials, providedSession)
+                makeBaseRequest(attributes, credentials, providedSession, stateless = isStatelessService)
               ),
             pathQuery               = url,
             method                  = method,
@@ -161,11 +166,18 @@ object TestHttpClient {
   def makeBaseRequest(
     attributes           : Map[String, AnyRef] = Map.empty,
     connectionCredentials: Option[Credentials] = None,
-    providedSession      : Option[Session]     = None
+    providedSession      : Option[Session]     = None,
+    stateless            : Boolean             = false
   ): RequestAdapter = new RequestAdapter {
 
+    private val effectiveAttributes: Map[String, AnyRef] =
+      if (stateless)
+        connectionCredentials.fold(attributes - CredentialsSupport.CredentialsRequestKey)(c => attributes + (CredentialsSupport.CredentialsRequestKey -> c))
+      else
+        attributes
+
     override val getContextPath                          = ServerState.ContextPath // called indirectly by `getClientContextPath`
-    override val getAttributesMap                        = ju.Collections.synchronizedMap(attributes.asJava)
+    override val getAttributesMap                        = ju.Collections.synchronizedMap(new ju.HashMap[String, AnyRef](effectiveAttributes.asJava))
     override def incomingCookies                         = Nil
     override val getRequestURL                           = s"$Scheme://$RemoteHost:${ServerState.Port}${ServerState.ContextPath}/" // only for to resolve
 
@@ -181,7 +193,7 @@ object TestHttpClient {
     override val getServerName                           = ServerState.Host
     override def getClientContextPath(urlString: String) = URLRewriterUtils.getClientContextPath(this, URLRewriterUtils.isPlatformPath(urlString))
     override def servicePrefix: String                   = "" // xxx or "/" or compute?
-    override def sessionInvalidate()                     = session.invalidate()
+    override def sessionInvalidate()                     = _sessionOpt.foreach(_.invalidate())
 
     override val credentials                             = connectionCredentials
 
@@ -191,12 +203,23 @@ object TestHttpClient {
     override val getAuthType                             = "BASIC" // some processors read it but result is unused
 
     // Session handling
-    private val session: Session =
-      providedSession.getOrElse(
-        new SimpleSession(SecureUtils.randomHexId) |!>
-          XFormsStateManager.sessionCreated
+    private val _sessionOpt: Option[Session] =
+      if (stateless)
+        None
+      else
+        Some(
+          providedSession.getOrElse(
+            new SimpleSession(SecureUtils.randomHexId) |!>
+              XFormsStateManager.sessionCreated
+          )
         )
 
-    override def getSession(create: Boolean): Session = session
+    override def getSession(create: Boolean): Session =
+      _sessionOpt.getOrElse {
+        if (create)
+          throw new IllegalStateException("Session creation is disabled for Form Runner service calls")
+        else
+          null
+      }
   }
 }

@@ -5,3 +5,12 @@ RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 
 # SQL scripts to create Orbeon Forms tables and indexes, as well as demo forms data
 COPY *.sql /docker-entrypoint-initdb.d/
+
+# Script to create the Orbeon Forms application user, which is not a superuser
+COPY --chmod=755 02-orbeon-user.sh /docker-entrypoint-initdb.d/
+
+# Entrypoint which makes the password file of that user readable by the initialization script, then runs the
+# entrypoint of the PostgreSQL image
+COPY --chmod=755 docker-entrypoint-postgres.sh /usr/local/bin/
+ENTRYPOINT ["docker-entrypoint-postgres.sh"]
+CMD ["postgres"]

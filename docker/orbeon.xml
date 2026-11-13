@@ -17,6 +17,6 @@
 	    validationQuery="select 1"
 
 	    username="orbeon"
-	    password="orbeon"
+	    password="CHANGE THIS PASSWORD"
 	    url="jdbc:postgresql://postgres:5432/orbeon?useUnicode=true&amp;characterEncoding=UTF8&amp;socketTimeout=30&amp;tcpKeepAlive=true"/>
 </Context>

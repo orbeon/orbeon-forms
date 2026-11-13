@@ -180,7 +180,7 @@
              view="services/attachments.xhtml"/>
 
     <!-- Run form in the background -->
-    <service path="/fr/service/([^/^.]+)/([^/^.]+)/(new|edit)(/([^/^.]+))?"
+    <service path="/fr/service/([^/^.]+)/([^/^.]+)/(new|edit|view)(/([^/^.]+))?"
              methods="POST"
              model="detail/detail-model.xpl"
              view="html-view.xpl"/>

@@ -860,13 +860,15 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def isServicePath(implicit xfc: XFormsFunction.Context): Boolean =
     isServicePath(xfc.containingDocument.getRequestPath)
 
-  // For now restrict to `new` and `edit` modes. Make sure, if changing, to except `validate` and `import`,
+  private val BackgroundModes: Set[String] = Set("new", "edit", "view")
+
+  // Restrict to `new`, `edit`, and `view` modes. Make sure, if changing, to except `validate` and `import`,
   // probably, as they also need to send an XML response back.
   def isBackground(implicit xfc: XFormsFunction.Context, p: FormRunnerParams): Boolean =
     isBackground(xfc.containingDocument.getRequestPath, p.mode)
 
   def isBackground(path: String, modeString: String): Boolean =
-    isServicePath(path) && (modeString == "new" || modeString == "edit")
+    isServicePath(path) && BackgroundModes(modeString)
 
   private def nextMessageSeq(): Unit =
     for {

@@ -14,7 +14,8 @@ class AllClientTest
   with NumberControlTests
   with AttachmentTests
   with DateTimeTests
-  with DateTimeFormatTests {
+  with DateTimeFormatTests
+  with RecaptchaTests {
 
   val ServerExternalPort = 8888
   val OrbeonServerUrl    = s"http://localhost:$ServerExternalPort/orbeon"

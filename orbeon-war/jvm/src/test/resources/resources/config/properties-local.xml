@@ -45,5 +45,18 @@
         name="oxf.fr.persistence.provider.tests.*.*"
         value="resource"/>
 
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.captcha.component.tests.recaptcha"
+        value="fr:recaptcha"/>
+    <property
+        as="xs:string"
+        name="oxf.xforms.xbl.fr.recaptcha.v2.public-key"
+        value="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"/>
+    <property
+        as="xs:string"
+        name="oxf.xforms.xbl.fr.recaptcha.v2.private-key"
+        value="6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"/>
+
 </properties>
 

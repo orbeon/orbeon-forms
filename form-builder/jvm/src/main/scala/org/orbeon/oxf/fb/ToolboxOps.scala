@@ -284,14 +284,31 @@ object ToolboxOps {
 
   //@XPathFunction
   def insertNewGrid(repeated: Boolean): Some[String] = {
-
     implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    val (into, after, grid) = findGridInsertionPoint
+    insertNewGridInto(
+      into                     = into,
+      after                    = after.toList,
+      before                   = Nil,
+      repeated                 = repeated,
+      suggestedNameOpt         = None,
+      precedingControlNameHint = Some(grid.flatMap(precedingBoundControlNameInSectionForGrid(_, includeSelf = true)))
+    )
+  }
 
+  def insertNewGridInto(
+    into                    : NodeInfo,
+    after                   : collection.Seq[NodeInfo],
+    before                  : collection.Seq[NodeInfo],
+    repeated                : Boolean,
+    suggestedNameOpt        : Option[String],
+    precedingControlNameHint: Option[Option[String]] = None
+  )(implicit
+    ctx                     : FormBuilderDocContext
+  ): Some[String] =
     withDebugGridOperation(s"insert new ${if (repeated) "repeated " else ""}grid") {
 
-      val (into, after, grid) = findGridInsertionPoint
-
-      val newGridName  = controlNameFromId(nextId("grid"))
+      val newGridName  = suggestedNameOpt.getOrElse(controlNameFromId(nextId("grid")))
       val newCellIdsIt = nextTmpIds(count = 2).iterator
 
       // The grid template
@@ -305,18 +322,35 @@ object ToolboxOps {
         </fr:grid>
 
       // Insert grid
-      val newGridElem = insert(into = into, after = after.toList, origin = gridTemplate).head
+      val newGridElem = insert(into = into, after = after, before = before, origin = gridTemplate).head
+
+      val precedingControlName =
+        precedingControlNameHint.getOrElse(
+          precedingBoundControlNameInSectionForGrid(newGridElem, includeSelf = false)
+        )
 
       // Insert instance holder (but no resource holders)
       insertHolders(
         controlElement       = newGridElem,
         dataHolders          = List(elementInfo(newGridName)),
         resourceHolders      = Nil,
-        precedingControlName = grid flatMap (precedingBoundControlNameInSectionForGrid(_, includeSelf = true))
+        precedingControlName = precedingControlName
       )
 
-      // Make sure binds are created
-      ensureBinds(findContainerNamesForModel(newGridElem, includeSelf = true))
+      // Make sure binds are created and positioned consistently with sibling containers/controls
+      val newGridBind       = ensureBinds(findContainerNamesForModel(newGridElem, includeSelf = true))
+      val otherSiblingBinds = (newGridBind.parentUnsafe / XFBindTest).filterNot(_ isSameNodeInfo newGridBind)
+      precedingControlName match {
+        case Some(prevName) =>
+          otherSiblingBinds.find(isBindForName(_, prevName)).foreach { prevBind =>
+            if (! otherSiblingBinds.lastOption.exists(_ isSameNodeInfo prevBind))
+              moveElementAfter(newGridBind, prevBind)
+          }
+        case None =>
+          otherSiblingBinds.headOption.foreach { firstBind =>
+            moveElementBefore(newGridBind, firstBind)
+          }
+      }
 
       // This takes care of all the repeat-related items
       if (repeated)
@@ -333,6 +367,8 @@ object ToolboxOps {
           applyDefaults        = true,
           initialIterations    = "first"
         )
+      else
+        updateTemplatesCheckContainers(findAncestorRepeatNames(into, includeSelf = true).to(Set))
 
       // Select new td
       selectFirstCellInContainer(newGridElem)
@@ -341,7 +377,6 @@ object ToolboxOps {
 
       Some(newGridName)
     }
-  }
 
   def selectFirstCellInContainer(containerElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
     (containerElem descendant Cell.CellTestName headOption) foreach selectCell

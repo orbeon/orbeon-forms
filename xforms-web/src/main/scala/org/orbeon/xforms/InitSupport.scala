@@ -149,7 +149,7 @@ object InitSupport {
           // We *may* be a duplicated tab, but not necessarily
           // We register handlers to listen to duplicated tab messages, but also to respond to a duplicated time ping
           // reply, which we obtain as an `IO`.
-          DuplicateTab.pingAndRegisterAllHandlers(initializations.namespacedFormId, initializations.uuid)
+          Some(DuplicateTab.pingAndRegisterAllHandlers(initializations.namespacedFormId, initializations.uuid))
         case StateResult.Reloaded =>
           // Reload and early return as there is no need to continue form initialization at all
           dom.window.location.reload()

@@ -56,7 +56,7 @@ object Bowser extends js.Object {
   val mobile  : js.UndefOr[Boolean] = js.native
   val version : String              = js.native
   val name    : String              = js.native
-  val osname  : js.UndefOr[String]  = js.native // can be undefined with JSDOM
+  val osname  : js.UndefOr[String]  = js.native // can be undefined if user agent OS is not recognized
 }
 
 object HTMLFacades {

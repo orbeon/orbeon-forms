@@ -195,18 +195,16 @@ object FormRunnerApp extends App {
         hidePopover()
     )
 
-    if (js.typeOf(g.MutationObserver) != "undefined") {
-      val observer = new MutationObserver((_, _) =>
-        if (isPopoverShown && activeStatusIconOpt != lastActiveIconOpt)
-          showOrUpdatePopover(toggleIfShown = false)
-      )
-      val options = new MutationObserverInit {
-        attributes      = true
-        attributeFilter = js.Array("class")
-      }
-      observer.observe(statusIconElem, options)
-      statusIconElem.closestOpt("form").foreach(observer.observe(_, options))
+    val observer = new MutationObserver((_, _) =>
+      if (isPopoverShown && activeStatusIconOpt != lastActiveIconOpt)
+        showOrUpdatePopover(toggleIfShown = false)
+    )
+    val options = new MutationObserverInit {
+      attributes      = true
+      attributeFilter = js.Array("class")
     }
+    observer.observe(statusIconElem, options)
+    statusIconElem.closestOpt("form").foreach(observer.observe(_, options))
   }
 
   private def initColorSchemeSelector(navElem: html.Element): Unit = {
@@ -284,14 +282,12 @@ object FormRunnerApp extends App {
   private def addScrollPadding(htmlElement: html.Element, cssClass: String): Unit = {
     val position = window.getComputedStyle(htmlElement).position
     if (position == "fixed" || position == "sticky") {
-      if (js.typeOf(g.ResizeObserver) != "undefined") { // ResizeObserver isn't implemented in jsdom, used in tests
-        val resizeObserver = new ResizeObserver((_, _) => {
-          val documentElement = document.documentElementT
-          val scrollPaddingWithMargin = htmlElement.clientHeight + 5;
-          documentElement.style.setProperty(cssClass, s"${scrollPaddingWithMargin}px")
-        })
-        resizeObserver.observe(htmlElement)
-      }
+      val resizeObserver = new ResizeObserver((_, _) => {
+        val documentElement = document.documentElementT
+        val scrollPaddingWithMargin = htmlElement.clientHeight + 5;
+        documentElement.style.setProperty(cssClass, s"${scrollPaddingWithMargin}px")
+      })
+      resizeObserver.observe(htmlElement)
     }
   }
 
@@ -324,11 +320,9 @@ object FormRunnerApp extends App {
       GlobalEventListenerSupport.addListener(window, DomEventNames.Scroll, (_: dom.Event) => requestUpdate(), useCapture = true)
       GlobalEventListenerSupport.addListener(window, "resize", (_: dom.Event) => requestUpdate())
 
-      if (js.typeOf(g.ResizeObserver) != "undefined") {
-        val resizeObserver = new ResizeObserver((_, _) => requestUpdate())
-        Option(buttonsElem.parentElement).foreach(resizeObserver.observe)
-        resizeObserver.observe(buttonsElem)
-      }
+      val resizeObserver = new ResizeObserver((_, _) => requestUpdate())
+      Option(buttonsElem.parentElement).foreach(resizeObserver.observe)
+      resizeObserver.observe(buttonsElem)
 
       update()
     }

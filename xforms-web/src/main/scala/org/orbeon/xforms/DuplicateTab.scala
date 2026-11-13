@@ -1,8 +1,6 @@
 package org.orbeon.xforms
 
 import cats.effect.IO
-import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.xforms.Session.broadcastChannelAvailable
 import org.scalajs.dom.{BroadcastChannel, MessageEvent}
 
 import scala.concurrent.duration.Duration
@@ -18,10 +16,8 @@ object DuplicateTab {
   // `Future` used so we can register a callback
   val duplicateTabDetectedF: Future[Unit] = duplicateTabDetectedP.future
 
-  def pingAndRegisterAllHandlers(namespacedFormId: String, uuid: String): Option[IO[Unit]] =
-    newBroadcastChannel(TabActivityBroadcastChannel).map { broadcastChannel =>
-      registerDuplicatedTabHandlers(broadcastChannel, namespacedFormId, uuid)
-    }
+  def pingAndRegisterAllHandlers(namespacedFormId: String, uuid: String): IO[Unit] =
+    registerDuplicatedTabHandlers(new BroadcastChannel(TabActivityBroadcastChannel), namespacedFormId, uuid)
 
   def waitForReplyWithTimeout[T](tabDuplicationReplyIo: IO[T], timeout: Duration, timeoutContinuation: IO[Unit]): IO[Unit] =
     tabDuplicationReplyIo
@@ -31,33 +27,29 @@ object DuplicateTab {
         timeoutContinuation
       )
 
-  def registerPingHandler(namespacedFormId: String, uuid: String): Unit =
-    newBroadcastChannel(TabActivityBroadcastChannel).foreach { tabActivityBroadcastChannel =>
+  def registerPingHandler(namespacedFormId: String, uuid: String): Unit = {
+    val tabActivityBroadcastChannel = new BroadcastChannel(TabActivityBroadcastChannel)
 
-      val _namespacedFormId = namespacedFormId
-      val _uuid = uuid
+    val _namespacedFormId = namespacedFormId
+    val _uuid = uuid
 
-      tabActivityBroadcastChannel.onmessage =
-        (event: MessageEvent) => {
-          val tabMessage = event.data.asInstanceOf[TabMessage]
-          if (tabMessage.namespacedFormId == namespacedFormId && tabMessage.uuid == uuid)
-            tabMessage.messageType match {
-              case TabOpenPingMessageType =>
-                // Another tab has opened with the same namespacedFormId and uuid.
-                // We need to send back a message to the channel to indicate that we are the original tab.
-                tabActivityBroadcastChannel.postMessage(new TabMessage {
-                  override val messageType     : String = TabOpenReplyMessageType
-                  override val namespacedFormId: String = _namespacedFormId
-                  override val uuid            : String = _uuid
-                })
-              case _ =>
-            }
-        }
-    }
-
-  // 2025-08-19: `BroadcastChannel` is not available with JSDOM/Node 16 yet.
-  def newBroadcastChannel(name: String): Option[BroadcastChannel] =
-    broadcastChannelAvailable.option(new BroadcastChannel(name))
+    tabActivityBroadcastChannel.onmessage =
+      (event: MessageEvent) => {
+        val tabMessage = event.data.asInstanceOf[TabMessage]
+        if (tabMessage.namespacedFormId == namespacedFormId && tabMessage.uuid == uuid)
+          tabMessage.messageType match {
+            case TabOpenPingMessageType =>
+              // Another tab has opened with the same namespacedFormId and uuid.
+              // We need to send back a message to the channel to indicate that we are the original tab.
+              tabActivityBroadcastChannel.postMessage(new TabMessage {
+                override val messageType     : String = TabOpenReplyMessageType
+                override val namespacedFormId: String = _namespacedFormId
+                override val uuid            : String = _uuid
+              })
+            case _ =>
+          }
+      }
+  }
 
   def registerDuplicatedTabHandlers(
     tabActivityBroadcastChannel: BroadcastChannel,

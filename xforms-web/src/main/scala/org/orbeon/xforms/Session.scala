@@ -3,11 +3,9 @@ package org.orbeon.xforms
 import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.*
-import org.orbeon.oxf.util.CoreUtils.*
 import org.scalajs.dom.{BroadcastChannel, MessageEvent}
 
 import scala.collection.mutable
-import scala.scalajs.js
 
 
 object Session {
@@ -50,8 +48,6 @@ object Session {
   def addSessionUpdateListener(listener: SessionUpdateListener): Unit    = sessionUpdateListeners += listener
   def removeSessionUpdateListener(listener: SessionUpdateListener): Unit = sessionUpdateListeners -= listener
 
-  val broadcastChannelAvailable: Boolean = ! js.isUndefined(js.Dynamic.global.window.BroadcastChannel)
-
   private object Private {
 
     case class Configuration(
@@ -71,25 +67,24 @@ object Session {
 
     private var maxNewestEventTimeAmongAllPages: Long = -1L
 
-    private lazy val sessionActivityBroadcastChannelOpt =
-      broadcastChannelAvailable.option { // 2025-08-19: not available with JSDOM/Node 16 yet
-        val sessionActivityBroadcastChannel = new BroadcastChannel("orbeon-session-activity")
+    private lazy val sessionActivityBroadcastChannel: BroadcastChannel = {
+      val channel = new BroadcastChannel("orbeon-session-activity")
 
-        sessionActivityBroadcastChannel.onmessage = (event: MessageEvent) => {
-          for {
-            sessionMessage <- sessionMessageFromJson(event.data.asInstanceOf[String])
-            configuration <- configurationOpt
-            if sessionMessage.sessionId == configuration.sessionId
-          } locally {
-            sessionMessage match {
-              case SessionActivity(_, localNewestEventTime) => sessionActivity(configuration, local = false, localNewestEventTime)
-              case SessionLogout(_) => sessionLogout(configuration, local = false)
-            }
+      channel.onmessage = (event: MessageEvent) => {
+        for {
+          sessionMessage <- sessionMessageFromJson(event.data.asInstanceOf[String])
+          configuration <- configurationOpt
+          if sessionMessage.sessionId == configuration.sessionId
+        } locally {
+          sessionMessage match {
+            case SessionActivity(_, localNewestEventTime) => sessionActivity(configuration, local = false, localNewestEventTime)
+            case SessionLogout(_) => sessionLogout(configuration, local = false)
           }
         }
-
-        sessionActivityBroadcastChannel
       }
+
+      channel
+    }
 
     private def sessionMessageFromJson(jsonString: String): Either[Error, SessionMessage] = {
       // This could be done in a cleaner way by using circe's discriminator feature, but it is not available in JS.
@@ -128,11 +123,9 @@ object Session {
         }
 
         if (local) {
-          sessionActivityBroadcastChannelOpt.foreach { sessionActivityBroadcastChannel =>
-            // Broadcast our local newestEventTime value to other pages
-            val message = SessionActivity(configuration.sessionId, newestEventTime).asJson.noSpaces
-            sessionActivityBroadcastChannel.postMessage(message)
-          }
+          // Broadcast our local newestEventTime value to other pages
+          val message = SessionActivity(configuration.sessionId, newestEventTime).asJson.noSpaces
+          sessionActivityBroadcastChannel.postMessage(message)
         }
 
         // Reason for the margin: we prefer to display that the session is expired a bit sooner, while the session might
@@ -172,11 +165,9 @@ object Session {
         sessionStatus = SessionExpired
 
         if (local) {
-          sessionActivityBroadcastChannelOpt.foreach { sessionActivityBroadcastChannel =>
-            // Broadcast our local logout to other pages
-            val message = SessionLogout(configuration.sessionId).asJson.noSpaces
-            sessionActivityBroadcastChannel.postMessage(message)
-          }
+          // Broadcast our local logout to other pages
+          val message = SessionLogout(configuration.sessionId).asJson.noSpaces
+          sessionActivityBroadcastChannel.postMessage(message)
         } else {
           // If the logout comes from another page, process the logout locally
           fireSessionUpdate(SessionUpdate(

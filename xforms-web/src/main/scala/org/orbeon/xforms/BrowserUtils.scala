@@ -35,8 +35,6 @@ object BrowserUtils {
   // 2025-08-19:
   // - `dom.window.performance.navigation` is deprecated.
   // - Moving to `dom.window.performance.getEntriesByType()`.
-  // - Neither `dom.window.performance.getEntriesByType()` nor `dom.window.performance.navigation` seem to
-  //   work with JSDOM.
   // - https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigationTiming/type#navigate
   // - https://stackoverflow.com/questions/5004978/check-if-page-gets-reloaded-or-refreshed-in-javascript/53307588#53307588
   // - https://www.w3.org/TR/navigation-timing/

@@ -169,6 +169,17 @@ trait FormBuilderSupport extends XFormsSupport {
               </save>
             </xf:instance>
           </xf:model>
+          <xf:model id="fr-parameters-model">
+            <xf:instance id="fr-parameters-instance">
+              <request xmlns="">
+                <app>orbeon</app>
+                <form>builder</form>
+                <form-version>1</form-version>
+                <document/>
+                <mode>new</mode>
+              </request>
+            </xf:instance>
+          </xf:model>
         </xh:head>
         <xh:body>
         </xh:body>

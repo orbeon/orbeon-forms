@@ -23,7 +23,7 @@ import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerParams}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.test.{DocumentTestBase, PipelineSupport, ResourceManagerSupport}
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, XPath}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
@@ -278,12 +278,9 @@ class ClipboardTest
     it("must not create a session when reading from clipboard or generating next ids") {
       withActionAndFBDoc(SectionsRepeatsDoc) { implicit ctx =>
 
-        val pipelineContext         = PipelineContext.get
-        val previousExternalContext = pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT)
-
         val statelessExternalContext =
           new TestExternalContext(
-            pipelineContext,
+            PipelineContext.get,
             ProcessorUtils.createDocumentFromURL(PipelineSupport.DefaultRequestUrl, null)
           ) {
             override def getSession(create: Boolean): ExternalContext.Session =
@@ -293,8 +290,7 @@ class ClipboardTest
                 null
           }
 
-        pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, statelessExternalContext)
-        try {
+        CoreCrossPlatformSupport.withExternalContext(statelessExternalContext) {
           assert(ToolboxOps.readXcvFromClipboard.isEmpty)
           assert(FormBuilder.nextIds("grid", count = 0).isEmpty)
           assert(FormBuilder.nextTmpIds(count = 0).isEmpty)
@@ -308,8 +304,6 @@ class ClipboardTest
             )
 
           FormBuilderMigrationXPathApi.migrateGridsEnclosingElements(mutableDoc)
-        } finally {
-          pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, previousExternalContext)
         }
       }
     }

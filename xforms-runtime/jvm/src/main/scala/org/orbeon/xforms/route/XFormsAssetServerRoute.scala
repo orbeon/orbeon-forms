@@ -15,10 +15,10 @@ package org.orbeon.xforms.route
 
 import cats.syntax.option.*
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.io.{CharsetNames, IOUtils}
+import org.orbeon.io.{CharsetNames, IOUtils, UriUtils}
 import org.orbeon.oxf.controller.NativeRoute
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
-import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext, UrlRewriteMode}
+import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, SafeRequestContext, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.http.{Headers, HttpRanges, SessionExpiredException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -37,6 +37,7 @@ import org.orbeon.xforms.{Constants, XFormsCrossPlatformSupport}
 
 import java.io.*
 import java.net.URI
+import java.util.concurrent.ConcurrentHashMap
 import scala.collection.immutable.ListSet
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
@@ -371,6 +372,19 @@ object XFormsAssetServerRoute extends NativeRoute {
 
   // Transform a URI accessible from the server into a URI accessible from the client.
   // The mapping expires with the session.
+  def ensureRequestDynamicResources(request: ExternalContext.Request): ConcurrentHashMap[String, DynamicResource] =
+    request
+      .getAttributesMap
+      .computeIfAbsent(DynamicResourcesSessionKey, _ => new ConcurrentHashMap[String, DynamicResource]())
+      .asInstanceOf[ConcurrentHashMap[String, DynamicResource]]
+
+  private def findRequestDynamicResources(request: ExternalContext.Request): Option[ConcurrentHashMap[String, DynamicResource]] =
+    Option(request.getAttributesMap.get(DynamicResourcesSessionKey))
+      .collect { case m: ConcurrentHashMap[String, DynamicResource] @unchecked => m }
+
+  private def getOrCreateSessionOpt(request: ExternalContext.Request): Option[ExternalContext.Session] =
+    Try(Option(request.getSession(true))).toOption.flatten
+
   def proxyURI(
     urlString       : String,
     filename        : Option[String]                 = None,
@@ -383,11 +397,8 @@ object XFormsAssetServerRoute extends NativeRoute {
     logger          : IndentedLogger
   ): Option[URI] = {
 
-    // Get session
     val externalContext = XFormsCrossPlatformSupport.externalContext
-    val session = externalContext.getRequest.getSession(true)
-
-    require(session ne null, "proxyURI requires a session")
+    val sessionOpt      = getOrCreateSessionOpt(externalContext.getRequest)
 
     // The resource URI may already be absolute, or may be relative to the server base. Make sure we work with
     // an absolute URI.
@@ -415,15 +426,25 @@ object XFormsAssetServerRoute extends NativeRoute {
     val resource =
       DynamicResource(serviceAbsoluteUrl, filename, contentType, lastModified, outgoingHeaders)
 
-    // Store mapping into session
-    session.setAttribute(DynamicResourcesSessionKey + resource.digest, resource, SessionScope.Application)
+    // Store mapping into session when available, or into request attributes for intra-request subrequests
+    // (such as stateless PDF image rendering or internal rendered-format creation).
+    sessionOpt match {
+      case Some(session) =>
+        session.setAttribute(DynamicResourcesSessionKey + resource.digest, resource, SessionScope.Application)
+      case None =>
+        ensureRequestDynamicResources(externalContext.getRequest).put(resource.digest, resource)
+    }
 
     URI.create(DynamicResourcesPath + resource.digest).some
   }
 
   // For Java callers
   // 2015-09-21: Only used by FileSerializer.
-  def jProxyURI(urlString: String, contentType: String): String =
+  def jProxyURI(urlString: String, contentType: String): String = {
+    val request = XFormsCrossPlatformSupport.externalContext.getRequest
+    if (getOrCreateSessionOpt(request).isEmpty && ! request.isInstanceOf[LocalRequest])
+      throw new IllegalStateException("Session is required to proxy file URI for external requests")
+
     proxyURI(
       urlString   = urlString,
       contentType = Option(contentType)
@@ -432,12 +453,13 @@ object XFormsAssetServerRoute extends NativeRoute {
     )
     .map(_.toString)
     .getOrElse("")
+  }
 
   // Try to remove a dynamic resource
   //
   // - do nothing if the session or resource are not found
   // - if `removeFile == true` and the resource maps to a file, try to remove the file
-  // - remove the mapping from the session
+  // - remove the mapping from the session (or request attributes)
   def tryToRemoveDynamicResource(
     requestPath: String,
     removeFile : Boolean // 2026-06-08: always `true`
@@ -445,15 +467,23 @@ object XFormsAssetServerRoute extends NativeRoute {
 
     implicit val externalContext: ExternalContext = XFormsCrossPlatformSupport.externalContext
 
-    findDynamicResource(requestPath).foreach { resource =>
-      externalContext.getRequest.sessionOpt.foreach { session =>
-
+    findDynamicResource(requestPath) match {
+      case Some(resource) =>
         if (removeFile)
           Try(new File(resource.uri))
             .foreach(_.delete())
 
-        session.removeAttribute(DynamicResourcesSessionKey + resource.digest, SessionScope.Application)
-      }
+        externalContext.getRequest.sessionOpt match {
+          case Some(session) =>
+            session.removeAttribute(DynamicResourcesSessionKey + resource.digest, SessionScope.Application)
+          case None =>
+            findRequestDynamicResources(externalContext.getRequest)
+              .foreach(_.remove(resource.digest))
+        }
+      case None if removeFile && requestPath.startsWith("file:") =>
+        Try(java.nio.file.Path.of(UriUtils.removeQueryAndFragment(URI.create(requestPath))).toFile)
+          .foreach(_.delete())
+      case None =>
     }
   }
 
@@ -461,13 +491,14 @@ object XFormsAssetServerRoute extends NativeRoute {
     requestPath    : String
   )(implicit
     externalContext: ExternalContext
-  ): Option[DynamicResource] =
-    externalContext.getRequest.sessionOpt flatMap { session =>
-      val digestFromPath = filename(requestPath)
-      val lookupKey      = DynamicResourcesSessionKey + digestFromPath
+  ): Option[DynamicResource] = {
+    val digestFromPath = filename(requestPath)
+    val lookupKey      = DynamicResourcesSessionKey + digestFromPath
 
-      session.getAttribute(lookupKey, SessionScope.Application) map (_.asInstanceOf[DynamicResource])
-    }
+    externalContext.getRequest.sessionOpt
+      .flatMap(session => session.getAttribute(lookupKey, SessionScope.Application).map(_.asInstanceOf[DynamicResource]))
+      .orElse(findRequestDynamicResources(externalContext.getRequest).flatMap(m => Option(m.get(digestFromPath))))
+  }
 
   // For unit tests only (called from XSLT)
   def testGetResources(key: String): Array[String] =

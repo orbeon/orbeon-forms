@@ -76,9 +76,9 @@ object FileItemSupport {
     val fileItem = fileItemFactory.createItem("dummy", null, false, null)
 
     scope match {
-      case ExpirationScope.Request     => deleteFileOnRequestEnd(fileItem)
+      case ExpirationScope.Request     => Private.deleteFileOnRequestEnd(fileItem)
       case ExpirationScope.Session     => Private.deleteFileOnSessionTermination(fileItem.fileLocationOpt.filter(_.exists()))
-      case ExpirationScope.Application => deleteFileOnApplicationDestroyed(fileItem)
+      case ExpirationScope.Application => Private.deleteFileOnApplicationDestroyed(fileItem)
     }
 
     fileItem
@@ -158,6 +158,9 @@ object FileItemSupport {
     override def toString = "Iterator wrapping FileItemIterator" // `super.toString` is dangerous when running in a debugger
   }
 
+  def deleteFileOnRequestEnd(file: File): Unit =
+    Option(PipelineContext.get).foreach(_.addContextListener((_: Boolean) => deleteFile(file, ExpirationScope.Request.some)))
+
   def deleteFileOnSessionTermination(file: File): Unit =
     Private.deleteFileOnSessionTermination(file.some)
 
@@ -199,8 +202,10 @@ object FileItemSupport {
               throw e
           }
         case None =>
-          // TODO: This should probably throw an error.
-          Logger.warn(s"no existing session found so cannot register temporary file deletion upon session destruction: `${file.map(_.getCanonicalPath).getOrElse("[no file provided]")}`")
+          Logger.debug(s"no existing session found; falling back to request-scoped temporary file deletion: `${file.map(_.getCanonicalPath).getOrElse("[no file provided]")}`")
+          Option(PipelineContext.get).foreach(
+            _.addContextListener((_: Boolean) => file foreach (deleteFile(_, ExpirationScope.Request.some)))
+          )
       }
 
     def deleteFileOnApplicationDestroyed(fileItem: FileItem): Unit =

@@ -89,9 +89,9 @@
                                 1"/>
 
                     <xf:action type="xpath">
-                        xxf:set-session-attribute('org.orbeon.fr.import.total', xs:integer(instance('fr-import-stats')/total)),
-                        xxf:set-session-attribute('org.orbeon.fr.import.processed', 0),
-                        xxf:set-session-attribute('org.orbeon.fr.import.succeeded', 0)
+                        xxf:set-session-attribute('org.orbeon.fr.import.total', xs:integer(instance('fr-import-stats')/total), false()),
+                        xxf:set-session-attribute('org.orbeon.fr.import.processed', 0, false()),
+                        xxf:set-session-attribute('org.orbeon.fr.import.succeeded', 0, false())
                     </xf:action>
 
 <!--                    <xf:message level="xxf:log-error" value="$format"/>-->
@@ -158,8 +158,8 @@
                                 </xf:action>
 
                                 <xf:action type="xpath">
-                                    xxf:set-session-attribute('org.orbeon.fr.import.processed', instance('fr-import-stats')/processed/xs:integer(.)),
-                                    xxf:set-session-attribute('org.orbeon.fr.import.succeeded', instance('fr-import-stats')/succeeded/xs:integer(.))
+                                    xxf:set-session-attribute('org.orbeon.fr.import.processed', instance('fr-import-stats')/processed/xs:integer(.), false()),
+                                    xxf:set-session-attribute('org.orbeon.fr.import.succeeded', instance('fr-import-stats')/succeeded/xs:integer(.), false())
                                 </xf:action>
                             </xf:action>
 
@@ -199,8 +199,8 @@
                         </xf:action>
 
                         <xf:action type="xpath">
-                            xxf:set-session-attribute('org.orbeon.fr.import.processed', instance('fr-import-stats')/processed/xs:integer(.)),
-                            xxf:set-session-attribute('org.orbeon.fr.import.succeeded', instance('fr-import-stats')/succeeded/xs:integer(.))
+                            xxf:set-session-attribute('org.orbeon.fr.import.processed', instance('fr-import-stats')/processed/xs:integer(.), false()),
+                            xxf:set-session-attribute('org.orbeon.fr.import.succeeded', instance('fr-import-stats')/succeeded/xs:integer(.), false())
                         </xf:action>
 
                         <xf:insert
@@ -214,7 +214,7 @@
                     </xf:action>
 
                     <xf:action type="xpath">
-                        xxf:set-session-attribute('org.orbeon.fr.import.invalid-rows', xs:string(instance('fr-import-stats')/invalid-rows-string))
+                        xxf:set-session-attribute('org.orbeon.fr.import.invalid-rows', xs:string(instance('fr-import-stats')/invalid-rows-string), false())
                     </xf:action>
                     <xf:delete ref="instance('fr-import-stats')/invalid-rows-string"/>
 

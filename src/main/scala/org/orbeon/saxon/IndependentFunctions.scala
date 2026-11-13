@@ -64,7 +64,8 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
     // TODO: Split this out into separate trait
     Fun("set-session-attribute", classOf[SetSessionAttribute], op = 0, min = 2, ITEM_TYPE, ALLOWS_ZERO,
       Arg(STRING, EXACTLY_ONE),
-      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+      Arg(BOOLEAN, ALLOWS_ZERO_OR_ONE)
     )
 
     // TODO: Split this out into separate trait

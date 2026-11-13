@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.process
 
 import cats.syntax.option.*
 import org.orbeon.connection.StreamedContent
-import org.orbeon.io.CharsetNames
+import org.orbeon.io.{CharsetNames, UriUtils}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
 import org.orbeon.oxf.fr.*
@@ -561,12 +561,15 @@ trait FormRunnerActions
                 case ContentToSend.Single(ContentToken.Rendered(_, true)) => true
                 case _                                                    => false
               }
-              if (isUrlOnly && uri.getScheme == "file")
+              if (isUrlOnly && uri.getScheme == "file") {
+                if (Try(Option(externalContext.getRequest.getSession(true))).toOption.flatten.isEmpty)
+                  throw new IllegalStateException("Session is required when sending `pdf-url` or `tiff-url`")
+
                 XFormsAssetServerRoute.proxyURI(
                   urlString   = uri.toString,
                   contentType = RenderedFormat.SupportedRenderFormatsMediatypes(format).some
                 )
-              else
+              } else
                 uri.some
             }
           }
@@ -923,6 +926,12 @@ trait FormRunnerActions
         case Some(_) | None =>
           // The file doesn't exist, create/update it and return the path/URI
 
+          val hasOrCanCreateSession =
+            Try(Option(externalContext.getRequest.getSession(true))).toOption.flatten.isDefined
+
+          if (! hasOrCanCreateSession)
+            XFormsAssetServerRoute.ensureRequestDynamicResources(externalContext.getRequest)
+
           val pathQuery =
             buildRenderedFormatPathWithParams(
               request      = request,
@@ -958,6 +967,12 @@ trait FormRunnerActions
                   .findDynamicResource(pathToTmpFileOrDynamic)
                   .map(_.uri.toString)
                   .getOrElse(pathToTmpFileOrDynamic)
+
+              if (! hasOrCanCreateSession) {
+                val fileUri = URI.create(pathToTmpFile)
+                if (fileUri.getScheme == "file")
+                  FileItemSupport.deleteFileOnRequestEnd(java.nio.file.Path.of(UriUtils.removeQueryAndFragment(fileUri)).toFile)
+              }
 
               setvalue(
                 ref   = node,

@@ -160,10 +160,17 @@ class SetSessionAttribute extends DefaultFunctionSupport with RuntimeDependentFu
 
     val attributeName = stringArgument(0)
     val item          = argument(1).evaluateItem(xpathContext)
+    val createSession = booleanArgument(2, default = true)
 
-    val session = NetUtils.getExternalContext.getRequest.getSession(true) // DO force session creation
+    val sessionOpt =
+      if (createSession)
+        Option(NetUtils.getExternalContext.getRequest.getSession(true)) // DO force session creation
+      else
+        NetUtils.getExternalContext.getRequest.sessionOpt
 
-    ScopeFunctionSupport.storeAttribute(session.setAttribute(_, _), attributeName, item)
+    sessionOpt.foreach { session =>
+      ScopeFunctionSupport.storeAttribute(session.setAttribute(_, _), attributeName, item)
+    }
 
     EmptyIterator.getInstance
   }

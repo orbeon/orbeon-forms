@@ -85,9 +85,9 @@
                             )"/>
 
                     <xf:action type="xpath">
-                        xxf:set-session-attribute('org.orbeon.fr.import.total', xs:integer(instance('fr-import-stats')/total)),
-                        xxf:set-session-attribute('org.orbeon.fr.import.processed', 0),
-                        xxf:set-session-attribute('org.orbeon.fr.import.succeeded', 0)
+                        xxf:set-session-attribute('org.orbeon.fr.import.total', xs:integer(instance('fr-import-stats')/total), false()),
+                        xxf:set-session-attribute('org.orbeon.fr.import.processed', 0, false()),
+                        xxf:set-session-attribute('org.orbeon.fr.import.succeeded', 0, false())
                     </xf:action>
 
                     <!-- Start import -->
@@ -220,7 +220,8 @@
                     <xf:action type="xpath">
                         xxf:set-session-attribute(
                             'org.orbeon.fr.import.succeeded',
-                            instance('fr-import-stats')/succeeded/xs:integer(.)
+                            instance('fr-import-stats')/succeeded/xs:integer(.),
+                            false()
                         )
                     </xf:action>
                     <!-- Maybe continue import -->
@@ -249,7 +250,8 @@
                     <xf:action type="xpath">
                         xxf:set-session-attribute(
                             'org.orbeon.fr.import.processed',
-                            instance('fr-import-stats')/processed/xs:integer(.)
+                            instance('fr-import-stats')/processed/xs:integer(.),
+                            false()
                         )
                     </xf:action>
 

@@ -69,10 +69,13 @@ public class ScopeGenerator extends ScopeProcessorBase {
                         ExternalContext externalContext = NetUtils.getExternalContext();
                         if (externalContext == null)
                             throw new OXFException("Missing external context");
+                        final ExternalContext.Session session = config.javaIsSessionScope()
+                                ? externalContext.getSession(false)
+                                : null;
                         Object value = config.javaIsRequestScope()
                                 ? externalContext.getRequest().getAttributesMap().get(config.key())
                                 : config.javaIsSessionScope()
-                                ? externalContext.getSession(true).javaGetAttribute(config.key(), config.sessionScope())
+                                ? (session != null ? session.javaGetAttribute(config.key(), config.sessionScope()) : null)
                                 : config.javaIsApplicationScope()
                                 ? externalContext.getWebAppContext().getAttributesMap().get(config.key())
                                 : null;

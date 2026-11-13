@@ -260,11 +260,17 @@ public class FileSerializer extends ProcessorImpl {
                     // Get the url of the file
                     final String resultURL;
                     {
-                        final String localURL = ((DiskFileItem) fileItem).getStoreLocation().toURI().toString();
-                        if ("session".equals(config.scope) && config.proxyResult)
-                            resultURL = XFormsAssetServerRoute.jProxyURI(localURL, config.requestedContentType);
-                        else
+                        final String localURL = storeLocation.toURI().toString();
+                        if ("session".equals(config.scope) && config.proxyResult) {
+                            try {
+                                resultURL = XFormsAssetServerRoute.jProxyURI(localURL, config.requestedContentType);
+                            } catch (RuntimeException e) {
+                                storeLocation.delete();
+                                throw e;
+                            }
+                        } else {
                             resultURL = localURL;
+                        }
                     }
 
                     xmlReceiver.startDocument();

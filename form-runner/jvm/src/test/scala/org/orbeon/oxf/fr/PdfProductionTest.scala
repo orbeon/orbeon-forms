@@ -6,6 +6,7 @@ import org.apache.pdfbox.io.RandomAccessReadBuffer
 import org.apache.pdfbox.text.PDFTextStripper
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.common.Version
+import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xml.XMLConstants
@@ -92,6 +93,27 @@ class PdfProductionTest
       withTestExternalContext { _ =>
         useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(content.stream))) { pdd =>
           // The test that follows assumes there is only one page
+          assert(pdd.getPages.getCount == 1)
+          // Look for 2 images: the logo and our WebP image
+          val imageCount = pdd.getPage(0).getResources.getXObjectNames.asScala.size
+          assert(imageCount == 2)
+        }
+      }
+    }
+
+    it("stateless PDF export service must contain WebP image attachment without a session") {
+      val (_, content, response) =
+        runFormRunnerReturnContent(
+          app        = "tests",
+          form       = "pdf-production",
+          mode       = "export",
+          documentId = PdfProductionDocumentId.some,
+          query      = List("export-format" -> "pdf"),
+          background = true
+        )
+      assert(response.statusCode == StatusCode.Ok)
+      withTestExternalContext { _ =>
+        useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(content.stream))) { pdd =>
           assert(pdd.getPages.getCount == 1)
           // Look for 2 images: the logo and our WebP image
           val imageCount = pdd.getPage(0).getResources.getXObjectNames.asScala.size

@@ -84,33 +84,36 @@ trait BaseOps extends Logging {
 
   // Special id namespace for `tmp-n-tmp` ids. We don't care if those are used in data as element names, or
   // if they are in the clipboard.
-  def nextTmpIds(token: String = "tmp", count: Int)(implicit ctx: FormBuilderDocContext): immutable.IndexedSeq[String] = {
+  def nextTmpIds(token: String = "tmp", count: Int)(implicit ctx: FormBuilderDocContext): immutable.IndexedSeq[String] =
+    if (count <= 0) {
+      Vector.empty
+    } else {
 
-    val allIdsIt = idsIterator(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get))
+      val allIdsIt = idsIterator(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get))
 
-    val prefix = token + "-"
-    val suffix = "-" + token
+      val prefix = token + "-"
+      val suffix = "-" + token
 
-    val allTmpIdsInUse =
-      collection.mutable.Set() ++ allIdsIt filter (id => id.startsWith(prefix) && id.endsWith(suffix))
+      val allTmpIdsInUse =
+        collection.mutable.Set() ++ allIdsIt filter (id => id.startsWith(prefix) && id.endsWith(suffix))
 
-    var guess = 1
+      var guess = 1
 
-    def nextId(): String = {
+      def nextId(): String = {
 
-      def buildName(i: Int) = prefix + i + suffix
+        def buildName(i: Int) = prefix + i + suffix
 
-      while (allTmpIdsInUse(buildName(guess)))
-        guess += 1
+        while (allTmpIdsInUse(buildName(guess)))
+          guess += 1
 
-      val result = buildName(guess)
-      allTmpIdsInUse += result
-      result
+        val result = buildName(guess)
+        allTmpIdsInUse += result
+        result
+      }
+
+      for (_ <- 1 to count)
+        yield nextId()
     }
-
-    for (_ <- 1 to count)
-      yield nextId()
-  }
 
   // Find a series of next available ids for a given token
   // Return ids of the form "foo-123-foo", where "foo" is the token
@@ -119,39 +122,42 @@ trait BaseOps extends Logging {
     count  : Int,
     others : Iterable[String] = Nil)(implicit
     ctx    : FormBuilderDocContext
-  ): immutable.IndexedSeq[String] = {
+  ): immutable.IndexedSeq[String] =
+    if (count <= 0) {
+      Vector.empty
+    } else {
 
-    val prefix = token + "-"
-    val suffix = "-" + token
+      val prefix = token + "-"
+      val suffix = "-" + token
 
-    val allNamesInUse =
-      collection.mutable.Set() ++ others ++
-        // Ids coming from the form definition
-        iterateNamesInUseCtx ++ {
-        // Ids coming from the special cut/copy/paste instance, if present
-        ToolboxOps.readXcvFromClipboard match {
-          case Some(xcvNode) => iterateNamesInUse(Right(xcvNode))
-          case None          => Nil
+      val allNamesInUse =
+        collection.mutable.Set() ++ others ++
+          // Ids coming from the form definition
+          iterateNamesInUseCtx ++ {
+          // Ids coming from the special cut/copy/paste instance, if present
+          ToolboxOps.readXcvFromClipboard match {
+            case Some(xcvNode) => iterateNamesInUse(Right(xcvNode))
+            case None          => Nil
+          }
         }
+
+      var guess = 1
+
+      def nextId(): String = {
+
+        def buildName(i: Int) = prefix + i
+
+        while (allNamesInUse(buildName(guess)))
+          guess += 1
+
+        val result = buildName(guess)
+        allNamesInUse += result
+        result + suffix
       }
 
-    var guess = 1
-
-    def nextId(): String = {
-
-      def buildName(i: Int) = prefix + i
-
-      while (allNamesInUse(buildName(guess)))
-        guess += 1
-
-      val result = buildName(guess)
-      allNamesInUse += result
-      result + suffix
+      for (_ <- 1 to count)
+        yield nextId()
     }
-
-    for (_ <- 1 to count)
-      yield nextId()
-  }
 
   def makeInstanceExpression(name: String): String = "instance('" + name + "')"
 

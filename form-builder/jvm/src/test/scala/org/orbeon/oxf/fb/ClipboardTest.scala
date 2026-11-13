@@ -15,10 +15,16 @@ package org.orbeon.oxf.fb
 
 import cats.syntax.option.*
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
+import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.externalcontext.{ExternalContext, TestExternalContext}
 import org.orbeon.oxf.fb.FormBuilder.*
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerParams}
-import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.processor.ProcessorUtils
+import org.orbeon.oxf.test.{DocumentTestBase, PipelineSupport, ResourceManagerSupport}
+import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -266,6 +272,45 @@ class ClipboardTest
 
         assert(FormBuilder.findContainerById("section-7-section").isDefined)
         assert(FormBuilder.findContainerById("section-7-section").toList.flatMap(_.child(*).ids).contains("section-7-content-control"))
+      }
+    }
+
+    it("must not create a session when reading from clipboard or generating next ids") {
+      withActionAndFBDoc(SectionsRepeatsDoc) { implicit ctx =>
+
+        val pipelineContext         = PipelineContext.get
+        val previousExternalContext = pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT)
+
+        val statelessExternalContext =
+          new TestExternalContext(
+            pipelineContext,
+            ProcessorUtils.createDocumentFromURL(PipelineSupport.DefaultRequestUrl, null)
+          ) {
+            override def getSession(create: Boolean): ExternalContext.Session =
+              if (create)
+                throw new IllegalStateException("Session creation is disabled for Form Runner service calls")
+              else
+                null
+          }
+
+        pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, statelessExternalContext)
+        try {
+          assert(ToolboxOps.readXcvFromClipboard.isEmpty)
+          assert(FormBuilder.nextIds("grid", count = 0).isEmpty)
+          assert(FormBuilder.nextTmpIds(count = 0).isEmpty)
+          assert(FormBuilder.nextIds("grid", count = 1).nonEmpty)
+
+          val mutableDoc =
+            new DocumentWrapper(
+              TransformerUtils.tinyTreeToOrbeonDom(ctx.formDefinitionRootElem.root),
+              null,
+              XPath.GlobalConfiguration
+            )
+
+          FormBuilderMigrationXPathApi.migrateGridsEnclosingElements(mutableDoc)
+        } finally {
+          pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, previousExternalContext)
+        }
       }
     }
   }

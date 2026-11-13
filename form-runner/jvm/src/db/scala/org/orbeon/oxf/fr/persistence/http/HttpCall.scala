@@ -86,7 +86,8 @@ private[persistence] object HttpCall {
     operations  : Operations,
     formVersion : Option[Int],
     body        : Array[Byte],
-    contentType : Option[String]
+    contentType : Option[String],
+    headers     : Map[String, List[String]] = Map.empty
   )
 
   def assertCall(
@@ -175,7 +176,8 @@ private[persistence] object HttpCall {
           IOUtils.copyStreamAndClose(actualResponse.content.stream, outputStream)
           outputStream.toByteArray
         },
-        contentType = Headers.firstItemIgnoreCase(actualHeaders, Headers.ContentType)
+        contentType = Headers.firstItemIgnoreCase(actualHeaders, Headers.ContentType),
+        headers     = actualHeaders
       )
 
       responseProcessor(response)

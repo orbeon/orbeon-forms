@@ -29,7 +29,20 @@ import org.scalajs.dom.html
 object SectionGridEditor {
 
   def sectionGridEditorContainer : html.Element  = dom.document.querySelectorT(".fb-section-grid-editor")
+  def gridMoveHandleContainer    : html.Element  = dom.document.querySelectorT(".fb-grid-move-handle")
   var currentSectionGridOpt      : Option[Block] = None
+
+  def canContainerMove(container: html.Element): Boolean =
+    ! FormRunnerUtils.isViewMode(container) &&
+      Direction.values.exists(d => container.hasClass("fb-can-move-" + d.entryName.toLowerCase))
+
+  def canSectionOrGridMove(sectionOrGridEl: html.Element): Boolean =
+    if (sectionOrGridEl.matches(BlockCache.SectionSelector))
+      sectionOrGridEl.childrenT(".fr-section-container").headOption.exists(canContainerMove)
+    else if (sectionOrGridEl.matches(BlockCache.GridSelector))
+      sectionOrGridEl.childrenT(".fr-grid").headOption.exists(canContainerMove)
+    else
+      false
 
   private def allIcons: collection.Seq[html.Element] =
     sectionGridEditorContainer.querySelectorAllT(".fa")
@@ -64,7 +77,11 @@ object SectionGridEditor {
       containerCache = BlockCache.sectionGridCache,
       wasCurrent = (sectionGridBody: Block) => {
         if (sectionGridBody.el.matches(BlockCache.GridSelector))
-          sectionGridBody.el.childrenT(".fr-grid").foreach(_.classList.remove("fb-hover"))
+          sectionGridBody.el.childrenT(".fr-grid").foreach { frGrid =>
+            frGrid.classList.remove("fb-hover")
+            frGrid.classList.remove("fb-grid-dnd-hover")
+          }
+        gridMoveHandleContainer.hide()
       },
       becomesCurrent = (sectionGridBody: Block) => {
         currentSectionGridOpt = Some(sectionGridBody)
@@ -82,22 +99,16 @@ object SectionGridEditor {
 
         // Start by hiding all the icons
         allIcons.foreach(_.hide())
+        gridMoveHandleContainer.hide()
 
         def showMoveDeleteIcons(container: html.Element): Unit = {
-
-          var canMoveAnyDirection = false
 
           Direction.values foreach { direction =>
             val relevant = ! isViewMode && container.hasClass("fb-can-move-" + direction.entryName.toLowerCase)
             val trigger  = allIconsWith(".fb-container-move-" + direction.entryName.toLowerCase)
-            if (relevant) {
-              canMoveAnyDirection = true
+            if (relevant)
               trigger.foreach(_.show())
-            }
           }
-
-          if (canMoveAnyDirection)
-            allIconsWith(".fb-container-move-handle").foreach(_.show())
 
           if (! isViewMode && container.matches(".fb-can-delete"))
             Set(ContainerDelete, ContainerCut)
@@ -138,12 +149,40 @@ object SectionGridEditor {
           val container = sectionGridBody.el.childrenT(".fr-grid").head
           showMoveDeleteIcons(container)
           container.classList.add("fb-hover")
+          if (canContainerMove(container)) {
+            val handle = gridMoveHandleContainer
+            handle.dataset("orbeonContainerId") = sectionGridBody.el.id
+            handle.show()
+            val containerOffset = Position.adjustedOffset(container)
+            handle.setOffset(
+              DomSupport.Offset(
+                left = containerOffset.left - Position.scrollLeft + container.outerWidth,
+                top  = containerOffset.top  - Position.scrollTop
+              )
+            )
+          }
         }
       }
     )
 
+    gridMoveHandleContainer.addEventListener(
+      "mouseenter",
+      (_: dom.Event) =>
+        currentSectionGridOpt
+          .filter(_.el.matches(BlockCache.GridSelector))
+          .foreach(_.el.childrenT(".fr-grid").foreach(_.classList.add("fb-grid-dnd-hover")))
+    )
+    gridMoveHandleContainer.addEventListener(
+      "mouseleave",
+      (_: dom.Event) =>
+        currentSectionGridOpt
+          .filter(_.el.matches(BlockCache.GridSelector))
+          .foreach(_.el.childrenT(".fr-grid").foreach(_.classList.remove("fb-grid-dnd-hover")))
+    )
+
     BlockCache.onExitFbMainOrOffsetMayHaveChanged { () =>
       sectionGridEditorContainer.hide()
+      gridMoveHandleContainer.hide()
       currentSectionGridOpt = None
     }
 

@@ -499,6 +499,7 @@ body.orbeon {
     .fb-messages { display: none; } // Section of the HTML we use to output localized text used by client-side code
 
     .fb-section-grid-editor,
+    .fb-grid-move-handle,
     .fb-control-editor-left,
     .fb-control-editor-right,
     .fb-control-editor-top,
@@ -509,6 +510,7 @@ body.orbeon {
     }
 
     .fb-section-grid-editor,
+    .fb-grid-move-handle,
     .fb-control-editor-left,
     .fb-control-editor-right {
         z-index: 2;
@@ -581,6 +583,9 @@ body.orbeon {
     .fb-section-grid-editor {
         padding-right: 6px; // Space between icons and section
     }
+    .fb-grid-move-handle {
+        padding-left: 6px;  // Space between grid and move handle
+    }
     .fb-control-editor-left {
         padding-left:  3px;
         padding-top: 0;
@@ -616,6 +621,38 @@ body.orbeon {
         color: var(--orbeon-fb-placeholder-color);
         font-family: @frBaseFontFamily; // Matching font defined by Bootstrap for titles
         z-index: 1;                     // Show on top of the page (default is 0)
+        -webkit-user-select: none;
+        user-select: none;
+        touch-action: none;
+    }
+
+    .fb-section-move-handle {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+        z-index: 2;
+
+        &> div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+            color: var(--orbeon-section-title-color);
+            opacity: 0.35;
+            transition: opacity 120ms ease, background-color 120ms ease;
+        }
+
+        &.hover > div {
+            opacity: 0.7;
+        }
+
+        &:hover > div {
+            opacity: 1;
+            background-color: color-mix(in oklab, currentColor 12%, transparent);
+        }
     }
 
     .fb-edit-section-label {                                                // Input created dynamically to edit section label
@@ -627,7 +664,7 @@ body.orbeon {
         .focusHighlight();
     }
 
-    .xbl-fr-section h2.fr-section-title.hover {                             // .hover added by CS on mouse over click interceptor
+    .xbl-fr-section .fr-section-title.hover {                               // .hover added by CS on mouse over click interceptor
         background-color: var(--orbeon-fb-editable-hover-background-color);
     }
 
@@ -739,7 +776,7 @@ body.orbeon {
 
     // Change mouse pointer when over "move" icon, as an additional hint
     .fr-body .fb-control-editor-right .fb-control-handle,
-    .fb-section-grid-editor .fb-container-move-handle {
+    .fb-container-move-handle {
         cursor: grab;
         touch-action: none;
         -webkit-user-select: none;
@@ -756,6 +793,12 @@ body.orbeon {
     .fb-dnd-source {
         opacity: 0.45;
         transition: opacity 120ms ease;
+    }
+
+    .fr-grid.fb-grid-dnd-hover {
+        outline: 1px dashed var(--orbeon-focus-border-color);
+        outline-offset: -1px;
+        border-radius: var(--orbeon-body-decorations-border-radius);
     }
 
     .fr-section-container.fb-dnd-drop-into,

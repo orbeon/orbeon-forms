@@ -31,6 +31,9 @@ object SectionLabelEditor {
 
   val sectionAdded: CallbackList[String] = new CallbackList
 
+  private var cancelHoverAndHintFn: () => Unit = () => ()
+  def cancelHoverAndHint(): Unit = cancelHoverAndHintFn()
+
   locally {
 
     val SectionTitleSelector = ".fr-section-title"
@@ -38,6 +41,20 @@ object SectionLabelEditor {
 
     var labelInputOpt         : js.UndefOr[html.Input] = js.undefined
     var labelClickInterceptors: List[html.Element]     = Nil
+    var sectionMoveHandles    : List[html.Element]     = Nil
+
+    cancelHoverAndHintFn = () => {
+      labelClickInterceptors.foreach(_.textContent = "")
+      sectionMoveHandles.foreach { handle =>
+        handle.classList.remove("hover")
+        handle.hide()
+      }
+      dom.document.querySelectorAllT(s"$SectionTitleSelector.hover").foreach(_.classList.remove("hover"))
+      labelInputOpt.foreach { input =>
+        if (input.isVisible)
+          input.blur()
+      }
+    }
 
     // On click on a trigger inside `.fb-section-grid-editor,` send section id as a property along with the event
     AjaxClient.beforeSendingEvent.add(
@@ -188,25 +205,43 @@ object SectionLabelEditor {
       clickInterceptor : html.Element
     )                  : Unit = {
 
-      val offset  = Position.adjustedOffset(clickInterceptor)
-      val section = Position.findInCache(BlockCache.sectionGridCache, offset.top, offset.left).get
-      val sectionTitle = section.el.querySelectorT(SectionTitleSelector)
-      updateClass("hover", sectionTitle)
+      val sectionOpt =
+        clickInterceptor.dataset.get("orbeonContainerId")
+          .flatMap(dom.document.getElementByIdOpt)
+          .orElse {
+            val offset = Position.adjustedOffset(clickInterceptor)
+            Position.findInCache(BlockCache.sectionGridCache, offset.top, offset.left).map(_.el)
+          }
+
+      sectionOpt.foreach { sectionEl =>
+        val sectionTitle = sectionEl.querySelectorT(SectionTitleSelector)
+        updateClass("hover", sectionTitle)
+        sectionMoveHandles
+          .find(_.dataset.get("orbeonContainerId").contains(sectionEl.id))
+          .foreach(updateClass("hover", _))
+      }
     }
 
     // Show textual indication user can click on empty section title
     def showClickHintIfTitleEmpty(clickInterceptor: html.Element): Unit = {
-      val interceptorOffset = Position.adjustedOffset(clickInterceptor)
-      val section = Position.findInCache(BlockCache.sectionGridCache, interceptorOffset.top, interceptorOffset.left).get
-      val labelAnchor = section.el.querySelectorT(SectionLabelSelector)
-      if (labelAnchor.textContent.isAllBlank) {
-        val outputWithHintMessage = SectionGridEditor.sectionGridEditorContainer.childrenT(".fb-enter-section-title-label").head
-        val hintMessage = XFormsUI.getCurrentValue(outputWithHintMessage).get
-        clickInterceptor.innerText = hintMessage
+      val sectionOpt =
+        clickInterceptor.dataset.get("orbeonContainerId")
+          .flatMap(dom.document.getElementByIdOpt)
+          .orElse {
+            val interceptorOffset = Position.adjustedOffset(clickInterceptor)
+            Position.findInCache(BlockCache.sectionGridCache, interceptorOffset.top, interceptorOffset.left).map(_.el)
+          }
+      sectionOpt.foreach { sectionEl =>
+        val labelAnchor = sectionEl.querySelectorT(SectionLabelSelector)
+        if (labelAnchor.textContent.isAllBlank) {
+          val outputWithHintMessage = SectionGridEditor.sectionGridEditorContainer.childrenT(".fb-enter-section-title-label").head
+          val hintMessage = XFormsUI.getCurrentValue(outputWithHintMessage).get
+          clickInterceptor.innerText = hintMessage
+        }
       }
     }
 
-    // Create and position click interceptors
+    // Create and position click interceptors and section move handles
     locally {
 
       Position.onOffsetMayHaveChanged(() => {
@@ -215,11 +250,13 @@ object SectionLabelEditor {
           case block if block.el.matches(BlockCache.SectionSelector) => block.el
         }
 
-        // Create interceptor divs, so we have enough to cover all the sections
+        // Create interceptor and move handle divs, so we have enough to cover all the sections
         locally {
 
+          val countToCreate = Math.max(0, sections.size - labelClickInterceptors.size)
+
           val newInterceptors =
-            List.fill(sections.size - labelClickInterceptors.size) {
+            List.fill(countToCreate) {
               val container = dom.document.createElementT("div")
               container.className = "fb-section-label-editor-click-interceptor"
               container.addEventListener(
@@ -244,7 +281,7 @@ object SectionLabelEditor {
                 "mouseover",
                 (e: dom.Event) => {
                   val isViewMode = FormRunnerUtils.isViewMode(e.targetT)
-                  if (! isViewMode) {
+                  if (! isViewMode && ! ContainerDnD.isDragging) {
                     updateHighlight(
                       (cssClass: String, el: html.Element) => el.classList.add(cssClass),
                       e.targetT
@@ -265,35 +302,110 @@ object SectionLabelEditor {
               container
             }
 
+          val newMoveHandles =
+            List.fill(countToCreate) {
+              val handle = dom.document.createElementT("div")
+              handle.className = "fb-container-move-handle fb-section-move-handle"
+              handle.setAttribute("role", "button")
+              val inner = dom.document.createElementT("div")
+              val icon  = dom.document.createElementT("i")
+              icon.className = "fa fa-grip-vertical fa-fw"
+              inner.appendChild(icon)
+              handle.appendChild(inner)
+
+              handle.addEventListener(
+                "mouseenter",
+                (_: dom.Event) => {
+                  if (! FormRunnerUtils.isViewMode(handle) && ! ContainerDnD.isDragging) {
+                    handle.classList.add("hover")
+                    handle.dataset.get("orbeonContainerId")
+                      .flatMap(dom.document.getElementByIdOpt)
+                      .flatMap(_.querySelectorOpt(SectionTitleSelector))
+                      .foreach(_.classList.add("hover"))
+                  }
+                }
+              )
+              handle.addEventListener(
+                "mouseleave",
+                (_: dom.Event) => {
+                  handle.classList.remove("hover")
+                  handle.dataset.get("orbeonContainerId")
+                    .flatMap(dom.document.getElementByIdOpt)
+                    .flatMap(_.querySelectorOpt(SectionTitleSelector))
+                    .foreach(_.classList.remove("hover"))
+                }
+              )
+
+              handle
+            }
+
           val fbMain = dom.document.querySelector(".fb-main")
           newInterceptors.foreach(fbMain.appendChild)
+          newMoveHandles.foreach(fbMain.appendChild)
 
           labelClickInterceptors :::= newInterceptors
+          sectionMoveHandles     :::= newMoveHandles
         }
 
-        // Hide interceptors we don't need
+        // Hide interceptors and move handles we don't need
         for (interceptor <- labelClickInterceptors)
           interceptor.hide()
+        for (moveHandle <- sectionMoveHandles)
+          moveHandle.hide()
 
-        // Position interceptor for each section
-        for ((section, interceptor) <- sections.iterator.zip(labelClickInterceptors.iterator)) {
+        val moveIconTitle =
+          dom.document
+            .querySelectorOpt(".fb-grid-move-handle")
+            .flatMap(el => Option(el.getAttribute("title")))
+            .getOrElse("")
+
+        // Position interceptor and move handle for each section
+        for (((section, interceptor), moveHandle) <- sections.iterator.zip(labelClickInterceptors.iterator).zip(sectionMoveHandles.iterator)) {
 
           val sectionTitle = section.querySelectorT(SectionTitleSelector)
           val sectionLabel = section.querySelectorT(SectionLabelSelector)
+          val canMove      = ! ContainerDnD.isDragging && SectionGridEditor.canSectionOrGridMove(section)
+
+          interceptor.dataset("orbeonContainerId") = section.id
+          moveHandle.dataset("orbeonContainerId")  = section.id
+          if (moveIconTitle.nonEmpty)
+            moveHandle.setAttribute("title", moveIconTitle)
+
+          val labelOffset = sectionLabel.getOffset
+          val titleOffset = sectionTitle.getOffset
+          val titleHeight = sectionTitle.outerHeight
+          val titleWidth  = sectionTitle.outerWidth
+
+          val handleReservedWidth =
+            if (canMove) {
+              moveHandle.show()
+              val handleWidth  = moveHandle.outerWidth
+              val handleHeight = moveHandle.outerHeight
+              moveHandle.setOffset(
+                DomSupport.Offset(
+                  top  = titleOffset.top + (titleHeight - handleHeight) / 2.0,
+                  left = titleOffset.left + titleWidth - handleWidth - 6.0
+                )
+              )
+              handleWidth + 8.0
+            } else {
+              moveHandle.hide()
+              0.0
+            }
 
           // Show, as this might be an interceptor that was previously hidden, and is now reused
           interceptor.show()
 
-          // Start at the label, but extend all the way to the right to the end of the title
-          val labelOffset = sectionLabel.getOffset
-          val titleOffset = sectionTitle.getOffset
+          // Start at the label, and extend to the right (stopping before the move handle if present)
           val interceptorOffset = DomSupport.Offset(
             top  = titleOffset.top,
             left = labelOffset.left
           )
           interceptor.setOffset(interceptorOffset)
           interceptor.setHeight(sectionTitle.contentHeightOrZero)
-          interceptor.setWidth(sectionTitle.contentWidthOrZero - (sectionLabel.getOffset.left - sectionTitle.getOffset.left))
+          val availableWidth =
+            Math.max(0.0, sectionTitle.contentWidthOrZero - (labelOffset.left - titleOffset.left) - handleReservedWidth)
+          interceptor.setWidth(availableWidth)
         }
       })
     }

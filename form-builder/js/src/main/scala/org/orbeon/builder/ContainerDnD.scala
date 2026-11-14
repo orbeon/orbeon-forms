@@ -98,14 +98,34 @@ object ContainerDnD {
       "pointerdown",
       (event: dom.PointerEvent) => {
         if (event.button == 0) {
-          val canvasSourceOpt =
+          val handleSourceOpt =
             event.targetOpt
               .flatMap(_.closestOpt(".fb-container-move-handle"))
-              .flatMap(_ => SectionGridEditor.currentSectionGridOpt)
+              .flatMap { handleEl =>
+                handleEl.dataset.get("orbeonContainerId")
+                  .flatMap(dom.document.getElementByIdOpt)
+                  .flatMap(el => BlockCache.sectionGridCache.elems.find(_.el == el).orElse(Some(Block(el))))
+                  .orElse(SectionGridEditor.currentSectionGridOpt)
+              }
               .map { currentBlock =>
                 event.preventDefault()
                 DragSource.Canvas(currentBlock)
               }
+
+          val titleBarSourceOpt =
+            if (handleSourceOpt.isEmpty && ! event.altKey && ! event.ctrlKey && ! event.metaKey && ! event.shiftKey)
+              event.targetOpt
+                .flatMap(_.closestOpt(".fb-section-label-editor-click-interceptor"))
+                .filter(el => ! FormRunnerUtils.isViewMode(el))
+                .flatMap(_.dataset.get("orbeonContainerId"))
+                .flatMap(dom.document.getElementByIdOpt)
+                .filter(SectionGridEditor.canSectionOrGridMove)
+                .flatMap(el => BlockCache.sectionGridCache.elems.find(_.el == el).orElse(Some(Block(el))))
+                .map(DragSource.Canvas.apply)
+            else
+              None
+
+          val canvasSourceOpt = handleSourceOpt.orElse(titleBarSourceOpt)
 
           val outlineSourceOpt =
             if (canvasSourceOpt.isEmpty)
@@ -656,6 +676,8 @@ object ContainerDnD {
       _isDragging = true
       ControlEditor.mask()
       SectionGridEditor.sectionGridEditorContainer.hide()
+      SectionGridEditor.gridMoveHandleContainer.hide()
+      SectionLabelEditor.cancelHoverAndHint()
       dom.document.querySelectorOpt(".fb-row-editor").foreach(_.hide())
 
       val targetDialogOpt =
@@ -673,7 +695,10 @@ object ContainerDnD {
         source match {
           case DragSource.Canvas(sourceBlock) =>
             if (sourceBlock.el.matches(BlockCache.GridSelector))
-              sourceBlock.el.childrenT(".fr-grid").foreach(_.classList.remove("fb-hover"))
+              sourceBlock.el.childrenT(".fr-grid").foreach { gridEl =>
+                gridEl.classList.remove("fb-hover")
+                gridEl.classList.remove("fb-grid-dnd-hover")
+              }
             sourceBlock.el.classList.add("fb-dnd-source")
             containerGhostLabel(sourceBlock.el)
 
@@ -981,6 +1006,7 @@ object ContainerDnD {
     if (_isDragging) {
       _isDragging = false
       ControlEditor.unmask()
+      Position.notifyOffsetMayHaveChanged()
     }
 
     orbeonRootEl.classList.remove("fb-dragging-container")

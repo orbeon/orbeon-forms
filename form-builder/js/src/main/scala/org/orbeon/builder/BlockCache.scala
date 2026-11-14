@@ -47,9 +47,10 @@ class BlockCache {
 
 object BlockCache {
 
-  val SectionSelector  = ".xbl-fr-section"
-  val GridSelector     = ".xbl-fr-grid"
-  val GridBodySelector = ".fr-grid-body"
+  val SectionSelector      = ".xbl-fr-section"
+  val GridSelector         = ".xbl-fr-grid"
+  val GridBodySelector     = ".fr-grid-body"
+  val GridRightGutterWidth = 34.0
 
   val sectionGridCache = new BlockCache
   val gridBodyCache    = new BlockCache
@@ -105,8 +106,10 @@ object BlockCache {
           for {
             grid <- collectElems(GridSelector).iterator
             if grid.isVisible && ! isElemInSectionTemplate(grid)
-          } yield
-            Block(grid)
+          } yield {
+            val block = Block(grid)
+            block.copy(width = block.width + GridRightGutterWidth)
+          }
 
         sectionGridCache._elems = (gridsIt ++ sectionsIt).toList
       }

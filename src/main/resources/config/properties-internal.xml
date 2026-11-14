@@ -217,6 +217,7 @@
         +fr:yesno-input
         +fr:color
         +fr:masked-input
+        +fr:code-input
         +fr:url
         +fr:hyperlink
         +fr:qr-code
@@ -322,6 +323,7 @@
         +fr:audio
         +fr:color
         +fr:masked-input
+        +fr:code-input
         +fr:url
         +fr:hyperlink
         +fr:qr-code

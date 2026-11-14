@@ -1,0 +1,90 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+
+    .xbl-component.xbl-fr-code-input {
+
+        .fr-code-input-container {
+            display    : inline-flex;
+            align-items: center;
+            max-width  : 100%;
+
+            .fr-code-input-boxes,
+            .fr-code-input-static-boxes {
+                display    : inline-flex;
+                flex-wrap  : wrap;
+                align-items: center;
+                gap        : 6px;
+                max-width  : 100%;
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+
+            .fr-code-input-static-boxes > :not(.fr-code-input-cell) {
+                display: none;
+            }
+
+            .fr-code-input-boxes input.fr-code-input-box,
+            .fr-code-input-boxes input[type="text"].fr-code-input-box {
+                flex                : 0 0 auto;
+                width               : 2.25em !important;
+                min-width           : 2.25em;
+                max-width           : 2.25em;
+                height              : 2.4em;
+                padding             : 0;
+                margin              : 0;
+                text-align          : center;
+                font-size           : 1.1em;
+                font-weight         : 600;
+                font-variant-numeric: tabular-nums;
+                font-family         : ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                border-radius       : var(--orbeon-control-border-radius);
+                box-sizing          : border-box;
+
+                &:focus,
+                &:focus-visible {
+                    position: relative;
+                    z-index : 2;
+                }
+
+                &:focus-visible {
+                    outline       : 2px solid var(--orbeon-focus-border-color);
+                    outline-offset: -1px;
+                }
+            }
+
+            .fr-code-input-static-boxes .fr-code-input-cell {
+                display             : inline-flex;
+                align-items         : center;
+                justify-content     : center;
+                flex                : 0 0 auto;
+                width               : 2.25em;
+                height              : 2.4em;
+                text-align          : center;
+                font-size           : 1.1em;
+                font-weight         : 600;
+                font-variant-numeric: tabular-nums;
+                font-family         : ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                border              : 1px solid var(--orbeon-control-border-color);
+                border-radius       : var(--orbeon-control-border-radius);
+                background-color    : var(--orbeon-control-read-only-background-color);
+                color               : var(--orbeon-control-color);
+                box-sizing          : border-box;
+            }
+        }
+    }
+}

@@ -29,6 +29,7 @@
         oxf:/xbl/orbeon/clipboard-copy/clipboard-copy.xbl
         oxf:/xbl/orbeon/url/url.xbl
         oxf:/xbl/orbeon/tags-input/tags-input.xbl
+        oxf:/xbl/orbeon/code-input/code-input.xbl
     </property>
 
     <property as="xs:string"  name="oxf.fb.toolbox.group.number.uri.*.*">

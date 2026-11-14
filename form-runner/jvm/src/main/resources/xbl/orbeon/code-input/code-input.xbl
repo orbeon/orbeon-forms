@@ -1,0 +1,294 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:CodeInputSupport="java:org.orbeon.xbl.CodeInputSupportJava">
+
+    <xbl:binding
+        id="fr-code-input"
+        element="fr|code-input"
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle allow-minimal-label-hint"
+        xxf:external-events="DOMActivate"
+        xxbl:label-for="fr-code-input-elem"
+        xxbl:type="xs:string"
+        xxbl:constraint="
+            CodeInputSupport:isValidCode(
+                string(.),
+                string(fr:component-param-value('length')),
+                string(fr:component-param-value('character-type'))
+            )"
+    >
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Code Input</display-name>
+            <display-name lang="fr">Saisie de code</display-name>
+            <display-name lang="no">Kodeinndata</display-name>
+            <display-name lang="ru">Ввод кода</display-name>
+            <display-name lang="it">Inserimento codice</display-name>
+            <display-name lang="de">Code-Eingabe</display-name>
+            <display-name lang="fi">Koodisyöttö</display-name>
+            <display-name lang="es">Entrada de código</display-name>
+            <display-name lang="nl">Code-invoer</display-name>
+            <display-name lang="pt">Entrada de código</display-name>
+            <display-name lang="sv">Kodinmatning</display-name>
+            <display-name lang="ar">إدخال الرمز</display-name>
+            <display-name lang="pl">Wprowadzanie kodu</display-name>
+            <display-name lang="ja">コード入力</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-key</icon-class>
+            </icon>
+            <templates>
+                <bind type="fr:code-input"/>
+                <view>
+                    <fr:code-input id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:code-input>
+                </view>
+            </templates>
+            <custom-settings>
+                <setting name="length"         type="xs:integer" min="1" max="16"/>
+                <setting name="character-type" type="xs:string"  values="digits alphanumeric letters"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-code-input-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue
+                            ref="$c"
+                            value="instance()/@*[name() = name($c)]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <length/>
+                            <character-type/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="length"
+                            xxf:whitespace="trim"
+                            constraint=". = '' or (. castable as xs:integer and xs:integer(.) ge 1 and xs:integer(.) le 16)"/>
+                        <xf:bind
+                            ref="character-type"
+                            xxf:whitespace="trim"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <length>Code Length</length>
+                                <length-hint>Number of characters (1 to 16, default 6)</length-hint>
+                                <character-type>Character Type</character-type>
+                                <type-digits>Digits (0–9)</type-digits>
+                                <type-alphanumeric>Alphanumeric (A–Z, 0–9)</type-alphanumeric>
+                                <type-letters>Letters (A–Z)</type-letters>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <length>Longueur du code</length>
+                                <length-hint>Nombre de caractères (1 à 16, 6 par défaut)</length-hint>
+                                <character-type>Type de caractères</character-type>
+                                <type-digits>Chiffres (0–9)</type-digits>
+                                <type-alphanumeric>Alphanumérique (A–Z, 0–9)</type-alphanumeric>
+                                <type-letters>Lettres (A–Z)</type-letters>
+                            </resource>
+                            <resource xml:lang="no">
+                                <length>Kodelengde</length>
+                                <length-hint>Antall tegn (1 til 16, standard 6)</length-hint>
+                                <character-type>Tegntype</character-type>
+                                <type-digits>Sifre (0–9)</type-digits>
+                                <type-alphanumeric>Alfanumerisk (A–Z, 0–9)</type-alphanumeric>
+                                <type-letters>Bokstaver (A–Z)</type-letters>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <length>Длина кода</length>
+                                <length-hint>Количество символов (от 1 до 16, по умолчанию 6)</length-hint>
+                                <character-type>Тип символов</character-type>
+                                <type-digits>Цифры (0–9)</type-digits>
+                                <type-alphanumeric>Буквы и цифры (A–Z, 0–9)</type-alphanumeric>
+                                <type-letters>Буквы (A–Z)</type-letters>
+                            </resource>
+                            <resource xml:lang="it">
+                                <length>Lunghezza del codice</length>
+                                <length-hint>Numero di caratteri (da 1 a 16, predefinito 6)</length-hint>
+                                <character-type>Tipo di caratteri</character-type>
+                                <type-digits>Cifre (0–9)</type-digits>
+                                <type-alphanumeric>Alfanumerico (A–Z, 0–9)</type-alphanumeric>
+                                <type-letters>Lettere (A–Z)</type-letters>
+                            </resource>
+                            <resource xml:lang="de">
+                                <length>Codelänge</length>
+                                <length-hint>Anzahl der Zeichen (1 bis 16, Standard 6)</length-hint>
+                                <character-type>Zeichentyp</character-type>
+                                <type-digits>Ziffern (0–9)</type-digits>
+                                <type-alphanumeric>Alphanumerisch (A–Z, 0–9)</type-alphanumeric>
+                                <type-letters>Buchstaben (A–Z)</type-letters>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <length>Koodin pituus</length>
+                                <length-hint>Merkkien määrä (1–16, oletus 6)</length-hint>
+                                <character-type>Merkkityyppi</character-type>
+                                <type-digits>Numerot (0–9)</type-digits>
+                                <type-alphanumeric>Aakkosnumeerinen (A–Z, 0–9)</type-alphanumeric>
+                                <type-letters>Kirjaimet (A–Z)</type-letters>
+                            </resource>
+                            <resource xml:lang="es">
+                                <length>Longitud del código</length>
+                                <length-hint>Número de caracteres (de 1 a 16, predeterminado 6)</length-hint>
+                                <character-type>Tipo de caracteres</character-type>
+                                <type-digits>Dígitos (0–9)</type-digits>
+                                <type-alphanumeric>Alfanumérico (A–Z, 0–9)</type-alphanumeric>
+                                <type-letters>Letras (A–Z)</type-letters>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <length>Codelengte</length>
+                                <length-hint>Aantal tekens (1 tot 16, standaard 6)</length-hint>
+                                <character-type>Tekentype</character-type>
+                                <type-digits>Cijfers (0–9)</type-digits>
+                                <type-alphanumeric>Alfanumeriek (A–Z, 0–9)</type-alphanumeric>
+                                <type-letters>Letters (A–Z)</type-letters>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <length>Comprimento do código</length>
+                                <length-hint>Número de caracteres (1 a 16, padrão 6)</length-hint>
+                                <character-type>Tipo de caracteres</character-type>
+                                <type-digits>Dígitos (0–9)</type-digits>
+                                <type-alphanumeric>Alfanumérico (A–Z, 0–9)</type-alphanumeric>
+                                <type-letters>Letras (A–Z)</type-letters>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <length>Kodlängd</length>
+                                <length-hint>Antal tecken (1 till 16, standard 6)</length-hint>
+                                <character-type>Teckentyp</character-type>
+                                <type-digits>Siffror (0–9)</type-digits>
+                                <type-alphanumeric>Alfanumerisk (A–Z, 0–9)</type-alphanumeric>
+                                <type-letters>Bokstäver (A–Z)</type-letters>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <length>طول الرمز</length>
+                                <length-hint>عدد الأحرف (من 1 إلى 16، الافتراضي 6)</length-hint>
+                                <character-type>نوع الأحرف</character-type>
+                                <type-digits>أرقام (0–9)</type-digits>
+                                <type-alphanumeric>أبجدي رقمي (A–Z, 0–9)</type-alphanumeric>
+                                <type-letters>أحرف (A–Z)</type-letters>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <length>Długość kodu</length>
+                                <length-hint>Liczba znaków (od 1 do 16, domyślnie 6)</length-hint>
+                                <character-type>Typ znaków</character-type>
+                                <type-digits>Cyfry (0–9)</type-digits>
+                                <type-alphanumeric>Alfanumeryczny (A–Z, 0–9)</type-alphanumeric>
+                                <type-letters>Litery (A–Z)</type-letters>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <length>コードの長さ</length>
+                                <length-hint>文字数 (1〜16、デフォルト 6)</length-hint>
+                                <character-type>文字タイプ</character-type>
+                                <type-digits>数字 (0–9)</type-digits>
+                                <type-alphanumeric>英数字 (A–Z, 0–9)</type-alphanumeric>
+                                <type-letters>英字 (A–Z)</type-letters>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-code-input-grid">
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <xf:input ref="instance('local')/length" id="length-control" xxf:placeholder="6">
+                                <xf:label ref="xxf:r('length')"/>
+                                <xf:hint ref="xxf:r('length-hint')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <xf:select1 appearance="minimal" ref="instance('local')/character-type" id="character-type-control">
+                                <xf:label ref="xxf:r('character-type')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('type-digits')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('type-alphanumeric')"/>
+                                    <xf:value>alphanumeric</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('type-letters')"/>
+                                    <xf:value>letters</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-code-input-action"
+                    event="xforms-value-changed"
+                    observer="length-control character-type-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/code-input/code-input.css"/>
+        </xbl:resources>
+
+        <xbl:template>
+            <xf:var name="binding"        value="xxf:binding('fr-code-input')"/>
+            <xf:var name="length"         value="CodeInputSupport:normalizeLength(string(fr:component-param-value('length')))"/>
+            <xf:var name="character-type" value="string(fr:component-param-value('character-type'))"/>
+            <xf:var
+                name="view"
+                value="
+                    property('xxf:readonly-appearance') = 'static' or
+                    fr:mode() = 'pdf'
+                "/>
+
+            <xf:group
+                id="fr-code-input-elem"
+                ref="$binding"
+                class="fr-code-input-container"
+                data-fr-length="{$length}"
+                data-fr-character-type="{$character-type}"
+                data-fr-label="{xxf:label('fr-code-input')}">
+
+                <!-- Interactive segmented boxes managed by FrCodeInputCompanion -->
+                <xh:div class="fr-code-input-boxes{' xforms-hidden'[$view]}"/>
+
+                <!-- Static-readonly / Automatic PDF segmented boxes -->
+                <xh:div class="fr-code-input-static-boxes{' xforms-hidden'[not($view)]}"><xf:repeat ref="(1 to $length)[$view]"><xh:span class="fr-code-input-cell"><xf:output value="CodeInputSupport:cellValueAt(string($binding), string($length), $character-type, .)"/></xh:span></xf:repeat></xh:div>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

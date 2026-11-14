@@ -716,22 +716,32 @@ object QrCodeSupport {
     scale    : Int,
     imgSize  : Int
   ): Array[Byte] = {
-    val qrSize      = matrix.length
-    val rowByteLen  = (imgSize + 7) / 8
+    val qrSize = matrix.length
+    encodeMonochromePngRect(imgSize, imgSize) { (px, py) =>
+      val mx = px / scale - quietZone
+      val my = py / scale - quietZone
+      mx >= 0 && mx < qrSize && my >= 0 && my < qrSize && matrix(my)(mx)
+    }
+  }
+
+  private[xbl] def encodeMonochromePngRect(
+    width      : Int,
+    height     : Int
+  )(
+    isDarkPixel: (Int, Int) => Boolean
+  ): Array[Byte] = {
+    val rowByteLen  = (width + 7) / 8
     val scanlineLen = 1 + rowByteLen
-    val rawData     = new Array[Byte](imgSize * scanlineLen)
+    val rawData     = new Array[Byte](height * scanlineLen)
 
     var py = 0
-    while (py < imgSize) {
+    while (py < height) {
       val rowOffset = py * scanlineLen
       rawData(rowOffset) = 0 // Filter type 0 (None)
-      val my = py / scale - quietZone
       var px = 0
-      while (px < imgSize) {
-        val mx     = px / scale - quietZone
-        val isDark = mx >= 0 && mx < qrSize && my >= 0 && my < qrSize && matrix(my)(mx)
+      while (px < width) {
         // In 1-bit grayscale PNG: 0 = black (dark module), 1 = white (light module)
-        if (! isDark) {
+        if (! isDarkPixel(px, py)) {
           val byteIdx = rowOffset + 1 + (px >>> 3)
           val bitMask = 1 << (7 - (px & 7))
           rawData(byteIdx) = (rawData(byteIdx) | bitMask).toByte
@@ -747,8 +757,8 @@ object QrCodeSupport {
 
     // IHDR chunk (width, height, bitDepth=1, colorType=0 grayscale, compression=0, filter=0, interlace=0)
     val ihdr = new ByteArrayOutputStream(13)
-    writeInt32BE(ihdr, imgSize)
-    writeInt32BE(ihdr, imgSize)
+    writeInt32BE(ihdr, width)
+    writeInt32BE(ihdr, height)
     ihdr.write(1) // bit depth = 1
     ihdr.write(0) // color type = 0 (grayscale)
     ihdr.write(0) // compression = 0

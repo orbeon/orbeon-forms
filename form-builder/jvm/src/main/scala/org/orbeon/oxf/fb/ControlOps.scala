@@ -981,7 +981,7 @@ trait ControlOps extends ResourcesOps {
     (FRRatingQName                                                        , _ => true, List("max")                                                          , Nil),
     (FRScaleQName                                                         , _ => true, List("start", "end", "start-label", "end-label")                     , Nil),
     (FRHyperlinkQName                                                     , _ => true, List("href")                                                         , Nil),
-    (FRQrCodeQName                                                        , _ => true, List("content")                                                      , Nil),
+    (FRQrCodeQName || FRBarcodeQName                                      , _ => true, List("content")                                                      , Nil),
     (FRDataboundSelect1QName || FRDataboundSelect1SearchQName             , _ => true, List("resource")                                                     , Nil),
     // These are a little different from `controls.xsl` as in the XSLT we use a mode, `within-databound-itemset`, and
     // then match on the attributes. So instead we have a different setup below, mostly not not 100% equivalent.

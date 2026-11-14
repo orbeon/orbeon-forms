@@ -377,7 +377,7 @@
 
     <!-- See also `fb.ControlOps` for the renaming part -->
     <xsl:template
-        match="fr:qr-code[exists(@content)]"
+        match="fr:qr-code[exists(@content)] | fr:barcode[exists(@content)]"
         mode="within-grid">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:copy>

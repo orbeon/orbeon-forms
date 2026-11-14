@@ -1,0 +1,405 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:BarcodeSupport="java:org.orbeon.xbl.BarcodeSupportJava">
+
+    <xbl:binding
+        id="fr-barcode"
+        element="fr|barcode"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value">
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Barcode</display-name>
+            <display-name lang="fr">Code-barres</display-name>
+            <display-name lang="no">Strekkode</display-name>
+            <display-name lang="ru">Штрих-код</display-name>
+            <display-name lang="it">Codice a barre</display-name>
+            <display-name lang="de">Barcode</display-name>
+            <display-name lang="fi">Viivakoodi</display-name>
+            <display-name lang="es">Código de barras</display-name>
+            <display-name lang="nl">Streepjescode</display-name>
+            <display-name lang="pt">Código de barras</display-name>
+            <display-name lang="sv">Streckkod</display-name>
+            <display-name lang="ar">الباركود</display-name>
+            <display-name lang="pl">Kod kreskowy</display-name>
+            <display-name lang="ja">バーコード</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-barcode</icon-class>
+            </icon>
+            <templates>
+                <bind fr:persist="false()"/>
+                <view>
+                    <fr:barcode id="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:barcode>
+                </view>
+            </templates>
+            <custom-settings>
+                <setting name="content"      type="xs:string"/>
+                <setting name="format"       type="xs:string"  values="CODE128 CODE39 EAN13 EAN8 UPCA ITF CODABAR" default="CODE128"/>
+                <setting name="height"       type="xs:integer" min="24" max="240" default="60"/>
+                <setting name="module-width" type="xs:integer" min="1"  max="4"   default="2"/>
+                <setting name="show-value"   type="xs:boolean" default="true"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-barcode-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue
+                            ref="$c"
+                            value="instance()/@*[name() = name($c)]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <content/>
+                            <format/>
+                            <height/>
+                            <module-width/>
+                            <show-value/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="content"
+                            xxf:whitespace="trim"
+                            type="xxf:XPath2ValueTemplate"/>
+                        <xf:bind
+                            ref="format"
+                            xxf:whitespace="trim"/>
+                        <xf:bind
+                            ref="height"
+                            xxf:whitespace="trim"
+                            constraint=". = '' or (. castable as xs:integer and xs:integer(.) ge 24 and xs:integer(.) le 240)"/>
+                        <xf:bind
+                            ref="module-width"
+                            xxf:whitespace="trim"
+                            constraint=". = '' or (. castable as xs:integer and xs:integer(.) ge 1 and xs:integer(.) le 4)"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <content>Value to Encode</content>
+                                <content-hint>Text, number, or XPath value template (e.g. {$order-id}); if blank, uses the control's calculated/bound value</content-hint>
+                                <format>Barcode Format</format>
+                                <height>Bar Height (px)</height>
+                                <module-width>Bar Width (px)</module-width>
+                                <show-value>Show Encoded Value Below Barcode</show-value>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <content>Valeur à encoder</content>
+                                <content-hint>Texte, nombre ou modèle de valeur XPath (ex. {$order-id}) ; si vide, utilise la valeur calculée/liée du contrôle</content-hint>
+                                <format>Format du code-barres</format>
+                                <height>Hauteur des barres (px)</height>
+                                <module-width>Largeur de barre (px)</module-width>
+                                <show-value>Afficher la valeur encodée sous le code-barres</show-value>
+                            </resource>
+                            <resource xml:lang="no">
+                                <content>Verdi som skal kodes</content>
+                                <content-hint>Tekst, tall eller XPath-verdimal (f.eks. {$order-id}); hvis tom, brukes kontrollens beregnede/bundne verdi</content-hint>
+                                <format>Strekkodeformat</format>
+                                <height>Stolpehøyde (px)</height>
+                                <module-width>Stolpebredde (px)</module-width>
+                                <show-value>Vis kodet verdi under strekkoden</show-value>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <content>Значение для кодирования</content>
+                                <content-hint>Текст, число или шаблон значения XPath (напр. {$order-id}); если пусто, используется вычисленное значение</content-hint>
+                                <format>Формат штрих-кода</format>
+                                <height>Высота штрихов (пикс.)</height>
+                                <module-width>Ширина штриха (пикс.)</module-width>
+                                <show-value>Показывать закодированное значение под штрих-кодом</show-value>
+                            </resource>
+                            <resource xml:lang="it">
+                                <content>Valore da codificare</content>
+                                <content-hint>Testo, numero o modello di valore XPath (es. {$order-id}); se vuoto, usa il valore calcolato/collegato del controllo</content-hint>
+                                <format>Formato codice a barre</format>
+                                <height>Altezza barre (px)</height>
+                                <module-width>Larghezza barra (px)</module-width>
+                                <show-value>Mostra valore codificato sotto il codice a barre</show-value>
+                            </resource>
+                            <resource xml:lang="de">
+                                <content>Zu kodierender Wert</content>
+                                <content-hint>Text, Zahl oder XPath-Wertvorlage (z. B. {$order-id}); wenn leer, wird der berechnete/gebundene Wert verwendet</content-hint>
+                                <format>Barcode-Format</format>
+                                <height>Balkenhöhe (px)</height>
+                                <module-width>Balkenbreite (px)</module-width>
+                                <show-value>Kodierten Wert unter dem Barcode anzeigen</show-value>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <content>Koodattava arvo</content>
+                                <content-hint>Teksti, numero tai XPath-arvomalli (esim. {$order-id}); jos tyhjä, käytetään ohjaimen laskettua arvoa</content-hint>
+                                <format>Viivakoodin muoto</format>
+                                <height>Viivojen korkeus (px)</height>
+                                <module-width>Viivan leveys (px)</module-width>
+                                <show-value>Näytä koodattu arvo viivakoodin alla</show-value>
+                            </resource>
+                            <resource xml:lang="es">
+                                <content>Valor a codificar</content>
+                                <content-hint>Texto, número o plantilla de valor XPath (p. ej. {$order-id}); si está vacío, usa el valor calculado del control</content-hint>
+                                <format>Formato del código de barras</format>
+                                <height>Altura de barras (px)</height>
+                                <module-width>Ancho de barra (px)</module-width>
+                                <show-value>Mostrar el valor codificado debajo del código de barras</show-value>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <content>Te coderen waarde</content>
+                                <content-hint>Tekst, getal of XPath-waardesjabloon (bijv. {$order-id}); indien leeg wordt de berekende waarde gebruikt</content-hint>
+                                <format>Streepjescodeformaat</format>
+                                <height>Staafhoogte (px)</height>
+                                <module-width>Staafbreedte (px)</module-width>
+                                <show-value>Gecodeerde waarde onder streepjescode tonen</show-value>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <content>Valor a codificar</content>
+                                <content-hint>Texto, número ou modelo de valor XPath (ex. {$order-id}); se vazio, usa o valor calculado do controlo</content-hint>
+                                <format>Formato do código de barras</format>
+                                <height>Altura das barras (px)</height>
+                                <module-width>Largura da barra (px)</module-width>
+                                <show-value>Mostrar valor codificado abaixo do código de barras</show-value>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <content>Värde att koda</content>
+                                <content-hint>Text, nummer eller XPath-värdemall (t.ex. {$order-id}); om tomt används kontrollens beräknade värde</content-hint>
+                                <format>Streckkodsformat</format>
+                                <height>Stapelhöjd (px)</height>
+                                <module-width>Stapelbredd (px)</module-width>
+                                <show-value>Visa kodat värde under streckkoden</show-value>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <content>القيمة المراد ترميزها</content>
+                                <content-hint>نص أو رقم أو قالب قيمة XPath (مثل {$order-id})؛ إذا كان فارغًا، تُستخدم القيمة المحسوبة</content-hint>
+                                <format>تنسيق الباركود</format>
+                                <height>ارتفاع الأشرطة (بكسل)</height>
+                                <module-width>عرض الشريط (بكسل)</module-width>
+                                <show-value>إظهار القيمة المرمّزة أسفل الباركود</show-value>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <content>Wartość do zakodowania</content>
+                                <content-hint>Tekst, liczba lub szablon wartości XPath (np. {$order-id}); jeśli puste, używana jest wartość wyliczona</content-hint>
+                                <format>Format kodu kreskowego</format>
+                                <height>Wysokość kresek (px)</height>
+                                <module-width>Szerokość kreski (px)</module-width>
+                                <show-value>Pokaż zakodowaną wartość pod kodem kreskowym</show-value>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <content>エンコードする値</content>
+                                <content-hint>テキスト、数値、またはXPath値テンプレート (例: {$order-id})。空の場合は計算値を使用します</content-hint>
+                                <format>バーコード形式</format>
+                                <height>バーの高さ (px)</height>
+                                <module-width>バーの幅 (px)</module-width>
+                                <show-value>バーコードの下にエンコードされた値を表示</show-value>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-barcode-grid">
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:input ref="instance('local')/content" id="content-control" appearance="xpath-completion" avt="true">
+                                <xf:label ref="xxf:r('content')"/>
+                                <xf:hint ref="xxf:r('content-hint')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="2">
+                            <fr:dropdown-select1 ref="instance('local')/format" id="format-control">
+                                <xf:label ref="xxf:r('format')"/>
+                                <xf:item>
+                                    <xf:label>Code 128</xf:label>
+                                    <xf:value>CODE128</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>Code 39</xf:label>
+                                    <xf:value>CODE39</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>EAN-13</xf:label>
+                                    <xf:value>EAN13</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>EAN-8</xf:label>
+                                    <xf:value>EAN8</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>UPC-A</xf:label>
+                                    <xf:value>UPCA</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>ITF (Interleaved 2 of 5)</xf:label>
+                                    <xf:value>ITF</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>Codabar</xf:label>
+                                    <xf:value>CODABAR</xf:value>
+                                </xf:item>
+                            </fr:dropdown-select1>
+                        </xh:td>
+                        <xh:td colspan="2">
+                            <xf:input ref="instance('local')/height" id="height-control">
+                                <xf:label ref="xxf:r('height')"/>
+                                <xf:alert/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td colspan="2">
+                            <fr:dropdown-select1 ref="instance('local')/module-width" id="module-width-control">
+                                <xf:label ref="xxf:r('module-width')"/>
+                                <xf:item>
+                                    <xf:label>1 px</xf:label>
+                                    <xf:value>1</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>2 px</xf:label>
+                                    <xf:value>2</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>3 px</xf:label>
+                                    <xf:value>3</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>4 px</xf:label>
+                                    <xf:value>4</xf:value>
+                                </xf:item>
+                            </fr:dropdown-select1>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:select1 ref="instance('local')/show-value" appearance="full xxf:horizontal" id="show-value-control">
+                                <xf:label ref="xxf:r('show-value')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
+                                    <xf:value>true</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
+                                    <xf:value>false</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-barcode-action"
+                    event="xforms-value-changed"
+                    observer="content-control format-control height-control module-width-control show-value-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/barcode/barcode.css"/>
+        </xbl:resources>
+
+        <xbl:template>
+            <xf:group appearance="xxf:internal">
+                <xf:var
+                    name="format"
+                    value="string(fr:component-param-value('format'))"/>
+                <xf:var
+                    name="content-param"
+                    value="if (fr:is-design-time()) then '' else string(fr:component-param-value('content'))"/>
+                <xf:var
+                    name="raw-value"
+                    value="
+                        if (xxf:non-blank($content-param)) then
+                            $content-param
+                        else
+                            string(xxf:binding('fr-barcode'))"/>
+                <xf:var
+                    name="effective-value"
+                    value="
+                        if (fr:is-design-time()) then
+                            if ($format = 'EAN13') then
+                                '5901234123457'
+                            else if ($format = 'EAN8') then
+                                '96385074'
+                            else if ($format = 'UPCA') then
+                                '036000291452'
+                            else if ($format = 'ITF') then
+                                '0123456789'
+                            else if ($format = 'CODABAR') then
+                                'A40156B'
+                            else
+                                'ORBEON-12345'
+                        else if (xxf:non-blank($raw-value)) then
+                            $raw-value
+                        else
+                            ''"/>
+                <xf:var
+                    name="height-px"
+                    value="BarcodeSupport:normalizeHeightPx(string(fr:component-param-value('height')))"/>
+                <xf:var
+                    name="module-width-px"
+                    value="BarcodeSupport:normalizeModuleWidthPx(string(fr:component-param-value('module-width')))"/>
+                <xf:var
+                    name="show-value"
+                    value="not(string(fr:component-param-value('show-value')) = 'false')"/>
+                <xf:var
+                    name="png-uri"
+                    value="BarcodeSupport:toPngDataUri($effective-value, $format, string($height-px), string($module-width-px))"/>
+                <xf:var
+                    name="width-px"
+                    value="BarcodeSupport:imageWidthPx($effective-value, $format, string($module-width-px))"/>
+                <xf:var
+                    name="display-value"
+                    value="BarcodeSupport:displayValue($effective-value, $format)"/>
+
+                <xf:group ref=".[xxf:non-blank($png-uri)]" xxf:element="span" class="fr-barcode-container">
+                    <xh:img
+                        class="fr-barcode-image"
+                        src="{$png-uri}"
+                        width="{$width-px}"
+                        height="{$height-px}"
+                        style="width: {$width-px}px; height: {$height-px}px;"
+                        alt="{xxf:label('fr-barcode')}"/>
+                    <xf:group ref=".[$show-value and xxf:non-blank($display-value)]" xxf:element="span" class="fr-barcode-caption">
+                        <xf:output id="barcode-caption" class="fr-barcode-value" value="$display-value"/>
+                    </xf:group>
+                </xf:group>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

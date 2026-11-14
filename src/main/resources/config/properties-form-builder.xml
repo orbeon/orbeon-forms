@@ -123,6 +123,7 @@
         oxf:/forms/orbeon/builder/xbl/text-output.xbl
         oxf:/xbl/orbeon/hyperlink/hyperlink.xbl
         oxf:/xbl/orbeon/qr-code/qr-code.xbl
+        oxf:/xbl/orbeon/barcode/barcode.xbl
         oxf:/xbl/orbeon/hidden/hidden.xbl
     </property>
 

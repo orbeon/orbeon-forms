@@ -129,6 +129,7 @@ object XMLNames {
   val FRRatingQName                 : QName = QName("rating",                   FRNamespace)
   val FRScaleQName                  : QName = QName("scale",                    FRNamespace)
   val FRQrCodeQName                 : QName = QName("qr-code",                  FRNamespace)
+  val FRBarcodeQName                : QName = QName("barcode",                  FRNamespace)
 
   val FRPdfAutomaticQName           : QName  = QName("pdf-automatic",           FRNamespace)
   val FRPdfTemplateQName            : QName  = QName("pdf-template",            FRNamespace)

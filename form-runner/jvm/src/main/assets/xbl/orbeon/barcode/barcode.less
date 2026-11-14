@@ -1,0 +1,50 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+
+    .xbl-component.xbl-fr-barcode {
+
+        .fr-barcode-container {
+            display         : inline-flex;
+            flex-direction  : column;
+            align-items     : center;
+            gap             : 2px;
+            padding         : 6px 4px;
+            background-color: @white;
+            border          : 1px solid var(--orbeon-control-border-color);
+            border-radius   : var(--orbeon-control-border-radius);
+            box-sizing      : border-box;
+            max-width       : 100%;
+        }
+
+        img.fr-barcode-image {
+            display         : block;
+            max-width       : 100%;
+            height          : auto;
+            background-color: @white;
+            image-rendering : pixelated;
+        }
+
+        .fr-barcode-caption {
+            font-family   : @monoFontFamily;
+            font-size     : var(--orbeon-control-font-size);
+            line-height   : 1.2;
+            letter-spacing: 0.08em;
+            text-align    : center;
+            overflow-wrap : anywhere;
+            max-width     : 100%;
+        }
+    }
+}

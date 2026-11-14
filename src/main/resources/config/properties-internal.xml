@@ -220,6 +220,7 @@
         +fr:url
         +fr:hyperlink
         +fr:qr-code
+        +fr:barcode
         +fr:range
         +fr:rating
         +fr:scale
@@ -324,6 +325,7 @@
         +fr:url
         +fr:hyperlink
         +fr:qr-code
+        +fr:barcode
         +fr:range
         +fr:rating
         +fr:scale

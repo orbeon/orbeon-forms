@@ -2017,6 +2017,7 @@
             <control-repeat-ancestry-changed todo="true">Control "{0}" moved across repeat boundaries ({1} to {2})</control-repeat-ancestry-changed>
             <incompatible-datatype-change todo="true">Control "{0}" changed data type from "{1}" to "{2}"</incompatible-datatype-change>
             <data-migration-required todo="true">Data structure changes compared to published version ({0})</data-migration-required>
+            <invalid-process todo="true">Invalid process "{0}": {1}</invalid-process>
         </issue>
     </dialog-check-form>
     <section-focus>

@@ -2036,6 +2036,7 @@
             <control-repeat-ancestry-changed>Le contrôle « {0} » a été déplacé à travers une limite de répétition ({1} vers {2})</control-repeat-ancestry-changed>
             <incompatible-datatype-change>Le contrôle « {0} » a changé de type de données de « {1} » vers « {2} »</incompatible-datatype-change>
             <data-migration-required>Modifications de la structure des données par rapport à la version publiée ({0})</data-migration-required>
+            <invalid-process>Processus invalide « {0} » : {1}</invalid-process>
         </issue>
     </dialog-check-form>
     <section-focus>

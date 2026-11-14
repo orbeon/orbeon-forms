@@ -18,9 +18,13 @@ import enumeratum.EnumEntry.Lowercase
 import enumeratum.*
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fb.XMLNames.*
+import org.orbeon.oxf.fb.process.{ProcessParams, ProcessUI}
+import org.orbeon.oxf.fb.process.ProcessParams.*
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.fr.permission.*
+import org.orbeon.oxf.fr.process.{ProcessInterpreter, ProcessParser}
+import org.orbeon.oxf.fr.process.ProcessParser.{ActionNode, ConditionNode, ExprNode, GroupNode}
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerDocContext, Names, NodeInfoCell}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
@@ -178,6 +182,16 @@ object ValidationIssue {
     val severity: ValidationSeverity = ValidationSeverity.Error
     val blocking: Boolean            = true
   }
+
+  case class InvalidProcess(
+    processName: String,
+    details    : String
+  ) extends ValidationIssue {
+    val severity   : ValidationSeverity = ValidationSeverity.Error
+    val blocking   : Boolean            = false
+    val code       : String             = "invalid-process"
+    val controlName: Option[String]     = None
+  }
 }
 
 object FormDefinitionValidator {
@@ -252,6 +266,7 @@ object FormDefinitionValidator {
     XFItemsetTest
 
   private val FormResourceRefRegex = """\$form-resources/([A-Za-z0-9_\-.]+)/""".r
+  private val ProcessNameRegex     = """^[a-zA-Z0-9_\-\.]+$""".r
 
   // Safe context wrapper over a form definition root element
   private class SafeFormDocContext(val formDefinitionRootElem: NodeInfo) extends FormRunnerDocContext {
@@ -386,6 +401,13 @@ object FormDefinitionValidator {
       (namesFromBodyIds ++ namesFromBinds).toSet
     }
 
+    val validSectionNames: Set[String] =
+      ctx.viewContainerElemOpt.toList
+        .descendant(FRSectionTest)
+        .flatMap(_.idOpt)
+        .flatMap(frc.controlNameFromIdOpt)
+        .toSet
+
     val allBindNames: Set[String] =
       ctx.topLevelBindElemOpt.toList
         .descendant(XFBindTest || FBBindTest)
@@ -446,14 +468,16 @@ object FormDefinitionValidator {
         .toSet
     }
 
-    def validateExpression(
-      elemOrAtt     : NodeInfo,
-      avt           : Boolean,
-      controlNameOpt: Option[String],
-      location      : String,
-      extraValidVars: Set[String] = Set.empty
+    def validateRawExpression(
+      rawValue        : String,
+      namespaceMapping: NamespaceMapping,
+      contextElem     : NodeInfo,
+      avt             : Boolean,
+      controlNameOpt  : Option[String],
+      location        : String,
+      extraValidVars  : Set[String] = Set.empty
     ): List[ValidationIssue] =
-      elemOrAtt.stringValue.trimAllToOpt match {
+      rawValue.trimAllToOpt match {
         case None =>
           Nil
         case Some(xpathString) if avt && ! xpathString.contains("{") && ! xpathString.contains("}") =>
@@ -462,7 +486,7 @@ object FormDefinitionValidator {
           Try(
             compileExpression(
               xpathString      = xpathString,
-              namespaceMapping = NamespaceMapping(elemOrAtt.namespaceMappings.toMap),
+              namespaceMapping = namespaceMapping,
               functionLibrary  = fnLibrary,
               avt              = avt
             )
@@ -470,7 +494,7 @@ object FormDefinitionValidator {
             case Failure(_) =>
               List(InvalidXPathExpression(controlNameOpt, location, xpathString))
             case Success(expr) =>
-              val inScopeVars = validVariableNames ++ extraValidVars ++ localAncestorVars(elemOrAtt)
+              val inScopeVars = validVariableNames ++ extraValidVars ++ localAncestorVars(contextElem)
 
               val unresolvedVars =
                 if (xpathString.contains("$"))
@@ -546,6 +570,23 @@ object FormDefinitionValidator {
               unresolvedVars ++ unresolvedFnControls ++ tokenIssues
           }
       }
+
+    def validateExpression(
+      elemOrAtt     : NodeInfo,
+      avt           : Boolean,
+      controlNameOpt: Option[String],
+      location      : String,
+      extraValidVars: Set[String] = Set.empty
+    ): List[ValidationIssue] =
+      validateRawExpression(
+        rawValue         = elemOrAtt.stringValue,
+        namespaceMapping = NamespaceMapping(elemOrAtt.namespaceMappings.toMap),
+        contextElem      = elemOrAtt,
+        avt              = avt,
+        controlNameOpt   = controlNameOpt,
+        location         = location,
+        extraValidVars   = extraValidVars
+      )
 
     def checkControlName(
       controlNameOpt       : Option[String],
@@ -751,6 +792,186 @@ object FormDefinitionValidator {
         val enclosingControlNameOpt =
           itemsetElem.ancestor(*).flatMap(e => e.idOpt.flatMap(frc.controlNameFromIdOpt)).headOption
         issues ++= validateExpression(exprElem, avt = false, enclosingControlNameOpt, "filter")
+      }
+    }
+
+    // 8. Processes in metadata (`fr-form-metadata/processes/process`)
+    val processElems = (ctx.metadataRootElemOpt.toList / "processes" / "process").toList
+    if (processElems.nonEmpty) {
+      val rawNames = processElems.map(_.attValueOpt("name").flatMap(_.trimAllToOpt))
+
+      for (nameOpt <- rawNames) {
+        nameOpt match {
+          case None =>
+            issues += InvalidProcess("(unnamed)", "Process name is required")
+          case Some(name) if ! ProcessNameRegex.matches(name) =>
+            issues += InvalidProcess(name, "Invalid process name")
+          case _ =>
+        }
+      }
+
+      rawNames.flatten
+        .groupBy(identity)
+        .collect { case (name, occurrences) if occurrences.size > 1 => name }
+        .toList
+        .sorted
+        .foreach { dupName =>
+          issues += InvalidProcess(dupName, "Duplicate process name")
+        }
+
+      val formProcessNames = rawNames.flatten.toSet
+      val procCtx = FormProcessContext(
+        controlNames     = Some(validControlNames),
+        sectionNames     = Some(validSectionNames),
+        formProcessNames = formProcessNames
+      )
+
+      val parsedProcesses: List[(NodeInfo, String, GroupNode)] =
+        processElems.flatMap { procElem =>
+          val procName = procElem.attValueOpt("name").flatMap(_.trimAllToOpt).getOrElse("(unnamed)")
+          procElem.stringValue.trimAllToOpt match {
+            case None =>
+              issues += InvalidProcess(procName, "Process definition is empty")
+              None
+            case Some(source) =>
+              Try(ProcessParser.parse(source)) match {
+                case Failure(_) =>
+                  issues += InvalidProcess(procName, "Process syntax is invalid")
+                  None
+                case Success(rootGroup) =>
+                  Some((procElem, procName, rootGroup))
+              }
+          }
+        }
+
+      def collectCalledFormProcesses(expr: ExprNode): Set[String] = expr match {
+        case GroupNode(first, rest) =>
+          collectCalledFormProcesses(first) ++ rest.flatMap { case (_, e) => collectCalledFormProcesses(e) }
+        case ConditionNode(_, thenBranch, elseBranch) =>
+          collectCalledFormProcesses(thenBranch) ++ elseBranch.toList.flatMap(collectCalledFormProcesses)
+        case ActionNode("process", paramsMap) =>
+          paramsMap.get(Some("name")).orElse(paramsMap.get(None))
+            .filterNot(containsAvtBraces)
+            .flatMap(_.trimAllToOpt)
+            .filter(formProcessNames)
+            .toSet
+        case ActionNode(actionName, _) =>
+          val isSubProcessRef =
+            ! ActionDefsByName.contains(actionName) ||
+              ActionDefsByName.get(actionName).exists(_.category == ActionCategory.SubProcess)
+          if (isSubProcessRef && formProcessNames(actionName)) Set(actionName) else Set.empty
+      }
+
+      val callGraph: Map[String, Set[String]] =
+        parsedProcesses
+          .groupBy(_._2)
+          .view
+          .mapValues(_.flatMap { case (_, _, g) => collectCalledFormProcesses(g) }.toSet)
+          .toMap
+
+      def reaches(start: String, current: String, visited: Set[String]): Boolean = {
+        val nexts = callGraph.getOrElse(current, Set.empty) - current
+        nexts.contains(start) ||
+          nexts.diff(visited).exists(n => reaches(start, n, visited + n))
+      }
+
+      for ((_, procName, _) <- parsedProcesses.distinctBy(_._2)) {
+        if (reaches(procName, procName, Set.empty))
+          issues += InvalidProcess(procName, s"""Circular sub-process call involving "$procName"""")
+      }
+
+      for ((procElem, procName, rootGroup) <- parsedProcesses) {
+        val processXPathNamespaces =
+          NamespaceMapping(procElem.namespaceMappings.toMap ++ ProcessUI.ProcessNamespaceMapping)
+        val processAvtNamespaces =
+          NamespaceMapping(procElem.namespaceMappings.toMap ++ ProcessInterpreter.StandardNamespaceMapping.mapping)
+        val procLocation = s"process:$procName"
+
+        def validateProcessNode(expr: ExprNode): Unit = expr match {
+          case GroupNode(first, rest) =>
+            validateProcessNode(first)
+            rest.foreach { case (_, child) => validateProcessNode(child) }
+
+          case ConditionNode(xpath, thenBranch, elseBranch) =>
+            if (xpath.trimAllToOpt.isEmpty)
+              issues += InvalidProcess(procName, "Condition expression is required")
+            else
+              issues ++= validateRawExpression(
+                rawValue         = xpath,
+                namespaceMapping = processXPathNamespaces,
+                contextElem      = procElem,
+                avt              = false,
+                controlNameOpt   = None,
+                location         = procLocation
+              )
+            validateProcessNode(thenBranch)
+            elseBranch.foreach(validateProcessNode)
+
+          case ActionNode(actionName, paramsMap) =>
+            val paramsList = paramsMap.toList
+            validateActionStep(actionName, paramsList, Some(procName), procCtx).foreach { err =>
+              issues += InvalidProcess(procName, err.details)
+            }
+
+            val resolvedParams: List[(String, String)] =
+              paramsList.map {
+                case (Some(pName), pVal) => (pName, pVal)
+                case (None, pVal)        => (resolveUnnamedParamName(actionName, pVal), pVal)
+              }
+            val presentNames = resolvedParams.map(_._1).filter(_.nonEmpty).toSet
+            val actionDefOpt = ActionDefsByName.get(actionName)
+
+            for ((pName, pVal) <- resolvedParams if pName.nonEmpty) {
+              val paramDefOpt = actionDefOpt.flatMap(_.paramsByName.get(pName))
+
+              validateParamStaticValue(
+                actionName        = actionName,
+                paramName         = pName,
+                rawValue          = pVal,
+                siblingParamNames = presentNames - pName,
+                enclosingProcess  = Some(procName),
+                ctx               = procCtx
+              ).foreach {
+                case ParamValidationError.UnknownControl | ParamValidationError.UnknownSection =>
+                  issues += UnresolvedControlReference(None, procLocation, pVal.trimAllToEmpty)
+                case ParamValidationError.UnknownParameter =>
+                  () // Already reported by `validateActionStep`
+                case ParamValidationError.RequiredValue if paramDefOpt.exists(_.tier == ParamTier.Required) =>
+                  () // Already reported by `validateActionStep`
+                case otherErr =>
+                  issues += InvalidProcess(procName, otherErr.describe(actionName, pName, pVal.trimAllToEmpty))
+              }
+
+              val valueMode =
+                paramDefOpt
+                  .map(_.valueMode)
+                  .getOrElse(if (actionDefOpt.exists(_.allowsCustomParams)) ValueMode.Avt else ValueMode.Literal)
+
+              valueMode match {
+                case ValueMode.XPath if pVal.nonAllBlank =>
+                  issues ++= validateRawExpression(
+                    rawValue         = pVal,
+                    namespaceMapping = processXPathNamespaces,
+                    contextElem      = procElem,
+                    avt              = false,
+                    controlNameOpt   = None,
+                    location         = procLocation
+                  )
+                case ValueMode.Avt if containsAvtBraces(pVal) =>
+                  issues ++= validateRawExpression(
+                    rawValue         = pVal,
+                    namespaceMapping = processAvtNamespaces,
+                    contextElem      = procElem,
+                    avt              = true,
+                    controlNameOpt   = None,
+                    location         = procLocation
+                  )
+                case _ =>
+              }
+            }
+        }
+
+        validateProcessNode(rootGroup)
       }
     }
 
@@ -1387,6 +1608,14 @@ object FormDefinitionValidator {
 
       case StructuralValidationError(message, _, _) =>
         message
+
+      case InvalidProcess(processName, details) =>
+        formatWith(
+          "invalid-process",
+          "Invalid process \"{0}\": {1}",
+          processName,
+          details
+        )
     }
   }
 

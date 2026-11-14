@@ -1284,4 +1284,130 @@ class FormDefinitionValidatorTest
       assert(problems.isEmpty, problems.mkString("\n", "\n\n", "\n"))
     }
   }
+
+  describe("Process definition validation (#7871)") {
+
+    def formWithProcesses(processesElem: scala.xml.Elem): NodeInfo =
+      toRootElem(
+        <xh:html
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xh:head>
+            <xf:model id="fr-form-model">
+              <xf:instance id="fr-form-instance">
+                <form>
+                  <section-1>
+                    <first-name/>
+                    <amount/>
+                  </section-1>
+                </form>
+              </xf:instance>
+              <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                  <xf:bind id="first-name-bind" name="first-name" ref="first-name"/>
+                  <xf:bind id="amount-bind" name="amount" ref="amount"/>
+                </xf:bind>
+              </xf:bind>
+              <xf:instance id="fr-form-metadata" xxf:readonly="true">
+                <metadata>
+                  <application-name>acme</application-name>
+                  <form-name>order</form-name>
+                  {processesElem}
+                </metadata>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <fr:view>
+              <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                  <fr:grid id="grid-1-grid">
+                    <fr:c x="1" y="1" w="6"><xf:input id="first-name-control" bind="first-name-bind"/></fr:c>
+                    <fr:c x="7" y="1" w="6"><xf:input id="amount-control" bind="amount-bind"/></fr:c>
+                  </fr:grid>
+                </fr:section>
+              </fr:body>
+            </fr:view>
+          </xh:body>
+        </xh:html>
+      )
+
+    it("must accept valid processes with XPath, AVTs, sub-processes, section-template setvalue, and custom XForms params") {
+      val form = formWithProcesses(
+        <processes>
+          <process name="helper">
+            control-setvalue(control-name = "first-name", value = "upper-case($first-name)")
+            then control-setvalue(control-name = "inner-ctrl", value = "'ok'", section-name = "section-1")
+            then xf:dispatch(name = "my-custom-event", targetid = "fr-form-model", custom-prop = "{{$amount + 1}}")
+          </process>
+          <process name="main">
+            require-uploads
+            then validate("warning")
+            then if ("$amount gt 0 and xxf:non-blank($first-name)") then (
+              helper
+              then process(name = "helper")
+              then send(uri = "https://example.org/items/{{$first-name}}", method = "post", content = "xml metadata")
+              then sleep(duration = "500ms")
+              then save(draft = "false")
+            ) else
+              error-message(message = "Invalid amount: {{$amount}}")
+          </process>
+        </processes>
+      )
+
+      assert(validateFormDefinition(form).isEmpty)
+    }
+
+    it("must report syntax, parameter domain, required-one-of, mutual-exclusion, XPath/AVT, reference, and cycle errors") {
+      val form = formWithProcesses(
+        <processes>
+          <process name="bad-syntax">validate then (save</process>
+          <process name="bad-params">
+            save(draft = "maybe", bogus = "1")
+            then validate(level = "")
+            then send(method = "POST")
+            then send(uri = "https://example.org/{{1 + }}", content = "xml nope")
+            then sleep(duration = "1000")
+            then change-mode(mode = "pdf")
+            then xf:send(submission = "bad id")
+            then control-setvalue(control-name = "missing-ctrl", value = "$missing-var + ")
+            then control-setvalue(control-name = "first-name", value = "'x'", at = "0")
+            then control-setvalue(control-name = "first-name", value = "'x'", at = "all", section-name = "missing-sec")
+            then if ("1 + * 2") then unknown-action else process(name = "bad-params")
+          </process>
+          <process name="cycle-a">cycle-b</process>
+          <process name="cycle-b">process(name = "cycle-a")</process>
+        </processes>
+      )
+
+      val issues = validateFormDefinition(form)
+
+      assert(issues.contains(InvalidProcess("bad-syntax", "Process syntax is invalid")))
+      assert(issues.exists { case InvalidProcess("bad-params", d) => d.contains("does not support parameter \"bogus\""); case _ => false })
+      assert(issues.exists { case InvalidProcess("bad-params", d) => d.contains("Parameter \"draft\""); case _ => false })
+      assert(issues.exists { case InvalidProcess("bad-params", d) => d.contains("Parameter \"level\" of action \"validate\" requires a non-empty value"); case _ => false })
+      assert(issues.exists { case InvalidProcess("bad-params", d) => d.contains("Action \"send\" requires at least one of"); case _ => false })
+      assert(issues.exists { case InvalidProcess("bad-params", d) => d.contains("Unsupported value in parameter \"content\""); case _ => false })
+      assert(issues.exists { case InvalidProcess("bad-params", d) => d.contains("Invalid duration \"1000\""); case _ => false })
+      assert(issues.exists { case InvalidProcess("bad-params", d) => d.contains("Unsupported mode \"pdf\""); case _ => false })
+      assert(issues.exists { case InvalidProcess("bad-params", d) => d.contains("Invalid identifier \"bad id\""); case _ => false })
+      assert(issues.exists { case InvalidProcess("bad-params", d) => d.contains("Invalid \"at\" value \"0\""); case _ => false })
+      assert(issues.exists { case InvalidProcess("bad-params", d) => d.contains("cannot specify both \"at\" and \"section-name\""); case _ => false })
+      assert(issues.exists { case InvalidProcess("bad-params", d) => d.contains("Unknown action or sub-process \"unknown-action\""); case _ => false })
+      assert(issues.exists { case InvalidProcess("bad-params", d) => d.contains("Process \"bad-params\" cannot call itself"); case _ => false })
+
+      // XPath & AVT compilation errors + unresolved control/section references
+      assert(issues.contains(InvalidXPathExpression(None, "process:bad-params", "https://example.org/{1 + }")))
+      assert(issues.contains(InvalidXPathExpression(None, "process:bad-params", "$missing-var +")))
+      assert(issues.contains(InvalidXPathExpression(None, "process:bad-params", "1 + * 2")))
+      assert(issues.contains(UnresolvedControlReference(None, "process:bad-params", "missing-ctrl")))
+      assert(issues.contains(UnresolvedControlReference(None, "process:bad-params", "missing-sec")))
+
+      // Mutual sub-process cycle detection
+      assert(issues.contains(InvalidProcess("cycle-a", """Circular sub-process call involving "cycle-a"""")))
+      assert(issues.contains(InvalidProcess("cycle-b", """Circular sub-process call involving "cycle-b"""")))
+    }
+  }
 }

@@ -1830,6 +1830,35 @@
         <no-steps>No steps defined for this process.</no-steps>
         <add-step>Add Step</add-step>
         <process-preview>Process syntax preview</process-preview>
+        <add-parameter todo="true">+ Parameter</add-parameter>
+        <custom-parameter todo="true">Custom parameter…</custom-parameter>
+        <remove-parameter todo="true">Remove parameter</remove-parameter>
+        <avt-toggle todo="true">Toggle dynamic value template ({…})</avt-toggle>
+        <categories>
+            <form-runner todo="true">Form Runner Actions</form-runner>
+            <sub-process todo="true">Sub-processes</sub-process>
+            <flow-control todo="true">Flow Control</flow-control>
+            <xforms todo="true">XForms Actions</xforms>
+            <form-processes todo="true">This Form's Processes</form-processes>
+        </categories>
+        <alerts>
+            <required todo="true">Value is required</required>
+            <invalid-xpath todo="true">Incorrect XPath expression</invalid-xpath>
+            <invalid-avt todo="true">Incorrect attribute value template</invalid-avt>
+            <invalid-boolean todo="true">Must be "true", "false", or an AVT expression</invalid-boolean>
+            <invalid-choice todo="true">Invalid parameter value</invalid-choice>
+            <invalid-token todo="true">Contains an unsupported value</invalid-token>
+            <invalid-duration todo="true">Must be a valid duration with unit (e.g. 1000ms or 5s)</invalid-duration>
+            <invalid-at todo="true">Must be "start", "end", "all", or a positive integer</invalid-at>
+            <invalid-mode todo="true">Unsupported target mode</invalid-mode>
+            <invalid-ncname todo="true">Must be a valid XML identifier</invalid-ncname>
+            <unknown-control todo="true">Unknown control name</unknown-control>
+            <unknown-section todo="true">Unknown section name</unknown-section>
+            <unknown-process todo="true">Unknown sub-process name</unknown-process>
+            <self-process todo="true">A process cannot call itself</self-process>
+            <unknown-param todo="true">Unsupported parameter for this action</unknown-param>
+            <invalid-param-name todo="true">A unique, valid parameter name is required</invalid-param-name>
+        </alerts>
     </dialog-process-editor>
     <modes>
         <editable>Bearbeitungsmodi</editable>

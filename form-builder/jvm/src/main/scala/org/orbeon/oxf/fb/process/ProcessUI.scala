@@ -13,7 +13,10 @@
  */
 package org.orbeon.oxf.fb.process
 
-import org.orbeon.oxf.fr.process.ProcessParser
+import org.orbeon.oxf.fb.{FormBuilder, FormBuilderDocContext, FormBuilderXPathApi}
+import org.orbeon.oxf.fb.process.ProcessParams.*
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerParams}
+import org.orbeon.oxf.fr.process.{ProcessInterpreter, ProcessParser}
 import org.orbeon.oxf.fr.process.ProcessParser.*
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
@@ -21,82 +24,25 @@ import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath.*
-import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
 
 import scala.util.{Failure, Success, Try}
 
 
 object ProcessUI {
 
-  case class ActionParamDef(name: String, defaultVal: String = "")
-  case class ActionDef(name: String, label: String, params: List[ActionParamDef] = Nil)
+  val CustomParamSentinel = "__custom__"
 
-  val DefaultParamNames: Map[String, String] = Map(
-    "success-message"    -> "message",
-    "error-message"      -> "message",
-    "confirm"            -> "message",
-    "email"              -> "name",
-    "set-workflow-stage" -> "name",
-    "log"                -> "message",
-    "result-dialog"      -> "name",
-    "xf:send"            -> "submission",
-    "xf:dispatch"        -> "name",
-    "xf:show"            -> "dialog",
-    "xf:hide"            -> "dialog"
-  )
+  val ProcessNamespaceMapping: Map[String, String] =
+    (ProcessInterpreter.StandardNamespaceMapping.mapping - "xml") +
+      ("frf" -> "java:org.orbeon.oxf.fr.FormRunner")
 
-  val ActionDefinitions: List[ActionDef] = List(
-    // Common Form Runner actions
-    ActionDef("save",                  "Save",                      Nil),
-    ActionDef("validate",              "Validate",                  List(ActionParamDef("level", "error"))),
-    ActionDef("success-message",       "Success Message",           List(ActionParamDef("message", "Data saved successfully"))),
-    ActionDef("error-message",         "Error Message",             List(ActionParamDef("message", "An error occurred"))),
-    ActionDef("confirm",               "Confirmation Dialog",       List(ActionParamDef("message", "Are you sure?"))),
-    ActionDef("navigate",              "Navigate",                  List(ActionParamDef("uri", "/"))),
-    ActionDef("email",                 "Send Email",                List(ActionParamDef("name", ""))),
-    ActionDef("set-workflow-stage",    "Set Workflow Stage",        List(ActionParamDef("name", ""))),
-    ActionDef("change-mode",           "Change Mode",               List(ActionParamDef("mode", "edit"))),
-    ActionDef("control-setvalue",      "Set Control Value",         List(ActionParamDef("control", ""), ActionParamDef("value", ""))),
-    ActionDef("result-dialog",         "Result Dialog",             List(ActionParamDef("name", ""))),
-    ActionDef("open-rendered-format",  "Open Rendered Format",      List(ActionParamDef("format", "pdf"))),
-    ActionDef("log",                   "Log Message",               List(ActionParamDef("message", ""))),
-    ActionDef("sleep",                 "Sleep",                     List(ActionParamDef("duration", "1000"))),
-    ActionDef("send",                  "Send HTTP",                 List(ActionParamDef("uri", ""), ActionParamDef("method", "POST"))),
-    ActionDef("pending-uploads",       "Check Pending Uploads",     Nil),
-    ActionDef("relinquish-lease",      "Relinquish Lease",          Nil),
-    ActionDef("visit-all",             "Show All Errors",           Nil),
-    ActionDef("unvisit-all",           "Clear Error Highlights",    Nil),
-    ActionDef("expand-all",            "Expand All Sections",       Nil),
-    ActionDef("collapse-all",          "Collapse All Sections",     Nil),
-    ActionDef("expand-invalid",        "Expand Invalid Sections",   Nil),
-    ActionDef("captcha",               "Verify CAPTCHA",            Nil),
-    ActionDef("captcha-reset",         "Reset CAPTCHA",             Nil),
-    ActionDef("wizard-prev",           "Wizard Previous",           Nil),
-    ActionDef("wizard-next",           "Wizard Next",               Nil),
-    ActionDef("new-to-edit",           "Switch New to Edit",        Nil),
-    ActionDef("edit-to-new",           "Switch Edit to New",        Nil),
-    ActionDef("review",                "Go to Review",              Nil),
-    ActionDef("edit",                  "Go to Edit",                Nil),
-
-    // XForms actions
-    ActionDef("xf:setvalue",           "XForms: Set Value",         List(ActionParamDef("ref", ""), ActionParamDef("value", ""))),
-    ActionDef("xf:show",               "XForms: Show Dialog",       List(ActionParamDef("dialog", ""))),
-    ActionDef("xf:hide",               "XForms: Hide Dialog",       List(ActionParamDef("dialog", ""))),
-    ActionDef("xf:dispatch",           "XForms: Dispatch Event",    List(ActionParamDef("name", ""), ActionParamDef("targetid", ""))),
-    ActionDef("xf:send",               "XForms: Send Submission",   List(ActionParamDef("submission", ""))),
-
-    // Process flow control actions
-    ActionDef("terminate-with-success", "Terminate with Success",   Nil),
-    ActionDef("terminate-with-failure", "Terminate with Failure",   Nil),
-    ActionDef("continue-with-success",  "Continue with Success",    Nil),
-    ActionDef("continue-with-failure",  "Continue with Failure",    Nil),
-    ActionDef("suspend",                "Suspend Process",          Nil),
-    ActionDef("resume-with-success",    "Resume with Success",      Nil),
-    ActionDef("resume-with-failure",    "Resume with Failure",      Nil)
-  )
-
-  private val ActionDefsByName: Map[String, ActionDef] =
-    ActionDefinitions.map(a => a.name -> a).toMap
+  private val ProcessNamespaceDeclsXml: String =
+    ProcessNamespaceMapping
+      .toList
+      .sortBy(_._1)
+      .map { case (prefix, uri) => s"""xmlns:$prefix="${uri.escapeXmlForAttribute}"""" }
+      .mkString(" ")
 
   def xmlStringToMutableNodeInfoRootElem(xml: String): NodeInfo = {
     val doc = XFormsCrossPlatformSupport.stringToTinyTree(XPath.GlobalConfiguration, xml, handleXInclude = false, handleLexical = false)
@@ -107,9 +53,27 @@ object ProcessUI {
   def availableActionsXml(): NodeInfo = {
     val itemsXml = ActionDefinitions.map { a =>
       val paramsXml = a.params.map { p =>
-        s"""<param name="${p.name.escapeXmlForAttribute}" default="${p.defaultVal.escapeXmlForAttribute}"/>"""
+        val choicesXml = p.kind.choices.map { c =>
+          s"""<item label="${c.escapeXmlForAttribute}" value="${c.escapeXmlForAttribute}"/>"""
+        }.mkString
+        s"""<param
+           | name="${p.name.escapeXmlForAttribute}"
+           | tier="${p.tier.entryName}"
+           | value-mode="${p.valueMode.entryName}"
+           | kind="${p.kind.entryName}"
+           | has-widget="${p.kind.hasConstrainedWidget}"
+           | initial="${p.initialValue.escapeXmlForAttribute}"
+           | default="${p.initialValue.escapeXmlForAttribute}"
+           | allow-blank="${p.allowBlank}"
+           | deprecated="${p.deprecated}"
+           | placeholder="${p.placeholder.escapeXmlForAttribute}">$choicesXml</param>""".stripMargin.replace('\n', ' ')
       }.mkString
-      s"""<action name="${a.name.escapeXmlForAttribute}" label="${a.label.escapeXmlForAttribute}">$paramsXml</action>"""
+      s"""<action
+         | name="${a.name.escapeXmlForAttribute}"
+         | label="${a.label.escapeXmlForAttribute}"
+         | category="${a.category.entryName}"
+         | allows-custom-params="${a.allowsCustomParams}"
+         | deprecated="${a.deprecated}">$paramsXml</action>""".stripMargin.replace('\n', ' ')
     }.mkString
     xmlStringToMutableNodeInfoRootElem(s"""<actions>$itemsXml</actions>""")
   }
@@ -123,11 +87,39 @@ object ProcessUI {
   private def actionParamsXmlString(actionName: String): String =
     ActionDefsByName.get(actionName) match {
       case Some(actionDef) =>
-        actionDef.params.map { p =>
-          s"""<param name="${p.name.escapeXmlForAttribute}">${p.defaultVal.escapeXmlMinimal}</param>"""
+        actionDef.params.filter(_.shownByDefault).map { p =>
+          s"""<param name="${p.name.escapeXmlForAttribute}" avt-mode="false" custom="false">${p.initialValue.escapeXmlMinimal}</param>"""
         }.mkString
       case None =>
         ""
+    }
+
+  /*@XPathFunction*/
+  def singleParamTemplateXml(actionName: String, paramName: String): NodeInfo =
+    if (paramName == CustomParamSentinel) {
+      xmlStringToMutableNodeInfoRootElem("""<param name="" avt-mode="false" custom="true"/>""")
+    } else {
+      val initialVal =
+        ActionDefsByName
+          .get(actionName)
+          .flatMap(_.paramsByName.get(paramName))
+          .map(_.initialValue)
+          .getOrElse("")
+      xmlStringToMutableNodeInfoRootElem(
+        s"""<param name="${paramName.escapeXmlForAttribute}" avt-mode="false" custom="false">${initialVal.escapeXmlMinimal}</param>"""
+      )
+    }
+
+  /*@XPathFunction*/
+  def defaultValueWhenLeavingAvtMode(actionName: String, paramName: String, currentValue: String): String =
+    ActionDefsByName.get(actionName).flatMap(_.paramsByName.get(paramName)) match {
+      case Some(paramDef) =>
+        if (shouldStartInAvtMode(actionName, paramName, currentValue))
+          paramDef.initialValue
+        else
+          currentValue
+      case None =>
+        currentValue
     }
 
   /*@XPathFunction*/
@@ -137,7 +129,8 @@ object ProcessUI {
       s"""<step
          |    type="action"
          |    combinator="${combinator.trimAllToOpt.getOrElse("then").escapeXmlForAttribute}"
-         |    name="${name.escapeXmlForAttribute}">$paramsXml</step>""".stripMargin
+         |    name="${name.escapeXmlForAttribute}"
+         |    _add-param="">$paramsXml</step>""".stripMargin
     )
   }
 
@@ -164,21 +157,293 @@ object ProcessUI {
   def newElseTemplateXml(): NodeInfo =
     xmlStringToMutableNodeInfoRootElem(
       s"""<else>
-         |    <step type="action" combinator="then" name="save"/>
+         |    <step type="action" combinator="then" name="save" _add-param=""/>
          |</else>""".stripMargin
     )
+
+  /*@XPathFunction*/
+  def formContextXml(): NodeInfo = {
+    val (controlsXml, sectionsXml, emailTemplatesXml, pdfTemplatesXml, customModesXml) =
+      Try {
+        implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+
+        val someResourcesMap =
+          Some(FormBuilder.currentResources.child(*).map(r => r.localname -> r).toMap)
+
+        val controls =
+          FormBuilderXPathApi.getControlsLabelValueItemset().map { item =>
+            val label = item.attValue("label")
+            val value = item.attValue("value")
+            s"""<item label="${label.escapeXmlForAttribute}" value="${value.escapeXmlForAttribute}"/>"""
+          }.mkString
+
+        val sections =
+          FormRunner.getAllContainersWithIds
+            .filter(FormRunner.IsSection)
+            .flatMap { sectionElem =>
+              FormRunner.getControlNameOpt(sectionElem).map { sectionName =>
+                val sectionLabel =
+                  FormBuilder.getControlResourceOrEmpty(
+                    sectionName,
+                    "label",
+                    removeHtmlTags  = true,
+                    resourcesMapOpt = someResourcesMap
+                  )
+                val label = if (sectionLabel.nonEmpty) s"$sectionLabel ($sectionName)" else sectionName
+                s"""<item label="${label.escapeXmlForAttribute}" value="${sectionName.escapeXmlForAttribute}"/>"""
+              }
+            }.mkString
+
+        val emailTemplates =
+          (ctx.metadataRootElem / "email" / "templates" / "template")
+            .flatMap(_.attValueOpt("name"))
+            .flatMap(_.trimAllToOpt)
+            .distinct
+            .map(n => s"""<item label="${n.escapeXmlForAttribute}" value="${n.escapeXmlForAttribute}"/>""")
+            .mkString
+
+        val pdfTemplates =
+          (ctx.modelElem / XFormsNames.XFORMS_INSTANCE_QNAME)
+            .find(_.id == "fr-form-attachments")
+            .toList
+            .flatMap(inst => (inst / * / "pdf").toList)
+            .flatMap(_.attValueOpt("name"))
+            .flatMap(_.trimAllToOpt)
+            .distinct
+            .map(n => s"""<item label="${n.escapeXmlForAttribute}" value="${n.escapeXmlForAttribute}"/>""")
+            .mkString
+
+        val customModes =
+          Try(FormRunner.customModes(FormRunnerParams()).map(_.publicName).distinct).getOrElse(Nil)
+            .map(m => s"""<item label="${m.escapeXmlForAttribute}" value="${m.escapeXmlForAttribute}"/>""")
+            .mkString
+
+        (controls, sections, emailTemplates, pdfTemplates, customModes)
+      }.getOrElse(("", "", "", "", ""))
+
+    xmlStringToMutableNodeInfoRootElem(
+      s"""<form-context>
+         |  <controls>$controlsXml</controls>
+         |  <sections>$sectionsXml</sections>
+         |  <email-templates>$emailTemplatesXml</email-templates>
+         |  <pdf-templates>$pdfTemplatesXml</pdf-templates>
+         |  <custom-modes>$customModesXml</custom-modes>
+         |</form-context>""".stripMargin
+    )
+  }
+
+  private def formProcessContextFromXml(
+    rootProcessesOpt : Option[NodeInfo],
+    formContextOpt   : Option[NodeInfo]
+  ): FormProcessContext = {
+    val formProcessNames =
+      rootProcessesOpt.toList
+        .flatMap(r => (r / "process").toList)
+        .flatMap(_.attValueOpt("name"))
+        .flatMap(_.trimAllToOpt)
+        .toSet
+
+    formContextOpt match {
+      case Some(fc) if (fc / *).nonEmpty =>
+        val controlItems = (fc / "controls" / "item").map(_.attValue("value")).filter(_.nonEmpty).toSet
+        val sectionItems = (fc / "sections" / "item").map(_.attValue("value")).filter(_.nonEmpty).toSet
+        val emailItems   = (fc / "email-templates" / "item").map(_.attValue("value")).filter(_.nonEmpty).toSet
+        val pdfItems     = (fc / "pdf-templates" / "item").map(_.attValue("value")).filter(_.nonEmpty).toSet
+        val modeItems    = (fc / "custom-modes" / "item").map(_.attValue("value")).filter(_.nonEmpty).toSet
+
+        // Only enforce control/section set membership when `formContextXml` actually ran in a Form Builder doc context.
+        val hasDocCtx =
+          controlItems.nonEmpty || sectionItems.nonEmpty || Try(FormBuilderDocContext()).isSuccess
+
+        FormProcessContext(
+          controlNames     = if (hasDocCtx) Some(controlItems) else None,
+          sectionNames     = if (hasDocCtx) Some(sectionItems) else None,
+          emailTemplates   = emailItems,
+          pdfTemplates     = pdfItems,
+          customModes      = modeItems,
+          formProcessNames = formProcessNames
+        )
+
+      case _ =>
+        FormProcessContext(formProcessNames = formProcessNames)
+    }
+  }
+
+  /*@XPathFunction*/
+  def paramValueMode(paramElem: NodeInfo): String = {
+    val actionName = paramElem.parentOption.flatMap(_.attValueOpt("name")).getOrElse("")
+    val paramName  = paramElem.attValueOpt("name").getOrElse("")
+    ActionDefsByName.get(actionName) match {
+      case Some(actionDef) =>
+        actionDef.paramsByName.get(paramName) match {
+          case Some(paramDef) => paramDef.valueMode.entryName
+          case None           => if (actionDef.allowsCustomParams) ValueMode.Avt.entryName else ValueMode.Literal.entryName
+        }
+      case None =>
+        ValueMode.Literal.entryName
+    }
+  }
+
+  /*@XPathFunction*/
+  def isCustomParamNameValid(paramElem: NodeInfo): Boolean = {
+    val stepOpt   = paramElem.parentOption
+    val actionOpt = stepOpt.flatMap(_.attValueOpt("name")).flatMap(ActionDefsByName.get)
+    val paramName = paramElem.attValueOpt("name").flatMap(_.trimAllToOpt).getOrElse("")
+
+    if (! isValidParamIdentifier(paramName)) {
+      false
+    } else {
+      val collidesWithKnown =
+        actionOpt.exists(_.paramsByName.contains(paramName))
+      val duplicateCount =
+        stepOpt.toList
+          .flatMap(s => (s child "param").toList)
+          .count(p => p.attValueOpt("name").flatMap(_.trimAllToOpt).contains(paramName))
+      duplicateCount <= 1 && ! collidesWithKnown
+    }
+  }
+
+  private def computeParamStaticError(
+    paramElem      : NodeInfo,
+    formContextOpt : Option[NodeInfo]
+  ): Option[ParamValidationError] = {
+    val stepOpt          = paramElem.parentOption
+    val actionName       = stepOpt.flatMap(_.attValueOpt("name")).getOrElse("")
+    val paramName        = paramElem.attValueOpt("name").getOrElse("")
+    val rawValue         = paramElem.stringValue
+    val siblingNames     =
+      stepOpt.toList
+        .flatMap(s => (s child "param").toList)
+        .filterNot(_ isSameNodeInfo paramElem)
+        .flatMap(_.attValueOpt("name"))
+        .filter(_.nonEmpty)
+        .toSet
+    val enclosingProcess = paramElem.ancestor("process").headOption.flatMap(_.attValueOpt("name")).flatMap(_.trimAllToOpt)
+    val processesRootOpt = paramElem.ancestor("processes").headOption
+    val ctx              = formProcessContextFromXml(processesRootOpt, formContextOpt)
+
+    validateParamStaticValue(
+      actionName        = actionName,
+      paramName         = paramName,
+      rawValue          = rawValue,
+      siblingParamNames = siblingNames,
+      enclosingProcess  = enclosingProcess,
+      ctx               = ctx
+    )
+  }
+
+  /*@XPathFunction*/
+  def isParamValueValid(paramElem: NodeInfo, formContextElem: NodeInfo): Boolean =
+    computeParamStaticError(paramElem, Option(formContextElem)).isEmpty
+
+  private val DefaultAlertMessages: Map[String, String] = Map(
+    "required"          -> "Value is required",
+    "invalid-xpath"     -> "Incorrect XPath expression",
+    "invalid-avt"       -> "Incorrect attribute value template",
+    "invalid-boolean"   -> "Must be \"true\", \"false\", or an AVT expression",
+    "invalid-choice"    -> "Invalid parameter value",
+    "invalid-token"     -> "Contains an unsupported value",
+    "invalid-duration"  -> "Must be a valid duration with unit (e.g. 1000ms or 5s)",
+    "invalid-at"        -> "Must be \"start\", \"end\", \"all\", or a positive integer",
+    "invalid-mode"      -> "Unsupported target mode",
+    "invalid-ncname"    -> "Must be a valid XML identifier",
+    "unknown-control"   -> "Unknown control name",
+    "unknown-section"   -> "Unknown section name",
+    "unknown-process"   -> "Unknown sub-process name",
+    "self-process"      -> "A process cannot call itself",
+    "unknown-param"     -> "Unsupported parameter for this action",
+    "invalid-param-name"-> "A unique, valid parameter name is required"
+  )
+
+  /*@XPathFunction*/
+  def paramAlertMessage(paramElem: NodeInfo, resourcesElem: NodeInfo, formContextElem: NodeInfo): String = {
+    val key =
+      computeParamStaticError(paramElem, Option(formContextElem))
+        .map(_.alertKey)
+        .getOrElse {
+          paramValueMode(paramElem) match {
+            case "xpath" => "invalid-xpath"
+            case "avt"   => "invalid-avt"
+            case _       => "invalid-choice"
+          }
+        }
+
+    Option(resourcesElem)
+      .flatMap(res => (res / "dialog-process-editor" / "alerts" / key).headOption)
+      .flatMap(_.stringValue.trimAllToOpt)
+      .getOrElse(DefaultAlertMessages.getOrElse(key, "Invalid value"))
+  }
+
+  private def computeDialogStepErrors(
+    stepElem       : NodeInfo,
+    formContextOpt : Option[NodeInfo]
+  ): List[StepValidationError] = {
+    val actionName       = stepElem.attValueOpt("name").getOrElse("")
+    val paramElems       = (stepElem child "param").toList
+    val presentNames     = paramElems.flatMap(_.attValueOpt("name")).filter(_.nonEmpty).toSet
+    val params           = paramElems.map { p =>
+      val unnamed = p.attValueOpt("unnamed").contains("true")
+      val pName   = p.attValueOpt("name").getOrElse("")
+      val keyOpt  = if (unnamed && pName.isEmpty) None else Some(pName)
+      (keyOpt, p.stringValue)
+    }
+    val enclosingProcess = stepElem.ancestor("process").headOption.flatMap(_.attValueOpt("name")).flatMap(_.trimAllToOpt)
+    val processesRootOpt = stepElem.ancestor("processes").headOption
+    val ctx              = formProcessContextFromXml(processesRootOpt, formContextOpt)
+
+    // Filter out errors already reported directly on child `<param>` controls so `<fr:error-summary>` never duplicates them
+    validateActionStep(actionName, params, enclosingProcess, ctx).filterNot {
+      case StepValidationError.MissingRequiredParam(_, pName) if presentNames.contains(pName)          => true
+      case StepValidationError.MissingRequiredOneOf(_, group) if group.exists(presentNames.contains)   => true
+      case StepValidationError.UnknownParam(_, _)             if paramElems.nonEmpty                   => true
+      case _                                                                                           => false
+    }
+  }
+
+  /*@XPathFunction*/
+  def isActionStepValid(stepElem: NodeInfo, formContextElem: NodeInfo): Boolean =
+    computeDialogStepErrors(stepElem, Option(formContextElem)).isEmpty
+
+  /*@XPathFunction*/
+  def actionStepAlertMessage(stepElem: NodeInfo, resourcesElem: NodeInfo, formContextElem: NodeInfo): String =
+    computeDialogStepErrors(stepElem, Option(formContextElem)).headOption match {
+      case Some(err) => err.details
+      case None      =>
+        Option(resourcesElem)
+          .flatMap(res => (res / "dialog-process-editor" / "process-definition" / "alert").headOption)
+          .flatMap(_.stringValue.trimAllToOpt)
+          .getOrElse("Invalid action configuration")
+    }
 
   // AST ExprNode to XML String
   def exprNodeToXmlString(expr: ExprNode, combinator: String): String = expr match {
     case ActionNode(name, params) =>
-      val paramsXml = params.map {
-        case (Some(pName), pVal) =>
-          s"""<param name="${pName.escapeXmlForAttribute}">${pVal.escapeXmlMinimal}</param>"""
-        case (None, pVal) =>
-          val defaultName = DefaultParamNames.getOrElse(name, "")
-          s"""<param name="${defaultName.escapeXmlForAttribute}" unnamed="true">${pVal.escapeXmlMinimal}</param>"""
+      val actionDefOpt = ActionDefsByName.get(name)
+      val canonicalIndex: Map[String, Int] =
+        actionDefOpt.map(_.params.map(_.name).zipWithIndex.toMap).getOrElse(Map.empty)
+
+      val resolvedEntries =
+        params.toList.zipWithIndex.map {
+          case ((Some(pName), pVal), idx) =>
+            val isCustom = actionDefOpt.exists(ad => ad.allowsCustomParams && ! ad.paramsByName.contains(pName))
+            val avtMode  = shouldStartInAvtMode(name, pName, pVal)
+            val sortKey  = canonicalIndex.getOrElse(pName, 1000 + idx)
+            (sortKey, pName, false, isCustom, avtMode, pVal)
+
+          case ((None, pVal), idx) =>
+            val defaultName = resolveUnnamedParamName(name, pVal)
+            val avtMode     = shouldStartInAvtMode(name, defaultName, pVal)
+            val sortKey     = canonicalIndex.getOrElse(defaultName, idx)
+            (sortKey, defaultName, true, false, avtMode, pVal)
+        }.sortBy(_._1)
+
+      val paramsXml = resolvedEntries.map {
+        case (_, pName, unnamed, isCustom, avtMode, pVal) =>
+          val unnamedAttr = if (unnamed) """ unnamed="true"""" else ""
+          s"""<param name="${pName.escapeXmlForAttribute}" avt-mode="$avtMode" custom="$isCustom"$unnamedAttr>${pVal.escapeXmlMinimal}</param>"""
       }.mkString
-      s"""<step type="action" combinator="${combinator.escapeXmlForAttribute}" name="${name.escapeXmlForAttribute}">$paramsXml</step>"""
+
+      s"""<step type="action" combinator="${combinator.escapeXmlForAttribute}" name="${name.escapeXmlForAttribute}" _add-param="">$paramsXml</step>"""
 
     case GroupNode(first, rest) =>
       val childrenXml = (("then", first) :: rest.map { case (c, e) => (c.name, e) }).map {
@@ -212,7 +477,7 @@ object ProcessUI {
   // Parse process string into XML String for <process>
   def processStringToXmlString(processString: String): String = {
     if (processString.trim.isEmpty) {
-      """<step type="action" combinator="then" name="save"/>"""
+      """<step type="action" combinator="then" name="save" _add-param=""/>"""
     } else {
       Try(ProcessParser.parse(processString)) match {
         case Success(rootGroup) =>
@@ -220,28 +485,34 @@ object ProcessUI {
           steps.map { case (comb, expr) => exprNodeToXmlString(expr, comb) }.mkString
         case Failure(_) =>
           // Fallback if parsing fails: create a single save action step
-          """<step type="action" combinator="then" name="save"/>"""
+          """<step type="action" combinator="then" name="save" _add-param=""/>"""
       }
     }
   }
 
   /*@XPathFunction*/
   def processStringToXml(processString: String): NodeInfo =
-    xmlStringToMutableNodeInfoRootElem(s"""<process>${processStringToXmlString(processString)}</process>""")
+    xmlStringToMutableNodeInfoRootElem(s"""<process $ProcessNamespaceDeclsXml>${processStringToXmlString(processString)}</process>""")
 
   private val IndentSpaces = "    "
 
   private def serializeAction(step: NodeInfo): String = {
-    val name = step attValueOpt "name" getOrElse ""
+    val name   = step attValueOpt "name" getOrElse ""
     val params = (step child "param").toList
     if (params.isEmpty) {
       name
     } else {
+      val multiParam = params.size > 1
       val paramsStr = params.map { p =>
-        val pName   = p attValueOpt "name" getOrElse ""
-        val unnamed = (p attValueOpt "unnamed").contains("true")
-        val pVal    = p.stringValue
-        if (pName.nonEmpty && ! unnamed)
+        val pName          = p attValueOpt "name" getOrElse ""
+        val unnamed        = (p attValueOpt "unnamed").contains("true")
+        val pVal           = p.stringValue
+        val canKeepUnnamed =
+          unnamed &&
+            ! multiParam &&
+            ! containsAvtBraces(pVal) &&
+            resolveUnnamedParamName(name, pVal) == pName
+        if (pName.nonEmpty && ! canKeepUnnamed)
           s"""$pName = ${ProcessParser.quote(pVal)}"""
         else
           ProcessParser.quote(pVal)
@@ -406,26 +677,26 @@ object ProcessUI {
 
   /*@XPathFunction*/
   def deserializeProcesses(configNode: NodeInfo): NodeInfo = {
-    val processes = (configNode / "process").toList
+    val processes = Option(configNode).toList.flatMap(c => (c / "process").toList)
     val processesXml =
       if (processes.isEmpty) {
-        """<process name=""><step type="action" combinator="then" name="save"/></process>"""
+        """<process name=""><step type="action" combinator="then" name="save" _add-param=""/></process>"""
       } else {
         processes.map { p =>
-          val name = p attValueOpt "name" getOrElse ""
-          val source = p.stringValue
+          val name     = p attValueOpt "name" getOrElse ""
+          val source   = p.stringValue
           val stepsXml = processStringToXmlString(source)
           s"""<process name="${name.escapeXmlForAttribute}">$stepsXml</process>"""
         }.mkString
       }
-    xmlStringToMutableNodeInfoRootElem(s"""<processes>$processesXml</processes>""")
+    xmlStringToMutableNodeInfoRootElem(s"""<processes $ProcessNamespaceDeclsXml>$processesXml</processes>""")
   }
 
   /*@XPathFunction*/
   def serializeProcesses(processesNode: NodeInfo): NodeInfo = {
     val processes = (processesNode / "process").toList
     val serializedProcessesXml = processes.map { p =>
-      val name = p attValueOpt "name" getOrElse ""
+      val name       = p attValueOpt "name" getOrElse ""
       val serialized = xmlToProcessString(p)
       s"""<process name="${name.escapeXmlForAttribute}">${serialized.escapeXmlMinimal}</process>"""
     }.mkString

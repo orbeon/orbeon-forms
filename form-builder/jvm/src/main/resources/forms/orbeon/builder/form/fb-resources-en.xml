@@ -1898,6 +1898,35 @@
         <no-steps>No steps defined for this process.</no-steps>
         <add-step>Add Step</add-step>
         <process-preview>Process syntax preview</process-preview>
+        <add-parameter>+ Parameter</add-parameter>
+        <custom-parameter>Custom parameter…</custom-parameter>
+        <remove-parameter>Remove parameter</remove-parameter>
+        <avt-toggle>Toggle dynamic value template ({…})</avt-toggle>
+        <categories>
+            <form-runner>Form Runner Actions</form-runner>
+            <sub-process>Sub-processes</sub-process>
+            <flow-control>Flow Control</flow-control>
+            <xforms>XForms Actions</xforms>
+            <form-processes>This Form's Processes</form-processes>
+        </categories>
+        <alerts>
+            <required>Value is required</required>
+            <invalid-xpath>Incorrect XPath expression</invalid-xpath>
+            <invalid-avt>Incorrect attribute value template</invalid-avt>
+            <invalid-boolean>Must be "true", "false", or an AVT expression</invalid-boolean>
+            <invalid-choice>Invalid parameter value</invalid-choice>
+            <invalid-token>Contains an unsupported value</invalid-token>
+            <invalid-duration>Must be a valid duration with unit (e.g. 1000ms or 5s)</invalid-duration>
+            <invalid-at>Must be "start", "end", "all", or a positive integer</invalid-at>
+            <invalid-mode>Unsupported target mode</invalid-mode>
+            <invalid-ncname>Must be a valid XML identifier</invalid-ncname>
+            <unknown-control>Unknown control name</unknown-control>
+            <unknown-section>Unknown section name</unknown-section>
+            <unknown-process>Unknown sub-process name</unknown-process>
+            <self-process>A process cannot call itself</self-process>
+            <unknown-param>Unsupported parameter for this action</unknown-param>
+            <invalid-param-name>A unique, valid parameter name is required</invalid-param-name>
+        </alerts>
     </dialog-process-editor>
     <modes>
         <editable>Editable modes</editable>

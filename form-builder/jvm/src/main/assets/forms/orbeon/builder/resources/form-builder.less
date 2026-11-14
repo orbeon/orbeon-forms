@@ -2258,40 +2258,61 @@ body.orbeon {
             .fb-process-iteration {
                 .fb-process-row-content {
                     display: grid;
-                    grid-template-columns: 1fr auto;
-                    column-gap: 4px;
+                    grid-template-columns: minmax(0, 1fr);
+                    column-gap: 6px;
+                    row-gap: 4px;
+                    align-items: start;
+                    margin-left: calc(var(--fb-indent-level) * 20px);
+                    margin-right: calc(var(--fb-indent-level) * 20px);
+                    padding: 2px 6px calc(2px + var(--fb-extra-closing) * 6px) 6px;
 
                     &.fb-process-has-combinator {
-                        grid-template-columns: min-content 1fr auto;
+                        grid-template-columns: min-content minmax(0, 1fr);
 
                         .fb-process-row-content-params {
-                            grid-column-start: 3;
-                            grid-column-end: 4;
+                            grid-column: 2 / 3;
                         }
                     }
                 }
 
                 .fb-process-row-content-params {
-                    grid-column-start: 2;
-                    grid-column-end: 3;
-                    grid-row-start: 1;
-                    grid-row-end: 3;
+                    grid-column: 1 / 2;
+                    margin-left: 4px;
+                    padding: 2px 0 2px 10px;
+                    border-left: 2px solid color-mix(in oklab, var(--orbeon-base-color) 15%, transparent);
                 }
 
                 .fb-process-row-switch {
                     align-self: center;
+                    min-width: 0;
+                }
+
+                .fb-process-action-bar {
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: flex-start;
+                    gap: 6px;
                 }
 
                 .fb-process-keyword-with-condition {
                     display: flex;
-                    column-gap: 4px;
-                    align-items: center;
+                    column-gap: 6px;
+                    align-items: flex-start;
 
                     .fb-process-keyword {
                         flex-grow: 0;
+                        margin-top: 5px;
                     }
+
                     .fb-process-condition-input {
                         flex-grow: 1;
+                        min-width: 0;
+
+                        input.xforms-input-input {
+                            width: 100%;
+                            box-sizing: border-box;
+                            font-family: monospace;
+                        }
                     }
                 }
 
@@ -2333,7 +2354,22 @@ body.orbeon {
                 }
             }
 
+            // Control labels inside step rows are used only by error-summary, not shown inline
+            .xforms-control > .xforms-label,
+            .xforms-control > fieldset > legend.xforms-label {
+                display: none;
+            }
+
+            .xforms-visited.xforms-invalid {
+                > input.xforms-input-input,
+                > select {
+                    border-color: var(--orbeon-error-color);
+                }
+            }
+
             .fb-process-combinator-select1 {
+                align-self: start;
+
                 select {
                     width: auto;
                     display: inline-block;
@@ -2349,13 +2385,155 @@ body.orbeon {
                 width: auto;
             }
 
-            .fb-process-param {
-                //display: block;
+            .fb-process-add-param {
+                select {
+                    width: auto;
+                    font-size: 12px;
+                    padding-top: 3px;
+                    padding-bottom: 3px;
+                    color: var(--orbeon-link-color);
+                    border-style: dashed;
+                }
+            }
 
-                label {
+            .fb-process-param-row {
+                display: grid;
+                grid-template-columns: 150px minmax(0, 1fr) auto;
+                column-gap: 8px;
+                align-items: start;
+                padding: 2px 0;
+
+                .fb-process-param-name {
+                    min-width: 0;
+                    padding-top: 5px;
+                    line-height: 20px;
+
+                    &:has(.fb-process-custom-name-input:not(.xforms-disabled)) {
+                        padding-top: 0;
+                    }
+
+                    .fb-process-param-label {
+                        display: block;
+                        font-family: monospace;
+                        font-size: 12px;
+                        color: var(--orbeon-base-color);
+                        opacity: 0.85;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+
+                        &.fb-process-param-required::after {
+                            content: " *";
+                            color: var(--orbeon-error-color);
+                            font-weight: bold;
+                        }
+                    }
+
+                    .fb-process-custom-name-input input.xforms-input-input {
+                        width: 100%;
+                        box-sizing: border-box;
+                        font-family: monospace;
+                        font-size: 12px;
+                    }
                 }
 
-                input {
+                .fb-process-param-control {
+                    min-width: 0;
+
+                    .fb-process-param-input {
+                        display: block;
+                        width: 100%;
+
+                        input.xforms-input-input {
+                            width: 100%;
+                            box-sizing: border-box;
+                        }
+
+                        &.fb-process-code-input input.xforms-input-input {
+                            font-family: monospace;
+                        }
+                    }
+
+                    .fb-process-param-select1 {
+                        display: inline-block;
+                        max-width: 100%;
+
+                        select {
+                            width: auto;
+                            min-width: 150px;
+                            max-width: 100%;
+                        }
+                    }
+
+                    .fb-process-param-tokens {
+                        display: block;
+
+                        fieldset {
+                            margin: 0;
+                            padding: 0;
+                        }
+
+                        .xforms-items {
+                            display: flex;
+                            flex-direction: row;
+                            flex-wrap: wrap;
+                            justify-content: flex-start;
+                            gap: 4px 12px;
+                            align-items: center;
+                            padding: 4px 2px;
+
+                            > span {
+                                display: inline-flex;
+                                width: auto;
+                                margin: 0;
+                            }
+
+                            label.checkbox {
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 4px;
+                                margin: 0;
+                                padding: 0;
+                                font-family: monospace;
+                                font-size: 12px;
+                                white-space: nowrap;
+                                cursor: pointer;
+
+                                input[type="checkbox"] {
+                                    margin: 0;
+                                    cursor: pointer;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .fb-process-param-actions {
+                    display: flex;
+                    align-items: center;
+                    min-height: 30px;
+                    white-space: nowrap;
+                }
+            }
+
+            .fb-process-avt-toggle {
+                .fb-process-avt-badge {
+                    display: inline-block;
+                    padding: 1px 5px;
+                    border: 1px solid var(--orbeon-control-border-color);
+                    border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+                    font-family: monospace;
+                    font-size: 11px;
+                    font-weight: 600;
+                    line-height: 16px;
+                    color: var(--orbeon-hint-color);
+                    background-color: var(--orbeon-control-background-color);
+                }
+
+                &.fb-process-avt-active .fb-process-avt-badge {
+                    color: var(--orbeon-fb-active-color);
+                    border-color: var(--orbeon-fb-active-color);
+                    background-color: var(--orbeon-fb-hover-background-color);
                 }
             }
 
@@ -2376,13 +2554,6 @@ body.orbeon {
                 font-family: monospace;
                 font-size: 13px;
                 color: #0056b3;
-                //margin-right: 6px;
-            }
-
-            .fb-process-condition-input input {
-                width: auto;
-                display: inline-block;
-                font-family: monospace;
             }
 
             .fb-process-btn {

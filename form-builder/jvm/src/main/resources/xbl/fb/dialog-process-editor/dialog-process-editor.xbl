@@ -35,36 +35,27 @@
             <!-- Handler to open dialog -->
             <xbl:handler event="fb-show-dialog xxforms-dialog-open" phase="target">
 
-                <xf:delete ref="instance()/*"/>
+                <xf:insert
+                    ref="instance()"
+                    origin="pui:deserializeProcesses((event('config'), instance('empty-processes-instance'))[1])"/>
 
-                <xf:var name="incoming" value="event('config')/process"/>
-                <xf:action if="exists($incoming)">
-                    <xf:insert
-                        context="instance()"
-                        ref="*"
-                        origin="pui:deserializeProcesses(event('config'))/*"/>
-                </xf:action>
-
-                <xf:action if="empty($incoming)">
-                    <xf:insert
-                        context="instance()"
-                        ref="*"
-                        origin="instance('process-template')"/>
-                </xf:action>
+                <xf:insert
+                    ref="instance('form-context-instance')"
+                    origin="pui:formContextXml()"/>
 
                 <xxf:show dialog="dialog"/>
                 <xf:setfocus control="fb-process-name"/>
             </xbl:handler>
 
             <!-- Save and close if valid -->
-            <xbl:handler event="DOMActivate" observer="fb-save-trigger" if="instance('validity-instance') = 'true'">
+            <xbl:handler event="DOMActivate" observer="fb-save-trigger" if="instance('validity-instance') = 'true' and valid(instance())">
                 <xf:dispatch name="fb-update" targetid="fb-dialog-process-editor">
                     <xf:property name="config" value="pui:serializeProcesses(instance())"/>
                 </xf:dispatch>
                 <xxf:hide dialog="dialog"/>
             </xbl:handler>
 
-            <xbl:handler event="DOMActivate" observer="fb-save-trigger" if="not(instance('validity-instance') = 'true')">
+            <xbl:handler event="DOMActivate" observer="fb-save-trigger" if="not(instance('validity-instance') = 'true' and valid(instance()))">
                 <xxf:setvisited control="dialog" recurse="true"/>
             </xbl:handler>
 
@@ -132,13 +123,27 @@
                     <processes/>
                 </xf:instance>
 
+                <xf:instance id="empty-processes-instance" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <processes/>
+                </xf:instance>
+
                 <xf:instance id="actions-instance" xxf:readonly="false" xxf:exclude-result-prefixes="#all">
                     <actions/>
                 </xf:instance>
 
+                <xf:instance id="form-context-instance" xxf:readonly="false" xxf:exclude-result-prefixes="#all">
+                    <form-context>
+                        <controls/>
+                        <sections/>
+                        <email-templates/>
+                        <pdf-templates/>
+                        <custom-modes/>
+                    </form-context>
+                </xf:instance>
+
                 <xf:instance id="process-template" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                     <process name="">
-                        <step type="action" combinator="then" name="save"/>
+                        <step type="action" combinator="then" name="save" _add-param=""/>
                     </process>
                 </xf:instance>
 
@@ -176,8 +181,28 @@
                         constraint="exists(step)"/>
                     <xf:bind
                         ref=".//step[@type = 'condition']/@condition"
+                        type="xxf:XPath2"
                         required="true()"
                         constraint="xxf:non-blank()"/>
+                    <xf:bind
+                        ref=".//step[@type = 'action']/@name"
+                        constraint="pui:isActionStepValid(.., instance('form-context-instance'))"/>
+                    <xf:bind ref=".//step[@type = 'action']/param">
+                        <xf:bind
+                            ref=".[pui:paramValueMode(.) = 'xpath']"
+                            type="xxf:XPath2"/>
+                        <xf:bind
+                            ref=".[pui:paramValueMode(.) = 'avt']"
+                            type="xxf:XPath2ValueTemplate"/>
+                        <xf:bind
+                            ref="."
+                            constraint="pui:isParamValueValid(., instance('form-context-instance'))"/>
+                        <xf:bind
+                            ref="@name[../@custom = 'true']"
+                            xxf:whitespace="trim"
+                            required="true()"
+                            constraint="pui:isCustomParamNameValid(..)"/>
+                    </xf:bind>
                 </xf:bind>
 
             </xf:model>
@@ -330,25 +355,107 @@
                                                                 <xf:switch caseref="$step-type" class="fb-process-row-switch" xxf:update="full">
                                                                     <!-- Action step -->
                                                                     <xf:case value="'action'">
-                                                                        <xf:select1 ref="@name" class="fb-process-action-select1">
-                                                                            <xf:itemset ref="instance('actions-instance')/action">
-                                                                                <xf:label ref="@label"/>
-                                                                                <xf:value ref="@name"/>
-                                                                            </xf:itemset>
-                                                                            <xf:action event="xforms-value-changed">
-                                                                                <xf:delete ref="$current/param"/>
-                                                                                <xf:insert context="$current" origin="pui:actionParamsXml(@name)/*"/>
-                                                                            </xf:action>
-                                                                        </xf:select1>
+                                                                        <xf:var name="enclosing-process-name" value="($current/ancestor::process/@name)[1]"/>
+                                                                        <xf:var name="action-def"             value="instance('actions-instance')/action[@name = $current/@name]"/>
+                                                                        <xf:var name="present-param-names"    value="$current/param/@name[xxf:non-blank()]"/>
+                                                                        <xf:var name="addable-params"         value="$action-def/param[@deprecated = 'false' and not(@name = $present-param-names)]"/>
+                                                                        <xf:var name="allows-custom-params"   value="$action-def/@allows-custom-params = 'true'"/>
+                                                                        <xf:var name="sibling-processes"      value="
+                                                                            $i/process/@name[
+                                                                                xxf:non-blank() and
+                                                                                . != $enclosing-process-name and
+                                                                                matches(., '^[A-Za-z_\-][A-Za-z0-9_\-:]*$') and
+                                                                                not(. = instance('actions-instance')/action[@deprecated = 'false']/@name)
+                                                                            ]"/>
 
-                                                                        <!-- Parameters -->
-<!--                                                                        <xf:repeat ref="param">-->
-<!--                                                                            <xh:span class="fb-process-param">-->
-<!--                                                                                <xf:input ref=".">-->
-<!--                                                                                    <xf:label value="if (@name != '') then @name else 'value'"/>-->
-<!--                                                                                </xf:input>-->
-<!--                                                                            </xh:span>-->
-<!--                                                                        </xf:repeat>-->
+                                                                        <xh:div class="fb-process-action-bar">
+                                                                            <xf:select1 ref="@name" class="fb-process-action-select1">
+                                                                                <xf:label value="$resources/dialog-process-editor/process-definition/label"/>
+                                                                                <xf:alert value="pui:actionStepAlertMessage($current, $resources, instance('form-context-instance'))"/>
+
+                                                                                <xf:choices>
+                                                                                    <xf:label ref="$resources/dialog-process-editor/categories/form-runner"/>
+                                                                                    <xf:itemset ref="instance('actions-instance')/action[@category = 'form-runner' and @deprecated = 'false']">
+                                                                                        <xf:label ref="@label"/>
+                                                                                        <xf:value ref="@name"/>
+                                                                                    </xf:itemset>
+                                                                                </xf:choices>
+
+                                                                                <xf:choices>
+                                                                                    <xf:label ref="$resources/dialog-process-editor/categories/form-processes[exists($sibling-processes)]"/>
+                                                                                    <xf:itemset ref="$sibling-processes">
+                                                                                        <xf:label value="."/>
+                                                                                        <xf:value value="."/>
+                                                                                    </xf:itemset>
+                                                                                </xf:choices>
+
+                                                                                <xf:choices>
+                                                                                    <xf:label ref="$resources/dialog-process-editor/categories/sub-process"/>
+                                                                                    <xf:itemset ref="instance('actions-instance')/action[@category = 'sub-process' and @deprecated = 'false']">
+                                                                                        <xf:label ref="@label"/>
+                                                                                        <xf:value ref="@name"/>
+                                                                                    </xf:itemset>
+                                                                                </xf:choices>
+
+                                                                                <xf:choices>
+                                                                                    <xf:label ref="$resources/dialog-process-editor/categories/flow-control"/>
+                                                                                    <xf:itemset ref="instance('actions-instance')/action[@category = 'flow-control' and @deprecated = 'false']">
+                                                                                        <xf:label ref="@label"/>
+                                                                                        <xf:value ref="@name"/>
+                                                                                    </xf:itemset>
+                                                                                </xf:choices>
+
+                                                                                <xf:choices>
+                                                                                    <xf:label ref="$resources/dialog-process-editor/categories/xforms"/>
+                                                                                    <xf:itemset ref="instance('actions-instance')/action[@category = 'xforms' and @deprecated = 'false']">
+                                                                                        <xf:label ref="@label"/>
+                                                                                        <xf:value ref="@name"/>
+                                                                                    </xf:itemset>
+                                                                                </xf:choices>
+
+                                                                                <xf:itemset ref="$action-def[@deprecated = 'true']">
+                                                                                    <xf:label ref="@label"/>
+                                                                                    <xf:value ref="@name"/>
+                                                                                </xf:itemset>
+
+                                                                                <xf:itemset ref="$current/@name[empty($action-def) and not(. = $sibling-processes)]">
+                                                                                    <xf:label value="concat('Sub-process: ', .)"/>
+                                                                                    <xf:value value="."/>
+                                                                                </xf:itemset>
+
+                                                                                <xf:action event="xforms-value-changed">
+                                                                                    <xf:delete ref="$current/param"/>
+                                                                                    <xf:insert context="$current" origin="pui:actionParamsXml(@name)/*"/>
+                                                                                </xf:action>
+                                                                            </xf:select1>
+
+                                                                            <!-- + Parameter menu -->
+                                                                            <xf:select1
+                                                                                ref="@_add-param[exists($addable-params) or $allows-custom-params]"
+                                                                                class="fb-process-add-param">
+                                                                                <xf:label value="$resources/dialog-process-editor/add-parameter"/>
+                                                                                <xf:item>
+                                                                                    <xf:label ref="$resources/dialog-process-editor/add-parameter"/>
+                                                                                    <xf:value/>
+                                                                                </xf:item>
+                                                                                <xf:itemset ref="$addable-params">
+                                                                                    <xf:label ref="@name"/>
+                                                                                    <xf:value ref="@name"/>
+                                                                                </xf:itemset>
+                                                                                <xf:itemset ref=".[$allows-custom-params]">
+                                                                                    <xf:label ref="$resources/dialog-process-editor/custom-parameter"/>
+                                                                                    <xf:value value="'__custom__'"/>
+                                                                                </xf:itemset>
+                                                                                <xf:action event="xforms-value-changed" if="xxf:non-blank(.)">
+                                                                                    <xf:var name="chosen" value="string(.)"/>
+                                                                                    <xf:setvalue ref="." value="''"/>
+                                                                                    <xf:insert
+                                                                                        context="$current"
+                                                                                        ref="param"
+                                                                                        origin="pui:singleParamTemplateXml($current/@name, $chosen)"/>
+                                                                                </xf:action>
+                                                                            </xf:select1>
+                                                                        </xh:div>
                                                                     </xf:case>
 
                                                                     <!-- Group container -->
@@ -361,7 +468,13 @@
                                                                         <xh:span class="fb-process-keyword-with-condition">
                                                                             <xh:span class="fb-process-keyword badge text-bg-success">if</xh:span>
                                                                             <xf:input ref="@condition" class="fb-process-condition-input">
-                                                                                <xf:alert value="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
+                                                                                <xf:label value="'if'"/>
+                                                                                <xf:hint value="'XPath condition'" appearance="minimal"/>
+                                                                                <xf:alert value="
+                                                                                    if (xxf:is-blank()) then
+                                                                                        $resources/dialog-process-editor/alerts/required
+                                                                                    else
+                                                                                        $resources/dialog-process-editor/alerts/invalid-xpath"/>
                                                                             </xf:input>
                                                                         </xh:span>
                                                                     </xf:case>
@@ -371,18 +484,284 @@
                                                                         <xh:span class="fb-process-keyword badge text-bg-warning">else</xh:span>
                                                                     </xf:case>
                                                                 </xf:switch>
-<!--                                                                <xh:div class="fb-process-row-spacers-2">-->
-<!--                                                                </xh:div>-->
-                                                                <xh:div class="fb-process-row-content-params {'xforms-disabled'[$step-type != 'action']}">
-    <!--                                                                <xf:repeat ref="1 to $indent-level" class="fb-indent-spacers"><xh:span class="fb-indent-spacer"/></xf:repeat>-->
-                                                                    <xf:switch caseref="$step-type" class="fb-process-row-switch-xxx">
+
+                                                                <!-- Parameters stacked below the action selector -->
+                                                                <xh:div class="fb-process-row-content-params {'xforms-hidden'[not($step-type = 'action' and exists($current/param))]}">
+                                                                    <xf:switch caseref="$step-type" class="fb-process-params-switch" xxf:update="full">
                                                                         <xf:case value="'action'">
                                                                             <xf:repeat ref="param">
-                                                                                <xh:span class="fb-process-param">
-                                                                                    <xf:input ref=".">
-                                                                                        <xf:label value="if (@name != '') then @name else 'value'" appearance="minimal"/>
-                                                                                    </xf:input>
-                                                                                </xh:span>
+                                                                                <xf:var name="param-elem"          value="."/>
+                                                                                <xf:var name="action-def"          value="instance('actions-instance')/action[@name = $current/@name]"/>
+                                                                                <xf:var name="param-def"           value="$action-def/param[@name = $param-elem/@name]"/>
+                                                                                <xf:var name="is-custom"           value="@custom = 'true'"/>
+                                                                                <xf:var name="is-required"         value="$param-def/@tier = 'required'"/>
+                                                                                <xf:var name="has-widget"          value="$param-def/@has-widget = 'true'"/>
+                                                                                <xf:var name="supports-avt-toggle" value="$has-widget and $param-def/@value-mode = 'avt'"/>
+                                                                                <xf:var name="is-avt-mode"         value="@avt-mode = 'true'"/>
+                                                                                <xf:var name="raw-kind"            value="($param-def/@kind, 'text')[1]"/>
+                                                                                <xf:var name="enclosing-proc-name" value="($current/ancestor::process/@name)[1]"/>
+                                                                                <xf:var name="effective-widget"    value="
+                                                                                    if ($is-avt-mode or $is-custom) then
+                                                                                        'text'
+                                                                                    else if ($raw-kind = 'control-name') then
+                                                                                        if (exists($current/param[@name = 'section-name']) or empty(instance('form-context-instance')/controls/item)) then 'text' else 'control-name'
+                                                                                    else if ($raw-kind = 'section-name') then
+                                                                                        if (empty(instance('form-context-instance')/sections/item)) then 'text' else 'section-name'
+                                                                                    else if ($raw-kind = 'email-template') then
+                                                                                        if (empty(instance('form-context-instance')/email-templates/item)) then 'text' else 'email-template'
+                                                                                    else if ($raw-kind = 'pdf-template') then
+                                                                                        if (empty(instance('form-context-instance')/pdf-templates/item)) then 'text' else 'pdf-template'
+                                                                                    else if ($raw-kind = ('boolean', 'enum', 'tokens', 'detail-mode', 'process-name')) then
+                                                                                        $raw-kind
+                                                                                    else
+                                                                                        'text'
+                                                                                "/>
+                                                                                <xf:var name="summary-label" value="
+                                                                                    concat(
+                                                                                        if (xxf:non-blank($enclosing-proc-name)) then concat($enclosing-proc-name, ': ') else '',
+                                                                                        $current/@name,
+                                                                                        ' — ',
+                                                                                        if (xxf:non-blank(@name)) then @name else 'parameter'
+                                                                                    )"/>
+                                                                                <xf:var name="alert-text"    value="pui:paramAlertMessage($param-elem, $resources, instance('form-context-instance'))"/>
+
+                                                                                <xh:div class="fb-process-param-row">
+                                                                                    <!-- Parameter name / custom name input -->
+                                                                                    <xh:div class="fb-process-param-name">
+                                                                                        <xh:span class="fb-process-param-label {'fb-process-param-required'[$is-required]} {'xforms-hidden'[$is-custom]}">
+                                                                                            <xf:output value="if (xxf:non-blank(@name)) then @name else 'value'"/>
+                                                                                        </xh:span>
+                                                                                        <xf:input ref="@name[$is-custom]" class="fb-process-custom-name-input">
+                                                                                            <xf:label value="concat(if (xxf:non-blank($enclosing-proc-name)) then concat($enclosing-proc-name, ': ') else '', $current/@name, ' — name')"/>
+                                                                                            <xf:hint value="'property'" appearance="minimal"/>
+                                                                                            <xf:alert value="$resources/dialog-process-editor/alerts/invalid-param-name"/>
+                                                                                        </xf:input>
+                                                                                    </xh:div>
+
+                                                                                    <!-- Parameter value control -->
+                                                                                    <xh:div class="fb-process-param-control">
+                                                                                        <xf:switch caseref="$effective-widget" xxf:update="full">
+
+                                                                                            <xf:case value="'boolean'">
+                                                                                                <xf:select1 ref=".[$effective-widget = 'boolean']" class="fb-process-param-select1">
+                                                                                                    <xf:label value="$summary-label"/>
+                                                                                                    <xf:alert value="$alert-text"/>
+                                                                                                    <xf:itemset ref=".[. = '']">
+                                                                                                        <xf:label value="'—'"/>
+                                                                                                        <xf:value/>
+                                                                                                    </xf:itemset>
+                                                                                                    <xf:item><xf:label>true</xf:label><xf:value>true</xf:value></xf:item>
+                                                                                                    <xf:item><xf:label>false</xf:label><xf:value>false</xf:value></xf:item>
+                                                                                                </xf:select1>
+                                                                                            </xf:case>
+
+                                                                                            <xf:case value="'enum'">
+                                                                                                <xf:var name="enum-items" value="$param-def/item"/>
+                                                                                                <xf:select1 ref=".[$effective-widget = 'enum']" class="fb-process-param-select1">
+                                                                                                    <xf:label value="$summary-label"/>
+                                                                                                    <xf:alert value="$alert-text"/>
+                                                                                                    <xf:itemset ref=".[. = '']">
+                                                                                                        <xf:label value="'—'"/>
+                                                                                                        <xf:value/>
+                                                                                                    </xf:itemset>
+                                                                                                    <xf:itemset ref="$enum-items">
+                                                                                                        <xf:label ref="@label"/>
+                                                                                                        <xf:value ref="@value"/>
+                                                                                                    </xf:itemset>
+                                                                                                    <xf:itemset ref=".[xxf:non-blank() and not(. = $enum-items/@value)]">
+                                                                                                        <xf:label value="."/>
+                                                                                                        <xf:value value="."/>
+                                                                                                    </xf:itemset>
+                                                                                                </xf:select1>
+                                                                                            </xf:case>
+
+                                                                                            <xf:case value="'tokens'">
+                                                                                                <xf:select ref=".[$effective-widget = 'tokens']" appearance="full" class="fb-process-param-tokens">
+                                                                                                    <xf:label value="$summary-label"/>
+                                                                                                    <xf:alert value="$alert-text"/>
+                                                                                                    <xf:itemset ref="$param-def/item">
+                                                                                                        <xf:label ref="@label"/>
+                                                                                                        <xf:value ref="@value"/>
+                                                                                                    </xf:itemset>
+                                                                                                </xf:select>
+                                                                                            </xf:case>
+
+                                                                                            <xf:case value="'detail-mode'">
+                                                                                                <xf:var name="mode-items" value="$param-def/item | instance('form-context-instance')/custom-modes/item[not(@value = $param-def/item/@value)]"/>
+                                                                                                <xf:select1 ref=".[$effective-widget = 'detail-mode']" class="fb-process-param-select1">
+                                                                                                    <xf:label value="$summary-label"/>
+                                                                                                    <xf:alert value="$alert-text"/>
+                                                                                                    <xf:itemset ref=".[. = '']">
+                                                                                                        <xf:label value="'—'"/>
+                                                                                                        <xf:value/>
+                                                                                                    </xf:itemset>
+                                                                                                    <xf:itemset ref="$mode-items">
+                                                                                                        <xf:label ref="@label"/>
+                                                                                                        <xf:value ref="@value"/>
+                                                                                                    </xf:itemset>
+                                                                                                    <xf:itemset ref=".[xxf:non-blank() and not(. = $mode-items/@value)]">
+                                                                                                        <xf:label value="."/>
+                                                                                                        <xf:value value="."/>
+                                                                                                    </xf:itemset>
+                                                                                                </xf:select1>
+                                                                                            </xf:case>
+
+                                                                                            <xf:case value="'control-name'">
+                                                                                                <xf:var name="ctrl-items" value="instance('form-context-instance')/controls/item"/>
+                                                                                                <xf:select1 ref=".[$effective-widget = 'control-name']" class="fb-process-param-select1">
+                                                                                                    <xf:label value="$summary-label"/>
+                                                                                                    <xf:alert value="$alert-text"/>
+                                                                                                    <xf:itemset ref=".[. = '']">
+                                                                                                        <xf:label value="'—'"/>
+                                                                                                        <xf:value/>
+                                                                                                    </xf:itemset>
+                                                                                                    <xf:itemset ref="$ctrl-items">
+                                                                                                        <xf:label ref="@label"/>
+                                                                                                        <xf:value ref="@value"/>
+                                                                                                    </xf:itemset>
+                                                                                                    <xf:itemset ref=".[xxf:non-blank() and not(. = $ctrl-items/@value)]">
+                                                                                                        <xf:label value="."/>
+                                                                                                        <xf:value value="."/>
+                                                                                                    </xf:itemset>
+                                                                                                </xf:select1>
+                                                                                            </xf:case>
+
+                                                                                            <xf:case value="'section-name'">
+                                                                                                <xf:var name="sec-items" value="instance('form-context-instance')/sections/item"/>
+                                                                                                <xf:select1 ref=".[$effective-widget = 'section-name']" class="fb-process-param-select1">
+                                                                                                    <xf:label value="$summary-label"/>
+                                                                                                    <xf:alert value="$alert-text"/>
+                                                                                                    <xf:itemset ref=".[. = '']">
+                                                                                                        <xf:label value="'—'"/>
+                                                                                                        <xf:value/>
+                                                                                                    </xf:itemset>
+                                                                                                    <xf:itemset ref="$sec-items">
+                                                                                                        <xf:label ref="@label"/>
+                                                                                                        <xf:value ref="@value"/>
+                                                                                                    </xf:itemset>
+                                                                                                    <xf:itemset ref=".[xxf:non-blank() and not(. = $sec-items/@value)]">
+                                                                                                        <xf:label value="."/>
+                                                                                                        <xf:value value="."/>
+                                                                                                    </xf:itemset>
+                                                                                                </xf:select1>
+                                                                                            </xf:case>
+
+                                                                                            <xf:case value="'email-template'">
+                                                                                                <xf:var name="email-items" value="instance('form-context-instance')/email-templates/item"/>
+                                                                                                <xf:select1 ref=".[$effective-widget = 'email-template']" class="fb-process-param-select1">
+                                                                                                    <xf:label value="$summary-label"/>
+                                                                                                    <xf:alert value="$alert-text"/>
+                                                                                                    <xf:itemset ref=".[. = '']">
+                                                                                                        <xf:label value="'—'"/>
+                                                                                                        <xf:value/>
+                                                                                                    </xf:itemset>
+                                                                                                    <xf:itemset ref="$email-items">
+                                                                                                        <xf:label ref="@label"/>
+                                                                                                        <xf:value ref="@value"/>
+                                                                                                    </xf:itemset>
+                                                                                                    <xf:itemset ref=".[xxf:non-blank() and not(. = $email-items/@value)]">
+                                                                                                        <xf:label value="."/>
+                                                                                                        <xf:value value="."/>
+                                                                                                    </xf:itemset>
+                                                                                                </xf:select1>
+                                                                                            </xf:case>
+
+                                                                                            <xf:case value="'pdf-template'">
+                                                                                                <xf:var name="pdf-items" value="instance('form-context-instance')/pdf-templates/item"/>
+                                                                                                <xf:select1 ref=".[$effective-widget = 'pdf-template']" class="fb-process-param-select1">
+                                                                                                    <xf:label value="$summary-label"/>
+                                                                                                    <xf:alert value="$alert-text"/>
+                                                                                                    <xf:itemset ref=".[. = '']">
+                                                                                                        <xf:label value="'—'"/>
+                                                                                                        <xf:value/>
+                                                                                                    </xf:itemset>
+                                                                                                    <xf:itemset ref="$pdf-items">
+                                                                                                        <xf:label ref="@label"/>
+                                                                                                        <xf:value ref="@value"/>
+                                                                                                    </xf:itemset>
+                                                                                                    <xf:itemset ref=".[xxf:non-blank() and not(. = $pdf-items/@value)]">
+                                                                                                        <xf:label value="."/>
+                                                                                                        <xf:value value="."/>
+                                                                                                    </xf:itemset>
+                                                                                                </xf:select1>
+                                                                                            </xf:case>
+
+                                                                                            <xf:case value="'process-name'">
+                                                                                                <xf:var name="form-procs"    value="$i/process/@name[xxf:non-blank() and . != $enclosing-proc-name]"/>
+                                                                                                <xf:var name="builtin-procs" value="instance('actions-instance')/action[@category = 'sub-process' and @name != 'process' and @deprecated = 'false' and not(@name = $form-procs)]"/>
+                                                                                                <xf:select1 ref=".[$effective-widget = 'process-name']" class="fb-process-param-select1">
+                                                                                                    <xf:label value="$summary-label"/>
+                                                                                                    <xf:alert value="$alert-text"/>
+                                                                                                    <xf:itemset ref=".[. = '']">
+                                                                                                        <xf:label value="'—'"/>
+                                                                                                        <xf:value/>
+                                                                                                    </xf:itemset>
+                                                                                                    <xf:choices>
+                                                                                                        <xf:label ref="$resources/dialog-process-editor/categories/form-processes[exists($form-procs)]"/>
+                                                                                                        <xf:itemset ref="$form-procs">
+                                                                                                            <xf:label value="."/>
+                                                                                                            <xf:value value="."/>
+                                                                                                        </xf:itemset>
+                                                                                                    </xf:choices>
+                                                                                                    <xf:choices>
+                                                                                                        <xf:label ref="$resources/dialog-process-editor/categories/sub-process"/>
+                                                                                                        <xf:itemset ref="$builtin-procs">
+                                                                                                            <xf:label ref="@name"/>
+                                                                                                            <xf:value ref="@name"/>
+                                                                                                        </xf:itemset>
+                                                                                                    </xf:choices>
+                                                                                                    <xf:itemset ref=".[xxf:non-blank() and not(. = $form-procs) and not(. = $builtin-procs/@name)]">
+                                                                                                        <xf:label value="."/>
+                                                                                                        <xf:value value="."/>
+                                                                                                    </xf:itemset>
+                                                                                                </xf:select1>
+                                                                                            </xf:case>
+
+                                                                                            <xf:case value="'text'">
+                                                                                                <xf:input ref=".[$effective-widget = 'text']" class="fb-process-param-input {'fb-process-code-input'[$param-def/@value-mode = 'xpath' or $is-avt-mode]}">
+                                                                                                    <xf:label value="$summary-label"/>
+                                                                                                    <xf:hint value="($param-def/@placeholder, '')[1]" appearance="minimal"/>
+                                                                                                    <xf:alert value="$alert-text"/>
+                                                                                                </xf:input>
+                                                                                            </xf:case>
+
+                                                                                        </xf:switch>
+                                                                                    </xh:div>
+
+                                                                                    <!-- AVT toggle & remove buttons -->
+                                                                                    <xh:div class="fb-process-param-actions">
+                                                                                        <xf:trigger
+                                                                                            ref=".[$supports-avt-toggle]"
+                                                                                            appearance="minimal"
+                                                                                            class="fb-process-btn fb-process-avt-toggle {'fb-process-avt-active'[$is-avt-mode]}">
+                                                                                            <xf:label>
+                                                                                                <xh:span class="fb-process-avt-badge" title="{$resources/dialog-process-editor/avt-toggle}">{…}</xh:span>
+                                                                                            </xf:label>
+                                                                                            <xf:action event="DOMActivate">
+                                                                                                <xf:delete ref="$param-elem/@unnamed"/>
+                                                                                                <xf:action if="$is-avt-mode">
+                                                                                                    <xf:setvalue
+                                                                                                        ref="$param-elem"
+                                                                                                        value="pui:defaultValueWhenLeavingAvtMode($current/@name, $param-elem/@name, $param-elem)"/>
+                                                                                                    <xf:setvalue ref="$param-elem/@avt-mode" value="'false'"/>
+                                                                                                </xf:action>
+                                                                                                <xf:action if="not($is-avt-mode)">
+                                                                                                    <xf:setvalue ref="$param-elem/@avt-mode" value="'true'"/>
+                                                                                                </xf:action>
+                                                                                            </xf:action>
+                                                                                        </xf:trigger>
+
+                                                                                        <xf:trigger
+                                                                                            ref=".[not($is-required)]"
+                                                                                            appearance="minimal"
+                                                                                            class="fb-process-btn fb-process-param-remove">
+                                                                                            <xf:label><xh:i class="fa fa-fw fa-minus-circle" title="{$resources/dialog-process-editor/remove-parameter}"/></xf:label>
+                                                                                            <xf:action event="DOMActivate">
+                                                                                                <xf:delete ref="$param-elem"/>
+                                                                                            </xf:action>
+                                                                                        </xf:trigger>
+                                                                                    </xh:div>
+                                                                                </xh:div>
                                                                             </xf:repeat>
                                                                         </xf:case>
                                                                     </xf:switch>
@@ -512,7 +891,7 @@
                                             </xh:div>
 
                                             <!-- Live XML syntax preview (for debugging) -->
-                                            <xh:div class="fb-process-preview">
+                                            <xh:div class="fb-process-preview fb-process-xml-preview xforms-hidden">
                                                 <xh:div class="fb-process-preview-header">
                                                     XML Syntax Preview
                                                 </xh:div>

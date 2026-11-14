@@ -1899,6 +1899,35 @@
         <no-steps>Aucune étape définie pour ce processus.</no-steps>
         <add-step>Ajouter une étape</add-step>
         <process-preview>Aperçu de la syntaxe du processus</process-preview>
+        <add-parameter>+ Paramètre</add-parameter>
+        <custom-parameter>Paramètre personnalisé…</custom-parameter>
+        <remove-parameter>Supprimer le paramètre</remove-parameter>
+        <avt-toggle>Basculer le modèle de valeur dynamique ({…})</avt-toggle>
+        <categories>
+            <form-runner>Actions Form Runner</form-runner>
+            <sub-process>Sous-processus</sub-process>
+            <flow-control>Contrôle de flux</flow-control>
+            <xforms>Actions XForms</xforms>
+            <form-processes>Processus de ce formulaire</form-processes>
+        </categories>
+        <alerts>
+            <required>Une valeur est requise</required>
+            <invalid-xpath>Expression XPath incorrecte</invalid-xpath>
+            <invalid-avt>Modèle de valeur d'attribut incorrect</invalid-avt>
+            <invalid-boolean>Doit être « true », « false » ou une expression AVT</invalid-boolean>
+            <invalid-choice>Valeur de paramètre invalide</invalid-choice>
+            <invalid-token>Contient une valeur non prise en charge</invalid-token>
+            <invalid-duration>Doit être une durée valide avec unité (ex : 1000ms ou 5s)</invalid-duration>
+            <invalid-at>Doit être « start », « end », « all » ou un entier positif</invalid-at>
+            <invalid-mode>Mode cible non pris en charge</invalid-mode>
+            <invalid-ncname>Doit être un identifiant XML valide</invalid-ncname>
+            <unknown-control>Nom de contrôle inconnu</unknown-control>
+            <unknown-section>Nom de section inconnu</unknown-section>
+            <unknown-process>Nom de sous-processus inconnu</unknown-process>
+            <self-process>Un processus ne peut pas s'appeler lui-même</self-process>
+            <unknown-param>Paramètre non pris en charge pour cette action</unknown-param>
+            <invalid-param-name>Un nom de paramètre valide et unique est requis</invalid-param-name>
+        </alerts>
     </dialog-process-editor>
     <modes>
         <editable>Modes éditables</editable>

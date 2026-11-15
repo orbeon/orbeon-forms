@@ -93,7 +93,7 @@ val PostgresqlVersion                = "42.7.14"
 val OracleJdbcVersion                = "23.26.4.0.0"
 val JsoupVersion                     = "1.23.2"
 val LibPhoneNumberVersion            = "9.0.42"
-val PlaywrightVersion                = "1.64.0"
+val PlaywrightVersion                = "1.65.0"
 
 // Only on PE for now
 val ApachePOIVersion                 = "5.5.1"

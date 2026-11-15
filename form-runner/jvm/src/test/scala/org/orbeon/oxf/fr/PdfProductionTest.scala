@@ -102,6 +102,8 @@ class PdfProductionTest
     }
 
     it("stateless PDF export service must contain WebP image attachment without a session") {
+      assume(Version.isPE)
+
       val (_, content, response) =
         runFormRunnerReturnContent(
           app        = "tests",

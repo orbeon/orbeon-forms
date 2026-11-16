@@ -52,9 +52,10 @@
     .fr-landing-quick-links-card {
         & > div {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-gap : 1em; // Same spacing between and around icons
-            padding  : 1em;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-auto-rows: 1fr;
+            gap    : 1em; // Same spacing between and around icons
+            padding: 1em;
         }
         a {
             &:hover {
@@ -340,6 +341,7 @@
         --bs-card-inner-border-radius: calc(var(--orbeon-landing-card-border-radius) - var(--bs-card-border-width));
 
         figure {
+            block-size: 100%;
             margin-bottom: 0;
             border: 1px solid var(--orbeon-landing-card-border-color);
             border-radius: var(--orbeon-landing-tile-border-radius);
@@ -348,6 +350,8 @@
             color: var(--orbeon-base-color);
             font-weight: 500;
             margin: 0 0 .5em;
+            padding-inline: .25em;
+            overflow-wrap: break-word;
         }
     }
 

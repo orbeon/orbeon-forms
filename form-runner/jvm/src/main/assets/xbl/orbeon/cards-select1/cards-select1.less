@@ -218,8 +218,11 @@
                 }
             }
         }
+    }
 
-        @media print {
+    @media print {
+        .xbl-fr-cards-select1,
+        .xbl-fr-cards-select {
             .xforms-select1-appearance-full,
             .xforms-select-appearance-full {
                 .xforms-items {
@@ -241,7 +244,11 @@
                     border             : 1px solid var(--orbeon-control-border-color);
                     border-radius      : var(--orbeon-control-border-radius);
                     background-color   : var(--orbeon-control-background-color);
-                    background-position: 8px 9px !important;
+                }
+
+                &.xforms-static .xforms-selected,
+                &.xforms-static .xforms-deselected {
+                    background-position: 10px 9px !important;
                 }
 
                 .xforms-selected {
@@ -272,6 +279,18 @@
 
                     > span.xforms-hint:empty {
                         display: none;
+                    }
+                }
+            }
+        }
+
+        .fr-pdf-color-mode-black-and-white {
+            .xbl-fr-cards-select1,
+            .xbl-fr-cards-select {
+                .xforms-select1-appearance-full,
+                .xforms-select-appearance-full {
+                    .xforms-selected {
+                        border-color: black;
                     }
                 }
             }

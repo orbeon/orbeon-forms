@@ -139,49 +139,55 @@
                 border-color: var(--orbeon-invalid-control-border-color);
             }
         }
+    }
 
-        @media print {
-            .xforms-select1-appearance-full {
-                .xforms-items {
-                    display         : inline-block;
-                    float           : none;
-                    clear           : none;
-                    padding         : 2px;
-                    border          : 1px solid var(--orbeon-control-border-color);
-                    border-radius   : var(--orbeon-control-border-radius);
-                    background-color: var(--orbeon-add-on-background-color);
-                }
+    @media print {
+        .xbl-fr-segmented-select1 .xforms-select1-appearance-full.xforms-static {
+            .xforms-items {
+                display         : inline-block;
+                float           : none;
+                clear           : none;
+                border          : 1px solid var(--orbeon-control-border-color);
+                border-radius   : var(--orbeon-control-border-radius);
+                background-color: var(--orbeon-add-on-background-color);
+            }
 
-                .xforms-selected,
-                .xforms-deselected {
-                    display         : inline-block;
-                    float           : none;
-                    clear           : none;
-                    margin-right    : 2px;
-                    background-image: none !important;
-                }
+            .xforms-selected,
+            .xforms-deselected {
+                display         : inline-block;
+                float           : none;
+                clear           : none;
+                min-height      : 0;
+                margin          : 0;
+                padding         : 0;
+                background-image: none !important;
 
-                label.radio,
-                span.radio {
-                    display: inline-block;
-                    padding: 2px 8px;
-                    margin : 0;
+                > .radio {
+                    display      : inline-block;
+                    margin       : 0;
+                    padding      : 2px 8px;
+                    border       : 1px solid transparent;
+                    border-radius: var(--orbeon-control-border-radius);
 
                     > span {
                         display    : inline;
                         margin-left: 0;
                     }
                 }
-
-                .xforms-selected > label.radio,
-                .xforms-selected > span.radio {
-                    background-color          : var(--orbeon-button-primary-background-color) !important;
-                    border-color              : var(--orbeon-button-primary-background-color) !important;
-                    color                     : var(--orbeon-button-primary-color) !important;
-                    -webkit-print-color-adjust: exact;
-                    print-color-adjust        : exact;
-                }
             }
+
+            .xforms-selected > .radio {
+                background-color          : var(--orbeon-button-primary-background-color);
+                border-color              : var(--orbeon-button-primary-background-color);
+                color                     : var(--orbeon-button-primary-color);
+                -webkit-print-color-adjust: exact;
+                print-color-adjust        : exact;
+            }
+        }
+
+        .fr-pdf-color-mode-black-and-white .xbl-fr-segmented-select1 .xforms-select1-appearance-full.xforms-static .xforms-selected > .radio {
+            border-color: black;
+            font-weight : bold;
         }
     }
 }

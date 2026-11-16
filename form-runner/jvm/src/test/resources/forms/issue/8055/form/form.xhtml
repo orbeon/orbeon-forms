@@ -1,0 +1,80 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+  <xh:head>
+    <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+      <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+        <form>
+          <section>
+            <grid>
+              <control/>
+              <explanation/>
+            </grid>
+          </section>
+        </form>
+      </xf:instance>
+      <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+        <xf:bind id="section-bind" name="section" ref="section">
+          <xf:bind id="grid-bind" ref="grid" name="grid">
+            <xf:bind id="control-bind" ref="control" name="control"/>
+            <xf:bind id="explanation-bind" ref="explanation" name="explanation"/>
+          </xf:bind>
+        </xf:bind>
+      </xf:bind>
+      <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+        <metadata>
+          <application-name>issue</application-name>
+          <form-name>8055</form-name>
+          <title xml:lang="en">PDF/A-2a/2u/3a/3u: U+FEFF character in text is not conformant #8055</title>
+          <description xml:lang="en"/>
+          <grid-tab-order>default</grid-tab-order>
+          <created-with-version>2026.1-SNAPSHOT PE</created-with-version>
+          <updated-with-version>2026.1-SNAPSHOT PE</updated-with-version>
+        </metadata>
+      </xf:instance>
+      <!-- The U+FEFF characters are written as character references, so that tools (editors, etc.) don't remove them -->
+      <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+        <resources>
+          <resource xml:lang="en">
+            <section>
+              <label>Section</label>
+            </section>
+            <grid/>
+            <control>
+              <label>Label&#xFEFF;8055</label>
+              <hint/>
+            </control>
+            <explanation>
+              <text>Explanation&#xFEFF;8055</text>
+            </explanation>
+          </resource>
+        </resources>
+      </xf:instance>
+    </xf:model>
+  </xh:head>
+  <xh:body>
+    <fr:view>
+      <fr:body>
+        <fr:section id="section-section" bind="section-bind">
+          <xf:label ref="$form-resources/section/label"/>
+          <fr:grid id="grid-grid" bind="grid-bind">
+            <fr:c y="1" x="1" w="6">
+              <xf:input id="control-control" bind="control-bind">
+                <xf:label ref="$form-resources/control/label"/>
+                <xf:hint ref="$form-resources/control/hint"/>
+                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+              </xf:input>
+            </fr:c>
+            <fr:c y="1" x="7" w="6">
+              <fr:explanation id="explanation-control" bind="explanation-bind">
+                <fr:text ref="$form-resources/explanation/text"/>
+              </fr:explanation>
+            </fr:c>
+          </fr:grid>
+        </fr:section>
+      </fr:body>
+    </fr:view>
+  </xh:body>
+</xh:html>

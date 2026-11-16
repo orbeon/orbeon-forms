@@ -54,6 +54,8 @@ private object XHTMLToPDFProcessor {
   val PdfFontFamilyPropertyPrefix = PdfFontPropertyPrefix + "family."
   val PdfJpegCompressionProperty  = "oxf.fr.pdf.jpeg.compression"
 
+  val ZeroWidthNoBreakSpace = '\uFEFF'
+
   var DefaultContentType  = ContentTypes.PdfContentType
   val DefaultDotsPerPixel = 14 // default is 20, and makes things larger
 
@@ -174,13 +176,18 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
             // in the PDF output, but we check for this anyway.
             // https://github.com/orbeon/orbeon-forms/issues/7214
 
+            // #8055: also remove U+FEFF characters (zero width no-break space, BOM), which are invisible and not allowed
+            // in the text of a PDF/A-2a, 2u, 3a or 3u
+
             override def characters(chars: Array[Char], start: Int, length: Int): Unit = {
-              val cs = java.nio.CharBuffer.wrap(chars, start, length)
-              if (Normalizer.isNormalized(cs, Normalizer.Form.NFC)) {
+              val cs        = java.nio.CharBuffer.wrap(chars, start, length)
+              val removeBom = cs.chars.anyMatch(_ == ZeroWidthNoBreakSpace)
+              if (Normalizer.isNormalized(cs, Normalizer.Form.NFC) && ! removeBom) {
                 super.characters(chars, start, length)
               } else {
                 val normalized = Normalizer.normalize(cs, Normalizer.Form.NFC)
-                super.characters(normalized.toCharArray, 0, normalized.length)
+                val filtered   = if (removeBom) normalized.filter(_ != ZeroWidthNoBreakSpace) else normalized
+                super.characters(filtered.toCharArray, 0, filtered.length)
               }
             }
 

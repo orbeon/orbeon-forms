@@ -34,6 +34,10 @@ class PdfProductionTest
   // Data for the `tests/pdf-required-star` form: a required text field, single checkbox and toggle switch
   private val PdfRequiredStarDocumentId = "a1b2c3d4e5f60718293a4b5c6d7e8f90"
 
+  // Data for the `issue/8055` form: a text field, whose label and value contain a U+FEFF character, and an explanation
+  // which contains one too
+  private val Issue8055DocumentId = "8055a1b2c3d4e5f60718293a4b5c6d7e"
+
   private val ShowRequiredProperty =
     PropertyParams(Map.empty, "oxf.fr.detail.static-readonly-required.*.*", XMLConstants.XS_BOOLEAN_QNAME, "true")
 
@@ -428,6 +432,48 @@ class PdfProductionTest
 
           val (compliant, report) = PdfAValidator.validate(pdf, flavour)
           assert(compliant, s"veraPDF report:\n$report")
+        }
+      }
+    }
+
+    // U+FEFF characters (zero width no-break space, BOM) are not allowed in the text of a PDF/A-2a, 2u, 3a or 3u: we
+    // always remove them
+    describe("#8055: U+FEFF characters in text") {
+
+      def extractedText(flavour: Option[String]): (Array[Byte], String) = {
+        val pdf =
+          runFormRunnerReturnContent(
+            "issue",
+            "8055",
+            "pdf",
+            documentId = Issue8055DocumentId.some,
+            attributes = flavour.map(f => propertiesOverride(pdfAProperty(f))).getOrElse(Map.empty)
+          )._2.body
+        (pdf, useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(pdf)))((new PDFTextStripper).getText))
+      }
+
+      it("must be removed from a PDF which is not a PDF/A") {
+        val (_, text) = extractedText(None)
+        assert(! text.contains('\uFEFF'))
+        List("Label8055", "Value8055", "Explanation8055").foreach { expected =>
+          assert(text.contains(expected))
+        }
+      }
+
+      for (flavour <- List("1a", "1b", "2a", "2b", "2u", "3a", "3b", "3u")) {
+        it(s"must be removed from a PDF/A-$flavour, which must be valid") {
+
+          assume(PdfAValidator.isAvailable, "the PDF/A validator classpath is only set when running tests with sbt")
+
+          val (pdf, text) = extractedText(flavour.some)
+
+          val (compliant, report) = PdfAValidator.validate(pdf, flavour)
+          assert(compliant, s"veraPDF report:\n$report")
+
+          assert(! text.contains('\uFEFF'))
+          List("Label8055", "Value8055", "Explanation8055").foreach { expected =>
+            assert(text.contains(expected))
+          }
         }
       }
     }

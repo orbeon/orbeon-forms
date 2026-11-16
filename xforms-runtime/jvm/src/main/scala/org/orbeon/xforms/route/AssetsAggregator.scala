@@ -161,7 +161,8 @@ class AssetsAggregator extends ProcessorImpl {
                   element("link", xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "href" -> resource :: LinkBaseAtts)
 
                 aggregate(baselineCSS, outputCSSElement, namespaceOpt,  isCSS = true)
-                aggregate(supplementalCSS.view.filterNot(baselineCSS).to(Set), outputCSSElement, namespaceOpt, isCSS = true)
+                // #8101: `LinkedHashSet` and not `Set`, to keep the order of the CSS files (custom CSS after the theme CSS)
+                aggregate(supplementalCSS.view.filterNot(baselineCSS).to(mutable.LinkedHashSet), outputCSSElement, namespaceOpt, isCSS = true)
                 preservedCSS foreach outputPreservedElement
               }
 

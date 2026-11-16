@@ -244,13 +244,39 @@
                 }
             }
         }
+    }
 
-        @media print {
+    @media print {
+        .xbl-fr-rating {
             display: inline;
 
             .fr-rating-readonly-container {
                 display: inline;
+
+                // Show the value as plain text after the stars, not as a field
+                .xforms-input {
+                    display: inline;
+
+                    .xforms-field {
+                        display       : inline;
+                        vertical-align: middle;
+                        min-height    : 0 !important; // the grid sets a min-height with !important
+                        padding       : 0;
+                        border        : none;
+                        background    : none;
+                        box-shadow    : none;
+                    }
+                }
+
+                &.fr-rating-readonly-hide-value .xforms-input {
+                    display: none;
+                }
             }
+        }
+
+        // Without the stars, always show the value
+        .fr-pdf-no-private-use-glyphs .xbl-fr-rating .fr-rating-readonly-container.fr-rating-readonly-hide-value .xforms-input {
+            display: inline;
         }
     }
 

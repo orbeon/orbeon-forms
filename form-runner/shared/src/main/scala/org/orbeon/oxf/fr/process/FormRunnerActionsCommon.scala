@@ -435,7 +435,7 @@ trait FormRunnerActionsCommon {
         } yield
           name -> effectiveValue
 
-      recombineQuery(path, newParams ::: params filterNot (p => StateParamNames(p._1)))
+      recombineQuery(path, newParams ::: params.filterNot(p => StateParamNames(p._1)))
     } else
       pathQueryOrUrl
 

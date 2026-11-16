@@ -33,14 +33,37 @@ object ImageAttachment {
 
   private case class LightboxItem(src: String, filename: String)
 
+  private case class CardDetails(
+    card       : html.Element,
+    src        : String,
+    filename   : String,
+    size       : String,
+    canDownload: Boolean,
+    canRemove  : Boolean
+  )
+
   private class ImageAttachmentCompanion(containerElem: html.Element) extends XBLCompanion {
 
     private object EventSupport extends EventListenerSupport
 
-    private val blobUrls                         = mutable.Set.empty[String]
+    private val blobUrls                           = mutable.Set.empty[String]
     private var observerOpt: Option[dom.MutationObserver] = None
     private var currentItems: Vector[LightboxItem] = Vector.empty
     private var currentIndex: Int                  = 0
+    private var carouselIndex: Int                 = 0
+    private var lastCardCount: Int                 = 0
+    private var isSyncing: Boolean                 = false
+
+    private def rootElemOpt: Option[html.Element] =
+      containerElem
+        .querySelectorOpt("[data-view-mode]")
+        .orElse(containerElem.childrenT.headOption)
+
+    private def isCarouselMode: Boolean =
+      rootElemOpt.exists(_.hasClass("fr-image-attachment-view-carousel"))
+
+    private def carouselStageOpt: Option[html.Element] =
+      containerElem.querySelectorOpt(".fr-image-attachment-carousel-stage")
 
     private def dialogOpt: Option[html.Element] =
       containerElem.querySelectorOpt("dialog.fr-image-attachment-lightbox")
@@ -69,6 +92,7 @@ object ImageAttachment {
                       img.src = url.toString
                       if (url.getScheme == "blob")
                         blobUrls += url.toString
+                      syncLayoutAndCarousel()
                     }
                   }
               }
@@ -76,31 +100,166 @@ object ImageAttachment {
           }
       }
 
-    private def collectItemsAndIndex(clickedCard: html.Element): (Vector[LightboxItem], Int) = {
+    private def collectCards(): Vector[CardDetails] = {
       val cards =
         containerElem
           .querySelectorAllT(".xforms-dnd-item:not(.xforms-disabled):not(.gu-mirror)")
           .toVector
 
-      val itemsWithCard =
-        cards.flatMap { card =>
-          card
-            .querySelectorOpt(".fr-attachment-thumbnail .xforms-mediatype-image:not(.xforms-disabled) img")
-            .map(_.asInstanceOf[html.Image])
-            .filter(img => img.src.nonEmpty && ! img.src.contains(DummyImageUri))
-            .map { img =>
-              val filename =
-                card
-                  .querySelectorAllT(".fr-attachment-filename:not(.xforms-disabled)")
-                  .headOption
-                  .map(_.textContent.trim)
-                  .getOrElse("")
-              card -> LightboxItem(img.src, filename)
-            }
-        }
+      cards.flatMap { card =>
+        card
+          .querySelectorOpt(".fr-attachment-thumbnail .xforms-mediatype-image:not(.xforms-disabled) img")
+          .map(_.asInstanceOf[html.Image])
+          .filter(img => img.src.nonEmpty && ! img.src.contains(DummyImageUri))
+          .map { img =>
+            val filenameElems = card.querySelectorAllT(".fr-attachment-filename:not(.xforms-disabled)")
+            val filename =
+              filenameElems
+                .headOption
+                .map(_.textContent.trim)
+                .getOrElse("")
+            val canDownload =
+              filenameElems.exists(el => el.matches("a, button") || el.querySelectorOpt("a, button").isDefined)
+            val size =
+              card
+                .querySelectorOpt(".fr-attachment-size:not(.xforms-disabled)")
+                .map(_.textContent.trim)
+                .getOrElse("")
+            val canRemove =
+              card
+                .querySelectorOpt(".fr-attachment-remove:not(.xforms-disabled)")
+                .isDefined
+            CardDetails(
+              card        = card,
+              src         = img.src,
+              filename    = filename,
+              size        = size,
+              canDownload = canDownload,
+              canRemove   = canRemove
+            )
+          }
+      }
+    }
 
-      val idx = itemsWithCard.indexWhere(_._1 eq clickedCard).max(0)
-      (itemsWithCard.map(_._2), idx)
+    private def setClass(el: html.Element, className: String, present: Boolean): Unit =
+      if (el.classList.contains(className) != present) {
+        if (present)
+          el.classList.add(className)
+        else
+          el.classList.remove(className)
+      }
+
+    private def syncLayoutAndCarousel(): Unit =
+      if (! isSyncing) {
+        isSyncing = true
+        try {
+          rootElemOpt.foreach { rootElem =>
+            val colsOpt =
+              rootElem.attValueOpt("data-columns").flatMap(_.toIntOption).filter(_ >= 1)
+            colsOpt match {
+              case Some(cols) =>
+                rootElem.style.setProperty("--fr-image-attachment-columns", cols.toString)
+              case None =>
+                rootElem.style.removeProperty("--fr-image-attachment-columns")
+            }
+
+            val maxRowsOpt =
+              rootElem.attValueOpt("data-max-rows").flatMap(_.toIntOption).filter(_ >= 1)
+            rootElem.querySelectorOpt(".xbl-fr-dnd-repeat").foreach { dndRepeat =>
+              (maxRowsOpt, isCarouselMode) match {
+                case (Some(maxRows), false) =>
+                  rootElem.style.setProperty("--fr-image-attachment-max-rows", maxRows.toString)
+                  val activeCards =
+                    dndRepeat.querySelectorAllT(".xforms-dnd-item:not(.xforms-disabled):not(.gu-mirror)")
+                  activeCards.headOption.foreach { firstCard =>
+                    val cardHeight = firstCard.getBoundingClientRect().height
+                    if (cardHeight > 0) {
+                      val gap       = 12.0
+                      val maxHeight = maxRows * cardHeight + (maxRows - 1) * gap + 4.0
+                      dndRepeat.style.maxHeight = s"${maxHeight}px"
+                    }
+                  }
+                case _ =>
+                  rootElem.style.removeProperty("--fr-image-attachment-max-rows")
+                  dndRepeat.style.removeProperty("max-height")
+              }
+            }
+          }
+
+          if (isCarouselMode) {
+            val cards = collectCards()
+            // If new images were just added, advance to the first newly added image or keep current valid index
+            if (lastCardCount == 0 && cards.nonEmpty)
+              carouselIndex = 0
+            else if (cards.nonEmpty)
+              carouselIndex = carouselIndex.max(0).min(cards.length - 1)
+            lastCardCount = cards.length
+
+            carouselStageOpt.foreach { stage =>
+              if (cards.isEmpty) {
+                setClass(stage, "xforms-hidden", present = true)
+              } else {
+                setClass(stage, "xforms-hidden", present = false)
+                val active = cards(carouselIndex)
+
+                cards.zipWithIndex.foreach { case (c, idx) =>
+                  setClass(c.card, "fr-image-attachment-carousel-active", present = idx == carouselIndex)
+                }
+
+                stage.querySelectorOpt(".fr-image-attachment-carousel-img").foreach { el =>
+                  val img = el.asInstanceOf[html.Image]
+                  if (img.src != active.src)
+                    img.src = active.src
+                  if (img.alt != active.filename)
+                    img.alt = active.filename
+                }
+
+                stage.querySelectorOpt(".fr-image-attachment-carousel-filename").foreach { el =>
+                  if (el.textContent != active.filename)
+                    el.textContent = active.filename
+                  setClass(el, "fr-image-attachment-carousel-filename-disabled", present = ! active.canDownload)
+                }
+
+                stage.querySelectorOpt(".fr-image-attachment-carousel-size").foreach { el =>
+                  if (el.textContent != active.size)
+                    el.textContent = active.size
+                }
+
+                val counterText = s"${carouselIndex + 1} / ${cards.length}"
+                stage.querySelectorOpt(".fr-image-attachment-carousel-counter").foreach { el =>
+                  if (el.textContent != counterText)
+                    el.textContent = counterText
+                }
+
+                stage.querySelectorOpt(".fr-image-attachment-carousel-remove").foreach { el =>
+                  setClass(el, "xforms-hidden", present = ! active.canRemove)
+                }
+
+                val hideNav = cards.length <= 1
+                stage.querySelectorOpt(".fr-image-attachment-carousel-prev").foreach(setClass(_, "xforms-hidden", present = hideNav))
+                stage.querySelectorOpt(".fr-image-attachment-carousel-next").foreach(setClass(_, "xforms-hidden", present = hideNav))
+              }
+            }
+          }
+        } finally {
+          observerOpt.foreach(_.takeRecords())
+          isSyncing = false
+        }
+      }
+
+    private def selectCarouselIndex(newIndex: Int, scrollFilmstrip: Boolean = true): Unit = {
+      val cards = collectCards()
+      if (cards.nonEmpty) {
+        carouselIndex = (newIndex + cards.length) % cards.length
+        syncLayoutAndCarousel()
+        if (scrollFilmstrip) {
+          cards.lift(carouselIndex).foreach { active =>
+            active.card.asInstanceOf[js.Dynamic].scrollIntoView(
+              js.Dynamic.literal(block = "nearest", inline = "nearest", behavior = "smooth")
+            )
+          }
+        }
+      }
     }
 
     private def updateLightboxView(): Unit =
@@ -151,18 +310,22 @@ object ImageAttachment {
 
     override def init(): Unit = {
       resolveDummyImages()
+      syncLayoutAndCarousel()
 
-      if (XFormsApp.isBrowserEnvironment) {
-        val observer = new dom.MutationObserver((_, _) => resolveDummyImages())
-        observer.observe(
-          containerElem,
-          new dom.MutationObserverInit {
-            childList = true
-            subtree   = true
-          }
-        )
-        observerOpt = Some(observer)
-      }
+      val observer = new dom.MutationObserver((_, _) => {
+        resolveDummyImages()
+        syncLayoutAndCarousel()
+      })
+      observer.observe(
+        containerElem,
+        new dom.MutationObserverInit {
+          childList       = true
+          subtree         = true
+          attributes      = true
+          attributeFilter = js.Array("class", "data-view-mode", "data-columns", "data-max-rows")
+        }
+      )
+      observerOpt = Some(observer)
 
       EventSupport.addListener(
         containerElem,
@@ -170,11 +333,55 @@ object ImageAttachment {
         (ev: dom.MouseEvent) =>
           ev.target match {
             case el: html.Element =>
-              if (el.closestOpt(".fr-attachment-zoom").isDefined || el.matches(".fr-attachment-thumbnail img")) {
-                el.closestOpt(".xforms-dnd-item").foreach { card =>
+              if (isCarouselMode) {
+                if (
+                  el.closestOpt(".fr-image-attachment-carousel-zoom").isDefined ||
+                  el.matches(".fr-image-attachment-carousel-img")
+                ) {
                   ev.preventDefault()
-                  val (items, idx) = collectItemsAndIndex(card)
-                  openLightbox(items, idx)
+                  val cards = collectCards()
+                  openLightbox(cards.map(c => LightboxItem(c.src, c.filename)), carouselIndex)
+                } else if (el.closestOpt(".fr-image-attachment-carousel-prev").isDefined) {
+                  ev.preventDefault()
+                  selectCarouselIndex(carouselIndex - 1)
+                } else if (el.closestOpt(".fr-image-attachment-carousel-next").isDefined) {
+                  ev.preventDefault()
+                  selectCarouselIndex(carouselIndex + 1)
+                } else if (el.closestOpt(".fr-image-attachment-carousel-filename").isDefined) {
+                  ev.preventDefault()
+                  val cards = collectCards()
+                  cards.lift(carouselIndex).foreach { active =>
+                    active.card
+                      .querySelectorAllT(".fr-attachment-filename:not(.xforms-disabled)")
+                      .flatMap(f => if (f.matches("a, button")) List(f) else f.querySelectorAllT("a, button").toList)
+                      .headOption
+                      .foreach(_.click())
+                  }
+                } else if (el.closestOpt(".fr-image-attachment-carousel-remove").isDefined) {
+                  ev.preventDefault()
+                  val cards = collectCards()
+                  cards.lift(carouselIndex).foreach { active =>
+                    active.card
+                      .querySelectorOpt(".fr-attachment-remove:not(.xforms-disabled) button, .fr-attachment-remove:not(.xforms-disabled) a")
+                      .foreach(_.click())
+                  }
+                } else if (el.closestOpt(".xforms-dnd-item").isDefined) {
+                  el.closestOpt(".xforms-dnd-item").foreach { clickedCard =>
+                    ev.preventDefault()
+                    val cards = collectCards()
+                    val idx   = cards.indexWhere(_.card eq clickedCard)
+                    if (idx >= 0)
+                      selectCarouselIndex(idx, scrollFilmstrip = false)
+                  }
+                }
+              } else {
+                if (el.closestOpt(".fr-attachment-zoom").isDefined || el.matches(".fr-attachment-thumbnail img")) {
+                  el.closestOpt(".xforms-dnd-item").foreach { clickedCard =>
+                    ev.preventDefault()
+                    val cards = collectCards()
+                    val idx   = cards.indexWhere(_.card eq clickedCard).max(0)
+                    openLightbox(cards.map(c => LightboxItem(c.src, c.filename)), idx)
+                  }
                 }
               }
             case _ =>

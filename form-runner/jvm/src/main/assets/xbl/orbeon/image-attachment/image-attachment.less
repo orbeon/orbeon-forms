@@ -14,6 +14,7 @@
             }
         }
 
+        // Shared Grid & Carousel screen styles
         .fr-attachment-image-preview {
 
             @media screen {
@@ -124,6 +125,213 @@
             }
         }
 
+        // Grid-specific `columns` and `max-rows` overrides
+        .fr-image-attachment-view-grid {
+            @media screen {
+                &.fr-image-attachment-has-columns .fr-attachment-image-preview .xbl-fr-dnd-repeat {
+                    grid-template-columns: repeat(var(--fr-image-attachment-columns, 3), minmax(0, 1fr));
+
+                    @media (max-width: 480px) {
+                        grid-template-columns: repeat(~"min(var(--fr-image-attachment-columns, 2), 2)", minmax(0, 1fr));
+                    }
+                }
+
+                &.fr-image-attachment-has-max-rows .fr-attachment-image-preview .xbl-fr-dnd-repeat {
+                    max-block-size: calc(var(--fr-image-attachment-max-rows, 2) * 10.5rem);
+                    overflow-y: auto;
+                    overscroll-behavior: contain;
+                    scrollbar-gutter: stable;
+                    padding-inline-end: 2px;
+                }
+            }
+        }
+
+        // Carousel / Filmstrip mode
+        .fr-image-attachment-view-carousel {
+            @media screen {
+                .fr-image-attachment-carousel-stage {
+                    display: block;
+                    .fieldBorder();
+                    border-radius: var(--orbeon-control-border-radius);
+                    background-color: var(--orbeon-control-background-color);
+                    margin-block-end: 0.5rem;
+                    overflow: clip;
+
+                    &.xforms-hidden {
+                        display: none;
+                    }
+
+                    .fr-image-attachment-carousel-viewport {
+                        position: relative;
+                        aspect-ratio: 16 / 9;
+                        max-block-size: 150px;
+                        inline-size: 100%;
+                        background-color: var(--orbeon-image-attachment-background-color);
+                        border-bottom: 1px solid var(--orbeon-control-border-color);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 0.5rem 2.75rem;
+                        box-sizing: border-box;
+
+                        .fr-image-attachment-carousel-img {
+                            display: block;
+                            max-inline-size: 100%;
+                            max-block-size: 100%;
+                            inline-size: auto;
+                            block-size: auto;
+                            object-fit: contain;
+                            cursor: zoom-in;
+                            -webkit-user-drag: none;
+                            user-select: none;
+                        }
+
+                        .fr-image-attachment-carousel-zoom {
+                            position: absolute;
+                            inset-block-start: 0.5rem;
+                            inset-inline-end: 0.5rem;
+                            padding: 0.35rem 0.5rem;
+                            line-height: 1;
+                            border: none;
+                            border-radius: var(--orbeon-control-border-radius);
+                            background-color: rgba(0, 0, 0, 0.55);
+                            color: #fff;
+                            text-decoration: none;
+
+                            &:hover,
+                            &:focus-visible {
+                                background-color: rgba(0, 0, 0, 0.8);
+                                color: #fff;
+                            }
+                        }
+
+                        .fr-image-attachment-carousel-prev,
+                        .fr-image-attachment-carousel-next {
+                            position: absolute;
+                            inset-block-start: 50%;
+                            transform: translateY(-50%);
+                            padding: 0.45rem 0.6rem;
+                            line-height: 1;
+                            border: none;
+                            border-radius: var(--orbeon-control-border-radius);
+                            background-color: rgba(0, 0, 0, 0.55);
+                            color: #fff;
+                            text-decoration: none;
+
+                            &:hover,
+                            &:focus-visible {
+                                background-color: rgba(0, 0, 0, 0.8);
+                                color: #fff;
+                            }
+                        }
+
+                        .fr-image-attachment-carousel-prev {
+                            inset-inline-start: 0.5rem;
+                        }
+
+                        .fr-image-attachment-carousel-next {
+                            inset-inline-end: 0.5rem;
+                        }
+                    }
+
+                    .fr-image-attachment-carousel-footer {
+                        display: flex;
+                        align-items: baseline;
+                        gap: 0.5rem;
+                        padding: 6px 10px;
+
+                        .fr-image-attachment-carousel-filename {
+                            flex: 1 1 auto;
+                            min-inline-size: 0;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+
+                            &.fr-image-attachment-carousel-filename-disabled {
+                                color: inherit;
+                                text-decoration: none;
+                                pointer-events: none;
+                            }
+                        }
+
+                        .fr-image-attachment-carousel-size {
+                            flex: 0 0 auto;
+                            white-space: nowrap;
+                        }
+
+                        .fr-image-attachment-carousel-counter {
+                            flex: 0 0 auto;
+                            color: var(--orbeon-hint-color);
+                            font-variant-numeric: tabular-nums;
+                            white-space: nowrap;
+                        }
+
+                        .fr-image-attachment-carousel-remove {
+                            flex: 0 0 auto;
+                            padding: 0 2px;
+                            line-height: 1;
+                            color: inherit;
+                            text-decoration: none;
+                        }
+                    }
+                }
+
+                // Horizontal filmstrip of thumbnails in carousel mode
+                .fr-attachment-image-preview {
+                    .xbl-fr-dnd-repeat {
+                        display: flex;
+                        flex-direction: row;
+                        flex-wrap: nowrap;
+                        gap: 0.5rem;
+                        overflow-x: auto;
+                        overscroll-behavior-x: contain;
+                        padding-block: 2px 4px;
+                    }
+
+                    .xforms-dnd-item {
+                        flex: 0 0 76px;
+                        inline-size: 76px;
+                        block-size: 58px;
+                        padding: 0;
+                        display: block;
+                        cursor: pointer;
+                        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+                        &.fr-image-attachment-carousel-active {
+                            border-color: var(--orbeon-focus-border-color);
+                            box-shadow: 0 0 0 2px var(--orbeon-focus-border-color);
+                        }
+
+                        .fr-attachment-thumbnail {
+                            margin: 0;
+                            inline-size: 100%;
+                            block-size: 100%;
+                            aspect-ratio: auto;
+                            border-bottom: none;
+
+                            .xforms-output.xforms-mediatype-image {
+                                padding: 2px;
+
+                                img {
+                                    cursor: pointer;
+                                }
+                            }
+
+                            .fr-attachment-zoom {
+                                display: none;
+                            }
+                        }
+
+                        .fr-attachment-filename,
+                        .fr-attachment-size,
+                        .fr-attachment-remove {
+                            display: none;
+                        }
+                    }
+                }
+            }
+        }
+
         dialog.fr-image-attachment-lightbox {
             border: 1px solid var(--orbeon-control-border-color);
             border-radius: var(--orbeon-body-decorations-border-radius);
@@ -172,12 +380,8 @@
                     font-variant-numeric: tabular-nums;
                 }
 
-                .fr-image-attachment-lightbox-close-form {
-                    margin: 0;
-                    flex: 0 0 auto;
-                }
-
                 .fr-image-attachment-lightbox-close {
+                    flex: 0 0 auto;
                     padding: 0.25rem 0.4rem;
                     line-height: 1;
                     color: inherit;
@@ -240,6 +444,9 @@
         .xbl-fr-image-attachment .fr-attachment-image-preview .xforms-dnd-item {
             cursor: default;
         }
+        .xbl-fr-image-attachment .fr-image-attachment-carousel-remove {
+            display: none;
+        }
     }
 
     // #7999: openhtmltopdf ignores "margin: auto" on an image without an explicit width, so center it as inline content
@@ -255,6 +462,7 @@
 
         .xbl-fr-image-attachment {
             dialog.fr-image-attachment-lightbox,
+            .fr-image-attachment-carousel-stage,
             .fr-attachment-zoom {
                 display: none !important;
             }

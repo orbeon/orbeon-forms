@@ -59,6 +59,9 @@
                 </view>
             </templates>
             <custom-settings>
+                <setting name="view-mode" type="xs:string" values="grid carousel"/>
+                <setting name="columns" type="xs:integer" min="1"/>
+                <setting name="max-rows" type="xs:integer" min="1"/>
                 <setting name="transform-max-width" type="xs:integer" min="1"/>
                 <setting name="transform-max-height" type="xs:integer" min="1"/>
                 <setting name="transform-quality" type="xs:integer" min="1" max="100"/>
@@ -72,7 +75,14 @@
                         <xf:action iterate="instance('local')/*">
                             <xf:var name="local-elem"  value="."/>
                             <xf:var name="param-name"  value="name($local-elem)"/>
-                            <xf:var name="control-att" value="instance()/@*[name() = concat('transform-', $param-name)]"/>
+                            <xf:var
+                                name="att-name"
+                                value="
+                                    if ($param-name = ('view-mode', 'columns', 'max-rows')) then
+                                        $param-name
+                                    else
+                                        concat('transform-', $param-name)"/>
+                            <xf:var name="control-att" value="instance()/@*[name() = $att-name]"/>
                             <xf:setvalue
                                 ref="$local-elem"
                                 value="
@@ -87,6 +97,9 @@
 
                     <xf:instance id="local" xxf:exclude-result-prefixes="#all">
                         <_>
+                            <view-mode  default="-2"/>
+                            <columns    default="-2"/>
+                            <max-rows   default="-2"/>
                             <max-width  default="-2"/>
                             <max-height default="-2"/>
                             <quality    default="80"/>
@@ -95,6 +108,15 @@
                     </xf:instance>
 
                     <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="view-mode"
+                            relevant="empty(instance()/@id) or instance()/@multiple = 'true'"/>
+                        <xf:bind
+                            ref="columns | max-rows"
+                            type="xf:integer"
+                            xxf:whitespace="trim"
+                            constraint=". = (-1, -2) or xxf:positive()"
+                            relevant="(empty(instance()/@id) or instance()/@multiple = 'true') and ../view-mode != 'carousel'"/>
                         <xf:bind
                             ref="max-width | max-height"
                             type="xf:integer"
@@ -105,26 +127,27 @@
                             type="xf:integer"
                             xxf:whitespace="trim"
                             constraint=". = -1 or (xxf:positive() and . le 100)"/>
-                        <!-- We don't need or want this fancy logic since it is allowed to override just `quality` or
-                             `format` at the control level. -->
-<!--                        <xf:bind-->
-<!--                            ref="quality | format"-->
-<!--                            calculate="-->
-<!--                                if (-->
-<!--                                    xxf:is-blank(../max-width/string()) and-->
-<!--                                    xxf:is-blank(../max-height/string())-->
-<!--                                ) then-->
-<!--                                    @default-->
-<!--                                else-->
-<!--                                    ."-->
-<!--                            readonly="-->
-<!--                                xxf:is-blank(../max-width/string()) and-->
-<!--                                xxf:is-blank(../max-height/string())"/>-->
                     </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                         <_>
                             <resource xml:lang="en">
+                                <view-mode>
+                                    <label>Display mode</label>
+                                    <item value="-1">Use default</item>
+                                    <item value="grid">Grid</item>
+                                    <item value="carousel">Carousel</item>
+                                </view-mode>
+                                <columns>
+                                    <label>Number of columns</label>
+                                    <item value="-1">Use default</item>
+                                    <item value="-2">Automatic</item>
+                                </columns>
+                                <max-rows>
+                                    <label>Maximum visible rows</label>
+                                    <item value="-1">Use default</item>
+                                    <item value="-2">Unlimited</item>
+                                </max-rows>
                                 <max-width>
                                     <label>Adjust to maximum width to</label>
                                     <item value="-1">Use default</item>
@@ -148,6 +171,22 @@
                                 </format>
                             </resource>
                             <resource xml:lang="fr">
+                                <view-mode>
+                                    <label>Mode d'affichage</label>
+                                    <item value="-1">Utiliser le défaut</item>
+                                    <item value="grid">Grille</item>
+                                    <item value="carousel">Carrousel</item>
+                                </view-mode>
+                                <columns>
+                                    <label>Nombre de colonnes</label>
+                                    <item value="-1">Utiliser le défaut</item>
+                                    <item value="-2">Automatique</item>
+                                </columns>
+                                <max-rows>
+                                    <label>Nombre maximal de lignes visibles</label>
+                                    <item value="-1">Utiliser le défaut</item>
+                                    <item value="-2">Illimité</item>
+                                </max-rows>
                                 <max-width>
                                     <label>Ajuster la largeur maximale à</label>
                                     <item value="-1">Utiliser le défaut</item>
@@ -171,6 +210,22 @@
                                 </format>
                             </resource>
                             <resource xml:lang="no">
+                                <view-mode>
+                                    <label>Visningsmodus</label>
+                                    <item value="-1">Bruk standard</item>
+                                    <item value="grid">Rutenett</item>
+                                    <item value="carousel">Karusell</item>
+                                </view-mode>
+                                <columns>
+                                    <label>Antall kolonner</label>
+                                    <item value="-1">Bruk standard</item>
+                                    <item value="-2">Automatisk</item>
+                                </columns>
+                                <max-rows>
+                                    <label>Maksimalt antall synlige rader</label>
+                                    <item value="-1">Bruk standard</item>
+                                    <item value="-2">Ubegrenset</item>
+                                </max-rows>
                                 <max-width>
                                     <label>Juster maksimal bredde til</label>
                                     <item value="-1">Bruk standard</item>
@@ -194,6 +249,22 @@
                                 </format>
                             </resource>
                             <resource xml:lang="ru">
+                                <view-mode>
+                                    <label>Режим отображения</label>
+                                    <item value="-1">Использовать по умолчанию</item>
+                                    <item value="grid">Сетка</item>
+                                    <item value="carousel">Карусель</item>
+                                </view-mode>
+                                <columns>
+                                    <label>Количество столбцов</label>
+                                    <item value="-1">Использовать по умолчанию</item>
+                                    <item value="-2">Автоматически</item>
+                                </columns>
+                                <max-rows>
+                                    <label>Максимальное число видимых строк</label>
+                                    <item value="-1">Использовать по умолчанию</item>
+                                    <item value="-2">Без ограничений</item>
+                                </max-rows>
                                 <max-width>
                                     <label>Установить макс. ширину</label>
                                     <item value="-1">Использовать по умолчанию</item>
@@ -217,6 +288,22 @@
                                 </format>
                             </resource>
                             <resource xml:lang="it">
+                                <view-mode>
+                                    <label>Modalità di visualizzazione</label>
+                                    <item value="-1">Usa predefinito</item>
+                                    <item value="grid">Griglia</item>
+                                    <item value="carousel">Carosello</item>
+                                </view-mode>
+                                <columns>
+                                    <label>Numero di colonne</label>
+                                    <item value="-1">Usa predefinito</item>
+                                    <item value="-2">Automatico</item>
+                                </columns>
+                                <max-rows>
+                                    <label>Numero massimo di righe visibili</label>
+                                    <item value="-1">Usa predefinito</item>
+                                    <item value="-2">Illimitato</item>
+                                </max-rows>
                                 <max-width>
                                     <label>Adatta la larghezza massima a</label>
                                     <item value="-1">Usa predefinito</item>
@@ -240,6 +327,22 @@
                                 </format>
                             </resource>
                             <resource xml:lang="de">
+                                <view-mode>
+                                    <label>Anzeigemodus</label>
+                                    <item value="-1">Standard verwenden</item>
+                                    <item value="grid">Raster</item>
+                                    <item value="carousel">Karussell</item>
+                                </view-mode>
+                                <columns>
+                                    <label>Anzahl der Spalten</label>
+                                    <item value="-1">Standard verwenden</item>
+                                    <item value="-2">Automatisch</item>
+                                </columns>
+                                <max-rows>
+                                    <label>Maximale sichtbare Zeilen</label>
+                                    <item value="-1">Standard verwenden</item>
+                                    <item value="-2">Unbegrenzt</item>
+                                </max-rows>
                                 <max-width>
                                     <label>Maximale Breite anpassen auf</label>
                                     <item value="-1">Standard verwenden</item>
@@ -263,6 +366,22 @@
                                 </format>
                             </resource>
                             <resource xml:lang="fi">
+                                <view-mode>
+                                    <label>Näyttötila</label>
+                                    <item value="-1">Käytä oletusta</item>
+                                    <item value="grid">Ruudukko</item>
+                                    <item value="carousel">Karuselli</item>
+                                </view-mode>
+                                <columns>
+                                    <label>Sarakkeiden määrä</label>
+                                    <item value="-1">Käytä oletusta</item>
+                                    <item value="-2">Automaattinen</item>
+                                </columns>
+                                <max-rows>
+                                    <label>Näkyvien rivien enimmäismäärä</label>
+                                    <item value="-1">Käytä oletusta</item>
+                                    <item value="-2">Rajoittamaton</item>
+                                </max-rows>
                                 <max-width>
                                     <label>Säädä enimmäisleveys arvoon</label>
                                     <item value="-1">Käytä oletusta</item>
@@ -286,6 +405,22 @@
                                 </format>
                             </resource>
                             <resource xml:lang="es">
+                                <view-mode>
+                                    <label>Modo de visualización</label>
+                                    <item value="-1">Usar predeterminado</item>
+                                    <item value="grid">Cuadrícula</item>
+                                    <item value="carousel">Carrusel</item>
+                                </view-mode>
+                                <columns>
+                                    <label>Número de columnas</label>
+                                    <item value="-1">Usar predeterminado</item>
+                                    <item value="-2">Automático</item>
+                                </columns>
+                                <max-rows>
+                                    <label>Máximo de filas visibles</label>
+                                    <item value="-1">Usar predeterminado</item>
+                                    <item value="-2">Ilimitado</item>
+                                </max-rows>
                                 <max-width>
                                     <label>Ajustar ancho máximo a</label>
                                     <item value="-1">Usar predeterminado</item>
@@ -309,6 +444,22 @@
                                 </format>
                             </resource>
                             <resource xml:lang="nl">
+                                <view-mode>
+                                    <label>Weergavemodus</label>
+                                    <item value="-1">Standaard gebruiken</item>
+                                    <item value="grid">Raster</item>
+                                    <item value="carousel">Carrousel</item>
+                                </view-mode>
+                                <columns>
+                                    <label>Aantal kolommen</label>
+                                    <item value="-1">Standaard gebruiken</item>
+                                    <item value="-2">Automatisch</item>
+                                </columns>
+                                <max-rows>
+                                    <label>Maximaal aantal zichtbare rijen</label>
+                                    <item value="-1">Standaard gebruiken</item>
+                                    <item value="-2">Onbeperkt</item>
+                                </max-rows>
                                 <max-width>
                                     <label>Maximale breedte aanpassen naar</label>
                                     <item value="-1">Standaard gebruiken</item>
@@ -332,6 +483,22 @@
                                 </format>
                             </resource>
                             <resource xml:lang="pt">
+                                <view-mode>
+                                    <label>Modo de exibição</label>
+                                    <item value="-1">Usar padrão</item>
+                                    <item value="grid">Grade</item>
+                                    <item value="carousel">Carrossel</item>
+                                </view-mode>
+                                <columns>
+                                    <label>Número de colunas</label>
+                                    <item value="-1">Usar padrão</item>
+                                    <item value="-2">Automático</item>
+                                </columns>
+                                <max-rows>
+                                    <label>Máximo de linhas visíveis</label>
+                                    <item value="-1">Usar padrão</item>
+                                    <item value="-2">Ilimitado</item>
+                                </max-rows>
                                 <max-width>
                                     <label>Ajustar largura máxima para</label>
                                     <item value="-1">Usar padrão</item>
@@ -355,6 +522,22 @@
                                 </format>
                             </resource>
                             <resource xml:lang="sv">
+                                <view-mode>
+                                    <label>Visningsläge</label>
+                                    <item value="-1">Använd standard</item>
+                                    <item value="grid">Rutnät</item>
+                                    <item value="carousel">Karusell</item>
+                                </view-mode>
+                                <columns>
+                                    <label>Antal kolumner</label>
+                                    <item value="-1">Använd standard</item>
+                                    <item value="-2">Automatiskt</item>
+                                </columns>
+                                <max-rows>
+                                    <label>Maximalt antal synliga rader</label>
+                                    <item value="-1">Använd standard</item>
+                                    <item value="-2">Obegränsat</item>
+                                </max-rows>
                                 <max-width>
                                     <label>Justera maxbredd till</label>
                                     <item value="-1">Använd standard</item>
@@ -378,6 +561,22 @@
                                 </format>
                             </resource>
                             <resource xml:lang="ar">
+                                <view-mode>
+                                    <label>وضع العرض</label>
+                                    <item value="-1">استخدام الإعداد الافتراضي</item>
+                                    <item value="grid">شبكة</item>
+                                    <item value="carousel">شريط دوّار</item>
+                                </view-mode>
+                                <columns>
+                                    <label>عدد الأعمدة</label>
+                                    <item value="-1">استخدام الإعداد الافتراضي</item>
+                                    <item value="-2">تلقائي</item>
+                                </columns>
+                                <max-rows>
+                                    <label>الحد الأقصى للصفوف المرئية</label>
+                                    <item value="-1">استخدام الإعداد الافتراضي</item>
+                                    <item value="-2">غير محدود</item>
+                                </max-rows>
                                 <max-width>
                                     <label>ضبط العرض الأقصى إلى</label>
                                     <item value="-1">استخدام الإعداد الافتراضي</item>
@@ -401,6 +600,22 @@
                                 </format>
                             </resource>
                             <resource xml:lang="pl">
+                                <view-mode>
+                                    <label>Tryb wyświetlania</label>
+                                    <item value="-1">Użyj domyślnie</item>
+                                    <item value="grid">Siatka</item>
+                                    <item value="carousel">Karuzela</item>
+                                </view-mode>
+                                <columns>
+                                    <label>Liczba kolumn</label>
+                                    <item value="-1">Użyj domyślnie</item>
+                                    <item value="-2">Automatycznie</item>
+                                </columns>
+                                <max-rows>
+                                    <label>Maksymalna liczba widocznych wierszy</label>
+                                    <item value="-1">Użyj domyślnie</item>
+                                    <item value="-2">Bez ograniczeń</item>
+                                </max-rows>
                                 <max-width>
                                     <label>Ustaw maksymalną szerokość na</label>
                                     <item value="-1">Użyj domyślnie</item>
@@ -424,6 +639,22 @@
                                 </format>
                             </resource>
                             <resource xml:lang="ja">
+                                <view-mode>
+                                    <label>表示モード</label>
+                                    <item value="-1">既定を使う</item>
+                                    <item value="grid">グリッド</item>
+                                    <item value="carousel">カルーセル</item>
+                                </view-mode>
+                                <columns>
+                                    <label>列数</label>
+                                    <item value="-1">既定を使う</item>
+                                    <item value="-2">自動</item>
+                                </columns>
+                                <max-rows>
+                                    <label>最大表示行数</label>
+                                    <item value="-1">既定を使う</item>
+                                    <item value="-2">無制限</item>
+                                </max-rows>
                                 <max-width>
                                     <label>最大幅を調整</label>
                                     <item value="-1">既定を使う</item>
@@ -451,7 +682,47 @@
 
                 </xf:model>
                 <fr:grid xmlns="" id="fb-editor-image-attachment-grid">
-                    <fr:c x="1" y="1" w="6">
+                    <fr:c x="1" y="1" w="12">
+                        <xf:select1
+                            ref="instance('local')/view-mode"
+                            appearance="full xxf:horizontal"
+                            id="view-mode-control">
+                            <xf:label ref="fr:r('view-mode.label')"/>
+                            <xf:itemset ref="xxf:resource-elements('view-mode.item')">
+                                <xf:label ref="."/>
+                                <xf:value ref="@value"/>
+                            </xf:itemset>
+                        </xf:select1>
+                    </fr:c>
+                    <fr:c x="1" y="2" w="6">
+                        <fr:open-select1
+                            ref="instance('local')/columns"
+                            appearance="minimal"
+                            id="columns-control"
+                            type="integer">
+                            <xf:label ref="fr:r('columns.label')"/>
+                            <xf:alert ref="fr:r('components.parameters-editor.name.alert', '|fr-form-resources|')"/>
+                            <xf:itemset ref="xxf:resource-elements('columns.item')">
+                                <xf:label ref="."/>
+                                <xf:value ref="@value"/>
+                            </xf:itemset>
+                        </fr:open-select1>
+                    </fr:c>
+                    <fr:c x="7" y="2" w="6">
+                        <fr:open-select1
+                            ref="instance('local')/max-rows"
+                            appearance="minimal"
+                            id="max-rows-control"
+                            type="integer">
+                            <xf:label ref="fr:r('max-rows.label')"/>
+                            <xf:alert ref="fr:r('components.parameters-editor.name.alert', '|fr-form-resources|')"/>
+                            <xf:itemset ref="xxf:resource-elements('max-rows.item')">
+                                <xf:label ref="."/>
+                                <xf:value ref="@value"/>
+                            </xf:itemset>
+                        </fr:open-select1>
+                    </fr:c>
+                    <fr:c x="1" y="3" w="6">
                         <fr:open-select1
                             ref="instance('local')/max-width"
                             appearance="minimal"
@@ -470,7 +741,7 @@
 
                         </fr:open-select1>
                     </fr:c>
-                    <fr:c x="7" y="1" w="6">
+                    <fr:c x="7" y="3" w="6">
                         <fr:open-select1
                             ref="instance('local')/max-height"
                             appearance="minimal"
@@ -489,7 +760,7 @@
 
                         </fr:open-select1>
                     </fr:c>
-                    <fr:c x="1" y="2" w="6">
+                    <fr:c x="1" y="4" w="6">
                         <xf:select1 ref="instance('local')/format" id="format-control">
                             <xf:label ref="fr:r('format.label')"/>
                             <xf:itemset ref="xxf:resource-elements('format.item')">
@@ -506,7 +777,7 @@
                             </xf:item>
                         </xf:select1>
                     </fr:c>
-                    <fr:c x="7" y="2" w="6">
+                    <fr:c x="7" y="4" w="6">
                         <fr:open-select1
                             ref="instance('local')/quality"
                             appearance="minimal"
@@ -534,6 +805,9 @@
                     id="fb-editor-action"
                     event="xforms-value-changed"
                     observer="
+                        view-mode-control
+                        columns-control
+                        max-rows-control
                         max-width-control
                         max-height-control
                         quality-control
@@ -542,6 +816,14 @@
                     <xf:var
                         name="param-name"
                         value="name(event('xxf:binding'))"/>
+
+                    <xf:var
+                        name="att-name"
+                        value="
+                            if ($param-name = ('view-mode', 'columns', 'max-rows')) then
+                                $param-name
+                            else
+                                concat('transform-', $param-name)"/>
 
                     <xf:var
                         name="new-value"
@@ -562,10 +844,10 @@
                         context="instance()"
                         if="exists($new-value)"
                         origin="
-                            xf:attribute(concat('transform-', $param-name), $new-value)"/>
+                            xf:attribute($att-name, $new-value)"/>
                     <xf:delete
                         if="empty($new-value)"
-                        ref="instance()/@*[name() = concat('transform-', $param-name)]"/>
+                        ref="instance()/@*[name() = $att-name]"/>
                 </xf:action>
             </control-details>
 
@@ -584,126 +866,147 @@
                             <close>Close</close>
                             <previous>Previous image</previous>
                             <next>Next image</next>
+                            <remove>Remove Attachment</remove>
                         </resource>
                         <resource xml:lang="es">
                             <zoom>Ampliar imagen</zoom>
                             <close>Cerrar</close>
                             <previous>Imagen anterior</previous>
                             <next>Imagen siguiente</next>
+                            <remove>Quitar archivo adjunto</remove>
                         </resource>
                         <resource xml:lang="fi">
                             <zoom>Suurenna kuva</zoom>
                             <close>Sulje</close>
                             <previous>Edellinen kuva</previous>
                             <next>Seuraava kuva</next>
+                            <remove>Poista liite</remove>
                         </resource>
                         <resource xml:lang="fr">
                             <zoom>Agrandir l'image</zoom>
                             <close>Fermer</close>
                             <previous>Image précédente</previous>
                             <next>Image suivante</next>
+                            <remove>Supprimer le fichier joint</remove>
                         </resource>
                         <resource xml:lang="ru">
                             <zoom>Увеличить изображение</zoom>
                             <close>Закрыть</close>
                             <previous>Предыдущее изображение</previous>
                             <next>Следующее изображение</next>
+                            <remove>Удалить вложение</remove>
                         </resource>
                         <resource xml:lang="it">
                             <zoom>Ingrandisci immagine</zoom>
                             <close>Chiudi</close>
                             <previous>Immagine precedente</previous>
                             <next>Immagine successiva</next>
+                            <remove>Rimuovi allegato</remove>
                         </resource>
                         <resource xml:lang="de">
                             <zoom>Bild vergrößern</zoom>
                             <close>Schließen</close>
                             <previous>Vorheriges Bild</previous>
                             <next>Nächstes Bild</next>
+                            <remove>Anhang entfernen</remove>
                         </resource>
                         <resource xml:lang="sv">
                             <zoom>Förstora bild</zoom>
                             <close>Stäng</close>
                             <previous>Föregående bild</previous>
                             <next>Nästa bild</next>
+                            <remove>Ta bort bilaga</remove>
                         </resource>
                         <resource xml:lang="nl">
                             <zoom>Afbeelding vergroten</zoom>
                             <close>Sluiten</close>
                             <previous>Vorige afbeelding</previous>
                             <next>Volgende afbeelding</next>
+                            <remove>Bijlage verwijderen</remove>
                         </resource>
                         <resource xml:lang="pt">
                             <zoom>Ampliar imagem</zoom>
                             <close>Fechar</close>
                             <previous>Imagem anterior</previous>
                             <next>Próxima imagem</next>
+                            <remove>Remover anexo</remove>
                         </resource>
                         <resource xml:lang="lt">
                             <zoom>Padidinti vaizdą</zoom>
                             <close>Uždaryti</close>
                             <previous>Ankstesnis vaizdas</previous>
                             <next>Kitas vaizdas</next>
+                            <remove>Pašalinti priedą</remove>
                         </resource>
                         <resource xml:lang="da">
                             <zoom>Forstør billede</zoom>
                             <close>Luk</close>
                             <previous>Forrige billede</previous>
                             <next>Næste billede</next>
+                            <remove>Fjern vedhæftning</remove>
                         </resource>
                         <resource xml:lang="ar">
                             <zoom>تكبير الصورة</zoom>
                             <close>إغلاق</close>
                             <previous>الصورة السابقة</previous>
                             <next>الصورة التالية</next>
+                            <remove>إزالة المرفق</remove>
                         </resource>
                         <resource xml:lang="ca">
                             <zoom>Ampliar la imatge</zoom>
                             <close>Tancar</close>
                             <previous>Imatge anterior</previous>
                             <next>Imatge següent</next>
+                            <remove>Eliminar adjunt</remove>
                         </resource>
                         <resource xml:lang="hu">
                             <zoom>Kép nagyítása</zoom>
                             <close>Bezárás</close>
                             <previous>Előző kép</previous>
                             <next>Következő kép</next>
+                            <remove>Melléklet eltávolítása</remove>
                         </resource>
                         <resource xml:lang="ja">
                             <zoom>画像を拡大</zoom>
                             <close>閉じる</close>
                             <previous>前の画像</previous>
                             <next>次の画像</next>
+                            <remove>添付ファイルを削除</remove>
                         </resource>
                         <resource xml:lang="no">
                             <zoom>Forstørr bilde</zoom>
                             <close>Lukk</close>
                             <previous>Forrige bilde</previous>
                             <next>Neste bilde</next>
+                            <remove>Fjern vedlegg</remove>
                         </resource>
                         <resource xml:lang="pl">
                             <zoom>Powiększ obraz</zoom>
                             <close>Zamknij</close>
                             <previous>Poprzedni obraz</previous>
                             <next>Następny obraz</next>
+                            <remove>Usuń załącznik</remove>
                         </resource>
                         <resource xml:lang="tr">
                             <zoom>Görseli büyüt</zoom>
                             <close>Kapat</close>
                             <previous>Önceki görsel</previous>
                             <next>Sonraki görsel</next>
+                            <remove>Eki kaldır</remove>
                         </resource>
                         <resource xml:lang="zh-Hans">
                             <zoom>放大图片</zoom>
                             <close>关闭</close>
                             <previous>上一张图片</previous>
                             <next>下一张图片</next>
+                            <remove>删除附件</remove>
                         </resource>
                         <resource xml:lang="zh-Hant">
                             <zoom>放大圖片</zoom>
                             <close>關閉</close>
                             <previous>上一張圖片</previous>
                             <next>下一張圖片</next>
+                            <remove>刪除附件</remove>
                         </resource>
                     </_>
                 </xf:instance>
@@ -715,10 +1018,87 @@
                 name="multiple"
                 value="xxf:component-param-value('multiple') = 'true'"/>
             <xf:var
+                name="view-mode"
+                value="if ($multiple and fr:component-param-value('view-mode') = 'carousel') then 'carousel' else 'grid'"/>
+            <xf:var
+                name="columns"
+                value="fr:component-param-value('columns')[. castable as xs:integer and xs:integer(.) ge 1]"/>
+            <xf:var
+                name="max-rows"
+                value="fr:component-param-value('max-rows')[. castable as xs:integer and xs:integer(.) ge 1]"/>
+            <xf:var
                 name="binding"
                 value="xxf:binding('fr-image-attachment')"/>
 
-            <xh:div id="fr-image-attachment-elem" xxf:control="true" tabindex="-1">
+            <xh:div
+                id="fr-image-attachment-elem"
+                xxf:control="true"
+                tabindex="-1"
+                data-view-mode="{$view-mode}"
+                data-columns="{$columns}"
+                data-max-rows="{$max-rows}"
+                class="{
+                    string-join(
+                        (
+                            if ($multiple) then
+                                if ($view-mode = 'carousel') then
+                                    'fr-image-attachment-view-carousel'
+                                else
+                                    'fr-image-attachment-view-grid'
+                            else
+                                (),
+                            if ($multiple and $view-mode = 'grid' and exists($columns)) then
+                                'fr-image-attachment-has-columns'
+                            else
+                                (),
+                            if ($multiple and $view-mode = 'grid' and exists($max-rows)) then
+                                'fr-image-attachment-has-max-rows'
+                            else
+                                ()
+                        ),
+                        ' '
+                    )
+                }">
+                <xf:group
+                    ref=".[$multiple and $view-mode = 'carousel']"
+                    class="fr-image-attachment-carousel-stage xforms-hidden">
+                    <xh:div class="fr-image-attachment-carousel-viewport">
+                        <xh:button
+                            type="button"
+                            class="btn btn-link fr-image-attachment-carousel-prev"
+                            aria-label="{fr:r('previous')}"
+                            title="{fr:r('previous')}">
+                            <xh:i class="fa fa-fw fa-chevron-left" aria-hidden="true"/>
+                        </xh:button>
+                        <xh:img class="fr-image-attachment-carousel-img" alt=""/>
+                        <xh:button
+                            type="button"
+                            class="btn btn-link fr-image-attachment-carousel-zoom"
+                            aria-label="{fr:r('zoom')}"
+                            title="{fr:r('zoom')}">
+                            <xh:i class="fa fa-fw fa-expand" aria-hidden="true"/>
+                        </xh:button>
+                        <xh:button
+                            type="button"
+                            class="btn btn-link fr-image-attachment-carousel-next"
+                            aria-label="{fr:r('next')}"
+                            title="{fr:r('next')}">
+                            <xh:i class="fa fa-fw fa-chevron-right" aria-hidden="true"/>
+                        </xh:button>
+                    </xh:div>
+                    <xh:div class="fr-image-attachment-carousel-footer">
+                        <xh:a href="javascript:void(0)" class="fr-image-attachment-carousel-filename"/>
+                        <xh:span class="fr-image-attachment-carousel-size"/>
+                        <xh:span class="fr-image-attachment-carousel-counter"/>
+                        <xh:button
+                            type="button"
+                            class="btn btn-link fr-image-attachment-carousel-remove"
+                            aria-label="{fr:r('remove')}"
+                            title="{fr:r('remove')}">
+                            <xh:i class="fa fa-fw fa-times" aria-hidden="true"/>
+                        </xh:button>
+                    </xh:div>
+                </xf:group>
                 <fr:attachment
                     ref="$binding"
                     xbl:attr="multiple"

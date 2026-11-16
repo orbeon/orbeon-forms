@@ -16,7 +16,8 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-    xmlns:xbl="http://www.w3.org/ns/xbl">
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <xbl:binding id="fr-image-attachment" element="fr|image-attachment[multiple ~= true]">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -34,6 +35,7 @@
             <display-name lang="ar">مرفقات صور متعددة</display-name>
             <display-name lang="pl">Wiele załączników obrazów</display-name>
             <display-name lang="ja">複数画像添付</display-name>
+            <form-settings show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-file-image-o</icon-class>
             </icon>
@@ -48,12 +50,10 @@
                     </fr:image-attachment>
                 </view>
             </templates>
-            <custom-settings>
-                <setting name="transform-max-width" type="xs:integer" min="1"/>
-                <setting name="transform-max-height" type="xs:integer" min="1"/>
-                <setting name="transform-quality" type="xs:integer" min="1" max="100"/>
-                <setting name="transform-format" type="xs:string" values="jpg png"/>
-            </custom-settings>
+            <xi:include
+                xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                href="/xbl/orbeon/image-attachment/image-attachment.xbl"
+                xpointer="xpath(/xbl:xbl/xbl:binding/fb:metadata/(fb:custom-settings, fb:control-details))"/>
         </metadata>
     </xbl:binding>
 </xbl:xbl>

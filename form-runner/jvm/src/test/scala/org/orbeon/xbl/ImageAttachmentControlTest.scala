@@ -60,10 +60,15 @@ class ImageAttachmentControlTest
                     <_ filename="photo-1.png" mediatype="image/png" size="1024">{signedImg1}</_>
                     <_ filename="photo-2.jpg" mediatype="image/jpeg" size="2048">{signedImg2}</_>
                   </gallery>
+                  <carousel-gallery>
+                    <_ filename="slide-1.png" mediatype="image/png" size="1024">{signedImg1}</_>
+                    <_ filename="slide-2.jpg" mediatype="image/jpeg" size="2048">{signedImg2}</_>
+                  </carousel-gallery>
                 </form>
               </xf:instance>
               <xf:bind ref="single-photo" type="xf:anyURI" constraint="xxf:upload-mediatypes('image/*')"/>
               <xf:bind ref="gallery" constraint="xxf:upload-mediatypes('image/*') and xxf:upload-max-files-per-control(5)"/>
+              <xf:bind ref="carousel-gallery" constraint="xxf:upload-mediatypes('image/*')"/>
             </xf:model>
             <xf:model id="fr-parameters-model">
               <xf:instance id="fr-parameters-instance">
@@ -81,8 +86,11 @@ class ImageAttachmentControlTest
             <fr:image-attachment id="single-photo-control" ref="single-photo" class="fr-attachment">
               <xf:label>Single Photo</xf:label>
             </fr:image-attachment>
-            <fr:image-attachment id="gallery-control" ref="gallery" multiple="true" class="fr-attachment">
+            <fr:image-attachment id="gallery-control" ref="gallery" multiple="true" columns="2" max-rows="1" class="fr-attachment">
               <xf:label>Photo Gallery</xf:label>
+            </fr:image-attachment>
+            <fr:image-attachment id="carousel-gallery-control" ref="carousel-gallery" multiple="true" view-mode="carousel" class="fr-attachment">
+              <xf:label>Carousel Gallery</xf:label>
             </fr:image-attachment>
           </xh:body>
         </xh:html>.toDocument
@@ -138,6 +146,29 @@ class ImageAttachmentControlTest
 
             val galleryElem = allElems.find(_.attributeValueOpt("id").contains("gallery-control")).get
             val galleryDescendants = galleryElem.descendantElementIterator(includeSelf = true).toList
+
+            // Grid mode with columns="2" and max-rows="1"
+            val galleryRootDivOpt = galleryDescendants.find(_.attributeValueOpt("data-view-mode").contains("grid"))
+            assert(galleryRootDivOpt.isDefined)
+            assert(galleryRootDivOpt.get.attributeValueOpt("data-columns").contains("2"))
+            assert(galleryRootDivOpt.get.attributeValueOpt("data-max-rows").contains("1"))
+            val galleryRootClasses = galleryRootDivOpt.get.attributeValueOpt("class").map(_.splitTo[Set]()).getOrElse(Set.empty)
+            assert(galleryRootClasses("fr-image-attachment-view-grid"))
+            assert(galleryRootClasses("fr-image-attachment-has-columns"))
+            assert(galleryRootClasses("fr-image-attachment-has-max-rows"))
+
+            // Carousel mode (`view-mode="carousel"`)
+            val carouselElem = allElems.find(_.attributeValueOpt("id").contains("carousel-gallery-control")).get
+            val carouselDescendants = carouselElem.descendantElementIterator(includeSelf = true).toList
+            val carouselRootDivOpt = carouselDescendants.find(_.attributeValueOpt("data-view-mode").contains("carousel"))
+            assert(carouselRootDivOpt.isDefined)
+            val carouselRootClasses = carouselRootDivOpt.get.attributeValueOpt("class").map(_.splitTo[Set]()).getOrElse(Set.empty)
+            assert(carouselRootClasses("fr-image-attachment-view-carousel"))
+            val carouselStageOpt = carouselDescendants.find { e =>
+              val classes = e.attributeValueOpt("class").map(_.splitTo[Set]()).getOrElse(Set.empty)
+              classes("fr-image-attachment-carousel-stage") && ! classes("xforms-disabled")
+            }
+            assert(carouselStageOpt.isDefined)
 
             // Multiple image attachment has `.fr-attachment-image-preview`
             assert(

@@ -13,6 +13,233 @@
                 margin: auto;
             }
         }
+
+        .fr-attachment-image-preview {
+
+            @media screen {
+                .xbl-fr-dnd-repeat {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(min(100%, 135px), 1fr));
+                    gap: 0.75rem;
+                    inline-size: 100%;
+
+                    &:has(.xforms-dnd-item:not(.xforms-disabled)) {
+                        margin-block-end: 0.5rem;
+                    }
+
+                    & > .xforms-repeat-begin-end,
+                    & > .xforms-repeat-delimiter {
+                        display: none !important;
+                    }
+                }
+
+                .xforms-dnd-item {
+                    display: grid;
+                    grid-template-columns: minmax(0, 1fr) auto auto;
+                    grid-template-rows: auto auto;
+                    align-items: baseline;
+                    column-gap: 4px;
+                    margin: 0;
+                    padding: 4px 6px;
+                    overflow: clip;
+                    cursor: grab;
+
+                    &:active {
+                        cursor: grabbing;
+                    }
+
+                    .fr-attachment-thumbnail {
+                        grid-column: 1 / -1;
+                        position: relative;
+                        aspect-ratio: 4 / 3;
+                        margin: -4px -6px 4px -6px;
+                        background-color: var(--orbeon-image-attachment-background-color);
+                        border-bottom: 1px solid var(--orbeon-control-border-color);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        overflow: clip;
+
+                        .xforms-output.xforms-mediatype-image {
+                            inline-size: 100%;
+                            block-size: 100%;
+                            padding: 4px;
+                            border-radius: 0;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+
+                            img {
+                                display: block;
+                                max-inline-size: 100%;
+                                max-block-size: 100%;
+                                inline-size: auto;
+                                block-size: auto;
+                                object-fit: contain;
+                                cursor: zoom-in;
+                                -webkit-user-drag: none;
+                                user-select: none;
+                            }
+                        }
+
+                        .fr-attachment-zoom {
+                            position: absolute;
+                            inset-block-start: 6px;
+                            inset-inline-end: 6px;
+                            padding: 4px 6px;
+                            line-height: 1;
+                            border: none;
+                            border-radius: var(--orbeon-control-border-radius);
+                            background-color: rgba(0, 0, 0, 0.55);
+                            color: #fff;
+                            text-decoration: none;
+                            opacity: 0;
+                            transition: opacity 0.15s ease-in-out, background-color 0.15s ease-in-out;
+
+                            &:hover,
+                            &:focus-visible {
+                                opacity: 1;
+                                background-color: rgba(0, 0, 0, 0.8);
+                                color: #fff;
+                            }
+
+                            @media (hover: none) {
+                                opacity: 1;
+                            }
+                        }
+
+                        &:hover .fr-attachment-zoom {
+                            opacity: 1;
+                        }
+                    }
+
+                    .fr-attachment-icon {
+                        display: none;
+                    }
+
+                    .fr-attachment-filename {
+                        min-inline-size: 0;
+                    }
+                }
+            }
+        }
+
+        dialog.fr-image-attachment-lightbox {
+            border: 1px solid var(--orbeon-control-border-color);
+            border-radius: var(--orbeon-body-decorations-border-radius);
+            background-color: var(--orbeon-control-background-color);
+            color: var(--orbeon-base-color);
+            padding: 0;
+            max-inline-size: min(92dvw, 1200px);
+            max-block-size: 90dvh;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+
+            &:modal {
+                overscroll-behavior: contain;
+            }
+
+            &::backdrop {
+                overflow: hidden;
+                overscroll-behavior: contain;
+                background-color: rgba(0, 0, 0, 0.75);
+                backdrop-filter: blur(2px);
+            }
+
+            &[open] {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .fr-image-attachment-lightbox-header {
+                display: flex;
+                align-items: safe center;
+                gap: 0.75rem;
+                padding: 0.5rem 0.75rem;
+                border-bottom: 1px solid var(--orbeon-control-border-color);
+
+                .fr-image-attachment-lightbox-filename {
+                    flex: 1 1 auto;
+                    min-inline-size: 0;
+                    font-weight: 600;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .fr-image-attachment-lightbox-counter {
+                    flex: 0 0 auto;
+                    color: var(--orbeon-hint-color);
+                    font-variant-numeric: tabular-nums;
+                }
+
+                .fr-image-attachment-lightbox-close-form {
+                    margin: 0;
+                    flex: 0 0 auto;
+                }
+
+                .fr-image-attachment-lightbox-close {
+                    padding: 0.25rem 0.4rem;
+                    line-height: 1;
+                    color: inherit;
+                    text-decoration: none;
+                }
+            }
+
+            .fr-image-attachment-lightbox-body {
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.75rem 3rem;
+                background-color: var(--orbeon-image-attachment-background-color);
+                min-inline-size: min(60dvw, 480px);
+                min-block-size: min(50dvh, 320px);
+                overflow: auto;
+
+                .fr-image-attachment-lightbox-img {
+                    display: block;
+                    max-inline-size: min(82dvw, 1080px);
+                    max-block-size: calc(86dvh - 4rem);
+                    inline-size: auto;
+                    block-size: auto;
+                    object-fit: contain;
+                }
+
+                .fr-image-attachment-lightbox-prev,
+                .fr-image-attachment-lightbox-next {
+                    position: absolute;
+                    inset-block-start: 50%;
+                    transform: translateY(-50%);
+                    padding: 0.5rem 0.65rem;
+                    border: none;
+                    border-radius: var(--orbeon-control-border-radius);
+                    background-color: rgba(0, 0, 0, 0.55);
+                    color: #fff;
+                    text-decoration: none;
+                    line-height: 1;
+
+                    &:hover,
+                    &:focus-visible {
+                        background-color: rgba(0, 0, 0, 0.8);
+                        color: #fff;
+                    }
+                }
+
+                .fr-image-attachment-lightbox-prev {
+                    inset-inline-start: 0.5rem;
+                }
+
+                .fr-image-attachment-lightbox-next {
+                    inset-inline-end: 0.5rem;
+                }
+            }
+        }
+    }
+
+    .fr-mode-view, .fr-mode-pdf {
+        .xbl-fr-image-attachment .fr-attachment-image-preview .xforms-dnd-item {
+            cursor: default;
+        }
     }
 
     // #7999: openhtmltopdf ignores "margin: auto" on an image without an explicit width, so center it as inline content
@@ -23,6 +250,32 @@
             line-height: 0;
             img {
                 display: inline-block;
+            }
+        }
+
+        .xbl-fr-image-attachment {
+            dialog.fr-image-attachment-lightbox,
+            .fr-attachment-zoom {
+                display: none !important;
+            }
+
+            .fr-attachment-image-preview {
+                .xforms-dnd-item {
+                    display: inline-block;
+                    vertical-align: top;
+                    width: 48%;
+                    margin: 0 1% 8px 0;
+                    page-break-inside: avoid;
+
+                    .fr-attachment-thumbnail {
+                        display: block;
+                        margin-bottom: 4px;
+                    }
+
+                    .fr-attachment-icon {
+                        display: none;
+                    }
+                }
             }
         }
     }

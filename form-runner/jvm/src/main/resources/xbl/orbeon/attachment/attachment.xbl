@@ -714,6 +714,9 @@
                 name="multiple"
                 value="xxf:component-param-value('multiple') = 'true'"/>
             <xf:var
+                name="image-preview"
+                value="$multiple and xxf:component-param-value('image-preview') = 'true'"/>
+            <xf:var
                 name="binding"
                 value="xxf:binding('fr-attachment')"/>
             <xf:var
@@ -732,7 +735,11 @@
                 name="disable-download"
                 value="xs:string(fr:component-param-value('allow-download')) = 'false' or fr:mode() = 'pdf'"/>
 
-            <xh:div id="fr-attachment-elem" xxf:control="true" tabindex="-1">
+            <xh:div
+                id="fr-attachment-elem"
+                xxf:control="true"
+                tabindex="-1"
+                class="{if ($image-preview) then 'fr-attachment-image-preview' else ''}">
                 <fr:dnd-repeat
                     ref="
                         (
@@ -751,6 +758,26 @@
                         ]">
 
                     <xh:div class="xforms-dnd-item xforms-dnd-moves">
+
+                        <xf:group ref=".[$image-preview]" class="fr-attachment-thumbnail">
+                            <xf:output mediatype="image/*" ref=".">
+                                <xf:filename  ref="@filename"/>
+                                <xf:mediatype ref="@mediatype"/>
+                                <xf:header ref="fr:attachment-form-version()">
+                                    <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                                    <xf:value value="."/>
+                                </xf:header>
+                                <xf:header ref=".[@fr:attachment-encrypted = 'true']">
+                                    <xf:name>Orbeon-Decrypt</xf:name>
+                                    <xf:value>true</xf:value>
+                                </xf:header>
+                            </xf:output>
+                            <xh:button
+                                type="button"
+                                class="btn btn-link fr-attachment-zoom">
+                                <xh:i class="fa fa-fw fa-expand" aria-hidden="true"/>
+                            </xh:button>
+                        </xf:group>
 
                         <xh:i class="fr-attachment-icon fa fa-fw {
                             for $m in @mediatype/string()

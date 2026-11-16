@@ -1,0 +1,59 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl">
+
+    <xbl:binding id="fr-image-attachment" element="fr|image-attachment[multiple ~= true]">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Multiple Image Attachments</display-name>
+            <display-name lang="fr">Images jointes multiples</display-name>
+            <display-name lang="no">Flere bildevedlegg</display-name>
+            <display-name lang="ru">Несколько изображений</display-name>
+            <display-name lang="it">Immagini allegate multiple</display-name>
+            <display-name lang="de">Mehrfache Bildanhänge</display-name>
+            <display-name lang="fi">Useita kuvaliitteitä</display-name>
+            <display-name lang="es">Imágenes adjuntas múltiples</display-name>
+            <display-name lang="nl">Meerdere afbeeldingsbijlagen</display-name>
+            <display-name lang="pt">Anexos de várias imagens</display-name>
+            <display-name lang="sv">Flera bildbilagor</display-name>
+            <display-name lang="ar">مرفقات صور متعددة</display-name>
+            <display-name lang="pl">Wiele załączników obrazów</display-name>
+            <display-name lang="ja">複数画像添付</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-file-image-o</icon-class>
+            </icon>
+            <templates>
+                <bind constraint="xxf:upload-mediatypes('image/*')"/>
+                <view>
+                     <fr:image-attachment multiple="true" id="" ref="" class="fr-attachment">
+                        <xf:label ref=""/>
+                        <xf:hint  ref=""/>
+                        <xf:help  ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:image-attachment>
+                </view>
+            </templates>
+            <custom-settings>
+                <setting name="transform-max-width" type="xs:integer" min="1"/>
+                <setting name="transform-max-height" type="xs:integer" min="1"/>
+                <setting name="transform-quality" type="xs:integer" min="1" max="100"/>
+                <setting name="transform-format" type="xs:string" values="jpg png"/>
+            </custom-settings>
+        </metadata>
+    </xbl:binding>
+</xbl:xbl>

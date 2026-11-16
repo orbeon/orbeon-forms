@@ -61,17 +61,30 @@ object DndRepeat {
 
             override val mirrorContainer: UndefOr[html.Element] = containerElem
 
+            override val direction: UndefOr[String] =
+              if (
+                containerElem.closestOpt(".fr-attachment-image-preview, .fr-dnd-horizontal").isDefined ||
+                Option(containerElem.getAttribute("dnd-direction")).contains("horizontal")
+              )
+                "horizontal"
+              else
+                js.undefined
+
             override def isContainer(el: html.Element): UndefOr[Boolean] =
               el eq containerElem
 
             override def moves(el: html.Element, source: html.Element, handle: html.Element, sibling: html.Element): UndefOr[Boolean] =
               el.matches(IsDndMovesSelector)
 
+            override def invalid(el: html.Element, handle: html.Element): UndefOr[Boolean] =
+              (handle ne null) && handle.closestOpt(".fr-attachment-remove, .fr-attachment-zoom, a, button").isDefined
+
             override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element): UndefOr[Boolean] =
               (sibling ne null)                  &&
                 sibling.matches(IsNotGuSelector) && (
-                  sibling.matches(IsDndItemSelector)        || // regular case
-                  sibling.matches(IsRepeatBeginEndSelector)    // at the end of the repeat see https://github.com/orbeon/orbeon-forms/issues/6000
+                  sibling.matches(IsDndItemSelector)         || // regular case
+                  sibling.matches(IsRepeatDelimiterSelector) || // between repeat items when dragging past midpoint
+                  sibling.matches(IsRepeatBeginEndSelector)     // at the end of the repeat see https://github.com/orbeon/orbeon-forms/issues/6000
                 )                                &&
                 (! dragState.exists(_.excludedTargets.exists(_ eq sibling)))
           }

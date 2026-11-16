@@ -4,7 +4,7 @@ import cats.syntax.option.*
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.runtime
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
-import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import org.orbeon.xbl.ImageAttachmentSupport
 
@@ -22,7 +22,7 @@ object FormRunnerRpcApiImpl extends FormRunnerRpcApi {
 
     containingDocument
       .findControlByEffectiveId(clientId)
-      .collect { case c: XFormsValueControl => c.boundNodeOpt }
+      .collect { case c: XFormsSingleNodeControl => c.boundNodeOpt }
       .flatten
       .map { node =>
         ImageAttachmentSupport.retrieveResource(

@@ -23,26 +23,26 @@
     <xbl:binding
         id="fr-image-attachment"
         element="fr|image-attachment"
-        xxbl:mode="binding lhha value javascript-lifecycle"
+        xxbl:mode="binding lhha javascript-lifecycle"
         xxbl:container="span"
         xxbl:label-for="fr-image-attachment-elem">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Image Attachment</display-name>
-            <display-name lang="fr">Image jointe</display-name>
-            <display-name lang="no">Bildevedlegg</display-name>
-            <display-name lang="ru">Загрузка изображения</display-name>
-            <display-name lang="it">Immagine allegata</display-name>
-            <display-name lang="de">Bild Anhang</display-name>
-            <display-name lang="fi">Kuvan liittäminen</display-name>
-            <display-name lang="es">Adjuntar Imagen</display-name>
-            <display-name lang="nl">Afbeeldingbijlage</display-name>
-            <display-name lang="pt">Anexar imagem</display-name>
-            <display-name lang="sv">Bild som bilaga</display-name>
-            <display-name lang="ar">مرفق صورة</display-name>
-            <display-name lang="pl">Załączony obraz</display-name>
-            <display-name lang="ja">画像添付</display-name>
+            <display-name lang="en">Single Image Attachment</display-name>
+            <display-name lang="fr">Image jointe unique</display-name>
+            <display-name lang="no">Enkelt bildevedlegg</display-name>
+            <display-name lang="ru">Загрузка одного изображения</display-name>
+            <display-name lang="it">Immagine allegata singola</display-name>
+            <display-name lang="de">Einzelner Bildanhang</display-name>
+            <display-name lang="fi">Yhden kuvan liittäminen</display-name>
+            <display-name lang="es">Adjuntar imagen única</display-name>
+            <display-name lang="nl">Enkele afbeeldingsbijlage</display-name>
+            <display-name lang="pt">Anexar imagem única</display-name>
+            <display-name lang="sv">Enkel bild som bilaga</display-name>
+            <display-name lang="ar">مرفق صورة واحدة</display-name>
+            <display-name lang="pl">Załącznik pojedynczego obrazu</display-name>
+            <display-name lang="ja">単一画像添付</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-file-image-o</icon-class>
             </icon>
@@ -575,7 +575,145 @@
             <xbl:style src="/xbl/orbeon/image-attachment/image-attachment.css"/>
         </xbl:resources>
 
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <resource xml:lang="en">
+                            <zoom>Expand image</zoom>
+                            <close>Close</close>
+                            <previous>Previous image</previous>
+                            <next>Next image</next>
+                        </resource>
+                        <resource xml:lang="es">
+                            <zoom>Ampliar imagen</zoom>
+                            <close>Cerrar</close>
+                            <previous>Imagen anterior</previous>
+                            <next>Imagen siguiente</next>
+                        </resource>
+                        <resource xml:lang="fi">
+                            <zoom>Suurenna kuva</zoom>
+                            <close>Sulje</close>
+                            <previous>Edellinen kuva</previous>
+                            <next>Seuraava kuva</next>
+                        </resource>
+                        <resource xml:lang="fr">
+                            <zoom>Agrandir l'image</zoom>
+                            <close>Fermer</close>
+                            <previous>Image précédente</previous>
+                            <next>Image suivante</next>
+                        </resource>
+                        <resource xml:lang="ru">
+                            <zoom>Увеличить изображение</zoom>
+                            <close>Закрыть</close>
+                            <previous>Предыдущее изображение</previous>
+                            <next>Следующее изображение</next>
+                        </resource>
+                        <resource xml:lang="it">
+                            <zoom>Ingrandisci immagine</zoom>
+                            <close>Chiudi</close>
+                            <previous>Immagine precedente</previous>
+                            <next>Immagine successiva</next>
+                        </resource>
+                        <resource xml:lang="de">
+                            <zoom>Bild vergrößern</zoom>
+                            <close>Schließen</close>
+                            <previous>Vorheriges Bild</previous>
+                            <next>Nächstes Bild</next>
+                        </resource>
+                        <resource xml:lang="sv">
+                            <zoom>Förstora bild</zoom>
+                            <close>Stäng</close>
+                            <previous>Föregående bild</previous>
+                            <next>Nästa bild</next>
+                        </resource>
+                        <resource xml:lang="nl">
+                            <zoom>Afbeelding vergroten</zoom>
+                            <close>Sluiten</close>
+                            <previous>Vorige afbeelding</previous>
+                            <next>Volgende afbeelding</next>
+                        </resource>
+                        <resource xml:lang="pt">
+                            <zoom>Ampliar imagem</zoom>
+                            <close>Fechar</close>
+                            <previous>Imagem anterior</previous>
+                            <next>Próxima imagem</next>
+                        </resource>
+                        <resource xml:lang="lt">
+                            <zoom>Padidinti vaizdą</zoom>
+                            <close>Uždaryti</close>
+                            <previous>Ankstesnis vaizdas</previous>
+                            <next>Kitas vaizdas</next>
+                        </resource>
+                        <resource xml:lang="da">
+                            <zoom>Forstør billede</zoom>
+                            <close>Luk</close>
+                            <previous>Forrige billede</previous>
+                            <next>Næste billede</next>
+                        </resource>
+                        <resource xml:lang="ar">
+                            <zoom>تكبير الصورة</zoom>
+                            <close>إغلاق</close>
+                            <previous>الصورة السابقة</previous>
+                            <next>الصورة التالية</next>
+                        </resource>
+                        <resource xml:lang="ca">
+                            <zoom>Ampliar la imatge</zoom>
+                            <close>Tancar</close>
+                            <previous>Imatge anterior</previous>
+                            <next>Imatge següent</next>
+                        </resource>
+                        <resource xml:lang="hu">
+                            <zoom>Kép nagyítása</zoom>
+                            <close>Bezárás</close>
+                            <previous>Előző kép</previous>
+                            <next>Következő kép</next>
+                        </resource>
+                        <resource xml:lang="ja">
+                            <zoom>画像を拡大</zoom>
+                            <close>閉じる</close>
+                            <previous>前の画像</previous>
+                            <next>次の画像</next>
+                        </resource>
+                        <resource xml:lang="no">
+                            <zoom>Forstørr bilde</zoom>
+                            <close>Lukk</close>
+                            <previous>Forrige bilde</previous>
+                            <next>Neste bilde</next>
+                        </resource>
+                        <resource xml:lang="pl">
+                            <zoom>Powiększ obraz</zoom>
+                            <close>Zamknij</close>
+                            <previous>Poprzedni obraz</previous>
+                            <next>Następny obraz</next>
+                        </resource>
+                        <resource xml:lang="tr">
+                            <zoom>Görseli büyüt</zoom>
+                            <close>Kapat</close>
+                            <previous>Önceki görsel</previous>
+                            <next>Sonraki görsel</next>
+                        </resource>
+                        <resource xml:lang="zh-Hans">
+                            <zoom>放大图片</zoom>
+                            <close>关闭</close>
+                            <previous>上一张图片</previous>
+                            <next>下一张图片</next>
+                        </resource>
+                        <resource xml:lang="zh-Hant">
+                            <zoom>放大圖片</zoom>
+                            <close>關閉</close>
+                            <previous>上一張圖片</previous>
+                            <next>下一張圖片</next>
+                        </resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
         <xbl:template>
+            <xf:var
+                name="multiple"
+                value="xxf:component-param-value('multiple') = 'true'"/>
             <xf:var
                 name="binding"
                 value="xxf:binding('fr-image-attachment')"/>
@@ -583,6 +721,8 @@
             <xh:div id="fr-image-attachment-elem" xxf:control="true" tabindex="-1">
                 <fr:attachment
                     ref="$binding"
+                    xbl:attr="multiple"
+                    image-preview="true"
                     accept="{(xxf:custom-mip($binding, 'upload-mediatypes')[xxf:non-blank()], 'image/*')[1]}">
 
                     <xf:filename  ref="@filename"  xxbl:scope="outer"/>
@@ -609,7 +749,7 @@
                         type="xpath">
                         fr:transform-uploaded-image(
                             xxf:absolute-id('fr-image-attachment'),
-                            $binding,
+                            if ($multiple) then $binding/*:_[last()] else $binding,
                             fr:component-param-value('transform-max-width'),
                             fr:component-param-value('transform-max-height'),
                             fr:component-param-value('transform-quality'),
@@ -629,7 +769,7 @@
                     </xf:dispatch>
 
                 </fr:attachment>
-                <xf:output mediatype="image/*" ref="$binding[xxf:non-blank()]">
+                <xf:output mediatype="image/*" ref="$binding[not($multiple) and xxf:non-blank()]">
                     <xf:filename  ref="@filename"  xxbl:scope="outer"/>
                     <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
                     <xf:header ref="fr:attachment-form-version()">
@@ -641,6 +781,40 @@
                         <xf:value>true</xf:value>
                     </xf:header>
                 </xf:output>
+                <xh:dialog
+                    class="fr-image-attachment-lightbox"
+                    closedby="any"
+                    aria-label="{fr:r('zoom')}">
+                    <xh:div class="fr-image-attachment-lightbox-header">
+                        <xh:span class="fr-image-attachment-lightbox-filename"/>
+                        <xh:span class="fr-image-attachment-lightbox-counter"/>
+                        <xh:button
+                            type="button"
+                            class="btn btn-link fr-image-attachment-lightbox-close"
+                            aria-label="{fr:r('close')}"
+                            title="{fr:r('close')}"
+                            autofocus="autofocus">
+                            <xh:i class="fa fa-fw fa-times" aria-hidden="true"/>
+                        </xh:button>
+                    </xh:div>
+                    <xh:div class="fr-image-attachment-lightbox-body">
+                        <xh:button
+                            type="button"
+                            class="btn btn-link fr-image-attachment-lightbox-prev"
+                            aria-label="{fr:r('previous')}"
+                            title="{fr:r('previous')}">
+                            <xh:i class="fa fa-fw fa-chevron-left" aria-hidden="true"/>
+                        </xh:button>
+                        <xh:img class="fr-image-attachment-lightbox-img" alt=""/>
+                        <xh:button
+                            type="button"
+                            class="btn btn-link fr-image-attachment-lightbox-next"
+                            aria-label="{fr:r('next')}"
+                            title="{fr:r('next')}">
+                            <xh:i class="fa fa-fw fa-chevron-right" aria-hidden="true"/>
+                        </xh:button>
+                    </xh:div>
+                </xh:dialog>
             </xh:div>
         </xbl:template>
     </xbl:binding>

@@ -525,7 +525,7 @@ class BindingDescriptorTest
           isCurrent       = isSameQName(current, FR -> "attachment")
         ),
         ConversionResult(
-          fullLabelOpt    = Some("Image Attachment"),
+          fullLabelOpt    = Some("Single Image Attachment"),
           value           = FR -> "image-attachment",
           elemName        = FR -> "image-attachment",
           appearanceOpt   = None,

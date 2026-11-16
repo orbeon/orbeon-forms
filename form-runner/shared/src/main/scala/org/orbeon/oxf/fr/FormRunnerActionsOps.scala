@@ -157,9 +157,9 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
   def findControlValue(control: XFormsControl, collector: ErrorEventCollector): Option[ControlValue] =
     control
-      .narrowTo[XFormsValueControl]
+      .narrowTo[XFormsSingleNodeControl]
       .filter(_.isRelevant)
-      .map {
+      .collect {
       case c: XFormsSelectControl  =>
         val selectedItems = c.findSelectedItems(collector)
         ControlValue.MultipleControlValue(
@@ -218,12 +218,21 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
         ControlValue.SingleControlValue(c.getValue(collector), formattedValue, isHtml = isHtmlValueControl(c))
       case c if Set("image-attachment", "attachment")(c.staticControl.localName) =>
-        ControlValue.SingleControlValue(
-          storageValue   = c.getValue(collector),
-          formattedValue = c.boundNodeOpt flatMap (_.attValueOpt("filename")),
-          isHtml         = false
-        )
-      case c =>
+        if (c.staticControl.element.attributeValueOpt("multiple").contains("true")) {
+          val items = c.boundNodeOpt.toList.flatMap(_.child("_")).filter(_.getStringValue.nonAllBlank)
+          ControlValue.MultipleControlValue(
+            storageValue    = items.map(_.getStringValue).mkString(" "),
+            formattedValues = items.flatMap(_.attValueOpt("filename")),
+            isHtml          = false
+          )
+        } else {
+          ControlValue.SingleControlValue(
+            storageValue   = c.boundNodeOpt.map(_.getStringValue).getOrElse(""),
+            formattedValue = c.boundNodeOpt.flatMap(_.attValueOpt("filename")),
+            isHtml         = false
+          )
+        }
+      case c: XFormsValueControl =>
         ControlValue.SingleControlValue(
           storageValue   = c.getValue(collector),
           formattedValue = c.getFormattedValue(collector) orElse Option(c.getValue(collector)),

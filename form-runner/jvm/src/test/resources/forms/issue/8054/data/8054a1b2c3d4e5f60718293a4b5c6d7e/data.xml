@@ -1,0 +1,13 @@
+<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+    <section>
+        <grid>
+            <cmyk-jpeg filename="cmyk.jpg" mediatype="image/jpeg" size="480">/fr/service/persistence/crud/issue/8054/data/8054a1b2c3d4e5f60718293a4b5c6d7e/8054cmykjpeg.bin</cmyk-jpeg>
+            <cmyk-tiff filename="cmyk.tiff" mediatype="image/tiff" size="1174">/fr/service/persistence/crud/issue/8054/data/8054a1b2c3d4e5f60718293a4b5c6d7e/8054cmyktiff.bin</cmyk-tiff>
+            <icc-v4-png filename="icc-v4.png" mediatype="image/png" size="477">/fr/service/persistence/crud/issue/8054/data/8054a1b2c3d4e5f60718293a4b5c6d7e/8054iccv4png.bin</icc-v4-png>
+            <icc-v4-tiff filename="icc-v4.tiff" mediatype="image/tiff" size="1706">/fr/service/persistence/crud/issue/8054/data/8054a1b2c3d4e5f60718293a4b5c6d7e/8054iccv4tiff.bin</icc-v4-tiff>
+            <rgb16-png filename="rgb16.png" mediatype="image/png" size="108">/fr/service/persistence/crud/issue/8054/data/8054a1b2c3d4e5f60718293a4b5c6d7e/8054rgb16png.bin</rgb16-png>
+            <rgb16-tiff filename="rgb16.tiff" mediatype="image/tiff" size="2568">/fr/service/persistence/crud/issue/8054/data/8054a1b2c3d4e5f60718293a4b5c6d7e/8054rgb16tiff.bin</rgb16-tiff>
+            <rgba16-png filename="rgba16.png" mediatype="image/png" size="157">/fr/service/persistence/crud/issue/8054/data/8054a1b2c3d4e5f60718293a4b5c6d7e/8054rgba16png.bin</rgba16-png>
+        </grid>
+    </section>
+</form>

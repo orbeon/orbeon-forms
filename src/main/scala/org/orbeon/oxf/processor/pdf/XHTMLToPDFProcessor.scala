@@ -221,6 +221,9 @@ class XHTMLToPDFProcessor extends HttpBinarySerializer {
             outputDevice,
             pipelineContext,
             DefaultDotsPerPixel,
+            // #8054: PDF/A doesn't allow CMYK images (as our output intent is sRGB), and PDF/A-1 doesn't allow 16-bit
+            // images or images with an ICC v4 profile
+            convertImagesToSrgb      = pdfAConformance != PdfRendererBuilder.PdfAConformance.NONE,
             // #7998: PDF/A-1 doesn't allow transparency, so images with an alpha channel are drawn on white
             flattenImageTransparency = pdfAConformance.getPart == 1
           )

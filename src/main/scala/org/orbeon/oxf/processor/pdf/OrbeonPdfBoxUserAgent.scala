@@ -17,6 +17,9 @@ import com.openhtmltopdf.pdfboxout.{PdfBoxImage, PdfBoxOutputDevice, PdfBoxUserA
 import com.openhtmltopdf.resource.ImageResource
 import com.openhtmltopdf.swing.NaiveUserAgent
 import com.openhtmltopdf.util.{LogMessageId, XRLog}
+import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.pdmodel.graphics.color.{PDColorSpace, PDDeviceGray, PDDeviceRGB, PDIndexed}
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.orbeon.connection.ConnectionResult
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, SafeRequestContext, UrlRewriteMode}
@@ -43,6 +46,7 @@ class OrbeonPdfBoxUserAgent(
   outputDevice                         : PdfBoxOutputDevice,
   override val pipelineContext         : PipelineContext,
   dotsPerPixel                         : Int,
+  convertImagesToSrgb                  : Boolean,
   flattenImageTransparency             : Boolean
 )(override implicit val externalContext: ExternalContext,
   override implicit val indentedLogger : IndentedLogger
@@ -124,9 +128,14 @@ class OrbeonPdfBoxUserAgent(
                   sourceBytes
               }
             }
+          val srgbBytes =
+            if (convertImagesToSrgb)
+              convertToSrgbIfNeeded(imgBytes, uriStr)
+            else
+              imgBytes
           val flatBytes =
             if (flattenImageTransparency)
-              Option(ImageIO.read(new ByteArrayInputStream(imgBytes))).filter(_.getColorModel.hasAlpha).map { image =>
+              Option(ImageIO.read(new ByteArrayInputStream(srgbBytes))).filter(_.getColorModel.hasAlpha).map { image =>
                 val flat = new BufferedImage(image.getWidth, image.getHeight, BufferedImage.TYPE_INT_RGB)
                 val g = flat.createGraphics()
                 g.setColor(Color.WHITE)
@@ -136,9 +145,9 @@ class OrbeonPdfBoxUserAgent(
                 val os = new ByteArrayOutputStream
                 ImageIO.write(flat, "png", os)
                 os.toByteArray
-              }.getOrElse(imgBytes)
+              }.getOrElse(srgbBytes)
             else
-              imgBytes
+              srgbBytes
           val fsImage = new PdfBoxImage(flatBytes, uriStr)
           scaleToOutputResolution(fsImage)
           outputDevice.realizeImage(fsImage)
@@ -158,6 +167,42 @@ class OrbeonPdfBoxUserAgent(
       resource = new ImageResource(uriStr, null)
 
     resource
+  }
+
+  // Convert to 8-bit sRGB the images which PDFBox wouldn't store as 8-bit `DeviceRGB` or `DeviceGray` images: CMYK images,
+  // images with an ICC profile, 16-bit images, etc.
+  private def convertToSrgbIfNeeded(imgBytes: Array[Byte], uriStr: String): Array[Byte] = {
+
+    def isDeviceRgbOrGray(colorSpace: PDColorSpace): Boolean =
+      colorSpace match {
+        case PDDeviceRGB.INSTANCE | PDDeviceGray.INSTANCE => true
+        case indexed: PDIndexed                           => isDeviceRgbOrGray(indexed.getBaseColorSpace)
+        case _                                            => false
+      }
+
+    try {
+      IOUtils.useAndClose(new PDDocument) { document =>
+        // Same call as in `PdfBoxOutputDevice.realizeImage()`, to know how the image would be stored in the PDF
+        val xObject = PDImageXObject.createFromByteArray(document, imgBytes, uriStr)
+        if (isDeviceRgbOrGray(xObject.getColorSpace) && xObject.getBitsPerComponent <= 8) {
+          imgBytes
+        } else {
+          // PDFBox always decodes to 8-bit sRGB, with an alpha channel if the image has one
+          val image = xObject.getImage
+          if (xObject.getSuffix == "jpg") {
+            compressJpegImage(image, jpegCompressionLevel)
+          } else {
+            val os = new ByteArrayOutputStream
+            ImageIO.write(image, "png", os)
+            os.toByteArray
+          }
+        }
+      }
+    } catch {
+      case NonFatal(t) =>
+        warn(s"failed to convert image to sRGB for URL `$uriStr`, using original image", t)
+        imgBytes
+    }
   }
 
   override protected def openReader(uri: String): Reader = {

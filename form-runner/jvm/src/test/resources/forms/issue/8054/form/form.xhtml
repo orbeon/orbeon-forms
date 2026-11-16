@@ -1,0 +1,148 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+  <xh:head>
+    <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+      <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+        <form>
+          <section>
+            <grid>
+              <cmyk-jpeg/>
+              <cmyk-tiff/>
+              <icc-v4-png/>
+              <icc-v4-tiff/>
+              <rgb16-png/>
+              <rgb16-tiff/>
+              <rgba16-png/>
+            </grid>
+          </section>
+        </form>
+      </xf:instance>
+      <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+        <xf:bind id="section-bind" name="section" ref="section">
+          <xf:bind id="grid-bind" ref="grid" name="grid">
+            <xf:bind id="cmyk-jpeg-bind" ref="cmyk-jpeg" name="cmyk-jpeg" type="xf:anyURI"/>
+            <xf:bind id="cmyk-tiff-bind" ref="cmyk-tiff" name="cmyk-tiff" type="xf:anyURI"/>
+            <xf:bind id="icc-v4-png-bind" ref="icc-v4-png" name="icc-v4-png" type="xf:anyURI"/>
+            <xf:bind id="icc-v4-tiff-bind" ref="icc-v4-tiff" name="icc-v4-tiff" type="xf:anyURI"/>
+            <xf:bind id="rgb16-png-bind" ref="rgb16-png" name="rgb16-png" type="xf:anyURI"/>
+            <xf:bind id="rgb16-tiff-bind" ref="rgb16-tiff" name="rgb16-tiff" type="xf:anyURI"/>
+            <xf:bind id="rgba16-png-bind" ref="rgba16-png" name="rgba16-png" type="xf:anyURI"/>
+          </xf:bind>
+        </xf:bind>
+      </xf:bind>
+      <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+        <metadata>
+          <application-name>issue</application-name>
+          <form-name>8054</form-name>
+          <title xml:lang="en">PDF/A: some images are not conformant (CMYK, 16-bit, ICC v4 profile) #8054</title>
+          <description xml:lang="en"/>
+          <grid-tab-order>default</grid-tab-order>
+          <created-with-version>2026.1-SNAPSHOT PE</created-with-version>
+          <updated-with-version>2026.1-SNAPSHOT PE</updated-with-version>
+        </metadata>
+      </xf:instance>
+      <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+        <resources>
+          <resource xml:lang="en">
+            <section>
+              <label>Section</label>
+            </section>
+            <grid/>
+            <cmyk-jpeg>
+              <label>cmyk.jpg</label>
+              <hint/>
+            </cmyk-jpeg>
+            <cmyk-tiff>
+              <label>cmyk.tiff</label>
+              <hint/>
+            </cmyk-tiff>
+            <icc-v4-png>
+              <label>icc-v4.png</label>
+              <hint/>
+            </icc-v4-png>
+            <icc-v4-tiff>
+              <label>icc-v4.tiff</label>
+              <hint/>
+            </icc-v4-tiff>
+            <rgb16-png>
+              <label>rgb16.png</label>
+              <hint/>
+            </rgb16-png>
+            <rgb16-tiff>
+              <label>rgb16.tiff</label>
+              <hint/>
+            </rgb16-tiff>
+            <rgba16-png>
+              <label>rgba16.png</label>
+              <hint/>
+            </rgba16-png>
+          </resource>
+        </resources>
+      </xf:instance>
+    </xf:model>
+  </xh:head>
+  <xh:body>
+    <fr:view>
+      <fr:body>
+        <fr:section id="section-section" bind="section-bind">
+          <xf:label ref="$form-resources/section/label"/>
+          <fr:grid id="grid-grid" bind="grid-bind">
+            <fr:c y="1" x="1" w="6">
+              <fr:image-attachment id="cmyk-jpeg-control" bind="cmyk-jpeg-bind" class="fr-attachment">
+                <xf:label ref="$form-resources/cmyk-jpeg/label"/>
+                <xf:hint ref="$form-resources/cmyk-jpeg/hint"/>
+                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+              </fr:image-attachment>
+            </fr:c>
+            <fr:c y="1" x="7" w="6">
+              <fr:image-attachment id="cmyk-tiff-control" bind="cmyk-tiff-bind" class="fr-attachment">
+                <xf:label ref="$form-resources/cmyk-tiff/label"/>
+                <xf:hint ref="$form-resources/cmyk-tiff/hint"/>
+                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+              </fr:image-attachment>
+            </fr:c>
+            <fr:c y="2" x="1" w="6">
+              <fr:image-attachment id="icc-v4-png-control" bind="icc-v4-png-bind" class="fr-attachment">
+                <xf:label ref="$form-resources/icc-v4-png/label"/>
+                <xf:hint ref="$form-resources/icc-v4-png/hint"/>
+                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+              </fr:image-attachment>
+            </fr:c>
+            <fr:c y="2" x="7" w="6">
+              <fr:image-attachment id="icc-v4-tiff-control" bind="icc-v4-tiff-bind" class="fr-attachment">
+                <xf:label ref="$form-resources/icc-v4-tiff/label"/>
+                <xf:hint ref="$form-resources/icc-v4-tiff/hint"/>
+                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+              </fr:image-attachment>
+            </fr:c>
+            <fr:c y="3" x="1" w="6">
+              <fr:image-attachment id="rgb16-png-control" bind="rgb16-png-bind" class="fr-attachment">
+                <xf:label ref="$form-resources/rgb16-png/label"/>
+                <xf:hint ref="$form-resources/rgb16-png/hint"/>
+                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+              </fr:image-attachment>
+            </fr:c>
+            <fr:c y="3" x="7" w="6">
+              <fr:image-attachment id="rgb16-tiff-control" bind="rgb16-tiff-bind" class="fr-attachment">
+                <xf:label ref="$form-resources/rgb16-tiff/label"/>
+                <xf:hint ref="$form-resources/rgb16-tiff/hint"/>
+                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+              </fr:image-attachment>
+            </fr:c>
+            <fr:c y="4" x="1" w="6">
+              <fr:image-attachment id="rgba16-png-control" bind="rgba16-png-bind" class="fr-attachment">
+                <xf:label ref="$form-resources/rgba16-png/label"/>
+                <xf:hint ref="$form-resources/rgba16-png/hint"/>
+                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+              </fr:image-attachment>
+            </fr:c>
+            <fr:c y="4" x="7" w="6"/>
+          </fr:grid>
+        </fr:section>
+      </fr:body>
+    </fr:view>
+  </xh:body>
+</xh:html>

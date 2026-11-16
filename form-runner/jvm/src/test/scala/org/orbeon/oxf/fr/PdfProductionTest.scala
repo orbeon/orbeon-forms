@@ -3,6 +3,7 @@ package org.orbeon.oxf.fr
 import cats.syntax.option.*
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.io.RandomAccessReadBuffer
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.apache.pdfbox.text.{PDFTextStripper, TextPosition}
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.common.Version
@@ -31,6 +32,10 @@ class PdfProductionTest
 
   // Data for the `tests/pdf-a-attachment` form: a single attachment control, whose value is shown with a mediatype icon
   private val PdfAAttachmentDocumentId = "5f1c7998b2d34e6f8a90c1d2e3f40718"
+
+  // Data for the `issue/8054` form: image attachments with a CMYK JPEG and TIFF, a PNG and TIFF with an ICC v4 profile,
+  // a 16-bit PNG and TIFF, and a 16-bit PNG with transparency
+  private val Issue8054DocumentId = "8054a1b2c3d4e5f60718293a4b5c6d7e"
 
   // Data for the `tests/pdf-required-star` form: a required text field, single checkbox and toggle switch
   private val PdfRequiredStarDocumentId = "a1b2c3d4e5f60718293a4b5c6d7e8f90"
@@ -455,6 +460,75 @@ class PdfProductionTest
 
           val (compliant, report) = PdfAValidator.validate(pdf, flavour)
           assert(compliant, s"veraPDF report:\n$report")
+        }
+      }
+    }
+
+    // CMYK images are not allowed in a PDF/A whose output intent is sRGB, and 16-bit images and images with an ICC v4
+    // profile are not allowed in a PDF/A-1
+    describe("#8054: CMYK images, 16-bit images and images with an ICC v4 profile") {
+
+      def pdfContent(flavour: Option[String]): Array[Byte] =
+        runFormRunnerReturnContent(
+          "issue",
+          "8054",
+          "pdf",
+          documentId = Issue8054DocumentId.some,
+          attributes = flavour.map(f => propertiesOverride(pdfAProperty(f))).getOrElse(Map.empty)
+        )._2.body
+
+      // Color space and bits per component of each image
+      def images(pdf: Array[Byte]): List[(String, Int)] =
+        useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(pdf))) { pdd =>
+          for {
+            page      <- pdd.getPages.asScala.toList
+            resources = page.getResources
+            name      <- resources.getXObjectNames.asScala.toList
+            image     <- resources.getXObject(name).some.collect { case image: PDImageXObject => image }
+          } yield
+            image.getColorSpace.getName -> image.getBitsPerComponent
+        }
+
+      // The 16-bit PNG with transparency is the only image of 7 by 5 pixels: color space, bits per component, and whether
+      // it has a soft mask, that is transparency
+      def transparentImage(pdf: Array[Byte]): Option[(String, Int, Boolean)] =
+        useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(pdf))) { pdd =>
+          (
+            for {
+              page      <- pdd.getPages.asScala.toList
+              resources = page.getResources
+              name      <- resources.getXObjectNames.asScala.toList
+              image     <- resources.getXObject(name).some.collect { case image: PDImageXObject => image }
+              if image.getWidth == 7 && image.getHeight == 5
+            } yield
+              (image.getColorSpace.getName, image.getBitsPerComponent, image.getSoftMask ne null)
+          ).headOption
+        }
+
+      val AttachmentCount = 7
+
+      it("must be kept as they are in a PDF which is not a PDF/A") {
+        val attachments = images(pdfContent(None)).filter(_ != ("DeviceRGB", 8))
+        assert(attachments.sorted == List("DeviceCMYK" -> 8, "DeviceCMYK" -> 8, "DeviceRGB" -> 16, "DeviceRGB" -> 16, "DeviceRGB" -> 16, "ICCBased" -> 8, "ICCBased" -> 8))
+        assert(transparentImage(pdfContent(None)).contains(("DeviceRGB", 16, true)))
+      }
+
+      for (flavour <- List("1a", "1b", "2a", "2b", "2u", "3a", "3b", "3u")) {
+        it(s"must be converted to 8-bit sRGB in a PDF/A-$flavour, which must be valid") {
+
+          assume(PdfAValidator.isAvailable, "the PDF/A validator classpath is only set when running tests with sbt")
+
+          val pdf = pdfContent(flavour.some)
+
+          val (compliant, report) = PdfAValidator.validate(pdf, flavour)
+          assert(compliant, s"veraPDF report:\n$report")
+
+          val allImages = images(pdf)
+          assert(allImages.size >= AttachmentCount)
+          assert(allImages.forall(_ == ("DeviceRGB", 8)))
+
+          // PDF/A-1 doesn't allow transparency (#7998), PDF/A-2 and PDF/A-3 do: the conversion must keep it
+          assert(transparentImage(pdf).contains(("DeviceRGB", 8, ! flavour.startsWith("1"))))
         }
       }
     }

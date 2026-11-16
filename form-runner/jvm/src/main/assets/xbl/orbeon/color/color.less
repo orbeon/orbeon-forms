@@ -137,13 +137,34 @@
                 }
             }
         }
+    }
 
-        @media print {
+    @media print {
+        .xbl-fr-color {
             display: inline;
 
             .fr-color-readonly-container {
                 display: inline;
+
+                // Show the value as plain text after the swatch, not as a field
+                .xforms-input {
+                    display: inline;
+
+                    .xforms-field {
+                        display: inline;
+                        vertical-align: middle;
+                        min-height: 0 !important; // the grid sets a min-height with !important
+                        padding: 0;
+                        border: none;
+                        background: none;
+                        box-shadow: none;
+                    }
+                }
             }
+        }
+
+        .fr-pdf-color-mode-black-and-white .xbl-fr-color .fr-color-readonly-container .fr-color-readonly-swatch {
+            display: none;
         }
     }
 }

@@ -26,6 +26,15 @@
 
 @fbButtonsBackground: var(--orbeon-fb-navbar-background-color); // so that the borderless buttons look good
 
+// Titles of the panels on the sides: toolbox groups and Outline
+.fbPanelTitle() {
+    font-size: 0.79em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--orbeon-hint-color);
+}
+
 // Case of non-embedded Form Builder: size body to take the whole viewport
 body.orbeon {
     position: absolute;
@@ -1320,11 +1329,7 @@ body.orbeon {
                     display: block;
                     width: 100%;
                     box-sizing: border-box;
-                    font-size: 0.79em;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                    letter-spacing: 0.04em;
-                    color: var(--orbeon-hint-color);
+                    .fbPanelTitle();
                     margin-bottom: 2px;
                     padding: 0 6px;
                     line-height: 20px;
@@ -1595,9 +1600,7 @@ body.orbeon {
             border-bottom: 1px solid var(--orbeon-base-border-color);
 
             .fb-outline-header-title {
-                font-size: 12px;
-                font-weight: 600;
-                color: var(--orbeon-base-color);
+                .fbPanelTitle();
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;

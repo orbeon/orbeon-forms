@@ -556,6 +556,7 @@
             <reencrypt-state>Ponowne szyfrowanie {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>Rozpoczęto ponowne szyfrowanie</reencrypt-started>
             <reencrypt-finished>Ponowne szyfrowanie zakończone</reencrypt-finished>
+            <free-search-placeholder>Szukaj według tytułu, aplikacji lub nazwy formularza…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>Eksportuj</export>

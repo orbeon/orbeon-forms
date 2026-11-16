@@ -555,6 +555,7 @@
             <reencrypt-state>إعادة تشفير {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>بدأت إعادة التشفير</reencrypt-started>
             <reencrypt-finished>انتهت إعادة التشفير</reencrypt-finished>
+            <free-search-placeholder>البحث حسب العنوان أو التطبيق أو اسم النموذج…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>تصدير</export>

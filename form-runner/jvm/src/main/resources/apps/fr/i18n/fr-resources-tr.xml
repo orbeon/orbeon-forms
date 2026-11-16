@@ -553,6 +553,7 @@
             <reencrypt-state>Yeniden şifreleniyor {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>Yeniden şifreleme başladı</reencrypt-started>
             <reencrypt-finished>Yeniden şifreleme tamamlandı</reencrypt-finished>
+            <free-search-placeholder>Başlık, uygulama veya form adına göre ara…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>Dışa Aktar</export>

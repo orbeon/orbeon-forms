@@ -26,6 +26,23 @@
         xxbl:container="th"
         xxbl:mode="">
 
+        <xbl:handlers>
+            <xbl:handler event="fr-aria-sort-changed" phase="target">
+                <xf:action type="javascript">
+                    <xf:param name="ariaSort" value="event('aria-sort')"/>
+                    <xf:body>
+                        if (this &amp;&amp; this.setAttribute) {
+                            this.setAttribute('scope', 'col');
+                            if (ariaSort)
+                                this.setAttribute('aria-sort', ariaSort);
+                            else
+                                this.removeAttribute('aria-sort');
+                        }
+                    </xf:body>
+                </xf:action>
+            </xbl:handler>
+        </xbl:handlers>
+
         <xbl:template>
             <xf:var name="label"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="ref=label"/></xf:var>
             <xf:var name="instance"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="ref=instance"/></xf:var>
@@ -38,18 +55,41 @@
                 name="no-caret"
                 value="$instance/local-or-remote != $local-or-remote or $instance/column != $column or not($sort-supported)"/>
 
+            <xf:var name="is-sorted"         value="not($no-caret)"/>
+            <xf:var name="default-direction" value="if ($column = ('created', 'last-modified')) then 'desc' else 'asc'"/>
+            <xf:var name="effective-dir"     value="if ($is-sorted) then string($instance/direction) else $default-direction"/>
+
             <xf:var
                 name="caret-value"
                 value="
-                    if      ($no-caret)                   then ''
-                    else if ($instance/direction = 'asc') then '&#x25B2;'
-                    else                                       '&#x25BC;'
+                    if      (not($sort-supported))   then ''
+                    else if ($effective-dir = 'asc') then '&#x25B2;'
+                    else                                  '&#x25BC;'
                 "/>
+
+            <xf:var
+                name="aria-sort"
+                value="
+                    if      (not($is-sorted))             then ''
+                    else if ($instance/direction = 'asc') then 'ascending'
+                    else                                       'descending'
+                ">
+                <xf:dispatch event="xforms-enabled xforms-value-changed" name="fr-aria-sort-changed" targetid="fr-sortable-th">
+                    <xf:property name="aria-sort" value="$aria-sort"/>
+                </xf:dispatch>
+            </xf:var>
 
             <xf:trigger appearance="minimal" class="{'fr-sortable-th'[$sort-supported]}">
                 <xf:label>
                     <xf:output value="frf:removeHtmlTags($label)"/>
-                    <xh:span class="{'caret-container', 'no-caret'[$no-caret]}">
+                    <xh:span
+                        class="{
+                            'caret-container',
+                            'active-caret'[$is-sorted],
+                            'hover-caret'[not($is-sorted) and $sort-supported],
+                            'no-caret'[not($sort-supported)]
+                        }"
+                        aria-hidden="true">
                         <xf:output value="$caret-value"/>
                     </xh:span>
                 </xf:label>

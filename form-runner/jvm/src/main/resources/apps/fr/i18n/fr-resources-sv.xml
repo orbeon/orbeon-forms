@@ -555,6 +555,7 @@
             <reencrypt-state>Krypterar om {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>Omkryptering startad</reencrypt-started>
             <reencrypt-finished>Omkryptering klar</reencrypt-finished>
+            <free-search-placeholder>Sök efter titel, applikation eller formulärnamn…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>Exportera</export>

@@ -560,6 +560,7 @@
             <reencrypt-state>Recryptage en cours {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>Recryptage commencé</reencrypt-started>
             <reencrypt-finished>Recryptage terminé</reencrypt-finished>
+            <free-search-placeholder>Rechercher par titre, application ou nom de formulaire…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>Exporter</export>

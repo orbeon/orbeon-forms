@@ -546,6 +546,7 @@
             <reencrypt-state>Genkrypterer {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>Genkryptering startet</reencrypt-started>
             <reencrypt-finished>Genkryptering afsluttet</reencrypt-finished>
+            <free-search-placeholder>Søg efter titel, applikation eller blanketnavn…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>Eksportér</export>

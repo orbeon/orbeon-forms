@@ -129,14 +129,17 @@
 
                 <xf:action if="instance()/request-parameters-loaded = 'false'">
 
-                    <!-- If we have a search URL parameters, use it as a search option and show search options -->
+                    <!-- Load distinct apps and forms for the inline dropdowns (#7917) -->
+                    <xf:send submission="distinct-apps-submission"/>
+                    <xf:send submission="distinct-forms-all-submission"/>
+
                     <xf:action if="exists($fr-search-app-opt)">
                         <xf:setvalue
                             ref="instance()/search-options/local/application-name"
                             value="$fr-search-app-opt"/>
                         <xf:setvalue
                             ref="instance()/search-options/local/application-name/@match"
-                            value="$fr-search-app-match"/>
+                            value="$fr-search-app-match[1]"/>
                     </xf:action>
                     <xf:action if="exists($fr-search-form-opt)">
                         <xf:setvalue
@@ -144,27 +147,13 @@
                             value="$fr-search-form-opt"/>
                         <xf:setvalue
                             ref="instance()/search-options/local/form-name/@match"
-                            value="$fr-search-form-match"/>
+                            value="$fr-search-form-match[1]"/>
                     </xf:action>
 
-                    <xf:var
-                        name="show-search-options-because-property"
-                        value="xs:string(xxf:property('oxf.fr.home.search-options-opened-on-load')) = 'true'"/>
-                    <xf:var
-                        name="show-search-options-because-app-form-provided"
-                        value="exists($fr-search-app-opt) or exists($fr-search-form-opt)"/>
-
-                    <xf:action if="$show-search-options-because-property or $show-search-options-because-app-form-provided">
-                        <xf:toggle case="fr-search-options-shown"/>
-
-                        <!-- Distinct values for search options (#7917) -->
-                        <xf:send submission="distinct-apps-submission"/>
-                        <xf:send submission="distinct-forms-all-submission"/>
-                        <xf:action if="instance()/search-options/local/application-name/@match = 'exact' and xxf:non-blank(instance()/search-options/local/application-name) and empty(instance('fr-distinct-forms-cache')/app[@name = instance()/search-options/local/application-name])">
-                            <xf:send submission="distinct-forms-submission">
-                                <xf:property name="app" value="string(instance()/search-options/local/application-name)" xxf:tunnel="true"/>
-                            </xf:send>
-                        </xf:action>
+                    <xf:action if="instance()/search-options/local/application-name/@match = 'exact' and xxf:non-blank(instance()/search-options/local/application-name) and empty(instance('fr-distinct-forms-cache')/app[@name = instance()/search-options/local/application-name])">
+                        <xf:send submission="distinct-forms-submission">
+                            <xf:property name="app" value="string(instance()/search-options/local/application-name)" xxf:tunnel="true"/>
+                        </xf:send>
                     </xf:action>
 
                     <xf:setvalue ref="instance()/request-parameters-loaded" value="'true'"/>
@@ -190,6 +179,22 @@
                     else
                         fr:run-process-by-name('oxf.fr.home.process', 'load-metadata-with-credentials')
                 </xf:action>
+
+                <xf:dispatch name="fr-sync-match-toggles" targetid="fr-form-model"/>
+            </xf:action>
+
+            <xf:action event="fr-sync-match-toggles" type="javascript">
+                <xf:param name="titlePressed" value="string(instance('fr-form-instance')/search-options/local/free-search/@scope = 'title')"/>
+                <xf:param name="appPressed"   value="string(instance('fr-form-instance')/search-options/local/application-name/@match != 'exact')"/>
+                <xf:param name="formPressed"  value="string(instance('fr-form-instance')/search-options/local/form-name/@match != 'exact')"/>
+                <xf:body>
+                    const titleBtn = document.querySelector('#fr-home-search-scope-toggle button');
+                    const appBtn   = document.querySelector('#fr-forms-app-match-toggle button');
+                    const formBtn  = document.querySelector('#fr-forms-form-match-toggle button');
+                    if (titleBtn) titleBtn.setAttribute('aria-pressed', titlePressed);
+                    if (appBtn)   appBtn.setAttribute('aria-pressed', appPressed);
+                    if (formBtn)  formBtn.setAttribute('aria-pressed', formPressed);
+                </xf:body>
             </xf:action>
 
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all">
@@ -246,6 +251,7 @@
 
                     <search-options>
                         <local>
+                            <free-search scope="all"/>
                             <operations/>
                             <available/>
                             <created/>
@@ -427,7 +433,44 @@
             </xf:instance>
 
             <xf:instance id="fr-metadata" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
-            <xf:var name="forms" value="instance('fr-metadata')/form"/>
+            <xf:var
+                name="forms"
+                value="
+                    let $all-forms     := instance('fr-metadata')/form,
+                        $local-search  := instance('fr-form-instance')/search-options/local,
+                        $title-only    := $local-search/free-search/@scope = 'title',
+                        $raw-query     := lower-case(xxf:trim($local-search/free-search)),
+                        $search-tokens := if ($title-only) then () else xxf:split($raw-query),
+                        $title-sub     := if ($title-only) then $raw-query else '',
+                        $app-sub       := if ($local-search/application-name/@match != 'exact') then lower-case(xxf:trim($local-search/application-name)) else '',
+                        $form-sub      := if ($local-search/form-name/@match != 'exact')        then lower-case(xxf:trim($local-search/form-name))        else ''
+                    return
+                        if (empty($search-tokens) and $title-sub = '' and $app-sub = '' and $form-sub = '') then
+                            $all-forms
+                        else
+                            let $lang := xxf:instance('fr-fr-language-instance')
+                            return
+                                $all-forms[
+                                    ($app-sub  = '' or contains(lower-case(application-name), $app-sub)) and
+                                    ($form-sub = '' or contains(lower-case(form-name),        $form-sub)) and
+                                    (
+                                        ($title-sub = '' and empty($search-tokens)) or (
+                                            let $form-title := string((
+                                                    title[@xml:lang = $lang][xxf:non-blank()],
+                                                    title[xxf:non-blank()],
+                                                    remote-server[1]/title[@xml:lang = $lang][xxf:non-blank()],
+                                                    remote-server[1]/title[xxf:non-blank()]
+                                                )[1])
+                                            return
+                                                if ($title-only) then
+                                                    contains(lower-case($form-title), $title-sub)
+                                                else
+                                                    let $haystack := lower-case(string-join((application-name, form-name, $form-title), ' '))
+                                                    return
+                                                        every $token in $search-tokens satisfies contains($haystack, $token)
+                                        )
+                                    )
+                                ]"/>
 
             <xf:bind ref="instance('fr-metadata')/form/created"                          type="xs:dateTime"/>
             <xf:bind ref="instance('fr-metadata')/form/last-modified-time"               type="xs:dateTime"/>
@@ -522,13 +565,19 @@
                     <!-- Local filters -->
                     <xf:action iterate="('operations', 'available', 'last-modified-by', 'application-name', 'form-name', 'form-version', 'title')">
                         <xf:var name="field" value="."/>
+                        <xf:var
+                            name="src"
+                            value="$search-options/local/*[local-name() = $field]"/>
+                        <xf:var
+                            name="skip-client-substring"
+                            value="$field = ('application-name', 'form-name') and $src/@match != 'exact'"/>
                         <xf:setvalue
                             ref="$queries/local/filter[@metadata = $field]"
-                            value="$search-options/local/*[local-name() = $field]"/>
+                            value="if ($skip-client-substring) then '' else $src"/>
                         <xf:setvalue
-                            iterate="$search-options/local/*[local-name() = $field]/@match"
+                            iterate="$src/@match"
                             ref="$queries/local/filter[@metadata = $field]/@match"
-                            value="context()"/>
+                            value="if ($skip-client-substring) then 'exact' else context()"/>
                     </xf:action>
 
                     <!-- Remote filters -->
@@ -1004,9 +1053,10 @@
             <fr:navbar/>
             <fr:config-check/>
             <fr:row>
-                <xf:group>
+                <xf:group class="{'fr-forms-admin'[$is-admin], 'fr-published-forms'[not($is-admin)]}">
 
                     <xf:group class="fr-top-fields">
+                        <xf:var name="pager-id" value="if ($is-admin) then 'fr-admin-pager' else 'fr-pager'"/>
 
                         <!-- Search also when user presses "enter" in a field -->
                         <xf:dispatch
@@ -1018,28 +1068,34 @@
                         </xf:dispatch>
 
                         <!-- Search also when dropdown value changes -->
-                        <xf:dispatch
+                        <xf:action
                             event="xforms-value-changed"
                             target="
-                                status-select-local        status-select-remote
-                                last-modified-select-local last-modified-select-remote
-                                last-modified-after-local  last-modified-after-remote
-                                last-modified-before-local last-modified-before-remote
-                                form-version-select
-                                application-name-select    form-name-select
-                                fr-application-name-match  fr-form-name-match
+                                fr-forms-status-select
+                                fr-forms-remote-status-select
+                                fr-forms-version-select
+                                fr-forms-application-select
+                                fr-forms-form-select
+                                fr-forms-last-modified-select
+                                fr-forms-last-modified-after
+                                fr-forms-last-modified-before
+                                fr-forms-remote-last-modified-select
+                                fr-forms-remote-last-modified-after
+                                fr-forms-remote-last-modified-before
                             "
-                            if="instance('fr-form-instance')/request-parameters-loaded = 'true'"
-                            name="fr-initialize"
-                            targetid="fr-form-model">
+                            if="instance('fr-form-instance')/request-parameters-loaded = 'true'">
+                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
+                                <xf:property name="page-number" value="1"/>
+                            </xf:dispatch>
+                            <xf:dispatch name="fr-initialize" targetid="fr-form-model">
+                                <xf:property name="keep-selection" value="'true'"/>
+                            </xf:dispatch>
+                        </xf:action>
 
-                            <xf:property name="keep-selection" value="'true'"/>
-                        </xf:dispatch>
-
-                        <xh:div class="fr-main-top-fields">
+                        <!-- Row 1 on Forms Admin: Admin operations (left) + Pager (right) -->
+                        <xf:group ref=".[$is-admin]" class="fr-admin-top-row">
                             <xf:group
-                                ref=".[$is-admin]"
-                                class="btn-toolbar"
+                                class="btn-toolbar fr-admin-actions"
                                 xmlns="http://www.w3.org/1999/xhtml"
                                 xxf:element="div">
                                 <div class="btn-group">
@@ -1281,6 +1337,8 @@
                                     </ul>
                                 </div>
 
+                                <span class="fr-toolbar-divider" aria-hidden="true"/>
+
                                 <xf:trigger class="btn-group" xxf:modal="true">
                                     <xf:label mediatype="text/html" ref="$fr-resources/buttons/refresh"/>
                                     <xf:dispatch event="DOMActivate" name="fr-initialize" targetid="fr-form-model"/>
@@ -1328,8 +1386,9 @@
                             </xf:group>
 
                             <!-- Progress bars for reindexing -->
-                            <xf:group ref="instance('fr-reindex-instance')"
-                                      class="fr-reindex-status">
+                            <xf:group
+                                ref="instance('fr-reindex-instance')[xxf:split(status)[2] = ('starting', 'indexing', 'stopping', 'done')]"
+                                class="fr-reindex-status">
                                 <xf:var name="status-name" value="xxf:split(status)[2]"/>
 
                                 <xf:group ref=".[$status-name = ('starting', 'indexing')]">
@@ -1380,44 +1439,10 @@
                                 </xf:group>
                             </xf:group>
 
-                            <xf:group class="btn-toolbar">
-                                <xf:trigger
-                                    ref="if (case('fr-search-options-switch') = 'fr-search-options-hidden') then '' else ."
-                                    class="btn-group fr-search-button">
-
-                                    <xf:label mediatype="text/html" value="$fr-resources/home-summary/search/search-forms"/>
-                                </xf:trigger>
-
-                                <!-- Show/hide search options button -->
-                                <xf:trigger appearance="full" class="btn-group fr-search-show-button">
-                                    <xf:label
-                                        mediatype="text/html"
-                                        ref="$fr-resources/home-summary/search/(if (case('fr-search-options-switch') = 'fr-search-options-hidden') then show-search-options else close-search-options)"/>
-
-                                    <xf:action event="DOMActivate">
-                                        <!-- Clear search fields -->
-                                        <xf:setvalue iterate="instance()/search-options/(local | remote)/*" ref="."/>
-                                        <xf:setvalue iterate="instance('fr-metadata-queries')/(local | remote)/query" ref="."/>
-
-                                        <xf:toggle case="{if (case('fr-search-options-switch') = 'fr-search-options-hidden') then 'fr-search-options-shown' else 'fr-search-options-hidden'}"/>
-
-                                        <xf:action if="case('fr-search-options-switch') = 'fr-search-options-shown'">
-                                            <xf:setfocus control="fr-search-options-switch"/>
-                                            <xf:action if="empty(instance('fr-distinct-apps')/*)">
-                                                <xf:send submission="distinct-apps-submission"/>
-                                            </xf:action>
-                                            <xf:action if="empty(instance('fr-distinct-forms-all')/*)">
-                                                <xf:send submission="distinct-forms-all-submission"/>
-                                            </xf:action>
-                                        </xf:action>
-                                    </xf:action>
-                                </xf:trigger>
-                            </xf:group>
-
                             <fr:pager
-                                id="fr-pager"
+                                id="fr-admin-pager"
                                 page-size="{xxf:property('oxf.fr.home.page-size')}"
-                                total-value="count(instance('fr-metadata')/*)"
+                                total-value="count($forms)"
                                 from-ref="instance('fr-paging-instance')/from"
                                 to-ref="instance('fr-paging-instance')/to">
 
@@ -1427,257 +1452,522 @@
                                     index="1"/>
 
                             </fr:pager>
-                        </xh:div>
+                        </xf:group>
 
-                        <!-- Search options -->
-                        <xf:switch id="fr-search-options-switch">
-                            <xf:case id="fr-search-options-hidden"/>
-                            <xf:case id="fr-search-options-shown">
-                                <xh:fieldset class="{'fr-search-options', 'root-fieldset', 'no-inner-fieldset'[not($show-remote)]}">
-                                    <xh:legend><xf:output ref="$fr-resources/home-summary/search/search-options"/></xh:legend>
+                        <!-- Always-visible inline filter bar (Row 2 on Forms Admin, Row 1 + Pager on Published Forms) -->
+                        <xh:div class="fr-filter-row">
+                            <xf:group class="fr-home-filters" role="search">
+                                <xf:var name="local-search"      value="instance()/search-options/local"/>
+                                <xf:var name="remote-search"     value="instance()/search-options/remote"/>
+                                <xf:var name="current-app-name"  value="$local-search/application-name"/>
+                                <xf:var name="current-form-name" value="$local-search/form-name"/>
+                                <xf:var name="local-prefix"      value="if ($is-admin and $show-remote) then concat($fr-resources/home/titles/local, ' — ') else ''"/>
+                                <xf:var name="remote-prefix"     value="concat($fr-resources/home/titles/remote, ' — ')"/>
 
-                                    <xf:var name="search-options" value="instance('fr-form-instance')/search-options"/>
+                                <xf:var
+                                    name="available-applications"
+                                    value="
+                                        if ($current-form-name/@match = 'exact' and xxf:non-blank($current-form-name) and (empty($current-app-name) or $current-app-name = '')) then
+                                            xxf:sort(distinct-values((
+                                                instance('fr-metadata')/form[form-name = $current-form-name]/application-name,
+                                                instance('fr-distinct-forms-cache')/app[* = $current-form-name]/@name
+                                            )), ., 'text')
+                                        else
+                                            instance('fr-distinct-apps')/*"/>
 
-                                    <xf:group class="fields-group">
-                                        <xh:fieldset class="fr-search-options">
-                                            <xh:legend><xf:output ref="$fr-resources/home/titles/local"/></xh:legend>
+                                <xf:var
+                                    name="available-forms"
+                                    value="
+                                        if ($current-app-name/@match = 'exact' and xxf:non-blank($current-app-name)) then
+                                            instance('fr-distinct-forms-cache')/app[@name = $current-app-name]/*
+                                        else
+                                            instance('fr-distinct-forms-all')/*"/>
 
-                                            <xf:group ref="$search-options/local/available[$show-permissions]" class="fr-search-item">
-                                                <xf:select1 id="status-select-local" ref=".">
-                                                    <xf:label ref="$fr-resources/home/titles/status"/>
-                                                    <xf:item>
-                                                        <xf:label ref="$fr-resources/home-summary/search/any"/>
-                                                        <xf:value/>
-                                                    </xf:item>
-                                                    <xf:item>
-                                                        <xf:label ref="$fr-resources/home/labels/available"/>
-                                                        <xf:value>true</xf:value>
-                                                    </xf:item>
-                                                    <xf:item>
-                                                        <xf:label ref="$fr-resources/home/labels/unavailable"/>
-                                                        <xf:value>false</xf:value>
-                                                    </xf:item>
-                                                </xf:select1>
-                                            </xf:group>
+                                <xf:var
+                                    name="has-active-filter"
+                                    value="
+                                        xxf:non-blank($local-search/free-search)                             or
+                                        ($local-search/free-search/@scope = 'title')                         or
+                                        xxf:non-blank($local-search/application-name)                        or
+                                        ($local-search/application-name/@match != 'exact')                   or
+                                        xxf:non-blank($local-search/form-name)                               or
+                                        ($local-search/form-name/@match != 'exact')                          or
+                                        xxf:non-blank($local-search/last-modified)                           or
+                                        ($is-admin and (
+                                            xxf:non-blank($local-search/available)                           or
+                                            xxf:non-blank($local-search/form-version)                        or
+                                            ($show-remote and xxf:non-blank($remote-search/available))       or
+                                            ($show-remote and xxf:non-blank($remote-search/last-modified))
+                                        ))"/>
 
-                                            <xf:group ref="$search-options/local/last-modified" class="fr-search-item date-range-group">
-                                                <xf:select1 id="last-modified-select-local" ref=".">
-                                                    <xf:label ref="$fr-resources/home-summary/titles/last-modified"/>
-                                                    <xf:item>
-                                                        <xf:label ref="$fr-resources/home-summary/search/any"/>
-                                                        <xf:value/>
-                                                    </xf:item>
-                                                    <xf:itemset ref="$fr-resources/home-summary/search/dates/item">
-                                                        <xf:label ref="label"/>
-                                                        <xf:value ref="value"/>
-                                                    </xf:itemset>
-
-                                                    <xf:action event="xforms-value-changed">
-                                                        <!-- Reset after/before fields -->
-                                                        <xf:setvalue ref="$search-options/local/last-modified-after"/>
-                                                        <xf:setvalue ref="$search-options/local/last-modified-before"/>
-                                                    </xf:action>
-                                                </xf:select1>
-                                                <xf:group ref="''[$search-options/local/last-modified = 'custom']" class="after-before-container">
-                                                    <fr:date id="last-modified-after-local" ref="$search-options/local/last-modified-after" >
-                                                        <xf:label ref="$fr-resources/home-summary/search/date-after"/>
-                                                    </fr:date>
-                                                    <fr:date id="last-modified-before-local" ref="$search-options/local/last-modified-before">
-                                                        <xf:label ref="$fr-resources/home-summary/search/date-before"/>
-                                                    </fr:date>
-                                                </xf:group>
-                                            </xf:group>
-                                        </xh:fieldset>
-                                    </xf:group>
-
-                                    <xf:group ref="''[$show-remote]" class="fields-group">
-                                        <xh:fieldset class="fr-search-options">
-                                            <xh:legend><xf:output ref="$fr-resources/home/titles/remote"/></xh:legend>
-
-                                            <xf:group ref="$search-options/remote/available[$show-permissions]" class="fr-search-item">
-                                                <xf:select1 id="status-select-remote" ref=".">
-                                                    <xf:label ref="$fr-resources/home/titles/status"/>
-                                                    <xf:item>
-                                                        <xf:label ref="$fr-resources/home-summary/search/any"/>
-                                                        <xf:value/>
-                                                    </xf:item>
-                                                    <xf:item>
-                                                        <xf:label ref="$fr-resources/home/labels/available"/>
-                                                        <xf:value>true</xf:value>
-                                                    </xf:item>
-                                                    <xf:item>
-                                                        <xf:label ref="$fr-resources/home/labels/unavailable"/>
-                                                        <xf:value>false</xf:value>
-                                                    </xf:item>
-                                                </xf:select1>
-                                            </xf:group>
-
-                                            <xf:group ref="$search-options/remote/last-modified" class="fr-search-item date-range-group">
-                                                <xf:select1 id="last-modified-select-remote" ref=".">
-                                                    <xf:label ref="$fr-resources/home-summary/titles/last-modified"/>
-                                                    <xf:item>
-                                                        <xf:label ref="$fr-resources/home-summary/search/any"/>
-                                                        <xf:value/>
-                                                    </xf:item>
-                                                    <xf:itemset ref="$fr-resources/home-summary/search/dates/item">
-                                                        <xf:label ref="label"/>
-                                                        <xf:value ref="value"/>
-                                                    </xf:itemset>
-
-                                                    <xf:action event="xforms-value-changed">
-                                                        <!-- Reset after/before fields -->
-                                                        <xf:setvalue ref="$search-options/remote/last-modified-after"/>
-                                                        <xf:setvalue ref="$search-options/remote/last-modified-before"/>
-                                                    </xf:action>
-                                                </xf:select1>
-                                                <xf:group ref="''[$search-options/remote/last-modified = 'custom']" class="after-before-container">
-                                                    <fr:date id="last-modified-after-remote" ref="$search-options/remote/last-modified-after" >
-                                                        <xf:label ref="$fr-resources/home-summary/search/date-after"/>
-                                                    </fr:date>
-                                                    <fr:date id="last-modified-before-remote" ref="$search-options/remote/last-modified-before">
-                                                        <xf:label ref="$fr-resources/home-summary/search/date-before"/>
-                                                    </fr:date>
-                                                </xf:group>
-                                            </xf:group>
-                                        </xh:fieldset>
-                                    </xf:group>
-
-                                    <xf:group class="fields-group">
-                                        <xh:fieldset class="fr-search-options">
-                                            <xh:legend><xf:output ref="$fr-resources/home/titles/form-identification"/></xh:legend>
-
-                                            <xf:var name="current-app-name"  value="$search-options/local/application-name"/>
-                                            <xf:var name="current-form-name" value="$search-options/local/form-name"/>
-
+                                <xh:div
+                                    class="fr-home-search-box"
+                                    role="group"
+                                    aria-label="{$fr-resources/home-summary/search/search}">
+                                    <xf:trigger
+                                        id="fr-home-search-scope-toggle"
+                                        ref="$local-search/free-search"
+                                        appearance="minimal"
+                                        class="fr-match-toggle">
+                                        <xf:label>
+                                            <xh:i class="fa fa-fw fa-search fr-match-icon fr-match-icon-exact" aria-hidden="true"/>
+                                            <xh:span class="fr-match-icon fr-match-icon-substring" aria-hidden="true">T</xh:span>
+                                            <xh:span class="xforms-hidden">
+                                                <xf:output value="concat(frf:removeHtmlTags($fr-resources/home-summary/titles/form-title), ': ', $fr-resources/home-summary/search/partial-match-hint)"/>
+                                            </xh:span>
+                                        </xf:label>
+                                        <xf:hint value="
+                                            if ($local-search/free-search/@scope = 'title') then
+                                                concat(frf:removeHtmlTags($fr-resources/home-summary/titles/form-title), ' (', $fr-resources/home-summary/search/partial-match-hint, ')')
+                                            else
+                                                frf:removeHtmlTags($fr-resources/home/labels/free-search-placeholder)"/>
+                                        <xf:action event="DOMActivate" propagate="stop">
                                             <xf:var
-                                                name="applications"
-                                                value="
-                                                    if ($current-form-name/@match = 'exact' and xxf:non-blank($current-form-name) and (empty($current-app-name) or $current-app-name = '')) then
-                                                        xxf:sort(distinct-values((
-                                                            instance('fr-metadata')/form[form-name = $current-form-name]/application-name,
-                                                            instance('fr-distinct-forms-cache')/app[* = $current-form-name]/@name
-                                                        )), ., 'text')
-                                                    else
-                                                        instance('fr-distinct-apps')/*"/>
+                                                name="next-scope"
+                                                value="if ($local-search/free-search/@scope = 'title') then 'all' else 'title'"/>
+                                            <xf:setvalue ref="$local-search/free-search/@scope" value="$next-scope"/>
+                                            <xf:dispatch name="fr-sync-match-toggles" targetid="fr-form-model"/>
+                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
+                                                <xf:property name="page-number" value="1"/>
+                                            </xf:dispatch>
+                                            <xf:action if="xxf:is-blank($local-search/free-search)">
+                                                <xf:setfocus control="fr-forms-search-input"/>
+                                            </xf:action>
+                                        </xf:action>
+                                    </xf:trigger>
+                                    <xf:input
+                                        id="fr-forms-search-input"
+                                        ref="$local-search/free-search"
+                                        incremental="true"
+                                        class="fr-home-search-input">
+                                        <xf:label
+                                            appearance="minimal"
+                                            value="
+                                                if ($local-search/free-search/@scope = 'title') then
+                                                    concat(frf:removeHtmlTags($fr-resources/home-summary/titles/form-title), '&#x2026;')
+                                                else
+                                                    $fr-resources/home/labels/free-search-placeholder"/>
+                                        <xf:action event="xforms-enabled" target="#observer" type="javascript">
+                                            <xf:body>
+                                                const inp = this.querySelector('input');
+                                                if (inp) {
+                                                    inp.setAttribute('autocorrect', 'off');
+                                                    inp.setAttribute('autocapitalize', 'none');
+                                                    inp.setAttribute('spellcheck', 'false');
+                                                }
+                                            </xf:body>
+                                        </xf:action>
+                                        <xf:action event="xforms-value-changed">
+                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
+                                                <xf:property name="page-number" value="1"/>
+                                            </xf:dispatch>
+                                        </xf:action>
+                                        <xf:action event="DOMActivate" propagate="stop">
+                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
+                                                <xf:property name="page-number" value="1"/>
+                                            </xf:dispatch>
+                                        </xf:action>
+                                    </xf:input>
+                                    <xf:trigger
+                                        ref=".[xxf:non-blank($local-search/free-search)]"
+                                        appearance="minimal"
+                                        class="fr-home-search-clear">
+                                        <xf:label>
+                                            <xh:i class="fa fa-fw fa-times-circle" aria-hidden="true"/>
+                                            <xh:span class="xforms-hidden">
+                                                <xf:output value="frf:removeHtmlTags($fr-resources/buttons/clear)"/>
+                                            </xh:span>
+                                        </xf:label>
+                                        <xf:action event="DOMActivate" propagate="stop">
+                                            <xf:setvalue ref="$local-search/free-search"/>
+                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
+                                                <xf:property name="page-number" value="1"/>
+                                            </xf:dispatch>
+                                            <xf:setfocus control="fr-forms-search-input"/>
+                                        </xf:action>
+                                    </xf:trigger>
+                                </xh:div>
 
+                                <xh:div
+                                    class="fr-home-app-filter"
+                                    role="group"
+                                    aria-label="{frf:removeHtmlTags($fr-resources/home-summary/titles/application-name)}">
+                                    <xf:trigger
+                                        id="fr-forms-app-match-toggle"
+                                        ref="$current-app-name"
+                                        appearance="minimal"
+                                        class="fr-match-toggle">
+                                        <xf:label>
+                                            <xh:span class="fr-match-icon fr-match-icon-exact" aria-hidden="true">=</xh:span>
+                                            <xh:span class="fr-match-icon fr-match-icon-substring" aria-hidden="true">&#x2248;</xh:span>
+                                            <xh:span class="xforms-hidden">
+                                                <xf:output value="concat(frf:removeHtmlTags($fr-resources/home-summary/titles/application-name), ': ', $fr-resources/home-summary/search/partial-match-hint)"/>
+                                            </xh:span>
+                                        </xf:label>
+                                        <xf:hint value="if ($current-app-name/@match = 'exact') then $fr-resources/home-summary/search/exact-match-hint else $fr-resources/home-summary/search/partial-match-hint"/>
+                                        <xf:action event="DOMActivate" propagate="stop">
                                             <xf:var
-                                                name="forms"
+                                                name="was-exact-non-blank"
+                                                value="$current-app-name/@match = 'exact' and xxf:non-blank($current-app-name)"/>
+                                            <xf:var
+                                                name="next-match"
+                                                value="if ($current-app-name/@match = 'exact') then 'substring' else 'exact'"/>
+                                            <xf:setvalue ref="$current-app-name/@match" value="$next-match"/>
+                                            <xf:setvalue ref="$current-app-name"/>
+                                            <xf:dispatch name="fr-sync-match-toggles" targetid="fr-form-model"/>
+                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
+                                                <xf:property name="page-number" value="1"/>
+                                            </xf:dispatch>
+                                            <xf:action if="$next-match != 'exact'">
+                                                <xf:setfocus control="fr-forms-application-input"/>
+                                            </xf:action>
+                                            <xf:action if="$was-exact-non-blank">
+                                                <xf:dispatch name="fr-initialize" targetid="fr-form-model">
+                                                    <xf:property name="keep-selection" value="'true'"/>
+                                                </xf:dispatch>
+                                            </xf:action>
+                                        </xf:action>
+                                    </xf:trigger>
+                                    <xf:select1
+                                        id="fr-forms-application-select"
+                                        ref="$current-app-name[@match = 'exact']"
+                                        appearance="search"
+                                        disable-placeholder="true">
+                                        <xf:label class="xforms-hidden" mediatype="text/html" value="$fr-resources/home-summary/titles/application-name"/>
+                                        <xf:item>
+                                            <xf:label ref="$fr-resources/home/export-purge/all-applications"/>
+                                            <xf:value/>
+                                        </xf:item>
+                                        <xf:itemset ref="$available-applications">
+                                            <xf:label ref="."/>
+                                            <xf:value ref="."/>
+                                        </xf:itemset>
+                                        <xf:action event="xforms-value-changed" if="$current-app-name/@match = 'exact' and xxf:non-blank($current-app-name)">
+                                            <xf:action if="exists(instance('fr-distinct-apps')/*) and not($current-app-name = instance('fr-distinct-apps')/*)">
+                                                <xf:setvalue ref="$current-app-name"/>
+                                            </xf:action>
+                                            <xf:action if="xxf:non-blank($current-app-name) and empty(instance('fr-distinct-forms-cache')/app[@name = $current-app-name])">
+                                                <xf:send submission="distinct-forms-submission">
+                                                    <xf:property name="app" value="string($current-app-name)" xxf:tunnel="true"/>
+                                                </xf:send>
+                                            </xf:action>
+                                            <xf:action if="xxf:non-blank($current-app-name) and $current-form-name/@match = 'exact' and xxf:non-blank($current-form-name) and not($current-form-name = instance('fr-distinct-forms-cache')/app[@name = $current-app-name]/*)">
+                                                <xf:setvalue ref="$current-form-name"/>
+                                            </xf:action>
+                                        </xf:action>
+                                    </xf:select1>
+                                    <xf:input
+                                        id="fr-forms-application-input"
+                                        ref="$current-app-name[not(@match = 'exact')]"
+                                        incremental="true"
+                                        class="fr-home-match-input">
+                                        <xf:label appearance="minimal" value="concat(frf:removeHtmlTags($fr-resources/home-summary/titles/application-name), '&#x2026;')"/>
+                                        <xf:action event="xforms-enabled" target="#observer" type="javascript">
+                                            <xf:body>
+                                                const inp = this.querySelector('input');
+                                                if (inp) {
+                                                    inp.setAttribute('autocorrect', 'off');
+                                                    inp.setAttribute('autocapitalize', 'none');
+                                                    inp.setAttribute('spellcheck', 'false');
+                                                }
+                                            </xf:body>
+                                        </xf:action>
+                                        <xf:action event="xforms-value-changed">
+                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
+                                                <xf:property name="page-number" value="1"/>
+                                            </xf:dispatch>
+                                        </xf:action>
+                                        <xf:action event="DOMActivate" propagate="stop">
+                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
+                                                <xf:property name="page-number" value="1"/>
+                                            </xf:dispatch>
+                                        </xf:action>
+                                    </xf:input>
+                                </xh:div>
+
+                                <xh:div
+                                    class="fr-home-form-filter"
+                                    role="group"
+                                    aria-label="{frf:removeHtmlTags($fr-resources/home-summary/titles/form-name)}">
+                                    <xf:trigger
+                                        id="fr-forms-form-match-toggle"
+                                        ref="$current-form-name"
+                                        appearance="minimal"
+                                        class="fr-match-toggle">
+                                        <xf:label>
+                                            <xh:span class="fr-match-icon fr-match-icon-exact" aria-hidden="true">=</xh:span>
+                                            <xh:span class="fr-match-icon fr-match-icon-substring" aria-hidden="true">&#x2248;</xh:span>
+                                            <xh:span class="xforms-hidden">
+                                                <xf:output value="concat(frf:removeHtmlTags($fr-resources/home-summary/titles/form-name), ': ', $fr-resources/home-summary/search/partial-match-hint)"/>
+                                            </xh:span>
+                                        </xf:label>
+                                        <xf:hint value="if ($current-form-name/@match = 'exact') then $fr-resources/home-summary/search/exact-match-hint else $fr-resources/home-summary/search/partial-match-hint"/>
+                                        <xf:action event="DOMActivate" propagate="stop">
+                                            <xf:var
+                                                name="was-exact-non-blank"
+                                                value="$current-form-name/@match = 'exact' and xxf:non-blank($current-form-name)"/>
+                                            <xf:var
+                                                name="next-match"
+                                                value="if ($current-form-name/@match = 'exact') then 'substring' else 'exact'"/>
+                                            <xf:setvalue ref="$current-form-name/@match" value="$next-match"/>
+                                            <xf:setvalue ref="$current-form-name"/>
+                                            <xf:dispatch name="fr-sync-match-toggles" targetid="fr-form-model"/>
+                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
+                                                <xf:property name="page-number" value="1"/>
+                                            </xf:dispatch>
+                                            <xf:action if="$next-match != 'exact'">
+                                                <xf:setfocus control="fr-forms-form-input"/>
+                                            </xf:action>
+                                            <xf:action if="$was-exact-non-blank">
+                                                <xf:dispatch name="fr-initialize" targetid="fr-form-model">
+                                                    <xf:property name="keep-selection" value="'true'"/>
+                                                </xf:dispatch>
+                                            </xf:action>
+                                        </xf:action>
+                                    </xf:trigger>
+                                    <xf:select1
+                                        id="fr-forms-form-select"
+                                        ref="$current-form-name[@match = 'exact']"
+                                        appearance="search"
+                                        disable-placeholder="true">
+                                        <xf:label class="xforms-hidden" mediatype="text/html" value="$fr-resources/home-summary/titles/form-name"/>
+                                        <xf:item>
+                                            <xf:label ref="$fr-resources/home/export-purge/all-forms"/>
+                                            <xf:value/>
+                                        </xf:item>
+                                        <xf:itemset ref="$available-forms">
+                                            <xf:label ref="."/>
+                                            <xf:value ref="."/>
+                                        </xf:itemset>
+                                        <xf:action event="xforms-value-changed" if="$current-form-name/@match = 'exact' and xxf:non-blank($current-form-name)">
+                                            <xf:var
+                                                name="valid-forms"
                                                 value="
                                                     if ($current-app-name/@match = 'exact' and xxf:non-blank($current-app-name)) then
                                                         instance('fr-distinct-forms-cache')/app[@name = $current-app-name]/*
                                                     else
                                                         instance('fr-distinct-forms-all')/*"/>
+                                            <xf:action if="exists($valid-forms) and not($current-form-name = $valid-forms)">
+                                                <xf:setvalue ref="$current-form-name"/>
+                                            </xf:action>
+                                        </xf:action>
+                                    </xf:select1>
+                                    <xf:input
+                                        id="fr-forms-form-input"
+                                        ref="$current-form-name[not(@match = 'exact')]"
+                                        incremental="true"
+                                        class="fr-home-match-input">
+                                        <xf:label appearance="minimal" value="concat(frf:removeHtmlTags($fr-resources/home-summary/titles/form-name), '&#x2026;')"/>
+                                        <xf:action event="xforms-enabled" target="#observer" type="javascript">
+                                            <xf:body>
+                                                const inp = this.querySelector('input');
+                                                if (inp) {
+                                                    inp.setAttribute('autocorrect', 'off');
+                                                    inp.setAttribute('autocapitalize', 'none');
+                                                    inp.setAttribute('spellcheck', 'false');
+                                                }
+                                            </xf:body>
+                                        </xf:action>
+                                        <xf:action event="xforms-value-changed">
+                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
+                                                <xf:property name="page-number" value="1"/>
+                                            </xf:dispatch>
+                                        </xf:action>
+                                        <xf:action event="DOMActivate" propagate="stop">
+                                            <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
+                                                <xf:property name="page-number" value="1"/>
+                                            </xf:dispatch>
+                                        </xf:action>
+                                    </xf:input>
+                                </xh:div>
 
-                                            <xf:group ref="$search-options/local/application-name" class="fr-search-item fr-application-name">
-                                                <xf:select1 id="application-name-select" ref=".[@match = 'exact']" appearance="search" disable-placeholder="true">
-                                                    <xf:label mediatype="text/html" value="$fr-resources/home-summary/titles/application-name"/>
-                                                    <xf:item>
-                                                        <xf:label ref="$fr-resources/home/export-purge/all-applications"/>
-                                                        <xf:value/>
-                                                    </xf:item>
-                                                    <xf:itemset ref="$applications">
-                                                        <xf:label ref="."/>
-                                                        <xf:value ref="."/>
-                                                    </xf:itemset>
-                                                </xf:select1>
-                                                <xf:input ref=".[not(@match = 'exact')]">
-                                                    <xf:label mediatype="text/html" value="$fr-resources/home-summary/titles/application-name"/>
-                                                </xf:input>
-                                                <fr:checkbox-input ref="@match" selected-value="substring" deselected-value="exact" class="xforms-enable-hint-as-tooltip" id="fr-application-name-match">
-                                                    <xf:hint appearance="minimal" ref="$fr-resources/home-summary/search/partial-match-hint"/>
-                                                </fr:checkbox-input>
+                                <xf:group ref=".[$is-admin and $show-permissions]" class="fr-home-status-filter">
+                                    <xf:select1 id="fr-forms-status-select" ref="$local-search/available">
+                                        <xf:label class="xforms-hidden" ref="$fr-resources/home/titles/status"/>
+                                        <xf:item>
+                                            <xf:label value="concat($local-prefix, $fr-resources/home/titles/status, ': ', $fr-resources/home-summary/search/any)"/>
+                                            <xf:value/>
+                                        </xf:item>
+                                        <xf:item>
+                                            <xf:label value="concat($local-prefix, $fr-resources/home/titles/status, ': ', $fr-resources/home/labels/available)"/>
+                                            <xf:value>true</xf:value>
+                                        </xf:item>
+                                        <xf:item>
+                                            <xf:label value="concat($local-prefix, $fr-resources/home/titles/status, ': ', $fr-resources/home/labels/unavailable)"/>
+                                            <xf:value>false</xf:value>
+                                        </xf:item>
+                                    </xf:select1>
+                                </xf:group>
 
-                                                <xf:action event="xforms-value-changed" if="$current-app-name/@match = 'exact' and xxf:non-blank($current-app-name)">
-                                                    <xf:action if="exists(instance('fr-distinct-apps')/*) and not($current-app-name = instance('fr-distinct-apps')/*)">
-                                                        <xf:setvalue ref="$current-app-name"/>
-                                                    </xf:action>
-                                                    <xf:action if="xxf:non-blank($current-app-name) and empty(instance('fr-distinct-forms-cache')/app[@name = $current-app-name])">
-                                                        <xf:send submission="distinct-forms-submission">
-                                                            <xf:property name="app" value="string($current-app-name)" xxf:tunnel="true"/>
-                                                        </xf:send>
-                                                    </xf:action>
-                                                    <xf:action if="xxf:non-blank($current-app-name) and $current-form-name/@match = 'exact' and xxf:non-blank($current-form-name) and not($current-form-name = instance('fr-distinct-forms-cache')/app[@name = $current-app-name]/*)">
-                                                        <xf:setvalue ref="$current-form-name"/>
-                                                    </xf:action>
-                                                </xf:action>
-                                            </xf:group>
+                                <xf:group ref=".[$is-admin]" class="fr-home-version-filter">
+                                    <xf:select1 id="fr-forms-version-select" ref="$local-search/form-version">
+                                        <xf:label class="xforms-hidden" ref="$fr-resources/home-summary/titles/version"/>
+                                        <xf:item>
+                                            <xf:label value="concat($fr-resources/home-summary/titles/version, ': ', $fr-resources/home/export-purge/all-versions)"/>
+                                            <xf:value/>
+                                        </xf:item>
+                                        <xf:item>
+                                            <xf:label value="concat($fr-resources/home-summary/titles/version, ': ', $fr-resources/home/export-purge/latest-version)"/>
+                                            <xf:value>latest</xf:value>
+                                        </xf:item>
+                                    </xf:select1>
+                                </xf:group>
 
-                                            <xf:group ref="$search-options/local/form-name" class="fr-search-item fr-form-name">
-                                                <xf:select1 id="form-name-select" ref=".[@match = 'exact']" appearance="search" disable-placeholder="true">
-                                                    <xf:label mediatype="text/html" value="$fr-resources/home-summary/titles/form-name"/>
-                                                    <xf:item>
-                                                        <xf:label ref="$fr-resources/home/export-purge/all-forms"/>
-                                                        <xf:value/>
-                                                    </xf:item>
-                                                    <xf:itemset ref="$forms">
-                                                        <xf:label ref="."/>
-                                                        <xf:value ref="."/>
-                                                    </xf:itemset>
-                                                </xf:select1>
-                                                <xf:input ref=".[not(@match = 'exact')]">
-                                                    <xf:label mediatype="text/html" value="$fr-resources/home-summary/titles/form-name"/>
-                                                </xf:input>
-                                                <fr:checkbox-input ref="@match" selected-value="substring" deselected-value="exact" class="xforms-enable-hint-as-tooltip" id="fr-form-name-match">
-                                                    <xf:hint appearance="minimal" ref="$fr-resources/home-summary/search/partial-match-hint"/>
-                                                </fr:checkbox-input>
-
-                                                <xf:action event="xforms-value-changed" if="$current-form-name/@match = 'exact' and xxf:non-blank($current-form-name)">
-                                                    <xf:var
-                                                        name="valid-forms"
-                                                        value="
-                                                            if ($current-app-name/@match = 'exact' and xxf:non-blank($current-app-name)) then
-                                                                instance('fr-distinct-forms-cache')/app[@name = $current-app-name]/*
-                                                            else
-                                                                instance('fr-distinct-forms-all')/*"/>
-                                                    <xf:action if="exists($valid-forms) and not($current-form-name = $valid-forms)">
-                                                        <xf:setvalue ref="$current-form-name"/>
-                                                    </xf:action>
-                                                </xf:action>
-                                            </xf:group>
-
-                                            <xf:group ref="$search-options/local/form-version" class="fr-search-item">
-                                                <xf:select1 id="form-version-select" ref=".">
-                                                    <xf:label ref="$fr-resources/home-summary/titles/version"/>
-                                                    <!-- Re-using export/purge dialog labels for now -->
-                                                    <xf:item>
-                                                        <xf:label ref="$fr-resources/home/export-purge/all-versions"/>
-                                                        <xf:value/>
-                                                    </xf:item>
-                                                    <xf:item>
-                                                        <xf:label ref="$fr-resources/home/export-purge/latest-version"/>
-                                                        <xf:value>latest</xf:value>
-                                                    </xf:item>
-                                                </xf:select1>
-                                            </xf:group>
-
-                                            <xf:group ref="$search-options/local/title" class="fr-search-item">
-                                                <xf:input ref=".">
-                                                    <xf:label mediatype="text/html" value="$fr-resources/home-summary/titles/form-title"/>
-                                                </xf:input>
-                                            </xf:group>
-                                        </xh:fieldset>
+                                <xh:div class="fr-home-modified-filter">
+                                    <xf:select1 id="fr-forms-last-modified-select" ref="$local-search/last-modified">
+                                        <xf:label class="xforms-hidden" ref="$fr-resources/home-summary/titles/last-modified"/>
+                                        <xf:item>
+                                            <xf:label value="concat($local-prefix, $fr-resources/home-summary/titles/last-modified, ': ', $fr-resources/home-summary/search/any)"/>
+                                            <xf:value/>
+                                        </xf:item>
+                                        <xf:itemset ref="$fr-resources/home-summary/search/dates/item">
+                                            <xf:label value="concat($local-prefix, $fr-resources/home-summary/titles/last-modified, ': ', label)"/>
+                                            <xf:value ref="value"/>
+                                        </xf:itemset>
+                                        <xf:action event="xforms-value-changed">
+                                            <xf:setvalue ref="$local-search/last-modified-after"/>
+                                            <xf:setvalue ref="$local-search/last-modified-before"/>
+                                        </xf:action>
+                                    </xf:select1>
+                                    <xf:group ref=".[$local-search/last-modified = 'custom']" class="fr-home-custom-dates">
+                                        <fr:date id="fr-forms-last-modified-after" ref="$local-search/last-modified-after">
+                                            <xf:label ref="$fr-resources/home-summary/search/date-after"/>
+                                        </fr:date>
+                                        <fr:date id="fr-forms-last-modified-before" ref="$local-search/last-modified-before">
+                                            <xf:label ref="$fr-resources/home-summary/search/date-before"/>
+                                        </fr:date>
                                     </xf:group>
-                                </xh:fieldset>
-                            </xf:case>
-                        </xf:switch>
+                                </xh:div>
+
+                                <xf:group ref=".[$is-admin and $show-remote]" class="fr-home-remote-filters">
+                                    <xf:group ref=".[$show-permissions]" class="fr-home-status-filter">
+                                        <xf:select1 id="fr-forms-remote-status-select" ref="$remote-search/available">
+                                            <xf:label class="xforms-hidden" value="concat($remote-prefix, $fr-resources/home/titles/status)"/>
+                                            <xf:item>
+                                                <xf:label value="concat($remote-prefix, $fr-resources/home/titles/status, ': ', $fr-resources/home-summary/search/any)"/>
+                                                <xf:value/>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label value="concat($remote-prefix, $fr-resources/home/titles/status, ': ', $fr-resources/home/labels/available)"/>
+                                                <xf:value>true</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label value="concat($remote-prefix, $fr-resources/home/titles/status, ': ', $fr-resources/home/labels/unavailable)"/>
+                                                <xf:value>false</xf:value>
+                                            </xf:item>
+                                        </xf:select1>
+                                    </xf:group>
+
+                                    <xh:div class="fr-home-modified-filter">
+                                        <xf:select1 id="fr-forms-remote-last-modified-select" ref="$remote-search/last-modified">
+                                            <xf:label class="xforms-hidden" value="concat($remote-prefix, $fr-resources/home-summary/titles/last-modified)"/>
+                                            <xf:item>
+                                                <xf:label value="concat($remote-prefix, $fr-resources/home-summary/titles/last-modified, ': ', $fr-resources/home-summary/search/any)"/>
+                                                <xf:value/>
+                                            </xf:item>
+                                            <xf:itemset ref="$fr-resources/home-summary/search/dates/item">
+                                                <xf:label value="concat($remote-prefix, $fr-resources/home-summary/titles/last-modified, ': ', label)"/>
+                                                <xf:value ref="value"/>
+                                            </xf:itemset>
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:setvalue ref="$remote-search/last-modified-after"/>
+                                                <xf:setvalue ref="$remote-search/last-modified-before"/>
+                                            </xf:action>
+                                        </xf:select1>
+                                        <xf:group ref=".[$remote-search/last-modified = 'custom']" class="fr-home-custom-dates">
+                                            <fr:date id="fr-forms-remote-last-modified-after" ref="$remote-search/last-modified-after">
+                                                <xf:label ref="$fr-resources/home-summary/search/date-after"/>
+                                            </fr:date>
+                                            <fr:date id="fr-forms-remote-last-modified-before" ref="$remote-search/last-modified-before">
+                                                <xf:label ref="$fr-resources/home-summary/search/date-before"/>
+                                            </fr:date>
+                                        </xf:group>
+                                    </xh:div>
+                                </xf:group>
+
+                                <xf:trigger ref=".[$has-active-filter]" class="fr-home-clear-filters">
+                                    <xf:label mediatype="text/html" ref="$fr-resources/buttons/clear"/>
+                                    <xf:action event="DOMActivate" propagate="stop">
+                                        <xf:var
+                                            name="had-backend-filter"
+                                            value="
+                                                ($local-search/application-name/@match = 'exact' and xxf:non-blank($local-search/application-name)) or
+                                                ($local-search/form-name/@match = 'exact'        and xxf:non-blank($local-search/form-name))        or
+                                                xxf:non-blank($local-search/last-modified)                                                          or
+                                                ($is-admin and (
+                                                    xxf:non-blank($local-search/available)                                                          or
+                                                    xxf:non-blank($local-search/form-version)                                                       or
+                                                    xxf:non-blank($remote-search/available)                                                         or
+                                                    xxf:non-blank($remote-search/last-modified)
+                                                ))"/>
+                                        <xf:setvalue ref="$local-search/free-search"/>
+                                        <xf:setvalue ref="$local-search/free-search/@scope" value="'all'"/>
+                                        <xf:setvalue ref="$local-search/application-name"/>
+                                        <xf:setvalue ref="$local-search/application-name/@match" value="'exact'"/>
+                                        <xf:setvalue ref="$local-search/form-name"/>
+                                        <xf:setvalue ref="$local-search/form-name/@match" value="'exact'"/>
+                                        <xf:setvalue ref="$local-search/last-modified"/>
+                                        <xf:setvalue ref="$local-search/last-modified-after"/>
+                                        <xf:setvalue ref="$local-search/last-modified-before"/>
+                                        <xf:action if="$is-admin">
+                                            <xf:setvalue ref="$local-search/available"/>
+                                            <xf:setvalue ref="$local-search/form-version"/>
+                                            <xf:setvalue ref="$remote-search/available"/>
+                                            <xf:setvalue ref="$remote-search/last-modified"/>
+                                            <xf:setvalue ref="$remote-search/last-modified-after"/>
+                                            <xf:setvalue ref="$remote-search/last-modified-before"/>
+                                        </xf:action>
+                                        <xf:dispatch name="fr-sync-match-toggles" targetid="fr-form-model"/>
+                                        <xf:dispatch name="fr-set-current-page" targetid="{$pager-id}">
+                                            <xf:property name="page-number" value="1"/>
+                                        </xf:dispatch>
+                                        <xf:action if="$had-backend-filter">
+                                            <xf:dispatch name="fr-initialize" targetid="fr-form-model">
+                                                <xf:property name="keep-selection" value="'true'"/>
+                                            </xf:dispatch>
+                                        </xf:action>
+                                    </xf:action>
+                                </xf:trigger>
+                            </xf:group>
+
+                            <xf:group ref=".[not($is-admin)]" class="fr-published-pager">
+                                <fr:pager
+                                    id="fr-pager"
+                                    page-size="{xxf:property('oxf.fr.home.page-size')}"
+                                    total-value="count($forms)"
+                                    from-ref="instance('fr-paging-instance')/from"
+                                    to-ref="instance('fr-paging-instance')/to">
+
+                                    <xf:setindex
+                                        event="fr-pager-changed"
+                                        repeat="forms-repeat"
+                                        index="1"/>
+
+                                </fr:pager>
+                            </xf:group>
+                        </xh:div>
                     </xf:group>
 
                     <xf:group xxf:update="full" class="fr-search-results fr-table-frame">
-                        <xh:table class="fr-forms-table table table-condensed">
+                        <xh:table class="fr-forms-table table table-condensed {'fr-table-no-form-data'[empty($forms)]}">
                             <xh:thead>
-								<xf:group ref=".[$show-remote]">
-									<xh:tr class="header-groups">
-										<xf:group ref=".[$show-permissions]">
-											<xh:th/>
-										</xf:group>
-										<xh:th colspan="{if ($show-permissions) then 2 else 1}"><xf:output value="$fr-resources/home/titles/local"/></xh:th>
-										<xh:th colspan="{if ($show-permissions) then 2 else 1}"><xf:output value="$fr-resources/home/titles/remote"/></xh:th>
-										<xh:th colspan="3"><xf:output value="$fr-resources/home/titles/form-identification"/></xh:th>
-									</xh:tr>
-								</xf:group>
-								<xh:tr>
-                                    <xf:group ref=".[$show-permissions]">
-                                        <xh:th class="fr-home-select"/>
+                                <xf:group ref=".[$is-admin and $show-remote]">
+                                    <xh:tr class="header-groups">
+                                        <xf:group ref=".[$show-permissions]">
+                                            <xh:th/>
+                                        </xf:group>
+                                        <xh:th colspan="{if ($show-permissions) then 2 else 1}"><xf:output value="$fr-resources/home/titles/local"/></xh:th>
+                                        <xh:th colspan="{if ($show-permissions) then 2 else 1}"><xf:output value="$fr-resources/home/titles/remote"/></xh:th>
+                                        <xh:th colspan="4"><xf:output value="$fr-resources/home/titles/form-identification"/></xh:th>
+                                    </xh:tr>
+                                </xf:group>
+                                <xh:tr>
+                                    <xf:group ref=".[$is-admin and $show-permissions]">
+                                        <xh:th class="fr-home-select" scope="col">
+                                            <xh:span class="xforms-hidden">
+                                                <xf:output value="$fr-resources/summary/titles/selected"/>
+                                            </xh:span>
+                                        </xh:th>
                                         <fr:sortable-th
                                             class="fr-status"
                                             label="$fr-resources/home/titles/status"
@@ -1685,13 +1975,13 @@
                                             local-or-remote="local"
                                             column="available"/>
                                     </xf:group>
-                                    <fr:sortable-th
-                                        class="fr-last-modified"
-                                        label="$fr-resources/home-summary/titles/last-modified"
-                                        instance="instance('fr-order-by')"
-                                        local-or-remote="local"
-                                        column="last-modified"/>
-                                    <xf:group ref=".[$show-remote]">
+                                    <xf:group ref=".[$is-admin and $show-remote]">
+                                        <fr:sortable-th
+                                            class="fr-last-modified"
+                                            label="$fr-resources/home-summary/titles/last-modified"
+                                            instance="instance('fr-order-by')"
+                                            local-or-remote="local"
+                                            column="last-modified"/>
                                         <xf:group ref=".[$show-permissions]">
                                             <fr:sortable-th
                                                 class="fr-status"
@@ -1707,6 +1997,12 @@
                                             local-or-remote="remote"
                                             column="last-modified"/>
                                     </xf:group>
+                                    <fr:sortable-th
+                                        class="fr-title"
+                                        label="$fr-resources/home-summary/titles/form-title"
+                                        instance="instance('fr-order-by')"
+                                        local-or-remote="local"
+                                        column="title"/>
                                     <fr:sortable-th
                                         class="fr-application-name"
                                         label="$fr-resources/home-summary/titles/application-name"
@@ -1725,24 +2021,31 @@
                                         instance="instance('fr-order-by')"
                                         local-or-remote="local"
                                         column="form-version"/>
-                                    <fr:sortable-th
-                                        class="fr-title"
-                                        label="$fr-resources/home-summary/titles/form-title"
-                                        instance="instance('fr-order-by')"
-                                        local-or-remote="local"
-                                        column="title"/>
+                                    <xf:group ref=".[not($is-admin and $show-remote)]">
+                                        <fr:sortable-th
+                                            class="fr-last-modified"
+                                            label="$fr-resources/home-summary/titles/last-modified"
+                                            instance="instance('fr-order-by')"
+                                            local-or-remote="local"
+                                            column="last-modified"/>
+                                        <xh:th class="fr-form-actions" scope="col">
+                                            <xh:span class="xforms-hidden">
+                                                <xf:output value="$fr-resources/home/buttons/operation"/>
+                                            </xh:span>
+                                        </xh:th>
+                                    </xf:group>
                                 </xh:tr>
                             </xh:thead>
                             <xh:tbody>
-                                <!-- 5 columns are always displayed. Some of them are displayed depending on $show-permissions/remote -->
                                 <xf:var
                                     name="column-count"
                                     value="
-                                        5 +
-                                        (    if ($show-permissions and $show-remote) then 4
-                                        else if ($show-permissions)                  then 2
-                                        else if ($show-remote)                       then 1
-                                        else                                              0)"/>
+                                        if (not($is-admin)) then
+                                            6
+                                        else if (not($show-remote)) then
+                                            6 + (if ($show-permissions) then 2 else 0)
+                                        else
+                                            5 + (if ($show-permissions) then 4 else 1)"/>
 
                                 <xf:repeat
                                     ref="
@@ -1760,36 +2063,100 @@
                                     <xf:var name="ops"                  value="xxf:split(@operations)"/>
                                     <xf:var name="remote-ops"           value="xxf:split(remote-server[1]/@operations)"/>
                                     <xf:var name="form-version"         value="(form-version/string(), '1')[1]"/>
+                                    <xf:var name="can-navigate-summary" value="$local-available and $ops = ('*', 'update', 'read', 'delete', 'list')"/>
+                                    <xf:var name="can-navigate-new"     value="$local-available and $ops = ('*', 'create')"/>
+                                    <xf:var
+                                        name="show-version-param"
+                                        value="xxf:property(string-join(('oxf.fr.summary.show-version-selector', application-name, form-name), '.')) or $is-admin"/>
 
                                     <xf:var
-                                        name="link-to"
+                                        name="summary-link"
                                         value="
-                                            let $can-navigate-summary := $local-available and $ops = ('*', 'update', 'read', 'delete'),
-                                                $can-navigate-new     := $local-available and $ops = ('*', 'create')
-                                            return
-                                                $link-to-tokens[
-                                                    (. = 'summary' and $can-navigate-summary) or
-                                                    (. = 'new'     and $can-navigate-new)
-                                                ][1]"/>
-
-                                    <xf:var
-                                        name="link"
-                                        value="
-                                            if (exists($link-to)) then
+                                            if ($can-navigate-summary and $link-to-tokens = 'summary') then
                                                 concat(
                                                     '/fr/',
                                                     application-name,
                                                     '/',
                                                     form-name,
-                                                    '/',
-                                                    $link-to,
-                                                    if (xxf:property('oxf.fr.summary.show-version-selector.*.*') or $is-admin) then concat('?form-version=', $form-version) else ''
+                                                    '/summary',
+                                                    if ($show-version-param) then concat('?form-version=', $form-version) else ''
                                                 )
                                             else
                                                 ()"/>
 
+                                    <xf:var
+                                        name="new-link"
+                                        value="
+                                            if ($can-navigate-new and $link-to-tokens = 'new') then
+                                                concat(
+                                                    '/fr/',
+                                                    application-name,
+                                                    '/',
+                                                    form-name,
+                                                    '/new',
+                                                    if ($is-admin) then concat('?form-version=', $form-version) else ''
+                                                )
+                                            else
+                                                ()"/>
+
+                                    <xf:var
+                                        name="link-to"
+                                        value="
+                                            $link-to-tokens[
+                                                (. = 'summary' and $can-navigate-summary) or
+                                                (. = 'new'     and $can-navigate-new)
+                                            ][1]"/>
+
+                                    <xf:var
+                                        name="link"
+                                        value="
+                                            if ($link-to = 'summary') then
+                                                $summary-link
+                                            else if ($link-to = 'new') then
+                                                $new-link
+                                            else
+                                                ()"/>
+
+                                    <xf:var
+                                        name="title"
+                                        value="
+                                            (
+                                                title[@xml:lang = $fr-lang][xxf:non-blank()],
+                                                title[xxf:non-blank()],
+                                                remote-server[1]/title[@xml:lang = $fr-lang][xxf:non-blank()],
+                                                remote-server[1]/title[xxf:non-blank()],
+                                                $fr-resources/untitled-form
+                                            )[1]"/>
+
+                                    <xf:var
+                                        name="modified-adjusted"
+                                        value="
+                                            for $t in last-modified-time[xxf:non-blank()]
+                                            return
+                                                if (exists($tz)) then
+                                                    adjust-dateTime-to-timezone(xs:dateTime($t), $tz)
+                                                else
+                                                    adjust-dateTime-to-timezone(xs:dateTime($t))"/>
+
+                                    <xf:var
+                                        name="modified-display"
+                                        value="
+                                            for $v in $modified-adjusted
+                                            return
+                                                if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
+                                                then format-dateTime($v, $fr-resources/common/formats/within-day, xxf:lang(), (), ())
+                                                else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
+                                                then format-dateTime($v, $fr-resources/common/formats/day-this-year, xxf:lang(), (), ())
+                                                else format-dateTime($v, $fr-resources/common/formats/short-date, xxf:lang(), (), ())"/>
+
+                                    <xf:var
+                                        name="modified-tooltip"
+                                        value="
+                                            for $v in $modified-adjusted
+                                            return format-dateTime($v, $fr-resources/summary/formats/dateTime, xxf:lang(), (), ())"/>
+
                                     <xh:tr>
-                                        <xf:group ref=".[$show-permissions]">
+                                        <xf:group ref=".[$is-admin and $show-permissions]">
                                             <xh:td class="fr-home-select">
                                                 <xf:select
                                                     appearance="full"
@@ -1826,28 +2193,12 @@
                                                     value="$fr-resources/home/labels/newer"/>
                                             </xh:td>
                                         </xf:group>
-                                        <xh:td class="fr-modified">
-                                            <xf:output
+                                        <xf:group ref=".[$is-admin and $show-remote]">
+                                            <xh:td class="fr-modified" title="{$modified-tooltip}">
+                                                <xf:output
                                                     ref="last-modified-time"
-                                                    value="
-                                                        for $v in
-                                                            if (exists($tz)) then
-                                                                adjust-dateTime-to-timezone(
-                                                                    xs:dateTime(.),
-                                                                    $tz
-                                                                )
-                                                            else
-                                                                adjust-dateTime-to-timezone(
-                                                                    xs:dateTime(.)
-                                                                )
-                                                        return
-                                                            if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
-                                                            then format-dateTime($v, $fr-resources/common/formats/within-day, xxf:lang(), (), ())
-                                                            else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
-                                                            then format-dateTime($v, $fr-resources/common/formats/day-this-year, xxf:lang(), (), ())
-                                                            else format-dateTime($v, $fr-resources/common/formats/short-date, xxf:lang(), (), ())"/>
-                                        </xh:td>
-                                        <xf:group ref=".[$show-remote]">
+                                                    value="$modified-display"/>
+                                            </xh:td>
                                             <xf:group ref=".[$show-permissions]">
                                                 <xh:td class="fr-status">
                                                     <xf:output
@@ -1886,39 +2237,64 @@
                                                             else format-dateTime($v, $fr-resources/common/formats/short-date, xxf:lang(), (), ())"/>
                                             </xh:td>
                                         </xf:group>
-                                        <xh:td class="fr-application-name">
-                                            <xh:a href="{$link}" class="{if ($link) then '' else 'xforms-hidden'}">
-                                                <xf:output ref=".[$link]" value="application-name"/>
+                                        <xh:td class="fr-title" title="{$title}">
+                                            <xh:a href="{$link}" class="{if (exists($link)) then '' else 'xforms-hidden'}">
+                                                <xf:output ref=".[exists($link)]" value="$title"/>
                                             </xh:a>
-                                            <xf:output ref=".[not($link)]" value="application-name"/>
+                                            <xf:output ref=".[empty($link)]" value="$title"/>
                                         </xh:td>
-                                        <xh:td class="fr-form-name">
-                                            <xh:a href="{$link}" class="{if ($link) then '' else 'xforms-hidden'}">
-                                                <xf:output ref=".[$link]" value="form-name"/>
+                                        <xh:td class="fr-application-name">
+                                            <xh:a href="{$link}" class="{if (exists($link)) then '' else 'xforms-hidden'}">
+                                                <xh:span class="fr-app-pill">
+                                                    <xf:output ref=".[exists($link)]" value="application-name"/>
+                                                </xh:span>
                                             </xh:a>
-                                            <xf:output ref=".[not($link)]" value="form-name"/>
+                                            <xh:span class="{'fr-app-pill', 'xforms-hidden'[exists($link)]}">
+                                                <xf:output ref=".[empty($link)]" value="application-name"/>
+                                            </xh:span>
+                                        </xh:td>
+                                        <xh:td class="fr-form-name" title="{form-name}">
+                                            <xh:a href="{$link}" class="{if (exists($link)) then '' else 'xforms-hidden'}">
+                                                <xh:span class="fr-form-slug">
+                                                    <xf:output ref=".[exists($link)]" value="form-name"/>
+                                                </xh:span>
+                                            </xh:a>
+                                            <xh:span class="{'fr-form-slug', 'xforms-hidden'[exists($link)]}">
+                                                <xf:output ref=".[empty($link)]" value="form-name"/>
+                                            </xh:span>
                                         </xh:td>
                                         <xh:td class="fr-version">
-                                            <xh:a href="{$link}" class="{if ($link) then '' else 'xforms-hidden'}">
-                                                <xf:output ref=".[$link]" value="$form-version"/>
+                                            <xh:a href="{$link}" class="{if (exists($link)) then '' else 'xforms-hidden'}">
+                                                <xh:span class="fr-version-badge">
+                                                    <xf:output ref=".[exists($link)]" value="concat('v', $form-version)"/>
+                                                </xh:span>
                                             </xh:a>
-                                            <xf:output ref=".[not($link)]" value="$form-version"/>
+                                            <xh:span class="{'fr-version-badge', 'xforms-hidden'[exists($link)]}">
+                                                <xf:output ref=".[empty($link)]" value="concat('v', $form-version)"/>
+                                            </xh:span>
                                         </xh:td>
-                                        <xh:td class="fr-title">
-                                            <xf:var
-                                                name="title"
-                                                value="
-                                                    (
-                                                        title[@xml:lang = $fr-lang],
-                                                        title,
-                                                        remote-server[1]/title[@xml:lang = $fr-lang],
-                                                        remote-server[1]/title
-                                                    )[1]"/>
-                                            <xh:a href="{$link}" class="{if ($link) then '' else 'xforms-hidden'}">
-                                                <xf:output ref=".[$link]" value="$title"/>
-                                            </xh:a>
-                                            <xf:output ref=".[not($link)]" value="$title"/>
-                                        </xh:td>
+                                        <xf:group ref=".[not($is-admin and $show-remote)]">
+                                            <xh:td class="fr-modified" title="{$modified-tooltip}">
+                                                <xh:a href="{$link}" class="{if (exists($link)) then '' else 'xforms-hidden'}">
+                                                    <xf:output ref=".[exists($link)]" value="$modified-display"/>
+                                                </xh:a>
+                                                <xf:output ref=".[empty($link)]" value="$modified-display"/>
+                                            </xh:td>
+                                            <xh:td class="fr-form-actions">
+                                                <xh:div class="fr-row-actions">
+                                                    <xh:a
+                                                        href="{$new-link}"
+                                                        class="{'fr-row-action', 'fr-row-action-new', 'xforms-hidden'[empty($new-link)]}">
+                                                        <xf:output ref=".[exists($new-link)]" mediatype="text/html" value="$fr-resources/buttons/new"/>
+                                                    </xh:a>
+                                                    <xh:a
+                                                        href="{$summary-link}"
+                                                        class="{'fr-row-action', 'fr-row-action-summary', 'xforms-hidden'[empty($summary-link)]}">
+                                                        <xf:output ref=".[exists($summary-link)]" mediatype="text/html" value="$fr-resources/buttons/summary"/>
+                                                    </xh:a>
+                                                </xh:div>
+                                            </xh:td>
+                                        </xf:group>
                                     </xh:tr>
                                 </xf:repeat>
 

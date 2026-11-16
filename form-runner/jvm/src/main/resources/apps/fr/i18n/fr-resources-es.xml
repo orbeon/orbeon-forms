@@ -589,6 +589,7 @@
             <reencrypt-state>Encriptando {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>Cifrado iniciado</reencrypt-started>
             <reencrypt-finished>Cifrado finalizado</reencrypt-finished>
+            <free-search-placeholder>Buscar por título, aplicación o nombre de formulario…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>Exportar</export>

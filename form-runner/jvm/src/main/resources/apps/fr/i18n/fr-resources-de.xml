@@ -555,6 +555,7 @@
             <reencrypt-state>Neuverschlüsselung {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>Neuverschlüsselung gestartet</reencrypt-started>
             <reencrypt-finished>Neuverschlüsselung abgeschlossen</reencrypt-finished>
+            <free-search-placeholder>Nach Titel, Anwendung oder Formularnamen suchen…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>Export</export>

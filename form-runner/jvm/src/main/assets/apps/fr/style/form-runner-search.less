@@ -181,7 +181,8 @@
           background-color: var(--orbeon-table-header-background-color);
           border-bottom: 1px solid var(--orbeon-table-header-border-color);
 
-          &:has(.caret-container:not(.no-caret)) {
+          &[aria-sort],
+          &:has(.caret-container.active-caret) {
             color: var(--orbeon-table-header-sorted-color);
             box-shadow: inset 0 -2px 0 var(--orbeon-table-header-sorted-border-color);
           }
@@ -191,6 +192,16 @@
               color: inherit;
               background-color: var(--orbeon-table-hover-background-color);
               cursor: pointer;
+            }
+
+            @media (hover: hover) {
+              &:hover .caret-container.hover-caret {
+                opacity: 0.45;
+              }
+            }
+
+            &:focus-visible .caret-container.hover-caret {
+              opacity: 0.45;
             }
           }
 
@@ -225,6 +236,15 @@
               font-size: var(--orbeon-search-caret-font-size);
               flex: 0 0 auto;
               line-height: 1;
+
+              &.hover-caret {
+                opacity: 0;
+                transition: opacity var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+                @media (prefers-reduced-motion: reduce) {
+                  transition: none;
+                }
+              }
 
               &.no-caret {
                 display: none !important;
@@ -275,6 +295,10 @@
         overflow: hidden;
         text-overflow: ellipsis;
 
+        &:focus-visible {
+          box-shadow: inset 0 0 0 2px var(--orbeon-focus-border-color);
+        }
+
         // https://github.com/orbeon/orbeon-forms/issues/7097
         span.xforms-output-output:empty::before {
           content: "\00A0";  // &nbsp;
@@ -289,6 +313,12 @@
 
         button.btn-link {
           justify-content: flex-end;
+
+          .caret-container {
+            order: -1;
+            margin-left: 0;
+            margin-right: 0.35rem;
+          }
         }
       }
 
@@ -319,6 +349,12 @@
 
         button.btn-link {
           justify-content: flex-end;
+
+          .caret-container {
+            order: -1;
+            margin-left: 0;
+            margin-right: 0.35rem;
+          }
         }
       }
 

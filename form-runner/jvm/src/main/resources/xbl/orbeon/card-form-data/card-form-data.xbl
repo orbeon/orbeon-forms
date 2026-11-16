@@ -284,9 +284,7 @@
                         <xf:var name="label" value="(resources[@lang = xxf:lang()]/label, resources/label, @name)[1]"/>
                         <xf:var name="is-sorted" value="instance('fr-order-by')/column = $path"/>
                         <xf:var name="caret-value" value="
-                            if (not($is-sorted)) then
-                                ''
-                            else if (instance('fr-order-by')/direction = 'asc') then
+                            if (not($is-sorted) or instance('fr-order-by')/direction = 'asc') then
                                 '&#x25B2;'
                             else
                                 '&#x25BC;'
@@ -297,7 +295,13 @@
                                     <xh:span class="fr-card-col-text text-truncate">
                                         <xf:output value="$label"/>
                                     </xh:span>
-                                    <xh:span class="fr-card-sort-caret {if ($is-sorted) then '' else 'no-caret'}">
+                                    <xh:span
+                                        class="{
+                                            'fr-card-sort-caret',
+                                            'active-caret'[$is-sorted],
+                                            'hover-caret'[not($is-sorted)]
+                                        }"
+                                        aria-hidden="true">
                                         <xf:output value="$caret-value"/>
                                     </xh:span>
                                 </xf:label>

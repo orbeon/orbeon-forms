@@ -575,6 +575,7 @@
             <reencrypt-state>Xifrant {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>Xifratge començat</reencrypt-started>
             <reencrypt-finished>Xifratge finalitzat</reencrypt-finished>
+            <free-search-placeholder>Cerca per títol, aplicació o nom del formulari…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>Exportar</export>

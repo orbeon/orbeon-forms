@@ -555,6 +555,7 @@
             <reencrypt-state>Újratitkosítás {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>Újratitkosítás elindult</reencrypt-started>
             <reencrypt-finished>Újratitkosítás befejeződött</reencrypt-finished>
+            <free-search-placeholder>Keresés cím, alkalmazás vagy űrlapnév alapján…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>Exportálás</export>

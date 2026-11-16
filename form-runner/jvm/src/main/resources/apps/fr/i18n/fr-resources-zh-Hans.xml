@@ -550,6 +550,7 @@
             <reencrypt-state>正在重新加密 {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>重新加密已开始</reencrypt-started>
             <reencrypt-finished>重新加密已完成</reencrypt-finished>
+            <free-search-placeholder>按标题、应用或表单名称搜索…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>导出</export>

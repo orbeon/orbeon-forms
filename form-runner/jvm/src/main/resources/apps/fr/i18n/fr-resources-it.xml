@@ -555,6 +555,7 @@
             <reencrypt-state>Ri-cifratura {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>Ri-cifratura avviata</reencrypt-started>
             <reencrypt-finished>Ri-cifratura completata</reencrypt-finished>
+            <free-search-placeholder>Cerca per titolo, applicazione o nome del modulo…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>Esporta</export>

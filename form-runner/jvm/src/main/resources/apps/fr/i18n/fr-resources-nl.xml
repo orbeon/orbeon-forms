@@ -555,6 +555,7 @@
             <reencrypt-state>Her-encryptie {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>Her-encryptie gestart</reencrypt-started>
             <reencrypt-finished>Her-encryptie voltooid</reencrypt-finished>
+            <free-search-placeholder>Zoek op titel, applicatie of formuliernaam…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>Exporteren</export>

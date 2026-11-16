@@ -556,6 +556,7 @@
             <reencrypt-state>Re-encrypting {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>Re-encryption started</reencrypt-started>
             <reencrypt-finished>Re-encryption finished</reencrypt-finished>
+            <free-search-placeholder>Search by title, application, or form name…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>Export</export>

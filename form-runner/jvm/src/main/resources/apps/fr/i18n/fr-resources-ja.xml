@@ -542,6 +542,7 @@
             <reencrypt-state>再暗号化中 {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>再暗号化を開始しました</reencrypt-started>
             <reencrypt-finished>再暗号化が完了しました</reencrypt-finished>
+            <free-search-placeholder>タイトル、アプリケーション、またはフォーム名で検索…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>エクスポート</export>

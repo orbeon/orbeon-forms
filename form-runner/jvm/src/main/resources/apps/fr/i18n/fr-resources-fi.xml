@@ -555,6 +555,7 @@
             <reencrypt-state>Salaus uusitaan {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>Uudelleensalaus aloitettu</reencrypt-started>
             <reencrypt-finished>Uudelleensalaus valmis</reencrypt-finished>
+            <free-search-placeholder>Hae otsikon, sovelluksen tai lomakkeen nimen mukaan…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>Vie</export>

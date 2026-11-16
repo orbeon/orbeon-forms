@@ -544,6 +544,7 @@
             <reencrypt-state>Перешифровывается {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>Перешифрование начато</reencrypt-started>
             <reencrypt-finished>Перешифрование завершено</reencrypt-finished>
+            <free-search-placeholder>Поиск по названию, приложению или имени формы…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>Экспорт</export>

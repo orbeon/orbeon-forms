@@ -552,6 +552,7 @@
             <reencrypt-state>Rekrypterer {0,number}/{1,number}</reencrypt-state>
             <reencrypt-started>Rekryptering startet</reencrypt-started>
             <reencrypt-finished>Rekryptering fullført</reencrypt-finished>
+            <free-search-placeholder>Søk etter tittel, applikasjon eller skjemanavn…</free-search-placeholder>
         </labels>
         <export-purge>
             <export>Eksporter</export>

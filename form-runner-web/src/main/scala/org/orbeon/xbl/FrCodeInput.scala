@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.web.DomSupport.*
+import org.orbeon.xbl.MaskedInputSupport.{MaskToken, SlotType}
 import org.orbeon.xforms.*
 import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom
@@ -41,23 +42,18 @@ object FrCodeInput {
     private var innerContainerOpt   : Option[html.Element]         = None
     private var boxesContainerOpt   : Option[html.Element]         = None
     private var observerOpt         : Option[dom.MutationObserver] = None
+    private var builtMask           : String                       = ""
     private var inputs              : Vector[html.Input]           = Vector.empty
+    private var slotTypes           : Vector[SlotType]             = Vector.empty
     private var slots               : Array[Option[Char]]          = Array.fill(CodeInputSupport.DefaultLength)(None)
     private var currentValue        : String                       = ""
     private var lastCompositionEndAt: Option[Double]               = None
 
-    private def activeLength: Int =
-      CodeInputSupport.normalizeLength(
-        innerContainerOpt
-          .flatMap(_.dataset.get("frLength"))
-          .getOrElse("")
-      )
-
-    private def activeCharType: String =
-      CodeInputSupport.normalizeCharacterType(
-        innerContainerOpt
-          .flatMap(_.dataset.get("frCharacterType"))
-          .getOrElse("")
+    private def activeMask: String =
+      CodeInputSupport.effectiveMask(
+        innerContainerOpt.flatMap(_.dataset.get("frMask")).getOrElse(""),
+        innerContainerOpt.flatMap(_.dataset.get("frLength")).getOrElse(""),
+        innerContainerOpt.flatMap(_.dataset.get("frCharacterType")).getOrElse("")
       )
 
     private def activeLabel: String =
@@ -95,7 +91,7 @@ object FrCodeInput {
           inner,
           new dom.MutationObserverInit {
             attributes      = true
-            attributeFilter = js.Array("data-fr-length", "data-fr-character-type", "data-fr-label")
+            attributeFilter = js.Array("data-fr-mask", "data-fr-length", "data-fr-character-type", "data-fr-label")
           }
         )
         observerOpt = Some(observer)
@@ -110,7 +106,9 @@ object FrCodeInput {
       BoxEventSupport.clearAllListeners()
       innerContainerOpt = None
       boxesContainerOpt = None
+      builtMask         = ""
       inputs            = Vector.empty
+      slotTypes         = Vector.empty
     }
 
     override def xformsGetValue(): String =
@@ -140,37 +138,59 @@ object FrCodeInput {
     }
 
     private def ensureInputsBuilt(): Unit = {
-      val len      = activeLength
-      val charType = activeCharType
-      val label    = activeLabel
+      val mask  = activeMask
+      val label = activeLabel
 
-      if (inputs.length != len) {
+      if (inputs.isEmpty || builtMask != mask) {
         BoxEventSupport.clearAllListeners()
         boxesContainerOpt.foreach { boxesContainer =>
           boxesContainer.innerHTML = ""
-          val built = Vector.tabulate(len) { idx =>
-            val inputElem = dom.document.createElement("input").asInstanceOf[html.Input]
-            inputElem.`type`    = "text"
-            inputElem.className = "fr-code-input-box xforms-input-input"
-            inputElem.id        = s"${containerElem.id}-box-$idx"
-            attachBoxListeners(inputElem, idx)
-            boxesContainer.appendChild(inputElem)
-            inputElem
+          val tokens      = CodeInputSupport.parseMaskTokens(mask)
+          val builtInputs = Vector.newBuilder[html.Input]
+          val builtTypes  = Vector.newBuilder[SlotType]
+          var slotIdx     = 0
+
+          tokens.foreach {
+            case MaskToken.Literal(ch) =>
+              val sepElem = dom.document.createElement("span").asInstanceOf[html.Span]
+              sepElem.className   = "fr-code-input-separator"
+              sepElem.textContent = if (ch == ' ') "\u00a0" else ch.toString
+              sepElem.setAttribute("aria-hidden", "true")
+              boxesContainer.appendChild(sepElem)
+
+            case MaskToken.Slot(st) =>
+              val idx       = slotIdx
+              val inputElem = dom.document.createElement("input").asInstanceOf[html.Input]
+              inputElem.`type`    = "text"
+              inputElem.className = "fr-code-input-box xforms-input-input"
+              inputElem.id        = s"${containerElem.id}-box-$idx"
+              attachBoxListeners(inputElem, idx)
+              boxesContainer.appendChild(inputElem)
+              builtInputs += inputElem
+              builtTypes  += st
+              slotIdx     += 1
           }
-          inputs = built
-          slots  = CodeInputSupport.storedValueToSlots(currentValue, len, charType).toArray
+
+          inputs    = builtInputs.result()
+          slotTypes = builtTypes.result()
+          builtMask = mask
+          slots     = CodeInputSupport.storedValueToSlots(currentValue, mask).toArray
         }
       }
 
+      val len = inputs.length
       inputs.zipWithIndex.foreach { case (inputElem, idx) =>
-        inputElem.setAttribute("inputmode",      if (charType == "digits") "numeric" else "text")
-        if (charType == "digits")
+        val st      = slotTypes.lift(idx).getOrElse(SlotType.Digit)
+        val isDigit = st == SlotType.Digit
+        val isLower = st == SlotType.LowerLetter
+        inputElem.setAttribute("inputmode",      if (isDigit) "numeric" else "text")
+        if (isDigit)
           inputElem.setAttribute("pattern", "[0-9]*")
         else
           inputElem.removeAttribute("pattern")
         inputElem.setAttribute("autocomplete",   if (idx == 0) "one-time-code" else "off")
         inputElem.setAttribute("autocorrect",    "off")
-        inputElem.setAttribute("autocapitalize", if (charType == "digits") "none" else "characters")
+        inputElem.setAttribute("autocapitalize", if (isDigit || isLower) "none" else "characters")
         inputElem.setAttribute("spellcheck",     "false")
         inputElem.setAttribute("aria-label",     s"$label (${idx + 1} / $len)")
         inputElem.disabled = isMarkedReadonly
@@ -192,6 +212,9 @@ object FrCodeInput {
       e.isComposing ||
       e.keyCode == 229 ||
       lastCompositionEndAt.exists(ts => math.abs(e.timeStamp - ts) < 50.0)
+
+    private def slotTypeAt(idx: Int): SlotType =
+      slotTypes.lift(idx).getOrElse(SlotType.Digit)
 
     private def attachBoxListeners(inputElem: html.Input, idx: Int): Unit = {
 
@@ -252,7 +275,7 @@ object FrCodeInput {
                 focusBox(inputs.length - 1)
             case key if ! composing && key.length == 1 && ! e.ctrlKey && ! e.metaKey && ! e.altKey =>
               e.preventDefault()
-              CodeInputSupport.normalizeChar(key.charAt(0), activeCharType).foreach { normChar =>
+              CodeInputSupport.normalizeCharForSlot(key.charAt(0), slotTypeAt(idx)).foreach { normChar =>
                 slots(idx) = Some(normChar)
                 commitSlots()
                 if (idx + 1 < inputs.length)
@@ -287,7 +310,7 @@ object FrCodeInput {
           } else if (raw.length > 1) {
             distributeText(raw, idx)
           } else {
-            CodeInputSupport.normalizeChar(raw.charAt(0), activeCharType) match {
+            CodeInputSupport.normalizeCharForSlot(raw.charAt(0), slotTypeAt(idx)) match {
               case Some(normChar) =>
                 val changed = ! slots(idx).contains(normChar)
                 slots(idx) = Some(normChar)
@@ -303,18 +326,11 @@ object FrCodeInput {
     }
 
     private def distributeText(rawText: String, startIndex: Int): Unit = {
-      val charType       = activeCharType
-      val len            = inputs.length
-      val effectiveStart = if (slots.forall(_.isEmpty)) 0 else math.max(0, math.min(startIndex, len - 1))
-      val filtered       = CodeInputSupport.filterAndNormalize(rawText, charType, len - effectiveStart)
-      if (filtered.nonEmpty) {
-        var i = 0
-        while (i < filtered.length && (effectiveStart + i) < len) {
-          slots(effectiveStart + i) = Some(filtered.charAt(i))
-          i += 1
-        }
+      val (updatedSlots, nextIdx) =
+        CodeInputSupport.distributeTextToSlots(rawText, slots.toIndexedSeq, activeMask, startIndex)
+      if (updatedSlots.zip(slots).exists { case (a, b) => a != b } || updatedSlots.exists(_.isDefined)) {
+        slots = updatedSlots.toArray
         commitSlots()
-        val nextIdx = math.min(effectiveStart + filtered.length, len - 1)
         focusBox(nextIdx)
       } else {
         renderSlotsToInputs()
@@ -329,7 +345,7 @@ object FrCodeInput {
       }
 
     private def syncSlotsFromCurrentValue(): Unit =
-      slots = CodeInputSupport.storedValueToSlots(currentValue, activeLength, activeCharType).toArray
+      slots = CodeInputSupport.storedValueToSlots(currentValue, activeMask).toArray
 
     private def renderSlotsToInputs(): Unit =
       inputs.zipWithIndex.foreach { case (inputElem, idx) =>

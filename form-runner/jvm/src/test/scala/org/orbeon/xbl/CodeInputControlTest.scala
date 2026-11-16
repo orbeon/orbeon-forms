@@ -87,6 +87,38 @@ class CodeInputControlTest
       assert(CodeInputSupport.isValidCode("WXYZ", "4", "letters"))
       assert(! CodeInputSupport.isValidCode("WX1Z", "4", "letters"))
     }
+
+    it("must parse masks with mixed slot types and literal separators and distribute pasted text") {
+      assert(CodeInputSupport.effectiveMask("", "", "")                   == "999999")
+      assert(CodeInputSupport.effectiveMask("AA-9999", "", "")            == "AA-9999")
+      assert(CodeInputSupport.effectiveMask("", "4", "alphanumeric")      == "****")
+      assert(CodeInputSupport.effectiveMask("", "5", "letters")           == "AAAAA")
+
+      // Mask AA-9999 has 7 tokens (2 UpperLetter slots, 1 '-' literal, 4 Digit slots)
+      assert(CodeInputSupport.tokenCount("AA-9999", "", "") == 7)
+      assert(CodeInputSupport.isSlotToken("AA-9999", "", "", 1))
+      assert(CodeInputSupport.isSlotToken("AA-9999", "", "", 2))
+      assert(! CodeInputSupport.isSlotToken("AA-9999", "", "", 3))
+      assert(CodeInputSupport.isSlotToken("AA-9999", "", "", 4))
+      assert(CodeInputSupport.tokenValueAt("AB1234", "AA-9999", "", "", 1) == "A")
+      assert(CodeInputSupport.tokenValueAt("AB1234", "AA-9999", "", "", 2) == "B")
+      assert(CodeInputSupport.tokenValueAt("AB1234", "AA-9999", "", "", 3) == "-")
+      assert(CodeInputSupport.tokenValueAt("AB1234", "AA-9999", "", "", 4) == "1")
+      assert(CodeInputSupport.tokenValueAt("AB1234", "AA-9999", "", "", 7) == "4")
+
+      // Pasting with or without literal '-' produces the same raw slots
+      val empty6 = Vector.fill[Option[Char]](6)(None)
+      val (slotsWithSep, _)    = CodeInputSupport.distributeTextToSlots("ab-1234", empty6, "AA-9999", 0)
+      val (slotsWithoutSep, _) = CodeInputSupport.distributeTextToSlots("ab1234",  empty6, "AA-9999", 0)
+      assert(CodeInputSupport.slotsToStoredValue(slotsWithSep)    == "AB1234")
+      assert(CodeInputSupport.slotsToStoredValue(slotsWithoutSep) == "AB1234")
+
+      // Validation against mask AA-9999
+      assert(CodeInputSupport.isValidCode("AB1234", "AA-9999", "", ""))
+      assert(! CodeInputSupport.isValidCode("121234", "AA-9999", "", ""))
+      assert(! CodeInputSupport.isValidCode("AB123A", "AA-9999", "", ""))
+      assert(! CodeInputSupport.isValidCode("AB123",  "AA-9999", "", ""))
+    }
   }
 
   describe("fr:code-input XBL control") {
@@ -108,11 +140,13 @@ class CodeInputControlTest
                 <form>
                   <otp-code/>
                   <alpha-code/>
+                  <masked-code/>
                 </form>
               </xf:instance>
               <xf:bind ref="instance('fr-form-instance')">
-                <xf:bind id="otp-code-bind"   ref="otp-code"   type="fr:code-input"/>
-                <xf:bind id="alpha-code-bind" ref="alpha-code" type="fr:code-input"/>
+                <xf:bind id="otp-code-bind"    ref="otp-code"    type="fr:code-input"/>
+                <xf:bind id="alpha-code-bind"  ref="alpha-code"  type="fr:code-input"/>
+                <xf:bind id="masked-code-bind" ref="masked-code" type="fr:code-input"/>
               </xf:bind>
             </xf:model>
           </xh:head>
@@ -123,6 +157,9 @@ class CodeInputControlTest
             <fr:code-input id="alpha-code-control" bind="alpha-code-bind" length="4" character-type="alphanumeric">
               <xf:label>Reference Code</xf:label>
             </fr:code-input>
+            <fr:code-input id="masked-code-control" bind="masked-code-bind" mask="AA-9999">
+              <xf:label>Masked Code</xf:label>
+            </fr:code-input>
           </xh:body>
         </xh:html>.toDocument
 
@@ -130,12 +167,14 @@ class CodeInputControlTest
         withXFormsDocument(xhtml) { doc =>
           withActionAndDoc(doc) {
 
-            val otpControl   = doc.getControlByEffectiveId("otp-code-control").asInstanceOf[XFormsValueComponentControl]
-            val alphaControl = doc.getControlByEffectiveId("alpha-code-control").asInstanceOf[XFormsValueComponentControl]
+            val otpControl    = doc.getControlByEffectiveId("otp-code-control").asInstanceOf[XFormsValueComponentControl]
+            val alphaControl  = doc.getControlByEffectiveId("alpha-code-control").asInstanceOf[XFormsValueComponentControl]
+            val maskedControl = doc.getControlByEffectiveId("masked-code-control").asInstanceOf[XFormsValueComponentControl]
 
             // Initially empty -> valid
             assert(otpControl.isValid)
             assert(alphaControl.isValid)
+            assert(maskedControl.isValid)
 
             // Incomplete 6-digit OTP -> invalid
             setControlValueWithEventSearchNested("otp-code-control", "123")
@@ -153,6 +192,13 @@ class CodeInputControlTest
 
             setControlValueWithEventSearchNested("alpha-code-control", "A1B9")
             assert(alphaControl.isValid)
+
+            // Masked code (AA-9999)
+            setControlValueWithEventSearchNested("masked-code-control", "123456")
+            assert(! maskedControl.isValid)
+
+            setControlValueWithEventSearchNested("masked-code-control", "AB1234")
+            assert(maskedControl.isValid)
           }
         }
       }

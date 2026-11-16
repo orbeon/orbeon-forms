@@ -31,6 +31,7 @@
         xxbl:constraint="
             CodeInputSupport:isValidCode(
                 string(.),
+                string(fr:component-param-value('mask')),
                 string(fr:component-param-value('length')),
                 string(fr:component-param-value('character-type'))
             )"
@@ -66,8 +67,7 @@
                 </view>
             </templates>
             <custom-settings>
-                <setting name="length"         type="xs:integer" min="1" max="16"/>
-                <setting name="character-type" type="xs:string"  values="digits alphanumeric letters"/>
+                <setting name="mask" type="xs:string"/>
             </custom-settings>
             <control-details>
                 <xf:model xmlns="" id="fb-editor-code-input-model">
@@ -81,170 +81,92 @@
 
                     <xf:instance id="local" xxf:exclude-result-prefixes="#all">
                         <_>
-                            <length/>
-                            <character-type/>
+                            <mask/>
                         </_>
                     </xf:instance>
 
                     <xf:bind ref="instance('local')">
                         <xf:bind
-                            ref="length"
-                            xxf:whitespace="trim"
-                            constraint=". = '' or (. castable as xs:integer and xs:integer(.) ge 1 and xs:integer(.) le 16)"/>
-                        <xf:bind
-                            ref="character-type"
+                            ref="mask"
                             xxf:whitespace="trim"/>
                     </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                         <_>
                             <resource xml:lang="en">
-                                <length>Code Length</length>
-                                <length-hint>Number of characters (1 to 16, default 6)</length-hint>
-                                <character-type>Character Type</character-type>
-                                <type-digits>Digits (0–9)</type-digits>
-                                <type-alphanumeric>Alphanumeric (A–Z, 0–9)</type-alphanumeric>
-                                <type-letters>Letters (A–Z)</type-letters>
+                                <mask>Mask</mask>
+                                <mask-hint>9 = digit, A/a = upper/lowercase letter, * = alphanumeric, H = hex; other characters are shown as separators (e.g. 999999, 999-999, AA-9999)</mask-hint>
                             </resource>
                             <resource xml:lang="fr">
-                                <length>Longueur du code</length>
-                                <length-hint>Nombre de caractères (1 à 16, 6 par défaut)</length-hint>
-                                <character-type>Type de caractères</character-type>
-                                <type-digits>Chiffres (0–9)</type-digits>
-                                <type-alphanumeric>Alphanumérique (A–Z, 0–9)</type-alphanumeric>
-                                <type-letters>Lettres (A–Z)</type-letters>
+                                <mask>Masque</mask>
+                                <mask-hint>9 = chiffre, A/a = lettre majuscule/minuscule, * = alphanumérique, H = hex ; les autres caractères sont affichés comme séparateurs (ex. 999999, 999-999, AA-9999)</mask-hint>
                             </resource>
                             <resource xml:lang="no">
-                                <length>Kodelengde</length>
-                                <length-hint>Antall tegn (1 til 16, standard 6)</length-hint>
-                                <character-type>Tegntype</character-type>
-                                <type-digits>Sifre (0–9)</type-digits>
-                                <type-alphanumeric>Alfanumerisk (A–Z, 0–9)</type-alphanumeric>
-                                <type-letters>Bokstaver (A–Z)</type-letters>
+                                <mask>Maske</mask>
+                                <mask-hint>9 = siffer, A/a = stor/liten bokstav, * = alfanumerisk, H = heks; andre tegn vises som skilletegn (f.eks. 999999, 999-999, AA-9999)</mask-hint>
                             </resource>
                             <resource xml:lang="ru">
-                                <length>Длина кода</length>
-                                <length-hint>Количество символов (от 1 до 16, по умолчанию 6)</length-hint>
-                                <character-type>Тип символов</character-type>
-                                <type-digits>Цифры (0–9)</type-digits>
-                                <type-alphanumeric>Буквы и цифры (A–Z, 0–9)</type-alphanumeric>
-                                <type-letters>Буквы (A–Z)</type-letters>
+                                <mask>Маска</mask>
+                                <mask-hint>9 = цифра, A/a = заглавная/строчная буква, * = буква или цифра, H = шестнадцатеричный; прочие символы отображаются как разделители (напр. 999999, 999-999, AA-9999)</mask-hint>
                             </resource>
                             <resource xml:lang="it">
-                                <length>Lunghezza del codice</length>
-                                <length-hint>Numero di caratteri (da 1 a 16, predefinito 6)</length-hint>
-                                <character-type>Tipo di caratteri</character-type>
-                                <type-digits>Cifre (0–9)</type-digits>
-                                <type-alphanumeric>Alfanumerico (A–Z, 0–9)</type-alphanumeric>
-                                <type-letters>Lettere (A–Z)</type-letters>
+                                <mask>Maschera</mask>
+                                <mask-hint>9 = cifra, A/a = lettera maiuscola/minuscola, * = alfanumerico, H = esadecimale; gli altri caratteri sono mostrati come separatori (es. 999999, 999-999, AA-9999)</mask-hint>
                             </resource>
                             <resource xml:lang="de">
-                                <length>Codelänge</length>
-                                <length-hint>Anzahl der Zeichen (1 bis 16, Standard 6)</length-hint>
-                                <character-type>Zeichentyp</character-type>
-                                <type-digits>Ziffern (0–9)</type-digits>
-                                <type-alphanumeric>Alphanumerisch (A–Z, 0–9)</type-alphanumeric>
-                                <type-letters>Buchstaben (A–Z)</type-letters>
+                                <mask>Maske</mask>
+                                <mask-hint>9 = Ziffer, A/a = Groß-/Kleinbuchstabe, * = alphanumerisch, H = Hex; andere Zeichen werden als Trennzeichen angezeigt (z. B. 999999, 999-999, AA-9999)</mask-hint>
                             </resource>
                             <resource xml:lang="fi">
-                                <length>Koodin pituus</length>
-                                <length-hint>Merkkien määrä (1–16, oletus 6)</length-hint>
-                                <character-type>Merkkityyppi</character-type>
-                                <type-digits>Numerot (0–9)</type-digits>
-                                <type-alphanumeric>Aakkosnumeerinen (A–Z, 0–9)</type-alphanumeric>
-                                <type-letters>Kirjaimet (A–Z)</type-letters>
+                                <mask>Maski</mask>
+                                <mask-hint>9 = numero, A/a = iso/pieni kirjain, * = aakkosnumeerinen, H = heksa; muut merkit näytetään erottimina (esim. 999999, 999-999, AA-9999)</mask-hint>
                             </resource>
                             <resource xml:lang="es">
-                                <length>Longitud del código</length>
-                                <length-hint>Número de caracteres (de 1 a 16, predeterminado 6)</length-hint>
-                                <character-type>Tipo de caracteres</character-type>
-                                <type-digits>Dígitos (0–9)</type-digits>
-                                <type-alphanumeric>Alfanumérico (A–Z, 0–9)</type-alphanumeric>
-                                <type-letters>Letras (A–Z)</type-letters>
+                                <mask>Máscara</mask>
+                                <mask-hint>9 = dígito, A/a = letra mayúscula/minúscula, * = alfanumérico, H = hex; otros caracteres se muestran como separadores (p. ej. 999999, 999-999, AA-9999)</mask-hint>
                             </resource>
                             <resource xml:lang="nl">
-                                <length>Codelengte</length>
-                                <length-hint>Aantal tekens (1 tot 16, standaard 6)</length-hint>
-                                <character-type>Tekentype</character-type>
-                                <type-digits>Cijfers (0–9)</type-digits>
-                                <type-alphanumeric>Alfanumeriek (A–Z, 0–9)</type-alphanumeric>
-                                <type-letters>Letters (A–Z)</type-letters>
+                                <mask>Masker</mask>
+                                <mask-hint>9 = cijfer, A/a = hoofd-/kleine letter, * = alfanumeriek, H = hex; andere tekens worden getoond als scheidingstekens (bijv. 999999, 999-999, AA-9999)</mask-hint>
                             </resource>
                             <resource xml:lang="pt">
-                                <length>Comprimento do código</length>
-                                <length-hint>Número de caracteres (1 a 16, padrão 6)</length-hint>
-                                <character-type>Tipo de caracteres</character-type>
-                                <type-digits>Dígitos (0–9)</type-digits>
-                                <type-alphanumeric>Alfanumérico (A–Z, 0–9)</type-alphanumeric>
-                                <type-letters>Letras (A–Z)</type-letters>
+                                <mask>Máscara</mask>
+                                <mask-hint>9 = dígito, A/a = letra maiúscula/minúscula, * = alfanumérico, H = hex; outros caracteres são mostrados como separadores (ex. 999999, 999-999, AA-9999)</mask-hint>
                             </resource>
                             <resource xml:lang="sv">
-                                <length>Kodlängd</length>
-                                <length-hint>Antal tecken (1 till 16, standard 6)</length-hint>
-                                <character-type>Teckentyp</character-type>
-                                <type-digits>Siffror (0–9)</type-digits>
-                                <type-alphanumeric>Alfanumerisk (A–Z, 0–9)</type-alphanumeric>
-                                <type-letters>Bokstäver (A–Z)</type-letters>
+                                <mask>Mask</mask>
+                                <mask-hint>9 = siffra, A/a = versal/gemen, * = alfanumerisk, H = hex; andra tecken visas som avgränsare (t.ex. 999999, 999-999, AA-9999)</mask-hint>
                             </resource>
                             <resource xml:lang="ar">
-                                <length>طول الرمز</length>
-                                <length-hint>عدد الأحرف (من 1 إلى 16، الافتراضي 6)</length-hint>
-                                <character-type>نوع الأحرف</character-type>
-                                <type-digits>أرقام (0–9)</type-digits>
-                                <type-alphanumeric>أبجدي رقمي (A–Z, 0–9)</type-alphanumeric>
-                                <type-letters>أحرف (A–Z)</type-letters>
+                                <mask>القناع</mask>
+                                <mask-hint>9 = رقم، A/a = حرف كبير/صغير، * = حرف أو رقم، H = ست عشري؛ تُعرض الأحرف الأخرى كفواصل (مثل 999999، 999-999، AA-9999)</mask-hint>
                             </resource>
                             <resource xml:lang="pl">
-                                <length>Długość kodu</length>
-                                <length-hint>Liczba znaków (od 1 do 16, domyślnie 6)</length-hint>
-                                <character-type>Typ znaków</character-type>
-                                <type-digits>Cyfry (0–9)</type-digits>
-                                <type-alphanumeric>Alfanumeryczny (A–Z, 0–9)</type-alphanumeric>
-                                <type-letters>Litery (A–Z)</type-letters>
+                                <mask>Maska</mask>
+                                <mask-hint>9 = cyfra, A/a = wielka/mała litera, * = alfanumeryczny, H = szesnastkowy; pozostałe znaki są wyświetlane jako separatory (np. 999999, 999-999, AA-9999)</mask-hint>
                             </resource>
                             <resource xml:lang="ja">
-                                <length>コードの長さ</length>
-                                <length-hint>文字数 (1〜16、デフォルト 6)</length-hint>
-                                <character-type>文字タイプ</character-type>
-                                <type-digits>数字 (0–9)</type-digits>
-                                <type-alphanumeric>英数字 (A–Z, 0–9)</type-alphanumeric>
-                                <type-letters>英字 (A–Z)</type-letters>
+                                <mask>マスク</mask>
+                                <mask-hint>9 = 数字、A/a = 大文字/小文字の英字、* = 英数字、H = 16進数。その他の文字は区切り文字として表示されます (例: 999999, 999-999, AA-9999)</mask-hint>
                             </resource>
                         </_>
                     </xf:instance>
                 </xf:model>
                 <fr:grid xmlns="" id="fb-editor-code-input-grid">
                     <xh:tr>
-                        <xh:td colspan="3">
-                            <xf:input ref="instance('local')/length" id="length-control" xxf:placeholder="6">
-                                <xf:label ref="xxf:r('length')"/>
-                                <xf:hint ref="xxf:r('length-hint')"/>
+                        <xh:td colspan="6">
+                            <xf:input ref="instance('local')/mask" id="mask-control" xxf:placeholder="999999">
+                                <xf:label ref="xxf:r('mask')"/>
+                                <xf:hint ref="xxf:r('mask-hint')"/>
                                 <xf:alert/>
                             </xf:input>
-                        </xh:td>
-                        <xh:td colspan="3">
-                            <xf:select1 appearance="minimal" ref="instance('local')/character-type" id="character-type-control">
-                                <xf:label ref="xxf:r('character-type')"/>
-                                <xf:item>
-                                    <xf:label ref="xxf:r('type-digits')"/>
-                                    <xf:value/>
-                                </xf:item>
-                                <xf:item>
-                                    <xf:label ref="xxf:r('type-alphanumeric')"/>
-                                    <xf:value>alphanumeric</xf:value>
-                                </xf:item>
-                                <xf:item>
-                                    <xf:label ref="xxf:r('type-letters')"/>
-                                    <xf:value>letters</xf:value>
-                                </xf:item>
-                            </xf:select1>
                         </xh:td>
                     </xh:tr>
                 </fr:grid>
                 <xf:action
                     id="fb-editor-code-input-action"
                     event="xforms-value-changed"
-                    observer="length-control character-type-control">
+                    observer="mask-control">
 
                     <xf:var name="name"      value="name(event('xxf:binding'))"/>
                     <xf:var name="new-value" value="string(event('xxf:binding'))"/>
@@ -265,8 +187,11 @@
 
         <xbl:template>
             <xf:var name="binding"        value="xxf:binding('fr-code-input')"/>
-            <xf:var name="length"         value="CodeInputSupport:normalizeLength(string(fr:component-param-value('length')))"/>
-            <xf:var name="character-type" value="string(fr:component-param-value('character-type'))"/>
+            <xf:var name="raw-mask"       value="string(fr:component-param-value('mask'))"/>
+            <xf:var name="raw-length"     value="string(fr:component-param-value('length'))"/>
+            <xf:var name="raw-char-type"  value="string(fr:component-param-value('character-type'))"/>
+            <xf:var name="effective-mask" value="CodeInputSupport:effectiveMask($raw-mask, $raw-length, $raw-char-type)"/>
+            <xf:var name="token-count"    value="CodeInputSupport:tokenCount($raw-mask, $raw-length, $raw-char-type)"/>
             <xf:var
                 name="view"
                 value="
@@ -278,15 +203,14 @@
                 id="fr-code-input-elem"
                 ref="$binding"
                 class="fr-code-input-container"
-                data-fr-length="{$length}"
-                data-fr-character-type="{$character-type}"
+                data-fr-mask="{$effective-mask}"
                 data-fr-label="{xxf:label('fr-code-input')}">
 
                 <!-- Interactive segmented boxes managed by FrCodeInputCompanion -->
                 <xh:div class="fr-code-input-boxes{' xforms-hidden'[$view]}"/>
 
-                <!-- Static-readonly / Automatic PDF segmented boxes -->
-                <xh:div class="fr-code-input-static-boxes{' xforms-hidden'[not($view)]}"><xf:repeat ref="(1 to $length)[$view]"><xh:span class="fr-code-input-cell"><xf:output value="CodeInputSupport:cellValueAt(string($binding), string($length), $character-type, .)"/></xh:span></xf:repeat></xh:div>
+                <!-- Static-readonly / Automatic PDF segmented boxes and literal separators -->
+                <xh:div class="fr-code-input-static-boxes{' xforms-hidden'[not($view)]}"><xf:repeat ref="(1 to $token-count)[$view]"><xh:span class="{if (CodeInputSupport:isSlotToken($raw-mask, $raw-length, $raw-char-type, .)) then 'fr-code-input-cell' else 'fr-code-input-separator'}"><xf:output value="CodeInputSupport:tokenValueAt(string($binding), $raw-mask, $raw-length, $raw-char-type, .)"/></xh:span></xf:repeat></xh:div>
             </xf:group>
         </xbl:template>
     </xbl:binding>

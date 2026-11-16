@@ -34,8 +34,21 @@
                 }
             }
 
-            .fr-code-input-static-boxes > :not(.fr-code-input-cell) {
+            .fr-code-input-static-boxes > :not(.fr-code-input-cell):not(.fr-code-input-separator) {
                 display: none;
+            }
+
+            .fr-code-input-separator {
+                display        : inline-flex;
+                align-items    : center;
+                justify-content: center;
+                flex           : 0 0 auto;
+                padding        : 0 2px;
+                font-size      : 1.1em;
+                font-weight    : 600;
+                font-family    : ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                color          : var(--orbeon-hint-color);
+                user-select    : none;
             }
 
             .fr-code-input-boxes input.fr-code-input-box,

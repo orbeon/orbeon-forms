@@ -890,5 +890,151 @@ extends DocumentTestBase
         }
       }
     }
+
+    it("must preserve explicit state parameters (`form-version`, `fr-language`) in `navigate` (#7073)") {
+      val (processorService, docOpt, _) = runFormRunner(
+        app        = "orbeon",
+        form       = "pta-remittance",
+        mode       = "edit",
+        documentId = Some("aed126ad8341b629f3b19ee7f3e9d4f7c83ebfe5")
+      )
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, docOpt.get) {
+          val doc = docOpt.get
+          val res = SimpleProcess.tryNavigate(Map(Some("uri") -> "/fr/orbeon/pta-remittance/summary?form-version=2&fr-language=fr&custom=1"))
+          assert(res.isInstanceOf[ActionResult.Sync] && res.asInstanceOf[ActionResult.Sync].value.isSuccess)
+          assert(doc.getNonJavaScriptLoadsToRun.map(_.resource) == List("/orbeon/fr/orbeon/pta-remittance/summary?fr-language=fr&form-version=2&custom=1"))
+        }
+      }
+    }
+
+    it("must resolve `oxf.fr.import.process` processes and fall back to `oxf.fr.detail.process` (#3249)") {
+      val (processorService, docOpt, _) = runFormRunner(
+        app        = "orbeon",
+        form       = "pta-remittance",
+        mode       = "edit",
+        documentId = Some("aed126ad8341b629f3b19ee7f3e9d4f7c83ebfe5")
+      )
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, docOpt.get) {
+          // Dedicated import processes
+          val cancelProc   = SimpleProcess.findProcessByName("oxf.fr.import.process", "cancel")
+          val completeProc = SimpleProcess.findProcessByName("oxf.fr.import.process", "complete")
+          val summaryProc  = SimpleProcess.findProcessByName("oxf.fr.import.process", "summary")
+
+          assert(cancelProc.exists(_.contains("fr:import-cancel-uri()")))
+          assert(completeProc.exists(_.contains("fr:import-complete-uri()")))
+          assert(summaryProc.exists(_.contains("fr:import-form-version()")))
+
+          // Fallback to `oxf.fr.detail.process` for shared processes
+          val closeProc      = SimpleProcess.findProcessByName("oxf.fr.import.process", "close")
+          val wizardNextProc = SimpleProcess.findProcessByName("oxf.fr.import.process", "wizard-next")
+          val reuploadProc   = SimpleProcess.findProcessByName("oxf.fr.import.process", "reupload")
+
+          assert(closeProc.exists(_.contains("oxf.fr.detail.close.uri")))
+          assert(wizardNextProc.exists(_.contains("wizard-next")))
+          assert(reuploadProc.exists(_.contains("fr-reupload")))
+        }
+      }
+    }
+
+    it("must navigate to configured or fallback pages from the Import page (#3249)") {
+      assume(org.orbeon.oxf.common.Version.isPE)
+
+      withTempSQLite { connection =>
+
+        val InsertFormSql =
+          """|INSERT INTO orbeon_form_definition (
+             |    created, last_modified_time, app, form, form_version, form_metadata, deleted, xml
+             |) VALUES (
+             |    ?, ?, ?, ?, ?, ?, 'N', ?
+             |)""".stripMargin
+
+        val now = new java.sql.Timestamp(System.currentTimeMillis())
+        for (formName <- List("import-default", "import-configured")) {
+          val metadataXml = s"<metadata><application-name>sqlite</application-name><form-name>$formName</form-name><title xml:lang='en'>Test</title></metadata>"
+          val formXml     = s"<xh:html xmlns:xh='http://www.w3.org/1999/xhtml' xmlns:xf='http://www.w3.org/2002/xforms' xmlns:fr='http://orbeon.org/oxf/xml/form-runner'><xh:head><xf:model id='fr-form-model'><xf:instance id='fr-form-instance'><form><section-1><c1/></section-1></form></xf:instance><xf:instance id='fr-form-metadata'>$metadataXml</xf:instance></xf:model></xh:head><xh:body><fr:view><fr:body><fr:section id='section-1-section'><fr:grid><fr:c x='1' y='1' w='12'><xf:input id='c1-control' ref='section-1/c1'/></fr:c></fr:grid></fr:section></fr:body></fr:view></xh:body></xh:html>"
+          org.orbeon.io.IOUtils.useAndClose(connection.prepareStatement(InsertFormSql)) { ps =>
+            ps.setTimestamp(1, now)
+            ps.setTimestamp(2, now)
+            ps.setString   (3, "sqlite")
+            ps.setString   (4, formName)
+            ps.setInt      (5, 2)
+            ps.setString   (6, metadataXml)
+            ps.setString   (7, formXml)
+            ps.executeUpdate()
+          }
+        }
+
+        // 1. Unconfigured app/form (`sqlite/import-default`, version 2): `cancel` and `complete` fall back to Summary with `?form-version=2`
+        locally {
+          val (processorService, docOpt, _) = runFormRunner(
+            app  = "sqlite",
+            form = "import-default",
+            mode = "import"
+          )
+          withTestExternalContext { _ =>
+            withFormRunnerDocument(processorService, docOpt.get) {
+              val doc = docOpt.get
+
+              val cancelBtn = XFormsAPI.resolveAs[org.orbeon.oxf.xforms.control.XFormsSingleNodeControl]("fr-button-cancel")
+              assert(cancelBtn.exists(c => c.isRelevant && ! c.isReadonly))
+              assert(org.orbeon.oxf.fr.library.ImportFunctionSupport.formVersionOpt.contains(2))
+
+              SimpleProcess.runProcessByName("oxf.fr.import.process", "cancel")
+              assert(doc.getNonJavaScriptLoadsToRun.map(_.resource) == List("/orbeon/fr/sqlite/import-default/summary?form-version=2"))
+
+              val statsElem = (FormRunner.formInstance.rootElement / "import" / "stats").head
+              XFormsAPI.setvalue(statsElem / "total",     "6")
+              XFormsAPI.setvalue(statsElem / "processed", "6")
+              XFormsAPI.setvalue(statsElem / "succeeded", "4")
+              XFormsAPI.setvalue(FormRunner.formInstance.rootElement / "import" / "importing", "succeeded")
+
+              SimpleProcess.runProcessByName("oxf.fr.import.process", "complete")
+              assert(
+                doc.getNonJavaScriptLoadsToRun.map(_.resource) ==
+                  List(
+                    "/orbeon/fr/sqlite/import-default/summary?form-version=2",
+                    "/orbeon/fr/sqlite/import-default/summary?form-version=2"
+                  )
+              )
+            }
+          }
+        }
+
+        // 2. Configured app/form (`sqlite/import-configured`, version 2): `cancel` and `complete` navigate to configured URIs with parameters
+        locally {
+          val (processorService, docOpt, _) = runFormRunner(
+            app   = "sqlite",
+            form  = "import-configured",
+            mode  = "import",
+            query = List("tenant" -> "acme", "unused" -> "skip")
+          )
+          withTestExternalContext { _ =>
+            withFormRunnerDocument(processorService, docOpt.get) {
+              val doc = docOpt.get
+
+              SimpleProcess.runProcessByName("oxf.fr.import.process", "cancel")
+              assert(doc.getNonJavaScriptLoadsToRun.map(_.resource) == List("/orbeon/portal/sqlite/canceled?tenant=acme"))
+
+              val statsElem = (FormRunner.formInstance.rootElement / "import" / "stats").head
+              XFormsAPI.setvalue(statsElem / "total",     "6")
+              XFormsAPI.setvalue(statsElem / "processed", "6")
+              XFormsAPI.setvalue(statsElem / "succeeded", "4")
+              XFormsAPI.setvalue(FormRunner.formInstance.rootElement / "import" / "importing", "succeeded")
+
+              SimpleProcess.runProcessByName("oxf.fr.import.process", "complete")
+              assert(
+                doc.getNonJavaScriptLoadsToRun.map(_.resource) ==
+                  List(
+                    "/orbeon/portal/sqlite/canceled?tenant=acme",
+                    "/orbeon/portal/sqlite/done?version=2&total=6&imported=4&skipped=2&tenant=acme"
+                  )
+              )
+            }
+          }
+        }
+      }
+    }
   }
 }

@@ -590,6 +590,7 @@
     </home>
     <import>
         <buttons>
+            <cancel>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Cancella</cancel>
             <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Carica</upload>
             <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Valida</validate>
             <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Importa</import>

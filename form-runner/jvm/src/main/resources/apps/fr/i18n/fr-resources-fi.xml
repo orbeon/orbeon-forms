@@ -590,6 +590,7 @@
     </home>
     <import>
         <buttons>
+            <cancel>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Peruuta</cancel>
             <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Lataa</upload>
             <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Validoi</validate>
             <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Tuo</import>

@@ -109,4 +109,12 @@
     <property as="xs:string" name="oxf.fr.resource.acme.*.en.xbl.fr:test-comp.alert-specificity"     value="App wildcard alert"/>
     <property as="xs:string" name="oxf.fr.resource.*.*.en.xbl.fr:test-comp.alert-specificity"        value="Global wildcard alert"/>
 
+    <!-- Tests for #3249: Import Cancel / Complete URIs -->
+    <property as="xs:string" name="oxf.fr.import.cancel.uri.issue.3249"                    value="/portal/{fr:app-name()}/canceled"/>
+    <property as="xs:string" name="oxf.fr.import.complete.uri.issue.3249"                  value="/portal/{fr:app-name()}/done?version={fr:import-form-version()}"/>
+    <property as="xs:string" name="oxf.fr.import.forward-parameters.issue.3249"            value="tenant batch"/>
+    <property as="xs:string" name="oxf.fr.import.cancel.uri.sqlite.import-configured"         value="/portal/{fr:app-name()}/canceled"/>
+    <property as="xs:string" name="oxf.fr.import.complete.uri.sqlite.import-configured"       value="/portal/{fr:app-name()}/done?version={fr:import-form-version()}"/>
+    <property as="xs:string" name="oxf.fr.import.forward-parameters.sqlite.import-configured" value="tenant"/>
+
 </properties>

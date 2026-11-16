@@ -624,6 +624,7 @@
     </home>
     <import>
         <buttons>
+            <cancel>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Cancelar</cancel>
             <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Subir</upload>
             <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Validar</validate>
             <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Importar</import>

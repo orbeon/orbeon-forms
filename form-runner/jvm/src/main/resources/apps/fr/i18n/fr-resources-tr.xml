@@ -588,6 +588,7 @@
     </home>
     <import>
         <buttons>
+            <cancel>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; İptal</cancel>
             <upload>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Yükle</upload>
             <validate>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Doğrula</validate>
             <import>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; İçe Aktar</import>

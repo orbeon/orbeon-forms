@@ -26,9 +26,11 @@ import org.orbeon.oxf.fr.definitions.ModeType
 import org.orbeon.oxf.fr.email.{EmailMetadataParsing, EvaluatedParams}
 import org.orbeon.oxf.fr.process.{SimpleProcess, *}
 import org.orbeon.oxf.fr.{XMLNames, *}
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.StringUtils.*
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, ExternalContextSupport, IndentedLogger}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, ExternalContextSupport, IndentedLogger, JvmUrlEncoderDecoder, PathUtils}
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.ancestorsIterator
 import org.orbeon.oxf.xforms.analysis.ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
@@ -270,6 +272,18 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     Fun("date-range-days", classOf[FRDateRangeDays], op = 0, min = 1, INTEGER, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, ALLOWS_ZERO_OR_ONE)
     )
+
+    // Import functions
+    Fun("import-form-version",   classOf[FRImportFormVersion],   op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE)
+    Fun("import-filename",       classOf[FRImportFilename],      op = 0, min = 0, STRING,  ALLOWS_ZERO_OR_ONE)
+    Fun("import-file-format",    classOf[FRImportFileFormat],    op = 0, min = 0, STRING,  ALLOWS_ZERO_OR_ONE)
+    Fun("import-total-count",    classOf[FRImportTotalCount],    op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE)
+    Fun("import-imported-count", classOf[FRImportImportedCount], op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE)
+    Fun("import-skipped-count",  classOf[FRImportSkippedCount],  op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE)
+    Fun("import-valid-count",    classOf[FRImportValidCount],    op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE)
+    Fun("import-invalid-count",  classOf[FRImportInvalidCount],  op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_ONE)
+    Fun("import-cancel-uri",     classOf[FRImportCancelUri],     op = 0, min = 0, STRING,  ALLOWS_ZERO_OR_ONE)
+    Fun("import-complete-uri",   classOf[FRImportCompleteUri],   op = 0, min = 0, STRING,  ALLOWS_ZERO_OR_ONE)
   }
 
   Namespace(List("http://orbeon.org/oxf/xml/form-builder")) {
@@ -1237,4 +1251,176 @@ class FRDateRangeDays extends FunctionSupport with DefaultFunctionSupport {
       .map(new Int64Value(_))
       .orNull
   }
+}
+
+object ImportFunctionSupport {
+
+  def containingDocumentOpt: Option[XFormsContainingDocument] =
+    Option(XFormsFunction.context).map(_.containingDocument).orElse(XFormsAPI.inScopeContainingDocumentOpt)
+
+  def formInstanceRootOpt: Option[NodeInfo] =
+    containingDocumentOpt
+      .flatMap(xfcd => XFormsAPI.topLevelInstance(Names.FormModel, Names.FormInstance)(xfcd))
+      .map(_.rootElement)
+
+  private def intElemOpt(parentOpt: Option[NodeInfo], elemName: String): Option[Int] =
+    parentOpt
+      .flatMap(p => (p / elemName).headOption)
+      .flatMap(_.stringValue.trimAllToOpt)
+      .flatMap(_.toIntOption)
+
+  def formVersionOpt: Option[Int] =
+    intElemOpt(formInstanceRootOpt.flatMap(r => (r / "version").headOption), "selected-version")
+
+  def filenameOpt: Option[String] =
+    formInstanceRootOpt
+      .flatMap(r => (r / "upload" / "file").headOption)
+      .flatMap(_.attValueOpt("filename"))
+      .flatMap(_.trimAllToOpt)
+
+  def fileFormatOpt: Option[String] =
+    formInstanceRootOpt
+      .flatMap(r => (r / "upload" / "file-format").headOption)
+      .flatMap(_.stringValue.trimAllToOpt)
+
+  def totalCountOpt: Option[Int] = {
+    val rootOpt = formInstanceRootOpt
+    intElemOpt(rootOpt.flatMap(r => (r / "import"   / "stats").headOption), "total")
+      .orElse(intElemOpt(rootOpt.flatMap(r => (r / "validate" / "stats").headOption), "total"))
+  }
+
+  def importedCountOpt: Option[Int] =
+    intElemOpt(formInstanceRootOpt.flatMap(r => (r / "import" / "stats").headOption), "succeeded")
+
+  def skippedCountOpt: Option[Int] = {
+    val statsOpt = formInstanceRootOpt.flatMap(r => (r / "import" / "stats").headOption)
+    for {
+      processed <- intElemOpt(statsOpt, "processed")
+      succeeded <- intElemOpt(statsOpt, "succeeded")
+    } yield processed - succeeded
+  }
+
+  def validCountOpt: Option[Int] =
+    intElemOpt(formInstanceRootOpt.flatMap(r => (r / "validate" / "stats").headOption), "succeeded")
+
+  def invalidCountOpt: Option[Int] = {
+    val statsOpt = formInstanceRootOpt.flatMap(r => (r / "validate" / "stats").headOption)
+    for {
+      processed <- intElemOpt(statsOpt, "processed")
+      succeeded <- intElemOpt(statsOpt, "succeeded")
+    } yield processed - succeeded
+  }
+
+  private def splitFragment(url: String): (String, Option[String]) = {
+    val hashIndex = url.indexOf('#')
+    if (hashIndex == -1)
+      (url, None)
+    else
+      (url.substring(0, hashIndex), Some(url.substring(hashIndex + 1)))
+  }
+
+  private def forwardedRequestParams(
+    xfcd       : XFormsContainingDocument,
+    propertySet: PropertySet
+  )(implicit
+    p          : FormRunnerParams
+  ): List[(String, String)] = {
+    val paramNames =
+      frc.formRunnerRawProperty("oxf.fr.import.forward-parameters", p.appForm, propertySet = propertySet)
+        .map(_.stringValue)
+        .toList
+        .flatMap(_.splitTo[List]())
+    val reqParams = xfcd.getRequestParameters
+    for {
+      name   <- paramNames
+      values <- reqParams.get(name).toList
+      value  <- values
+    } yield name -> value
+  }
+
+  def resolveImportUri(
+    propertyName: String,
+    extraParams : => List[(String, String)],
+    propertySet : PropertySet = CoreCrossPlatformSupport.properties
+  ): Option[String] =
+    containingDocumentOpt.flatMap { xfcd =>
+      XFormsAPI.withContainingDocument(xfcd) {
+        FormRunnerParamsOpt().flatMap { implicit p =>
+          frc.formRunnerRawProperty(propertyName, p.appForm, propertySet = propertySet)
+            .map(_.stringValue)
+            .map(SimpleProcess.evaluateValueTemplate)
+            .flatMap(_.trimAllToOpt)
+            .map { evaluatedUri =>
+              val (withoutFragment, fragmentOpt) = splitFragment(evaluatedUri)
+              val (_, existingParams)            = PathUtils.splitQueryDecodeParams(withoutFragment)
+              val existingNames                  = existingParams.map(_._1).toSet
+              val extraParamsList                = extraParams.filterNot { case (name, _) => existingNames.contains(name) }
+              val blockedNames                   = existingNames ++ extraParamsList.map(_._1)
+              val forwardedList                  = forwardedRequestParams(xfcd, propertySet).filterNot { case (name, _) => blockedNames.contains(name) }
+              val recombined                     = PathUtils.recombineQuery(withoutFragment, extraParamsList ::: forwardedList)
+              fragmentOpt.fold(recombined)(frag => s"$recombined#$frag")
+            }
+        }
+      }
+    }
+}
+
+class FRImportFormVersion extends FunctionSupport with RuntimeDependentFunction {
+  override def evaluateItem(context: XPathContext): Int64Value =
+    ImportFunctionSupport.formVersionOpt.map(new Int64Value(_)).orNull
+}
+
+class FRImportFilename extends FunctionSupport with RuntimeDependentFunction {
+  override def evaluateItem(context: XPathContext): StringValue =
+    ImportFunctionSupport.filenameOpt
+}
+
+class FRImportFileFormat extends FunctionSupport with RuntimeDependentFunction {
+  override def evaluateItem(context: XPathContext): StringValue =
+    ImportFunctionSupport.fileFormatOpt
+}
+
+class FRImportTotalCount extends FunctionSupport with RuntimeDependentFunction {
+  override def evaluateItem(context: XPathContext): Int64Value =
+    ImportFunctionSupport.totalCountOpt.map(new Int64Value(_)).orNull
+}
+
+class FRImportImportedCount extends FunctionSupport with RuntimeDependentFunction {
+  override def evaluateItem(context: XPathContext): Int64Value =
+    ImportFunctionSupport.importedCountOpt.map(new Int64Value(_)).orNull
+}
+
+class FRImportSkippedCount extends FunctionSupport with RuntimeDependentFunction {
+  override def evaluateItem(context: XPathContext): Int64Value =
+    ImportFunctionSupport.skippedCountOpt.map(new Int64Value(_)).orNull
+}
+
+class FRImportValidCount extends FunctionSupport with RuntimeDependentFunction {
+  override def evaluateItem(context: XPathContext): Int64Value =
+    ImportFunctionSupport.validCountOpt.map(new Int64Value(_)).orNull
+}
+
+class FRImportInvalidCount extends FunctionSupport with RuntimeDependentFunction {
+  override def evaluateItem(context: XPathContext): Int64Value =
+    ImportFunctionSupport.invalidCountOpt.map(new Int64Value(_)).orNull
+}
+
+class FRImportCancelUri extends FunctionSupport with RuntimeDependentFunction {
+  override def evaluateItem(context: XPathContext): StringValue =
+    ImportFunctionSupport.resolveImportUri(
+      propertyName = "oxf.fr.import.cancel.uri",
+      extraParams  = Nil
+    )
+}
+
+class FRImportCompleteUri extends FunctionSupport with RuntimeDependentFunction {
+  override def evaluateItem(context: XPathContext): StringValue =
+    ImportFunctionSupport.resolveImportUri(
+      propertyName = "oxf.fr.import.complete.uri",
+      extraParams  = List(
+        "total"    -> ImportFunctionSupport.totalCountOpt,
+        "imported" -> ImportFunctionSupport.importedCountOpt,
+        "skipped"  -> ImportFunctionSupport.skippedCountOpt
+      ).collect { case (k, Some(v)) => k -> v.toString }
+    )
 }

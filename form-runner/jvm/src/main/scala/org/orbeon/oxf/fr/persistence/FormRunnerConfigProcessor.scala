@@ -261,6 +261,7 @@ class FormRunnerConfigProcessor extends ProcessorImpl {
             element("has-pdf-automatic-binding",  text = formRunnerConfig.hasPdfAutomaticBinding.toString)
             element("is-static-readonly",         text = formRunnerConfig.isStaticReadonly.toString)
             element("is-test",                    text = formRunnerConfig.isTest.toString)
+            element("is-import-page",             text = formRunnerConfig.isImportPage.toString)
 
             formRunnerConfig.tocPositionOpt
               .foreach(v => element("toc-position", text = v))
@@ -348,6 +349,7 @@ private object FormRunnerConfigProcessor {
     hasPdfAutomaticBinding          : Boolean,
     isStaticReadonly                : Boolean,
     isTest                          : Boolean,
+    isImportPage                    : Boolean,
     tocPositionOpt                  : Option[String],
     validateSelectionControlsChoices: Option[Boolean],
     disableRelevantOpt              : Option[Boolean],
@@ -368,6 +370,7 @@ private object FormRunnerConfigProcessor {
         .tap(_.update(hasPdfAutomaticBinding.toString.getBytes(StandardCharsets.UTF_8)))
         .tap(_.update(isStaticReadonly.toString.getBytes(StandardCharsets.UTF_8)))
         .tap(_.update(isTest.toString.getBytes(StandardCharsets.UTF_8)))
+        .tap(_.update(isImportPage.toString.getBytes(StandardCharsets.UTF_8)))
         .tap(_.update(tocPositionOpt.getOrElse("").getBytes(StandardCharsets.UTF_8)))
         .tap(_.update(validateSelectionControlsChoices.toString.getBytes(StandardCharsets.UTF_8)))
         .tap(_.update(disableRelevantOpt.toString.getBytes(StandardCharsets.UTF_8)))
@@ -443,10 +446,10 @@ private object FormRunnerConfigProcessor {
       updatedParams.mode == "view" && ! isFormBuilder ||
       isPdf                        && ! usePdfTemplate
 
-    val (viewAppearanceOpt, useWizardInNewEdit) = {
+    val isImportPage =
+      updatedParams.mode == "import" && ! isService
 
-      def isImportPage =
-        updatedParams.mode == "import" && ! isService
+    val (viewAppearanceOpt, useWizardInNewEdit) = {
 
       val modeQName =
         FormRunner.modeQName(updatedParams.app, updatedParams.form, updatedParams.mode)
@@ -605,6 +608,7 @@ private object FormRunnerConfigProcessor {
       hasPdfAutomaticBinding           = metadata.hasPdfAutomaticBinding,
       isStaticReadonly                 = isStaticReadonly,
       isTest                           = TestModes(updatedParams.mode),
+      isImportPage                     = isImportPage,
       tocPositionOpt                   = if (hasToc) tocPositionOpt else None,
       validateSelectionControlsChoices = if (validateSelectionControlsChoices) Some(true) else None,
       disableRelevantOpt               = disableParams._1,

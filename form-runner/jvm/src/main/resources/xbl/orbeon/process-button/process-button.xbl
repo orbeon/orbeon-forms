@@ -53,7 +53,12 @@
             <!-- React to button pressed -->
             <xf:action event="DOMActivate" type="xpath">
                 xxf:instance('fr-form-instance')/fr:run-process-by-name(
-                    if (fr:mode() = 'summary') then 'oxf.fr.summary.process' else 'oxf.fr.detail.process',
+                    if (fr:mode() = 'summary') then
+                        'oxf.fr.summary.process'
+                    else if (fr:mode() = 'import') then
+                        'oxf.fr.import.process'
+                    else
+                        'oxf.fr.detail.process',
                     $button-name
                 )
             </xf:action>

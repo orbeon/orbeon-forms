@@ -166,8 +166,9 @@ trait SimpleProcessCommon
   // The scope is interpreted as a property prefix.
   def findProcessByName(scope: String, name: String): Option[String] = {
     implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
-    findProcessInMetadata(name)            orElse
-    formRunnerProperty(scope + '.' + name) orElse
+    findProcessInMetadata(name)                                                                                orElse
+    formRunnerProperty(scope + '.' + name)                                                                     orElse
+    Option.when(scope == "oxf.fr.import.process")(formRunnerProperty("oxf.fr.detail.process." + name)).flatten orElse
     buildProcessFromLegacyProperties(name)
   }
 

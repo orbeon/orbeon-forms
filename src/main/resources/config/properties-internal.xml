@@ -537,6 +537,26 @@
     <property as="xs:string"  name="oxf.fr.detail.process.reupload.*.*">
         xf:dispatch(name = "fr-reupload", targetid = "fr-form-model")
     </property>
+    <property as="xs:string"  name="oxf.fr.import.process.summary.*.*">
+        relinquish-lease
+        then navigate(
+            uri =
+                "/fr/{
+                    fr:app-name()
+                }/{
+                    fr:form-name()
+                }/summary{
+                    let
+                        $show-version-selector-name  := ('oxf.fr.summary.show-version-selector', fr:app-name(), fr:form-name()),
+                        $show-version-selector-value := xxf:property(string-join($show-version-selector-name, '.')),
+                        $selected-version            := fr:import-form-version()
+                    return
+                        if ($show-version-selector-value and exists($selected-version))
+                        then concat('?form-version=', $selected-version)
+                        else ''
+                }"
+        )
+    </property>
 
     <!-- Home page internal processes -->
     <property as="xs:string"  name="oxf.fr.home.process.load-metadata">

@@ -24,7 +24,15 @@
                 target="#observer"
                 if="event('fr-value') = xxf:itemset('hidden-select', 'xml')//item/value"
                 type="xpath">
-                xxf:instance('fr-form-instance')/fr:run-process-by-name('oxf.fr.detail.process', event('fr-value'))
+                xxf:instance('fr-form-instance')/fr:run-process-by-name(
+                    if (fr:mode() = 'summary') then
+                        'oxf.fr.summary.process'
+                    else if (fr:mode() = 'import') then
+                        'oxf.fr.import.process'
+                    else
+                        'oxf.fr.detail.process',
+                    event('fr-value')
+                )
             </xbl:handler>
         </xbl:handlers>
 

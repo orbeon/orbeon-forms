@@ -17,7 +17,7 @@ import cats.syntax.option.*
 import org.orbeon.dom
 import org.orbeon.oxf.fr.FormRunner.*
 import org.orbeon.oxf.fr.FormRunnerPersistence.*
-import org.orbeon.oxf.fr.library.ErrorAlertSupport
+import org.orbeon.oxf.fr.library.{ErrorAlertSupport, ImportFunctionSupport}
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
@@ -1039,6 +1039,8 @@ class FormRunnerFunctionsTest
         val valCompletedLabel    = (doc.descendant("import") / "validation" / "completed-label").headOption.map(_.stringValue)
         val importLabel          = (doc.descendant("import") / "import" / "label").headOption.map(_.stringValue)
         val importCompletedLabel = (doc.descendant("import") / "import" / "completed-label").headOption.map(_.stringValue)
+        val cancelButtonLabel    = (doc.descendant("import") / "buttons" / "cancel").headOption.map(_.stringValue)
+        val completeButtonLabel  = (doc.descendant("import") / "buttons" / "complete").headOption.map(_.stringValue)
 
         assert(uploadLabel.exists(_.nonEmpty),          s"Missing or empty import/upload/label in $resourcePath")
         assert(uploadCompletedLabel.exists(_.nonEmpty), s"Missing or empty import/upload/completed-label in $resourcePath")
@@ -1046,6 +1048,8 @@ class FormRunnerFunctionsTest
         assert(valCompletedLabel.exists(_.nonEmpty),    s"Missing or empty import/validation/completed-label in $resourcePath")
         assert(importLabel.exists(_.nonEmpty),          s"Missing or empty import/import/label in $resourcePath")
         assert(importCompletedLabel.exists(_.nonEmpty), s"Missing or empty import/import/completed-label in $resourcePath")
+        assert(cancelButtonLabel.exists(_.nonEmpty),    s"Missing or empty import/buttons/cancel in $resourcePath")
+        assert(completeButtonLabel.exists(_.nonEmpty),  s"Missing or empty import/buttons/complete in $resourcePath")
 
         if (lang == "en") {
           assert(uploadLabel.contains("Upload"))
@@ -1054,6 +1058,8 @@ class FormRunnerFunctionsTest
           assert(valCompletedLabel.contains("Validated"))
           assert(importLabel.contains("Import"))
           assert(importCompletedLabel.contains("Imported"))
+          assert(cancelButtonLabel.exists(_.contains("Cancel")))
+          assert(completeButtonLabel.exists(_.contains("Complete")))
         }
       }
     }
@@ -1159,6 +1165,138 @@ class FormRunnerFunctionsTest
           assert(resolveObject[XFormsValueControl]("upload-title").get.getValue(EventCollector.Throw) == "Uploaded")
           assert(resolveObject[XFormsValueControl]("validate-title").get.getValue(EventCollector.Throw) == "Validated")
           assert(resolveObject[XFormsValueControl]("import-title").get.getValue(EventCollector.Throw) == "Imported")
+        }
+      }
+    }
+
+    it("must evaluate `fr:import-*` XPath functions and build Cancel/Complete URIs (#3249)") {
+      withTestExternalContext { _ =>
+
+        def importDoc(app: String, form: String): dom.Document =
+          <xh:html
+              xmlns:xh="http://www.w3.org/1999/xhtml"
+              xmlns:xf="http://www.w3.org/2002/xforms"
+              xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+              xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+            <xh:head>
+              <xf:model id="fr-parameters-model">
+                <xf:instance id="fr-parameters-instance">
+                  <params>
+                    <app>{app}</app>
+                    <form>{form}</form>
+                    <form-version/>
+                    <document/>
+                    <draft/>
+                    <mode>import</mode>
+                  </params>
+                </xf:instance>
+              </xf:model>
+              <xf:model id="fr-form-model" xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+                <xf:instance id="fr-form-instance">
+                  <wizard>
+                    <version>
+                      <selected-version>3</selected-version>
+                    </version>
+                    <upload>
+                      <file mediatype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" filename="contacts 2026.xlsx" size="4096">file:/tmp/contacts.xlsx</file>
+                      <file-format>excel-headings</file-format>
+                    </upload>
+                    <validate>
+                      <validating>succeeded</validating>
+                      <stats>
+                        <total>10</total>
+                        <processed>10</processed>
+                        <succeeded>8</succeeded>
+                      </stats>
+                    </validate>
+                    <import>
+                      <importing>succeeded</importing>
+                      <stats>
+                        <total>10</total>
+                        <processed>10</processed>
+                        <succeeded>8</succeeded>
+                      </stats>
+                    </import>
+                  </wizard>
+                </xf:instance>
+              </xf:model>
+            </xh:head>
+            <xh:body>
+              <xf:group model="fr-form-model">
+                <xf:input  id="version-input"    ref="instance('fr-form-instance')/version/selected-version"/>
+                <xf:output id="out-version"      value="string(fr:import-form-version())"/>
+                <xf:output id="out-filename"     value="string(fr:import-filename())"/>
+                <xf:output id="out-format"       value="string(fr:import-file-format())"/>
+                <xf:output id="out-total"        value="string(fr:import-total-count())"/>
+                <xf:output id="out-imported"     value="string(fr:import-imported-count())"/>
+                <xf:output id="out-skipped"      value="string(fr:import-skipped-count())"/>
+                <xf:output id="out-valid"        value="string(fr:import-valid-count())"/>
+                <xf:output id="out-invalid"      value="string(fr:import-invalid-count())"/>
+                <xf:output id="out-cancel-uri"   value="string(fr:import-cancel-uri())"/>
+                <xf:output id="out-complete-uri" value="string(fr:import-complete-uri())"/>
+              </xf:group>
+            </xh:body>
+          </xh:html>.toDocument
+
+        // 1. End-to-end XPath evaluation using properties configured for `issue.3249` in `properties-local.xml`
+        withActionAndDoc(setupDocument(importDoc("issue", "3249"))) {
+          val doc = inScopeContainingDocument
+          doc.setRequestInformation(doc.getRequestInformation.copy(
+            requestParameters = Map(
+              "tenant"  -> List("acme"),
+              "batch"   -> List("42"),
+              "ignored" -> List("nope")
+            )
+          ))
+          // Trigger an XForms value change + refresh so `<xf:output>` controls re-evaluate with the updated request parameters
+          setControlValue("version-input", "2")
+          setControlValue("version-input", "3")
+
+          assert(resolveObject[XFormsValueControl]("out-version").get.getValue(EventCollector.Throw)      == "3")
+          assert(resolveObject[XFormsValueControl]("out-filename").get.getValue(EventCollector.Throw)     == "contacts 2026.xlsx")
+          assert(resolveObject[XFormsValueControl]("out-format").get.getValue(EventCollector.Throw)       == "excel-headings")
+          assert(resolveObject[XFormsValueControl]("out-total").get.getValue(EventCollector.Throw)        == "10")
+          assert(resolveObject[XFormsValueControl]("out-imported").get.getValue(EventCollector.Throw)     == "8")
+          assert(resolveObject[XFormsValueControl]("out-skipped").get.getValue(EventCollector.Throw)      == "2")
+          assert(resolveObject[XFormsValueControl]("out-valid").get.getValue(EventCollector.Throw)        == "8")
+          assert(resolveObject[XFormsValueControl]("out-invalid").get.getValue(EventCollector.Throw)      == "2")
+          assert(resolveObject[XFormsValueControl]("out-cancel-uri").get.getValue(EventCollector.Throw)   == "/portal/issue/canceled?tenant=acme&batch=42")
+          assert(resolveObject[XFormsValueControl]("out-complete-uri").get.getValue(EventCollector.Throw) == "/portal/issue/done?version=3&total=10&imported=8&skipped=2&tenant=acme&batch=42")
+
+          // 2. Test additional URI configurations (blank properties, external URLs, fragments, explicit parameter deduplication)
+          val blankProps = PropertySet.forTests(Nil)
+          assert(ImportFunctionSupport.resolveImportUri("oxf.fr.import.cancel.uri", Nil, blankProps).isEmpty)
+          assert(ImportFunctionSupport.resolveImportUri("oxf.fr.import.complete.uri", List("total" -> "10"), blankProps).isEmpty)
+
+          val customProps = PropertySet.forTests(List(
+            PropertyParams(
+              Map("fr" -> XMLNames.FR),
+              "oxf.fr.import.complete.uri.issue.3249",
+              XS_STRING_QNAME,
+              "https://example.org/confirm?imported={fr:import-imported-count()}&file={encode-for-uri(fr:import-filename())}#summary"
+            ),
+            PropertyParams(
+              Map.empty,
+              "oxf.fr.import.forward-parameters.issue.3249",
+              XS_STRING_QNAME,
+              "tenant"
+            )
+          ))
+          val resolvedExternal =
+            ImportFunctionSupport.resolveImportUri(
+              propertyName = "oxf.fr.import.complete.uri",
+              extraParams  = List("total" -> "10", "imported" -> "8", "skipped" -> "2"),
+              propertySet  = customProps
+            )
+          // `imported` was already in the template query string, so it must not be duplicated; `#summary` fragment preserved
+          assert(resolvedExternal.contains("https://example.org/confirm?imported=8&file=contacts+2026.xlsx&total=10&skipped=2&tenant=acme#summary") ||
+                 resolvedExternal.contains("https://example.org/confirm?imported=8&file=contacts%202026.xlsx&total=10&skipped=2&tenant=acme#summary"))
+        }
+
+        // 3. Unconfigured app/form returns empty strings via XPath
+        withActionAndDoc(setupDocument(importDoc("unconfigured", "form"))) {
+          assert(resolveObject[XFormsValueControl]("out-cancel-uri").get.getValue(EventCollector.Throw)   == "")
+          assert(resolveObject[XFormsValueControl]("out-complete-uri").get.getValue(EventCollector.Throw) == "")
         }
       }
     }

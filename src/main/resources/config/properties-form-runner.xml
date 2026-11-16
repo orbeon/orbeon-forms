@@ -835,7 +835,21 @@
     <property as="xs:boolean" name="oxf.fr.import.show-app-form-names.*.*"                         value="true"/>
     <property as="xs:string"  name="oxf.fr.import.forward-parameters.*.*"                          value=""/>
     <property as="xs:string"  name="oxf.fr.import.attachment-callback.uri.*.*"                     value=""/>
+    <property as="xs:string"  name="oxf.fr.import.cancel.uri.*.*"                                  value=""/>
+    <property as="xs:string"  name="oxf.fr.import.complete.uri.*.*"                                value=""/>
     <property as="xs:string"  name="oxf.fr.import.buttons.*.*"                                     value="home summary close"/>
+
+    <property as="xs:string"  name="oxf.fr.import.process.cancel.*.*">
+        xf:dispatch(name = "fr-import-cancel", targetid = "fr-form-model")
+        then (
+            navigate(uri = "{fr:import-cancel-uri()}")
+            recover close
+        )
+    </property>
+    <property as="xs:string"  name="oxf.fr.import.process.complete.*.*">
+        navigate(uri = "{fr:import-complete-uri()}")
+        recover summary
+    </property>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.validate.*.*"                         value="free"/>
     <!-- Table of contents position: "left", "separate", or "none". Empty defaults to "left".

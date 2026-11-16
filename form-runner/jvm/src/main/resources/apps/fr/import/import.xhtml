@@ -242,6 +242,10 @@
                 <xf:toggle case="upload-section-case"/>
             </xf:action>
 
+            <xf:action event="fr-import-cancel" type="xpath">
+                xxf:set-session-attribute('org.orbeon.fr.import.cancel', true())
+            </xf:action>
+
             <xf:action event="fr-import-clear-validation-and-import-stats">
 
                 <xf:dispatch
@@ -1367,7 +1371,7 @@
                 </fr:process-button>
                 <fr:process-button
                     id="fr-button-wizard-next"
-                    name="{if (case('switch') = 'import-section-case') then 'summary' else 'wizard-next'}"
+                    name="{if (case('switch') = 'import-section-case') then 'complete' else 'wizard-next'}"
                     class="xforms-trigger-appearance-xxforms-primary"
                     label="{
                         xxf:r(
@@ -1408,7 +1412,12 @@
                             else
                                 '')
                         else if (case('switch') = 'import-section-case') then
-                            (if (instance('fr-form-instance')/import/importing = 'succeeded' and not($import-canceled)) then . else '')
+                            (if (instance('fr-form-instance')/import/importing = 'started') then
+                                ''
+                            else if (instance('fr-form-instance')/import/importing = 'succeeded' and not($import-canceled)) then
+                                .
+                            else
+                                ())
                         else
                             ''"/>
 
@@ -1419,6 +1428,23 @@
                         <xf:label ref="xxf:r('import.review-data.label', '|fr-fr-resources|')"/>
                     </xf:submit>
                 </xf:group>
+
+                <fr:process-button
+                    id="fr-button-cancel"
+                    name="cancel"
+                    label="{xxf:r('import.buttons.cancel', '|fr-fr-resources|')}"
+                    ref="
+                        if (case('switch') = ('version-section-case', 'upload-section-case', 'validate-section-case')) then
+                            .
+                        else if (case('switch') = 'import-section-case') then
+                            (if (instance('fr-form-instance')/import/importing = 'started') then
+                                ''
+                            else if ($import-canceled or instance('fr-form-instance')/import/importing = 'failed') then
+                                .
+                            else
+                                ())
+                        else
+                            ()"/>
             </fr:inner-buttons>
         </fr:view>
     </xh:body>

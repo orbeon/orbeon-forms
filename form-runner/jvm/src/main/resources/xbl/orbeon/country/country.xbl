@@ -374,7 +374,7 @@
                 value="string(fr:component-param-value('show-code')) = 'true'"/>
             <xf:var
                 name="show-flag"
-                value="string(fr:component-param-value('show-flag')) = 'true'"/>
+                value="string(fr:component-param-value('show-flag')) = 'true' and not(fr:mode() = 'pdf')"/>
 
             <xf:var
                 name="lang"

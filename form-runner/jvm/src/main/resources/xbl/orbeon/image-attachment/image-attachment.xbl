@@ -60,6 +60,7 @@
             </templates>
             <custom-settings>
                 <setting name="view-mode" type="xs:string" values="grid carousel"/>
+                <setting name="carousel-size" type="xs:string" values="small medium large"/>
                 <setting name="columns" type="xs:integer" min="1"/>
                 <setting name="max-rows" type="xs:integer" min="1"/>
                 <setting name="transform-max-width" type="xs:integer" min="1"/>
@@ -78,7 +79,7 @@
                             <xf:var
                                 name="att-name"
                                 value="
-                                    if ($param-name = ('view-mode', 'columns', 'max-rows')) then
+                                    if ($param-name = ('view-mode', 'carousel-size', 'columns', 'max-rows')) then
                                         $param-name
                                     else
                                         concat('transform-', $param-name)"/>
@@ -97,13 +98,14 @@
 
                     <xf:instance id="local" xxf:exclude-result-prefixes="#all">
                         <_>
-                            <view-mode  default="-2"/>
-                            <columns    default="-2"/>
-                            <max-rows   default="-2"/>
-                            <max-width  default="-2"/>
-                            <max-height default="-2"/>
-                            <quality    default="80"/>
-                            <format     default="-2"/>
+                            <view-mode     default="-2"/>
+                            <carousel-size default="-2"/>
+                            <columns       default="-2"/>
+                            <max-rows      default="-2"/>
+                            <max-width     default="-2"/>
+                            <max-height    default="-2"/>
+                            <quality       default="80"/>
+                            <format        default="-2"/>
                         </_>
                     </xf:instance>
 
@@ -111,6 +113,9 @@
                         <xf:bind
                             ref="view-mode"
                             relevant="empty(instance()/@id) or instance()/@multiple = 'true'"/>
+                        <xf:bind
+                            ref="carousel-size"
+                            relevant="(empty(instance()/@id) or instance()/@multiple = 'true') and ../view-mode = 'carousel'"/>
                         <xf:bind
                             ref="columns | max-rows"
                             type="xf:integer"
@@ -138,6 +143,13 @@
                                     <item value="grid">Grid</item>
                                     <item value="carousel">Carousel</item>
                                 </view-mode>
+                                <carousel-size>
+                                    <label>Carousel size</label>
+                                    <item value="-1">Use default</item>
+                                    <item value="small">Small</item>
+                                    <item value="medium">Medium</item>
+                                    <item value="large">Large</item>
+                                </carousel-size>
                                 <columns>
                                     <label>Number of columns</label>
                                     <item value="-1">Use default</item>
@@ -177,6 +189,13 @@
                                     <item value="grid">Grille</item>
                                     <item value="carousel">Carrousel</item>
                                 </view-mode>
+                                <carousel-size>
+                                    <label>Taille du carrousel</label>
+                                    <item value="-1">Utiliser le défaut</item>
+                                    <item value="small">Petite</item>
+                                    <item value="medium">Moyenne</item>
+                                    <item value="large">Grande</item>
+                                </carousel-size>
                                 <columns>
                                     <label>Nombre de colonnes</label>
                                     <item value="-1">Utiliser le défaut</item>
@@ -216,6 +235,13 @@
                                     <item value="grid">Rutenett</item>
                                     <item value="carousel">Karusell</item>
                                 </view-mode>
+                                <carousel-size>
+                                    <label>Karusellstørrelse</label>
+                                    <item value="-1">Bruk standard</item>
+                                    <item value="small">Liten</item>
+                                    <item value="medium">Middels</item>
+                                    <item value="large">Stor</item>
+                                </carousel-size>
                                 <columns>
                                     <label>Antall kolonner</label>
                                     <item value="-1">Bruk standard</item>
@@ -255,6 +281,13 @@
                                     <item value="grid">Сетка</item>
                                     <item value="carousel">Карусель</item>
                                 </view-mode>
+                                <carousel-size>
+                                    <label>Размер карусели</label>
+                                    <item value="-1">Использовать по умолчанию</item>
+                                    <item value="small">Маленький</item>
+                                    <item value="medium">Средний</item>
+                                    <item value="large">Большой</item>
+                                </carousel-size>
                                 <columns>
                                     <label>Количество столбцов</label>
                                     <item value="-1">Использовать по умолчанию</item>
@@ -294,6 +327,13 @@
                                     <item value="grid">Griglia</item>
                                     <item value="carousel">Carosello</item>
                                 </view-mode>
+                                <carousel-size>
+                                    <label>Dimensione del carosello</label>
+                                    <item value="-1">Usa predefinito</item>
+                                    <item value="small">Piccola</item>
+                                    <item value="medium">Media</item>
+                                    <item value="large">Grande</item>
+                                </carousel-size>
                                 <columns>
                                     <label>Numero di colonne</label>
                                     <item value="-1">Usa predefinito</item>
@@ -333,6 +373,13 @@
                                     <item value="grid">Raster</item>
                                     <item value="carousel">Karussell</item>
                                 </view-mode>
+                                <carousel-size>
+                                    <label>Karussellgröße</label>
+                                    <item value="-1">Standard verwenden</item>
+                                    <item value="small">Klein</item>
+                                    <item value="medium">Mittel</item>
+                                    <item value="large">Groß</item>
+                                </carousel-size>
                                 <columns>
                                     <label>Anzahl der Spalten</label>
                                     <item value="-1">Standard verwenden</item>
@@ -372,6 +419,13 @@
                                     <item value="grid">Ruudukko</item>
                                     <item value="carousel">Karuselli</item>
                                 </view-mode>
+                                <carousel-size>
+                                    <label>Karusellin koko</label>
+                                    <item value="-1">Käytä oletusta</item>
+                                    <item value="small">Pieni</item>
+                                    <item value="medium">Keskikokoinen</item>
+                                    <item value="large">Suuri</item>
+                                </carousel-size>
                                 <columns>
                                     <label>Sarakkeiden määrä</label>
                                     <item value="-1">Käytä oletusta</item>
@@ -411,6 +465,13 @@
                                     <item value="grid">Cuadrícula</item>
                                     <item value="carousel">Carrusel</item>
                                 </view-mode>
+                                <carousel-size>
+                                    <label>Tamaño del carrusel</label>
+                                    <item value="-1">Usar predeterminado</item>
+                                    <item value="small">Pequeño</item>
+                                    <item value="medium">Mediano</item>
+                                    <item value="large">Grande</item>
+                                </carousel-size>
                                 <columns>
                                     <label>Número de columnas</label>
                                     <item value="-1">Usar predeterminado</item>
@@ -450,6 +511,13 @@
                                     <item value="grid">Raster</item>
                                     <item value="carousel">Carrousel</item>
                                 </view-mode>
+                                <carousel-size>
+                                    <label>Carrouselgrootte</label>
+                                    <item value="-1">Standaard gebruiken</item>
+                                    <item value="small">Klein</item>
+                                    <item value="medium">Gemiddeld</item>
+                                    <item value="large">Groot</item>
+                                </carousel-size>
                                 <columns>
                                     <label>Aantal kolommen</label>
                                     <item value="-1">Standaard gebruiken</item>
@@ -489,6 +557,13 @@
                                     <item value="grid">Grade</item>
                                     <item value="carousel">Carrossel</item>
                                 </view-mode>
+                                <carousel-size>
+                                    <label>Tamanho do carrossel</label>
+                                    <item value="-1">Usar padrão</item>
+                                    <item value="small">Pequeno</item>
+                                    <item value="medium">Médio</item>
+                                    <item value="large">Grande</item>
+                                </carousel-size>
                                 <columns>
                                     <label>Número de colunas</label>
                                     <item value="-1">Usar padrão</item>
@@ -528,6 +603,13 @@
                                     <item value="grid">Rutnät</item>
                                     <item value="carousel">Karusell</item>
                                 </view-mode>
+                                <carousel-size>
+                                    <label>Karusellstorlek</label>
+                                    <item value="-1">Använd standard</item>
+                                    <item value="small">Liten</item>
+                                    <item value="medium">Medel</item>
+                                    <item value="large">Stor</item>
+                                </carousel-size>
                                 <columns>
                                     <label>Antal kolumner</label>
                                     <item value="-1">Använd standard</item>
@@ -567,6 +649,13 @@
                                     <item value="grid">شبكة</item>
                                     <item value="carousel">شريط دوّار</item>
                                 </view-mode>
+                                <carousel-size>
+                                    <label>حجم الشريط الدوّار</label>
+                                    <item value="-1">استخدام الإعداد الافتراضي</item>
+                                    <item value="small">صغير</item>
+                                    <item value="medium">متوسط</item>
+                                    <item value="large">كبير</item>
+                                </carousel-size>
                                 <columns>
                                     <label>عدد الأعمدة</label>
                                     <item value="-1">استخدام الإعداد الافتراضي</item>
@@ -606,6 +695,13 @@
                                     <item value="grid">Siatka</item>
                                     <item value="carousel">Karuzela</item>
                                 </view-mode>
+                                <carousel-size>
+                                    <label>Rozmiar karuzeli</label>
+                                    <item value="-1">Użyj domyślnie</item>
+                                    <item value="small">Mały</item>
+                                    <item value="medium">Średni</item>
+                                    <item value="large">Duży</item>
+                                </carousel-size>
                                 <columns>
                                     <label>Liczba kolumn</label>
                                     <item value="-1">Użyj domyślnie</item>
@@ -645,6 +741,13 @@
                                     <item value="grid">グリッド</item>
                                     <item value="carousel">カルーセル</item>
                                 </view-mode>
+                                <carousel-size>
+                                    <label>カルーセルのサイズ</label>
+                                    <item value="-1">既定を使う</item>
+                                    <item value="small">小</item>
+                                    <item value="medium">中</item>
+                                    <item value="large">大</item>
+                                </carousel-size>
                                 <columns>
                                     <label>列数</label>
                                     <item value="-1">既定を使う</item>
@@ -694,7 +797,19 @@
                             </xf:itemset>
                         </xf:select1>
                     </fr:c>
-                    <fr:c x="1" y="2" w="6">
+                    <fr:c x="1" y="2" w="12">
+                        <xf:select1
+                            ref="instance('local')/carousel-size"
+                            appearance="full xxf:horizontal"
+                            id="carousel-size-control">
+                            <xf:label ref="fr:r('carousel-size.label')"/>
+                            <xf:itemset ref="xxf:resource-elements('carousel-size.item')">
+                                <xf:label ref="."/>
+                                <xf:value ref="@value"/>
+                            </xf:itemset>
+                        </xf:select1>
+                    </fr:c>
+                    <fr:c x="1" y="3" w="6">
                         <fr:open-select1
                             ref="instance('local')/columns"
                             appearance="minimal"
@@ -708,7 +823,7 @@
                             </xf:itemset>
                         </fr:open-select1>
                     </fr:c>
-                    <fr:c x="7" y="2" w="6">
+                    <fr:c x="7" y="3" w="6">
                         <fr:open-select1
                             ref="instance('local')/max-rows"
                             appearance="minimal"
@@ -722,7 +837,7 @@
                             </xf:itemset>
                         </fr:open-select1>
                     </fr:c>
-                    <fr:c x="1" y="3" w="6">
+                    <fr:c x="1" y="4" w="6">
                         <fr:open-select1
                             ref="instance('local')/max-width"
                             appearance="minimal"
@@ -741,7 +856,7 @@
 
                         </fr:open-select1>
                     </fr:c>
-                    <fr:c x="7" y="3" w="6">
+                    <fr:c x="7" y="4" w="6">
                         <fr:open-select1
                             ref="instance('local')/max-height"
                             appearance="minimal"
@@ -760,7 +875,7 @@
 
                         </fr:open-select1>
                     </fr:c>
-                    <fr:c x="1" y="4" w="6">
+                    <fr:c x="1" y="5" w="6">
                         <xf:select1 ref="instance('local')/format" id="format-control">
                             <xf:label ref="fr:r('format.label')"/>
                             <xf:itemset ref="xxf:resource-elements('format.item')">
@@ -777,7 +892,7 @@
                             </xf:item>
                         </xf:select1>
                     </fr:c>
-                    <fr:c x="7" y="4" w="6">
+                    <fr:c x="7" y="5" w="6">
                         <fr:open-select1
                             ref="instance('local')/quality"
                             appearance="minimal"
@@ -806,6 +921,7 @@
                     event="xforms-value-changed"
                     observer="
                         view-mode-control
+                        carousel-size-control
                         columns-control
                         max-rows-control
                         max-width-control
@@ -820,7 +936,7 @@
                     <xf:var
                         name="att-name"
                         value="
-                            if ($param-name = ('view-mode', 'columns', 'max-rows')) then
+                            if ($param-name = ('view-mode', 'carousel-size', 'columns', 'max-rows')) then
                                 $param-name
                             else
                                 concat('transform-', $param-name)"/>
@@ -1021,6 +1137,18 @@
                 name="view-mode"
                 value="if ($multiple and fr:component-param-value('view-mode') = 'carousel') then 'carousel' else 'grid'"/>
             <xf:var
+                name="carousel-size"
+                value="
+                    let $raw := lower-case(normalize-space(string(fr:component-param-value('carousel-size'))))
+                    return
+                        if ($raw = ('small', 's')) then
+                            'small'
+                        else if ($raw = ('large', 'l')) then
+                            'large'
+                        else
+                            'medium'
+                "/>
+            <xf:var
                 name="columns"
                 value="fr:component-param-value('columns')[. castable as xs:integer and xs:integer(.) ge 1]"/>
             <xf:var
@@ -1035,6 +1163,7 @@
                 xxf:control="true"
                 tabindex="-1"
                 data-view-mode="{$view-mode}"
+                data-carousel-size="{$carousel-size}"
                 data-columns="{$columns}"
                 data-max-rows="{$max-rows}"
                 class="{
@@ -1042,7 +1171,10 @@
                         (
                             if ($multiple) then
                                 if ($view-mode = 'carousel') then
-                                    'fr-image-attachment-view-carousel'
+                                    (
+                                        'fr-image-attachment-view-carousel',
+                                        concat('fr-image-attachment-carousel-size-', $carousel-size)
+                                    )
                                 else
                                     'fr-image-attachment-view-grid'
                             else
@@ -1065,7 +1197,7 @@
                     <xh:div class="fr-image-attachment-carousel-viewport">
                         <xh:button
                             type="button"
-                            class="btn btn-link fr-image-attachment-carousel-prev"
+                            class="btn fr-image-attachment-carousel-prev"
                             aria-label="{fr:r('previous')}"
                             title="{fr:r('previous')}">
                             <xh:i class="fa fa-fw fa-chevron-left" aria-hidden="true"/>
@@ -1073,14 +1205,14 @@
                         <xh:img class="fr-image-attachment-carousel-img" alt=""/>
                         <xh:button
                             type="button"
-                            class="btn btn-link fr-image-attachment-carousel-zoom"
+                            class="btn fr-image-attachment-carousel-zoom"
                             aria-label="{fr:r('zoom')}"
                             title="{fr:r('zoom')}">
                             <xh:i class="fa fa-fw fa-expand" aria-hidden="true"/>
                         </xh:button>
                         <xh:button
                             type="button"
-                            class="btn btn-link fr-image-attachment-carousel-next"
+                            class="btn fr-image-attachment-carousel-next"
                             aria-label="{fr:r('next')}"
                             title="{fr:r('next')}">
                             <xh:i class="fa fa-fw fa-chevron-right" aria-hidden="true"/>
@@ -1092,7 +1224,7 @@
                         <xh:span class="fr-image-attachment-carousel-counter"/>
                         <xh:button
                             type="button"
-                            class="btn btn-link fr-image-attachment-carousel-remove"
+                            class="btn-link fr-image-attachment-carousel-remove"
                             aria-label="{fr:r('remove')}"
                             title="{fr:r('remove')}">
                             <xh:i class="fa fa-fw fa-times" aria-hidden="true"/>
@@ -1170,7 +1302,7 @@
                         <xh:span class="fr-image-attachment-lightbox-counter"/>
                         <xh:button
                             type="button"
-                            class="btn btn-link fr-image-attachment-lightbox-close"
+                            class="btn-link fr-image-attachment-lightbox-close"
                             aria-label="{fr:r('close')}"
                             title="{fr:r('close')}"
                             autofocus="autofocus">
@@ -1180,7 +1312,7 @@
                     <xh:div class="fr-image-attachment-lightbox-body">
                         <xh:button
                             type="button"
-                            class="btn btn-link fr-image-attachment-lightbox-prev"
+                            class="btn fr-image-attachment-lightbox-prev"
                             aria-label="{fr:r('previous')}"
                             title="{fr:r('previous')}">
                             <xh:i class="fa fa-fw fa-chevron-left" aria-hidden="true"/>
@@ -1188,7 +1320,7 @@
                         <xh:img class="fr-image-attachment-lightbox-img" alt=""/>
                         <xh:button
                             type="button"
-                            class="btn btn-link fr-image-attachment-lightbox-next"
+                            class="btn fr-image-attachment-lightbox-next"
                             aria-label="{fr:r('next')}"
                             title="{fr:r('next')}">
                             <xh:i class="fa fa-fw fa-chevron-right" aria-hidden="true"/>

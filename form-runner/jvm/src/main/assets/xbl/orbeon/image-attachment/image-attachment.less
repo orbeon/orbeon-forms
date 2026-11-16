@@ -76,6 +76,7 @@
                                 inline-size: auto;
                                 block-size: auto;
                                 object-fit: contain;
+                                border-radius: var(--orbeon-body-decorations-border-radius);
                                 cursor: zoom-in;
                                 -webkit-user-drag: none;
                                 user-select: none;
@@ -90,8 +91,8 @@
                             line-height: 1;
                             border: none;
                             border-radius: var(--orbeon-control-border-radius);
-                            background-color: rgba(0, 0, 0, 0.55);
-                            color: #fff;
+                            background-color: var(--orbeon-button-background-color);
+                            color: var(--orbeon-button-color);
                             text-decoration: none;
                             opacity: 0;
                             transition: opacity 0.15s ease-in-out, background-color 0.15s ease-in-out;
@@ -99,8 +100,8 @@
                             &:hover,
                             &:focus-visible {
                                 opacity: 1;
-                                background-color: rgba(0, 0, 0, 0.8);
-                                color: #fff;
+                                background-color: var(--orbeon-button-highlight-background-color);
+                                color: var(--orbeon-button-color);
                             }
 
                             @media (hover: none) {
@@ -148,6 +149,16 @@
         // Carousel / Filmstrip mode
         .fr-image-attachment-view-carousel {
             @media screen {
+                --fr-image-attachment-carousel-height: 280px;
+
+                &.fr-image-attachment-carousel-size-small {
+                    --fr-image-attachment-carousel-height: 180px;
+                }
+
+                &.fr-image-attachment-carousel-size-large {
+                    --fr-image-attachment-carousel-height: 420px;
+                }
+
                 .fr-image-attachment-carousel-stage {
                     display: block;
                     .fieldBorder();
@@ -162,15 +173,15 @@
 
                     .fr-image-attachment-carousel-viewport {
                         position: relative;
-                        aspect-ratio: 16 / 9;
-                        max-block-size: 150px;
+                        block-size: var(--fr-image-attachment-carousel-height, 280px);
+                        max-block-size: 65dvh;
                         inline-size: 100%;
                         background-color: var(--orbeon-image-attachment-background-color);
                         border-bottom: 1px solid var(--orbeon-control-border-color);
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        padding: 0.5rem 2.75rem;
+                        padding: 0.75rem 3.5rem;
                         box-sizing: border-box;
 
                         .fr-image-attachment-carousel-img {
@@ -180,6 +191,7 @@
                             inline-size: auto;
                             block-size: auto;
                             object-fit: contain;
+                            border-radius: var(--orbeon-body-decorations-border-radius);
                             cursor: zoom-in;
                             -webkit-user-drag: none;
                             user-select: none;
@@ -193,14 +205,14 @@
                             line-height: 1;
                             border: none;
                             border-radius: var(--orbeon-control-border-radius);
-                            background-color: rgba(0, 0, 0, 0.55);
-                            color: #fff;
+                            background-color: var(--orbeon-button-background-color);
+                            color: var(--orbeon-button-color);
                             text-decoration: none;
 
                             &:hover,
                             &:focus-visible {
-                                background-color: rgba(0, 0, 0, 0.8);
-                                color: #fff;
+                                background-color: var(--orbeon-button-highlight-background-color);
+                                color: var(--orbeon-button-color);
                             }
                         }
 
@@ -213,14 +225,14 @@
                             line-height: 1;
                             border: none;
                             border-radius: var(--orbeon-control-border-radius);
-                            background-color: rgba(0, 0, 0, 0.55);
-                            color: #fff;
+                            background-color: var(--orbeon-button-background-color);
+                            color: var(--orbeon-button-color);
                             text-decoration: none;
 
                             &:hover,
                             &:focus-visible {
-                                background-color: rgba(0, 0, 0, 0.8);
-                                color: #fff;
+                                background-color: var(--orbeon-button-highlight-background-color);
+                                color: var(--orbeon-button-color);
                             }
                         }
 
@@ -267,10 +279,13 @@
 
                         .fr-image-attachment-carousel-remove {
                             flex: 0 0 auto;
-                            padding: 0 2px;
-                            line-height: 1;
+                            margin-inline-start: 4px;
+                            border: none;
+                            border-radius: var(--orbeon-control-border-radius);
+                            background-color: transparent;
                             color: inherit;
                             text-decoration: none;
+                            .focusHighlightGroup();
                         }
                     }
                 }
@@ -284,7 +299,14 @@
                         gap: 0.5rem;
                         overflow-x: auto;
                         overscroll-behavior-x: contain;
-                        padding-block: 2px 4px;
+                        scroll-padding-inline: 2px;
+                        box-sizing: border-box;
+
+                        &:has(.xforms-dnd-item:not(.xforms-disabled)) {
+                            padding: 2px 2px 4px 2px;
+                            margin-inline: -2px;
+                            inline-size: calc(100% + 4px);
+                        }
                     }
 
                     .xforms-dnd-item {
@@ -381,10 +403,12 @@
 
                 .fr-image-attachment-lightbox-close {
                     flex: 0 0 auto;
-                    padding: 0.25rem 0.4rem;
-                    line-height: 1;
+                    border: none;
+                    border-radius: var(--orbeon-control-border-radius);
+                    background-color: transparent;
                     color: inherit;
                     text-decoration: none;
+                    .focusHighlightGroup();
                 }
             }
 
@@ -393,7 +417,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                padding: 0.75rem 3rem;
+                padding: 0.75rem 3.75rem;
                 background-color: var(--orbeon-image-attachment-background-color);
                 min-inline-size: min(60dvw, 480px);
                 min-block-size: min(50dvh, 320px);
@@ -406,6 +430,7 @@
                     inline-size: auto;
                     block-size: auto;
                     object-fit: contain;
+                    border-radius: var(--orbeon-body-decorations-border-radius);
                 }
 
                 .fr-image-attachment-lightbox-prev,
@@ -416,15 +441,15 @@
                     padding: 0.5rem 0.65rem;
                     border: none;
                     border-radius: var(--orbeon-control-border-radius);
-                    background-color: rgba(0, 0, 0, 0.55);
-                    color: #fff;
+                    background-color: var(--orbeon-button-background-color);
+                    color: var(--orbeon-button-color);
                     text-decoration: none;
                     line-height: 1;
 
                     &:hover,
                     &:focus-visible {
-                        background-color: rgba(0, 0, 0, 0.8);
-                        color: #fff;
+                        background-color: var(--orbeon-button-highlight-background-color);
+                        color: var(--orbeon-button-color);
                     }
                 }
 

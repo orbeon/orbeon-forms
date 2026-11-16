@@ -774,7 +774,7 @@
                             </xf:output>
                             <xh:button
                                 type="button"
-                                class="btn btn-link fr-attachment-zoom">
+                                class="btn fr-attachment-zoom">
                                 <xh:i class="fa fa-fw fa-expand" aria-hidden="true"/>
                             </xh:button>
                         </xf:group>

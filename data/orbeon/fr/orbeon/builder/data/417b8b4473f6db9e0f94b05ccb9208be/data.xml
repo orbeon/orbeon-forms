@@ -152,11 +152,31 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             </multiple-file-attachment>
                             <image-attachment filename="Earth Eastern Hemisphere (1024).jpg" mediatype="image/jpeg"
                                               size="218652">/fr/service/persistence/crud/orbeon-features/controls/form/2a3bd8bb935c54280948a5874c47e2994359d01b.bin</image-attachment>
+                            <multiple-image-attachment>
+                                <_ filename="Pillars of Creation (1024).jpg" mediatype="image/jpeg"
+                                   size="130592">/fr/service/persistence/crud/orbeon-features/controls/form/801c247a5d737058620043886749294927a54c5e.bin</_>
+                                <_ filename="Southern Ring Nebula (1024).jpg" mediatype="image/jpeg"
+                                   size="106027">/fr/service/persistence/crud/orbeon-features/controls/form/cdc9c43b2ad81b47c805f37ad585a6eae2d110dc.bin</_>
+                                <_ filename="Cartwheel Galaxy (1024).jpg" mediatype="image/jpeg"
+                                   size="87239">/fr/service/persistence/crud/orbeon-features/controls/form/811927d123d7ea1a2e2f1121065666505100d525.bin</_>
+                                <_ filename="Whirlpool Galaxy (1024).jpg" mediatype="image/jpeg"
+                                   size="87373">/fr/service/persistence/crud/orbeon-features/controls/form/51d9e7d5fab828629b6d07f3c018760647ca7e73.bin</_>
+                            </multiple-image-attachment>
+                            <multiple-image-attachment-carousel>
+                                <_ filename="Pillars of Creation (1024).jpg" mediatype="image/jpeg"
+                                   size="130592">/fr/service/persistence/crud/orbeon-features/controls/form/801c247a5d737058620043886749294927a54c5e.bin</_>
+                                <_ filename="Southern Ring Nebula (1024).jpg" mediatype="image/jpeg"
+                                   size="106027">/fr/service/persistence/crud/orbeon-features/controls/form/cdc9c43b2ad81b47c805f37ad585a6eae2d110dc.bin</_>
+                                <_ filename="Cartwheel Galaxy (1024).jpg" mediatype="image/jpeg"
+                                   size="87239">/fr/service/persistence/crud/orbeon-features/controls/form/811927d123d7ea1a2e2f1121065666505100d525.bin</_>
+                                <_ filename="Whirlpool Galaxy (1024).jpg" mediatype="image/jpeg"
+                                   size="87373">/fr/service/persistence/crud/orbeon-features/controls/form/51d9e7d5fab828629b6d07f3c018760647ca7e73.bin</_>
+                            </multiple-image-attachment-carousel>
                             <video-attachment filename="Apollo 11 Moonwalk Montage.mp4" mediatype="video/mp4" size="2600533">/fr/service/persistence/crud/orbeon-features/controls/form/8e442acb004488a6fc08b932366f12c725c5f819.bin</video-attachment>
-                            <audio-attachment filename="" mediatype="" size=""/>
+                            <audio-attachment filename="Apollo 11 - The Eagle Has Landed.mp3" mediatype="audio/mpeg" size="26388">/fr/service/persistence/crud/orbeon-features/controls/form/5f0d7d67acce527386942b0e48c59d558e202d78.bin</audio-attachment>
                             <static-image filename="Eta Carinae Nebula (384).jpg" mediatype="image/jpeg" size="193055">/fr/service/persistence/crud/orbeon-features/controls/form/340971f98952e4b9d15a9810b1eff00fb7b8cdb1.bin</static-image>
                             <static-video filename="Apollo 11 Moonwalk Montage.mp4" mediatype="video/mp4" size="2600533">/fr/service/persistence/crud/orbeon-features/controls/form/8e442acb004488a6fc08b932366f12c725c5f819.bin</static-video>
-                            <static-audio filename="" mediatype=""/>
+                            <static-audio filename="Cassini - Saturn Radio Waves.mp3" mediatype="audio/mpeg">/fr/service/persistence/crud/orbeon-features/controls/form/c02e3770a89199794333e5f9824fd7117845d702.bin</static-audio>
                             <image-annotation>
                                 <image filename="" mediatype="" size=""/>
                                 <annotation/>
@@ -454,6 +474,12 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind id="image-attachment-bind" ref="image-attachment" name="image-attachment"
                                  type="xf:anyURI"
                                  constraint="xxf:upload-mediatypes('image/*')"/>
+                        <xf:bind id="multiple-image-attachment-bind" ref="multiple-image-attachment"
+                                 name="multiple-image-attachment"
+                                 constraint="xxf:upload-mediatypes('image/*')"/>
+                        <xf:bind id="multiple-image-attachment-carousel-bind" ref="multiple-image-attachment-carousel"
+                                 name="multiple-image-attachment-carousel"
+                                 constraint="xxf:upload-mediatypes('image/*')"/>
                         <xf:bind id="video-attachment-bind" ref="video-attachment" name="video-attachment"
                                  type="xf:anyURI"
                                  constraint="xxf:upload-mediatypes('video/*')"/>
@@ -696,16 +722,24 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <hint/>
                         </multiple-file-attachment>
                         <image-attachment>
-                            <label>Image Attachment</label>
+                            <label>Single Image Attachment</label>
                             <hint/>
                         </image-attachment>
+                        <multiple-image-attachment>
+                            <label>Multiple Image Attachments</label>
+                            <hint>&lt;div&gt;Credit: &lt;a href="https://science.nasa.gov/mission/webb/"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
+                        </multiple-image-attachment>
+                        <multiple-image-attachment-carousel>
+                            <label>Multiple Image Attachments (Carousel)</label>
+                            <hint>&lt;div&gt;Credit: &lt;a href="https://science.nasa.gov/mission/webb/"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
+                        </multiple-image-attachment-carousel>
                         <video-attachment>
                             <label>Video Attachment</label>
                             <hint>&lt;div&gt;Credit: &lt;a href="https://images.nasa.gov/details/Apollo%2011%20Moonwalk%20Montage"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
                         </video-attachment>
                         <audio-attachment>
                             <label>Audio Attachment</label>
-                            <hint/>
+                            <hint>&lt;div&gt;Credit: &lt;a href="https://www.nasa.gov/historical-sounds/"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
                         </audio-attachment>
                         <static-image>
                             <label>Static Image</label>
@@ -717,7 +751,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         </static-video>
                         <static-audio>
                             <label>Static Audio</label>
-                            <hint/>
+                            <hint>&lt;div&gt;Credit: &lt;a href="https://www.nasa.gov/historical-sounds/"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
                         </static-audio>
                         <image-annotation>
                             <label>Image Annotation</label>
@@ -1636,16 +1670,24 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <hint/>
                         </multiple-file-attachment>
                         <image-attachment>
-                            <label>Image jointe</label>
+                            <label>Image jointe unique</label>
                             <hint/>
                         </image-attachment>
+                        <multiple-image-attachment>
+                            <label>Images jointes multiples</label>
+                            <hint>&lt;div&gt;Crédit: &lt;a href="https://science.nasa.gov/mission/webb/"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
+                        </multiple-image-attachment>
+                        <multiple-image-attachment-carousel>
+                            <label>Images jointes multiples (Carrousel)</label>
+                            <hint>&lt;div&gt;Crédit: &lt;a href="https://science.nasa.gov/mission/webb/"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
+                        </multiple-image-attachment-carousel>
                         <video-attachment>
                             <label>Vidéo jointe</label>
                             <hint>&lt;div&gt;Crédit: &lt;a href="https://images.nasa.gov/details/Apollo%2011%20Moonwalk%20Montage"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
                         </video-attachment>
                         <audio-attachment>
                             <label>Audio joint</label>
-                            <hint/>
+                            <hint>&lt;div&gt;Crédit: &lt;a href="https://www.nasa.gov/historical-sounds/"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
                         </audio-attachment>
                         <static-image>
                             <label>Image fixe</label>
@@ -1657,7 +1699,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         </static-video>
                         <static-audio>
                             <label>Audio fixe</label>
-                            <hint/>
+                            <hint>&lt;div&gt;Crédit: &lt;a href="https://www.nasa.gov/historical-sounds/"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
                         </static-audio>
                         <image-annotation>
                             <label>Annotation d'image</label>
@@ -3391,6 +3433,27 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             </fr:image-attachment>
                         </fr:c>
                         <fr:c x="7" y="2" w="6">
+                            <fr:image-attachment id="multiple-image-attachment-control"
+                                                 bind="multiple-image-attachment-bind"
+                                                 multiple="true"
+                                                 class="fr-attachment">
+                                <xf:label ref="$form-resources/multiple-image-attachment/label"/>
+                                <xf:hint ref="$form-resources/multiple-image-attachment/hint" mediatype="text/html"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:image-attachment>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="6" h="2">
+                            <fr:image-attachment id="multiple-image-attachment-carousel-control"
+                                                 bind="multiple-image-attachment-carousel-bind"
+                                                 multiple="true"
+                                                 view-mode="carousel"
+                                                 class="fr-attachment">
+                                <xf:label ref="$form-resources/multiple-image-attachment-carousel/label"/>
+                                <xf:hint ref="$form-resources/multiple-image-attachment-carousel/hint" mediatype="text/html"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:image-attachment>
+                        </fr:c>
+                        <fr:c x="7" y="3" w="6">
                             <fr:video-attachment id="video-attachment-control" bind="video-attachment-bind"
                                                  class="fr-attachment">
                                 <xf:label ref="$form-resources/video-attachment/label"/>
@@ -3400,37 +3463,36 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                             </fr:video-attachment>
                         </fr:c>
-                        <fr:c x="1" y="3" w="6">
+                        <fr:c x="7" y="4" w="6">
                             <fr:audio-attachment id="audio-attachment-control" class="fr-attachment"
                                                  bind="audio-attachment-bind">
                                 <xf:label ref="$form-resources/audio-attachment/label"/>
-                                <xf:hint ref="$form-resources/audio-attachment/hint"/>
+                                <xf:hint ref="$form-resources/audio-attachment/hint" mediatype="text/html"/>
 
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:audio-attachment>
                         </fr:c>
-                        <fr:c x="7" y="3" w="6"/>
-                        <fr:c x="1" y="4" w="6">
+                        <fr:c x="1" y="5" w="6">
                             <fr:image bind="static-image-bind" id="static-image-control">
                                 <xf:label ref="$form-resources/static-image/label"/>
                             </fr:image>
                         </fr:c>
-                        <fr:c x="7" y="4" w="6" h="2">
+                        <fr:c x="7" y="5" w="6" h="2">
                             <fr:video id="static-video-control" bind="static-video-bind" class="fr-static-attachment">
                                 <xf:label ref="$form-resources/static-video/label" mediatype="text/html"/>
                                 <xf:hint ref="$form-resources/static-video/hint" mediatype="text/html"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:video>
                         </fr:c>
-                        <fr:c x="1" y="5" w="6">
+                        <fr:c x="1" y="6" w="6">
                             <fr:audio id="static-audio-control" class="fr-static-attachment" bind="static-audio-bind">
                                 <xf:label ref="$form-resources/static-audio/label"/>
-                                <xf:hint ref="$form-resources/static-audio/hint"/>
+                                <xf:hint ref="$form-resources/static-audio/hint" mediatype="text/html"/>
 
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:audio>
                         </fr:c>
-                        <fr:c x="1" y="6" w="6">
+                        <fr:c x="1" y="7" w="6">
                             <fr:wpaint id="image-annotation-control" bind="image-annotation-bind">
                                 <xf:label ref="$form-resources/image-annotation/label"/>
                                 <xf:hint ref="$form-resources/image-annotation/hint"/>
@@ -3438,7 +3500,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:wpaint>
                         </fr:c>
-                        <fr:c x="7" y="6" w="6"/>
+                        <fr:c x="7" y="7" w="6"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="buttons-section" bind="buttons-bind">

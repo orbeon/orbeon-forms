@@ -134,11 +134,23 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 <_ filename="Mars Valles Marineris (1024).jpg" mediatype="image/jpeg" size="117440">/fr/service/persistence/crud/orbeon-features/controls/form/60f7b39c8394d4c4c49321e292d80b3c162d9b75.bin</_>
                             </multiple-file-attachment>
                             <image-attachment filename="Earth Eastern Hemisphere (1024).jpg" mediatype="image/jpeg" size="218652">/fr/service/persistence/crud/orbeon-features/controls/form/2a3bd8bb935c54280948a5874c47e2994359d01b.bin</image-attachment>
+                            <multiple-image-attachment>
+                                <_ filename="Pillars of Creation (1024).jpg" mediatype="image/jpeg" size="130592">/fr/service/persistence/crud/orbeon-features/controls/form/801c247a5d737058620043886749294927a54c5e.bin</_>
+                                <_ filename="Southern Ring Nebula (1024).jpg" mediatype="image/jpeg" size="106027">/fr/service/persistence/crud/orbeon-features/controls/form/cdc9c43b2ad81b47c805f37ad585a6eae2d110dc.bin</_>
+                                <_ filename="Cartwheel Galaxy (1024).jpg" mediatype="image/jpeg" size="87239">/fr/service/persistence/crud/orbeon-features/controls/form/811927d123d7ea1a2e2f1121065666505100d525.bin</_>
+                                <_ filename="Whirlpool Galaxy (1024).jpg" mediatype="image/jpeg" size="87373">/fr/service/persistence/crud/orbeon-features/controls/form/51d9e7d5fab828629b6d07f3c018760647ca7e73.bin</_>
+                            </multiple-image-attachment>
+                            <multiple-image-attachment-carousel>
+                                <_ filename="Pillars of Creation (1024).jpg" mediatype="image/jpeg" size="130592">/fr/service/persistence/crud/orbeon-features/controls/form/801c247a5d737058620043886749294927a54c5e.bin</_>
+                                <_ filename="Southern Ring Nebula (1024).jpg" mediatype="image/jpeg" size="106027">/fr/service/persistence/crud/orbeon-features/controls/form/cdc9c43b2ad81b47c805f37ad585a6eae2d110dc.bin</_>
+                                <_ filename="Cartwheel Galaxy (1024).jpg" mediatype="image/jpeg" size="87239">/fr/service/persistence/crud/orbeon-features/controls/form/811927d123d7ea1a2e2f1121065666505100d525.bin</_>
+                                <_ filename="Whirlpool Galaxy (1024).jpg" mediatype="image/jpeg" size="87373">/fr/service/persistence/crud/orbeon-features/controls/form/51d9e7d5fab828629b6d07f3c018760647ca7e73.bin</_>
+                            </multiple-image-attachment-carousel>
                             <video-attachment filename="Apollo 11 Moonwalk Montage.mp4" mediatype="video/mp4" size="2600533">/fr/service/persistence/crud/orbeon-features/controls/form/8e442acb004488a6fc08b932366f12c725c5f819.bin</video-attachment>
-                            <audio-attachment filename="" mediatype="" size=""/>
+                            <audio-attachment filename="Apollo 11 - The Eagle Has Landed.mp3" mediatype="audio/mpeg" size="26388">/fr/service/persistence/crud/orbeon-features/controls/form/5f0d7d67acce527386942b0e48c59d558e202d78.bin</audio-attachment>
                             <static-image filename="Eta Carinae Nebula (384).jpg" mediatype="image/jpeg" size="193055">/fr/service/persistence/crud/orbeon-features/controls/form/340971f98952e4b9d15a9810b1eff00fb7b8cdb1.bin</static-image>
                             <static-video filename="Apollo 11 Moonwalk Montage.mp4" mediatype="video/mp4" size="2600533">/fr/service/persistence/crud/orbeon-features/controls/form/8e442acb004488a6fc08b932366f12c725c5f819.bin</static-video>
-                            <static-audio filename="" mediatype=""/>
+                            <static-audio filename="Cassini - Saturn Radio Waves.mp3" mediatype="audio/mpeg">/fr/service/persistence/crud/orbeon-features/controls/form/c02e3770a89199794333e5f9824fd7117845d702.bin</static-audio>
                             <image-annotation>
                                 <image filename="" mediatype="" size=""/>
                                 <annotation/>
@@ -349,6 +361,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind id="single-file-attachment-bind" ref="single-file-attachment" type="xf:anyURI" name="single-file-attachment"/>
                         <xf:bind id="multiple-file-attachment-bind" ref="multiple-file-attachment" type="xf:anyURI" name="multiple-file-attachment"/>
                         <xf:bind id="image-attachment-bind" ref="image-attachment" name="image-attachment" type="xf:anyURI" constraint="xxf:upload-mediatypes('image/*')"/>
+                        <xf:bind id="multiple-image-attachment-bind" ref="multiple-image-attachment" name="multiple-image-attachment" constraint="xxf:upload-mediatypes('image/*')"/>
+                        <xf:bind id="multiple-image-attachment-carousel-bind" ref="multiple-image-attachment-carousel" name="multiple-image-attachment-carousel" constraint="xxf:upload-mediatypes('image/*')"/>
                         <xf:bind id="video-attachment-bind" ref="video-attachment" name="video-attachment" type="xf:anyURI" constraint="xxf:upload-mediatypes('video/*')"/>
                         <xf:bind id="audio-attachment-bind" ref="audio-attachment" name="audio-attachment" type="xf:anyURI" constraint="xxf:upload-mediatypes('audio/*')"/>
                         <xf:bind ref="static-image" id="static-image-bind" type="xf:anyURI" name="static-image"/>
@@ -471,7 +485,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2020.1 PE</updated-with-version><updated-with-version>2022.1 PE</updated-with-version><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><updated-with-version>2026.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"input"},{"value":"input-counter"},{"value":"input-content-filter"},{"value":"input-clipboard"},{"value":"textarea"},{"value":"textarea-resize"},{"value":"textarea-counter"},{"value":"textarea-content-filter"},{"value":"textarea-clipboard"}],"topLevel":true},{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-2"},"afterElem":{"value":"grid-1"},"content":[{"value":"htmlarea"}],"topLevel":true},{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-6"},"afterElem":{"value":"grid-2"},"content":[{"value":"secret"},{"value":"masked-input"},{"value":"url"},{"value":"tags"},{"value":"code-input"}],"topLevel":true},{"containerPath":[{"value":"number-controls"}],"newGridElem":{"value":"grid-11"},"afterElem":null,"content":[{"value":"number"},{"value":"number-right"},{"value":"numeric-stepper"},{"value":"currency"},{"value":"currency-right"},{"value":"percentage"},{"value":"slider"}],"topLevel":true},{"containerPath":[{"value":"date-time-controls"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"date-us"},{"value":"date-eu"},{"value":"date-iso"},{"value":"dropdown-date"},{"value":"fields-date"},{"value":"native-date"},{"value":"month-year"},{"value":"year"},{"value":"dropdown-year"},{"value":"time"},{"value":"time-24hour"},{"value":"native-time"},{"value":"time-12hour-noseconds"},{"value":"time-24hour-noseconds"},{"value":"native-time-noseconds"},{"value":"datetime"},{"value":"date-range"},{"value":"duration"},{"value":"timestamp"}],"topLevel":true},{"containerPath":[{"value":"selection-controls"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"dropdown"},{"value":"dropdown-with-search"},{"value":"dropdown-with-other"},{"value":"dynamic-dropdown"},{"value":"dynamic-dropdown-with-search-by-ui"},{"value":"dynamic-dropdown-with-search-by-service"},{"value":"dynamic-dropdown-with-search-and-paging-by-service"},{"value":"open-selection-1"},{"value":"open-selection-2"},{"value":"open-selection-3"},{"value":"dynamic-multiselect"},{"value":"radio-buttons"},{"value":"radio-buttons-horizontal"},{"value":"segmented-buttons"},{"value":"choice-cards"},{"value":"radio-buttons-with-other"},{"value":"checkboxes"},{"value":"checkboxes-horizontal"},{"value":"scrollable-checkboxes"},{"value":"choice-cards-multiple"},{"value":"checkboxes-with-other"},{"value":"checkbox-input"},{"value":"yesno-input"},{"value":"checkbox-input-label-top"},{"value":"toggle-switch"},{"value":"color-picker"},{"value":"star-rating"},{"value":"linear-scale"}],"topLevel":true},{"containerPath":[{"value":"international-controls"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"email"},{"value":"phone"},{"value":"country"},{"value":"iban"},{"value":"legal-entity-identifier-lei"},{"value":"international-securities-identification-number-isin"}],"topLevel":true},{"containerPath":[{"value":"us-controls"}],"newGridElem":{"value":"grid-10"},"afterElem":null,"content":[{"value":"us-state"},{"value":"us-ssn"},{"value":"ssn-explanation"},{"value":"us-ein"},{"value":"us-phone"}],"topLevel":true},{"containerPath":[{"value":"attachment-controls"}],"newGridElem":{"value":"grid-7"},"afterElem":null,"content":[{"value":"single-file-attachment"},{"value":"multiple-file-attachment"},{"value":"image-attachment"},{"value":"video-attachment"},{"value":"audio-attachment"},{"value":"static-image"},{"value":"static-video"},{"value":"static-audio"},{"value":"image-annotation"}],"topLevel":true},{"containerPath":[{"value":"buttons"}],"newGridElem":{"value":"grid-8"},"afterElem":null,"content":[{"value":"standard-button"},{"value":"primary-button"},{"value":"inverse-button"},{"value":"success-button"},{"value":"danger-button"},{"value":"warning-button"},{"value":"info-button"},{"value":"link-button"}],"topLevel":true},{"containerPath":[{"value":"utility-controls"}],"newGridElem":{"value":"grid-9"},"afterElem":null,"content":[{"value":"explanatory-text"},{"value":"calculated-value"},{"value":"calculated-value-borderless"},{"value":"calculated-value-clipboard"},{"value":"hyperlink"},{"value":"hidden-field"},{"value":"qr-code"},{"value":"barcode"}],"topLevel":true},{"containerPath":[{"value":"reusable-sections"},{"value":"address-us"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"us-address-street-1"},{"value":"us-address-city"},{"value":"us-address-street-2"},{"value":"us-address-state"},{"value":"us-address-zip"},{"value":"us-address-urbanization"}],"topLevel":false},{"containerPath":[{"value":"reusable-sections"},{"value":"address-uk"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"uk-address-line-1"},{"value":"uk-address-town"},{"value":"uk-address-line-2"},{"value":"uk-address-postcode"},{"value":"uk-address-locality"}],"topLevel":false},{"containerPath":[{"value":"reusable-sections"},{"value":"contact-information"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"contact-information-first-name"},{"value":"contact-information-middle-initial"},{"value":"contact-information-last-name"},{"value":"contact-information-phone"},{"value":"contact-information-email"}],"topLevel":false}]}</migration></metadata>
+                <email><templates><template name="default"><headers/><exclude-from-all-control-values/></template></templates><parameters/></email><updated-with-version>2020.1 PE</updated-with-version><updated-with-version>2022.1 PE</updated-with-version><updated-with-version>2024.1-SNAPSHOT PE</updated-with-version><updated-with-version>2026.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"input"},{"value":"input-counter"},{"value":"input-content-filter"},{"value":"input-clipboard"},{"value":"textarea"},{"value":"textarea-resize"},{"value":"textarea-counter"},{"value":"textarea-content-filter"},{"value":"textarea-clipboard"}],"topLevel":true},{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-2"},"afterElem":{"value":"grid-1"},"content":[{"value":"htmlarea"}],"topLevel":true},{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-6"},"afterElem":{"value":"grid-2"},"content":[{"value":"secret"},{"value":"masked-input"},{"value":"url"},{"value":"tags"},{"value":"code-input"}],"topLevel":true},{"containerPath":[{"value":"number-controls"}],"newGridElem":{"value":"grid-11"},"afterElem":null,"content":[{"value":"number"},{"value":"number-right"},{"value":"numeric-stepper"},{"value":"currency"},{"value":"currency-right"},{"value":"percentage"},{"value":"slider"}],"topLevel":true},{"containerPath":[{"value":"date-time-controls"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"date-us"},{"value":"date-eu"},{"value":"date-iso"},{"value":"dropdown-date"},{"value":"fields-date"},{"value":"native-date"},{"value":"month-year"},{"value":"year"},{"value":"dropdown-year"},{"value":"time"},{"value":"time-24hour"},{"value":"native-time"},{"value":"time-12hour-noseconds"},{"value":"time-24hour-noseconds"},{"value":"native-time-noseconds"},{"value":"datetime"},{"value":"date-range"},{"value":"duration"},{"value":"timestamp"}],"topLevel":true},{"containerPath":[{"value":"selection-controls"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"dropdown"},{"value":"dropdown-with-search"},{"value":"dropdown-with-other"},{"value":"dynamic-dropdown"},{"value":"dynamic-dropdown-with-search-by-ui"},{"value":"dynamic-dropdown-with-search-by-service"},{"value":"dynamic-dropdown-with-search-and-paging-by-service"},{"value":"open-selection-1"},{"value":"open-selection-2"},{"value":"open-selection-3"},{"value":"dynamic-multiselect"},{"value":"radio-buttons"},{"value":"radio-buttons-horizontal"},{"value":"segmented-buttons"},{"value":"choice-cards"},{"value":"radio-buttons-with-other"},{"value":"checkboxes"},{"value":"checkboxes-horizontal"},{"value":"scrollable-checkboxes"},{"value":"choice-cards-multiple"},{"value":"checkboxes-with-other"},{"value":"checkbox-input"},{"value":"yesno-input"},{"value":"checkbox-input-label-top"},{"value":"toggle-switch"},{"value":"color-picker"},{"value":"star-rating"},{"value":"linear-scale"}],"topLevel":true},{"containerPath":[{"value":"international-controls"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"email"},{"value":"phone"},{"value":"country"},{"value":"iban"},{"value":"legal-entity-identifier-lei"},{"value":"international-securities-identification-number-isin"}],"topLevel":true},{"containerPath":[{"value":"us-controls"}],"newGridElem":{"value":"grid-10"},"afterElem":null,"content":[{"value":"us-state"},{"value":"us-ssn"},{"value":"ssn-explanation"},{"value":"us-ein"},{"value":"us-phone"}],"topLevel":true},{"containerPath":[{"value":"attachment-controls"}],"newGridElem":{"value":"grid-7"},"afterElem":null,"content":[{"value":"single-file-attachment"},{"value":"multiple-file-attachment"},{"value":"image-attachment"},{"value":"multiple-image-attachment"},{"value":"multiple-image-attachment-carousel"},{"value":"video-attachment"},{"value":"audio-attachment"},{"value":"static-image"},{"value":"static-video"},{"value":"static-audio"},{"value":"image-annotation"}],"topLevel":true},{"containerPath":[{"value":"buttons"}],"newGridElem":{"value":"grid-8"},"afterElem":null,"content":[{"value":"standard-button"},{"value":"primary-button"},{"value":"inverse-button"},{"value":"success-button"},{"value":"danger-button"},{"value":"warning-button"},{"value":"info-button"},{"value":"link-button"}],"topLevel":true},{"containerPath":[{"value":"utility-controls"}],"newGridElem":{"value":"grid-9"},"afterElem":null,"content":[{"value":"explanatory-text"},{"value":"calculated-value"},{"value":"calculated-value-borderless"},{"value":"calculated-value-clipboard"},{"value":"hyperlink"},{"value":"hidden-field"},{"value":"qr-code"},{"value":"barcode"}],"topLevel":true},{"containerPath":[{"value":"reusable-sections"},{"value":"address-us"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"us-address-street-1"},{"value":"us-address-city"},{"value":"us-address-street-2"},{"value":"us-address-state"},{"value":"us-address-zip"},{"value":"us-address-urbanization"}],"topLevel":false},{"containerPath":[{"value":"reusable-sections"},{"value":"address-uk"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"uk-address-line-1"},{"value":"uk-address-town"},{"value":"uk-address-line-2"},{"value":"uk-address-postcode"},{"value":"uk-address-locality"}],"topLevel":false},{"containerPath":[{"value":"reusable-sections"},{"value":"contact-information"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"contact-information-first-name"},{"value":"contact-information-middle-initial"},{"value":"contact-information-last-name"},{"value":"contact-information-phone"},{"value":"contact-information-email"}],"topLevel":false}]}</migration></metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">
                 <attachments>
@@ -540,16 +554,24 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <hint/>
                         </multiple-file-attachment>
                         <image-attachment>
-                            <label>Image Attachment</label>
+                            <label>Single Image Attachment</label>
                             <hint/>
                         </image-attachment>
+                        <multiple-image-attachment>
+                            <label>Multiple Image Attachments</label>
+                            <hint>&lt;div&gt;Credit: &lt;a href="https://science.nasa.gov/mission/webb/"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
+                        </multiple-image-attachment>
+                        <multiple-image-attachment-carousel>
+                            <label>Multiple Image Attachments (Carousel)</label>
+                            <hint>&lt;div&gt;Credit: &lt;a href="https://science.nasa.gov/mission/webb/"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
+                        </multiple-image-attachment-carousel>
                         <video-attachment>
                             <label>Video Attachment</label>
                             <hint>&lt;div&gt;Credit: &lt;a href="https://images.nasa.gov/details/Apollo%2011%20Moonwalk%20Montage"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
                         </video-attachment>
                         <audio-attachment>
                             <label>Audio Attachment</label>
-                            <hint/>
+                            <hint>&lt;div&gt;Credit: &lt;a href="https://www.nasa.gov/historical-sounds/"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
                         </audio-attachment>
                         <static-image>
                             <label>Static Image</label>
@@ -561,7 +583,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         </static-video>
                         <static-audio>
                             <label>Static Audio</label>
-                            <hint/>
+                            <hint>&lt;div&gt;Credit: &lt;a href="https://www.nasa.gov/historical-sounds/"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
                         </static-audio>
                         <image-annotation>
                             <label>Image Annotation</label>
@@ -1468,16 +1490,24 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <hint/>
                         </multiple-file-attachment>
                         <image-attachment>
-                            <label>Image jointe</label>
+                            <label>Image jointe unique</label>
                             <hint/>
                         </image-attachment>
+                        <multiple-image-attachment>
+                            <label>Images jointes multiples</label>
+                            <hint>&lt;div&gt;Crédit: &lt;a href="https://science.nasa.gov/mission/webb/"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
+                        </multiple-image-attachment>
+                        <multiple-image-attachment-carousel>
+                            <label>Images jointes multiples (Carrousel)</label>
+                            <hint>&lt;div&gt;Crédit: &lt;a href="https://science.nasa.gov/mission/webb/"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
+                        </multiple-image-attachment-carousel>
                         <video-attachment>
                             <label>Vidéo jointe</label>
                             <hint>&lt;div&gt;Crédit: &lt;a href="https://images.nasa.gov/details/Apollo%2011%20Moonwalk%20Montage"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
                         </video-attachment>
                         <audio-attachment>
                             <label>Audio joint</label>
-                            <hint/>
+                            <hint>&lt;div&gt;Crédit: &lt;a href="https://www.nasa.gov/historical-sounds/"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
                         </audio-attachment>
                         <static-image>
                             <label>Image fixe</label>
@@ -1489,7 +1519,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         </static-video>
                         <static-audio>
                             <label>Audio fixe</label>
-                            <hint/>
+                            <hint>&lt;div&gt;Crédit: &lt;a href="https://www.nasa.gov/historical-sounds/"&gt;NASA&lt;/a&gt;&lt;/div&gt;</hint>
                         </static-audio>
                         <image-annotation>
                             <label>Annotation d'image</label>
@@ -3419,6 +3449,20 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             </fr:image-attachment>
                         </fr:c>
                         <fr:c x="7" y="2" w="6">
+                            <fr:image-attachment id="multiple-image-attachment-control" bind="multiple-image-attachment-bind" multiple="true" class="fr-attachment">
+                                <xf:label ref="$form-resources/multiple-image-attachment/label"/>
+                                <xf:hint ref="$form-resources/multiple-image-attachment/hint" mediatype="text/html"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:image-attachment>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="6" h="2">
+                            <fr:image-attachment id="multiple-image-attachment-carousel-control" bind="multiple-image-attachment-carousel-bind" multiple="true" view-mode="carousel" class="fr-attachment">
+                                <xf:label ref="$form-resources/multiple-image-attachment-carousel/label"/>
+                                <xf:hint ref="$form-resources/multiple-image-attachment-carousel/hint" mediatype="text/html"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:image-attachment>
+                        </fr:c>
+                        <fr:c x="7" y="3" w="6">
                             <fr:video-attachment id="video-attachment-control" bind="video-attachment-bind" class="fr-attachment">
                                 <xf:label ref="$form-resources/video-attachment/label"/>
                                 <xf:hint ref="$form-resources/video-attachment/hint" mediatype="text/html"/>
@@ -3427,36 +3471,35 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                             </fr:video-attachment>
                         </fr:c>
-                        <fr:c x="1" y="3" w="6">
+                        <fr:c x="7" y="4" w="6">
                             <fr:audio-attachment id="audio-attachment-control" class="fr-attachment" bind="audio-attachment-bind">
                                 <xf:label ref="$form-resources/audio-attachment/label"/>
-                                <xf:hint ref="$form-resources/audio-attachment/hint"/>
+                                <xf:hint ref="$form-resources/audio-attachment/hint" mediatype="text/html"/>
 
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:audio-attachment>
                         </fr:c>
-                        <fr:c x="7" y="3" w="6"/>
-                        <fr:c x="1" y="4" w="6">
+                        <fr:c x="1" y="5" w="6">
                             <fr:image bind="static-image-bind" id="static-image-control">
                                 <xf:label ref="$form-resources/static-image/label"/>
                             </fr:image>
                         </fr:c>
-                        <fr:c x="7" y="4" w="6" h="2">
+                        <fr:c x="7" y="5" w="6" h="2">
                             <fr:video id="static-video-control" bind="static-video-bind" class="fr-static-attachment">
                                 <xf:label ref="$form-resources/static-video/label" mediatype="text/html"/>
                                 <xf:hint ref="$form-resources/static-video/hint" mediatype="text/html"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:video>
                         </fr:c>
-                        <fr:c x="1" y="5" w="6">
+                        <fr:c x="1" y="6" w="6">
                             <fr:audio id="static-audio-control" class="fr-static-attachment" bind="static-audio-bind">
                                 <xf:label ref="$form-resources/static-audio/label"/>
-                                <xf:hint ref="$form-resources/static-audio/hint"/>
+                                <xf:hint ref="$form-resources/static-audio/hint" mediatype="text/html"/>
 
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:audio>
                         </fr:c>
-                        <fr:c x="1" y="6" w="6">
+                        <fr:c x="1" y="7" w="6">
                             <fr:wpaint id="image-annotation-control" bind="image-annotation-bind">
                                 <xf:label ref="$form-resources/image-annotation/label"/>
                                 <xf:hint ref="$form-resources/image-annotation/hint"/>
@@ -3464,7 +3507,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:wpaint>
                         </fr:c>
-                        <fr:c x="7" y="6" w="6"/>
+                        <fr:c x="7" y="7" w="6"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="buttons-section" bind="buttons-bind">

@@ -47,4 +47,22 @@
             max-width     : 100%;
         }
     }
+
+    @media print {
+        .xbl-component.xbl-fr-barcode {
+
+            .fr-barcode-container {
+                display   : inline-block;
+                text-align: center;
+            }
+
+            img.fr-barcode-image {
+                margin: 0 auto 2px auto;
+            }
+
+            .fr-barcode-caption {
+                display: block;
+            }
+        }
+    }
 }

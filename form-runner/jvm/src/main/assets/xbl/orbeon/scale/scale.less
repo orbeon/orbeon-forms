@@ -246,13 +246,35 @@
                 }
             }
         }
+    }
 
-        @media print {
+    @media print {
+        .xbl-fr-scale {
             display: inline;
 
             .fr-scale-readonly-container {
                 display: inline;
+
+                // Show the value as plain text after the pills, not as a field
+                .xforms-input {
+                    display: inline;
+
+                    .xforms-field {
+                        display       : inline;
+                        vertical-align: middle;
+                        min-height    : 0 !important; // the grid sets a min-height with !important
+                        padding       : 0;
+                        border        : none;
+                        background    : none;
+                        box-shadow    : none;
+                    }
+                }
             }
+        }
+
+        // Without a background, show the selected pill with a black border
+        .fr-pdf-color-mode-black-and-white .xbl-fr-scale .fr-scale-readonly-container .fr-scale-readonly-pills .fr-scale-readonly-pill.fr-scale-readonly-pill-selected {
+            border-color: black;
         }
     }
 }

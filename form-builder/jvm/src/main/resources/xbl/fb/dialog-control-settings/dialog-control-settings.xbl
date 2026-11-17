@@ -1900,23 +1900,50 @@
                                                     $current-schema-type != '' and
                                                     $current-schema-type = $schema/xs:simpleType/string-join(($schema-prefix, @name), ':')"/>
 
+                                            <xf:var
+                                                name="is-component-type"
+                                                value="
+                                                    $current-schema-type != '' and
+                                                    not($matches-schema-type)  and (
+                                                        let $control-elem := $i/control-elem-atts/*[1],
+                                                            $type-prefix  := substring-before($current-schema-type, ':'),
+                                                            $type-local   := if (contains($current-schema-type, ':')) then substring-after($current-schema-type, ':') else $current-schema-type,
+                                                            $type-uri     := if ($type-prefix = '') then '' else string(namespace-uri-for-prefix($type-prefix, $i))
+                                                        return
+                                                            exists($control-elem) and
+                                                            local-name($control-elem)    = $type-local and
+                                                            namespace-uri($control-elem) = $type-uri
+                                                    )"/>
+
+                                            <xf:var
+                                                name="is-dangling-schema-type"
+                                                value="
+                                                    $current-schema-type != '' and
+                                                    not($matches-schema-type)  and
+                                                    not($is-component-type)"/>
+
                                             <xf:select1 ref="builtin-type">
-                                                <!-- Only show label if there is a schema -->
-                                                <xf:label ref="$resources/dialog-control-settings/builtin-type/label[exists($schema)]"/>
-                                                <!-- Add placeholder if there is a schema type -->
-                                                <xf:itemset ref=".[$matches-schema-type]">
-                                                    <xf:label ref="$resources/dialog-control-settings/builtin-type/use-schema-type"/>
+                                                <!-- Only show label if there is a schema (and not locked to a component type) -->
+                                                <xf:label ref="$resources/dialog-control-settings/builtin-type/label[exists($schema) and not($is-component-type)]"/>
+                                                <!-- Add placeholder if there is a schema type (including dangling schema types so the author can switch to a built-in type) -->
+                                                <xf:itemset ref=".[$matches-schema-type or $is-dangling-schema-type]">
+                                                    <xf:label
+                                                        value="
+                                                            if ($is-dangling-schema-type) then
+                                                                concat($resources/dialog-control-settings/builtin-type/use-schema-type, ' (', $current-schema-type, ')')
+                                                            else
+                                                                string($resources/dialog-control-settings/builtin-type/use-schema-type)"/>
                                                     <xf:value/>
                                                 </xf:itemset>
 
-                                                <xf:itemset ref=".[$current-schema-type != '' and not($matches-schema-type)]">
+                                                <xf:itemset ref=".[$is-component-type]">
                                                     <xf:label ref="$resources/dialog-control-settings/builtin-type/use-component-type"/>
                                                     <xf:value/>
                                                 </xf:itemset>
 
                                                 <xf:itemset
                                                     ref="
-                                                        if ($current-schema-type != '' and not($matches-schema-type)) then
+                                                        if ($is-component-type) then
                                                             ()
                                                         else
                                                             $resources/dialog-control-settings/builtin-type/choices//(
@@ -1948,7 +1975,7 @@
                                                 </xf:dispatch>
                                             </xf:select1>
                                             <!-- Schema type selection if applicable -->
-                                            <fr:dropdown-select1 ref="schema-type[exists($schema)]">
+                                            <fr:dropdown-select1 ref="schema-type[exists($schema) and not($is-component-type)]">
                                                 <xf:label ref="$resources/dialog-control-settings/schema-type/label"/>
                                                 <!-- NOTE: Mark itemset as mutable as the schema may be updated -->
                                                 <xf:itemset ref="$schema/xs:simpleType">

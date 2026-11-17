@@ -186,7 +186,31 @@ trait FormBuilderSchemaDialogTests {
         assert(checkDialog.locator(".alert-error").textContent().contains("""Control "control-1" uses unknown XML Schema type "bk:publication-year""""))
         closeCheckFormDialog(checkDialog, ajaxServer)
 
+        // 6b. Control Settings on a control with a dangling schema type must show "Use schema type (bk:publication-year)"
+        //     and keep built-in types (like String) selectable (rather than locking to "Use predefined type")
+        page.locator(".fr-grid-td").first().hover()
+        page.locator(".fb-control-editor-left .fa-cog, [title*='Control Settings']").first().click()
+        ajaxServer.waitForAllEventsProcessed()
+        csDialog.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE))
+        switchTabbableTab(csDialog, ajaxServer, "Validations and Alerts")
+
+        val builtinSelect = csDialog.locator("select:has(option:has-text('String'))").first()
+        builtinSelect.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE))
+        assert(builtinSelect.locator("option:has-text('Use schema type (bk:publication-year)')").count() == 1)
+        assert(builtinSelect.locator("option:has-text('Use predefined type')").count() == 0)
+
+        builtinSelect.focus()
+        builtinSelect.selectOption(new SelectOption().setLabel("String"))
+        builtinSelect.blur()
+        ajaxServer.waitForAllEventsProcessed()
+        assert(builtinSelect.locator("option:has-text('Use schema type (bk:publication-year)')").count() == 0)
+
+        csDialog.locator(".fr-dialog-buttons a:has-text('Cancel'), .fr-dialog-buttons button:has-text('Cancel')").first().click()
+        ajaxServer.waitForAllEventsProcessed()
+        csDialog.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN))
+
         // 7. Re-open XML Schema dialog, check "Reset data type of affected controls to String", and Apply
+        switchToolboxTab(page, ajaxServer, "Advanced")
         openSchemaDialog(page, ajaxServer)
         assert(orphanedWarning.isVisible)
         assert(applyButton.isDisabled)

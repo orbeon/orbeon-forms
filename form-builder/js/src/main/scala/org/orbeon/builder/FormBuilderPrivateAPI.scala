@@ -21,7 +21,7 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 
-import scala.annotation.unused
+import scala.annotation.{tailrec, unused}
 import scala.scalajs.js
 
 
@@ -96,11 +96,9 @@ object FormBuilderPrivateAPI extends js.Object {
       for {
         containerElem <- dom.document.getElementByIdOpt(namespacedId)
         _             =  SectionFocus.ensureVisible(containerElem)
-        targetElem    = containerElem.querySelectorOpt(".fr-section-title").getOrElse(containerElem)
-        mainInnerElem <- dom.document.querySelectorOpt(".fb-main-inner")
         mainElem      <- dom.document.querySelectorOpt(".fb-main")
       } locally {
-        moveIntoViewIfNeeded(mainElem, mainInnerElem, targetElem, margin = 20)
+        OutlineContainerScroll.scrollContainerIntoView(mainElem, containerElem)
       }
     }
   }
@@ -154,6 +152,81 @@ object FormBuilderPrivateAPI extends js.Object {
   def processRpcResponse(id: String, response: String): Unit =
     FormBuilderRpcClient.processResponse(id, response)
 }
+
+private[builder] object OutlineContainerScroll {
+
+  val TopMarginPx                   = 20.0
+  val FirstContainerSnapToZeroMaxPx = 60.0
+  val ParentSectionHeaderMaxGapPx   = 80.0
+
+  @tailrec
+  def topAnchorElem(elem: html.Element): html.Element =
+    elem.parentElementOpt.flatMap(_.closestOpt(BlockCache.SectionSelector)) match {
+      case Some(parentSection)
+        if elem.getBoundingClientRect().top - parentSection.getBoundingClientRect().top <= ParentSectionHeaderMaxGapPx =>
+        topAnchorElem(parentSection)
+      case _ =>
+        elem
+    }
+
+  def computeTargetScrollTop(
+    currentScrollTop  : Double,
+    scrollHeight      : Double,
+    clientHeight      : Double,
+    mainInnerTop      : Double,
+    anchorTop         : Double,
+    stickyBannerHeight: Double
+  ): Double = {
+    val rawScrollTop =
+      currentScrollTop + anchorTop - (mainInnerTop + stickyBannerHeight + TopMarginPx)
+
+    val snappedScrollTop =
+      if (rawScrollTop < FirstContainerSnapToZeroMaxPx)
+        0.0
+      else
+        rawScrollTop
+
+    val maxScrollTop = Math.max(0.0, scrollHeight - clientHeight)
+    Math.max(0.0, Math.min(snappedScrollTop, maxScrollTop))
+  }
+
+  private def prefersReducedMotion: Boolean = {
+    val winDyn = dom.window.asInstanceOf[js.Dynamic]
+    (! js.isUndefined(winDyn.matchMedia)) &&
+      winDyn.matchMedia("(prefers-reduced-motion: reduce)").matches.asInstanceOf[Boolean]
+  }
+
+  def scrollContainerIntoView(mainElem: html.Element, containerElem: html.Element): Unit = {
+    val anchorElem = topAnchorElem(containerElem)
+    val mainRect   = mainElem.getBoundingClientRect()
+    val anchorRect = anchorElem.getBoundingClientRect()
+
+    val stickyBannerHeight =
+      mainElem
+        .querySelectorOpt(".fb-section-focus-banner:not(.xforms-hidden)")
+        .map(_.getBoundingClientRect().height)
+        .getOrElse(0.0)
+
+    val targetScrollTop =
+      computeTargetScrollTop(
+        currentScrollTop   = mainElem.scrollTop,
+        scrollHeight       = mainElem.scrollHeight,
+        clientHeight       = mainElem.clientHeight,
+        mainInnerTop       = mainRect.top + mainElem.clientTop,
+        anchorTop          = anchorRect.top,
+        stickyBannerHeight = stickyBannerHeight
+      )
+
+    if (Math.abs(targetScrollTop - mainElem.scrollTop) > 1.0)
+      mainElem.asInstanceOf[js.Dynamic].scrollTo(
+        js.Dynamic.literal(
+          top      = targetScrollTop,
+          behavior = if (prefersReducedMotion) "instant" else "smooth"
+        )
+      )
+  }
+}
+
 private[builder] object FormBuilderPreferencesClient {
 
   private val ToolboxTabsId        = "fb-toolbox-tabs"

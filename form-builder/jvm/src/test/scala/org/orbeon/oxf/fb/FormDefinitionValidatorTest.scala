@@ -1410,4 +1410,107 @@ class FormDefinitionValidatorTest
       assert(issues.contains(InvalidProcess("cycle-b", """Circular sub-process call involving "cycle-b"""")))
     }
   }
+
+  describe("XML Schema type validation (#816/#5746)") {
+
+    it("must accept valid schema types with and without targetNamespace as well as component predefined types") {
+      val withNsForm = toRootElem(
+        <xh:html
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+          xmlns:bk="http://example.org/books">
+          <xh:head>
+            <xf:model id="fr-form-model">
+              <xs:schema targetNamespace="http://example.org/books" xmlns:bk="http://example.org/books">
+                <xs:simpleType name="rating">
+                  <xs:restriction base="xs:integer">
+                    <xs:minInclusive value="1"/>
+                    <xs:maxInclusive value="5"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:schema>
+              <xf:instance id="fr-form-instance">
+                <form><section-1><book-rating/><iban/></section-1></form>
+              </xf:instance>
+              <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                  <xf:bind id="book-rating-bind" name="book-rating" ref="book-rating" type="bk:rating"/>
+                  <xf:bind id="iban-bind" name="iban" ref="iban" type="fr:iban"/>
+                </xf:bind>
+              </xf:bind>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <fr:view>
+              <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                  <fr:grid id="grid-1-grid">
+                    <fr:c x="1" y="1" w="6"><xf:input id="book-rating-control" bind="book-rating-bind"/></fr:c>
+                    <fr:c x="7" y="1" w="6"><fr:iban id="iban-control" bind="iban-bind"/></fr:c>
+                  </fr:grid>
+                </fr:section>
+              </fr:body>
+            </fr:view>
+          </xh:body>
+        </xh:html>
+      )
+
+      assert(validateFormDefinition(withNsForm).isEmpty)
+    }
+
+    it("must report UnresolvedSchemaType when schema is missing, type is undefined, or prefix is undeclared") {
+      val noSchemaForm = toRootElem(
+        <xh:html
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+          xmlns:bk="http://example.org/books">
+          <xh:head>
+            <xf:model id="fr-form-model">
+              <xf:instance id="fr-form-instance">
+                <form><section-1><rating-ctrl/><year-ctrl/><nested-ctrl/></section-1></form>
+              </xf:instance>
+              <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                  <xf:bind id="rating-ctrl-bind" name="rating-ctrl" ref="rating-ctrl" type="rating"/>
+                  <xf:bind id="year-ctrl-bind" name="year-ctrl" ref="year-ctrl" type="undeclared:year"/>
+                  <xf:bind id="nested-ctrl-bind" name="nested-ctrl" ref="nested-ctrl">
+                    <xf:type id="v-1">bk:missing-type</xf:type>
+                  </xf:bind>
+                </xf:bind>
+              </xf:bind>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <fr:view>
+              <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                  <fr:grid id="grid-1-grid">
+                    <fr:c x="1" y="1" w="4"><xf:input id="rating-ctrl-control" bind="rating-ctrl-bind"/></fr:c>
+                    <fr:c x="5" y="1" w="4"><xf:input id="year-ctrl-control" bind="year-ctrl-bind"/></fr:c>
+                    <fr:c x="9" y="1" w="4"><xf:input id="nested-ctrl-control" bind="nested-ctrl-bind"/></fr:c>
+                  </fr:grid>
+                </fr:section>
+              </fr:body>
+            </fr:view>
+          </xh:body>
+        </xh:html>
+      )
+
+      val issues = validateFormDefinition(noSchemaForm)
+      assert(issues.contains(UnresolvedSchemaType("rating-ctrl", "rating")))
+      assert(issues.contains(UnresolvedSchemaType("year-ctrl", "undeclared:year")))
+      assert(issues.contains(UnresolvedSchemaType("nested-ctrl", "bk:missing-type")))
+
+      val validationXml = validateFormAsXml(noSchemaForm, includeStructureCheck = false)
+      assert(validationXml.attValue("error-count") == "3")
+      val issueTexts = (validationXml / "issue").map(_.stringValue)
+      assert(issueTexts.contains("""Control "rating-ctrl" uses unknown XML Schema type "rating""""))
+    }
+  }
 }

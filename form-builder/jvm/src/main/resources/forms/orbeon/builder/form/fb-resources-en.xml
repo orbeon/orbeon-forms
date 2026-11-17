@@ -2036,6 +2036,7 @@
             <incompatible-datatype-change>Control "{0}" changed data type from "{1}" to "{2}"</incompatible-datatype-change>
             <data-migration-required>Data structure changes compared to published version ({0})</data-migration-required>
             <invalid-process>Invalid process "{0}": {1}</invalid-process>
+            <unresolved-schema-type>Control "{0}" uses unknown XML Schema type "{1}"</unresolved-schema-type>
         </issue>
     </dialog-check-form>
     <section-focus>

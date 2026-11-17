@@ -25,7 +25,7 @@ import org.orbeon.oxf.fr.XMLNames.*
 import org.orbeon.oxf.fr.permission.*
 import org.orbeon.oxf.fr.process.{ProcessInterpreter, ProcessParser}
 import org.orbeon.oxf.fr.process.ProcessParser.{ActionNode, ConditionNode, ExprNode, GroupNode}
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerDocContext, Names, NodeInfoCell}
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerDocContext, Names, NodeInfoCell, SchemaOps}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, XPath}
@@ -192,6 +192,16 @@ object ValidationIssue {
     val code       : String             = "invalid-process"
     val controlName: Option[String]     = None
   }
+
+  case class UnresolvedSchemaType(
+    controlNameValue: String,
+    schemaType      : String
+  ) extends ValidationIssue {
+    val severity   : ValidationSeverity = ValidationSeverity.Error
+    val blocking   : Boolean            = false
+    val code       : String             = "unresolved-schema-type"
+    val controlName: Option[String]     = Some(controlNameValue)
+  }
 }
 
 object FormDefinitionValidator {
@@ -280,7 +290,16 @@ object FormDefinitionValidator {
 
     checkCircularDependencies(ctx) ++
       checkFormulasAndReferences(ctx) ++
-      checkResourcePointerControlNames(ctx)
+      checkResourcePointerControlNames(ctx) ++
+      checkSchemaTypes(ctx)
+  }
+
+  private def checkSchemaTypes(ctx: SafeFormDocContext): List[UnresolvedSchemaType] = {
+    val rootElem  = ctx.formDefinitionRootElem
+    val schemaOpt = SchemaOps.findSchema(rootElem)
+    SchemaOps.findDanglingSchemaTypeUsages(rootElem, schemaOpt).map { usage =>
+      UnresolvedSchemaType(usage.controlName, usage.rawType)
+    }
   }
 
   // Check whether setting `mipName` (`"calculate"` or `"default"`) on `originalControlNameOpt` (possibly renamed to `controlName`)
@@ -1615,6 +1634,14 @@ object FormDefinitionValidator {
           "Invalid process \"{0}\": {1}",
           processName,
           details
+        )
+
+      case UnresolvedSchemaType(controlNameValue, schemaType) =>
+        formatWith(
+          "unresolved-schema-type",
+          "Control \"{0}\" uses unknown XML Schema type \"{1}\"",
+          controlNameValue,
+          schemaType
         )
     }
   }

@@ -2037,6 +2037,7 @@
             <incompatible-datatype-change>Le contrôle « {0} » a changé de type de données de « {1} » vers « {2} »</incompatible-datatype-change>
             <data-migration-required>Modifications de la structure des données par rapport à la version publiée ({0})</data-migration-required>
             <invalid-process>Processus invalide « {0} » : {1}</invalid-process>
+            <unresolved-schema-type>Le contrôle « {0} » utilise un type de schéma XML inconnu « {1} »</unresolved-schema-type>
         </issue>
     </dialog-check-form>
     <section-focus>

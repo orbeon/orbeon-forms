@@ -4,7 +4,8 @@ description: How to use the Orbeon MCP to create Orbeon Form Builder forms
 ---
 
 - To create a new form, start with the `form_new` MCP call.
-- To edit an existing form, use the `form_edit` MCP call. You need a document id for that.
+- To find existing forms (by application name, form name, title, description, or free-text query) and get their `document_id`, use the `form_search` MCP call.
+- To edit an existing form, use the `form_edit` MCP call (or `form_view` for read-only inspection). You need a `document_id` for that, which you can obtain from `form_search`.
 - Before creating/making changes to controls in a form, start by calling `list_available_toolbox_form_controls` to know what form controls are available to use.
 - If editing a form, or as a checkpoint, use the `form_get_structure` MCP call to learn about what's in the form.
     - A form is structurally made of sections, grids, and form controls.

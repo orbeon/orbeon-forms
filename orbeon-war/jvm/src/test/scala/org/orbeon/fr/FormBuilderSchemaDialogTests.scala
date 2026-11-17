@@ -241,6 +241,66 @@ trait FormBuilderSchemaDialogTests {
         assert(hasClass(toolboxBadge, "xforms-hidden"))
       }
     }
+
+    it("must show and update the attached PDF Templates count badge in the toolbox") { _ =>
+      withNewFormBuilderForm { case FormRunnerWindow(xformsWindow, _) =>
+        val page       = xformsWindow.page
+        val ajaxServer = xformsWindow.ajaxServer
+
+        switchToolboxTab(page, ajaxServer, "Advanced")
+
+        val pdfButton = page.locator(".fb-pdf-toolbox-button")
+        val pdfBadge  = pdfButton.locator(".fb-tool-badge")
+
+        // Initially hidden when 0 PDF templates are attached
+        assert(hasClass(pdfBadge, "xforms-hidden"))
+
+        // 1. Attach 1 PDF template and click Apply -> badge shows "1"
+        val pdfDialog = openPdfDialog(page, ajaxServer)
+        uploadPdfPayload(pdfDialog, ajaxServer, rowIndex = 0, filename = "template-1.pdf", templateName = "main")
+        pdfDialog.locator("[id$='save-trigger'] button").click()
+        ajaxServer.waitForAllEventsProcessed()
+        pdfDialog.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN))
+
+        assert(! hasClass(pdfBadge, "xforms-hidden"))
+        assert(pdfBadge.textContent().trimAllToEmpty == "1")
+
+        // 2. Add a 2nd PDF template, verify Cancel keeps "1", then Apply -> badge shows "2"
+        openPdfDialog(page, ajaxServer)
+        pdfDialog.locator("[id$='fr-grid-add'] button").click()
+        ajaxServer.waitForAllEventsProcessed()
+        uploadPdfPayload(pdfDialog, ajaxServer, rowIndex = 1, filename = "template-2.pdf", templateName = "summary")
+
+        pdfDialog.locator("[id$='cancel-trigger'] button").click()
+        ajaxServer.waitForAllEventsProcessed()
+        pdfDialog.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN))
+        assert(pdfBadge.textContent().trimAllToEmpty == "1")
+
+        openPdfDialog(page, ajaxServer)
+        pdfDialog.locator("[id$='fr-grid-add'] button").click()
+        ajaxServer.waitForAllEventsProcessed()
+        uploadPdfPayload(pdfDialog, ajaxServer, rowIndex = 1, filename = "template-2.pdf", templateName = "summary")
+
+        pdfDialog.locator("[id$='save-trigger'] button").click()
+        ajaxServer.waitForAllEventsProcessed()
+        pdfDialog.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN))
+
+        assert(! hasClass(pdfBadge, "xforms-hidden"))
+        assert(pdfBadge.textContent().trimAllToEmpty == "2")
+
+        // 3. Remove both PDF attachments and Apply -> badge hides again
+        openPdfDialog(page, ajaxServer)
+        while (pdfDialog.locator(".fr-attachment-remove button").count() > 0) {
+          pdfDialog.locator(".fr-attachment-remove button").first().click()
+          ajaxServer.waitForAllEventsProcessed()
+        }
+        pdfDialog.locator("[id$='save-trigger'] button").click()
+        ajaxServer.waitForAllEventsProcessed()
+        pdfDialog.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN))
+
+        assert(hasClass(pdfBadge, "xforms-hidden"))
+      }
+    }
   }
 
   private object Private {
@@ -377,6 +437,39 @@ trait FormBuilderSchemaDialogTests {
       assert(row.locator(".fb-schema-col-type").textContent().trimAllToEmpty == expectedType)
       assert(row.locator(".fb-schema-col-restriction").textContent().trimAllToEmpty == expectedRestriction)
       assert(row.locator(".fb-schema-col-in-use").textContent().trimAllToEmpty == expectedInUse)
+    }
+
+    val MinimalPdfBytes: Array[Byte] =
+      "%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n".getBytes(StandardCharsets.US_ASCII)
+
+    def openPdfDialog(page: Page, ajaxServer: AjaxServer): Locator = {
+      page.locator(".fb-pdf-toolbox-button button").click()
+      ajaxServer.waitForAllEventsProcessed()
+      val dialog = page.locator("dialog.fb-pdf-dialog[open]")
+      dialog.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE))
+      dialog
+    }
+
+    def uploadPdfPayload(
+      pdfDialog   : Locator,
+      ajaxServer  : AjaxServer,
+      rowIndex    : Int,
+      filename    : String,
+      templateName: String
+    ): Unit = {
+      val attachment = pdfDialog.locator(".xbl-fr-attachment").nth(rowIndex)
+      attachment.locator("input[type='file']").setInputFiles(new FilePayload(filename, "application/pdf", MinimalPdfBytes))
+      eventually(200.millis, 30.seconds) {
+        val filenameLink = attachment.locator(".fr-attachment-filename a")
+        assert(filenameLink.isVisible)
+        assert(filenameLink.textContent().trimAllToEmpty == filename)
+      }
+      ajaxServer.waitForAllEventsProcessed()
+
+      val nameInput = pdfDialog.locator("tbody [id*='attachment-name-control'] input, .fr-grid-tr [id*='attachment-name-control'] input").nth(rowIndex)
+      nameInput.fill(templateName)
+      nameInput.blur()
+      ajaxServer.waitForAllEventsProcessed()
     }
   }
 }

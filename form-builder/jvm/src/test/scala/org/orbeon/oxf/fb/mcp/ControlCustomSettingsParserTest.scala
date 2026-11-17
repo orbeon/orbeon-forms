@@ -294,5 +294,40 @@ class ControlCustomSettingsParserTest
       assert(dateRangeSpec.settings.map(_.name) == List("fieldWidth", "minDays", "maxDays"))
       assert(dateRangeSpec.constraints.size == 1)
     }
+
+    it("must parse `<fr:image>` and `<fr:image-attachment>` custom settings") {
+      import org.orbeon.scaxon.SimplePath.*
+
+      val imageDoc = new org.orbeon.dom.saxon.DocumentWrapper(
+        org.orbeon.oxf.resources.ResourceManagerWrapper.instance.getContentAsOrbeonDom("/xbl/orbeon/image/image.xbl"),
+        null,
+        org.orbeon.oxf.util.XPath.GlobalConfiguration
+      )
+      val imageSpec = ControlCustomSettingsParser.fromBinding((imageDoc.rootElement / "*:binding").head).get
+      assert(imageSpec.localName == "image")
+      assert(imageSpec.settings.map(_.name) == List("size"))
+      assert(imageSpec.findSetting("size").exists(_.allowedValues.contains(Set("auto", "small", "medium", "large"))))
+
+      val imageAttachmentDoc = new org.orbeon.dom.saxon.DocumentWrapper(
+        org.orbeon.oxf.resources.ResourceManagerWrapper.instance.getContentAsOrbeonDom("/xbl/orbeon/image-attachment/image-attachment.xbl"),
+        null,
+        org.orbeon.oxf.util.XPath.GlobalConfiguration
+      )
+      val imageAttachmentSpec = ControlCustomSettingsParser.fromBinding((imageAttachmentDoc.rootElement / "*:binding").head).get
+      assert(imageAttachmentSpec.localName == "image-attachment")
+      assert(imageAttachmentSpec.settings.map(_.name) == List(
+        "size",
+        "viewMode",
+        "carouselSize",
+        "columns",
+        "maxRows",
+        "transformMaxWidth",
+        "transformMaxHeight",
+        "transformQuality",
+        "transformFormat"
+      ))
+      assert(imageAttachmentSpec.findSetting("size").exists(_.allowedValues.contains(Set("auto", "small", "medium", "large"))))
+      assert(imageAttachmentSpec.findSetting("carouselSize").exists(_.allowedValues.contains(Set("small", "medium", "large"))))
+    }
   }
 }

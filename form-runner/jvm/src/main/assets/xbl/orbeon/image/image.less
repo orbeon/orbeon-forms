@@ -1,3 +1,53 @@
+.orbeon .xbl-fr-image {
+    .fr-image-size-small .xforms-output.xforms-mediatype-image img {
+        max-height: 180px;
+    }
+
+    .fr-image-size-medium .xforms-output.xforms-mediatype-image img {
+        max-height: 280px;
+    }
+
+    .fr-image-size-large .xforms-output.xforms-mediatype-image img {
+        max-height: 420px;
+    }
+
+    .fr-image-size-small,
+    .fr-image-size-medium,
+    .fr-image-size-large {
+        .xforms-output.xforms-mediatype-image img {
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+    }
+
+    @media screen {
+        .fr-image-size-small {
+            --fr-image-max-height: 180px;
+        }
+
+        .fr-image-size-medium {
+            --fr-image-max-height: 280px;
+        }
+
+        .fr-image-size-large {
+            --fr-image-max-height: 420px;
+        }
+
+        .fr-image-size-small,
+        .fr-image-size-medium,
+        .fr-image-size-large {
+            .xforms-output.xforms-mediatype-image img {
+                max-inline-size: 100%;
+                max-block-size: min(var(--fr-image-max-height), 65dvh);
+                inline-size: auto;
+                block-size: auto;
+            }
+        }
+    }
+}
+
 .fr-grid-td {
 
     // Hidden by default

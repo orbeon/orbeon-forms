@@ -59,6 +59,7 @@
                 </view>
             </templates>
             <custom-settings>
+                <setting name="size" type="xs:string" values="auto small medium large"/>
                 <setting name="view-mode" type="xs:string" values="grid carousel"/>
                 <setting name="carousel-size" type="xs:string" values="small medium large"/>
                 <setting name="columns" type="xs:integer" min="1"/>
@@ -79,7 +80,7 @@
                             <xf:var
                                 name="att-name"
                                 value="
-                                    if ($param-name = ('view-mode', 'carousel-size', 'columns', 'max-rows')) then
+                                    if ($param-name = ('size', 'view-mode', 'carousel-size', 'columns', 'max-rows')) then
                                         $param-name
                                     else
                                         concat('transform-', $param-name)"/>
@@ -98,6 +99,7 @@
 
                     <xf:instance id="local" xxf:exclude-result-prefixes="#all">
                         <_>
+                            <size          default="-2"/>
                             <view-mode     default="-2"/>
                             <carousel-size default="-2"/>
                             <columns       default="-2"/>
@@ -110,6 +112,9 @@
                     </xf:instance>
 
                     <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="size"
+                            relevant="empty(instance()/@id) or not(instance()/@multiple = 'true')"/>
                         <xf:bind
                             ref="view-mode"
                             relevant="empty(instance()/@id) or instance()/@multiple = 'true'"/>
@@ -137,6 +142,14 @@
                     <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                         <_>
                             <resource xml:lang="en">
+                                <size>
+                                    <label>Image size</label>
+                                    <item value="-1">Use default</item>
+                                    <item value="auto">Automatic</item>
+                                    <item value="small">Small</item>
+                                    <item value="medium">Medium</item>
+                                    <item value="large">Large</item>
+                                </size>
                                 <view-mode>
                                     <label>Display mode</label>
                                     <item value="-1">Use default</item>
@@ -183,6 +196,14 @@
                                 </format>
                             </resource>
                             <resource xml:lang="fr">
+                                <size>
+                                    <label>Taille de l'image</label>
+                                    <item value="-1">Utiliser le défaut</item>
+                                    <item value="auto">Automatique</item>
+                                    <item value="small">Petite</item>
+                                    <item value="medium">Moyenne</item>
+                                    <item value="large">Grande</item>
+                                </size>
                                 <view-mode>
                                     <label>Mode d'affichage</label>
                                     <item value="-1">Utiliser le défaut</item>
@@ -229,6 +250,14 @@
                                 </format>
                             </resource>
                             <resource xml:lang="no">
+                                <size>
+                                    <label>Bildestørrelse</label>
+                                    <item value="-1">Bruk standard</item>
+                                    <item value="auto">Automatisk</item>
+                                    <item value="small">Liten</item>
+                                    <item value="medium">Middels</item>
+                                    <item value="large">Stor</item>
+                                </size>
                                 <view-mode>
                                     <label>Visningsmodus</label>
                                     <item value="-1">Bruk standard</item>
@@ -275,6 +304,14 @@
                                 </format>
                             </resource>
                             <resource xml:lang="ru">
+                                <size>
+                                    <label>Размер изображения</label>
+                                    <item value="-1">Использовать по умолчанию</item>
+                                    <item value="auto">Автоматически</item>
+                                    <item value="small">Маленький</item>
+                                    <item value="medium">Средний</item>
+                                    <item value="large">Большой</item>
+                                </size>
                                 <view-mode>
                                     <label>Режим отображения</label>
                                     <item value="-1">Использовать по умолчанию</item>
@@ -321,6 +358,14 @@
                                 </format>
                             </resource>
                             <resource xml:lang="it">
+                                <size>
+                                    <label>Dimensione dell'immagine</label>
+                                    <item value="-1">Usa predefinito</item>
+                                    <item value="auto">Automatico</item>
+                                    <item value="small">Piccola</item>
+                                    <item value="medium">Media</item>
+                                    <item value="large">Grande</item>
+                                </size>
                                 <view-mode>
                                     <label>Modalità di visualizzazione</label>
                                     <item value="-1">Usa predefinito</item>
@@ -367,6 +412,14 @@
                                 </format>
                             </resource>
                             <resource xml:lang="de">
+                                <size>
+                                    <label>Bildgröße</label>
+                                    <item value="-1">Standard verwenden</item>
+                                    <item value="auto">Automatisch</item>
+                                    <item value="small">Klein</item>
+                                    <item value="medium">Mittel</item>
+                                    <item value="large">Groß</item>
+                                </size>
                                 <view-mode>
                                     <label>Anzeigemodus</label>
                                     <item value="-1">Standard verwenden</item>
@@ -413,6 +466,14 @@
                                 </format>
                             </resource>
                             <resource xml:lang="fi">
+                                <size>
+                                    <label>Kuvan koko</label>
+                                    <item value="-1">Käytä oletusta</item>
+                                    <item value="auto">Automaattinen</item>
+                                    <item value="small">Pieni</item>
+                                    <item value="medium">Keskikokoinen</item>
+                                    <item value="large">Suuri</item>
+                                </size>
                                 <view-mode>
                                     <label>Näyttötila</label>
                                     <item value="-1">Käytä oletusta</item>
@@ -459,6 +520,14 @@
                                 </format>
                             </resource>
                             <resource xml:lang="es">
+                                <size>
+                                    <label>Tamaño de la imagen</label>
+                                    <item value="-1">Usar predeterminado</item>
+                                    <item value="auto">Automático</item>
+                                    <item value="small">Pequeño</item>
+                                    <item value="medium">Mediano</item>
+                                    <item value="large">Grande</item>
+                                </size>
                                 <view-mode>
                                     <label>Modo de visualización</label>
                                     <item value="-1">Usar predeterminado</item>
@@ -505,6 +574,14 @@
                                 </format>
                             </resource>
                             <resource xml:lang="nl">
+                                <size>
+                                    <label>Afbeeldingsgrootte</label>
+                                    <item value="-1">Standaard gebruiken</item>
+                                    <item value="auto">Automatisch</item>
+                                    <item value="small">Klein</item>
+                                    <item value="medium">Gemiddeld</item>
+                                    <item value="large">Groot</item>
+                                </size>
                                 <view-mode>
                                     <label>Weergavemodus</label>
                                     <item value="-1">Standaard gebruiken</item>
@@ -551,6 +628,14 @@
                                 </format>
                             </resource>
                             <resource xml:lang="pt">
+                                <size>
+                                    <label>Tamanho da imagem</label>
+                                    <item value="-1">Usar padrão</item>
+                                    <item value="auto">Automático</item>
+                                    <item value="small">Pequeno</item>
+                                    <item value="medium">Médio</item>
+                                    <item value="large">Grande</item>
+                                </size>
                                 <view-mode>
                                     <label>Modo de exibição</label>
                                     <item value="-1">Usar padrão</item>
@@ -597,6 +682,14 @@
                                 </format>
                             </resource>
                             <resource xml:lang="sv">
+                                <size>
+                                    <label>Bildstorlek</label>
+                                    <item value="-1">Använd standard</item>
+                                    <item value="auto">Automatiskt</item>
+                                    <item value="small">Liten</item>
+                                    <item value="medium">Medel</item>
+                                    <item value="large">Stor</item>
+                                </size>
                                 <view-mode>
                                     <label>Visningsläge</label>
                                     <item value="-1">Använd standard</item>
@@ -643,6 +736,14 @@
                                 </format>
                             </resource>
                             <resource xml:lang="ar">
+                                <size>
+                                    <label>حجم الصورة</label>
+                                    <item value="-1">استخدام الإعداد الافتراضي</item>
+                                    <item value="auto">تلقائي</item>
+                                    <item value="small">صغير</item>
+                                    <item value="medium">متوسط</item>
+                                    <item value="large">كبير</item>
+                                </size>
                                 <view-mode>
                                     <label>وضع العرض</label>
                                     <item value="-1">استخدام الإعداد الافتراضي</item>
@@ -689,6 +790,14 @@
                                 </format>
                             </resource>
                             <resource xml:lang="pl">
+                                <size>
+                                    <label>Rozmiar obrazu</label>
+                                    <item value="-1">Użyj domyślnie</item>
+                                    <item value="auto">Automatycznie</item>
+                                    <item value="small">Mały</item>
+                                    <item value="medium">Średni</item>
+                                    <item value="large">Duży</item>
+                                </size>
                                 <view-mode>
                                     <label>Tryb wyświetlania</label>
                                     <item value="-1">Użyj domyślnie</item>
@@ -735,6 +844,14 @@
                                 </format>
                             </resource>
                             <resource xml:lang="ja">
+                                <size>
+                                    <label>画像のサイズ</label>
+                                    <item value="-1">既定を使う</item>
+                                    <item value="auto">自動</item>
+                                    <item value="small">小</item>
+                                    <item value="medium">中</item>
+                                    <item value="large">大</item>
+                                </size>
                                 <view-mode>
                                     <label>表示モード</label>
                                     <item value="-1">既定を使う</item>
@@ -787,6 +904,18 @@
                 <fr:grid xmlns="" id="fb-editor-image-attachment-grid">
                     <fr:c x="1" y="1" w="12">
                         <xf:select1
+                            ref="instance('local')/size"
+                            appearance="full xxf:horizontal"
+                            id="size-control">
+                            <xf:label ref="fr:r('size.label')"/>
+                            <xf:itemset ref="xxf:resource-elements('size.item')">
+                                <xf:label ref="."/>
+                                <xf:value ref="@value"/>
+                            </xf:itemset>
+                        </xf:select1>
+                    </fr:c>
+                    <fr:c x="1" y="2" w="12">
+                        <xf:select1
                             ref="instance('local')/view-mode"
                             appearance="full xxf:horizontal"
                             id="view-mode-control">
@@ -797,7 +926,7 @@
                             </xf:itemset>
                         </xf:select1>
                     </fr:c>
-                    <fr:c x="1" y="2" w="12">
+                    <fr:c x="1" y="3" w="12">
                         <xf:select1
                             ref="instance('local')/carousel-size"
                             appearance="full xxf:horizontal"
@@ -809,7 +938,7 @@
                             </xf:itemset>
                         </xf:select1>
                     </fr:c>
-                    <fr:c x="1" y="3" w="6">
+                    <fr:c x="1" y="4" w="6">
                         <fr:open-select1
                             ref="instance('local')/columns"
                             appearance="minimal"
@@ -823,7 +952,7 @@
                             </xf:itemset>
                         </fr:open-select1>
                     </fr:c>
-                    <fr:c x="7" y="3" w="6">
+                    <fr:c x="7" y="4" w="6">
                         <fr:open-select1
                             ref="instance('local')/max-rows"
                             appearance="minimal"
@@ -837,7 +966,7 @@
                             </xf:itemset>
                         </fr:open-select1>
                     </fr:c>
-                    <fr:c x="1" y="4" w="6">
+                    <fr:c x="1" y="5" w="6">
                         <fr:open-select1
                             ref="instance('local')/max-width"
                             appearance="minimal"
@@ -856,7 +985,7 @@
 
                         </fr:open-select1>
                     </fr:c>
-                    <fr:c x="7" y="4" w="6">
+                    <fr:c x="7" y="5" w="6">
                         <fr:open-select1
                             ref="instance('local')/max-height"
                             appearance="minimal"
@@ -875,7 +1004,7 @@
 
                         </fr:open-select1>
                     </fr:c>
-                    <fr:c x="1" y="5" w="6">
+                    <fr:c x="1" y="6" w="6">
                         <xf:select1 ref="instance('local')/format" id="format-control">
                             <xf:label ref="fr:r('format.label')"/>
                             <xf:itemset ref="xxf:resource-elements('format.item')">
@@ -892,7 +1021,7 @@
                             </xf:item>
                         </xf:select1>
                     </fr:c>
-                    <fr:c x="7" y="5" w="6">
+                    <fr:c x="7" y="6" w="6">
                         <fr:open-select1
                             ref="instance('local')/quality"
                             appearance="minimal"
@@ -920,6 +1049,7 @@
                     id="fb-editor-action"
                     event="xforms-value-changed"
                     observer="
+                        size-control
                         view-mode-control
                         carousel-size-control
                         columns-control
@@ -936,7 +1066,7 @@
                     <xf:var
                         name="att-name"
                         value="
-                            if ($param-name = ('view-mode', 'carousel-size', 'columns', 'max-rows')) then
+                            if ($param-name = ('size', 'view-mode', 'carousel-size', 'columns', 'max-rows')) then
                                 $param-name
                             else
                                 concat('transform-', $param-name)"/>
@@ -1134,6 +1264,20 @@
                 name="multiple"
                 value="xxf:component-param-value('multiple') = 'true'"/>
             <xf:var
+                name="size"
+                value="
+                    let $raw := lower-case(normalize-space(string(fr:component-param-value('size'))))
+                    return
+                        if ($raw = ('small', 's')) then
+                            'small'
+                        else if ($raw = ('medium', 'm')) then
+                            'medium'
+                        else if ($raw = ('large', 'l')) then
+                            'large'
+                        else
+                            'auto'
+                "/>
+            <xf:var
                 name="view-mode"
                 value="if ($multiple and fr:component-param-value('view-mode') = 'carousel') then 'carousel' else 'grid'"/>
             <xf:var
@@ -1162,6 +1306,7 @@
                 id="fr-image-attachment-elem"
                 xxf:control="true"
                 tabindex="-1"
+                data-size="{$size}"
                 data-view-mode="{$view-mode}"
                 data-carousel-size="{$carousel-size}"
                 data-columns="{$columns}"
@@ -1177,6 +1322,8 @@
                                     )
                                 else
                                     'fr-image-attachment-view-grid'
+                            else if ($size != 'auto') then
+                                concat('fr-image-attachment-size-', $size)
                             else
                                 (),
                             if ($multiple and $view-mode = 'grid' and exists($columns)) then

@@ -239,5 +239,112 @@ class ImageAttachmentControlTest
         }
       }
     }
+
+    it("must apply S/M/L size classes to single fr:image-attachment and fr:image while leaving default unconstrained") {
+
+      val signedImg = XFormsUploadControl.hmacURL(DummyImageUri, Some("photo.jpg"), Some("image/jpeg"), Some("1024"))
+
+      val xhtml =
+        <xh:html
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xh:head>
+            <xf:model
+              id="fr-form-model"
+              xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary"
+              xxf:custom-mips="upload-mediatypes">
+              <xf:instance id="fr-form-instance">
+                <form>
+                  <single-default filename="photo.jpg" mediatype="image/jpeg" size="1024">{signedImg}</single-default>
+                  <single-small filename="photo.jpg" mediatype="image/jpeg" size="1024">{signedImg}</single-small>
+                  <single-medium filename="photo.jpg" mediatype="image/jpeg" size="1024">{signedImg}</single-medium>
+                  <single-large filename="photo.jpg" mediatype="image/jpeg" size="1024">{signedImg}</single-large>
+                  <static-default filename="photo.jpg" mediatype="image/jpeg">{signedImg}</static-default>
+                  <static-small filename="photo.jpg" mediatype="image/jpeg">{signedImg}</static-small>
+                  <static-medium filename="photo.jpg" mediatype="image/jpeg">{signedImg}</static-medium>
+                  <static-large filename="photo.jpg" mediatype="image/jpeg">{signedImg}</static-large>
+                </form>
+              </xf:instance>
+              <xf:bind ref="single-default | single-small | single-medium | single-large" type="xf:anyURI" constraint="xxf:upload-mediatypes('image/*')"/>
+              <xf:bind ref="static-default | static-small | static-medium | static-large" type="xf:anyURI"/>
+            </xf:model>
+            <xf:model id="fr-parameters-model">
+              <xf:instance id="fr-parameters-instance">
+                <request>
+                  <app>acme</app>
+                  <form>size-test</form>
+                  <form-version>1</form-version>
+                  <document/>
+                  <mode>new</mode>
+                </request>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <fr:image-attachment id="single-default-control" ref="single-default" class="fr-attachment">
+              <xf:label>Single Default</xf:label>
+            </fr:image-attachment>
+            <fr:image-attachment id="single-small-control" ref="single-small" size="small" class="fr-attachment">
+              <xf:label>Single Small</xf:label>
+            </fr:image-attachment>
+            <fr:image-attachment id="single-medium-control" ref="single-medium" size="medium" class="fr-attachment">
+              <xf:label>Single Medium</xf:label>
+            </fr:image-attachment>
+            <fr:image-attachment id="single-large-control" ref="single-large" size="large" class="fr-attachment">
+              <xf:label>Single Large</xf:label>
+            </fr:image-attachment>
+            <fr:image id="static-default-control" ref="static-default" class="fr-static-attachment">
+              <xf:label>Static Default</xf:label>
+            </fr:image>
+            <fr:image id="static-small-control" ref="static-small" size="small" class="fr-static-attachment">
+              <xf:label>Static Small</xf:label>
+            </fr:image>
+            <fr:image id="static-medium-control" ref="static-medium" size="medium" class="fr-static-attachment">
+              <xf:label>Static Medium</xf:label>
+            </fr:image>
+            <fr:image id="static-large-control" ref="static-large" size="large" class="fr-static-attachment">
+              <xf:label>Static Large</xf:label>
+            </fr:image>
+          </xh:body>
+        </xh:html>.toDocument
+
+      withTestExternalContext { implicit ec =>
+        withXFormsDocument(xhtml) { doc =>
+          val template = AnnotatedTemplate(PartAnalysisBuilder.createFromDocument(xhtml)(XFormsStateManager.newIndentedLogger)._1)
+          val receiver = new LocationSAXContentHandler
+          XHTMLOutput.send(doc, template, ec)(receiver)
+          val allElems = receiver.getDocument.getRootElement.descendantElementIterator(includeSelf = true).toList
+
+          def findDataSizeElem(controlId: String) = {
+            val ctrlElem = allElems.find(_.attributeValueOpt("id").contains(controlId)).get
+            ctrlElem.descendantElementIterator(includeSelf = true).find(_.attributeValueOpt("data-size").isDefined).get
+          }
+
+          val singleDefaultDiv = findDataSizeElem("single-default-control")
+          assert(singleDefaultDiv.attributeValueOpt("data-size").contains("auto"))
+          assert(! singleDefaultDiv.attributeValueOpt("class").exists(_.contains("fr-image-attachment-size-")))
+
+          for (sz <- List("small", "medium", "large")) {
+            val div     = findDataSizeElem(s"single-$sz-control")
+            val classes = div.attributeValueOpt("class").map(_.splitTo[Set]()).getOrElse(Set.empty)
+            assert(div.attributeValueOpt("data-size").contains(sz))
+            assert(classes(s"fr-image-attachment-size-$sz"))
+          }
+
+          val staticDefaultDiv = findDataSizeElem("static-default-control")
+          assert(staticDefaultDiv.attributeValueOpt("data-size").contains("auto"))
+          assert(! staticDefaultDiv.attributeValueOpt("class").exists(_.contains("fr-image-size-")))
+
+          for (sz <- List("small", "medium", "large")) {
+            val div     = findDataSizeElem(s"static-$sz-control")
+            val classes = div.attributeValueOpt("class").map(_.splitTo[Set]()).getOrElse(Set.empty)
+            assert(div.attributeValueOpt("data-size").contains(sz))
+            assert(classes(s"fr-image-size-$sz"))
+          }
+        }
+      }
+    }
   }
 }

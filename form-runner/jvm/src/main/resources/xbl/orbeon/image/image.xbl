@@ -57,26 +57,258 @@
                     </fr:image>
                 </view>
             </templates>
+            <custom-settings>
+                <setting name="size" type="xs:string" values="auto small medium large"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="">
+
+                    <xf:action event="xforms-model-construct-done">
+                        <xf:var name="control-att" value="instance()/@size"/>
+                        <xf:setvalue
+                            ref="instance('local')/size"
+                            value="
+                                if (empty($control-att)) then
+                                    -1
+                                else if (xxf:is-blank($control-att)) then
+                                    instance('local')/size/@default
+                                else
+                                    $control-att"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <size default="-2"/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <size>
+                                    <label>Image size</label>
+                                    <item value="-1">Use default</item>
+                                    <item value="auto">Automatic</item>
+                                    <item value="small">Small</item>
+                                    <item value="medium">Medium</item>
+                                    <item value="large">Large</item>
+                                </size>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <size>
+                                    <label>Taille de l'image</label>
+                                    <item value="-1">Utiliser le défaut</item>
+                                    <item value="auto">Automatique</item>
+                                    <item value="small">Petite</item>
+                                    <item value="medium">Moyenne</item>
+                                    <item value="large">Grande</item>
+                                </size>
+                            </resource>
+                            <resource xml:lang="no">
+                                <size>
+                                    <label>Bildestørrelse</label>
+                                    <item value="-1">Bruk standard</item>
+                                    <item value="auto">Automatisk</item>
+                                    <item value="small">Liten</item>
+                                    <item value="medium">Middels</item>
+                                    <item value="large">Stor</item>
+                                </size>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <size>
+                                    <label>Размер изображения</label>
+                                    <item value="-1">Использовать по умолчанию</item>
+                                    <item value="auto">Автоматически</item>
+                                    <item value="small">Маленький</item>
+                                    <item value="medium">Средний</item>
+                                    <item value="large">Большой</item>
+                                </size>
+                            </resource>
+                            <resource xml:lang="it">
+                                <size>
+                                    <label>Dimensione dell'immagine</label>
+                                    <item value="-1">Usa predefinito</item>
+                                    <item value="auto">Automatico</item>
+                                    <item value="small">Piccola</item>
+                                    <item value="medium">Media</item>
+                                    <item value="large">Grande</item>
+                                </size>
+                            </resource>
+                            <resource xml:lang="de">
+                                <size>
+                                    <label>Bildgröße</label>
+                                    <item value="-1">Standard verwenden</item>
+                                    <item value="auto">Automatisch</item>
+                                    <item value="small">Klein</item>
+                                    <item value="medium">Mittel</item>
+                                    <item value="large">Groß</item>
+                                </size>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <size>
+                                    <label>Kuvan koko</label>
+                                    <item value="-1">Käytä oletusta</item>
+                                    <item value="auto">Automaattinen</item>
+                                    <item value="small">Pieni</item>
+                                    <item value="medium">Keskikokoinen</item>
+                                    <item value="large">Suuri</item>
+                                </size>
+                            </resource>
+                            <resource xml:lang="es">
+                                <size>
+                                    <label>Tamaño de la imagen</label>
+                                    <item value="-1">Usar predeterminado</item>
+                                    <item value="auto">Automático</item>
+                                    <item value="small">Pequeño</item>
+                                    <item value="medium">Mediano</item>
+                                    <item value="large">Grande</item>
+                                </size>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <size>
+                                    <label>Afbeeldingsgrootte</label>
+                                    <item value="-1">Standaard gebruiken</item>
+                                    <item value="auto">Automatisch</item>
+                                    <item value="small">Klein</item>
+                                    <item value="medium">Gemiddeld</item>
+                                    <item value="large">Groot</item>
+                                </size>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <size>
+                                    <label>Tamanho da imagem</label>
+                                    <item value="-1">Usar padrão</item>
+                                    <item value="auto">Automático</item>
+                                    <item value="small">Pequeno</item>
+                                    <item value="medium">Médio</item>
+                                    <item value="large">Grande</item>
+                                </size>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <size>
+                                    <label>Bildstorlek</label>
+                                    <item value="-1">Använd standard</item>
+                                    <item value="auto">Automatiskt</item>
+                                    <item value="small">Liten</item>
+                                    <item value="medium">Medel</item>
+                                    <item value="large">Stor</item>
+                                </size>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <size>
+                                    <label>حجم الصورة</label>
+                                    <item value="-1">استخدام الإعداد الافتراضي</item>
+                                    <item value="auto">تلقائي</item>
+                                    <item value="small">صغير</item>
+                                    <item value="medium">متوسط</item>
+                                    <item value="large">كبير</item>
+                                </size>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <size>
+                                    <label>Rozmiar obrazu</label>
+                                    <item value="-1">Użyj domyślnie</item>
+                                    <item value="auto">Automatycznie</item>
+                                    <item value="small">Mały</item>
+                                    <item value="medium">Średni</item>
+                                    <item value="large">Duży</item>
+                                </size>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <size>
+                                    <label>画像のサイズ</label>
+                                    <item value="-1">既定を使う</item>
+                                    <item value="auto">自動</item>
+                                    <item value="small">小</item>
+                                    <item value="medium">中</item>
+                                    <item value="large">大</item>
+                                </size>
+                            </resource>
+                        </_>
+                    </xf:instance>
+
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-image-grid">
+                    <fr:c x="1" y="1" w="12">
+                        <xf:select1
+                            ref="instance('local')/size"
+                            appearance="full xxf:horizontal"
+                            id="size-control">
+                            <xf:label ref="fr:r('size.label')"/>
+                            <xf:itemset ref="xxf:resource-elements('size.item')">
+                                <xf:label ref="."/>
+                                <xf:value ref="@value"/>
+                            </xf:itemset>
+                        </xf:select1>
+                    </fr:c>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-action"
+                    event="xforms-value-changed"
+                    observer="size-control">
+
+                    <xf:var
+                        name="new-value"
+                        value="
+                            let $binding := event('xxf:binding'),
+                                $v       := $binding/string(),
+                                $default := $binding/@default/string()
+                            return
+                                if ($v = '-1') then
+                                    ()
+                                else if ($v = $default) then
+                                    ''
+                                else
+                                    $v
+                        "/>
+
+                    <xf:insert
+                        context="instance()"
+                        if="exists($new-value)"
+                        origin="xf:attribute('size', $new-value)"/>
+                    <xf:delete
+                        if="empty($new-value)"
+                        ref="instance()/@size"/>
+                </xf:action>
+            </control-details>
         </metadata>
 
         <xbl:template>
-            <xf:output ref="xxf:binding('fr-image')" mediatype="image/*" xxf:alt="{xxf:label('fr-image')}">
-                <xf:filename  ref="@filename"  xxbl:scope="outer"/>
-                <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
-                <xf:header ref="fr:attachment-form-version()">
-                    <xf:name>Orbeon-Form-Definition-Version</xf:name>
-                    <xf:value value="."/>
-                </xf:header>
-            </xf:output>
-            <xf:group
-                fr:keep-if-design-time="true"
-                ref=".[xxf:is-blank(xxf:binding('fr-image'))]">
-                <xh:i class="fa fa-fw fa-lg fa-photo"/>
-            </xf:group>
-            <fr:attachment
-                fr:keep-if-design-time="true"
-                class="fr-image-attach"
-                ref="xxf:binding('fr-image')"/>
+            <xf:var
+                name="size"
+                value="
+                    let $raw := lower-case(normalize-space(string(fr:component-param-value('size'))))
+                    return
+                        if ($raw = ('small', 's')) then
+                            'small'
+                        else if ($raw = ('medium', 'm')) then
+                            'medium'
+                        else if ($raw = ('large', 'l')) then
+                            'large'
+                        else
+                            'auto'
+                "/>
+            <xh:div
+                data-size="{$size}"
+                class="{if ($size != 'auto') then concat('fr-image-size-', $size) else ''}">
+                <xf:output ref="xxf:binding('fr-image')" mediatype="image/*" xxf:alt="{xxf:label('fr-image')}">
+                    <xf:filename  ref="@filename"  xxbl:scope="outer"/>
+                    <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
+                    <xf:header ref="fr:attachment-form-version()">
+                        <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                        <xf:value value="."/>
+                    </xf:header>
+                </xf:output>
+                <xf:group
+                    fr:keep-if-design-time="true"
+                    ref=".[xxf:is-blank(xxf:binding('fr-image'))]">
+                    <xh:i class="fa fa-fw fa-lg fa-photo"/>
+                </xf:group>
+                <fr:attachment
+                    fr:keep-if-design-time="true"
+                    class="fr-image-attach"
+                    ref="xxf:binding('fr-image')"/>
+            </xh:div>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

@@ -14,6 +14,55 @@
             }
         }
 
+        // Single image attachment size presets (S / M / L)
+        .fr-image-attachment-size-small > .xforms-output.xforms-mediatype-image img {
+            max-height: 180px;
+        }
+
+        .fr-image-attachment-size-medium > .xforms-output.xforms-mediatype-image img {
+            max-height: 280px;
+        }
+
+        .fr-image-attachment-size-large > .xforms-output.xforms-mediatype-image img {
+            max-height: 420px;
+        }
+
+        .fr-image-attachment-size-small,
+        .fr-image-attachment-size-medium,
+        .fr-image-attachment-size-large {
+            & > .xforms-output.xforms-mediatype-image img {
+                max-width: 100%;
+                width: auto;
+                height: auto;
+                object-fit: contain;
+            }
+        }
+
+        @media screen {
+            .fr-image-attachment-size-small {
+                --fr-image-attachment-max-height: 180px;
+            }
+
+            .fr-image-attachment-size-medium {
+                --fr-image-attachment-max-height: 280px;
+            }
+
+            .fr-image-attachment-size-large {
+                --fr-image-attachment-max-height: 420px;
+            }
+
+            .fr-image-attachment-size-small,
+            .fr-image-attachment-size-medium,
+            .fr-image-attachment-size-large {
+                & > .xforms-output.xforms-mediatype-image img {
+                    max-inline-size: 100%;
+                    max-block-size: min(var(--fr-image-attachment-max-height), 65dvh);
+                    inline-size: auto;
+                    block-size: auto;
+                }
+            }
+        }
+
         // Shared Grid & Carousel screen styles
         .fr-attachment-image-preview {
 

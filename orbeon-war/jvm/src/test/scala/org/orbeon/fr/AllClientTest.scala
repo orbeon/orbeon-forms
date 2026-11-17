@@ -15,30 +15,34 @@ class AllClientTest
   with AttachmentTests
   with DateTimeTests
   with DateTimeFormatTests
-  with RecaptchaTests {
+  with RecaptchaTests
+  with FormBuilderSchemaDialogTests {
 
   val ServerExternalPort = 8888
-  val OrbeonServerUrl    = s"http://localhost:$ServerExternalPort/orbeon"
+  val OrbeonServerUrl    = externalServerUrlOpt.getOrElse(s"http://localhost:$ServerExternalPort/orbeon")
 
   type FixtureParam = Unit
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
-    val r = runTomcatContainer(
-      containerName     = "FormRunnerTomcat",
-      port              = ServerExternalPort,
-      checkImageRunning = true,
-      network           = None,
-      configDirectory   = DefaultConfigDirectory
-    )
-    assert(r.isSuccess)
+    if (externalServerUrlOpt.isEmpty) {
+      val r = runTomcatContainer(
+        containerName     = "FormRunnerTomcat",
+        port              = ServerExternalPort,
+        checkImageRunning = true,
+        network           = None,
+        configDirectory   = DefaultConfigDirectory
+      )
+      assert(r.isSuccess)
+    }
     assert(waitForServerCookie(None, OrbeonServerUrl).isSuccess)
   }
 
   override protected def afterAll(): Unit =
     try {
       closePlaywright()
-      removeContainerByImage(TomcatImageName)
+      if (externalServerUrlOpt.isEmpty)
+        removeContainerByImage(TomcatImageName)
     } finally {
       super.afterAll()
     }

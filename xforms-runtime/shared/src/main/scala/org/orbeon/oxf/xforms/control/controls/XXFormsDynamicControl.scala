@@ -435,19 +435,21 @@ object XXFormsDynamicControl {
       }
 
   // Find whether the given node is a bind element or attribute and return the associated model id -> element mapping
-  private def findBindChange(node: om.NodeInfo): Option[(String, Element)] = {
+  private def findBindChange(node: om.NodeInfo): Option[(String, Element)] =
+    if (node.getNodeKind == SaxonUtils.NodeType.Namespace)
+      None // can't find ancestors of namespace nodes with Orbeon DOM
+    else {
+      val XF = XFORMS_NAMESPACE_URI
 
-    val XF = XFORMS_NAMESPACE_URI
+      // Any change to a model bind element or a descendant element or attribute
+      val modelOption =
+        (node ancestorOrSelf (XF -> "bind") ancestor (XF -> "model")).headOption
 
-    // Any change to a model bind element or a descendant element or attribute
-    val modelOption =
-      (node ancestorOrSelf (XF -> "bind") ancestor (XF -> "model")).headOption
-
-    modelOption map { modelNode =>
-      val modelElement = unsafeUnwrapElement(modelNode)
-      modelElement.idOrNull -> modelElement
+      modelOption map { modelNode =>
+        val modelElement = unsafeUnwrapElement(modelNode)
+        modelElement.idOrNull -> modelElement
+      }
     }
-  }
 
   // Find whether a change occurred in a descendant of a top-level XBL binding
   private def findXBLChange(partAnalysis: PartAnalysis, node: om.NodeInfo): Option[(String, Element)] = {

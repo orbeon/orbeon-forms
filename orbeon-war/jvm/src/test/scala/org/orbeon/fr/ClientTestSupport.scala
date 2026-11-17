@@ -1,8 +1,9 @@
 package org.orbeon.fr
 
 import com.microsoft.playwright.*
-import com.microsoft.playwright.options.Cookie
+import com.microsoft.playwright.options.{Cookie, WaitForSelectorState}
 import org.orbeon.fr.DockerSupport.{eventually, eventuallyAsTry, removeContainerByImage, runContainer}
+import org.orbeon.oxf.util.StringUtils.*
 import org.scalatest.Suite
 
 import java.io.File
@@ -184,8 +185,14 @@ trait ClientTestSupport {
   val RequestTimeout          = 120.seconds
   val PageLoadTimeout         = 120.seconds
 
+  def externalServerUrlOpt: Option[String] =
+    sys.props.get("orbeon.test.external-url").flatMap(_.trimAllToOpt)
+
+  def resolvedOrbeonServerUrl: String =
+    externalServerUrlOpt.getOrElse(OrbeonServerUrl)
+
   def withFormRunnerSession[T](body: => T): T = {
-    val sessionCookie = waitForServerCookie(None, OrbeonServerUrl)
+    val sessionCookie = waitForServerCookie(None, resolvedOrbeonServerUrl)
     assert(sessionCookie.isSuccess)
     body
   }
@@ -199,11 +206,11 @@ trait ClientTestSupport {
   )(
     body           : FormRunnerWindow => T
   ): T = {
-    val sessionCookie = waitForServerCookie(None, OrbeonServerUrl)
+    val sessionCookie = waitForServerCookie(None, resolvedOrbeonServerUrl)
     assert(sessionCookie.isSuccess)
 
     val path   = s"/fr/$app/$form/$mode" + queryStringOpt.map(qs => s"?$qs").getOrElse("")
-    val page   = loadDocumentViaPlaywright(path, OrbeonServerUrl, sessionCookie.toOption, timezoneIdOpt)
+    val page   = loadDocumentViaPlaywright(path, resolvedOrbeonServerUrl, sessionCookie.toOption, timezoneIdOpt)
     val window = FormRunnerWindow(page)
 
     // Wait until there is a form returned by the API
@@ -217,6 +224,31 @@ trait ClientTestSupport {
       window.xformsWindow.close()
     }
   }
+
+  def withNewFormBuilderForm[T](body: FormRunnerWindow => T): T =
+    withFormReady(app = "orbeon", form = "builder", mode = "new") { window =>
+      val page       = window.xformsWindow.page
+      val ajaxServer = window.xformsWindow.ajaxServer
+
+      page.setViewportSize(1440, 900)
+      ajaxServer.waitForAllEventsProcessed()
+
+      val newFormDialog = page.locator("dialog.fb-dialog-form-settings[open]")
+      newFormDialog.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE))
+
+      // Advance past template selection (if present) and initial form metadata step
+      var steps = 0
+      while (steps < 3 && newFormDialog.isVisible) {
+        newFormDialog.locator("[id$='fb-continue-button'] button").click()
+        ajaxServer.waitForAllEventsProcessed()
+        steps += 1
+      }
+
+      newFormDialog.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN))
+      page.locator(".fr-grid-td").first().waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE))
+
+      body(window)
+    }
 
   protected def runTomcatContainer(
     containerName    : String,
@@ -304,9 +336,11 @@ trait ClientTestSupport {
 
     sessionCookie.foreach { cookieHeader =>
       HttpCookie.parse(cookieHeader).asScala.headOption.foreach { httpCookie =>
-        val pwCookie = new Cookie(httpCookie.getName, httpCookie.getValue)
-          .setDomain(URI.create(serverUrl).getHost)
-          .setPath(Option(httpCookie.getPath).getOrElse("/orbeon"))
+        val serverUri   = URI.create(serverUrl)
+        val defaultPath = Option(serverUri.getPath).flatMap(_.trimAllToOpt).getOrElse("/orbeon")
+        val pwCookie    = new Cookie(httpCookie.getName, httpCookie.getValue)
+          .setDomain(serverUri.getHost)
+          .setPath(Option(httpCookie.getPath).getOrElse(defaultPath))
         context.addCookies(java.util.Collections.singletonList(pwCookie))
       }
     }

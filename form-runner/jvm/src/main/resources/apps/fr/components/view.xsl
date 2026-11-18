@@ -674,7 +674,37 @@
 
     <xsl:template match="fr:title" name="fr-title">
         <!-- Q: Why do we need @ref here? -->
-        <xh:h1 class="fr-navbar-title"><xf:output value="{if (exists(@ref)) then @ref else '$title'}"/></xh:h1>
+        <xh:h1 class="fr-navbar-title">
+            <xsl:if test="empty(@ref)">
+                <xsl:choose>
+                    <xsl:when test="$is-home">
+                        <xh:img
+                            src="{{if (xxf:get-request-path() = '/fr/admin') then '/apps/fr/style/images/orbeon/cogwheels.svg' else '/apps/fr/style/images/orbeon/book.svg'}}"
+                            alt=""
+                            class="fr-navbar-title-icon img-invertible"/>
+                    </xsl:when>
+                    <xsl:when test="$is-console">
+                        <xh:img
+                            src="/apps/fr/style/images/orbeon/console.svg"
+                            alt=""
+                            class="fr-navbar-title-icon img-invertible"/>
+                    </xsl:when>
+                    <xsl:when test="$is-form-configuration">
+                        <xh:img
+                            src="/apps/fr/style/images/orbeon/configuration.svg"
+                            alt=""
+                            class="fr-navbar-title-icon img-invertible"/>
+                    </xsl:when>
+                    <xsl:when test="$is-form-builder and $is-summary">
+                        <xh:img
+                            src="/apps/fr/style/images/orbeon/library.svg"
+                            alt=""
+                            class="fr-navbar-title-icon img-invertible"/>
+                    </xsl:when>
+                </xsl:choose>
+            </xsl:if>
+            <xf:output value="{if (exists(@ref)) then @ref else '$title'}"/>
+        </xh:h1>
     </xsl:template>
 
     <xsl:template match="fr:config-check" name="fr-config-check">

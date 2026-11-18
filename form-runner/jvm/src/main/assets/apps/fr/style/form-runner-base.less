@@ -243,6 +243,16 @@
         .clearfix()
     }
 
+    // #8011: propagate the correct color scheme (light, dark, system) to SVG icons across Form Runner pages
+    .img-invertible {
+        color-scheme: light;
+    }
+    .dark-mode({
+        .img-invertible {
+            color-scheme: dark;
+        }
+    });
+
     // ***** XForms Controls *******************************************************************************************
 
     // Hide alerts by default

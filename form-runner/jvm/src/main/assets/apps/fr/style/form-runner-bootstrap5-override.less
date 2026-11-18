@@ -71,6 +71,27 @@
   .navbar h1.fr-navbar-title {
     margin-bottom: 0;
     color: var(--orbeon-navbar-title-color);
+
+    &:has(.fr-navbar-title-icon) {
+      display: flex;
+      align-items: safe center;
+      gap: 0.45em;
+      min-inline-size: 0;
+
+      .fr-navbar-title-icon {
+        display: block;
+        flex: 0 0 auto;
+        inline-size: 1.45em;
+        block-size: 1.45em;
+      }
+
+      .xforms-output {
+        min-inline-size: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
   }
 
   // Home (fa-th) link: Bootstrap 2's navbar icon color and 15px link padding

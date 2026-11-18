@@ -215,6 +215,7 @@ object XFormsContainingDocumentBuilder {
   ): XFormsStaticStateImpl = {
 
     val staticStateDocument = new StaticStateDocument(EncodeDecode.decodeXML(encodedState, forceEncryption))
+    val resolvedDigest      = staticStateDocument.getOrComputeDigest(digest)
 
     // Restore template
     val template = staticStateDocument.template map AnnotatedTemplateBuilder.apply
@@ -224,12 +225,12 @@ object XFormsContainingDocumentBuilder {
 
     XFormsStaticStateImpl(
       Right(encodedState),
-      staticStateDocument.getOrComputeDigest(digest),
+      resolvedDigest,
       new Scope(None, ""),
       metadata,
       template,
       staticStateDocument
-    )
+    ).trimAfterServerCompilation()
   }
 
   def restoreStaticStateFromBytes(
@@ -240,6 +241,7 @@ object XFormsContainingDocumentBuilder {
   ): XFormsStaticStateImpl = {
 
     val staticStateDocument = new StaticStateDocument(EncodeDecode.decodeXMLFromCompressedBytes(compressedBytes))
+    val resolvedDigest      = staticStateDocument.getOrComputeDigest(digest)
 
     // Restore template
     val template = staticStateDocument.template map AnnotatedTemplateBuilder.apply
@@ -249,12 +251,12 @@ object XFormsContainingDocumentBuilder {
 
     XFormsStaticStateImpl(
       Left(compressedBytes),
-      staticStateDocument.getOrComputeDigest(digest),
+      resolvedDigest,
       new Scope(None, ""),
       metadata,
       template,
       staticStateDocument
-    )
+    ).trimAfterServerCompilation()
   }
 
   private def findOrRestoreStaticState(

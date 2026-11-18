@@ -1,5 +1,7 @@
 package org.orbeon.oxf.xml
 
+import java.util as ju
+
 import org.orbeon.oxf.xml.SBinaryDefaultFormats.*
 import sbinary.Operations.{fromByteArray, read, toByteArray, write}
 import sbinary.*
@@ -19,6 +21,18 @@ object SAXStoreBinaryFormat {
     def reads(in: Input): SAXStore = {
 
       val ss = new SAXStore // This will call `init()` and allocate the arrays. Was not the case earlier with Java and `Externalizable`.
+      val dedup = new ju.HashMap[String, String](256)
+
+      def deduplicate(s: String, alwaysDedup: Boolean): String =
+        if (s eq null) null
+        else if (s.isEmpty) ""
+        else if (s == "CDATA") "CDATA"
+        else if (alwaysDedup || s.length <= 64) {
+          val existing = dedup.putIfAbsent(s, s)
+          if (existing ne null) existing else s
+        } else {
+          s
+        }
 
       ss.eventBufferPosition = read[Int](in)
       ss.eventBuffer = new Array[Byte](ss.eventBufferPosition)
@@ -39,9 +53,8 @@ object SAXStoreBinaryFormat {
       ss.systemIdBufferPosition = read[Int](in)
       ss.systemIdBuffer = new Array[String](ss.systemIdBufferPosition)
       for (i <- 0 until ss.systemIdBufferPosition) {
-        ss.systemIdBuffer(i) = read[String](in)
-        if ("" == ss.systemIdBuffer(i))
-          ss.systemIdBuffer(i) = null
+        val rawSystemId = read[String](in)
+        ss.systemIdBuffer(i) = if (rawSystemId.isEmpty) null else deduplicate(rawSystemId, alwaysDedup = true)
       }
       ss.attributeCountBufferPosition = read[Int](in)
       ss.attributeCountBuffer = new Array[Int](ss.attributeCountBufferPosition)
@@ -51,14 +64,16 @@ object SAXStoreBinaryFormat {
         ss.attributeCount += count
       }
       val stringBuilderSize = read[Int](in)
+      ss.stringBuilder = new ju.ArrayList[String](stringBuilderSize)
       for (_ <- 0 until stringBuilderSize)
-        ss.stringBuilder.add(read[String](in))
+        ss.stringBuilder.add(deduplicate(read[String](in), alwaysDedup = false))
       ss.hasDocumentLocator = read[Boolean](in)
       ss.publicId = read[String](in)
       if ("" == ss.publicId)
         ss.publicId = null
       val marksCount = read[Int](in)
-      if (marksCount > 0)
+      if (marksCount > 0) {
+        ss.marks = new ju.ArrayList[ss.Mark](marksCount)
         for (_ <- 0 until marksCount) {
           val id = read[String](in)
           val values = new Array[Int](7)
@@ -66,6 +81,7 @@ object SAXStoreBinaryFormat {
             values(j) = read[Int](in)
           ss.newMark(values, id)
         }
+      }
 
       ss
     }

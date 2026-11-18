@@ -65,7 +65,7 @@ trait BindingMetadata extends Logging {
       _xblBaselineAssets = baseline
     }
 
-  def commitBindingIndex(implicit indentedLogger: IndentedLogger): Unit =
+  def commitBindingIndex(cleanTransientState: Boolean)(implicit indentedLogger: IndentedLogger): Unit = {
     _xblIndex match {
       case Some(index) =>
         val cleanIndex = BindingIndex.keepBindingsWithPathOnly(index)
@@ -74,6 +74,14 @@ trait BindingMetadata extends Logging {
       case None =>
         debug("no binding index to commit")
     }
+    // Only clear `_xblIndex` on immutable top-level parts. Mutable `NestedPartAnalysis` instances (`xxf:dynamic`,
+    // such as Form Builder's canvas) reuse `findBindingForElement` during incremental XBL shadow-tree updates.
+    if (cleanTransientState) {
+      _xblIndex          = None
+      _checkedPaths      = Set.empty
+      inlineBindingsRefs = Nil
+    }
+  }
 
   def registerInlineBinding(
     namespaces       : NamespaceMapping,

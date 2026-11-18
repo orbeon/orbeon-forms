@@ -20,7 +20,7 @@ import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.analysis.PartAnalysisBuilder
 import org.orbeon.oxf.xforms.state.XFormsStateManager
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContainingDocumentBuilder}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsStaticStateImpl}
 
 
 abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSupport with XMLSupport {
@@ -40,6 +40,10 @@ abstract class DocumentTestBase extends ResourceManagerTestBase with XFormsSuppo
     implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
 
     val staticState = PartAnalysisBuilder.createFromDocument(xhtml)._2
+    staticState match {
+      case impl: XFormsStaticStateImpl => impl.trimAfterServerCompilation()
+      case _                           =>
+    }
     val doc = XFormsContainingDocumentBuilder(staticState, None, None, mustInitialize = true)
 
     doc.afterInitialResponse()

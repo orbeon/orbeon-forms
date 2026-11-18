@@ -83,6 +83,18 @@ class StaticStateDocument(val xmlDocument: Document) {
       location = true
     )
 
+  // Detach subtrees (`<template>`, `<properties>`, and `<xbl:xbl>`) that are no longer needed on `xmlDocument`
+  // once `encodedStatePayload`, `template`, `nonDefaultProperties`, and inline XBL bindings have been extracted.
+  def trimAfterExtraction(): Unit = {
+    staticStateElement.elementOpt("template").foreach(_.detach())
+    staticStateElement.elements(STATIC_STATE_PROPERTIES_QNAME).toList.foreach(_.detach())
+    for (xblElem <- xblElements.toList) {
+      val parentOpt = xblElem.parentElemOpt
+      xblElem.detach()
+      xblElem.copyMissingNamespacesByPrefix(parentOpt)
+    }
+  }
+
   def dump(): Unit =
     println(xmlDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat))
 }

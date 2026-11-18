@@ -118,17 +118,19 @@ object PartAnalysisBuilder {
   // Used by `XFormsToXHTML`.
   def createFromStaticStateBits(staticStateBits: StaticStateBits): XFormsStaticStateImpl = {
 
-    val startScope = new Scope(None, "")
+    val startScope          = new Scope(None, "")
     val staticStateDocument = new StaticStateDocument(staticStateBits.staticStateDocument)
+    val encodedPayload      = staticStateDocument.encodedStatePayload
+    val templateOpt         = staticStateDocument.template.map(_ => staticStateBits.template) // only keep the template around if needed
 
     XFormsStaticStateImpl(
-      staticStateDocument.encodedStatePayload,
+      encodedPayload,
       staticStateBits.staticStateDigest,
       startScope,
       staticStateBits.metadata,
-      staticStateDocument.template map (_ => staticStateBits.template),    // only keep the template around if needed
+      templateOpt,
       staticStateDocument
-    )
+    ).trimAfterServerCompilation()
   }
 
   // Create analyzed static state for the given XForms document.
@@ -144,13 +146,15 @@ object PartAnalysisBuilder {
     def create(staticStateXML: Document, digest: String, metadata: Metadata, template: AnnotatedTemplate): XFormsStaticStateImpl = {
 
       val staticStateDocument = new StaticStateDocument(staticStateXML)
+      val encodedPayload      = staticStateDocument.encodedStatePayload
+      val templateOpt         = staticStateDocument.template.map(_ => template) // only keep the template around if needed
 
       XFormsStaticStateImpl(
-        staticStateDocument.encodedStatePayload,
+        encodedPayload,
         digest,
         startScope,
         metadata,
-        staticStateDocument.template map (_ => template),    // only keep the template around if needed
+        templateOpt,
         staticStateDocument
       )
     }

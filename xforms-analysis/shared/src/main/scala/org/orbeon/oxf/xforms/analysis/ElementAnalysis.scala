@@ -169,7 +169,8 @@ abstract class ElementAnalysis(
   // LHHAAnalysis, StaticBind, VariableAnalysisTrait, ValueTrait
 
   def freeTransientState(): Unit = {
-    contextAnalysis foreach (_.freeTransientState()) // TODO: Could also set to `None`, right?
+    contextAnalysis foreach (_.freeTransientState())
+    contextAnalysis = None
     bindingAnalysis foreach (_.freeTransientState())
     valueAnalysis   foreach (_.freeTransientState())
   }

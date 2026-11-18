@@ -170,15 +170,24 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
     implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
 
     val doc = this setupDocument simpleDoc
-    val staticStateXML = doc.staticState.asInstanceOf[XFormsStaticStateImpl].staticStateDocumentForTests.xmlDocument
+    val staticStateXML = EncodeDecode.decodeXML(doc.staticState.encodedState, forceEncryption = false)
 
-    // Serialize/deserialize
+    // Serialize/deserialize via Base64 string and raw compressed bytes
     val serialized = doc.staticState.encodedState
     val restored = XFormsContainingDocumentBuilder.restoreStaticState(None, serialized, forceEncryption = false)
-    val restoredXML = restored.staticStateDocumentForTests.xmlDocument
+    val restoredXML = EncodeDecode.decodeXML(restored.encodedState, forceEncryption = false)
+
+    val restoredFromBytes =
+      XFormsContainingDocumentBuilder.restoreStaticStateFromBytes(
+        Some(doc.staticState.digest),
+        doc.staticState.asInstanceOf[XFormsStaticStateImpl].serverEncodedStateBytes
+      )
+    val restoredFromBytesXML =
+      EncodeDecode.decodeXMLFromCompressedBytes(restoredFromBytes.serverEncodedStateBytes)
 
     // Compare expected/actual XML representation of the static state
     assertXMLDocumentsIgnoreNamespacesInScope(staticStateXML, restoredXML)
+    assertXMLDocumentsIgnoreNamespacesInScope(staticStateXML, restoredFromBytesXML)
 
     // Check other aspects of the restored state
     val part = restored.topLevelPart

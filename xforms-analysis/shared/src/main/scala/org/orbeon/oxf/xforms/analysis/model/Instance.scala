@@ -49,16 +49,16 @@ case class InstanceMetadata(
 )
 
 class Instance(
-  index            : Int,
-  element          : Element,
-  parent           : Option[ElementAnalysis],
-  preceding        : Option[ElementAnalysis],
-  staticId         : String,
-  prefixedId       : String,
-  namespaceMapping : NamespaceMapping,
-  scope            : Scope,
-  containerScope   : Scope,
-  instanceMetadata : InstanceMetadata
+  index                   : Int,
+  element                 : Element,
+  parent                  : Option[ElementAnalysis],
+  preceding               : Option[ElementAnalysis],
+  staticId                : String,
+  prefixedId              : String,
+  namespaceMapping        : NamespaceMapping,
+  scope                   : Scope,
+  containerScope          : Scope,
+  initialInstanceMetadata : InstanceMetadata
 ) extends ElementAnalysis(
   index,
   element,
@@ -72,6 +72,8 @@ class Instance(
 ) {
 
   selfInstance =>
+
+  private var _instanceMetadata: InstanceMetadata = initialInstanceMetadata
 
   // Get constant inline content from `CommonBinding` if possible, otherwise extract from element.
   // Doing so allows for sharing of constant instances globally, among uses of a `CommonBinding` and
@@ -92,55 +94,41 @@ class Instance(
           val modelIndex    = modelsIt.indexWhere(_ eq parentModel)
           val instanceIndex = instancesIt.indexWhere(_ eq selfInstance)
 
-//          debug(
-//            "getting readonly inline instance from abstract binding",
-//            List(
-//              "model id"       -> parent.get.staticId,
-//              "instance id"    -> staticId,
-//              "scope id"       -> (component.bindingOpt map (_.innerScope.scopeId) orNull),
-//              "binding name"   -> component.commonBinding.debugBindingName,
-//              "model index"    -> modelIndex.toString,
-//              "instance index" -> instanceIndex.toString
-//            )
-//          ) // TODO: pass a logger?
-
           component.commonBinding.constantInstances((modelIndex, instanceIndex))
         case _ =>
-
-//          debug(
-//            "getting readonly inline instance from top-level",
-//            List(
-//              "model id"       -> parent.get.staticId,
-//              "instance id"    -> staticId,
-//              "scope id"       -> scope.scopeId
-//            )
-//          ) // TODO: pass a logger?
-
           // FIXME: `get`
           Instance.extractReadonlyDocument(inlineRootElemOpt.get, excludeResultPrefixes)
       }
     }
 
+  // Materialize `constantContent` (`TinyTree`) and release the duplicate Orbeon DOM subtree on server-side static states
+  def releaseInlineDom(): Unit =
+    if (readonly && useInlineContent) {
+      val _ = constantContent
+      _instanceMetadata = _instanceMetadata.copy(inlineRootElemOpt = None)
+      element.clearContent()
+    }
+
   // Scala 3 would be nice here:
-  // `export instanceMetadata._`
-  def readonly              : Boolean                  = instanceMetadata.readonly
-  def cache                 : Boolean                  = instanceMetadata.cache
-  def timeToLive            : Long                     = instanceMetadata.timeToLive
-  def handleXInclude        : Boolean                  = instanceMetadata.handleXInclude
-  def exposeXPathTypes      : Boolean                  = instanceMetadata.exposeXPathTypes
-  def indexIds              : Boolean                  = instanceMetadata.indexIds
-  def indexClasses          : Boolean                  = instanceMetadata.indexClasses
-  def isLaxValidation       : Boolean                  = instanceMetadata.isLaxValidation
-  def isStrictValidation    : Boolean                  = instanceMetadata.isStrictValidation
-  def isSchemaValidation    : Boolean                  = instanceMetadata.isSchemaValidation
-  def credentials           : Option[BasicCredentials] = instanceMetadata.credentials
-  def excludeResultPrefixes : Set[String]              = instanceMetadata.excludeResultPrefixes
-  def inlineRootElemOpt     : Option[Element]          = instanceMetadata.inlineRootElemOpt
-  def useInlineContent      : Boolean                  = instanceMetadata.useInlineContent
-  def useExternalContent    : Boolean                  = instanceMetadata.useExternalContent
-  def instanceSource        : Option[String]           = instanceMetadata.instanceSource
-  def dependencyURL         : Option[String]           = instanceMetadata.dependencyURL
-  def mirror                : Boolean                  = instanceMetadata.mirror
+  // `export _instanceMetadata._`
+  def readonly              : Boolean                  = _instanceMetadata.readonly
+  def cache                 : Boolean                  = _instanceMetadata.cache
+  def timeToLive            : Long                     = _instanceMetadata.timeToLive
+  def handleXInclude        : Boolean                  = _instanceMetadata.handleXInclude
+  def exposeXPathTypes      : Boolean                  = _instanceMetadata.exposeXPathTypes
+  def indexIds              : Boolean                  = _instanceMetadata.indexIds
+  def indexClasses          : Boolean                  = _instanceMetadata.indexClasses
+  def isLaxValidation       : Boolean                  = _instanceMetadata.isLaxValidation
+  def isStrictValidation    : Boolean                  = _instanceMetadata.isStrictValidation
+  def isSchemaValidation    : Boolean                  = _instanceMetadata.isSchemaValidation
+  def credentials           : Option[BasicCredentials] = _instanceMetadata.credentials
+  def excludeResultPrefixes : Set[String]              = _instanceMetadata.excludeResultPrefixes
+  def inlineRootElemOpt     : Option[Element]          = _instanceMetadata.inlineRootElemOpt
+  def useInlineContent      : Boolean                  = _instanceMetadata.useInlineContent
+  def useExternalContent    : Boolean                  = _instanceMetadata.useExternalContent
+  def instanceSource        : Option[String]           = _instanceMetadata.instanceSource
+  def dependencyURL         : Option[String]           = _instanceMetadata.dependencyURL
+  def mirror                : Boolean                  = _instanceMetadata.mirror
 }
 
 object Instance {

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.datatypes.MaximumSize
-import org.orbeon.dom.QName
+import org.orbeon.dom.{Document, QName}
 import org.orbeon.oxf.cache.{MemorySizeEstimator, SizedCacheable}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -30,11 +30,15 @@ import org.orbeon.oxf.xforms.XFormsProperties as P
 import org.orbeon.oxf.xml.EncodeDecode
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.oxf.xml.dom.Extensions.*
+import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.xforms.xbl.Scope
 
+import java.lang as jl
 import java.net.URI
+import java.util as ju
 import scala.collection.immutable.SortedMap
 import scala.collection.mutable
+import scala.jdk.CollectionConverters.*
 
 
 object XFormsStaticStateImpl {
@@ -90,34 +94,37 @@ object XFormsStaticStateImpl {
         topLevelPart
       )
 
+    val isHTMLDocument       = staticStateDocument.isHTMLDocument
+    val nonDefaultProperties = staticStateDocument.nonDefaultProperties
+
+    staticStateDocument.trimAfterExtraction()
+
     new XFormsStaticStateImpl(
       encodedStatePayload,
       digest,
       topLevelPart,
       topLevelPart.metadata,
       template,
-      staticStateDocument.isHTMLDocument,
-      staticStateDocument.nonDefaultProperties,
+      isHTMLDocument,
+      nonDefaultProperties,
       staticProperties,
-      dynamicProperties,
-      staticStateDocument
+      dynamicProperties
     )
   }
 }
 
 class XFormsStaticStateImpl(
-  val encodedStatePayload         : Either[Array[Byte], String],
-  val digest                      : String,
-  val topLevelPart                : TopLevelPartAnalysis,
-  metadata                        : Metadata,
-  val template                    : Option[AnnotatedTemplate],      // for serialization and tests
-  val isHTMLDocument              : Boolean,
-  val nonDefaultProperties        : Map[String, (String, Boolean)], // for serialization
-  staticProperties                : XFormsStaticStateStaticProperties,
-  dynamicProperties               : XFormsStaticStateDynamicProperties,
-  val staticStateDocumentForTests : StaticStateDocument
+  val encodedStatePayload  : Either[Array[Byte], String],
+  val digest               : String,
+  val topLevelPart         : TopLevelPartAnalysis,
+  metadata                 : Metadata,
+  val template             : Option[AnnotatedTemplate],      // for serialization and tests
+  val isHTMLDocument       : Boolean,
+  val nonDefaultProperties : Map[String, (String, Boolean)], // for serialization
+  staticProperties         : XFormsStaticStateStaticProperties,
+  dynamicProperties        : XFormsStaticStateDynamicProperties
 )(implicit
-  val getIndentedLogger           : IndentedLogger
+  val getIndentedLogger    : IndentedLogger
 ) extends XFormsStaticState
   with XFormsStaticStateStaticProperties
   with XFormsStaticStateDynamicProperties
@@ -238,24 +245,59 @@ class XFormsStaticStateImpl(
       case Right(s)    => MemorySizeEstimator.estimateStringBytes(s)
     }
   def templateSizeBytes  : Long = template.map(_.saxStore.approximateSizeBytes).getOrElse(0L)
-  def staticDomSizeBytes : Long =
-    if (staticStateDocumentForTests ne null)
-      MemorySizeEstimator.estimateOrbeonDomDocument(staticStateDocumentForTests.xmlDocument)
-    else
-      0L
+  def staticDomSizeBytes : Long = {
+    val seenDocs = ju.Collections.newSetFromMap(new ju.IdentityHashMap[Document, jl.Boolean])
+    for (control <- topLevelPart.controlAnalysisMap.valuesIterator) {
+      val doc = control.element.getDocument
+      if (doc ne null)
+        seenDocs.add(doc)
+    }
+    var sum = 0L
+    for (doc <- seenDocs.asScala)
+      sum += MemorySizeEstimator.estimateOrbeonDomDocument(doc)
+    sum
+  }
 
   // Diagnostic metadata extracted from `fr-form-metadata` when compiled by Form Runner: (app, form, titleOpt)
   lazy val formRunnerMetadataOpt: Option[(String, String, Option[String])] =
     for {
-      model    <- topLevelPart.findModel("fr-form-model")
-      inst     <- model.instances.get("fr-form-metadata")
-      rootElem <- inst.inlineRootElemOpt
-      app      <- rootElem.elementOpt("application-name").map(_.getText.trim).filter(_.nonEmpty)
-      form     <- rootElem.elementOpt("form-name").map(_.getText.trim).filter(_.nonEmpty)
-    } yield (app, form, rootElem.elementOpt("title").map(_.getText.trim).filter(_.nonEmpty))
+      model <- topLevelPart.findModel("fr-form-model")
+      inst  <- model.instances.get("fr-form-metadata")
+      res   <- inst.constantContent match {
+        case Some(docNode) =>
+          for {
+            root <- (docNode / *).headOption
+            app  <- (root / "application-name").headOption.flatMap(_.stringValue.trimAllToOpt)
+            form <- (root / "form-name").headOption.flatMap(_.stringValue.trimAllToOpt)
+          } yield (app, form, (root / "title").headOption.flatMap(_.stringValue.trimAllToOpt))
+        case None =>
+          for {
+            rootElem <- inst.inlineRootElemOpt
+            app      <- rootElem.elementOpt("application-name").flatMap(_.getText.trimAllToOpt)
+            form     <- rootElem.elementOpt("form-name").flatMap(_.getText.trimAllToOpt)
+          } yield (app, form, rootElem.elementOpt("title").flatMap(_.getText.trimAllToOpt))
+      }
+    } yield res
+
+  // Release duplicate Orbeon DOM subtrees on all `readonly && useInlineContent` instances for server-side execution.
+  // Offline Scala.js compilation (`XFormsCompiler`) omits this step because `XFormsStaticStateSerializer` reads `inlineRootElemOpt`.
+  def trimAfterServerCompilation(): this.type = {
+    val _ = formRunnerMetadataOpt
+    for {
+      model <- topLevelPart.iterateModels
+      inst  <- model.instances.valuesIterator
+    } inst.releaseInlineDom()
+    this
+  }
 
   def estimatedMemoryBytes: Long = {
-    val controlsBytes = topLevelPart.controlAnalysisMap.size.toLong * 920L
+    val controlsBytes = topLevelPart.controlAnalysisMap.size.toLong * 600L
+    val componentTemplatesBytes =
+      topLevelPart
+        .controlAnalysisMap
+        .valuesIterator
+        .collect { case cc: ComponentControl => cc.bindingOpt.map(_.templateTree.approximateSizeBytes).getOrElse(0L) }
+        .sum
     val topLevelConstantInstancesBytes =
       topLevelPart
         .iterateModels
@@ -265,6 +307,6 @@ class XFormsStaticStateImpl(
         .map(MemorySizeEstimator.estimateBytes)
         .sum
 
-    512L + encodedStateBytes + templateSizeBytes + staticDomSizeBytes + controlsBytes + topLevelConstantInstancesBytes
+    512L + encodedStateBytes + templateSizeBytes + staticDomSizeBytes + controlsBytes + componentTemplatesBytes + topLevelConstantInstancesBytes
   }
 }

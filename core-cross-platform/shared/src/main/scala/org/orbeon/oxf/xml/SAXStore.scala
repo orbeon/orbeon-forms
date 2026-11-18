@@ -46,6 +46,17 @@ private object SAXStore {
   val Comment              : Byte = 0x0B
 
   val InitialSize          : Int  = 10
+
+  val EmptyByteArray       : Array[Byte]   = new Array[Byte](0)
+  val EmptyCharArray       : Array[Char]   = new Array[Char](0)
+  val EmptyIntArray        : Array[Int]    = new Array[Int](0)
+  val EmptyStringArray     : Array[String] = new Array[String](0)
+
+  def canonicalizeString(s: String): String =
+    if (s eq null) null
+    else if (s.isEmpty) ""
+    else if (s == "CDATA") "CDATA"
+    else s
 }
 
 final class SAXStore extends ForwardingXMLReceiver with SizedCacheable {
@@ -192,7 +203,7 @@ final class SAXStore extends ForwardingXMLReceiver with SizedCacheable {
 
     var previousId: String = null
 
-    for (i <- systemIdBuffer.indices) {
+    for (i <- 0 until systemIdBufferPosition) {
       val currentId = systemIdBuffer(i)
       // This is rough, but entries in the list could point to the same string, so we try to detect this case.
       if (currentId != null && (currentId ne previousId))
@@ -391,6 +402,69 @@ final class SAXStore extends ForwardingXMLReceiver with SizedCacheable {
     baseBytes + eventBytes + charBytes + intBytes + lineBytes + sysIdBytes + attCntBytes + strListRefs + attValBytes + marksBytes
   }
 
+  // Shrink all internal backing buffers to exact recorded sizes once document recording completes
+  def trimToSize(): Unit = {
+    if ((eventBuffer ne null) && eventBuffer.length > eventBufferPosition)
+      if (eventBufferPosition == 0) {
+        eventBuffer = SAXStore.EmptyByteArray
+      } else {
+        val trimmed = new Array[Byte](eventBufferPosition)
+        System.arraycopy(eventBuffer, 0, trimmed, 0, eventBufferPosition)
+        eventBuffer = trimmed
+      }
+
+    if ((charBuffer ne null) && charBuffer.length > charBufferPosition)
+      if (charBufferPosition == 0) {
+        charBuffer = SAXStore.EmptyCharArray
+      } else {
+        val trimmed = new Array[Char](charBufferPosition)
+        System.arraycopy(charBuffer, 0, trimmed, 0, charBufferPosition)
+        charBuffer = trimmed
+      }
+
+    if ((intBuffer ne null) && intBuffer.length > intBufferPosition)
+      if (intBufferPosition == 0) {
+        intBuffer = SAXStore.EmptyIntArray
+      } else {
+        val trimmed = new Array[Int](intBufferPosition)
+        System.arraycopy(intBuffer, 0, trimmed, 0, intBufferPosition)
+        intBuffer = trimmed
+      }
+
+    if ((lineBuffer ne null) && lineBuffer.length > lineBufferPosition)
+      if (lineBufferPosition == 0) {
+        lineBuffer = SAXStore.EmptyIntArray
+      } else {
+        val trimmed = new Array[Int](lineBufferPosition)
+        System.arraycopy(lineBuffer, 0, trimmed, 0, lineBufferPosition)
+        lineBuffer = trimmed
+      }
+
+    if ((systemIdBuffer ne null) && systemIdBuffer.length > systemIdBufferPosition)
+      if (systemIdBufferPosition == 0) {
+        systemIdBuffer = SAXStore.EmptyStringArray
+      } else {
+        val trimmed = new Array[String](systemIdBufferPosition)
+        System.arraycopy(systemIdBuffer, 0, trimmed, 0, systemIdBufferPosition)
+        systemIdBuffer = trimmed
+      }
+
+    if ((attributeCountBuffer ne null) && attributeCountBuffer.length > attributeCountBufferPosition)
+      if (attributeCountBufferPosition == 0) {
+        attributeCountBuffer = SAXStore.EmptyIntArray
+      } else {
+        val trimmed = new Array[Int](attributeCountBufferPosition)
+        System.arraycopy(attributeCountBuffer, 0, trimmed, 0, attributeCountBufferPosition)
+        attributeCountBuffer = trimmed
+      }
+
+    if (stringBuilder ne null)
+      stringBuilder.trimToSize()
+
+    if (marks ne null)
+      marks.trimToSize()
+  }
+
 //  // Print to System.out. For debug only.
 //  def printOut() {
 //    try {
@@ -439,13 +513,14 @@ final class SAXStore extends ForwardingXMLReceiver with SizedCacheable {
     super.endDocument()
     // The resulting `SAXStore` must never keep references to whoever filled it
     locator = null
+    trimToSize()
   }
 
   @throws[SAXException]
   override def endElement(uri: String, localname: String, qName: String): Unit = {
     addToEventBuffer(SAXStore.EndElement)
     addLocation()
-    stringBuilder.add(uri)
+    stringBuilder.add(SAXStore.canonicalizeString(uri))
     stringBuilder.add(localname)
     stringBuilder.add(qName)
     super.endElement(uri, localname, qName)
@@ -455,7 +530,7 @@ final class SAXStore extends ForwardingXMLReceiver with SizedCacheable {
   override def endPrefixMapping(s: String): Unit = {
     addToEventBuffer(SAXStore.EndPrefixMapping)
     // NOTE: We don't keep location data for this event as it is very unlikely to be used
-    stringBuilder.add(s)
+    stringBuilder.add(SAXStore.canonicalizeString(s))
     super.endPrefixMapping(s)
   }
 
@@ -508,7 +583,7 @@ final class SAXStore extends ForwardingXMLReceiver with SizedCacheable {
       if ((publicId eq null) && (locator.getPublicId ne null))
         publicId = locator.getPublicId
     }
-    stringBuilder.add(uri)
+    stringBuilder.add(SAXStore.canonicalizeString(uri))
     stringBuilder.add(localname)
     stringBuilder.add(qName)
     addToAttributeBuffer(attributes)
@@ -518,8 +593,8 @@ final class SAXStore extends ForwardingXMLReceiver with SizedCacheable {
   @throws[SAXException]
   override def startPrefixMapping(s: String, s1: String): Unit = {
     addToEventBuffer(SAXStore.StartPrefixMapping)
-    stringBuilder.add(s)
-    stringBuilder.add(s1)
+    stringBuilder.add(SAXStore.canonicalizeString(s))
+    stringBuilder.add(SAXStore.canonicalizeString(s1))
     super.startPrefixMapping(s, s1)
   }
 
@@ -541,21 +616,23 @@ final class SAXStore extends ForwardingXMLReceiver with SizedCacheable {
 
   @tailrec
   private def addToCharBuffer(chars: Array[Char], start: Int, length: Int): Unit =
-    if (charBuffer.length - charBufferPosition <= length) {
+    if (charBuffer.length - charBufferPosition < length) {
       val old = charBuffer
-      charBuffer = new Array[Char](old.length * 3 / 2 + 1)
+      val newSize = math.max(SAXStore.InitialSize * 4, math.max(old.length * 3 / 2 + 1, charBufferPosition + length))
+      charBuffer = new Array[Char](newSize)
       System.arraycopy(old, 0, charBuffer, 0, charBufferPosition)
       addToCharBuffer(chars, start, length)
     } else {
-      System.arraycopy(chars, start, charBuffer, charBufferPosition, length)
+      if (length > 0)
+        System.arraycopy(chars, start, charBuffer, charBufferPosition, length)
       charBufferPosition += length
     }
 
   @tailrec
   private def addToIntBuffer(i: Int): Unit =
-    if (intBuffer.length - intBufferPosition == 1) {
+    if (intBufferPosition >= intBuffer.length) {
       val old = intBuffer
-      intBuffer = new Array[Int](old.length * 3 / 2 + 1)
+      intBuffer = new Array[Int](math.max(SAXStore.InitialSize, old.length * 3 / 2 + 1))
       System.arraycopy(old, 0, intBuffer, 0, intBufferPosition)
       addToIntBuffer(i)
     } else {
@@ -565,9 +642,9 @@ final class SAXStore extends ForwardingXMLReceiver with SizedCacheable {
 
   @tailrec
   private def addToLineBuffer(i: Int): Unit =
-    if (lineBuffer.length - lineBufferPosition == 1) {
+    if (lineBufferPosition >= lineBuffer.length) {
       val old = lineBuffer
-      lineBuffer = new Array[Int](old.length * 3 / 2 + 1)
+      lineBuffer = new Array[Int](math.max(SAXStore.InitialSize, old.length * 3 / 2 + 1))
       System.arraycopy(old, 0, lineBuffer, 0, lineBufferPosition)
       addToLineBuffer(i)
     } else {
@@ -577,28 +654,27 @@ final class SAXStore extends ForwardingXMLReceiver with SizedCacheable {
 
   @tailrec
   private def addToSystemIdBuffer(systemId: String): Unit =
-    // Try to detect contiguous system ids
-    //
-    // NOTE: This native method won't work during replay, will need to store number of contiguous identical strings
-    // as well, and/or use intern().
-    //        if (systemIdBufferPosition > 0 && systemIdBuffer[systemIdBufferPosition] == systemId) {
-    //            return;
-    //        }
-    if (systemIdBuffer.length - systemIdBufferPosition == 1) {
+    if (systemIdBufferPosition >= systemIdBuffer.length) {
       val old = systemIdBuffer
-      systemIdBuffer = new Array[String](old.length * 3 / 2 + 1)
+      systemIdBuffer = new Array[String](math.max(SAXStore.InitialSize, old.length * 3 / 2 + 1))
       System.arraycopy(old, 0, systemIdBuffer, 0, systemIdBufferPosition)
       addToSystemIdBuffer(systemId)
     } else {
-      systemIdBuffer(systemIdBufferPosition) = systemId
+      // Reuse the previous String instance when contiguous events share the same systemId
+      val deduplicated =
+        if ((systemId ne null) && systemIdBufferPosition > 0 && systemId == systemIdBuffer(systemIdBufferPosition - 1))
+          systemIdBuffer(systemIdBufferPosition - 1)
+        else
+          systemId
+      systemIdBuffer(systemIdBufferPosition) = deduplicated
       systemIdBufferPosition += 1
     }
 
   @tailrec
   private def addToEventBuffer(b: Byte): Unit =
-    if (eventBuffer.length - eventBufferPosition == 1) {
+    if (eventBufferPosition >= eventBuffer.length) {
       val old = eventBuffer
-      eventBuffer = new Array[Byte](old.length * 3 / 2 + 1)
+      eventBuffer = new Array[Byte](math.max(SAXStore.InitialSize, old.length * 3 / 2 + 1))
       System.arraycopy(old, 0, eventBuffer, 0, eventBufferPosition)
       addToEventBuffer(b)
     } else {
@@ -608,9 +684,9 @@ final class SAXStore extends ForwardingXMLReceiver with SizedCacheable {
 
   @tailrec
   private def addToAttributeBuffer(attributes: Attributes): Unit =
-    if (attributeCountBuffer.length - attributeCountBufferPosition == 1) {
+    if (attributeCountBufferPosition >= attributeCountBuffer.length) {
       val old = attributeCountBuffer
-      attributeCountBuffer = new Array[Int](old.length * 3 / 2 + 1)
+      attributeCountBuffer = new Array[Int](math.max(SAXStore.InitialSize, old.length * 3 / 2 + 1))
       System.arraycopy(old, 0, attributeCountBuffer, 0, attributeCountBufferPosition)
       addToAttributeBuffer(attributes)
     } else {
@@ -618,12 +694,12 @@ final class SAXStore extends ForwardingXMLReceiver with SizedCacheable {
       attributeCountBuffer(attributeCountBufferPosition) = count
       attributeCountBufferPosition += 1
       attributeCount += count
-      for (i <- 0 until attributes.getLength) {
-        stringBuilder.add(attributes.getURI(i))
+      for (i <- 0 until count) {
+        stringBuilder.add(SAXStore.canonicalizeString(attributes.getURI(i)))
         stringBuilder.add(attributes.getLocalName(i))
         stringBuilder.add(attributes.getQName(i))
-        stringBuilder.add(attributes.getType(i))
-        stringBuilder.add(attributes.getValue(i))
+        stringBuilder.add(SAXStore.canonicalizeString(attributes.getType(i)))
+        stringBuilder.add(SAXStore.canonicalizeString(attributes.getValue(i)))
       }
     }
 }

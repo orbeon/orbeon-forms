@@ -31,6 +31,7 @@ trait PartXBLAnalysis extends TransientState {
   self =>
 
   def startScope: Scope
+  def isTopLevelPart: Boolean
   def metadata: Metadata
 
   val abstractBindingsWithGlobals = mutable.ArrayBuffer[AbstractBinding]()
@@ -134,6 +135,6 @@ trait PartXBLAnalysis extends TransientState {
 
   override def freeTransientState(): Unit = {
     super.freeTransientState()
-    metadata.commitBindingIndex(new IndentedLogger(xbl.Logger))
+    metadata.commitBindingIndex(cleanTransientState = isTopLevelPart)(new IndentedLogger(xbl.Logger))
   }
 }

@@ -711,8 +711,8 @@
                                             <xf:output value="$schemas-count"/>
                                         </xh:span>
                                     </xf:label>
-                                    <xxf:show ev:event="DOMActivate" if="$is-pe" dialog="fb-schema-upload-dialog"/>
-                                    <xf:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
+                                    <xxf:show event="DOMActivate" if="$is-pe" dialog="fb-schema-upload-dialog"/>
+                                    <xf:dispatch event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                                 </xf:trigger>
                             </xf:group>
                         </xh:div>

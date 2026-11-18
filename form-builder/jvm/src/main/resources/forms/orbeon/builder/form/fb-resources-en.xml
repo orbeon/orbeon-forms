@@ -1175,9 +1175,24 @@
         </open-settings>
     </dialog-search>
     <dialog-upload-schema>
-        <label>XML Schema Upload</label>
+        <label>XML Schema</label>
+        <description>Attach an XML Schema (.xsd) to validate controls using custom simple types.</description>
+        <attached-label>XML Schema</attached-label>
+        <status-new>New</status-new>
+        <status-modified>Modified</status-modified>
+        <download>Download</download>
+        <replace>Replace</replace>
+        <cancel-replace>Cancel</cancel-replace>
+        <remove>Remove</remove>
+        <types-header>
+            <type>Type</type>
+            <restriction>Base / Restriction</restriction>
+            <in-use>In Use</in-use>
+        </types-header>
+        <in-use-count>{0,choice,0#—|1#1 control|1&lt;{0,number,integer} controls}</in-use-count>
+        <reset-orphaned-types>Reset data type of affected controls to String</reset-orphaned-types>
         <schema-type>
-            <label>Available Schema Types</label>
+            <label>Available Simple Types</label>
             <hint>The simple types available in the uploaded schema</hint>
         </schema-type>
         <namespace-uri>
@@ -1201,8 +1216,13 @@
         </upload-schema>
         <messages>
             <no-simple-types>Your schema does not seem to contain simple types. You won't be able to select types from this schema for validation.</no-simple-types>
-            <has-includes>Your schema contains imports or includes. These will be disabled.</has-includes>
-            <not-a-schema>The uploaded file is not a valid schema.</not-a-schema>
+            <has-includes>Your schema contains imports or includes, which have been removed because external schema inclusions are not supported.</has-includes>
+            <not-a-schema>The uploaded file is not a valid XML Schema (.xsd).</not-a-schema>
+            <malformed-xml>The uploaded file is not well-formed XML.</malformed-xml>
+            <invalid-schema>The uploaded XML Schema contains errors: {0}</invalid-schema>
+            <pending-removal>The existing XML Schema will be removed when you click Apply.</pending-removal>
+            <readonly-empty>No XML Schema is attached to this form.</readonly-empty>
+            <orphaned-types>{0,choice,1#1 control uses an XML Schema type that is not defined|1&lt;{0,number,integer} controls use XML Schema types that are not defined}: {1}.</orphaned-types>
             <new-schema-information>New Schema Information</new-schema-information>
             <existing-schema-information>Existing Schema Information</existing-schema-information>
         </messages>

@@ -40,13 +40,18 @@ import org.orbeon.oxf.xforms.action.actions.XXFormsInvalidateInstanceAction
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.{MipName, Types}
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.event.XFormsEvent.PropertyValue
+import org.orbeon.oxf.xforms.model.XFormsModelSchemaValidator
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor.*
 import org.orbeon.oxf.xforms.xbl.BindingIndex.DatatypeMatch
 import org.orbeon.oxf.xforms.xbl.{BindingDescriptor, BindingIndex}
 import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsContainingDocument}
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.oxf.xml.dom.Extensions.*
-import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
+import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils, XMLConstants}
+import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.io.IOUtils
 import org.orbeon.saxon.ArrayFunctions
 import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
@@ -56,10 +61,15 @@ import org.orbeon.scaxon.NodeConversions.*
 import org.orbeon.scaxon.SimplePath.*
 import org.orbeon.scaxon.{NodeConversions, NodeInfoConversions}
 import org.orbeon.xforms.XFormsNames.XFORMS_VAR_QNAME
-import org.orbeon.xforms.{XFormsId, XFormsNames}
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
+import java.io.InputStream
+import java.net.URI
+import java.nio.charset.StandardCharsets
+import java.util.Base64
 import scala.collection.immutable.SortedSet
+import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
 
@@ -906,6 +916,216 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def findSchemaPrefixOrEmpty(inDoc: NodeInfo) =
     SchemaOps.findSchemaPrefix(inDoc).orNull
+
+  private val SchemaIncludeElementNames: Set[String] = Set("import", "include", "redefine")
+
+  //@XPathFunction
+  def parseUploadedSchema(uriOrBlank: String): NodeInfo =
+    uriOrBlank.trimAllToOpt match {
+      case Some(uri) if XFormsUploadControl.isUploadedFileURL(uri) =>
+        try {
+          val cleanUri = URI.create(PathUtils.removeQueryString(uri))
+          IOUtils.useAndClose(XFormsCrossPlatformSupport.openUrlStream(cleanUri)) { is =>
+            parseSchemaFromInputStream(is, cleanUri.toString)
+          }
+        } catch {
+          case NonFatal(_) =>
+            elemToNodeInfo(<parsed-schema valid="false" error-type="malformed-xml" error-message="" has-includes="false"/>)
+        }
+      case _ =>
+        elemToNodeInfo(<parsed-schema valid="false" error-type="malformed-xml" error-message="" has-includes="false"/>)
+    }
+
+  def parseSchemaFromInputStream(is: InputStream, systemId: String): NodeInfo = {
+    val parsedDocOpt =
+      try {
+        Some(
+          XFormsCrossPlatformSupport.readOrbeonDom(
+            inputStream    = is,
+            systemId       = systemId,
+            handleXInclude = false,
+            handleLexical  = false
+          )
+        )
+      } catch {
+        case NonFatal(_) => None
+      }
+
+    parsedDocOpt match {
+      case None =>
+        elemToNodeInfo(<parsed-schema valid="false" error-type="malformed-xml" error-message="" has-includes="false"/>)
+
+      case Some(doc) =>
+        val rootElem = doc.getRootElement
+        if ((rootElem eq null) || rootElem.getQName != XMLConstants.XML_SCHEMA_QNAME) {
+          elemToNodeInfo(<parsed-schema valid="false" error-type="not-a-schema" error-message="" has-includes="false"/>)
+        } else {
+          val includeElems =
+            rootElem.elements.filter { e =>
+              e.getNamespaceURI == XMLConstants.XSD_URI && SchemaIncludeElementNames(e.getName)
+            }
+          val hasIncludes = includeElems.nonEmpty
+          includeElems.foreach(rootElem.remove)
+
+          // Verify with Orbeon's MSV XML Schema validator that the sanitized schema compiles cleanly
+          val schemaCompileErrorOpt =
+            try {
+              val dummyModel = org.orbeon.dom.Element(org.orbeon.dom.QName("model", XFormsNames.XFORMS_NAMESPACE))
+              dummyModel.add(rootElem.createCopy)
+              val validator = new XFormsModelSchemaValidator(dummyModel, null)
+              validator.loadSchemas(null)
+              if (validator.hasSchema) None else Some("")
+            } catch {
+              case NonFatal(t) =>
+                Some(Option(t.getMessage).flatMap(_.trimAllToOpt).getOrElse(""))
+            }
+
+          schemaCompileErrorOpt match {
+            case Some(errMsg) =>
+              elemToNodeInfo(
+                <parsed-schema
+                  valid="false"
+                  error-type="invalid-schema"
+                  error-message={errMsg}
+                  has-includes="false"/>
+              )
+            case None =>
+              val wrapperElem = org.orbeon.dom.Element("parsed-schema")
+              wrapperElem.addAttribute("valid", "true")
+              wrapperElem.addAttribute("error-type", "")
+              wrapperElem.addAttribute("error-message", "")
+              wrapperElem.addAttribute("has-includes", hasIncludes.toString)
+              wrapperElem.add(rootElem.createCopy)
+              val wrapperDoc = org.orbeon.dom.Document(wrapperElem)
+              new DocumentWrapper(wrapperDoc, null, org.orbeon.oxf.util.XPath.GlobalConfiguration).rootElement
+          }
+        }
+    }
+  }
+
+  //@XPathFunction
+  def schemaInfoAsXml(formDefinitionRootElem: NodeInfo, schemaElemOrNull: NodeInfo): NodeInfo = {
+    val schemaOpt        = Option(schemaElemOrNull)
+    val targetNsOpt      = schemaOpt.flatMap(SchemaOps.findSchemaNamespaceForSchema)
+    val prefixOpt        = schemaOpt.flatMap(SchemaOps.findSchemaPrefixForSchema)
+    val simpleTypes      = schemaOpt.toList.flatMap(SchemaOps.findSimpleTypes)
+    val allUsages        = SchemaOps.findControlSchemaTypeUsages(formDefinitionRootElem)
+    val orphanedUsages   = SchemaOps.findDanglingSchemaTypeUsages(formDefinitionRootElem, schemaOpt)
+    val targetNsOrEmpty  = targetNsOpt.getOrElse("")
+    val orphanedControls = orphanedUsages.map(_.controlName).distinct
+
+    elemToNodeInfo(
+      <schema-info
+        has-schema={schemaOpt.isDefined.toString}
+        target-namespace={targetNsOrEmpty}
+        prefix={prefixOpt.getOrElse("")}
+        simple-types-count={simpleTypes.size.toString}
+        orphaned-controls-count={orphanedControls.size.toString}
+        orphaned-summary={orphanedUsages.map(u => s"${u.controlName} (${u.rawType})").mkString(", ")}>
+        <simple-types>
+          {
+            simpleTypes.map { st =>
+              val usedByControls =
+                allUsages.filter { u =>
+                  u.resolvedOpt match {
+                    case Some(q) =>
+                      q.namespace.uri == targetNsOrEmpty && q.localName == st.localName
+                    case None =>
+                      val (p, l) = SaxonUtils.parseQName(u.rawType)
+                      p.nonEmpty && prefixOpt.contains(p) && l == st.localName
+                  }
+                }.map(_.controlName).distinct
+
+              <simple-type
+                name={st.localName}
+                qualified-name={st.qualifiedName}
+                restriction={st.restrictionSummary}
+                used-count={usedByControls.size.toString}
+                used-by={usedByControls.mkString(", ")}/>
+            }
+          }
+        </simple-types>
+        <orphaned-usages>
+          {
+            orphanedUsages.map { u =>
+              <usage control-name={u.controlName} schema-type={u.rawType}/>
+            }
+          }
+        </orphaned-usages>
+      </schema-info>
+    )
+  }
+
+  //@XPathFunction
+  def schemaToDownloadUri(schemaElemOrNull: NodeInfo): String =
+    Option(schemaElemOrNull) match {
+      case None =>
+        ""
+      case Some(schemaNode) =>
+        val domDoc      = TransformerUtils.tinyTreeToOrbeonDom(schemaNode)
+        val rootElem    = domDoc.getRootElement
+        // Remove inherited Form Builder / XHTML wrapper namespaces that are not used inside `<xs:schema>`
+        val usedPrefixes = {
+          def collectFromElem(el: org.orbeon.dom.Element): Set[String] = {
+            val ownPrefix = Option(el.getNamespacePrefix).filter(_.nonEmpty).toSet
+            val attPrefixes =
+              el.attributes.flatMap { att =>
+                val attPrefix = Option(att.getNamespacePrefix).filter(_.nonEmpty).toList
+                val valPrefix = {
+                  val v = att.getValue
+                  val colonIdx = v.indexOf(':')
+                  if (colonIdx > 0 && ! v.contains("://")) List(v.substring(0, colonIdx)) else Nil
+                }
+                attPrefix ++ valPrefix
+              }.toSet
+            ownPrefix ++ attPrefixes ++ el.elements.flatMap(collectFromElem)
+          }
+          val targetNsPrefixes =
+            Option(rootElem.attributeValue("targetNamespace"))
+              .toSet
+              .flatMap((tns: String) => rootElem.declaredNamespacesIterator.filter(_.uri == tns).map(_.prefix))
+          collectFromElem(rootElem) ++ targetNsPrefixes + "xs" + "xsd"
+        }
+        rootElem.declaredNamespacesIterator.toList.foreach { ns =>
+          if (ns.prefix.nonEmpty && ! usedPrefixes(ns.prefix))
+            rootElem.remove(ns)
+        }
+        val xmlBytes = domDoc.serializeToString(org.orbeon.dom.io.XMLWriter.PrettyFormat).getBytes(StandardCharsets.UTF_8)
+        val base64   = Base64.getEncoder.encodeToString(xmlBytes)
+        s"data:application/xml;charset=utf-8;base64,$base64"
+    }
+
+  //@XPathFunction
+  def resetOrphanedSchemaTypes(schemaElemOrNull: NodeInfo): Int = {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+    resetOrphanedSchemaTypesInDoc(Option(schemaElemOrNull))
+  }
+
+  def resetOrphanedSchemaTypesInDoc(schemaOpt: Option[NodeInfo])(implicit ctx: FormBuilderDocContext): Int = {
+    val orphanedControlNames =
+      SchemaOps.findDanglingSchemaTypeUsages(ctx.formDefinitionRootElem, schemaOpt)
+        .map(_.controlName)
+        .distinct
+
+    orphanedControlNames.foreach { controlName =>
+      val existingDtOpt = Try(FormBuilder.DatatypeValidation.fromForm(controlName)).toOption
+      val updatedDatatype =
+        FormBuilder.DatatypeValidation.datatypeQNameFromStrings(
+          controlName    = controlName,
+          builtinTypeOpt = Some("string" -> false),
+          schemaTypeOpt  = None
+        )
+      val newDt =
+        existingDtOpt
+          .map(_.copy(datatype = updatedDatatype))
+          .getOrElse(FormBuilder.DatatypeValidation(None, updatedDatatype, None))
+
+      Try(newDt.renameControlIfNeeded(controlName, newAppearanceOpt = None))
+      FormBuilder.writeValidations(controlName, MipName.Type, List(newDt))
+    }
+
+    orphanedControlNames.size
+  }
 
   //@XPathFunction
   def countSections        (inDoc: NodeInfo): Int = FormRunner.getAllControlsWithIds(new InDocFormRunnerDocContext(inDoc)) count FormRunner.IsSection

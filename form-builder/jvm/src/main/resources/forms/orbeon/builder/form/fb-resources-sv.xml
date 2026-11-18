@@ -1158,6 +1158,21 @@
     </dialog-search>
     <dialog-upload-schema>
         <label>Ladda upp XML-schema</label>
+        <description todo="true">Attach an XML Schema (.xsd) to validate controls using custom simple types.</description>
+        <attached-label todo="true">XML Schema</attached-label>
+        <status-new todo="true">New</status-new>
+        <status-modified todo="true">Modified</status-modified>
+        <download todo="true">Download</download>
+        <replace todo="true">Replace</replace>
+        <cancel-replace todo="true">Cancel</cancel-replace>
+        <remove todo="true">Remove</remove>
+        <types-header>
+            <type todo="true">Type</type>
+            <restriction todo="true">Base / Restriction</restriction>
+            <in-use todo="true">In Use</in-use>
+        </types-header>
+        <in-use-count todo="true">{0,choice,0#—|1#1 control|1&lt;{0,number,integer} controls}</in-use-count>
+        <reset-orphaned-types todo="true">Reset data type of affected controls to String</reset-orphaned-types>
         <schema-type>
             <label>Tillgängliga schematyper</label>
             <hint>Enkla typer tillgängliga i det uppladdade schemat</hint>
@@ -1185,6 +1200,11 @@
             <no-simple-types>Schemat ser inte ut att innehålla enkla typer. Du kommer inte att kunna välja typer från detta schema för validering.</no-simple-types>
             <has-includes>Schemat innehåller import- eller include-kommandon. De används inte.</has-includes>
             <not-a-schema>Den uppladdade filen är inte ett giltigt schema.</not-a-schema>
+            <malformed-xml todo="true">The uploaded file is not well-formed XML.</malformed-xml>
+            <invalid-schema todo="true">The uploaded XML Schema contains errors: {0}</invalid-schema>
+            <pending-removal todo="true">The existing XML Schema will be removed when you click Apply.</pending-removal>
+            <readonly-empty todo="true">No XML Schema is attached to this form.</readonly-empty>
+            <orphaned-types todo="true">{0,choice,1#1 control uses an XML Schema type that is not defined|1&lt;{0,number,integer} controls use XML Schema types that are not defined}: {1}.</orphaned-types>
             <new-schema-information>Ny schemainformation</new-schema-information>
             <existing-schema-information>Existerande schemainformation</existing-schema-information>
         </messages>

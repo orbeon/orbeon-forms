@@ -1176,9 +1176,24 @@
         </open-settings>
     </dialog-search>
     <dialog-upload-schema>
-        <label>Insertion de schéma XML</label>
+        <label>Schéma XML</label>
+        <description>Joignez un schéma XML (.xsd) pour valider vos contrôles à l'aide de types simples personnalisés.</description>
+        <attached-label>Schéma XML</attached-label>
+        <status-new>Nouveau</status-new>
+        <status-modified>Modifié</status-modified>
+        <download>Télécharger</download>
+        <replace>Remplacer</replace>
+        <cancel-replace>Annuler</cancel-replace>
+        <remove>Supprimer</remove>
+        <types-header>
+            <type>Type</type>
+            <restriction>Base / Restriction</restriction>
+            <in-use>Utilisé</in-use>
+        </types-header>
+        <in-use-count>{0,choice,0#—|1#1 contrôle|1&lt;{0,number,integer} contrôles}</in-use-count>
+        <reset-orphaned-types>Réinitialiser le type de données des contrôles concernés à « Chaîne de caractères »</reset-orphaned-types>
         <schema-type>
-            <label>Types disponibles</label>
+            <label>Types simples disponibles</label>
             <hint>Types simples disponibles dans le schéma</hint>
         </schema-type>
         <namespace-uri>
@@ -1202,8 +1217,13 @@
         </upload-schema>
         <messages>
             <no-simple-types>Votre schéma ne semble pas contenir de types simples. Vous ne pourrez pas sélectionner des types provenant de ce schéma pour la validation.</no-simple-types>
-            <has-includes>Votre schéma contient des imports ou inclusions. Ceux-ci seront supprimés.</has-includes>
-            <not-a-schema>Le fichier inséré n'est pas un schéma XML valide.</not-a-schema>
+            <has-includes>Votre schéma contient des imports ou inclusions qui ont été supprimés car les inclusions externes ne sont pas prises en charge.</has-includes>
+            <not-a-schema>Le fichier inséré n'est pas un schéma XML (.xsd) valide.</not-a-schema>
+            <malformed-xml>Le fichier inséré n'est pas du XML bien formé.</malformed-xml>
+            <invalid-schema>Le schéma XML inséré contient des erreurs : {0}</invalid-schema>
+            <pending-removal>Le schéma XML existant sera supprimé lorsque vous cliquerez sur Appliquer.</pending-removal>
+            <readonly-empty>Aucun schéma XML n'est joint à ce formulaire.</readonly-empty>
+            <orphaned-types>{0,choice,1#1 contrôle utilise un type de schéma XML qui n''est pas défini|1&lt;{0,number,integer} contrôles utilisent des types de schéma XML qui ne sont pas définis} : {1}.</orphaned-types>
             <new-schema-information>Information du nouveau schéma</new-schema-information>
             <existing-schema-information>Information du schéma existant</existing-schema-information>
         </messages>

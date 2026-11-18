@@ -271,6 +271,7 @@
             <xf:action event="xxforms-xpath-error" target="#observer" class="fb-annotation" defaultAction="cancel">
                 <xf:dispatch name="fb-xxforms-xpath-error" targetid="|fr-form-model|"/>
             </xf:action>
+            <xf:action event="xxforms-binding-error" target="#observer" class="fb-annotation" defaultAction="cancel"/>
             <xf:var xmlns:ev="http://www.w3.org/2001/xml-events" name="fr-roles" value="''" class="fb-annotation"/>
             <xf:var xmlns:ev="http://www.w3.org/2001/xml-events" name="fr-mode" value="'edit'" class="fb-annotation"/>
         </xf:model>

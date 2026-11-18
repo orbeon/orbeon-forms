@@ -1152,6 +1152,21 @@
     </dialog-search>
     <dialog-upload-schema>
         <label>XML-skeeman lähettäminen</label>
+        <description todo="true">Attach an XML Schema (.xsd) to validate controls using custom simple types.</description>
+        <attached-label todo="true">XML Schema</attached-label>
+        <status-new todo="true">New</status-new>
+        <status-modified todo="true">Modified</status-modified>
+        <download todo="true">Download</download>
+        <replace todo="true">Replace</replace>
+        <cancel-replace todo="true">Cancel</cancel-replace>
+        <remove todo="true">Remove</remove>
+        <types-header>
+            <type todo="true">Type</type>
+            <restriction todo="true">Base / Restriction</restriction>
+            <in-use todo="true">In Use</in-use>
+        </types-header>
+        <in-use-count todo="true">{0,choice,0#—|1#1 control|1&lt;{0,number,integer} controls}</in-use-count>
+        <reset-orphaned-types todo="true">Reset data type of affected controls to String</reset-orphaned-types>
         <schema-type>
             <label>Saatavilla olevat skeematyypit</label>
             <hint>Yksinkertaiset, lähetetyn skeeman saatavilla olevat tyypit</hint>
@@ -1179,6 +1194,11 @@
             <no-simple-types>Skeemasi ei sisällä yksinkertaisia tyyppejä. Sinun ei ole mahdollista valita tyyppejä tästä skeemasta oikeellisuutta varten.</no-simple-types>
             <has-includes>Skeemasi sisältää tuotuja osia. Nämä kytketään pois päältä.</has-includes>
             <not-a-schema>Lähetetty tiedosto ei ole kelpaava skeema.</not-a-schema>
+            <malformed-xml todo="true">The uploaded file is not well-formed XML.</malformed-xml>
+            <invalid-schema todo="true">The uploaded XML Schema contains errors: {0}</invalid-schema>
+            <pending-removal todo="true">The existing XML Schema will be removed when you click Apply.</pending-removal>
+            <readonly-empty todo="true">No XML Schema is attached to this form.</readonly-empty>
+            <orphaned-types todo="true">{0,choice,1#1 control uses an XML Schema type that is not defined|1&lt;{0,number,integer} controls use XML Schema types that are not defined}: {1}.</orphaned-types>
             <new-schema-information>Uuden skeeman tietoja</new-schema-information>
             <existing-schema-information>Olemassaolevan skeeman tietoja</existing-schema-information>
         </messages>

@@ -154,6 +154,9 @@
                             </xf:action>
                         </xsl:for-each>
 
+                        <!-- Cancel default error behavior for binding errors (e.g. dangling XML Schema types at design time) -->
+                        <xf:action event="xxforms-binding-error" target="#observer" class="fb-annotation" defaultAction="cancel"/>
+
                         <!-- Dummy variable values so that user XPath expressions find them -->
                         <xf:var name="fr-roles" value="''" class="fb-annotation"/>
                         <xf:var name="fr-mode" value="'edit'" class="fb-annotation"/>

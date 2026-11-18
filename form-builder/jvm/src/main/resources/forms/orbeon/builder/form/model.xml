@@ -1218,24 +1218,33 @@
         </xf:action>
     </xf:action>
 
-    <!-- Schema upload dialog -->
-    <xf:instance id="fb-schema-upload-instance">
+    <!-- Schema dialog -->
+    <xf:instance id="fb-schema-upload-instance" xxf:exclude-result-prefixes="#all">
         <_>
             <schema-uri filename="" mediatype="" size=""/>
-            <schema>
-                <!-- Content will be like this -->
-                <!--<xs:schema>-->
-                    <!--...-->
-                <!--</xs:schema>-->
-            </schema>
-            <temp-type/>
+            <uploaded-filename/>
+            <dirty>false</dirty>
+            <replacing>false</replacing>
+            <has-includes>false</has-includes>
+            <error-type/>
+            <error-message/>
+            <reset-orphaned-types>false</reset-orphaned-types>
+            <download-uri/>
+            <schema/>
+            <info/>
             <apply-trigger/>
         </_>
     </xf:instance>
 
     <xf:bind ref="instance('fb-schema-upload-instance')">
-        <xf:bind ref="temp-type" readonly="true()"/>
-        <xf:bind ref="apply-trigger" readonly="$fr-mode = 'view'"/>
+        <xf:bind ref="reset-orphaned-types" type="xs:boolean" readonly="$fr-mode = 'view'"/>
+        <xf:bind
+            ref="apply-trigger"
+            readonly="
+                $fr-mode = 'view' or (
+                    ../dirty != 'true' and
+                    not(string(../reset-orphaned-types) = 'true' and exists(../info/schema-info/orphaned-usages/usage))
+                )"/>
     </xf:bind>
 
     <xf:instance id="fb-xcv-triggers-instance" xxf:index="id">

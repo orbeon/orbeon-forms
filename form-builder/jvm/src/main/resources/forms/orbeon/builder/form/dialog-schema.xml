@@ -1,169 +1,379 @@
 <!--
-  Copyright (C) 2010 Orbeon, Inc.
+    Copyright (C) 2010 Orbeon, Inc.
 
-  This program is free software; you can redistribute it and/or modify it under the terms of the
-  GNU Lesser General Public License as published by the Free Software Foundation; either version
-  2.1 of the License, or (at your option) any later version.
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU Lesser General Public License for more details.
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
 
-  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
-  -->
-<xxf:dialog xmlns:xh="http://www.w3.org/1999/xhtml"
-      xmlns:xf="http://www.w3.org/2002/xforms"
-      xmlns:xs="http://www.w3.org/2001/XMLSchema"
-      xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xi="http://www.w3.org/2001/XInclude"
-      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-      xmlns:saxon="http://saxon.sf.net/"
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xxf:dialog
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+    xmlns:upload="java:org.orbeon.oxf.xforms.control.controls.XFormsUploadControl"
 
-      id="fb-schema-upload-dialog" level="modal">
+    id="fb-schema-upload-dialog"
+    level="modal"
+    close="true"
+    draggable="true"
+    class="fb-schema-dialog">
 
     <xf:label ref="$form-resources/dialog-upload-schema/label"/>
 
-    <xf:var name="instance" value="instance('fb-schema-upload-instance')"/>
-    <xh:div>
-        <xf:group>
+    <xf:var name="instance"         value="instance('fb-schema-upload-instance')"/>
+    <xf:var name="schema-resources" value="$form-resources/dialog-upload-schema"/>
+    <xf:var name="is-readonly"      value="fr:is-readonly-mode()"/>
+    <xf:var name="has-saved-schema" value="exists($model/xs:schema)"/>
+    <xf:var name="staged-schema"    value="$instance/schema/xs:schema"/>
+    <xf:var name="has-staged"       value="exists($staged-schema)"/>
+    <xf:var name="schema-info"      value="$instance/info/schema-info"/>
+    <xf:var name="orphaned-usages"  value="$schema-info/orphaned-usages/usage"/>
+    <xf:var name="download-name"    value="if (xxf:non-blank($instance/uploaded-filename)) then string($instance/uploaded-filename) else 'schema.xsd'"/>
 
-            <!-- Schema information -->
-            <xf:var name="schema-element" value="($instance/schema/xs:schema, $model/xs:schema)[1]" as="element()?"/>
-            <xf:var name="is-existing-schema" value="exists($model/xs:schema)" as="xs:boolean"/>
-            <xf:var name="is-new-schema" value="exists($instance/schema/xs:schema)" as="xs:boolean"/>
+    <!-- Initialize staged dialog state from the current form model when opening -->
+    <xf:action event="xxforms-dialog-open" target="#observer">
+        <xf:action type="xpath">upload:deleteFileIfPossible(string($instance/schema-uri))</xf:action>
+        <xf:setvalue iterate="($instance/schema-uri, $instance/schema-uri/@*)" ref="."/>
+        <xf:setvalue ref="$instance/uploaded-filename"/>
+        <xf:setvalue ref="$instance/dirty"                value="'false'"/>
+        <xf:setvalue ref="$instance/replacing"            value="'false'"/>
+        <xf:setvalue ref="$instance/has-includes"         value="'false'"/>
+        <xf:setvalue ref="$instance/error-type"/>
+        <xf:setvalue ref="$instance/error-message"/>
+        <xf:setvalue ref="$instance/reset-orphaned-types" value="'false'"/>
+        <xf:setvalue ref="$instance/download-uri"/>
+        <xf:delete   ref="$instance/schema/*"/>
+        <xf:delete   ref="$instance/info/*"/>
 
-            <xf:group ref="$schema-element" class="fb-hide-alert">
-                <xf:label class="fb-dialog-h2" value="$form-resources/dialog-upload-schema/messages/(if ($is-new-schema) then new-schema-information else existing-schema-information)"/>
+        <xf:action if="exists($model/xs:schema)">
+            <xf:insert context="$instance/schema" origin="$model/xs:schema"/>
+            <xf:setvalue ref="$instance/download-uri" value="fbf:schemaToDownloadUri($instance/schema/xs:schema)"/>
+        </xf:action>
 
-                <xh:div class="fb-dialog-section">
-                    <xf:group ref=".[xs:simpleType]">
-                        <!-- Schema types -->
-                        <!-- NOTE: Maybe we should simply output the types with xf:output instead -->
-                        <xf:select1 ref="$instance/temp-type" appearance="compact">
-                            <xf:label ref="$form-resources/dialog-upload-schema/schema-type/label"/>
-                            <xf:hint ref="$form-resources/dialog-upload-schema/schema-type/hint"/>
-                            <xf:itemset ref="$schema-element/xs:simpleType">
-                                <xf:label ref="@name"/>
-                                <xf:value ref="@name"/>
-                            </xf:itemset>
-                        </xf:select1>
-                    </xf:group>
-                    <xf:group ref=".[not(xs:simpleType)]">
-                        <xf:label ref="$form-resources/dialog-upload-schema/schema-type/label"/>
-                        <!-- Display message when no simple types are available -->
-                        <xf:output value="$form-resources/dialog-upload-schema/messages/no-simple-types"/>
-                    </xf:group>
-                    <xf:group ref=".[@targetNamespace]">
-                        <xf:output value="@targetNamespace">
-                            <xf:label ref="$form-resources/dialog-upload-schema/namespace-uri/label"/>
-                            <xf:hint ref="$form-resources/dialog-upload-schema/namespace-uri/hint"/>
-                        </xf:output>
-                    </xf:group>
+        <xf:insert context="$instance/info" origin="fbf:schemaInfoAsXml(instance('fb-form-instance'), $instance/schema/xs:schema)"/>
+    </xf:action>
+
+    <!-- Clean up temporary state whenever the dialog closes (Apply, Cancel, X button, or Esc) -->
+    <xf:action event="xxforms-dialog-close" target="#observer">
+        <xf:action type="xpath">upload:deleteFileIfPossible(string($instance/schema-uri))</xf:action>
+        <xf:setvalue iterate="($instance/schema-uri, $instance/schema-uri/@*)" ref="."/>
+        <xf:setvalue ref="$instance/uploaded-filename"/>
+        <xf:setvalue ref="$instance/dirty"                value="'false'"/>
+        <xf:setvalue ref="$instance/replacing"            value="'false'"/>
+        <xf:setvalue ref="$instance/has-includes"         value="'false'"/>
+        <xf:setvalue ref="$instance/error-type"/>
+        <xf:setvalue ref="$instance/error-message"/>
+        <xf:setvalue ref="$instance/reset-orphaned-types" value="'false'"/>
+        <xf:setvalue ref="$instance/download-uri"/>
+        <xf:delete   ref="$instance/schema/*"/>
+        <xf:delete   ref="$instance/info/*"/>
+    </xf:action>
+
+    <xh:div class="fb-schema-dialog-body">
+
+        <!-- Empty state helper description -->
+        <xf:group ref=".[not($has-staged) and not($is-readonly)]">
+            <xh:p class="fb-schema-description">
+                <xf:output value="$schema-resources/description"/>
+            </xh:p>
+        </xf:group>
+
+        <!-- Read-only empty state -->
+        <xf:group ref=".[not($has-staged) and $is-readonly]">
+            <xh:div class="alert alert-info">
+                <xf:output value="$schema-resources/messages/readonly-empty"/>
+            </xh:div>
+        </xf:group>
+
+        <!-- Attached schema summary card -->
+        <xf:group ref=".[$has-staged]">
+            <xh:div class="fb-schema-card">
+                <xh:div class="fb-schema-card-main">
+                    <xh:i class="fa fa-fw fa-file-code-o fb-schema-card-icon" aria-hidden="true"/>
+                    <xh:div class="fb-schema-card-info">
+                        <xh:div class="fb-schema-card-title-row">
+                            <xh:span class="fb-schema-card-title">
+                                <xf:output
+                                    value="
+                                        if (xxf:non-blank($instance/uploaded-filename)) then
+                                            $instance/uploaded-filename
+                                        else
+                                            $schema-resources/attached-label"/>
+                            </xh:span>
+                            <xf:group ref=".[$instance/dirty = 'true']">
+                                <xh:span class="fb-schema-status-badge">
+                                    <xf:output
+                                        value="
+                                            if ($has-saved-schema) then
+                                                $schema-resources/status-modified
+                                            else
+                                                $schema-resources/status-new"/>
+                                </xh:span>
+                            </xf:group>
+                        </xh:div>
+                        <xf:group ref=".[xxf:non-blank($schema-info/@target-namespace)]">
+                            <xh:div class="fb-schema-namespace" title="{$schema-info/@target-namespace}">
+                                <xh:span class="fb-schema-namespace-value">
+                                    <xf:output value="$schema-info/@target-namespace"/>
+                                </xh:span>
+                                <xf:group ref=".[xxf:non-blank($schema-info/@prefix)]">
+                                    <xh:code class="fb-schema-prefix-badge">
+                                        <xf:output value="$schema-info/@prefix"/>
+                                    </xh:code>
+                                </xf:group>
+                            </xh:div>
+                        </xf:group>
+                    </xh:div>
                 </xh:div>
 
-            </xf:group>
-            <xf:group class="fb-hide-alert">
-                <xf:label class="fb-dialog-h2" ref="$form-resources/dialog-upload-schema/operations/label"/>
+                <xh:div class="fb-schema-card-actions">
+                    <xf:output
+                        appearance="xxf:download"
+                        ref="$instance/download-uri[xxf:non-blank()]"
+                        xxf:download="schema.xsd"
+                        class="fb-schema-download-link">
+                        <xf:label
+                            mediatype="text/html"
+                            value="concat('&lt;i class=&quot;fa fa-fw fa-download&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt; ', $schema-resources/download)"/>
+                        <xf:filename  ref="$download-name"/>
+                        <xf:mediatype ref="'application/xml'"/>
+                    </xf:output>
 
-                <xh:div class="fb-dialog-section">
-
-                    <!-- Delete schema button -->
-                    <xf:trigger ref=".[not($is-new-schema) and $model/xs:schema and not(fr:is-readonly-mode())]">
-                        <xf:label ref="$form-resources/dialog-upload-schema/delete-schema/label"/>
-
-                        <xf:action ev:event="DOMActivate">
-                            <!-- Delete XML Schema -->
-                            <xf:delete ref="$model/xs:schema"/>
-                            <!-- TODO: Ask for confirmation, esp. if some types are in use -->
-                            <!-- TODO: Check and adjust types that could be in use -->
+                    <xf:trigger
+                        ref=".[not($is-readonly)]"
+                        id="fb-schema-replace-trigger"
+                        class="{if ($instance/replacing = 'true') then 'fb-schema-action-btn active' else 'fb-schema-action-btn'}">
+                        <xf:label>
+                            <xh:i class="fa fa-fw fa-exchange" aria-hidden="true"/>
+                            <xh:span>
+                                <xf:output
+                                    value="
+                                        if ($instance/replacing = 'true') then
+                                            $schema-resources/cancel-replace
+                                        else
+                                            $schema-resources/replace"/>
+                            </xh:span>
+                        </xf:label>
+                        <xf:action event="DOMActivate">
+                            <xf:setvalue
+                                ref="$instance/replacing"
+                                value="if (. = 'true') then 'false' else 'true'"/>
+                            <xf:setvalue ref="$instance/error-type"/>
+                            <xf:setvalue ref="$instance/error-message"/>
                         </xf:action>
-
                     </xf:trigger>
 
-                    <!-- Upload a schema -->
-                    <fr:attachment ref="$instance/schema-uri[not(fr:is-readonly-mode())]">
-                        <xf:label
-                            value="
-                                $form-resources/dialog-upload-schema/
-                                    (if ($is-new-schema) then
-                                        change-schema
-                                    else if ($is-existing-schema) then
-                                        replace-schema
-                                    else
-                                        upload-schema)/label"/>
-
-                        <xf:filename  ref="@filename"/>
-                        <xf:mediatype ref="@mediatype"/>
-                        <xxf:size     ref="@size"/>
-
-                        <!-- Handle a successful submission -->
-                        <xf:action ev:event="xxforms-upload-done" context="$instance">
-                            <!-- Read the schema and store it -->
-                            <!-- TODO: support catching dynamic XPath error in case doc() fails -->
-                            <xf:insert context="schema" origin="doc(../schema-uri)"/>
-                            <xf:var name="schema-element" value="schema/*"/>
-                            <xf:action if="$schema-element/self::xs:schema">
-                                <!-- We got something that looks like a schema -->
-
-                                <!-- Check for inclusions -->
-                                <xf:action if="$schema-element/(xs:import | xs:include)">
-                                    <xf:message><xf:output value="$form-resources/dialog-upload-schema/messages/has-includes"/></xf:message>
-                                    <!-- Delete inclusions -->
-                                    <xf:delete ref="$schema-element/(xs:import | xs:include)"/>
-                                </xf:action>
-
-                            </xf:action>
-                            <xf:action if="not($schema-element/self::xs:schema)">
-                                <!-- Oops, this is definitely not a schema -->
-                                <xf:message><xf:output value="$form-resources/dialog-upload-schema/messages/not-a-schema"/></xf:message>
-                                <!-- Clear uploaded content -->
-                                <xf:setvalue ref="schema-uri"/>
-                                <xf:delete ref="$schema-element"/>
-                            </xf:action>
+                    <xf:trigger
+                        ref=".[not($is-readonly)]"
+                        id="fb-schema-remove-trigger"
+                        class="fb-schema-action-btn fb-schema-remove-btn">
+                        <xf:label>
+                            <xh:i class="fa fa-fw fa-trash-o" aria-hidden="true"/>
+                            <xh:span><xf:output value="$schema-resources/remove"/></xh:span>
+                        </xf:label>
+                        <xf:action event="DOMActivate">
+                            <xf:delete   ref="$instance/schema/*"/>
+                            <xf:delete   ref="$instance/info/*"/>
+                            <xf:setvalue ref="$instance/uploaded-filename"/>
+                            <xf:setvalue ref="$instance/download-uri"/>
+                            <xf:setvalue ref="$instance/replacing"    value="'false'"/>
+                            <xf:setvalue ref="$instance/has-includes" value="'false'"/>
+                            <xf:setvalue ref="$instance/error-type"/>
+                            <xf:setvalue ref="$instance/error-message"/>
+                            <xf:setvalue ref="$instance/dirty"        value="if ($has-saved-schema) then 'true' else 'false'"/>
+                            <xf:insert   context="$instance/info"     origin="fbf:schemaInfoAsXml(instance('fb-form-instance'), ())"/>
                         </xf:action>
+                    </xf:trigger>
+                </xh:div>
+            </xh:div>
+        </xf:group>
 
-                        <!-- Clear information when deselected -->
-                        <xf:action ev:event="xforms-deselect">
-                            <!-- Clear uploaded content -->
-                            <xf:setvalue ref="$instance/schema-uri"/>
-                            <xf:delete ref="$instance/schema/*"/>
-                        </xf:action>
-                    </fr:attachment>
+        <!-- Pending removal informational notice -->
+        <xf:group ref=".[not($has-staged) and $has-saved-schema and $instance/dirty = 'true']">
+            <xh:div class="alert alert-info">
+                <xh:i class="fa fa-fw fa-info-circle" aria-hidden="true"/>
+                <xf:output value="$schema-resources/messages/pending-removal"/>
+            </xh:div>
+        </xf:group>
+
+        <!-- Inline upload error banner -->
+        <xf:group ref=".[xxf:non-blank($instance/error-type)]">
+            <xh:div class="alert alert-error" role="alert">
+                <xh:i class="fa fa-fw fa-exclamation-circle" aria-hidden="true"/>
+                <xf:output
+                    value="
+                        if ($instance/error-type = 'malformed-xml') then
+                            $schema-resources/messages/malformed-xml
+                        else if ($instance/error-type = 'invalid-schema' and xxf:non-blank($instance/error-message)) then
+                            xxf:format-message($schema-resources/messages/invalid-schema, string($instance/error-message))
+                        else
+                            $schema-resources/messages/not-a-schema"/>
+            </xh:div>
+        </xf:group>
+
+        <!-- Dropzone (visible when no schema is staged, or when Replace is toggled on) -->
+        <xf:group ref=".[not($is-readonly) and (not($has-staged) or $instance/replacing = 'true')]" class="fb-hide-alert fb-schema-upload-area">
+            <fr:attachment
+                id="fb-schema-attachment"
+                ref="$instance/schema-uri"
+                accept=".xsd,application/xml,text/xml"
+                class="fr-attachment">
+                <xf:label
+                    appearance="minimal"
+                    value="if ($has-staged) then $schema-resources/replace-schema/label else $schema-resources/upload-schema/label"/>
+
+                <xf:action event="xxforms-upload-done">
+                    <xf:var name="uploaded-name" value="string($instance/schema-uri/@filename)"/>
+                    <xf:var name="parsed"        value="fbf:parseUploadedSchema(string($instance/schema-uri))"/>
+
+                    <!-- Immediately clean up temporary upload binding so fr:attachment stays a clean dropzone -->
+                    <xf:action type="xpath">upload:deleteFileIfPossible(string($instance/schema-uri))</xf:action>
+                    <xf:setvalue iterate="($instance/schema-uri, $instance/schema-uri/@*)" ref="."/>
+
+                    <xf:action if="$parsed/@valid = 'true'">
+                        <xf:delete   ref="$instance/schema/*"/>
+                        <xf:delete   ref="$instance/info/*"/>
+                        <xf:insert   context="$instance/schema" origin="$parsed/xs:schema"/>
+                        <xf:setvalue ref="$instance/uploaded-filename" value="$uploaded-name"/>
+                        <xf:setvalue ref="$instance/dirty"             value="'true'"/>
+                        <xf:setvalue ref="$instance/replacing"         value="'false'"/>
+                        <xf:setvalue ref="$instance/has-includes"      value="string($parsed/@has-includes)"/>
+                        <xf:setvalue ref="$instance/error-type"/>
+                        <xf:setvalue ref="$instance/error-message"/>
+                        <xf:setvalue ref="$instance/download-uri"      value="fbf:schemaToDownloadUri($instance/schema/xs:schema)"/>
+                        <xf:insert   context="$instance/info"          origin="fbf:schemaInfoAsXml(instance('fb-form-instance'), $instance/schema/xs:schema)"/>
+                    </xf:action>
+
+                    <xf:action if="$parsed/@valid != 'true'">
+                        <xf:setvalue ref="$instance/error-type"    value="string($parsed/@error-type)"/>
+                        <xf:setvalue ref="$instance/error-message" value="string($parsed/@error-message)"/>
+                    </xf:action>
+                </xf:action>
+            </fr:attachment>
+        </xf:group>
+
+        <!-- Warning when xs:import / xs:include / xs:redefine were stripped -->
+        <xf:group ref=".[$instance/has-includes = 'true']">
+            <xh:div class="alert alert-warning">
+                <xh:i class="fa fa-fw fa-exclamation-triangle" aria-hidden="true"/>
+                <xf:output value="$schema-resources/messages/has-includes"/>
+            </xh:div>
+        </xf:group>
+
+        <!-- Available Simple Types table / empty-types notice -->
+        <xf:group ref=".[$has-staged]" class="fb-schema-types-section">
+            <xf:var name="simple-types" value="$schema-info/simple-types/simple-type"/>
+
+            <xf:group ref=".[exists($simple-types)]">
+                <xh:div class="fb-schema-section-header">
+                    <xh:span class="fb-schema-section-title">
+                        <xf:output value="$schema-resources/schema-type/label"/>
+                    </xh:span>
+                    <xh:span class="fb-schema-count-pill">
+                        <xf:output value="count($simple-types)"/>
+                    </xh:span>
+                </xh:div>
+
+                <xh:div class="fr-table-frame fb-schema-types-table-frame">
+                    <xh:table class="table fb-schema-types-table">
+                        <xh:thead>
+                            <xh:tr>
+                                <xh:th scope="col"><xf:output value="$schema-resources/types-header/type"/></xh:th>
+                                <xh:th scope="col"><xf:output value="$schema-resources/types-header/restriction"/></xh:th>
+                                <xh:th scope="col"><xf:output value="$schema-resources/types-header/in-use"/></xh:th>
+                            </xh:tr>
+                        </xh:thead>
+                        <xh:tbody>
+                            <xf:repeat ref="$simple-types">
+                                <xh:tr>
+                                    <xh:td class="fb-schema-col-type" title="{@qualified-name}">
+                                        <xh:code><xf:output value="@qualified-name"/></xh:code>
+                                    </xh:td>
+                                    <xh:td class="fb-schema-col-restriction" title="{@restriction}">
+                                        <xf:output value="@restriction"/>
+                                    </xh:td>
+                                    <xh:td class="fb-schema-col-in-use" title="{@used-by}">
+                                        <xh:span class="{if (xs:integer(@used-count) gt 0) then 'fb-schema-in-use-pill' else 'fb-schema-unused'}">
+                                            <xf:output value="xxf:format-message($schema-resources/in-use-count, xs:integer(@used-count))"/>
+                                        </xh:span>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
+                    </xh:table>
                 </xh:div>
             </xf:group>
 
+            <xf:group ref=".[empty($simple-types)]">
+                <xh:div class="alert alert-warning">
+                    <xh:i class="fa fa-fw fa-exclamation-triangle" aria-hidden="true"/>
+                    <xf:output value="$schema-resources/messages/no-simple-types"/>
+                </xh:div>
+            </xf:group>
         </xf:group>
+
+        <!-- Warning & optional reset-to-String checkbox when controls reference dangling XML Schema types -->
+        <xf:group ref=".[exists($orphaned-usages)]">
+            <xh:div class="alert alert-warning fb-schema-orphaned-warning">
+                <xh:div class="fb-schema-orphaned-message">
+                    <xh:i class="fa fa-fw fa-exclamation-triangle" aria-hidden="true"/>
+                    <xh:span>
+                        <xf:output
+                            value="
+                                xxf:format-message(
+                                    $schema-resources/messages/orphaned-types,
+                                    (
+                                        xs:integer($schema-info/@orphaned-controls-count),
+                                        string($schema-info/@orphaned-summary)
+                                    )
+                                )"/>
+                    </xh:span>
+                </xh:div>
+                <xf:group ref=".[not($is-readonly)]" class="fb-schema-reset-option">
+                    <fr:checkbox-input id="fb-schema-reset-orphaned-checkbox" ref="$instance/reset-orphaned-types">
+                        <xf:label ref="$schema-resources/reset-orphaned-types"/>
+                    </fr:checkbox-input>
+                </xf:group>
+            </xh:div>
+        </xf:group>
+
     </xh:div>
+
     <xh:div class="fr-dialog-buttons">
         <xf:group appearance="xxf:internal">
             <xf:trigger id="fb-edit-schema-trigger" appearance="xxf:primary" ref="$instance/apply-trigger">
                 <xf:label ref="$form-resources/apply/label"/>
 
-                <xf:action ev:event="DOMActivate">
-                    <!-- Insert schema into the model -->
+                <xf:action event="DOMActivate">
+                    <!-- Optionally reset orphaned controls' data types back to xs:string -->
+                    <xf:action
+                        if="string($instance/reset-orphaned-types) = 'true' and exists($orphaned-usages)"
+                        type="xpath">
+                        fbf:resetOrphanedSchemaTypes($instance/schema/xs:schema)
+                    </xf:action>
 
-                    <!-- Delete existing XML Schema if any -->
-                    <!-- TODO: What we want in fact is to disable this button if there is an existing schema, and the user will explicitly remove the previous schema -->
-                    <xf:delete ref="$model/xs:schema"/>
+                    <!-- Commit staged schema changes to the form model -->
+                    <xf:action if="$instance/dirty = 'true'">
+                        <xf:delete ref="$model/xs:schema"/>
+                        <xf:insert if="exists($instance/schema/xs:schema)" context="$model" origin="$instance/schema/xs:schema"/>
+                    </xf:action>
 
-                    <xf:insert context="$model" origin="$instance/schema/*"/>
+                    <xxf:hide dialog="fb-schema-upload-dialog"/>
                 </xf:action>
-
             </xf:trigger>
             <xf:output value="$form-resources/or/label"/>
-            <xf:trigger appearance="minimal">
+            <xf:trigger id="fb-cancel-schema-trigger" appearance="minimal">
                 <xf:label ref="$form-resources/cancel/label"/>
+                <xxf:hide event="DOMActivate" dialog="fb-schema-upload-dialog"/>
             </xf:trigger>
-
-            <xf:action ev:event="DOMActivate">
-                <!-- Hide dialog -->
-                <xxf:hide dialog="fb-schema-upload-dialog"/>
-                <!-- Clear uploaded content -->
-                <xf:setvalue ref="$instance/schema-uri"/>
-                <xf:delete ref="$instance/schema/*"/>
-            </xf:action>
         </xf:group>
     </xh:div>
 </xxf:dialog>

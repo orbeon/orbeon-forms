@@ -13,20 +13,21 @@
   */
 package org.orbeon.oxf.xforms.model
 
-import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.processor.validation.SchemaValidationException
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{Logging, XPath}
 import org.orbeon.oxf.xforms.XFormsProperties.{EmailDomainRegexProperty, EmailLocalPartRegexProperty}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.XPathMIP
 import org.orbeon.oxf.xforms.analysis.model.{MipName, Types}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
+import org.orbeon.oxf.xforms.event.events.XXFormsBindingErrorEvent
 import org.orbeon.oxf.xforms.model.XFormsModelBinds.*
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants, XMLParsing}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.NodeInfoConversions.unsafeUnwrapElement
-import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.{BindingErrorReason, XFormsNames}
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xml.NamespaceMapping
 import org.w3c.dom.Node
@@ -54,7 +55,7 @@ trait ValidationBindOps extends Logging {
       if (staticModel.hasTypeBind || staticModel.hasRequiredBind)
         iterateBinds(topLevelBinds, bindNode =>
           if (bindNode.staticBind.dataType.isDefined || bindNode.staticBind.hasXPathMIP(MipName.Required))
-            validateTypeAndRequired(bindNode, invalidInstances)
+            validateTypeAndRequired(bindNode, invalidInstances, collector)
         )
 
       // 2. Validate constraints
@@ -92,7 +93,11 @@ trait ValidationBindOps extends Logging {
       EmailValidator(localPartRegexOpt, domainRegexOpt)
     }
 
-    def validateTypeAndRequired(bindNode: BindNode, invalidInstances: m.Set[String]): Unit = {
+    def validateTypeAndRequired(
+      bindNode         : BindNode,
+      invalidInstances : m.Set[String],
+      collector        : ErrorEventCollector
+    ): Unit = {
 
       val staticBind = bindNode.staticBind
 
@@ -134,7 +139,7 @@ trait ValidationBindOps extends Logging {
               requiredMIPOpt.isDefined && dependencies.requireModelMIPUpdate(model, staticBind, MipName.Required, null)) {
               // Compute new type validity if the value of the node might have changed OR the value of requiredness
               // might have changed
-              val typeValidity = validateType(bindNode.parentBind, currentNodeInfo, isRequired)
+              val typeValidity = validateType(bindNode.parentBind, currentNodeInfo, isRequired, collector)
               bindNode.setTypeValid(typeValidity, staticBind.typeMIPOpt.get)
               typeValidity
             } else {
@@ -160,7 +165,12 @@ trait ValidationBindOps extends Logging {
       }
     }
 
-    def validateType(bind: RuntimeBind, currentNodeInfo: om.NodeInfo, required: Boolean): Boolean = {
+    def validateType(
+      bind            : RuntimeBind,
+      currentNodeInfo : om.NodeInfo,
+      required        : Boolean,
+      collector       : ErrorEventCollector
+    ): Boolean = {
 
       val staticBind = bind.staticBind
 
@@ -181,9 +191,20 @@ trait ValidationBindOps extends Logging {
       val isBuiltInXFormsType  = XFormsNames.XFORMS_NAMESPACE_URI == typeNamespaceURI
       val isBuiltInXXFormsType = XFormsNames.XXFORMS_NAMESPACE_URI == typeNamespaceURI
 
-      // TODO: Check what XForms event must be dispatched.
-      def throwError() =
-        throw new ValidationException(s"Invalid schema type `${typeQName.qualifiedName}`", staticBind.locationData)
+      def dispatchBindingError(message: String): Boolean = {
+        collector(
+          new XXFormsBindingErrorEvent(
+            target          = bind.model,
+            locationDataOpt = Option(staticBind.locationData),
+            reason          = BindingErrorReason.Other(message)
+          )
+        )
+
+        ! Types.DEFAULT_VALID
+      }
+
+      def invalidSchemaTypeError(): Boolean =
+        dispatchBindingError(s"Invalid schema type `${typeQName.qualifiedName}`")
 
       if (isBuiltInXFormsType && nodeValue.isEmpty) {
         // Don't consider the node invalid if the string is empty with `xf:*` types
@@ -211,8 +232,7 @@ trait ValidationBindOps extends Logging {
         // Is that expected?
         val stringValue = StringValue.makeStringValue(nodeValue)
         SaxonUtils.convertType(stringValue, typeLocalname, XPath.GlobalConfiguration)
-          .getOrElse(throwError())
-          .isDefined
+          .fold(_ => invalidSchemaTypeError(), _.isDefined)
       } else if (isBuiltInXXFormsType) {
         // Built-in extension types
 
@@ -246,23 +266,28 @@ trait ValidationBindOps extends Logging {
             isOptionalAndEmpty
           }
         } else {
-          throwError()
+          invalidSchemaTypeError()
         }
       } else if (model.hasSchema) {
         // Other type and there is a schema
 
         // There are possibly types defined in the schema
-        val validationError = model.schemaValidator.validateDatatype(
-          nodeValue,
-          typeNamespaceURI,
-          typeLocalname,
-          typeQName.qualifiedName,
-          staticBind.locationData
-        )
+        try {
+          val validationError = model.schemaValidator.validateDatatype(
+            nodeValue,
+            typeNamespaceURI,
+            typeLocalname,
+            typeQName.qualifiedName,
+            staticBind.locationData
+          )
 
-        validationError eq null
+          validationError eq null
+        } catch {
+          case e: SchemaValidationException =>
+            dispatchBindingError(Option(e.getMessage).getOrElse(s"Invalid schema type `${typeQName.qualifiedName}`"))
+        }
       } else {
-        throwError()
+        invalidSchemaTypeError()
       }
     }
 

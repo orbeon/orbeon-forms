@@ -544,6 +544,8 @@
             <store-entries>entrées</store-entries>
             <processors>Processeurs</processors>
             <non-heap>Hors-tas utilisé</non-heap>
+            <sort-ascending>ordre croissant</sort-ascending>
+            <sort-descending>ordre décroissant</sort-descending>
         </labels>
         <buttons>
             <refresh>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Rafraîchir</refresh>
@@ -553,6 +555,7 @@
             <no-static-states>Aucun état statique XForms n'est actuellement en cache mémoire.</no-static-states>
             <no-live-documents>Aucun document XForms actif n'est actuellement dans le tas JVM.</no-live-documents>
             <live-documents-note>Seuls les documents présents dans le tas JVM (en cache dans xforms.cache.live-documents ou en cours de requête) figurent ci-dessous. Les formulaires ouverts évincés lorsque ce cache atteint sa limite restent actifs dans xforms.store.dynamic-states et sont restaurés automatiquement lors d'une interaction.</live-documents-note>
+            <sorted-announcement>Trié par {0}, {1}</sorted-announcement>
         </messages>
         <cache-descriptions>
             <core-cache-pipelines title="Cache pipelines et ressources">Conserve en mémoire les pipelines XPL compilés, feuilles XSLT et fichiers XML analysés afin d'éviter de les relire à chaque requête. Les entrées sont invalidées automatiquement lorsqu'une ressource change, et vider ce cache est sans risque.</core-cache-pipelines>

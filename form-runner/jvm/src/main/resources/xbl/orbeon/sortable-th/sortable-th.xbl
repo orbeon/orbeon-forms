@@ -49,11 +49,12 @@
 
             <xf:var name="sort-supported"  value="string(fr:component-param-value('sort-supported')) != 'false'"/> <!-- Default: true -->
             <xf:var name="local-or-remote" value="fr:component-param-value('local-or-remote')"/>
+            <xf:var name="table"           value="fr:component-param-value('table')"/>
             <xf:var name="column"          value="fr:component-param-value('column')"/>
 
             <xf:var
                 name="no-caret"
-                value="$instance/local-or-remote != $local-or-remote or $instance/column != $column or not($sort-supported)"/>
+                value="$instance/local-or-remote != $local-or-remote or $instance/table != $table or $instance/column != $column or not($sort-supported)"/>
 
             <xf:var name="is-sorted"         value="not($no-caret)"/>
             <xf:var name="default-direction" value="if ($column = ('created', 'last-modified')) then 'desc' else 'asc'"/>
@@ -79,9 +80,18 @@
                 </xf:dispatch>
             </xf:var>
 
+            <xf:var
+                name="plain-label"
+                value="
+                    if ($label/@mediatype = 'text/html' or contains($label, '&lt;')) then
+                        frf:removeHtmlTags($label)
+                    else
+                        string($label)
+                "/>
+
             <xf:trigger appearance="minimal" class="{'fr-sortable-th'[$sort-supported]}">
                 <xf:label>
-                    <xf:output value="frf:removeHtmlTags($label)"/>
+                    <xf:output value="$plain-label"/>
                     <xh:span
                         class="{
                             'caret-container',
@@ -96,7 +106,9 @@
                 <xf:action event="DOMActivate" if="$sort-supported">
                     <xf:dispatch name="fr-order-by" targetid="fr-form-model" xxbl:scope="outer">
                         <xf:property name="local-or-remote" value="$local-or-remote" xxbl:scope="inner"/>
+                        <xf:property name="table"           value="$table"           xxbl:scope="inner"/>
                         <xf:property name="column"          value="$column"          xxbl:scope="inner"/>
+                        <xf:property name="label"           value="$plain-label"     xxbl:scope="inner"/>
                     </xf:dispatch>
                 </xf:action>
             </xf:trigger>

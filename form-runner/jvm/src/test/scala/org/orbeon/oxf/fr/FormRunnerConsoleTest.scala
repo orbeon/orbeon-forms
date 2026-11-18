@@ -17,7 +17,9 @@ import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.test.TestHttpClient.StaticState
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, TestHttpClient}
 import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsTriggerControl}
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsDocumentCache, XFormsStateManager, XFormsStaticStateCache}
+import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -61,7 +63,10 @@ class FormRunnerConsoleTest
       assert(jvmElem.isDefined)
       assert(jvmElem.get.attributeValue("heap-max-bytes").toLong > 0L)
       assert(jvmElem.get.attributeValue("estimated-caches-heap-bytes").toLong > 0L)
-      assert(jvmElem.get.element("memory-pools").elements("pool").nonEmpty)
+      val poolElems = jvmElem.get.element("memory-pools").elements("pool").toList
+      assert(poolElems.nonEmpty)
+      assert(poolElems.forall(p => p.attributeValue("committed-bytes").toLongOption.isDefined))
+      assert(poolElems.forall(p => p.attributeValue("max-bytes").toLongOption.isDefined))
 
       // 2. Unified caches section (all 12 standardized `<domain>.<cache|store>.<subject>` names)
       val cacheElems = root.element("caches").elements("cache").toList
@@ -80,6 +85,13 @@ class FormRunnerConsoleTest
       assert(cacheNames.contains("xforms.store.dynamic-states"))
       assert(cacheNames.contains("xforms.store.static-states"))
       assert(cacheElems.forall(_.attributeValue("canonical-key").nonEmpty))
+      // Every `<cache>` element must carry raw numeric sort attributes so `/fr/console` never sorts formatted strings
+      assert(cacheElems.forall(e => e.attributeValue("total-entries-raw").toLongOption.isDefined))
+      assert(cacheElems.forall(e => e.attributeValue("max-entries-raw").toLongOption.isDefined))
+      assert(cacheElems.forall(e => e.attributeValue("disk-bytes-raw").toLongOption.isDefined))
+      assert(cacheElems.forall(e => e.attributeValue("hits-raw").toLongOption.isDefined))
+      assert(cacheElems.forall(e => e.attributeValue("hit-rate-raw").toDoubleOption.isDefined))
+      assert(cacheElems.forall(e => e.attributeValue("evictions-raw").toLongOption.isDefined))
 
       val stateStoreElem = cacheElems.find(_.attributeValue("name") == "xforms.store.dynamic-states").get
       // Statistics must be enabled on Infinispan `xforms.store.dynamic-states`
@@ -107,7 +119,11 @@ class FormRunnerConsoleTest
           .find(e => e.attributeValue("app") == "tests" && e.attributeValue("form") == "wizard")
       assert(wizardStaticOpt.isDefined)
       assert(wizardStaticOpt.get.attributeValue("controls").toInt > 0)
+      assert(wizardStaticOpt.get.attributeValue("template-bytes").toLong > 0L)
+      assert(wizardStaticOpt.get.attributeValue("static-dom-bytes").toLong > 0L)
+      assert(wizardStaticOpt.get.attributeValue("encoded-bytes").toLong > 0L)
       assert(wizardStaticOpt.get.attributeValue("estimated-bytes").toLong > 0L)
+      assert(wizardStaticOpt.get.attributeValue("idle-ms").toLong >= 0L)
 
       // 4. Live documents drill-down (cached state + cache limit & state-store context)
       val liveDocsElem = root.element("live-documents")
@@ -124,6 +140,7 @@ class FormRunnerConsoleTest
           .find(_.attributeValue("request-path").contains("/fr/tests/wizard/new"))
       assert(wizardDocOpt.isDefined)
       assert(wizardDocOpt.get.attributeValue("status") == "cached")
+      assert(wizardDocOpt.get.attributeValue("idle-ms").toLong >= 0L)
 
       // 4b. Checked-out (in-flight Ajax update) and initializing documents must remain visible as `in-request`
       val wizardDoc = docOpt.get
@@ -143,6 +160,7 @@ class FormRunnerConsoleTest
             .find(_.attributeValue("uuid") == wizardDoc.uuid)
         assert(inFlightWizardOpt.isDefined)
         assert(inFlightWizardOpt.get.attributeValue("status") == "in-request")
+        assert(inFlightWizardOpt.get.attributeValue("idle-ms") == "-1")
         assert(inFlightWizardOpt.get.attributeValue("idle-formatted") == "—")
       } finally {
         XFormsStateManager.unregisterInFlightDocument(wizardDoc.uuid)
@@ -187,6 +205,184 @@ class FormRunnerConsoleTest
       val staticStateTraceOpt = eventsAfterClear.collectFirst { case s: StaticState => s }
       assert(staticStateTraceOpt.exists(s => ! s.read && s.found))
       assert(XFormsStaticStateCache.findDocument(staticStateTraceOpt.get.digest).isDefined)
+    }
+
+    it("must sort console tables by column ascending and descending on raw numeric and text keys via fr:sortable-th") {
+      val consoleTestDom =
+        <xh:html
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:xf="http://www.w3.org/2002/xforms"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xh:head>
+            <xf:model
+                id="fr-form-model"
+                xxf:xpath-analysis="true"
+                xxf:expose-xpath-types="true"
+                xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+              <xf:instance id="fr-parameters-instance">
+                <parameters>
+                  <app>orbeon</app>
+                  <form>console</form>
+                  <form-version>1</form-version>
+                  <mode>console</mode>
+                </parameters>
+              </xf:instance>
+              <xf:instance id="fr-console-instance" xxf:exclude-result-prefixes="#all">
+                <console>
+                  <caches count="3">
+                    <!-- Deliberately craft formatted strings whose alphabetical order ('40.2 KB' > '30.1 MB' > '3.5 MB')
+                         differs from raw byte order (41164 < 3670016 < 31562137) -->
+                    <cache name="xforms.store.asset-bundles"  engine="Infinispan (Heap + Disk)" heap-entries="12"  total-entries-raw="12"  max-entries-raw="200"  estimated-heap-bytes="41164"    estimated-heap-formatted="40.2 KB" disk-bytes-raw="279"   hits-raw="0"    hit-rate-raw="-1"   evictions-raw="0"/>
+                    <cache name="core.cache.pipelines"        engine="ObjectCache (JVM Heap)"   heap-entries="875" total-entries-raw="875" max-entries-raw="1000" estimated-heap-bytes="31562137" estimated-heap-formatted="30.1 MB" disk-bytes-raw="-1"    hits-raw="4548" hit-rate-raw="83.7" evictions-raw="0"/>
+                    <cache name="xforms.cache.live-documents" engine="ObjectCache (JVM Heap)"   heap-entries="2"   total-entries-raw="2"   max-entries-raw="50"   estimated-heap-bytes="3670016"  estimated-heap-formatted="3.5 MB"  disk-bytes-raw="-1"    hits-raw="6"    hit-rate-raw="100"  evictions-raw="3"/>
+                  </caches>
+                </console>
+              </xf:instance>
+              <xf:instance id="fr-console-sort-instance" xxf:exclude-result-prefixes="#all">
+                <sort>
+                  <announcement/>
+                  <table id="caches">
+                    <column>name</column>
+                    <direction>asc</direction>
+                  </table>
+                </sort>
+              </xf:instance>
+              <xf:instance id="labels-instance" xxf:exclude-result-prefixes="#all">
+                <labels>
+                  <cache-name>Cache / Store</cache-name>
+                  <est-heap>Est. Heap</est-heap>
+                  <limits>Limits &amp; Expiration</limits>
+                  <sorted-announcement>Sorted by {{0}}, {{1}}</sorted-announcement>
+                  <sort-ascending>ascending</sort-ascending>
+                  <sort-descending>descending</sort-descending>
+                </labels>
+              </xf:instance>
+              <xf:action event="fr-order-by">
+                <xf:var name="table-id"   value="string(event('table'))"/>
+                <xf:var name="column"     value="string(event('column'))"/>
+                <xf:var name="col-label"  value="string(event('label'))"/>
+                <xf:var name="table-sort" value="instance('fr-console-sort-instance')/table[@id = $table-id]"/>
+                <xf:action if="exists($table-sort)">
+                  <xf:var
+                      name="next-dir"
+                      value="
+                          if ($table-sort/column = $column) then
+                              (if ($table-sort/direction = 'asc') then 'desc' else 'asc')
+                          else
+                              'asc'"/>
+                  <xf:setvalue ref="$table-sort/column"    value="$column"/>
+                  <xf:setvalue ref="$table-sort/direction" value="$next-dir"/>
+                  <xf:setvalue
+                      ref="instance('fr-console-sort-instance')/announcement"
+                      value="
+                          xxf:format-message(
+                              instance('labels-instance')/sorted-announcement,
+                              (
+                                  $col-label,
+                                  if ($next-dir = 'asc') then
+                                      string(instance('labels-instance')/sort-ascending)
+                                  else
+                                      string(instance('labels-instance')/sort-descending)
+                              )
+                          )"/>
+                </xf:action>
+              </xf:action>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <xf:group ref="instance('fr-console-instance')">
+              <xf:var name="c"                value="."/>
+              <xf:var name="caches-sort"      value="instance('fr-console-sort-instance')/table[@id = 'caches']"/>
+              <xf:var name="caches-col"       value="string($caches-sort/column)"/>
+              <xf:var name="caches-dir"       value="if ($caches-sort/direction = 'desc') then 'descending' else 'ascending'"/>
+              <xf:var name="caches-data-type" value="if ($caches-col = ('name', 'engine')) then 'text' else 'number'"/>
+              <xh:table>
+                <xh:thead>
+                  <xh:tr>
+                    <fr:sortable-th id="th-name"   label="instance('labels-instance')/cache-name" instance="$caches-sort" table="caches" column="name"/>
+                    <fr:sortable-th id="th-limits" label="instance('labels-instance')/limits"     instance="$caches-sort" table="caches" column="limits"/>
+                    <fr:sortable-th id="th-heap"   label="instance('labels-instance')/est-heap"   instance="$caches-sort" table="caches" column="estimated-heap"/>
+                  </xh:tr>
+                </xh:thead>
+                <xh:tbody>
+                  <xf:repeat
+                      id="caches-repeat"
+                      ref="
+                          xxf:sort(
+                              $c/caches/cache,
+                              if      ($caches-col = 'limits')         then xs:double(@max-entries-raw)
+                              else if ($caches-col = 'estimated-heap') then xs:double(@estimated-heap-bytes)
+                              else                                          lower-case(string(@name)),
+                              $caches-data-type,
+                              $caches-dir
+                          )">
+                    <xh:tr>
+                      <xh:td><xf:output id="row-name" value="@name"/></xh:td>
+                    </xh:tr>
+                  </xf:repeat>
+                </xh:tbody>
+              </xh:table>
+            </xf:group>
+          </xh:body>
+        </xh:html>.toDocument
+
+      withTestExternalContext { implicit ec =>
+        withXFormsDocument(consoleTestDom) { doc =>
+          withActionAndDoc(doc) {
+
+            def currentRowNames: List[String] = {
+              val repeat = doc.getControlByEffectiveId("caches-repeat").asInstanceOf[XFormsRepeatControl]
+              (1 to repeat.getSize).map(idx => getControlValue(s"row-name⊙$idx")).toList
+            }
+
+            def currentAnnouncement: String =
+              instance("fr-console-sort-instance").get.underlyingDocumentOpt.get.getRootElement.element("announcement").getText
+
+            def findInnerSortTriggerId(thPrefix: String): String =
+              doc.controls.getCurrentControlTree.effectiveIdsToControls
+                .collectFirst {
+                  case (id, _: XFormsTriggerControl) if id.startsWith(s"$thPrefix≡") => id
+                }
+                .getOrElse(throw new NoSuchElementException(s"Trigger not found under $thPrefix"))
+
+            // Initial alphabetical order (`name` asc)
+            assert(currentRowNames == List(
+              "core.cache.pipelines",
+              "xforms.cache.live-documents",
+              "xforms.store.asset-bundles"
+            ))
+
+            // 1st click on Est. Heap: sorts ascending by raw bytes (40.2 KB < 3.5 MB < 30.1 MB)
+            activateControlWithEvent(findInnerSortTriggerId("th-heap"))
+            assert(currentRowNames == List(
+              "xforms.store.asset-bundles",
+              "xforms.cache.live-documents",
+              "core.cache.pipelines"
+            ))
+            assert(currentAnnouncement == "Sorted by Est. Heap, ascending")
+
+            // 2nd click on Est. Heap: toggles to descending (30.1 MB > 3.5 MB > 40.2 KB)
+            activateControlWithEvent(findInnerSortTriggerId("th-heap"))
+            assert(currentRowNames == List(
+              "core.cache.pipelines",
+              "xforms.cache.live-documents",
+              "xforms.store.asset-bundles"
+            ))
+            assert(currentAnnouncement == "Sorted by Est. Heap, descending")
+
+            // Switching to Limits & Expiration starts ascending again on numeric max entries (50 < 200 < 1000)
+            activateControlWithEvent(findInnerSortTriggerId("th-limits"))
+            assert(currentRowNames == List(
+              "xforms.cache.live-documents",
+              "xforms.store.asset-bundles",
+              "core.cache.pipelines"
+            ))
+            assert(currentAnnouncement == "Sorted by Limits & Expiration, ascending")
+          }
+        }
+      }
     }
   }
 }

@@ -540,6 +540,8 @@
             <store-entries>entries</store-entries>
             <processors>Processors</processors>
             <non-heap>Non-Heap Used</non-heap>
+            <sort-ascending>ascending</sort-ascending>
+            <sort-descending>descending</sort-descending>
         </labels>
         <buttons>
             <refresh>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Refresh</refresh>
@@ -549,6 +551,7 @@
             <no-static-states>No XForms static states are currently cached in memory.</no-static-states>
             <no-live-documents>No live XForms documents are currently in JVM heap.</no-live-documents>
             <live-documents-note>Only documents currently in JVM heap (cached in xforms.cache.live-documents or actively handling a request) appear below. Open forms evicted when this cache reaches its limit remain active in xforms.store.dynamic-states and rehydrate automatically on interaction.</live-documents-note>
+            <sorted-announcement>Sorted by {0}, {1}</sorted-announcement>
         </messages>
         <cache-descriptions>
             <core-cache-pipelines title="Pipeline &amp; Resource Cache">Caches compiled XPL pipelines, XSLT stylesheets, and parsed XML configuration files in memory so Orbeon Forms does not have to re-parse them on every request. Entries are automatically invalidated whenever an underlying resource changes, and clearing this cache is safe.</core-cache-pipelines>

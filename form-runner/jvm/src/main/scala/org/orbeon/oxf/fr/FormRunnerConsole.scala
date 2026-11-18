@@ -228,6 +228,7 @@ object FormRunnerConsole {
             sequence       = xfcd.sequence,
             controlCount   = xfcd.liveControlCount,
             estimatedBytes = entry.estimatedBytes,
+            idleMs         = math.max(0L, nowMs - entry.lastAccessedAtMs),
             idleFormatted  = formatDurationMs(math.max(0L, nowMs - entry.lastAccessedAtMs)),
             status         = "cached"
           )
@@ -269,6 +270,7 @@ object FormRunnerConsole {
             sequence       = info.sequence,
             controlCount   = info.controlCount,
             estimatedBytes = info.estimatedBytes,
+            idleMs         = -1L,
             idleFormatted  = "—",
             status         = "in-request"
           )
@@ -314,30 +316,39 @@ object FormRunnerConsole {
     jvmElem.addAttribute("active-document-locks",         XFormsStateManager.activeDocumentLocksCount.toString)
 
     val poolsElem = jvmElem.addElement("memory-pools")
-    ManagementFactory.getMemoryPoolMXBeans.asScala.foreach { pool =>
-      Option(pool.getUsage).foreach { usage =>
-        val pElem = poolsElem.addElement("pool")
-        val used  = math.max(0L, usage.getUsed)
-        val max   = usage.getMax
-        pElem.addAttribute("name",           pool.getName)
-        pElem.addAttribute("type",           if (pool.getType == MemoryType.HEAP) "Heap" else "Non-Heap")
-        pElem.addAttribute("used-bytes",     used.toString)
-        pElem.addAttribute("used-formatted", formatBytes(used))
-        pElem.addAttribute("committed-formatted", formatBytes(math.max(0L, usage.getCommitted)))
-        pElem.addAttribute("max-formatted",  if (max > 0) formatBytes(max) else "Unbounded")
+    ManagementFactory.getMemoryPoolMXBeans.asScala
+      .toList
+      .sortBy(p => Option(p.getName).getOrElse("").toLowerCase(Locale.ROOT))
+      .foreach { pool =>
+        Option(pool.getUsage).foreach { usage =>
+          val pElem     = poolsElem.addElement("pool")
+          val used      = math.max(0L, usage.getUsed)
+          val committed = math.max(0L, usage.getCommitted)
+          val max       = usage.getMax
+          pElem.addAttribute("name",                pool.getName)
+          pElem.addAttribute("type",                if (pool.getType == MemoryType.HEAP) "Heap" else "Non-Heap")
+          pElem.addAttribute("used-bytes",          used.toString)
+          pElem.addAttribute("used-formatted",      formatBytes(used))
+          pElem.addAttribute("committed-bytes",     committed.toString)
+          pElem.addAttribute("committed-formatted", formatBytes(committed))
+          pElem.addAttribute("max-bytes",           (if (max > 0L) max else 9007199254740991L).toString)
+          pElem.addAttribute("max-formatted",       if (max > 0L) formatBytes(max) else "Unbounded")
+        }
       }
-    }
 
     val gcsElem = jvmElem.addElement("garbage-collectors")
-    ManagementFactory.getGarbageCollectorMXBeans.asScala.foreach { gc =>
-      val gcElem = gcsElem.addElement("gc")
-      val count  = math.max(0L, gc.getCollectionCount)
-      val timeMs = math.max(0L, gc.getCollectionTime)
-      gcElem.addAttribute("name",                gc.getName)
-      gcElem.addAttribute("collection-count",    count.toString)
-      gcElem.addAttribute("collection-time-ms",  timeMs.toString)
-      gcElem.addAttribute("collection-time-formatted", formatDurationMs(timeMs))
-    }
+    ManagementFactory.getGarbageCollectorMXBeans.asScala
+      .toList
+      .sortBy(gc => Option(gc.getName).getOrElse("").toLowerCase(Locale.ROOT))
+      .foreach { gc =>
+        val gcElem = gcsElem.addElement("gc")
+        val count  = math.max(0L, gc.getCollectionCount)
+        val timeMs = math.max(0L, gc.getCollectionTime)
+        gcElem.addAttribute("name",                      gc.getName)
+        gcElem.addAttribute("collection-count",          count.toString)
+        gcElem.addAttribute("collection-time-ms",        timeMs.toString)
+        gcElem.addAttribute("collection-time-formatted", formatDurationMs(timeMs))
+      }
 
     val flagsElem = jvmElem.addElement("vm-flags")
     runtimeMx.getInputArguments.asScala
@@ -360,19 +371,25 @@ object FormRunnerConsole {
       cElem.addAttribute("engine",                   "ObjectCache (JVM Heap)")
       cElem.addAttribute("heap-entries",             snap.currentSize.toString)
       cElem.addAttribute("total-entries",            snap.currentSize.toString)
+      cElem.addAttribute("total-entries-raw",        snap.currentSize.toString)
       cElem.addAttribute("max-entries",              snap.maxSize.toString)
+      cElem.addAttribute("max-entries-raw",          snap.maxSize.toString)
       cElem.addAttribute("max-bytes",                snap.maxSizeBytes.map(_.toString).getOrElse(""))
       cElem.addAttribute("max-idle-ms",              snap.maxIdleMillis.map(_.toString).getOrElse(""))
       cElem.addAttribute("limit-summary",            formatObjectCacheLimitSummary(snap))
       cElem.addAttribute("estimated-heap-bytes",     snap.estimatedBytes.toString)
       cElem.addAttribute("estimated-heap-formatted", formatBytes(snap.estimatedBytes))
       cElem.addAttribute("disk-bytes",               "0")
+      cElem.addAttribute("disk-bytes-raw",           "-1")
       cElem.addAttribute("disk-formatted",           "—")
       cElem.addAttribute("disk-files",               "0")
       cElem.addAttribute("hits",                     snap.hitCount.toString)
+      cElem.addAttribute("hits-raw",                 snap.hitCount.toString)
       cElem.addAttribute("misses",                   snap.missCount.toString)
       cElem.addAttribute("hit-rate",                 snap.hitRateOpt.map(r => formatPercentValue(r * 100.0) + "%").getOrElse("—"))
+      cElem.addAttribute("hit-rate-raw",             snap.hitRateOpt.map(r => (r * 100.0).toString).getOrElse("-1"))
       cElem.addAttribute("evictions",                snap.evictionCount.toString)
+      cElem.addAttribute("evictions-raw",            snap.evictionCount.toString)
       cElem.addAttribute("can-clear",                SafeClearableObjectCaches(canonicalName).toString)
       cacheRows += (canonicalName -> cElem)
     }
@@ -398,17 +415,23 @@ object FormRunnerConsole {
       cElem.addAttribute("engine",                   engineLabel)
       cElem.addAttribute("heap-entries",             snap.heapEntries.toString)
       cElem.addAttribute("total-entries",            snap.totalEntries.map(_.toString).getOrElse("—"))
+      cElem.addAttribute("total-entries-raw",        snap.totalEntries.getOrElse(-1L).toString)
+      cElem.addAttribute("max-entries-raw",          snap.maxEntriesLocalHeap.getOrElse(-1L).toString)
       cElem.addAttribute("limit-summary",            if (limitParts.nonEmpty) limitParts.mkString(", ") else "Default")
       cElem.addAttribute("estimated-heap-bytes",     snap.estimatedHeapBytes.toString)
       cElem.addAttribute("estimated-heap-formatted", formatBytes(snap.estimatedHeapBytes))
       cElem.addAttribute("disk-bytes",               snap.diskStoreBytes.getOrElse(0L).toString)
+      cElem.addAttribute("disk-bytes-raw",           snap.diskStoreBytes.getOrElse(-1L).toString)
       cElem.addAttribute("disk-formatted",           snap.diskStoreBytes.map(formatBytes).getOrElse("—"))
       cElem.addAttribute("disk-files",               snap.diskStoreFiles.map(_.toString).getOrElse("—"))
       cElem.addAttribute("disk-path",                snap.diskStorePathOpt.getOrElse(""))
       cElem.addAttribute("hits",                     snap.hitCount.map(_.toString).getOrElse("—"))
+      cElem.addAttribute("hits-raw",                 snap.hitCount.getOrElse(-1L).toString)
       cElem.addAttribute("misses",                   snap.missCount.map(_.toString).getOrElse("—"))
       cElem.addAttribute("hit-rate",                 snap.hitRateOpt.map(r => formatPercentValue(r * 100.0) + "%").getOrElse("—"))
+      cElem.addAttribute("hit-rate-raw",             snap.hitRateOpt.map(r => (r * 100.0).toString).getOrElse("-1"))
       cElem.addAttribute("evictions",                snap.evictionCount.map(_.toString).getOrElse("—"))
+      cElem.addAttribute("evictions-raw",            snap.evictionCount.getOrElse(-1L).toString)
       cElem.addAttribute("can-clear",                SafeClearableProviderCaches(canonicalName).toString)
       cacheRows += (canonicalName -> cElem)
     }
@@ -422,16 +445,22 @@ object FormRunnerConsole {
       xblElem.addAttribute("engine",                   "Global Singleton (JVM Heap)")
       xblElem.addAttribute("heap-entries",             globalXblCount.toString)
       xblElem.addAttribute("total-entries",            globalXblCount.toString)
+      xblElem.addAttribute("total-entries-raw",        globalXblCount.toString)
+      xblElem.addAttribute("max-entries-raw",          "-1")
       xblElem.addAttribute("limit-summary",            "Global XBL library")
       xblElem.addAttribute("estimated-heap-bytes",     globalXblBytes.toString)
       xblElem.addAttribute("estimated-heap-formatted", formatBytes(globalXblBytes))
       xblElem.addAttribute("disk-bytes",               "0")
+      xblElem.addAttribute("disk-bytes-raw",           "-1")
       xblElem.addAttribute("disk-formatted",           "—")
       xblElem.addAttribute("disk-files",               "0")
       xblElem.addAttribute("hits",                     "—")
+      xblElem.addAttribute("hits-raw",                 "-1")
       xblElem.addAttribute("misses",                   "—")
       xblElem.addAttribute("hit-rate",                 "—")
+      xblElem.addAttribute("hit-rate-raw",             "-1")
       xblElem.addAttribute("evictions",                "—")
+      xblElem.addAttribute("evictions-raw",            "-1")
       xblElem.addAttribute("can-clear",                "false")
       cacheRows += (canonicalName -> xblElem)
     }
@@ -458,22 +487,27 @@ object FormRunnerConsole {
             case None if samplePath.nonEmpty    => samplePath
             case None                           => ss.digest.take(12)
           }
+          val idleMs      = math.max(0L, nowMs - entry.lastAccessedAtMs)
 
-          sElem.addAttribute("digest",              ss.digest)
-          sElem.addAttribute("short-digest",        ss.digest.take(12))
-          sElem.addAttribute("display-name",        displayName)
-          sElem.addAttribute("app",                 frMetaOpt.map(_._1).getOrElse(""))
-          sElem.addAttribute("form",                frMetaOpt.map(_._2).getOrElse(""))
-          sElem.addAttribute("sample-path",         samplePath)
-          sElem.addAttribute("controls",            ss.topLevelPart.controlAnalysisMap.size.toString)
-          sElem.addAttribute("models",              ss.topLevelPart.iterateModels.size.toString)
-          sElem.addAttribute("xpath-analysis",      ss.isXPathAnalysis.toString)
-          sElem.addAttribute("template-formatted",  formatBytes(ss.templateSizeBytes))
+          sElem.addAttribute("digest",               ss.digest)
+          sElem.addAttribute("short-digest",         ss.digest.take(12))
+          sElem.addAttribute("display-name",         displayName)
+          sElem.addAttribute("app",                  frMetaOpt.map(_._1).getOrElse(""))
+          sElem.addAttribute("form",                 frMetaOpt.map(_._2).getOrElse(""))
+          sElem.addAttribute("sample-path",          samplePath)
+          sElem.addAttribute("controls",             ss.topLevelPart.controlAnalysisMap.size.toString)
+          sElem.addAttribute("models",               ss.topLevelPart.iterateModels.size.toString)
+          sElem.addAttribute("xpath-analysis",       ss.isXPathAnalysis.toString)
+          sElem.addAttribute("template-bytes",       ss.templateSizeBytes.toString)
+          sElem.addAttribute("template-formatted",   formatBytes(ss.templateSizeBytes))
+          sElem.addAttribute("static-dom-bytes",     ss.staticDomSizeBytes.toString)
           sElem.addAttribute("static-dom-formatted", formatBytes(ss.staticDomSizeBytes))
-          sElem.addAttribute("encoded-formatted",   formatBytes(ss.encodedStateBytes))
-          sElem.addAttribute("estimated-bytes",     entry.estimatedBytes.toString)
-          sElem.addAttribute("estimated-formatted", formatBytes(entry.estimatedBytes))
-          sElem.addAttribute("idle-formatted",      formatDurationMs(math.max(0L, nowMs - entry.lastAccessedAtMs)))
+          sElem.addAttribute("encoded-bytes",        ss.encodedStateBytes.toString)
+          sElem.addAttribute("encoded-formatted",    formatBytes(ss.encodedStateBytes))
+          sElem.addAttribute("estimated-bytes",      entry.estimatedBytes.toString)
+          sElem.addAttribute("estimated-formatted",  formatBytes(entry.estimatedBytes))
+          sElem.addAttribute("idle-ms",              idleMs.toString)
+          sElem.addAttribute("idle-formatted",       formatDurationMs(idleMs))
         case _ =>
       }
     }
@@ -511,7 +545,7 @@ object FormRunnerConsole {
         val maxSeq   = items.iterator.map(_.sequence).maxOption.getOrElse(1L)
         (path, items.size, sumBytes, maxSeq)
       }
-      .sortBy { case (_, _, sumBytes, _) => -sumBytes }
+      .sortBy { case (path, _, sumBytes, _) => (-sumBytes, path) }
       .foreach { case (path, count, sumBytes, maxSeq) =>
         val gElem = groupsElem.addElement("group")
         gElem.addAttribute("request-path",    path)
@@ -523,7 +557,7 @@ object FormRunnerConsole {
 
     val itemsElem = liveDocsElem.addElement("documents")
     allLiveDocs
-      .sortBy(d => -d.estimatedBytes)
+      .sortBy(d => (-d.estimatedBytes, d.uuid))
       .take(200)
       .foreach { d =>
         val dElem = itemsElem.addElement("document")
@@ -535,6 +569,7 @@ object FormRunnerConsole {
         dElem.addAttribute("controls",            d.controlCount.toString)
         dElem.addAttribute("estimated-bytes",     d.estimatedBytes.toString)
         dElem.addAttribute("estimated-formatted", formatBytes(d.estimatedBytes))
+        dElem.addAttribute("idle-ms",             d.idleMs.toString)
         dElem.addAttribute("idle-formatted",      d.idleFormatted)
       }
 
@@ -547,6 +582,7 @@ object FormRunnerConsole {
     sequence       : Long,
     controlCount   : Int,
     estimatedBytes : Long,
+    idleMs         : Long,
     idleFormatted  : String,
     status         : String
   )

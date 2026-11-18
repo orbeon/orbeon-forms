@@ -27,7 +27,7 @@ trait FormBuilderSchemaDialogTests {
         val toolboxButton = page.locator(".fb-schema-toolbox-button")
         val toolboxBadge  = toolboxButton.locator(".fb-tool-badge")
 
-        assert(toolboxButton.textContent().trimAllToEmpty == "XML Schema")
+        assert(toolboxButton.innerText().trimAllToEmpty == "XML Schema")
         assert(hasClass(toolboxBadge, "xforms-hidden"))
 
         val schemaDialog = openSchemaDialog(page, ajaxServer)
@@ -92,7 +92,7 @@ trait FormBuilderSchemaDialogTests {
 
         val toolboxBadge = page.locator(".fb-schema-toolbox-button .fb-tool-badge")
 
-        // 1. Attach books.xsd and verify toolbox active checkmark badge
+        // 1. Attach books.xsd and verify toolbox count badge ("1")
         switchToolboxTab(page, ajaxServer, "Advanced")
         val schemaDialog = openSchemaDialog(page, ajaxServer)
         uploadValidSchemaPayload(schemaDialog, ajaxServer, "books.xsd", BooksSchemaXml)
@@ -101,6 +101,7 @@ trait FormBuilderSchemaDialogTests {
         schemaDialog.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN))
 
         assert(! hasClass(toolboxBadge, "xforms-hidden"))
+        assert(toolboxBadge.textContent().trimAllToEmpty == "1")
 
         // 2. Insert a Text Field control (control-1) and bind it to bk:publication-year in Control Settings
         switchToolboxTab(page, ajaxServer, "Controls")

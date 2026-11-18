@@ -658,12 +658,16 @@
                                 </xf:trigger>
                             </xf:group>
                             <xf:group bind="fb-toolbox-schema-bind">
-                                <!-- Upload XML Schema -->
-                                <xf:trigger>
+                                <!-- XML Schema -->
+                                <xf:var name="schemas-count" value="count($model/xs:schema)"/>
+                                <xf:trigger class="fb-schema-toolbox-button">
                                     <xf:label>
-                                        <xh:i class="fa fa-fw fa-file-code-o"/>
+                                        <xh:i class="fa fa-fw fa-file-code-o" aria-hidden="true"/>
                                         <xh:span>
-                                            <xf:output value="if (exists($model/xs:schema)) then $form-resources/change-schema/label else $form-resources/upload-schema/label"/>
+                                            <xf:output value="$form-resources/upload-schema/label"/>
+                                        </xh:span>
+                                        <xh:span class="{if ($schemas-count gt 0) then 'fb-tool-badge' else 'fb-tool-badge xforms-hidden'}">
+                                            <xf:output value="$schemas-count"/>
                                         </xh:span>
                                     </xf:label>
                                     <xxf:show ev:event="DOMActivate" if="$is-pe" dialog="fb-schema-upload-dialog"/>

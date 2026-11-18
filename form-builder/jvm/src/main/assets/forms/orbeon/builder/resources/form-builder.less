@@ -1384,6 +1384,25 @@ body.orbeon {
                             text-overflow: ellipsis;
                         }
 
+                        & > span.fb-tool-badge:not(.xforms-hidden) {
+                            flex: 0 0 auto;
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            box-sizing: border-box;
+                            min-width: 16px;
+                            height: 16px;
+                            padding: 0 4px;
+                            margin-left: 4px;
+                            border-radius: 999px;
+                            font-size: 10px;
+                            font-weight: 600;
+                            font-variant-numeric: tabular-nums;
+                            line-height: 1;
+                            color: var(--orbeon-fb-active-color);
+                            background-color: var(--orbeon-form-background-color);
+                            border: 1px solid var(--orbeon-fb-active-color);
+                        }
                         i {
                             margin-top: -1px; // so that Bootstrap icons are better aligned
                         }

@@ -416,7 +416,7 @@ object XFormsUiEventHandlers {
 
             // Clear any `title`, to avoid having both the tooltip and the browser tooltip based on the title showing up
             if (control.hasAnyClass("xforms-trigger", "xforms-submit"))
-              control.querySelectorAllT("a, button").foreach(_.title = "")
+              control.querySelectorAllT("a, button").foreach(XFormsUI.clearTriggerNativeTitleForTooltip)
 
             XFormsUiEvents.showToolTip(
               tooltipForControl = Globals.hintTooltipForControl,

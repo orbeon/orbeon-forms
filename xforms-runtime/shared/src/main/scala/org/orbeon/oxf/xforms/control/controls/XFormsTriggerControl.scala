@@ -14,8 +14,10 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.xforms.analysis.controls.LHHA
+import org.orbeon.oxf.util.CoreUtils.*
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.{SingleNodeFocusableTrait, XFormsControl, XFormsSingleNodeControl}
+import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 
@@ -27,6 +29,8 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 class XFormsTriggerControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
     extends XFormsSingleNodeControl(container, parent, element, _effectiveId)
     with SingleNodeFocusableTrait {
+
+  self =>
 
   import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl.*
 
@@ -44,6 +48,30 @@ class XFormsTriggerControl(container: XBLContainer, parent: XFormsControl, eleme
 
   // Don't output anything for triggers in static readonly mode
   override def supportAjaxUpdates = ! isStaticReadonly
+
+  override def compareLHHA(other: XFormsControl, collector: ErrorEventCollector): Boolean =
+    ajaxLhhaSupport.forall {
+      case hint @ LHHA.Hint => directOrByLocalLhhaValue(hint, collector) == other.directOrByLocalLhhaValue(hint, collector)
+      case lha              => lhhaProperty(lha, local = true).value(collector) == other.lhhaProperty(lha, local = true).value(collector)
+    }
+
+  override def evaluateLhhaForAjax(
+    staticLhhaSupport : StaticLHHASupport,
+    lhha              : LHHA,
+    previousControlOpt: Option[XFormsControl],
+    collector         : ErrorEventCollector
+  ): Option[String] =
+    lhha match {
+      case hint @ LHHA.Hint =>
+        if (staticLhhaSupport.hasLocal(hint) || staticLhhaSupport.hasByLhha(hint)) {
+          val value1 = previousControlOpt.map(_.directOrByLocalLhhaValue(hint, collector))
+          val value2 = self.directOrByLocalLhhaValue(hint, collector)
+          (! value1.contains(value2)).option(value2.getOrElse(""))
+        } else
+          None
+      case _ =>
+        super.evaluateLhhaForAjax(staticLhhaSupport, lhha, previousControlOpt, collector)
+    }
 }
 
 private object XFormsTriggerControl {

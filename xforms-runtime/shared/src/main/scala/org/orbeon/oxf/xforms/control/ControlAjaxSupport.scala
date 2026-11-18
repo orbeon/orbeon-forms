@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control
 
 
 import org.orbeon.dom.QName
+import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaPlacementType}
@@ -83,6 +84,24 @@ trait ControlAjaxSupport {
     added
   }
 
+  // https://github.com/orbeon/orbeon-forms/issues/3836
+  // Also: we can have multiple `staticLhhaSupport` for `LHHA.Alert`, but only one `lhhaProperty`! Some `LHHA`s
+  // could be nested, some external, but in the end we only get one value. For now (2022-06-09) the constraint
+  // remains that we should either have all local alerts, or all separate.
+  def evaluateLhhaForAjax(
+    staticLhhaSupport : StaticLHHASupport,
+    lhha              : LHHA,
+    previousControlOpt: Option[XFormsControl],
+    collector         : ErrorEventCollector
+  ): Option[String] =
+    if (staticLhhaSupport.hasLocal(lhha) || staticLhhaSupport.hasLhhaPlaceholder(lhha)) {
+      val value1  = previousControlOpt.map(_.lhhaProperty(lhha, local = true).value(collector))
+      val lhha2   = self.lhhaProperty(lhha, local = true)
+      val value2  = lhha2.value(collector)
+      (! value1.contains(value2)).option(Option(lhha2.escapedValue(collector)).getOrElse(""))
+    } else
+      None
+
   // Label, help, hint, alert
   private final def addAjaxLHHA(
     attributesImpl    : AttributesImpl,
@@ -95,16 +114,7 @@ trait ControlAjaxSupport {
     for {
       staticLhhaSupport <- staticControl.cast[StaticLHHASupport].toList // NOTE: `narrowTo` fails
       lhha              <- ajaxLhhaSupport
-      // https://github.com/orbeon/orbeon-forms/issues/3836
-      // Also: we can have multiple `staticLhhaSupport` for `LHHA.Alert`, but only one `lhhaProperty`! Some `LHHA`s
-      // could be nested, some external, but in the end we only get one value. For now (2022-06-09) the constraint
-      // remains that we should either have all local alerts, or all separate.
-      if staticLhhaSupport.hasLocal(lhha) || staticLhhaSupport.hasLhhaPlaceholder(lhha)
-      value1            = previousControlOpt.map(_.lhhaProperty(lhha, local = true).value(collector)).orNull
-      lhha2             = self.lhhaProperty(lhha, local = true)
-      value2            = lhha2.value(collector)
-      if value1 != value2
-      attributeValue    = Option(lhha2.escapedValue(collector)) getOrElse ""
+      attributeValue    <- evaluateLhhaForAjax(staticLhhaSupport, lhha, previousControlOpt, collector)
     } yield
       added |= addOrAppendToAttributeIfNeeded(attributesImpl, lhha.entryName, attributeValue, previousControlOpt.isEmpty, attributeValue == "")
 

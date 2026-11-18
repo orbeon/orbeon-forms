@@ -4,7 +4,7 @@ import org.log4s.Logger
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.KeyboardShortcuts
+import org.orbeon.xforms.{KeyboardShortcuts, XFormsUI}
 import org.orbeon.xforms.XFormsXbl
 import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom
@@ -35,11 +35,12 @@ object Trigger {
 
       def updateDisplay(shortcut: String, kbd: html.Element): Unit =
         if (isMinimal) {
-          if (shortcut.nonEmpty) {
-            val suffix = s"($shortcut)"
-            if (! buttonOrAnchor.title.endsWith(suffix))
-              buttonOrAnchor.title = s"${buttonOrAnchor.title} $suffix"
-          }
+          val shortcutToDisplay =
+            if (containerElem.closestOpt(".fr-keyboard-shortcuts-hidden").isEmpty)
+              shortcut
+            else
+              ""
+          XFormsUI.setTriggerShortcutDisplay(buttonOrAnchor, shortcutToDisplay)
         } else
           kbd.innerHTML = shortcut
 

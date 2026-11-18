@@ -275,4 +275,85 @@ class TooltipTest extends AnyFunSpecLike {
       assert(mock.enabled)
     }
   }
+
+  describe("XFormsUI trigger hint and keyboard shortcut display (#6343)") {
+
+    def createMinimalTriggerDom(id: String, initialTitle: String): (html.Span, html.Button) = {
+      val span = dom.document.createElement("span").asInstanceOf[html.Span]
+      span.id = id
+      span.className = "xforms-control xforms-trigger xforms-trigger-appearance-minimal"
+      val button = dom.document.createElement("button").asInstanceOf[html.Button]
+      button.id = s"$id-btn"
+      button.title = initialTitle
+      span.appendChild(button)
+      dom.document.body.appendChild(span)
+      (span, button)
+    }
+
+    it("must keep empty title when initial hint is empty, and include shortcut once hint becomes non-empty") {
+      setupBootstrapMock()
+      Globals.reset()
+      val (span, button) = createMinimalTriggerDom("undo-trigger-inner", "")
+
+      XFormsUI.setTriggerShortcutDisplay(button, "⌘Z")
+      assert(button.title == "")
+
+      XFormsUI.setHintMessage(span, "Undo insert")
+      assert(button.title == "Undo insert (⌘Z)")
+
+      XFormsUI.setHintMessage(span, "Undo rename")
+      assert(button.title == "Undo rename (⌘Z)")
+
+      XFormsUI.setHintMessage(span, "")
+      assert(button.title == "")
+
+      dom.document.body.removeChild(span)
+    }
+
+    it("must update title without duplicating suffix when shortcut changes or re-binds") {
+      setupBootstrapMock()
+      Globals.reset()
+      val (span, button) = createMinimalTriggerDom("cut-trigger-inner", "Cut")
+
+      XFormsUI.setTriggerShortcutDisplay(button, "⌘X")
+      assert(button.title == "Cut (⌘X)")
+
+      // Language change updates hint, then MutationObserver re-applies shortcut
+      XFormsUI.setHintMessage(span, "Couper")
+      assert(button.title == "Couper (⌘X)")
+      XFormsUI.setTriggerShortcutDisplay(button, "⌘X")
+      assert(button.title == "Couper (⌘X)")
+
+      // Shortcut changed or cleared
+      XFormsUI.setTriggerShortcutDisplay(button, "⌃X")
+      assert(button.title == "Couper (⌃X)")
+      XFormsUI.setTriggerShortcutDisplay(button, "")
+      assert(button.title == "Couper")
+
+      dom.document.body.removeChild(span)
+    }
+
+    it("must preserve hint and shortcut when native title is cleared for Bootstrap tooltip") {
+      setupBootstrapMock()
+      Globals.reset()
+      val (span, button) = createMinimalTriggerDom("redo-trigger-inner", "Redo insert")
+
+      XFormsUI.setTriggerShortcutDisplay(button, "⌘⇧Z")
+      assert(XFormsUI.findNonAllBlankHintMessage(span).contains("Redo insert (⌘⇧Z)"))
+
+      XFormsUI.clearTriggerNativeTitleForTooltip(button)
+      assert(button.title == "")
+      assert(XFormsUI.findNonAllBlankHintMessage(span).contains("Redo insert (⌘⇧Z)"))
+
+      XFormsUiEvents.showToolTip(Globals.hintTooltipForControl, span, button, XFormsUI.getNonAllBlankHintMessage(span))
+      val mock = getMockInstance(button).get
+      assert(mock.title == "Redo insert (⌘⇧Z)")
+
+      XFormsUI.setHintMessage(span, "Redo rename")
+      assert(mock.title == "Redo rename (⌘⇧Z)")
+      assert(button.title == "")
+
+      dom.document.body.removeChild(span)
+    }
+  }
 }

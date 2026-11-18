@@ -190,6 +190,46 @@ object XFormsUI {
     setTooltipMessage(control, message, Globals.alertTooltipForControl)
   }
 
+  private val OrbeonHintDatasetKey                    = "orbeonHint"
+  private val OrbeonKeyboardShortcutDisplayDatasetKey = "orbeonKeyboardShortcutDisplay"
+
+  private def combineHintAndShortcut(hint: String, shortcut: String): String =
+    if (hint.isAllBlank)
+      ""
+    else if (shortcut.isAllBlank)
+      hint
+    else
+      s"$hint ($shortcut)"
+
+  private def getTriggerEffectiveHint(buttonOrAnchor: html.Element): String =
+    combineHintAndShortcut(
+      hint     = buttonOrAnchor.dataset.getOrElse(OrbeonHintDatasetKey, buttonOrAnchor.title),
+      shortcut = buttonOrAnchor.dataset.getOrElse(OrbeonKeyboardShortcutDisplayDatasetKey, "")
+    )
+
+  def setTriggerShortcutDisplay(buttonOrAnchor: html.Element, shortcut: String): Unit = {
+    if (! buttonOrAnchor.dataset.contains(OrbeonHintDatasetKey))
+      buttonOrAnchor.dataset(OrbeonHintDatasetKey) = buttonOrAnchor.title
+    buttonOrAnchor.dataset(OrbeonKeyboardShortcutDisplayDatasetKey) = shortcut
+
+    val effectiveMessage = getTriggerEffectiveHint(buttonOrAnchor)
+    buttonOrAnchor.closestOpt(".xforms-trigger, .xforms-submit") match {
+      case Some(control) =>
+        val tooltips = Globals.hintTooltipForControl
+        if (tooltips.get(control.id).orNull == null)
+          buttonOrAnchor.title = effectiveMessage
+        setTooltipMessage(control, effectiveMessage, tooltips)
+      case None =>
+        buttonOrAnchor.title = effectiveMessage
+    }
+  }
+
+  def clearTriggerNativeTitleForTooltip(buttonOrAnchor: html.Element): Unit = {
+    if (! buttonOrAnchor.dataset.contains(OrbeonHintDatasetKey))
+      buttonOrAnchor.dataset(OrbeonHintDatasetKey) = buttonOrAnchor.title
+    buttonOrAnchor.title = ""
+  }
+
   def getNonAllBlankHintMessage(control: html.Element): String =
     findNonAllBlankHintMessage(control).getOrElse("")
 
@@ -198,7 +238,7 @@ object XFormsUI {
       control
         .queryNestedElems[html.Element]("button, a")
         .headOption
-        .map(_.title)
+        .map(getTriggerEffectiveHint)
         .flatMap(_.trimAllToOpt)
     else
       findControlLHHA(control, "hint")
@@ -213,18 +253,23 @@ object XFormsUI {
         tooltips.put(control.id, null)
       }
     }
-    if (control.hasAnyClass("xforms-trigger", "xforms-submit")) {
-      val tip = tooltips.get(control.id).orNull
-      if (tip == null) {
-        control
-          .queryNestedElems[html.Element]("button, a")
-          .headOption
-          .foreach(_.title = message)
+    val effectiveMessage =
+      if (control.hasAnyClass("xforms-trigger", "xforms-submit")) {
+        control.queryNestedElems[html.Element]("button, a").headOption match {
+          case Some(buttonOrAnchor) =>
+            buttonOrAnchor.dataset(OrbeonHintDatasetKey) = message
+            val combined = getTriggerEffectiveHint(buttonOrAnchor)
+            if (tooltips.get(control.id).orNull == null)
+              buttonOrAnchor.title = combined
+            combined
+          case None =>
+            message
+        }
+      } else {
+        setMessage(control, "hint", message)
+        message
       }
-    } else {
-      setMessage(control, "hint", message)
-    }
-    setTooltipMessage(control, message, tooltips)
+    setTooltipMessage(control, effectiveMessage, tooltips)
   }
 
   private def setTooltipMessage(control: html.Element, message: String, tooltipForControl: js.Dictionary[BootstrapTip]): Unit =

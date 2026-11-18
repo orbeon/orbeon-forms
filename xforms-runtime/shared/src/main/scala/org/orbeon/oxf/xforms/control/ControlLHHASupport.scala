@@ -36,6 +36,7 @@ trait ControlLHHASupport {
   // NOTE: `var` because of cloning
   private[ControlLHHASupport] var lhhMap: Map[LHHA, LHHAProperty] = Map.empty
   private[ControlLHHASupport] var alerts: Option[(List[LHHAProperty], LHHAProperty, LHHAProperty)] = None // separate, combined local, and combined active alerts
+  private[ControlLHHASupport] var byLhhValuesCopyOpt: Option[Map[LHHA, Option[String]]] = None
 
   // XBL Container in which dynamic LHHA elements like `xf:output` and AVTs evaluate
   def lhhaContainer: XBLContainer = container
@@ -57,8 +58,9 @@ trait ControlLHHASupport {
     alerts = None
 
   def evaluateNonRelevantLHHA(): Unit = {
-    lhhMap = Map.empty
-    alerts = None
+    lhhMap             = Map.empty
+    alerts             = None
+    byLhhValuesCopyOpt = None
   }
 
   // Make immutable eager copies of all LHHA properties
@@ -81,6 +83,18 @@ trait ControlLHHASupport {
           new ImmutableLHHAProperty(local.value(collector), local.isHTML, local.locationData),
           new ImmutableLHHAProperty(combined.value(collector), combined.isHTML, combined.locationData)
         )
+      }
+
+    copy.byLhhValuesCopyOpt =
+      self.staticControl match {
+        case s: StaticLHHASupport =>
+          val byLhhas = LHHA.values.filter(lhha => ! s.hasDirectLhha(lhha) && s.hasByLhha(lhha))
+          if (byLhhas.nonEmpty)
+            Some(byLhhas.map(lhha => lhha -> self.directOrByLocalLhhaValue(lhha, collector)).toMap)
+          else
+            None
+        case _ =>
+          None
       }
   }
 
@@ -201,7 +215,7 @@ trait ControlLHHASupport {
   final def getHint    (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Hint,  local = true).value(collector))
   final def getAlert   (collector: ErrorEventCollector): Option[String] = Option(lhhaProperty(LHHA.Alert, local = true).value(collector))
 
-  lazy val referencingControl: Option[(StaticLHHASupport, XFormsSingleNodeControl)] =
+  def referencingControl: Option[(StaticLHHASupport, XFormsSingleNodeControl)] =
     for {
       lhhaSupport           <- self.staticControl.cast[StaticLHHASupport]
       staticRc              <- lhhaSupport.referencingControl
@@ -211,16 +225,23 @@ trait ControlLHHASupport {
     } yield
       staticRc -> concreteSnRc
 
-  def directOrByLocalLhhaValue(lhha: LHHA): Option[String] =
-    (
-      self.staticControl match { // Scala 3: `.match`
-        case s: StaticLHHASupport if s.hasDirectLhha(lhha) => Some(self)
-        case s: StaticLHHASupport if s.hasByLhha(lhha)     => self.referencingControl.map(_._2)
-        case _                                             => None
-      }
-    )
-    .flatMap(_.lhhaProperty(lhha, local = true)
-    .valueOpt(EventCollector.Throw))
+  def directOrByLocalLhhaValue(
+    lhha     : LHHA,
+    collector: ErrorEventCollector = EventCollector.Throw
+  ): Option[String] =
+    byLhhValuesCopyOpt match {
+      case Some(byLhhValues) if byLhhValues.contains(lhha) =>
+        byLhhValues(lhha)
+      case _ =>
+        (
+          self.staticControl match { // Scala 3: `.match`
+            case s: StaticLHHASupport if s.hasDirectLhha(lhha) => Some(self)
+            case s: StaticLHHASupport if s.hasByLhha(lhha)     => self.referencingControl.map(_._2)
+            case _                                             => None
+          }
+        )
+        .flatMap(_.lhhaProperty(lhha, local = true).valueOpt(collector))
+    }
 }
 
 // NOTE: Use name different from trait so that the Java compiler is happy

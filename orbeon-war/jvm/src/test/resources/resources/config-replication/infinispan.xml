@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <infinispan
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="urn:infinispan:config:16.0 https://infinispan.org/schemas/infinispan-config-16.0.xsd"
-    xmlns="urn:infinispan:config:16.0">
+    xsi:schemaLocation="urn:infinispan:config:16.2 https://infinispan.org/schemas/infinispan-config-16.2.xsd"
+    xmlns="urn:infinispan:config:16.2">
 
     <cache-container name="orbeon-container" statistics="true">
         <!-- ORBEON: This uses port 7800 "for its JGroups cluster transport" by default. -->
@@ -21,9 +21,9 @@
 
         <!-- XForms dynamic state store -->
         <replicated-cache name="xforms.store.dynamic-states" statistics="true">
-            <expiration max-idle="18000000" interval="120000"/>
+            <expiration max-idle="1h" lifespan="7d" interval="1m"/>
             <persistence passivation="true">
-                <file-store purge="true" path="xforms.store.dynamic-states" shared="false">
+                <file-store purge="true" path="xforms.store.dynamic-states" shared="false" compaction-threshold="0.25">
                     <write-behind modification-queue-size="1024" />
                 </file-store>
             </persistence>
@@ -49,13 +49,13 @@
 
         <!-- Form Runner external modes store -->
         <replicated-cache name="fr.store.external-modes" statistics="true">
-            <expiration lifespan="960000" interval="120000"/>
+            <expiration lifespan="16m" interval="2m"/>
             <memory max-count="200" when-full="REMOVE"/>
         </replicated-cache>
 
         <!-- Form Runner persistence form metadata cache -->
         <local-cache name="fr.cache.form-metadata" statistics="true">
-            <expiration lifespan="300000" interval="120000"/>
+            <expiration lifespan="5m" interval="2m"/>
             <memory max-count="100" when-full="REMOVE"/>
         </local-cache>
 

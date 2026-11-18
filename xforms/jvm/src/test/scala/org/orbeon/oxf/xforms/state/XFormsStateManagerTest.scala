@@ -33,17 +33,17 @@ class XFormsStateManagerTest
 
   describe("Cache passivation to store using tuples") {
 
-    // The size of the memory cache is supposed to be 1, so anything beyond that should be passivated to the store.
-    val Count = 100
-
     it("should store and retrieve values") {
 
       val stateStore: CacheApi = XFormsStores.stateStore
 
-      for (i <- 1 to Count)
+      // Exceed `max-count` so entries are passivated to the persistent store.
+      val count = stateStore.getMaxEntriesLocalHeap.map(_.toInt).filter(_ > 0).getOrElse(1) + 100
+
+      for (i <- 1 to count)
         stateStore.put(i.toString, (s"v-$i", i))
 
-      for (i <- 1 to Count)
+      for (i <- 1 to count)
         assert(stateStore.get(i.toString).map(_.asInstanceOf[(String, Int)]).contains((s"v-$i", i)))
     }
   }

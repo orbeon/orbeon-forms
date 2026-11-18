@@ -56,7 +56,7 @@
         <!-- Form Runner form definition cache -->
         <local-cache name="form-runner.persistence.form-definition" statistics="true">
             <expiration lifespan="300000" interval="120000"/>
-            <memory max-count="10" when-full="REMOVE"/>
+            <memory max-count="100" when-full="REMOVE"/>
         </local-cache>
 
         <local-cache name="orbeon.properties" statistics="true">

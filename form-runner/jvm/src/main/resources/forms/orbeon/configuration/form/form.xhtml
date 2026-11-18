@@ -231,6 +231,9 @@
                     <xf:bind ref="@value[../@validation = 'xpath2-avt']"                                                       type="xxf:XPath2ValueTemplate" xxf:whitespace="trim"/>
                     <xf:bind ref="@value[../@validation = 'xpath2-or-avt' and starts-with(., '{') and ends-with(., '}')]"      type="xxf:XPath2ValueTemplate" xxf:whitespace="trim"/>
                     <xf:bind ref="@value[../@validation = 'xpath2-or-avt' and not(starts-with(., '{') and ends-with(., '}'))]" type="xxf:XPath2"              xxf:whitespace="trim"/>
+                    <xf:bind ref="@value[../@validation = 'non-negative-integer']"                                             constraint=". castable as xs:integer and xs:integer(.) ge 0"/>
+                    <xf:bind ref="@value[../@validation = 'byte-size-or-percent']"                                             xxf:whitespace="trim" constraint="frf:isValidCacheMaxSizeBytes(.)"/>
+                    <xf:bind ref="@value[../@validation = 'duration']"                                                         xxf:whitespace="trim" constraint="frf:isValidCacheDuration(.)"/>
                 </xf:bind>
 
                 <xf:bind
@@ -326,9 +329,15 @@
                         </filter>
                         <alerts>
                             <xpath>Invalid XPath expression</xpath>
+                            <non-negative-integer>Enter a non-negative integer (0 or greater)</non-negative-integer>
+                            <byte-size>Enter a byte size or max-heap percentage (1–100%), e.g. 15%, 256m, 1g, or 0</byte-size>
+                            <duration>Enter a duration, e.g. 30m, 2h, 1d, PT30M, or milliseconds</duration>
                         </alerts>
                         <system-section>
                             <label>System</label>
+                            <console-callout-prefix>Monitor live JVM heap usage, cache hit rates, SIFS disk stores, and compiled static states in the </console-callout-prefix>
+                            <console-callout-link>Admin Console</console-callout-link>
+                            <console-callout-suffix>.</console-callout-suffix>
                         </system-section>
                         <navbar-section>
                             <label>Navigation Bar</label>
@@ -426,6 +435,30 @@
                                 <value>false</value>
                             </item>
                         </session-heartbeat>
+                        <cache-documents-size>
+                            <label>XForms Documents Cache Max Entries</label>
+                            <hint>Maximum live XForms documents kept in JVM heap before passivating to store &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.documents.size&lt;/code&gt;</hint>
+                        </cache-documents-size>
+                        <cache-documents-max-size-bytes>
+                            <label>XForms Documents Cache Byte Budget</label>
+                            <hint>Max heap percentage or byte limit (e.g. &lt;code&gt;15%&lt;/code&gt;, &lt;code&gt;256m&lt;/code&gt;, &lt;code&gt;1g&lt;/code&gt;, or &lt;code&gt;0&lt;/code&gt; for unlimited) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.documents.max-size-bytes&lt;/code&gt;</hint>
+                        </cache-documents-max-size-bytes>
+                        <cache-documents-max-idle>
+                            <label>XForms Documents Cache Max Idle</label>
+                            <hint>Optional idle timeout before passivating live documents (e.g. &lt;code&gt;30m&lt;/code&gt;, &lt;code&gt;2h&lt;/code&gt;, or blank) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.documents.max-idle&lt;/code&gt;</hint>
+                        </cache-documents-max-idle>
+                        <cache-static-state-size>
+                            <label>XForms Static State Cache Max Entries</label>
+                            <hint>Maximum compiled XForms static states kept in JVM heap &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-state.size&lt;/code&gt;</hint>
+                        </cache-static-state-size>
+                        <cache-static-state-max-size-bytes>
+                            <label>XForms Static State Cache Byte Budget</label>
+                            <hint>Max heap percentage or byte limit (e.g. &lt;code&gt;15%&lt;/code&gt;, &lt;code&gt;256m&lt;/code&gt;, &lt;code&gt;1g&lt;/code&gt;, or &lt;code&gt;0&lt;/code&gt; for unlimited) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-state.max-size-bytes&lt;/code&gt;</hint>
+                        </cache-static-state-max-size-bytes>
+                        <cache-static-state-max-idle>
+                            <label>XForms Static State Cache Max Idle</label>
+                            <hint>Optional idle timeout before spilling static states to store (e.g. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt;, or blank) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-state.max-idle&lt;/code&gt;</hint>
+                        </cache-static-state-max-idle>
                         <navbar-home-link>
                             <label>Show Home Link in Navbar</label>
                             <hint>Enable the Home link in the navigation bar &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
@@ -2414,9 +2447,15 @@
                         </filter>
                         <alerts>
                             <xpath>Expression XPath invalide</xpath>
+                            <non-negative-integer>Saisissez un entier positif ou nul (0 ou plus)</non-negative-integer>
+                            <byte-size>Saisissez une taille en octets ou un pourcentage du tas max (1–100%), ex. 15%, 256m, 1g ou 0</byte-size>
+                            <duration>Saisissez une durée, ex. 30m, 2h, 1d, PT30M ou millisecondes</duration>
                         </alerts>
                         <system-section>
                             <label>Système</label>
+                            <console-callout-prefix>Consultez l'utilisation mémoire JVM, les taux de succès des caches, le stockage disque SIFS et les états statiques compilés dans la </console-callout-prefix>
+                            <console-callout-link>Console d'administration</console-callout-link>
+                            <console-callout-suffix>.</console-callout-suffix>
                         </system-section>
                         <navbar-section>
                             <label>Barre de navigation</label>
@@ -2514,6 +2553,30 @@
                                 <value>false</value>
                             </item>
                         </session-heartbeat>
+                        <cache-documents-size>
+                            <label>Cache des documents XForms (entrées max)</label>
+                            <hint>Nombre maximal de documents XForms actifs en mémoire JVM avant passivation &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.documents.size&lt;/code&gt;</hint>
+                        </cache-documents-size>
+                        <cache-documents-max-size-bytes>
+                            <label>Budget mémoire du cache des documents XForms</label>
+                            <hint>Pourcentage du tas max ou limite en octets (ex. &lt;code&gt;15%&lt;/code&gt;, &lt;code&gt;256m&lt;/code&gt;, &lt;code&gt;1g&lt;/code&gt; ou &lt;code&gt;0&lt;/code&gt; sans limite) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.documents.max-size-bytes&lt;/code&gt;</hint>
+                        </cache-documents-max-size-bytes>
+                        <cache-documents-max-idle>
+                            <label>Inactivité max du cache des documents XForms</label>
+                            <hint>Délai d'inactivité optionnel avant passivation des documents actifs (ex. &lt;code&gt;30m&lt;/code&gt;, &lt;code&gt;2h&lt;/code&gt; ou vide) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.documents.max-idle&lt;/code&gt;</hint>
+                        </cache-documents-max-idle>
+                        <cache-static-state-size>
+                            <label>Cache d'états statiques XForms (entrées max)</label>
+                            <hint>Nombre maximal d'états statiques XForms compilés conservés en mémoire JVM &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-state.size&lt;/code&gt;</hint>
+                        </cache-static-state-size>
+                        <cache-static-state-max-size-bytes>
+                            <label>Budget mémoire du cache d'états statiques XForms</label>
+                            <hint>Pourcentage du tas max ou limite en octets (ex. &lt;code&gt;15%&lt;/code&gt;, &lt;code&gt;256m&lt;/code&gt;, &lt;code&gt;1g&lt;/code&gt; ou &lt;code&gt;0&lt;/code&gt; sans limite) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-state.max-size-bytes&lt;/code&gt;</hint>
+                        </cache-static-state-max-size-bytes>
+                        <cache-static-state-max-idle>
+                            <label>Inactivité max du cache d'états statiques XForms</label>
+                            <hint>Délai d'inactivité optionnel avant éviction vers le magasin d'état (ex. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; ou vide) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-state.max-idle&lt;/code&gt;</hint>
+                        </cache-static-state-max-idle>
                         <navbar-home-link>
                             <label>Lien d'accueil dans la barre de navigation</label>
                             <hint>Afficher le lien d'accueil dans la barre de navigation &lt;code class="fr-config-prop-name"&gt;oxf.fr.navbar.home-link.enable&lt;/code&gt;</hint>
@@ -4634,7 +4697,110 @@
                                             </xf:action>
                                         </xf:select1>
                                     </fr:c>
+
+                                    <fr:c x="1" y="4" w="6" class="fr-config-has-override">
+                                        <fr:checkbox-input id="cache-documents-size-override-control" ref="cache-documents-size/@override" class="fr-config-override-checkbox">
+                                            <xf:label ref="$form-resources/override/label"/>
+                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
+                                                <xf:setvalue ref="../@value" value="../@default"/>
+                                            </xf:action>
+                                        </fr:checkbox-input>
+                                        <xf:input id="cache-documents-size-value-control" ref="cache-documents-size/@value" class="fr-config-value-control">
+                                            <xf:label ref="$form-resources/cache-documents-size/label"/>
+                                            <xf:hint mediatype="text/html" ref="$form-resources/cache-documents-size/hint"/>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </xf:input>
+                                    </fr:c>
+
+                                    <fr:c x="7" y="4" w="6" class="fr-config-has-override">
+                                        <fr:checkbox-input id="cache-documents-max-size-bytes-override-control" ref="cache-documents-max-size-bytes/@override" class="fr-config-override-checkbox">
+                                            <xf:label ref="$form-resources/override/label"/>
+                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
+                                                <xf:setvalue ref="../@value" value="../@default"/>
+                                            </xf:action>
+                                        </fr:checkbox-input>
+                                        <xf:input id="cache-documents-max-size-bytes-value-control" ref="cache-documents-max-size-bytes/@value" class="fr-config-value-control">
+                                            <xf:label ref="$form-resources/cache-documents-max-size-bytes/label"/>
+                                            <xf:hint mediatype="text/html" ref="$form-resources/cache-documents-max-size-bytes/hint"/>
+                                            <xf:alert ref="$form-resources/alerts/byte-size"/>
+                                        </xf:input>
+                                    </fr:c>
+
+                                    <fr:c x="1" y="5" w="6" class="fr-config-has-override">
+                                        <fr:checkbox-input id="cache-documents-max-idle-override-control" ref="cache-documents-max-idle/@override" class="fr-config-override-checkbox">
+                                            <xf:label ref="$form-resources/override/label"/>
+                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
+                                                <xf:setvalue ref="../@value" value="../@default"/>
+                                            </xf:action>
+                                        </fr:checkbox-input>
+                                        <xf:input id="cache-documents-max-idle-value-control" ref="cache-documents-max-idle/@value" class="fr-config-value-control">
+                                            <xf:label ref="$form-resources/cache-documents-max-idle/label"/>
+                                            <xf:hint mediatype="text/html" ref="$form-resources/cache-documents-max-idle/hint"/>
+                                            <xf:alert ref="$form-resources/alerts/duration"/>
+                                        </xf:input>
+                                    </fr:c>
+
+                                    <fr:c x="7" y="5" w="6" class="fr-config-has-override">
+                                        <fr:checkbox-input id="cache-static-state-size-override-control" ref="cache-static-state-size/@override" class="fr-config-override-checkbox">
+                                            <xf:label ref="$form-resources/override/label"/>
+                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
+                                                <xf:setvalue ref="../@value" value="../@default"/>
+                                            </xf:action>
+                                        </fr:checkbox-input>
+                                        <xf:input id="cache-static-state-size-value-control" ref="cache-static-state-size/@value" class="fr-config-value-control">
+                                            <xf:label ref="$form-resources/cache-static-state-size/label"/>
+                                            <xf:hint mediatype="text/html" ref="$form-resources/cache-static-state-size/hint"/>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </xf:input>
+                                    </fr:c>
+
+                                    <fr:c x="1" y="6" w="6" class="fr-config-has-override">
+                                        <fr:checkbox-input id="cache-static-state-max-size-bytes-override-control" ref="cache-static-state-max-size-bytes/@override" class="fr-config-override-checkbox">
+                                            <xf:label ref="$form-resources/override/label"/>
+                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
+                                                <xf:setvalue ref="../@value" value="../@default"/>
+                                            </xf:action>
+                                        </fr:checkbox-input>
+                                        <xf:input id="cache-static-state-max-size-bytes-value-control" ref="cache-static-state-max-size-bytes/@value" class="fr-config-value-control">
+                                            <xf:label ref="$form-resources/cache-static-state-max-size-bytes/label"/>
+                                            <xf:hint mediatype="text/html" ref="$form-resources/cache-static-state-max-size-bytes/hint"/>
+                                            <xf:alert ref="$form-resources/alerts/byte-size"/>
+                                        </xf:input>
+                                    </fr:c>
+
+                                    <fr:c x="7" y="6" w="6" class="fr-config-has-override">
+                                        <fr:checkbox-input id="cache-static-state-max-idle-override-control" ref="cache-static-state-max-idle/@override" class="fr-config-override-checkbox">
+                                            <xf:label ref="$form-resources/override/label"/>
+                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
+                                                <xf:setvalue ref="../@value" value="../@default"/>
+                                            </xf:action>
+                                        </fr:checkbox-input>
+                                        <xf:input id="cache-static-state-max-idle-value-control" ref="cache-static-state-max-idle/@value" class="fr-config-value-control">
+                                            <xf:label ref="$form-resources/cache-static-state-max-idle/label"/>
+                                            <xf:hint mediatype="text/html" ref="$form-resources/cache-static-state-max-idle/hint"/>
+                                            <xf:alert ref="$form-resources/alerts/duration"/>
+                                        </xf:input>
+                                    </fr:c>
                                 </fr:grid>
+                                <xf:group
+                                    id="system-cache-console-callout-group"
+                                    ref=".[
+                                        let $f := lower-case(xxf:trim(instance('fr-configuration-ui-instance')/filter))
+                                        return
+                                            $f = '' or
+                                            contains('cache caches memory heap console static-state documents oxf.xforms.cache', $f)
+                                    ]">
+                                    <xh:div class="fr-config-enc-callout fr-config-enc-callout-info" style="margin-top: 14px;">
+                                        <xh:i class="fa fa-fw fa-info-circle"/>
+                                        <xh:span>
+                                            <xf:output ref="$form-resources/system-section/console-callout-prefix"/>
+                                            <xh:a href="/fr/console" target="_blank" rel="noopener">
+                                                <xf:output ref="$form-resources/system-section/console-callout-link"/>
+                                            </xh:a>
+                                            <xf:output ref="$form-resources/system-section/console-callout-suffix"/>
+                                        </xh:span>
+                                    </xh:div>
+                                </xf:group>
                             </fr:tab>
 
                             <!-- Navigation Bar -->

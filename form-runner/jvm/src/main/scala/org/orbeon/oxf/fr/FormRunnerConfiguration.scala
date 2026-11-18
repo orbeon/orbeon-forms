@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.dom.{Document, Element, Namespace}
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.cache.ObjectCache
 import org.orbeon.oxf.fr.persistence.PersistencePropertyProvider
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
@@ -46,6 +47,19 @@ trait FormRunnerConfiguration {
     val propertiesDoc = configurationDomToPropertiesDom(configDoc)
     new DocumentWrapper(propertiesDoc, null, StaticXPath.GlobalConfiguration)
   }
+  //@XPathFunction
+  def isValidCacheMaxSizeBytes(value: String): Boolean =
+    value.trimAllToOpt match {
+      case None | Some("0") | Some("-1") => true
+      case Some(nonEmpty)                => ObjectCache.parseMaxSizeBytes(nonEmpty, 1024L * 1024L * 1024L).isDefined
+    }
+
+  //@XPathFunction
+  def isValidCacheDuration(value: String): Boolean =
+    value.trimAllToOpt match {
+      case None | Some("0") | Some("-1") => true
+      case Some(nonEmpty)                => ObjectCache.parseDurationMillis(nonEmpty).isDefined
+    }
 }
 
 object FormRunnerConfiguration extends FormRunnerConfiguration {
@@ -151,6 +165,60 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       xsType       = "xs:boolean",
       hasAppForm   = false,
       defaultValue = "true"
+    ),
+    CuratedPropertyDef(
+      key           = "cache-documents-size",
+      category      = "system",
+      baseName      = "oxf.xforms.cache.documents.size",
+      xsType        = "xs:integer",
+      hasAppForm    = false,
+      defaultValue  = "50",
+      validationOpt = Some("non-negative-integer")
+    ),
+    CuratedPropertyDef(
+      key           = "cache-documents-max-size-bytes",
+      category      = "system",
+      baseName      = "oxf.xforms.cache.documents.max-size-bytes",
+      xsType        = "xs:string",
+      hasAppForm    = false,
+      defaultValue  = "15%",
+      validationOpt = Some("byte-size-or-percent")
+    ),
+    CuratedPropertyDef(
+      key           = "cache-documents-max-idle",
+      category      = "system",
+      baseName      = "oxf.xforms.cache.documents.max-idle",
+      xsType        = "xs:string",
+      hasAppForm    = false,
+      defaultValue  = "",
+      validationOpt = Some("duration")
+    ),
+    CuratedPropertyDef(
+      key           = "cache-static-state-size",
+      category      = "system",
+      baseName      = "oxf.xforms.cache.static-state.size",
+      xsType        = "xs:integer",
+      hasAppForm    = false,
+      defaultValue  = "50",
+      validationOpt = Some("non-negative-integer")
+    ),
+    CuratedPropertyDef(
+      key           = "cache-static-state-max-size-bytes",
+      category      = "system",
+      baseName      = "oxf.xforms.cache.static-state.max-size-bytes",
+      xsType        = "xs:string",
+      hasAppForm    = false,
+      defaultValue  = "15%",
+      validationOpt = Some("byte-size-or-percent")
+    ),
+    CuratedPropertyDef(
+      key           = "cache-static-state-max-idle",
+      category      = "system",
+      baseName      = "oxf.xforms.cache.static-state.max-idle",
+      xsType        = "xs:string",
+      hasAppForm    = false,
+      defaultValue  = "",
+      validationOpt = Some("duration")
     ),
 
     // 2. Navigation Bar

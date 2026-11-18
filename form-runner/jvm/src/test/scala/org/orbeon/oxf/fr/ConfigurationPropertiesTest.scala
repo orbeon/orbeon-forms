@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.io.IOUtils.useAndClose
+import org.orbeon.oxf.cache.ObjectCache
 import org.orbeon.oxf.fr.persistence.PersistencePropertyProvider
 import org.orbeon.oxf.fr.process.SimpleProcess
 import org.orbeon.oxf.properties.{PropertyLoader, PropertyStore}
@@ -24,6 +25,7 @@ import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.EventCollector
+import org.orbeon.oxf.xforms.state.{XFormsDocumentCache, XFormsStaticStateCache}
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.scaxon.SimplePath.*
 import org.scalatest.funspec.AnyFunSpecLike
@@ -50,6 +52,11 @@ class ConfigurationPropertiesTest
       val defaultLangElem = curatedElem.element("system").element("default-language")
       assert(defaultLangElem.attributeValue("override") == "false")
       assert(defaultLangElem.attributeValue("value") == "en")
+
+      val staticBytesElem = curatedElem.element("system").element("cache-static-state-max-size-bytes")
+      assert(staticBytesElem.attributeValue("override") == "false")
+      assert(staticBytesElem.attributeValue("value") == "15%")
+      assert(staticBytesElem.attributeValue("name") == "oxf.xforms.cache.static-state.max-size-bytes")
 
       val navbarHomeElem = curatedElem.element("navbar").element("navbar-home-link")
       assert(navbarHomeElem.attributeValue("override") == "false")
@@ -290,6 +297,37 @@ class ConfigurationPropertiesTest
             setControlValueWithEventSearchNested(loginValueControl.effectiveId, "/fr/auth?source={xxf:get-request-path()}")
             assert(loginValueControl.isValid)
 
+            // Test curated cache byte-budget, max-idle, and entry-count validation & overrides
+            val staticBytesOverride       = resolveObject[XFormsSingleNodeControl]("cache-static-state-max-size-bytes-override-control").get
+            val staticBytesOverrideSelect = ControlsIterator(staticBytesOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val staticBytesValue          = resolveObject[XFormsSingleNodeControl]("cache-static-state-max-size-bytes-value-control").get
+
+            setControlValueWithEventSearchNested(staticBytesOverrideSelect.effectiveId, encodedTrue)
+            setControlValueWithEventSearchNested(staticBytesValue.effectiveId, "150%")
+            assert(! staticBytesValue.isValid)
+            setControlValueWithEventSearchNested(staticBytesValue.effectiveId, "256m")
+            assert(staticBytesValue.isValid)
+
+            val staticIdleOverride       = resolveObject[XFormsSingleNodeControl]("cache-static-state-max-idle-override-control").get
+            val staticIdleOverrideSelect = ControlsIterator(staticIdleOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val staticIdleValue          = resolveObject[XFormsSingleNodeControl]("cache-static-state-max-idle-value-control").get
+
+            setControlValueWithEventSearchNested(staticIdleOverrideSelect.effectiveId, encodedTrue)
+            setControlValueWithEventSearchNested(staticIdleValue.effectiveId, "invalid-duration")
+            assert(! staticIdleValue.isValid)
+            setControlValueWithEventSearchNested(staticIdleValue.effectiveId, "45m")
+            assert(staticIdleValue.isValid)
+
+            val docsSizeOverride       = resolveObject[XFormsSingleNodeControl]("cache-documents-size-override-control").get
+            val docsSizeOverrideSelect = ControlsIterator(docsSizeOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val docsSizeValue          = resolveObject[XFormsSingleNodeControl]("cache-documents-size-value-control").get
+
+            setControlValueWithEventSearchNested(docsSizeOverrideSelect.effectiveId, encodedTrue)
+            setControlValueWithEventSearchNested(docsSizeValue.effectiveId, "-5")
+            assert(! docsSizeValue.isValid)
+            setControlValueWithEventSearchNested(docsSizeValue.effectiveId, "25")
+            assert(docsSizeValue.isValid)
+
             val configInstance = instance("fr-configuration-instance").get
             val configRoot     = configInstance.rootElement
 
@@ -328,6 +366,16 @@ class ConfigurationPropertiesTest
             val store = PropertyLoader.getPropertyStore(Option(ec.getRequest))
             assert(store.globalPropertySet.getString("oxf.fr.default-language.my-app.my-form").contains("fr"))
             assert(store.globalPropertySet.getIntOpt("oxf.test.custom.persistence.prop").contains(42))
+            assert(store.globalPropertySet.getString("oxf.xforms.cache.static-state.max-size-bytes").contains("256m"))
+            assert(store.globalPropertySet.getString("oxf.xforms.cache.static-state.max-idle").contains("45m"))
+            assert(store.globalPropertySet.getIntOpt("oxf.xforms.cache.documents.size").contains(25))
+
+            // Verify live ObjectCache reconfiguration from reloaded PropertySet without restart
+            val _ = (XFormsStaticStateCache.getCacheForDiagnostics, XFormsDocumentCache.getCacheForDiagnostics)
+            ObjectCache.configureAllIfNeeded(store.globalPropertySet)
+            assert(XFormsStaticStateCache.getCacheForDiagnostics.getMaxSizeBytes.contains(256L * 1024L * 1024L))
+            assert(XFormsStaticStateCache.getCacheForDiagnostics.getMaxIdleMillis.contains(45L * 60_000L))
+            assert(XFormsDocumentCache.getCacheForDiagnostics.getMaxSize == 25)
           }
         }
 
@@ -359,6 +407,8 @@ class ConfigurationPropertiesTest
           }
         }
       }
+      PersistencePropertyProvider.invalidateCache()
+      ObjectCache.configureAllIfNeeded(org.orbeon.oxf.properties.Properties.instance.getPropertySet)
     }
   }
 }

@@ -18,10 +18,10 @@
         </global-state>
 
         <!-- XForms dynamic state store -->
-        <local-cache name="xforms.state" statistics="true">
+        <local-cache name="xforms.store.dynamic-states" statistics="true">
             <expiration max-idle="18000000" interval="120000"/>
             <persistence passivation="true">
-                <file-store purge="true" path="xforms.state">
+                <file-store purge="true" path="xforms.store.dynamic-states">
                     <write-behind modification-queue-size="1024" />
                 </file-store>
             </persistence>
@@ -29,40 +29,41 @@
         </local-cache>
 
         <!-- XForms serialized static state store -->
-        <local-cache name="xforms.static-state" statistics="true">
+        <local-cache name="xforms.store.static-states" statistics="true">
             <expiration max-idle="4h" lifespan="7d" interval="2m"/>
             <persistence passivation="true">
-                <file-store purge="true" path="xforms.static-state" compaction-threshold="0.25">
+                <file-store purge="true" path="xforms.store.static-states" compaction-threshold="0.25">
                     <write-behind modification-queue-size="1024" />
                 </file-store>
             </persistence>
             <memory max-count="100" when-full="REMOVE"/>
         </local-cache>
 
-        <!-- XForms resources store -->
-        <local-cache name="xforms.resources" statistics="true">
+        <!-- XForms aggregated JS/CSS asset bundles store -->
+        <local-cache name="xforms.store.asset-bundles" statistics="true">
             <expiration max-idle="24h" lifespan="7d" interval="5m"/>
             <persistence passivation="true">
-                <file-store purge="true" path="xforms.resources" compaction-threshold="0.25">
+                <file-store purge="true" path="xforms.store.asset-bundles" compaction-threshold="0.25">
                     <write-behind modification-queue-size="1024" />
                 </file-store>
             </persistence>
             <memory max-count="200" when-full="REMOVE"/>
         </local-cache>
 
-        <!-- External mode store -->
-        <local-cache name="form-runner.external-mode-store" statistics="true">
+        <!-- Form Runner external modes store -->
+        <local-cache name="fr.store.external-modes" statistics="true">
             <expiration lifespan="960000" interval="120000"/>
             <memory max-count="200" when-full="REMOVE"/>
         </local-cache>
 
-        <!-- Form Runner form definition cache -->
-        <local-cache name="form-runner.persistence.form-definition" statistics="true">
+        <!-- Form Runner persistence form metadata cache -->
+        <local-cache name="fr.cache.form-metadata" statistics="true">
             <expiration lifespan="300000" interval="120000"/>
             <memory max-count="100" when-full="REMOVE"/>
         </local-cache>
 
-        <local-cache name="orbeon.properties" statistics="true">
+        <!-- Configuration properties cache -->
+        <local-cache name="core.cache.properties" statistics="true">
             <memory max-count="50" when-full="REMOVE"/>
         </local-cache>
 

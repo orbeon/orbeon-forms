@@ -63,30 +63,35 @@ class FormRunnerConsoleTest
       assert(jvmElem.get.attributeValue("estimated-caches-heap-bytes").toLong > 0L)
       assert(jvmElem.get.element("memory-pools").elements("pool").nonEmpty)
 
-      // 2. Unified caches section
+      // 2. Unified caches section (all 12 standardized `<domain>.<cache|store>.<subject>` names)
       val cacheElems = root.element("caches").elements("cache").toList
       val cacheNames = cacheElems.map(_.attributeValue("name")).toSet
 
-      assert(cacheNames.contains("cache.main"))
-      assert(cacheNames.contains("xforms.cache.static-state"))
-      assert(cacheNames.contains("xforms.cache.documents"))
+      assert(cacheNames.contains("core.cache.pipelines"))
+      assert(cacheNames.contains("core.cache.properties"))
+      assert(cacheNames.contains("core.cache.xpath"))
+      assert(cacheNames.contains("fr.cache.form-metadata"))
+      assert(cacheNames.contains("fr.store.external-modes"))
+      assert(cacheNames.contains("xforms.cache.live-documents"))
       assert(cacheNames.contains("xforms.cache.shared-instances"))
-      assert(cacheNames.contains("cache.xpath"))
-      assert(cacheNames.contains("xforms.state"))
-      assert(cacheNames.contains("xforms.static-state"))
-      assert(cacheNames.contains("xbl.global-binding-index"))
+      assert(cacheNames.contains("xforms.cache.static-states"))
+      assert(cacheNames.contains("xforms.cache.xbl-bindings"))
+      assert(cacheNames.contains("xforms.store.asset-bundles"))
+      assert(cacheNames.contains("xforms.store.dynamic-states"))
+      assert(cacheNames.contains("xforms.store.static-states"))
+      assert(cacheElems.forall(_.attributeValue("canonical-key").nonEmpty))
 
-      val stateStoreElem = cacheElems.find(_.attributeValue("name") == "xforms.state").get
-      // Statistics must be enabled on Infinispan `xforms.state`
+      val stateStoreElem = cacheElems.find(_.attributeValue("name") == "xforms.store.dynamic-states").get
+      // Statistics must be enabled on Infinispan `xforms.store.dynamic-states`
       assert(stateStoreElem.attributeValue("hits") != "—")
       assert(stateStoreElem.attributeValue("can-clear") == "false")
 
-      val staticStateStoreElem = cacheElems.find(_.attributeValue("name") == "xforms.static-state").get
+      val staticStateStoreElem = cacheElems.find(_.attributeValue("name") == "xforms.store.static-states").get
       assert(staticStateStoreElem.attributeValue("can-clear") == "false")
 
-      // Default 15% max-heap byte budgets must be active on both `xforms.cache.documents` and `xforms.cache.static-state` (#1973, #1572)
-      val docsObjectCacheElem   = cacheElems.find(_.attributeValue("name") == "xforms.cache.documents").get
-      val staticObjectCacheElem = cacheElems.find(_.attributeValue("name") == "xforms.cache.static-state").get
+      // Default 15% max-heap byte budgets must be active on both `xforms.cache.live-documents` and `xforms.cache.static-states` (#1973, #1572)
+      val docsObjectCacheElem   = cacheElems.find(_.attributeValue("name") == "xforms.cache.live-documents").get
+      val staticObjectCacheElem = cacheElems.find(_.attributeValue("name") == "xforms.cache.static-states").get
       assert(docsObjectCacheElem.attributeValue("max-bytes").toLong > 0L)
       assert(staticObjectCacheElem.attributeValue("max-bytes").toLong > 0L)
       assert(docsObjectCacheElem.attributeValue("limit-summary").contains("max"))
@@ -159,11 +164,13 @@ class FormRunnerConsoleTest
         XFormsDocumentCache.put(wizardDoc)
       }
 
-      // 5. Safe cache clearing policy & stats reset
+      // 5. Safe cache clearing policy & stats reset (both canonical and legacy aliases)
+      assert(! FormRunnerConsole.clearCacheInternal("object-cache", "xforms.cache.live-documents"))
       assert(! FormRunnerConsole.clearCacheInternal("object-cache", "xforms.cache.documents"))
+      assert(! FormRunnerConsole.clearCacheInternal("provider-cache", "xforms.store.dynamic-states"))
       assert(! FormRunnerConsole.clearCacheInternal("provider-cache", "xforms.state"))
-      assert(FormRunnerConsole.resetCacheStatsInternal("xforms.cache.static-state"))
-      assert(FormRunnerConsole.clearCacheInternal("object-cache", "xforms.cache.static-state"))
+      assert(FormRunnerConsole.resetCacheStatsInternal("xforms.cache.static-states"))
+      assert(FormRunnerConsole.clearCacheInternal("object-cache", "xforms.cache.static-states"))
 
       val snapshotAfterClear = FormRunnerConsole.buildConsoleSnapshotDom()
       assert(snapshotAfterClear.getRootElement.element("static-states").attributeValue("count").toInt == 0)

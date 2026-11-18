@@ -318,7 +318,7 @@ object XFormsAssetServerRoute extends NativeRoute {
 
     val resources =
       // New hash-based mechanism
-      XFormsStores.resourcesStore.get(hash) match {
+      XFormsStores.assetBundlesStore.get(hash) match {
         case Some(value: Array[String]) =>
           // Mapping found
           value.toList map (r => AssetPath(r, hasMin = false))
@@ -509,7 +509,7 @@ object XFormsAssetServerRoute extends NativeRoute {
 
   // For unit tests only (called from XSLT)
   def testGetResources(key: String): Array[String] =
-    XFormsStores.resourcesStore.get(key) map (_.asInstanceOf[Array[String]]) orNull
+    XFormsStores.assetBundlesStore.get(key) map (_.asInstanceOf[Array[String]]) orNull
 
   // Information about the resource, stored into the session
   case class DynamicResource(

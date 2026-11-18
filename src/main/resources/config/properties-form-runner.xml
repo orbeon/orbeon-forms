@@ -122,8 +122,8 @@
     <property as="xs:boolean" name="oxf.fr.persistence.*.escape-non-ascii-characters"              value="false"/>
     <property as="xs:string"  name="oxf.fr.persistence.attachments.filename.*.*"                   value="concat(fr:attachment-id(), '.bin')"/>
 
-    <!-- Whether to use the form definition cache -->
-    <property as="xs:boolean" name="oxf.fr.persistence.proxy.form-definition-cache.enable"         value="true"/>
+    <!-- Whether to use the form metadata cache -->
+    <property as="xs:boolean" name="oxf.fr.persistence.proxy.form-metadata-cache.enable"           value="true"/>
 
     <property as="xs:string"  name="oxf.fr.default-timezone"                                       value=""/>
     <property as="xs:string"  name="oxf.fr.default-language.*.*"                                   value="en"/>

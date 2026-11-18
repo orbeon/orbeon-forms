@@ -24,7 +24,7 @@ trait PropertyLoaderPlatform extends PropertyLoaderTrait {
 
   private val BootPropertyProviderClassName           = "org.orbeon.oxf.properties.ResourcesPropertyProvider"
   private val PropertyProvidersClassnamesPropertyName = "oxf.properties.providers.classnames"
-  private val ProviderEtagCacheName                    = "orbeon.properties"
+  private val ProviderEtagCacheName                    = "core.cache.properties"
 
   import java.util.concurrent.atomic.AtomicInteger
   import scala.collection.mutable

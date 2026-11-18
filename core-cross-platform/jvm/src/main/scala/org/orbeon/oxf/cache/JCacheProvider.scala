@@ -20,23 +20,21 @@ class JCacheProvider(store: Boolean) extends CacheProviderApi {
 
   val ProviderName = "jcache"
 
-  def get(cacheName: String): Option[CacheApi] = {
-    val cacheOpt = Option(cacheManager.getCache[io.Serializable, io.Serializable](cacheName))
-    val cache = cacheOpt.getOrElse(
-      cacheManager.createCache
-        [io.Serializable, io.Serializable, MutableConfiguration[io.Serializable, io.Serializable]]
-        (
-          cacheName,
-          new MutableConfiguration[io.Serializable, io.Serializable]().tap { config =>
-            // Force storing by reference if we are a plain cache, otherwise leave it to the default. It doesn't seem
-            // that this can be configured in the declarative XML configuration file for Ehcache 3, so we do it here.
-            if (! store)
-              config.setStoreByValue(false)
-          }
-        )
-    )
-    // We always return a `Some` since our implementation for JCache always creates a cache if one doesn't
-    // already exist, while our implementation for EHCache 2 doesn't.
+  def findConfigured(cacheName: String): Option[CacheApi] =
+    Option(cacheManager.getCache[io.Serializable, io.Serializable](cacheName))
+      .map(new JCacheCacheApi(_))
+
+  override def createDefault(cacheName: String): Option[CacheApi] = {
+    val cache =
+      cacheManager.createCache[io.Serializable, io.Serializable, MutableConfiguration[io.Serializable, io.Serializable]](
+        cacheName,
+        new MutableConfiguration[io.Serializable, io.Serializable]().tap { config =>
+          // Force storing by reference if we are a plain cache, otherwise leave it to the default. It doesn't seem
+          // that this can be configured in the declarative XML configuration file for Ehcache 3, so we do it here.
+          if (! store)
+            config.setStoreByValue(false)
+        }
+      )
     Some(new JCacheCacheApi(cache))
   }
 

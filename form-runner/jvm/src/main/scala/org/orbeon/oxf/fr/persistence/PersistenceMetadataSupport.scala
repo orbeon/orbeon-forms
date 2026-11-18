@@ -33,12 +33,17 @@ import scala.util.{Success, Try}
 //
 object PersistenceMetadataSupport {
 
-  private def cacheEnabled =
-    ! Properties.instance.getPropertySet.getBooleanOpt(s"$PersistenceProxyPropertyPrefix.form-definition-cache.enable").contains(false)
+  private def cacheEnabled = {
+    val ps = Properties.instance.getPropertySet
+    ps.getBooleanOpt(s"$PersistenceProxyPropertyPrefix.form-metadata-cache.enable") match {
+      case Some(false) => false
+      case _           => ! ps.getBooleanOpt(s"$PersistenceProxyPropertyPrefix.form-definition-cache.enable").contains(false)
+    }
+  }
 
   // Use `lazy val`s so we get an exception other than `ExceptionInInitializerError`
   private lazy val formDefinitionCache =
-    cacheEnabled option CacheSupport.getOrElseThrow("form-runner.persistence.form-definition", store = false)
+    cacheEnabled option CacheSupport.getOrElseThrow("fr.cache.form-metadata", store = false)
 
   private type CacheKey = (String, String, Int) // app/form/version
 

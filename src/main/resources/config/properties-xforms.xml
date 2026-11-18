@@ -71,12 +71,12 @@
     <property as="xs:string"  name="oxf.xforms.store.infinispan.resource"               value=""/>
     <property as="xs:string"  name="oxf.xforms.store.infinispan.uri"                    value=""/>
 
-    <property as="xs:integer" name="oxf.xforms.cache.documents.size"                    value="50"/>
-    <property as="xs:string"  name="oxf.xforms.cache.documents.max-size-bytes"          value="15%"/>
-    <property as="xs:string"  name="oxf.xforms.cache.documents.max-idle"                value=""/>
-    <property as="xs:integer" name="oxf.xforms.cache.static-state.size"                 value="50"/>
-    <property as="xs:string"  name="oxf.xforms.cache.static-state.max-size-bytes"       value="15%"/>
-    <property as="xs:string"  name="oxf.xforms.cache.static-state.max-idle"             value=""/>
+    <property as="xs:integer" name="oxf.xforms.cache.live-documents.size"               value="50"/>
+    <property as="xs:string"  name="oxf.xforms.cache.live-documents.max-size-bytes"     value="15%"/>
+    <property as="xs:string"  name="oxf.xforms.cache.live-documents.max-idle"           value=""/>
+    <property as="xs:integer" name="oxf.xforms.cache.static-states.size"                value="50"/>
+    <property as="xs:string"  name="oxf.xforms.cache.static-states.max-size-bytes"      value="15%"/>
+    <property as="xs:string"  name="oxf.xforms.cache.static-states.max-idle"            value=""/>
     <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"             value="50"/>
     <property as="xs:string"  name="oxf.xforms.cache.shared-instances.max-size-bytes"   value=""/>
     <property as="xs:string"  name="oxf.xforms.cache.shared-instances.max-idle"         value=""/>

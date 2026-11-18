@@ -43,7 +43,7 @@ object XFormsDocumentCache {
 
   private object Private {
 
-    val CacheName                 = "xforms.cache.documents"
+    val CacheName                 = "xforms.cache.live-documents"
     val DefaultSize               = 50
     val ConstantValidity          = 0L
     val ContainingDocumentKeyType = CacheName

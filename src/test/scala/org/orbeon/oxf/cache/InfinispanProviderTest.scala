@@ -81,9 +81,12 @@ class InfinispanProviderTest
       val uriProps = propsFrom("oxf.xforms.cache.infinispan.uri" -> "oxf:/config/infinispan.xml")
       val p1       = new InfinispanProvider(store = true, Some(uriProps))
       try {
-        assert(p1.get("xforms.state").isDefined)
-        assert(p1.get("xforms.static-state").isDefined)
-        assert(p1.get("xforms.resources").isDefined)
+        assert(p1.findConfigured("xforms.store.dynamic-states").isDefined)
+        assert(p1.findConfigured("xforms.store.static-states").isDefined)
+        assert(p1.findConfigured("xforms.store.asset-bundles").isDefined)
+        assert(p1.findConfigured("fr.store.external-modes").isDefined)
+        assert(p1.findConfigured("fr.cache.form-metadata").isDefined)
+        assert(p1.findConfigured("core.cache.properties").isDefined)
       } finally {
         p1.close()
       }
@@ -91,9 +94,51 @@ class InfinispanProviderTest
       val resProps = propsFrom("oxf.xforms.store.infinispan.resource" -> "/config/infinispan.xml")
       val p2       = new InfinispanProvider(store = true, Some(resProps))
       try {
-        assert(p2.get("xforms.static-state").flatMap(_.getMaxEntriesLocalHeap).contains(100L))
+        assert(p2.findConfigured("xforms.store.static-states").flatMap(_.getMaxEntriesLocalHeap).contains(100L))
+        assert(p2.findConfigured("fr.cache.form-metadata").flatMap(_.getMaxEntriesLocalHeap).contains(100L))
       } finally {
         p2.close()
+      }
+    }
+
+    it("must map legacy provider cache names to canonical names and support legacy Infinispan XML configs") {
+      assert(CacheSupport.toCanonicalCacheName("xforms.state") == "xforms.store.dynamic-states")
+      assert(CacheSupport.toCanonicalCacheName("xforms.static-state") == "xforms.store.static-states")
+      assert(CacheSupport.toCanonicalCacheName("xforms.resources") == "xforms.store.asset-bundles")
+      assert(CacheSupport.toCanonicalCacheName("orbeon.properties") == "core.cache.properties")
+      assert(CacheSupport.toCanonicalCacheName("form-runner.persistence.form-definition") == "fr.cache.form-metadata")
+      assert(CacheSupport.toCanonicalCacheName("form-runner.external-mode-store") == "fr.store.external-modes")
+
+      val legacyXml =
+        """<?xml version="1.0" encoding="UTF-8"?>
+          |<infinispan
+          |    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          |    xsi:schemaLocation="urn:infinispan:config:16.2 https://infinispan.org/schemas/infinispan-config-16.2.xsd"
+          |    xmlns="urn:infinispan:config:16.2">
+          |  <cache-container name="legacy-test-container" statistics="true">
+          |    <local-cache name="xforms.state" statistics="true">
+          |      <memory max-count="77" when-full="REMOVE"/>
+          |    </local-cache>
+          |  </cache-container>
+          |</infinispan>
+          |""".stripMargin
+
+      val tempFile = Files.createTempFile("orbeon-infinispan-legacy-", ".xml")
+      try {
+        Files.write(tempFile, legacyXml.getBytes(StandardCharsets.UTF_8))
+        val props    = propsFrom("oxf.xforms.store.infinispan.uri" -> tempFile.toUri.toString)
+        val provider = new InfinispanProvider(store = true, Some(props))
+        try {
+          assert(provider.findConfigured("xforms.store.dynamic-states").isEmpty)
+          val legacyFallback =
+            provider.findConfigured("xforms.store.dynamic-states")
+              .orElse(CacheSupport.LegacyProviderCacheNames.get("xforms.store.dynamic-states").flatMap(provider.findConfigured))
+          assert(legacyFallback.flatMap(_.getMaxEntriesLocalHeap).contains(77L))
+        } finally {
+          provider.close()
+        }
+      } finally {
+        Files.deleteIfExists(tempFile)
       }
     }
 

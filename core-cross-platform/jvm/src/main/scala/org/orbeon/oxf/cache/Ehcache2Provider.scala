@@ -31,7 +31,7 @@ object Ehcache2Provider extends CacheProviderApi {
   import CacheSupport.Logger.*
   import Private.*
 
-  def get(cacheName: String): Option[CacheApi] =
+  def findConfigured(cacheName: String): Option[CacheApi] =
     cacheManager.getCache(cacheName) match {
       case cache: ehcache.Cache =>
         debug(s"found Ehcache 2 cache for `$cacheName`")

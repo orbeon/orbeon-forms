@@ -23,13 +23,39 @@ import org.orbeon.oxf.util.StringUtils.*
 
 object ObjectCache {
 
-  val DefaultCacheName = "cache.main"
+  val DefaultCacheName = "core.cache.pipelines"
   private val DefaultSize = 200
 
   private val CachePropertyNamePrefix      = "oxf"
   private val CachePropertyNameSizeSuffix  = "size"
   private val CachePropertyMaxBytesSuffix  = "max-size-bytes"
   private val CachePropertyMaxIdleSuffix   = "max-idle"
+
+  private final case class LegacyObjectCacheSpec(
+    legacyPrefixes : List[String],
+    defaultSize    : Int,
+    defaultMaxBytes: String,
+    defaultMaxIdle : String
+  )
+
+  val LegacyCacheAliases: Map[String, String] = Map(
+    "cache.main"                -> "core.cache.pipelines",
+    "cache.xpath"               -> "core.cache.xpath",
+    "xforms.cache.documents"    -> "xforms.cache.live-documents",
+    "xforms.cache.static-state" -> "xforms.cache.static-states"
+  )
+
+  private val LegacyObjectCacheSpecs: Map[String, LegacyObjectCacheSpec] = Map(
+    "core.cache.pipelines"        -> LegacyObjectCacheSpec(List("oxf.cache", "oxf.cache.main"),   defaultSize = 1000, defaultMaxBytes = "",    defaultMaxIdle = ""),
+    "core.cache.xpath"            -> LegacyObjectCacheSpec(List("oxf.cache.xpath"),               defaultSize = 5000, defaultMaxBytes = "",    defaultMaxIdle = ""),
+    "xforms.cache.live-documents" -> LegacyObjectCacheSpec(List("oxf.xforms.cache.documents"),    defaultSize = 50,   defaultMaxBytes = "15%", defaultMaxIdle = ""),
+    "xforms.cache.static-states"  -> LegacyObjectCacheSpec(List("oxf.xforms.cache.static-state"), defaultSize = 50,   defaultMaxBytes = "15%", defaultMaxIdle = "")
+  )
+
+  private val warnedLegacyProperties = ju.concurrent.ConcurrentHashMap.newKeySet[String]()
+
+  def canonicalCacheName(cacheName: String): String =
+    LegacyCacheAliases.getOrElse(cacheName, cacheName)
 
   private val ByteSpecRegex     = """(?i)^([0-9]+(?:\.[0-9]+)?)\s*(b|k|kb|kib|m|mb|mib|g|gb|gib)?$""".r
   private val DurationSpecRegex = """(?i)^([0-9]+)\s*(ms|s|m|h|d)?$""".r
@@ -48,21 +74,23 @@ object ObjectCache {
   def instance: Cache = namedObjectCaches.get(DefaultCacheName)
 
   // Get the instance of the object cache specified
-  def instance(cacheName: String, defaultSize: Int): Cache =
+  def instance(cacheName: String, defaultSize: Int): Cache = {
+    val canonical = canonicalCacheName(cacheName)
     namedObjectCaches.computeIfAbsent(
-      cacheName,
+      canonical,
       _ => {
-        registeredDefaults.put(cacheName, defaultSize)
+        registeredDefaults.put(canonical, defaultSize)
         val cache = new MemoryCacheImpl(defaultSize)
         Try(Option(Properties.instance.getPropertySet)).toOption.flatten.foreach { ps =>
-          configureCacheFromPropertySet(cacheName, defaultSize, cache, ps)
+          configureCacheFromPropertySet(canonical, defaultSize, cache, ps)
         }
         cache
       }
     )
+  }
 
   def findCache(cacheName: String): Option[Cache] =
-    Option(namedObjectCaches.get(cacheName))
+    Option(namedObjectCaches.get(canonicalCacheName(cacheName)))
 
   def allCaches: List[(String, Cache)] =
     namedObjectCaches.entrySet.asScala.map(e => e.getKey -> e.getValue).toList.sortBy(_._1)
@@ -79,18 +107,32 @@ object ObjectCache {
       lastConfiguredPropertySet = propertySet
     }
 
-  private def propertyPrefixesFor(cacheName: String): List[String] =
-    if (cacheName == DefaultCacheName)
-      List("oxf.cache", s"$CachePropertyNamePrefix.$DefaultCacheName")
-    else
-      List(s"$CachePropertyNamePrefix.$cacheName")
+  private def warnLegacyPropertyOnce(legacyName: String, canonicalName: String): Unit =
+    if (warnedLegacyProperties.add(legacyName))
+      CacheSupport.Logger.warn(s"Deprecated cache property `$legacyName` is in use; rename it to `$canonicalName`.")
 
-  private def readStringOrNumericOpt(propertySet: PropertySet, prefixes: List[String], suffix: String): Option[String] =
-    prefixes.iterator
-      .flatMap(prefix => propertySet.getObjectOpt(s"$prefix.$suffix"))
-      .map(_.toString)
-      .flatMap(_.trimAllToOpt)
-      .nextOption()
+  private def resolveRawStringWithLegacyFallback(
+    propertySet     : PropertySet,
+    canonicalName   : String,
+    suffix          : String,
+    specOpt         : Option[LegacyObjectCacheSpec],
+    builtInDefaultFn: LegacyObjectCacheSpec => String
+  ): Option[String] = {
+    val canonicalProp = s"$CachePropertyNamePrefix.$canonicalName.$suffix"
+    val newRawOpt     = propertySet.getObjectOpt(canonicalProp).map(_.toString.trim)
+    val legacyHitOpt  =
+      specOpt.toList.flatMap(_.legacyPrefixes).iterator
+        .flatMap(p => propertySet.getObjectOpt(s"$p.$suffix").map(v => s"$p.$suffix" -> v.toString.trim))
+        .nextOption()
+
+    legacyHitOpt match {
+      case Some((legacyProp, legacyVal)) if newRawOpt.forall(v => specOpt.exists(s => builtInDefaultFn(s) == v)) =>
+        warnLegacyPropertyOnce(legacyProp, canonicalProp)
+        legacyVal.trimAllToOpt
+      case _ =>
+        newRawOpt.flatMap(_.trimAllToOpt)
+    }
+  }
 
   def configureCacheFromPropertySet(
     cacheName  : String,
@@ -98,20 +140,30 @@ object ObjectCache {
     cache      : Cache,
     propertySet: PropertySet
   ): Unit = {
-    val prefixes = propertyPrefixesFor(cacheName)
+    val canonical     = canonicalCacheName(cacheName)
+    val specOpt       = LegacyObjectCacheSpecs.get(canonical)
+    val canonicalSize = s"$CachePropertyNamePrefix.$canonical.$CachePropertyNameSizeSuffix"
+    val newSizeOpt    = propertySet.getIntOpt(canonicalSize)
+    val legacySizeOpt =
+      specOpt.toList.flatMap(_.legacyPrefixes).iterator
+        .flatMap(p => propertySet.getIntOpt(s"$p.$CachePropertyNameSizeSuffix").map(v => s"$p.$CachePropertyNameSizeSuffix" -> v))
+        .nextOption()
 
     val resolvedMaxSize =
-      prefixes.iterator
-        .flatMap(prefix => propertySet.getIntOpt(s"$prefix.$CachePropertyNameSizeSuffix"))
-        .nextOption()
-        .getOrElse(defaultSize)
+      legacySizeOpt match {
+        case Some((legacyProp, legacySize)) if newSizeOpt.forall(v => specOpt.exists(_.defaultSize == v)) =>
+          warnLegacyPropertyOnce(legacyProp, canonicalSize)
+          legacySize
+        case _ =>
+          newSizeOpt.getOrElse(defaultSize)
+      }
 
     val resolvedMaxBytes =
-      readStringOrNumericOpt(propertySet, prefixes, CachePropertyMaxBytesSuffix)
+      resolveRawStringWithLegacyFallback(propertySet, canonical, CachePropertyMaxBytesSuffix, specOpt, _.defaultMaxBytes)
         .flatMap(parseMaxSizeBytes(_, Runtime.getRuntime.maxMemory()))
 
     val resolvedMaxIdle =
-      readStringOrNumericOpt(propertySet, prefixes, CachePropertyMaxIdleSuffix)
+      resolveRawStringWithLegacyFallback(propertySet, canonical, CachePropertyMaxIdleSuffix, specOpt, _.defaultMaxIdle)
         .flatMap(parseDurationMillis)
 
     cache.setMaxSize(resolvedMaxSize)

@@ -29,9 +29,9 @@
             diskExpiryThreadIntervalSeconds="120"
             memoryStoreEvictionPolicy="LRU"/>
 
-    <!-- XForms state store configuration. Only modify if you know what you are doing! -->
+    <!-- XForms dynamic state store configuration. Only modify if you know what you are doing! -->
     <!-- NOTE: We set this as a disk cache, but follow the Ehcache doc and set maxElementsInMemory to 1 instead of 0. -->
-    <cache name="xforms.state"
+    <cache name="xforms.store.dynamic-states"
            maxElementsInMemory="1"
            memoryStoreEvictionPolicy="LFU"
            overflowToDisk="true"
@@ -44,7 +44,7 @@
            diskExpiryThreadIntervalSeconds="120"/>
 
     <!-- XForms serialized static state store -->
-    <cache name="xforms.static-state"
+    <cache name="xforms.store.static-states"
            maxElementsInMemory="100"
            memoryStoreEvictionPolicy="LFU"
            overflowToDisk="true"
@@ -56,8 +56,8 @@
            maxElementsOnDisk="0"
            diskExpiryThreadIntervalSeconds="120"/>
 
-    <!-- XForms resources. Only modify if you know what you are doing! -->
-    <cache name="xforms.resources"
+    <!-- XForms aggregated JS/CSS asset bundles store. Only modify if you know what you are doing! -->
+    <cache name="xforms.store.asset-bundles"
            maxElementsInMemory="200"
            memoryStoreEvictionPolicy="LFU"
            overflowToDisk="true"
@@ -69,8 +69,8 @@
            maxElementsOnDisk="0"
            diskExpiryThreadIntervalSeconds="120"/>
 
-    <!-- Form Runner persistence form definitions. Only modify if you know what you are doing! -->
-    <cache name="form-runner.persistence.form-definition"
+    <!-- Form Runner persistence form metadata cache. Only modify if you know what you are doing! -->
+    <cache name="fr.cache.form-metadata"
            maxElementsInMemory="100"
            memoryStoreEvictionPolicy="LFU"
            overflowToDisk="false"
@@ -82,7 +82,7 @@
            maxElementsOnDisk="0"
            diskExpiryThreadIntervalSeconds="120"/>
 
-    <cache name="form-runner.external-mode-store"
+    <cache name="fr.store.external-modes"
            maxElementsInMemory="200"
            memoryStoreEvictionPolicy="LFU"
            overflowToDisk="true"
@@ -94,7 +94,7 @@
            maxElementsOnDisk="0"
            diskExpiryThreadIntervalSeconds="120"/>
 
-    <cache name="orbeon.properties"
+    <cache name="core.cache.properties"
            maxElementsInMemory="50"
            memoryStoreEvictionPolicy="LFU"
            overflowToDisk="false"

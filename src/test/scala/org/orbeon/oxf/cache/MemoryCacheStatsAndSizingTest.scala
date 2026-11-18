@@ -19,7 +19,10 @@ import scala.concurrent.duration.*
 import scala.concurrent.{Await, Future}
 
 import org.orbeon.dom
+import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.xml.SAXStore
+import org.orbeon.oxf.xml.XMLConstants.{XS_INTEGER_QNAME, XS_STRING_QNAME}
 import org.scalatest.funspec.AnyFunSpecLike
 import org.xml.sax.helpers.AttributesImpl
 
@@ -231,6 +234,37 @@ class MemoryCacheStatsAndSizingTest extends AnyFunSpecLike {
       assert(ObjectCache.parseDurationMillis("1d").contains(86_400_000L))
       assert(ObjectCache.parseDurationMillis("PT30M").contains(30L * 60_000L))
       assert(ObjectCache.parseDurationMillis("120000").contains(120_000L))
+    }
+
+    it("must honor legacy ObjectCache properties over untouched built-in defaults while preferring explicit canonical overrides") {
+      assert(ObjectCache.canonicalCacheName("cache.main") == "core.cache.pipelines")
+      assert(ObjectCache.canonicalCacheName("cache.xpath") == "core.cache.xpath")
+      assert(ObjectCache.canonicalCacheName("xforms.cache.documents") == "xforms.cache.live-documents")
+      assert(ObjectCache.canonicalCacheName("xforms.cache.static-state") == "xforms.cache.static-states")
+
+      val cache = new MemoryCacheImpl(50)
+
+      // 1. Legacy `oxf.xforms.cache.documents.size = 2` wins when `oxf.xforms.cache.live-documents.size` is at its built-in default `50`
+      val legacyOverrideProps = PropertySet.forTests(Seq(
+        PropertyParams(Map.empty, "oxf.xforms.cache.live-documents.size",          XS_INTEGER_QNAME, "50"),
+        PropertyParams(Map.empty, "oxf.xforms.cache.live-documents.max-size-bytes", XS_STRING_QNAME,  "15%"),
+        PropertyParams(Map.empty, "oxf.xforms.cache.documents.size",               XS_INTEGER_QNAME, "2"),
+        PropertyParams(Map.empty, "oxf.xforms.cache.documents.max-size-bytes",     XS_STRING_QNAME,  "0")
+      ))
+      ObjectCache.configureCacheFromPropertySet("xforms.cache.live-documents", 50, cache, legacyOverrideProps)
+      assert(cache.getMaxSize == 2)
+      assert(cache.getMaxSizeBytes.isEmpty)
+
+      // 2. Explicit canonical override (`oxf.xforms.cache.live-documents.size = 25`) wins when both legacy and canonical are set
+      val bothProps = PropertySet.forTests(Seq(
+        PropertyParams(Map.empty, "oxf.xforms.cache.live-documents.size",          XS_INTEGER_QNAME, "25"),
+        PropertyParams(Map.empty, "oxf.xforms.cache.live-documents.max-size-bytes", XS_STRING_QNAME,  "128m"),
+        PropertyParams(Map.empty, "oxf.xforms.cache.documents.size",               XS_INTEGER_QNAME, "2"),
+        PropertyParams(Map.empty, "oxf.xforms.cache.documents.max-size-bytes",     XS_STRING_QNAME,  "0")
+      ))
+      ObjectCache.configureCacheFromPropertySet("xforms.cache.live-documents", 50, cache, bothProps)
+      assert(cache.getMaxSize == 25)
+      assert(cache.getMaxSizeBytes.contains(128L * 1024L * 1024L))
     }
   }
 

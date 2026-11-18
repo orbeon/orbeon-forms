@@ -436,28 +436,28 @@
                             </item>
                         </session-heartbeat>
                         <cache-documents-size>
-                            <label>XForms Documents Cache Max Entries</label>
-                            <hint>Maximum live XForms documents kept in JVM heap before passivating to store &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.documents.size&lt;/code&gt;</hint>
+                            <label>XForms Live Documents Cache Max Entries</label>
+                            <hint>Maximum live XForms documents kept in JVM heap before passivating to store &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.size&lt;/code&gt;</hint>
                         </cache-documents-size>
                         <cache-documents-max-size-bytes>
-                            <label>XForms Documents Cache Byte Budget</label>
-                            <hint>Max heap percentage or byte limit (e.g. &lt;code&gt;15%&lt;/code&gt;, &lt;code&gt;256m&lt;/code&gt;, &lt;code&gt;1g&lt;/code&gt;, or &lt;code&gt;0&lt;/code&gt; for unlimited) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.documents.max-size-bytes&lt;/code&gt;</hint>
+                            <label>XForms Live Documents Cache Byte Budget</label>
+                            <hint>Max heap percentage or byte limit (e.g. &lt;code&gt;15%&lt;/code&gt;, &lt;code&gt;256m&lt;/code&gt;, &lt;code&gt;1g&lt;/code&gt;, or &lt;code&gt;0&lt;/code&gt; for unlimited) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.max-size-bytes&lt;/code&gt;</hint>
                         </cache-documents-max-size-bytes>
                         <cache-documents-max-idle>
-                            <label>XForms Documents Cache Max Idle</label>
-                            <hint>Optional idle timeout before passivating live documents (e.g. &lt;code&gt;30m&lt;/code&gt;, &lt;code&gt;2h&lt;/code&gt;, or blank) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.documents.max-idle&lt;/code&gt;</hint>
+                            <label>XForms Live Documents Cache Max Idle</label>
+                            <hint>Optional idle timeout before passivating live documents (e.g. &lt;code&gt;30m&lt;/code&gt;, &lt;code&gt;2h&lt;/code&gt;, or blank) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.max-idle&lt;/code&gt;</hint>
                         </cache-documents-max-idle>
                         <cache-static-state-size>
-                            <label>XForms Static State Cache Max Entries</label>
-                            <hint>Maximum compiled XForms static states kept in JVM heap &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-state.size&lt;/code&gt;</hint>
+                            <label>XForms Static States Cache Max Entries</label>
+                            <hint>Maximum compiled XForms static states kept in JVM heap &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.size&lt;/code&gt;</hint>
                         </cache-static-state-size>
                         <cache-static-state-max-size-bytes>
-                            <label>XForms Static State Cache Byte Budget</label>
-                            <hint>Max heap percentage or byte limit (e.g. &lt;code&gt;15%&lt;/code&gt;, &lt;code&gt;256m&lt;/code&gt;, &lt;code&gt;1g&lt;/code&gt;, or &lt;code&gt;0&lt;/code&gt; for unlimited) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-state.max-size-bytes&lt;/code&gt;</hint>
+                            <label>XForms Static States Cache Byte Budget</label>
+                            <hint>Max heap percentage or byte limit (e.g. &lt;code&gt;15%&lt;/code&gt;, &lt;code&gt;256m&lt;/code&gt;, &lt;code&gt;1g&lt;/code&gt;, or &lt;code&gt;0&lt;/code&gt; for unlimited) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-size-bytes&lt;/code&gt;</hint>
                         </cache-static-state-max-size-bytes>
                         <cache-static-state-max-idle>
-                            <label>XForms Static State Cache Max Idle</label>
-                            <hint>Optional idle timeout before spilling static states to store (e.g. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt;, or blank) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-state.max-idle&lt;/code&gt;</hint>
+                            <label>XForms Static States Cache Max Idle</label>
+                            <hint>Optional idle timeout before spilling static states to store (e.g. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt;, or blank) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
                         </cache-static-state-max-idle>
                         <navbar-home-link>
                             <label>Show Home Link in Navbar</label>
@@ -2554,28 +2554,28 @@
                             </item>
                         </session-heartbeat>
                         <cache-documents-size>
-                            <label>Cache des documents XForms (entrées max)</label>
-                            <hint>Nombre maximal de documents XForms actifs en mémoire JVM avant passivation &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.documents.size&lt;/code&gt;</hint>
+                            <label>Cache des documents XForms actifs (entrées max)</label>
+                            <hint>Nombre maximal de documents XForms actifs en mémoire JVM avant passivation &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.size&lt;/code&gt;</hint>
                         </cache-documents-size>
                         <cache-documents-max-size-bytes>
-                            <label>Budget mémoire du cache des documents XForms</label>
-                            <hint>Pourcentage du tas max ou limite en octets (ex. &lt;code&gt;15%&lt;/code&gt;, &lt;code&gt;256m&lt;/code&gt;, &lt;code&gt;1g&lt;/code&gt; ou &lt;code&gt;0&lt;/code&gt; sans limite) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.documents.max-size-bytes&lt;/code&gt;</hint>
+                            <label>Budget mémoire du cache des documents XForms actifs</label>
+                            <hint>Pourcentage du tas max ou limite en octets (ex. &lt;code&gt;15%&lt;/code&gt;, &lt;code&gt;256m&lt;/code&gt;, &lt;code&gt;1g&lt;/code&gt; ou &lt;code&gt;0&lt;/code&gt; sans limite) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.max-size-bytes&lt;/code&gt;</hint>
                         </cache-documents-max-size-bytes>
                         <cache-documents-max-idle>
-                            <label>Inactivité max du cache des documents XForms</label>
-                            <hint>Délai d'inactivité optionnel avant passivation des documents actifs (ex. &lt;code&gt;30m&lt;/code&gt;, &lt;code&gt;2h&lt;/code&gt; ou vide) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.documents.max-idle&lt;/code&gt;</hint>
+                            <label>Inactivité max du cache des documents XForms actifs</label>
+                            <hint>Délai d'inactivité optionnel avant passivation des documents actifs (ex. &lt;code&gt;30m&lt;/code&gt;, &lt;code&gt;2h&lt;/code&gt; ou vide) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.live-documents.max-idle&lt;/code&gt;</hint>
                         </cache-documents-max-idle>
                         <cache-static-state-size>
-                            <label>Cache d'états statiques XForms (entrées max)</label>
-                            <hint>Nombre maximal d'états statiques XForms compilés conservés en mémoire JVM &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-state.size&lt;/code&gt;</hint>
+                            <label>Cache des états statiques XForms (entrées max)</label>
+                            <hint>Nombre maximal d'états statiques XForms compilés conservés en mémoire JVM &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.size&lt;/code&gt;</hint>
                         </cache-static-state-size>
                         <cache-static-state-max-size-bytes>
-                            <label>Budget mémoire du cache d'états statiques XForms</label>
-                            <hint>Pourcentage du tas max ou limite en octets (ex. &lt;code&gt;15%&lt;/code&gt;, &lt;code&gt;256m&lt;/code&gt;, &lt;code&gt;1g&lt;/code&gt; ou &lt;code&gt;0&lt;/code&gt; sans limite) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-state.max-size-bytes&lt;/code&gt;</hint>
+                            <label>Budget mémoire du cache des états statiques XForms</label>
+                            <hint>Pourcentage du tas max ou limite en octets (ex. &lt;code&gt;15%&lt;/code&gt;, &lt;code&gt;256m&lt;/code&gt;, &lt;code&gt;1g&lt;/code&gt; ou &lt;code&gt;0&lt;/code&gt; sans limite) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-size-bytes&lt;/code&gt;</hint>
                         </cache-static-state-max-size-bytes>
                         <cache-static-state-max-idle>
-                            <label>Inactivité max du cache d'états statiques XForms</label>
-                            <hint>Délai d'inactivité optionnel avant éviction vers le magasin d'état (ex. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; ou vide) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-state.max-idle&lt;/code&gt;</hint>
+                            <label>Inactivité max du cache des états statiques XForms</label>
+                            <hint>Délai d'inactivité optionnel avant éviction vers le magasin d'état (ex. &lt;code&gt;2h&lt;/code&gt;, &lt;code&gt;1d&lt;/code&gt; ou vide) &lt;code class="fr-config-prop-name"&gt;oxf.xforms.cache.static-states.max-idle&lt;/code&gt;</hint>
                         </cache-static-state-max-idle>
                         <navbar-home-link>
                             <label>Lien d'accueil dans la barre de navigation</label>

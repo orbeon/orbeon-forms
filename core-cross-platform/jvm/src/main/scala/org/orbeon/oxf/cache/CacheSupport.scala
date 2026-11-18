@@ -43,7 +43,9 @@ case class CacheProviderStats(
 
 trait CacheProviderApi {
   val ProviderName: String
-  def get(cacheName: String): Option[CacheApi]
+  def findConfigured(cacheName: String): Option[CacheApi]
+  def createDefault(cacheName: String): Option[CacheApi] = None
+  def get(cacheName: String): Option[CacheApi] = findConfigured(cacheName).orElse(createDefault(cacheName))
   def listRunningCacheSnapshots: List[CacheProviderStats]
   def close(): Unit
 }
@@ -119,14 +121,47 @@ object CacheSupport {
     (loadProvider(store = true, propertySet), loadProvider(store = false, propertySet))
   }
 
+  val LegacyProviderCacheNames: Map[String, String] = Map(
+    "core.cache.properties"       -> "orbeon.properties",
+    "xforms.store.dynamic-states" -> "xforms.state",
+    "xforms.store.static-states"  -> "xforms.static-state",
+    "xforms.store.asset-bundles"  -> "xforms.resources",
+    "fr.cache.form-metadata"      -> "form-runner.persistence.form-definition",
+    "fr.store.external-modes"     -> "form-runner.external-mode-store"
+  )
+
+  val CanonicalByLegacyProviderCacheName: Map[String, String] =
+    LegacyProviderCacheNames.map(_.swap)
+
+  private val warnedLegacyCaches = java.util.concurrent.ConcurrentHashMap.newKeySet[String]()
+
+  def toCanonicalCacheName(cacheName: String): String =
+    CanonicalByLegacyProviderCacheName.getOrElse(cacheName, cacheName)
+
+  private def warnLegacyCacheOnce(legacyName: String, canonicalName: String): Unit =
+    if (warnedLegacyCaches.add(legacyName))
+      Logger.warn(s"Deprecated cache/store name `$legacyName` found in provider configuration; rename it to `$canonicalName`.")
+
   def close(): Unit = {
     storeProvider.close()
     if (storeProvider ne cacheProvider)
       cacheProvider.close()
   }
 
-  def findCache(cacheName: String, store: Boolean): Option[CacheApi] =
-    (if (store) storeProvider else cacheProvider).get(cacheName)
+  def findCache(cacheName: String, store: Boolean): Option[CacheApi] = {
+    val canonical = toCanonicalCacheName(cacheName)
+    val provider  = if (store) storeProvider else cacheProvider
+    provider.findConfigured(canonical)
+      .orElse {
+        LegacyProviderCacheNames.get(canonical).flatMap { legacy =>
+          val found = provider.findConfigured(legacy)
+          if (found.isDefined)
+            warnLegacyCacheOnce(legacy, canonical)
+          found
+        }
+      }
+      .orElse(provider.createDefault(canonical))
+  }
 
   def getOrElseThrow(cacheName: String, store: Boolean): CacheApi =
     findCache(cacheName, store)

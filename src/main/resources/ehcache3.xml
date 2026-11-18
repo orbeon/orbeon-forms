@@ -17,25 +17,38 @@
         - `diskExpiryThreadIntervalSeconds`
      -->
 
-    <!-- XForms state store configuration. Only modify if you know what you are doing! -->
-    <eh:cache alias="xforms.state">
+    <!-- XForms dynamic state store configuration. Only modify if you know what you are doing! -->
+    <eh:cache alias="xforms.store.dynamic-states">
         <eh:key-type>java.lang.String</eh:key-type>
         <eh:value-type>java.io.Serializable</eh:value-type>
         <eh:expiry>
             <eh:tti unit="hours">5</eh:tti>
         </eh:expiry>
         <eh:resources>
-            <eh:heap unit="entries">1</eh:heap>
+            <eh:heap unit="entries">200</eh:heap>
             <eh:disk persistent="false" unit="GB">2</eh:disk>
         </eh:resources>
     </eh:cache>
 
-    <!-- XForms resources. Only modify if you know what you are doing! -->
-    <eh:cache alias="xforms.resources">
+    <!-- XForms serialized static state store -->
+    <eh:cache alias="xforms.store.static-states">
+        <eh:key-type>java.lang.String</eh:key-type>
+        <eh:value-type>java.io.Serializable</eh:value-type>
+        <eh:expiry>
+            <eh:tti unit="hours">4</eh:tti>
+        </eh:expiry>
+        <eh:resources>
+            <eh:heap unit="entries">100</eh:heap>
+            <eh:disk persistent="false" unit="MB">500</eh:disk>
+        </eh:resources>
+    </eh:cache>
+
+    <!-- XForms aggregated JS/CSS asset bundles store. Only modify if you know what you are doing! -->
+    <eh:cache alias="xforms.store.asset-bundles">
         <eh:key-type>java.lang.String</eh:key-type>
         <eh:value-type>[Ljava.lang.String;</eh:value-type>
         <eh:expiry>
-            <eh:none/>
+            <eh:tti unit="hours">24</eh:tti>
         </eh:expiry>
         <eh:resources>
             <eh:heap unit="entries">200</eh:heap>
@@ -43,15 +56,39 @@
         </eh:resources>
     </eh:cache>
 
-    <!-- Form Runner persistence form definitions. Only modify if you know what you are doing! -->
-    <eh:cache alias="form-runner.persistence.form-definition">
+    <!-- Form Runner external modes store -->
+    <eh:cache alias="fr.store.external-modes">
+        <eh:key-type>java.io.Serializable</eh:key-type>
+        <eh:value-type>java.io.Serializable</eh:value-type>
+        <eh:expiry>
+            <eh:ttl unit="minutes">16</eh:ttl>
+        </eh:expiry>
+        <eh:resources>
+            <eh:heap unit="entries">200</eh:heap>
+        </eh:resources>
+    </eh:cache>
+
+    <!-- Form Runner persistence form metadata cache. Only modify if you know what you are doing! -->
+    <eh:cache alias="fr.cache.form-metadata">
+        <eh:key-type>java.io.Serializable</eh:key-type>
+        <eh:value-type>java.io.Serializable</eh:value-type>
+        <eh:expiry>
+            <eh:ttl unit="minutes">5</eh:ttl>
+        </eh:expiry>
+        <eh:resources>
+            <eh:heap unit="entries">100</eh:heap>
+        </eh:resources>
+    </eh:cache>
+
+    <!-- Configuration properties cache -->
+    <eh:cache alias="core.cache.properties">
         <eh:key-type>java.io.Serializable</eh:key-type>
         <eh:value-type>java.io.Serializable</eh:value-type>
         <eh:expiry>
             <eh:none/>
         </eh:expiry>
         <eh:resources>
-            <eh:heap unit="entries">10</eh:heap>
+            <eh:heap unit="entries">50</eh:heap>
         </eh:resources>
     </eh:cache>
 

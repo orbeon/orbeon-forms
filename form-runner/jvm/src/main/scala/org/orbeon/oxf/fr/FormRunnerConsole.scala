@@ -69,14 +69,14 @@ object FormRunnerConsole {
 
   private val SafeClearableObjectCaches: Set[String] = Set(
     ObjectCache.DefaultCacheName,
-    "xforms.cache.static-state",
+    "xforms.cache.static-states",
     "xforms.cache.shared-instances",
-    "cache.xpath"
+    "core.cache.xpath"
   )
 
   private val SafeClearableProviderCaches: Set[String] = Set(
-    "form-runner.persistence.form-definition",
-    "orbeon.properties"
+    "fr.cache.form-metadata",
+    "core.cache.properties"
   )
 
   private val SafeJvmFlagPrefixes: List[String] = List(
@@ -99,12 +99,12 @@ object FormRunnerConsole {
 
   def clearCacheInternal(cacheKind: String, cacheName: String): Boolean =
     cacheKind match {
-      case "object-cache" if SafeClearableObjectCaches(cacheName) =>
+      case "object-cache" if SafeClearableObjectCaches(ObjectCache.canonicalCacheName(cacheName)) =>
         ObjectCache.findCache(cacheName).exists { c =>
           c.removeAll()
           true
         }
-      case "provider-cache" if SafeClearableProviderCaches(cacheName) =>
+      case "provider-cache" if SafeClearableProviderCaches(CacheSupport.toCanonicalCacheName(cacheName)) =>
         CacheSupport.findCache(cacheName, store = false).exists { c =>
           c.clear()
           true
@@ -133,7 +133,10 @@ object FormRunnerConsole {
       XPathCache.getCacheForDiagnostics,
       XFormsStores.stateStore,
       XFormsStores.staticStateStore,
-      XFormsStores.resourcesStore
+      XFormsStores.assetBundlesStore,
+      CacheSupport.findCache("fr.store.external-modes", store = true),
+      CacheSupport.findCache("fr.cache.form-metadata", store = false),
+      CacheSupport.findCache("core.cache.properties", store = false)
     )
     ObjectCache.configureAllIfNeeded(org.orbeon.oxf.properties.Properties.instance.getPropertySet)
 
@@ -345,13 +348,15 @@ object FormRunnerConsole {
 
     // ==== <caches> ====
     val cachesElem = root.addElement("caches")
-    cachesElem.addAttribute("count", (objectCacheSnaps.size + providerCacheSnaps.size + 1).toString)
+    val cacheRows  = scala.collection.mutable.ListBuffer.empty[(String, dom.Element)]
 
     objectCacheSnaps.foreach { snap =>
-      val cElem = cachesElem.addElement("cache")
+      val canonicalName = ObjectCache.canonicalCacheName(snap.name)
+      val cElem         = dom.Element("cache")
 
       cElem.addAttribute("kind",                     "object-cache")
       cElem.addAttribute("name",                     snap.name)
+      cElem.addAttribute("canonical-key",            canonicalName.replace('.', '-'))
       cElem.addAttribute("engine",                   "ObjectCache (JVM Heap)")
       cElem.addAttribute("heap-entries",             snap.currentSize.toString)
       cElem.addAttribute("total-entries",            snap.currentSize.toString)
@@ -368,11 +373,13 @@ object FormRunnerConsole {
       cElem.addAttribute("misses",                   snap.missCount.toString)
       cElem.addAttribute("hit-rate",                 snap.hitRateOpt.map(r => formatPercentValue(r * 100.0) + "%").getOrElse("—"))
       cElem.addAttribute("evictions",                snap.evictionCount.toString)
-      cElem.addAttribute("can-clear",                SafeClearableObjectCaches(snap.name).toString)
+      cElem.addAttribute("can-clear",                SafeClearableObjectCaches(canonicalName).toString)
+      cacheRows += (canonicalName -> cElem)
     }
 
     providerCacheSnaps.foreach { snap =>
-      val cElem = cachesElem.addElement("cache")
+      val canonicalName = CacheSupport.toCanonicalCacheName(snap.name)
+      val cElem         = dom.Element("cache")
       val engineLabel =
         if (snap.diskStoreBytes.isDefined) s"${snap.provider.capitalize} (Heap + Disk)"
         else s"${snap.provider.capitalize} (Heap)"
@@ -387,6 +394,7 @@ object FormRunnerConsole {
 
       cElem.addAttribute("kind",                     "provider-cache")
       cElem.addAttribute("name",                     snap.name)
+      cElem.addAttribute("canonical-key",            canonicalName.replace('.', '-'))
       cElem.addAttribute("engine",                   engineLabel)
       cElem.addAttribute("heap-entries",             snap.heapEntries.toString)
       cElem.addAttribute("total-entries",            snap.totalEntries.map(_.toString).getOrElse("—"))
@@ -401,13 +409,16 @@ object FormRunnerConsole {
       cElem.addAttribute("misses",                   snap.missCount.map(_.toString).getOrElse("—"))
       cElem.addAttribute("hit-rate",                 snap.hitRateOpt.map(r => formatPercentValue(r * 100.0) + "%").getOrElse("—"))
       cElem.addAttribute("evictions",                snap.evictionCount.map(_.toString).getOrElse("—"))
-      cElem.addAttribute("can-clear",                SafeClearableProviderCaches(snap.name).toString)
+      cElem.addAttribute("can-clear",                SafeClearableProviderCaches(canonicalName).toString)
+      cacheRows += (canonicalName -> cElem)
     }
 
     locally {
-      val xblElem = cachesElem.addElement("cache")
+      val canonicalName = "xforms.cache.xbl-bindings"
+      val xblElem       = dom.Element("cache")
       xblElem.addAttribute("kind",                     "global-index")
-      xblElem.addAttribute("name",                     "xbl.global-binding-index")
+      xblElem.addAttribute("name",                     canonicalName)
+      xblElem.addAttribute("canonical-key",            canonicalName.replace('.', '-'))
       xblElem.addAttribute("engine",                   "Global Singleton (JVM Heap)")
       xblElem.addAttribute("heap-entries",             globalXblCount.toString)
       xblElem.addAttribute("total-entries",            globalXblCount.toString)
@@ -422,7 +433,11 @@ object FormRunnerConsole {
       xblElem.addAttribute("hit-rate",                 "—")
       xblElem.addAttribute("evictions",                "—")
       xblElem.addAttribute("can-clear",                "false")
+      cacheRows += (canonicalName -> xblElem)
     }
+
+    cachesElem.addAttribute("count", cacheRows.size.toString)
+    cacheRows.sortBy(_._1).foreach { case (_, elem) => cachesElem.add(elem) }
 
     // ==== <static-states> ====
     val staticStatesElem = root.addElement("static-states")
@@ -466,8 +481,17 @@ object FormRunnerConsole {
     // ==== <live-documents> ====
     val liveDocsElem         = root.addElement("live-documents")
     val docsTotalBytes       = allLiveDocs.iterator.map(_.estimatedBytes).sum
-    val docCacheLimitSummary = objectCacheSnaps.find(_.name == "xforms.cache.documents").map(formatObjectCacheLimitSummary).getOrElse("")
-    val stateStoreEntries    = providerCacheSnaps.find(_.name == "xforms.state").flatMap(_.totalEntries).map(_.toString).getOrElse("—")
+    val docCacheLimitSummary =
+      objectCacheSnaps
+        .find(s => ObjectCache.canonicalCacheName(s.name) == "xforms.cache.live-documents")
+        .map(formatObjectCacheLimitSummary)
+        .getOrElse("")
+    val stateStoreEntries    =
+      providerCacheSnaps
+        .find(s => CacheSupport.toCanonicalCacheName(s.name) == "xforms.store.dynamic-states")
+        .flatMap(_.totalEntries)
+        .map(_.toString)
+        .getOrElse("—")
 
     liveDocsElem.addAttribute("count",               allLiveDocs.size.toString)
     liveDocsElem.addAttribute("cached-count",        cachedDocs.size.toString)

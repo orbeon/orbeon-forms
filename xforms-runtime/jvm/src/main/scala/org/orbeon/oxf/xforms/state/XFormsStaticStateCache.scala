@@ -63,7 +63,7 @@ object XFormsStaticStateCache {
     def createCacheKey(digest: String) =
       new InternalCacheKey(ContainingDocumentKeyType, digest ensuring (_ ne null))
 
-    val XFormsDocumentCache            = "xforms.cache.static-state"
+    val XFormsDocumentCache            = "xforms.cache.static-states"
     val XFormsDocumentCacheDefaultSize = 50
     val ConstantValidity               = 0L
     val ContainingDocumentKeyType      = XFormsDocumentCache

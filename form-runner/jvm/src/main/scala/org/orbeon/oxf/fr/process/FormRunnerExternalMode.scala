@@ -21,7 +21,7 @@ object FormRunnerExternalMode extends FormRunnerExternalModeTrait {
   val Logger = LoggerFactory.createLogger(FormRunnerExternalMode.getClass)
   implicit val Slf4JLogger: slf4j.Logger = Logger.logger
 
-  private lazy val externalModeStore = CacheSupport.getOrElseThrow("form-runner.external-mode-store", store = true)
+  private lazy val externalModeStore = CacheSupport.getOrElseThrow("fr.store.external-modes", store = true)
 
   import io.circe.generic.auto.*
   import io.circe.syntax.*

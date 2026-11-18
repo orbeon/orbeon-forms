@@ -56,7 +56,21 @@ class ConfigurationPropertiesTest
       val staticBytesElem = curatedElem.element("system").element("cache-static-state-max-size-bytes")
       assert(staticBytesElem.attributeValue("override") == "false")
       assert(staticBytesElem.attributeValue("value") == "15%")
-      assert(staticBytesElem.attributeValue("name") == "oxf.xforms.cache.static-state.max-size-bytes")
+      assert(staticBytesElem.attributeValue("name") == "oxf.xforms.cache.static-states.max-size-bytes")
+
+      // Legacy property names saved in older configuration XML must migrate into the curated controls seamlessly
+      val legacyCachePropsDoc =
+        IOSupport.readOrbeonDom(
+          """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            |    <property as="xs:integer" name="oxf.xforms.cache.documents.size" value="33"/>
+            |</properties>""".stripMargin
+        )
+      val migratedConfigDoc = FormRunnerConfiguration.propertiesDomToConfigurationDom(legacyCachePropsDoc)
+      val migratedDocsElem  = migratedConfigDoc.getRootElement.element("curated").element("system").element("cache-documents-size")
+      assert(migratedDocsElem.attributeValue("override") == "true")
+      assert(migratedDocsElem.attributeValue("value") == "33")
+      val migratedOutDoc = FormRunnerConfiguration.configurationDomToPropertiesDom(migratedConfigDoc)
+      assert(migratedOutDoc.getRootElement.element("property").attributeValue("name") == "oxf.xforms.cache.live-documents.size")
 
       val navbarHomeElem = curatedElem.element("navbar").element("navbar-home-link")
       assert(navbarHomeElem.attributeValue("override") == "false")
@@ -366,9 +380,9 @@ class ConfigurationPropertiesTest
             val store = PropertyLoader.getPropertyStore(Option(ec.getRequest))
             assert(store.globalPropertySet.getString("oxf.fr.default-language.my-app.my-form").contains("fr"))
             assert(store.globalPropertySet.getIntOpt("oxf.test.custom.persistence.prop").contains(42))
-            assert(store.globalPropertySet.getString("oxf.xforms.cache.static-state.max-size-bytes").contains("256m"))
-            assert(store.globalPropertySet.getString("oxf.xforms.cache.static-state.max-idle").contains("45m"))
-            assert(store.globalPropertySet.getIntOpt("oxf.xforms.cache.documents.size").contains(25))
+            assert(store.globalPropertySet.getString("oxf.xforms.cache.static-states.max-size-bytes").contains("256m"))
+            assert(store.globalPropertySet.getString("oxf.xforms.cache.static-states.max-idle").contains("45m"))
+            assert(store.globalPropertySet.getIntOpt("oxf.xforms.cache.live-documents.size").contains(25))
 
             // Verify live ObjectCache reconfiguration from reloaded PropertySet without restart
             val _ = (XFormsStaticStateCache.getCacheForDiagnostics, XFormsDocumentCache.getCacheForDiagnostics)

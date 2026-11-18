@@ -65,17 +65,21 @@ trait FormRunnerConfiguration {
 object FormRunnerConfiguration extends FormRunnerConfiguration {
 
   case class CuratedPropertyDef(
-    key          : String,
-    category     : String,
-    baseName     : String,
-    xsType       : String,
-    hasAppForm   : Boolean,
-    hasProfiles  : Boolean = false,
-    defaultValue : String,
-    validationOpt: Option[String] = None
+    key            : String,
+    category       : String,
+    baseName       : String,
+    xsType         : String,
+    hasAppForm     : Boolean,
+    hasProfiles    : Boolean = false,
+    defaultValue   : String,
+    validationOpt  : Option[String] = None,
+    legacyBaseNames: List[String] = Nil
   ) {
     def globalPropertyName: String =
       if (hasAppForm) s"$baseName.*.*" else baseName
+
+    def legacyGlobalPropertyNames: List[String] =
+      if (hasAppForm) legacyBaseNames.map(n => s"$n.*.*") else legacyBaseNames
 
     def appFormPropertyName(app: String, form: String): String =
       s"$baseName.$app.$form"
@@ -167,58 +171,64 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = "true"
     ),
     CuratedPropertyDef(
-      key           = "cache-documents-size",
-      category      = "system",
-      baseName      = "oxf.xforms.cache.documents.size",
-      xsType        = "xs:integer",
-      hasAppForm    = false,
-      defaultValue  = "50",
-      validationOpt = Some("non-negative-integer")
+      key             = "cache-documents-size",
+      category        = "system",
+      baseName        = "oxf.xforms.cache.live-documents.size",
+      xsType          = "xs:integer",
+      hasAppForm      = false,
+      defaultValue    = "50",
+      validationOpt   = Some("non-negative-integer"),
+      legacyBaseNames = List("oxf.xforms.cache.documents.size")
     ),
     CuratedPropertyDef(
-      key           = "cache-documents-max-size-bytes",
-      category      = "system",
-      baseName      = "oxf.xforms.cache.documents.max-size-bytes",
-      xsType        = "xs:string",
-      hasAppForm    = false,
-      defaultValue  = "15%",
-      validationOpt = Some("byte-size-or-percent")
+      key             = "cache-documents-max-size-bytes",
+      category        = "system",
+      baseName        = "oxf.xforms.cache.live-documents.max-size-bytes",
+      xsType          = "xs:string",
+      hasAppForm      = false,
+      defaultValue    = "15%",
+      validationOpt   = Some("byte-size-or-percent"),
+      legacyBaseNames = List("oxf.xforms.cache.documents.max-size-bytes")
     ),
     CuratedPropertyDef(
-      key           = "cache-documents-max-idle",
-      category      = "system",
-      baseName      = "oxf.xforms.cache.documents.max-idle",
-      xsType        = "xs:string",
-      hasAppForm    = false,
-      defaultValue  = "",
-      validationOpt = Some("duration")
+      key             = "cache-documents-max-idle",
+      category        = "system",
+      baseName        = "oxf.xforms.cache.live-documents.max-idle",
+      xsType          = "xs:string",
+      hasAppForm      = false,
+      defaultValue    = "",
+      validationOpt   = Some("duration"),
+      legacyBaseNames = List("oxf.xforms.cache.documents.max-idle")
     ),
     CuratedPropertyDef(
-      key           = "cache-static-state-size",
-      category      = "system",
-      baseName      = "oxf.xforms.cache.static-state.size",
-      xsType        = "xs:integer",
-      hasAppForm    = false,
-      defaultValue  = "50",
-      validationOpt = Some("non-negative-integer")
+      key             = "cache-static-state-size",
+      category        = "system",
+      baseName        = "oxf.xforms.cache.static-states.size",
+      xsType          = "xs:integer",
+      hasAppForm      = false,
+      defaultValue    = "50",
+      validationOpt   = Some("non-negative-integer"),
+      legacyBaseNames = List("oxf.xforms.cache.static-state.size")
     ),
     CuratedPropertyDef(
-      key           = "cache-static-state-max-size-bytes",
-      category      = "system",
-      baseName      = "oxf.xforms.cache.static-state.max-size-bytes",
-      xsType        = "xs:string",
-      hasAppForm    = false,
-      defaultValue  = "15%",
-      validationOpt = Some("byte-size-or-percent")
+      key             = "cache-static-state-max-size-bytes",
+      category        = "system",
+      baseName        = "oxf.xforms.cache.static-states.max-size-bytes",
+      xsType          = "xs:string",
+      hasAppForm      = false,
+      defaultValue    = "15%",
+      validationOpt   = Some("byte-size-or-percent"),
+      legacyBaseNames = List("oxf.xforms.cache.static-state.max-size-bytes")
     ),
     CuratedPropertyDef(
-      key           = "cache-static-state-max-idle",
-      category      = "system",
-      baseName      = "oxf.xforms.cache.static-state.max-idle",
-      xsType        = "xs:string",
-      hasAppForm    = false,
-      defaultValue  = "",
-      validationOpt = Some("duration")
+      key             = "cache-static-state-max-idle",
+      category        = "system",
+      baseName        = "oxf.xforms.cache.static-states.max-idle",
+      xsType          = "xs:string",
+      hasAppForm      = false,
+      defaultValue    = "",
+      validationOpt   = Some("duration"),
+      legacyBaseNames = List("oxf.xforms.cache.static-state.max-idle")
     ),
 
     // 2. Navigation Bar
@@ -1620,7 +1630,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
   )
 
   private val CuratedByGlobalName: Map[String, CuratedPropertyDef] =
-    CuratedProperties.map(c => c.globalPropertyName -> c).toMap
+    CuratedProperties.flatMap(c => (c.globalPropertyName :: c.legacyGlobalPropertyNames).map(_ -> c)).toMap
 
   private val CuratedAppFormList: List[CuratedPropertyDef] =
     CuratedProperties.filter(_.hasAppForm).sortBy(-_.baseName.length)

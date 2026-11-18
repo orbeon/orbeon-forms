@@ -155,7 +155,7 @@ class InfinispanProvider(store: Boolean, propertySetOpt: Option[PropertySet] = N
 
   import CacheSupport.Logger.*
 
-  def get(cacheName: String): Option[CacheApi] =
+  def findConfigured(cacheName: String): Option[CacheApi] =
     if (cacheManager.cacheConfigurationExists(cacheName) || cacheManager.getCacheNames.contains(cacheName))
       Option(cacheManager.getCache[io.Serializable, io.Serializable](cacheName))
         .map(new InfinispanCacheApi(_))

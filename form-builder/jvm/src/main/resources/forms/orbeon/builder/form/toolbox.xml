@@ -673,11 +673,15 @@
                         <xh:div class="fb-tool">
                             <xf:group bind="fb-toolbox-pdf-bind">
                                 <!-- Upload PDF Template -->
-                                <xf:trigger>
+                                <xf:var name="pdf-templates-count" value="count(bind('pdf-attachments-bind')[xxf:non-blank()])"/>
+                                <xf:trigger class="fb-pdf-toolbox-button">
                                     <xf:label>
-                                        <xh:i class="fa fa-fw fa-file-pdf-o"/>
+                                        <xh:i class="fa fa-fw fa-file-pdf-o" aria-hidden="true"/>
                                         <xh:span>
                                             <xf:output value="$form-resources/pdf-templates/label"/>
+                                        </xh:span>
+                                        <xh:span class="{if ($pdf-templates-count gt 0) then 'fb-tool-badge' else 'fb-tool-badge xforms-hidden'}">
+                                            <xf:output value="$pdf-templates-count"/>
                                         </xh:span>
                                     </xf:label>
                                     <xf:action event="DOMActivate">

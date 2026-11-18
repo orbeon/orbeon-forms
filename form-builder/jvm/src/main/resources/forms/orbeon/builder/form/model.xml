@@ -1276,7 +1276,7 @@
 
     <!-- Control settings mini-toolbar (#6484) and outline (#7857) -->
     <xf:instance id="fb-toolbar-instance">
-        <toolbar visible="true" show-cell-badges="true" outline-visible="true">
+        <toolbar visible="true" show-cell-badges="true" outline-visible="true" toolbox-tab="controls">
             <tracked-state/>
             <tracked-control-name/>
             <control-name/>

@@ -1850,5 +1850,6 @@ object FormBuilderXPathApi {
     setvalue(toolbarElem /@ "visible",          prefs.controlSettingsToolbarVisible.toString)
     setvalue(toolbarElem /@ "show-cell-badges", prefs.showCellBadges.toString)
     setvalue(toolbarElem /@ "outline-visible",  prefs.outlineVisible.toString)
+    setvalue(toolbarElem /@ "toolbox-tab",      prefs.toolboxTab.entryName)
   }
 }

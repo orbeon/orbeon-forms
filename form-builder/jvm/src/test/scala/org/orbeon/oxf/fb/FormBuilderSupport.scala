@@ -96,7 +96,7 @@ trait FormBuilderSupport extends XFormsSupport {
             <xf:var name="undo" value="instance('fb-undo-instance')"/>
 
             <xf:instance id="fb-toolbar-instance">
-                <toolbar visible="true" show-cell-badges="true" outline-visible="true"/>
+                <toolbar visible="true" show-cell-badges="true" outline-visible="true" toolbox-tab="controls"/>
             </xf:instance>
             <xf:var name="toolbar" value="instance('fb-toolbar-instance')"/>
 

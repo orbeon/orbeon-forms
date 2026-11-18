@@ -262,12 +262,14 @@ class FormBuilderUndoTest
 
     it("must round-trip preferences via cookie value and header") {
       import org.orbeon.builder.FormBuilderPreferences
+      import org.orbeon.builder.FormBuilderPreferences.ToolboxTab
       import org.orbeon.oxf.util.JvmUrlEncoderDecoder
 
       val prefs = FormBuilderPreferences(
         controlSettingsToolbarVisible = false,
         showCellBadges                = true,
-        outlineVisible                = false
+        outlineVisible                = false,
+        toolboxTab                    = ToolboxTab.Advanced
       )
       val cookieValue = FormBuilderPreferences.toCookieValue(prefs)
       assert(FormBuilderPreferences.fromCookieValue(cookieValue).contains(prefs))
@@ -276,18 +278,33 @@ class FormBuilderUndoTest
       assert(FormBuilderPreferences.fromCookieHeader(cookieHeader).contains(prefs))
     }
 
-    it("must default missing keys and initialize fb-toolbar-instance from request cookie") {
+    it("must default missing or unknown keys and initialize fb-toolbar-instance from request cookie") {
       import org.orbeon.builder.FormBuilderPreferences
+      import org.orbeon.builder.FormBuilderPreferences.ToolboxTab
       import org.orbeon.oxf.util.JvmUrlEncoderDecoder
 
-      // Partial JSON (only `outline-visible` specified)
+      // Partial JSON (only `outline-visible` specified, `toolbox-tab` missing)
       val partialEncoded = JvmUrlEncoderDecoder.encode("""{"outline-visible":false}""")
       assert(
         FormBuilderPreferences.fromCookieValue(partialEncoded).contains(
           FormBuilderPreferences(
             controlSettingsToolbarVisible = true,
             showCellBadges                = true,
-            outlineVisible                = false
+            outlineVisible                = false,
+            toolboxTab                    = ToolboxTab.Controls
+          )
+        )
+      )
+
+      // Unknown `toolbox-tab` value defaults to `Controls`
+      val unknownTabEncoded = JvmUrlEncoderDecoder.encode("""{"toolbox-tab":"other"}""")
+      assert(
+        FormBuilderPreferences.fromCookieValue(unknownTabEncoded).contains(
+          FormBuilderPreferences(
+            controlSettingsToolbarVisible = true,
+            showCellBadges                = true,
+            outlineVisible                = true,
+            toolboxTab                    = ToolboxTab.Controls
           )
         )
       )
@@ -299,7 +316,8 @@ class FormBuilderUndoTest
           FormBuilderPreferences(
             controlSettingsToolbarVisible = false,
             showCellBadges                = false,
-            outlineVisible                = false
+            outlineVisible                = false,
+            toolboxTab                    = ToolboxTab.Advanced
           )
         )
         doc.setRequestInformation(
@@ -314,6 +332,7 @@ class FormBuilderUndoTest
         assert(toolbarRoot.attValue("visible")          === "false")
         assert(toolbarRoot.attValue("show-cell-badges") === "false")
         assert(toolbarRoot.attValue("outline-visible")  === "false")
+        assert(toolbarRoot.attValue("toolbox-tab")      === "advanced")
       }
     }
   }

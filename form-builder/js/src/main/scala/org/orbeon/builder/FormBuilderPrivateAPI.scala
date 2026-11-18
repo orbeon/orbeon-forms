@@ -15,7 +15,8 @@ package org.orbeon.builder
 
 import org.orbeon.builder.rpc.FormBuilderRpcClient
 import org.orbeon.web.DomSupport.*
-import org.orbeon.xforms.{AjaxClient, AjaxEvent, CallbackList, Support, XFormsUI}
+import org.orbeon.xbl.Tabbable
+import org.orbeon.xforms.{AjaxClient, AjaxEvent, CallbackList, Support, XFormsId, XFormsUI}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
@@ -111,13 +112,19 @@ object FormBuilderPrivateAPI extends js.Object {
   ): Unit = {
     import org.orbeon.oxf.util.JsUrlEncoderDecoder
 
-    val prefs = FormBuilderPreferences(
-      controlSettingsToolbarVisible = controlSettingsToolbarVisible,
-      showCellBadges                = showCellBadges,
-      outlineVisible                = outlineVisible
+    val toolboxTab =
+      FormBuilderPreferencesClient.currentToolboxTabFromDom
+        .orElse(FormBuilderPreferences.fromCookieHeader(dom.document.cookie).map(_.toolboxTab))
+        .getOrElse(FormBuilderPreferences.Default.toolboxTab)
+
+    FormBuilderPreferencesClient.writeCookie(
+      FormBuilderPreferences(
+        controlSettingsToolbarVisible = controlSettingsToolbarVisible,
+        showCellBadges                = showCellBadges,
+        outlineVisible                = outlineVisible,
+        toolboxTab                    = toolboxTab
+      )
     )
-    val cookieValue = FormBuilderPreferences.toCookieValue(prefs)
-    dom.document.cookie = s"${FormBuilderPreferences.PreferencesCookieName}=$cookieValue; path=/; max-age=31536000; SameSite=Lax"
   }
 
   def copyItemsetToClipboard(tsvString: String): Unit =
@@ -146,4 +153,68 @@ object FormBuilderPrivateAPI extends js.Object {
     }
   def processRpcResponse(id: String, response: String): Unit =
     FormBuilderRpcClient.processResponse(id, response)
+}
+private[builder] object FormBuilderPreferencesClient {
+
+  private val ToolboxTabsId        = "fb-toolbox-tabs"
+  private val ToolboxAdvancedTabId = "fb-toolbox-advanced-tab"
+
+  private var initialized = false
+
+  def init(): Unit =
+    if (! initialized) {
+      initialized = true
+      dom.document.addEventListener(
+        Tabbable.TabSelectedEvent,
+        (event: dom.Event) =>
+          event.targetOpt
+            .filter(elem => XFormsId.getStaticIdFromId(elem.id) == ToolboxTabsId)
+            .foreach(_ => saveFromDom())
+      )
+    }
+
+  def currentToolboxTabFromDom: Option[FormBuilderPreferences.ToolboxTab] =
+    dom.document
+      .querySelectorOpt(s"[id$$='$ToolboxAdvancedTabId']")
+      .map { elem =>
+        if (elem.hasClass("active"))
+          FormBuilderPreferences.ToolboxTab.Advanced
+        else
+          FormBuilderPreferences.ToolboxTab.Controls
+      }
+
+  def writeCookie(prefs: FormBuilderPreferences): Unit = {
+    import org.orbeon.oxf.util.JsUrlEncoderDecoder
+
+    val cookieValue = FormBuilderPreferences.toCookieValue(prefs)
+    dom.document.cookie = s"${FormBuilderPreferences.PreferencesCookieName}=$cookieValue; path=/; max-age=31536000; SameSite=Lax"
+  }
+
+  private def saveFromDom(): Unit = {
+    import org.orbeon.oxf.util.JsUrlEncoderDecoder
+
+    val basePrefs =
+      FormBuilderPreferences
+        .fromCookieHeader(dom.document.cookie)
+        .getOrElse(FormBuilderPreferences.Default)
+
+    val prefsFromMain =
+      dom.document.querySelectorOpt(".fb-main") match {
+        case Some(fbMain) =>
+          basePrefs.copy(
+            controlSettingsToolbarVisible = fbMain.hasClass("fb-has-control-toolbar"),
+            showCellBadges                = ! fbMain.hasClass("fb-hide-cell-badges"),
+            outlineVisible                = fbMain.hasClass("fb-has-outline")
+          )
+        case None =>
+          basePrefs
+      }
+
+    val updatedPrefs =
+      prefsFromMain.copy(
+        toolboxTab = currentToolboxTabFromDom.getOrElse(basePrefs.toolboxTab)
+      )
+
+    writeCookie(updatedPrefs)
+  }
 }

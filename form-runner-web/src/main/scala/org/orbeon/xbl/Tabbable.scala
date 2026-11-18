@@ -31,7 +31,10 @@ import scala.scalajs.js.UndefOr
 
 object Tabbable {
 
+  val TabSelectedEvent = "fr-tab-selected"
+
   private val ActiveClass         = "active"
+  private val DefaultTabClass     = "fr-tab-default"
 
   private val ExcludeNotVisible   = ":not(.xforms-repeat-delimiter, .xforms-repeat-begin-end, .xforms-group-begin-end, .fr-tabbable-add, .xforms-hidden)"
   private val NavTabsSelector     = ".nav-tabs"
@@ -143,9 +146,9 @@ object Tabbable {
         drake = Some(newDrake)
       }
 
-      // Select first visible tab
+      // Select default (or first visible) tab
       // https://github.com/orbeon/orbeon-forms/issues/3458
-      selectTab(0)
+      selectDefaultTab()
 
       // 2016-10-13: We use our own logic to show/hide tabs based on position as we want to be able to
       // support dynamically repeated tabs.
@@ -194,7 +197,14 @@ object Tabbable {
     }
 
     // noinspection ScalaWeakerAccess (called from `tabbable.xbl`)
-    def selectTab(tabPosition: Int): Unit = {
+    def selectDefaultTab(): Unit =
+      selectTabInternal(getDefaultTabIndex, notify = false)
+
+    // noinspection ScalaWeakerAccess (called from `tabbable.xbl`)
+    def selectTab(tabPosition: Int): Unit =
+      selectTabInternal(tabPosition, notify = true)
+
+    private def selectTabInternal(tabPosition: Int, notify: Boolean): Unit = {
 
       // Ignore if we get this after the dialog closed
       if (containerElem.matches(".xforms-disabled")) return
@@ -222,7 +232,8 @@ object Tabbable {
       }
 
       // Switch tab
-      val newLi = allLis(tabPosition)
+      val newLi            = allLis(tabPosition)
+      val wasAlreadyActive = newLi.matches(ActiveSelector)
       val allTabPanes = newLi
         .closestT(NavTabsSelector)
         .nextElementSiblings
@@ -234,7 +245,17 @@ object Tabbable {
       allTabPanes.foreach(_.classList.remove(ActiveClass))
       newLi.classList.add(ActiveClass)
       newTabPane.classList.add(ActiveClass)
+
+      if (notify && ! wasAlreadyActive)
+        dispatchCustomEvent(
+          target    = containerElem,
+          name      = TabSelectedEvent,
+          detailOpt = tabPosition.asInstanceOf[js.Any]
+        )
     }
+
+    private def getDefaultTabIndex: Int =
+      getAllLis.indexWhere(_.hasClass(DefaultTabClass)).max(0)
 
     // noinspection ScalaWeakerAccess (called from `tabbable.xbl`)
     def maybeAdjustCurrentTab(): Unit = {

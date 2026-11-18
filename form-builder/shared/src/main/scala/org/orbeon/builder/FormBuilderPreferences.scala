@@ -13,27 +13,41 @@
  */
 package org.orbeon.builder
 
+import enumeratum.EnumEntry.Lowercase
+import enumeratum.{Enum, EnumEntry}
 import io.circe.parser.decode
 import io.circe.syntax.*
 import io.circe.{Decoder, Encoder, Json}
 import org.orbeon.oxf.util.PathUtils.UrlEncoderDecoder
 import org.orbeon.oxf.util.StringUtils.*
 
+import scala.collection.immutable
 import scala.util.Try
 
 
 case class FormBuilderPreferences(
-  controlSettingsToolbarVisible: Boolean = true,
-  showCellBadges               : Boolean = true,
-  outlineVisible               : Boolean = true
+  controlSettingsToolbarVisible: Boolean                           = true,
+  showCellBadges               : Boolean                           = true,
+  outlineVisible               : Boolean                           = true,
+  toolboxTab                   : FormBuilderPreferences.ToolboxTab = FormBuilderPreferences.ToolboxTab.Controls
 )
 
 object FormBuilderPreferences {
+
+  sealed trait ToolboxTab extends EnumEntry with Lowercase
+
+  object ToolboxTab extends Enum[ToolboxTab] {
+    case object Controls extends ToolboxTab
+    case object Advanced extends ToolboxTab
+
+    val values: immutable.IndexedSeq[ToolboxTab] = findValues
+  }
 
   val PreferencesCookieName            = "orbeon-fb-preferences"
   val ControlSettingsToolbarVisibleKey = "control-settings-toolbar-visible"
   val ShowCellBadgesKey                = "show-cell-badges"
   val OutlineVisibleKey                = "outline-visible"
+  val ToolboxTabKey                    = "toolbox-tab"
 
   val Default: FormBuilderPreferences = FormBuilderPreferences()
 
@@ -41,7 +55,8 @@ object FormBuilderPreferences {
     Json.obj(
       ControlSettingsToolbarVisibleKey -> Json.fromBoolean(prefs.controlSettingsToolbarVisible),
       ShowCellBadgesKey                -> Json.fromBoolean(prefs.showCellBadges),
-      OutlineVisibleKey                -> Json.fromBoolean(prefs.outlineVisible)
+      OutlineVisibleKey                -> Json.fromBoolean(prefs.outlineVisible),
+      ToolboxTabKey                    -> Json.fromString(prefs.toolboxTab.entryName)
     )
   }
 
@@ -50,10 +65,12 @@ object FormBuilderPreferences {
       controlSettingsToolbarVisible <- c.getOrElse[Boolean](ControlSettingsToolbarVisibleKey)(Default.controlSettingsToolbarVisible)
       showCellBadges                <- c.getOrElse[Boolean](ShowCellBadgesKey)(Default.showCellBadges)
       outlineVisible                <- c.getOrElse[Boolean](OutlineVisibleKey)(Default.outlineVisible)
+      toolboxTabOpt                 <- c.getOrElse[Option[String]](ToolboxTabKey)(None)
     } yield FormBuilderPreferences(
       controlSettingsToolbarVisible = controlSettingsToolbarVisible,
       showCellBadges                = showCellBadges,
-      outlineVisible                = outlineVisible
+      outlineVisible                = outlineVisible,
+      toolboxTab                    = toolboxTabOpt.flatMap(ToolboxTab.withNameOption).getOrElse(Default.toolboxTab)
     )
   }
 

@@ -51,6 +51,7 @@ object FormBuilderApp extends App {
 
     BlockCache
     SectionFocus
+    FormBuilderPreferencesClient.init()
 
     DialogItemset
     DialogPublish

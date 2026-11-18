@@ -226,7 +226,7 @@
         </xh:div>
 
         <fr:tabbable id="fb-toolbox-tabs">
-            <fr:tab id="fb-toolbox-controls-tab">
+            <fr:tab id="fb-toolbox-controls-tab" active="$toolbar/@toolbox-tab != 'advanced'">
                 <xf:label value="$form-resources/controls/label"/>
 
                 <!-- Sections, grids, etc. toolbox -->
@@ -467,7 +467,7 @@
                     </xf:group>
                 </xf:repeat>
             </fr:tab>
-            <fr:tab id="fb-toolbox-advanced-tab">
+            <fr:tab id="fb-toolbox-advanced-tab" active="$toolbar/@toolbox-tab = 'advanced'">
                 <xf:label value="$form-resources/advanced/label"/>
 
                 <xh:div class="fb-tools">

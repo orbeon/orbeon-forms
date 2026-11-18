@@ -39,7 +39,7 @@
             <!-- Basic fix for https://github.com/orbeon/orbeon-forms/issues/4090 -->
             <xbl:handler event="xxforms-visible" phase="target">
                 <xf:action type="javascript">
-                    ORBEON.xforms.XBL.instanceForControl(this).selectTab(0);
+                    ORBEON.xforms.XBL.instanceForControl(this).selectDefaultTab();
                 </xf:action>
             </xbl:handler>
             <xbl:handler event="fr-select-tab" phase="target">
@@ -111,10 +111,19 @@
                                         </xf:var>
                                     </xsl:if>
 
+                                    <!-- Whether the tab is initially active -->
+                                    <xsl:if test="$tab/@active">
+                                        <xf:var name="active">
+                                            <xxf:value value="{$tab/@active}" xxbl:scope="outer"/>
+                                        </xf:var>
+                                    </xsl:if>
+
                                     <xsl:variable name="content">
                                         <xh:li
                                             class="{
-                                                if ($repeat and $pos = 1) then
+                                                if ($tab/@active) then
+                                                    '{''active fr-tab-default''[boolean($active)]}'
+                                                else if ($repeat and $pos = 1) then
                                                     '{''active''[xxf:repeat-position() = 1]}'
                                                 else
                                                     'active'[$pos = 1],
@@ -202,7 +211,9 @@
                                         xxf:element="div"
                                         class="{
                                             'tab-pane',
-                                            if ($repeat and $pos = 1) then
+                                            if ($tab/@active) then
+                                                concat('{''active''[boolean(', $tab/@active, ')]}')
+                                            else if ($repeat and $pos = 1) then
                                                 '{''active''[xxf:repeat-position() = 1]}'
                                             else
                                                 'active'[$pos = 1],

@@ -35,11 +35,11 @@
     <property as="xs:anyURI"  name="oxf.log4j-config"                                value="oxf:/config/log4j.xml"/>
     <property as="xs:anyURI"  name="oxf.log4j2-config"                               value="oxf:/config/log4j2.xml"/>
     <property as="xs:boolean" name="oxf.log4j.thread-context.http-headers"           value="false"/>
-    <property as="xs:integer" name="oxf.core.cache.pipelines.size"                   value="1000"/>
-    <property as="xs:string"  name="oxf.core.cache.pipelines.max-size-bytes"         value=""/>
+    <property as="xs:integer" name="oxf.core.cache.pipelines.size"                   value="2000"/>
+    <property as="xs:string"  name="oxf.core.cache.pipelines.max-size-bytes"         value="10%"/>
     <property as="xs:string"  name="oxf.core.cache.pipelines.max-idle"               value=""/>
-    <property as="xs:integer" name="oxf.core.cache.xpath.size"                       value="5000"/>
-    <property as="xs:string"  name="oxf.core.cache.xpath.max-size-bytes"             value=""/>
+    <property as="xs:integer" name="oxf.core.cache.xpath.size"                       value="20000"/>
+    <property as="xs:string"  name="oxf.core.cache.xpath.max-size-bytes"             value="5%"/>
     <property as="xs:string"  name="oxf.core.cache.xpath.max-idle"                   value=""/>
     <property as="xs:boolean" name="oxf.sax.inspection"                              value="false"/>
     <property as="xs:boolean" name="oxf.show-version"                                value="false"/>

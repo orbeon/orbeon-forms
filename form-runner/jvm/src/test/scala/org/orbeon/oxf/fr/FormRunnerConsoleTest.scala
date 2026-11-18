@@ -103,11 +103,22 @@ class FormRunnerConsoleTest
       val staticStateStoreElem = cacheElems.find(_.attributeValue("name") == "xforms.store.static-states").get
       assert(staticStateStoreElem.attributeValue("can-clear") == "false")
 
-      // Default 15% max-heap byte budgets must be active on both `xforms.cache.live-documents` and `xforms.cache.static-states` (#1973, #1572)
+      // Default max-heap percentage budgets and raised entry-count ceilings must be active (#1973, #1572)
+      val pipelinesCacheElem    = cacheElems.find(_.attributeValue("name") == "core.cache.pipelines").get
+      val xpathCacheElem        = cacheElems.find(_.attributeValue("name") == "core.cache.xpath").get
       val docsObjectCacheElem   = cacheElems.find(_.attributeValue("name") == "xforms.cache.live-documents").get
       val staticObjectCacheElem = cacheElems.find(_.attributeValue("name") == "xforms.cache.static-states").get
+      val sharedObjectCacheElem = cacheElems.find(_.attributeValue("name") == "xforms.cache.shared-instances").get
+      assert(pipelinesCacheElem.attributeValue("max-entries") == "2000")
+      assert(xpathCacheElem.attributeValue("max-entries") == "20000")
+      assert(docsObjectCacheElem.attributeValue("max-entries") == "500")
+      assert(staticObjectCacheElem.attributeValue("max-entries") == "200")
+      assert(sharedObjectCacheElem.attributeValue("max-entries") == "200")
+      assert(pipelinesCacheElem.attributeValue("max-bytes").toLong > 0L)
+      assert(xpathCacheElem.attributeValue("max-bytes").toLong > 0L)
       assert(docsObjectCacheElem.attributeValue("max-bytes").toLong > 0L)
       assert(staticObjectCacheElem.attributeValue("max-bytes").toLong > 0L)
+      assert(sharedObjectCacheElem.attributeValue("max-bytes").toLong > 0L)
       assert(docsObjectCacheElem.attributeValue("limit-summary").contains("max"))
       assert(staticObjectCacheElem.attributeValue("limit-summary").contains("max"))
 

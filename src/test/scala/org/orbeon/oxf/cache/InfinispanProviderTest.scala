@@ -94,7 +94,8 @@ class InfinispanProviderTest
       val resProps = propsFrom("oxf.xforms.store.infinispan.resource" -> "/config/infinispan.xml")
       val p2       = new InfinispanProvider(store = true, Some(resProps))
       try {
-        assert(p2.findConfigured("xforms.store.static-states").flatMap(_.getMaxEntriesLocalHeap).contains(100L))
+        assert(p2.findConfigured("xforms.store.dynamic-states").flatMap(_.getMaxEntriesLocalHeap).contains(500L))
+        assert(p2.findConfigured("xforms.store.static-states").flatMap(_.getMaxEntriesLocalHeap).contains(200L))
         assert(p2.findConfigured("fr.cache.form-metadata").flatMap(_.getMaxEntriesLocalHeap).contains(100L))
       } finally {
         p2.close()

@@ -242,29 +242,51 @@ class MemoryCacheStatsAndSizingTest extends AnyFunSpecLike {
       assert(ObjectCache.canonicalCacheName("xforms.cache.documents") == "xforms.cache.live-documents")
       assert(ObjectCache.canonicalCacheName("xforms.cache.static-state") == "xforms.cache.static-states")
 
-      val cache = new MemoryCacheImpl(50)
+      val cache = new MemoryCacheImpl(500)
 
-      // 1. Legacy `oxf.xforms.cache.documents.size = 2` wins when `oxf.xforms.cache.live-documents.size` is at its built-in default `50`
+      // 1. Legacy `oxf.xforms.cache.documents.size = 2` wins when `oxf.xforms.cache.live-documents.size` is at its built-in default `500`
       val legacyOverrideProps = PropertySet.forTests(Seq(
-        PropertyParams(Map.empty, "oxf.xforms.cache.live-documents.size",          XS_INTEGER_QNAME, "50"),
+        PropertyParams(Map.empty, "oxf.xforms.cache.live-documents.size",           XS_INTEGER_QNAME, "500"),
         PropertyParams(Map.empty, "oxf.xforms.cache.live-documents.max-size-bytes", XS_STRING_QNAME,  "15%"),
-        PropertyParams(Map.empty, "oxf.xforms.cache.documents.size",               XS_INTEGER_QNAME, "2"),
-        PropertyParams(Map.empty, "oxf.xforms.cache.documents.max-size-bytes",     XS_STRING_QNAME,  "0")
+        PropertyParams(Map.empty, "oxf.xforms.cache.documents.size",                XS_INTEGER_QNAME, "2"),
+        PropertyParams(Map.empty, "oxf.xforms.cache.documents.max-size-bytes",      XS_STRING_QNAME,  "0")
       ))
-      ObjectCache.configureCacheFromPropertySet("xforms.cache.live-documents", 50, cache, legacyOverrideProps)
+      ObjectCache.configureCacheFromPropertySet("xforms.cache.live-documents", 500, cache, legacyOverrideProps)
       assert(cache.getMaxSize == 2)
       assert(cache.getMaxSizeBytes.isEmpty)
 
       // 2. Explicit canonical override (`oxf.xforms.cache.live-documents.size = 25`) wins when both legacy and canonical are set
       val bothProps = PropertySet.forTests(Seq(
-        PropertyParams(Map.empty, "oxf.xforms.cache.live-documents.size",          XS_INTEGER_QNAME, "25"),
+        PropertyParams(Map.empty, "oxf.xforms.cache.live-documents.size",           XS_INTEGER_QNAME, "25"),
         PropertyParams(Map.empty, "oxf.xforms.cache.live-documents.max-size-bytes", XS_STRING_QNAME,  "128m"),
-        PropertyParams(Map.empty, "oxf.xforms.cache.documents.size",               XS_INTEGER_QNAME, "2"),
-        PropertyParams(Map.empty, "oxf.xforms.cache.documents.max-size-bytes",     XS_STRING_QNAME,  "0")
+        PropertyParams(Map.empty, "oxf.xforms.cache.documents.size",                XS_INTEGER_QNAME, "2"),
+        PropertyParams(Map.empty, "oxf.xforms.cache.documents.max-size-bytes",      XS_STRING_QNAME,  "0")
       ))
-      ObjectCache.configureCacheFromPropertySet("xforms.cache.live-documents", 50, cache, bothProps)
+      ObjectCache.configureCacheFromPropertySet("xforms.cache.live-documents", 500, cache, bothProps)
       assert(cache.getMaxSize == 25)
       assert(cache.getMaxSizeBytes.contains(128L * 1024L * 1024L))
+
+      // 3. Legacy `oxf.cache.size = 750` wins when `oxf.core.cache.pipelines.size` is at its built-in default `2000`
+      val pipelinesCache = new MemoryCacheImpl(2000)
+      val legacyPipelineProps = PropertySet.forTests(Seq(
+        PropertyParams(Map.empty, "oxf.core.cache.pipelines.size",           XS_INTEGER_QNAME, "2000"),
+        PropertyParams(Map.empty, "oxf.core.cache.pipelines.max-size-bytes", XS_STRING_QNAME,  "10%"),
+        PropertyParams(Map.empty, "oxf.cache.size",                          XS_INTEGER_QNAME, "750")
+      ))
+      ObjectCache.configureCacheFromPropertySet("core.cache.pipelines", 2000, pipelinesCache, legacyPipelineProps)
+      assert(pipelinesCache.getMaxSize == 750)
+      assert(pipelinesCache.getMaxSizeBytes.isDefined)
+
+      // 4. `core.cache.xpath` resolves its built-in `20000` / `5%` defaults and honors legacy `oxf.cache.xpath.*` overrides
+      val xpathCache = new MemoryCacheImpl(20000)
+      val xpathProps = PropertySet.forTests(Seq(
+        PropertyParams(Map.empty, "oxf.core.cache.xpath.size",           XS_INTEGER_QNAME, "20000"),
+        PropertyParams(Map.empty, "oxf.core.cache.xpath.max-size-bytes", XS_STRING_QNAME,  "5%"),
+        PropertyParams(Map.empty, "oxf.cache.xpath.size",                XS_INTEGER_QNAME, "1500")
+      ))
+      ObjectCache.configureCacheFromPropertySet("core.cache.xpath", 20000, xpathCache, xpathProps)
+      assert(xpathCache.getMaxSize == 1500)
+      assert(xpathCache.getMaxSizeBytes.isDefined)
     }
   }
 

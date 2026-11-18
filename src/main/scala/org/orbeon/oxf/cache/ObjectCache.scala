@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.StringUtils.*
 object ObjectCache {
 
   val DefaultCacheName = "core.cache.pipelines"
-  private val DefaultSize = 200
+  private val DefaultSize = 2000
 
   private val CachePropertyNamePrefix      = "oxf"
   private val CachePropertyNameSizeSuffix  = "size"
@@ -46,10 +46,10 @@ object ObjectCache {
   )
 
   private val LegacyObjectCacheSpecs: Map[String, LegacyObjectCacheSpec] = Map(
-    "core.cache.pipelines"        -> LegacyObjectCacheSpec(List("oxf.cache", "oxf.cache.main"),   defaultSize = 1000, defaultMaxBytes = "",    defaultMaxIdle = ""),
-    "core.cache.xpath"            -> LegacyObjectCacheSpec(List("oxf.cache.xpath"),               defaultSize = 5000, defaultMaxBytes = "",    defaultMaxIdle = ""),
-    "xforms.cache.live-documents" -> LegacyObjectCacheSpec(List("oxf.xforms.cache.documents"),    defaultSize = 50,   defaultMaxBytes = "15%", defaultMaxIdle = ""),
-    "xforms.cache.static-states"  -> LegacyObjectCacheSpec(List("oxf.xforms.cache.static-state"), defaultSize = 50,   defaultMaxBytes = "15%", defaultMaxIdle = "")
+    "core.cache.pipelines"        -> LegacyObjectCacheSpec(List("oxf.cache", "oxf.cache.main"),   defaultSize = 2000,  defaultMaxBytes = "10%", defaultMaxIdle = ""),
+    "core.cache.xpath"            -> LegacyObjectCacheSpec(List("oxf.cache.xpath"),               defaultSize = 20000, defaultMaxBytes = "5%",  defaultMaxIdle = ""),
+    "xforms.cache.live-documents" -> LegacyObjectCacheSpec(List("oxf.xforms.cache.documents"),    defaultSize = 500,   defaultMaxBytes = "15%", defaultMaxIdle = ""),
+    "xforms.cache.static-states"  -> LegacyObjectCacheSpec(List("oxf.xforms.cache.static-state"), defaultSize = 200,   defaultMaxBytes = "15%", defaultMaxIdle = "")
   )
 
   private val warnedLegacyProperties = ju.concurrent.ConcurrentHashMap.newKeySet[String]()

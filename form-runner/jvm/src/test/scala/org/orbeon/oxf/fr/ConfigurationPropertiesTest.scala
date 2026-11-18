@@ -53,6 +53,14 @@ class ConfigurationPropertiesTest
       assert(defaultLangElem.attributeValue("override") == "false")
       assert(defaultLangElem.attributeValue("value") == "en")
 
+      val docsSizeElem = curatedElem.element("system").element("cache-documents-size")
+      assert(docsSizeElem.attributeValue("override") == "false")
+      assert(docsSizeElem.attributeValue("value") == "500")
+
+      val staticSizeElem = curatedElem.element("system").element("cache-static-state-size")
+      assert(staticSizeElem.attributeValue("override") == "false")
+      assert(staticSizeElem.attributeValue("value") == "200")
+
       val staticBytesElem = curatedElem.element("system").element("cache-static-state-max-size-bytes")
       assert(staticBytesElem.attributeValue("override") == "false")
       assert(staticBytesElem.attributeValue("value") == "15%")

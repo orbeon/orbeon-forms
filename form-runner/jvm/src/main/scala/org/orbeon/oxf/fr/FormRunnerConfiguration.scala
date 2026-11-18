@@ -176,7 +176,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       baseName        = "oxf.xforms.cache.live-documents.size",
       xsType          = "xs:integer",
       hasAppForm      = false,
-      defaultValue    = "50",
+      defaultValue    = "500",
       validationOpt   = Some("non-negative-integer"),
       legacyBaseNames = List("oxf.xforms.cache.documents.size")
     ),
@@ -206,7 +206,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       baseName        = "oxf.xforms.cache.static-states.size",
       xsType          = "xs:integer",
       hasAppForm      = false,
-      defaultValue    = "50",
+      defaultValue    = "200",
       validationOpt   = Some("non-negative-integer"),
       legacyBaseNames = List("oxf.xforms.cache.static-state.size")
     ),

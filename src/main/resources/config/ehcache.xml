@@ -45,7 +45,7 @@
 
     <!-- XForms serialized static state store -->
     <cache name="xforms.store.static-states"
-           maxElementsInMemory="100"
+           maxElementsInMemory="200"
            memoryStoreEvictionPolicy="LFU"
            overflowToDisk="true"
            diskSpoolBufferSizeMB="10"

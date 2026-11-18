@@ -25,7 +25,7 @@
             <eh:tti unit="hours">5</eh:tti>
         </eh:expiry>
         <eh:resources>
-            <eh:heap unit="entries">200</eh:heap>
+            <eh:heap unit="entries">500</eh:heap>
             <eh:disk persistent="false" unit="GB">2</eh:disk>
         </eh:resources>
     </eh:cache>
@@ -38,7 +38,7 @@
             <eh:tti unit="hours">4</eh:tti>
         </eh:expiry>
         <eh:resources>
-            <eh:heap unit="entries">100</eh:heap>
+            <eh:heap unit="entries">200</eh:heap>
             <eh:disk persistent="false" unit="MB">500</eh:disk>
         </eh:resources>
     </eh:cache>

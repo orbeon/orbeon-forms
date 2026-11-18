@@ -144,7 +144,7 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
 
     val XFormsSharedInstancesCacheName        = "xforms.cache.shared-instances"
 
-    val XFormsSharedInstancesCacheDefaultSize = 10
+    val XFormsSharedInstancesCacheDefaultSize = 200
 
     val ConstantValidity                      = 0L
 

@@ -42,7 +42,7 @@ object XPathCache extends XPathCacheTrait {
   import XPath.*
 
   private val XPathCacheName = "core.cache.xpath"
-  private val XPathCacheDefaultSize = 200
+  private val XPathCacheDefaultSize = 20000
 
   def getCacheForDiagnostics: org.orbeon.oxf.cache.Cache =
     ObjectCache.instance(XPathCacheName, XPathCacheDefaultSize)

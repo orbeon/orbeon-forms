@@ -505,12 +505,14 @@
             <evictions>Évictions</evictions>
             <actions>Actions</actions>
             <form-or-path>Formulaire / Chemin</form-or-path>
+            <mode>Mode</mode>
             <digest>Empreinte</digest>
             <controls>Contrôles</controls>
             <models>Modèles</models>
             <template-size>Modèle HTML</template-size>
             <static-dom-size>DOM statique</static-dom-size>
             <encoded-size>État encodé</encoded-size>
+            <compiled>Compilé</compiled>
             <idle>Inactivité</idle>
             <request-path>Chemin de requête</request-path>
             <document-count>Documents</document-count>
@@ -551,6 +553,12 @@
             <auto-off>Désactivé</auto-off>
             <max-heap>Tas max</max-heap>
         </labels>
+        <pages>
+            <summary>Résumé Form Runner</summary>
+            <home>Administration des formulaires</home>
+            <landing>Accueil</landing>
+            <console>Console d'administration</console>
+        </pages>
         <buttons>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-hidden="true"&gt;&lt;/i&gt; Rafraîchir</refresh>
             <charts>&lt;i class="fa fa-fw fa-chart-line" aria-hidden="true"&gt;&lt;/i&gt; Graphiques</charts>

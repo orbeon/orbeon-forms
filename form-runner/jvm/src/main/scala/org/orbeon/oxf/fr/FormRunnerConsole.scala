@@ -488,22 +488,88 @@ object FormRunnerConsole {
     staticStateEntries.sortBy(e => -e.estimatedBytes).foreach { entry =>
       entry.value match {
         case ss: XFormsStaticStateImpl =>
-          val sElem       = staticStatesElem.addElement("static-state")
-          val samplePath  = XFormsStaticStateCache.sampleRequestPathOpt(ss.digest).getOrElse("")
-          val frMetaOpt   = ss.formRunnerMetadataOpt
-          val displayName = frMetaOpt match {
-            case Some((app, form, Some(title))) => s"$app/$form ($title)"
-            case Some((app, form, None))        => s"$app/$form"
-            case None if samplePath.nonEmpty    => samplePath
-            case None                           => ss.digest.take(12)
+          val sElem        = staticStatesElem.addElement("static-state")
+          val samplePath   = XFormsStaticStateCache.sampleRequestPathOpt(ss.digest).getOrElse("")
+          val metaOpt      = ss.formRunnerStaticStateMetadataOpt
+          val appOpt       = metaOpt.flatMap(_.appOpt)
+          val formOpt      = metaOpt.flatMap(_.formOpt)
+          val versionOpt   = metaOpt.flatMap(_.versionOpt)
+          val titleOpt     = metaOpt.flatMap(_.titleOpt).orElse {
+            if (appOpt.contains("orbeon") && formOpt.contains("builder")) Some("Form Builder") else None
           }
-          val idleMs      = math.max(0L, nowMs - entry.lastAccessedAtMs)
+          val majorModeOpt = metaOpt.flatMap(_.majorModeOpt)
+          val traits       = metaOpt.map(_.configTraits).getOrElse(Nil)
+
+          val systemPageOpt =
+            if (appOpt.isEmpty)
+              majorModeOpt.filter(Set("summary", "home", "landing", "console"))
+            else
+              None
+
+          val systemPageFallbackNameOpt = systemPageOpt.map {
+            case "summary" => "Form Runner Summary"
+            case "home"    => "Forms Admin"
+            case "landing" => "Landing"
+            case "console" => "Admin Console"
+            case other     => other
+          }
+
+          val displayName =
+            (appOpt, formOpt) match {
+              case (Some(app), Some(form)) =>
+                List(
+                  Some(s"$app/$form"),
+                  versionOpt.map(v => s"v$v"),
+                  titleOpt.map(t => s"($t)")
+                ).flatten.mkString(" ")
+              case _ =>
+                systemPageFallbackNameOpt
+                  .orElse(samplePath.trimAllToOpt)
+                  .getOrElse(ss.digest.take(12))
+            }
+
+          val modeSummary =
+            majorModeOpt match {
+              case Some(mm) if traits.nonEmpty => s"$mm (${traits.mkString(", ")})"
+              case Some(mm)                    => mm
+              case None                        => ""
+            }
+
+          val baseShortId =
+            (appOpt, formOpt) match {
+              case (Some(app), Some(form)) =>
+                versionOpt.fold(s"$app/$form")(v => s"$app/$form v$v")
+              case _ =>
+                systemPageFallbackNameOpt
+                  .orElse(samplePath.trimAllToOpt)
+                  .getOrElse(ss.digest.take(12))
+            }
+
+          val chartLabel =
+            if (modeSummary.nonEmpty && appOpt.isDefined) s"$baseShortId · $modeSummary"
+            else baseShortId
+
+          val fullChartTitle =
+            if (modeSummary.nonEmpty) s"$displayName — $modeSummary"
+            else displayName
+
+          val idleMs     = math.max(0L, nowMs - entry.lastAccessedAtMs)
+          val compiledMs = math.max(0L, nowMs - entry.createdAtMs)
 
           sElem.addAttribute("digest",               ss.digest)
           sElem.addAttribute("short-digest",         ss.digest.take(12))
           sElem.addAttribute("display-name",         displayName)
-          sElem.addAttribute("app",                  frMetaOpt.map(_._1).getOrElse(""))
-          sElem.addAttribute("form",                 frMetaOpt.map(_._2).getOrElse(""))
+          sElem.addAttribute("chart-label",          chartLabel)
+          sElem.addAttribute("full-chart-title",     fullChartTitle)
+          sElem.addAttribute("app",                  appOpt.getOrElse(""))
+          sElem.addAttribute("form",                 formOpt.getOrElse(""))
+          sElem.addAttribute("version",              versionOpt.map(_.toString).getOrElse(""))
+          sElem.addAttribute("version-raw",          versionOpt.getOrElse(-1).toString)
+          sElem.addAttribute("title",                titleOpt.getOrElse(""))
+          sElem.addAttribute("system-page",          systemPageOpt.getOrElse(""))
+          sElem.addAttribute("major-mode",           majorModeOpt.getOrElse(""))
+          sElem.addAttribute("mode-summary",         modeSummary)
+          sElem.addAttribute("traits",               traits.mkString(" "))
           sElem.addAttribute("sample-path",          samplePath)
           sElem.addAttribute("controls",             ss.topLevelPart.controlAnalysisMap.size.toString)
           sElem.addAttribute("models",               ss.topLevelPart.iterateModels.size.toString)
@@ -516,8 +582,11 @@ object FormRunnerConsole {
           sElem.addAttribute("encoded-formatted",    formatBytes(ss.encodedStateBytes))
           sElem.addAttribute("estimated-bytes",      entry.estimatedBytes.toString)
           sElem.addAttribute("estimated-formatted",  formatBytes(entry.estimatedBytes))
+          sElem.addAttribute("compiled-ms",          compiledMs.toString)
+          sElem.addAttribute("compiled-formatted",   formatDurationMs(compiledMs))
           sElem.addAttribute("idle-ms",              idleMs.toString)
           sElem.addAttribute("idle-formatted",       formatDurationMs(idleMs))
+          traits.foreach(t => sElem.addElement("trait").addText(t))
         case _ =>
       }
     }
@@ -719,15 +788,17 @@ object FormRunnerConsole {
           .toList
           .take(10)
           .map { e =>
-            val name       = e.attributeValue("display-name")
-            val domB       = e.attributeValue("static-dom-bytes").toLongOption.getOrElse(0L)
-            val tmplB      = e.attributeValue("template-bytes").toLongOption.getOrElse(0L)
-            val estB       = e.attributeValue("estimated-bytes").toLongOption.getOrElse(0L)
-            val otherB     = math.max(0L, estB - domB - tmplB)
-            val encodedFmt = e.attributeValue("encoded-formatted")
-            val controls   = e.attributeValue("controls")
-            val models     = e.attributeValue("models")
-            (name, domB, tmplB, otherB, s"Encoded: $encodedFmt · $controls controls · $models models")
+            val chartLbl    = e.attributeValue("chart-label")
+            val fullTitle   = e.attributeValue("full-chart-title")
+            val domB        = e.attributeValue("static-dom-bytes").toLongOption.getOrElse(0L)
+            val tmplB       = e.attributeValue("template-bytes").toLongOption.getOrElse(0L)
+            val estB        = e.attributeValue("estimated-bytes").toLongOption.getOrElse(0L)
+            val otherB      = math.max(0L, estB - domB - tmplB)
+            val encodedFmt  = e.attributeValue("encoded-formatted")
+            val controls    = e.attributeValue("controls")
+            val models      = e.attributeValue("models")
+            val compiledFmt = e.attributeValue("compiled-formatted")
+            (chartLbl, fullTitle, domB, tmplB, otherB, s"Encoded: $encodedFmt · $controls controls · $models models · Compiled $compiledFmt ago")
           }
 
       addChartElem(
@@ -736,13 +807,13 @@ object FormRunnerConsole {
           kind           = "hbar",
           valueUnit      = "bytes",
           stacked        = true,
-          categories     = topStatic.map(r => truncateCategory(r._1, 30)),
-          fullCategories = topStatic.map(_._1),
-          categoryMeta   = topStatic.map(_._5),
+          categories     = topStatic.map(r => truncateCategory(r._1, 34)),
+          fullCategories = topStatic.map(_._2),
+          categoryMeta   = topStatic.map(_._6),
           series         = List(
-            ConsoleChartSeries("static-dom",     topStatic.map(_._2.toDouble), "bar", colorSlot = 0),
-            ConsoleChartSeries("template",       topStatic.map(_._3.toDouble), "bar", colorSlot = 1),
-            ConsoleChartSeries("analysis-other", topStatic.map(_._4.toDouble), "bar", colorSlot = 2)
+            ConsoleChartSeries("static-dom",     topStatic.map(_._3.toDouble), "bar", colorSlot = 0),
+            ConsoleChartSeries("template",       topStatic.map(_._4.toDouble), "bar", colorSlot = 1),
+            ConsoleChartSeries("analysis-other", topStatic.map(_._5.toDouble), "bar", colorSlot = 2)
           )
         )
       )

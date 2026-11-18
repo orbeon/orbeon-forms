@@ -16,11 +16,14 @@ package org.orbeon.oxf.fr
 import io.circe.generic.auto.*
 import io.circe.parser.decode
 import org.orbeon.oxf.http.HttpMethod.GET
+import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.test.TestHttpClient.StaticState
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, TestHttpClient}
+import org.orbeon.oxf.xforms.XFormsStaticStateImpl
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.controls.{XFormsRepeatControl, XFormsTriggerControl}
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsDocumentCache, XFormsStateManager, XFormsStaticStateCache}
+import org.orbeon.oxf.xml.XMLConstants.XS_BOOLEAN_QNAME
 import org.orbeon.oxf.xml.dom.Converter.*
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.scalatest.funspec.AnyFunSpecLike
@@ -131,11 +134,20 @@ class FormRunnerConsoleTest
           .elements("static-state")
           .find(e => e.attributeValue("app") == "tests" && e.attributeValue("form") == "wizard")
       assert(wizardStaticOpt.isDefined)
+      assert(wizardStaticOpt.get.attributeValue("version") == "1")
+      assert(wizardStaticOpt.get.attributeValue("version-raw") == "1")
+      assert(wizardStaticOpt.get.attributeValue("major-mode") == "detail")
+      assert(wizardStaticOpt.get.attributeValue("display-name").startsWith("tests/wizard v1"))
+      assert(wizardStaticOpt.get.elements("trait").map(_.getText).contains("wizard"))
+      assert(wizardStaticOpt.get.attributeValue("mode-summary") == "detail (wizard)")
+      assert(wizardStaticOpt.get.attributeValue("chart-label") == "tests/wizard v1 · detail (wizard)")
       assert(wizardStaticOpt.get.attributeValue("controls").toInt > 0)
       assert(wizardStaticOpt.get.attributeValue("template-bytes").toLong > 0L)
       assert(wizardStaticOpt.get.attributeValue("static-dom-bytes").toLong > 0L)
       assert(wizardStaticOpt.get.attributeValue("encoded-bytes").toLong > 0L)
       assert(wizardStaticOpt.get.attributeValue("estimated-bytes").toLong > 0L)
+      assert(wizardStaticOpt.get.attributeValue("compiled-ms").toLong >= 0L)
+      assert(wizardStaticOpt.get.attributeValue("compiled-formatted").nonEmpty)
       assert(wizardStaticOpt.get.attributeValue("idle-ms").toLong >= 0L)
 
       // 4. Live documents drill-down (cached state + cache limit & state-store context)
@@ -527,6 +539,113 @@ class FormRunnerConsoleTest
             assert(spec.fullCategories.size == spec.categories.size)
             assert(spec.series.forall(_.values.size == spec.categories.size))
           }
+        }
+      }
+    }
+
+    it("must distinguish FormRunnerConfig variants, preserve Summary static-state sharing, and omit Form Builder version") {
+      assert(FormRunnerConsole.clearCacheInternal("object-cache", "xforms.cache.static-states"))
+
+      // 1. Load `tests/wizard` in default wizard mode, then again with selection-controls choice validation enabled
+      val (_, wizardDocOpt, _) =
+        runFormRunner(
+          app  = "tests",
+          form = "wizard",
+          mode = "new"
+        )
+      assert(wizardDocOpt.isDefined)
+
+      val (_, wizardChoicesDocOpt, _) =
+        runFormRunner(
+          app        = "tests",
+          form       = "wizard",
+          mode       = "new",
+          attributes = propertiesOverride(
+            PropertyParams(Map.empty, "oxf.fr.detail.validate-selection-controls-choices.tests.wizard", XS_BOOLEAN_QNAME, "true")
+          )
+        )
+      assert(wizardChoicesDocOpt.isDefined)
+
+      // 2. Load two different Summary pages: they must share a single compiled static state (`Form Runner Summary`)
+      val (_, summary1Opt, _) = runFormRunner("tests", "wizard",                       "summary")
+      val (_, summary2Opt, _) = runFormRunner("tests", "restricted-functions-allowed", "summary")
+      assert(summary1Opt.isDefined && summary2Opt.isDefined)
+      assert(summary1Opt.get.staticState.digest == summary2Opt.get.staticState.digest)
+
+      // 3. Load Landing (`/fr/`) and Forms Admin (`/fr/forms`) system pages
+      val (_, landingResp, _, _) = TestHttpClient.connect(url = "/fr/",      method = GET, headers = Map.empty, content = None)
+      val (_, formsResp,   _, _) = TestHttpClient.connect(url = "/fr/forms", method = GET, headers = Map.empty, content = None)
+      assert(landingResp.statusCode == 200 && formsResp.statusCode == 200)
+
+      val staticStates =
+        FormRunnerConsole.buildConsoleSnapshotDom().getRootElement
+          .element("static-states")
+          .elements("static-state")
+          .toList
+
+      // Two distinct `tests/wizard` v1 `detail` entries with disambiguated traits and chart labels
+      val wizardVariants = staticStates.filter(e => e.attributeValue("app") == "tests" && e.attributeValue("form") == "wizard")
+      assert(wizardVariants.size == 2)
+      assert(wizardVariants.forall(_.attributeValue("version") == "1"))
+      assert(wizardVariants.forall(_.attributeValue("major-mode") == "detail"))
+      assert(wizardVariants.map(_.attributeValue("mode-summary")).toSet == Set(
+        "detail (wizard)",
+        "detail (wizard, validate-choices)"
+      ))
+      assert(wizardVariants.map(_.attributeValue("chart-label")).toSet == Set(
+        "tests/wizard v1 · detail (wizard)",
+        "tests/wizard v1 · detail (wizard, validate-choices)"
+      ))
+
+      // Single shared Summary static state
+      val summaryEntries = staticStates.filter(_.attributeValue("major-mode") == "summary")
+      assert(summaryEntries.size == 1)
+      assert(summaryEntries.head.attributeValue("app") == "")
+      assert(summaryEntries.head.attributeValue("form") == "")
+      assert(summaryEntries.head.attributeValue("version") == "")
+      assert(summaryEntries.head.attributeValue("system-page") == "summary")
+      assert(summaryEntries.head.attributeValue("display-name") == "Form Runner Summary")
+
+      // Landing and Forms Admin system pages
+      assert(staticStates.exists(e => e.attributeValue("system-page") == "landing" && e.attributeValue("major-mode") == "landing"))
+      assert(staticStates.exists(e => e.attributeValue("system-page") == "home"    && e.attributeValue("major-mode") == "home"))
+
+      // 4. Form Builder (`orbeon/builder`) must never carry a version number
+      val fbDom =
+        <xh:html
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xf="http://www.w3.org/2002/xforms"
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xh:head>
+            <xf:model id="fr-parameters-model" fr:app="orbeon" fr:form="builder" fr:form-version="1" fr:major-mode="detail"/>
+            <xf:model id="fr-form-model">
+              <xf:instance id="fr-form-metadata" xxf:readonly="true" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <metadata>
+                  <application-name>orbeon</application-name>
+                  <form-name>builder</form-name>
+                  <title xml:lang="en">Form Builder</title>
+                </metadata>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
+          <xh:body/>
+        </xh:html>.toDocument
+
+      withTestExternalContext { implicit ec =>
+        withXFormsDocument(fbDom) { fbDoc =>
+          val fbStatic = fbDoc.staticState.asInstanceOf[XFormsStaticStateImpl]
+          assert(
+            fbStatic.formRunnerStaticStateMetadataOpt.contains(
+              XFormsStaticStateImpl.FormRunnerStaticStateMetadata(
+                appOpt       = Some("orbeon"),
+                formOpt      = Some("builder"),
+                versionOpt   = None,
+                titleOpt     = Some("Form Builder"),
+                majorModeOpt = Some("detail"),
+                configTraits = Nil
+              )
+            )
+          )
         }
       }
     }

@@ -501,12 +501,14 @@
             <evictions>Evictions</evictions>
             <actions>Actions</actions>
             <form-or-path>Form / Path</form-or-path>
+            <mode>Mode</mode>
             <digest>Digest</digest>
             <controls>Controls</controls>
             <models>Models</models>
             <template-size>Template</template-size>
             <static-dom-size>Static DOM</static-dom-size>
             <encoded-size>Encoded State</encoded-size>
+            <compiled>Compiled</compiled>
             <idle>Idle</idle>
             <request-path>Request Path</request-path>
             <document-count>Documents</document-count>
@@ -547,6 +549,12 @@
             <auto-off>Off</auto-off>
             <max-heap>Max heap</max-heap>
         </labels>
+        <pages>
+            <summary>Form Runner Summary</summary>
+            <home>Forms Admin</home>
+            <landing>Landing</landing>
+            <console>Admin Console</console>
+        </pages>
         <buttons>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-hidden="true"&gt;&lt;/i&gt; Refresh</refresh>
             <charts>&lt;i class="fa fa-fw fa-chart-line" aria-hidden="true"&gt;&lt;/i&gt; Charts</charts>

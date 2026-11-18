@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.datatypes.MaximumSize
-import org.orbeon.dom.{Document, QName}
+import org.orbeon.dom.{Document, Namespace, QName}
 import org.orbeon.oxf.cache.{MemorySizeEstimator, SizedCacheable}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -42,6 +42,22 @@ import scala.jdk.CollectionConverters.*
 
 
 object XFormsStaticStateImpl {
+
+  final case class FormRunnerStaticStateMetadata(
+    appOpt      : Option[String],
+    formOpt     : Option[String],
+    versionOpt  : Option[Int],
+    titleOpt    : Option[String],
+    majorModeOpt: Option[String],
+    configTraits: List[String]
+  )
+
+  private val FRNamespace        = Namespace("fr", "http://orbeon.org/oxf/xml/form-runner")
+  private val FRAppQName         = QName("app",           FRNamespace)
+  private val FRFormQName        = QName("form",          FRNamespace)
+  private val FRFormVersionQName = QName("form-version",  FRNamespace)
+  private val FRMajorModeQName   = QName("major-mode",    FRNamespace)
+  private val FRTraitsQName      = QName("config-traits", FRNamespace)
 
   def apply(
     encodedState        : String,
@@ -258,31 +274,71 @@ class XFormsStaticStateImpl(
     sum
   }
 
+  lazy val formRunnerStaticStateMetadataOpt: Option[XFormsStaticStateImpl.FormRunnerStaticStateMetadata] = {
+    import XFormsStaticStateImpl.*
+
+    val paramsModelElemOpt = topLevelPart.findModel("fr-parameters-model").map(_.element)
+
+    val configMajorModeOpt = paramsModelElemOpt.flatMap(_.attributeValueOpt(FRMajorModeQName)).flatMap(_.trimAllToOpt)
+    val configAppOpt       = paramsModelElemOpt.flatMap(_.attributeValueOpt(FRAppQName)).flatMap(_.trimAllToOpt)
+    val configFormOpt      = paramsModelElemOpt.flatMap(_.attributeValueOpt(FRFormQName)).flatMap(_.trimAllToOpt)
+    val configVersionOpt   = paramsModelElemOpt.flatMap(_.attributeValueOpt(FRFormVersionQName)).flatMap(_.trimAllToOpt).flatMap(_.toIntOption).filter(_ > 0)
+    val configTraits       = paramsModelElemOpt.flatMap(_.attributeValueOpt(FRTraitsQName)).toList.flatMap(_.splitTo[List]())
+
+    val formMetaTupleOpt: Option[(String, String, Option[String])] =
+      for {
+        model <- topLevelPart.findModel("fr-form-model")
+        inst  <- model.instances.get("fr-form-metadata")
+        res   <- inst.constantContent match {
+          case Some(docNode) =>
+            for {
+              root <- (docNode / *).headOption
+              app  <- (root / "application-name").headOption.flatMap(_.stringValue.trimAllToOpt)
+              form <- (root / "form-name").headOption.flatMap(_.stringValue.trimAllToOpt)
+            } yield (app, form, (root / "title").headOption.flatMap(_.stringValue.trimAllToOpt))
+          case None =>
+            for {
+              rootElem <- inst.inlineRootElemOpt
+              app      <- rootElem.elementOpt("application-name").flatMap(_.getText.trimAllToOpt)
+              form     <- rootElem.elementOpt("form-name").flatMap(_.getText.trimAllToOpt)
+            } yield (app, form, rootElem.elementOpt("title").flatMap(_.getText.trimAllToOpt))
+        }
+      } yield res
+
+    val appOpt   = configAppOpt.orElse(formMetaTupleOpt.map(_._1))
+    val formOpt  = configFormOpt.orElse(formMetaTupleOpt.map(_._2))
+    val titleOpt = formMetaTupleOpt.flatMap(_._3)
+    val effectiveVersionOpt =
+      if (appOpt.contains("orbeon") && formOpt.contains("builder")) None
+      else configVersionOpt
+
+    if (configMajorModeOpt.isDefined || appOpt.isDefined)
+      Some(
+        FormRunnerStaticStateMetadata(
+          appOpt       = appOpt,
+          formOpt      = formOpt,
+          versionOpt   = effectiveVersionOpt,
+          titleOpt     = titleOpt,
+          majorModeOpt = configMajorModeOpt,
+          configTraits = configTraits
+        )
+      )
+    else
+      None
+  }
+
   // Diagnostic metadata extracted from `fr-form-metadata` when compiled by Form Runner: (app, form, titleOpt)
   lazy val formRunnerMetadataOpt: Option[(String, String, Option[String])] =
     for {
-      model <- topLevelPart.findModel("fr-form-model")
-      inst  <- model.instances.get("fr-form-metadata")
-      res   <- inst.constantContent match {
-        case Some(docNode) =>
-          for {
-            root <- (docNode / *).headOption
-            app  <- (root / "application-name").headOption.flatMap(_.stringValue.trimAllToOpt)
-            form <- (root / "form-name").headOption.flatMap(_.stringValue.trimAllToOpt)
-          } yield (app, form, (root / "title").headOption.flatMap(_.stringValue.trimAllToOpt))
-        case None =>
-          for {
-            rootElem <- inst.inlineRootElemOpt
-            app      <- rootElem.elementOpt("application-name").flatMap(_.getText.trimAllToOpt)
-            form     <- rootElem.elementOpt("form-name").flatMap(_.getText.trimAllToOpt)
-          } yield (app, form, rootElem.elementOpt("title").flatMap(_.getText.trimAllToOpt))
-      }
-    } yield res
+      meta <- formRunnerStaticStateMetadataOpt
+      app  <- meta.appOpt
+      form <- meta.formOpt
+    } yield (app, form, meta.titleOpt)
 
   // Release duplicate Orbeon DOM subtrees on all `readonly && useInlineContent` instances for server-side execution.
   // Offline Scala.js compilation (`XFormsCompiler`) omits this step because `XFormsStaticStateSerializer` reads `inlineRootElemOpt`.
   def trimAfterServerCompilation(): this.type = {
-    val _ = formRunnerMetadataOpt
+    val _ = formRunnerStaticStateMetadataOpt
     for {
       model <- topLevelPart.iterateModels
       inst  <- model.instances.valuesIterator

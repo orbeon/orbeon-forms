@@ -40,8 +40,9 @@
     <xsl:import href="legacy-repeat.xsl"/>    <!-- convert legacy fr:repeat to fr:grid -->
 
     <!-- Global variables -->
-    <xsl:variable name="app"  select="doc('input:form-runner-config')/*/app"  as="xs:string"/>
-    <xsl:variable name="form" select="doc('input:form-runner-config')/*/form" as="xs:string"/>
+    <xsl:variable name="app"          select="doc('input:form-runner-config')/*/app"                        as="xs:string"/>
+    <xsl:variable name="form"         select="doc('input:form-runner-config')/*/form"                       as="xs:string"/>
+    <xsl:variable name="form-version" select="doc('input:form-runner-config')/*/form-version[p:non-blank()]" as="xs:string?"/>
 
     <xsl:variable name="major-mode" select="doc('input:form-runner-config')/*/major-mode" as="xs:string"/>
 
@@ -1014,6 +1015,40 @@
                     <xsl:attribute name="xxf:upload.mediatypes" select="$attachment-mediatypes"/>
                 </xsl:otherwise>
             </xsl:choose>
+
+            <!-- Compile-time Form Runner diagnostic metadata for `/fr/console` (`XFormsStaticStateImpl`) -->
+            <xsl:attribute name="fr:major-mode" select="$major-mode"/>
+            <xsl:if test="not($is-landing or $is-home or $is-console or ($is-summary and not($is-form-builder))) and $app != '*'">
+                <xsl:attribute name="fr:app"  select="$app"/>
+                <xsl:attribute name="fr:form" select="$form"/>
+                <xsl:if test="not($is-form-builder) and exists($form-version)">
+                    <xsl:attribute name="fr:form-version" select="$form-version"/>
+                </xsl:if>
+            </xsl:if>
+            <xsl:variable
+                name="fr-config-traits"
+                as="xs:string*"
+                select="(
+                    if ($is-pdf-mode and $use-pdf-template)                 then 'pdf-template'
+                    else if ($is-pdf-mode)                                  then 'pdf'
+                    else if ($is-readonly-mode and $is-static-readonly)     then 'readonly'
+                    else if ($is-readonly-mode)                             then 'dynamic-readonly'
+                    else (),
+                    if ($is-test-mode)                                      then 'test'             else (),
+                    if ($is-import and not($is-import-page))                then 'service'          else (),
+                    for $va in $view-appearance-opt[p:non-blank()]
+                    return
+                        if (starts-with($va, 'fr:')) then substring-after($va, 'fr:') else $va,
+                    for $toc in $toc-position-opt[p:non-blank()]
+                    return concat('toc:', $toc),
+                    if ($disable-calculate)                                 then 'no-calculate'     else (),
+                    if ($disable-relevant)                                  then 'no-relevant'      else (),
+                    if ($disable-default)                                   then 'no-default'       else (),
+                    if ($validate-selection-controls-choices)               then 'validate-choices' else ()
+                )"/>
+            <xsl:if test="exists($fr-config-traits)">
+                <xsl:attribute name="fr:config-traits" select="string-join($fr-config-traits, ' ')"/>
+            </xsl:if>
 
             <!-- Parameters passed to this page -->
             <!-- NOTE: the `<document>` and `mode` elements may be modified, so we don't set this as read-only -->

@@ -328,7 +328,6 @@ object ConsoleChart {
       val isHBar        = spec.kind == "hbar"
       val baseChartType = if (isHBar || spec.series.forall(_.chartType == "bar")) "bar" else "line"
       val pointCount    = if (spec.kind == "timeseries") spec.timestampsMs.size else spec.categories.size
-      val reducedMotion = dom.window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
       val datasets =
         spec.series.zipWithIndex.map { case (s, idx) =>
@@ -493,7 +492,7 @@ object ConsoleChart {
           indexAxis           = if (isHBar) "y" else "x",
           responsive          = true,
           maintainAspectRatio = false,
-          animation           = if (reducedMotion) false else js.Dynamic.literal(duration = 200),
+          animation           = false,
           interaction         = js.Dynamic.literal(
             mode      = if (isHBar) "nearest" else "index",
             axis      = if (isHBar) "y" else "x",

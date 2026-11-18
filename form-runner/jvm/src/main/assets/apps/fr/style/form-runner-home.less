@@ -582,69 +582,48 @@
         }
 
         .fr-table-pill {
-            --fr-pill-bg           : #eff2f7;
-            --fr-pill-border       : #cfd5e2;
-            --fr-pill-color        : var(--orbeon-base-color);
-            --fr-pill-hover-bg     : #e0e6f2;
-            --fr-pill-hover-border : #aeb9d1;
-            --fr-pill-hover-color  : var(--orbeon-base-color);
-            --fr-pill-active-bg    : #dce6f9;
-            --fr-pill-active-border: var(--orbeon-link-color);
-            --fr-pill-active-color : var(--orbeon-link-color);
+            --fr-pill-bg           : var(--orbeon-pill-background-color);
+            --fr-pill-border       : var(--orbeon-pill-border-color);
+            --fr-pill-color        : var(--orbeon-pill-color);
+            --fr-pill-active-bg    : var(--orbeon-pill-active-background-color);
+            --fr-pill-active-border: var(--orbeon-pill-active-color);
+            --fr-pill-active-color : var(--orbeon-pill-active-color);
 
-            @media screen {
-                --fr-pill-bg          : color-mix(in oklab, var(--orbeon-accent-color) 6%, #f3f4f7);
-                --fr-pill-border      : color-mix(in oklab, var(--orbeon-accent-color) 14%, #d5d8de);
-                --fr-pill-hover-bg    : color-mix(in oklab, var(--orbeon-accent-color) 14%, #eaecf0);
-                --fr-pill-hover-border: color-mix(in oklab, var(--orbeon-accent-color) 30%, #c2c6ce);
-                --fr-pill-active-bg   : color-mix(in oklab, var(--orbeon-accent-color) 16%, #eef2f8);
+            &.fr-pill-muted {
+                --fr-pill-bg    : var(--orbeon-pill-muted-background-color);
+                --fr-pill-border: var(--orbeon-pill-muted-border-color);
+                --fr-pill-color : var(--orbeon-pill-muted-color);
             }
 
             &.fr-pill-success {
-                --fr-pill-bg           : #eaf6ee;
-                --fr-pill-border       : #b7dfc4;
-                --fr-pill-color        : #185c37;
-                --fr-pill-hover-bg     : #d8efe0;
-                --fr-pill-hover-border : #8bc9a0;
-                --fr-pill-hover-color  : #114729;
-                --fr-pill-active-bg    : #cdebd8;
-                --fr-pill-active-border: #237a4b;
-                --fr-pill-active-color : #114729;
-            }
-
-            &.fr-pill-muted {
-                --fr-pill-bg           : #f1f2f4;
-                --fr-pill-border       : #d2d5db;
-                --fr-pill-color        : #4b5058;
-                --fr-pill-hover-bg     : #e4e6ea;
-                --fr-pill-hover-border : #b6bbc4;
-                --fr-pill-hover-color  : #2b2e32;
-                --fr-pill-active-bg    : #dfe2e8;
-                --fr-pill-active-border: #5a6069;
-                --fr-pill-active-color : #1f2328;
+                --fr-pill-bg    : var(--orbeon-pill-success-background-color);
+                --fr-pill-border: var(--orbeon-pill-success-border-color);
+                --fr-pill-color : var(--orbeon-pill-success-color);
             }
 
             &.fr-pill-info {
-                --fr-pill-bg           : #eaf2fc;
-                --fr-pill-border       : #b8d2f2;
-                --fr-pill-color        : #174ea6;
-                --fr-pill-hover-bg     : #d8e7fa;
-                --fr-pill-hover-border : #8eb8ec;
-                --fr-pill-hover-color  : #0f3b82;
-                --fr-pill-active-bg    : #cfe2fa;
-                --fr-pill-active-border: #1d5bbf;
-                --fr-pill-active-color : #0f3b82;
+                --fr-pill-bg    : var(--orbeon-pill-info-background-color);
+                --fr-pill-border: var(--orbeon-pill-info-border-color);
+                --fr-pill-color : var(--orbeon-pill-info-color);
             }
 
             &.fr-pill-warning {
-                --fr-pill-bg    : #fef4e6;
-                --fr-pill-border: #f5d096;
-                --fr-pill-color : #8a4b08;
+                --fr-pill-bg    : var(--orbeon-pill-warning-background-color);
+                --fr-pill-border: var(--orbeon-pill-warning-border-color);
+                --fr-pill-color : var(--orbeon-pill-warning-color);
+            }
+
+            &.fr-pill-muted,
+            &.fr-pill-success,
+            &.fr-pill-info,
+            &.fr-pill-warning {
+                --fr-pill-active-bg    : var(--fr-pill-bg);
+                --fr-pill-active-border: var(--fr-pill-color);
+                --fr-pill-active-color : var(--fr-pill-color);
             }
 
             @media (prefers-contrast: more) {
                 --fr-pill-border      : currentColor;
-                --fr-pill-hover-border: currentColor;
             }
 
             &.xforms-output:not(.xforms-disabled) {
@@ -693,16 +672,12 @@
 
                     @media (hover: hover) {
                         &:hover {
-                            background-color: var(--fr-pill-hover-bg);
-                            border-color: var(--fr-pill-hover-border);
-                            color: var(--fr-pill-hover-color);
+                            box-shadow: inset 0 0 0 100px var(--orbeon-pill-hover-overlay-color);
                         }
                     }
 
                     &:active {
-                        background-color: var(--fr-pill-hover-bg);
-                        border-color: var(--fr-pill-hover-border);
-                        color: var(--fr-pill-hover-color);
+                        box-shadow: inset 0 0 0 100px var(--orbeon-pill-hover-overlay-color);
 
                         @media (prefers-reduced-motion: no-preference) {
                             scale: 0.97;
@@ -758,75 +733,6 @@
             padding: 28px 16px;
         }
     }
-
-    .dark-mode({
-        .fr-forms-table .fr-table-pill {
-            --fr-pill-bg           : #282d37;
-            --fr-pill-border       : #434b59;
-            --fr-pill-color        : var(--orbeon-base-color);
-            --fr-pill-hover-bg     : #333b4a;
-            --fr-pill-hover-border : #5b6880;
-            --fr-pill-hover-color  : var(--orbeon-base-color);
-            --fr-pill-active-bg    : #1e325c;
-            --fr-pill-active-border: var(--orbeon-link-color);
-            --fr-pill-active-color : #bfd6ff;
-
-            @media screen {
-                --fr-pill-bg          : color-mix(in oklab, var(--orbeon-accent-color) 10%, #272a30);
-                --fr-pill-border      : color-mix(in oklab, var(--orbeon-accent-color) 20%, #3f434c);
-                --fr-pill-hover-bg    : color-mix(in oklab, var(--orbeon-accent-color) 20%, #32363f);
-                --fr-pill-hover-border: color-mix(in oklab, var(--orbeon-accent-color) 36%, #4d525d);
-                --fr-pill-active-bg   : color-mix(in oklab, var(--orbeon-accent-color) 28%, #22262e);
-            }
-
-            &.fr-pill-success {
-                --fr-pill-bg           : #162d21;
-                --fr-pill-border       : #28593e;
-                --fr-pill-color        : #8ce0ac;
-                --fr-pill-hover-bg     : #1d3c2c;
-                --fr-pill-hover-border : #377854;
-                --fr-pill-hover-color  : #a8ebbf;
-                --fr-pill-active-bg    : #204532;
-                --fr-pill-active-border: #4ca372;
-                --fr-pill-active-color : #b7f0cb;
-            }
-
-            &.fr-pill-muted {
-                --fr-pill-bg           : #26292e;
-                --fr-pill-border       : #3e434b;
-                --fr-pill-color        : #c0c5ce;
-                --fr-pill-hover-bg     : #31353c;
-                --fr-pill-hover-border : #545b66;
-                --fr-pill-hover-color  : #e6e9ef;
-                --fr-pill-active-bg    : #353a42;
-                --fr-pill-active-border: #8a929e;
-                --fr-pill-active-color : #f1f3f6;
-            }
-
-            &.fr-pill-info {
-                --fr-pill-bg           : #172840;
-                --fr-pill-border       : #2a4b78;
-                --fr-pill-color        : #93c5fd;
-                --fr-pill-hover-bg     : #1f3554;
-                --fr-pill-hover-border : #3b67a1;
-                --fr-pill-hover-color  : #b5d8fe;
-                --fr-pill-active-bg    : #233e63;
-                --fr-pill-active-border: #5c94de;
-                --fr-pill-active-color : #cbe3ff;
-            }
-
-            &.fr-pill-warning {
-                --fr-pill-bg    : #332512;
-                --fr-pill-border: #66481c;
-                --fr-pill-color : #fcd38d;
-            }
-
-            @media (prefers-contrast: more) {
-                --fr-pill-border      : currentColor;
-                --fr-pill-hover-border: currentColor;
-            }
-        }
-    });
 
     .fr-search-results .fr-forms-table {
         width: 100%;

@@ -208,7 +208,7 @@
   --orbeon-button-disabled-opacity     : 0.65;
   --orbeon-button-disabled-icon-opacity: 0.4;
 
-  // Status pills (.label), e.g. character counters, draft labels
+  // Status labels (.label), e.g. character counters, draft labels: white text on a solid color
   --orbeon-status-color                    : white;
   --orbeon-status-text-shadow-color        : rgba(0, 0, 0, 0.25);
   --orbeon-status-background-color         : #999;     // default (e.g. unavailable)
@@ -217,6 +217,14 @@
   --orbeon-status-warning-background-color : #f89406;
   --orbeon-status-error-background-color   : #b94a48;  // Bootstrap 2 .label-important
   --orbeon-status-border-radius            : 3px;
+
+  // Pills (.fr-table-pill), e.g. table filters and statuses: lightness and maximum chroma of the colored pills
+  --orbeon-pill-background-lightness: 0.96;
+  --orbeon-pill-background-chroma   : 0.018;
+  --orbeon-pill-border-lightness    : 0.86;
+  --orbeon-pill-border-chroma       : 0.055;
+  --orbeon-pill-color-lightness     : 0.43;
+  --orbeon-pill-color-chroma        : 0.13;
 
   // Badges (.badge), e.g. selection counts
   --orbeon-badge-border-radius: 9px;
@@ -536,6 +544,32 @@
   --orbeon-stripe-color-1: #f5f5f5; // @wellBackground
   --orbeon-stripe-color-2: white;   // @inputBackground
 
+  // Pills: translucent grays for the neutral and muted pills, hue of a status label or of the accent for the others
+  .pill-colors() {
+    --orbeon-pill-tint-color              : color-mix(in oklab, var(--orbeon-accent-color) 50%, var(--orbeon-base-color));
+    --orbeon-pill-background-color        : color-mix(in oklab, var(--orbeon-pill-tint-color) 11%, transparent);
+    --orbeon-pill-border-color            : color-mix(in oklab, var(--orbeon-pill-tint-color) 29%, transparent);
+    --orbeon-pill-color                   : var(--orbeon-base-color);
+    --orbeon-pill-muted-background-color  : color-mix(in oklab, var(--orbeon-base-color)  8%, transparent);
+    --orbeon-pill-muted-border-color      : color-mix(in oklab, var(--orbeon-base-color) 22%, transparent);
+    --orbeon-pill-muted-color             : color-mix(in oklab, var(--orbeon-base-color) 83%, transparent);
+    --orbeon-pill-success-background-color: ~"oklch(from var(--orbeon-status-success-background-color) var(--orbeon-pill-background-lightness) min(c, var(--orbeon-pill-background-chroma)) h)";
+    --orbeon-pill-success-border-color    : ~"oklch(from var(--orbeon-status-success-background-color) var(--orbeon-pill-border-lightness) min(c, var(--orbeon-pill-border-chroma)) h)";
+    --orbeon-pill-success-color           : ~"oklch(from var(--orbeon-status-success-background-color) var(--orbeon-pill-color-lightness) min(c, var(--orbeon-pill-color-chroma)) h)";
+    --orbeon-pill-info-background-color   : ~"oklch(from var(--orbeon-status-info-background-color) var(--orbeon-pill-background-lightness) min(c, var(--orbeon-pill-background-chroma)) h)";
+    --orbeon-pill-info-border-color       : ~"oklch(from var(--orbeon-status-info-background-color) var(--orbeon-pill-border-lightness) min(c, var(--orbeon-pill-border-chroma)) h)";
+    --orbeon-pill-info-color              : ~"oklch(from var(--orbeon-status-info-background-color) var(--orbeon-pill-color-lightness) min(c, var(--orbeon-pill-color-chroma)) h)";
+    --orbeon-pill-warning-background-color: ~"oklch(from var(--orbeon-status-warning-background-color) var(--orbeon-pill-background-lightness) min(c, var(--orbeon-pill-background-chroma)) h)";
+    --orbeon-pill-warning-border-color    : ~"oklch(from var(--orbeon-status-warning-background-color) var(--orbeon-pill-border-lightness) min(c, var(--orbeon-pill-border-chroma)) h)";
+    --orbeon-pill-warning-color           : ~"oklch(from var(--orbeon-status-warning-background-color) var(--orbeon-pill-color-lightness) min(c, var(--orbeon-pill-color-chroma)) h)";
+    --orbeon-pill-active-background-color : ~"oklch(from var(--orbeon-accent-color) var(--orbeon-pill-background-lightness) min(c, var(--orbeon-pill-background-chroma)) h)";
+    --orbeon-pill-active-color            : ~"oklch(from var(--orbeon-accent-color) var(--orbeon-pill-color-lightness) min(c, var(--orbeon-pill-color-chroma)) h)";
+    --orbeon-pill-hover-overlay-color     : color-mix(in oklab, var(--orbeon-base-color) 6%, transparent);
+  }
+  @media screen {
+    .pill-colors();
+  }
+
   .dark-mode(.dark-color-scheme());
 
   .dark-color-scheme() {
@@ -723,6 +757,13 @@
     --orbeon-info-color                                      : @info;
     --orbeon-warning-color                                   : @warning;
     --orbeon-error-color                                     : @error;
+    --orbeon-pill-background-lightness                       : 0.27;
+    --orbeon-pill-background-chroma                          : 0.035;
+    --orbeon-pill-border-lightness                           : 0.42;
+    --orbeon-pill-border-chroma                              : 0.07;
+    --orbeon-pill-color-lightness                            : 0.85;
+    --orbeon-pill-color-chroma                               : 0.11;
+    .pill-colors();
     --orbeon-landing-card-border-color                       : @gray-27;
     --orbeon-landing-card-image-border                       : @gray-27;
     --orbeon-landing-card-header-color                       : @text-light;

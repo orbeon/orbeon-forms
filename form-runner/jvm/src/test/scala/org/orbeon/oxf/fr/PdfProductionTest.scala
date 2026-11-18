@@ -3,7 +3,7 @@ package org.orbeon.oxf.fr
 import cats.syntax.option.*
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.io.RandomAccessReadBuffer
-import org.apache.pdfbox.text.PDFTextStripper
+import org.apache.pdfbox.text.{PDFTextStripper, TextPosition}
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.http.StatusCode
@@ -14,6 +14,7 @@ import org.scalatest.funspec.AnyFunSpecLike
 
 import java.io.File
 import java.nio.file.Files
+import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.IterableHasAsScala
 import scala.sys.process.*
 import scala.util.chaining.*
@@ -41,9 +42,32 @@ class PdfProductionTest
   private val ShowRequiredProperty =
     PropertyParams(Map.empty, "oxf.fr.detail.static-readonly-required.*.*", XMLConstants.XS_BOOLEAN_QNAME, "true")
 
+  private def isRequiredStar(c: Char): Boolean =
+    c == '\uF005' || c == '\u2B50'
+
   private def requiredStars(pdf: Array[Byte]): String =
     useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(pdf))) { pdd =>
-      (new PDFTextStripper).getText(pdd).filter(c => c == '\uF005' || c == '\u2B50')
+      (new PDFTextStripper).getText(pdd).filter(isRequiredStar)
+    }
+
+  // Horizontal space, in points, between each required star and the closest glyph to its right on the same line, the
+  // first one of the label. Don't rely on the order of the glyphs in the PDF.
+  private def requiredStarGaps(pdf: Array[Byte]): List[Float] =
+    useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(pdf))) { pdd =>
+      val positions = ListBuffer[TextPosition]()
+      new PDFTextStripper {
+        override protected def processTextPosition(text: TextPosition): Unit =
+          positions += text
+      }.getText(pdd)
+      val all = positions.toList
+      all.filter(_.getUnicode.exists(isRequiredStar)).flatMap { star =>
+        val starEnd = star.getXDirAdj + star.getWidthDirAdj
+        // Start from the middle of the star, so that a label which overlaps the star still counts, with a negative gap
+        all
+          .filter(p => (p ne star) && ! p.getUnicode.isBlank && math.abs(p.getYDirAdj - star.getYDirAdj) < 3f && p.getXDirAdj >= star.getXDirAdj + star.getWidthDirAdj / 2)
+          .map(_.getXDirAdj - starEnd)
+          .minOption
+      }
     }
 
   describe("Form Runner PDF production") {
@@ -321,6 +345,19 @@ class PdfProductionTest
         )
       // One star each for the text field, the single checkbox and the toggle switch
       assert(requiredStars(content.body) == "\uF005" * 3)
+    }
+
+    it("must be separated from the label") {
+      val (_, content, _) =
+        runFormRunnerReturnContent(
+          "tests",
+          "pdf-required-star",
+          "pdf",
+          documentId = PdfRequiredStarDocumentId.some,
+          attributes = propertiesOverride(ShowRequiredProperty)
+        )
+      val gaps = requiredStarGaps(content.body)
+      assert(gaps.size == 3 && gaps.forall(_ > 1f), s"gaps in points: $gaps")
     }
   }
 

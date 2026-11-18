@@ -512,6 +512,7 @@
             <document-count>Documents</document-count>
             <max-sequence>Max Sequence</max-sequence>
             <uuid>Document UUID</uuid>
+            <status>Status</status>
             <sequence>Ajax Updates</sequence>
             <pool-name>Memory Pool</pool-name>
             <type>Type</type>
@@ -529,9 +530,14 @@
             <committed>Committed</committed>
             <of-max-heap>of max heap</of-max-heap>
             <files-on-disk>files on disk</files-on-disk>
-            <live-docs>cached in heap</live-docs>
+            <live-docs>live in heap</live-docs>
             <http-sessions>HTTP sessions</http-sessions>
             <active-requests>active locks</active-requests>
+            <status-cached>Cached</status-cached>
+            <status-in-request>In request</status-in-request>
+            <status-cached-lower>cached</status-cached-lower>
+            <status-in-request-lower>in request</status-in-request-lower>
+            <store-entries>entries</store-entries>
             <processors>Processors</processors>
             <non-heap>Non-Heap Used</non-heap>
         </labels>
@@ -541,7 +547,8 @@
         </buttons>
         <messages>
             <no-static-states>No XForms static states are currently cached in memory.</no-static-states>
-            <no-live-documents>No live XForms documents are currently sitting in the document cache.</no-live-documents>
+            <no-live-documents>No live XForms documents are currently in JVM heap.</no-live-documents>
+            <live-documents-note>Only documents currently in JVM heap (cached in xforms.cache.documents or actively handling a request) appear below. Open forms evicted when this cache reaches its limit remain active in xforms.state and rehydrate automatically on interaction.</live-documents-note>
         </messages>
     </console>
     <landing>

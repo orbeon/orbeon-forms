@@ -20,9 +20,10 @@ import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{DateUtils, StaticXPath, XPathCache}
-import org.orbeon.oxf.xforms.state.{XFormsDocumentCache, XFormsStateManager, XFormsStaticStateCache}
+import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.state.{InFlightDocumentInfo, XFormsDocumentCache, XFormsStateManager, XFormsStaticStateCache}
 import org.orbeon.oxf.xforms.xbl.{BindingIndex, GlobalBindingIndex}
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsServerSharedInstancesCache, XFormsStaticStateImpl, XFormsStores}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties, XFormsServerSharedInstancesCache, XFormsStaticStateImpl, XFormsStores}
 
 import java.lang.management.{ManagementFactory, MemoryType}
 import java.time.Instant
@@ -213,8 +214,70 @@ object FormRunnerConsole {
           (0, 0L)
       }
 
+    // 4. Merge cached XFormsContainingDocuments with checked-out / actively initializing documents
+    val cachedDocs: List[LiveDocSnapshot] =
+      documentEntries.collect {
+        case entry if entry.value.isInstanceOf[XFormsContainingDocument] =>
+          val xfcd = entry.value.asInstanceOf[XFormsContainingDocument]
+          LiveDocSnapshot(
+            uuid           = xfcd.uuid,
+            requestPath    = Option(xfcd.getRequestPath).getOrElse(""),
+            sequence       = xfcd.sequence,
+            controlCount   = xfcd.liveControlCount,
+            estimatedBytes = entry.estimatedBytes,
+            idleFormatted  = formatDurationMs(math.max(0L, nowMs - entry.lastAccessedAtMs)),
+            status         = "cached"
+          )
+      }
+    val cachedUuids = cachedDocs.iterator.map(_.uuid).toSet
+
+    val currentThreadDocInfoOpt: Option[InFlightDocumentInfo] =
+      XFormsAPI.inScopeContainingDocumentOpt
+        .filter(doc =>
+          ! doc.disableUpdates &&
+            doc.staticState.propertyMaybeAsExpression(XFormsProperties.NoUpdates).fold(_.toString != "true", _ => true)
+        )
+        .map { doc =>
+          val controls =
+            if (doc.initializing && doc.liveControlCount == 0)
+              doc.staticState.topLevelPart.controlAnalysisMap.size
+            else
+              doc.liveControlCount
+          InFlightDocumentInfo(
+            uuid           = doc.uuid,
+            requestPath    = Option(doc.getRequestPath).getOrElse(""),
+            sequence       = doc.sequence,
+            controlCount   = controls,
+            estimatedBytes = doc.estimatedMemoryBytes
+          )
+        }
+
+    val inFlightByUuid: Map[String, InFlightDocumentInfo] =
+      (XFormsStateManager.inFlightDocumentsSnapshot.map(i => i.uuid -> i) ++
+        currentThreadDocInfoOpt.map(i => i.uuid -> i)).toMap
+
+    val inFlightDocs: List[LiveDocSnapshot] =
+      inFlightByUuid.valuesIterator
+        .filterNot(info => cachedUuids.contains(info.uuid))
+        .map { info =>
+          LiveDocSnapshot(
+            uuid           = info.uuid,
+            requestPath    = info.requestPath,
+            sequence       = info.sequence,
+            controlCount   = info.controlCount,
+            estimatedBytes = info.estimatedBytes,
+            idleFormatted  = "—",
+            status         = "in-request"
+          )
+        }
+        .toList
+
+    val allLiveDocs: List[LiveDocSnapshot] = cachedDocs ++ inFlightDocs
+    val inFlightTotalBytes: Long           = inFlightDocs.iterator.map(_.estimatedBytes).sum
+
     val totalEstimatedCacheHeapBytes =
       objectCacheSnaps.iterator.map(_.estimatedBytes).sum +
+        inFlightTotalBytes +
         providerCacheSnaps.iterator.map(_.estimatedHeapBytes).sum +
         globalXblBytes
 
@@ -286,11 +349,6 @@ object FormRunnerConsole {
 
     objectCacheSnaps.foreach { snap =>
       val cElem = cachesElem.addElement("cache")
-      val limitParts = List(
-        Some(s"${snap.maxSize} entries"),
-        snap.maxSizeBytes.map(b => s"${formatBytes(b)} max"),
-        snap.maxIdleMillis.map(ms => s"idle ${formatDurationMs(ms)}")
-      ).flatten
 
       cElem.addAttribute("kind",                     "object-cache")
       cElem.addAttribute("name",                     snap.name)
@@ -300,7 +358,7 @@ object FormRunnerConsole {
       cElem.addAttribute("max-entries",              snap.maxSize.toString)
       cElem.addAttribute("max-bytes",                snap.maxSizeBytes.map(_.toString).getOrElse(""))
       cElem.addAttribute("max-idle-ms",              snap.maxIdleMillis.map(_.toString).getOrElse(""))
-      cElem.addAttribute("limit-summary",            limitParts.mkString(", "))
+      cElem.addAttribute("limit-summary",            formatObjectCacheLimitSummary(snap))
       cElem.addAttribute("estimated-heap-bytes",     snap.estimatedBytes.toString)
       cElem.addAttribute("estimated-heap-formatted", formatBytes(snap.estimatedBytes))
       cElem.addAttribute("disk-bytes",               "0")
@@ -406,25 +464,27 @@ object FormRunnerConsole {
     }
 
     // ==== <live-documents> ====
-    val liveDocsElem  = root.addElement("live-documents")
-    val docsTotalBytes = documentEntries.iterator.map(_.estimatedBytes).sum
-    liveDocsElem.addAttribute("count",           documentEntries.size.toString)
-    liveDocsElem.addAttribute("active-locks",    XFormsStateManager.activeDocumentLocksCount.toString)
-    liveDocsElem.addAttribute("total-bytes",     docsTotalBytes.toString)
-    liveDocsElem.addAttribute("total-formatted", formatBytes(docsTotalBytes))
+    val liveDocsElem         = root.addElement("live-documents")
+    val docsTotalBytes       = allLiveDocs.iterator.map(_.estimatedBytes).sum
+    val docCacheLimitSummary = objectCacheSnaps.find(_.name == "xforms.cache.documents").map(formatObjectCacheLimitSummary).getOrElse("")
+    val stateStoreEntries    = providerCacheSnaps.find(_.name == "xforms.state").flatMap(_.totalEntries).map(_.toString).getOrElse("—")
 
-    val typedDocs = documentEntries.collect {
-      case entry if entry.value.isInstanceOf[XFormsContainingDocument] =>
-        (entry, entry.value.asInstanceOf[XFormsContainingDocument])
-    }
+    liveDocsElem.addAttribute("count",               allLiveDocs.size.toString)
+    liveDocsElem.addAttribute("cached-count",        cachedDocs.size.toString)
+    liveDocsElem.addAttribute("in-flight-count",     inFlightDocs.size.toString)
+    liveDocsElem.addAttribute("active-locks",        XFormsStateManager.activeDocumentLocksCount.toString)
+    liveDocsElem.addAttribute("cache-limit-summary", docCacheLimitSummary)
+    liveDocsElem.addAttribute("state-store-entries", stateStoreEntries)
+    liveDocsElem.addAttribute("total-bytes",         docsTotalBytes.toString)
+    liveDocsElem.addAttribute("total-formatted",     formatBytes(docsTotalBytes))
 
     val groupsElem = liveDocsElem.addElement("groups")
-    typedDocs
-      .groupBy { case (_, xfcd) => Option(xfcd.getRequestPath).flatMap(_.trimAllToOpt).getOrElse("(unknown)") }
+    allLiveDocs
+      .groupBy(d => d.requestPath.trimAllToOpt.getOrElse("(unknown)"))
       .toList
       .map { case (path, items) =>
-        val sumBytes = items.iterator.map(_._1.estimatedBytes).sum
-        val maxSeq   = items.iterator.map(_._2.sequence).maxOption.getOrElse(1L)
+        val sumBytes = items.iterator.map(_.estimatedBytes).sum
+        val maxSeq   = items.iterator.map(_.sequence).maxOption.getOrElse(1L)
         (path, items.size, sumBytes, maxSeq)
       }
       .sortBy { case (_, _, sumBytes, _) => -sumBytes }
@@ -438,23 +498,41 @@ object FormRunnerConsole {
       }
 
     val itemsElem = liveDocsElem.addElement("documents")
-    typedDocs
-      .sortBy { case (entry, _) => -entry.estimatedBytes }
+    allLiveDocs
+      .sortBy(d => -d.estimatedBytes)
       .take(200)
-      .foreach { case (entry, xfcd) =>
+      .foreach { d =>
         val dElem = itemsElem.addElement("document")
-        dElem.addAttribute("uuid",                xfcd.uuid)
-        dElem.addAttribute("short-uuid",          xfcd.uuid.take(12))
-        dElem.addAttribute("request-path",        Option(xfcd.getRequestPath).getOrElse(""))
-        dElem.addAttribute("sequence",            xfcd.sequence.toString)
-        dElem.addAttribute("controls",            xfcd.liveControlCount.toString)
-        dElem.addAttribute("estimated-bytes",     entry.estimatedBytes.toString)
-        dElem.addAttribute("estimated-formatted", formatBytes(entry.estimatedBytes))
-        dElem.addAttribute("idle-formatted",      formatDurationMs(math.max(0L, nowMs - entry.lastAccessedAtMs)))
+        dElem.addAttribute("uuid",                d.uuid)
+        dElem.addAttribute("short-uuid",          d.uuid.take(12))
+        dElem.addAttribute("request-path",        d.requestPath)
+        dElem.addAttribute("status",              d.status)
+        dElem.addAttribute("sequence",            d.sequence.toString)
+        dElem.addAttribute("controls",            d.controlCount.toString)
+        dElem.addAttribute("estimated-bytes",     d.estimatedBytes.toString)
+        dElem.addAttribute("estimated-formatted", formatBytes(d.estimatedBytes))
+        dElem.addAttribute("idle-formatted",      d.idleFormatted)
       }
 
     doc
   }
+
+  private final case class LiveDocSnapshot(
+    uuid           : String,
+    requestPath    : String,
+    sequence       : Long,
+    controlCount   : Int,
+    estimatedBytes : Long,
+    idleFormatted  : String,
+    status         : String
+  )
+
+  private def formatObjectCacheLimitSummary(snap: ObjectCacheStatsSnapshot): String =
+    List(
+      Some(s"${snap.maxSize} entries"),
+      snap.maxSizeBytes.map(b => s"${formatBytes(b)} max"),
+      snap.maxIdleMillis.map(ms => s"idle ${formatDurationMs(ms)}")
+    ).flatten.mkString(", ")
 
   def formatBytes(bytes: Long): String =
     if (bytes < 1024L) {

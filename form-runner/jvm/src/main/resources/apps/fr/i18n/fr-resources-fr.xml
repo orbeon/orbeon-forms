@@ -516,6 +516,7 @@
             <document-count>Documents</document-count>
             <max-sequence>Séquence max</max-sequence>
             <uuid>UUID du document</uuid>
+            <status>Statut</status>
             <sequence>Mises à jour Ajax</sequence>
             <pool-name>Pool mémoire</pool-name>
             <type>Type</type>
@@ -533,9 +534,14 @@
             <committed>Alloué</committed>
             <of-max-heap>du tas max</of-max-heap>
             <files-on-disk>fichiers sur disque</files-on-disk>
-            <live-docs>en mémoire</live-docs>
+            <live-docs>actifs en mémoire</live-docs>
             <http-sessions>sessions HTTP</http-sessions>
             <active-requests>verrous actifs</active-requests>
+            <status-cached>En cache</status-cached>
+            <status-in-request>En requête</status-in-request>
+            <status-cached-lower>en cache</status-cached-lower>
+            <status-in-request-lower>en requête</status-in-request-lower>
+            <store-entries>entrées</store-entries>
             <processors>Processeurs</processors>
             <non-heap>Hors-tas utilisé</non-heap>
         </labels>
@@ -545,7 +551,8 @@
         </buttons>
         <messages>
             <no-static-states>Aucun état statique XForms n'est actuellement en cache mémoire.</no-static-states>
-            <no-live-documents>Aucun document XForms actif n'est actuellement dans le cache de documents.</no-live-documents>
+            <no-live-documents>Aucun document XForms actif n'est actuellement dans le tas JVM.</no-live-documents>
+            <live-documents-note>Seuls les documents présents dans le tas JVM (en cache dans xforms.cache.documents ou en cours de requête) figurent ci-dessous. Les formulaires ouverts évincés lorsque ce cache atteint sa limite restent actifs dans xforms.state et sont restaurés automatiquement lors d'une interaction.</live-documents-note>
         </messages>
     </console>
     <landing>

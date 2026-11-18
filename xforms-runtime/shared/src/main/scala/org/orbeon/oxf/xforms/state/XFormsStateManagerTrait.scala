@@ -4,18 +4,49 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.*
-import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsProperties}
 
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.{ConcurrentHashMap, TimeUnit}
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.{Lock, ReentrantLock}
+import scala.jdk.CollectionConverters.*
 
+
+final case class InFlightDocumentInfo(
+  uuid           : String,
+  requestPath    : String,
+  sequence       : Long,
+  controlCount   : Int,
+  estimatedBytes : Long
+)
 
 trait XFormsStateManagerTrait extends XFormsStateLifecycle {
 
   private val activeLocksCounter = new AtomicInteger(0)
+  private val inFlightDocuments  = new ConcurrentHashMap[String, InFlightDocumentInfo]()
 
   def activeDocumentLocksCount: Int = math.max(0, activeLocksCounter.get())
+
+  def registerInFlightDocument(containingDocument: XFormsContainingDocument): Unit =
+    if (! containingDocument.disableUpdates &&
+        containingDocument.staticState.propertyMaybeAsExpression(XFormsProperties.NoUpdates).fold(_.toString != "true", _ => true)) {
+      inFlightDocuments.put(
+        containingDocument.uuid,
+        InFlightDocumentInfo(
+          uuid           = containingDocument.uuid,
+          requestPath    = Option(containingDocument.getRequestPath).getOrElse(""),
+          sequence       = containingDocument.sequence,
+          controlCount   = containingDocument.liveControlCount,
+          estimatedBytes = containingDocument.estimatedMemoryBytes
+        )
+      )
+    }
+
+  def unregisterInFlightDocument(uuid: String): Unit =
+    inFlightDocuments.remove(uuid)
+
+  def inFlightDocumentsSnapshot: List[InFlightDocumentInfo] =
+    inFlightDocuments.values().asScala.toList
 
   // Require implementation
   def getDocumentLock(uuid: String): Option[ReentrantLock]
@@ -98,12 +129,16 @@ trait XFormsStateManagerTrait extends XFormsStateLifecycle {
     *
     * @return document, either from cache or from state information
     */
-  def beforeUpdate(parameters: RequestParameters, disableDocumentCache: Boolean): Option[XFormsContainingDocument] =
-    findOrRestoreDocument(
-      parameters           = parameters,
-      disableUpdates       = false,
-      disableDocumentCache = disableDocumentCache
-    )
+  def beforeUpdate(parameters: RequestParameters, disableDocumentCache: Boolean): Option[XFormsContainingDocument] = {
+    val docOpt =
+      findOrRestoreDocument(
+        parameters           = parameters,
+        disableUpdates       = false,
+        disableDocumentCache = disableDocumentCache
+      )
+    docOpt.foreach(registerInFlightDocument)
+    docOpt
+  }
 
   /**
     * Return the delay for the session heartbeat event.

@@ -108,6 +108,7 @@ object XFormsContainingDocumentSupport {
                 case t: Throwable                         => afterUpdate(keepDocument = false); Failure(t)
               }
             } finally {
+              XFormsStateManager.unregisterInFlightDocument(containingDocument.uuid)
               XFormsStateManager.releaseDocumentLock(lock)
             }
           case None =>

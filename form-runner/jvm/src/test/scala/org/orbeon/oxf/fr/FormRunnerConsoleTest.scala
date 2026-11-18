@@ -16,7 +16,8 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.test.TestHttpClient.StaticState
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, TestHttpClient}
-import org.orbeon.oxf.xforms.state.XFormsStaticStateCache
+import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsDocumentCache, XFormsStateManager, XFormsStaticStateCache}
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -103,9 +104,13 @@ class FormRunnerConsoleTest
       assert(wizardStaticOpt.get.attributeValue("controls").toInt > 0)
       assert(wizardStaticOpt.get.attributeValue("estimated-bytes").toLong > 0L)
 
-      // 4. Live documents drill-down
+      // 4. Live documents drill-down (cached state + cache limit & state-store context)
       val liveDocsElem = root.element("live-documents")
       assert(liveDocsElem.attributeValue("count").toInt >= 1)
+      assert(liveDocsElem.attributeValue("cached-count").toInt >= 1)
+      assert(liveDocsElem.attributeValue("in-flight-count") == "0")
+      assert(liveDocsElem.attributeValue("cache-limit-summary").contains("entries"))
+      assert(liveDocsElem.attributeValue("state-store-entries").toInt >= 1)
       assert(liveDocsElem.attributeValue("total-bytes").toLong > 0L)
       val wizardDocOpt =
         liveDocsElem
@@ -113,6 +118,46 @@ class FormRunnerConsoleTest
           .elements("document")
           .find(_.attributeValue("request-path").contains("/fr/tests/wizard/new"))
       assert(wizardDocOpt.isDefined)
+      assert(wizardDocOpt.get.attributeValue("status") == "cached")
+
+      // 4b. Checked-out (in-flight Ajax update) and initializing documents must remain visible as `in-request`
+      val wizardDoc = docOpt.get
+      val checkedOutOpt =
+        XFormsStateManager.beforeUpdate(
+          RequestParameters(wizardDoc.uuid, None, None, None, None),
+          disableDocumentCache = false
+        )
+      assert(checkedOutOpt.contains(wizardDoc))
+      try {
+        val inFlightSnap = FormRunnerConsole.buildConsoleSnapshotDom().getRootElement.element("live-documents")
+        assert(inFlightSnap.attributeValue("in-flight-count") == "1")
+        val inFlightWizardOpt =
+          inFlightSnap
+            .element("documents")
+            .elements("document")
+            .find(_.attributeValue("uuid") == wizardDoc.uuid)
+        assert(inFlightWizardOpt.isDefined)
+        assert(inFlightWizardOpt.get.attributeValue("status") == "in-request")
+        assert(inFlightWizardOpt.get.attributeValue("idle-formatted") == "—")
+      } finally {
+        XFormsStateManager.unregisterInFlightDocument(wizardDoc.uuid)
+      }
+
+      // Also verify current-thread `XFormsAPI.inScopeContainingDocumentOpt` visibility (initial GET before `afterInitialResponse`)
+      try {
+        XFormsAPI.withContainingDocument(wizardDoc) {
+          val initSnap = FormRunnerConsole.buildConsoleSnapshotDom().getRootElement.element("live-documents")
+          assert(initSnap.attributeValue("in-flight-count") == "1")
+          assert(
+            initSnap
+              .element("documents")
+              .elements("document")
+              .exists(e => e.attributeValue("uuid") == wizardDoc.uuid && e.attributeValue("status") == "in-request")
+          )
+        }
+      } finally {
+        XFormsDocumentCache.put(wizardDoc)
+      }
 
       // 5. Safe cache clearing policy & stats reset
       assert(! FormRunnerConsole.clearCacheInternal("object-cache", "xforms.cache.documents"))

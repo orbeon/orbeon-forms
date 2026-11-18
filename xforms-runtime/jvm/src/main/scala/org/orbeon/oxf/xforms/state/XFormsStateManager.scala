@@ -98,23 +98,26 @@ object XFormsStateManager
     containingDocument   : XFormsContainingDocument,
     keepDocument         : Boolean,
     disableDocumentCache : Boolean
-  ): Unit = {
-    implicit val logger: IndentedLogger = containingDocument.getIndentedLogger("state")
-    if (keepDocument) {
-      // Re-add document to the cache
-      debug("Keeping document in cache.")
-      cacheOrStore(containingDocument, isInitialState = false, disableDocumentCache = disableDocumentCache)
-    } else {
-      // Don't re-add document to the cache
-      debug("Not keeping document in cache following error.")
-      // Remove all information about this document from the session and state store
-      val uuid = containingDocument.uuid
-      removeFromUuidListInSession(uuid)
-      removeSessionDocument(uuid)
-      XFormsDocumentCache.remove(uuid)
-      XFormsStateStore.removeDynamicState(uuid)
+  ): Unit =
+    try {
+      implicit val logger: IndentedLogger = containingDocument.getIndentedLogger("state")
+      if (keepDocument) {
+        // Re-add document to the cache
+        debug("Keeping document in cache.")
+        cacheOrStore(containingDocument, isInitialState = false, disableDocumentCache = disableDocumentCache)
+      } else {
+        // Don't re-add document to the cache
+        debug("Not keeping document in cache following error.")
+        // Remove all information about this document from the session and state store
+        val uuid = containingDocument.uuid
+        removeFromUuidListInSession(uuid)
+        removeSessionDocument(uuid)
+        XFormsDocumentCache.remove(uuid)
+        XFormsStateStore.removeDynamicState(uuid)
+      }
+    } finally {
+      unregisterInFlightDocument(containingDocument.uuid)
     }
-  }
 
   // Find or restore a document based on an incoming request.
   // NOTE: If found in cache, document is removed from cache.
@@ -250,7 +253,11 @@ object XFormsStateManager
   protected def getSession(create: Boolean): Option[ExternalContext.Session] =
     Option(NetUtils.getExternalContext).flatMap(_.getSessionOpt(create))
 
+  override protected def onSessionUuidRemoved(uuid: String): Unit =
+    unregisterInFlightDocument(uuid)
+
   override protected def onSessionUuidOverflow(session: ExternalContext.Session, evictedUuid: String): Unit = {
+    unregisterInFlightDocument(evictedUuid)
     session.removeAttribute(Private.getUUIDSessionKey(evictedUuid), ExternalContext.SessionScope.Application)
     XFormsDocumentCache.remove(evictedUuid)
     XFormsStateStore.removeDynamicState(evictedUuid)
@@ -378,6 +385,8 @@ trait XFormsStateManagerUuidList {
       session.setAttribute(XFormsStateManagerUUIDListKey, new BoundedSessionUuidSet(XFormsGlobalProperties.sessionMaxUuids))
     }
 
+  protected def onSessionUuidRemoved(uuid: String): Unit = ()
+
   // This must be called once exactly when the session is destroyed
   def sessionDestroyed(session: ExternalContext.Session): Unit =
     if (hasUuidListInSession(session)) {
@@ -385,6 +394,7 @@ trait XFormsStateManagerUuidList {
       val uuids = getUuidListInSession(session).snapshot
       session.removeAttribute(XFormsStateManagerUUIDListKey, ExternalContext.SessionScope.Application)
       uuids.foreach { uuid =>
+        onSessionUuidRemoved(uuid)
         XFormsDocumentCache.remove(uuid)
         XFormsStateStore.removeDynamicState(uuid)
       }

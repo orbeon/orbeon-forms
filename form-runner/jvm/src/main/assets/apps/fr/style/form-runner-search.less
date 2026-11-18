@@ -25,11 +25,41 @@
     margin-bottom: 16px;
 
     .fr-main-top-fields {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: @spacing;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      column-gap: @spacing;
+
+      &:has(> .xbl-fr-pager > .pagination[data-search-total="0"]) {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .fr-summary-top-controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: @spacing;
+        min-inline-size: 0;
+
+        > .xforms-switch:not(:has(.xforms-trigger:not(.xforms-disabled))) {
+          display: none;
+        }
+      }
+
+      > .xbl-fr-pager {
+        .pagination {
+          float: none;
+          margin: 0;
+
+          @container fr-list-page (inline-size < 980px) {
+            .fr-pager-compact-arrows();
+          }
+
+          @container fr-list-page (inline-size < 620px) {
+            .fr-pager-count-only();
+          }
+        }
+      }
 
       .btn-toolbar {
         display: flex;
@@ -37,7 +67,9 @@
     }
 
     .fr-search-free-input {
-      flex-grow: 1;
+      flex: 1 1 180px;
+      min-inline-size: 140px;
+      margin: 0;
       input {
         width: 100%;
         &[readonly] {
@@ -462,6 +494,10 @@
     .pagination {
       float: none;
       margin: 0;
+
+      @container fr-list-page (inline-size < 420px) {
+        .fr-pager-compact-arrows();
+      }
 
       ul > li:not(.disabled) > a,
       ul > li:not(.disabled) > span {

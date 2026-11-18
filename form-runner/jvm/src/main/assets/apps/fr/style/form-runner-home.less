@@ -15,19 +15,36 @@
 
 .orbeon {
 
+    .fr-forms-admin:not(.xforms-disabled),
+    .fr-published-forms:not(.xforms-disabled) {
+        display: block;
+        container: fr-list-page / inline-size;
+    }
+
     .fr-admin-top-row:not(.xforms-disabled) {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: @spacing;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: start;
+        column-gap: @spacing;
         margin-bottom: @spacing;
+
+        &:has(> .xbl-fr-pager > .pagination[data-search-total="0"]) {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .fr-admin-left {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-inline-size: 0;
+        }
 
         .fr-admin-actions {
             display: flex;
             align-items: center;
             flex-wrap: wrap;
             gap: 8px;
+            min-inline-size: 0;
 
             > .btn-group {
                 margin: 0;
@@ -51,28 +68,44 @@
         }
 
         > .xbl-fr-pager {
-            margin-left: auto;
-
             .pagination {
                 float: none;
                 margin: 0;
+
+                @container fr-list-page (inline-size < 980px) {
+                    .fr-pager-compact-arrows();
+                }
+
+                @container fr-list-page (inline-size < 620px) {
+                    .fr-pager-count-only();
+                }
             }
         }
     }
 
     .fr-filter-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: @spacing;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: start;
+        column-gap: @spacing;
+
+        &:not(:has(> .fr-published-pager:not(.xforms-disabled))),
+        &:has(> .fr-published-pager > .xbl-fr-pager > .pagination[data-search-total="0"]) {
+            grid-template-columns: minmax(0, 1fr);
+        }
 
         .fr-published-pager:not(.xforms-disabled) {
-            margin-left: auto;
-
             .pagination {
                 float: none;
                 margin: 0;
+
+                @container fr-list-page (inline-size < 1180px) {
+                    .fr-pager-compact-arrows();
+                }
+
+                @container fr-list-page (inline-size < 680px) {
+                    .fr-pager-count-only();
+                }
             }
         }
     }
@@ -82,7 +115,7 @@
         align-items: center;
         flex-wrap: wrap;
         gap: @spacing;
-        flex: 1 1 auto;
+        min-inline-size: 0;
 
         .fr-match-toggle:not(.xforms-disabled) {
             display: inline-flex;

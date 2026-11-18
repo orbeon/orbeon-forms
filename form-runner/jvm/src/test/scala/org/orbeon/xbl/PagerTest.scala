@@ -142,6 +142,9 @@ class PagerTest
             val singlePageClasses = classAttributesFor("top-pager")
             assert(singlePageClasses.exists(_.contains("fr-pagination-single-page")))
             assert(singlePageClasses.count(_.contains("xforms-hidden")) == 4)
+            List("fr-pager-first", "fr-pager-prev", "fr-pager-next", "fr-pager-last").foreach { cls =>
+              assert(singlePageClasses.exists(_.splitTo[Set]().contains(cls)))
+            }
             assert(rangeTextFor("top-pager").contains("1 to 8 of 8"))
             assert(! doc.getControlByEffectiveId("bottom-pager").isRelevant)
 
@@ -164,6 +167,9 @@ class PagerTest
             val multiPageClasses = classAttributesFor("top-pager")
             assert(! multiPageClasses.exists(_.contains("fr-pagination-single-page")))
             assert(! multiPageClasses.exists(_.contains("xforms-hidden")))
+            List("fr-pager-first", "fr-pager-prev", "fr-pager-next", "fr-pager-last").foreach { cls =>
+              assert(multiPageClasses.exists(_.splitTo[Set]().contains(cls)))
+            }
             assert(rangeTextFor("top-pager").contains("1 to 10 of 25"))
             assert(doc.getControlByEffectiveId("bottom-pager").isRelevant)
             assert(rangeTextFor("bottom-pager").contains("1 to 10 of 25"))

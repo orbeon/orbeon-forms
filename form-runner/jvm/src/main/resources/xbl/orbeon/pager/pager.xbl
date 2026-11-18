@@ -157,7 +157,7 @@
                 <xf:var name="single-page" value="instance('fr-paging-instance')/page-count le 1"/>
 
                 <xh:ul>
-                    <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}{if ($single-page) then ' xforms-hidden' else ''}">
+                    <xh:li class="fr-pager-first{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then ' disabled' else ''}{if ($single-page) then ' xforms-hidden' else ''}">
                         <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-first" xxf:readonly-appearance="dynamic">
                             <xf:label>
                                 <xh:i class="fa fa-fw fa-step-backward" aria-hidden="true"/>
@@ -169,7 +169,7 @@
                             </xf:action>
                         </xf:trigger>
                     </xh:li>
-                    <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}{if ($single-page) then ' xforms-hidden' else ''}">
+                    <xh:li class="fr-pager-prev{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then ' disabled' else ''}{if ($single-page) then ' xforms-hidden' else ''}">
                         <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-prev" xxf:readonly-appearance="dynamic">
                             <xf:label>
                                 <xh:i class="fa fa-fw fa-chevron-left" aria-hidden="true"/>
@@ -228,7 +228,7 @@
                     <xf:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) = 0]">
                         <!-- No results -->
                     </xf:group>
-                    <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}{if ($single-page) then ' xforms-hidden' else ''}">
+                    <xh:li class="fr-pager-next{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then ' disabled' else ''}{if ($single-page) then ' xforms-hidden' else ''}">
                         <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-next" xxf:readonly-appearance="dynamic">
                             <xf:label>
                                 <xh:i class="fa fa-fw fa-chevron-right" aria-hidden="true"/>
@@ -240,7 +240,7 @@
                             </xf:action>
                         </xf:trigger>
                     </xh:li>
-                    <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}{if ($single-page) then ' xforms-hidden' else ''}">
+                    <xh:li class="fr-pager-last{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then ' disabled' else ''}{if ($single-page) then ' xforms-hidden' else ''}">
                         <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-last" xxf:readonly-appearance="dynamic">
                             <xf:label>
                                 <xh:i class="fa fa-fw fa-step-forward" aria-hidden="true"/>

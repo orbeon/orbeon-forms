@@ -1,6 +1,7 @@
 package org.orbeon.connection
 
 import org.log4s
+import org.orbeon.io.IOUtils.runQuietly
 import org.orbeon.oxf.http.Headers.{ContentLength, ContentType}
 import org.orbeon.oxf.http.{DateHeaders, Headers, HttpStatusCodeException, StatusCode, Headers as HttpHeaders}
 import org.orbeon.oxf.util.Logging.*
@@ -18,14 +19,18 @@ case class ConnectionResultT[S](
   headers           : Map[String, List[String]],
   content           : StreamedContentT[S],
   hasContent        : Boolean,
-  dontHandleResponse: Boolean // TODO: Should be outside of ConnectionResult.
+  dontHandleResponse: Boolean, // TODO: Should be outside of ConnectionResult.
+  closeFn           : () => Unit = () => ()
 ) {
 
   val lastModified: Option[Long] = DateHeaders.firstDateHeaderIgnoreCase(headers, HttpHeaders.LastModified)
 
   def lastModifiedJava: jl.Long = lastModified map (_.asInstanceOf[jl.Long]) orNull
 
-  def close(): Unit = content.close()
+  def close(): Unit = {
+    content.close()
+    runQuietly(closeFn())
+  }
 
   def isSuccessResponse: Boolean = StatusCode.isSuccessCode(statusCode)
 
@@ -124,12 +129,13 @@ object ConnectionResult {
   def syncToAsync(
     cxr: ConnectionResult
   ): AsyncConnectionResult = ConnectionResultT(
-    url               = cxr.url,
-    statusCode        = cxr.statusCode,
-    headers           = cxr.headers,
-    content           = ConnectionSupport.syncToAsyncStreamedContent(cxr.content),
-    hasContent        = cxr.hasContent,
-    dontHandleResponse= cxr.dontHandleResponse
+    url                = cxr.url,
+    statusCode         = cxr.statusCode,
+    headers            = cxr.headers,
+    content            = ConnectionSupport.syncToAsyncStreamedContent(cxr.content),
+    hasContent         = cxr.hasContent,
+    dontHandleResponse = cxr.dontHandleResponse,
+    closeFn            = () => cxr.close()
   )
 
   def trySuccessConnection[S](cxr: ConnectionResultT[S]): Try[ConnectionResultT[S]] =

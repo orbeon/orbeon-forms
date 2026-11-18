@@ -54,9 +54,6 @@ object RequestReader {
   private def requestInputStream(bodyOpt: Option[Body]): Option[InputStream] =
     bodyOpt.map(b => new ByteArrayInputStream(b.bytes))
 
-  def bytes(bodyOpt: Option[Body]): Option[Array[Byte]] =
-    bodyOpt.map(_.bytes)
-
   // Used by FlatView
   def xmlDocument(bodyOpt: Option[Body]): Option[DocumentInfo] =
     requestInputStream(bodyOpt).map { is =>
@@ -332,29 +329,30 @@ trait CreateUpdateDelete {
     indentedLogger : IndentedLogger,
     propertySet    : PropertySet
 
-  ): Unit = {
+  ): Unit =
+    try {
+      debug("CRUD: handling change request", List("delete" -> delete.toString, "request" -> req.toString))
 
-    debug("CRUD: handling change request", List("delete" -> delete.toString, "request" -> req.toString))
+      val versionToSet =
+        req.version.getOrElse(throw HttpStatusCodeException(StatusCode.BadRequest))
 
-    val versionToSet =
-      req.version.getOrElse(throw HttpStatusCodeException(StatusCode.BadRequest))
+      val appFormVersion = (req.appForm, versionToSet)
 
-    val appFormVersion = (req.appForm, versionToSet)
+      val isFormDefinitionPut =
+        req.forFormNotAttachment && ! delete
 
-    val isFormDefinitionPut =
-      req.forFormNotAttachment && ! delete
+      val createFlatView: Boolean =
+        isFormDefinitionPut                               &&
+        req.flatView                                      &&
+        Provider.FlatViewSupportedProviders(req.provider) &&
+        req.appForm.form != Names.LibraryFormName
 
-    val createFlatView: Boolean =
-      isFormDefinitionPut                               &&
-      req.flatView                                      &&
-      Provider.FlatViewSupportedProviders(req.provider) &&
-      req.appForm.form != Names.LibraryFormName
-
-    // Cache the request content if we need it for multiple reads. We used to do this only for `createFlatView`, but now
-    // need it for any `PUT` of form definition, because we need to read the request content to compute the indexed
-    // controls XPaths after storing the form definition.
-    val reqBodyOpt: Option[RequestReader.Body] =
-      req.bodyStreamOpt.map(is => RequestReader.Body(useAndClose(is)(_.readAllBytes())))
+      // Cache the request content if we need it for multiple reads (XML form definitions and XML form data).
+      // For attachments, stream `req.bodyStreamOpt` directly via `PreparedStatement.setBinaryStream`.
+      val reqBodyOpt: Option[RequestReader.Body] =
+        (! req.forAttachment)
+          .flatOption(req.bodyStreamOpt)
+          .map(is => RequestReader.Body(useAndClose(is)(_.readAllBytes())))
 
     val deletingDataDraft = delete && req.dataPart.exists(_.isDraft)
     val forceDelete       = delete && req.dataPart.exists(_.forceDelete)
@@ -590,7 +588,9 @@ trait CreateUpdateDelete {
       else
         StatusCode.Created
     )
-  }
+    } finally {
+      req.bodyStreamOpt.foreach(is => runQuietly(is.close()))
+    }
 
   private def doCreateFlatView(
     req            : CrudRequest,

@@ -249,7 +249,7 @@ object LocalRequest {
       getParameterMap           = queryAndBodyParameters,
       incomingCookies           = safeRequestCtx.cookies,
 
-      getContentLength          = contentLengthOpt map (_.toInt) getOrElse -1,
+      getContentLength          = contentLengthOpt.filter(_ <= Int.MaxValue).map(_.toInt).getOrElse(-1),
       getContentType            = contentTypeOpt.orNull,
       getInputStream            = content map (_.stream) getOrElse EmptyInputStream,
 

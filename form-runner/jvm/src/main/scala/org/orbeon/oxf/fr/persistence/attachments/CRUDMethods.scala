@@ -35,17 +35,22 @@ object CRUDMethods {
     httpRanges        : HttpRanges,
     length            : Long,
     partialInputStream: HttpRange => InputStream,
-    fullInputStream   : => InputStream)(implicit
+    fullInputStream   : => InputStream,
+    passStreamDirectly: Boolean = false
+  )(implicit
     httpRequest       : Request,
     httpResponse      : Response,
     logger            : Logger
   ): Unit =
     httpRanges.streamResponse(length, partialInputStream, fullInputStream) match {
       case Success(streamResponse) =>
-        IOUtils.copyStreamAndClose(streamResponse.inputStream, httpResponse.getOutputStream)
-
         httpResponse.addHeaders(streamResponse.headers)
         httpResponse.setStatus(streamResponse.statusCode)
+
+        if (passStreamDirectly)
+          httpResponse.sendInputStream(streamResponse.inputStream)
+        else
+          IOUtils.copyStreamAndClose(streamResponse.inputStream, httpResponse.getOutputStream)
 
       case Failure(throwable) =>
         logger.error(throwable)(s"Error while processing request ${httpRequest.getRequestPath}")

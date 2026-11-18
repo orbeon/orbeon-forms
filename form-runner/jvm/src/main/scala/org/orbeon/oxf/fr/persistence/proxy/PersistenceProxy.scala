@@ -959,17 +959,20 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
     response                  : Response,
     responseTransforms        : List[(InputStream, OutputStream) => Unit],
     attachmentsProviderCxrOpt : Option[ConnectionResult]
-  ): Unit =
-    IOUtils.useAndClose(cxr) { connectionResult =>
+  ): Unit = {
+    var transferredMainStream        = false
+    var transferredAttachmentsStream = false
+
+    try {
       // Proxy status code
-      response.setStatus(connectionResult.statusCode)
+      response.setStatus(cxr.statusCode)
 
       // Proxy incoming headers
-      proxyCapitalizeAndCombineHeaders(connectionResult.headers, request = false) foreach (response.setHeader _).tupled
+      proxyCapitalizeAndCombineHeaders(cxr.headers, request = false) foreach (response.setHeader _).tupled
 
       // If an attachments provider is available, forward its headers and status
       request.getMethod match {
-        case HttpMethod.GET | HttpMethod.HEAD if StatusCode.isSuccessCode(connectionResult.statusCode) =>
+        case HttpMethod.GET | HttpMethod.HEAD if StatusCode.isSuccessCode(cxr.statusCode) =>
           attachmentsProviderCxrOpt.foreach { attachmentsProviderCxr =>
             // Forward HTTP range headers, content length/type, and status to client
             HttpRanges.forwardResponseHeaders(attachmentsProviderCxr, response)
@@ -980,7 +983,7 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
       }
 
       // Proxy content type
-      val responseContentType = connectionResult.content.contentType
+      val responseContentType = cxr.content.contentType
       responseContentType.foreach(response.setHeader(Headers.ContentType, _))
 
       @tailrec
@@ -1000,29 +1003,38 @@ private[persistence] object PersistenceProxy extends FormProxyLogic {
         }
       }
 
-      val doTransforms =
-        connectionResult.statusCode == StatusCode.Ok
+      val effectiveTransforms =
+        if (cxr.statusCode == StatusCode.Ok) responseTransforms else Nil
 
-      // If an attachments provider is available, use it stream
-      val inputStream = attachmentsProviderCxrOpt match {
-        case Some(attachmentsProviderCxr) if request.getMethod == HttpMethod.GET &&
-                                             StatusCode.isSuccessCode(connectionResult.statusCode) =>
-          attachmentsProviderCxr.content.stream
+      val useAttachmentsStream =
+        attachmentsProviderCxrOpt.isDefined &&
+        request.getMethod == HttpMethod.GET &&
+        StatusCode.isSuccessCode(cxr.statusCode)
 
-        case _ =>
-          connectionResult.content.stream
+      if (effectiveTransforms.isEmpty) {
+        if (useAttachmentsStream) {
+          response.sendInputStream(attachmentsProviderCxrOpt.get.content.stream)
+          transferredAttachmentsStream = true
+        } else {
+          response.sendInputStream(cxr.content.stream)
+          transferredMainStream = true
+        }
+      } else {
+        val inputStream =
+          if (useAttachmentsStream)
+            attachmentsProviderCxrOpt.get.content.stream
+          else
+            cxr.content.stream
+
+        applyTransforms(inputStream, response.getOutputStream, effectiveTransforms)
       }
-
-      try {
-        applyTransforms(
-          inputStream,
-          response.getOutputStream,
-          if (doTransforms) responseTransforms else Nil
-        )
-      } finally {
+    } finally {
+      if (! transferredMainStream)
+        cxr.close()
+      if (! transferredAttachmentsStream)
         attachmentsProviderCxrOpt.foreach(_.close())
-      }
     }
+  }
 
   // Unneeded for JVM platform
   private implicit val resourceResolver: Option[ResourceResolver] = None

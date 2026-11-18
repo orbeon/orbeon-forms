@@ -1134,7 +1134,6 @@ trait FormRunnerPersistence {
         UrlRewriteMode.Absolute
       )
 
-    // xxx xxx close resources
     def saveAllAttachmentsStream(implicit
       xfcd         : XFormsContainingDocument,
       connectionCtx: ConnectionContexts
@@ -1142,13 +1141,13 @@ trait FormRunnerPersistence {
       for {
         case AttachmentWithHolderAndFilename(beforeUrl, migratedHolder, afterUrl)
                           <- fs2.Stream.emits(attachmentsWithHolderAndFilename)
-        getCr             <- fs2.Stream.eval(readAttachmentIo(fromBasePaths, beforeUrl))
+        getCr             <- fs2.Stream.bracket(readAttachmentIo(fromBasePaths, beforeUrl))(cr => IO(cr.close()))
         getCxr            <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(getCr)))
         pathToHolder      = pathToHolderForEncryption(migratedHolder)
         hashAlgorithmOpt  = migratedHolder.attValueOpt(XFormsNames.XXFORMS_HASH_ALGORITHM_QNAME.localName)
         hashValueOpt      = migratedHolder.attValueOpt(XFormsNames.XXFORMS_HASH_VALUE_QNAME.localName)
         resolvedPutUri    = URI.create(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString)))
-        putCr             <- fs2.Stream.eval(saveAttachmentIo(getCxr.contentWithTypeAndLengthFromHeadersIfMissing, pathToHolder, resolvedPutUri, formVersion, hashAlgorithmOpt, hashValueOpt, credentials))
+        putCr             <- fs2.Stream.bracket(saveAttachmentIo(getCxr.contentWithTypeAndLengthFromHeadersIfMissing, pathToHolder, resolvedPutUri, formVersion, hashAlgorithmOpt, hashValueOpt, credentials))(cr => IO(cr.close()))
         putCxr            <- fs2.Stream.eval(IO.fromTry(ConnectionResult.trySuccessConnection(putCr)))
         isEncryptedAtRest = putCxr.headers.get(OrbeonDidEncryptHeader).exists(_.contains("true"))
       } yield

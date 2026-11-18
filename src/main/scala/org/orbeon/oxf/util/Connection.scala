@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util
 
-import cats.effect.IO
+import cats.effect.{IO, Resource}
 import cats.syntax.option.*
 import org.apache.hc.client5.http.cookie.{BasicCookieStore, CookieStore}
 import org.log4s
@@ -115,28 +115,25 @@ object Connection extends ConnectionTrait {
     // associated with the `XFormsContainingDocument` and reused by the calling thread.
     val newLogger = IndentedLogger(logger)
 
-    // Here we convert an `fs2.Stream` to a Java `InputStream` which is used downstream. This works if the producer and
-    // the consumer are in different threads. Ideally, our downstream code would be able to deal with an `fs2.Stream`.
-//    def requestStreamedContentOptF: Future[Option[StreamedContent]] =
-//      content.map(c =>
-//        c.stream
-//          .through(fs2.io.toInputStream)
-//          .map(is =>
-//            StreamedContent(
-//              inputStream   = is,
-//              contentType   = c.contentType,
-//              contentLength = c.contentLength,
-//              title         = c.title
-//            ).some
-//          ).compile.onlyOrError.unsafeToFuture()
-//      ).getOrElse(Future.successful(None))
+    // Pipe the `fs2.Stream` to a Java `InputStream` using a bounded single-chunk queue so large bodies (such as
+    // multi-GB attachments) stream end-to-end without materializing an `Array[Byte]` in heap.
+    val streamedContentResource: Resource[IO, Option[StreamedContent]] =
+      content match {
+        case Some(asc) =>
+          fs2.io.toInputStreamResource(asc.stream).map { is =>
+            StreamedContent(
+              inputStream   = is,
+              contentType   = asc.contentType,
+              contentLength = asc.contentLength,
+              title         = asc.title
+            ).some
+          }
+        case None =>
+          Resource.pure(None)
+      }
 
-    def requestStreamedContentOptIo: IO[Option[StreamedContent]] =
-      content.map(ConnectionSupport.asyncToSyncStreamedContent).map(_.map(_.some))
-        .getOrElse(IO.pure(None))
-
-    def connectWithContentIo(requestStreamedContentOpt: Option[StreamedContent]): IO[AsyncConnectionResult] =
-      IO {
+    streamedContentResource.use { requestStreamedContentOpt =>
+      IO.blocking {
         val (_, cxr) =
           connectInternal(
             method      = method,
@@ -153,13 +150,11 @@ object Connection extends ConnectionTrait {
             connectionCtx  = connectionCtx
           )
 
-        // Return an `AsyncConnectionResult` even though for now we obtain a synchronous `ConnectionResult`, so that
-        // the callers deal with an `fs2.Stream` consistently for async calls on the JVM as well as JavaScript. Later
-        // we can create an `AsyncConnectionResult` directly.
+        // Return an `AsyncConnectionResult` even though we obtain a synchronous `ConnectionResult`, so that
+        // the callers deal with an `fs2.Stream` consistently for async calls on the JVM as well as JavaScript.
         ConnectionResult.syncToAsync(cxr)
       }
-
-    requestStreamedContentOptIo.flatMap(connectWithContentIo)
+    }
   }
 
   // For Java callers

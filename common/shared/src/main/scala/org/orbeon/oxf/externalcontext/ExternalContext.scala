@@ -18,7 +18,7 @@ import java.net.URL
 import java.util as ju
 import enumeratum.{Enum, EnumEntry}
 import enumeratum.values.{IntEnum, IntEnumEntry}
-import org.orbeon.io.CharsetNames
+import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.http.{Headers, HttpMethod, PathType}
 import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.StringUtils.*
@@ -230,6 +230,10 @@ object ExternalContext {
   trait Response extends Rewriter {
     def getWriter: PrintWriter // TODO: remove uses of this, see https://github.com/orbeon/orbeon-forms/issues/2962
     def getOutputStream: OutputStream
+
+    // Send `inputStream` as the response body and transfer ownership of closing `inputStream` to this response.
+    def sendInputStream(inputStream: InputStream): Unit =
+      IOUtils.copyStreamAndClose(inputStream, getOutputStream)
 
     def isCommitted: Boolean
     def reset(): Unit

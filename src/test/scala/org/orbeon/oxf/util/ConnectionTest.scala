@@ -13,22 +13,28 @@
  */
 package org.orbeon.oxf.util
 
+import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import cats.syntax.option.*
 import org.apache.hc.client5.http.cookie.BasicCookieStore
-import org.mockito.Mockito
-import org.orbeon.connection.StreamedContent
-import org.orbeon.io.CharsetNames
+import org.mockito.{ArgumentMatchers, Mockito}
+import org.orbeon.connection.{ConnectionContextSupport, ConnectionResult, StreamedContent}
+import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.externalcontext.*
 import org.orbeon.oxf.http.Headers.*
-import org.orbeon.oxf.http.{Headers, HttpMethod}
+import org.orbeon.oxf.http.{EmptyInputStream, Headers, HttpMethod, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.PropertyLoader
 import org.orbeon.oxf.servlet.*
 import org.orbeon.oxf.test.{ResourceManagerSupport, ResourceManagerTestBase}
+import org.orbeon.oxf.webapp.ProcessorService
 import org.scalatest.funspec.AnyFunSpecLike
 
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream}
 import java.net.URI
+import java.nio.file.Files
 import java.util as ju
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicLong}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 
@@ -472,6 +478,248 @@ class ConnectionTest
       val cookies = sec.getRequest.incomingCookies.toList
 
       assert(cookies == List("FALLBACK" -> "cookie-val"))
+    }
+  }
+
+  describe("#7531: Large attachment streaming and LocalResponse spooling") {
+
+    def newDummyUrlRewriter: URLRewriter = new URLRewriter {
+      def rewriteActionURL(urlString: String): String = urlString
+      def rewriteRenderURL(urlString: String): String = urlString
+      def rewriteActionURL(urlString: String, portletMode: String, windowState: String): String = urlString
+      def rewriteRenderURL(urlString: String, portletMode: String, windowState: String): String = urlString
+      def rewriteResourceURL(urlString: String, rewriteMode: UrlRewriteMode): String = urlString
+      def getNamespacePrefix: String = ""
+    }
+
+    def listLocalResponseTempFiles(): List[java.nio.file.Path] = {
+      val tempDir = NetUtils.getTemporaryDirectory.toPath
+      if (Files.exists(tempDir)) {
+        val stream = Files.list(tempDir)
+        try {
+          stream
+            .iterator()
+            .asScala
+            .filter(_.getFileName.toString.startsWith("orbeon-local-response-"))
+            .toList
+        } finally {
+          stream.close()
+        }
+      } else {
+        Nil
+      }
+    }
+
+    it("must return -1 for LocalRequest.getContentLength and full Long in contentLengthOpt when > 2 GB") {
+      val externalContext = newMockExternalContext(OrbeonBaseUrl)
+      val fiveGb          = 5_000_000_000L
+
+      val localRequest =
+        LocalRequest(
+          safeRequestCtx          = SafeRequestContext(externalContext),
+          pathQuery               = "/fr/service/persistence/crud/app/form/data/123/file.bin",
+          method                  = HttpMethod.PUT,
+          headersMaybeCapitalized = Map.empty,
+          content                 = Some(StreamedContent(EmptyInputStream, Some("application/octet-stream"), Some(fiveGb), None))
+        )
+
+      assert(localRequest.getContentLength == -1)
+      assert(localRequest.contentLengthOpt.contains(fiveGb))
+    }
+
+    it("must pass InputStream through LocalResponse.sendInputStream lazily and close on LocalResponse.close()") {
+      val bytesRead = new AtomicLong(0L)
+      val isClosed  = new AtomicBoolean(false)
+      val payload   = Array.tabulate[Byte](4096)(i => (i & 0xff).toByte)
+
+      val trackingStream = new ByteArrayInputStream(payload) {
+        override def read(): Int = {
+          val r = super.read()
+          if (r >= 0) bytesRead.incrementAndGet()
+          r
+        }
+        override def read(b: Array[Byte], off: Int, len: Int): Int = {
+          val r = super.read(b, off, len)
+          if (r > 0) bytesRead.addAndGet(r.toLong)
+          r
+        }
+        override def close(): Unit = {
+          isClosed.set(true)
+          super.close()
+        }
+      }
+
+      val localResponse = new LocalResponse(newDummyUrlRewriter)
+      localResponse.sendInputStream(trackingStream)
+
+      // Zero bytes eagerly read on handoff
+      assert(bytesRead.get() == 0L)
+      assert(! isClosed.get())
+
+      val out = new ByteArrayOutputStream
+      IOUtils.copyStreamAndClose(localResponse.getInputStream, out)
+
+      assert(bytesRead.get() == payload.length.toLong)
+      assert(isClosed.get())
+      assert(out.toByteArray.sameElements(payload))
+    }
+
+    it("must keep small LocalResponse bodies in memory and spill > threshold bodies to temporary files cleaned up on close/reset") {
+      val beforeTempFiles = listLocalResponseTempFiles().toSet
+      val threshold       = 1024
+
+      // 1. Below threshold: stays in memory, no temp file created
+      locally {
+        val smallPayload = Array.tabulate[Byte](512)(i => (i & 0xff).toByte)
+        val resp         = new LocalResponse(newDummyUrlRewriter, inMemoryThresholdBytes = threshold)
+        resp.getOutputStream.write(smallPayload)
+        assert((listLocalResponseTempFiles().toSet -- beforeTempFiles).isEmpty)
+
+        val out = new ByteArrayOutputStream
+        IOUtils.copyStreamAndClose(resp.getInputStream, out)
+        assert(out.toByteArray.sameElements(smallPayload))
+      }
+
+      // 2. Above threshold: spills to temp file, reads back identically, deletes temp file on InputStream.close()
+      locally {
+        val largePayload = Array.tabulate[Byte](100 * 1024)(i => ((i * 31) & 0xff).toByte)
+        val resp         = new LocalResponse(newDummyUrlRewriter, inMemoryThresholdBytes = threshold)
+        resp.getOutputStream.write(largePayload)
+
+        val spilledFiles = listLocalResponseTempFiles().toSet -- beforeTempFiles
+        assert(spilledFiles.size == 1)
+
+        val out = new ByteArrayOutputStream
+        IOUtils.copyStreamAndClose(resp.getInputStream, out)
+        assert(out.toByteArray.sameElements(largePayload))
+        assert((listLocalResponseTempFiles().toSet -- beforeTempFiles).isEmpty)
+      }
+
+      // 3. Above threshold with reset() before reading: deletes temp file immediately
+      locally {
+        val largePayload = new Array[Byte](8 * 1024)
+        val resp         = new LocalResponse(newDummyUrlRewriter, inMemoryThresholdBytes = threshold)
+        resp.getOutputStream.write(largePayload)
+        assert((listLocalResponseTempFiles().toSet -- beforeTempFiles).size == 1)
+
+        resp.reset()
+        assert((listLocalResponseTempFiles().toSet -- beforeTempFiles).isEmpty)
+      }
+    }
+
+    it("must close underlying InputStream when AsyncConnectionResult is closed without draining or after draining") {
+      // Closed without draining (e.g. HTTP error in trySuccessConnection)
+      locally {
+        val closed = new AtomicBoolean(false)
+        val syncCxr = ConnectionResult(
+          url        = "http://example.org/test",
+          statusCode = StatusCode.InternalServerError,
+          headers    = Map.empty,
+          content    = StreamedContent(
+            inputStream   = new ByteArrayInputStream(Array[Byte](1, 2, 3)) {
+              override def close(): Unit = { closed.set(true); super.close() }
+            },
+            contentType   = Some("application/octet-stream"),
+            contentLength = Some(3L),
+            title         = None
+          )
+        )
+        val asyncCxr = ConnectionResult.syncToAsync(syncCxr)
+        assert(ConnectionResult.trySuccessConnection(asyncCxr).isFailure)
+        assert(closed.get())
+      }
+
+      // Closed automatically when fs2.Stream is drained
+      locally {
+        val closed = new AtomicBoolean(false)
+        val syncCxr = ConnectionResult(
+          url        = "http://example.org/test",
+          statusCode = StatusCode.Ok,
+          headers    = Map.empty,
+          content    = StreamedContent(
+            inputStream   = new ByteArrayInputStream(Array[Byte](10, 20, 30, 40)) {
+              override def close(): Unit = { closed.set(true); super.close() }
+            },
+            contentType   = Some("application/octet-stream"),
+            contentLength = Some(4L),
+            title         = None
+          )
+        )
+        val asyncCxr = ConnectionResult.syncToAsync(syncCxr)
+        val bytes    = asyncCxr.content.stream.compile.to(Array).unsafeRunSync()
+        assert(bytes.sameElements(Array[Byte](10, 20, 30, 40)))
+        assert(closed.get())
+      }
+    }
+
+    it("must stream > 2 GB (exceeding Int.MaxValue) through Connection.connectAsync without Array[Byte] materialization") {
+      val externalContext = newMockExternalContext(OrbeonBaseUrl)
+
+      // 2.5 GB = 40,960 * 64 KB = 2,684,354,560 bytes (> Int.MaxValue, impossible to fit in a JVM Array[Byte])
+      val chunkSize  = 65536
+      val numChunks  = 40960
+      val totalBytes = numChunks.toLong * chunkSize.toLong
+      val chunkBytes = Array.tabulate[Byte](chunkSize)(i => (i & 0xff).toByte)
+      val chunk      = fs2.Chunk.array(chunkBytes)
+
+      val syntheticStream: fs2.Stream[IO, Byte] =
+        fs2.Stream.chunk(chunk).repeatN(numChunks.toLong)
+
+      val mockProcessorService = Mockito.mock(classOf[ProcessorService])
+      Mockito.doAnswer { invocation =>
+        val ec  = invocation.getArgument[ExternalContext](1)
+        val req = ec.getRequest
+        val res = ec.getResponse
+
+        assert(req.getContentLength == -1)
+        assert(req.contentLengthOpt.contains(totalBytes))
+
+        val buf   = new Array[Byte](chunkSize)
+        var count = 0L
+        val is    = req.getInputStream
+        try {
+          var read = is.read(buf)
+          while (read != -1) {
+            count += read.toLong
+            read = is.read(buf)
+          }
+        } finally {
+          is.close()
+        }
+
+        res.setStatus(StatusCode.Ok)
+        res.setContentType(ContentTypes.PlainTextContentType)
+        res.getWriter.print(count.toString)
+        res.getWriter.flush()
+        null
+      }.when(mockProcessorService).service(ArgumentMatchers.any(), ArgumentMatchers.any())
+
+      val streamedBytesCountStr =
+        ProcessorService.withProcessorService(mockProcessorService) {
+          implicit val safeRequestCtx  : SafeRequestContext                          = SafeRequestContext(externalContext)
+          implicit val connectionCtx   : ConnectionContextSupport.ConnectionContexts = ConnectionContextSupport.findContext(Map.empty)
+          implicit val logger          : IndentedLogger                              = ResourceManagerTestBase.newIndentedLogger
+          implicit val resourceResolver: Option[ResourceResolver]                    = None
+
+          val io =
+            for {
+              cr   <- Connection.connectAsync(
+                method      = HttpMethod.PUT,
+                url         = URI.create(s"$OrbeonBaseUrl/fr/service/large-stream-test"),
+                credentials = None,
+                content     = Some(StreamedContent(syntheticStream, Some("application/octet-stream"), Some(totalBytes))),
+                headers     = Map(Headers.ContentType -> List("application/octet-stream")),
+                loadState   = false,
+                logBody     = false
+              )
+              cxr  <- IO.fromTry(ConnectionResult.trySuccessConnection(cr))
+              body <- cxr.content.stream.through(fs2.text.utf8.decode).compile.string
+            } yield body
+
+          io.unsafeRunSync()
+        }
+
+      assert(streamedBytesCountStr == totalBytes.toString)
     }
   }
 }

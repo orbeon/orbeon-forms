@@ -154,7 +154,7 @@ object TestHttpClient {
         lazy val headers      = response.capitalizedHeaders
         lazy val lastModified = DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
         lazy val content      = response.streamedContent
-        def disconnect()      = content.close()
+        def disconnect()      = response.close()
       }
 
     debug(s"response status code: ${httpResponse.statusCode}, headers: ${httpResponse.headers}, last modified: ${httpResponse.lastModified}")

@@ -65,6 +65,7 @@ trait FilesystemCRUD extends CRUDMethods {
         length             = fileToRead.length(),
         partialInputStream = (httpRange: HttpRange) => FileRangeInputStream(fileToRead, httpRange),
         fullInputStream    = new FileInputStream(fileToRead),
+        passStreamDirectly = true
       )
     }
 

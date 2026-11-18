@@ -145,7 +145,8 @@ object CRUDRoute
           singleton,
           hashAlgorithm,
           hashValue,
-          (httpRequest.getMethod == HttpMethod.PUT).option(httpRequest.getInputStream).filter(_ != EmptyInputStream)
+          (httpRequest.getMethod == HttpMethod.PUT).option(httpRequest.getInputStream).filter(_ != EmptyInputStream),
+          httpRequest.contentLengthOpt
         )
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) =>
 
@@ -181,7 +182,8 @@ object CRUDRoute
           singleton,
           hashAlgorithm,
           hashValue,
-          (httpRequest.getMethod == HttpMethod.PUT).option(httpRequest.getInputStream).filter(_ != EmptyInputStream)
+          (httpRequest.getMethod == HttpMethod.PUT).option(httpRequest.getInputStream).filter(_ != EmptyInputStream),
+          httpRequest.contentLengthOpt
         )
       case _ =>
         throw HttpStatusCodeException(StatusCode.BadRequest)

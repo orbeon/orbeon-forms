@@ -267,6 +267,7 @@ object XFormsAssetServerRoute extends NativeRoute {
 
         // Copy stream out
         try {
+          var transferred = false
           val cxr =
             Connection.connectNow(
               method      = GET,
@@ -280,11 +281,17 @@ object XFormsAssetServerRoute extends NativeRoute {
               logBody     = false
             )
 
-          // Forward HTTP range headers, content length/type, and status to client
-          HttpRanges.forwardResponseHeaders(cxr, response)
-          response.setStatus(cxr.statusCode)
+          try {
+            // Forward HTTP range headers, content length/type, and status to client
+            HttpRanges.forwardResponseHeaders(cxr, response)
+            response.setStatus(cxr.statusCode)
 
-          IOUtils.copyStreamAndClose(cxr.content.stream, response.getOutputStream)
+            response.sendInputStream(cxr.content.stream)
+            transferred = true
+          } finally {
+            if (! transferred)
+              cxr.close()
+          }
         } catch {
           case NonFatal(t) =>
             if (isConnectionInterruption(t))

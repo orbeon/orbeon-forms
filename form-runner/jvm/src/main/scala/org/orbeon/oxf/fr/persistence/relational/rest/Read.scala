@@ -24,13 +24,12 @@ import org.orbeon.oxf.fr.persistence.relational.*
 import org.orbeon.oxf.fr.persistence.relational.Provider.{PostgreSQL, SQLite, binarySize, partialBinary}
 import org.orbeon.oxf.http.*
 import org.orbeon.oxf.util.CoreUtils.*
-import org.orbeon.oxf.util.{ContentTypes, DateUtils, IndentedLogger, NetUtils, SecureUtils}
+import org.orbeon.oxf.util.{ContentTypes, DateUtils, IndentedLogger}
 
-import java.io.{ByteArrayInputStream, StringReader}
+import java.io.{InputStream, StringReader}
 import java.sql.Timestamp
 import java.time.Instant
 import scala.annotation.tailrec
-import scala.util.{Failure, Success, Try}
 
 
 trait Read {
@@ -60,7 +59,8 @@ trait Read {
                 req                     = req,
                 hasStage                = hasStage,
                 readTotalAttachmentSize = true,
-                bodyContentOpt          = None
+                bodyContentOpt          = None,
+                onRow                   = (_, _) => ()
               )
               .fold(t => throw t, identity) // will throw nested `HttpStatusCodeException` if present
               .totalAttachmentSize
@@ -109,78 +109,80 @@ trait Read {
         (bodyContentOpt, None)
     }
 
-    val fromDatabase =
-      this.fromDatabase(
-        req                     = req,
-        hasStage                = hasStage,
-        readTotalAttachmentSize = actualBodyContentOpt match {
-          case Some(PartialAttachment(_, _)) => true
-          case _                             => false
-        },
-        bodyContentOpt          = actualBodyContentOpt
-      )
-      .fold(t => throw t, identity) // will throw nested `HttpStatusCodeException` if present
-
     val httpResponse = externalContext.getResponse
 
-    if (! headersSet) {
-      // Send headers
-      httpResponse.setHeader(OrbeonFormDefinitionApp,     fromDatabase.app)
-      httpResponse.setHeader(OrbeonFormDefinitionForm,    fromDatabase.form)
-      httpResponse.setHeader(OrbeonFormDefinitionVersion, fromDatabase.formVersion.toString)
+    this.fromDatabase(
+      req                     = req,
+      hasStage                = hasStage,
+      readTotalAttachmentSize = actualBodyContentOpt match {
+        case Some(PartialAttachment(_, _)) => true
+        case _                             => false
+      },
+      bodyContentOpt          = actualBodyContentOpt,
+      onRow                   = (fromDatabase, bodyStreamOpt) => {
+        if (! headersSet) {
+          // Send headers before streaming body
+          httpResponse.setHeader(OrbeonFormDefinitionApp,     fromDatabase.app)
+          httpResponse.setHeader(OrbeonFormDefinitionForm,    fromDatabase.form)
+          httpResponse.setHeader(OrbeonFormDefinitionVersion, fromDatabase.formVersion.toString)
 
-      fromDatabase.dataUserOpt.foreach { dataUser =>
-        dataUser.userAndGroup.foreach { userAndGroup =>
-          httpResponse.setHeader(Headers.OrbeonUsername, userAndGroup.username)
-          userAndGroup.groupname.foreach(httpResponse.setHeader(Headers.OrbeonGroup, _))
-        }
-        dataUser.organization.foreach { organization =>
-          // TODO: review this if organizations are ever used again in the future (are names sufficient to identify
-          //  an organization? should depths and and positions be returned as well? should a unique ID be used?)
-          organization.levels.foreach(httpResponse.addHeader(Headers.OrbeonOrganization, _))
-        }
-      }
-      fromDatabase.lastModifiedByOpt.foreach { lastModifiedBy =>
-        httpResponse.setHeader(Headers.OrbeonLastModifiedByUsername, lastModifiedBy.username)
-      }
-      fromDatabase.stageOpt.foreach(httpResponse.setHeader(StageHeader.HeaderName, _))
-      fromDatabase.hashAlgorithmOpt.foreach(httpResponse.setHeader(OrbeonHashAlgorithm, _))
-      fromDatabase.hashValueOpt.foreach(httpResponse.setHeader(OrbeonHashValue, _))
-      httpResponse.setHeader(Headers.Created,            DateUtils.formatRfc1123DateTimeGmt(fromDatabase.createdDateTime))
-      httpResponse.setHeader(Headers.LastModified,       DateUtils.formatRfc1123DateTimeGmt(fromDatabase.lastModifiedDateTime))
-      // Also provide this with in ISO format with millisecond precision for compatibility with Search and History APIs
-      httpResponse.setHeader(Headers.OrbeonCreated,      DateUtils.formatIsoDateTimeUtc(fromDatabase.createdDateTime))
-      httpResponse.setHeader(Headers.OrbeonLastModified, DateUtils.formatIsoDateTimeUtc(fromDatabase.lastModifiedDateTime))
-      if (req.forDataNotAttachment) {
-        fromDatabase.idOpt.foreach { id =>
+          fromDatabase.dataUserOpt.foreach { dataUser =>
+            dataUser.userAndGroup.foreach { userAndGroup =>
+              httpResponse.setHeader(Headers.OrbeonUsername, userAndGroup.username)
+              userAndGroup.groupname.foreach(httpResponse.setHeader(Headers.OrbeonGroup, _))
+            }
+            dataUser.organization.foreach { organization =>
+              // TODO: review this if organizations are ever used again in the future (are names sufficient to identify
+              //  an organization? should depths and and positions be returned as well? should a unique ID be used?)
+              organization.levels.foreach(httpResponse.addHeader(Headers.OrbeonOrganization, _))
+            }
+          }
+          fromDatabase.lastModifiedByOpt.foreach { lastModifiedBy =>
+            httpResponse.setHeader(Headers.OrbeonLastModifiedByUsername, lastModifiedBy.username)
+          }
+          fromDatabase.stageOpt.foreach(httpResponse.setHeader(StageHeader.HeaderName, _))
+          fromDatabase.hashAlgorithmOpt.foreach(httpResponse.setHeader(OrbeonHashAlgorithm, _))
+          fromDatabase.hashValueOpt.foreach(httpResponse.setHeader(OrbeonHashValue, _))
+          httpResponse.setHeader(Headers.Created,            DateUtils.formatRfc1123DateTimeGmt(fromDatabase.createdDateTime))
+          httpResponse.setHeader(Headers.LastModified,       DateUtils.formatRfc1123DateTimeGmt(fromDatabase.lastModifiedDateTime))
+          // Also provide this with in ISO format with millisecond precision for compatibility with Search and History APIs
+          httpResponse.setHeader(Headers.OrbeonCreated,      DateUtils.formatIsoDateTimeUtc(fromDatabase.createdDateTime))
+          httpResponse.setHeader(Headers.OrbeonLastModified, DateUtils.formatIsoDateTimeUtc(fromDatabase.lastModifiedDateTime))
+          if (req.forDataNotAttachment) {
+            fromDatabase.idOpt.foreach { id =>
+              httpResponse.setHeader(
+                Headers.ETag,
+                ETag.eTag(tableName = SqlSupport.tableName(req), id = id, lastModified = fromDatabase.lastModifiedDateTime)
+              )
+            }
+          }
+
           httpResponse.setHeader(
-            Headers.ETag,
-            ETag.eTag(tableName = SqlSupport.tableName(req), id = id, lastModified = fromDatabase.lastModifiedDateTime)
+            name  = Headers.ContentType,
+            value = if (req.forAttachment)
+              ContentTypes.OctetStreamContentType else
+              ContentTypes.XmlContentType
           )
+
+          for {
+            range                <- req.ranges.singleRange
+            totalFileContentSize <- fromDatabase.totalAttachmentSize
+            // Check that the file is stored into the database (and not e.g. in the filesystem)
+            if totalFileContentSize > 0L
+          } locally {
+            // Set HTTP range headers and status
+            httpResponse.addHeaders(range.responseHeaders(totalFileContentSize))
+            httpResponse.setStatus(StatusCode.PartialContent)
+          }
+        }
+
+        // Stream body directly while the JDBC `ResultSet` is open
+        bodyStreamOpt.foreach { is =>
+          copyStreamAndClose(is, httpResponse.getOutputStream, doCloseOut = false)
         }
       }
-
-      httpResponse.setHeader(
-        name  = Headers.ContentType,
-        value = if (req.forAttachment)
-          ContentTypes.OctetStreamContentType else
-          ContentTypes.XmlContentType
-      )
-
-      for {
-        range                <- req.ranges.singleRange
-        totalFileContentSize <- fromDatabase.totalAttachmentSize
-        // Check that the file is stored into the database (and not e.g. in the filesystem)
-        if totalFileContentSize > 0
-      } locally {
-        // Set HTTP range headers and status
-        httpResponse.addHeaders(range.responseHeaders(totalFileContentSize))
-        httpResponse.setStatus(StatusCode.PartialContent)
-      }
-    }
-
-    // Maybe send body
-    fromDatabase.bodyOpt.foreach(httpResponse.getOutputStream.write)
+    )
+    .fold(t => throw t, identity) // will throw nested `HttpStatusCodeException` if present
 
     nextBodyContentOpt match {
       case None =>
@@ -197,7 +199,7 @@ trait Read {
     }
   }
 
-  // Holds the data we will read from the database
+  // Holds the metadata we read from the database
   private case class FromDatabase(
     idOpt               : Option[Int],
     dataUserOpt         : Option[CheckWithDataUser], // set to `Some(_)` if `forData == true`
@@ -208,8 +210,7 @@ trait Read {
     stageOpt            : Option[String],
     createdDateTime     : Instant,
     lastModifiedDateTime: Instant,
-    bodyOpt             : Option[Array[Byte]],
-    totalAttachmentSize : Option[Int],
+    totalAttachmentSize : Option[Long],
     hashAlgorithmOpt    : Option[String],
     hashValueOpt        : Option[String]
  )
@@ -223,7 +224,8 @@ trait Read {
     req                    : CrudRequest,
     hasStage               : Boolean,
     readTotalAttachmentSize: Boolean,
-    bodyContentOpt         : Option[BodyContent]
+    bodyContentOpt         : Option[BodyContent],
+    onRow                  : (FromDatabase, Option[InputStream]) => Unit
   )(implicit
     externalContext        : ExternalContext,
     indentedLogger         : IndentedLogger
@@ -347,26 +349,22 @@ trait Read {
             groupname = ""
           )
 
-          val bodyOpt = bodyContentOpt.flatMap { bodyContent =>
-            val bodyInputStream = bodyContent match {
-              case FullAttachment | PartialAttachment(_, _) =>
-                req.provider match {
-                  case PostgreSQL | SQLite  => Option(resultSet.getBytes("file_content")).map(new ByteArrayInputStream(_))
-                  case _                    => Option(resultSet.getBlob("file_content")).map(_.getBinaryStream)
-                }
+          val bodyStreamOpt: Option[InputStream] = bodyContentOpt.flatMap {
+            case FullAttachment | PartialAttachment(_, _) =>
+              req.provider match {
+                case PostgreSQL | SQLite => Option(resultSet.getBinaryStream("file_content"))
+                case _                   => Option(resultSet.getBlob("file_content")).map(_.getBinaryStream)
+              }
 
-              case Xml =>
-                val reader = req.provider match {
-                  case PostgreSQL | SQLite => new StringReader(resultSet.getString("xml"))
-                  case _                   => resultSet.getClob("xml").getCharacterStream
-                }
-                Some(ReaderInputStream.builder.setReader(reader).setCharset(CharsetNames.Utf8).get())
-            }
-
-            bodyInputStream.map(useAndClose(_)(NetUtils.inputStreamToByteArray))
+            case Xml =>
+              val readerOpt = req.provider match {
+                case PostgreSQL | SQLite => Option(resultSet.getString("xml")).map(new StringReader(_))
+                case _                   => Option(resultSet.getClob("xml")).map(_.getCharacterStream)
+              }
+              readerOpt.map(reader => ReaderInputStream.builder.setReader(reader).setCharset(CharsetNames.Utf8).get())
           }
 
-          Right(
+          val fromDb =
             FromDatabase(
               idOpt                = req.forDataNotAttachment.option(resultSet.getInt("id")),
               dataUserOpt          = dataUser,
@@ -377,12 +375,18 @@ trait Read {
               stageOpt             = hasStage.option(resultSet.getString("stage")),
               createdDateTime      = resultSet.getTimestamp("created").toInstant,
               lastModifiedDateTime = resultSet.getTimestamp("last_modified_time").toInstant,
-              bodyOpt              = bodyOpt,
-              totalAttachmentSize  = readTotalAttachmentSize.option(resultSet.getInt("total_file_content_size")),
+              totalAttachmentSize  = readTotalAttachmentSize.option(resultSet.getLong("total_file_content_size")),
               hashAlgorithmOpt     = req.forAttachment.option(resultSet.getString("hash_algorithm")),
               hashValueOpt         = req.forAttachment.option(resultSet.getString("hash_value"))
             )
-          )
+
+          try {
+            onRow(fromDb, bodyStreamOpt)
+          } finally {
+            bodyStreamOpt.foreach(is => runQuietly(is.close()))
+          }
+
+          Right(fromDb)
         } else {
           Left(HttpStatusCodeException(StatusCode.NotFound))
         }

@@ -57,7 +57,8 @@ case class CrudRequest(
   singleton       : Option[Boolean],
   hashAlgorithm   : Option[String],
   hashValue       : Option[String],
-  bodyStreamOpt   : Option[InputStream]
+  bodyStreamOpt   : Option[InputStream],
+  contentLengthOpt: Option[Long]
 ) {
   def forForm              : Boolean = dataPart.isEmpty
   def forData              : Boolean = dataPart.isDefined

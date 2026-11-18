@@ -155,7 +155,22 @@ object SqlSupport {
         Col(
           name          = "file_content",
           placeholder   = "?",
-          paramSetter   = param(_.setBytes, RequestReader.bytes(reqBodyOpt).orNull)
+          paramSetter   = (ps: PreparedStatement, i: Int) =>
+            if (delete) {
+              ps.setBytes(i, null)
+            } else {
+              req.bodyStreamOpt match {
+                case None =>
+                  ps.setBytes(i, null)
+                case Some(is) =>
+                  req.contentLengthOpt match {
+                    case Some(len) if (req.provider != Provider.SQLite && req.provider != Provider.PostgreSQL) || len <= Int.MaxValue =>
+                      ps.setBinaryStream(i, is, len)
+                    case _ =>
+                      ps.setBinaryStream(i, is)
+                  }
+              }
+            }
         )
     ) ::: (
       req.forAttachment list

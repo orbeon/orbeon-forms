@@ -100,8 +100,11 @@ object InternalHttpClient extends HttpClient[CookieStore] {
         // Content-Type and Content-Length, must not be provided upon redirect. Possibly, only headers  coming from
         // the incoming request should be passed, minus content headers.
         response.serverSideRedirect match {
-          case Some(location) => processRedirects(location, GET, Map.empty, None)
-          case None           => response
+          case Some(location) =>
+            response.close()
+            processRedirects(location, GET, Map.empty, None)
+          case None =>
+            response
         }
       }
 
@@ -112,7 +115,7 @@ object InternalHttpClient extends HttpClient[CookieStore] {
         lazy val headers      = response.capitalizedHeaders
         lazy val lastModified = DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
         lazy val content      = response.streamedContent
-        def disconnect()      = content.close()
+        def disconnect()      = response.close()
       }
     }
 

@@ -14,24 +14,37 @@
 package org.orbeon.oxf.externalcontext
 
 import org.orbeon.connection.StreamedContent
+import org.orbeon.io.IOUtils.runQuietly
 import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.externalcontext.ExternalContext.Response
 import org.orbeon.oxf.http.{EmptyInputStream, Headers, StatusCode}
+import org.orbeon.oxf.util.NetUtils
 
 import java.io.*
+import java.lang.ref.Cleaner
+import java.nio.file.{Files, Path}
 import scala.collection.mutable
+import scala.util.control.NonFatal
 
 
-class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponseSupport {
+object LocalResponse {
+  val DefaultInMemoryThresholdBytes: Int = 64 * 1024
+  private[externalcontext] val TempFileCleaner: Cleaner = Cleaner.create()
+}
+
+class LocalResponse(
+  rewriter              : URLRewriter,
+  inMemoryThresholdBytes: Int = LocalResponse.DefaultInMemoryThresholdBytes
+) extends Response with CachingResponseSupport {
 
   private var _statusCode                         = StatusCode.Ok
   private var _serverSideRedirect: Option[String] = None
   private val _lowerCaseHeaders                   = mutable.LinkedHashMap[String, List[String]]()
 
-  private var _stringWriter: StringBuilderWriter        = null
-  private var _printWriter : PrintWriter                = null
-  private var _byteStream  : LocalByteArrayOutputStream = null
-  private var _inputStream : InputStream                = null
+  private var _stringWriter  : StringBuilderWriter  = null
+  private var _printWriter   : PrintWriter          = null
+  private var _spoolingStream: SpoolingOutputStream = null
+  private var _inputStream   : InputStream          = null
 
   def streamedContent: StreamedContent = {
     val responseHeaders = capitalizedHeaders
@@ -55,13 +68,22 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
         if (_stringWriter ne null) {
           val bytes = _stringWriter.builder.toString.getBytes(ExternalContext.StandardCharacterEncoding)
           new ByteArrayInputStream(bytes, 0, bytes.length)
-        } else if (_byteStream ne null) {
-          new ByteArrayInputStream(_byteStream.getByteArray, 0, _byteStream.size)
+        } else if (_spoolingStream ne null) {
+          _spoolingStream.toInputStream()
         } else {
           EmptyInputStream
         }
     }
     _inputStream
+  }
+
+  override def sendInputStream(inputStream: InputStream): Unit = {
+    require(inputStream ne null)
+    if ((_spoolingStream ne null) || (_stringWriter ne null) || (_inputStream ne null)) {
+      runQuietly(inputStream.close())
+      throw new IllegalStateException("Response body has already been set on `LocalResponse`")
+    }
+    _inputStream = inputStream
   }
 
   def setHeader(name: String, value: String): Unit =
@@ -75,12 +97,16 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
   def getNamespacePrefix: String = rewriter.getNamespacePrefix
 
   def getOutputStream: OutputStream = {
-    if (_byteStream eq null)
-      _byteStream = new LocalByteArrayOutputStream
-    _byteStream
+    if (_inputStream ne null)
+      throw new IllegalStateException("Response body stream has already been set on `LocalResponse`")
+    if (_spoolingStream eq null)
+      _spoolingStream = new SpoolingOutputStream(inMemoryThresholdBytes)
+    _spoolingStream
   }
 
   def getWriter: PrintWriter = {
+    if (_inputStream ne null)
+      throw new IllegalStateException("Response body stream has already been set on `LocalResponse`")
     if (_stringWriter eq null) {
       _stringWriter = new StringBuilderWriter
       _printWriter = new PrintWriter(_stringWriter)
@@ -90,7 +116,20 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
 
   def isCommitted = false
 
-  def reset(): Unit = ()
+  def reset(): Unit = {
+    close()
+    _stringWriter   = null
+    _printWriter    = null
+    _spoolingStream = null
+    _inputStream    = null
+  }
+
+  def close(): Unit = {
+    if (_inputStream ne null)
+      runQuietly(_inputStream.close())
+    if (_spoolingStream ne null)
+      _spoolingStream.discard()
+  }
 
   def rewriteActionURL(urlString: String): String =
     rewriter.rewriteActionURL(urlString)
@@ -140,4 +179,131 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
 
 private class LocalByteArrayOutputStream extends ByteArrayOutputStream {
   def getByteArray: Array[Byte] = buf
+}
+
+private final class TempFileCleanup(path: Path) extends Runnable {
+  def run(): Unit = runQuietly(Files.deleteIfExists(path))
+}
+
+private final class TempFileHandle(val path: Path) {
+  private val cleanable = LocalResponse.TempFileCleaner.register(this, new TempFileCleanup(path))
+  def deleteNow(): Unit = cleanable.clean()
+}
+
+private class SpoolingOutputStream(
+  thresholdBytes: Int
+) extends OutputStream {
+
+  private var _byteStream    : LocalByteArrayOutputStream = new LocalByteArrayOutputStream
+  private var _tempFileHandle: TempFileHandle             = null
+  private var _fileOut       : OutputStream               = null
+  private var _closed        : Boolean                    = false
+
+  override def write(b: Int): Unit = {
+    ensureOpen()
+    if (_fileOut ne null) {
+      _fileOut.write(b)
+    } else if (_byteStream.size + 1 <= thresholdBytes) {
+      _byteStream.write(b)
+    } else {
+      spillToDisk()
+      _fileOut.write(b)
+    }
+  }
+
+  override def write(b: Array[Byte], off: Int, len: Int): Unit = {
+    if ((off < 0) || (off > b.length) || (len < 0) || ((off + len) > b.length) || ((off + len) < 0))
+      throw new IndexOutOfBoundsException
+    if (len > 0) {
+      ensureOpen()
+      if (_fileOut ne null) {
+        _fileOut.write(b, off, len)
+      } else if (_byteStream.size.toLong + len.toLong <= thresholdBytes.toLong) {
+        _byteStream.write(b, off, len)
+      } else {
+        spillToDisk()
+        _fileOut.write(b, off, len)
+      }
+    }
+  }
+
+  override def flush(): Unit =
+    if (_fileOut ne null)
+      _fileOut.flush()
+
+  override def close(): Unit =
+    if (! _closed) {
+      _closed = true
+      if (_fileOut ne null)
+        _fileOut.close()
+    }
+
+  def toInputStream(): InputStream = {
+    close()
+    if (_tempFileHandle ne null) {
+      val handle = _tempFileHandle
+      _tempFileHandle = null
+      val rawIn =
+        try Files.newInputStream(handle.path)
+        catch {
+          case NonFatal(t) =>
+            handle.deleteNow()
+            throw t
+        }
+      new FilterInputStream(rawIn) {
+        // Hold `handle` strongly for the lifetime of this `InputStream` and delete immediately on `close()`.
+        private val retainedHandle: TempFileHandle = handle
+        override def close(): Unit =
+          try super.close()
+          finally retainedHandle.deleteNow()
+      }
+    } else if (_byteStream ne null) {
+      new ByteArrayInputStream(_byteStream.getByteArray, 0, _byteStream.size)
+    } else {
+      EmptyInputStream
+    }
+  }
+
+  def discard(): Unit = {
+    runQuietly(close())
+    if (_tempFileHandle ne null) {
+      _tempFileHandle.deleteNow()
+      _tempFileHandle = null
+    }
+    _byteStream = null
+    _fileOut    = null
+  }
+
+  private def ensureOpen(): Unit =
+    if (_closed)
+      throw new IOException("Stream closed")
+
+  private def spillToDisk(): Unit = {
+    val tempDir = NetUtils.getTemporaryDirectory.toPath
+    Files.createDirectories(tempDir)
+    val path = Files.createTempFile(tempDir, "orbeon-local-response-", ".tmp")
+    path.toFile.deleteOnExit()
+    val handle = new TempFileHandle(path)
+
+    val out =
+      try new BufferedOutputStream(Files.newOutputStream(path))
+      catch {
+        case NonFatal(t) =>
+          handle.deleteNow()
+          throw t
+      }
+
+    try {
+      if (_byteStream.size > 0)
+        out.write(_byteStream.getByteArray, 0, _byteStream.size)
+      _tempFileHandle = handle
+      _fileOut        = out
+      _byteStream     = null
+    } catch {
+      case NonFatal(t) =>
+        runQuietly(out.close())
+        handle.deleteNow()
+        throw t
+    }
+  }
 }

@@ -1067,10 +1067,11 @@
                 <paging xmlns="">
                     <from>0</from>
                     <to>0</to>
+                    <page-number>1</page-number>
                 </paging>
             </xf:instance>
 
-            <xf:bind ref="instance('fr-paging-instance')/(from | to)" type="xs:integer"/>
+            <xf:bind ref="instance('fr-paging-instance')/(from | to | page-number)" type="xs:integer"/>
 
             <xf:instance id="fr-home-triggers-instance" xxf:exclude-result-prefixes="#all">
                 <_ xmlns="">
@@ -1097,6 +1098,7 @@
             <fr:config-check/>
             <fr:row>
                 <xf:group class="{'fr-forms-admin'[$is-admin], 'fr-published-forms'[not($is-admin)]}">
+                    <xf:var name="home-page-size" value="xs:integer(xxf:property('oxf.fr.home.page-size'))"/>
 
                     <xf:group class="fr-top-fields">
                         <xf:var name="pager-id" value="if ($is-admin) then 'fr-admin-pager' else 'fr-pager'"/>
@@ -1502,10 +1504,11 @@
 
                             <fr:pager
                                 id="fr-admin-pager"
-                                page-size="{xxf:property('oxf.fr.home.page-size')}"
+                                page-size="{$home-page-size}"
                                 total-value="count($forms)"
                                 from-ref="instance('fr-paging-instance')/from"
-                                to-ref="instance('fr-paging-instance')/to">
+                                to-ref="instance('fr-paging-instance')/to"
+                                page-number-ref="instance('fr-paging-instance')/page-number">
 
                                 <xf:setindex
                                     event="fr-pager-changed"
@@ -2029,10 +2032,11 @@
                             <xf:group ref=".[not($is-admin)]" class="fr-published-pager">
                                 <fr:pager
                                     id="fr-pager"
-                                    page-size="{xxf:property('oxf.fr.home.page-size')}"
+                                    page-size="{$home-page-size}"
                                     total-value="count($forms)"
                                     from-ref="instance('fr-paging-instance')/from"
-                                    to-ref="instance('fr-paging-instance')/to">
+                                    to-ref="instance('fr-paging-instance')/to"
+                                    page-number-ref="instance('fr-paging-instance')/page-number">
 
                                     <xf:setindex
                                         event="fr-pager-changed"
@@ -2044,7 +2048,7 @@
                         </xh:div>
                     </xf:group>
 
-                    <xf:group xxf:update="full" class="fr-search-results fr-table-frame">
+                    <xf:group xxf:update="full" xxf:element="div" class="fr-search-results fr-table-frame">
                         <xh:table class="fr-forms-table table table-condensed {'fr-table-no-form-data'[empty($forms)]}">
                             <xh:thead>
                                 <xf:group ref=".[$is-admin and $show-remote]">
@@ -2531,6 +2535,32 @@
                                 </xf:group>
                             </xh:tbody>
                         </xh:table>
+                    </xf:group>
+
+                    <xf:group
+                        ref=".[count($forms) gt $home-page-size]"
+                        xxf:element="div"
+                        class="fr-table-footer">
+                        <fr:pager
+                            id="fr-bottom-pager"
+                            page-size="{$home-page-size}"
+                            total-value="count($forms)"
+                            page-number-ref="instance('fr-paging-instance')/page-number">
+
+                            <xf:action event="fr-pager-changed">
+                                <xf:setindex repeat="forms-repeat" index="1"/>
+                                <xf:action type="javascript">
+                                    <xf:body>
+                                        const top = document.querySelector('.fr-filter-row, .fr-search-results');
+                                        if (top &amp;&amp; top.getBoundingClientRect().top &lt; 0)
+                                            top.scrollIntoView({
+                                                behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+                                                block: 'start'
+                                            });
+                                    </xf:body>
+                                </xf:action>
+                            </xf:action>
+                        </fr:pager>
                     </xf:group>
                 </xf:group>
             </fr:row>

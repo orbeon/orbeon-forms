@@ -430,13 +430,43 @@
   }
 
   // TODO: use same styling as in form-runner-home?
-  .pagination {
+  .pagination:not(.fr-pagination-single-page) {
     .fr-paging-numbers > span {
       // content-box so min-width reserves *content* room for the digits; border-box would fold the padding/border in
       // and re-introduce the size jump while paging
       box-sizing: content-box;
       min-width: 105px; // try to allow at least 3 times 3 digits so the size doesn't change too much when paging
       text-align: center;
+    }
+  }
+
+  .fr-search-results.fr-table-frame:has(+ .fr-table-footer:not(.xforms-disabled)),
+  .fr-dynamic:has(+ .fr-table-footer:not(.xforms-disabled)) .fr-search-results.fr-table-frame {
+    margin-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .fr-table-footer:not(.xforms-disabled) {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 8px 16px;
+    margin: 0 0 @spacing 0;
+    background-color: var(--orbeon-table-header-background-color);
+    border: 1px solid var(--orbeon-table-border-color);
+    border-top: 0;
+    border-radius: 0 0 var(--orbeon-body-decorations-border-radius) var(--orbeon-body-decorations-border-radius);
+    box-shadow: var(--orbeon-table-frame-box-shadow);
+
+    .pagination {
+      float: none;
+      margin: 0;
+
+      ul > li:not(.disabled) > a,
+      ul > li:not(.disabled) > span {
+        background-color: var(--orbeon-table-background-color);
+      }
     }
   }
 }

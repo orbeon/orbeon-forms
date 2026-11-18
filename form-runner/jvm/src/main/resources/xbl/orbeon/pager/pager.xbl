@@ -75,7 +75,7 @@
 
         <xbl:template>
             <xh:div
-                class="pagination"
+                class="pagination{if (instance('fr-paging-instance')/page-count le 1) then ' fr-pagination-single-page' else ''}"
                 data-search-total="{instance('fr-paging-instance')/search-total}"
                 data-page-size="{instance('fr-paging-instance')/page-size}"
                 data-page-number="{instance('fr-paging-instance')/page-number}"
@@ -132,29 +132,49 @@
                     fr:keep-if-param-non-blank="page-number-ref"
                     xbl:attr="model context ref=page-number-ref" appearance="xxf:internal" xxbl:scope="outer"
                 >
+                    <xf:var name="outer-value" as="xs:string" xxbl:scope="inner">
+                        <xxf:value value="string(.)" xxbl:scope="outer"/>
+                        <xf:setvalue
+                            event="xforms-enabled xforms-value-changed"
+                            if="$outer-value castable as xs:integer and xs:integer($outer-value) != instance('fr-paging-instance')/page-number/data(.)"
+                            ref="instance('fr-paging-instance')/page-number"
+                            value="xs:integer($outer-value)"/>
+                    </xf:var>
                     <xf:group ref="instance('fr-paging-instance')/page-number" xxbl:scope="inner" appearance="xxf:internal">
                         <xf:var name="ref" as="item()?">
                             <xxf:value value="." xxbl:scope="outer"/>
                         </xf:var>
                         <xf:var name="value" as="xs:integer" value="data(.)">
-                            <xf:setvalue event="xforms-enabled xforms-value-changed" ref="$ref" value="$value"/>
+                            <xf:setvalue
+                                event="xforms-enabled xforms-value-changed"
+                                if="string($ref) != string($value)"
+                                ref="$ref"
+                                value="$value"/>
                         </xf:var>
                     </xf:group>
                 </xf:group>
 
+                <xf:var name="single-page" value="instance('fr-paging-instance')/page-count le 1"/>
+
                 <xh:ul>
-                    <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
+                    <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}{if ($single-page) then ' xforms-hidden' else ''}">
                         <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-first" xxf:readonly-appearance="dynamic">
-                            <xf:label><xh:i class="fa fa-fw fa-step-backward"/></xf:label>
+                            <xf:label>
+                                <xh:i class="fa fa-fw fa-step-backward" aria-hidden="true"/>
+                                <xh:span class="visually-hidden"><xf:output value="concat(xxf:r('summary.paging.page', '|fr-fr-resources|'), ' 1')"/></xh:span>
+                            </xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="1"/>
                                 <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
                             </xf:action>
                         </xf:trigger>
                     </xh:li>
-                    <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
+                    <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}{if ($single-page) then ' xforms-hidden' else ''}">
                         <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-prev" xxf:readonly-appearance="dynamic">
-                            <xf:label><xh:i class="fa fa-fw fa-chevron-left"/></xf:label>
+                            <xf:label>
+                                <xh:i class="fa fa-fw fa-chevron-left" aria-hidden="true"/>
+                                <xh:span class="visually-hidden"><xf:output value="xxf:r('buttons.previous', '|fr-fr-resources|')"/></xh:span>
+                            </xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:setvalue ref="instance('fr-paging-instance')/page-number" value=". - 1"/>
                                 <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
@@ -208,18 +228,24 @@
                     <xf:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) = 0]">
                         <!-- No results -->
                     </xf:group>
-                    <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
+                    <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}{if ($single-page) then ' xforms-hidden' else ''}">
                         <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-next" xxf:readonly-appearance="dynamic">
-                            <xf:label><xh:i class="fa fa-fw fa-chevron-right"/></xf:label>
+                            <xf:label>
+                                <xh:i class="fa fa-fw fa-chevron-right" aria-hidden="true"/>
+                                <xh:span class="visually-hidden"><xf:output value="xxf:r('buttons.next', '|fr-fr-resources|')"/></xh:span>
+                            </xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:setvalue ref="instance('fr-paging-instance')/page-number" value=". + 1"/>
                                 <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
                             </xf:action>
                         </xf:trigger>
                     </xh:li>
-                    <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
+                    <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}{if ($single-page) then ' xforms-hidden' else ''}">
                         <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-last" xxf:readonly-appearance="dynamic">
-                            <xf:label><xh:i class="fa fa-fw fa-step-forward"/></xf:label>
+                            <xf:label>
+                                <xh:i class="fa fa-fw fa-step-forward" aria-hidden="true"/>
+                                <xh:span class="visually-hidden"><xf:output value="concat(xxf:r('summary.paging.page', '|fr-fr-resources|'), ' ', instance('fr-paging-instance')/page-count)"/></xh:span>
+                            </xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="instance('fr-paging-instance')/page-count"/>
                                 <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>

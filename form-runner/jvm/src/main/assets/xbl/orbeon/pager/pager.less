@@ -13,5 +13,29 @@
                 padding-right: 0;
             }
         }
+
+        .pagination.fr-pagination-single-page {
+            ul > li.fr-paging-numbers {
+                > span:not(.xforms-disabled) {
+                    min-width: 0;
+                    padding-inline: 12px;
+                    color: var(--orbeon-hint-color);
+                    font-variant-numeric: tabular-nums;
+                }
+
+                // Restore left border and outer pill corners when surrounding arrow <li>s are hidden
+                > .fr-paging-page:not(.xforms-disabled),
+                > .xforms-disabled + .xforms-disabled + span {
+                    border-left-width: 1px;
+                    border-top-left-radius: var(--orbeon-button-border-radius);
+                    border-bottom-left-radius: var(--orbeon-button-border-radius);
+                }
+
+                > span:last-child {
+                    border-top-right-radius: var(--orbeon-button-border-radius);
+                    border-bottom-right-radius: var(--orbeon-button-border-radius);
+                }
+            }
+        }
     }
 }

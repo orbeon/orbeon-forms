@@ -1221,6 +1221,13 @@
                 <!--</fr:header>-->
                 <fr:body>
 
+                    <xf:var
+                        name="summary-page-size"
+                        value="xs:integer(xxf:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.')))"/>
+                    <xf:var
+                        name="summary-search-total"
+                        value="xs:integer((instance('fr-search-results-instance')/@search-total[. castable as xs:integer], 0)[1])"/>
+
                     <xf:var name="show-created"          value="frf:showSummaryMetadataColumn($source-form-metadata, 'created',          $app, $form)"/>
                     <xf:var name="show-last-modified"    value="frf:showSummaryMetadataColumn($source-form-metadata, 'last-modified',    $app, $form)"/>
                     <xf:var name="show-workflow-stage"   value="frf:showSummaryMetadataColumn($source-form-metadata, 'workflow-stage',   $app, $form)"/>
@@ -1514,8 +1521,8 @@
 
                             <fr:pager
                                 id="fr-pager"
-                                page-size="{xxf:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))}"
-                                total-value="(instance('fr-search-results-instance')/@search-total, 0)[1]"
+                                page-size="{$summary-page-size}"
+                                total-value="$summary-search-total"
                                 page-number-ref="instance('fr-search-instance')/page-number">
 
                                 <xf:action event="fr-pager-changed">
@@ -2001,6 +2008,31 @@
                     <xh:div class="fr-dynamic">
                         <xxf:dynamic id="fr-summary-dynamic" ref="instance('fr-dynamic-instance')"/>
                     </xh:div>
+                    <xf:group
+                        ref=".[exists(instance('fr-search-results-instance')/document) and $summary-search-total gt $summary-page-size]"
+                        xxf:element="div"
+                        class="fr-table-footer">
+                        <fr:pager
+                            id="fr-bottom-pager"
+                            page-size="{$summary-page-size}"
+                            total-value="$summary-search-total"
+                            page-number-ref="instance('fr-search-instance')/page-number">
+
+                            <xf:action event="fr-pager-changed">
+                                <xf:send submission="fr-summary-search-submission"/>
+                                <xf:action type="javascript">
+                                    <xf:body>
+                                        const top = document.querySelector('.fr-main-top-fields, .fr-search-results');
+                                        if (top &amp;&amp; top.getBoundingClientRect().top &lt; 0)
+                                            top.scrollIntoView({
+                                                behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+                                                block: 'start'
+                                            });
+                                    </xf:body>
+                                </xf:action>
+                            </xf:action>
+                        </fr:pager>
+                    </xf:group>
                     <xf:group ref="instance('fr-search-results-instance')[empty(document)]">
                         <xh:div class="fr-search-results">
                             <!-- Logic from `fr:buttons-bar`, specialized -->

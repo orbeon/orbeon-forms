@@ -427,7 +427,7 @@
         margin-top: 6px;
         margin-bottom: 6px;
 
-        .fr-paging-numbers > span {
+        &:not(.fr-pagination-single-page) .fr-paging-numbers > span {
             box-sizing: content-box; // so min-width reserves *content* room for digits (see form-runner-search.less)
             min-width: 125px; // try to allow at least 3 times 3 digits so the size doesn't change too much when paging
             text-align: center;

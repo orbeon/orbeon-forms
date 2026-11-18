@@ -542,9 +542,14 @@
             <non-heap>Non-Heap Used</non-heap>
             <sort-ascending>ascending</sort-ascending>
             <sort-descending>descending</sort-descending>
+            <window>Window</window>
+            <auto-refresh>Auto-refresh</auto-refresh>
+            <auto-off>Off</auto-off>
+            <max-heap>Max heap</max-heap>
         </labels>
         <buttons>
-            <refresh>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Refresh</refresh>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-hidden="true"&gt;&lt;/i&gt; Refresh</refresh>
+            <charts>&lt;i class="fa fa-fw fa-chart-line" aria-hidden="true"&gt;&lt;/i&gt; Charts</charts>
             <clear>Clear</clear>
         </buttons>
         <messages>
@@ -552,7 +557,38 @@
             <no-live-documents>No live XForms documents are currently in JVM heap.</no-live-documents>
             <live-documents-note>Only documents currently in JVM heap (cached in xforms.cache.live-documents or actively handling a request) appear below. Open forms evicted when this cache reaches its limit remain active in xforms.store.dynamic-states and rehydrate automatically on interaction.</live-documents-note>
             <sorted-announcement>Sorted by {0}, {1}</sorted-announcement>
+            <no-chart-data>No data available yet.</no-chart-data>
         </messages>
+        <charts>
+            <memory-trend title="Memory &amp; Disk Trend" subtitle="JVM heap, estimated cache heap, and disk stores"/>
+            <activity-trend title="Cache Throughput &amp; Evictions" subtitle="Aggregate lookup rates and eviction deltas"/>
+            <heap-breakdown title="Estimated Cache Heap Share" subtitle="Top caches and stores by estimated heap footprint"/>
+            <static-anatomy title="Compiled Form Memory Anatomy" subtitle="Top compiled forms by static DOM, HTML template, and XPath/control analysis"/>
+            <live-docs-trend title="Sessions, Live Heap &amp; State Store" subtitle="Open HTTP sessions, live heap documents, and dynamic state store entries"/>
+            <live-docs-by-path title="Live Document Heap by Request Path" subtitle="Top active form paths by total estimated heap"/>
+            <gc-trend title="GC Pause Activity" subtitle="Collection pause time and collection count per sample interval"/>
+            <memory-pools title="JVM Memory Pools" subtitle="Used vs. committed headroom across heap and non-heap pools"/>
+            <series>
+                <heap-used>JVM Heap Used</heap-used>
+                <cache-heap>Est. Cache Heap</cache-heap>
+                <disk-store>Disk Stores</disk-store>
+                <heap-committed>Heap Committed</heap-committed>
+                <hits-rate>Hits / sec</hits-rate>
+                <misses-rate>Misses / sec</misses-rate>
+                <evictions>Evictions</evictions>
+                <static-dom>Static DOM</static-dom>
+                <template>HTML Template</template>
+                <analysis-other>XPath &amp; Control Analysis</analysis-other>
+                <live-docs>Live Docs (Heap)</live-docs>
+                <state-store>Dynamic State Store</state-store>
+                <sessions>HTTP Sessions</sessions>
+                <live-doc-heap>Live Document Heap</live-doc-heap>
+                <gc-pause-ms>GC Pause Time</gc-pause-ms>
+                <gc-collections>Collections</gc-collections>
+                <pool-used>Used</pool-used>
+                <pool-headroom>Committed Headroom</pool-headroom>
+            </series>
+        </charts>
         <cache-descriptions>
             <core-cache-pipelines title="Pipeline &amp; Resource Cache">Caches compiled XPL pipelines, XSLT stylesheets, and parsed XML configuration files in memory so Orbeon Forms does not have to re-parse them on every request. Entries are automatically invalidated whenever an underlying resource changes, and clearing this cache is safe.</core-cache-pipelines>
             <core-cache-properties title="Configuration Properties Cache">Caches parsed configuration property sets (from XML files and the Configuration UI) along with their change tags so property lookups stay fast on every request. Clearing this cache is safe and forces a fresh reload from property providers on the next request.</core-cache-properties>

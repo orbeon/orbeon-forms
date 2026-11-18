@@ -142,7 +142,15 @@ object CacheSupport {
     if (warnedLegacyCaches.add(legacyName))
       Logger.warn(s"Deprecated cache/store name `$legacyName` found in provider configuration; rename it to `$canonicalName`.")
 
+  private val closeListeners = java.util.concurrent.ConcurrentHashMap.newKeySet[() => Unit]()
+
+  def addCloseListener(listener: () => Unit): Unit =
+    closeListeners.add(listener)
+
   def close(): Unit = {
+    closeListeners.forEach { listener =>
+      try listener() catch { case scala.util.control.NonFatal(_) => () }
+    }
     storeProvider.close()
     if (storeProvider ne cacheProvider)
       cacheProvider.close()

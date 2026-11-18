@@ -115,6 +115,7 @@ val WildFlyElytronHttpOidcVersion    = "2.9.4.Final"
 
 val WebJarDependencies = Seq(
   "org.webjars.npm" % "bowser"           % "1.9.4",
+  "org.webjars.npm" % "chart.js"         % "4.6.1" intransitive(),
   "org.webjars"     % "clipboard.js"     % "2.0.11",
   "org.webjars.npm" % "codemirror"       % "5.65.20",
   "org.webjars.npm" % "dragula"          % "3.7.3",

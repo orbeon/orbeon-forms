@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.fr
 
+import io.circe.generic.auto.*
+import io.circe.syntax.*
 import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.cache.*
@@ -37,6 +39,9 @@ trait FormRunnerConsole {
 
   import FormRunnerConsole.*
 
+  // Start the lightweight bounded metrics history sampler as soon as FormRunner initializes
+  ConsoleMetricsHistory.ensureConfigured()
+
   //@XPathFunction
   def isConsoleAuthorized: Boolean = {
     val configurationOpt = formBuilderPermissionsConfiguration
@@ -44,10 +49,14 @@ trait FormRunnerConsole {
   }
 
   //@XPathFunction
-  def consoleSnapshotXml(): DocumentNodeInfoType = {
+  def consoleSnapshotXml(): DocumentNodeInfoType =
+    consoleSnapshotXmlForWindow("1h")
+
+  //@XPathFunction
+  def consoleSnapshotXmlForWindow(window: String): DocumentNodeInfoType = {
     if (! isConsoleAuthorized)
       throw new SecurityException("Unauthorized access to Form Runner Admin Console")
-    new DocumentWrapper(buildConsoleSnapshotDom(), null, StaticXPath.GlobalConfiguration)
+    new DocumentWrapper(buildConsoleSnapshotDom(window), null, StaticXPath.GlobalConfiguration)
   }
 
   //@XPathFunction
@@ -122,7 +131,8 @@ object FormRunnerConsole {
         false
     }
 
-  def buildConsoleSnapshotDom(): dom.Document = {
+  def buildConsoleSnapshotDom(window: String = "1h"): dom.Document = {
+    ConsoleMetricsHistory.ensureConfigured()
     // Ensure standard caches/stores are registered so they always appear in the console table,
     // and sync ObjectCache limits with the active PropertySet.
     val _ = (
@@ -572,6 +582,267 @@ object FormRunnerConsole {
         dElem.addAttribute("idle-ms",             d.idleMs.toString)
         dElem.addAttribute("idle-formatted",      d.idleFormatted)
       }
+
+    // ==== Record live history sample & serialize <charts> ====
+    ConsoleMetricsHistory.updateGlobalXblBytesBaseline(globalXblBytes)
+
+    val totalCacheHits =
+      objectCacheSnaps.iterator.map(_.hitCount).sum +
+        providerCacheSnaps.iterator.flatMap(_.hitCount).sum
+    val totalCacheMisses =
+      objectCacheSnaps.iterator.map(_.missCount).sum +
+        providerCacheSnaps.iterator.flatMap(_.missCount).sum
+    val totalCacheEvictions =
+      objectCacheSnaps.iterator.map(_.evictionCount).sum +
+        providerCacheSnaps.iterator.flatMap(_.evictionCount).sum
+
+    val totalGcCount =
+      gcsElem.elements("gc").iterator.map(_.attributeValue("collection-count").toLongOption.getOrElse(0L)).sum
+    val totalGcTimeMs =
+      gcsElem.elements("gc").iterator.map(_.attributeValue("collection-time-ms").toLongOption.getOrElse(0L)).sum
+
+    val stateStoreEntriesLong =
+      providerCacheSnaps
+        .find(s => CacheSupport.toCanonicalCacheName(s.name) == "xforms.store.dynamic-states")
+        .flatMap(s => s.totalEntries.orElse(Some(s.heapEntries)))
+        .getOrElse(0L)
+
+    ConsoleMetricsHistory.recordConsoleSnapshotSample(
+      ConsoleMetricsHistory.MetricsSample(
+        timestampMs              = nowMs,
+        heapUsedBytes            = heapUsed,
+        heapCommittedBytes       = heapCommitted,
+        heapMaxBytes             = heapMax,
+        nonHeapUsedBytes         = nonHeapUsed,
+        estimatedCachesHeapBytes = totalEstimatedCacheHeapBytes,
+        diskStoreBytes           = totalDiskStoreBytes,
+        totalCacheHits           = totalCacheHits,
+        totalCacheMisses         = totalCacheMisses,
+        totalCacheEvictions      = totalCacheEvictions,
+        activeSessions           = XFormsStateManager.activeSessionsCount,
+        liveDocsInHeap           = allLiveDocs.size,
+        stateStoreEntries        = stateStoreEntriesLong,
+        gcCollectionCount        = totalGcCount,
+        gcCollectionTimeMs       = totalGcTimeMs
+      )
+    )
+
+    val normalizedWindow = ConsoleMetricsHistory.normalizeWindow(window)
+    val historyPoints    = ConsoleMetricsHistory.snapshotWindow(normalizedWindow, nowMs)
+    val timestamps       = historyPoints.map(_.sample.timestampMs)
+
+    val chartsElem = root.addElement("charts")
+    chartsElem.addAttribute("window",       normalizedWindow)
+    chartsElem.addAttribute("sample-count", historyPoints.size.toString)
+
+    def addChartElem(id: String, spec: ConsoleChartSpec): Unit = {
+      val cElem = chartsElem.addElement("chart")
+      cElem.addAttribute("id", id)
+      cElem.addText(spec.asJson.noSpaces)
+    }
+
+    def truncateCategory(label: String, maxLen: Int = 28): String =
+      if (label.length <= maxLen) label else label.take(maxLen - 1) + "…"
+
+    // 1A. Memory & Disk Trend
+    addChartElem(
+      "caches-memory-trend",
+      ConsoleChartSpec(
+        kind         = "timeseries",
+        valueUnit    = "bytes",
+        window       = normalizedWindow,
+        timestampsMs = timestamps,
+        series       = List(
+          ConsoleChartSeries("heap-used",      historyPoints.map(_.sample.heapUsedBytes.toDouble),            "area", colorSlot = 0),
+          ConsoleChartSeries("cache-heap",     historyPoints.map(_.sample.estimatedCachesHeapBytes.toDouble), "line", colorSlot = 1),
+          ConsoleChartSeries("disk-store",     historyPoints.map(_.sample.diskStoreBytes.toDouble),           "line", colorSlot = 2),
+          ConsoleChartSeries("heap-committed", historyPoints.map(_.sample.heapCommittedBytes.toDouble),       "line", colorSlot = 3, dashed = true)
+        )
+      )
+    )
+
+    // 1B. Cache Throughput & Evictions Over Time
+    addChartElem(
+      "caches-activity-trend",
+      ConsoleChartSpec(
+        kind             = "timeseries",
+        valueUnit        = "rate",
+        secondaryUnitOpt = Some("count"),
+        stacked          = true,
+        window           = normalizedWindow,
+        timestampsMs     = timestamps,
+        series           = List(
+          ConsoleChartSeries("hits-rate",   historyPoints.map(_.hitsPerSec),            "bar",  colorSlot = 1, yAxisId = "y"),
+          ConsoleChartSeries("misses-rate", historyPoints.map(_.missesPerSec),          "bar",  colorSlot = 4, yAxisId = "y"),
+          ConsoleChartSeries("evictions",   historyPoints.map(_.evictionsDelta.toDouble), "line", colorSlot = 5, yAxisId = "y1")
+        )
+      )
+    )
+
+    // 1C. Estimated Cache Heap Share (Top caches by estimated-heap-bytes)
+    locally {
+      val sortedCaches =
+        cachesElem
+          .elements("cache")
+          .toList
+          .map { e =>
+            val name    = e.attributeValue("name")
+            val bytes   = e.attributeValue("estimated-heap-bytes").toLongOption.getOrElse(0L)
+            val engine  = e.attributeValue("engine")
+            val entries = e.attributeValue("heap-entries")
+            (name, bytes, s"$engine · $entries entries")
+          }
+          .sortBy { case (name, bytes, _) => (-bytes, name) }
+      val nonZero = sortedCaches.filter(_._2 > 0L)
+      val topList = (if (nonZero.nonEmpty) nonZero else sortedCaches).take(10)
+
+      addChartElem(
+        "caches-heap-breakdown",
+        ConsoleChartSpec(
+          kind           = "hbar",
+          valueUnit      = "bytes",
+          categories     = topList.map(r => truncateCategory(r._1, 30)),
+          fullCategories = topList.map(_._1),
+          categoryMeta   = topList.map(_._3),
+          series         = List(
+            ConsoleChartSeries("cache-heap", topList.map(_._2.toDouble), "bar", colorSlot = 0)
+          )
+        )
+      )
+    }
+
+    // 2A. Compiled Form Memory Anatomy (Top 10 Static States)
+    locally {
+      val topStatic =
+        staticStatesElem
+          .elements("static-state")
+          .toList
+          .take(10)
+          .map { e =>
+            val name       = e.attributeValue("display-name")
+            val domB       = e.attributeValue("static-dom-bytes").toLongOption.getOrElse(0L)
+            val tmplB      = e.attributeValue("template-bytes").toLongOption.getOrElse(0L)
+            val estB       = e.attributeValue("estimated-bytes").toLongOption.getOrElse(0L)
+            val otherB     = math.max(0L, estB - domB - tmplB)
+            val encodedFmt = e.attributeValue("encoded-formatted")
+            val controls   = e.attributeValue("controls")
+            val models     = e.attributeValue("models")
+            (name, domB, tmplB, otherB, s"Encoded: $encodedFmt · $controls controls · $models models")
+          }
+
+      addChartElem(
+        "static-states-anatomy",
+        ConsoleChartSpec(
+          kind           = "hbar",
+          valueUnit      = "bytes",
+          stacked        = true,
+          categories     = topStatic.map(r => truncateCategory(r._1, 30)),
+          fullCategories = topStatic.map(_._1),
+          categoryMeta   = topStatic.map(_._5),
+          series         = List(
+            ConsoleChartSeries("static-dom",     topStatic.map(_._2.toDouble), "bar", colorSlot = 0),
+            ConsoleChartSeries("template",       topStatic.map(_._3.toDouble), "bar", colorSlot = 1),
+            ConsoleChartSeries("analysis-other", topStatic.map(_._4.toDouble), "bar", colorSlot = 2)
+          )
+        )
+      )
+    }
+
+    // 3A. Sessions, Live Heap Documents & State Store Entries Over Time
+    addChartElem(
+      "live-docs-trend",
+      ConsoleChartSpec(
+        kind         = "timeseries",
+        valueUnit    = "count",
+        window       = normalizedWindow,
+        timestampsMs = timestamps,
+        series       = List(
+          ConsoleChartSeries("live-docs",   historyPoints.map(_.sample.liveDocsInHeap.toDouble),    "area", colorSlot = 0),
+          ConsoleChartSeries("state-store", historyPoints.map(_.sample.stateStoreEntries.toDouble), "line", colorSlot = 2),
+          ConsoleChartSeries("sessions",    historyPoints.map(_.sample.activeSessions.toDouble),    "line", colorSlot = 1, dashed = true)
+        )
+      )
+    )
+
+    // 3B. Live Document Heap by Request Path (Top 10 Paths)
+    locally {
+      val topGroups =
+        groupsElem
+          .elements("group")
+          .toList
+          .take(10)
+          .map { e =>
+            val path   = e.attributeValue("request-path")
+            val bytes  = e.attributeValue("total-bytes").toLongOption.getOrElse(0L)
+            val count  = e.attributeValue("count")
+            val maxSeq = e.attributeValue("max-sequence")
+            (path, bytes, s"$count docs · max Ajax seq $maxSeq")
+          }
+
+      addChartElem(
+        "live-docs-by-path",
+        ConsoleChartSpec(
+          kind           = "hbar",
+          valueUnit      = "bytes",
+          categories     = topGroups.map(r => truncateCategory(r._1, 32)),
+          fullCategories = topGroups.map(_._1),
+          categoryMeta   = topGroups.map(_._3),
+          series         = List(
+            ConsoleChartSeries("live-doc-heap", topGroups.map(_._2.toDouble), "bar", colorSlot = 0)
+          )
+        )
+      )
+    }
+
+    // 4A. GC Pause Activity Over Time
+    addChartElem(
+      "jvm-gc-trend",
+      ConsoleChartSpec(
+        kind             = "timeseries",
+        valueUnit        = "duration-ms",
+        secondaryUnitOpt = Some("count"),
+        window           = normalizedWindow,
+        timestampsMs     = timestamps,
+        series           = List(
+          ConsoleChartSeries("gc-pause-ms",    historyPoints.map(_.gcPauseMsDelta.toDouble), "bar",  colorSlot = 2, yAxisId = "y"),
+          ConsoleChartSeries("gc-collections", historyPoints.map(_.gcCountDelta.toDouble),   "line", colorSlot = 0, yAxisId = "y1")
+        )
+      )
+    )
+
+    // 4B. JVM Memory Pools (Used vs Committed)
+    locally {
+      val sortedPools =
+        poolsElem
+          .elements("pool")
+          .toList
+          .map { e =>
+            val name      = e.attributeValue("name")
+            val pType     = e.attributeValue("type")
+            val used      = e.attributeValue("used-bytes").toLongOption.getOrElse(0L)
+            val committed = e.attributeValue("committed-bytes").toLongOption.getOrElse(0L)
+            val headroom  = math.max(0L, committed - used)
+            val maxFmt    = e.attributeValue("max-formatted")
+            (name, used, headroom, committed, s"$pType · Committed: ${formatBytes(committed)} · Max: $maxFmt")
+          }
+          .sortBy { case (name, _, _, committed, _) => (-committed, name) }
+
+      addChartElem(
+        "jvm-memory-pools",
+        ConsoleChartSpec(
+          kind           = "hbar",
+          valueUnit      = "bytes",
+          stacked        = true,
+          categories     = sortedPools.map(r => truncateCategory(r._1, 28)),
+          fullCategories = sortedPools.map(_._1),
+          categoryMeta   = sortedPools.map(_._5),
+          series         = List(
+            ConsoleChartSeries("pool-used",     sortedPools.map(_._2.toDouble), "bar", colorSlot = 0),
+            ConsoleChartSeries("pool-headroom", sortedPools.map(_._3.toDouble), "bar", colorSlot = 6)
+          )
+        )
+      )
+    }
 
     doc
   }

@@ -546,9 +546,14 @@
             <non-heap>Hors-tas utilisé</non-heap>
             <sort-ascending>ordre croissant</sort-ascending>
             <sort-descending>ordre décroissant</sort-descending>
+            <window>Fenêtre</window>
+            <auto-refresh>Rafraîchissement auto</auto-refresh>
+            <auto-off>Désactivé</auto-off>
+            <max-heap>Tas max</max-heap>
         </labels>
         <buttons>
-            <refresh>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Rafraîchir</refresh>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-hidden="true"&gt;&lt;/i&gt; Rafraîchir</refresh>
+            <charts>&lt;i class="fa fa-fw fa-chart-line" aria-hidden="true"&gt;&lt;/i&gt; Graphiques</charts>
             <clear>Vider</clear>
         </buttons>
         <messages>
@@ -556,7 +561,38 @@
             <no-live-documents>Aucun document XForms actif n'est actuellement dans le tas JVM.</no-live-documents>
             <live-documents-note>Seuls les documents présents dans le tas JVM (en cache dans xforms.cache.live-documents ou en cours de requête) figurent ci-dessous. Les formulaires ouverts évincés lorsque ce cache atteint sa limite restent actifs dans xforms.store.dynamic-states et sont restaurés automatiquement lors d'une interaction.</live-documents-note>
             <sorted-announcement>Trié par {0}, {1}</sorted-announcement>
+            <no-chart-data>Aucune donnée disponible pour le moment.</no-chart-data>
         </messages>
+        <charts>
+            <memory-trend title="Évolution mémoire et disque" subtitle="Tas JVM, mémoire estimée des caches et magasins sur disque"/>
+            <activity-trend title="Débit des caches et évictions" subtitle="Taux de lectures agrégés et évictions par intervalle"/>
+            <heap-breakdown title="Répartition mémoire des caches" subtitle="Principaux caches et magasins par empreinte mémoire estimée"/>
+            <static-anatomy title="Anatomie mémoire des formulaires compilés" subtitle="Principaux formulaires compilés par DOM statique, modèle HTML et analyse XPath/contrôles"/>
+            <live-docs-trend title="Sessions, documents actifs et magasin d'état" subtitle="Sessions HTTP ouvertes, documents actifs en mémoire et entrées du magasin d'état"/>
+            <live-docs-by-path title="Mémoire des documents actifs par chemin" subtitle="Principaux chemins de formulaires actifs par mémoire estimée"/>
+            <gc-trend title="Activité du ramasse-miettes (GC)" subtitle="Durée des pauses et nombre de collectes par intervalle"/>
+            <memory-pools title="Pools mémoire JVM" subtitle="Mémoire utilisée et marge allouée par pool"/>
+            <series>
+                <heap-used>Tas JVM utilisé</heap-used>
+                <cache-heap>Caches (estimé)</cache-heap>
+                <disk-store>Magasins disque</disk-store>
+                <heap-committed>Tas alloué</heap-committed>
+                <hits-rate>Succès / s</hits-rate>
+                <misses-rate>Échecs / s</misses-rate>
+                <evictions>Évictions</evictions>
+                <static-dom>DOM statique</static-dom>
+                <template>Modèle HTML</template>
+                <analysis-other>Analyse XPath et contrôles</analysis-other>
+                <live-docs>Documents actifs (tas)</live-docs>
+                <state-store>Magasin d'état dynamique</state-store>
+                <sessions>Sessions HTTP</sessions>
+                <live-doc-heap>Mémoire documents actifs</live-doc-heap>
+                <gc-pause-ms>Temps de pause GC</gc-pause-ms>
+                <gc-collections>Collectes</gc-collections>
+                <pool-used>Utilisé</pool-used>
+                <pool-headroom>Marge allouée</pool-headroom>
+            </series>
+        </charts>
         <cache-descriptions>
             <core-cache-pipelines title="Cache pipelines et ressources">Conserve en mémoire les pipelines XPL compilés, feuilles XSLT et fichiers XML analysés afin d'éviter de les relire à chaque requête. Les entrées sont invalidées automatiquement lorsqu'une ressource change, et vider ce cache est sans risque.</core-cache-pipelines>
             <core-cache-properties title="Cache des propriétés de configuration">Conserve les jeux de propriétés analysés (fichiers XML et interface de configuration) et leurs jetons de version pour accélérer les lectures à chaque requête. Vider ce cache est sans risque et force un rechargement à la requête suivante.</core-cache-properties>

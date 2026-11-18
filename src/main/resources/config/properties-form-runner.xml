@@ -125,6 +125,10 @@
     <!-- Whether to use the form metadata cache -->
     <property as="xs:boolean" name="oxf.fr.persistence.proxy.form-metadata-cache.enable"           value="true"/>
 
+    <!-- Admin Console metrics history sampler -->
+    <property as="xs:boolean" name="oxf.fr.console.history.enable"                                 value="true"/>
+    <property as="xs:string"  name="oxf.fr.console.history.sample-interval"                        value="15s"/>
+
     <property as="xs:string"  name="oxf.fr.default-timezone"                                       value=""/>
     <property as="xs:string"  name="oxf.fr.default-language.*.*"                                   value="en"/>
     <property as="xs:anyURI"  name="oxf.fr.default-logo.uri.*.*">

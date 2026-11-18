@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.fr
 
+import io.circe.generic.auto.*
+import io.circe.parser.decode
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.test.TestHttpClient.StaticState
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, TestHttpClient}
@@ -380,6 +382,139 @@ class FormRunnerConsoleTest
               "core.cache.pipelines"
             ))
             assert(currentAnnouncement == "Sorted by Limits & Expiration, ascending")
+          }
+        }
+      }
+    }
+
+    it("must bound ConsoleMetricsHistory ring buffers, filter 15m/1h/24h windows, and clamp counter resets to non-negative rates") {
+      ConsoleMetricsHistory.clearForTests()
+      try {
+        val baseTs = 1_800_000_000_000L
+
+        def mkSample(
+          ts        : Long,
+          hits      : Long,
+          misses    : Long,
+          evictions : Long,
+          gcCount   : Long,
+          gcTimeMs  : Long
+        ): ConsoleMetricsHistory.MetricsSample =
+          ConsoleMetricsHistory.MetricsSample(
+            timestampMs              = ts,
+            heapUsedBytes            = 256L * 1024L * 1024L,
+            heapCommittedBytes       = 512L * 1024L * 1024L,
+            heapMaxBytes             = 1024L * 1024L * 1024L,
+            nonHeapUsedBytes         = 64L * 1024L * 1024L,
+            estimatedCachesHeapBytes = 48L * 1024L * 1024L,
+            diskStoreBytes           = 16L * 1024L,
+            totalCacheHits           = hits,
+            totalCacheMisses         = misses,
+            totalCacheEvictions      = evictions,
+            activeSessions           = 2,
+            liveDocsInHeap           = 1,
+            stateStoreEntries        = 3L,
+            gcCollectionCount        = gcCount,
+            gcCollectionTimeMs       = gcTimeMs
+          )
+
+        // Append 300 samples spaced 15s apart (75 minutes total > 240-slot 1h fine ring capacity)
+        (0 until 300).foreach { idx =>
+          val ts = baseTs + idx.toLong * 15000L
+          // Simulate a cache-stats reset at idx == 298 where cumulative hits/misses drop
+          val hits   = if (idx >= 298) 10L * (idx - 298) else 100L * idx
+          val misses = if (idx >= 298) 2L * (idx - 298)  else 20L * idx
+          ConsoleMetricsHistory.recordSampleForTests(
+            mkSample(
+              ts        = ts,
+              hits      = hits,
+              misses    = misses,
+              evictions = if (idx >= 298) 0L else idx.toLong,
+              gcCount   = idx.toLong / 10L,
+              gcTimeMs  = idx.toLong * 5L
+            )
+          )
+        }
+
+        val latestTs  = baseTs + 299L * 15000L
+        val points1h  = ConsoleMetricsHistory.snapshotWindow("1h",  latestTs)
+        val points15m = ConsoleMetricsHistory.snapshotWindow("15m", latestTs)
+        val points24h = ConsoleMetricsHistory.snapshotWindow("24h", latestTs)
+
+        // Fine ring must never exceed `FineMaxSamples` (240)
+        assert(points1h.size <= ConsoleMetricsHistory.FineMaxSamples)
+        assert(points1h.size >= 235)
+        // 15m at 15s intervals yields ~61 samples (inclusive of boundary)
+        assert(points15m.size >= 60 && points15m.size <= 62)
+        // 75m of 5m coarse buckets + latest fine tail yields ~16 points
+        assert(points24h.size >= 15 && points24h.size <= 17)
+        assert(points24h.last.sample.timestampMs == latestTs)
+
+        // Normal intervals before reset have 100 hits / 15s ~= 6.666 hits/s; reset step at idx 298 clamps to 0.0
+        assert(points1h.forall(p => p.hitsPerSec >= 0.0 && p.missesPerSec >= 0.0 && p.evictionsDelta >= 0L && p.gcPauseMsDelta >= 0L))
+        val resetPointOpt = points1h.find(_.sample.timestampMs == baseTs + 298L * 15000L)
+        assert(resetPointOpt.exists(p => p.hitsPerSec == 0.0 && p.missesPerSec == 0.0 && p.evictionsDelta == 0L))
+        val postResetPointOpt = points1h.find(_.sample.timestampMs == latestTs)
+        assert(postResetPointOpt.exists(p => math.abs(p.hitsPerSec - (10.0 / 15.0)) < 0.01))
+      } finally {
+        ConsoleMetricsHistory.clearForTests()
+      }
+    }
+
+    it("must emit valid Circe ConsoleChartSpec payloads for all 8 console charts across 15m, 1h, and 24h windows") {
+      val (_, docOpt, _) =
+        runFormRunner(
+          app  = "tests",
+          form = "wizard",
+          mode = "new"
+        )
+      assert(docOpt.isDefined)
+
+      val expectedChartIds = Set(
+        "caches-memory-trend",
+        "caches-activity-trend",
+        "caches-heap-breakdown",
+        "static-states-anatomy",
+        "live-docs-trend",
+        "live-docs-by-path",
+        "jvm-gc-trend",
+        "jvm-memory-pools"
+      )
+
+      val expectedSeriesKeys = Set(
+        "heap-used", "cache-heap", "disk-store", "heap-committed",
+        "hits-rate", "misses-rate", "evictions",
+        "static-dom", "template", "analysis-other",
+        "live-docs", "state-store", "sessions", "live-doc-heap",
+        "gc-pause-ms", "gc-collections",
+        "pool-used", "pool-headroom"
+      )
+
+      List("15m", "1h", "24h").foreach { win =>
+        val snapRoot   = FormRunnerConsole.buildConsoleSnapshotDom(win).getRootElement
+        val chartsElem = snapRoot.element("charts")
+        assert(chartsElem.attributeValue("window") == win)
+        assert(chartsElem.attributeValue("sample-count").toInt >= 1)
+
+        val chartElems = chartsElem.elements("chart").toList
+        assert(chartElems.map(_.attributeValue("id")).toSet == expectedChartIds)
+
+        chartElems.foreach { elem =>
+          val id   = elem.attributeValue("id")
+          val spec = decode[ConsoleChartSpec](elem.getText).fold(err => fail(s"Failed to decode chart $id: $err"), identity)
+
+          assert(spec.series.nonEmpty, s"Chart $id must declare series")
+          assert(spec.series.map(_.key).forall(expectedSeriesKeys.contains), s"Unexpected series key in $id: ${spec.series.map(_.key)}")
+
+          if (spec.kind == "timeseries") {
+            assert(spec.window == win)
+            assert(spec.timestampsMs.nonEmpty)
+            assert(spec.series.forall(_.values.size == spec.timestampsMs.size))
+          } else {
+            assert(spec.kind == "hbar")
+            assert(spec.categories.nonEmpty, s"Expected populated categories on $id")
+            assert(spec.fullCategories.size == spec.categories.size)
+            assert(spec.series.forall(_.values.size == spec.categories.size))
           }
         }
       }

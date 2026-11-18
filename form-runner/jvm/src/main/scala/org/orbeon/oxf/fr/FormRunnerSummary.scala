@@ -329,23 +329,19 @@ trait FormRunnerSummary {
       linkElem.addAttribute("aria-label", "{($fr-resources/summary/titles/*[local-name() = $edit-view-opt], $edit-view-opt)[1]}")
     } else {
       preparedColumns.zipWithIndex.foreach { case (col, colIdx0) =>
+        val pos          = colIdx0 + 1
+        val valueGroupId = s"fr-summary-col-$pos-value"
+
         val tdElem = bodyRowElem.addElement(XhTdQName)
         tdElem.addAttribute("class", if (col.alignRight) "fr-td fr-align-right" else "fr-td")
 
         val linkElem = tdElem.addElement(XhAQName)
-        linkElem.addAttribute("href",  "{$current-document-href-opt}")
-        linkElem.addAttribute("class", "fr-summary-cell-link{' xforms-hidden'[empty($current-document-href-opt)]}")
-        if (colIdx0 == 0) {
-          // Keep the first control column focusable for keyboard navigation if all metadata columns are hidden
-          linkElem.addAttribute("tabindex",    "{if (empty($metadata-columns)) then '0' else '-1'}")
-          linkElem.addAttribute("aria-hidden", "{if (empty($metadata-columns)) then 'false' else 'true'}")
-          linkElem.addAttribute("aria-label",  "{if (empty($metadata-columns)) then ($fr-resources/summary/titles/*[local-name() = $edit-view-opt], $edit-view-opt)[1] else ''}")
-        } else {
-          linkElem.addAttribute("tabindex",    "-1")
-          linkElem.addAttribute("aria-hidden", "true")
-        }
+        linkElem.addAttribute("href",            "{$current-document-href-opt}")
+        linkElem.addAttribute("class",           "fr-summary-cell-link{' xforms-hidden'[empty($current-document-href-opt)]}")
+        linkElem.addAttribute("aria-labelledby", s"{xxf:client-id('$valueGroupId')}")
 
         val groupElem = tdElem.addElement(XfGroupQName)
+        groupElem.addAttribute("id",                        valueGroupId)
         groupElem.addAttribute("bind",                      "fr-details-bind")
         groupElem.addAttribute(XxfElementQName,            "div")
         groupElem.addAttribute(XxfUpdateQName,             "full")

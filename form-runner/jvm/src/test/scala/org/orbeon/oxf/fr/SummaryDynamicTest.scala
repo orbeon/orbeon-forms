@@ -737,11 +737,25 @@ class SummaryDynamicTest
             assert(anchors.nonEmpty)
             assert(anchors.forall(a => ! a.descendantElementIterator(includeSelf = false).exists(_.getName == "a")))
 
-            // Sibling `.fr-summary-cell-link` points to `/fr/sqlite/invoice/edit/doc-1` (row 1) and `/fr/sqlite/invoice/view/doc-2` (row 2)
+            // Metadata and data `.fr-summary-cell-link` anchors point to `/fr/sqlite/invoice/edit/doc-1` (row 1) and `/fr/sqlite/invoice/view/doc-2` (row 2)
             val cellLinks = anchors.filter(_.attributeValueOpt("class").exists(_.splitTo[Set]().contains("fr-summary-cell-link")))
-            assert(cellLinks.size == 22)
-            assert(cellLinks.take(11).forall(_.attributeValue("href") == "/fr/sqlite/invoice/edit/doc-1"))
-            assert(cellLinks.drop(11).forall(_.attributeValue("href") == "/fr/sqlite/invoice/view/doc-2"))
+            assert(cellLinks.size == 24)
+            assert(cellLinks.take(12).forall(_.attributeValue("href") == "/fr/sqlite/invoice/edit/doc-1"))
+            assert(cellLinks.drop(12).forall(_.attributeValue("href") == "/fr/sqlite/invoice/view/doc-2"))
+            assert(cellLinks.forall(a => ! a.attributeValueOpt("tabindex").contains("-1")))
+
+            // Data cell `.fr-summary-cell-link` anchors reference their sibling `.fr-summary-cell-value` container via `aria-labelledby`
+            val dataCellLinks = cellLinks.filter(_.attributeValueOpt("aria-labelledby").isDefined)
+            assert(dataCellLinks.size == 22)
+
+            // Unlabeled static-readonly `.xforms-field` elements inside `.fr-summary-cell-value` do not add extra `tabindex` stops
+            val summaryFields =
+              allElems1
+                .filter(_.attributeValueOpt("class").exists(_.splitTo[Set]().contains("fr-summary-cell-value")))
+                .flatMap(_.descendantElementIterator(includeSelf = false))
+                .filter(_.attributeValueOpt("class").exists(_.splitTo[Set]().contains("xforms-field")))
+            assert(summaryFields.nonEmpty)
+            assert(summaryFields.forall(_.attributeValueOpt("tabindex").isEmpty))
 
             // Inner `fr:url` anchors point to `https://www.orbeon.com` and `https://doc.orbeon.com`
             assert(anchors.exists(_.attributeValue("href") == "https://www.orbeon.com"))

@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import cats.syntax.option.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
+import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport.AriaReadonlyQName
 import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl}
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
@@ -229,13 +229,31 @@ abstract class XFormsControlLifecycleHandler(
       containingDocument.staticReadonlyHint
     )
 
+    val hasEnclosingUnlabeledValueComponent =
+      ElementAnalysis
+        .ancestorsIterator(elementAnalysis, includeSelf = false)
+        .exists {
+          case c: ComponentControl with StaticLHHASupport if c.commonBinding.modeValue =>
+            c.firstByOrDirectLhhaOpt(LHHA.Label).isEmpty
+          case _ =>
+            false
+        }
+
+    val hasDirectOrByLabel =
+      findStaticLhhaOrLhhaBy(LHHA.Label).isDefined && ! hasEnclosingUnlabeledValueComponent
+
     val atts: AttributesImpl =
-      List( // Q: if placeholder label?
-        CLASS_QNAME       -> "xforms-field",
-        TABINDEX_QNAME    -> "0",
-        ROLE_QNAME        -> "textbox",
-        AriaReadonlyQName -> "true",
-      )
+      if (hasDirectOrByLabel)
+        List( // Q: if placeholder label?
+          CLASS_QNAME       -> "xforms-field",
+          TABINDEX_QNAME    -> "0",
+          ROLE_QNAME        -> "textbox",
+          AriaReadonlyQName -> "true",
+        )
+      else
+        List(
+          CLASS_QNAME       -> "xforms-field",
+        )
 
     handleAriaByAtts(atts, ariaByCondition)
 

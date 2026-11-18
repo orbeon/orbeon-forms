@@ -81,6 +81,7 @@
                 background-color: transparent;
                 box-shadow: none;
                 color: inherit;
+                line-height: inherit;
                 cursor: inherit;
                 white-space: nowrap;
             }
@@ -140,11 +141,16 @@
 
             // Compact `fr:tags-input` pills without input container border/padding
             .fr-open-select-tags-container.fr-open-select-tags-disabled {
+                flex-wrap: nowrap;
                 min-height: 0;
                 padding: 0;
                 border: 0;
                 background-color: transparent;
                 box-shadow: none;
+
+                .fr-pill {
+                    white-space: nowrap;
+                }
             }
 
             // Keep signatures and image outputs compact within table rows

@@ -50,7 +50,6 @@
         <close-message>Stäng</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Rensa</clear>
         <cancel>Avbryt</cancel>
-        <save-locally>Spara lokalt</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Visa på nytt"&gt;&lt;/i&gt;</refresh>
@@ -430,26 +429,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>Spara lokalt</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    Klicka Spara-knappen för att spara formulärdata på datorn som en HTML-fil.
-                </p>
-                <p>
-                    För att se formulärdata:
-                </p>
-                <ul>
-                    <li>Öppna HTML-filen i en webbläsare. (Dubbelklicka filen eller dra den till webbläsaren.)</li>
-                    <li>Klicka på Öppna-knappen.</li>
-                </ul>
-                <p>
-                    <b>OBS:</b>Ingen information lagras centralt. Om du tar bort filen på datorn förloras all information.
-                </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>Skapa länk för delning</label>
         <body>Låt alla med länken visa eller redigera dessa data.</body>

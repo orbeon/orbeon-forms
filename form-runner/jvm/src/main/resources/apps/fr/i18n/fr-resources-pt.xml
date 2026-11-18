@@ -50,7 +50,6 @@
         <close-message>Fechar</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Apagar</clear>
         <cancel>Cancelar</cancel>
-        <save-locally>Guardar Localmente</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Refrescar"&gt;&lt;/i&gt;</refresh>
@@ -430,26 +429,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>Guardar Localmente</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    Clique no botão Guardar em baixo para guardar o formulário no seu computador como um ficheiro HTML.
-                </p>
-                <p>
-                    Para reabrir os seu formulário:
-                </p>
-                <ul>
-                    <li>Abra o ficheiro HTML no seu navegador (clicando sobre o ficheiro, ou arrastando para a janela do navegador).</li>
-                    <li>Clique no botão Abrir que será apresentado para confirmar.</li>
-                </ul>
-                <p>
-                    <b>AVISO:</b> Nenhuns dados são mantidos no servidor e se você remover o ficheiro que guardou, os seus dados serão perdidos.
-                </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>Criar ligação para partilhar</label>
         <body>Permitir que qualquer pessoa com a ligação veja ou edite estes dados.</body>

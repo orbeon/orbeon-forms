@@ -259,6 +259,9 @@
     // NOTE: Include active alerts because Form Runner only shows active alerts for visited controls.
     .xforms-alert, .xforms-alert.xforms-active {
         display: none;
+        &::before {
+            content: none;
+        }
     }
 
     // NOTE: The PDF renderer has an issue when using `3`. So we apply these rules with `:empty`
@@ -290,8 +293,7 @@
         // override xforms.css
         font-weight: normal;
         font-size: var(--orbeon-active-alert-font-size);
-        text-indent: 0;
-        background-image: none;
+        line-height: normal;
         white-space: normal;// allow for multiline alert messages
 
         > ul {
@@ -346,8 +348,7 @@
     .xforms-upload-info {
         display: block;
         width: 100%;
-        padding: 2px 2px 2px 18px;
-        background: url( images/silk/attach.png ) no-repeat left center;
+        padding: 2px;
         box-sizing: border-box;
     }
 

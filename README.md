@@ -79,7 +79,6 @@ This product includes:
 
 - software developed by the [Apache Software Foundation](https://www.apache.org/)
 - other third-party software listed in [build.sbt](https://github.com/orbeon/orbeon-forms/blob/master/build.sbt)
-- Silk Icons, licensed under the Creative Commons Attribution 2.5 License
 - [PixelMixer icons](https://iconarchive.com/artist/pixelmixer.html)
 - schemas for XSLT 2.0 and XForms 1.1, licensed under the W3C Software License
 

@@ -50,7 +50,6 @@
         <close-message>Bezárás</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Törlés</clear>
         <cancel>Mégse</cancel>
-        <save-locally>Helyi mentés</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Frissítés"&gt;&lt;/i&gt;</refresh>
@@ -430,26 +429,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>Helyi mentés</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    Kattintson az alábbi Mentés gombra az űrlapadatok számítógépre mentéséhez HTML fájlként.
-                </p>
-                <p>
-                    Az űrlapadatok újbóli megnyitásához:
-                </p>
-                <ul>
-                    <li>Nyissa meg a HTML fájlt a böngészőben (a fájlra kattintva vagy a böngészőablakba húzva).</li>
-                    <li>A megerősítéshez kattintson a megjelenő Megnyitás gombra.</li>
-                </ul>
-                <p>
-                    <b>FIGYELMEZTETÉS:</b> A szerveren nem tárolunk adatokat, és ha törli a mentett fájlt, az adatok elvesznek.
-                </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>Megosztási link létrehozása</label>
         <body>Bárki, akinek van linkje, megtekintheti vagy szerkesztheti ezeket az adatokat.</body>

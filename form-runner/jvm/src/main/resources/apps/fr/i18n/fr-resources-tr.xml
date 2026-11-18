@@ -50,7 +50,6 @@
         <close-message>Kapat</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Temizle</clear>
         <cancel>İptal</cancel>
-        <save-locally>Yerel Olarak Kaydet</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Yenile"&gt;&lt;/i&gt;</refresh>
@@ -428,26 +427,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>Yerel Olarak Kaydet</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    Form verilerinizi bilgisayarınıza HTML dosyası olarak kaydetmek için aşağıdaki Kaydet düğmesine tıklayın.
-                </p>
-                <p>
-                    Form verilerinizi yeniden açmak için:
-                </p>
-                <ul>
-                    <li>HTML dosyasını tarayıcınızda açın (dosyaya tıklayarak veya tarayıcı pencerenize sürükleyerek).</li>
-                    <li>Onaylamak için görüntülenecek Aç düğmesine tıklayın.</li>
-                </ul>
-                <p>
-                    <b>UYARI:</b> Sunucuda hiçbir veri tutulmaz ve kaydettiğiniz dosyayı silerseniz verileriniz kaybolacaktır.
-                </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>Paylaşmak için bağlantı oluştur</label>
         <body>Bu veriyi görüntülemek veya düzenlemek için bağlantıya sahip herkese izin ver.</body>

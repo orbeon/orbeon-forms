@@ -43,7 +43,7 @@
             <display-name lang="pl">Kalifornijska tablica rejestracyjna</display-name>
             <display-name lang="ja">カリフォルニア州ナンバープレート</display-name>
             <icon>
-                <small-icon>/ops/images/xforms/calendar.png</small-icon>
+                <icon-class>fa fa-fw fa-car</icon-class>
             </icon>
             <templates>
                 <view>

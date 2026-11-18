@@ -147,16 +147,6 @@
         <setvalue ref="/*/mode" matcher-group="3"/>
     </service>
 
-    <!-- Generate HTML to be saved -->
-    <page path="/fr/service/save-locally/save-generate" view="save-locally/save-generate.xpl"/>
-
-    <!-- Serve document previously produced -->
-    <service path="/fr/service/save-locally/serve" model="save-locally/serve.xpl"
-             default-submission="save-locally/serve-instance.xml">
-        <setvalue ref="/instance/uuid"     parameter="uuid"/>
-        <setvalue ref="/instance/filename" parameter="filename"/>
-    </service>
-
     <!-- Return the form's tree of control -->
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(controls)(/([^/^.]+))"
              model="detail/detail-model.xpl"

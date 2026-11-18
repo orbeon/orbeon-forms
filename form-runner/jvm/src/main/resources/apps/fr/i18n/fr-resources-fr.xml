@@ -50,7 +50,6 @@
         <close-message>Fermer</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Effacer</clear>
         <cancel>Annuler</cancel>
-        <save-locally>Enreg. Local</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Rafraîchir"&gt;&lt;/i&gt;</refresh>
@@ -433,28 +432,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>Enregistrer Localement</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    Cliquez sur le bouton Enregistrer ci-dessous pour enregistrer les données de votre formulaire
-                    dans un fichier HTML.
-                </p>
-                <p>
-                    Pour rouvrir les données :
-                </p>
-                <ul>
-                    <li>Ouvrir le fichier HTML dans votre navigateur (en cliquant sur le fichier, ou en le déposant sur une fenêtre du navigateur).</li>
-                    <li>Cliquez le bouton Open qui s'affichera pour confirmer.</li>
-                </ul>
-                <p>
-                    <b>ATTENTION:</b> Les données ne seront pas conservées sur le serveur, et si vous supprimez le
-                    fichier sur disque celles-ci seront perdues.
-                </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>Création d'un lien de partage</label>
         <body>Permettre à des tiers possédant le lien de lire ou d'écrire ces donnes.</body>

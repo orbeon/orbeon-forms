@@ -50,7 +50,6 @@
         <close-message>Sulje</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Tyhjennä</clear>
         <cancel>Peruuta</cancel>
-        <save-locally>Tallenna paikallisesti</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Lataa sivu uudelleen"&gt;&lt;/i&gt;</refresh>
@@ -430,26 +429,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>Tallenna paikallisesti</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    Klikkaa Tallenna-painiketta tallentaaksesi tiedot koneellesi HTML-tiedostona.
-                </p>
-                <p>
-                    Uudelleenavataksesi taulukkotietosi:
-                </p>
-                <ul>
-                    <li>Avaa HTML-tiedosto selaimellasi (klikkaa tiedostoa tai siirrä se selainikkunaasi).</li>
-                    <li>Klikkaa Avaa-painiketta vahvistaaksesi.</li>
-                </ul>
-                <p>
-                    <b>VAROITUS:</b> Tietoja ei tallenneta palvelimelle. Jos poistat tallentamasi tiedoston, menetät tietosi.
-                </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>Luo jaettava linkki</label>
         <body>Salli linkin haltijan tarkastella tai muokata näitä tietoja.</body>

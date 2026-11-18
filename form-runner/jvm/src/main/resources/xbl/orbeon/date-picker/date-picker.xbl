@@ -41,7 +41,7 @@
         <display-name lang="pl">Selektor daty</display-name>
         <display-name lang="ja">日付ピッカー</display-name>
             <icon>
-                <small-icon>/apps/fr/style/images/silk/date.png</small-icon>
+                <icon-class>fa fa-fw fa-calendar</icon-class>
             </icon>
             <templates>
                 <bind type="xf:date"/>

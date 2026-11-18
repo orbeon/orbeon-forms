@@ -50,7 +50,6 @@
         <close-message>Закрыть</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Очистить</clear>
         <cancel>Отменить</cancel>
-        <save-locally>Сохр.на диск</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Обновить"&gt;&lt;/i&gt;</refresh>
@@ -423,22 +422,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>Сохранить</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    Чтобы сохранить форму, нажмите на ссылку ниже и сохраните файл на свой компьютер.
-                </p>
-                <p>
-                    Чтобы вернуться к редактированию формы, откройте сохраненный файл. После этого вы автоматически вернетесь к редактированию формы.
-                </p>
-                <p>
-                    <b>Внимание:</b> данные не сохраняются на сервере, если вы удалите файл, восстановить данные будет невозможно.
-                </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>Создать ссылку для совместного доступа</label>
         <body>Любой, у кого есть ссылка, сможет просматривать или изменять эти данные.</body>

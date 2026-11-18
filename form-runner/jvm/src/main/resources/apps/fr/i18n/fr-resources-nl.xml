@@ -50,7 +50,6 @@
         <close-message>Sluiten</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Wissen</clear>
         <cancel>Anulleren</cancel>
-        <save-locally>Lokaal bewaren</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Verversen"&gt;&lt;/i&gt;</refresh>
@@ -430,26 +429,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>Lokaal opslaan</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    Klik op de knop Opslaan hieronder om uw formgegevens als een HTML-bestand op uw computer op te slaan.
-                </p>
-                <p>
-                    Om uw formgegevens opnieuw te openen:
-                </p>
-                <ul>
-                    <li>Open het HTML-bestand in uw browser (door er dubbel op te klikken, of het in het browservenster te slepen).</li>
-                    <li>Klik op de knop Open die wordt weergegeven om te bevestigen.</li>
-                </ul>
-                <p>
-                    <b>WAARSCHUWING:</b> Er worden geen gegevens op de server opgeslagen en als u het bestand verwijdert zijn alle opgeslagen gegevens weg.
-                </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>Koppeling om te delen maken</label>
         <body>Laat iedereen met de koppeling deze gegevens bekijken of bewerken.</body>

@@ -50,7 +50,6 @@
         <close-message>閉じる</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; クリア</clear>
         <cancel>キャンセル</cancel>
-        <save-locally>ローカルに保存</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="更新"&gt;&lt;/i&gt;</refresh>
@@ -417,26 +416,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>ローカルに保存</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    下の保存ボタンをクリックして、フォームデータをHTMLファイルとしてコンピューターに保存します。
-                </p>
-                <p>
-                    フォームデータを再度開くには:
-                </p>
-                <ul>
-                    <li>ブラウザでHTMLファイルを開きます（ファイルをクリックするか、ブラウザウィンドウにドロップします）。</li>
-                    <li>表示される開くボタンをクリックして確認します。</li>
-                </ul>
-                <p>
-                    <b>警告:</b> データはサーバーに保存されません。保存したファイルを削除すると、データは失われます。
-                </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>共有リンクを作成</label>
         <body>リンクを持つ誰でもこのデータを表示または編集できるようにします。</body>

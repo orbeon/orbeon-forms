@@ -50,7 +50,6 @@
         <close-message>Chiudi</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Cancella</clear>
         <cancel>Cancella</cancel>
-        <save-locally>Salva localmente</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Aggiorna"&gt;&lt;/i&gt;</refresh>
@@ -430,26 +429,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>Salva localmente</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    Clicca qui per salvare i dati del tuo modulo come file HTML sul tuo computer.
-                </p>
-                <p>
-                    Per riaprire i dati modulo:
-                </p>
-                <ul>
-                    <li>Apri il file HTML nel tuo browser (Clicca sul file o trascinalo nella finestra del tuo browser).</li>
-                    <li>Clicca su Apri per confermare.</li>
-                </ul>
-                <p>
-                    <b>AVVISO:</b> I dati non sono salvati sul server e se elimini il file salvato i vostri dati andranno persi.
-                </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>Crea link per la condivisione</label>
         <body>Consenti a chiunque abbia il link di visualizzare o modificare questi dati.</body>

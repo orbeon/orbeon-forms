@@ -50,7 +50,6 @@
         <close-message>Luk</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Slet indhold</clear>
         <cancel>Afbryd</cancel>
-        <save-locally>Gem lokalt</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Genindlæs"&gt;&lt;/i&gt;</refresh>
@@ -424,23 +423,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>Gem lokalt</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    For at gemme dine data, klik på henvisning herunder og gem på din maskine.
-                </p>
-                <p>
-                    For at hente data tilbage, dobbelt-klik på den fil du har gemt på din maskine og
-                    værktøjet vil automatisk sætte informationen du har skrevet ind i blanketten igen.
-                </p>
-                <p>
-                    <b>Bemærk:</b> Disse data er ikke gemt på en server, så hvis du sletter din fil vil data være gået tabt.
-                </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>Opret link til deling</label>
         <body>Lad alle med linket se eller redigere disse data.</body>

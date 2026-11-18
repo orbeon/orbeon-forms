@@ -110,18 +110,40 @@
     }
 
     .xforms-help {
-        display: inline-block;
-        margin-left: 0;
-        vertical-align: middle;
-        max-width: 16px;
-        max-height: 16px;
-        text-indent: 20px;
-        overflow: hidden;
-        cursor: pointer;
-        border: none;
-        background-image: url(../../ops/images/xforms/help.png);
-        background-repeat: no-repeat;
-        background-position: left bottom;
+        display: none;
+
+        &:not(:empty) {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            position: relative;
+            vertical-align: middle;
+            margin-left: 0;
+            padding: 0;
+            width: 16px;
+            height: 16px;
+            font-size: 14px;
+            overflow: hidden;
+            text-indent: -9999px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: #0d6efd;
+
+            &::before {
+                content: "\f059"; // Font Awesome 'circle-question'
+                position: absolute;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-indent: 0;
+                font-family: "Font Awesome 6 Free";
+                font-weight: 900;
+                line-height: 1;
+            }
+        }
     }
 
     .xforms-hint-region {
@@ -153,16 +175,24 @@
 
     .xforms-alert.xforms-active {
         display: inline-block;
+        vertical-align: middle;
         white-space: nowrap;
         width: 16px;
         height: 16px;
+        line-height: 16px;
         overflow: hidden;
-        // This is needed to hide the text of the alert!
-        text-indent: 20px;
+        color: #dc3545;
 
-        background-image: url(../../ops/images/xforms/exclamation.png);
-        background-repeat: no-repeat;
-        background-position: left center;
+        // Occupies the 16px box so trailing alert text overflows and is clipped without `position: absolute`
+        &::before {
+            content: "\f06a"; // Font Awesome 'circle-exclamation'
+            display: inline-block;
+            width: 16px;
+            text-align: center;
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 14px;
+        }
     }
 
     // ***** Controls **************************************************************************************************

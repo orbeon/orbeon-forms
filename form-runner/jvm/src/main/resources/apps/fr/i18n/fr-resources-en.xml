@@ -50,7 +50,6 @@
         <close-message>Close</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Clear</clear>
         <cancel>Cancel</cancel>
-        <save-locally>Save Locally</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Refresh"&gt;&lt;/i&gt;</refresh>
@@ -430,27 +429,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>Save Locally</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    Click on the Save button below to save your form data on your computer as an HTML file.
-                </p>
-                <p>
-                    To reopen your form data:
-                </p>
-                <ul>
-                    <li>Open the HTML file in your browser (by clicking on the file, or dropping it on your browser window).</li>
-                    <li>Click the Open button that will be displayed to confirm.</li>
-                </ul>
-                <p>
-                    <b>WARNING:</b> No data is kept on the server and if you delete the file you saved your data will
-                    be lost.
-                </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>Create link to share</label>
         <body>Let anyone with the link view or edit this data.</body>

@@ -21,12 +21,12 @@
                 <display-name lang="en">US Address</display-name>
                 <description lang="en"/>
                 <icon>
-                    <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
+                    <icon-class>fa fa-fw fa-puzzle-piece</icon-class>
                 </icon>
                 <display-name lang="fr">Adresse US</display-name>
                 <description lang="fr"/>
                 <icon lang="fr">
-                    <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
+                    <icon-class>fa fa-fw fa-puzzle-piece</icon-class>
                 </icon>
                 <templates>
                     <view>
@@ -252,7 +252,7 @@
                 <display-name lang="en">One repeated grid</display-name>
                 <description lang="en"/>
                 <icon>
-                    <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
+                    <icon-class>fa fa-fw fa-puzzle-piece</icon-class>
                 </icon>
                 <templates>
                     <view>
@@ -384,7 +384,7 @@
                 <display-name lang="en">Two repeated grids</display-name>
                 <description lang="en"/>
                 <icon>
-                    <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
+                    <icon-class>fa fa-fw fa-puzzle-piece</icon-class>
                 </icon>
                 <templates>
                     <view>

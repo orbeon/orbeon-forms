@@ -43,7 +43,7 @@
         <display-name lang="pl">Selektor linku</display-name>
         <display-name lang="ja">リンクセレクター</display-name>
             <icon>
-                <small-icon>/apps/fr/style/images/silk/link.png</small-icon>
+                <icon-class>fa fa-fw fa-link</icon-class>
             </icon>
             <editors static-itemset="true"/>
             <template xmlns:xf="http://www.w3.org/2002/xforms">

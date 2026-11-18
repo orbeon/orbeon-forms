@@ -50,7 +50,6 @@
         <close-message>إغلاق</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; مسح</clear>
         <cancel>إلغاء</cancel>
-        <save-locally>حفظ محليًا</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="تحديث"&gt;&lt;/i&gt;</refresh>
@@ -430,26 +429,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>حفظ محليًا</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    انقر على زر الحفظ أدناه لحفظ بيانات النموذج على جهاز الكمبيوتر الخاص بك كملف HTML.
-                </p>
-                <p>
-                    لإعادة فتح بيانات النموذج:
-                </p>
-                <ul>
-                    <li>افتح ملف HTML في متصفحك (بالنقر على الملف، أو سحبه إلى نافذة المتصفح).</li>
-                    <li>انقر على زر "فتح" الذي سيتم عرضه للتأكيد.</li>
-                </ul>
-                <p>
-                    <b>تحذير:</b> لا يتم الاحتفاظ بأي بيانات على الخادم وإذا قمت بحذف الملف الذي حفظته، ستفقد بياناتك.
-                </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>إنشاء رابط للمشاركة</label>
         <body>السماح لأي شخص لديه الرابط بعرض أو تعديل هذه البيانات.</body>

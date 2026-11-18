@@ -53,7 +53,6 @@
         <close-message>Cerrar</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Limpiar</clear>
         <cancel>Cancelar</cancel>
-        <save-locally>Guardar Localmente</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Actualizar"&gt;&lt;/i&gt;</refresh>
@@ -455,28 +454,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>Guardar Localmente</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    Haga clic en el botón Guardar para guardar los datos en su computadora como un
-                    archivo HTML.
-                </p>
-                <p>
-                    Para re abrir el formulario:
-                </p>
-                <ul>
-                    <li>Abra el archivo HTML de su computadora (clicando en el archivo, o
-                        soltándolo en un ventana del Browser).</li>
-                    <li>Haga clic en botón Abrir que será mostrado para confirmar.</li>
-                </ul>
-                <p>
-                    <b>ADVERTENCIA:</b> Ningún dato esta guardado en el servidor y si elimina el
-                    archivo los datos guardados se perderán. </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>Crear enlace para compartir</label>
         <body>Permita que cualquier persona con el enlace vea o edite estos datos.</body>

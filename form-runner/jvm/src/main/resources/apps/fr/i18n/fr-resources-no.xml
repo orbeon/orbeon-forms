@@ -50,7 +50,6 @@
         <close-message>Lukk</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Tøm innhold</clear>
         <cancel>Angre</cancel>
-        <save-locally>Lagre lokalt</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Oppdater"&gt;&lt;/i&gt;</refresh>
@@ -430,23 +429,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>Lagre</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    For å lagre dine data, klikk på lenken under og lagre dokumentet på din maskin.
-                </p>
-                <p>
-                    For å hente tilbake informasjonen, dobbeltklikk på filen du lagret på maskinen din og
-                    verktøyet vil automatisk hente informasjonen du skrev inn i skjemaet.
-                </p>
-                <p>
-                    <b>Merk:</b> Informasjonen er ikke lagret på serveren så hvis du sletter filen så vil informasjonen du skrev inn gå tapt.
-                </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>Opprett lenke for deling</label>
         <body>La alle med lenken se eller redigere disse dataene.</body>

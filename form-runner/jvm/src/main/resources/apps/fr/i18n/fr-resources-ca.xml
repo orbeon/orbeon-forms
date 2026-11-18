@@ -53,7 +53,6 @@
         <close-message>Tancar</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Netejar</clear>
         <cancel>Cancel·lar</cancel>
-        <save-locally>Emmagatzemar localment</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Actualitzar"&gt;&lt;/i&gt;</refresh>
@@ -443,27 +442,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>Guardar localment</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    Faci clic al botó Guardar per guardar les dades al seu ordinador en format HTML.
-                </p>
-                <p>
-                    Per reobrir el formulari:
-                </p>
-                <ul>
-                    <li>Obri el fitxer HTML del seu ordinador (fent clic al fitxer, o arrossegant-lo
-                        a la finestra del navegador).</li>
-                    <li>Faci clic al botó Obrir que sortirà per confirmar.</li>
-                </ul>
-                <p>
-                    <b>ADVERTÈNCIA:</b> Cap dada s'ha guardat al servidor i si elimina l'arxiu de
-                    les dades, es perdran. </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>Crear enllaç per compartir</label>
         <body>Permet que qualsevol persona amb l'enllaç vegi o editi aquestes dades.</body>

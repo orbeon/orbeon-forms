@@ -50,7 +50,6 @@
         <close-message>Zamknij</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Wyczyść</clear>
         <cancel>Anuluj</cancel>
-        <save-locally>Zapisz lokalnie</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"/></collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"/></expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Odśwież"/></refresh>
@@ -431,26 +430,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>Zapisz lokalnie</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    Kliknij na przycisk "Zapisz" poniżej, aby zapisać dane formularza w postaci pliku HTML na swoim komputerze.
-                </p>
-                <p>
-                    Aby otworzyć ponownie otworzyć Twój formularz:
-                </p>
-                <ul>
-                    <li>Otwórz plik HTML w swojej przeglądarce (poprzez kliknięcie na plik lub upuszczenie pliku w oknie przeglądarki).</li>
-                    <li>Kliknij na przycisk "Otwórz", który będzie wyświetlony, aby zatwierdzić otwieranie pliku.</li>
-                </ul>
-                <p>
-                    <b>OSTRZEŻENIE:</b> Dane w zapisanym na dysku formularzu nie są zapisane na serwerze. Jeśli skasujesz plik na dysku, dane zostaną utracone.
-                </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>Utwórz link do udostępniania</label>
         <body>Pozwól każdemu z linkiem wyświetlać lub edytować te dane.</body>

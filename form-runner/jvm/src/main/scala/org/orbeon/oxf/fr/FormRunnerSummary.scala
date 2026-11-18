@@ -451,7 +451,7 @@ object FormRunnerSummary extends FormRunnerSummary {
     Set("number", "number-stepper", "currency", "percentage")
 
   private val EditOnlyAppearances: Set[String] =
-    Set("character-counter", "xxf:autosize", "spell-checker")
+    Set("character-counter", "xxf:autosize")
 
   private val SummaryStripChildQNames: Set[QName] = Set(
     QName("index",               FRNamespace),

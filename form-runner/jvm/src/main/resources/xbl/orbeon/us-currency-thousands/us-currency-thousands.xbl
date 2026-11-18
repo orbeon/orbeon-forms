@@ -43,7 +43,7 @@
         <display-name lang="pl">Dolary (w tysiącach)</display-name>
         <display-name lang="ja">ドル（千単位）</display-name>
             <icon>
-                <small-icon>/apps/fr/style/images/silk/money_dollar.png</small-icon>
+                <icon-class>fa fa-fw fa-dollar-sign fa-usd</icon-class>
             </icon>
             <templates>
                 <bind type="xf:decimal"/>

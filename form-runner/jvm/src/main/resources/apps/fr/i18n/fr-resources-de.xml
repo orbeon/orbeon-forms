@@ -50,7 +50,6 @@
         <close-message>Schließen</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Zurücksetzen</clear>
         <cancel>Abbrechen</cancel>
-        <save-locally>Lokal speichern</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Aktualisieren"&gt;&lt;/i&gt;</refresh>
@@ -430,26 +429,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>Lokal speichern</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    Klicken Sie auf "Speichern" um das Formular auf ihrem Computer als HTML-Datei zu speichern.
-                </p>
-                <p>
-                    Um das Formular wieder zu öffenen:
-                </p>
-                <ul>
-                    <li>Öffnen Sie die HTML-Datei in ihrem Browser (Entweder indem Sie auf die Datei klicken oder indem Sie die Datei in ein neues Browserfenster ziehen).</li>
-                    <li>Klicken Sie auf "Öffnen" um zu bestätigen.</li>
-                </ul>
-                <p>
-                    <b>WARNUNG:</b> Die Daten sind nicht auf dem Server gespeichert. Löschen Sie diese Datei, so ist Sie unwiderruflich gelöscht.
-                </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>Link zum Teilen erstellen</label>
         <body>Erlauben Sie jedem mit dem Link, diese Daten anzuzeigen oder zu bearbeiten.</body>

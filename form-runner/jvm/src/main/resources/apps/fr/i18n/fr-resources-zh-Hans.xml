@@ -48,7 +48,6 @@
         <close-message>关闭</close-message>
         <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; 清除</clear>
         <cancel>取消</cancel>
-        <save-locally>本地保存</save-locally>
         <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
         <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
         <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="刷新"&gt;&lt;/i&gt;</refresh>
@@ -425,26 +424,6 @@
             </valid>
         </validity-status>
     </detail>
-    <save-locally>
-        <dialog-title>本地保存</dialog-title>
-        <dialog-body>
-            <div>
-                <p>
-                    点击下方的保存按钮，将您的表单数据作为HTML文件保存在计算机上。
-                </p>
-                <p>
-                    要重新打开您的表单数据：
-                </p>
-                <ul>
-                    <li>在浏览器中打开HTML文件（通过点击文件或将其拖放到浏览器窗口）。</li>
-                    <li>点击显示的打开按钮以确认。</li>
-                </ul>
-                <p>
-                    <b>警告：</b>服务器上不保留任何数据，如果您删除保存的文件，您的数据将会丢失。
-                </p>
-            </div>
-        </dialog-body>
-    </save-locally>
     <share-dialog>
         <label>创建共享链接</label>
         <body>让任何拥有链接的人查看或编辑此数据。</body>

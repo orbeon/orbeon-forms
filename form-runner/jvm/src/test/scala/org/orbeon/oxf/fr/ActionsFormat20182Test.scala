@@ -41,8 +41,8 @@ class ActionsFormat20182Test
         withTestExternalContext { _ =>
           withFormRunnerDocument(processorService, doc) {
             List(true, false, true, false).zipWithIndex.foreach { case (hasAttachment, i) =>
-              val control = resolveObject[XFormsValueControl]("my-attachment-control", indexes = List(i + 1)).get
-              val value   = control.getValue(EventCollector.Throw)
+              val control = resolveObject[XFormsControl]("my-attachment-control", indexes = List(i + 1)).get
+              val value   = FormRunner.findControlValue(control, EventCollector.Throw).get.storageValue
               if (hasAttachment) {
                 assert(PathUtils.getFirstQueryParameter(value, "mediatype") contains "image/png")
                 assert(PathUtils.getFirstQueryParameter(value, "size").exists(_.toIntOption.exists(_ > 0))) // I suppose that sizes can change if the service changes…

@@ -461,6 +461,14 @@
         }
 
         tbody {
+            // Same transition as the row action buttons, so that a button never flashes against its row
+            tr > td {
+                transition: background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+                @media (prefers-reduced-motion: reduce) {
+                    transition: none;
+                }
+            }
             tr:nth-child(4n+3) > td {
                 background-color: var(--orbeon-table-background-color);
             }

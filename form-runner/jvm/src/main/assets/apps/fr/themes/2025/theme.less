@@ -32,7 +32,8 @@
   --orbeon-base-font-weight: normal;
   --orbeon-base-color      : #333; // @grayDark, darker than Bootstrap default of #555
 
-  // Links
+  // Accent and links
+  --orbeon-accent-color    : @btnPrimaryBackground;
   --orbeon-link-color      : #08c;
   --orbeon-link-hover-color: darken(#08c, 15%);
 
@@ -576,6 +577,7 @@
     --orbeon-form-background-color                           : @base-bg;
     --orbeon-base-border-color                               : @gray-27;
     --orbeon-base-color                                      : @text-light;
+    --orbeon-accent-color                                    : hsl(@primary-hue, 98%, 63%);
     --orbeon-link-hover-color                                : lighten(#08c, 15%);
     --orbeon-label-read-only-color                           : @gray-53;
     --orbeon-hint-color                                      : @gray-53;

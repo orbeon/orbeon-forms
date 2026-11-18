@@ -519,19 +519,202 @@
             .fr-plain-checkbox-container();
         }
 
-        .label {
+        .fr-status-pills {
             display: inline-flex;
             align-items: center;
-            width: auto;
+            gap: 5px;
+            vertical-align: middle;
+        }
+
+        .fr-pill-visual() {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            min-height: 24px;
+            min-width: 24px;
             padding: 2px 9px;
+            margin: 0;
             border-radius: 9999px;
+            border: 1px solid var(--fr-pill-border);
+            background-color: var(--fr-pill-bg);
+            color: var(--fr-pill-color);
+            font-family: var(--orbeon-base-font-family);
             font-size: var(--orbeon-code-font-size);
             font-weight: var(--orbeon-label-font-weight);
             line-height: 1.35;
+            text-decoration: none;
+            text-shadow: none;
+            white-space: nowrap;
+        }
 
-            + .label {
-                margin-left: 4px;
+        .fr-table-pill {
+            --fr-pill-bg           : #eff2f7;
+            --fr-pill-border       : #cfd5e2;
+            --fr-pill-color        : var(--orbeon-base-color);
+            --fr-pill-hover-bg     : #e0e6f2;
+            --fr-pill-hover-border : #aeb9d1;
+            --fr-pill-hover-color  : var(--orbeon-base-color);
+            --fr-pill-active-bg    : #dce6f9;
+            --fr-pill-active-border: var(--orbeon-link-color);
+            --fr-pill-active-color : var(--orbeon-link-color);
+
+            @media screen {
+                --fr-pill-bg          : color-mix(in oklab, var(--orbeon-accent-color) 6%, #f3f4f7);
+                --fr-pill-border      : color-mix(in oklab, var(--orbeon-accent-color) 14%, #d5d8de);
+                --fr-pill-hover-bg    : color-mix(in oklab, var(--orbeon-accent-color) 14%, #eaecf0);
+                --fr-pill-hover-border: color-mix(in oklab, var(--orbeon-accent-color) 30%, #c2c6ce);
+                --fr-pill-active-bg   : color-mix(in oklab, var(--orbeon-accent-color) 16%, #eef2f8);
             }
+
+            &.fr-pill-success {
+                --fr-pill-bg           : #eaf6ee;
+                --fr-pill-border       : #b7dfc4;
+                --fr-pill-color        : #185c37;
+                --fr-pill-hover-bg     : #d8efe0;
+                --fr-pill-hover-border : #8bc9a0;
+                --fr-pill-hover-color  : #114729;
+                --fr-pill-active-bg    : #cdebd8;
+                --fr-pill-active-border: #237a4b;
+                --fr-pill-active-color : #114729;
+            }
+
+            &.fr-pill-muted {
+                --fr-pill-bg           : #f1f2f4;
+                --fr-pill-border       : #d2d5db;
+                --fr-pill-color        : #4b5058;
+                --fr-pill-hover-bg     : #e4e6ea;
+                --fr-pill-hover-border : #b6bbc4;
+                --fr-pill-hover-color  : #2b2e32;
+                --fr-pill-active-bg    : #dfe2e8;
+                --fr-pill-active-border: #5a6069;
+                --fr-pill-active-color : #1f2328;
+            }
+
+            &.fr-pill-info {
+                --fr-pill-bg           : #eaf2fc;
+                --fr-pill-border       : #b8d2f2;
+                --fr-pill-color        : #174ea6;
+                --fr-pill-hover-bg     : #d8e7fa;
+                --fr-pill-hover-border : #8eb8ec;
+                --fr-pill-hover-color  : #0f3b82;
+                --fr-pill-active-bg    : #cfe2fa;
+                --fr-pill-active-border: #1d5bbf;
+                --fr-pill-active-color : #0f3b82;
+            }
+
+            &.fr-pill-warning {
+                --fr-pill-bg    : #fef4e6;
+                --fr-pill-border: #f5d096;
+                --fr-pill-color : #8a4b08;
+            }
+
+            @media (prefers-contrast: more) {
+                --fr-pill-border      : currentColor;
+                --fr-pill-hover-border: currentColor;
+            }
+
+            &.xforms-output:not(.xforms-disabled) {
+                .fr-pill-visual();
+                vertical-align: middle;
+
+                @media (forced-colors: active) {
+                    background-color: Canvas;
+                    border-color: CanvasText;
+                    color: CanvasText;
+                }
+            }
+
+            &.xforms-trigger:not(.xforms-disabled) {
+                display: inline-flex;
+                vertical-align: middle;
+                margin: 0;
+
+                > button.btn-link {
+                    .fr-pill-visual();
+                    cursor: pointer;
+
+                    .xforms-output,
+                    .xforms-output-output {
+                        display: inline;
+                        line-height: inherit;
+                        color: inherit;
+                    }
+
+                    @media (prefers-reduced-motion: no-preference) {
+                        transition: background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                    border-color     var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                    color            var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                    box-shadow       var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                    scale            var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+                    }
+
+                    &:hover,
+                    &:focus,
+                    &:active {
+                        text-decoration: none;
+                        background-color: var(--fr-pill-bg);
+                        border-color: var(--fr-pill-border);
+                        color: var(--fr-pill-color);
+                    }
+
+                    @media (hover: hover) {
+                        &:hover {
+                            background-color: var(--fr-pill-hover-bg);
+                            border-color: var(--fr-pill-hover-border);
+                            color: var(--fr-pill-hover-color);
+                        }
+                    }
+
+                    &:active {
+                        background-color: var(--fr-pill-hover-bg);
+                        border-color: var(--fr-pill-hover-border);
+                        color: var(--fr-pill-hover-color);
+
+                        @media (prefers-reduced-motion: no-preference) {
+                            scale: 0.97;
+                        }
+                    }
+
+                    &:focus-visible {
+                        outline: 2px solid var(--orbeon-focus-border-color);
+                        outline-offset: 1px;
+                        box-shadow: var(--orbeon-focus-ring);
+                    }
+
+                    @media (forced-colors: active) {
+                        &:not([aria-pressed="true"]) {
+                            background-color: ButtonFace;
+                            border-color: ButtonText;
+                            color: ButtonText;
+                        }
+
+                        &[aria-pressed="true"] {
+                            background-color: Highlight;
+                            border-color: Highlight;
+                            color: HighlightText;
+                            forced-color-adjust: none;
+                        }
+                    }
+                }
+
+                &.fr-pill-active > button.btn-link,
+                > button.btn-link[aria-pressed="true"] {
+                    background-color: var(--fr-pill-active-bg);
+                    border-color: var(--fr-pill-active-border);
+                    color: var(--fr-pill-active-color);
+                    box-shadow: inset 0 0 0 0.5px var(--fr-pill-active-border);
+
+                    &:focus-visible {
+                        box-shadow: inset 0 0 0 0.5px var(--fr-pill-active-border), var(--orbeon-focus-ring);
+                    }
+                }
+            }
+        }
+
+        &.fr-forms-table .fr-version-badge,
+        .fr-version-badge {
+            font-variant-numeric: tabular-nums;
         }
 
         #fr-no-form-data {
@@ -542,6 +725,75 @@
             padding: 28px 16px;
         }
     }
+
+    .dark-mode({
+        .fr-forms-table .fr-table-pill {
+            --fr-pill-bg           : #282d37;
+            --fr-pill-border       : #434b59;
+            --fr-pill-color        : var(--orbeon-base-color);
+            --fr-pill-hover-bg     : #333b4a;
+            --fr-pill-hover-border : #5b6880;
+            --fr-pill-hover-color  : var(--orbeon-base-color);
+            --fr-pill-active-bg    : #1e325c;
+            --fr-pill-active-border: var(--orbeon-link-color);
+            --fr-pill-active-color : #bfd6ff;
+
+            @media screen {
+                --fr-pill-bg          : color-mix(in oklab, var(--orbeon-accent-color) 10%, #272a30);
+                --fr-pill-border      : color-mix(in oklab, var(--orbeon-accent-color) 20%, #3f434c);
+                --fr-pill-hover-bg    : color-mix(in oklab, var(--orbeon-accent-color) 20%, #32363f);
+                --fr-pill-hover-border: color-mix(in oklab, var(--orbeon-accent-color) 36%, #4d525d);
+                --fr-pill-active-bg   : color-mix(in oklab, var(--orbeon-accent-color) 28%, #22262e);
+            }
+
+            &.fr-pill-success {
+                --fr-pill-bg           : #162d21;
+                --fr-pill-border       : #28593e;
+                --fr-pill-color        : #8ce0ac;
+                --fr-pill-hover-bg     : #1d3c2c;
+                --fr-pill-hover-border : #377854;
+                --fr-pill-hover-color  : #a8ebbf;
+                --fr-pill-active-bg    : #204532;
+                --fr-pill-active-border: #4ca372;
+                --fr-pill-active-color : #b7f0cb;
+            }
+
+            &.fr-pill-muted {
+                --fr-pill-bg           : #26292e;
+                --fr-pill-border       : #3e434b;
+                --fr-pill-color        : #c0c5ce;
+                --fr-pill-hover-bg     : #31353c;
+                --fr-pill-hover-border : #545b66;
+                --fr-pill-hover-color  : #e6e9ef;
+                --fr-pill-active-bg    : #353a42;
+                --fr-pill-active-border: #8a929e;
+                --fr-pill-active-color : #f1f3f6;
+            }
+
+            &.fr-pill-info {
+                --fr-pill-bg           : #172840;
+                --fr-pill-border       : #2a4b78;
+                --fr-pill-color        : #93c5fd;
+                --fr-pill-hover-bg     : #1f3554;
+                --fr-pill-hover-border : #3b67a1;
+                --fr-pill-hover-color  : #b5d8fe;
+                --fr-pill-active-bg    : #233e63;
+                --fr-pill-active-border: #5c94de;
+                --fr-pill-active-color : #cbe3ff;
+            }
+
+            &.fr-pill-warning {
+                --fr-pill-bg    : #332512;
+                --fr-pill-border: #66481c;
+                --fr-pill-color : #fcd38d;
+            }
+
+            @media (prefers-contrast: more) {
+                --fr-pill-border      : currentColor;
+                --fr-pill-hover-border: currentColor;
+            }
+        }
+    });
 
     .fr-search-results .fr-forms-table {
         width: 100%;
@@ -567,6 +819,12 @@
 
             > a {
                 padding: 10px 16px;
+            }
+
+            &.fr-status,
+            &.fr-application-name,
+            &.fr-version {
+                padding: 6px 16px;
             }
         }
 
@@ -602,14 +860,6 @@
             white-space: nowrap;
         }
 
-        .fr-app-pill {
-            .fr-pill();
-            padding: 1px 8px;
-            font-size: var(--orbeon-code-font-size);
-            font-weight: var(--orbeon-label-font-weight);
-            white-space: nowrap;
-        }
-
         th.fr-form-name,
         td.fr-form-name {
             width: 200px;
@@ -631,18 +881,6 @@
             width: 1%;
             white-space: nowrap;
             text-align: right;
-        }
-
-        .fr-version-badge {
-            display: inline-block;
-            padding: 1px 7px;
-            border-radius: var(--orbeon-control-border-radius);
-            background-color: var(--orbeon-control-read-only-background-color);
-            border: 1px solid var(--orbeon-table-border-color);
-            color: var(--orbeon-hint-color);
-            font-size: var(--orbeon-code-font-size);
-            font-variant-numeric: tabular-nums;
-            line-height: 1.35;
         }
 
         th.fr-last-modified,
@@ -753,6 +991,9 @@
                 padding: 8px 6px 8px 14px;
             }
 
+            &.fr-status,
+            &.fr-application-name,
+            &.fr-version,
             &.fr-form-actions {
                 padding: 5px 12px;
             }

@@ -13,4 +13,5 @@ object FormRunner
      with FormRunnerComponentsCompileTime
      with FormRunnerRevisionHistory
      with FormRunnerConfiguration
+     with FormRunnerConsole
      with FormRunnerPlatformJVM

@@ -467,6 +467,83 @@
     <admin>
         <title>Forms Admin</title>
     </admin>
+    <console>
+        <title>Admin Console</title>
+        <cards>
+            <jvm-heap>JVM Heap Memory</jvm-heap>
+            <caches-heap>Estimated Cache Heap</caches-heap>
+            <disk-stores>Cache Disk Stores</disk-stores>
+            <sessions-documents>Sessions &amp; Live Documents</sessions-documents>
+        </cards>
+        <tabs>
+            <caches>Caches &amp; State Stores</caches>
+            <static-states>XForms Static States</static-states>
+            <live-documents>Live XForms Documents</live-documents>
+            <jvm>JVM &amp; Runtime</jvm>
+        </tabs>
+        <sections>
+            <documents-by-path>Live Documents by Request Path</documents-by-path>
+            <individual-documents>Live Document Instances</individual-documents>
+            <runtime-info>Runtime &amp; Memory Flags</runtime-info>
+            <memory-pools>JVM Memory Pools</memory-pools>
+            <garbage-collectors>Garbage Collectors</garbage-collectors>
+        </sections>
+        <columns>
+            <cache-name>Cache / Store</cache-name>
+            <engine>Engine</engine>
+            <heap-entries>Heap Entries</heap-entries>
+            <total-entries>Total Entries</total-entries>
+            <limits>Limits &amp; Expiration</limits>
+            <est-heap>Est. Heap</est-heap>
+            <disk-store>Disk Store (Files)</disk-store>
+            <hits-misses>Hits / Misses</hits-misses>
+            <hit-rate>Hit Rate</hit-rate>
+            <evictions>Evictions</evictions>
+            <actions>Actions</actions>
+            <form-or-path>Form / Path</form-or-path>
+            <digest>Digest</digest>
+            <controls>Controls</controls>
+            <models>Models</models>
+            <template-size>Template</template-size>
+            <static-dom-size>Static DOM</static-dom-size>
+            <encoded-size>Encoded State</encoded-size>
+            <idle>Idle</idle>
+            <request-path>Request Path</request-path>
+            <document-count>Documents</document-count>
+            <max-sequence>Max Sequence</max-sequence>
+            <uuid>Document UUID</uuid>
+            <sequence>Ajax Updates</sequence>
+            <pool-name>Memory Pool</pool-name>
+            <type>Type</type>
+            <used>Used</used>
+            <committed>Committed</committed>
+            <max>Max</max>
+            <gc-name>Collector</gc-name>
+            <collections>Collections</collections>
+            <total-time>Total Time</total-time>
+        </columns>
+        <labels>
+            <orbeon-version>Orbeon Forms</orbeon-version>
+            <uptime>Uptime</uptime>
+            <updated>Snapshot</updated>
+            <committed>Committed</committed>
+            <of-max-heap>of max heap</of-max-heap>
+            <files-on-disk>files on disk</files-on-disk>
+            <live-docs>cached in heap</live-docs>
+            <http-sessions>HTTP sessions</http-sessions>
+            <active-requests>active locks</active-requests>
+            <processors>Processors</processors>
+            <non-heap>Non-Heap Used</non-heap>
+        </labels>
+        <buttons>
+            <refresh>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Refresh</refresh>
+            <clear>Clear</clear>
+        </buttons>
+        <messages>
+            <no-static-states>No XForms static states are currently cached in memory.</no-static-states>
+            <no-live-documents>No live XForms documents are currently sitting in the document cache.</no-live-documents>
+        </messages>
+    </console>
     <landing>
         <title>Landing</title>
         <titles>
@@ -478,6 +555,7 @@
             <demo-features>Demo Features</demo-features>
             <quick-links>Quick Links</quick-links>
             <form-runner-admin>Forms Admin</form-runner-admin>
+            <admin-console>Admin Console</admin-console>
         </titles>
         <descriptions>
             <published-forms>Access your published forms</published-forms>
@@ -521,6 +599,7 @@
             <reencrypt>Re-encrypt form definitions</reencrypt>
             <reload-resources>Reload resources</reload-resources>
             <configuration>Configuration</configuration>
+            <console>Admin Console</console>
             <reload-properties>Reload properties</reload-properties>
         </buttons>
         <titles>

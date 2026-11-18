@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.dom.QName
+import org.orbeon.oxf.cache.{MemorySizeEstimator, SizedCacheable}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.properties.Property
@@ -22,10 +23,12 @@ import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.analysis.*
+import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{BindingLoader, XBLAssets}
 import org.orbeon.oxf.xforms.XFormsProperties as P
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.xforms.xbl.Scope
 
 import java.net.URI
@@ -97,7 +100,8 @@ class XFormsStaticStateImpl(
   val getIndentedLogger           : IndentedLogger
 ) extends XFormsStaticState
   with XFormsStaticStateStaticProperties
-  with XFormsStaticStateDynamicProperties {
+  with XFormsStaticStateDynamicProperties
+  with SizedCacheable {
 
   // Delegate (Scala 3's `export` would be nice!)
   // export staticProperties._
@@ -195,4 +199,36 @@ class XFormsStaticStateImpl(
 
   // No resource resolver on the JVM for now
   val resourceResolverOpt: Option[ResourceResolver] = None
+
+  def encodedStateBytes  : Long = MemorySizeEstimator.estimateStringBytes(encodedState)
+  def templateSizeBytes  : Long = template.map(_.saxStore.approximateSizeBytes).getOrElse(0L)
+  def staticDomSizeBytes : Long =
+    if (staticStateDocumentForTests ne null)
+      MemorySizeEstimator.estimateOrbeonDomDocument(staticStateDocumentForTests.xmlDocument)
+    else
+      0L
+
+  // Diagnostic metadata extracted from `fr-form-metadata` when compiled by Form Runner: (app, form, titleOpt)
+  lazy val formRunnerMetadataOpt: Option[(String, String, Option[String])] =
+    for {
+      model    <- topLevelPart.findModel("fr-form-model")
+      inst     <- model.instances.get("fr-form-metadata")
+      rootElem <- inst.inlineRootElemOpt
+      app      <- rootElem.elementOpt("application-name").map(_.getText.trim).filter(_.nonEmpty)
+      form     <- rootElem.elementOpt("form-name").map(_.getText.trim).filter(_.nonEmpty)
+    } yield (app, form, rootElem.elementOpt("title").map(_.getText.trim).filter(_.nonEmpty))
+
+  def estimatedMemoryBytes: Long = {
+    val controlsBytes = topLevelPart.controlAnalysisMap.size.toLong * 920L
+    val topLevelConstantInstancesBytes =
+      topLevelPart
+        .iterateModels
+        .flatMap(_.instances.valuesIterator)
+        .filter(i => i.readonly && i.useInlineContent && ! i.parent.flatMap(_.parent).exists(_.isInstanceOf[ComponentControl]))
+        .flatMap(_.constantContent)
+        .map(MemorySizeEstimator.estimateBytes)
+        .sum
+
+    512L + encodedStateBytes + templateSizeBytes + staticDomSizeBytes + controlsBytes + topLevelConstantInstancesBytes
+  }
 }

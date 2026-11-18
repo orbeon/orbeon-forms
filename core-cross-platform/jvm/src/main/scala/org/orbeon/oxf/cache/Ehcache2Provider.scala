@@ -50,14 +50,42 @@ object Ehcache2Provider extends CacheProviderApi {
       CacheManager.ALL_CACHE_MANAGERS.get(0).shutdown()
   }
 
+  def listRunningCacheSnapshots: List[CacheProviderStats] =
+    cacheManager.getCacheNames.toList.sorted.flatMap(get).flatMap(_.statsSnapshot)
+
   private class EhcacheCacheApi(private val cache: ehcache.Cache) extends CacheApi {
-    def put(k: io.Serializable, v: io.Serializable): Unit         = { trace("put");                    cache.put(new ehcache.Element(k, v)) }
-    def putIfAbsent(k: io.Serializable, v: io.Serializable): Unit = { trace("putIfAbsent");            cache.put(new ehcache.Element(k, v)) }
-    def get(k: io.Serializable): Option[io.Serializable]          = { trace("get");                    Option(cache.get(k)).map(_.getObjectValue.asInstanceOf[io.Serializable]) }
-    def remove(k: io.Serializable): Boolean                       = { trace("remove");                 cache.remove(k) }
-    def getName: String                                           = { trace("getName");                cache.getName }
-    def getMaxEntriesLocalHeap: Option[Long]                      = { trace("getMaxEntriesLocalHeap"); cache.getCacheConfiguration.getMaxEntriesLocalHeap.some }
-    def getLocalHeapSize: Option[Long]                            = { trace("getLocalHeapSize");       cache.getCacheConfiguration.getMaxBytesLocalHeap.some }
+    def put(k: io.Serializable, v: io.Serializable): Unit         = { trace("put");                        cache.put(new ehcache.Element(k, v)) }
+    def putIfAbsent(k: io.Serializable, v: io.Serializable): Unit = { trace("putIfAbsent");                cache.put(new ehcache.Element(k, v)) }
+    def get(k: io.Serializable): Option[io.Serializable]          = { trace("get");                        Option(cache.get(k)).map(_.getObjectValue.asInstanceOf[io.Serializable]) }
+    def remove(k: io.Serializable): Boolean                       = { trace("remove");                     cache.remove(k) }
+    def clear(): Unit                                             = { trace("clear");                      cache.removeAll() }
+    def getName: String                                           = { trace("getName");                    cache.getName }
+    def getCurrentEntriesLocalHeap: Option[Long]                  = { trace("getCurrentEntriesLocalHeap"); cache.getStatistics.getLocalHeapSize.some }
+    def getMaxEntriesLocalHeap: Option[Long]                      = { trace("getMaxEntriesLocalHeap");     Some(cache.getCacheConfiguration.getMaxEntriesLocalHeap).filter(_ > 0) }
+    def getMaxBytesLocalHeap: Option[Long]                        = { trace("getMaxBytesLocalHeap");       Some(cache.getCacheConfiguration.getMaxBytesLocalHeap).filter(_ > 0) }
+    def statsSnapshot: Option[CacheProviderStats]                 = {
+      val stats = cache.getStatistics
+      CacheProviderStats(
+        name                = cache.getName,
+        provider            = ProviderName,
+        isStore             = cache.getCacheConfiguration.isDiskPersistent || cache.getCacheConfiguration.isOverflowToDisk,
+        heapEntries         = stats.getLocalHeapSize,
+        totalEntries        = Some(stats.getSize),
+        maxEntriesLocalHeap = getMaxEntriesLocalHeap,
+        maxBytesLocalHeap   = getMaxBytesLocalHeap,
+        estimatedHeapBytes  = stats.getLocalHeapSizeInBytes,
+        diskStoreBytes      = Some(stats.getLocalDiskSizeInBytes).filter(_ >= 0),
+        diskStoreFiles      = None,
+        diskStorePathOpt    = None,
+        maxIdleMs           = Some(cache.getCacheConfiguration.getTimeToIdleSeconds * 1000L).filter(_ > 0),
+        lifespanMs          = Some(cache.getCacheConfiguration.getTimeToLiveSeconds * 1000L).filter(_ > 0),
+        passivation         = cache.getCacheConfiguration.isOverflowToDisk,
+        hitCount            = Some(stats.cacheHitCount()),
+        missCount           = Some(stats.cacheMissCount()),
+        storeCount          = Some(stats.cachePutCount()),
+        evictionCount       = Some(stats.cacheEvictedCount())
+      ).some
+    }
   }
 
   private object Private {

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import cats.syntax.option.*
+import org.orbeon.oxf.cache.{DomMemorySizeEstimator, SizedCacheable}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.CoreUtils.*
@@ -68,7 +69,8 @@ class XFormsContainingDocument(
   val uploadSupport  : UploadSupport,
   val uuid           : String,
   val disableUpdates : Boolean,
-) extends XFormsContainingDocumentSupport {
+) extends XFormsContainingDocumentSupport
+     with SizedCacheable {
 
   self =>
 
@@ -138,6 +140,35 @@ class XFormsContainingDocument(
     controls.findObjectByEffectiveId(effectiveId)
 
   def isDirtySinceLastRequest: Boolean = controls.isDirtySinceLastRequest
+
+  def liveControlCount: Int =
+    Option(controls.getCurrentControlTree).map(_.effectiveIdsToControls.size).getOrElse(0)
+
+  // Estimate exclusive heap memory retained by this live document (excluding shared staticState and cached shared instances)
+  def estimatedMemoryBytes: Long = {
+    val controlTreeBytes = liveControlCount.toLong * 420L
+    val ajaxBytes        = lastAjaxResponse.map(_.approximateSizeBytes).getOrElse(0L)
+    val depsBytes        = if (staticState.isXPathAnalysis) liveControlCount.toLong * 96L else 128L
+
+    var instancesBytes = 0L
+    val instIt         = allModels.flatMap(_.instancesIterator)
+    while (instIt.hasNext) {
+      val inst     = instIt.next()
+      val isShared = inst.instanceCaching.isDefined || (inst.readonly && inst.instance.useInlineContent && ! inst.modified)
+      instancesBytes += 128L
+      if (! isShared) {
+        inst.underlyingDocumentOpt match {
+          case Some(domDoc) =>
+            instancesBytes += DomMemorySizeEstimator.estimateOrbeonDomDocument(domDoc, maxElements = 10000)
+          case None =>
+            // Non-cached external readonly instance (TinyTree)
+            instancesBytes += 2048L
+        }
+      }
+    }
+
+    2048L + controlTreeBytes + ajaxBytes + depsBytes + instancesBytes
+  }
 
   def initialize(
     uriResolver : Option[XFormsURIResolver],

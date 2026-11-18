@@ -471,6 +471,83 @@
     <admin>
         <title>Admin formulaires</title>
     </admin>
+    <console>
+        <title>Console d'administration</title>
+        <cards>
+            <jvm-heap>Mémoire tas JVM</jvm-heap>
+            <caches-heap>Tas estimé des caches</caches-heap>
+            <disk-stores>Stockage disque des caches</disk-stores>
+            <sessions-documents>Sessions et documents actifs</sessions-documents>
+        </cards>
+        <tabs>
+            <caches>Caches et magasins d'état</caches>
+            <static-states>États statiques XForms</static-states>
+            <live-documents>Documents XForms en mémoire</live-documents>
+            <jvm>JVM et exécution</jvm>
+        </tabs>
+        <sections>
+            <documents-by-path>Documents en mémoire par chemin</documents-by-path>
+            <individual-documents>Instances de documents en mémoire</individual-documents>
+            <runtime-info>Environnement et options mémoire</runtime-info>
+            <memory-pools>Pools mémoire JVM</memory-pools>
+            <garbage-collectors>Ramasse-miettes (GC)</garbage-collectors>
+        </sections>
+        <columns>
+            <cache-name>Cache / Magasin</cache-name>
+            <engine>Moteur</engine>
+            <heap-entries>Entrées tas</heap-entries>
+            <total-entries>Entrées totales</total-entries>
+            <limits>Limites et expiration</limits>
+            <est-heap>Tas estimé</est-heap>
+            <disk-store>Disque (Fichiers)</disk-store>
+            <hits-misses>Succès / Échecs</hits-misses>
+            <hit-rate>Taux de succès</hit-rate>
+            <evictions>Évictions</evictions>
+            <actions>Actions</actions>
+            <form-or-path>Formulaire / Chemin</form-or-path>
+            <digest>Empreinte</digest>
+            <controls>Contrôles</controls>
+            <models>Modèles</models>
+            <template-size>Modèle HTML</template-size>
+            <static-dom-size>DOM statique</static-dom-size>
+            <encoded-size>État encodé</encoded-size>
+            <idle>Inactivité</idle>
+            <request-path>Chemin de requête</request-path>
+            <document-count>Documents</document-count>
+            <max-sequence>Séquence max</max-sequence>
+            <uuid>UUID du document</uuid>
+            <sequence>Mises à jour Ajax</sequence>
+            <pool-name>Pool mémoire</pool-name>
+            <type>Type</type>
+            <used>Utilisé</used>
+            <committed>Alloué</committed>
+            <max>Max</max>
+            <gc-name>Collecteur</gc-name>
+            <collections>Collectes</collections>
+            <total-time>Temps total</total-time>
+        </columns>
+        <labels>
+            <orbeon-version>Orbeon Forms</orbeon-version>
+            <uptime>Disponibilité</uptime>
+            <updated>Instantané</updated>
+            <committed>Alloué</committed>
+            <of-max-heap>du tas max</of-max-heap>
+            <files-on-disk>fichiers sur disque</files-on-disk>
+            <live-docs>en mémoire</live-docs>
+            <http-sessions>sessions HTTP</http-sessions>
+            <active-requests>verrous actifs</active-requests>
+            <processors>Processeurs</processors>
+            <non-heap>Hors-tas utilisé</non-heap>
+        </labels>
+        <buttons>
+            <refresh>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Rafraîchir</refresh>
+            <clear>Vider</clear>
+        </buttons>
+        <messages>
+            <no-static-states>Aucun état statique XForms n'est actuellement en cache mémoire.</no-static-states>
+            <no-live-documents>Aucun document XForms actif n'est actuellement dans le cache de documents.</no-live-documents>
+        </messages>
+    </console>
     <landing>
         <title>Landing</title>
         <titles>
@@ -482,6 +559,7 @@
             <demo-features>Fonctions de démonstration</demo-features>
             <quick-links>Raccourcis</quick-links>
             <form-runner-admin>Admin formulaires</form-runner-admin>
+            <admin-console>Console d'admin</admin-console>
         </titles>
         <descriptions>
             <published-forms>Accédez vos formulaires publiés</published-forms>
@@ -525,6 +603,7 @@
             <reencrypt>Réencrypter les formulaires</reencrypt>
             <reload-resources>Recharger les resources</reload-resources>
             <configuration>Configuration</configuration>
+            <console>Console d'admin</console>
             <reload-properties>Recharger les propriétés</reload-properties>
         </buttons>
         <titles>

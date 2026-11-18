@@ -115,7 +115,7 @@ object XFormsStateStore {
   }
 
   def getMaxSize     : Option[Long] = XFormsStores.stateStore.getMaxEntriesLocalHeap
-  def getCurrentSize : Option[Long] = XFormsStores.stateStore.getLocalHeapSize
+  def getCurrentSize : Option[Long] = XFormsStores.stateStore.getCurrentEntriesLocalHeap
 
   private object Private {
     def createDynamicStateKey(documentUUID: String, isInitialState: Boolean) =

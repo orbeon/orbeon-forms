@@ -218,6 +218,13 @@
         <setvalue ref="/*/mode">home</setvalue>
     </page>
 
+    <!-- Admin console page -->
+    <page id="fr-console" path="/fr/console" model="console/console.xhtml" view="html-view.xpl" default-submission="request-parameters.xml">
+        <setvalue ref="/*/app">*</setvalue>
+        <setvalue ref="/*/form">*</setvalue>
+        <setvalue ref="/*/mode">console</setvalue>
+    </page>
+
     <!-- Summary -->
     <page id="summary"
           path="/fr/([^/^.]+)/([^/^.]+)(/summary)"

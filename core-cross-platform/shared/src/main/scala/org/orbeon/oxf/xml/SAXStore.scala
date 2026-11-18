@@ -15,6 +15,7 @@ package org.orbeon.oxf.xml
 
 import java.{lang as jl, util as ju}
 
+import org.orbeon.oxf.cache.SizedCacheable
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator, SAXException}
 
@@ -47,7 +48,7 @@ private object SAXStore {
   val InitialSize          : Int  = 10
 }
 
-final class SAXStore extends ForwardingXMLReceiver {
+final class SAXStore extends ForwardingXMLReceiver with SizedCacheable {
 
   thisSAXStore =>
 
@@ -370,6 +371,25 @@ final class SAXStore extends ForwardingXMLReceiver {
       marks
     else
       ju.Collections.emptyList[Mark]
+
+  def estimatedMemoryBytes: Long = approximateSizeBytes
+
+  // Fast O(1) structural estimate of this SAXStore's backing buffers on a 64-bit JVM with compressed OOPs
+  def approximateSizeBytes: Long = {
+    val baseBytes   = 160L
+    val eventBytes  = if (eventBuffer ne null)          16L + eventBuffer.length.toLong              else 0L
+    val charBytes   = if (charBuffer ne null)           16L + charBuffer.length.toLong * 2L          else 0L
+    val intBytes    = if (intBuffer ne null)            16L + intBuffer.length.toLong * 4L           else 0L
+    val lineBytes   = if (lineBuffer ne null)           16L + lineBuffer.length.toLong * 4L          else 0L
+    val sysIdBytes  = if (systemIdBuffer ne null)       16L + systemIdBuffer.length.toLong * 4L      else 0L
+    val attCntBytes = if (attributeCountBuffer ne null) 16L + attributeCountBuffer.length.toLong * 4L else 0L
+    val strListRefs = if (stringBuilder ne null)        24L + stringBuilder.size.toLong * 4L         else 0L
+    // Element/attribute names and URIs are largely interned/shared; non-interned attribute values average ~28 bytes per attribute
+    val attValBytes = attributeCount.toLong * 28L
+    val marksBytes  = if (marks ne null)                24L + marks.size.toLong * 56L                else 0L
+
+    baseBytes + eventBytes + charBytes + intBytes + lineBytes + sysIdBytes + attCntBytes + strListRefs + attValBytes + marksBytes
+  }
 
 //  // Print to System.out. For debug only.
 //  def printOut() {

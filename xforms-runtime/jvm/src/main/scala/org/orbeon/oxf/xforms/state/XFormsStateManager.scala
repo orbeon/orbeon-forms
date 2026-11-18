@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent}
 import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsGlobalProperties}
 
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.ReentrantLock
 import scala.jdk.CollectionConverters.*
 
@@ -323,16 +324,21 @@ trait XFormsStateManagerUuidList {
   protected val ForceSessionCreation: Boolean
 
   private val XFormsStateManagerUUIDListKey   = "oxf.xforms.state.manager.uuid-list-key"
+  private val activeSessionsCounter           = new AtomicInteger(0)
+
+  def activeSessionsCount: Int = math.max(0, activeSessionsCounter.get())
 
   // This must be called once exactly when the session is created
   def sessionCreated(session: ExternalContext.Session): Unit =
     session.getAttribute(XFormsStateManagerUUIDListKey).getOrElse {
+      activeSessionsCounter.incrementAndGet()
       session.setAttribute(XFormsStateManagerUUIDListKey, ConcurrentHashMap.newKeySet[String])
     }
 
   // This must be called once exactly when the session is destroyed
   def sessionDestroyed(session: ExternalContext.Session): Unit =
     if (hasUuidListInSession(session)) {
+      activeSessionsCounter.decrementAndGet()
       getUuidListInSession(session).iterator.asScala.foreach { uuid =>
         XFormsDocumentCache.remove(uuid)
         XFormsStateStore.removeDynamicState(uuid)

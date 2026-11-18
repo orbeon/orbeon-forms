@@ -17,5 +17,8 @@ public class CacheEntry {
     public CacheKey key;
     public Object cacheable;
     public Object validity;
-    public CacheLinkedList.ListEntry listEntry;
+    public CacheLinkedList.ListEntry<CacheEntry> listEntry;
+    public long createdAtMs;
+    public long lastAccessedAtMs;
+    public long estimatedBytes;
 }

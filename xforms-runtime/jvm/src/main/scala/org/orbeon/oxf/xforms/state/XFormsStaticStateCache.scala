@@ -15,7 +15,11 @@ package org.orbeon.oxf.xforms.state
 
 import org.orbeon.oxf.cache.*
 import org.orbeon.oxf.processor.ProcessorImpl
+import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.xforms.XFormsStaticState
+
+import java.util.concurrent.ConcurrentHashMap
+import scala.util.Try
 
 object XFormsStaticStateCache {
 
@@ -27,12 +31,14 @@ object XFormsStaticStateCache {
   }
 
   def storeDocument(staticState: XFormsStaticState): Unit = {
-
-//    pprint.pprintln("xxx staticState footprint")
-//    pprint.pprintln(org.openjdk.jol.info.GraphLayout.parseInstance(staticState).toFootprint)
-
-    if (! (staticState.singleUseStaticState && staticState.isInlineResources)) // https://github.com/orbeon/orbeon-forms/issues/1730
+    if (! (staticState.singleUseStaticState && staticState.isInlineResources)) { // https://github.com/orbeon/orbeon-forms/issues/1730
+      Try(Option(CoreCrossPlatformSupport.externalContext).flatMap(ec => Option(ec.getRequest)).map(_.getRequestPath))
+        .toOption
+        .flatten
+        .filter(_.nonEmpty)
+        .foreach(path => digestToSamplePath.putIfAbsent(staticState.digest, path))
       cache.add(createCacheKey(staticState.digest), System.currentTimeMillis, staticState)
+    }
   }
 
   def findDocument(digest: String): Option[(XFormsStaticState, Long)] =
@@ -40,8 +46,15 @@ object XFormsStaticStateCache {
       o.asInstanceOf[XFormsStaticState] -> ProcessorImpl.findLastModified(validity)
     }
 
- def removeDocument(digest: String): Unit =
+  def removeDocument(digest: String): Unit = {
+    digestToSamplePath.remove(digest)
     cache.remove(createCacheKey(digest))
+  }
+
+  def sampleRequestPathOpt(digest: String): Option[String] =
+    Option(digestToSamplePath.get(digest))
+
+  def getCacheForDiagnostics: Cache = cache
 
   private object Private {
 
@@ -53,6 +66,7 @@ object XFormsStaticStateCache {
     val ConstantValidity               = 0L
     val ContainingDocumentKeyType      = XFormsDocumentCache
 
-    val cache = ObjectCache.instance(XFormsDocumentCache, XFormsDocumentCacheDefaultSize)
+    val cache              = ObjectCache.instance(XFormsDocumentCache, XFormsDocumentCacheDefaultSize)
+    val digestToSamplePath = new ConcurrentHashMap[String, String]()
   }
 }

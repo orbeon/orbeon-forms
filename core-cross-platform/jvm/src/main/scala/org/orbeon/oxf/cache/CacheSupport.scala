@@ -6,9 +6,39 @@ import org.slf4j
 import java.io
 
 
+case class CacheProviderStats(
+  name                : String,
+  provider            : String,
+  isStore             : Boolean,
+  heapEntries         : Long,
+  totalEntries        : Option[Long],
+  maxEntriesLocalHeap : Option[Long],
+  maxBytesLocalHeap   : Option[Long],
+  estimatedHeapBytes  : Long,
+  diskStoreBytes      : Option[Long],
+  diskStoreFiles      : Option[Int],
+  diskStorePathOpt    : Option[String],
+  maxIdleMs           : Option[Long],
+  lifespanMs          : Option[Long],
+  passivation         : Boolean,
+  hitCount            : Option[Long],
+  missCount           : Option[Long],
+  storeCount          : Option[Long],
+  evictionCount       : Option[Long]
+) {
+  def hitRateOpt: Option[Double] =
+    for {
+      h <- hitCount
+      m <- missCount
+      total = h + m
+      if total > 0
+    } yield h.toDouble / total.toDouble
+}
+
 trait CacheProviderApi {
   val ProviderName: String
   def get(cacheName: String): Option[CacheApi]
+  def listRunningCacheSnapshots: List[CacheProviderStats]
   def close(): Unit
 }
 
@@ -17,15 +47,16 @@ trait CacheApi {
   def putIfAbsent(k: io.Serializable, v: io.Serializable): Unit
   def get(k: io.Serializable): Option[io.Serializable]
   def remove(k: io.Serializable): Boolean
+  def clear(): Unit
 
   def getName: String
 
-  def getMaxEntriesLocalHeap: Option[Long]
-  def getLocalHeapSize: Option[Long]
+  def getCurrentEntriesLocalHeap: Option[Long]
+  def getMaxEntriesLocalHeap    : Option[Long]
+  def getMaxBytesLocalHeap      : Option[Long]
+  def statsSnapshot             : Option[CacheProviderStats]
 }
 
-// Abstraction for the cache provider. For backward compatibility, we default to Ehcache 2.x without going through
-// the JCache API (JSR-107). See https://github.com/orbeon/orbeon-forms/issues/5399.
 object CacheSupport {
 
   val Logger: slf4j.Logger = slf4j.LoggerFactory.getLogger("org.orbeon.caches")
@@ -67,11 +98,6 @@ object CacheSupport {
       case        Some((name, other))     => throw new IllegalArgumentException(s"invalid value for `$name`: `$other` (must be one of `ehcache2`, `jcache`, or `infinispan`)")
     }
 
-  // We thought about implementing provider deduplication, but it's unneeded: `Eh2CacheSupport` and `InfinispanProvider`
-  // are `object`s, and so we get the same reference anyway. `JCacheSupport` is a class, but it finds a JCache provider
-  // and then gets a `CacheManager` from the provider. If the configurations are the same, the JCache API says that
-  // "calls to this method with the same `URI` and `ClassLoader` must return the same `CacheManager` instance". So we
-  // might have two different instances of `JCacheSupport`, but they will point to the same `CacheManager` instance.
   private lazy val (storeProvider, cacheProvider): (CacheProviderApi, CacheProviderApi) = {
     val propertySet = PropertyLoader.getPropertyStore(None).globalPropertySet
     (loadProvider(store = true, propertySet), loadProvider(store = false, propertySet))
@@ -89,4 +115,12 @@ object CacheSupport {
   def getOrElseThrow(cacheName: String, store: Boolean): CacheApi =
     findCache(cacheName, store)
       .getOrElse(throw new IllegalStateException(s"no cache found for `$cacheName` (store = $store)"))
+
+  def allRunningCacheSnapshots: List[CacheProviderStats] = {
+    val storeSnaps = storeProvider.listRunningCacheSnapshots
+    val cacheSnaps =
+      if (storeProvider eq cacheProvider) Nil
+      else cacheProvider.listRunningCacheSnapshots.filterNot(c => storeSnaps.exists(_.name == c.name))
+    (storeSnaps ++ cacheSnaps).sortBy(_.name)
+  }
 }

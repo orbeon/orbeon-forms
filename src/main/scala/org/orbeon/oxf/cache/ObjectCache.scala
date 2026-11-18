@@ -14,12 +14,13 @@
 package org.orbeon.oxf.cache
 
 import java.util as ju
+import scala.jdk.CollectionConverters.*
 
 import org.orbeon.oxf.properties.Properties
 
 object ObjectCache {
 
-  private val DefaultCacheName = "cache.main"
+  val DefaultCacheName = "cache.main"
   private val DefaultSize      = 200
 
   private val CachePropertyNamePrefix     = "oxf"
@@ -46,4 +47,10 @@ object ObjectCache {
         new MemoryCacheImpl(size)
       }
     )
+
+  def findCache(cacheName: String): Option[Cache] =
+    Option(namedObjectCaches.get(cacheName))
+
+  def allCaches: List[(String, Cache)] =
+    namedObjectCaches.entrySet.asScala.map(e => e.getKey -> e.getValue).toList.sortBy(_._1)
 }

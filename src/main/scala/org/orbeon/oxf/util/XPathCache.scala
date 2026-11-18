@@ -44,6 +44,9 @@ object XPathCache extends XPathCacheTrait {
   private val XPathCacheName = "cache.xpath"
   private val XPathCacheDefaultSize = 200
 
+  def getCacheForDiagnostics: org.orbeon.oxf.cache.Cache =
+    ObjectCache.instance(XPathCacheName, XPathCacheDefaultSize)
+
   private val Logger = LoggerFactory.createLogger(getClass)
 
   def isDynamicXPathError(t: Throwable): Boolean = t match {

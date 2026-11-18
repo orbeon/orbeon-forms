@@ -7,10 +7,15 @@ import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.{Lock, ReentrantLock}
 
 
 trait XFormsStateManagerTrait extends XFormsStateLifecycle {
+
+  private val activeLocksCounter = new AtomicInteger(0)
+
+  def activeDocumentLocksCount: Int = math.max(0, activeLocksCounter.get())
 
   // Require implementation
   def getDocumentLock(uuid: String): Option[ReentrantLock]
@@ -34,9 +39,10 @@ trait XFormsStateManagerTrait extends XFormsStateLifecycle {
     getDocumentLock(uuid ensuring (_ ne null)) match {
       case Some(lock) =>
         try {
-          if (lock.tryLock(timeout, TimeUnit.MILLISECONDS))
+          if (lock.tryLock(timeout, TimeUnit.MILLISECONDS)) {
+            activeLocksCounter.incrementAndGet()
             LockResponse.Success(lock)
-          else if (timeout == 0L)
+          } else if (timeout == 0L)
             LockResponse.Busy
           else
             LockResponse.Timeout
@@ -49,8 +55,10 @@ trait XFormsStateManagerTrait extends XFormsStateLifecycle {
     }
 
   // Release the given document lock. Must be called after afterUpdate() in a finally block.
-  def releaseDocumentLock(lock: Lock): Unit =
+  def releaseDocumentLock(lock: Lock): Unit = {
+    activeLocksCounter.decrementAndGet()
     lock.unlock()
+  }
 
   // Update the document's change sequence.
   def beforeUpdateResponse(containingDocument: XFormsContainingDocument, ignoreSequence: Boolean): Unit = {

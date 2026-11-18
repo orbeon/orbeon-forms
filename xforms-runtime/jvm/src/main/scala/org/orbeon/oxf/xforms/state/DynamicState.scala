@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.state
 
 import org.orbeon.dom
 import org.orbeon.dom.{Document, Element}
+import org.orbeon.oxf.cache.{DomMemorySizeEstimator, SizedCacheable}
 import org.orbeon.oxf.util.{PathMatcher, SecureUtils}
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl}
@@ -53,7 +54,40 @@ case class DynamicState(
   initializationData: Option[(Option[String], String)],
   delayedEvents     : Seq[Byte],
   openDialogs       : Int
-) {
+) extends SizedCacheable {
+
+  def estimatedMemoryBytes: Long = {
+    import DomMemorySizeEstimator.estimateStringBytes
+    def optStr(o: Option[String]): Long = o.map(estimateStringBytes).getOrElse(0L)
+    def pairsBytes(ps: List[(String, List[String])]): Long =
+      ps.iterator.map { case (k, vs) => 48L + estimateStringBytes(k) + vs.iterator.map(v => 16L + estimateStringBytes(v)).sum }.sum
+
+    val byteSeqs =
+      6L * 24L +
+        pathMatchers.size +
+        pendingUploads.size +
+        lastAjaxResponse.size +
+        instances.size +
+        controls.size +
+        delayedEvents.size
+
+    val initBytes =
+      initializationData.map { case (a, b, c) => 32L + optStr(a) + estimateStringBytes(b) + optStr(c) }.getOrElse(0L)
+
+    128L +
+      estimateStringBytes(uuid) +
+      optStr(deploymentType) +
+      optStr(requestMethod) +
+      optStr(requestContextPath) +
+      optStr(requestPath) +
+      optStr(containerType) +
+      optStr(containerNamespace) +
+      optStr(focusedControl) +
+      pairsBytes(requestHeaders) +
+      pairsBytes(requestParameters) +
+      byteSeqs +
+      initBytes
+  }
   // Decode individual bits
   def decodePathMatchers     : List[PathMatcher]           = fromByteSeq[List[PathMatcher]](pathMatchers)
   def decodePendingUploads   : Set[String]                 = fromByteSeq[Set[String]](pendingUploads)

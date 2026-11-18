@@ -39,6 +39,8 @@ object XFormsDocumentCache {
   def getCurrentSize : Int = cache.getCurrentSize
   def getMaxSize     : Int = cache.getMaxSize
 
+  def getCacheForDiagnostics: org.orbeon.oxf.cache.Cache = cache
+
   private object Private {
 
     val CacheName                 = "xforms.cache.documents"

@@ -125,6 +125,8 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
     debug("removed all instances", List("count" -> count.toString))
   }
 
+  def getCacheForDiagnostics: org.orbeon.oxf.cache.Cache = getCache
+
   private object Private {
 
     case class SharedInstanceCacheKey(
@@ -135,6 +137,10 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
     ) extends CacheKey
 
     case class CacheEntry(instanceContent: InstanceContent, timeToLive: Long, timestamp: Long = System.currentTimeMillis)
+      extends SizedCacheable {
+      def estimatedMemoryBytes: Long =
+        48L + MemorySizeEstimator.estimateBytes(instanceContent.documentInfo)
+    }
 
     val XFormsSharedInstancesCacheName        = "xforms.cache.shared-instances"
 

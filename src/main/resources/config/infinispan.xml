@@ -4,7 +4,7 @@
     xsi:schemaLocation="urn:infinispan:config:16.0 https://infinispan.org/schemas/infinispan-config-16.0.xsd"
     xmlns="urn:infinispan:config:16.0">
 
-    <cache-container name="orbeon-container" statistics="false">
+    <cache-container name="orbeon-container" statistics="true">
 
         <serialization marshaller="org.infinispan.commons.marshall.JavaSerializationMarshaller">
             <allow-list>
@@ -18,7 +18,7 @@
         </global-state>
 
         <!-- XForms state store -->
-        <local-cache name="xforms.state">
+        <local-cache name="xforms.state" statistics="true">
             <expiration max-idle="18000000" interval="120000"/>
             <persistence passivation="true">
                 <file-store purge="true" path="xforms.state">
@@ -29,7 +29,7 @@
         </local-cache>
 
         <!-- XForms resources store -->
-        <local-cache name="xforms.resources">
+        <local-cache name="xforms.resources" statistics="true">
             <persistence passivation="true">
                 <file-store purge="true" path="xforms.resources">
                     <write-behind modification-queue-size="1024" />
@@ -39,18 +39,18 @@
         </local-cache>
 
         <!-- External mode store -->
-        <local-cache name="form-runner.external-mode-store">
+        <local-cache name="form-runner.external-mode-store" statistics="true">
             <expiration lifespan="960000" interval="120000"/>
             <memory max-count="200" when-full="REMOVE"/>
         </local-cache>
 
         <!-- Form Runner form definition cache -->
-        <local-cache name="form-runner.persistence.form-definition">
+        <local-cache name="form-runner.persistence.form-definition" statistics="true">
             <expiration lifespan="300000" interval="120000"/>
             <memory max-count="10" when-full="REMOVE"/>
         </local-cache>
 
-        <local-cache name="orbeon.properties">
+        <local-cache name="orbeon.properties" statistics="true">
             <memory max-count="50" when-full="REMOVE"/>
         </local-cache>
 

@@ -261,7 +261,12 @@ private object XFormsProcessorBase {
   class Stage1CacheableState extends URIReferences
 
   // What can be cached by the second stage: SAXStore and static state
-  class Stage2CacheableState(val staticStateDigest: String, val template: AnnotatedTemplate) extends URIReferences
+  class Stage2CacheableState(val staticStateDigest: String, val template: AnnotatedTemplate)
+    extends URIReferences
+       with org.orbeon.oxf.cache.SizedCacheable {
+    def estimatedMemoryBytes: Long =
+      96L + org.orbeon.oxf.cache.DomMemorySizeEstimator.estimateStringBytes(staticStateDigest) + template.saxStore.approximateSizeBytes
+  }
 
   // State passed by the second stage to the first stage.
   // NOTE: This extends URIReferencesState because we use URIProcessorOutputImpl.

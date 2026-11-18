@@ -459,7 +459,7 @@
                        have code to do this that is able to handle AVTs. :)
                     if (
                         not(fr:is-form-builder()) and
-                        not(fr:mode() = ('summary', 'home', 'landing', ''))
+                        not(fr:mode() = ('summary', 'home', 'landing', 'console', ''))
                     ) then
                         let $density-opt := frf:optionFromMetadataOrPropertiesDynamicXPath('density', 'compact')[. = ('compact', 'comfortable', 'roomy')]
                         return
@@ -948,8 +948,8 @@
             ref=".[
                 not(fr:mode() = 'test') and
                 not(fr:is-embedded())   and (
-                        fr:mode() = ('forms', 'admin', 'landing')  and xxf:property('oxf.fr.navbar.color-scheme-selector.enable') or
-                    not(fr:mode() = ('forms', 'admin', 'landing')) and xxf:property(string-join(('oxf.fr.navbar.color-scheme-selector.enable', fr:app-name(), fr:form-name()), '.'))
+                        fr:mode() = ('forms', 'admin', 'landing', 'console')  and xxf:property('oxf.fr.navbar.color-scheme-selector.enable') or
+                    not(fr:mode() = ('forms', 'admin', 'landing', 'console')) and xxf:property(string-join(('oxf.fr.navbar.color-scheme-selector.enable', fr:app-name(), fr:form-name()), '.'))
                 )
             ]">
             <xh:div class="dropdown">
@@ -1260,7 +1260,7 @@
 
         <xf:group
             model="fr-form-model"
-            ref=".[not($fr-mode = ('summary', 'home', 'landing'))]"
+            ref=".[not($fr-mode = ('summary', 'home', 'landing', 'console'))]"
             class="fr-status-icons nav-item">
 
             <xf:group model="fr-error-summary-model" ref=".[visible-counts/@alert gt 0]">

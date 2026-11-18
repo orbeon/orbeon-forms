@@ -89,12 +89,14 @@
 @frGridDensityMarginRoomyLeftRight:       26px;
 @frGridDensityMarginRoomyHelpTop:         1.05em;
 
+// At design time, editable grid cells already have horizontal padding for the left/right control icons, so we don't add
+// extra horizontal density margins.
 @fbGridDensityMarginCompactTopBottom:     0px;
 @fbGridDensityMarginCompactLeftRight:     0px;
 @fbGridDensityMarginComfortableTopBottom: 0.2em;
-@fbGridDensityMarginComfortableLeftRight: 0.5em;
+@fbGridDensityMarginComfortableLeftRight: 0px;
 @fbGridDensityMarginRoomyTopBottom:       0.5em;
-@fbGridDensityMarginRoomyLeftRight:       1.0em;
+@fbGridDensityMarginRoomyLeftRight:       0px;
 
 @controlsBottomMargin: 5px;                 // 5px is the Bootstrap default
 @dropdownMenuMinWidth: 160px;

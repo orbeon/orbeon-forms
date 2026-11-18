@@ -3772,9 +3772,15 @@ body.orbeon {
                 }
 
                 .fr-grid-head .fr-grid-th {
+                    & > .xforms-control, & > .xbl-component, & > .xforms-group {
+                        margin: @densityMarginTopBottom @densityMarginLeftRight;
+                    }
                     .xforms-label, .xforms-help, .xforms-hint {
                         // Keep labels, etc. aligned with fields in repetitions
                         margin-left: @densityMarginLeftRight;
+                    }
+                    .xforms-label, .xforms-hint {
+                        margin-right: @densityMarginLeftRight;
                     }
                 }
 
@@ -3832,7 +3838,7 @@ body.orbeon {
                 .fr-grid-td {
                     position: relative;
 
-                    & > .xbl-component, & > .xforms-control {
+                    & > .xbl-component, & > .xforms-control, & > .xforms-group:not(.fb-control-cell-badges) {
                         // At design-time, the cells also have internal padding for the icons.
                         margin: @densityMarginTopBottom @densityMarginLeftRight;
 

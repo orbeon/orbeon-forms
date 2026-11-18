@@ -15,7 +15,7 @@ package org.orbeon.oxf.cache
 
 import java.util as ju
 import scala.collection.mutable.ListBuffer
-import scala.jdk.CollectionConverters.*
+import scala.util.control.Breaks.{break, breakable}
 
 
 case class ObjectCacheEntrySnapshot(
@@ -31,6 +31,8 @@ case class ObjectCacheStatsSnapshot(
   name          : String,
   currentSize   : Int,
   maxSize       : Int,
+  maxSizeBytes  : Option[Long],
+  maxIdleMillis : Option[Long],
   estimatedBytes: Long,
   hitCount      : Long,
   missCount     : Long,
@@ -42,12 +44,21 @@ case class ObjectCacheStatsSnapshot(
   def hitRateOpt  : Option[Double] = if (totalLookups > 0) Some(hitCount.toDouble / totalLookups.toDouble) else None
 }
 
-class MemoryCacheImpl(private var maxSize: Int) extends Cache {
+class MemoryCacheImpl(
+  private var maxSize       : Int,
+  private var maxSizeBytes  : Option[Long] = None,
+  private var maxIdleMillis : Option[Long] = None,
+  clockMillis               : () => Long   = () => System.currentTimeMillis()
+) extends Cache {
+
+  maxSizeBytes  = maxSizeBytes.filter(_ > 0L)
+  maxIdleMillis = maxIdleMillis.filter(_ > 0L)
 
   private var keyToEntryMap          = new ju.HashMap[CacheKey, CacheEntry]()
   private var linkedList             = new CacheLinkedList[CacheEntry]()
   private var currentSize            = 0
   private var currentEstimatedBytes  = 0L
+  private var evictionListenerOpt    = Option.empty[AnyRef => Unit]
 
   private var hitCount               = 0L
   private var missCount              = 0L
@@ -55,22 +66,31 @@ class MemoryCacheImpl(private var maxSize: Int) extends Cache {
   private var evictionCount          = 0L
   private var removeCount            = 0L
 
+  def setEvictionListener(listener: AnyRef => Unit): Unit = synchronized {
+    evictionListenerOpt = Option(listener)
+  }
+
   override def add(key: CacheKey, validity: Any, cacheable: Any): Unit = synchronized {
     val validityRef  = validity.asInstanceOf[AnyRef]
     val cacheableRef = cacheable.asInstanceOf[AnyRef]
     if ((key eq null) || (validityRef eq null) || maxSize == 0)
       return
 
-    val now      = System.currentTimeMillis()
+    val now = clockMillis()
+    evictExpiredUnlocked(now)
+
     val estBytes = MemorySizeEstimator.estimateBytes(cacheableRef)
     val existing = keyToEntryMap.get(key)
 
     if (existing eq null) {
-      if (currentSize >= maxSize) {
-        // Cache is full; try to evict one unlocked entry starting from the LRU end.
-        // If all entries are locked, the cache temporarily grows past maxSize.
-        tryEvictLast()
-      }
+      // Evict LRU unlocked entries until within both entry-count and byte budgets (always allowing at least 1 entry
+      // so a single large form/document still caches cleanly without self-thrashing).
+      def needsEviction: Boolean =
+        currentSize >= maxSize ||
+          maxSizeBytes.exists(maxBytes => currentSize > 0 && currentEstimatedBytes + estBytes > maxBytes)
+
+      while (needsEviction && tryEvictLast(skipEntry = null)) ()
+
       currentSize += 1
       currentEstimatedBytes += estBytes
       addCount += 1L
@@ -96,14 +116,52 @@ class MemoryCacheImpl(private var maxSize: Int) extends Cache {
       existing.estimatedBytes   = estBytes
       linkedList.remove(existing.listEntry)
       existing.listEntry        = linkedList.addFirst(existing)
+
+      // If an in-place update grew the entry past maxSizeBytes, evict older unlocked LRU entries (never `existing`)
+      while (
+        currentSize > 1 &&
+        maxSizeBytes.exists(currentEstimatedBytes > _) &&
+        tryEvictLast(skipEntry = existing)
+      ) ()
     }
   }
 
-  private def tryEvictLast(): Boolean = {
+  private def isExpired(entry: CacheEntry, now: Long): Boolean =
+    maxIdleMillis.exists(maxIdle => (now - entry.lastAccessedAtMs) > maxIdle)
+
+  override def evictExpired(): Int = synchronized {
+    evictExpiredUnlocked(clockMillis())
+  }
+
+  // Because every insertion/hit moves an entry to the head with monotonic `now`, the tail (`reverseIterator`)
+  // has the oldest `lastAccessedAtMs`, allowing us to stop scanning at the first non-expired entry.
+  private def evictExpiredUnlocked(now: Long): Int =
+    if (maxIdleMillis.isEmpty || currentSize == 0) {
+      0
+    } else {
+      val candidates = ListBuffer.empty[CacheEntry]
+      val it = linkedList.reverseIterator()
+      breakable {
+        while (it.hasNext) {
+          val entry = it.next()
+          if (isExpired(entry, now))
+            candidates += entry
+          else
+            break()
+        }
+      }
+      var evicted = 0
+      for (entry <- candidates)
+        if (keyToEntryMap.containsKey(entry.key) && tryEvict(entry))
+          evicted += 1
+      evicted
+    }
+
+  private def tryEvictLast(skipEntry: CacheEntry): Boolean = {
     val it = linkedList.reverseIterator()
     while (it.hasNext) {
       val entryToTry = it.next()
-      if (tryEvict(entryToTry))
+      if ((entryToTry ne skipEntry) && tryEvict(entryToTry))
         return true
     }
     false
@@ -172,11 +230,13 @@ class MemoryCacheImpl(private var maxSize: Int) extends Cache {
       case _            =>
     }
 
-  private def notifyEvicted(obj: AnyRef): Unit =
+  private def notifyEvicted(obj: AnyRef): Unit = {
     obj match {
       case c: Cacheable => c.evicted()
       case _            =>
     }
+    evictionListenerOpt.foreach(_(obj))
+  }
 
   override def removeAll(): Int = synchronized {
     val previousSize = currentSize
@@ -209,19 +269,29 @@ class MemoryCacheImpl(private var maxSize: Int) extends Cache {
   }
 
   private def getValidEntry(key: CacheKey, validity: AnyRef, remove: Boolean): CacheEntry = synchronized {
+    val now   = clockMillis()
     val entry = keyToEntryMap.get(key)
-    if ((entry ne null) && lowerOrEqual(validity, entry.validity)) {
-      hitCount += 1L
-      entry.lastAccessedAtMs = System.currentTimeMillis()
+    if (entry ne null) {
+      if (isExpired(entry, now)) {
+        tryEvict(entry)
+        missCount += 1L
+        null
+      } else if (lowerOrEqual(validity, entry.validity)) {
+        hitCount += 1L
+        entry.lastAccessedAtMs = now
 
-      if (remove) {
-        removeInternal(key, isEvict = false, isRemove = true, countExplicitRemove = false)
-      } else if (linkedList.getFirst ne entry) {
-        linkedList.remove(entry.listEntry)
-        entry.listEntry = linkedList.addFirst(entry)
+        if (remove) {
+          removeInternal(key, isEvict = false, isRemove = true, countExplicitRemove = false)
+        } else if (linkedList.getFirst ne entry) {
+          linkedList.remove(entry.listEntry)
+          entry.listEntry = linkedList.addFirst(entry)
+        }
+
+        entry
+      } else {
+        missCount += 1L
+        null
       }
-
-      entry
     } else {
       missCount += 1L
       null
@@ -229,21 +299,47 @@ class MemoryCacheImpl(private var maxSize: Int) extends Cache {
   }
 
   override def findAny(key: CacheKey): CacheEntry = synchronized {
-    keyToEntryMap.get(key)
+    val entry = keyToEntryMap.get(key)
+    if ((entry ne null) && isExpired(entry, clockMillis())) {
+      tryEvict(entry)
+      null
+    } else {
+      entry
+    }
   }
 
-  override def getCurrentSize: Int = synchronized { currentSize }
-  override def getMaxSize: Int     = synchronized { maxSize }
+  override def getCurrentSize: Int           = synchronized { currentSize }
+  override def getMaxSize: Int               = synchronized { maxSize }
+  override def getMaxSizeBytes: Option[Long] = synchronized { maxSizeBytes }
+  override def getMaxIdleMillis: Option[Long]= synchronized { maxIdleMillis }
 
   override def setMaxSize(newMaxSize: Int): Unit = synchronized {
     if (newMaxSize != this.maxSize) {
       var tryCount = 0
       val maxTries = currentSize
       while (currentSize > newMaxSize && tryCount < maxTries) {
-        tryEvictLast()
+        tryEvictLast(skipEntry = null)
         tryCount += 1
       }
       this.maxSize = newMaxSize
+    }
+  }
+
+  override def setMaxSizeBytes(newMaxSizeBytes: Option[Long]): Unit = synchronized {
+    val normalized = newMaxSizeBytes.filter(_ > 0L)
+    if (normalized != this.maxSizeBytes) {
+      this.maxSizeBytes = normalized
+      normalized.foreach { maxBytes =>
+        while (currentSize > 1 && currentEstimatedBytes > maxBytes && tryEvictLast(skipEntry = null)) ()
+      }
+    }
+  }
+
+  override def setMaxIdleMillis(newMaxIdleMillis: Option[Long]): Unit = synchronized {
+    val normalized = newMaxIdleMillis.filter(_ > 0L)
+    if (normalized != this.maxIdleMillis) {
+      this.maxIdleMillis = normalized
+      evictExpiredUnlocked(clockMillis())
     }
   }
 
@@ -267,6 +363,8 @@ class MemoryCacheImpl(private var maxSize: Int) extends Cache {
       name           = name,
       currentSize    = currentSize,
       maxSize        = maxSize,
+      maxSizeBytes   = maxSizeBytes,
+      maxIdleMillis  = maxIdleMillis,
       estimatedBytes = currentEstimatedBytes,
       hitCount       = hitCount,
       missCount      = missCount,
@@ -277,6 +375,8 @@ class MemoryCacheImpl(private var maxSize: Int) extends Cache {
   }
 
   def entriesSnapshot: List[ObjectCacheEntrySnapshot] = synchronized {
+    evictExpiredUnlocked(clockMillis())
+
     val buf = ListBuffer.empty[ObjectCacheEntrySnapshot]
     val it  = linkedList.iterator()
     var recomputedTotal = 0L

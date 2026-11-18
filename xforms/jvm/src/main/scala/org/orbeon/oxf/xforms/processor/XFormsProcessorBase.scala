@@ -26,7 +26,7 @@ import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.PartAnalysisBuilder
-import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, XFormsStateManager, XFormsStaticStateCache}
+import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, XFormsStateManager, XFormsStateStore, XFormsStaticStateCache}
 import org.orbeon.oxf.xml.*
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xforms.route.PipelineResponse
@@ -205,24 +205,40 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
                   cacheTracer.staticStateStatus(read = false, found = true, cachedState.digest)
                   cachedState
                 case other =>
-                  // Not found static state in cache OR it is out of date, create static state from input
-                  // NOTE: In out of date case, could clone static state and reprocess instead?
+                  // If evicted from `XFormsStaticStateCache` (`other.isEmpty`), check `xforms.static-state` store (#1572)
+                  // before re-executing the upstream `InputAnnotatedDocument` compilation pipeline.
+                  val restoredFromStoreOpt =
+                    if (other.isEmpty)
+                      XFormsStateStore.findStaticStateBytes(stage2CacheableState.staticStateDigest)
+                        .map(XFormsContainingDocumentBuilder.restoreStaticStateFromBytes(stage2CacheableState.staticStateDigest.some, _))
+                        .filter(_.topLevelPart.bindingsIncludesAreUpToDate)
+                    else
+                      None
 
-                  other foreach { case (cachedState, _) =>
-                    debug(s"out-of-date static state by digest in cache due to: ${cachedState.topLevelPart.debugOutOfDateBindingsIncludes}")
+                  restoredFromStoreOpt match {
+                    case Some(restoredState) =>
+                      debug("restored evicted static state by digest from xforms.static-state store")
+                      cacheTracer.staticStateStatus(read = false, found = true, restoredState.digest)
+                      XFormsStaticStateCache.storeDocument(restoredState)
+                      restoredState
+                    case None =>
+                      // Not found in static-state store OR XBL bindings are out of date: re-read from upstream input
+                      other foreach { case (cachedState, _) =>
+                        debug(s"out-of-date static state by digest in cache due to: ${cachedState.topLevelPart.debugOutOfDateBindingsIncludes}")
+                      }
+
+                      val staticState =
+                        PartAnalysisBuilder.createFromStaticStateBits(
+                          StaticStateBits.fromXmlReceiver(
+                            stage2CacheableState.staticStateDigest.some,
+                            readInputAsSAX(pipelineContext, InputAnnotatedDocument, _)
+                          )
+                        )
+                      cacheTracer.staticStateStatus(read = true, found = false, staticState.digest)
+
+                      XFormsStaticStateCache.storeDocument(staticState)
+                      staticState
                   }
-
-                  val staticState =
-                    PartAnalysisBuilder.createFromStaticStateBits(
-                      StaticStateBits.fromXmlReceiver(
-                        stage2CacheableState.staticStateDigest.some,
-                        readInputAsSAX(pipelineContext, InputAnnotatedDocument, _)
-                      )
-                    )
-                  cacheTracer.staticStateStatus(read = true, found = false, staticState.digest)
-
-                  XFormsStaticStateCache.storeDocument(staticState)
-                  staticState
               }
               XFormsContainingDocumentBuilder(
                 staticState    = staticState,

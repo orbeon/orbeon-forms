@@ -14,7 +14,9 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.http.HttpMethod.GET
+import org.orbeon.oxf.test.TestHttpClient.StaticState
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, TestHttpClient}
+import org.orbeon.oxf.xforms.state.XFormsStaticStateCache
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -81,6 +83,14 @@ class FormRunnerConsoleTest
       val staticStateStoreElem = cacheElems.find(_.attributeValue("name") == "xforms.static-state").get
       assert(staticStateStoreElem.attributeValue("can-clear") == "false")
 
+      // Default 15% max-heap byte budgets must be active on both `xforms.cache.documents` and `xforms.cache.static-state` (#1973, #1572)
+      val docsObjectCacheElem   = cacheElems.find(_.attributeValue("name") == "xforms.cache.documents").get
+      val staticObjectCacheElem = cacheElems.find(_.attributeValue("name") == "xforms.cache.static-state").get
+      assert(docsObjectCacheElem.attributeValue("max-bytes").toLong > 0L)
+      assert(staticObjectCacheElem.attributeValue("max-bytes").toLong > 0L)
+      assert(docsObjectCacheElem.attributeValue("limit-summary").contains("max"))
+      assert(staticObjectCacheElem.attributeValue("limit-summary").contains("max"))
+
       // 3. Static state drill-down
       val staticStatesElem = root.element("static-states")
       assert(staticStatesElem.attributeValue("count").toInt >= 1)
@@ -112,6 +122,19 @@ class FormRunnerConsoleTest
 
       val snapshotAfterClear = FormRunnerConsole.buildConsoleSnapshotDom()
       assert(snapshotAfterClear.getRootElement.element("static-states").attributeValue("count").toInt == 0)
+
+      // 6. Store-backed static-state recovery (#1572): reloading `/fr/tests/wizard/new` after `xforms.cache.static-state`
+      // was cleared/evicted must restore directly from `xforms.static-state` without re-reading `InputAnnotatedDocument`.
+      val (_, docAfterClearOpt, eventsAfterClear) =
+        runFormRunner(
+          app  = "tests",
+          form = "wizard",
+          mode = "new"
+        )
+      assert(docAfterClearOpt.isDefined)
+      val staticStateTraceOpt = eventsAfterClear.collectFirst { case s: StaticState => s }
+      assert(staticStateTraceOpt.exists(s => ! s.read && s.found))
+      assert(XFormsStaticStateCache.findDocument(staticStateTraceOpt.get.digest).isDefined)
     }
   }
 }

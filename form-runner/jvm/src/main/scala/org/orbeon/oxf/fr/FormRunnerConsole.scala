@@ -122,7 +122,8 @@ object FormRunnerConsole {
     }
 
   def buildConsoleSnapshotDom(): dom.Document = {
-    // Ensure standard caches/stores are registered so they always appear in the console table
+    // Ensure standard caches/stores are registered so they always appear in the console table,
+    // and sync ObjectCache limits with the active PropertySet.
     val _ = (
       ObjectCache.instance,
       XFormsStaticStateCache.getCacheForDiagnostics,
@@ -133,6 +134,7 @@ object FormRunnerConsole {
       XFormsStores.staticStateStore,
       XFormsStores.resourcesStore
     )
+    ObjectCache.configureAllIfNeeded(org.orbeon.oxf.properties.Properties.instance.getPropertySet)
 
     val nowMs      = System.currentTimeMillis()
     val runtimeMx  = ManagementFactory.getRuntimeMXBean
@@ -181,6 +183,8 @@ object FormRunnerConsole {
             name           = name,
             currentSize    = other.getCurrentSize,
             maxSize        = other.getMaxSize,
+            maxSizeBytes   = other.getMaxSizeBytes,
+            maxIdleMillis  = other.getMaxIdleMillis,
             estimatedBytes = other.getCurrentEstimatedBytes,
             hitCount       = other.getHitCount,
             missCount      = other.getMissCount,
@@ -282,12 +286,21 @@ object FormRunnerConsole {
 
     objectCacheSnaps.foreach { snap =>
       val cElem = cachesElem.addElement("cache")
+      val limitParts = List(
+        Some(s"${snap.maxSize} entries"),
+        snap.maxSizeBytes.map(b => s"${formatBytes(b)} max"),
+        snap.maxIdleMillis.map(ms => s"idle ${formatDurationMs(ms)}")
+      ).flatten
+
       cElem.addAttribute("kind",                     "object-cache")
       cElem.addAttribute("name",                     snap.name)
       cElem.addAttribute("engine",                   "ObjectCache (JVM Heap)")
       cElem.addAttribute("heap-entries",             snap.currentSize.toString)
       cElem.addAttribute("total-entries",            snap.currentSize.toString)
-      cElem.addAttribute("limit-summary",            s"${snap.maxSize} entries")
+      cElem.addAttribute("max-entries",              snap.maxSize.toString)
+      cElem.addAttribute("max-bytes",                snap.maxSizeBytes.map(_.toString).getOrElse(""))
+      cElem.addAttribute("max-idle-ms",              snap.maxIdleMillis.map(_.toString).getOrElse(""))
+      cElem.addAttribute("limit-summary",            limitParts.mkString(", "))
       cElem.addAttribute("estimated-heap-bytes",     snap.estimatedBytes.toString)
       cElem.addAttribute("estimated-heap-formatted", formatBytes(snap.estimatedBytes))
       cElem.addAttribute("disk-bytes",               "0")

@@ -29,6 +29,11 @@ trait Cache {
   def getCurrentSize: Int
   def getMaxSize: Int
   def setMaxSize(maxSize: Int): Unit
+  def getMaxSizeBytes: Option[Long]
+  def setMaxSizeBytes(maxSizeBytes: Option[Long]): Unit
+  def getMaxIdleMillis: Option[Long]
+  def setMaxIdleMillis(maxIdleMillis: Option[Long]): Unit
+  def evictExpired(): Int
   def getCurrentEstimatedBytes: Long
   def getHitCount: Long
   def getMissCount: Long

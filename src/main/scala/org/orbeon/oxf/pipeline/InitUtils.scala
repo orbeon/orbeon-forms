@@ -37,7 +37,6 @@ import scala.util.control.NonFatal
 
 object InitUtils {
 
-  private val CacheSizeProperty            = "oxf.cache.size"
   private val ProcessorsProperty           = "oxf.pipeline.processors"
   private val DeprecatedProcessorsProperty = "oxf.prologue"
   private val DefaultProcessors            = "oxf:/processors.xml"
@@ -75,9 +74,8 @@ object InitUtils {
 
         var success = false
         try {
-          // Set cache size
-          Properties.instance.getPropertySet.getIntOpt(CacheSizeProperty) foreach
-            ObjectCache.instance.setMaxSize
+          // Sync ObjectCache entry/byte/idle limits if PropertySet initialized or reloaded
+          ObjectCache.configureAllIfNeeded(Properties.instance.getPropertySet)
 
           // Start execution
           processor.reset(pipelineContext)

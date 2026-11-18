@@ -37,6 +37,8 @@ object XFormsStaticStateCache {
         .flatten
         .filter(_.nonEmpty)
         .foreach(path => digestToSamplePath.putIfAbsent(staticState.digest, path))
+      if (staticState.isServerStateHandling)
+        Try(XFormsStateStore.storeStaticState(staticState, refresh = false))
       cache.add(createCacheKey(staticState.digest), System.currentTimeMillis, staticState)
     }
   }
@@ -68,5 +70,15 @@ object XFormsStaticStateCache {
 
     val cache              = ObjectCache.instance(XFormsDocumentCache, XFormsDocumentCacheDefaultSize)
     val digestToSamplePath = new ConcurrentHashMap[String, String]()
+
+    cache match {
+      case mc: MemoryCacheImpl =>
+        mc.setEvictionListener {
+          case ss: XFormsStaticState if ss.isServerStateHandling =>
+            Try(XFormsStateStore.storeStaticState(ss, refresh = false))
+          case _ =>
+        }
+      case _ =>
+    }
   }
 }

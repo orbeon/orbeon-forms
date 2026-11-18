@@ -206,12 +206,15 @@ trait BindingOps {
     val originalAttsIncludingAppearance =
       updateAttAppearance(originalAttsWithoutAppearance, originalAppearanceOpt)
 
-    val originalVirtualName =
+    val (originalVirtualName, resolvedAppearanceOpt) =
       findVirtualNameAndAppearance(
         searchElemName = originalControlElemAtts.uriQualifiedName,
         searchDatatype = originalDatatype,
         searchAtts     = originalAttsIncludingAppearance
-      )._1
+      )
+
+    val effectiveAttsIncludingAppearance =
+      updateAttAppearance(originalAttsWithoutAppearance, originalAppearanceOpt.orElse(resolvedAppearanceOpt))
 
     val datatypeMatch = DatatypeMatch.makeExcludeStringMatch(originalDatatype)
 
@@ -223,13 +226,12 @@ trait BindingOps {
           searchAtts     = atts
         )
         relatedDescriptors = findRelatedDescriptors(specificDescriptor)
-        directQName        <- BindingOps.findFirstDirectInRelated(relatedDescriptors)
-        if ctx.conversions.contains(directQName)
+        directQName        <- BindingOps.findAllDirectInRelated(relatedDescriptors).find(ctx.conversions.contains)
       } yield
         directQName
 
     val originalDirectQNameOpt =
-      resolveDirectWithConversions(originalAttsIncludingAppearance)
+      resolveDirectWithConversions(effectiveAttsIncludingAppearance)
         .orElse(resolveDirectWithConversions(originalAttsWithoutAppearance))
 
     val originalNonCommonAtts =
@@ -589,14 +591,29 @@ trait BindingOps {
   def createConversionsMap(implicit index: BindingIndex[BindingDescriptor]): Map[QName, Set[QName]] = {
 
     // `index.nameOnlySelectors` is prepended in reverse registration order and also includes datatype-only selectors
-    // (`xf|input:xxf-type(...)`). Filter to direct-name selectors only (`datatype.isEmpty`) in registration/toolbox order.
-    val directDescriptorsInOrder =
+    // (`xf|input:xxf-type(...)`). Filter to direct-name selectors only (`datatype.isEmpty`) in registration/toolbox
+    // order, keeping only the primary (first-declared) direct selector per `<xbl:binding>` (e.g. `fr|range` in
+    // `fr|range, xf|range`).
+    val allDirectDescriptorsInOrder =
       index.nameOnlySelectors.reverseIterator.collect {
         case (b @ BindingDescriptor(Some(_), None, None, EmptySet()), _) => b
       }.toList
 
-    val directQNamesSet =
-      directDescriptorsInOrder.iterator.flatMap(_.elementName).toSet
+    val directDescriptorsInOrder =
+      allDirectDescriptorsInOrder.keepDistinctBy(_.binding)
+
+    val bindingToPrimaryDirectQName =
+      (for {
+        d <- directDescriptorsInOrder
+        b <- d.binding
+        q <- d.elementName
+      } yield b -> q).toMap
+
+    val aliasToPrimaryDirectQName =
+      (for {
+        d <- allDirectDescriptorsInOrder
+        q <- d.elementName
+      } yield q -> d.binding.flatMap(bindingToPrimaryDirectQName.get).getOrElse(q)).toMap
 
     val builder = mutable.ListBuffer[(QName, QName)]()
 
@@ -616,7 +633,7 @@ trait BindingOps {
         .collect { case (Selector(ElementWithFiltersSelector(Some(ts: TypeSelector), Nil), Seq()), ns) => // direct name only for now
           ts.toQName(ns)
         }
-        .filter(directQNamesSet)
+        .flatMap(aliasToPrimaryDirectQName.get)
         .foreach { conversionDirectName =>
           builder += directName -> conversionDirectName
         }
@@ -863,8 +880,10 @@ object BindingOps {
   val StandardControlClasses: Set[String] = Set("fr-attachment", "fr-static-attachment")
   private val AutocompleteQName: QName    = QName("autocomplete")
 
-  def findFirstDirectInRelated(relatedDescriptors: Iterable[BindingDescriptor]): Option[QName] =
-    relatedDescriptors.collectFirst {
+  // `relatedDescriptors` comes from `BindingIndex`, where `nameOnlySelectors` are prepended in reverse declaration order,
+  // so reverse to restore declaration order (e.g. `fr|range` before `xf|range`).
+  def findAllDirectInRelated(relatedDescriptors: Iterable[BindingDescriptor]): List[QName] =
+    relatedDescriptors.collect {
       case
         BindingDescriptor(
           Some(elemName),
@@ -872,7 +891,10 @@ object BindingOps {
           None,
           EmptySet()
         ) => elemName
-    }
+    }.toList.reverse
+
+  def findFirstDirectInRelated(relatedDescriptors: Iterable[BindingDescriptor]): Option[QName] =
+    findAllDirectInRelated(relatedDescriptors).headOption
 
   def findDescriptorForDirectName(directName: QName)(implicit index: BindingIndex[BindingDescriptor]): Option[BindingDescriptor] =
     index.iterateDescriptors.collectFirst {

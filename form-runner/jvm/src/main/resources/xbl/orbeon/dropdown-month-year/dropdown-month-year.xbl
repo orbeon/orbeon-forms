@@ -63,6 +63,7 @@
                 <setting name="start-year" type="xs:string"/>
                 <setting name="end-year" type="xs:string"/>
             </custom-settings>
+            <conversions element="fr|date"/>
             <control-details>
                 <xf:model xmlns="">
 

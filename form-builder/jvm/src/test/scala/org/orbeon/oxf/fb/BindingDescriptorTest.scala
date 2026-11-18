@@ -78,7 +78,7 @@ class BindingDescriptorTest
           </metadata>
         </xbl:binding>
 
-        <xbl:binding element="xf|input:xxf-type('xs:date')">
+        <xbl:binding element="fr|date, xf|input:xxf-type('xs:date')">
           <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Date</display-name>
             <conversions element="xf|input"/>
@@ -278,11 +278,11 @@ class BindingDescriptorTest
     assertVaryTypes(XF -> "input"        , XS -> "string" , None                     , XS -> "boolean", None                     )(None)
     assertVaryTypes(XF -> "input"        , XS -> "boolean", None                     , XS -> "boolean", None                     )(None)
 
-    assertVaryTypes(XF -> "input"        , XS -> "string" , None                     , XS -> "date"   , None                     )(None)
+    assertVaryTypes(XF -> "input"        , XS -> "string" , None                     , XS -> "date"   , None                     )(Some(FR -> "date"         , None))
     assertVaryTypes(XF -> "input"        , XS -> "string" , None                     , XS -> "date"   , Some("dropdowns")        )(Some(FR -> "dropdown-date", None))
     assertVaryTypes(XF -> "input"        , XS -> "date"   , None                     , XS -> "date"   , Some("dropdowns")        )(Some(FR -> "dropdown-date", None))
 
-    assertVaryTypes(FR -> "dropdown-date", XS -> "date"   , None                     , XS -> "date"   , None                     )(Some(XF -> "input"        , None))
+    assertVaryTypes(FR -> "dropdown-date", XS -> "date"   , None                     , XS -> "date"   , None                     )(Some(FR -> "date"        , None))
     assertVaryTypes(FR -> "dropdown-date", XS -> "date"   , None                     , XS -> "date"   , Some("fields")           )(Some(FR -> "fields-date"  , None))
     assertVaryTypes(FR -> "dropdown-date", XS -> "date"   , None                     , XS -> "string" , Some("fields")           )(Some(XF -> "input"        , None))
 
@@ -502,9 +502,100 @@ class BindingDescriptorTest
           iconPathOpt   = None,
           iconClasses   = "fa fa-fw fa-superscript",
           isCurrent     = isSameQName(current, FR -> "number")
+        ),
+        ConversionResult(
+          fullLabelOpt  = Some("Calculated Value"),
+          value         = XF -> "output",
+          elemName      = XF -> "output",
+          appearanceOpt = None,
+          datatypeOpt   = None,
+          addAtts       = Set.empty,
+          removeAtts    = removed,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-calculator",
+          isCurrent     = isSameQName(current, XF -> "output")
+        ),
+        ConversionResult(
+          fullLabelOpt  = Some("Hidden Field"),
+          value         = FR -> "hidden",
+          elemName      = FR -> "hidden",
+          appearanceOpt = None,
+          datatypeOpt   = None,
+          addAtts       = Set.empty,
+          removeAtts    = removed,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-eye-slash",
+          isCurrent     = isSameQName(current, FR -> "hidden")
         )
       )
     }
+
+    def expectedDateTimeConversions(
+      current   : QName,
+      removeAtts: Set[QName] = Set.empty
+    ): List[ConversionResult] =
+      List(
+        ConversionResult(
+          fullLabelOpt  = Some("Date"),
+          value         = FR -> "date",
+          elemName      = FR -> "date",
+          appearanceOpt = None,
+          datatypeOpt   = Some(XF -> "date"),
+          addAtts       = Set.empty,
+          removeAtts    = removeAtts,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-calendar",
+          isCurrent     = isSameQName(current, FR -> "date")
+        ),
+        ConversionResult(
+          fullLabelOpt  = Some("Dropdown Month/Year"),
+          value         = FR -> "dropdown-month-year",
+          elemName      = FR -> "dropdown-month-year",
+          appearanceOpt = None,
+          datatypeOpt   = Some(XF -> "gYearMonth"),
+          addAtts       = Set.empty,
+          removeAtts    = removeAtts,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-calendar",
+          isCurrent     = isSameQName(current, FR -> "dropdown-month-year")
+        ),
+        ConversionResult(
+          fullLabelOpt  = Some("Year"),
+          value         = FR -> "year",
+          elemName      = FR -> "year",
+          appearanceOpt = None,
+          datatypeOpt   = Some(XF -> "gYear"),
+          addAtts       = Set.empty,
+          removeAtts    = removeAtts,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-calendar",
+          isCurrent     = isSameQName(current, FR -> "year")
+        ),
+        ConversionResult(
+          fullLabelOpt  = Some("Time"),
+          value         = FR -> "time",
+          elemName      = FR -> "time",
+          appearanceOpt = None,
+          datatypeOpt   = Some(XF -> "time"),
+          addAtts       = Set.empty,
+          removeAtts    = removeAtts,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-clock-o",
+          isCurrent     = isSameQName(current, FR -> "time")
+        ),
+        ConversionResult(
+          fullLabelOpt  = Some("Date and Time"),
+          value         = FR -> "datetime",
+          elemName      = FR -> "datetime",
+          appearanceOpt = None,
+          datatypeOpt   = Some(XF -> "dateTime"),
+          addAtts       = Set.empty,
+          removeAtts    = removeAtts,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-calendar-o",
+          isCurrent     = isSameQName(current, FR -> "datetime")
+        )
+      )
 
     def expectedAttachmentConversions(
       current   : QName,
@@ -536,6 +627,150 @@ class BindingDescriptorTest
           iconPathOpt     = None,
           iconClasses     = "fa fa-fw fa-file-image-o",
           isCurrent       = isSameQName(current, FR -> "image-attachment")
+        ),
+        ConversionResult(
+          fullLabelOpt    = Some("Video Attachment"),
+          value           = FR -> "video-attachment",
+          elemName        = FR -> "video-attachment",
+          appearanceOpt   = None,
+          datatypeOpt     = Some(XF -> "anyURI"),
+          addAtts         = Set.empty,
+          removeAtts      = removeAtts,
+          standardClasses = "fr-attachment",
+          iconPathOpt     = None,
+          iconClasses     = "fa fa-fw fa-file-video-o",
+          isCurrent       = isSameQName(current, FR -> "video-attachment")
+        ),
+        ConversionResult(
+          fullLabelOpt    = Some("Audio Attachment"),
+          value           = FR -> "audio-attachment",
+          elemName        = FR -> "audio-attachment",
+          appearanceOpt   = None,
+          datatypeOpt     = Some(XF -> "anyURI"),
+          addAtts         = Set.empty,
+          removeAtts      = removeAtts,
+          standardClasses = "fr-attachment",
+          iconPathOpt     = None,
+          iconClasses     = "fa fa-fw fa-file-audio-o",
+          isCurrent       = isSameQName(current, FR -> "audio-attachment")
+        )
+      )
+
+    def expectedStaticMediaConversions(
+      current: QName
+    ): List[ConversionResult] =
+      List(
+        ConversionResult(
+          fullLabelOpt    = Some("Static Image"),
+          value           = FR -> "image",
+          elemName        = FR -> "image",
+          appearanceOpt   = None,
+          datatypeOpt     = Some(XF -> "anyURI"),
+          addAtts         = Set.empty,
+          removeAtts      = Set.empty,
+          standardClasses = "fr-static-attachment",
+          iconPathOpt     = None,
+          iconClasses     = "fa fa-fw fa-image",
+          isCurrent       = isSameQName(current, FR -> "image")
+        ),
+        ConversionResult(
+          fullLabelOpt    = Some("Static Video"),
+          value           = FR -> "video",
+          elemName        = FR -> "video",
+          appearanceOpt   = None,
+          datatypeOpt     = Some(XF -> "anyURI"),
+          addAtts         = Set.empty,
+          removeAtts      = Set.empty,
+          standardClasses = "fr-static-attachment",
+          iconPathOpt     = None,
+          iconClasses     = "fa fa-fw fa-file-video-o",
+          isCurrent       = isSameQName(current, FR -> "video")
+        ),
+        ConversionResult(
+          fullLabelOpt    = Some("Static Audio"),
+          value           = FR -> "audio",
+          elemName        = FR -> "audio",
+          appearanceOpt   = None,
+          datatypeOpt     = Some(XF -> "anyURI"),
+          addAtts         = Set.empty,
+          removeAtts      = Set.empty,
+          standardClasses = "fr-static-attachment",
+          iconPathOpt     = None,
+          iconClasses     = "fa fa-fw fa-file-audio-o",
+          isCurrent       = isSameQName(current, FR -> "audio")
+        )
+      )
+
+    def expectedRangeScaleRatingConversions(
+      current   : QName,
+      removeAtts: Set[QName] = Set.empty
+    ): List[ConversionResult] =
+      List(
+        ConversionResult(
+          fullLabelOpt  = Some("Slider"),
+          value         = FR -> "range",
+          elemName      = FR -> "range",
+          appearanceOpt = None,
+          datatypeOpt   = Some(FR -> "range"),
+          addAtts       = Set.empty,
+          removeAtts    = removeAtts,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-sliders",
+          isCurrent     = isSameQName(current, FR -> "range")
+        ),
+        ConversionResult(
+          fullLabelOpt  = Some("Star Rating"),
+          value         = FR -> "rating",
+          elemName      = FR -> "rating",
+          appearanceOpt = None,
+          datatypeOpt   = Some(FR -> "rating"),
+          addAtts       = Set.empty,
+          removeAtts    = removeAtts,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-star",
+          isCurrent     = isSameQName(current, FR -> "rating")
+        ),
+        ConversionResult(
+          fullLabelOpt  = Some("Linear Scale"),
+          value         = FR -> "scale",
+          elemName      = FR -> "scale",
+          appearanceOpt = None,
+          datatypeOpt   = Some(FR -> "scale"),
+          addAtts       = Set.empty,
+          removeAtts    = removeAtts,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-ruler-horizontal",
+          isCurrent     = isSameQName(current, FR -> "scale")
+        )
+      )
+
+    def expectedOpenSelectionConversions(
+      current: QName
+    ): List[ConversionResult] =
+      List(
+        ConversionResult(
+          fullLabelOpt  = Some("Radio Buttons with \"Other\""),
+          value         = FR -> "open-select1",
+          elemName      = FR -> "open-select1",
+          appearanceOpt = None,
+          datatypeOpt   = None,
+          addAtts       = Set.empty,
+          removeAtts    = Set.empty,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-dot-circle-o",
+          isCurrent     = isSameQName(current, FR -> "open-select1")
+        ),
+        ConversionResult(
+          fullLabelOpt  = Some("Checkboxes with \"Other\""),
+          value         = FR -> "open-select",
+          elemName      = FR -> "open-select",
+          appearanceOpt = None,
+          datatypeOpt   = None,
+          addAtts       = Set.empty,
+          removeAtts    = Set.empty,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-check-square-o",
+          isCurrent     = isSameQName(current, FR -> "open-select")
         )
       )
 
@@ -553,14 +788,44 @@ class BindingDescriptorTest
         (<fr:percentage xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,           XF -> "decimal",      None,                      expectedTextConversions(FR -> "number")),
         (<xf:input xmlns:xf="http://www.w3.org/2002/xforms"/>,                        XF -> "decimal",      Some("xxf:percentage"),    expectedTextConversions(FR -> "number")),
         (<fr:number-stepper xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,       XF -> "integer",      None,                      expectedTextConversions(FR -> "number", numberDatatype = XF -> "integer")),
+        (<xf:output xmlns:xf="http://www.w3.org/2002/xforms"/>,                       XS -> "string",       None,                      expectedTextConversions(XF -> "output")),
+        (<xf:output xmlns:xf="http://www.w3.org/2002/xforms"/>,                       XS -> "string",       Some("full"),              expectedTextConversions(XF -> "output")),
+        (<fr:hidden xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,               XS -> "string",       None,                      expectedTextConversions(FR -> "hidden")),
+        (<fr:date xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,                 XS -> "date",         None,                      expectedDateTimeConversions(FR -> "date")),
+        (<fr:dropdown-date xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,        XF -> "date",         None,                      expectedDateTimeConversions(FR -> "date")),
+        (<fr:dropdown-month-year xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,  XF -> "gYearMonth",   None,                      expectedDateTimeConversions(FR -> "dropdown-month-year")),
+        (<fr:dropdown-year xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,        XF -> "gYear",        None,                      expectedDateTimeConversions(FR -> "year")),
+        (<fr:time xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,                 XF -> "time",         None,                      expectedDateTimeConversions(FR -> "time")),
+        (<fr:datetime xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,             XF -> "dateTime",     None,                      expectedDateTimeConversions(FR -> "datetime")),
         (<fr:attachment xmlns:fr="http://orbeon.org/oxf/xml/form-runner" class="fr-attachment"/>,
           XF -> "anyURI", None, expectedAttachmentConversions(FR -> "attachment")),
         (<fr:image-attachment xmlns:fr="http://orbeon.org/oxf/xml/form-runner" class="fr-attachment"/>,
           XF -> "anyURI", None, expectedAttachmentConversions(FR -> "image-attachment")),
+        (<fr:video-attachment xmlns:fr="http://orbeon.org/oxf/xml/form-runner" class="fr-attachment"/>,
+          XF -> "anyURI", None, expectedAttachmentConversions(FR -> "video-attachment")),
+        (<fr:audio-attachment xmlns:fr="http://orbeon.org/oxf/xml/form-runner" class="fr-attachment"/>,
+          XF -> "anyURI", None, expectedAttachmentConversions(FR -> "audio-attachment")),
         (<fr:attachment xmlns:fr="http://orbeon.org/oxf/xml/form-runner" class="fr-attachment" allow-download="false"/>,
           XF -> "anyURI", None, expectedAttachmentConversions(FR -> "attachment", removeAtts = Set(QName("allow-download")))),
+        (<fr:attachment xmlns:fr="http://orbeon.org/oxf/xml/form-runner" multiple="true" class="fr-attachment"/>,
+          XS -> "string", None, Nil),
+        (<fr:image-attachment xmlns:fr="http://orbeon.org/oxf/xml/form-runner" multiple="true" class="fr-attachment"/>,
+          XS -> "string", None, Nil),
+        (<fr:image xmlns:fr="http://orbeon.org/oxf/xml/form-runner" class="fr-static-attachment"/>,
+          XF -> "anyURI", None, expectedStaticMediaConversions(FR -> "image")),
+        (<fr:video xmlns:fr="http://orbeon.org/oxf/xml/form-runner" class="fr-static-attachment"/>,
+          XF -> "anyURI", None, expectedStaticMediaConversions(FR -> "video")),
+        (<fr:audio xmlns:fr="http://orbeon.org/oxf/xml/form-runner" class="fr-static-attachment"/>,
+          XF -> "anyURI", None, expectedStaticMediaConversions(FR -> "audio")),
+        (<fr:range xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,                FR -> "range",        None,                      expectedRangeScaleRatingConversions(FR -> "range")),
+        (<xf:range xmlns:xf="http://www.w3.org/2002/xforms"/>,                        FR -> "range",        None,                      expectedRangeScaleRatingConversions(FR -> "range")),
+        (<fr:rating xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,               FR -> "rating",       None,                      expectedRangeScaleRatingConversions(FR -> "rating")),
+        (<fr:scale xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,                FR -> "scale",        None,                      expectedRangeScaleRatingConversions(FR -> "scale")),
+        (<fr:open-select1 xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,         XS -> "string",       None,                      expectedOpenSelectionConversions(FR -> "open-select1")),
+        (<fr:open-select1 xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,         XS -> "string",       Some("minimal"),           expectedOpenSelectionConversions(FR -> "open-select1")),
+        (<fr:open-select xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,          XS -> "string",       None,                      expectedOpenSelectionConversions(FR -> "open-select")),
         (<xf:select1 xmlns:xf="http://www.w3.org/2002/xforms" appearance="full"/>,    XS -> "string",       Some("full"),              Nil),
-        (<fr:date xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,                 XS -> "date",         None,                      Nil),
+        (<fr:date-range xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,           FR -> "date-range",   None,                      Nil),
       )
 
     for ((controlElem, datatype, appearance, expected) <- testValues) {
@@ -634,11 +899,11 @@ class BindingDescriptorTest
         val Control1             = "control-1"
         val globalAlertAsXML: NodeInfo = AlertDetails(None, Nil, global = true, params = Nil).toXML
 
-        def datatypeValidationXml(builtinType: String): NodeInfo =
+        def datatypeValidationXml(builtinType: String, schemaType: String = ""): NodeInfo =
           <validation type="datatype" id="" level="error" default-alert="true">
             <builtin-type>{builtinType}</builtin-type>
             <builtin-type-required>false</builtin-type-required>
-            <schema-type/>
+            <schema-type>{schemaType}</schema-type>
             <alert global="true"/>
           </validation>
 
@@ -713,6 +978,24 @@ class BindingDescriptorTest
         assert(findControlByName(Control1).map(_.name).contains("fr:percentage"))
         assert(findControlByName(Control1).flatMap(_.attValueOpt("appearance")).isEmpty)
         assert(findBindByName(Control1).flatMap(_.attValueOpt("type")).contains("xf:decimal"))
+
+        // 5. Star Rating -> Slider (`fr:range` + `fr:range` schema type, keeping primary `fr:range` over `xf:range`)
+        FormBuilder.saveControlElemAtts(
+          controlName     = Control1,
+          controlElemAtts = <fr:range xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,
+          keepCurrentAtts = false
+        )
+        FormBuilder.writeAlertsAndValidationsAsXML(
+          controlName        = Control1,
+          newAppearance      = "",
+          defaultAlertElem   = globalAlertAsXML,
+          validationElems    = List(datatypeValidationXml("", "fr:range")),
+          controlElemUpdated = true
+        )
+
+        assert(findControlByName(Control1).map(_.name).contains("fr:range"))
+        assert(findControlByName(Control1).flatMap(_.attValueOpt("appearance")).isEmpty)
+        assert(findBindByName(Control1).flatMap(_.attValueOpt("type")).contains("fr:range"))
       }
     }
   }

@@ -81,6 +81,7 @@
                     test="not(start castable as xs:integer and end castable as xs:integer) or (xs:integer(start) lt xs:integer(end) and (xs:integer(end) - xs:integer(start)) le 20)"
                     message="Maximum must be greater than minimum (at most 21 steps)"/>
             </custom-settings>
+            <conversions element="fr|range"/>
             <control-details>
                 <xf:model xmlns="" id="fb-editor-scale-model">
 

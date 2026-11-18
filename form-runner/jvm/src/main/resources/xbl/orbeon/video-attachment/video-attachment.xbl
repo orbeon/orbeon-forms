@@ -45,6 +45,7 @@
                     </fr:video-attachment>
                 </view>
             </templates>
+            <conversions element="fr|attachment"/>
         </metadata>
 
         <xbl:template>

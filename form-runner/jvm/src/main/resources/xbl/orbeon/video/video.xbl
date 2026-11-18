@@ -57,6 +57,7 @@
                     </fr:video>
                 </view>
             </templates>
+            <conversions element="fr|image"/>
         </metadata>
 
         <xbl:template>

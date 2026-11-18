@@ -65,6 +65,7 @@
                     </fr:open-select>
                 </view>
             </templates>
+            <conversions element="fr|open-select1"/>
         </metadata>
 
         <xbl:resources>

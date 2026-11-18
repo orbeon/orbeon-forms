@@ -61,6 +61,7 @@
             <custom-settings>
                 <setting name="field-width" type="xs:string" values="full natural"/>
             </custom-settings>
+            <conversions element="fr|date"/>
             <control-details>
                 <xf:model xmlns="" id="fb-editor-datetime-model">
 

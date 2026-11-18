@@ -77,6 +77,7 @@
                     test="not(max castable as xs:integer) or (xs:integer(max) ge 2 and xs:integer(max) le 10)"
                     message="Number of stars must be between 2 and 10"/>
             </custom-settings>
+            <conversions element="fr|range"/>
             <control-details>
                 <xf:model xmlns="" id="fb-editor-rating-model">
 

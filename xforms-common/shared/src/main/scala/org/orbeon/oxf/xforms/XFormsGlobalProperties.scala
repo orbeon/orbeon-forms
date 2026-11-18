@@ -26,6 +26,7 @@ object XFormsGlobalProperties {
   def isMinimalResources        : Boolean = propertySet.getBoolean(PropertyPrefix + "minimal-resources",                  default = true)
   def isCombinedResources       : Boolean = propertySet.getBoolean(PropertyPrefix + "combine-resources",                  default = true)
   def isReplication             : Boolean = propertySet.getBoolean(PropertyPrefix + "replication",                        default = false)
+  def sessionMaxUuids           : Int     = math.max(1, propertySet.getInteger(PropertyPrefix + "state.session-max-uuids", default = 500))
   def getDebugLogXPathAnalysis  : Boolean = propertySet.getBoolean(PropertyPrefix + "debug.log-xpath-analysis",           default = false)
   def isRequestStats            : Boolean = propertySet.getBoolean(PropertyPrefix + "debug.log-request-stats",            default = false)
   def getAjaxTimeout            : Long    = propertySet.getInteger(PropertyPrefix + "delay-before-ajax-timeout",          default = 30000).toLong

@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.event.events.XXFormsStateRestoredEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent}
 import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsGlobalProperties}
 
-import java.util.concurrent.ConcurrentHashMap
+import java.util as ju
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.ReentrantLock
 import scala.jdk.CollectionConverters.*
@@ -73,27 +73,21 @@ object XFormsStateManager
   /**
     * This is called indirectly when:
     *
-    * - the session expires, which calls the session listener above to remove the document from cache
-    * - upon takeValid()
-    * - nobody else is supposed to call remove() or removeAll() on the cache
+    * - the session expires, which calls the session listener to remove the document from cache
+    * - upon takeValid() when borrowing a document during an Ajax update
+    *
+    * Keep the UUID in the session's bounded UUID set so borrowed and passivated documents are still cleaned up from
+    * `XFormsStateStore` when `sessionDestroyed` runs (#1990, #7572).
     */
-  // WARNING: This can be called while another threads owns this document lock
-  def onRemovedFromCache(uuid: String): Unit =
-    removeFromUuidListInSession(uuid)
+  def onRemovedFromCache(uuid: String): Unit = ()
 
-  // WARNING: This could have been called while another threads owns this document lock, but the cache now obtains
-  // the lock on the document first and will not evict us if we have the lock. This means that this will be called
-  // only if no thread is dealing with this document.
-  // With #7572, we have contemplated whether NOT to remove the UUID from the set when a document is evicted from the
-  // cache. However, this can cause the set to grow indefinitely if the session is long-lived and the user keeps opening
-  // documents, which can cause memory issues. So for now we are not changing this behavior. In order to change it, we
-  // would need to be able to store the list of UUIDs for passivated documents in a store as well. Instead, we re-added
-  // an expiration setting to the Infinispan configuration for `xforms.state`.
-  def onEvictedFromCache(containingDocument: XFormsContainingDocument): Unit = {
-    removeFromUuidListInSession(containingDocument.uuid)
+  // Keep `containingDocument.uuid` in the session's `BoundedSessionUuidSet` upon cache eviction so that when the HTTP
+  // session expires or logs out (`sessionDestroyed`), `XFormsStateStore.removeDynamicState(uuid)` reclaims passivated
+  // Infinispan heap and SIFS disk entries immediately (#1990, #7572), while bounding per-session UUID tracking memory
+  // via `oxf.xforms.state.session-max-uuids`.
+  def onEvictedFromCache(containingDocument: XFormsContainingDocument): Unit =
     if (containingDocument.staticState.isServerStateHandling)
       storeDocumentState(containingDocument, isInitialState = false)
-  }
 
   /**
     * Called after an update.
@@ -113,10 +107,12 @@ object XFormsStateManager
     } else {
       // Don't re-add document to the cache
       debug("Not keeping document in cache following error.")
-      // Remove all information about this document from the session
+      // Remove all information about this document from the session and state store
       val uuid = containingDocument.uuid
       removeFromUuidListInSession(uuid)
       removeSessionDocument(uuid)
+      XFormsDocumentCache.remove(uuid)
+      XFormsStateStore.removeDynamicState(uuid)
     }
   }
 
@@ -254,13 +250,22 @@ object XFormsStateManager
   protected def getSession(create: Boolean): Option[ExternalContext.Session] =
     Option(NetUtils.getExternalContext).flatMap(_.getSessionOpt(create))
 
+  override protected def onSessionUuidOverflow(session: ExternalContext.Session, evictedUuid: String): Unit = {
+    session.removeAttribute(Private.getUUIDSessionKey(evictedUuid), ExternalContext.SessionScope.Application)
+    XFormsDocumentCache.remove(evictedUuid)
+    XFormsStateStore.removeDynamicState(evictedUuid)
+  }
+
   private object Private {
 
     private val XFormsStateManagerUuidKeyPrefix = "oxf.xforms.state.manager.uuid-key."
 
-    def addDocumentToSession(uuid: String): Unit =
-      getSession(ForceSessionCreation) foreach
-        (_.setAttribute(getUUIDSessionKey(uuid), SessionDocument(uuid), ExternalContext.SessionScope.Application))
+    def addDocumentToSession(uuid: String): Unit = {
+      getSession(ForceSessionCreation).foreach { session =>
+        session.setAttribute(getUUIDSessionKey(uuid), SessionDocument(uuid), ExternalContext.SessionScope.Application)
+      }
+      addToUuidListInSession(uuid)
+    }
 
     def getSessionDocument(uuid: String): Option[SessionDocument] =
       getSession(false)
@@ -315,13 +320,51 @@ object XFormsStateManager
   }
 }
 
-// Handle the UUID list in the session.
-trait XFormsStateManagerUuidList {
+final class BoundedSessionUuidSet(val maxEntries: Int) extends Serializable {
 
-  private type SetType = ConcurrentHashMap.KeySetView[String, java.lang.Boolean]
+  private val effectiveMax = math.max(1, maxEntries)
+  private val entries      = new ju.LinkedHashMap[String, java.lang.Boolean](16, 0.75f, true)
+
+  def add(uuid: String): Option[String] =
+    synchronized {
+      entries.put(uuid, java.lang.Boolean.TRUE)
+      if (entries.size() > effectiveMax) {
+        val it     = entries.keySet().iterator()
+        val eldest = it.next()
+        it.remove()
+        Some(eldest)
+      } else {
+        None
+      }
+    }
+
+  def remove(uuid: String): Boolean =
+    synchronized {
+      entries.remove(uuid) ne null
+    }
+
+  def contains(uuid: String): Boolean =
+    synchronized {
+      entries.containsKey(uuid)
+    }
+
+  def size: Int =
+    synchronized {
+      entries.size()
+    }
+
+  def snapshot: List[String] =
+    synchronized {
+      entries.keySet().iterator().asScala.toList
+    }
+}
+
+// Handle the bounded LRU UUID set in the session.
+trait XFormsStateManagerUuidList {
 
   protected def getSession(create: Boolean): Option[ExternalContext.Session]
   protected val ForceSessionCreation: Boolean
+  protected def onSessionUuidOverflow(session: ExternalContext.Session, evictedUuid: String): Unit = ()
 
   private val XFormsStateManagerUUIDListKey   = "oxf.xforms.state.manager.uuid-list-key"
   private val activeSessionsCounter           = new AtomicInteger(0)
@@ -332,23 +375,29 @@ trait XFormsStateManagerUuidList {
   def sessionCreated(session: ExternalContext.Session): Unit =
     session.getAttribute(XFormsStateManagerUUIDListKey).getOrElse {
       activeSessionsCounter.incrementAndGet()
-      session.setAttribute(XFormsStateManagerUUIDListKey, ConcurrentHashMap.newKeySet[String])
+      session.setAttribute(XFormsStateManagerUUIDListKey, new BoundedSessionUuidSet(XFormsGlobalProperties.sessionMaxUuids))
     }
 
   // This must be called once exactly when the session is destroyed
   def sessionDestroyed(session: ExternalContext.Session): Unit =
     if (hasUuidListInSession(session)) {
       activeSessionsCounter.decrementAndGet()
-      getUuidListInSession(session).iterator.asScala.foreach { uuid =>
+      val uuids = getUuidListInSession(session).snapshot
+      session.removeAttribute(XFormsStateManagerUUIDListKey, ExternalContext.SessionScope.Application)
+      uuids.foreach { uuid =>
         XFormsDocumentCache.remove(uuid)
         XFormsStateStore.removeDynamicState(uuid)
       }
-      session.removeAttribute(XFormsStateManagerUUIDListKey, ExternalContext.SessionScope.Application)
     }
 
   protected def addToUuidListInSession(uuid: String): Unit =
     getSession(ForceSessionCreation)
-      .foreach(session => getUuidListInSession(session).add(uuid))
+      .foreach { session =>
+        getUuidListInSession(session).add(uuid).foreach { evictedUuid =>
+          if (evictedUuid != uuid)
+            onSessionUuidOverflow(session, evictedUuid)
+        }
+      }
 
   protected def removeFromUuidListInSession(uuid: String): Unit =
     getSession(ForceSessionCreation) // support missing session for tests
@@ -359,10 +408,10 @@ trait XFormsStateManagerUuidList {
 
   // The UUID list is added once upon session creation so it is expected to be found here
   private[state]
-  def getUuidListInSession(session: ExternalContext.Session): SetType =
+  def getUuidListInSession(session: ExternalContext.Session): BoundedSessionUuidSet =
     session
       .getAttribute(XFormsStateManagerUUIDListKey, ExternalContext.SessionScope.Application)
-      .map(_.asInstanceOf[SetType])
+      .map(_.asInstanceOf[BoundedSessionUuidSet])
       .getOrElse(throw new IllegalStateException(s"`$XFormsStateManagerUUIDListKey` was not set in the session. Check your listeners."))
 
   private[state]

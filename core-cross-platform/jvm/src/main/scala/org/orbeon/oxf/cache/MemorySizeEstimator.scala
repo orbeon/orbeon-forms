@@ -14,6 +14,7 @@
 package org.orbeon.oxf.cache
 
 import org.apache.commons.pool.ObjectPool
+import org.infinispan.commons.marshall.WrappedBytes
 import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.xml.SAXStore
@@ -37,6 +38,7 @@ object MemorySizeEstimator {
     value match {
       case null                        => 0L
       case s: SizedCacheable           => s.estimatedMemoryBytes
+      case wb: WrappedBytes            => 32L + wb.getLength.toLong
       case bytes: Array[Byte]          => 16L + bytes.length.toLong
       case chars: Array[Char]          => 16L + chars.length.toLong * 2L
       case ints: Array[Int]            => 16L + ints.length.toLong * 4L
@@ -68,6 +70,8 @@ object MemorySizeEstimator {
         128L + count.toLong * EstimatedXPathExprBytes
       case (a, b)                      => 24L + estimateBytes(a) + estimateBytes(b)
       case (a, b, c)                   => 32L + estimateBytes(a) + estimateBytes(b) + estimateBytes(c)
+      case Some(v)                     => 16L + estimateBytes(v)
+      case None                        => 0L
       case seq: scala.collection.Seq[?] if seq.isInstanceOf[scala.collection.immutable.ArraySeq.ofByte] =>
         24L + seq.size.toLong
       case _: java.lang.Long | _: java.lang.Integer | _: java.lang.Boolean | _: java.lang.Double =>

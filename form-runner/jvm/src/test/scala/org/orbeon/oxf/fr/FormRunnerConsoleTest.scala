@@ -70,12 +70,16 @@ class FormRunnerConsoleTest
       assert(cacheNames.contains("xforms.cache.shared-instances"))
       assert(cacheNames.contains("cache.xpath"))
       assert(cacheNames.contains("xforms.state"))
+      assert(cacheNames.contains("xforms.static-state"))
       assert(cacheNames.contains("xbl.global-binding-index"))
 
       val stateStoreElem = cacheElems.find(_.attributeValue("name") == "xforms.state").get
       // Statistics must be enabled on Infinispan `xforms.state`
       assert(stateStoreElem.attributeValue("hits") != "—")
       assert(stateStoreElem.attributeValue("can-clear") == "false")
+
+      val staticStateStoreElem = cacheElems.find(_.attributeValue("name") == "xforms.static-state").get
+      assert(staticStateStoreElem.attributeValue("can-clear") == "false")
 
       // 3. Static state drill-down
       val staticStatesElem = root.element("static-states")

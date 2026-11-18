@@ -27,7 +27,7 @@ import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, PathMatche
 import org.orbeon.oxf.xforms.XFormsProperties.{NoUpdates, UploadSupportProperty}
 import org.orbeon.oxf.xforms.analysis.{Metadata, StaticStateDocument}
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
-import org.orbeon.oxf.xforms.state.{AnnotatedTemplateBuilder, XFormsState, XFormsStaticStateCache}
+import org.orbeon.oxf.xforms.state.{AnnotatedTemplateBuilder, XFormsState, XFormsStateStore, XFormsStaticStateCache}
 import org.orbeon.oxf.xforms.upload.UploadSupport
 import org.orbeon.oxf.xml.EncodeDecode
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
@@ -223,7 +223,32 @@ object XFormsContainingDocumentBuilder {
     val metadata = Metadata(staticStateDocument, template)
 
     XFormsStaticStateImpl(
-      encodedState,
+      Right(encodedState),
+      staticStateDocument.getOrComputeDigest(digest),
+      new Scope(None, ""),
+      metadata,
+      template,
+      staticStateDocument
+    )
+  }
+
+  def restoreStaticStateFromBytes(
+    digest         : Option[String],
+    compressedBytes: Array[Byte]
+  )(implicit
+    indentedLogger : IndentedLogger
+  ): XFormsStaticStateImpl = {
+
+    val staticStateDocument = new StaticStateDocument(EncodeDecode.decodeXMLFromCompressedBytes(compressedBytes))
+
+    // Restore template
+    val template = staticStateDocument.template map AnnotatedTemplateBuilder.apply
+
+    // Restore metadata
+    val metadata = Metadata(staticStateDocument, template)
+
+    XFormsStaticStateImpl(
+      Left(compressedBytes),
       staticStateDocument.getOrComputeDigest(digest),
       new Scope(None, ""),
       metadata,
@@ -246,22 +271,27 @@ object XFormsContainingDocumentBuilder {
             debug("found static state by digest in cache")
             cachedState
           case _ =>
-            // Not found static state in cache, create static state from input
+            // Not found static state in cache, create static state from input or `xforms.static-state` store
             debug("did not find static state by digest in cache")
             val restoredStaticState =
               withDebug("initialization: restoring static state") {
-                restoreStaticState(
-                  digest          = digestOpt,
-                  encodedState    = xformsState.staticState getOrElse (throw new IllegalStateException),
-                  forceEncryption = forceEncryption
-                )
+                xformsState.staticStateBytes.orElse(XFormsStateStore.findStaticStateBytes(digest)) match {
+                  case Some(compressedBytes) =>
+                    restoreStaticStateFromBytes(digestOpt, compressedBytes)
+                  case None =>
+                    restoreStaticState(
+                      digest          = digestOpt,
+                      encodedState    = xformsState.staticState.getOrElse(throw new IllegalStateException),
+                      forceEncryption = forceEncryption
+                    )
+                }
               }
             // Store in cache
             XFormsStaticStateCache.storeDocument(restoredStaticState)
             restoredStaticState
         }) ensuring (_.isServerStateHandling)
       case digestOpt @ None =>
-        // Not digest provided, create static state from input
+        // No digest provided, create static state from input
         debug("did not find static state by digest in cache")
         restoreStaticState(
           digest          = digestOpt,

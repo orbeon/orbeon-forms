@@ -37,6 +37,28 @@ object EncodeDecode {
     encodeBytes(bytes, compress, encrypt, SecureUtils.KeyUsage.GeneralNoCheck)
   }
 
+  def encodeXMLToCompressedBytes(document: Document, location: Boolean): Array[Byte] = {
+    val saxStore = TransformerUtils.orbeonDomToSAXStore(document, location)
+    val bytes    = SAXStoreBinaryFormat.serialize(saxStore)
+    Compressor.compressBytes(bytes)
+  }
+
+  def decodeXMLFromCompressedBytes(compressedBytes: Array[Byte]): Document = {
+    val bytes    = Compressor.uncompressBytes(compressedBytes)
+    val saxStore = SAXStoreBinaryFormat.deserialize(bytes)
+    TransformerUtils.saxStoreToOrbeonDomDocument(saxStore)
+  }
+
+  def encodeCompressedBytesToString(
+    compressedBytes: Array[Byte],
+    encrypt        : Boolean,
+    keyUsage       : SecureUtils.KeyUsage
+  ): String =
+    if (encrypt)
+      "X2" + SecureUtils.encrypt(keyUsage, compressedBytes)
+    else
+      "X4" + org.orbeon.oxf.util.Base64.encode(compressedBytes, useLineBreaks = false)
+
   def decodeXML(encodedXML: String, forceEncryption: Boolean): Document = {
 
     val bytes = decodeBytes(encodedXML, forceEncryption, SecureUtils.KeyUsage.GeneralNoCheck)

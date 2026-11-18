@@ -14,11 +14,13 @@
 package org.orbeon.oxf.xforms.state
 
 
-// Encoded combination of static an dynamic state that fully represents an XForms document's current state
+// Encoded combination of static and dynamic state that fully represents an XForms document's current state
 case class XFormsState(
   staticStateDigest : Option[String],
   staticState       : Option[String],
-  dynamicState      : Option[DynamicState]
+  dynamicState      : Option[DynamicState],
+  staticStateBytes  : Option[Array[Byte]] = None
 ) {
-  override def toString = s"XFormsState($staticState, $dynamicState)"
+  override def toString =
+    s"XFormsState($staticStateDigest, ${staticState.orElse(staticStateBytes.map(b => s"[${b.length} bytes]"))}, $dynamicState)"
 }

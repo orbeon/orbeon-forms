@@ -7,12 +7,13 @@ import org.infinispan.manager.DefaultCacheManager
 import org.infinispan.persistence.sifs.configuration.SoftIndexFileStoreConfiguration
 import org.orbeon.io.FileUtils
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.properties.PropertyLoader
+import org.orbeon.oxf.properties.{PropertyLoader, PropertySet}
 import org.orbeon.oxf.util.ExternalContextSupport
 import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 
 import java.io
 import java.io.File
+import java.net.URI
 import java.util.Properties
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
@@ -20,18 +21,146 @@ import scala.util.chaining.*
 import scala.util.{Try, Using}
 
 
-class InfinispanProvider(store: Boolean) extends CacheProviderApi {
+object InfinispanProvider {
 
-  val ProviderName         = "infinispan"
+  val ProviderName                     = "infinispan"
+  private val DefaultResourcePath      = "/config/infinispan.xml"
+  private val WebappTmpDirProperty     = "orbeon.webapp.tmpdir"
 
-  private val DefaultResourcePath  = "/config/infinispan.xml"
-  private val WebappTmpDirProperty = "orbeon.webapp.tmpdir"
+  private final class SharedManager(
+    val manager    : DefaultCacheManager,
+    val description: String,
+    var refCount   : Int
+  )
+
+  private case class ResolvedConfigSource(
+    key        : String,
+    description: String,
+    openStream : () => io.InputStream
+  )
+
+  private val sharedManagers = mutable.Map.empty[String, SharedManager]
+
+  private def resolveConfigSource(store: Boolean, properties: PropertySet): ResolvedConfigSource = {
+    def resolveClasspathStream(rawPath: String): Option[() => io.InputStream] = {
+      val normalized = if (rawPath.startsWith("/")) rawPath else "/" + rawPath
+      Option(getClass.getResource(normalized)).map(url => () => url.openStream())
+    }
+
+    CacheSupport.nonBlankString(store, CacheSupport.resourcePropertyName(_, ProviderName))(properties) match {
+      case Some((propName, rawPath)) =>
+        val openFn =
+          CacheSupport.configResolverOpt
+            .flatMap(_.resolveResource(rawPath))
+            .orElse(resolveClasspathStream(rawPath))
+            .getOrElse(
+              throw new OXFException(s"Infinispan configuration resource `$rawPath` specified by `$propName` was not found")
+            )
+        ResolvedConfigSource(s"resource:$rawPath", s"resource `$rawPath` (`$propName`)", openFn)
+
+      case None =>
+        CacheSupport.nonBlankString(store, CacheSupport.uriPropertyName(_, ProviderName))(properties) match {
+          case Some((propName, rawUri)) =>
+            val openFn: () => io.InputStream =
+              CacheSupport.configResolverOpt
+                .flatMap(_.resolveUri(rawUri))
+                .getOrElse(() => URI.create(rawUri).toURL.openStream())
+            ResolvedConfigSource(s"uri:$rawUri", s"URI `$rawUri` (`$propName`)", openFn)
+
+          case None =>
+            val openFn =
+              CacheSupport.configResolverOpt
+                .flatMap(_.resolveResource(DefaultResourcePath))
+                .orElse(resolveClasspathStream(DefaultResourcePath))
+                .getOrElse(
+                  throw new OXFException(s"Default Infinispan configuration `$DefaultResourcePath` was not found")
+                )
+            ResolvedConfigSource(s"default:$DefaultResourcePath", s"default resource `$DefaultResourcePath`", openFn)
+        }
+    }
+  }
+
+  private def acquireManager(store: Boolean, properties: PropertySet): (String, DefaultCacheManager) =
+    synchronized {
+      import org.orbeon.oxf.util.PathUtils.*
+
+      val source         = resolveConfigSource(store, properties)
+      val siblingKeyOpt  = Try(resolveConfigSource(! store, properties).key).toOption
+      val sharesConfig   = siblingKeyOpt.contains(source.key)
+
+      val contextPathOpt = ExternalContextSupport.externalContextOpt.map(_.getWebAppContext.getContextPath)
+      val contextOpt     = contextPathOpt.map(_.dropStartingSlash.dropTrailingSlash).flatMap(_.trimAllToOpt)
+
+      val rolePrefix =
+        if (sharesConfig) "infinispan"
+        else if (store)   "store"
+        else              "cache"
+
+      val dirLeaf =
+        if (source.key == s"default:$DefaultResourcePath")
+          rolePrefix
+        else
+          s"$rolePrefix-${Integer.toHexString(source.key.hashCode)}"
+
+      val managerKey = s"${contextOpt.getOrElse("")}|$dirLeaf|${source.key}"
+
+      sharedManagers.get(managerKey) match {
+        case Some(existing) =>
+          existing.refCount += 1
+          CacheSupport.Logger.debug(s"Reusing Infinispan DefaultCacheManager for ${if (store) "store" else "cache"} from ${existing.description} (refCount = ${existing.refCount})")
+          (managerKey, existing.manager)
+
+        case None =>
+          val webappTmpDir =
+            contextOpt match {
+              case Some(context) => FileUtils.canonicalTemporaryDirectoryPath + File.separatorChar + context + File.separatorChar + dirLeaf
+              case None          => FileUtils.canonicalTemporaryDirectoryPath + File.separatorChar + dirLeaf
+            }
+
+          val sysProps = new Properties(System.getProperties)
+          sysProps.put(WebappTmpDirProperty, webappTmpDir)
+
+          val manager =
+            Using.resource(source.openStream()) { configurationStream =>
+              new DefaultCacheManager(
+                new ParserRegistry(getClass.getClassLoader, false, sysProps)
+                  .parse(configurationStream, ConfigurationResourceResolvers.DEFAULT, MediaType.APPLICATION_XML),
+                true
+              )
+            }
+
+          CacheSupport.Logger.info(s"Initialized Infinispan DefaultCacheManager from ${source.description}")
+          sharedManagers.put(managerKey, new SharedManager(manager, source.description, refCount = 1))
+          (managerKey, manager)
+      }
+    }
+
+  private def releaseManager(managerKey: String): Unit =
+    synchronized {
+      sharedManagers.get(managerKey).foreach { shared =>
+        shared.refCount -= 1
+        if (shared.refCount <= 0) {
+          sharedManagers.remove(managerKey)
+          shared.manager.close()
+        }
+      }
+    }
+}
+
+class InfinispanProvider(store: Boolean, propertySetOpt: Option[PropertySet] = None) extends CacheProviderApi {
+
+  def this(store: Boolean) = this(store, None)
+
+  val ProviderName: String = InfinispanProvider.ProviderName
 
   import CacheSupport.Logger.*
 
   def get(cacheName: String): Option[CacheApi] =
-    Option(cacheManager.getCache[io.Serializable, io.Serializable](cacheName))
-      .map(new InfinispanCacheApi(_))
+    if (cacheManager.cacheConfigurationExists(cacheName) || cacheManager.getCacheNames.contains(cacheName))
+      Option(cacheManager.getCache[io.Serializable, io.Serializable](cacheName))
+        .map(new InfinispanCacheApi(_))
+    else
+      None
 
   def listRunningCacheSnapshots: List[CacheProviderStats] =
     synchronized {
@@ -49,13 +178,18 @@ class InfinispanProvider(store: Boolean) extends CacheProviderApi {
       }
     }
 
-  private var open   = false
-  private var closed = false
+  private var open                      = false
+  private var closed                    = false
+  private var acquiredKeyOpt: Option[String] = None
+
+  private[cache] def underlyingCacheManagerForTests: DefaultCacheManager = cacheManager
 
   def close(): Unit =
     synchronized {
-      if (open && ! closed)
-        cacheManager.close()
+      if (open && ! closed) {
+        acquiredKeyOpt.foreach(InfinispanProvider.releaseManager)
+        acquiredKeyOpt = None
+      }
       closed = true
     }
 
@@ -192,42 +326,22 @@ class InfinispanProvider(store: Boolean) extends CacheProviderApi {
 
   private lazy val cacheManager: DefaultCacheManager =
     try {
-
       val properties =
-        PropertyLoader
-          .getPropertyStore(None) // we are typically in the boot phase here so there is no request
-          .globalPropertySet
+        propertySetOpt
+          .getOrElse(PropertyLoader.getPropertyStore(None).globalPropertySet) // boot phase when no PropertySet passed
           .tap(CacheSupport.logProperties(_, CacheSupport.Logger.debug))
 
-      Option(getClass.getResource(DefaultResourcePath))
-        .map(url => Using.resource(url.openStream()) { configurationStream =>
-
-          import org.orbeon.oxf.util.PathUtils.*
-
-          // Prefix the temporary directory with the web app context path to avoid clashes between multiple web apps
-          // https://github.com/orbeon/orbeon-forms/issues/7415
-          val contextPathOpt = ExternalContextSupport.externalContextOpt.map(_.getWebAppContext.getContextPath)
-          val contextOpt     = contextPathOpt.map(_.dropStartingSlash.dropTrailingSlash).flatMap(_.trimAllToOpt)
-
-          val webappTmpDir =
-            contextOpt match {
-              case Some(context) => FileUtils.canonicalTemporaryDirectoryPath + java.io.File.separatorChar + context + java.io.File.separatorChar + (if (store) "store" else "cache")
-              case None          => FileUtils.canonicalTemporaryDirectoryPath + java.io.File.separatorChar + (if (store) "store" else "cache")
-            }
-
-          val sysProps = new Properties(System.getProperties)
-          sysProps.put(WebappTmpDirProperty, webappTmpDir)
-
-          new DefaultCacheManager(new ParserRegistry(getClass.getClassLoader, false, sysProps)
-            .parse(configurationStream, ConfigurationResourceResolvers.DEFAULT, MediaType.APPLICATION_XML), true)
-        })
-        .get
-        .tap(_ => open = true)
+      val (key, manager) = InfinispanProvider.acquireManager(store, properties)
+      synchronized {
+        acquiredKeyOpt = Some(key)
+        open           = true
+      }
+      manager
     } catch {
       case t: Throwable => // don't use `NonFatal()` here as we want to catch all for example `NoClassDefFoundError`
-        Try(PropertyLoader.getPropertyStore(None).globalPropertySet)
+        Try(propertySetOpt.getOrElse(PropertyLoader.getPropertyStore(None).globalPropertySet))
           .foreach(CacheSupport.logProperties(_, CacheSupport.Logger.error))
 
-        throw new OXFException(s"unable to initialize Infinispan cache manager from `$DefaultResourcePath`", t)
+        throw new OXFException("unable to initialize Infinispan cache manager", t)
     }
 }

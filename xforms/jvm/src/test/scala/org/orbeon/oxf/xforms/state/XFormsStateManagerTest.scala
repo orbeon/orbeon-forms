@@ -103,6 +103,87 @@ class XFormsStateManagerTest
         }
       }
     }
+
+    it("must clean up passivated dynamic states from xforms.state when the session expires (#1990, #7572)") {
+      withTestExternalContext { ec =>
+
+        val session = ec.getSession(true)
+        implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
+
+        val staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/server-cache.xhtml")
+        val doc         = XFormsContainingDocumentBuilder(staticState, None, None, mustInitialize = true)
+
+        doc.afterInitialResponse()
+        XFormsStateManager.afterInitialResponse(doc, disableDocumentCache = false)
+
+        // Simulate cache eviction to `XFormsStateStore`
+        XFormsDocumentCache.remove(doc.uuid)
+        XFormsStateManager.onEvictedFromCache(doc)
+
+        assert(XFormsStateManager.getUuidListInSession(session).contains(doc.uuid))
+        assert(XFormsStateStore.findState(doc.uuid, isInitialState = false).isDefined)
+        assert(XFormsStateStore.findState(doc.uuid, isInitialState = true).isDefined)
+        assert(XFormsStores.staticStateStore.get(staticState.digest).exists(_.isInstanceOf[Array[Byte]]))
+        assert(XFormsStores.stateStore.get(staticState.digest).isEmpty)
+
+        // Expire session -> both current and initial dynamic states must be removed from `xforms.state`,
+        // while the shared static state remains in `xforms.static-state`
+        XFormsStateManager.sessionDestroyed(session)
+
+        assert(XFormsStateStore.findState(doc.uuid, isInitialState = false).isEmpty)
+        assert(XFormsStateStore.findState(doc.uuid, isInitialState = true).isEmpty)
+        assert(XFormsStores.staticStateStore.get(staticState.digest).isDefined)
+      }
+    }
+
+    it("must restore static state from raw compressed bytes in xforms.static-state when XFormsStaticStateCache misses") {
+      withTestExternalContext { ec =>
+
+        ec.getSession(true)
+        implicit val indentedLogger: IndentedLogger = XFormsStateManager.newIndentedLogger
+
+        val staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/server-nocache.xhtml")
+        val state1      = TestState(XFormsContainingDocumentBuilder(staticState, None, None, mustInitialize = true))
+
+        state1.document.afterInitialResponse()
+        XFormsStateManager.afterInitialResponse(state1.document, disableDocumentCache = true)
+
+        // Stored static state in `xforms.static-state` must be raw compressed `Array[Byte]` smaller than Base64 string
+        val rawBytesOpt = XFormsStores.staticStateStore.get(staticState.digest).collect { case b: Array[Byte] => b }
+        assert(rawBytesOpt.isDefined)
+        assert(rawBytesOpt.get.length < staticState.encodedState.length)
+
+        // Clear in-memory `XFormsStaticStateCache` and verify full document restoration from `xforms.static-state`
+        XFormsStaticStateCache.getCacheForDiagnostics.removeAll()
+        assert(XFormsStaticStateCache.findDocument(staticState.digest).isEmpty)
+
+        val state2 = doUpdate(isCache = false, state1, doc =>
+          List(
+            new XXFormsValueEvent(
+              doc.getObjectByEffectiveId("my-input").asInstanceOf[XFormsEventTarget],
+              "restored-from-bytes"
+            )
+          )
+        )
+        assert(state2.document.sequence == 2)
+        assert(XFormsStaticStateCache.findDocument(staticState.digest).isDefined)
+      }
+    }
+
+    it("must bound session UUID tracking in BoundedSessionUuidSet using LRU order") {
+      val set = new BoundedSessionUuidSet(maxEntries = 3)
+      assert(set.add("u1").isEmpty)
+      assert(set.add("u2").isEmpty)
+      assert(set.add("u3").isEmpty)
+
+      // Touch `u1` so `u2` becomes least-recently-used
+      assert(set.add("u1").isEmpty)
+      assert(set.add("u4").contains("u2"))
+
+      assert(set.size == 3)
+      assert(! set.contains("u2"))
+      assert(set.contains("u1") && set.contains("u3") && set.contains("u4"))
+    }
   }
 
   object Private {

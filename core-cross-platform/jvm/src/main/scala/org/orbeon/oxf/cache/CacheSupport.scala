@@ -4,7 +4,13 @@ import org.orbeon.oxf.properties.{PropertyLoader, PropertySet}
 import org.slf4j
 
 import java.io
+import java.util.concurrent.atomic.AtomicReference
 
+
+trait CacheConfigResolver {
+  def resolveResource(path: String): Option[() => io.InputStream]
+  def resolveUri(uri: String)      : Option[() => io.InputStream]
+}
 
 case class CacheProviderStats(
   name                : String,
@@ -61,6 +67,14 @@ object CacheSupport {
 
   val Logger: slf4j.Logger = slf4j.LoggerFactory.getLogger("org.orbeon.caches")
 
+  private val configResolverRef = new AtomicReference[Option[CacheConfigResolver]](None)
+
+  def registerConfigResolver(resolver: CacheConfigResolver): Unit =
+    configResolverRef.set(Some(resolver))
+
+  private[cache] def configResolverOpt: Option[CacheConfigResolver] =
+    configResolverRef.get()
+
   private def propertyPrefix (store: Boolean) = s"oxf.xforms.${if (store) "store" else "cache"}"
 
   private[cache] def providerPropertyName   (store: Boolean) = s"${propertyPrefix(store)}.provider"
@@ -74,9 +88,11 @@ object CacheSupport {
 
   private val AllPropertyNames = List(
     providerPropertyName   (store = false), providerPropertyName   (store = true),
-    resourcePropertyName   (store = false, "jcache"), resourcePropertyName   (store = true, "jcache"),
-    uriPropertyName        (store = false, "jcache"), uriPropertyName        (store = true, "jcache"),
-    classnameRePropertyName(store = false, "jcache"), classnameRePropertyName(store = true, "jcache"),
+    resourcePropertyName   (store = false, "infinispan"), resourcePropertyName(store = true, "infinispan"),
+    uriPropertyName        (store = false, "infinispan"), uriPropertyName     (store = true, "infinispan"),
+    resourcePropertyName   (store = false, "jcache"),     resourcePropertyName(store = true, "jcache"),
+    uriPropertyName        (store = false, "jcache"),     uriPropertyName     (store = true, "jcache"),
+    classnameRePropertyName(store = false, "jcache"),     classnameRePropertyName(store = true, "jcache"),
   )
 
   private[cache]
@@ -92,7 +108,7 @@ object CacheSupport {
 
   private def loadProvider(store: Boolean, propertySet: PropertySet): CacheProviderApi =
     nonBlankString(store, providerPropertyName)(propertySet) match {
-      case None | Some((_, "infinispan")) => new InfinispanProvider(store)
+      case None | Some((_, "infinispan")) => new InfinispanProvider(store, Some(propertySet))
       case        Some((_, "jcache"))     => new JCacheProvider(store)
       case        Some((_, "ehcache2"))   => Ehcache2Provider
       case        Some((name, other))     => throw new IllegalArgumentException(s"invalid value for `$name`: `$other` (must be one of `ehcache2`, `jcache`, or `infinispan`)")

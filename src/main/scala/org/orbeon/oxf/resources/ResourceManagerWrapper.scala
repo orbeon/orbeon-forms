@@ -15,6 +15,7 @@ package org.orbeon.oxf.resources
 
 import java.util as ju
 
+import org.orbeon.oxf.cache.{CacheConfigResolver, CacheSupport}
 import org.orbeon.oxf.common.OXFException
 
 import scala.jdk.CollectionConverters.*
@@ -49,6 +50,23 @@ object ResourceManagerWrapper {
         case _ =>
           throw new OXFException("Declaration of resource factory missing: no value declared for property '" + FactoryProperty + "'")
       }
+
+    CacheSupport.registerConfigResolver(new CacheConfigResolver {
+      def resolveResource(path: String): Option[() => java.io.InputStream] = {
+        val stripped   = if (path.startsWith("oxf:")) path.substring(4) else path
+        val normalized = if (stripped.startsWith("/")) stripped else "/" + stripped
+        if ((_factory ne null) && instance.exists(normalized))
+          Some(() => instance.getContentAsStream(normalized))
+        else
+          None
+      }
+
+      def resolveUri(uri: String): Option[() => java.io.InputStream] =
+        if (_factory ne null)
+          Some(() => URLFactory.createURL(uri).openStream())
+        else
+          None
+    })
   }
 
   lazy val instance: ResourceManager = {

@@ -130,6 +130,7 @@ object FormRunnerConsole {
       XFormsServerSharedInstancesCache.getCacheForDiagnostics,
       XPathCache.getCacheForDiagnostics,
       XFormsStores.stateStore,
+      XFormsStores.staticStateStore,
       XFormsStores.resourcesStore
     )
 

@@ -43,6 +43,19 @@
            maxElementsOnDisk="0"
            diskExpiryThreadIntervalSeconds="120"/>
 
+    <!-- XForms serialized static state store -->
+    <cache name="xforms.static-state"
+           maxElementsInMemory="100"
+           memoryStoreEvictionPolicy="LFU"
+           overflowToDisk="true"
+           diskSpoolBufferSizeMB="10"
+           eternal="false"
+           timeToLiveSeconds="604800"
+           timeToIdleSeconds="14400"
+           diskPersistent="false"
+           maxElementsOnDisk="0"
+           diskExpiryThreadIntervalSeconds="120"/>
+
     <!-- XForms resources. Only modify if you know what you are doing! -->
     <cache name="xforms.resources"
            maxElementsInMemory="200"

@@ -17,7 +17,7 @@
             <persistent-location path="orbeon/cache" relative-to="orbeon.webapp.tmpdir"/>
         </global-state>
 
-        <!-- XForms state store -->
+        <!-- XForms dynamic state store -->
         <local-cache name="xforms.state" statistics="true">
             <expiration max-idle="18000000" interval="120000"/>
             <persistence passivation="true">
@@ -28,10 +28,22 @@
             <memory max-count="1" when-full="REMOVE"/>
         </local-cache>
 
+        <!-- XForms serialized static state store -->
+        <local-cache name="xforms.static-state" statistics="true">
+            <expiration max-idle="4h" lifespan="7d" interval="2m"/>
+            <persistence passivation="true">
+                <file-store purge="true" path="xforms.static-state" compaction-threshold="0.25">
+                    <write-behind modification-queue-size="1024" />
+                </file-store>
+            </persistence>
+            <memory max-count="100" when-full="REMOVE"/>
+        </local-cache>
+
         <!-- XForms resources store -->
         <local-cache name="xforms.resources" statistics="true">
+            <expiration max-idle="24h" lifespan="7d" interval="5m"/>
             <persistence passivation="true">
-                <file-store purge="true" path="xforms.resources">
+                <file-store purge="true" path="xforms.resources" compaction-threshold="0.25">
                     <write-behind modification-queue-size="1024" />
                 </file-store>
             </persistence>

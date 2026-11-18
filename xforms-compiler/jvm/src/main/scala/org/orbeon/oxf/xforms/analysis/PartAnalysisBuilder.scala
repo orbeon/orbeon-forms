@@ -122,7 +122,7 @@ object PartAnalysisBuilder {
     val staticStateDocument = new StaticStateDocument(staticStateBits.staticStateDocument)
 
     XFormsStaticStateImpl(
-      staticStateDocument.asBase64,
+      staticStateDocument.encodedStatePayload,
       staticStateBits.staticStateDigest,
       startScope,
       staticStateBits.metadata,
@@ -146,7 +146,7 @@ object PartAnalysisBuilder {
       val staticStateDocument = new StaticStateDocument(staticStateXML)
 
       XFormsStaticStateImpl(
-        staticStateDocument.asBase64,
+        staticStateDocument.encodedStatePayload,
         digest,
         startScope,
         metadata,

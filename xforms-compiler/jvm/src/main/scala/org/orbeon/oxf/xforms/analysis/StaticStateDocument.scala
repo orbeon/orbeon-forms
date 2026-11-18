@@ -59,12 +59,18 @@ class StaticStateDocument(val xmlDocument: Document) {
       NumberUtils.toHexString(digestContentHandler.getResult)
     }
 
-  private def isClientStateHandling: Boolean = {
+  def isClientStateHandling: Boolean = {
     def nonDefault = nonDefaultProperties.get(P.StateHandlingProperty) map (_._1 == P.StateHandlingClientValue)
     def default    = P.SupportedDocumentProperties(P.StateHandlingProperty).defaultValue.toString == P.StateHandlingClientValue
 
     nonDefault getOrElse default
   }
+
+  def asCompressedBytes: Array[Byte] =
+    EncodeDecode.encodeXMLToCompressedBytes(xmlDocument, location = true)
+
+  def encodedStatePayload: Either[Array[Byte], String] =
+    if (isClientStateHandling) Right(asBase64) else Left(asCompressedBytes)
 
   // Get the encoded static state
   // If an existing state is passed in, use it, otherwise encode from XML, encrypting if necessary.

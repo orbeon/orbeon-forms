@@ -66,10 +66,15 @@
     <!-- XForms cache configuration -->
     <!-- NOTE: This also configures non-XForms caches, including the properties ETag cache -->
     <property as="xs:string"  name="oxf.xforms.cache.provider"                          value="infinispan"/>
+    <property as="xs:string"  name="oxf.xforms.cache.infinispan.resource"               value=""/>
+    <property as="xs:string"  name="oxf.xforms.cache.infinispan.uri"                    value=""/>
+    <property as="xs:string"  name="oxf.xforms.store.infinispan.resource"               value=""/>
+    <property as="xs:string"  name="oxf.xforms.store.infinispan.uri"                    value=""/>
 
     <property as="xs:integer" name="oxf.xforms.cache.documents.size"                    value="50"/>
     <property as="xs:integer" name="oxf.xforms.cache.static-state.size"                 value="50"/>
     <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"             value="50"/>
+    <property as="xs:integer" name="oxf.xforms.state.session-max-uuids"                 value="500"/>
 
     <!-- Formats -->
     <property as="xs:string"  name="oxf.xforms.format.output.date">

@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{BindingLoader, XBLAssets}
 import org.orbeon.oxf.xforms.XFormsProperties as P
+import org.orbeon.oxf.xml.EncodeDecode
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.xforms.xbl.Scope
@@ -46,8 +47,27 @@ object XFormsStaticStateImpl {
     template            : Option[AnnotatedTemplate], // for tests only?
     staticStateDocument : StaticStateDocument
   ): XFormsStaticStateImpl = {
-
     require(encodedState ne null)
+    apply(
+      Right(encodedState),
+      digest,
+      startScope,
+      metadata,
+      template,
+      staticStateDocument
+    )
+  }
+
+  def apply(
+    encodedStatePayload : Either[Array[Byte], String],
+    digest              : String,
+    startScope          : Scope,
+    metadata            : Metadata,
+    template            : Option[AnnotatedTemplate], // for tests only?
+    staticStateDocument : StaticStateDocument
+  ): XFormsStaticStateImpl = {
+
+    require(encodedStatePayload ne null)
     require(digest ne null)
 
     implicit val logger: IndentedLogger = Loggers.newIndentedLogger("analysis") // https://github.com/orbeon/orbeon-forms/issues/179
@@ -71,7 +91,7 @@ object XFormsStaticStateImpl {
       )
 
     new XFormsStaticStateImpl(
-      encodedState,
+      encodedStatePayload,
       digest,
       topLevelPart,
       topLevelPart.metadata,
@@ -86,7 +106,7 @@ object XFormsStaticStateImpl {
 }
 
 class XFormsStaticStateImpl(
-  val encodedState                : String,
+  val encodedStatePayload         : Either[Array[Byte], String],
   val digest                      : String,
   val topLevelPart                : TopLevelPartAnalysis,
   metadata                        : Metadata,
@@ -102,6 +122,18 @@ class XFormsStaticStateImpl(
   with XFormsStaticStateStaticProperties
   with XFormsStaticStateDynamicProperties
   with SizedCacheable {
+
+  lazy val encodedState: String =
+    encodedStatePayload match {
+      case Right(s)    => s
+      case Left(bytes) => EncodeDecode.encodeCompressedBytesToString(bytes, encrypt = isClientStateHandling, SecureUtils.KeyUsage.GeneralNoCheck)
+    }
+
+  def serverEncodedStateBytes: Array[Byte] =
+    encodedStatePayload match {
+      case Left(bytes) => bytes
+      case Right(s)    => Compressor.compressBytes(EncodeDecode.decodeBytes(s, forceEncryption = false, SecureUtils.KeyUsage.GeneralNoCheck))
+    }
 
   // Delegate (Scala 3's `export` would be nice!)
   // export staticProperties._
@@ -200,7 +232,11 @@ class XFormsStaticStateImpl(
   // No resource resolver on the JVM for now
   val resourceResolverOpt: Option[ResourceResolver] = None
 
-  def encodedStateBytes  : Long = MemorySizeEstimator.estimateStringBytes(encodedState)
+  def encodedStateBytes  : Long =
+    encodedStatePayload match {
+      case Left(bytes) => MemorySizeEstimator.estimateBytes(bytes)
+      case Right(s)    => MemorySizeEstimator.estimateStringBytes(s)
+    }
   def templateSizeBytes  : Long = template.map(_.saxStore.approximateSizeBytes).getOrElse(0L)
   def staticDomSizeBytes : Long =
     if (staticStateDocumentForTests ne null)

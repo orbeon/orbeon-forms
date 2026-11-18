@@ -93,6 +93,8 @@
         <move-wall>déplacement de la séparation</move-wall>
         <split-cell>partage de cellule</split-cell>
         <merge-cell>combinaison de cellule</merge-cell>
+        <control-lhha>libellé</control-lhha>
+        <control-settings-batch>aperçu des contrôles</control-settings-batch>
     </undo-redo>
     <merge-section>
         <label>Intégrer modèle de section</label>
@@ -1858,6 +1860,7 @@
         <apply-ok-dialog>Appliquer/OK (cliquer sur le bouton principal)</apply-ok-dialog>
         <open-quick-search>Ouvrir la recherche rapide de contrôle</open-quick-search>
         <open-form-settings>Ouvrir les paramètres du formulaire</open-form-settings>
+        <open-controls>Ouvrir l'aperçu des contrôles</open-controls>
         <open-permissions>Ouvrir les permissions</open-permissions>
         <open-email-settings>Ouvrir les paramètres d'email</open-email-settings>
         <open-messages>Ouvrir les messages</open-messages>
@@ -2046,4 +2049,48 @@
         <focused-on>Section isolée :</focused-on>
         <show-all>Afficher toutes les sections</show-all>
     </section-focus>
+    <dialog-controls>
+        <label>Aperçu des contrôles</label>
+        <search-placeholder>Filtrer par nom, libellé, suggestion ou type…</search-placeholder>
+        <clear-search>Effacer le filtre</clear-search>
+        <filter>
+            <all>Tout</all>
+            <controls>Contrôles</controls>
+            <unnamed>Non nommés</unnamed>
+        </filter>
+        <suggest-all>Suggérer les noms</suggest-all>
+        <suggest-all-hint>Suggérer les noms des contrôles et sections à partir des libellés</suggest-all-hint>
+        <columns>
+            <pdf>Nom PDF</pdf>
+            <pdf-hint>Afficher ou masquer la colonne Nom du champ PDF</pdf-hint>
+            <excel>Nom Excel</excel>
+            <excel-hint>Afficher ou masquer la colonne Nom de plage Excel</excel-hint>
+        </columns>
+        <export-csv>Télécharger CSV</export-csv>
+        <empty-form>Ce formulaire ne contient encore aucune section ni aucun contrôle.</empty-form>
+        <no-matches>Aucun élément ne correspond au filtre actuel.</no-matches>
+        <headers>
+            <type>Type</type>
+            <name>Nom</name>
+            <label>Libellé</label>
+            <hint>Suggestion</hint>
+            <required>Req.</required>
+            <summary>Résumé</summary>
+            <rules>Règles</rules>
+            <pdf>Nom du champ PDF</pdf>
+            <excel>Nom de plage Excel</excel>
+        </headers>
+        <types>
+            <section>Section</section>
+            <repeated-section>Section répétée</repeated-section>
+            <section-template>Modèle de section</section-template>
+            <grid>Grille</grid>
+            <repeated-grid>Grille répétée</repeated-grid>
+        </types>
+        <readonly-template-hint>Lecture seule (provient de la bibliothèque de modèles de section)</readonly-template-hint>
+        <html-readonly-hint>Formaté en HTML ; modifier dans les propriétés du contrôle</html-readonly-hint>
+        <summary-encrypted-hint>Désactivé car le chiffrement des données est activé</summary-encrypted-hint>
+        <summary-advanced-hint>Configuré avec restriction de rôle, tri ou édition groupée dans les propriétés du contrôle</summary-advanced-hint>
+        <invalid-names-error>{0,choice,1#1 élément a un nom invalide ou en double.|1&lt;{0,number,integer} éléments ont des noms invalides ou en double.}</invalid-names-error>
+    </dialog-controls>
 </resource>

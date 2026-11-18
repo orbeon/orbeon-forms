@@ -1786,6 +1786,8 @@ object FormBuilderXPathApi {
       case InsertRow(gridId, rowPos, AboveBelow.Below) =>
         FormBuilder.rowDelete(gridId, rowPos + 1)
       case Rename(oldName, newName) =>
+        if (FormRunner.findControlByName(newName).exists(c => FormRunner.isRepeat(c) && ! hasCustomIterationName(newName)))
+          FormBuilder.renameControlIterationIfNeeded(newName, oldName, None, None)
         FormBuilder.renameControlIfNeeded(newName, oldName)
       case InsertControl(controlId) =>
         FormRunner.findControlByName(FormRunner.controlNameFromId(controlId)) map
@@ -1870,7 +1872,44 @@ object FormBuilderXPathApi {
         FormBuilder.split(FormBuilderRpcApiImpl.resolveId(cellId).get, direction, Some(size))
       case MigrateGridColumns(gridId, from, to) =>
         FormBuilder.migrateGridColumns(FormBuilderRpcApiImpl.resolveId(gridId).get, to, from)
+      case ControlLhha(controlName, lhht, values, isOptional) =>
+        val langs = values.map(_._1)
+        val currentMap = FormBuilder.getControlResourcesWithLang(controlName, lhht, langs).toMap
+        val currentValues = langs.map { lang =>
+          lang -> currentMap.get(lang).flatMap(_.headOption).map(_.getStringValue).getOrElse("")
+        }
+        settingControlLabelHintHelpOrText(controlName, lhht, forceOptional = isOptional) { implicit ctx =>
+          FormBuilder.setControlResourcesWithLang(
+            controlName  = controlName,
+            resourceName = lhht,
+            langValues   = values.map { case (l, v) => l -> Seq(v) }
+          )
+        }
+        Some(ControlLhha(controlName, lhht, currentValues, isOptional))
+      case ControlSettingsBatch(actions) =>
+        val redoActions = actions.reverse.flatMap(processUndoRedoAction)
+        if (redoActions.nonEmpty) Some(ControlSettingsBatch(redoActions)) else None
     }
+
+  //@XPathFunction
+  def buildControlOverviewXml(fbLang: String, isReadonlyMode: Boolean): NodeInfo =
+    FormBuilder.buildControlOverviewXml(fbLang, isReadonlyMode)(FormBuilderDocContext())
+
+  //@XPathFunction
+  def suggestControlNameForOverviewRow(overviewElem: NodeInfo, rowId: String, lang: String): String =
+    FormBuilder.suggestControlNameForOverviewRow(overviewElem, rowId, lang).orNull
+
+  //@XPathFunction
+  def suggestAllDefaultControlNames(overviewElem: NodeInfo, lang: String): Int =
+    FormBuilder.suggestAllDefaultControlNames(overviewElem, lang)
+
+  //@XPathFunction
+  def applyControlOverviewChanges(overviewElem: NodeInfo): Int =
+    FormBuilder.applyControlOverviewChanges(overviewElem)(FormBuilderDocContext())
+
+  //@XPathFunction
+  def controlOverviewToCsvDownloadUri(overviewElem: NodeInfo, currentLang: String): String =
+    FormBuilder.controlOverviewToCsvDownloadUri(overviewElem, currentLang)
 
   //@XPathFunction
   def initializeToolbarFromPreferences(toolbarElem: NodeInfo): Unit = {

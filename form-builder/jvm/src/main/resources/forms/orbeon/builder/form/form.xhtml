@@ -1456,6 +1456,12 @@
             </fb:dialog-control-settings>
 
             <fb:dialog-container-settings id="dialog-container-settings" ref="$form"      resources-ref="$form-resources"/>
+            <fb:dialog-controls           id="dialog-controls"                            resources-ref="$form-resources">
+                <xf:action event="fb-dialog-controls-closed">
+                    <xf:recalculate model="fr-form-model"/>
+                    <xf:dispatch name="fb-sync-toolbar" targetid="fr-form-model"/>
+                </xf:action>
+            </fb:dialog-controls>
             <fb:dialog-itemsets           id="dialog-itemsets"                            resources-ref="$form-resources"/>
             <fb:dialog-edit-source        id="dialog-edit-source"        ref="$form"      resources-ref="$form-resources"/>
             <fb:dialog-ids                id="dialog-ids"                ref="$form"      resources-ref="$form-resources"/>

@@ -23,3 +23,4 @@ object FormBuilder
     with BindingOps
     with ActionsOps
     with PdfOps
+    with ControlOverviewOps

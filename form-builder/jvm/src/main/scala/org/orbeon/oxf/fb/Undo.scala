@@ -83,6 +83,13 @@ object UndoAction {
                                     from       : Int,
                                     to         : Int)                                     extends UndoAction
 
+  case class ControlLhha           (controlName: String,
+                                    lhht       : String,
+                                    values     : List[(String, String)],
+                                    isOptional : Boolean)                                 extends UndoAction
+
+  case class ControlSettingsBatch  (actions    : List[UndoAction])                        extends UndoAction
+
   // From https://github.com/lloydmeta/enumeratum/blob/92b28ca1ceb72cebd58c1b3b1b763a6add875be3/enumeratum-core/src/main/scala/enumeratum/EnumEntry.scala#L34
   import java.util.regex.Pattern
 

@@ -1,0 +1,705 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
+
+    <xbl:binding id="fb-dialog-controls" element="fb|dialog-controls">
+
+        <xbl:handlers>
+            <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
+                <xf:setvalue ref="$ui/search"/>
+                <xf:setvalue ref="$ui/filter" value="'all'"/>
+                <xf:setvalue ref="$li/lang"   value="fbf:currentLang()"/>
+
+                <xf:insert
+                    ref="instance('overview')"
+                    origin="fbf:buildControlOverviewXml(fbf:currentLang(), fr:is-readonly-mode())"/>
+
+                <xxf:show dialog="dialog"/>
+            </xbl:handler>
+
+            <xbl:handler event="xxforms-dialog-open" observer="dialog">
+                <xf:setfocus control="fb-controls-search-input"/>
+            </xbl:handler>
+
+            <xbl:handler event="DOMActivate" observer="save-trigger" if="valid($ov)">
+                <xf:action type="xpath">
+                    fbf:applyControlOverviewChanges($ov)
+                </xf:action>
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+
+            <xbl:handler event="DOMActivate" observer="save-trigger" if="not(valid($ov))">
+                <xxf:setvisited control="dialog" recurse="true"/>
+            </xbl:handler>
+
+            <xbl:handler event="DOMActivate" observer="cancel-trigger">
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+
+            <xbl:handler event="xxforms-dialog-close" observer="dialog">
+                <!-- Clean up staged overview tree when closed and notify outer model after xxf:open-dialogs() is 0 -->
+                <xf:delete ref="$ov/item | $ov/langs/*"/>
+                <xf:setvalue ref="$ov/@external-names"/>
+                <xf:setvalue ref="$ui/search"/>
+                <xf:dispatch name="fb-dialog-controls-closed" targetid="fb-dialog-controls"/>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:implementation>
+            <xf:model id="model">
+
+                <xf:instance id="ui" xxf:exclude-result-prefixes="#all">
+                    <ui>
+                        <search/>
+                        <filter>all</filter>
+                        <show-pdf-column>false</show-pdf-column>
+                        <show-excel-column>false</show-excel-column>
+                        <csv-download-uri/>
+                        <apply-trigger/>
+                    </ui>
+                </xf:instance>
+
+                <xf:instance id="language-instance" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <lang/>
+                    </_>
+                </xf:instance>
+
+                <xf:instance id="overview" xxf:exclude-result-prefixes="#all">
+                    <overview external-names="" app="" form="">
+                        <langs/>
+                    </overview>
+                </xf:instance>
+
+                <xf:var name="ui"             value="instance('ui')"/>
+                <xf:var name="li"             value="instance('language-instance')"/>
+                <xf:var name="ov"             value="instance('overview')"/>
+                <xf:var name="external-names"                 value="xxf:split($ov/@external-names)"/>
+                <xf:var name="editable-items"                 value="$ov/item[@readonly != 'true' and @has-name = 'true']"/>
+                <xf:var name="section-template-content-names" value="$editable-items[@is-section-template = 'true']/concat(string(name), '-content')"/>
+
+                <!-- Rebuild dynamic language-dependent value bindings when switching form language -->
+                <xf:action event="xxforms-value-changed" observer="language-instance">
+                    <xf:rebuild/>
+                    <xf:recalculate/>
+                </xf:action>
+
+                <xf:bind ref="$ui">
+                    <xf:bind ref="show-pdf-column | show-excel-column" type="xs:boolean"/>
+                    <xf:bind
+                        ref="csv-download-uri"
+                        calculate="
+                            if (
+                                exists($ov/item) and
+                                count(($ov/item/(name | required | summary | (label | hint)/value))/string()) ge 0
+                            ) then
+                                fbf:controlOverviewToCsvDownloadUri($ov, $li/lang)
+                            else
+                                ''"/>
+                    <xf:bind
+                        ref="apply-trigger"
+                        readonly="fr:is-readonly-mode()"/>
+                </xf:bind>
+
+                <xf:bind ref="$ov/item">
+                    <xf:bind
+                        ref="name"
+                        type="xs:NCName"
+                        xxf:whitespace="trim"
+                        required="../@has-name = 'true'"
+                        readonly="fr:is-readonly-mode() or ../@readonly = 'true' or ../@has-name != 'true'"
+                        constraint="
+                            ../@readonly = 'true' or
+                            ../@has-name != 'true' or (
+                                let $self-name := string(.)
+                                return
+                                    not(ends-with($self-name, '-iteration')) and
+                                    not($self-name = $external-names) and
+                                    not($self-name = $section-template-content-names) and
+                                    count($editable-items[string(name) = $self-name]) le 1 and
+                                    (
+                                        ../@is-section-template != 'true' or
+                                        not(concat($self-name, '-content') = ($external-names, $editable-items/string(name)))
+                                    )
+                            )"/>
+
+                    <xf:bind
+                        ref="required"
+                        type="xs:boolean"
+                        readonly="fr:is-readonly-mode() or ../@readonly = 'true' or ../@required-supported != 'true' or ../@required-mode = 'formula'"/>
+
+                    <xf:bind
+                        ref="summary"
+                        type="xs:boolean"
+                        readonly="fr:is-readonly-mode() or ../@summary-readonly = 'true'"/>
+
+                    <xf:bind
+                        ref="(label | hint)/value"
+                        xxf:whitespace="trim"
+                        readonly="fr:is-readonly-mode() or ../../@readonly = 'true' or ../@supported != 'true' or ../@isHTML = 'true'"/>
+
+                    <xf:bind
+                        ref="@effective-pdf-name"
+                        calculate="
+                            if (../@kind != 'control' or xxf:is-blank(../name)) then
+                                ''
+                            else if (xxf:non-blank(../@custom-pdf-name)) then
+                                string(../@custom-pdf-name)
+                            else
+                                string-join(
+                                    (
+                                        for $cid in xxf:split(../@ancestor-container-ids)
+                                        return $ov/item[@row-id = $cid]/string(name)[xxf:non-blank()],
+                                        string(../name),
+                                        string(../@pdf-suffix)[xxf:non-blank()]
+                                    ),
+                                    '$'
+                                )"/>
+
+                    <xf:bind
+                        ref="@effective-excel-name"
+                        calculate="
+                            if (../@kind = 'control' and xxf:non-blank(../name)) then
+                                fbf:getExcelRangeName(string(../name))
+                            else
+                                ''"/>
+                </xf:bind>
+
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:group id="container" appearance="xxf:internal">
+
+                <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+                <xf:var name="dc-res"          value="$resources/dialog-controls"/>
+                <xf:var name="is-readonly"     value="fr:is-readonly-mode()"/>
+                <xf:var name="show-pdf"        value="data($ui/show-pdf-column)"/>
+                <xf:var name="show-excel"      value="data($ui/show-excel-column)"/>
+                <xf:var name="search-lower"    value="lower-case(xxf:trim($ui/search))"/>
+                <xf:var name="active-filter"   value="string($ui/filter)"/>
+                <xf:var name="is-filtered"     value="$search-lower != '' or $active-filter != 'all'"/>
+                <xf:var name="all-items"       value="$ov/item"/>
+
+                <xf:var
+                    name="filtered-items"
+                    value="
+                        $all-items[
+                            (
+                                $active-filter = 'all' or
+                                ($active-filter = 'controls' and @kind = 'control') or
+                                ($active-filter = 'unnamed'  and @readonly != 'true' and @kind = ('section', 'control') and matches(name, '^(control|section)-\d+$'))
+                            ) and (
+                                $search-lower = '' or
+                                (
+                                    some $s in (
+                                        name,
+                                        @original-name,
+                                        @type-label,
+                                        @section-path,
+                                        @effective-pdf-name,
+                                        @effective-excel-name,
+                                        label/value[@lang = $li/lang],
+                                        label/@preview,
+                                        hint/value[@lang = $li/lang],
+                                        hint/@preview
+                                    )
+                                    satisfies contains(lower-case(string($s)), $search-lower)
+                                )
+                            )
+                        ]"/>
+
+                <xf:var
+                    name="suggestible-count"
+                    value="
+                        count(
+                            $all-items[
+                                @readonly != 'true' and
+                                @kind = ('section', 'control') and
+                                matches(name, '^(control|section)-\d+$') and
+                                label/@supported = 'true' and
+                                (
+                                    xxf:non-blank(label/value[@lang = $li/lang]) or
+                                    xxf:non-blank(label/@preview) or
+                                    (some $v in label/value satisfies xxf:non-blank($v))
+                                )
+                            ]
+                        )"/>
+
+                <xf:var
+                    name="invalid-count"
+                    value="count($all-items/name[not(valid())])"/>
+
+                <xf:var
+                    name="csv-filename"
+                    value="
+                        if (xxf:non-blank($ov/@app) and xxf:non-blank($ov/@form)) then
+                            concat($ov/@app, '-', $ov/@form, '-controls.csv')
+                        else
+                            'controls.csv'"/>
+
+                <xxf:dialog id="dialog" appearance="full" level="modal" close="true" draggable="true" class="fb-dialog-controls">
+                    <xf:label ref="$dc-res/label"/>
+
+                    <xh:div class="fb-dialog-body fb-controls-dialog-body">
+
+                        <!-- Top toolbar: Search, Quick Filters, Suggest Names, Column Toggles, CSV Export, Language -->
+                        <xh:div class="fb-controls-toolbar">
+                            <xh:div class="fb-controls-toolbar-left">
+                                <xh:div class="fb-controls-search-box">
+                                    <xh:i class="fa fa-fw fa-search fb-controls-search-icon" aria-hidden="true"/>
+                                    <xf:input
+                                        id="fb-controls-search-input"
+                                        ref="$ui/search"
+                                        incremental="true"
+                                        class="fb-controls-search-input">
+                                        <xf:label appearance="minimal" ref="$dc-res/search-placeholder"/>
+                                    </xf:input>
+                                    <xf:trigger
+                                        ref=".[xxf:non-blank($ui/search)]"
+                                        appearance="minimal"
+                                        class="fb-controls-search-clear">
+                                        <xf:label><xh:i class="fa fa-fw fa-times-circle" aria-hidden="true"/></xf:label>
+                                        <xf:hint ref="$dc-res/clear-search"/>
+                                        <xf:setvalue event="DOMActivate" ref="$ui/search"/>
+                                    </xf:trigger>
+                                </xh:div>
+
+                                <xh:div class="btn-group fb-controls-filter-group" role="group">
+                                    <xf:trigger
+                                        appearance="minimal"
+                                        class="fb-controls-filter-btn{' active'[$active-filter = 'all']}">
+                                        <xf:label>
+                                            <xf:output value="$dc-res/filter/all"/>
+                                            <xh:span class="fb-controls-count-pill">
+                                                <xf:output value="count($all-items)"/>
+                                            </xh:span>
+                                        </xf:label>
+                                        <xf:setvalue event="DOMActivate" ref="$ui/filter" value="'all'"/>
+                                    </xf:trigger>
+                                    <xf:trigger
+                                        appearance="minimal"
+                                        class="fb-controls-filter-btn{' active'[$active-filter = 'controls']}">
+                                        <xf:label>
+                                            <xf:output value="$dc-res/filter/controls"/>
+                                            <xh:span class="fb-controls-count-pill">
+                                                <xf:output value="count($all-items[@kind = 'control'])"/>
+                                            </xh:span>
+                                        </xf:label>
+                                        <xf:setvalue event="DOMActivate" ref="$ui/filter" value="'controls'"/>
+                                    </xf:trigger>
+                                    <xf:trigger
+                                        appearance="minimal"
+                                        class="fb-controls-filter-btn{' active'[$active-filter = 'unnamed']}">
+                                        <xf:label>
+                                            <xf:output value="$dc-res/filter/unnamed"/>
+                                            <xh:span class="fb-controls-count-pill">
+                                                <xf:output value="count($all-items[@readonly != 'true' and @kind = ('section', 'control') and matches(name, '^(control|section)-\d+$')])"/>
+                                            </xh:span>
+                                        </xf:label>
+                                        <xf:setvalue event="DOMActivate" ref="$ui/filter" value="'unnamed'"/>
+                                    </xf:trigger>
+                                </xh:div>
+                            </xh:div>
+
+                            <xh:div class="fb-controls-toolbar-right">
+                                <!-- Bulk suggest names from labels -->
+                                <xf:trigger
+                                    id="fb-controls-suggest-all-trigger"
+                                    ref=".[not($is-readonly) and $suggestible-count gt 0]"
+                                    appearance="minimal"
+                                    class="fb-controls-action-pill fb-controls-suggest-all-btn">
+                                    <xf:label>
+                                        <xh:i class="fa fa-fw fa-magic" aria-hidden="true"/>
+                                        <xh:span><xf:output value="$dc-res/suggest-all"/></xh:span>
+                                        <xh:span class="fb-controls-count-pill">
+                                            <xf:output value="$suggestible-count"/>
+                                        </xh:span>
+                                    </xf:label>
+                                    <xf:hint ref="$dc-res/suggest-all-hint"/>
+                                    <xf:action event="DOMActivate" type="xpath">
+                                        fbf:suggestAllDefaultControlNames($ov, $li/lang)
+                                    </xf:action>
+                                </xf:trigger>
+
+                                <!-- Optional mapping columns toggles -->
+                                <xf:trigger
+                                    id="fb-controls-toggle-pdf-col"
+                                    appearance="minimal"
+                                    class="fb-controls-action-pill fb-controls-col-toggle{' active'[$show-pdf]}">
+                                    <xf:label>
+                                        <xh:i class="fa fa-fw fa-file-pdf-o" aria-hidden="true"/>
+                                        <xh:span><xf:output value="$dc-res/columns/pdf"/></xh:span>
+                                    </xf:label>
+                                    <xf:hint ref="$dc-res/columns/pdf-hint"/>
+                                    <xf:setvalue event="DOMActivate" ref="$ui/show-pdf-column" value="not(data(.))"/>
+                                </xf:trigger>
+
+                                <xf:trigger
+                                    id="fb-controls-toggle-excel-col"
+                                    appearance="minimal"
+                                    class="fb-controls-action-pill fb-controls-col-toggle{' active'[$show-excel]}">
+                                    <xf:label>
+                                        <xh:i class="fa fa-fw fa-file-excel-o" aria-hidden="true"/>
+                                        <xh:span><xf:output value="$dc-res/columns/excel"/></xh:span>
+                                    </xf:label>
+                                    <xf:hint ref="$dc-res/columns/excel-hint"/>
+                                    <xf:setvalue event="DOMActivate" ref="$ui/show-excel-column" value="not(data(.))"/>
+                                </xf:trigger>
+
+                                <!-- CSV Export -->
+                                <xf:output
+                                    id="fb-controls-csv-download"
+                                    appearance="xxf:download"
+                                    ref="$ui/csv-download-uri[xxf:non-blank()]"
+                                    class="fb-controls-download-link">
+                                    <xf:label
+                                        mediatype="text/html"
+                                        value="concat('&lt;i class=&quot;fa fa-fw fa-download&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt; ', $dc-res/export-csv)"/>
+                                    <xf:filename  ref="$csv-filename"/>
+                                    <xf:mediatype ref="'text/csv'"/>
+                                </xf:output>
+
+                                <!-- Multi-language switcher -->
+                                <fb:language-choice ref="$li/lang"/>
+                            </xh:div>
+                        </xh:div>
+
+                        <!-- Empty / no-matches state -->
+                        <xf:group ref=".[empty($filtered-items)]" class="fb-controls-empty-group">
+                            <xh:div class="fb-controls-empty-state">
+                                <xh:i class="fa fa-fw fa-search" aria-hidden="true"/>
+                                <xf:output value="if (empty($all-items)) then $dc-res/empty-form else $dc-res/no-matches"/>
+                            </xh:div>
+                        </xf:group>
+
+                        <!-- Main Controls Overview Table -->
+                        <xf:group ref=".[exists($filtered-items)]" class="fb-controls-table-group">
+                            <xh:div
+                                tabindex="0"
+                                role="region"
+                                aria-label="{$dc-res/label}"
+                                class="fr-table-frame fb-controls-table-frame{' fb-show-pdf'[$show-pdf]}{' fb-show-excel'[$show-excel]}">
+                                <xh:table class="table fb-controls-table">
+                                    <xh:thead>
+                                        <xh:tr>
+                                            <xh:th scope="col" class="fb-col-type"><xf:output value="$dc-res/headers/type"/></xh:th>
+                                            <xh:th scope="col" class="fb-col-name"><xf:output value="$dc-res/headers/name"/></xh:th>
+                                            <xh:th scope="col" class="fb-col-label"><xf:output value="$dc-res/headers/label"/></xh:th>
+                                            <xh:th scope="col" class="fb-col-hint"><xf:output value="$dc-res/headers/hint"/></xh:th>
+                                            <xh:th scope="col" class="fb-col-req"><xf:output value="$dc-res/headers/required"/></xh:th>
+                                            <xh:th scope="col" class="fb-col-sum"><xf:output value="$dc-res/headers/summary"/></xh:th>
+                                            <xh:th scope="col" class="fb-col-rules"><xf:output value="$dc-res/headers/rules"/></xh:th>
+                                            <xh:th scope="col" class="fb-col-pdf{' xforms-hidden'[not($show-pdf)]}"><xf:output value="$dc-res/headers/pdf"/></xh:th>
+                                            <xh:th scope="col" class="fb-col-excel{' xforms-hidden'[not($show-excel)]}"><xf:output value="$dc-res/headers/excel"/></xh:th>
+                                        </xh:tr>
+                                    </xh:thead>
+                                    <xh:tbody>
+                                        <xf:repeat ref="$filtered-items" id="fb-controls-repeat">
+                                            <xf:var name="item"            value="."/>
+                                            <xf:var name="row-id"          value="string(@row-id)"/>
+                                            <xf:var name="kind"            value="string(@kind)"/>
+                                            <xf:var name="type-kind"       value="string(@type-kind)"/>
+                                            <xf:var name="level"           value="if ($is-filtered) then 1 else xs:integer(@level)"/>
+                                            <xf:var name="in-sec-tmpl"     value="@in-section-template = 'true'"/>
+                                            <xf:var name="row-ro"          value="$is-readonly or @readonly = 'true'"/>
+                                            <xf:var name="has-name"        value="@has-name = 'true'"/>
+                                            <xf:var name="current-name"    value="string(name)"/>
+                                            <xf:var name="formula-cnt"     value="xs:integer(@formula-count)"/>
+                                            <xf:var name="validation-cnt"  value="xs:integer(@validation-count)"/>
+
+                                            <xf:var
+                                                name="display-type"
+                                                value="
+                                                    if ($kind = 'section') then
+                                                        (
+                                                            if ($type-kind = 'section-template') then $dc-res/types/section-template
+                                                            else if ($type-kind = 'repeated-section') then $dc-res/types/repeated-section
+                                                            else $dc-res/types/section
+                                                        )
+                                                    else if ($kind = 'grid') then
+                                                        concat(
+                                                            if ($type-kind = 'repeated-grid') then $dc-res/types/repeated-grid else $dc-res/types/grid,
+                                                            if (xxf:non-blank(@grid-size)) then concat(' (', @grid-size, ')') else ''
+                                                        )
+                                                    else
+                                                        string(@type-label)"/>
+
+                                            <xf:var
+                                                name="row-suggestion"
+                                                value="
+                                                    if (
+                                                        not($row-ro) and
+                                                        $kind = ('section', 'control') and
+                                                        matches($current-name, '^(control|section)-\d+$') and
+                                                        label/@supported = 'true' and
+                                                        (
+                                                            xxf:non-blank(label/value[@lang = $li/lang]) or
+                                                            xxf:non-blank(label/@preview) or
+                                                            (some $v in label/value satisfies xxf:non-blank($v))
+                                                        ) and
+                                                        count($editable-items/string(name)) ge 0
+                                                    ) then
+                                                        fbf:suggestControlNameForOverviewRow($ov, $row-id, $li/lang)
+                                                    else
+                                                        ()"/>
+
+                                            <xh:tr
+                                                class="fb-controls-row fb-controls-kind-{$kind}{' fb-controls-in-template'[$in-sec-tmpl]}{' fb-controls-row-invalid'[not(valid($item/name))]}">
+
+                                                <!-- 1. Structure & Type -->
+                                                <xh:td class="fb-col-type" style="--fb-depth: {$level}">
+                                                    <xh:div class="fb-controls-type-cell">
+                                                        <xh:i class="{@icon-class} fb-controls-type-icon" aria-hidden="true"/>
+                                                        <xh:div class="fb-controls-type-text-wrap">
+                                                            <xh:span class="fb-controls-type-name" title="{$display-type}">
+                                                                <xf:output value="$display-type"/>
+                                                            </xh:span>
+                                                            <xf:group ref=".[$is-filtered and xxf:non-blank(@section-path)]">
+                                                                <xh:span class="fb-controls-section-breadcrumb" title="{@section-path}">
+                                                                    <xf:output value="@section-path"/>
+                                                                </xh:span>
+                                                            </xf:group>
+                                                        </xh:div>
+                                                        <xf:group ref=".[xxf:non-blank(@datatype)]">
+                                                            <xh:code class="fb-controls-datatype-pill" title="{@datatype}">
+                                                                <xf:output value="@datatype"/>
+                                                            </xh:code>
+                                                        </xf:group>
+                                                        <xf:group ref=".[$in-sec-tmpl]">
+                                                            <xh:i
+                                                                class="fa fa-fw fa-lock fb-controls-readonly-lock"
+                                                                title="{$dc-res/readonly-template-hint}"
+                                                                aria-hidden="true"/>
+                                                        </xf:group>
+                                                    </xh:div>
+                                                </xh:td>
+
+                                                <!-- 2. Control / Container Name -->
+                                                <xh:td class="fb-col-name">
+                                                    <xf:group ref=".[not($has-name)]">
+                                                        <xh:span class="fb-controls-na">—</xh:span>
+                                                    </xf:group>
+                                                    <xf:group ref=".[$has-name and $row-ro]">
+                                                        <xh:code class="fb-controls-readonly-name" title="{$current-name}">
+                                                            <xf:output value="$current-name"/>
+                                                        </xh:code>
+                                                    </xf:group>
+                                                    <xf:group ref=".[$has-name and not($row-ro)]" class="fb-controls-name-edit-wrap">
+                                                        <xf:input id="fb-row-name-input" ref="name" class="fb-controls-cell-input fb-controls-name-input">
+                                                            <xf:label class="xforms-hidden" ref="$dc-res/headers/name"/>
+                                                            <xf:alert ref="$resources/dialog-control-settings/control-name/alert"/>
+                                                        </xf:input>
+                                                        <xf:trigger
+                                                            id="fb-row-suggest-name-trigger"
+                                                            ref=".[exists($row-suggestion) and $row-suggestion != $current-name]"
+                                                            appearance="minimal"
+                                                            class="fb-controls-suggest-row-btn">
+                                                            <xf:label><xh:i class="fa fa-fw fa-magic" aria-hidden="true"/></xf:label>
+                                                            <xf:hint value="frf:removeHtmlTags(xxf:format-message($resources/suggestion/label, $row-suggestion))"/>
+                                                            <xf:setvalue event="DOMActivate" ref="$item/name" value="$row-suggestion"/>
+                                                        </xf:trigger>
+                                                    </xf:group>
+                                                </xh:td>
+
+                                                <!-- 3. Label -->
+                                                <xh:td class="fb-col-label">
+                                                    <xf:var name="lbl"         value="label"/>
+                                                    <xf:var name="lbl-sup"     value="$lbl/@supported = 'true'"/>
+                                                    <xf:var name="lbl-html"    value="$lbl/@isHTML = 'true'"/>
+                                                    <xf:var name="is-expl"     value="$type-kind = 'explanation'"/>
+                                                    <xf:var name="lbl-val-ref" value="$lbl/value[@lang = $li/lang]"/>
+                                                    <xf:var
+                                                        name="lbl-ro-text"
+                                                        value="
+                                                            if ($lbl-html or $is-expl) then
+                                                                frf:removeHtmlTags(string($lbl-val-ref))
+                                                            else
+                                                                string($lbl-val-ref)"/>
+
+                                                    <xf:group ref=".[not($lbl-sup) and not($is-expl)]">
+                                                        <xh:span class="fb-controls-na">—</xh:span>
+                                                    </xf:group>
+                                                    <xf:group ref=".[($lbl-sup or $is-expl) and ($row-ro or $lbl-html or $is-expl)]" class="fb-controls-readonly-lhh">
+                                                        <xh:span class="fb-controls-readonly-text" title="{$lbl-ro-text}">
+                                                            <xf:output value="$lbl-ro-text"/>
+                                                        </xh:span>
+                                                        <xf:group ref=".[$lbl-html or $is-expl]">
+                                                            <xh:span class="fb-controls-html-badge" title="{$dc-res/html-readonly-hint}">HTML</xh:span>
+                                                        </xf:group>
+                                                    </xf:group>
+                                                    <xf:group ref=".[$lbl-sup and not($row-ro) and not($lbl-html) and not($is-expl)]">
+                                                        <xf:input id="fb-row-label-input" ref="$lbl-val-ref" class="fb-controls-cell-input fb-controls-lhh-input">
+                                                            <xf:label class="xforms-hidden" ref="$dc-res/headers/label"/>
+                                                        </xf:input>
+                                                    </xf:group>
+                                                </xh:td>
+
+                                                <!-- 4. Hint -->
+                                                <xh:td class="fb-col-hint">
+                                                    <xf:var name="hnt"         value="hint"/>
+                                                    <xf:var name="hnt-sup"     value="$hnt/@supported = 'true'"/>
+                                                    <xf:var name="hnt-html"    value="$hnt/@isHTML = 'true'"/>
+                                                    <xf:var name="hnt-val-ref" value="$hnt/value[@lang = $li/lang]"/>
+                                                    <xf:var
+                                                        name="hnt-ro-text"
+                                                        value="
+                                                            if ($hnt-html) then
+                                                                frf:removeHtmlTags(string($hnt-val-ref))
+                                                            else
+                                                                string($hnt-val-ref)"/>
+
+                                                    <xf:group ref=".[not($hnt-sup)]">
+                                                        <xh:span class="fb-controls-na">—</xh:span>
+                                                    </xf:group>
+                                                    <xf:group ref=".[$hnt-sup and ($row-ro or $hnt-html)]" class="fb-controls-readonly-lhh">
+                                                        <xh:span class="fb-controls-readonly-text" title="{$hnt-ro-text}">
+                                                            <xf:output value="$hnt-ro-text"/>
+                                                        </xh:span>
+                                                        <xf:group ref=".[$hnt-html]">
+                                                            <xh:span class="fb-controls-html-badge" title="{$dc-res/html-readonly-hint}">HTML</xh:span>
+                                                        </xf:group>
+                                                    </xf:group>
+                                                    <xf:group ref=".[$hnt-sup and not($row-ro) and not($hnt-html)]">
+                                                        <xf:input id="fb-row-hint-input" ref="$hnt-val-ref" class="fb-controls-cell-input fb-controls-lhh-input">
+                                                            <xf:label class="xforms-hidden" ref="$dc-res/headers/hint"/>
+                                                        </xf:input>
+                                                    </xf:group>
+                                                </xh:td>
+
+                                                <!-- 5. Required -->
+                                                <xh:td class="fb-col-req">
+                                                    <xf:group ref=".[@required-supported != 'true']">
+                                                        <xh:span class="fb-controls-na">—</xh:span>
+                                                    </xf:group>
+                                                    <xf:group ref=".[@required-supported = 'true' and @required-mode = 'formula']">
+                                                        <xh:span
+                                                            class="fb-controls-badge fb-controls-fx-badge"
+                                                            title="{concat($dc-res/headers/required, ': ', @required-formula)}">
+                                                            fx
+                                                        </xh:span>
+                                                    </xf:group>
+                                                    <xf:group ref=".[@required-supported = 'true' and @required-mode != 'formula']">
+                                                        <fr:checkbox-input id="fb-row-required-checkbox" ref="required" class="fb-controls-checkbox">
+                                                            <xf:label class="xforms-hidden" ref="$dc-res/headers/required"/>
+                                                        </fr:checkbox-input>
+                                                    </xf:group>
+                                                </xh:td>
+
+                                                <!-- 6. Show on Summary -->
+                                                <xh:td class="fb-col-sum">
+                                                    <xf:group ref=".[@summary-supported != 'true']">
+                                                        <xh:span class="fb-controls-na">—</xh:span>
+                                                    </xf:group>
+                                                    <xf:group
+                                                        ref=".[@summary-supported = 'true']"
+                                                        title="{
+                                                            if (@summary-readonly-reason = 'encrypted') then $dc-res/summary-encrypted-hint
+                                                            else if (@summary-readonly-reason = 'advanced-index') then $dc-res/summary-advanced-hint
+                                                            else ''
+                                                        }">
+                                                        <fr:checkbox-input id="fb-row-summary-checkbox" ref="summary" class="fb-controls-checkbox">
+                                                            <xf:label class="xforms-hidden" ref="$dc-res/headers/summary"/>
+                                                        </fr:checkbox-input>
+                                                    </xf:group>
+                                                </xh:td>
+
+                                                <!-- 7. Rules (Formulas & Validations badges) -->
+                                                <xh:td class="fb-col-rules">
+                                                    <xh:div class="fb-controls-badges-cell">
+                                                        <xf:group ref=".[$formula-cnt gt 0]">
+                                                            <xh:span class="fb-controls-badge fb-controls-fx-badge" title="{@formulas-tooltip}">
+                                                                <xh:span class="fb-fx-symbol">fx</xh:span>
+                                                                <xf:group ref=".[$formula-cnt gt 1]">
+                                                                    <xh:span class="fb-controls-badge-cnt"><xf:output value="$formula-cnt"/></xh:span>
+                                                                </xf:group>
+                                                            </xh:span>
+                                                        </xf:group>
+                                                        <xf:group ref=".[$validation-cnt gt 0]">
+                                                            <xh:span class="fb-controls-badge fb-controls-val-badge" title="{@validations-tooltip}">
+                                                                <xh:i class="fa fa-check-circle" aria-hidden="true"/>
+                                                                <xh:span class="fb-controls-badge-cnt"><xf:output value="$validation-cnt"/></xh:span>
+                                                            </xh:span>
+                                                        </xf:group>
+                                                    </xh:div>
+                                                </xh:td>
+
+                                                <!-- 8. PDF Field Name (optional column) -->
+                                                <xh:td class="fb-col-pdf{' xforms-hidden'[not($show-pdf)]}">
+                                                    <xf:group ref=".[xxf:is-blank(@effective-pdf-name)]">
+                                                        <xh:span class="fb-controls-na">—</xh:span>
+                                                    </xf:group>
+                                                    <xf:group ref=".[xxf:non-blank(@effective-pdf-name)]" class="fb-controls-mapping-cell">
+                                                        <xh:code class="fb-controls-mapping-code" title="{@effective-pdf-name}">
+                                                            <xf:output value="@effective-pdf-name"/>
+                                                        </xh:code>
+                                                    </xf:group>
+                                                </xh:td>
+
+                                                <!-- 9. Excel Range Name (optional column) -->
+                                                <xh:td class="fb-col-excel{' xforms-hidden'[not($show-excel)]}">
+                                                    <xf:group ref=".[xxf:is-blank(@effective-excel-name)]">
+                                                        <xh:span class="fb-controls-na">—</xh:span>
+                                                    </xf:group>
+                                                    <xf:group ref=".[xxf:non-blank(@effective-excel-name)]" class="fb-controls-mapping-cell">
+                                                        <xh:code class="fb-controls-mapping-code" title="{@effective-excel-name}">
+                                                            <xf:output value="@effective-excel-name"/>
+                                                        </xh:code>
+                                                    </xf:group>
+                                                </xh:td>
+
+                                            </xh:tr>
+                                        </xf:repeat>
+                                    </xh:tbody>
+                                </xh:table>
+                            </xh:div>
+                        </xf:group>
+
+                        <!-- Invalid / Duplicate Name Banner -->
+                        <xf:group ref=".[$invalid-count gt 0]" class="fb-controls-error-group">
+                            <xh:div class="alert alert-error fb-controls-error-banner" role="alert">
+                                <xh:i class="fa fa-fw fa-exclamation-circle" aria-hidden="true"/>
+                                <xf:output value="xxf:format-message($dc-res/invalid-names-error, $invalid-count)"/>
+                            </xh:div>
+                        </xf:group>
+
+                    </xh:div>
+
+                    <xh:div class="fr-dialog-buttons">
+                        <xf:group appearance="xxf:internal">
+                            <xf:trigger id="save-trigger" appearance="xxf:primary" ref="$ui/apply-trigger">
+                                <xf:label ref="$resources/apply/label"/>
+                            </xf:trigger>
+                            <xf:output value="$resources/or/label"/>
+                            <xf:trigger id="cancel-trigger" appearance="minimal">
+                                <xf:label ref="$resources/cancel/label"/>
+                            </xf:trigger>
+                        </xf:group>
+                    </xh:div>
+
+                </xxf:dialog>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

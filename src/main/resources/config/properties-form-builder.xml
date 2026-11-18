@@ -133,6 +133,7 @@
         http://orbeon.org/oxf/xml/form-builder
     </property>
 
+    <property as="xs:boolean" name="oxf.fb.menu.controls"                                       value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.schema"                                         value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.pdf"                                            value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.check-form"                                     value="true"/>
@@ -409,6 +410,10 @@
         as="xs:string"
         name="oxf.fr.detail.button.keyboard-shortcut.toolbox.open-form-settings"
         value="OF"/>
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.button.keyboard-shortcut.toolbox.open-controls"
+        value="OC"/>
     <property
         as="xs:string"
         name="oxf.fr.detail.button.keyboard-shortcut.toolbox.open-permissions"

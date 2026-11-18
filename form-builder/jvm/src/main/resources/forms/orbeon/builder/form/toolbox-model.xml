@@ -262,6 +262,7 @@
     <xf:instance id="fb-toolbox-instance">
         <_>
             <relevant/>
+            <controls/>
             <schema/>
             <css/>
             <pdf/>
@@ -292,6 +293,7 @@
 
     <xf:bind ref="instance('fb-toolbox-instance')">
         <xf:bind ref="relevant"              id="fb-relevant-bind"/>
+        <xf:bind ref="controls"              id="fb-toolbox-controls-bind"               relevant="xxf:property('oxf.fb.menu.controls')"/>
         <xf:bind ref="schema"                id="fb-toolbox-schema-bind"                 relevant="xxf:property('oxf.fb.menu.schema')"/>
         <xf:bind ref="pdf"                   id="fb-toolbox-pdf-bind"                    relevant="xxf:property('oxf.fb.menu.pdf')"/>
         <xf:bind ref="check-form"            id="fb-toolbox-check-form-bind"             relevant="xxf:property('oxf.fb.menu.check-form')"/>

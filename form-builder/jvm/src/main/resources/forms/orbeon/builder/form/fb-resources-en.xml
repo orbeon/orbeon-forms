@@ -95,6 +95,8 @@
         <move-wall>move wall</move-wall>
         <split-cell>split cell</split-cell>
         <merge-cell>merge cell</merge-cell>
+        <control-lhha>label</control-lhha>
+        <control-settings-batch>control overview</control-settings-batch>
     </undo-redo>
     <merge-section>
         <label>Merge Section Template</label>
@@ -1857,6 +1859,7 @@
         <apply-ok-dialog>Apply/OK dialog (clicks primary button)</apply-ok-dialog>
         <open-quick-search>Open the Quick control search</open-quick-search>
         <open-form-settings>Open Form Settings</open-form-settings>
+        <open-controls>Open Control Overview</open-controls>
         <open-permissions>Open Permissions</open-permissions>
         <open-email-settings>Open Email Settings</open-email-settings>
         <open-messages>Open Messages</open-messages>
@@ -2045,4 +2048,48 @@
         <focused-on>Focused on:</focused-on>
         <show-all>Show All Sections</show-all>
     </section-focus>
+    <dialog-controls>
+        <label>Control Overview</label>
+        <search-placeholder>Filter by name, label, hint, or type…</search-placeholder>
+        <clear-search>Clear filter</clear-search>
+        <filter>
+            <all>All</all>
+            <controls>Controls</controls>
+            <unnamed>Unnamed</unnamed>
+        </filter>
+        <suggest-all>Suggest Names</suggest-all>
+        <suggest-all-hint>Suggest control and section names from labels for default names</suggest-all-hint>
+        <columns>
+            <pdf>PDF Name</pdf>
+            <pdf-hint>Show or hide PDF Field Name column</pdf-hint>
+            <excel>Excel Name</excel>
+            <excel-hint>Show or hide Excel Range Name column</excel-hint>
+        </columns>
+        <export-csv>Download CSV</export-csv>
+        <empty-form>This form does not contain any sections or controls yet.</empty-form>
+        <no-matches>No items match the current filter.</no-matches>
+        <headers>
+            <type>Type</type>
+            <name>Name</name>
+            <label>Label</label>
+            <hint>Hint</hint>
+            <required>Req.</required>
+            <summary>Summary</summary>
+            <rules>Rules</rules>
+            <pdf>PDF Field Name</pdf>
+            <excel>Excel Range Name</excel>
+        </headers>
+        <types>
+            <section>Section</section>
+            <repeated-section>Repeated Section</repeated-section>
+            <section-template>Section Template</section-template>
+            <grid>Grid</grid>
+            <repeated-grid>Repeated Grid</repeated-grid>
+        </types>
+        <readonly-template-hint>Read-only (from Section Template library)</readonly-template-hint>
+        <html-readonly-hint>Formatted as HTML; edit in Control Settings</html-readonly-hint>
+        <summary-encrypted-hint>Disabled because data encryption is enabled</summary-encrypted-hint>
+        <summary-advanced-hint>Configured with role restrictions, sorting, or bulk edit in Control Settings</summary-advanced-hint>
+        <invalid-names-error>{0,choice,1#1 item has an invalid or duplicate name.|1&lt;{0,number,integer} items have invalid or duplicate names.}</invalid-names-error>
+    </dialog-controls>
 </resource>

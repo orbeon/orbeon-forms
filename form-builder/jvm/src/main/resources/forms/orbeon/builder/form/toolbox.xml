@@ -96,6 +96,21 @@
                     </xf:action>
                 </fr:trigger>
 
+                <!-- Control overview -->
+                <fr:trigger
+                        id="open-controls-trigger"
+                        appearance="minimal"
+                        bind="fb-toolbox-controls-bind"
+                        class="fb-controls-button"
+                        name="toolbox.open-controls">
+                    <xf:label><xh:i class="fa fa-list-alt fa-fw"/></xf:label>
+                    <xf:hint ref="$form-resources/dialog-controls/label"/>
+                    <xf:action event="DOMActivate">
+                        <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="dialog-controls"/>
+                        <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog"/>
+                    </xf:action>
+                </fr:trigger>
+
                 <!-- Clipboard operations -->
                 <fr:trigger
                         appearance="minimal"
@@ -496,6 +511,19 @@
                             </xf:label>
                             <xf:action event="DOMActivate">
                                 <xf:dispatch name="DOMActivate" targetid="open-form-settings-trigger"/>
+                            </xf:action>
+                        </fr:trigger>
+                        <fr:trigger
+                                id="open-controls-trigger-full"
+                                bind="fb-toolbox-controls-bind"
+                                name="toolbox.open-controls">
+                            <xf:label>
+                                <xh:i class="fa fa-list-alt fa-fw"/>
+                                <xf:output value="$form-resources/dialog-controls/label"/>
+                            </xf:label>
+                            <xf:action event="DOMActivate">
+                                <xf:dispatch if="$is-pe"      name="fb-show-dialog" targetid="dialog-controls"/>
+                                <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog"/>
                             </xf:action>
                         </fr:trigger>
                         <fr:trigger

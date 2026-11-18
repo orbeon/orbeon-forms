@@ -51,3 +51,5 @@ resources-local/
 # FormMetadataApiTest
 src/test/resources/properties-form-metadata-api-test.xml
 CLAUDE.md
+CLAUDE.local.md
+GEMINI.md

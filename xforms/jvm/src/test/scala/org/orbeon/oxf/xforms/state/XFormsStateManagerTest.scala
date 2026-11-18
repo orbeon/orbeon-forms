@@ -116,11 +116,19 @@ class XFormsStateManagerTest
         doc.afterInitialResponse()
         XFormsStateManager.afterInitialResponse(doc, disableDocumentCache = false)
 
+        // Upon initial load, only `uuid-I` is stored in `xforms.state` (no separate `uuid` mapping object yet)
+        assert(XFormsStores.stateStore.get(doc.uuid).isEmpty)
+        assert(XFormsStores.stateStore.get(doc.uuid + "-I").isDefined)
+        assert(XFormsStateStore.findSequence(doc.uuid).contains(1L))
+        assert(XFormsStateStore.findState(doc.uuid, isInitialState = false).isDefined)
+        assert(XFormsStateStore.findState(doc.uuid, isInitialState = true).isDefined)
+
         // Simulate cache eviction to `XFormsStateStore`
         XFormsDocumentCache.remove(doc.uuid)
         XFormsStateManager.onEvictedFromCache(doc)
 
         assert(XFormsStateManager.getUuidListInSession(session).contains(doc.uuid))
+        assert(XFormsStores.stateStore.get(doc.uuid).isDefined)
         assert(XFormsStateStore.findState(doc.uuid, isInitialState = false).isDefined)
         assert(XFormsStateStore.findState(doc.uuid, isInitialState = true).isDefined)
         assert(XFormsStores.staticStateStore.get(staticState.digest).exists(_.isInstanceOf[Array[Byte]]))
@@ -130,6 +138,8 @@ class XFormsStateManagerTest
         // while the shared static state remains in `xforms.static-state`
         XFormsStateManager.sessionDestroyed(session)
 
+        assert(XFormsStores.stateStore.get(doc.uuid).isEmpty)
+        assert(XFormsStores.stateStore.get(doc.uuid + "-I").isEmpty)
         assert(XFormsStateStore.findState(doc.uuid, isInitialState = false).isEmpty)
         assert(XFormsStateStore.findState(doc.uuid, isInitialState = true).isEmpty)
         assert(XFormsStores.staticStateStore.get(staticState.digest).isDefined)

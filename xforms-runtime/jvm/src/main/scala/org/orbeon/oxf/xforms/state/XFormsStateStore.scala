@@ -25,9 +25,9 @@ object XFormsStateStore {
 
   import Private.*
 
-  // (staticStateDigest, sequence, currentDynamicStateOpt) — uses pure Scala tuple + Option + DynamicState
+  // `(staticStateDigest, dynamicState)` — uses pure Scala Tuple2 + String + DynamicState
   // so it satisfies existing Infinispan JavaSerializationMarshaller `<allow-list>` configurations.
-  type StoredDocumentMapping = (String, Long, Option[DynamicState])
+  type StoredDynamicStateEntry = (String, DynamicState)
 
   def storeStaticState(staticState: XFormsStaticState, refresh: Boolean): Unit = {
     val bytes =
@@ -72,28 +72,21 @@ object XFormsStateStore {
       "replication"               -> XFormsGlobalProperties.isReplication.toString
     )) {
       val staticStateDigest = document.staticState.digest
-      val sequence          = document.sequence
       val dynamicState      = DynamicState(document)
 
       // Persist raw compressed static state in `xforms.static-state` (refreshing timestamp on initial load)
       storeStaticState(document.staticState, refresh = isInitialState)
 
-      // Consolidate dynamic state in `xforms.state`:
-      // - `uuid-I` holds the initial dynamic state (written only once upon initial load)
-      // - `uuid` holds `(staticStateDigest, sequence, currentDynamicStateOpt)`
-      if (isInitialState) {
-        XFormsStores.stateStore.put(createInitialDynamicStateKey(documentUUID), dynamicState)
-        XFormsStores.stateStore.put(documentUUID, (staticStateDigest, sequence, None): StoredDocumentMapping)
-      } else {
-        XFormsStores.stateStore.put(documentUUID, (staticStateDigest, sequence, Some(dynamicState)): StoredDocumentMapping)
-      }
+      // Store dynamic state in `xforms.state` without a separate mapping entry:
+      // - `uuid-I` holds `(staticStateDigest, initialDynamicState)` (written once upon initial load)
+      // - `uuid` holds `(staticStateDigest, currentDynamicState)` (written only upon eviction or update)
+      val key = if (isInitialState) createInitialDynamicStateKey(documentUUID) else documentUUID
+      XFormsStores.stateStore.put(key, (staticStateDigest, dynamicState): StoredDynamicStateEntry)
     }
   }
 
   def findSequence(documentUUID: String): Option[Long] =
-    XFormsStores.stateStore.get(documentUUID).collect {
-      case (_: String, seq: Long, _: Option[?]) => seq
-    }
+    findStoredEntry(documentUUID, isInitialState = false).map(_._2.sequence)
 
   def findState(
     documentUUID   : String,
@@ -113,29 +106,21 @@ object XFormsStateStore {
     ) {
       debug(s"store size before finding: ${getCurrentSize.map(_.toString).getOrElse("unknown")} entries.")
 
-      XFormsStores.stateStore.get(documentUUID) match {
-        case Some((staticStateDigest: String, _: Long, currentStateOpt: Option[DynamicState @unchecked])) =>
+      findStoredEntry(documentUUID, isInitialState) match {
+        case Some((staticStateDigest, dynamicState)) =>
 
           assert(staticStateDigest.length >= SecureUtils.HexShortLength) // static state key is a hex hash
 
-          val dynamicStateOpt =
-            if (isInitialState)
-              findInitialDynamicState(documentUUID)
-            else
-              currentStateOpt.orElse(findInitialDynamicState(documentUUID))
+          // Avoid reading/deserializing serialized static state from `xforms.static-state` when the compiled
+          // `XFormsStaticState` is already live in `XFormsStaticStateCache`.
+          if (XFormsStaticStateCache.findDocument(staticStateDigest).isDefined)
+            Some(XFormsState(Some(staticStateDigest), staticState = None, Some(dynamicState), staticStateBytes = None))
+          else
+            findStaticStateBytes(staticStateDigest).map { bytes =>
+              XFormsState(Some(staticStateDigest), staticState = None, Some(dynamicState), staticStateBytes = Some(bytes))
+            }
 
-          dynamicStateOpt.flatMap { dynamicState =>
-            // Avoid reading/deserializing serialized static state from `xforms.static-state` when the compiled
-            // `XFormsStaticState` is already live in `XFormsStaticStateCache`.
-            if (XFormsStaticStateCache.findDocument(staticStateDigest).isDefined)
-              Some(XFormsState(Some(staticStateDigest), staticState = None, Some(dynamicState), staticStateBytes = None))
-            else
-              findStaticStateBytes(staticStateDigest).map { bytes =>
-                XFormsState(Some(staticStateDigest), staticState = None, Some(dynamicState), staticStateBytes = Some(bytes))
-              }
-          }
-
-        case _ =>
+        case None =>
           None
       }
     }
@@ -154,9 +139,15 @@ object XFormsStateStore {
     def createInitialDynamicStateKey(documentUUID: String): String =
       documentUUID + "-I"
 
-    def findInitialDynamicState(documentUUID: String): Option[DynamicState] =
-      XFormsStores.stateStore.get(createInitialDynamicStateKey(documentUUID)).collect {
-        case ds: DynamicState => ds
+    private def getEntry(key: String): Option[StoredDynamicStateEntry] =
+      XFormsStores.stateStore.get(key).collect {
+        case (digest: String, ds: DynamicState) => (digest, ds)
       }
+
+    def findStoredEntry(documentUUID: String, isInitialState: Boolean): Option[StoredDynamicStateEntry] =
+      if (isInitialState)
+        getEntry(createInitialDynamicStateKey(documentUUID))
+      else
+        getEntry(documentUUID).orElse(getEntry(createInitialDynamicStateKey(documentUUID)))
   }
 }

@@ -504,6 +504,7 @@
             <demo-features>Demostración de funciones</demo-features>
             <quick-links>Enlaces rápidos</quick-links>
             <form-runner-admin>Administración de formularios</form-runner-admin>
+            <configuration>Configuración</configuration>
         </titles>
         <descriptions>
             <published-forms>Acceder a tus formularios publicados</published-forms>

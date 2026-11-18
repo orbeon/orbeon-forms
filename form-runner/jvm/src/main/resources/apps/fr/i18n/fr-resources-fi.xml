@@ -477,6 +477,7 @@
             <demo-features>Esimerkkitoiminnot</demo-features>
             <quick-links>Pikalinkit</quick-links>
             <form-runner-admin>Lomakehallinta</form-runner-admin>
+            <configuration>Asetukset</configuration>
         </titles>
         <descriptions>
             <published-forms>Siirry julkaistuihin lomakkeisiisi</published-forms>

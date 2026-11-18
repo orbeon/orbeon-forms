@@ -477,6 +477,7 @@
             <demo-features>Demofuncties</demo-features>
             <quick-links>Snelle koppelingen</quick-links>
             <form-runner-admin>Form Runner-beheer</form-runner-admin>
+            <configuration>Configuratie</configuration>
         </titles>
         <descriptions>
             <published-forms>Toegang tot uw gepubliceerde forms</published-forms>

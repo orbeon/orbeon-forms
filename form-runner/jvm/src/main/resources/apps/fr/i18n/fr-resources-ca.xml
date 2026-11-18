@@ -491,6 +491,7 @@
             <demo-features>Demostració de funcions</demo-features>
             <quick-links>Dreceres</quick-links>
             <form-runner-admin>Administrador de formularis</form-runner-admin>
+            <configuration>Configuració</configuration>
         </titles>
         <descriptions>
             <published-forms>Accedir als teus formularis publicats</published-forms>

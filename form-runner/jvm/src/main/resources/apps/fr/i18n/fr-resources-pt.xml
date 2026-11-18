@@ -477,6 +477,7 @@
             <demo-features>Funcionalidades de demonstração</demo-features>
             <quick-links>Ligações rápidas</quick-links>
             <form-runner-admin>Administração do Form Runner</form-runner-admin>
+            <configuration>Configuração</configuration>
         </titles>
         <descriptions>
             <published-forms>Aceder aos seus formulários publicados</published-forms>

@@ -477,6 +477,7 @@
             <demo-features>Demofunktionen</demo-features>
             <quick-links>Schnellzugriffe</quick-links>
             <form-runner-admin>Formularverwaltung</form-runner-admin>
+            <configuration>Konfiguration</configuration>
         </titles>
         <descriptions>
             <published-forms>Greifen Sie auf Ihre veröffentlichten Formulare zu</published-forms>

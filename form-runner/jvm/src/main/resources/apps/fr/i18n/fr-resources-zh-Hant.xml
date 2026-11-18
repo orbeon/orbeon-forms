@@ -477,6 +477,7 @@
             <demo-features>功能演示</demo-features>
             <quick-links>快速鏈接</quick-links>
             <form-runner-admin>表單管理</form-runner-admin>
+            <configuration>設定</configuration>
         </titles>
         <descriptions>
             <published-forms>訪問您已發布的表單</published-forms>

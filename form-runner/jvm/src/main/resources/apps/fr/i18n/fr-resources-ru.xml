@@ -466,6 +466,7 @@
             <demo-features>Демонстрационные возможности</demo-features>
             <quick-links>Быстрые ссылки</quick-links>
             <form-runner-admin>Администрирование форм</form-runner-admin>
+            <configuration>Конфигурация</configuration>
         </titles>
         <descriptions>
             <published-forms>Доступ к вашим опубликованным формам</published-forms>

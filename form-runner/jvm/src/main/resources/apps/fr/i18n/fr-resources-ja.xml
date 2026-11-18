@@ -464,6 +464,7 @@
             <demo-features>デモ機能</demo-features>
             <quick-links>クイックリンク</quick-links>
             <form-runner-admin>フォーム管理</form-runner-admin>
+            <configuration>設定</configuration>
         </titles>
         <descriptions>
             <published-forms>公開済みフォームにアクセス</published-forms>

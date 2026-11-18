@@ -477,6 +477,7 @@
             <demo-features>Demonstrationsfunktioner</demo-features>
             <quick-links>Snabblänkar</quick-links>
             <form-runner-admin>Formuläradministration</form-runner-admin>
+            <configuration>Konfiguration</configuration>
         </titles>
         <descriptions>
             <published-forms>Öppna dina publicerade formulär</published-forms>

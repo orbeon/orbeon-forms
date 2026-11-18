@@ -556,6 +556,7 @@
             <quick-links>Quick Links</quick-links>
             <form-runner-admin>Forms Admin</form-runner-admin>
             <admin-console>Admin Console</admin-console>
+            <configuration>Configuration</configuration>
         </titles>
         <descriptions>
             <published-forms>Access your published forms</published-forms>

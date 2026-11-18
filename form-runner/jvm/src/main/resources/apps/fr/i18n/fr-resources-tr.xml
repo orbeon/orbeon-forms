@@ -475,6 +475,7 @@
             <demo-features>Demo Özellikler</demo-features>
             <quick-links>Hızlı Bağlantılar</quick-links>
             <form-runner-admin>Form Yönetimi</form-runner-admin>
+            <configuration>Yapılandırma</configuration>
         </titles>
         <descriptions>
             <published-forms>Yayınlanan formlarınıza erişin</published-forms>

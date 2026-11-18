@@ -560,6 +560,7 @@
             <quick-links>Raccourcis</quick-links>
             <form-runner-admin>Admin formulaires</form-runner-admin>
             <admin-console>Console d'admin</admin-console>
+            <configuration>Configuration</configuration>
         </titles>
         <descriptions>
             <published-forms>Accédez vos formulaires publiés</published-forms>

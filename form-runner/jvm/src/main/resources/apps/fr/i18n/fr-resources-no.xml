@@ -474,6 +474,7 @@
             <demo-features>Demofunksjoner</demo-features>
             <quick-links>Hurtiglenker</quick-links>
             <form-runner-admin>Skjemabehandling</form-runner-admin>
+            <configuration>Konfigurasjon</configuration>
         </titles>
         <descriptions>
             <published-forms>Få tilgang til dine publiserte skjema</published-forms>

@@ -477,6 +477,7 @@
             <demo-features>Demó funkciók</demo-features>
             <quick-links>Gyors linkek</quick-links>
             <form-runner-admin>Űrlapok adminisztrációja</form-runner-admin>
+            <configuration>Konfiguráció</configuration>
         </titles>
         <descriptions>
             <published-forms>Hozzáférés a közzétett űrlapjaihoz</published-forms>

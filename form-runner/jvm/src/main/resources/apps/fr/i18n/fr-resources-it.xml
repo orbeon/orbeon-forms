@@ -477,6 +477,7 @@
             <demo-features>Funzionalità demo</demo-features>
             <quick-links>Link rapidi</quick-links>
             <form-runner-admin>Amministrazione moduli</form-runner-admin>
+            <configuration>Configurazione</configuration>
         </titles>
         <descriptions>
             <published-forms>Accedi ai tuoi moduli pubblicati</published-forms>

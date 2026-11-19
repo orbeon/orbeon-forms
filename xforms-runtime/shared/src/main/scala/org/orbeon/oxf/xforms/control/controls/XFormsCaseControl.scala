@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis.controls.CaseControl
 import org.orbeon.oxf.xforms.control.{VisibilityTrait, XFormsControl, XFormsNoSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -24,8 +23,8 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
  *
  * NOTE: This doesn't keep the "currently selected flag". Instead, the parent xf:switch holds this information.
  */
-class XFormsCaseControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
-    extends XFormsNoSingleNodeContainerControl(container, parent, element, _effectiveId)
+class XFormsCaseControl(container: XBLContainer, parent: XFormsControl, _effectiveId: String)
+    extends XFormsNoSingleNodeContainerControl(container, parent, _effectiveId)
        with VisibilityTrait {
 
   override type Control <: CaseControl

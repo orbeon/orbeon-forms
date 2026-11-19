@@ -33,7 +33,6 @@ class XFormsActionAction extends XFormsAction {
   override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
     val actionInterpreter = actionContext.interpreter
-    val actionElement     = actionContext.element
     val actionAnalysis    = actionContext.analysis
     val bindingContext    = actionContext.bindingContext
 
@@ -57,7 +56,6 @@ class XFormsActionAction extends XFormsAction {
               // https://github.com/orbeon/orbeon-forms/issues/2499
               actionInterpreter.evaluateAsString(
                 actionAnalysis,
-                actionElement,
                 bindingContext.nodeset,
                 bindingContext.position,
                 expr

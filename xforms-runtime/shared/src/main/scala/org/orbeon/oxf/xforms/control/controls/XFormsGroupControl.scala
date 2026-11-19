@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.{Element, QName}
+import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.xforms.XFormsNames.*
@@ -22,12 +22,10 @@ import org.orbeon.xforms.XFormsNames.*
 class XFormsGroupControl(
   container   : XBLContainer,
   parent      : XFormsControl,
-  element     : Element,
   _effectiveId: String
 ) extends XFormsSingleNodeContainerControl(
   container,
   parent,
-  element,
   _effectiveId
 ) {
 

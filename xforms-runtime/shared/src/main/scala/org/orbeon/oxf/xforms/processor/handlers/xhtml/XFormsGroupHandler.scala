@@ -51,7 +51,7 @@ abstract class XFormsGroupHandler(
       labelClasses.append(" xforms-disabled")
 
     // Copy over existing label classes if any
-    lhhaAnalysis.element.attributeValueOpt(XFormsNames.CLASS_QNAME) foreach { labelClassAttribute =>
+    lhhaAnalysis.attributeValueOpt(XFormsNames.CLASS_QNAME) foreach { labelClassAttribute =>
       labelClasses.append(' ')
       labelClasses.append(labelClassAttribute)
     }

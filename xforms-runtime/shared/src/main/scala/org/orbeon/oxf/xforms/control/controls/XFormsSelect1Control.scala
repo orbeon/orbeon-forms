@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import cats.syntax.option.*
-import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -44,12 +43,10 @@ import scala.util.control.NonFatal
 class XFormsSelect1Control(
   container : XBLContainer,
   parent    : XFormsControl,
-  element   : Element,
   id        : String
 ) extends XFormsSingleNodeControl(
   container,
   parent,
-  element,
   id
 ) with XFormsValueControl
   with ReadonlySingleNodeFocusableTrait {
@@ -107,7 +104,10 @@ class XFormsSelect1Control(
       case NonFatal(t) =>
         throw OrbeonLocationException.wrapException(
           t,
-          XmlExtendedLocationData(getLocationData, "evaluating itemset".some, element = Some(element))
+          if (staticControl ne null)
+            staticControl.extendedLocationData("evaluating itemset")
+          else
+            XmlExtendedLocationData(getLocationData, "evaluating itemset".some)
         )
     }
 

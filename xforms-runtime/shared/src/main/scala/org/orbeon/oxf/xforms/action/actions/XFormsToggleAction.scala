@@ -37,7 +37,7 @@ class XFormsToggleAction extends XFormsAction {
         XFormsToggleAction.toggle(
           caseControl                  = caseControl,
           mustHonorDeferredUpdateFlags = interpreter.mustHonorDeferredUpdateFlags(actionContext.analysis),
-          mustToggleAncestors          = ! actionContext.analysis.element.attributeValueOpt(XXFORMS_TOGGLE_ANCESTORS_QNAME).contains("false"),
+          mustToggleAncestors          = ! actionContext.analysis.attributeValueOpt(XXFORMS_TOGGLE_ANCESTORS_QNAME).contains("false"),
           collector                    = actionContext.collector
         )
       case _ =>
@@ -45,7 +45,7 @@ class XFormsToggleAction extends XFormsAction {
         // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
         debug(
           "xf:toggle: case does not refer to an existing xf:case element, ignoring action",
-          List("case id" -> actionContext.element.attributeValue("case"))
+          List("case id" -> actionContext.analysis.attributeValue("case"))
         )
     }
   }

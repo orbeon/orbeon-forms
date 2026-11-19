@@ -39,7 +39,7 @@ class XFormsDeleteAction extends XFormsAction {
 
   override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
-    val atAttributeOpt     = actionContext.element.attributeValueOpt("at")
+    val atAttributeOpt     = actionContext.analysis.attributeValueOpt("at")
     val collectionToUpdate = actionContext.interpreter.actionXPathContext.getCurrentBindingContext.nodeset.asScala
 
     // NOTE: XForms says "Otherwise, the Sequence Binding is not expressed, so the Sequence Binding node-sequence
@@ -56,7 +56,6 @@ class XFormsDeleteAction extends XFormsAction {
             val insertionIndexString =
               actionContext.interpreter.evaluateAsString(
                 actionContext.analysis,
-                actionContext.element,
                 collectionToUpdate.asJava,
                 1,
                 "round(" + atAttribute + ")"

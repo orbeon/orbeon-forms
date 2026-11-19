@@ -34,7 +34,6 @@ class XFormsSetindexAction extends XFormsAction {
   override def execute(context: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
     val interpreter = context.interpreter
-    val element     = context.analysis.element
 
     val repeatStaticId =
       resolveStringAVT("repeat")(context) getOrElse
@@ -42,12 +41,11 @@ class XFormsSetindexAction extends XFormsAction {
 
     val indexOpt = {
 
-      val indexXPath = element.attributeValue("index")
+      val indexXPath   = context.analysis.attributeValue("index")
       val contextStack = interpreter.actionXPathContext
 
       val indexString = interpreter.evaluateAsString(
         context.analysis,
-        element,
         contextStack.getCurrentBindingContext.nodeset,
         contextStack.getCurrentBindingContext.position,
         "number(" + indexXPath + ")"

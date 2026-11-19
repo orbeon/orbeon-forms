@@ -71,13 +71,13 @@ object ElementAnalysisTreeBuilder {
         m.model = m.some
       case e =>
         e.model =
-          e.element.attributeValue(XFormsNames.MODEL_QNAME) match {
+          e.attributeValue(XFormsNames.MODEL_QNAME) match {
             case localModelStaticId: String =>
               // Get model prefixed id and verify it belongs to this scope
               val localModelPrefixedId = e.scope.prefixedIdForStaticId(localModelStaticId)
               val localModelOpt        = partAnalysisCtx.findModel(localModelPrefixedId)
               if (localModelOpt.isEmpty)
-                throw new ValidationException(s"Reference to non-existing model id: `$localModelStaticId`", ElementAnalysis.createLocationData(e.element))
+                throw new ValidationException(s"Reference to non-existing model id: `$localModelStaticId`", e.locationData)
               localModelOpt
             case _ =>
               // Use inherited model
@@ -109,7 +109,7 @@ object ElementAnalysisTreeBuilder {
     if (existingComponent.hasConcreteBinding)
       removeConcreteBinding(partAnalysisCtx, existingComponent)
 
-    existingComponent.rootElem = elemInSource getOrElse existingComponent.element
+    existingComponent.rootElem = elemInSource getOrElse existingComponent.compileElement
 
     PartAnalysisBuilder.analyzeSubtree(partAnalysisCtx, existingComponent)
   }
@@ -228,7 +228,7 @@ object ElementAnalysisTreeBuilder {
             def annotateChild(innerScope: Scope, outerScope: Scope, containerScope: XXBLScope)(child: Element): Element =
               XBLBindingBuilder.annotateSubtreeByElement(
                 partAnalysisCtx,
-                componentControl.element,            // bound element
+                componentControl.compileElement,     // bound element
                 child,                // child tree to annotate
                 innerScope,
                 outerScope,
@@ -239,7 +239,7 @@ object ElementAnalysisTreeBuilder {
             // Directly nested handlers (if enabled)
             def directlyNestedHandlers =
               if (componentControl.commonBinding.modeHandlers)
-                componentControl.element.elements            filter
+                componentControl.compileElement.elements     filter
                   EventHandler.isEventHandler map
                   (annotateChild _).tupled(scopesForDirectlyNestedChildren)
               else
@@ -248,7 +248,7 @@ object ElementAnalysisTreeBuilder {
             // Directly nested LHHA (if enabled)
             def directlyNestedLHHA =
               if (componentControl.commonBinding.modeLHHA)
-                componentControl.element.elements                                     filter
+                componentControl.compileElement.elements                              filter
                   (e => LHHA.isLHHA(e) && ! e.hasAttribute(FOR_QNAME)) map
                   (annotateChild _).tupled(scopesForDirectlyNestedChildren)
               else
@@ -287,7 +287,7 @@ object ElementAnalysisTreeBuilder {
       import VariableAnalysis.VariableQNames
 
       def allChildren: Iterable[(Element, Scope)] =
-        e.element.elements map ((_, e.containerScope))
+        e.compileElement.elements map ((_, e.containerScope))
 
       e match {
         case _: RootControl =>
@@ -318,7 +318,7 @@ object ElementAnalysisTreeBuilder {
           allChildren collect {
             case (e, s) if isLHHA(e) && ! e.hasAttribute(FOR_QNAME) || isAction(e.getQName) => (e, s)
           }
-        case e: ActionTrait if EventHandler.isPropertiesAction(e.element.getQName) =>
+        case e: ActionTrait if EventHandler.isPropertiesAction(e.qName) =>
           allChildren collect {
             case (e, s) if PropertyQNames(e.getQName) => (e, s)
           }

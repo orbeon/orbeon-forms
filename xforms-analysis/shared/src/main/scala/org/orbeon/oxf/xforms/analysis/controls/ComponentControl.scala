@@ -27,15 +27,14 @@ class ComponentControl(
 
   val hasLazyBinding: Boolean =
     ! isTopLevelPart &&
-      element.attributeValueOpt(XFormsNames.XXFORMS_UPDATE_QNAME).contains(XFormsNames.XFORMS_FULL_UPDATE)
+      elem.attributeValueOpt(XFormsNames.XXFORMS_UPDATE_QNAME).contains(XFormsNames.XFORMS_FULL_UPDATE)
 
-  var rootElem: Element = element // default, can be updated by `xxf:dynamic`
+  var rootElem: Element = elem // default, can be updated by `xxf:dynamic`; cleared on `isTopLevelPart` in `compactForRuntime`
 
-  override def replaceElementForRuntime(newElement: Element): Unit = {
-    val wasDefaultRoot = rootElem eq element
-    super.replaceElementForRuntime(newElement)
-    if (wasDefaultRoot)
-      rootElem = newElement
+  override def compactForRuntime(effectiveXmlBaseOpt: Option[String]): Unit = {
+    if (isTopLevelPart)
+      rootElem = null
+    super.compactForRuntime(effectiveXmlBaseOpt)
   }
 
   private var _concreteBindingOpt: Option[ConcreteBinding] = None //part.getBinding(prefixedId)

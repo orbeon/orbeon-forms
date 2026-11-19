@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control
 
 import cats.syntax.option.*
 import org.orbeon.datatypes.LocationData
-import org.orbeon.dom.{Element, QName}
+import org.orbeon.dom.QName
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.rewrite.Rewrite
 import org.orbeon.oxf.util.CoreUtils.*
@@ -45,7 +45,6 @@ import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId, XFormsNames}
 class XFormsControl(
     val container  : XBLContainer,
     var parent     : XFormsControl, // var just so we can null it upon clone
-    val element    : Element,
     var effectiveId: String         // var because can be updated upon iteration change
 ) extends ControlXPathSupport
      with Cloneable
@@ -94,13 +93,13 @@ class XFormsControl(
       else if (! ancestor.propagatesStaticReadonlyAppearanceToDescendants)
         findInherited(ancestor.parent)
       else
-        ancestor.element.attributeValue(XFormsNames.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME) match {
+        ancestor.staticControl.attributeValue(XFormsNames.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME) match {
           case XFormsProperties.ReadonlyAppearanceStaticValue  => true
           case XFormsProperties.ReadonlyAppearanceDynamicValue => false
           case _                                               => findInherited(ancestor.parent)
         }
 
-    element.attributeValue(XFormsNames.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME) match {
+    staticControl.attributeValue(XFormsNames.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME) match {
       case XFormsProperties.ReadonlyAppearanceStaticValue  => true
       case XFormsProperties.ReadonlyAppearanceDynamicValue => false
       case _                                               => findInherited(parent)
@@ -143,7 +142,7 @@ class XFormsControl(
     self.effectiveId = effectiveId
 
   final def getLocationData: LocationData =
-    if (staticControl ne null) staticControl.locationData else if (element ne null) element.getData.asInstanceOf[LocationData] else null
+    if (staticControl ne null) staticControl.locationData else null
 
   // Semi-dynamic information (depends on the tree of controls, but does not change over time)
   private var _childrenActions: List[XFormsActionControl] = Nil
@@ -231,11 +230,13 @@ class XFormsControl(
       case e: ValidationException =>
         throw OrbeonLocationException.wrapException(
           e,
-          XmlExtendedLocationData(
-            getLocationData,
-            "evaluating control".some,
-            element = Option(element)
-          )
+          if (staticControl ne null)
+            staticControl.extendedLocationData("evaluating control")
+          else
+            XmlExtendedLocationData(
+              getLocationData,
+              "evaluating control".some
+            )
         )
     }
 

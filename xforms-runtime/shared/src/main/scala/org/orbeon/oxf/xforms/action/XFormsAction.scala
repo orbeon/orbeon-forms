@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.action
 
-import org.orbeon.datatypes.LocationData
-import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, Logging, XPathCache}
@@ -26,9 +24,7 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent.{ActionPropertyGetter, PropertyValue}
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xml.dom.Extensions.*
-import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsNames.*
-import org.orbeon.xforms.xbl.Scope
 import shapeless.syntax.typeable.typeableOps
 
 import scala.jdk.CollectionConverters.*
@@ -39,30 +35,12 @@ abstract class XFormsAction extends Logging {
   val pushBinding: Boolean = true
 
   // Execute the action with the given context
-  // By default, run the legacy execute()
-  def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit =
-    execute(
-      actionContext.interpreter,
-      actionContext.analysis.element,
-      actionContext.analysis.scope,
-      actionContext.overriddenContext.isDefined,
-      actionContext.overriddenContext.orNull
-    )
-
-  // Legacy `execute()`
-  def execute(
-     actionInterpreter   : XFormsActionInterpreter,
-     actionElement       : Element,
-     actionScope         : Scope,
-     hasOverriddenContext: Boolean,
-     overriddenContext   : om.Item
-  ): Unit = ()
+  def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit
 
   // Resolve a control given the name of an AVT
   def resolveControlAvt(attName: String, required: Boolean = true)(implicit context: DynamicActionContext): Option[XFormsControl] = {
 
     val interpreter = context.interpreter
-    val element = context.element
 
     import interpreter.indentedLogger
 
@@ -76,7 +54,7 @@ abstract class XFormsAction extends Logging {
               "attribute does not refer to an existing control",
               List(
                 "attribute"      -> attName,
-                "value"          -> element.attributeValue("control"),
+                "value"          -> context.analysis.attributeValue("control"),
                 "resolved value" -> resolvedAvt
               )
             )
@@ -98,7 +76,7 @@ abstract class XFormsAction extends Logging {
   // Resolve an optional boolean AVT
   // Return `None` if there is no attribute or if the AVT cannot be evaluated
   def resolveStringAVT(att: String)(implicit context: DynamicActionContext): Option[String] =
-    context.element.attributeValueOpt(att) flatMap
+    context.analysis.attributeValueOpt(att) flatMap
       (avt => Option(context.interpreter.resolveAVTProvideValue(context.analysis, avt)))
 
   // Resolve an optional boolean AVT
@@ -125,7 +103,7 @@ object XFormsAction {
     val properties =
       actionAnalysis.narrowTo[ActionTrait & WithChildrenTrait].toList flatMap
         (_.children) collect {
-          case e if PropertyQNames(e.element.getQName) => e
+          case e if PropertyQNames(e.qName) => e
         }
 
     // Iterate over context information if any
@@ -133,24 +111,22 @@ object XFormsAction {
       for {
         property <- properties
 
-        element = property.element
-
         // Get and check attributes
         name =
           resolveQName(
            property.namespaceMapping.mapping.get,
-           element.attributeValue(NAME_QNAME),
+           property.attributeValue(NAME_QNAME),
            unprefixedIsNoNamespace = true
         ) map (_.clarkName) getOrElse
           (throw new OXFException(XXFORMS_CONTEXT_QNAME.qualifiedName + " element must have a \"name\" attribute."))
 
-        value = VariableAnalysis.valueOrSelectAttribute(element) match {
+        value = VariableAnalysis.valueOrSelectAttribute(property) match {
           case Some(valueExpr) =>
             // XPath expression
 
             // Set context on context element
             contextStack.pushBinding(
-              bindingElement    = element,
+              bindingAnalysis   = property,
               sourceEffectiveId = actionInterpreter.getSourceEffectiveId(property),
               scope             = property.scope,
               eventTarget       = eventTarget,
@@ -169,7 +145,7 @@ object XFormsAction {
                   functionLibrary    = actionInterpreter.container.partAnalysis.functionLibrary(property.isFunctionsRestricted),
                   functionContext    = contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(property)),
                   baseURI            = null,
-                  locationData       = element.getData.asInstanceOf[LocationData],
+                  locationData       = property.locationData,
                   reporter           = actionInterpreter.containingDocument.getRequestStats.addXPathStat
                 ).asScala
               )
@@ -181,11 +157,11 @@ object XFormsAction {
             // Literal text
             property match {
               case p: PropertyControl => p.constantValueOpt.getOrElse("")
-              case _                  => element.getStringValue
+              case _                  => ""
             }
         }
 
-        tunnel = element.attributeValueOpt("tunnel").contains("true")
+        tunnel = property.attributeValueOpt("tunnel").contains("true")
       } yield
         PropertyValue(name, Option(value), tunnel)
 

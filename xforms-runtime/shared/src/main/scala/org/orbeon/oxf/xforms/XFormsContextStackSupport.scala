@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms
 
 import cats.syntax.option.*
-import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.{Exceptions, IndentedLogger, XPathCache}
 import org.orbeon.oxf.xforms.analysis.controls.WithExpressionOrConstantTrait
@@ -35,7 +34,7 @@ object XFormsContextStackSupport {
     context                       : Option[String],
     modelId                       : Option[String],
     bindId                        : Option[String],
-    bindingElement                : Element,
+    bindingAnalysis               : ElementAnalysis,
     bindingElementNamespaceMapping: NamespaceMapping,
     sourceEffectiveId             : String,
     scope                         : Scope,
@@ -52,7 +51,7 @@ object XFormsContextStackSupport {
       null,
       modelId.orNull,
       bindId.orNull,
-      bindingElement,
+      bindingAnalysis,
       bindingElementNamespaceMapping,
       sourceEffectiveId,
       scope,
@@ -63,7 +62,7 @@ object XFormsContextStackSupport {
   }
 
   def withBinding[T](
-    bindingElement    : Element,
+    bindingAnalysis   : ElementAnalysis,
     sourceEffectiveId : String,
     scope             : Scope,
     eventTarget       : XFormsEventTarget,
@@ -73,7 +72,7 @@ object XFormsContextStackSupport {
   )(implicit
     contextStack      : XFormsContextStack
   ): T = {
-    contextStack.pushBinding(bindingElement, sourceEffectiveId, scope, eventTarget, collector)
+    contextStack.pushBinding(bindingAnalysis, sourceEffectiveId, scope, eventTarget, collector)
     body(contextStack.getCurrentBindingContext) |!>
       (_ => contextStack.popBinding())
   }
@@ -156,7 +155,7 @@ object XFormsContextStackSupport {
       nodeset                        = null,
       modelId                        = bindingElem.model.map(_.staticId).orNull,
       bindId                         = null,
-      bindingElement                 = bindingElem.element,
+      bindingAnalysis                = bindingElem,
       bindingElementNamespaceMapping = bindingElem.namespaceMapping,
       sourceEffectiveId              = getElementEffectiveId(parentEffectiveId, bindingElem),
       scope                          = bindingElem.scope,

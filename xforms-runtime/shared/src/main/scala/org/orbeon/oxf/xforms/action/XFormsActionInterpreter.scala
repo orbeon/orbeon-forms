@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action
 
-import org.orbeon.datatypes.LocationData
-import org.orbeon.dom.{Element, QName}
+import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
@@ -28,7 +27,6 @@ import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventTarget}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLUtils
-import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.xforms.runtime.XFormsObject
@@ -78,7 +76,7 @@ class XFormsActionInterpreter(
         context                        = staticAction.context,
         modelId                        = staticAction.model map (_.staticId),
         bindId                         = None,
-        bindingElement                 = staticAction.element,
+        bindingAnalysis                = staticAction,
         bindingElementNamespaceMapping = staticAction.namespaceMapping,
         sourceEffectiveId              = getSourceEffectiveId(staticAction),
         scope                          = staticAction.scope,
@@ -89,7 +87,7 @@ class XFormsActionInterpreter(
         def runSingle(hasOverriddenContext: Boolean, contextItem: om.Item): Unit =
           runSingleIteration(
             actionAnalysis          = staticAction,
-            actionQName             = staticAction.element.getQName,
+            actionQName             = staticAction.qName,
             ifConditionAttribute    = staticAction.ifCondition,
             whileIterationAttribute = staticAction.whileCondition,
             hasOverriddenContext    = hasOverriddenContext,
@@ -125,11 +123,9 @@ class XFormsActionInterpreter(
       case NonFatal(t) =>
         throw OrbeonLocationException.wrapException(
           t,
-          XmlExtendedLocationData(
-            locationData = staticAction.element.getData.asInstanceOf[LocationData],
-            description  = "running XForms action",
-            element      = staticAction.element,
-            params       = Array[String]("action name", staticAction.element.getQName.qualifiedName)
+          staticAction.extendedLocationData(
+            description = "running XForms action",
+            params      = List("action name" -> staticAction.qualifiedName)
           )
         )
     }
@@ -186,7 +182,7 @@ class XFormsActionInterpreter(
               context                        = None,
               modelId                        = None,
               bindId                         = actionAnalysis.bind,
-              bindingElement                 = actionAnalysis.element,
+              bindingAnalysis                = actionAnalysis,
               bindingElementNamespaceMapping = actionAnalysis.namespaceMapping,
               sourceEffectiveId              = getSourceEffectiveId(actionAnalysis),
               scope                          = actionAnalysis.scope,
@@ -256,7 +252,6 @@ class XFormsActionInterpreter(
   // TODO: Pass `DynamicActionContext`.
   def evaluateAsString(
     actionAnalysis  : ActionTrait,
-    actionElement   : Element, // only used for `LocationData`; useful at all?
     nodeset         : ju.List[om.Item],
     position        : Int,
     xpathExpression : String
@@ -270,7 +265,7 @@ class XFormsActionInterpreter(
       functionLibrary    = container.partAnalysis.functionLibrary(actionAnalysis.isFunctionsRestricted),
       functionContext    = actionXPathContext.getFunctionContext(getSourceEffectiveId(actionAnalysis)),
       baseURI            = null,
-      locationData       = actionElement.getData.asInstanceOf[LocationData],
+      locationData       = actionAnalysis.locationData,
       reporter           = containingDocument.getRequestStats.getReporter
     ) getOrElse ""
 
@@ -290,7 +285,7 @@ class XFormsActionInterpreter(
       functionLibrary    = container.partAnalysis.functionLibrary(actionAnalysis.isFunctionsRestricted),
       functionContext    = actionXPathContext.getFunctionContext(getSourceEffectiveId(actionAnalysis)),
       baseURI            = null,
-      locationData       = actionAnalysis.element.getData.asInstanceOf[LocationData],
+      locationData       = actionAnalysis.locationData,
       reporter           = containingDocument.getRequestStats.getReporter
     )
 
@@ -325,7 +320,7 @@ class XFormsActionInterpreter(
         functionLibrary    = container.partAnalysis.functionLibrary(actionAnalysis.isFunctionsRestricted),
         functionContext    = actionXPathContext.getFunctionContext(getSourceEffectiveId(actionAnalysis)),
         baseURI            = null,
-        locationData       = actionAnalysis.element.getData.asInstanceOf[LocationData],
+        locationData       = actionAnalysis.locationData,
         reporter           = containingDocument.getRequestStats.getReporter
       )
     } else {
@@ -337,12 +332,12 @@ class XFormsActionInterpreter(
   // Resolve the value of an attribute which may be an AVT.
   // TODO: Pass `DynamicActionContext`.
   def resolveAVT(actionAnalysis: ActionTrait, attributeName: QName): String =
-    resolveAVTProvideValue(actionAnalysis, actionAnalysis.element.attributeValue(attributeName))
+    resolveAVTProvideValue(actionAnalysis, actionAnalysis.attributeValue(attributeName))
 
   // Resolve the value of an attribute which may be an AVT.
   // TODO: Pass `DynamicActionContext`.
   def resolveAVT(actionAnalysis: ActionTrait, attributeName: String): String =
-    actionAnalysis.element.attributeValueOpt(attributeName) map (resolveAVTProvideValue(actionAnalysis, _)) orNull
+    actionAnalysis.attributeValueOpt(attributeName) map (resolveAVTProvideValue(actionAnalysis, _)) orNull
 
   // Find an effective object based on either the `xxf:repeat-indexes` attribute, or on the current repeat indexes.
   def resolveObject(actionAnalysis: ActionTrait, targetStaticOrAbsoluteId: String): XFormsObject = {

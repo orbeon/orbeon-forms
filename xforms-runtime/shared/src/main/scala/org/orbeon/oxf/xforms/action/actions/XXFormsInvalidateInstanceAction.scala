@@ -23,7 +23,7 @@ class XXFormsInvalidateInstanceAction extends XFormsAction {
     XXFormsInvalidateInstanceAction.doInvalidateInstance(
       resourceURI       = interpreter.resolveAVT(actionContext.analysis, "resource"),
       handleXInclude    = Option(interpreter.resolveAVT(actionContext.analysis, "xinclude")).map(_.toBoolean),
-      ignoreQueryString = actionContext.element.attributeValueOpt(XFormsNames.IGNORE_QUERY_STRING).contains("true")
+      ignoreQueryString = actionContext.analysis.attributeValueOpt(XFormsNames.IGNORE_QUERY_STRING).contains("true")
     )(interpreter.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory))
 }
 }

@@ -21,12 +21,12 @@ trait TriggerAppearanceTrait extends AppearanceTrait {
   // Normalize appearances
   override val appearances = {
     // val initialAppearances = super.appearances
-    val initialAppearances = attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
+    val initialAppearances = attQNameSet(this, APPEARANCE_QNAME, namespaceMapping)
 
     val isMinimal = initialAppearances(XFORMS_MINIMAL_APPEARANCE_QNAME)
     val isCompact = initialAppearances(XFORMS_COMPACT_APPEARANCE_QNAME)
 
-    val isModal = element.attributeValue(XXFORMS_MODAL_QNAME) == "true"
+    val isModal = attributeValue(XXFORMS_MODAL_QNAME) == "true"
 
     // - When the appearance is not minimal, put a class for the full appearance, so we can style the full trigger
     //   properly without banging our head on walls due to poor CSS support in IE.

@@ -37,7 +37,7 @@ trait ControlXPathSupport {
   self: XFormsControl =>
 
   def getNamespaceMappings: NamespaceMapping =
-    if (staticControl ne null) staticControl.namespaceMapping else container.getNamespaceMappings(element)
+    if (staticControl ne null) staticControl.namespaceMapping else NamespaceMapping.EmptyMapping
 
   def evaluateBooleanAvt(attributeValue: String, collector: ErrorEventCollector): Boolean =
     evaluateAvt(attributeValue, collector).contains("true")

@@ -223,7 +223,12 @@ object XFormsLHHAHandler {
     if (! targetControl.scope.isTopLevelScope)
       handlerContext.pushComponentContext(targetControl.scope.scopeId)
     try
-      handlerContext.controller.findHandlerFromElem(targetControl.element) match {
+      handlerContext.controller.findHandler(
+        targetControl.namespaceURI,
+        targetControl.localName,
+        targetControl.qualifiedName,
+        targetControl.attributesAsSax
+      ).map(_.elementHandler) match {
         case Some(handler: XFormsControlLifecycleHandler) => handler.getForEffectiveIdWithNs(lhhaAnalysis)
         case _                                            => None
       }

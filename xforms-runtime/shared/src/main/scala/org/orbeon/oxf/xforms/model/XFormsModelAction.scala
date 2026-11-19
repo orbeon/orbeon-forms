@@ -42,7 +42,7 @@ class XFormsModelAction(parent: XFormsEventTarget, eventHandler: EventHandler)
         // NOTE: When the submission actually starts processing, the binding will be re-evaluated
         val contextStack = new XFormsContextStack(submission.container, submission.model.getDefaultEvaluationContext)
         contextStack.pushBinding(
-          submission.staticSubmission.element,
+          submission.staticSubmission,
           submission.effectiveId,
           submission.model.getResolutionScope,
           submission,

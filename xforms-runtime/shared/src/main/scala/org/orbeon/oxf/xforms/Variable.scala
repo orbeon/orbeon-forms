@@ -69,7 +69,7 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
         val pushContext = pushOuterContext || staticVariable.hasNestedValue
         if (pushContext)
           contextStack.pushBinding(
-            staticVariable.valueElement,
+            staticVariable.valueAnalysisElement,
             sourceEffectiveId,
             staticVariable.valueScope,
             eventTarget,

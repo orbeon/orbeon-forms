@@ -67,7 +67,7 @@ object FRResourceSupport {
         // Query within a component
         val directName =
           componentControl.staticControl.commonBinding.directName
-            .getOrElse(componentControl.staticControl.element.getQName)
+            .getOrElse(componentControl.staticControl.qName)
 
         val componentName =
           directName.qualifiedName

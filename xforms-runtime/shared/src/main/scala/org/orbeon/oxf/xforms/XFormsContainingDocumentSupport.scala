@@ -17,8 +17,7 @@ import cats.effect.IO
 import cats.syntax.option.*
 import org.log4s
 import org.log4s.LogLevel
-import org.orbeon.datatypes.{LocationData, MaximumCurrentFiles, MaximumFiles, MaximumSize}
-import org.orbeon.dom.Element
+import org.orbeon.datatypes.{MaximumCurrentFiles, MaximumFiles, MaximumSize}
 import org.orbeon.oxf.cache.Cacheable
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
@@ -30,6 +29,7 @@ import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.XFormsProperties.*
 import org.orbeon.oxf.xforms.action.actions.XFormsDispatchAction
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analytics.{RequestStats, RequestStatsImpl}
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
@@ -45,6 +45,7 @@ import org.orbeon.oxf.xforms.state.{LockResponse, RequestParameters, XFormsState
 import org.orbeon.oxf.xforms.submission.{AsyncConnectResult, TwoPassSubmissionParameters}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic, UploadSupport}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.xforms.*
 import org.orbeon.xforms.Constants.FormId
@@ -707,20 +708,41 @@ trait ContainingDocumentRequest {
    * Resolve a URI string against an element, taking into account ancestor xml:base attributes for
    * the resolution, and using the document's request URL as a base.
    *
-   * @param element            element used to start resolution (if null, no resolution takes place)
+   * @param analysis           element analysis used to start resolution (if null, no resolution takes place)
    * @param uri                URI to resolve
    * @return resolved URI
    */
-  def resolveXMLBase(element: Element, uri: String): URI =
-    try
-      element.resolveXMLBase(Option(getRequestPath), uri)
-    catch {
+  def resolveXMLBase(analysis: ElementAnalysis, uri: String): URI =
+    try {
+      if (analysis eq null) {
+        URI.create(uri)
+      } else {
+        analysis.compileElementOpt match {
+          case Some(elem) =>
+            elem.resolveXMLBase(Option(getRequestPath), uri)
+          case None =>
+            val xmlBaseValuesLeafToRootIt =
+              ElementAnalysis.ancestorsIterator(analysis, includeSelf = true)
+                .flatMap(_.attributeValueOpt(XMLConstants.XML_BASE_QNAME))
+
+            val urisRootToLeaf =
+              Option(getRequestPath).iterator ++
+                xmlBaseValuesLeafToRootIt.toArray.reverseIterator ++
+                Iterator.single(uri)
+
+            urisRootToLeaf.foldLeft(null: URI) { (r, s) =>
+              val currentURI = URI.create(s)
+              if (r eq null) currentURI else r.resolve(currentURI)
+            }
+        }
+      }
+    } catch {
       case e: IllegalArgumentException =>
         throw new ValidationException(
           s"Error while resolving URI: `$uri`",
           e,
-          if (element ne null)
-            element.getData.asInstanceOf[LocationData]
+          if (analysis ne null)
+            analysis.locationData
           else
             null
         )

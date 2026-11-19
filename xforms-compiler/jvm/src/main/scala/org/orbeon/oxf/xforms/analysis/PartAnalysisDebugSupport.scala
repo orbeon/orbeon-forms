@@ -188,7 +188,7 @@ object PartAnalysisDebugSupport {
               "model-prefixed-id" -> (e.model map (_.prefixedId) orNull),
               "binding"           -> e.hasBinding.toString,
               "value"             -> e.isInstanceOf[ValueTrait].toString,
-              "name"              -> e.element.attributeValue("name")
+              "name"              -> e.attributeValue("name")
             )
         }
 

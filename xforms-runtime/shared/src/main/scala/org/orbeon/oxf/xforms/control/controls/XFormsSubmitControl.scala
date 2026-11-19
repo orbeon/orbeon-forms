@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.xforms.control.XFormsControl
@@ -29,8 +28,8 @@ import org.orbeon.xforms.XFormsNames.SUBMISSION_QNAME
 /**
  * xf:submit control.
  */
-class XFormsSubmitControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
-    extends XFormsTriggerControl(container, parent, element, _effectiveId) {
+class XFormsSubmitControl(container: XBLContainer, parent: XFormsControl, _effectiveId: String)
+    extends XFormsTriggerControl(container, parent, _effectiveId) {
 
   override def performDefaultAction(event: XFormsEvent, collector: ErrorEventCollector): Unit = {
     // Do the default stuff upon receiving a DOMActivate event
@@ -38,7 +37,7 @@ class XFormsSubmitControl(container: XBLContainer, parent: XFormsControl, elemen
 
       // Find submission id
       val submissionId =
-        Option(element.attributeValue(SUBMISSION_QNAME)) getOrElse
+        staticControl.attributeValueOpt(SUBMISSION_QNAME) getOrElse
         (throw new ValidationException("xf:submit requires a submission attribute.", getLocationData))
 
       resolve(submissionId) match {

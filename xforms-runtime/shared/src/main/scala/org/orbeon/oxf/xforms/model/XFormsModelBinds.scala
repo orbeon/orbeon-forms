@@ -110,11 +110,7 @@ object XFormsModelBinds {
         case NonFatal(t) =>
           throw OrbeonLocationException.wrapException(
             t,
-            XmlExtendedLocationData(
-              currentBind.staticBind.locationData,
-              "evaluating XForms binds".some,
-              element = currentBind.staticBind.element.some
-            )
+            currentBind.staticBind.extendedLocationData("evaluating XForms binds")
           )
       }
 
@@ -160,12 +156,11 @@ object XFormsModelBinds {
     throwable match {
       case NonFatalCheckTypedValueException((t, false)) =>
         // All other errors dispatch an event and will cause the usual fatal-or-not behavior
-        val ve = OrbeonLocationException.wrapException(t,
-          XmlExtendedLocationData(
-            locationData = bindNode.locationData,
-            description  = Some(mipName.name),
-            params       = List("expression" -> xpathMIP.compiledExpression.string),
-            element      = Some(bindNode.staticBind.element)
+        val ve = OrbeonLocationException.wrapException(
+          t,
+          bindNode.staticBind.extendedLocationData(
+            description = mipName.name,
+            params      = List("expression" -> xpathMIP.compiledExpression.string)
           )
         )
 

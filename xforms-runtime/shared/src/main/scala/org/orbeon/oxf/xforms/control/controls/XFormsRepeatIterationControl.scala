@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 
-import org.orbeon.dom.{Element, QName}
+import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.controls.RepeatIterationControl
 import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeContainerControl}
@@ -34,12 +34,10 @@ import org.xml.sax.helpers.AttributesImpl
 class XFormsRepeatIterationControl(
   container   : XBLContainer,
   parent      : XFormsControl,
-  element     : Element,
   _effectiveId: String
 ) extends XFormsSingleNodeContainerControl(
   container,
   parent,
-  element,
   _effectiveId
 ) with NoLHHATrait {
 

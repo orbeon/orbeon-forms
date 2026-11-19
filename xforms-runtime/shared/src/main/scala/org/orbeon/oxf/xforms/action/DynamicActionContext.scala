@@ -25,7 +25,6 @@ case class DynamicActionContext(
   collector         : ErrorEventCollector
 ) {
   def actionName         = analysis.localName
-  def element            = analysis.element
   def scope              = analysis.scope
   def container          = interpreter.actionXPathContext.container
   def containingDocument = interpreter.containingDocument

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
-import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
@@ -35,7 +34,7 @@ class XFormsRefreshAction extends XFormsAction {
         XFormsRefreshAction.refresh(model, context.collector)
       case None =>
         val modelId = context.analysis.model.orNull
-        throw new ValidationException(s"Invalid model id: `$modelId`", context.element.getData.asInstanceOf[LocationData])
+        throw new ValidationException(s"Invalid model id: `$modelId`", context.analysis.locationData)
     }
   }
 }

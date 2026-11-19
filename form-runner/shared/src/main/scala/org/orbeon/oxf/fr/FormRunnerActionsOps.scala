@@ -187,7 +187,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
             // HACK for https://github.com/orbeon/orbeon-forms/issues/4042
             val itemOpt =
-              if (c.staticControl.element.getQName == QName("dropdown-select1", XMLNames.FRNamespace))
+              if (c.staticControl.qName == QName("dropdown-select1", XMLNames.FRNamespace))
                 select1Control.findSelectedItem(collector) filter (_.value match {
                   case Left(v) if v.nonAllBlank => true
                   case _                        => false
@@ -218,7 +218,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
         ControlValue.SingleControlValue(c.getValue(collector), formattedValue, isHtml = isHtmlValueControl(c))
       case c if Set("image-attachment", "attachment")(c.staticControl.localName) =>
-        if (c.staticControl.element.attributeValueOpt("multiple").contains("true")) {
+        if (c.staticControl.attributeValueOpt("multiple").contains("true")) {
           val items = c.boundNodeOpt.toList.flatMap(_.child("_")).filter(_.getStringValue.nonAllBlank)
           ControlValue.MultipleControlValue(
             storageValue    = items.map(_.getStringValue).mkString(" "),
@@ -242,8 +242,8 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
   // Is the control a formatted text control or a control with a "text/html" media type?
   private def isHtmlValueControl(c: XFormsControl): Boolean =
-    c.staticControl.element.getQName == TinymceQName ||
-    c.staticControl.element.attributeValueOpt(XFormsNames.MEDIATYPE_QNAME).contains(ContentTypes.HtmlContentType)
+    c.staticControl.qName == TinymceQName ||
+    c.staticControl.attributeValueOpt(XFormsNames.MEDIATYPE_QNAME).contains(ContentTypes.HtmlContentType)
 
   private val TinymceQName = QName("tinymce", XMLNames.FRNamespace)
 
@@ -307,7 +307,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     // All the section template controls from the given library
     val allSectionTemplateControlsForLibrary =
       container.containingDocument.controls.getCurrentControlTree.getSectionTemplateControls.toList collect {
-        case s if s.staticControl.element.getNamespaceURI == libraryUri && s.isRelevant => s
+        case s if s.staticControl.namespaceURI == libraryUri && s.isRelevant => s
       }
 
     val uniqueSectionTemplateControlsForLibraryStaticIds =
@@ -322,7 +322,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
       val containingSectionTemplateControlAndAppOpt =
         container.ancestorsIterator.flatMap(_.associatedControlOpt).flatMap(control =>
-          frc.findAppFromSectionTemplateUri(control.element.getNamespaceURI).map(control ->)).nextOption()
+          frc.findAppFromSectionTemplateUri(control.staticControl.namespaceURI).map(control ->)).nextOption()
 
       containingSectionTemplateControlAndAppOpt match {
         case Some((containingSection, _)) => containingSection.effectiveId

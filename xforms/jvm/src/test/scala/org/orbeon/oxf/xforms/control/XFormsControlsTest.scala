@@ -47,7 +47,7 @@ class XFormsControlsTest
 
   describe("Diff custom MIPs changes ") {
     val attributes = new AttributesImpl
-    val control1 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
+    val control1 = new XFormsInputControl(getContainingDocument("input-1"), null, "input-1") {
       override val customMIPs = Map(
         "name1" -> "value1",
         "name2" -> "value2",
@@ -55,7 +55,7 @@ class XFormsControlsTest
         "name4" -> "value4"
       )
     }
-    val control2 = new XFormsInputControl(getContainingDocument("input-2"), null, null, "input-2") {
+    val control2 = new XFormsInputControl(getContainingDocument("input-2"), null, "input-2") {
       override val customMIPs = Map(
         // leave as is
         "name1" -> "value1",
@@ -74,7 +74,7 @@ class XFormsControlsTest
 
   describe("Diff new custom MIPs") {
     val attributes = new AttributesImpl
-    val control2 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
+    val control2 = new XFormsInputControl(getContainingDocument("input-1"), null, "input-1") {
       override val customMIPs = Map(
         "name1" -> "value1",
         "name2" -> "value2",
@@ -90,10 +90,10 @@ class XFormsControlsTest
 
   describe("Diff class AVT changes") {
     val attributes = new AttributesImpl
-    val control1 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
+    val control1 = new XFormsInputControl(getContainingDocument("input-1"), null, "input-1") {
       override def extensionAttributeValue(attributeName: QName): Option[String] = Some("foo bar gaga")
     }
-    val control2 = new XFormsInputControl(getContainingDocument("input-2"), null, null, "input-2") {
+    val control2 = new XFormsInputControl(getContainingDocument("input-2"), null, "input-2") {
       override def extensionAttributeValue(attributeName: QName): Option[String] = Some("bar toto")
     }
     ControlAjaxSupport.addAjaxClasses(attributes, Some(control1), control2)
@@ -104,7 +104,7 @@ class XFormsControlsTest
 
   describe("Diff new class AVT") {
     val attributes = new AttributesImpl
-    val control2 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
+    val control2 = new XFormsInputControl(getContainingDocument("input-1"), null, "input-1") {
       override def extensionAttributeValue(attributeName: QName): Option[String] = Some("foo bar")
     }
     ControlAjaxSupport.addAjaxClasses(attributes, None, control2)

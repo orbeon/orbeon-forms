@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import cats.syntax.option.*
 import org.orbeon.datatypes.{MaximumCurrentFiles, MediatypeRange}
-import org.orbeon.dom.{Element, QName}
+import org.orbeon.dom.QName
 import org.orbeon.io.FileUtils
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.util.PathUtils.*
@@ -45,8 +45,8 @@ import scala.util.control.NonFatal
 /**
  * Represents an xf:upload control.
  */
-class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
-    extends XFormsSingleNodeControl(container, parent, element, _effectiveId)
+class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, _effectiveId: String)
+    extends XFormsSingleNodeControl(container, parent, _effectiveId)
     with XFormsValueControl
     with SingleNodeFocusableTrait
     with FileMetadata {

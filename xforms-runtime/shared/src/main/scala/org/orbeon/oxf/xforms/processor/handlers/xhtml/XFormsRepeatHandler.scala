@@ -121,11 +121,7 @@ class XFormsRepeatHandler(
           case NonFatal(t) =>
             throw OrbeonLocationException.wrapException(
               t,
-              XmlExtendedLocationData(
-                repeatControl.getLocationData,
-                "unrolling xf:repeat control".some,
-                element = repeatControl.element.some
-              )
+              repeatControl.staticControl.extendedLocationData("unrolling xf:repeat control")
             )
         }
         handlerContext.popRepeatContext()

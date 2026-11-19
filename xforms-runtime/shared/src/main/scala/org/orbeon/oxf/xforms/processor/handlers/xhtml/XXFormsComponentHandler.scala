@@ -66,7 +66,7 @@ class XXFormsComponentHandler(
     // add a CSS class based on the element name.
     if (matched.commonBinding.directName.isEmpty) {
       classes.append(" xbl-")
-      classes.append(matched.element.getQName.qualifiedName.replace(':', '-'))
+      classes.append(matched.qualifiedName.replace(':', '-'))
     }
   }
 

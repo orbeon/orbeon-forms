@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.{Element, Namespace, QName}
+import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.xforms.analysis.controls.InputControl
 import org.orbeon.oxf.xforms.control.*
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl.*
@@ -33,12 +33,10 @@ import org.xml.sax.helpers.AttributesImpl
 class XFormsInputControl(
   container   : XBLContainer,
   parent      : XFormsControl,
-  element     : Element,
   _effectiveId: String
 ) extends XFormsSingleNodeControl(
   container,
   parent,
-  element,
   _effectiveId
 ) with XFormsValueControl
   with ReadonlySingleNodeFocusableTrait

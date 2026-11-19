@@ -12,8 +12,8 @@ class XXFormsLogAction extends XFormsAction {
   override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
     implicit val contextStack: XFormsContextStack = actionContext.interpreter.actionXPathContext
     actionContext.interpreter.containingDocument.logMessage(
-      name    = actionContext.element.attributeValueOpt("name").getOrElse("orbeon"),
-      level   = actionContext.element.attributeValueOpt("level").map(LogLevel.forName).getOrElse(log4s.Info),
+      name    = actionContext.analysis.attributeValueOpt("name").getOrElse("orbeon"),
+      level   = actionContext.analysis.attributeValueOpt("level").map(LogLevel.forName).getOrElse(log4s.Info),
       message =
         XFormsContextStackSupport.evaluateExpressionOrConstant(
           childElem           = actionContext.analysis.asInstanceOf[WithExpressionOrConstantTrait],

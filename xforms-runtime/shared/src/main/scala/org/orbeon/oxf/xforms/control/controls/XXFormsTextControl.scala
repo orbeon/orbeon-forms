@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -28,16 +27,14 @@ import org.xml.sax.helpers.AttributesImpl
 class XXFormsTextControl(
   container   : XBLContainer,
   parent      : XFormsControl,
-  element     : Element,
   _effectiveId: String
 ) extends XFormsOutputControl(
   container,
   parent,
-  element,
   _effectiveId
 ) {
 
-  private val forAttribute = element.attributeValue(XFormsNames.FOR_QNAME)
+  private val forAttribute = staticControl.attributeValue(XFormsNames.FOR_QNAME)
 
   // A kind of hacky way of getting the effective id of the HTML element
   def getEffectiveForAttribute: String =

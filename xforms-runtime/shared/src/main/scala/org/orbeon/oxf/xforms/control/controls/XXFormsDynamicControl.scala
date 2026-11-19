@@ -64,8 +64,8 @@ import scala.jdk.CollectionConverters.*
  *
  * In the future the hope is to make any change fully incremental.
  */
-class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
-  extends XFormsSingleNodeContainerControl(container, parent, element, _effectiveId) {
+class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, _effectiveId: String)
+  extends XFormsSingleNodeContainerControl(container, parent, _effectiveId) {
 
   case class Nested(container: XBLContainer, partAnalysis: NestedPartAnalysis, template: SAXStore, outerListener: EventListener)
 
@@ -90,7 +90,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         contextStack.resetBindingContext(collector)
         contextStack.getCurrentBindingContext
       } else {
-        BindingContext.empty(staticControl.element, staticControl.scope)
+        BindingContext.empty(staticControl, staticControl.scope)
       }
     }
 
@@ -499,7 +499,7 @@ object XXFormsDynamicControl {
   def updateDynamicShadowTree(componentControl: XFormsComponentControl, collector: ErrorEventCollector): Unit = {
 
     val doc             = componentControl.containingDocument
-    val templateTreeOpt = componentControl.staticControl.children find (_.element.getQName == XBL_TEMPLATE_QNAME)
+    val templateTreeOpt = componentControl.staticControl.children find (_.qName == XBL_TEMPLATE_QNAME)
 
     templateTreeOpt foreach { templateTree =>
       doc.controls.getCurrentControlTree.createAndInitializeDynamicSubTree(

@@ -340,8 +340,8 @@ object FormRunnerMetadata {
 
     def isSection (c: XFormsControl) = c.localName == "section"
     def isGrid    (c: XFormsControl) = c.localName == "grid"
-    def isRepeat  (c: XFormsControl) = c.staticControl.element.attributeValue("repeat") == "content"
-    def isExcluded(c: XFormsControl) = c.staticControl.element.attributeValue("class").splitTo[Set]().contains(FrExcludeFromEmailBody)
+    def isRepeat  (c: XFormsControl) = c.staticControl.attributeValue("repeat") == "content"
+    def isExcluded(c: XFormsControl) = c.staticControl.attributeValue("class").splitTo[Set]().contains(FrExcludeFromEmailBody)
 
     def isRepeatedGridComponent(control: XFormsControl): Boolean =
       control match {

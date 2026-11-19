@@ -260,8 +260,19 @@ class SwitchControl(
 
   override def allowMinimalLabelHint: Boolean = false
 
-  val caseref           = element.attributeValueOpt(CASEREF_QNAME)
-  val hasFullUpdate     = element.attributeValueOpt(XXFORMS_UPDATE_QNAME).contains(XFORMS_FULL_UPDATE)
+  val caseref           = attributeValueOpt(CASEREF_QNAME)
+  val hasFullUpdate     = attributeValueOpt(XXFORMS_UPDATE_QNAME).contains(XFORMS_FULL_UPDATE)
+
+  override protected def synthesizedUnprefixedAttributeValue(local: String): String =
+    if (local == "caseref") caseref.orNull else super.synthesizedUnprefixedAttributeValue(local)
+
+  override protected def extraSynthesizedAttributes: List[(QName, String)] =
+    super.extraSynthesizedAttributes      :::
+      caseref.map(CASEREF_QNAME -> _).toList :::
+      (if (hasFullUpdate) List(XXFORMS_UPDATE_QNAME -> XFORMS_FULL_UPDATE) else Nil)
+
+  override protected def isPrunedAttribute(attQName: QName): Boolean =
+    super.isPrunedAttribute(attQName) || attQName == CASEREF_QNAME || attQName == XXFORMS_UPDATE_QNAME
 
   lazy val caseControls = children collect { case c: CaseControl => c }
   lazy val caseIds      = caseControls map (_.staticId) toSet
@@ -285,7 +296,16 @@ class CaseControl(
 
   override def allowMinimalLabelHint: Boolean = false
 
-  val selected: Option[String] = element.attributeValueOpt(SELECTED_QNAME)
+  val selected: Option[String] = attributeValueOpt(SELECTED_QNAME)
+
+  override protected def synthesizedUnprefixedAttributeValue(local: String): String =
+    if (local == "selected") selected.orNull else super.synthesizedUnprefixedAttributeValue(local)
+
+  override protected def extraSynthesizedAttributes: List[(QName, String)] =
+    super.extraSynthesizedAttributes ::: selected.map(SELECTED_QNAME -> _).toList
+
+  override protected def isPrunedAttribute(attQName: QName): Boolean =
+    super.isPrunedAttribute(attQName) || attQName == SELECTED_QNAME
 }
 
 class GroupControl(
@@ -352,8 +372,8 @@ class PropertyControl(
   containerScope   : Scope
 ) extends ElementAnalysis(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
   val constantValueOpt: Option[String] =
-    if (VariableAnalysis.valueOrSelectAttribute(element).isEmpty)
-      Option(element.getStringValue).filter(_.nonEmpty)
+    if (VariableAnalysis.valueOrSelectAttribute(elem).isEmpty)
+      Option(elem.getStringValue).filter(_.nonEmpty)
     else
       None
 }

@@ -45,7 +45,7 @@ class RuntimeBind(
 
   val (items, bindNodes) = {
     val contextStack = model.getContextStack
-    contextStack.pushBinding(staticBind.element, model.effectiveId, model.getResolutionScope, model, collector)
+    contextStack.pushBinding(staticBind, model.effectiveId, model.getResolutionScope, model, collector)
 
     // NOTE: This should probably go into XFormsContextStack
     val bindingContext = contextStack.getCurrentBindingContext

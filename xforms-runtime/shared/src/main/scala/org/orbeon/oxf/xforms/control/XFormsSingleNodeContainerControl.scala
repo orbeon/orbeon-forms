@@ -13,17 +13,14 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 abstract class XFormsSingleNodeContainerControl(
   container   : XBLContainer,
   parent      : XFormsControl,
-  element     : Element,
   _effectiveId: String
 ) extends XFormsSingleNodeControl(
   container,
   parent,
-  element,
   _effectiveId
 ) with XFormsContainerControl

@@ -41,15 +41,15 @@ class RepeatControl(
     appearances(XXFORMS_SEPARATOR_APPEARANCE_QNAME)
 
   def isDnD: Boolean =
-    element.attributeValueOpt(XXFORMS_DND_QNAME) exists (_ != "none")
+    attributeValueOpt(XXFORMS_DND_QNAME) exists (_ != "none")
 
   val dndClasses: Option[String] =
-    element.attributeValueOpt(XXFORMS_DND_QNAME) filter
-      Set("vertical", "horizontal")              map
+    attributeValueOpt(XXFORMS_DND_QNAME) filter
+      Set("vertical", "horizontal")      map
       (dndType => s"xforms-dnd xforms-dnd-$dndType")
 
   private def findPositiveInt(attName: QName): Option[Int] =
-    element.attributeValueOpt(attName) flatMap (_.trimAllToOpt) map (_.toInt) filter (_ > 0)
+    attributeValueOpt(attName) flatMap (_.trimAllToOpt) map (_.toInt) filter (_ > 0)
 
   val startIndex: Int =
     findPositiveInt(XXFORMS_REPEAT_STARTINDEX_QNAME) getOrElse  1

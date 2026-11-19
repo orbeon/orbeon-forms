@@ -24,8 +24,17 @@ trait AppearanceTrait extends ElementAnalysis {
 
   import AppearanceTrait.*
 
-  val appearances: Set[QName]     = ElementAnalysis.attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
-  val mediatype  : Option[String] = element.attributeValueOpt(MEDIATYPE_QNAME)
+  val appearances: Set[QName]     = ElementAnalysis.attQNameSet(this, APPEARANCE_QNAME, namespaceMapping)
+  val mediatype  : Option[String] = attributeValueOpt(MEDIATYPE_QNAME)
+
+  override protected def synthesizedUnprefixedAttributeValue(local: String): String =
+    if (local == "mediatype") mediatype.orNull else super.synthesizedUnprefixedAttributeValue(local)
+
+  override protected def extraSynthesizedAttributes: List[(QName, String)] =
+    super.extraSynthesizedAttributes ::: mediatype.map(MEDIATYPE_QNAME -> _).toList
+
+  override protected def isPrunedAttribute(attQName: QName): Boolean =
+    super.isPrunedAttribute(attQName) || attQName == MEDIATYPE_QNAME
 
   def encodeAndAppendAppearances(sb: jl.StringBuilder): Unit =
     appearances foreach (encodeAndAppendAppearance(sb, localName, _))

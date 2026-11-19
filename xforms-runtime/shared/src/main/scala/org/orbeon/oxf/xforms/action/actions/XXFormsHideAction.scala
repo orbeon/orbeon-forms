@@ -44,7 +44,7 @@ class XXFormsHideAction extends XFormsAction {
       case _ =>
         debug(
           "xxf:hide: dialog does not refer to an existing xxf:dialog element, ignoring action",
-          List("dialog id" -> actionContext.element.attributeValue("dialog"))
+          List("dialog id" -> actionContext.analysis.attributeValue("dialog"))
         )
     }
   }

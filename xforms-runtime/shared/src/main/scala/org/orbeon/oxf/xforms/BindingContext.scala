@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms
 
 import java.util as ju
 import org.orbeon.datatypes.LocationData
-import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
@@ -37,7 +36,7 @@ case class BindingContext(
   position                  : Int,
   elementId                 : String,
   newBind                   : Boolean,
-  controlElement            : Element, // only used to determine if it's a repeat or a grouping element
+  controlAnalysis           : ElementAnalysis, // only used to determine if it's a repeat or a grouping element
   private val _locationData : LocationData,
   hasOverriddenContext      : Boolean,
   contextItem               : om.Item,
@@ -52,20 +51,20 @@ case class BindingContext(
   // Location data associated with the XForms element (typically, a control) associated with the binding. If location
   // data was passed during construction, pass that, otherwise try to get location data from passed element.
   val locationData: LocationData =
-    Option(_locationData) orElse (Option(controlElement) map (_.getData.asInstanceOf[LocationData])) orNull
+    Option(_locationData) orElse (Option(controlAnalysis) flatMap (a => Option(a.locationData))) orNull
 
   private var _variable: Option[VariableNameValue] = None
   def variable: Option[VariableNameValue] = _variable
 
   // Constructor for scoping a variable
   def this(
-    parent         : BindingContext,
-    base           : BindingContext,
-    controlElement : Element,
-    locationData   : LocationData,
-    variableName   : String,
-    variableValue  : ValueRepresentationType,
-    scope          : Scope
+    parent          : BindingContext,
+    base            : BindingContext,
+    controlAnalysis : ElementAnalysis,
+    locationData    : LocationData,
+    variableName    : String,
+    variableValue   : ValueRepresentationType,
+    scope           : Scope
   ) = {
     this(
       parent               = parent,
@@ -75,7 +74,7 @@ case class BindingContext(
       position             = base.position,
       elementId            = base.elementId,
       newBind              = false,
-      controlElement       =  controlElement,
+      controlAnalysis      = controlAnalysis,
       _locationData        = locationData,
       hasOverriddenContext = false,
       contextItem          = base.contextItem,
@@ -91,7 +90,7 @@ case class BindingContext(
     def ancestorOrSelfInScope(scope: Scope) =
       new AncestorIterator(includeSelf = true) find (_.scope == scope) getOrElse (throw new IllegalStateException)
 
-    new BindingContext(this, ancestorOrSelfInScope(scope), variableElement.element, variableElement.locationData, name, value, scope)
+    new BindingContext(this, ancestorOrSelfInScope(scope), variableElement, variableElement.locationData, name, value, scope)
   }
 
   def contextItemOpt: Option[om.Item] = Option(contextItem)
@@ -184,10 +183,10 @@ case class BindingContext(
 
   // We don't have a bound element, but the parent is bound to xf:repeat
   def isRepeatIterationBindingContext: Boolean =
-    (parent ne null) && (controlElement eq null) && parent.isRepeatBindingContext
+    (parent ne null) && (controlAnalysis eq null) && parent.isRepeatBindingContext
 
   def isRepeatBindingContext: Boolean =
-    (controlElement ne null) && controlElement.getName == "repeat"
+    (controlAnalysis ne null) && controlAnalysis.localName == "repeat"
 
   // Return the closest enclosing repeat id, throw if not found
   def enclosingRepeatId: String =
@@ -203,7 +202,7 @@ case class BindingContext(
   // Get the current repeat sequence for the given repeat id
   def repeatItems(repeatId: String): ju.List[om.Item] =
     new AncestorIterator(includeSelf = true) collectFirst {
-      case binding if repeatId == binding.elementId && (binding.controlElement ne null) && binding.controlElement.getName == "repeat" =>
+      case binding if repeatId == binding.elementId && (binding.controlAnalysis ne null) && binding.controlAnalysis.localName == "repeat" =>
         binding.nodeset
     } getOrElse {
       throw new ValidationException(s"No enclosing xf:repeat found for id $repeatId", locationData)
@@ -215,12 +214,12 @@ case class BindingContext(
   def contextForId(contextId: String): om.Item = {
 
     def matchesContainer(binding: BindingContext) =
-      (binding.controlElement ne null) &&
-      XFormsControlFactory.isContainerControl(binding.controlElement.getNamespaceURI, binding.controlElement.getName) &&
+      (binding.controlAnalysis ne null) &&
+      XFormsControlFactory.isContainerControl(binding.controlAnalysis.namespaceURI, binding.controlAnalysis.localName) &&
       binding.elementId == contextId
 
     def matchesRepeat(binding: BindingContext) =
-      (binding.controlElement eq null) &&
+      (binding.controlAnalysis eq null) &&
       binding.isRepeatIterationBindingContext && binding.parent.elementId == contextId
 
     new AncestorIterator(includeSelf = true) collectFirst {
@@ -296,7 +295,7 @@ case class VariableNameValue(name: String, value: ValueRepresentationType)
 object BindingContext {
   // NOTE: Ideally, we would like the empty context to be a constant, as nobody should use it! Or, the binding context
   // should simply be `None`.
-  def empty(bindingElement: Element, scope: Scope): BindingContext =
+  def empty(bindingAnalysis: ElementAnalysis, scope: Scope): BindingContext =
     BindingContext(
       parent               = null,
       modelOpt             = None,
@@ -305,7 +304,7 @@ object BindingContext {
       position             = 0,
       elementId            = null,
       newBind              = false,
-      controlElement       = bindingElement,
+      controlAnalysis      = bindingAnalysis,
       _locationData        = null,
       hasOverriddenContext = false,
       contextItem          = null,

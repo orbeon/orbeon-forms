@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.control.ControlLocalSupport.XFormsControlLocal
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl, XFormsNoSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -39,9 +38,8 @@ private case class XXFormsDialogControlLocal(
 class XXFormsDialogControl(
   container   : XBLContainer,
   parent      : XFormsControl,
-  element     : Element,
   effectiveId : String
-) extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId) {
+) extends XFormsNoSingleNodeContainerControl(container, parent, effectiveId) {
 
   // NOTE: Attributes logic duplicated in XXFormsDialogHandler.
   // TODO: Should be in the static state.
@@ -55,8 +53,8 @@ class XXFormsDialogControl(
   // private val close                    = ! ("false" == element.attributeValue("close"))
   // private val draggable                = ! ("false" == element.attributeValue("draggable"))
 
-  private val defaultNeighborControlId = element.attributeValueOpt("neighbor")
-  private val initiallyVisible         = element.attributeValue("visible") == "true"
+  private val defaultNeighborControlId = staticControl.attributeValueOpt("neighbor")
+  private val initiallyVisible         = staticControl.attributeValue("visible") == "true"
 
   // Initial local state
   setLocal(XXFormsDialogControlLocal(initiallyVisible, constrainToViewport = false, None))

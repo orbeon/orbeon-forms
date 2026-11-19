@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.Element
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl
@@ -31,12 +30,10 @@ import org.xml.sax.helpers.AttributesImpl
 class XXFormsAttributeControl(
   container   : XBLContainer,
   parent      : XFormsControl,
-  element     : Element,
   _effectiveId: String
 ) extends XFormsSingleNodeControl(
   container,
   parent,
-  element,
   _effectiveId
 ) with XFormsValueControl {
 
@@ -58,13 +55,13 @@ class XXFormsAttributeControl(
     val externalValue = getExternalValue(collector)
     attributeName match {
       case "src" =>
-        XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, externalValue, UrlRewriteMode.AbsolutePathOrRelative)
+        XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, staticControl, externalValue, UrlRewriteMode.AbsolutePathOrRelative)
       case "href" if ! externalValue.startsWith("#") =>
         // NOTE: Keep value unchanged if it's just a fragment (see also XFormsLoadAction)
         attributeControl.urlType match {
-          case "action"   => XFormsCrossPlatformSupport.resolveActionURL  (containingDocument, element, externalValue)
-          case "resource" => XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, externalValue, UrlRewriteMode.AbsolutePathOrRelative)
-          case _          => XFormsCrossPlatformSupport.resolveRenderURL  (containingDocument, element, externalValue, skipRewrite = false) // default is "render"
+          case "action"   => XFormsCrossPlatformSupport.resolveActionURL  (containingDocument, staticControl, externalValue)
+          case "resource" => XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, staticControl, externalValue, UrlRewriteMode.AbsolutePathOrRelative)
+          case _          => XFormsCrossPlatformSupport.resolveRenderURL  (containingDocument, staticControl, externalValue, skipRewrite = false) // default is "render"
         }
       case _ => externalValue
     }

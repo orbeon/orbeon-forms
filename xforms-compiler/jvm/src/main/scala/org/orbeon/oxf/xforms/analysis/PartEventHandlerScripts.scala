@@ -38,7 +38,7 @@ trait PartEventHandlerScripts {
 
     def extractStaticScript(analysis: ElementAnalysis, scriptType: ScriptType) = {
 
-      val elem     = analysis.element
+      val elem     = analysis.compileElement
       val isClient = elem.attributeValue("runat") != "server"
 
       if (! isClient)

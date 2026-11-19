@@ -280,7 +280,7 @@ abstract class XFormsBaseHandlerXHTML (
     if (! lhhaAnalysis.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME)) {
 
       val lhha = lhhaAnalysis.lhhaType
-      val staticLHHAAttributes = lhhaAnalysis.element.attributesAsSax
+      val staticLHHAAttributes = lhhaAnalysis.attributesAsSax
 
       // If no attributes were found, there is no such label / help / hint / alert
 

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.{Element, QName}
+import org.orbeon.dom.QName
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.FileUtils
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
@@ -48,9 +48,8 @@ import scala.util.control.NonFatal
 class XFormsOutputControl(
   container   : XBLContainer,
   parent      : XFormsControl,
-  element     : Element,
   _effectiveId: String
-) extends XFormsSingleNodeControl(container, parent, element, _effectiveId)
+) extends XFormsSingleNodeControl(container, parent, _effectiveId)
   with XFormsValueControl
   with ReadonlySingleNodeFocusableTrait
   with VisitableTrait
@@ -62,9 +61,9 @@ class XFormsOutputControl(
   def supportedFileMetadata: Seq[String] = Seq("mediatype", "filename") // could add "state"?
 
   // Value attribute
-  private val valueAttributeOpt = element.attributeValueOpt(VALUE_QNAME)
+  private val valueAttributeOpt = staticControlOpt.flatMap(_.value)
   // TODO: resolve statically
-  private val urlNorewrite = XFormsLoadAction.resolveUrlNorewrite(element)
+  private val urlNorewrite = staticControlOpt.exists(XFormsLoadAction.resolveUrlNorewrite)
 
   override def markDirtyImpl(): Unit ={
     super.markDirtyImpl()
@@ -193,7 +192,7 @@ class XFormsOutputControl(
                   // Resolve `xml:base` and try to obtain a path which is an absolute path without the context
                   URLRewriterUtils.rewriteResourceURL(
                     XFormsCrossPlatformSupport.externalContext.getRequest,
-                    containingDocument.resolveXMLBase(element, trimmedInternalValue).toString,
+                    containingDocument.resolveXMLBase(staticControl, trimmedInternalValue).toString,
                     URLRewriterUtils.getPathMatchers,
                     UrlRewriteMode.AbsolutePathNoContext
                   )
@@ -254,7 +253,7 @@ class XFormsOutputControl(
         // External value is not blank, rewrite as absolute path. Two cases:
         // - URL is proxied:        /xforms-server/dynamic/27bf...  => [/context]/xforms-server/dynamic/27bf...
         // - URL is default value:  /ops/images/xforms/foo.gif      => [/context][/version]/ops/images/xforms/foo.gif
-        XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, externalValue, UrlRewriteMode.AbsolutePath)
+        XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, staticControl, externalValue, UrlRewriteMode.AbsolutePath)
       } else
         // Empty value, return as is
         externalValue
@@ -268,7 +267,7 @@ class XFormsOutputControl(
   override def getNonRelevantEscapedExternalValue: String =
     if (mediatype exists (_.startsWith("image/")))
       // Return rewritten URL of dummy image URL
-      XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, DummyImageUri, UrlRewriteMode.AbsolutePath)
+      XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, staticControl, DummyImageUri, UrlRewriteMode.AbsolutePath)
     else
       super.getNonRelevantEscapedExternalValue
 

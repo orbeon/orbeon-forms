@@ -24,6 +24,7 @@ import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.util.StaticXPath.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.saxon.jaxp.SaxonTransformerFactory
@@ -66,13 +67,13 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     throw new NotImplementedError("attachmentFileExists")
 
   // Form Runner: called with `input:instance`
-  def resolveServiceURL(containingDocument: XFormsContainingDocument, element: orbeon.dom.Element, url: String, rewriteMode: UrlRewriteMode): String =
+  def resolveServiceURL(containingDocument: XFormsContainingDocument, analysis: ElementAnalysis, url: String, rewriteMode: UrlRewriteMode): String =
     url match {
       case "input:instance" => url
       case _                => url
     }
 
-  def resolveResourceURL(containingDocument: XFormsContainingDocument, element: orbeon.dom.Element, url: String, rewriteMode: UrlRewriteMode): String =
+  def resolveResourceURL(containingDocument: XFormsContainingDocument, analysis: ElementAnalysis, url: String, rewriteMode: UrlRewriteMode): String =
     if (url.startsWith("data:") || url.startsWith("blob:") || url.startsWith("javascript:"))
       url
     else
@@ -80,7 +81,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
 
   def resolveRenderURL(
     containingDocument : XFormsContainingDocument,
-    currentElement     : orbeon.dom.Element,
+    currentAnalysis    : ElementAnalysis,
     url                : String,
     skipRewrite        : Boolean
   ): String =
@@ -89,7 +90,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: UrlRewriteMode): String =
     URLRewriterImpl.rewriteURL(request, urlString, rewriteMode)
 
-  def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: orbeon.dom.Element, url: String): String =
+  def resolveActionURL(containingDocument: XFormsContainingDocument, currentAnalysis: ElementAnalysis, url: String): String =
     throw new NotImplementedError("resolveActionURL")
 
   // In the JavaScript environment, we currently don't require a way to handle dynamic URLs, so we

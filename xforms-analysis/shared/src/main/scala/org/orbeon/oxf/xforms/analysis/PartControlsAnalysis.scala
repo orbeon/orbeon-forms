@@ -85,7 +85,7 @@ trait PartControlsAnalysis extends TransientState {
 
   def controlElement(prefixedId: String): Option[om.NodeInfo] =
     findControlAnalysis(prefixedId) map { control =>
-      wrapElement(control.element)
+      wrapElement(control.toDomElement)
     }
 
   def hasAttributeControl(prefixedForAttribute: String): Boolean =

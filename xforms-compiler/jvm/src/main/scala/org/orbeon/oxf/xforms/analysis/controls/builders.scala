@@ -1077,7 +1077,7 @@ object EventHandlerBuilder {
 
         val (expressionOrConstant, _) =
           XFormsStaticElementValue.findElementExpressionOrConstantDirectOrNested(
-            outerElem       = this.element,
+            outerElem       = element,
             containerPrefix = this.containerScope.fullPrefix,
             isWithinRepeat  = this.parent.exists(_.isWithinRepeat),
             acceptHTML      = false,
@@ -1248,7 +1248,7 @@ object ValueActionBuilder {
 
         val (expressionOrConstant, _) =
           XFormsStaticElementValue.findElementExpressionOrConstantDirectOrNested(
-            outerElem       = this.element,
+            outerElem       = element,
             containerPrefix = this.containerScope.fullPrefix,
             isWithinRepeat  = this.parent.exists(_.isWithinRepeat),
             acceptHTML      = false,

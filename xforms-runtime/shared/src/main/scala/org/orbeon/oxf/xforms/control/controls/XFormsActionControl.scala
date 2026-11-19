@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.{XFormsContainerControl, XFormsControl}
@@ -22,8 +21,8 @@ import org.orbeon.oxf.xforms.event.XFormsEventHandler
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 
-class XFormsActionControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
-  extends XFormsControl(container, parent, element, _effectiveId) with XFormsEventHandler {
+class XFormsActionControl(container: XBLContainer, parent: XFormsControl, _effectiveId: String)
+  extends XFormsControl(container, parent, _effectiveId) with XFormsEventHandler {
 
   // Tell the parent about us if the parent is not a container
   Option(parent) foreach {

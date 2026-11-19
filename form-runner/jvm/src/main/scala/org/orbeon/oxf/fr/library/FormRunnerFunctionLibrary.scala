@@ -587,10 +587,10 @@ private object FormRunnerFunctions {
           //
           // TODO: handle AVT dependencies
           val hasAttributeAndIsNotAvt =
-            boundElemOpt.exists(_.element.attributeValueOpt(paramName).exists(v => ! XMLUtils.maybeAVT(v)))
+            boundElemOpt.exists(_.attributeValueOpt(paramName).exists(v => ! XMLUtils.maybeAVT(v)))
 
           val doesNotHaveAttribute =
-            boundElemOpt.exists(_.element.attributeValueOpt(paramName).isEmpty)
+            boundElemOpt.exists(_.attributeValueOpt(paramName).isEmpty)
 
           if (hasAttributeAndIsNotAvt || doesNotHaveAttribute) {
             pathMapNodeSet

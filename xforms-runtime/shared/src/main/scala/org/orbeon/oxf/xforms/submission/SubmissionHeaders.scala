@@ -54,7 +54,7 @@ object SubmissionHeaders {
         for (headerElem <- headerElems) {
 
           withBinding(
-            headerElem.element,
+            headerElem,
             getElementEffectiveId(parentEffectiveId, headerElem),
             headerElem.scope,
             eventTarget,
@@ -85,7 +85,7 @@ object SubmissionHeaders {
 
               // Evaluate combine attribute as AVT
               val combine = {
-                val avtCombine = headerElem.element.attributeValueOpt("combine") getOrElse DefaultCombineValue
+                val avtCombine = headerElem.attributeValueOpt("combine") getOrElse DefaultCombineValue
                 val result =
                   try
                     XPathCache.evaluateAsAvt(

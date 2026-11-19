@@ -90,13 +90,13 @@ class LHHAAnalysis(
 
   val forValidations: Set[String] =
     if (localName == "alert")
-      gatherAlertValidations(element.attributeValueOpt(VALIDATION_QNAME))
+      gatherAlertValidations(attributeValueOpt(VALIDATION_QNAME))
     else
       Set.empty
 
   val forLevels: Set[ValidationLevel] =
     if (localName == "alert")
-      gatherAlertLevels(element.attributeValueOpt(LEVEL_QNAME))
+      gatherAlertLevels(attributeValueOpt(LEVEL_QNAME))
     else
       Set.empty
 

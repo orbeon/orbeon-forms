@@ -405,7 +405,7 @@ object SubmissionParameters {
     // TODO: don't update `XFormsContextStack`
     val contextStack = model.getContextStack
     contextStack.pushBinding(
-      staticSubmission.element,
+      staticSubmission,
       dynamicSubmission.effectiveId,
       model.getResolutionScope,
       dynamicSubmission,

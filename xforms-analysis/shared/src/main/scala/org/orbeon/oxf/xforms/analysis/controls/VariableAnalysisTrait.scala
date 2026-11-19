@@ -1,6 +1,6 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.dom.Element
+import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.isValueOrSequenceElement
 import org.orbeon.xforms.XFormsId
@@ -30,14 +30,18 @@ trait VariableAnalysisTrait
   val expressionOrConstant: Either[String, String]
 
   // Used below and by `ElementAnalysisTreeXPathAnalyzer`
-  def nestedValueAnalysis: Option[ElementAnalysis] = children.find(e => isValueOrSequenceElement(e.element))
+  def nestedValueAnalysis: Option[ElementAnalysis] = children.find(e => VariableAnalysis.ValueOrSequenceQNames(e.qName))
 
-  // `def` so server-side static DOM compaction (`replaceElementForRuntime`) does not stay pinned in a cached tuple
-  def valueElement: Element =
-    nestedValueAnalysis match {
-      case Some(valueElem) => valueElem.element
-      case None            => variableSelf.element
-    }
+  def valueAnalysisElement: ElementAnalysis = nestedValueAnalysis.getOrElse(variableSelf)
+
+  override protected def synthesizedUnprefixedAttributeValue(local: String): String =
+    if (local == "name") name else super.synthesizedUnprefixedAttributeValue(local)
+
+  override protected def extraSynthesizedAttributes: List[(QName, String)] =
+    super.extraSynthesizedAttributes ::: (if (name ne null) List(NAME_QNAME -> name) else Nil)
+
+  override protected def isPrunedAttribute(attQName: QName): Boolean =
+    super.isPrunedAttribute(attQName) || attQName == NAME_QNAME || attQName == SELECT_QNAME
 
   // `lazy` because the children are evaluated after the container
   // All used by `Variable`
@@ -71,6 +75,9 @@ object VariableAnalysis {
 
   def valueOrSelectAttribute(element: Element): Option[String] =
     element.attributeValueOpt(VALUE_QNAME) orElse element.attributeValueOpt(SELECT_QNAME)
+
+  def valueOrSelectAttribute(analysis: ElementAnalysis): Option[String] =
+    analysis.value orElse analysis.attributeValueOpt(SELECT_QNAME)
 
   def valueOrSequenceElement(element: Element): Option[Element] =
     element.elementOpt(XXFORMS_VALUE_QNAME) orElse element.elementOpt(XXFORMS_SEQUENCE_QNAME)

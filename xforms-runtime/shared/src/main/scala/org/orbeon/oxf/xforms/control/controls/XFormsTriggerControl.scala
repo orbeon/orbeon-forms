@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.{SingleNodeFocusableTrait, XFormsControl, XFormsSingleNodeControl}
@@ -26,8 +25,8 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
  *
  * TODO: Use inheritance/interface to make this a single-node control that doesn't hold a value.
  */
-class XFormsTriggerControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
-    extends XFormsSingleNodeControl(container, parent, element, _effectiveId)
+class XFormsTriggerControl(container: XBLContainer, parent: XFormsControl, _effectiveId: String)
+    extends XFormsSingleNodeControl(container, parent, _effectiveId)
     with SingleNodeFocusableTrait {
 
   self =>

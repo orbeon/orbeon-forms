@@ -13,7 +13,6 @@
   */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.analysis.controls.LHHA.Alert
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, ValueControl}
@@ -38,9 +37,8 @@ import shapeless.syntax.typeable.typeableOps
 class XFormsLHHAControl(
   container   : XBLContainer,
   parent      : XFormsControl,
-  element     : Element,
   _effectiveId: String
-) extends XFormsSingleNodeControl(container, parent, element, _effectiveId)
+) extends XFormsSingleNodeControl(container, parent, _effectiveId)
   with XFormsValueControl
   with NoLHHATrait {
 

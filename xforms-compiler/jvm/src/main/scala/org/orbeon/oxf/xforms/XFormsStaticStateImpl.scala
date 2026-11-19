@@ -61,66 +61,53 @@ object XFormsStaticStateImpl {
   private val FRMajorModeQName   = QName("major-mode",    FRNamespace)
   private val FRTraitsQName      = QName("config-traits", FRNamespace)
 
-  private def resolveEffectiveXmlBaseOpt(elem: Element): Option[String] = {
-    var firstXmlBase: String        = null
-    var extraXmlBases: List[String] = Nil
-    var cur                         = elem
-    while (cur ne null) {
-      val b = cur.attributeValue(XMLConstants.XML_BASE_QNAME)
-      if (b ne null) {
-        if (firstXmlBase eq null)
-          firstXmlBase = b
-        else
-          extraXmlBases = b :: extraXmlBases
+  private def computeStepXmlBaseOpt(analysis: ElementAnalysis): Option[String] =
+    analysis.compileElementOpt.flatMap { srcElem =>
+      val stopElemOpt = analysis.parent.flatMap(_.compileElementOpt)
+      var xmlBasesRootToLeaf: List[String] = Nil
+      var cur: Element = srcElem
+      while ((cur ne null) && ! stopElemOpt.contains(cur)) {
+        val b = cur.attributeValue(XMLConstants.XML_BASE_QNAME)
+        if (b ne null)
+          xmlBasesRootToLeaf = b :: xmlBasesRootToLeaf
+        cur = cur.getParent
       }
-      cur = cur.getParent
-    }
-    if (firstXmlBase eq null) {
-      None
-    } else if (extraXmlBases.isEmpty) {
-      Some(firstXmlBase)
-    } else {
-      val allRootToLeaf = extraXmlBases ::: (firstXmlBase :: Nil)
-      Try {
-        allRootToLeaf.foldLeft(null: URI) { (acc, s) =>
-          val u = URI.create(s)
-          if (acc eq null) u else acc.resolve(u)
-        }.toString
-      }.toOption.orElse(Some(firstXmlBase))
-    }
-  }
-
-  private def compactAnalysisElement(analysis: ElementAnalysis): Unit = {
-    val srcElem = analysis.element
-    if (! srcElem.isInstanceOf[CompactElement]) {
-      val effectiveXmlBaseOpt = resolveEffectiveXmlBaseOpt(srcElem)
-      val effectiveData       = if (analysis.locationData ne null) analysis.locationData else srcElem.getData
-
-      analysis match {
-        case model: Model if srcElem.elements(XMLConstants.XML_SCHEMA_QNAME).nonEmpty =>
-          if ((srcElem.getDocument ne null) || (srcElem.getParent ne null)) {
-            val standalone = Element(srcElem.getQName)
-            standalone.setData(effectiveData)
-            model.namespaceMapping.mapping.foreach { case (prefix, uri) => standalone.addNamespace(prefix, uri) }
-            var i        = 0
-            val attCount = srcElem.attributeCount
-            while (i < attCount) {
-              val att = srcElem.attribute(i)
-              standalone.addAttribute(att.getQName, att.getValue)
-              i += 1
-            }
-            effectiveXmlBaseOpt.foreach(standalone.addAttribute(XMLConstants.XML_BASE_QNAME, _))
-            srcElem.elements(XMLConstants.XML_SCHEMA_QNAME).foreach { schemaElem =>
-              standalone.add(schemaElem.copyAndCopyParentNamespaces)
-            }
-            model.replaceElementForRuntime(standalone)
-          }
-
-        case _ =>
-          analysis.replaceElementForRuntime(
-            CompactElement.fromElement(srcElem, effectiveXmlBaseOpt, effectiveData)
-          )
+      xmlBasesRootToLeaf match {
+        case Nil           => None
+        case single :: Nil => Some(single)
+        case many          =>
+          Try {
+            many.foldLeft(null: URI) { (acc, s) =>
+              val u = URI.create(s)
+              if (acc eq null) u else acc.resolve(u)
+            }.toString
+          }.toOption.orElse(many.lastOption)
       }
+    }
+
+  private def compactAnalyses(analysesIt: Iterator[ElementAnalysis]): Unit = {
+    val seen = ju.Collections.newSetFromMap(new ju.IdentityHashMap[ElementAnalysis, jl.Boolean])
+    val all  = new mutable.ArrayBuffer[ElementAnalysis]
+    analysesIt.foreach { a =>
+      if ((a ne null) && seen.add(a))
+        all += a
+    }
+
+    val rawSteps = new ju.IdentityHashMap[ElementAnalysis, String](all.size)
+    all.foreach { a =>
+      computeStepXmlBaseOpt(a).foreach(rawSteps.put(a, _))
+    }
+
+    all.foreach { a =>
+      val stepOpt = Option(rawSteps.get(a)).filterNot { s =>
+        s == "." &&
+          ElementAnalysis
+            .ancestorsIterator(a, includeSelf = false)
+            .flatMap(p => Option(rawSteps.get(p)))
+            .nextOption()
+            .contains(".")
+      }
+      a.compactForRuntime(stepOpt)
     }
   }
 
@@ -331,27 +318,29 @@ class XFormsStaticStateImpl(
     val seenElems = ju.Collections.newSetFromMap(new ju.IdentityHashMap[Element, jl.Boolean])
     var sum       = 0L
 
-    for (control <- topLevelPart.controlAnalysisMap.valuesIterator) {
-      val elem = control.element
-      val doc  = elem.getDocument
+    def addDetachedOrDocumentElem(elem: Element): Unit = {
+      val doc = elem.getDocument
       if (doc ne null) {
         if (seenDocs.add(doc))
           sum += MemorySizeEstimator.estimateOrbeonDomDocument(doc)
       } else if (seenElems.add(elem)) {
         sum += MemorySizeEstimator.estimateOrbeonDomElement(elem, maxElements = 25000)
       }
+    }
+
+    for (control <- topLevelPart.controlAnalysisMap.valuesIterator) {
+      control.compileElementOpt match {
+        case Some(elem) =>
+          addDetachedOrDocumentElem(elem)
+        case None =>
+          sum += org.orbeon.oxf.cache.DomMemorySizeEstimator.estimateRawAttributesArray(control.rawAtts)
+      }
 
       control match {
         case inst: Instance =>
-          inst.inlineRootElemOpt.foreach { inlineElem =>
-            val inlineDoc = inlineElem.getDocument
-            if (inlineDoc ne null) {
-              if (seenDocs.add(inlineDoc))
-                sum += MemorySizeEstimator.estimateOrbeonDomDocument(inlineDoc)
-            } else if (seenElems.add(inlineElem)) {
-              sum += MemorySizeEstimator.estimateOrbeonDomElement(inlineElem, maxElements = 25000)
-            }
-          }
+          inst.inlineRootElemOpt.foreach(addDetachedOrDocumentElem)
+        case model: Model if model.isCompactedForRuntime =>
+          model.inlineSchemaElements.foreach(addDetachedOrDocumentElem)
         case _ =>
       }
     }
@@ -362,13 +351,13 @@ class XFormsStaticStateImpl(
   lazy val formRunnerStaticStateMetadataOpt: Option[XFormsStaticStateImpl.FormRunnerStaticStateMetadata] = {
     import XFormsStaticStateImpl.*
 
-    val paramsModelElemOpt = topLevelPart.findModel("fr-parameters-model").map(_.element)
+    val paramsModelOpt = topLevelPart.findModel("fr-parameters-model")
 
-    val configMajorModeOpt = paramsModelElemOpt.flatMap(_.attributeValueOpt(FRMajorModeQName)).flatMap(_.trimAllToOpt)
-    val configAppOpt       = paramsModelElemOpt.flatMap(_.attributeValueOpt(FRAppQName)).flatMap(_.trimAllToOpt)
-    val configFormOpt      = paramsModelElemOpt.flatMap(_.attributeValueOpt(FRFormQName)).flatMap(_.trimAllToOpt)
-    val configVersionOpt   = paramsModelElemOpt.flatMap(_.attributeValueOpt(FRFormVersionQName)).flatMap(_.trimAllToOpt).flatMap(_.toIntOption).filter(_ > 0)
-    val configTraits       = paramsModelElemOpt.flatMap(_.attributeValueOpt(FRTraitsQName)).toList.flatMap(_.splitTo[List]())
+    val configMajorModeOpt = paramsModelOpt.flatMap(_.attributeValueOpt(FRMajorModeQName)).flatMap(_.trimAllToOpt)
+    val configAppOpt       = paramsModelOpt.flatMap(_.attributeValueOpt(FRAppQName)).flatMap(_.trimAllToOpt)
+    val configFormOpt      = paramsModelOpt.flatMap(_.attributeValueOpt(FRFormQName)).flatMap(_.trimAllToOpt)
+    val configVersionOpt   = paramsModelOpt.flatMap(_.attributeValueOpt(FRFormVersionQName)).flatMap(_.trimAllToOpt).flatMap(_.toIntOption).filter(_ > 0)
+    val configTraits       = paramsModelOpt.flatMap(_.attributeValueOpt(FRTraitsQName)).toList.flatMap(_.splitTo[List]())
 
     val formMetaTupleOpt: Option[(String, String, Option[String])] =
       for {
@@ -421,10 +410,10 @@ class XFormsStaticStateImpl(
     } yield (app, form, meta.titleOpt)
 
   // Release duplicate Orbeon DOM subtrees on `readonly && useInlineContent` instances, detach mutable inline instance
-  // roots, and replace `ElementAnalysis` `ConcreteElement`s with standalone `CompactElement`s for server-side execution.
+  // roots, and compact all `ElementAnalysis` instances in place for server-side execution.
   // Offline Scala.js compilation (`XFormsCompiler`) omits this step because `XFormsStaticStateSerializer` reads `inlineRootElemOpt`.
   def trimAfterServerCompilation(): this.type = {
-    import XFormsStaticStateImpl.compactAnalysisElement
+    import XFormsStaticStateImpl.compactAnalyses
 
     val _ = formRunnerStaticStateMetadataOpt
 
@@ -434,13 +423,12 @@ class XFormsStaticStateImpl(
       inst  <- model.instances.valuesIterator
     } inst.releaseInlineDom()
 
-    // 2. Replace every `ElementAnalysis.element` with `CompactElement` (preserving `<xs:schema>` children on `Model`)
-    topLevelPart.controlAnalysisMap.valuesIterator.foreach(compactAnalysisElement)
-    topLevelPart.iterateControls.foreach(compactAnalysisElement)
-    for {
-      model <- topLevelPart.iterateModels
-      desc  <- ElementAnalysis.iterateDescendants(model, includeSelf = true)
-    } compactAnalysisElement(desc)
+    // 2. Compact every `ElementAnalysis` (preserving `<xs:schema>` children on `Model` and minimal `xml:base` steps)
+    compactAnalyses(
+      topLevelPart.controlAnalysisMap.valuesIterator ++
+        topLevelPart.iterateControls ++
+        topLevelPart.iterateModels.flatMap(ElementAnalysis.iterateDescendants(_, includeSelf = true))
+    )
 
     this
   }

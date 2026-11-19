@@ -65,7 +65,7 @@ object FormRunnerUploadSupport extends UploadSupport {
   private def getAttachmentBoundNodeOpt(uploadControl: XFormsUploadControl): Option[NodeInfo] =
     uploadControl.container.associatedControlOpt
       .collect { case c: XFormsComponentControl => c }
-      .filter(_.staticControl.element.getName == "attachment")
+      .filter(_.staticControl.localName == "attachment")
       .flatMap(_.boundNodeOpt)
 
   // Return `None` if we can't find the associated attachment XBL control or bound node

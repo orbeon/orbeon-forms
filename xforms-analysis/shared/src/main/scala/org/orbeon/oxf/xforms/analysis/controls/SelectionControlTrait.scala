@@ -27,18 +27,18 @@ trait SelectionControlTrait
      with SelectAppearanceTrait
      with WithChildrenTrait {
 
-  if (element.attributeValue("selection") == "open")
+  if (attributeValue("selection") == "open")
     throw new ValidationException("Open selection is currently not supported.", locationData)
 
   val excludeWhitespaceTextNodesForCopy: Boolean =
-    element.attributeValue(EXCLUDE_WHITESPACE_TEXT_NODES_QNAME) == "true"
+    attributeValue(EXCLUDE_WHITESPACE_TEXT_NODES_QNAME) == "true"
 
   val isNorefresh: Boolean =
-    element.attributeValue(XXFORMS_REFRESH_ITEMS_QNAME) == "false"
+    attributeValue(XXFORMS_REFRESH_ITEMS_QNAME) == "false"
 
   val groupName: Option[String] =
     if (isFull)
-      element.attributeValueOpt(XXFORMS_GROUP_QNAME)
+      attributeValueOpt(XXFORMS_GROUP_QNAME)
     else
       None
 

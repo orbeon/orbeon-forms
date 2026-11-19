@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.control.controls
 
 import cats.data.NonEmptyList
 import cats.syntax.option.*
-import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils.InsertPosition
 import org.orbeon.oxf.util.CoreUtils.*
@@ -47,12 +46,10 @@ import scala.jdk.CollectionConverters.*
 class XFormsRepeatControl(
   container   : XBLContainer,
   parent      : XFormsControl,
-  element     : Element,
   _effectiveId: String
 ) extends XFormsNoSingleNodeContainerControl(
   container,
   parent,
-  element,
   _effectiveId
 ) with NoLHHATrait {
 
@@ -224,7 +221,7 @@ class XFormsRepeatControl(
   override protected def computeBinding(parentContext: BindingContext, collector: ErrorEventCollector): BindingContext = {
     val contextStack = container.contextStack
     contextStack.setBinding(parentContext)
-    contextStack.pushBinding(element, effectiveId, staticControl.scope, this, collector)
+    contextStack.pushBinding(staticControl, effectiveId, staticControl.scope, this, collector)
 
     // Keep only the relevant items
     import XFormsSingleNodeControl.isRelevantItem

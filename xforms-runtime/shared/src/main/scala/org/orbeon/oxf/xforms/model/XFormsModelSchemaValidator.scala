@@ -27,6 +27,8 @@ import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.processor.validation.SchemaValidationException
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom.{Extensions, LocationSAXWriter}
@@ -41,7 +43,7 @@ class XFormsModelSchemaValidator extends XFormsModelSchemaValidatorPlatform {
 
   import XFormsModelSchemaValidator.*
 
-  private var modelElement: Element = _
+  private var modelAnalysis: ElementAnalysis = _
   private var indentedLogger: IndentedLogger = _
 
   private var schemaGrammar: Grammar = _
@@ -50,9 +52,20 @@ class XFormsModelSchemaValidator extends XFormsModelSchemaValidatorPlatform {
 
   private var documentDeclaration: REDocumentDeclaration = _
 
+  def this(staticModel: Model, indentedLogger: IndentedLogger) = {
+    this()
+    this.modelAnalysis = staticModel
+    this.indentedLogger = indentedLogger
+
+    val schemaAttribute = staticModel.attributeValue(XFormsNames.SCHEMA_QNAME)
+    if (schemaAttribute != null)
+      this.schemaURIs = StringUtils.splitToArray(MarkupUtils.encodeHRRI(schemaAttribute, false))
+
+    this.schemaElements = staticModel.schemaElements
+  }
+
   def this(modelElement: Element, indentedLogger: IndentedLogger) = {
     this()
-    this.modelElement = modelElement
     this.indentedLogger = indentedLogger
 
     val schemaAttribute = modelElement.attributeValue(XFormsNames.SCHEMA_QNAME)
@@ -334,7 +347,7 @@ class XFormsModelSchemaValidator extends XFormsModelSchemaValidatorPlatform {
         if (containingDocument != null)
           XFormsCrossPlatformSupport.resolveServiceURL(
             containingDocument,
-            modelElement,
+            modelAnalysis,
             schemaURIs(0),
             UrlRewriteMode.Absolute
           )

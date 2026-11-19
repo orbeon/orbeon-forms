@@ -7,6 +7,7 @@ import io.circe.parser.decode
 import io.circe.{Decoder, DecodingFailure, HCursor, KeyDecoder}
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.dom
+import org.orbeon.dom.tree.CompactElement
 import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.properties.{PropertyLoader, PropertySet, SimplePropertyStore}
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
@@ -22,7 +23,7 @@ import org.orbeon.oxf.xforms.analysis.model.*
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding, XBLAssets}
-import org.orbeon.oxf.xml.SAXStore
+import org.orbeon.oxf.xml.{SAXStore, XMLConstants}
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
@@ -98,7 +99,7 @@ object XFormsStaticStateDeserializer {
 
         // Index special controls
         elementAnalysis match {
-          case e: LHHAAnalysis if ! TopLevelItemsetQNames(e.getParent.element.getQName) => lhhas += e
+          case e: LHHAAnalysis if ! TopLevelItemsetQNames(e.getParent.qName) => lhhas += e
           case e: EventHandler                                                          => eventHandlers += e
           case e: Model                                                                 => models        += e
           case e: AttributeControl                                                      => attributes    += e
@@ -407,9 +408,30 @@ object XFormsStaticStateDeserializer {
 
     var currentIndex = 0
 
+    val decodeAnalysisElement: Decoder[CompactElement] = (c: HCursor) =>
+      for {
+        nameIndex   <- c.get[Int]("name")
+        attsIndexes <- c.getOrElse[List[(Int, String)]]("atts")(Nil)
+      } yield {
+        val rawAtts =
+          if (attsIndexes.isEmpty) {
+            ElementAnalysis.EmptyRawAtts
+          } else {
+            val arr = new Array[AnyRef](attsIndexes.size * 2)
+            var i   = 0
+            attsIndexes.foreach { case (index, value) =>
+              arr(i)     = collectedQNames(index)
+              arr(i + 1) = value
+              i += 2
+            }
+            arr
+          }
+        new CompactElement(collectedQNames(nameIndex), rawAtts, null)
+      }
+
     implicit lazy val decodeElementAnalysis: Decoder[ElementAnalysis] = (c: HCursor) =>
       for {
-        element             <- c.get[dom.Element]("element")
+        element             <- c.get[CompactElement]("element")(decodeAnalysisElement)
         prefixedId          <- c.get[String]("prefixedId")
         namespaceMapping    <- c.get[Int]("nsRef").map(nsRef => NamespaceMapping(collectedNamespaces(nsRef)))
         scopeIndex          <- c.get[Int]("scopeRef")
@@ -454,8 +476,11 @@ object XFormsStaticStateDeserializer {
 
                   // We don't serialize the attributes separately as we have them on the bound element, so we
                   // copy them again here.
+                  val boundAtts =
+                    (if (staticId ne null) Map(ID_QNAME -> staticId) else Map.empty[dom.QName, String]) ++
+                      element.attributeIterator.map(att => att.getQName -> att.getValue)
                   componentControl.setConcreteBinding(
-                    concreteBinding.copy(boundElementAtts = element.attributes map { att => att.getQName -> att.getValue } toMap)
+                    concreteBinding.copy(boundElementAtts = boundAtts)
                   )
 
                   componentControl
@@ -476,11 +501,18 @@ object XFormsStaticStateDeserializer {
                   schemas                          <- c.getOrElse[List[dom.Element]]("schemas")(Nil)
                 } yield {
                   if (schemas.nonEmpty) {
-                    namespaceMapping.mapping foreach { case (prefix, uri) => element.addNamespace(prefix, uri) }
-                    schemas foreach element.add
+                    schemas.foreach { schemaElem =>
+                      val existingNs = schemaElem.allInScopeNamespacesAsStrings
+                      namespaceMapping.mapping.foreach { case (prefix, uri) =>
+                        if (! existingNs.contains(prefix))
+                          schemaElem.addNamespace(prefix, uri)
+                      }
+                    }
                   }
 
                   val model = new Model(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
+                  if (schemas.nonEmpty)
+                    model.inlineSchemaElements = schemas
 
                   model.bindInstances                    ++= bindInstances
                   model.computedBindExpressionsInstances ++= computedBindExpressionsInstances
@@ -775,7 +807,7 @@ object XFormsStaticStateDeserializer {
 
             case qName: dom.QName if EventHandler.isAction(qName) =>
 
-              if (EventHandler.isEventHandler(element)) {
+              if (c.value.asObject.exists(_.contains("isEventHandler")) || EventHandler.isEventHandler(element)) {
 
                 val eventHandler =
                   for {
@@ -1091,6 +1123,19 @@ object XFormsStaticStateDeserializer {
 
         // Connect dependent models
         PartAnalysisSupport.connectDependentModels(Index.models, Index.controlAnalysisMap(_).asInstanceOf[Model])
+
+        // Compact all ElementAnalysis instances on the client as well so `_compileElement` is released
+        Index.controlAnalysisMap.valuesIterator.foreach { c =>
+          val ownXmlBaseOpt = c.compileElementOpt.flatMap(_.attributeValueOpt(XMLConstants.XML_BASE_QNAME)).filterNot { s =>
+            s == "." &&
+              ElementAnalysis
+                .ancestorsIterator(c, includeSelf = false)
+                .flatMap(_.attributeValueOpt(XMLConstants.XML_BASE_QNAME))
+                .nextOption()
+                .contains(".")
+          }
+          c.compactForRuntime(ownXmlBaseOpt)
+        }
 
         XFormsStaticStateImpl(
           nonDefaultProperties,

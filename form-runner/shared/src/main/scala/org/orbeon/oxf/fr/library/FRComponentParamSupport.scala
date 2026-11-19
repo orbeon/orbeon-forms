@@ -72,7 +72,10 @@ object FRComponentParamSupport {
     sourceAndStaticOpt.flatMap { case (sourceComponentOpt, staticControl, partAnalysis) =>
 
       val boundElementAtts: QName => Option[String] =
-        staticControl.bindingOpt.map(_.boundElementAtts.lift).getOrElse(staticControl.rootElem.attributeValueOpt)
+        staticControl.bindingOpt
+          .map(_.boundElementAtts.lift)
+          .orElse(Option(staticControl.rootElem).map(elem => (qName: QName) => elem.attributeValueOpt(qName)))
+          .getOrElse(staticControl.attributeValueOpt)
 
       def fromAttributes: Option[AtomicValue] =
         ComponentParamSupport.fromElem(
@@ -83,7 +86,7 @@ object FRComponentParamSupport {
       def fromMetadataAndProperties: Option[AtomicValue] =
         FRComponentParamSupport.fromMetadataAndProperties(
           partAnalysis  = partAnalysis,
-          directNameOpt = staticControl.commonBinding.directName.orElse(staticControl.element.getQName.some), // https://github.com/orbeon/orbeon-forms/issues/6707
+          directNameOpt = staticControl.commonBinding.directName.orElse(staticControl.qName.some), // https://github.com/orbeon/orbeon-forms/issues/6707
           paramName     = paramName,                                                                          // Ideally, we should know which selector picked the binding
           property      = property(_, ! (sourceComponentOpt.isDefined && sourceComponentIdOpt.isEmpty))       // and use the element name from that.
         )
@@ -311,7 +314,7 @@ object FRComponentParamSupport {
           staticControl <- associatedControlOpt.flatMap(_.staticControlOpt).iterator
           ancestor      <- ElementAnalysis.ancestorsIterator(staticControl, includeSelf = false)
           if ancestor.isInstanceOf[ComponentControl]
-          app           <- frc.findAppFromSectionTemplateUri(ancestor.element.getNamespaceURI)
+          app           <- frc.findAppFromSectionTemplateUri(ancestor.namespaceURI)
         } yield
           app
 
@@ -362,14 +365,14 @@ object FRComponentParamSupport {
 
   def ancestorSectionsIt(control: XFormsControl): Iterator[XFormsComponentControl] =
     new AncestorOrSelfIterator(control.parent) collect {
-      case cc: XFormsComponentControl if cc.staticControl.element.getQName == XMLNames.FRSectionQName => cc
+      case cc: XFormsComponentControl if cc.staticControl.qName == XMLNames.FRSectionQName => cc
     }
 
   private val ContainerQNames = Set(XMLNames.FRSectionQName, XMLNames.FRGridQName)
 
   def ancestorContainersIt(control: XFormsControl): Iterator[XFormsComponentControl] =
     new AncestorOrSelfIterator(control.parent) collect {
-      case cc: XFormsComponentControl if ContainerQNames(cc.staticControl.element.getQName) => cc
+      case cc: XFormsComponentControl if ContainerQNames(cc.staticControl.qName) => cc
     }
 
   def ancestorContainerNamesIt(control: XFormsControl): Iterator[String] =
@@ -378,13 +381,13 @@ object FRComponentParamSupport {
   def ancestorRepeatedContainersIt(control: XFormsControl): Iterator[XFormsComponentControl] =
     ancestorContainersIt(control)
       .collect {
-        case cc if cc.staticControl.element.attributeValueOpt("repeat").contains("content") => cc
+        case cc if cc.staticControl.attributeValueOpt("repeat").contains("content") => cc
       }
 
   def ancestorRepeatedContainerNamesIt(control: XFormsControl): Iterator[String] =
     ancestorContainersIt(control)
       .collect {
-        case s if s.staticControl.element.attributeValueOpt("repeat").contains("content") =>
+        case s if s.staticControl.attributeValueOpt("repeat").contains("content") =>
           frc.controlNameFromId(s.staticControl.staticId)
       }
 

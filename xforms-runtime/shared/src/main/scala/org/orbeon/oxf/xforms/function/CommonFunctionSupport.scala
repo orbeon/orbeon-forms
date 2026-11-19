@@ -52,10 +52,9 @@ trait CommonFunctionSupport {
       case Some(bindNode: BindNode) =>
         // Function was called from a bind
         bindNode.parentBind.staticBind.namespaceMapping
-      case None if bindingContext.controlElement ne null =>
+      case None if bindingContext.controlAnalysis ne null =>
         // Function was called from a control
-        // `controlElement` is mainly used in `BindingContext` to handle repeats and context.
-        container.getNamespaceMappings(bindingContext.controlElement)
+        bindingContext.controlAnalysis.namespaceMapping
       case None =>
         // Unclear which cases reach here!
         throw new IllegalArgumentException("cannot find namespace mapping")
@@ -66,7 +65,7 @@ trait CommonFunctionSupport {
     def apply(xformsObject: XFormsObject): Context =
       Context(
         container         = xformsObject.container,
-        bindingContext    = BindingContext.empty(xformsObject.elementAnalysis.element, xformsObject.elementAnalysis.scope),
+        bindingContext    = BindingContext.empty(xformsObject.elementAnalysis, xformsObject.elementAnalysis.scope),
         sourceEffectiveId = xformsObject.effectiveId,
         modelOpt          = xformsObject.modelOpt,
         bindNodeOpt       = None

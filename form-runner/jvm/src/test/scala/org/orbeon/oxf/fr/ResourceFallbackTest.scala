@@ -52,7 +52,7 @@ class ResourceFallbackTest
           val allButtons = ControlsIterator(doc.controls.getCurrentControlTree)
             .collect {
               case control: XFormsSingleNodeControl
-                if ButtonComponentQNames(control.staticControl.element.getQName) =>
+                if ButtonComponentQNames(control.staticControl.qName) =>
                 control
             }
             .toList

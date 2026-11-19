@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.{Element, QName}
+import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.BindingContext
@@ -37,8 +37,8 @@ import java.util as ju
  *
  * NOTE: This keep the "currently selected flag" for all children xf:case.
  */
-class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
-    extends XFormsSingleNodeContainerControl(container, parent, element, _effectiveId) {
+class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, _effectiveId: String)
+    extends XFormsSingleNodeContainerControl(container, parent, _effectiveId) {
 
   override type Control <: SwitchControl
 
@@ -365,7 +365,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     }
 
   def isXForms11Switch: Boolean = {
-    val localXForms11Switch = element.attributeValue(XXFORMS_XFORMS11_SWITCH_QNAME)
+    val localXForms11Switch = staticControl.attributeValue(XXFORMS_XFORMS11_SWITCH_QNAME)
     if (localXForms11Switch ne null)
       localXForms11Switch.toBoolean
     else

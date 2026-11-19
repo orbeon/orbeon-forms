@@ -29,7 +29,7 @@ object PartAnalysisSupport {
   // Attach this LHHA to its target control if any
   def attachToControl(findControlAnalysis: String => Option[ElementAnalysis], lhhaAnalysis: LHHAAnalysis): Unit = {
 
-    val forStaticIdOpt = lhhaAnalysis.element.attributeValueOpt(FOR_QNAME)
+    val forStaticIdOpt = lhhaAnalysis.attributeValueOpt(FOR_QNAME)
 
     def searchLHHAControlInScope(scope: Scope, forStaticId: String): Option[StaticLHHASupport] =
       findControlAnalysis(scope.prefixedIdForStaticId(forStaticId)) collect { case e: StaticLHHASupport => e }
@@ -65,7 +65,7 @@ object PartAnalysisSupport {
             searchLHHAControlInScope(lhhaAnalysis.scope, forStaticId) getOrElse (
               throw new ValidationException(
                 s"`for` attribute with value `$forStaticId` doesn't point to a control supporting label, help, hint or alert.",
-                ElementAnalysis.createLocationData(lhhaAnalysis.element)
+                lhhaAnalysis.locationData
               )
             )
 
@@ -81,7 +81,7 @@ object PartAnalysisSupport {
               case _ =>
                 throw new ValidationException(
                   s"parent control must support label, help, hint or alert.",
-                  ElementAnalysis.createLocationData(lhhaAnalysis.element)
+                  lhhaAnalysis.locationData
                 )
             }
 
@@ -123,7 +123,7 @@ object PartAnalysisSupport {
     elementAnalysis    : ElementAnalysis
   ): Unit =
     elementAnalysis.lang =
-      elementAnalysis.element.attributeValueOpt(XML_LANG_QNAME) match {
+      elementAnalysis.attributeValueOpt(XML_LANG_QNAME) match {
         case Some(v) => extractXMLLang(getAttributeControl, elementAnalysis, v)
         case None    => LangRef.Undefined
       }
@@ -135,11 +135,11 @@ object PartAnalysisSupport {
     rootControlAnalysis: RootControl
   ): Option[LangRef] =
     rootControlAnalysis.children.collectFirst {
-      case e if e.element.hasAttribute(XML_LANG_QNAME) =>
+      case e if e.hasAttribute(XML_LANG_QNAME) =>
         PartAnalysisSupport.extractXMLLang(
           getAttributeControl = getAttributeControl,
           elementAnalysis     = rootControlAnalysis,
-          lang                = e.element.attributeValue(XML_LANG_QNAME)
+          lang                = e.attributeValue(XML_LANG_QNAME)
         )
     }
 

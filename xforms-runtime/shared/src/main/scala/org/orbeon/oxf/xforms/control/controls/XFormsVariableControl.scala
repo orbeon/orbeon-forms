@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.Element
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.xforms.analysis.controls.VariableControl
 import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeControl}
@@ -33,9 +32,8 @@ import org.orbeon.xforms.XFormsId
 class XFormsVariableControl(
   container   : XBLContainer,
   parent      : XFormsControl,
-  element     : Element,
   _effectiveId: String
-) extends XFormsSingleNodeControl(container, parent, element, _effectiveId)
+) extends XFormsSingleNodeControl(container, parent, _effectiveId)
   with NoLHHATrait {
 
   override type Control <: VariableControl
@@ -112,7 +110,7 @@ class XFormsVariableControl(
       _bindingContextForFollowing = bc.parent.pushVariable(staticControl, staticControl.name, _value, staticControl.scope)
     } else {
       // If we are within a non-relevant container, don't even bother pushing variables
-      val empty = BindingContext.empty(staticControl.element, staticControl.scope)
+      val empty = BindingContext.empty(staticControl, staticControl.scope)
       _bindingContextForChild     = empty
       _bindingContextForFollowing = empty
     }

@@ -24,7 +24,7 @@ import org.orbeon.xforms.XFormsNames.*
 trait ViewTrait extends ElementAnalysis with AppearanceTrait {
 
   // By default, external events are keypress plus those specifically allowed by the form author
-  protected def externalEventsDef = attSet(element, XXFORMS_EXTERNAL_EVENTS_QNAME) ++ EventNames.KeyboardEvents
+  protected def externalEventsDef = attSet(this, XXFORMS_EXTERNAL_EVENTS_QNAME) ++ EventNames.KeyboardEvents
   def externalEvents              = externalEventsDef
 
   // In the view, in-scope model variables are always first in scope

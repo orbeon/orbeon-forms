@@ -13,12 +13,11 @@
  */
 package org.orbeon.oxf.xforms.state
 
-import org.orbeon.dom.tree.CompactElement
 import org.orbeon.oxf.cache.MemorySizeEstimator
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.analysis.PartAnalysisBuilder
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisBuilder}
 import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.xbl.GlobalBindingIndex
@@ -198,7 +197,7 @@ class StaticStateMemoryFootprintTest
       val staticState = rawStaticState.asInstanceOf[XFormsStaticStateImpl]
 
       // 1. `<template>`, `<properties>`, and `<xbl:xbl>` are already detached from the retained root control Document
-      val rootElem       = staticState.topLevelPart.getTopLevelControls.head.element
+      val rootElem       = staticState.topLevelPart.getTopLevelControls.head.compileElement
       val staticStateDoc = rootElem.getDocument
       assert(staticStateDoc.getRootElement.element("template") eq null)
       assert(rootElem.elements.forall(_.getName != "xbl"))
@@ -216,11 +215,11 @@ class StaticStateMemoryFootprintTest
       val jolBeforeOpt = MemorySizeEstimator.measureExclusiveBytesWithJol(staticState, sharedRoots).map(_._1)
 
       // 4. Trim server static state: materializes `constantContent` (`TinyTree`), detaches mutable inline instances,
-      // and replaces every `ElementAnalysis.element` with a detached `CompactElement`
+      // clears `_compileElement` across every `ElementAnalysis`, and prunes already-parsed attributes into `_rawAtts`
       staticState.trimAfterServerCompilation()
 
       assert(resourcesInst.inlineRootElemOpt.isEmpty)
-      assert(resourcesInst.element.elements.isEmpty)
+      assert(resourcesInst.compileElementOpt.isEmpty)
       assert(resourcesInst.constantContent.isDefined)
 
       val formInst = staticState.topLevelPart.findModel("fr-form-model").get.instances("fr-form-instance")
@@ -229,13 +228,20 @@ class StaticStateMemoryFootprintTest
       assert(formInst.inlineRootElemOpt.get.getParent eq null)
       assert(formInst.inlineRootElemOpt.get.namespaceForPrefix("acme").contains("http://www.acme.com/xbl"))
 
-      assert(staticState.topLevelPart.controlAnalysisMap.values.forall(_.element.isInstanceOf[CompactElement]))
-      assert(staticState.topLevelPart.controlAnalysisMap.values.forall(_.element.getDocument eq null))
+      assert(staticState.topLevelPart.controlAnalysisMap.values.forall(_.isCompactedForRuntime))
+      assert(staticState.topLevelPart.controlAnalysisMap.values.forall(_.compileElementOpt.isEmpty))
+
+      // Zero-extra-attribute controls share `ElementAnalysis.EmptyRawAtts` (`0 B` array allocation) while synthesizing pruned attributes
+      val nameInput = staticState.topLevelPart.findControlAnalysis("name-input").get
+      assert(nameInput.rawAtts eq ElementAnalysis.EmptyRawAtts)
+      assert(nameInput.attributeValue("id") == "name-input")
+      assert(nameInput.attributeValue("ref") == "name")
+      assert(formInst.rawAtts eq ElementAnalysis.EmptyRawAtts)
 
       val domBytesAfterServerTrim = staticState.staticDomSizeBytes
       assert(
         domBytesAfterServerTrim < domBytesBeforeServerTrim / 10,
-        s"Expected >90% DOM reduction after CompactElement + readonly TinyTree trim, got before=$domBytesBeforeServerTrim after=$domBytesAfterServerTrim"
+        s"Expected >90% DOM reduction after ElementAnalysis compaction + readonly TinyTree trim, got before=$domBytesBeforeServerTrim after=$domBytesAfterServerTrim"
       )
 
       jolBeforeOpt.foreach { jolBefore =>
@@ -331,7 +337,7 @@ class StaticStateMemoryFootprintTest
       }
     }
 
-    it("must preserve ancestor xml:base, literal xf:property text, xxf:control-element, and inline xs:schema after CompactElement trim") {
+    it("must preserve ancestor xml:base, literal xf:property text, xxf:control-element, and inline xs:schema after ElementAnalysis compaction") {
       val docDom =
         <xh:html
           xmlns:xh="http://www.w3.org/1999/xhtml"
@@ -358,7 +364,7 @@ class StaticStateMemoryFootprintTest
               <xf:bind ref="code" type="code3"/>
               <xf:action event="my-custom-event">
                 <xf:setvalue ref="prop-out" value="event('greeting')"/>
-                <xf:setvalue ref="ctrl-att" value="xxf:control-element('code-input')/@class"/>
+                <xf:setvalue ref="ctrl-att" value="concat(xxf:control-element('code-input')/@id, ':', xxf:control-element('code-input')/@class)"/>
               </xf:action>
             </xf:model>
           </xh:head>
@@ -369,7 +375,7 @@ class StaticStateMemoryFootprintTest
             <xf:trigger id="fire-btn">
               <xf:label>Fire</xf:label>
               <xf:dispatch event="DOMActivate" name="my-custom-event" targetid="main-model">
-                <xf:property name="greeting">Hello from CompactElement</xf:property>
+                <xf:property name="greeting">Hello from ElementAnalysis</xf:property>
               </xf:dispatch>
             </xf:trigger>
           </xh:body>
@@ -383,15 +389,15 @@ class StaticStateMemoryFootprintTest
           setControlValueWithEventSearchNested("code-input", "XYZ")
           assert(isValid("code-input"))
 
-          // 2. Ancestor `xml:base` (`http://example.org/app/` + `forms/v1/`) was pre-resolved onto `CompactElement`
-          val codeElem = doc.staticOps.findControlAnalysis("code-input").get.element
-          assert(codeElem.isInstanceOf[CompactElement])
-          assert(doc.resolveXMLBase(codeElem, "lookup.xml").toString == "http://example.org/app/forms/v1/lookup.xml")
+          // 2. Ancestor `xml:base` (`http://example.org/app/` + `forms/v1/`) was pre-resolved onto `ElementAnalysis`
+          val codeAnalysis = doc.staticOps.findControlAnalysis("code-input").get
+          assert(codeAnalysis.isCompactedForRuntime && codeAnalysis.compileElementOpt.isEmpty)
+          assert(doc.resolveXMLBase(codeAnalysis, "lookup.xml").toString == "http://example.org/app/forms/v1/lookup.xml")
 
-          // 3. Literal `<xf:property>` text and `xxf:control-element` work on `CompactElement`
+          // 3. Literal `<xf:property>` text and `xxf:control-element` (both pruned `@id` and raw `@class`) work on compacted `ElementAnalysis`
           activateControlWithEvent("fire-btn")
-          assert(getControlValue("prop-out-ctrl") == "Hello from CompactElement")
-          assert(getControlValue("ctrl-att-ctrl") == "code-field")
+          assert(getControlValue("prop-out-ctrl") == "Hello from ElementAnalysis")
+          assert(getControlValue("ctrl-att-ctrl") == "code-input:code-field")
         }
       }
     }

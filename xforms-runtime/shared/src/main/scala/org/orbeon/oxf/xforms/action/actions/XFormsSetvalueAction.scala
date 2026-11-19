@@ -33,7 +33,6 @@ class XFormsSetvalueAction extends XFormsAction {
   override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
     val actionInterpreter = actionContext.interpreter
-    val actionElement     = actionContext.element
     val contextStack      = actionInterpreter.actionXPathContext
 
     implicit val containingDocument: XFormsContainingDocument = actionInterpreter.containingDocument
@@ -51,7 +50,6 @@ class XFormsSetvalueAction extends XFormsAction {
         case Left(valueExpression) =>
           actionInterpreter.evaluateAsString(
             actionContext.analysis,
-            actionElement,
             contextStack.getCurrentBindingContext.nodeset,
             contextStack.getCurrentBindingContext.position,
             valueExpression

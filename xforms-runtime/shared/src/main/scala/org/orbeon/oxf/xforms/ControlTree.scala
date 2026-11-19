@@ -44,8 +44,8 @@ private class ControlIndex {
 
   private def collectSectionContentControl(control: XFormsControl): Option[XFormsComponentControl] = control match {
     case s: XFormsComponentControl
-      if s.staticControl.element.getNamespaceURI.startsWith(Controls.SectionTemplateUriPrefix) => Some(s)
-    case _                                                                                     => None
+      if s.staticControl.namespaceURI.startsWith(Controls.SectionTemplateUriPrefix) => Some(s)
+    case _                                                                          => None
   }
 
   private def mustMapControl(control: XFormsControl): Boolean = control match {
@@ -64,7 +64,7 @@ private class ControlIndex {
 
     // Remember by control type (for certain controls we know we need)
     if (mustMapControl(control)) {
-      val controlQName = control.staticControl.element.getQName
+      val controlQName = control.staticControl.qName
       var controlsMap = _controlTypes.get(controlQName)
       if (controlsMap eq null) {
         controlsMap = new ju.LinkedHashMap[String, XFormsControl] // need for order here!
@@ -89,7 +89,7 @@ private class ControlIndex {
 
     // Remove by control type (for certain controls we know we need)
     if (mustMapControl(control)) {
-      val controlQName = control.staticControl.element.getQName
+      val controlQName = control.staticControl.qName
       val controlsMap = _controlTypes.get(controlQName)
       if (controlsMap ne null)
         controlsMap.remove(control.effectiveId)

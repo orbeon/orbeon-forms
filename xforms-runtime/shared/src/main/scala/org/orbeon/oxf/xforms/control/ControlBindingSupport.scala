@@ -100,7 +100,7 @@ trait ControlBindingSupport {
       if (pr)
         computeBinding(parentContext, collector)
       else
-        BindingContext.empty(element, staticControl.scope),
+        BindingContext.empty(staticControl, staticControl.scope),
       pr,
       update,
       restoreState,
@@ -131,7 +131,7 @@ trait ControlBindingSupport {
   protected def computeBinding(parentContext: BindingContext, collector: ErrorEventCollector): BindingContext = {
     val contextStack = container.contextStack
     contextStack.setBinding(parentContext)
-    contextStack.pushBinding(element, effectiveId, staticControl.scope, this, collector) // xxx event won't reach non-relevant control
+    contextStack.pushBinding(staticControl, effectiveId, staticControl.scope, this, collector) // xxx event won't reach non-relevant control
     contextStack.getCurrentBindingContext
   }
 

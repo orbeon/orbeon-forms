@@ -31,18 +31,18 @@ class XFormsDispatchAction extends XFormsAction {
 
   override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
-    val interpreter   = actionContext.interpreter
-    val actionElement = actionContext.element
+    val interpreter    = actionContext.interpreter
+    val actionAnalysis = actionContext.analysis
 
     // Mandatory attribute
     val newEventNameAttributeValue =
-      Option(actionElement.attributeValue(NAME_QNAME)) getOrElse
+      actionAnalysis.attributeValueOpt(NAME_QNAME) getOrElse
       (throw new OXFException("Missing mandatory name attribute on xf:dispatch element."))
 
     // As of 2009-05, XForms 1.1 gives @targetid priority over @target
     val newEventTargetIdValue =
-      Option(actionElement.attributeValue(TARGETID_QNAME)) orElse
-      Option(actionElement.attributeValue(TARGET_QNAME))   getOrElse
+      actionAnalysis.attributeValueOpt(TARGETID_QNAME) orElse
+      actionAnalysis.attributeValueOpt(TARGET_QNAME)   getOrElse
       (throw new OXFException("Missing mandatory targetid attribute on xf:dispatch element."))
 
     val resolvedNewEventName =

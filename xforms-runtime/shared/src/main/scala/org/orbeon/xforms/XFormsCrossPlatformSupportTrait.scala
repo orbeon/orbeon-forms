@@ -26,6 +26,7 @@ import org.orbeon.oxf.util.StaticXPath.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{ByteEncoding, CoreCrossPlatformSupport, HtmlParsing, IndentedLogger, ResourceResolver, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler.IconAriaXMLReceiver
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, PlainHTMLOrXHTMLReceiver, SkipRootElement, XMLReceiver}
@@ -51,13 +52,13 @@ trait XFormsCrossPlatformSupportTrait {
 
   def attachmentFileExists(holderValue: String): Boolean
 
-  def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: UrlRewriteMode): String
+  def resolveServiceURL(containingDocument: XFormsContainingDocument, analysis: ElementAnalysis, url: String, rewriteMode: UrlRewriteMode): String
 
-  def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: UrlRewriteMode): String
+  def resolveResourceURL(containingDocument: XFormsContainingDocument, analysis: ElementAnalysis, url: String, rewriteMode: UrlRewriteMode): String
 
   def resolveRenderURL(
     containingDocument : XFormsContainingDocument,
-    currentElement     : dom.Element,
+    currentAnalysis    : ElementAnalysis,
     url                : String,
     skipRewrite        : Boolean
   ): String
@@ -112,7 +113,7 @@ trait XFormsCrossPlatformSupportTrait {
       htmlReceiver
   }
 
-  def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: dom.Element, url: String): String
+  def resolveActionURL(containingDocument: XFormsContainingDocument, currentAnalysis: ElementAnalysis, url: String): String
 
   def serializeToByteArray(
     document           : dom.Document,

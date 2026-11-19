@@ -480,9 +480,9 @@ class XFormsInsertAction extends XFormsAction {
     val containingDocument     = actionContext.containingDocument
     val contextStack           = actionContext.interpreter.actionXPathContext
 
-    val atAttributeOpt         = actionContext.element.attributeValueOpt("at")
-    val originAttributeOpt     = actionContext.element.attributeValueOpt("origin")
-    val contextAttributeOpt    = actionContext.element.attributeValueOpt(XFormsNames.CONTEXT_QNAME)
+    val atAttributeOpt         = actionContext.analysis.attributeValueOpt("at")
+    val originAttributeOpt     = actionContext.analysis.attributeValueOpt("origin")
+    val contextAttributeOpt    = actionContext.analysis.context
 
     // Extension: allow `position` to be an AVT
     val resolvedPositionAttributeOpt = Option(actionContext.interpreter.resolveAVT(actionContext.analysis, "position"))
@@ -491,7 +491,7 @@ class XFormsInsertAction extends XFormsAction {
     val setRequireDefaultValues = actionContext.interpreter.resolveAVT(actionContext.analysis, XFormsNames.XXFORMS_DEFAULTS_QNAME) == "true"
 
     // Extension: `xxf:structural-dependencies="false"` disables marking a structural dependency
-    val structuralDependencies = ! actionContext.element.attributeValueOpt(XFormsNames.XXFORMS_STRUCTURAL_DEPENDENCIES).contains("false")
+    val structuralDependencies = ! actionContext.analysis.attributeValueOpt(XFormsNames.XXFORMS_STRUCTURAL_DEPENDENCIES).contains("false")
 
     // "2. The Node Set Binding node-set is determined."
     val currentBindingContext = contextStack.getCurrentBindingContext
@@ -577,7 +577,6 @@ class XFormsInsertAction extends XFormsAction {
             val insertionIndexString =
               actionContext.interpreter.evaluateAsString(
                 actionContext.analysis,
-                actionContext.element,
                 currentBindingContext.nodeset,
                 1,
                 "round(" + atAttribute + ")"

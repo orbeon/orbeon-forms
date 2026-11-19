@@ -15,20 +15,18 @@ package org.orbeon.oxf.xforms
 
 import cats.syntax.option.*
 import org.orbeon.datatypes.LocationData
-import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.{Exceptions, StaticXPath, XPathCache}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
-import org.orbeon.oxf.xforms.analysis.{BindSingleItemBinding, RefSingleItemBinding, SingleItemBinding, XPathErrorDetails}
+import org.orbeon.oxf.xforms.analysis.{BindSingleItemBinding, ElementAnalysis, RefSingleItemBinding, SingleItemBinding, XPathErrorDetails}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.events.{XXFormsBindingErrorEvent, XXFormsXPathErrorEvent}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{BindNode, RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om
 import org.orbeon.xforms.xbl.Scope
@@ -73,7 +71,7 @@ object XFormsContextStack {
       position             = DefaultContext.size,
       elementId            = null,
       newBind              = true,
-      controlElement       = null,
+      controlAnalysis      = null,
       _locationData        = modelOpt map (_.getLocationData) orNull,
       hasOverriddenContext = false,
       contextItem          = null,
@@ -122,7 +120,7 @@ class XFormsContextStack {
         position             = parent.position,
         elementId            = parent.elementId,
         newBind              = false,
-        controlElement       = parent.controlElement,
+        controlAnalysis      = parent.controlAnalysis,
         _locationData        = parent.locationData,
         hasOverriddenContext = false,
         contextItem          = parent.contextItem,
@@ -176,7 +174,7 @@ class XFormsContextStack {
             position             = 1,
             elementId            = null,
             newBind              = true,
-            controlElement       = null,
+            controlAnalysis      = null,
             _locationData        = defaultInstance.getLocationData,
             hasOverriddenContext = false,
             contextItem          = defaultNode,
@@ -279,7 +277,7 @@ class XFormsContextStack {
           nodeset                        = null,
           modelId                        = model.orNull,
           bindId                         = bind,
-          bindingElement                 = null, // TODO: for id
+          bindingAnalysis                = null, // TODO: for id
           bindingElementNamespaceMapping = NamespaceMapping.EmptyMapping, // unused
           sourceEffectiveId              = sourceEffectiveId,
           scope                          = scope,
@@ -293,7 +291,7 @@ class XFormsContextStack {
           nodeset                        = null,
           modelId                        = model.orNull,
           bindId                         = null,
-          bindingElement                 = null, // TODO: for id
+          bindingAnalysis                = null, // TODO: for id
           bindingElementNamespaceMapping = ns,
           sourceEffectiveId              = sourceEffectiveId,
           scope                          = scope,
@@ -302,23 +300,22 @@ class XFormsContextStack {
         )
     }
 
-  // TODO: move away from element and use static analysis information
   // 11 external callers
   def pushBinding(
-    bindingElement   : Element,
+    bindingAnalysis  : ElementAnalysis,
     sourceEffectiveId: String,
     scope            : Scope,
     eventTarget      : XFormsEventTarget,
     collector        : ErrorEventCollector
   ): Unit =
     pushBinding(
-      ref                            = bindingElement.attributeValue(XFormsNames.REF_QNAME),
-      context                        = bindingElement.attributeValue(XFormsNames.CONTEXT_QNAME),
-      nodeset                        = bindingElement.attributeValue(XFormsNames.NODESET_QNAME),
-      modelId                        = bindingElement.attributeValue(XFormsNames.MODEL_QNAME),
-      bindId                         = bindingElement.attributeValue(XFormsNames.BIND_QNAME),
-      bindingElement                 = bindingElement,
-      bindingElementNamespaceMapping = container.partAnalysis.getNamespaceMapping(scope, bindingElement.idOrNull), // TODO: `idOrThrow` probably
+      ref                            = bindingAnalysis.ref.orNull,
+      context                        = bindingAnalysis.context.orNull,
+      nodeset                        = null,
+      modelId                        = bindingAnalysis.attributeValue(XFormsNames.MODEL_QNAME),
+      bindId                         = bindingAnalysis.bind.orNull,
+      bindingAnalysis                = bindingAnalysis,
+      bindingElementNamespaceMapping = bindingAnalysis.namespaceMapping,
       sourceEffectiveId              = sourceEffectiveId,
       scope                          = scope,
       eventTarget                    = eventTarget,
@@ -343,7 +340,7 @@ class XFormsContextStack {
     nodeset                        : String,
     modelId                        : String,
     bindId                         : String,
-    bindingElement                 : Element,
+    bindingAnalysis                : ElementAnalysis,
     bindingElementNamespaceMapping : NamespaceMapping,
     sourceEffectiveId              : String,
     scope                          : Scope,
@@ -354,12 +351,8 @@ class XFormsContextStack {
     assert(scope != null)
 
     val locationData =
-      if (keepLocationData && bindingElement != null)
-        XmlExtendedLocationData(
-          bindingElement.getData.asInstanceOf[LocationData],
-          "pushing XForms control binding".some,
-          element = bindingElement.some
-        )
+      if (keepLocationData && (bindingAnalysis ne null))
+        bindingAnalysis.extendedLocationData("pushing XForms control binding")
       else
         null
 
@@ -382,7 +375,7 @@ class XFormsContextStack {
               collector(
                 new XXFormsBindingErrorEvent(
                   target          = eventTarget,
-                  locationDataOpt = Option(bindingElement).flatMap(e => Option(e.getData.asInstanceOf[LocationData])),
+                  locationDataOpt = Option(bindingAnalysis).flatMap(e => Option(e.locationData)),
                   reason          = BindingErrorReason.InvalidModel(modelId)
                 )
               )
@@ -421,7 +414,7 @@ class XFormsContextStack {
             collector(
               new XXFormsBindingErrorEvent(
                 target          = eventTarget,
-                locationDataOpt = Option(bindingElement).flatMap(e => Option(e.getData.asInstanceOf[LocationData])),
+                locationDataOpt = Option(bindingAnalysis).flatMap(e => Option(e.locationData)),
                 reason          = BindingErrorReason.InvalidBind(bindId)
               )
             )
@@ -449,7 +442,7 @@ class XFormsContextStack {
             nodeset                        = context,
             modelId                        = modelId,
             bindId                         = null,
-            bindingElement                 = bindingElement,
+            bindingAnalysis                = bindingAnalysis,
             bindingElementNamespaceMapping = bindingElementNamespaceMapping,
             sourceEffectiveId              = sourceEffectiveId,
             scope                          = scope,
@@ -468,7 +461,7 @@ class XFormsContextStack {
             nodeset                        = null,
             modelId                        = modelId,
             bindId                         = null,
-            bindingElement                 = null,
+            bindingAnalysis                = null,
             bindingElementNamespaceMapping = bindingElementNamespaceMapping,
             sourceEffectiveId              = sourceEffectiveId,
             scope                          = scope,
@@ -549,17 +542,10 @@ class XFormsContextStack {
             )
 
           val expression = if (ref != null) ref else nodeset
-          val bindingElementAnalysisOpt =
-            for {
-              be <- Option(bindingElement)
-              id <- be.idOpt
-              ea <- container.partAnalysis.findControlAnalysis(scope.prefixedIdForStaticId(id))
-            } yield ea
           val isRestricted =
-            bindingElementAnalysisOpt
+            Option(bindingAnalysis)
               .orElse(container.partAnalysis.findControlAnalysis(sourceEffectiveId))
-              .exists(_.isFunctionsRestricted) ||
-            Option(bindingElement).exists(_.attributeValueOpt(XFormsNames.XXFORMS_FUNCTIONS_QNAME).contains("restricted"))
+              .exists(_.isFunctionsRestricted)
           val result =
             try
               XPathCache.evaluateKeepItemsJava(
@@ -627,7 +613,7 @@ class XFormsContextStack {
           nodeset                        = context,
           modelId                        = modelId,
           bindId                         = null,
-          bindingElement                 = null,
+          bindingAnalysis                = null,
           bindingElementNamespaceMapping = bindingElementNamespaceMapping,
           sourceEffectiveId              = sourceEffectiveId,
           scope                          = scope,
@@ -655,10 +641,10 @@ class XFormsContextStack {
       }
       // Push new context
       val bindingElementId =
-        if (bindingElement == null)
+        if (bindingAnalysis eq null)
           null
         else
-          bindingElement.idOrNull
+          bindingAnalysis.staticId
 
       this.head =
         new BindingContext(
@@ -669,7 +655,7 @@ class XFormsContextStack {
           position             = newPosition,
           elementId            = bindingElementId,
           newBind              = isNewBind,
-          controlElement       = bindingElement,
+          controlAnalysis      = bindingAnalysis,
           _locationData        = locationData,
           hasOverriddenContext = hasOverriddenContext,
           contextItem          = contextItem,
@@ -677,21 +663,17 @@ class XFormsContextStack {
         )
     } catch {
       case NonFatal(t) =>
-        if (bindingElement != null)
+        if (bindingAnalysis ne null)
           throw OrbeonLocationException.wrapException(
             t,
-            XmlExtendedLocationData(
-              locationData,
-              "evaluating binding expression".some,
-              element = bindingElement.some
-            )
+            bindingAnalysis.extendedLocationData("evaluating binding expression")
           )
         else
           throw OrbeonLocationException.wrapException(
             t,
             XmlExtendedLocationData(
               locationData, "" + "evaluating binding expression",
-              bindingElement,
+              null,
               Array("ref", ref, "context", context, "nodeset", nodeset, "modelId", modelId, "bindId", bindId)
             )
           )
@@ -710,7 +692,7 @@ class XFormsContextStack {
       position             = base.position,
       elementId            = base.elementId,
       newBind              = false,
-      controlElement       = base.controlElement,
+      controlAnalysis      = base.controlAnalysis,
       _locationData        = base.locationData,
       hasOverriddenContext = false,
       contextItem          = contextItem,
@@ -741,7 +723,7 @@ class XFormsContextStack {
         position             = currentPosition,
         elementId            = currentBindingContext.elementId,
         newBind              = true,
-        controlElement       = null,
+        controlAnalysis      = null,
         _locationData        = currentBindingContext.locationData,
         hasOverriddenContext = false,
         contextItem          = newContextItem,

@@ -22,11 +22,28 @@ trait ActionTrait extends ElementAnalysis {
 
   import ActionTrait.*
 
-  private def find(qNames: Seq[QName]): Option[String] = qNames.iterator map element.attributeValue find (_ ne null)
+  private def find(qNames: Seq[QName]): Option[String] = qNames.iterator map attributeValue find (_ ne null)
 
   var ifCondition   : Option[String] = find(IfQNames)
   var whileCondition: Option[String] = find(WhileQNames)
   var iterate       : Option[String] = find(IterateQNames)
+
+  override protected def synthesizedUnprefixedAttributeValue(local: String): String =
+    local match {
+      case "if"      => ifCondition.orNull
+      case "while"   => whileCondition.orNull
+      case "iterate" => iterate.orNull
+      case _         => super.synthesizedUnprefixedAttributeValue(local)
+    }
+
+  override protected def extraSynthesizedAttributes: List[(QName, String)] =
+    super.extraSynthesizedAttributes              :::
+      ifCondition.map(IfQNames.head -> _).toList   :::
+      whileCondition.map(WhileQNames.head -> _).toList :::
+      iterate.map(IterateQNames.head -> _).toList
+
+  override protected def isPrunedAttribute(attQName: QName): Boolean =
+    super.isPrunedAttribute(attQName) || ActionTrait.PrunedActionAttributeQNames(attQName)
 }
 
 private object ActionTrait {
@@ -38,4 +55,6 @@ private object ActionTrait {
   val IfQNames      : Seq[QName] = Namespaces map makeQName("if")
   val WhileQNames   : Seq[QName] = Namespaces map makeQName("while")
   val IterateQNames : Seq[QName] = Namespaces map makeQName("iterate")
+
+  val PrunedActionAttributeQNames: Set[QName] = (IfQNames ++ WhileQNames ++ IterateQNames).toSet
 }

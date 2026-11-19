@@ -195,7 +195,7 @@ class FormBuilderRestrictedFunctionsTest
       val ex = intercept[XPathException] {
         StaticXPath.compileExpression(
           xpathString      = disallowedControl.value.get,
-          namespaceMapping = newPart.getNamespaceMapping("fb≡", disallowedControl.element),
+          namespaceMapping = disallowedControl.namespaceMapping,
           locationData     = null,
           functionLibrary  = newPart.functionLibrary(disallowedControl.isFunctionsRestricted),
           avt              = false
@@ -265,7 +265,7 @@ class FormBuilderRestrictedFunctionsTest
           case c: org.orbeon.oxf.xforms.control.XFormsContainerControl => c.children
           case _                                                       => Nil
         }).takeWhile(_.nonEmpty).flatten.collectFirst {
-          case g: XFormsGroupControl if g.staticControl.element.attributeValue("class") == "fb-control-cell-badges" => g
+          case g: XFormsGroupControl if g.staticControl.attributeValue("class") == "fb-control-cell-badges" => g
         }
 
       def childAttributeValues(group: XFormsGroupControl, attrName: String): List[String] =

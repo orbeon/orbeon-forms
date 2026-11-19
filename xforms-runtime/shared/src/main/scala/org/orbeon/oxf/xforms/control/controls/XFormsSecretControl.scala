@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.control.*
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -24,12 +23,10 @@ import org.orbeon.saxon.om
 class XFormsSecretControl(
   container   : XBLContainer,
   parent      : XFormsControl,
-  element     : Element,
   _effectiveId: String
 ) extends XFormsSingleNodeControl(
   container,
   parent,
-  element,
   _effectiveId
 ) with XFormsValueControl
   with SingleNodeFocusableTrait

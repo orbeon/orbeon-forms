@@ -231,11 +231,21 @@ object XFormsStaticStateSerializer {
             }
           }
 
+      def isOmittedSerializerAtt(e: ElementAnalysis, attQName: QName): Boolean =
+        attQName == org.orbeon.xforms.XFormsNames.ID_QNAME ||
+          (e match {
+            case _: Instance              => attQName != XMLConstants.XML_BASE_QNAME
+            case _: StaticBind            => ! Set("ref", "nodeset", "context", "bind", "model")(attQName.localName) || attQName.namespace.uri.nonEmpty
+            case _: VariableAnalysisTrait => attQName == org.orbeon.xforms.XFormsNames.NAME_QNAME
+            case _                        => false
+          })
+
       def updateDistinctCommon(e: ElementAnalysis) = {
 
-        distinct += e.element.getQName
-        e.element.attributeIterator foreach { att =>
-          distinct += att.getQName
+        distinct += e.qName
+        e.attributesIterator foreach { case (attQName, _) =>
+          if (! isOmittedSerializerAtt(e, attQName))
+            distinct += attQName
         }
 
         // XPath analysis QNames
@@ -245,8 +255,6 @@ object XFormsStaticStateSerializer {
         } locally {
           collectForXPathAnalysis(analysis)
         }
-
-        distinct += e.element.getQName
       }
 
       def collectElementTreeQNames(rootElem: dom.Element): Unit =
@@ -263,7 +271,7 @@ object XFormsStaticStateSerializer {
           e.commonBinding.directName foreach (distinct +=)
         case e: Model =>
           updateDistinctCommon(e)
-          e.element.elements(XMLConstants.XML_SCHEMA_QNAME) foreach collectElementTreeQNames
+          e.schemaElements foreach collectElementTreeQNames
         case e: Instance =>
           updateDistinctCommon(e)
           // All inline instance element QNames
@@ -414,9 +422,25 @@ object XFormsStaticStateSerializer {
       Json.fromFields(b)
     }
 
-    val encodeLocalElementOnly: Encoder[dom.Element] = (a: dom.Element) => {
+    val encodeAnalysisElementOnly: Encoder[ElementAnalysis] = (a: ElementAnalysis) => {
       val b = ListBuffer[(String, Json)]()
-      appendElemAndAtts(a, b)
+      b += "name" -> Json.fromInt(collectedQNamesWithPositions(a.qName))
+      val atts =
+        a.attributesIterator
+          .collect {
+            case (attQName, attValue)
+              if attQName != org.orbeon.xforms.XFormsNames.ID_QNAME &&
+                 (a match {
+                   case _: Instance              => attQName == XMLConstants.XML_BASE_QNAME
+                   case _: StaticBind            => attQName.namespace.uri.isEmpty && Set("ref", "nodeset", "context", "bind", "model")(attQName.localName)
+                   case _: VariableAnalysisTrait => attQName != org.orbeon.xforms.XFormsNames.NAME_QNAME
+                   case _                        => true
+                 }) =>
+              (collectedQNamesWithPositions(attQName), attValue)
+          }
+          .toList
+      if (atts.nonEmpty)
+        b += "atts" -> atts.asJson
       Json.fromFields(b)
     }
 
@@ -466,7 +490,7 @@ object XFormsStaticStateSerializer {
           val defaultValueOrder = c.defaultValueOrder filter (_.nonEmpty)
           if (defaultValueOrder.isDefined)
             b += "defaultValueOrder"                -> (defaultValueOrder map (_ map (_.staticId))).asJson
-          val schemas = c.element.elements(XMLConstants.XML_SCHEMA_QNAME)
+          val schemas = c.schemaElements
           if (schemas.nonEmpty)
             b += "schemas"                          -> schemas.map(_.copyAndCopyParentNamespaces).asJson
         case c: Instance      =>
@@ -603,6 +627,7 @@ object XFormsStaticStateSerializer {
           b += "name"                   -> Json.fromString(c.name)
           b += "expressionOrConstant"   -> c.expressionOrConstant.asJson
         case c: EventHandler           =>
+          b += "isEventHandler"           -> Json.True
           if (c.keyText.isDefined)
             b += "keyText"                -> c.keyText.asJson
           if (c.keyModifiers.nonEmpty)
@@ -707,7 +732,7 @@ object XFormsStaticStateSerializer {
       val b = ListBuffer[(String, Json)]()
 
       // Don't serialize the index and just recreate in order when deserializing
-      b += "element"           -> encodeLocalElementOnly(a.element)
+      b += "element"           -> encodeAnalysisElementOnly(a)
       // Reconstitute `staticId` from the `prefixedId` when deserializing
       b += "prefixedId"        -> Json.fromString(a.prefixedId)
       b += "nsRef"             -> Json.fromInt(collectedNamespacesWithPositions(a.namespaceMapping.mapping))

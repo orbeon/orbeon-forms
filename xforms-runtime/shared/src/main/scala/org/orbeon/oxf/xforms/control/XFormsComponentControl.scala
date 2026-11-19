@@ -47,12 +47,10 @@ import scala.jdk.CollectionConverters.*
 class XFormsValueComponentControl(
   container   : XBLContainer,
   parent      : XFormsControl,
-  element     : Element,
   _effectiveId: String
 ) extends XFormsComponentControl(
   container,
   parent,
-  element,
   _effectiveId
 ) with XFormsValueControl {
 
@@ -203,9 +201,8 @@ class XFormsValueComponentControl(
 class XFormsComponentControl(
   container   : XBLContainer,
   parent      : XFormsControl,
-  element     : Element,
   _effectiveId: String
-) extends XFormsSingleNodeContainerControl(container, parent, element, _effectiveId) {
+) extends XFormsSingleNodeContainerControl(container, parent, _effectiveId) {
 
   override type Control <: ComponentControl
 
@@ -277,7 +274,7 @@ class XFormsComponentControl(
         contextStack.resetBindingContext(collector)
         contextStack.getCurrentBindingContext
       } else {
-        BindingContext.empty(staticControl.element, staticControl.scope)
+        BindingContext.empty(staticControl, staticControl.scope)
       }
     }
 

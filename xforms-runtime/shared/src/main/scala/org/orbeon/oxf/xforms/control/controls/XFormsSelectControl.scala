@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.dom.{Element, QName}
+import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -36,12 +36,10 @@ import scala.collection.{mutable, Set as CSet}
 class XFormsSelectControl(
   container   : XBLContainer,
   parent      : XFormsControl,
-  element     : Element,
   _effectiveId: String
 ) extends XFormsSelect1Control( // TODO: bad inheritance; use shared trait if needed
   container,
   parent,
-  element,
   _effectiveId
 ) {
 

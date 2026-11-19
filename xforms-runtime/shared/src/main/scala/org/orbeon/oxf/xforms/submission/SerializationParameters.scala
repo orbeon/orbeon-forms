@@ -74,7 +74,7 @@ object SerializationParameters {
                   URI.create(
                     XFormsCrossPlatformSupport.resolveServiceURL(
                       submission.containingDocument,
-                      submission.staticSubmission.element,
+                      submission.staticSubmission,
                       uri.toString,
                       UrlRewriteMode.Absolute
                     )

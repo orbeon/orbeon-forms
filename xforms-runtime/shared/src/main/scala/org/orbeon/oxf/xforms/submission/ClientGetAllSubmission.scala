@@ -42,7 +42,7 @@ class ClientGetAllSubmission(submission: XFormsModelSubmission)
   ): Option[ConnectResult Either IO[AsyncConnectResult]] = {
     XFormsLoadAction.resolveStoreLoadValue(
       containingDocument           = submission.containingDocument,
-      currentElem                  = Option(submission.staticSubmission.element),
+      currentElem                  = Option(submission.staticSubmission),
       doReplace                    = true,
       value                        = PathUtils.appendQueryString(submissionParameters.actionOrResource, Option(serializationParameters.queryString) getOrElse ""),
       target                       = None,

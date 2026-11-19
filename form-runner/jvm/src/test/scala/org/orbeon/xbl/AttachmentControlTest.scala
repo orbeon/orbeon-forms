@@ -303,7 +303,7 @@ class AttachmentControlTest
           case t: XFormsTriggerControl
             if t.isRelevant &&
                t.effectiveId.startsWith(s"$controlId≡") &&
-               t.staticControl.element.attributeValueOpt("class").exists(_.splitTo[Set]().contains("fr-attachment-remove")) => t
+               t.staticControl.attributeValueOpt("class").exists(_.splitTo[Set]().contains("fr-attachment-remove")) => t
         }
         .toList
         .sortBy(_.effectiveId)

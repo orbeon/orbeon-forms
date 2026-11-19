@@ -13,7 +13,6 @@
   */
 package org.orbeon.oxf.xforms.action.actions
 
-import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.util.CoreUtils.*
@@ -21,6 +20,7 @@ import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.xforms.{Load, UrlType, XFormsCrossPlatformSupport, XFormsNames}
@@ -32,27 +32,27 @@ class XFormsLoadAction extends XFormsAction {
 
   override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
-    val interpreter = actionContext.interpreter
-    val actionElem  = actionContext.analysis.element
+    val interpreter    = actionContext.interpreter
+    val actionAnalysis = actionContext.analysis
 
     val show =
-      Option(interpreter.resolveAVT(actionContext.analysis, "show")) map
+      Option(interpreter.resolveAVT(actionAnalysis, "show")) map
         LegacyShow.withNameLowercaseOnly                 getOrElse
         LegacyShow.Replace
 
     // NOTE: Will also be none if the XPath context item is missing (which is not great).
     val targetOpt =
-      actionElem.attributeValueOpt(XFormsNames.TARGET_QNAME)         orElse
-      actionElem.attributeValueOpt(XFormsNames.XXFORMS_TARGET_QNAME) flatMap
-      (v => Option(interpreter.resolveAVTProvideValue(actionContext.analysis, v)))
+      actionAnalysis.attributeValueOpt(XFormsNames.TARGET_QNAME)         orElse
+      actionAnalysis.attributeValueOpt(XFormsNames.XXFORMS_TARGET_QNAME) flatMap
+      (v => Option(interpreter.resolveAVTProvideValue(actionAnalysis, v)))
 
     val urlType =
-      Option(interpreter.resolveAVT(actionContext.analysis, XMLConstants.FORMATTING_URL_TYPE_QNAME)) map
+      Option(interpreter.resolveAVT(actionAnalysis, XMLConstants.FORMATTING_URL_TYPE_QNAME)) map
       UrlType.withNameLowercaseOnly getOrElse
       UrlType.Render
 
-    val urlNorewrite      = resolveUrlNorewrite(actionElem)
-    val isShowProgressOpt = Option(interpreter.resolveAVT(actionContext.analysis, XFormsNames.XXFORMS_SHOW_PROGRESS_QNAME)).map(_ ==  "true")
+    val urlNorewrite      = resolveUrlNorewrite(actionAnalysis)
+    val isShowProgressOpt = Option(interpreter.resolveAVT(actionAnalysis, XFormsNames.XXFORMS_SHOW_PROGRESS_QNAME)).map(_ ==  "true")
 
     // XForms 1.1 had "If both are present, the action has no effect.", but XForms 2.0 no longer requires this.
 
@@ -63,32 +63,32 @@ class XFormsLoadAction extends XFormsAction {
       // NOP if no URI obtained (2019-03-12 asked WG for confirmation)
       case Some(item) =>
         resolveStoreLoadValue(
-          containingDocument = actionContext.containingDocument,
-          currentElem        = Some(actionElem),
-          doReplace          = show == LegacyShow.Replace,
-          value              = DataModel.getValue(item).encodeHRRI(processSpace = true),
-          target             = targetOpt,
-          urlType            = urlType,
-          urlNorewrite       = urlNorewrite,
-          isShowProgressOpt     = isShowProgressOpt,
-          mustHonorDeferredUpdateFlags           = interpreter.mustHonorDeferredUpdateFlags(actionContext.analysis)
+          containingDocument           = actionContext.containingDocument,
+          currentElem                  = Some(actionAnalysis),
+          doReplace                    = show == LegacyShow.Replace,
+          value                        = DataModel.getValue(item).encodeHRRI(processSpace = true),
+          target                       = targetOpt,
+          urlType                      = urlType,
+          urlNorewrite                 = urlNorewrite,
+          isShowProgressOpt            = isShowProgressOpt,
+          mustHonorDeferredUpdateFlags = interpreter.mustHonorDeferredUpdateFlags(actionAnalysis)
         )
       case None =>
-        actionElem.attributeValueOpt(XFormsNames.RESOURCE_QNAME) match {
+        actionAnalysis.attributeValueOpt(XFormsNames.RESOURCE_QNAME) match {
           case Some(resourceAttValue) =>
 
-            Option(interpreter.resolveAVTProvideValue(actionContext.analysis, resourceAttValue)) match {
+            Option(interpreter.resolveAVTProvideValue(actionAnalysis, resourceAttValue)) match {
               case Some(resolvedResource) =>
                 resolveStoreLoadValue(
-                  containingDocument = actionContext.containingDocument,
-                  currentElem        = Some(actionElem),
-                  doReplace          = show == LegacyShow.Replace,
-                  value              = resolvedResource.encodeHRRI(processSpace = true),
-                  target             = targetOpt,
-                  urlType            = urlType,
-                  urlNorewrite       = urlNorewrite,
-                  isShowProgressOpt     = isShowProgressOpt,
-                  mustHonorDeferredUpdateFlags           = interpreter.mustHonorDeferredUpdateFlags(actionContext.analysis)
+                  containingDocument           = actionContext.containingDocument,
+                  currentElem                  = Some(actionAnalysis),
+                  doReplace                    = show == LegacyShow.Replace,
+                  value                        = resolvedResource.encodeHRRI(processSpace = true),
+                  target                       = targetOpt,
+                  urlType                      = urlType,
+                  urlNorewrite                 = urlNorewrite,
+                  isShowProgressOpt            = isShowProgressOpt,
+                  mustHonorDeferredUpdateFlags = interpreter.mustHonorDeferredUpdateFlags(actionAnalysis)
                 )
               case None =>
                 debug(
@@ -121,7 +121,7 @@ object XFormsLoadAction {
 
   def resolveStoreLoadValue(
     containingDocument           : XFormsContainingDocument,
-    currentElem                  : Option[Element],
+    currentElem                  : Option[ElementAnalysis],
     doReplace                    : Boolean,
     value                        : String,
     target                       : Option[String],
@@ -229,19 +229,13 @@ object XFormsLoadAction {
    * Resolve f:url-norewrite attributes on this element, taking into account ancestor f:url-norewrite attributes for
    * the resolution.
    *
-   * @param element element used to start resolution
+   * @param analysis element analysis used to start resolution
    * @return true if rewriting is turned off, false otherwise
    */
-  def resolveUrlNorewrite(element: Element): Boolean = {
-    var currentElement = element
-    do {
-      val urlNorewriteAttribute = currentElement.attributeValue(XMLConstants.FORMATTING_URL_NOREWRITE_QNAME)
-      // Return the first ancestor value found
-      if (urlNorewriteAttribute != null)
-        return "true" == urlNorewriteAttribute
-      currentElement = currentElement.getParent
-    } while (currentElement ne null)
-    // Default is to rewrite
-    false
-  }
+  def resolveUrlNorewrite(analysis: ElementAnalysis): Boolean =
+    ElementAnalysis
+      .ancestorsAcrossPartsIterator(analysis, includeSelf = true)
+      .flatMap(_.attributeValueOpt(XMLConstants.FORMATTING_URL_NOREWRITE_QNAME))
+      .nextOption()
+      .contains("true")
 }

@@ -71,7 +71,7 @@ trait StaticLHHASupport extends ElementAnalysis {
 
   // Make `var` for `fullOpt` error "Assignment to immutable field beforeAfterTokensOpt"
   var beforeAfterTokensOpt: Option[(List[String], List[String])] =
-    element.attributeValueOpt(XFormsNames.XXFORMS_ORDER_QNAME) map LHHA.getBeforeAfterOrderTokens
+    attributeValueOpt(XFormsNames.XXFORMS_ORDER_QNAME) map LHHA.getBeforeAfterOrderTokens
 
   // https://github.com/orbeon/orbeon-forms/issues/6279
   // If this is nested within an XBL component that is the target of an `xxf:label-for`, find the outermost control

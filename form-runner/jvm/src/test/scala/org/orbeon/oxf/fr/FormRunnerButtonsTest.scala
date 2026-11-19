@@ -35,7 +35,7 @@ class FormRunnerButtonsTest
         ControlsIterator(doc.controls.getCurrentControlTree)
           .collectFirst {
             case control: XFormsSingleNodeControl
-              if ButtonComponentQNames(control.staticControl.element.getQName) &&
+              if ButtonComponentQNames(control.staticControl.qName) &&
                 control.extensionAttributeValue(XFormsNames.CLASS_QNAME).exists(_.splitTo[List]().contains(s"fr-$name-button")) =>
               control
           }

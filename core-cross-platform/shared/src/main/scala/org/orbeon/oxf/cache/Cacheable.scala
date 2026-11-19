@@ -47,26 +47,27 @@ object DomMemorySizeEstimator {
     if (s eq null) 0L
     else 40L + ((s.length.toLong + 7L) & ~7L)
 
-  def estimateCompactElement(elem: org.orbeon.dom.tree.CompactElement): Long = {
-    val rawAtts = elem.rawAtts
-    val arrBytes =
-      if (rawAtts.isEmpty) 0L
-      else (16L + rawAtts.length.toLong * 4L + 7L) & ~7L
-
-    var strBytes = 0L
-    var i        = 0
-    while (i < rawAtts.length) {
-      val qn = rawAtts(i).asInstanceOf[dom.QName]
-      if (qn.namespace.uri.isEmpty && SharedAnalysisAttLocalNames.contains(qn.localName)) {
-        // String reference is already retained on `ElementAnalysis` (`staticId`, `ref`, `bind`, `context`, `value`)
-      } else {
-        strBytes += estimateStringBytes(rawAtts(i + 1).asInstanceOf[String])
+  def estimateRawAttributesArray(rawAtts: Array[AnyRef]): Long =
+    if ((rawAtts eq null) || rawAtts.isEmpty) {
+      0L
+    } else {
+      val arrBytes = (16L + rawAtts.length.toLong * 4L + 7L) & ~7L
+      var strBytes = 0L
+      var i        = 0
+      while (i < rawAtts.length) {
+        val qn = rawAtts(i).asInstanceOf[dom.QName]
+        if (qn.namespace.uri.isEmpty && SharedAnalysisAttLocalNames.contains(qn.localName)) {
+          // String reference is already retained on `ElementAnalysis` (`staticId`, `ref`, `bind`, `context`, `value`)
+        } else {
+          strBytes += estimateStringBytes(rawAtts(i + 1).asInstanceOf[String])
+        }
+        i += 2
       }
-      i += 2
+      arrBytes + strBytes
     }
 
-    24L + arrBytes + strBytes
-  }
+  def estimateCompactElement(elem: org.orbeon.dom.tree.CompactElement): Long =
+    24L + estimateRawAttributesArray(elem.rawAtts)
 
   def estimateOrbeonDomDocument(doc: dom.Document, maxElements: Int = 25000): Long =
     if (doc eq null) 0L

@@ -4,6 +4,8 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
 import org.orbeon.oxf.xforms.analysis.model.MipName.{NeverCustomMipUris, StandardCustomMipQNames}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, InstancePath, WithChildrenTrait}
+import org.orbeon.oxf.xml.XMLConstants
+import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.xforms.XFormsNames.XXFORMS_CUSTOM_MIPS_QNAME
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
@@ -30,6 +32,28 @@ class Model(
   with ModelBinds {
 
   require(scope ne null)
+
+  var inlineSchemaElements: List[Element] = Nil
+
+  def schemaElements: List[Element] =
+    compileElementOpt match {
+      case Some(ce) =>
+        val fromElem = ce.elements(XMLConstants.XML_SCHEMA_QNAME).toList
+        if (fromElem.nonEmpty) fromElem else inlineSchemaElements
+      case None     =>
+        inlineSchemaElements
+    }
+
+  override def compactForRuntime(effectiveXmlBaseOpt: Option[String]): Unit = {
+    compileElementOpt.foreach { ce =>
+      if (inlineSchemaElements.isEmpty) {
+        val schemas = ce.elements(XMLConstants.XML_SCHEMA_QNAME)
+        if (schemas.nonEmpty)
+          inlineSchemaElements = schemas.map(_.copyAndCopyParentNamespaces).toList
+      }
+    }
+    super.compactForRuntime(effectiveXmlBaseOpt)
+  }
 
   override def freeTransientState(): Unit = {
     super.freeTransientState()
@@ -117,10 +141,10 @@ trait ModelBinds extends BindTree {
       (! qName.namespace.prefix.startsWith("xml")) &&
       (StandardCustomMipQNames(qName) || ! NeverCustomMipUris(qName.namespace.uri))
 
-    selfModel.element.attributeOpt(XXFORMS_CUSTOM_MIPS_QNAME) match {
+    selfModel.attributeValueOpt(XXFORMS_CUSTOM_MIPS_QNAME) match {
       case Some(_) =>
         // If the attribute is present, allow all specified QNames if valid, plus standard MIP QNames
-        attQNameSet(selfModel.element, XXFORMS_CUSTOM_MIPS_QNAME, namespaceMapping) ++ StandardCustomMipQNames filter canBeCustomMIP
+        attQNameSet(selfModel, XXFORMS_CUSTOM_MIPS_QNAME, namespaceMapping) ++ StandardCustomMipQNames filter canBeCustomMIP
       case None    =>
         // Attribute not present: backward-compatible behavior
         canBeCustomMIP

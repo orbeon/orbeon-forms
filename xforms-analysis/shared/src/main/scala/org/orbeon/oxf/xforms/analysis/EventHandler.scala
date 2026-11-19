@@ -82,6 +82,9 @@ class EventHandler(
   final def isMatchByNameAndTarget(eventName: String, targetPrefixedId: String): Boolean =
     isMatchByName(eventName) && isMatchTarget(targetPrefixedId)
 
+  override protected def isPrunedAttribute(attQName: QName): Boolean =
+    super.isPrunedAttribute(attQName) || EventHandler.PrunedEventHandlerAttributeQNames(attQName)
+
       // Analyze the handle, setting:
     // - `observersPrefixedIds`
     // - `targetPrefixedIds`
@@ -95,7 +98,7 @@ class EventHandler(
     def ignoringHandler(attName: String) = {
       debug(
         s"`$attName` attribute present but does not refer to at least one valid id, ignoring event handler",
-        List("element" -> element.toDebugString)
+        List("element" -> toDebugString)
       )
       Set.empty[String]
     }
@@ -125,7 +128,7 @@ class EventHandler(
 
     // Support `ev:observer` and plain `observer`
     // NOTE: Supporting space-separated observer/target ids is an extension, which may make it into XML Events 2
-    val observersTokens               = attSet(element, XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME) ++ attSet(element, XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME)
+    val observersTokens               = attSet(this, XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME) ++ attSet(this, XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME)
     val observersPrefixedIdsAndHashes = observersTokens flatMap (observerHashResolver orElse staticIdResolver)
 
     val ignoreDueToObservers = observersTokens.nonEmpty && observersPrefixedIdsAndHashes.isEmpty
@@ -160,11 +163,11 @@ class EventHandler(
     // the target of the dispatch action, not the incoming XML Events target. In this case to specify the incoming
     // XML Events target, the attribute must be qualified as `ev:target`.
     val isDispatchActionNoTargetId =
-      isDispatchAction(element.getQName)   &&
-        element.hasAttribute(TARGET_QNAME) &&
-        (! element.hasAttribute(TARGETID_QNAME))
+      isDispatchAction(qName)       &&
+        hasAttribute(TARGET_QNAME)  &&
+        (! hasAttribute(TARGETID_QNAME))
 
-    val targetTokens                = attSet(element, XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME) ++ (if (isDispatchActionNoTargetId) Set.empty else attSet(element, XML_EVENTS_TARGET_ATTRIBUTE_QNAME))
+    val targetTokens                = attSet(this, XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME) ++ (if (isDispatchActionNoTargetId) Set.empty else attSet(this, XML_EVENTS_TARGET_ATTRIBUTE_QNAME))
     val targetsPrefixedIdsAndHashes = targetTokens flatMap (targetHashResolver orElse staticIdResolver)
 
     val ignoreDueToTarget = targetTokens.nonEmpty && targetsPrefixedIdsAndHashes.isEmpty
@@ -186,6 +189,24 @@ object EventHandler {
   import Private.*
 
   val PropertyQNames = Set(XFORMS_PROPERTY_QNAME, XXFORMS_CONTEXT_QNAME)
+
+  val PrunedEventHandlerAttributeQNames: Set[QName] = Set(
+    XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME,
+    XML_EVENTS_EVENT_ATTRIBUTE_QNAME,
+    XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME,
+    XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME,
+    XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME,
+    XML_EVENTS_EV_PHASE_ATTRIBUTE_QNAME,
+    XML_EVENTS_PHASE_ATTRIBUTE_QNAME,
+    XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME,
+    XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME,
+    XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME,
+    XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME,
+    XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME,
+    XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME,
+    XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME,
+    XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME
+  )
 
   // Special observer id indicating that the observer is the preceding sibling control
   val ObserverIsPrecedingSibling = "#preceding-sibling"

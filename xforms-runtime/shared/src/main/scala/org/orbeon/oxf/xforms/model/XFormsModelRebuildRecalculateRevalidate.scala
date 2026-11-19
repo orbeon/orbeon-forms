@@ -183,7 +183,7 @@ trait XFormsModelRebuildRecalculateRevalidate {
   private object Private {
 
     lazy val _schemaValidator: XFormsModelSchemaValidator =
-      new XFormsModelSchemaValidator(staticModel.element, indentedLogger) |!> (_.loadSchemas(containingDocument))
+      new XFormsModelSchemaValidator(staticModel, indentedLogger) |!> (_.loadSchemas(containingDocument))
 
     def doRecalculate(binds: XFormsModelBinds, defaultsStrategy: DefaultsStrategy, collector: ErrorEventCollector): Unit =
       withDebug("performing recalculate", List("model" -> effectiveId)) {

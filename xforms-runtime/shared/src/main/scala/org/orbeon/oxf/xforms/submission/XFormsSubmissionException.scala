@@ -13,10 +13,8 @@
   */
 package org.orbeon.oxf.xforms.submission
 
-import cats.syntax.option.*
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent
-import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 
 class XFormsSubmissionException(
   submission       : XFormsModelSubmission,
@@ -27,11 +25,7 @@ class XFormsSubmissionException(
 ) extends ValidationException(
   message            = message,
   throwable          = throwable,
-  locationDataOrNull = XmlExtendedLocationData(
-    submission.getLocationData,
-    Option(description),
-    element = submission.staticSubmission.element.some
-  )
+  locationDataOrNull = submission.staticSubmission.extendedLocationData(description)
 ) {
   def submitErrorEventOpt: Option[XFormsSubmitErrorEvent] =
     Option(submitErrorEvent)

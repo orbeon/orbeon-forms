@@ -111,14 +111,11 @@ object ItemsetSupport {
               private var position: Int = 0
               private var currentContainer: ItemContainer = result
 
-              def startElement(elem: ElementAnalysis): Unit = {
-
-                val domElem = elem.element
-
-                domElem.getQName match {
+              def startElement(elem: ElementAnalysis): Unit =
+                elem.qName match {
                   case XFORMS_ITEM_QNAME =>
 
-                    contextStack.pushBinding(domElem, getElementEffectiveId(parentEffectiveId, elem), elem.scope, select1Control, failFastCollector)
+                    contextStack.pushBinding(elem, getElementEffectiveId(parentEffectiveId, elem), elem.scope, select1Control, failFastCollector)
 
                     getValueOrCopyItemValue(elem) map (createValueNode(_, elem, position)) foreach { newItem =>
                       currentContainer.addChildItem(newItem)
@@ -127,7 +124,7 @@ object ItemsetSupport {
 
                   case XFORMS_ITEMSET_QNAME =>
 
-                    contextStack.pushBinding(domElem, getElementEffectiveId(parentEffectiveId, elem), elem.scope, select1Control, failFastCollector)
+                    contextStack.pushBinding(elem, getElementEffectiveId(parentEffectiveId, elem), elem.scope, select1Control, failFastCollector)
 
                     val currentBindingContext = contextStack.getCurrentBindingContext
 
@@ -156,7 +153,7 @@ object ItemsetSupport {
                       }(contextStack)
                   case XFORMS_CHOICES_QNAME =>
 
-                    contextStack.pushBinding(domElem, getElementEffectiveId(parentEffectiveId, elem), elem.scope, select1Control, failFastCollector)
+                    contextStack.pushBinding(elem, getElementEffectiveId(parentEffectiveId, elem), elem.scope, select1Control, failFastCollector)
 
                     if (findChildElem(elem, LABEL_QNAME).isDefined) {
                       val newItem = createChoiceNode(elem, position)
@@ -166,13 +163,9 @@ object ItemsetSupport {
                     }
                   case _ =>
                 }
-              }
 
-              def endElement(elem: ElementAnalysis): Unit = {
-
-                val domElem = elem.element
-
-                domElem.getQName match {
+              def endElement(elem: ElementAnalysis): Unit =
+                elem.qName match {
                   case XFORMS_ITEM_QNAME | XFORMS_ITEMSET_QNAME =>
                     contextStack.popBinding()
                   case XFORMS_CHOICES_QNAME =>
@@ -181,7 +174,6 @@ object ItemsetSupport {
                       currentContainer = currentContainer.parent
                   case _ =>
                 }
-              }
 
               private def updatedLevelAndItemStack(
                 currentLevelAndStack: (Int, List[om.Item]),
@@ -279,11 +271,11 @@ object ItemsetSupport {
               // - the context item is missing
               //
               private def getCopyValue(copyElem: ElementAnalysis): Option[List[om.Item]] =
-                copyElem.element.attributeValueOpt(XFormsNames.REF_QNAME) flatMap { _ =>
+                copyElem.ref flatMap { _ =>
 
                   val sourceEffectiveId = getElementEffectiveId(parentEffectiveId, copyElem)
 
-                  withBinding(copyElem.element, sourceEffectiveId, copyElem.scope, select1Control, failFastCollector) { currentBindingContext =>
+                  withBinding(copyElem, sourceEffectiveId, copyElem.scope, select1Control, failFastCollector) { currentBindingContext =>
                     val currentNodeset = currentBindingContext.nodeset.asScala.toList
                     currentNodeset.nonEmpty option currentNodeset
                   }(contextStack)
@@ -328,7 +320,7 @@ object ItemsetSupport {
               private def getAttributes(elem: ElementAnalysis): List[(QName, String)] =
                 for {
                   name   <- SelectionControlUtil.AttributesToPropagate
-                  value  = elem.element.attributeValue(name)
+                  value  = elem.attributeValue(name)
                   if value ne null
                   result <- findAttributeAVTValue(elem, name, value, getElementEffectiveId(parentEffectiveId, elem))
                 } yield
@@ -357,7 +349,7 @@ object ItemsetSupport {
                           functionLibrary    = container.partAnalysis.functionLibrary(itemChoiceItemsetElem.isFunctionsRestricted),
                           functionContext    = contextStack.getFunctionContext(elemEffectiveId),
                           baseURI            = null,
-                          locationData       = itemChoiceItemsetElem.element.getData.asInstanceOf[LocationData],
+                          locationData       = itemChoiceItemsetElem.locationData,
                           reporter           = container.containingDocument.getRequestStats.getReporter
                         )
                       } catch {

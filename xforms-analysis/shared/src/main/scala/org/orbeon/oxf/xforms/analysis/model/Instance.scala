@@ -13,13 +13,14 @@
  */
 package org.orbeon.oxf.xforms.analysis.model
 
-import org.orbeon.dom.{Document, Element}
+import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, WithChildrenTrait}
+import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.xbl.Scope
@@ -101,13 +102,16 @@ class Instance(
       }
     }
 
+  override protected def isPrunedAttribute(attQName: QName): Boolean =
+    attQName != XMLConstants.XML_BASE_QNAME
+
   // Materialize `constantContent` (`TinyTree`) and release the duplicate Orbeon DOM subtree on server-side static states;
   // for mutable inline instances, copy parent namespaces onto the root element and detach it from the enclosing `<xf:instance>`.
   def releaseInlineDom(): Unit =
     if (readonly && useInlineContent) {
       val _ = constantContent
       _instanceMetadata = _instanceMetadata.copy(inlineRootElemOpt = None)
-      element.clearContent()
+      compileElementOpt.foreach(_.clearContent())
     } else if (useInlineContent) {
       inlineRootElemOpt.foreach { inlineElem =>
         if (! excludeResultPrefixes("#all")) {
@@ -118,7 +122,7 @@ class Instance(
           inlineElem.detach()
         }
       }
-      element.clearContent()
+      compileElementOpt.foreach(_.clearContent())
     }
 
   // Scala 3 would be nice here:

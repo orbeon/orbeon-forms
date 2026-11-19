@@ -188,7 +188,7 @@ class PagerTest
               ControlsIterator(comp, includeSelf = false)
                 .collectFirst {
                   case t: XFormsTriggerControl
-                    if Option(t.staticControl.element.attributeValue("class")).exists(_.splitTo[Set]().contains(triggerClass)) =>
+                    if t.staticControl.attributeValueOpt("class").exists(_.splitTo[Set]().contains(triggerClass)) =>
                     t
                 }
                 .getOrElse(sys.error(s"Missing `$triggerClass` in `$pagerId`"))

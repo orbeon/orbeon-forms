@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.dom.Element
+import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames.*
@@ -35,14 +35,45 @@ class AttributeControl(
      with ValueTrait
      with OptionalSingleNode {
 
-  val forStaticId   : String = element.attributeValue(FOR_QNAME)
+  val forStaticId   : String = elem.attributeValue(FOR_QNAME)
   val forPrefixedId : String = XFormsId.getRelatedEffectiveId(prefixedId, forStaticId)
 
-  val attributeName : String = element.attributeValue(NAME_QNAME)
-  val attributeValue: String = element.attributeValue(VALUE_QNAME)
+  val attributeName : String = elem.attributeValue(NAME_QNAME)
+  val attributeValue: String = elem.attributeValue(VALUE_QNAME)
 
-  val forName       : String = element.attributeValue("for-name")
-  val urlType       : String = element.attributeValue("url-type")
-  val portletMode   : String = element.attributeValue("portlet-mode")
-  val windowState   : String = element.attributeValue("window-state")
+  val forName       : String = elem.attributeValue("for-name")
+  val urlType       : String = elem.attributeValue("url-type")
+  val portletMode   : String = elem.attributeValue("portlet-mode")
+  val windowState   : String = elem.attributeValue("window-state")
+
+  override protected def synthesizedUnprefixedAttributeValue(local: String): String =
+    local match {
+      case "for"          => forStaticId
+      case "name"         => attributeName
+      case "for-name"     => forName
+      case "url-type"     => urlType
+      case "portlet-mode" => portletMode
+      case "window-state" => windowState
+      case _              => super.synthesizedUnprefixedAttributeValue(local)
+    }
+
+  override protected def extraSynthesizedAttributes: List[(QName, String)] = {
+    val b = List.newBuilder[(QName, String)]
+    b ++= super.extraSynthesizedAttributes
+    if (forStaticId ne null)   b += FOR_QNAME             -> forStaticId
+    if (attributeName ne null) b += NAME_QNAME            -> attributeName
+    if (forName ne null)       b += QName("for-name")     -> forName
+    if (urlType ne null)       b += QName("url-type")     -> urlType
+    if (portletMode ne null)   b += QName("portlet-mode") -> portletMode
+    if (windowState ne null)   b += QName("window-state") -> windowState
+    b.result()
+  }
+
+  override protected def isPrunedAttribute(attQName: QName): Boolean =
+    super.isPrunedAttribute(attQName) ||
+      (attQName.namespace.uri.isEmpty && AttributeControl.PrunedLocalNames(attQName.localName))
+}
+
+private object AttributeControl {
+  val PrunedLocalNames: Set[String] = Set("for", "name", "for-name", "url-type", "portlet-mode", "window-state")
 }

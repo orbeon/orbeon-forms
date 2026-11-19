@@ -66,7 +66,7 @@ trait ControlEventSupport extends ListenersTrait {
           val excludes = focusEvent.excludes
 
           def satisfiesIncludesAndExcludes(c: XFormsControl): Boolean = {
-            val qName = c.staticControl.element.getQName
+            val qName = c.staticControl.qName
             (includes.isEmpty || includes.contains(qName)) && ! excludes.contains(qName)
           }
 

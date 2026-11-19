@@ -166,7 +166,7 @@ object ElementAnalysisTreeXPathAnalyzer {
             .getOrElse(
               throw new ValidationException(
                 s"Reference to non-existing bind id `$bindStaticId`",
-                ElementAnalysis.createLocationData(e.element)
+                e.locationData
               )
             )
             .bindsById
@@ -199,7 +199,7 @@ object ElementAnalysisTreeXPathAnalyzer {
                 analyzeXPathWithStringExpression(
                   partAnalysisCtx,
                   e,
-                  if (e.hasBinding && e.element.hasAttribute(VALUE_QNAME))
+                  if (e.hasBinding && e.value.isDefined)
                     e.bindingAnalysis
                   else
                     e.contextAnalysis,
@@ -248,7 +248,7 @@ object ElementAnalysisTreeXPathAnalyzer {
 
               // Custom value analysis done here
               val valueXPathAnalysis =
-                valueOrSelectAttribute(valueElem.element) match {
+                valueOrSelectAttribute(valueElem) match {
                   case Some(value) =>
                     analyzeXPathWithStringExpression(partAnalysisCtx, valueElem, getChildrenContext(partAnalysisCtx, valueElem), valueElem.inScopeVariables, value).some
                   case None =>
@@ -260,7 +260,7 @@ object ElementAnalysisTreeXPathAnalyzer {
             case None =>
               // No nested `xxf:value` element
 
-              valueOrSelectAttribute(e.element) match {
+              valueOrSelectAttribute(e) match {
                 case Some(value) => analyzeXPathWithStringExpression(partAnalysisCtx, e, getChildrenContext(partAnalysisCtx, e), e.inScopeVariables, value).some
                 case _           => StringAnalysis.some // TODO: store constant value?
               }
@@ -418,7 +418,7 @@ object ElementAnalysisTreeXPathAnalyzer {
 
       var combinedAnalysis: XPathAnalysis = StringAnalysis
 
-      e.element.visitDescendants(
+      e.compileElement.visitDescendants(
         new VisitorListener {
 
           var stack: List[ElementAnalysis] = e :: Nil
@@ -582,7 +582,7 @@ object ElementAnalysisTreeXPathAnalyzer {
         scope                     = e.scope,
         defaultInstancePrefixedId = e.model flatMap (_.defaultInstancePrefixedId),
         locationData              = e.locationData,
-        element                   = e.element,
+        element                   = e.compileElement,
         avt                       = avt,
         isFunctionsRestricted     = e.isFunctionsRestricted
       )
@@ -602,7 +602,7 @@ object ElementAnalysisTreeXPathAnalyzer {
         inScopeVariables          = inScopeVariables,
         pathMapContext            = new SimplePathMapContext(partAnalysisCtx, e),
         scope                     = e.scope,
-        element                   = e.element,
+        element                   = e.compileElement,
         defaultInstancePrefixedId = e.model flatMap (_.defaultInstancePrefixedId)
       )
 
@@ -681,7 +681,7 @@ object ElementAnalysisTreeXPathAnalyzer {
               scope                     = m.scope,
               defaultInstancePrefixedId = defaultInstancePrefixedId.some,
               locationData              = m.locationData,
-              element                   = m.element,
+              element                   = m.compileElement,
               avt                       = false)(
               logger                    = null // only used for warnings
             )

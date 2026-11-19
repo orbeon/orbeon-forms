@@ -71,7 +71,7 @@ class XFormsMessageAction extends XFormsAction {
     val containingDocument = actionContext.containingDocument
 
     val levelQName =
-      actionContext.element.attributeValueOpt(XFormsNames.LEVEL_QNAME) flatMap { levelQName =>
+      actionContext.analysis.attributeValueOpt(XFormsNames.LEVEL_QNAME) flatMap { levelQName =>
         Extensions.resolveQName(
           actionContext.analysis.namespaceMapping.mapping.get,
           levelQName,

@@ -136,13 +136,26 @@ class StaticBind(
   def firstXPathMipByName(mip: MipName.XPath): Option[XPathMIP] = getXPathMIPs(mip).headOption
   def hasXPathMIP  (mip: MipName.XPath): Boolean          = firstXPathMipByName(mip).nonEmpty
 
+  override protected def synthesizedUnprefixedAttributeValue(local: String): String =
+    if (local == "name") nameOpt.orNull else super.synthesizedUnprefixedAttributeValue(local)
+
+  override protected def extraSynthesizedAttributes: List[(QName, String)] =
+    super.extraSynthesizedAttributes ::: nameOpt.map(org.orbeon.xforms.XFormsNames.NAME_QNAME -> _).toList
+
+  override protected def isPrunedAttribute(attQName: QName): Boolean =
+    attQName != org.orbeon.xforms.XFormsNames.MODEL_QNAME
+
   // Used by `PartXBLAnalysis.unmapScopeIds()`
   def iterateNestedIds: Iterator[String] =
-    for {
-      elem <- element.elements.iterator
-      id   <- elem.idOpt
-    } yield
-      id
+    compileElementOpt match {
+      case Some(ce) =>
+        for {
+          elem <- ce.elements.iterator
+          id   <- elem.idOpt
+        } yield id
+      case None =>
+        iterateNestedIds2
+    }
 
   // TODO: Use this instead of `iterateNestedIds` as we don't want to use `element.elements` in general.
   def iterateNestedIds2: Iterator[String] =

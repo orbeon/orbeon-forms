@@ -46,5 +46,5 @@ object StaticScriptBuilder {
   }
 
   def scriptTypeFromElem(elem: ElementAnalysis, default: Option[ScriptType]): Option[ScriptType] =
-    scriptTypeFromMediatype(elem.element.attributeValue("type"), default)
+    scriptTypeFromMediatype(elem.attributeValue("type"), default)
 }

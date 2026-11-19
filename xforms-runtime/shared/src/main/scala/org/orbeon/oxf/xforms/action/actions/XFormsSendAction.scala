@@ -28,11 +28,10 @@ class XFormsSendAction extends XFormsAction {
 
   override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
-    val interpreter   = actionContext.interpreter
-    val actionElement = actionContext.element
+    val interpreter = actionContext.interpreter
 
     // Find submission object
-    val submissionId = actionElement.attributeValue(XFormsNames.SUBMISSION_QNAME)
+    val submissionId = actionContext.analysis.attributeValue(XFormsNames.SUBMISSION_QNAME)
     if (submissionId eq null)
       throw new OXFException("Missing mandatory submission attribute on xf:send element.")
 

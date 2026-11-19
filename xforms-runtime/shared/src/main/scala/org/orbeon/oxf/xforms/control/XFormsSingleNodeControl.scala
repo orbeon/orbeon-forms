@@ -13,7 +13,7 @@
 */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.dom.{Element, QName}
+import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
@@ -39,8 +39,8 @@ import scala.collection.immutable as i
 /**
 * Control with a single-node binding (possibly optional). Such controls can have MIPs (properties coming from a model).
 */
-abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
-    extends XFormsControl(container, parent, element, _effectiveId)
+abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsControl, _effectiveId: String)
+    extends XFormsControl(container, parent, _effectiveId)
        with VisibilityTrait {
 
   import XFormsSingleNodeControl.*

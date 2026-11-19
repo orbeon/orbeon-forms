@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import java.io.IOException
-import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsNoSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -25,8 +24,8 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 // Control at the root of the control tree
 // NOTE: This is also the root of a dynamic sub-tree, in which case the control is a child of xxf:dynamic
-class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element: Element, _effectiveId: String)
-  extends XFormsNoSingleNodeContainerControl(container, parent, element, _effectiveId) {
+class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, _effectiveId: String)
+  extends XFormsNoSingleNodeContainerControl(container, parent, _effectiveId) {
 
   // If we are really at the root, register to ControlTree. This so that the tree is made available during
   // construction to XPath functions like index() or case()

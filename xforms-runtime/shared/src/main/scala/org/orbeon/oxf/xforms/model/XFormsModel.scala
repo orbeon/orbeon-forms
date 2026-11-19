@@ -196,13 +196,12 @@ class XFormsModel(
   private def doAfterReady(): Unit = ()
 
   private def doModelConstruct(rrr: Boolean): Unit = {
-    val modelElement = staticModel.element
 
     // 1. The XML Schemas, if any, are loaded
     try schemaValidator
     catch {
       case NonFatal(t) =>
-        val schemaAttribute = modelElement.attributeValue(XFormsNames.SCHEMA_QNAME)
+        val schemaAttribute = staticModel.attributeValue(XFormsNames.SCHEMA_QNAME)
         Dispatch.dispatchEvent(new XFormsLinkExceptionEvent(selfModel, schemaAttribute, t), EventCollector.ToReview)
     }
 
@@ -447,11 +446,7 @@ trait XFormsModelInstances {
                 null,
                 new ValidationException(
                   "Error extracting or setting inline instance",
-                  XmlExtendedLocationData(
-                    instance.locationData,
-                    "processing XForms instance".some,
-                    element = instance.element.some
-                  )
+                  instance.extendedLocationData("processing XForms instance")
                 )
               ),
               EventCollector.ToReview
@@ -465,11 +460,7 @@ trait XFormsModelInstances {
             "",
             new ValidationException(
               s"Required @src attribute, @resource attribute, or inline content for instance: `${instance.staticId}`",
-              XmlExtendedLocationData(
-                instance.locationData,
-                "processing XForms instance".some,
-                element = instance.element.some
-              )
+              instance.extendedLocationData("processing XForms instance")
             )
           ),
           EventCollector.ToReview
@@ -480,7 +471,7 @@ trait XFormsModelInstances {
   private def resolveInstanceURL(instance: Instance): String =
     XFormsCrossPlatformSupport.resolveServiceURL(
       containingDocument,
-      instance.element,
+      instance,
       instance.instanceSource.get,
       UrlRewriteMode.Absolute
     )
@@ -515,11 +506,7 @@ trait XFormsModelInstances {
             instanceResource,
             OrbeonLocationException.wrapException(
               e,
-              XmlExtendedLocationData(
-                instance.locationData,
-                "reading external instance".some,
-                element = instance.element.some
-              )
+              instance.extendedLocationData("reading external instance")
             )
           ),
           EventCollector.ToReview

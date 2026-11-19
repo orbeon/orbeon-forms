@@ -89,7 +89,7 @@ trait FormRunnerSectionTemplateOps {
       inScopeContainingDocument.controls.getCurrentControlTree.findControl(XFormsId.absoluteIdToEffectiveId(controlAbsoluteId))
         .exists(
           _.container.ancestorsIterator.flatMap(_.associatedControlOpt)
-            .exists(_.element.getNamespaceURI == libraryUri)
+            .exists(_.staticControl.namespaceURI == libraryUri)
         )
     }
 
@@ -108,7 +108,7 @@ trait FormRunnerSectionTemplateOps {
     //
     val sectionTemplateElementOpt =
       frSectionComponent.staticControl.descendants find
-      (c => matchesComponentURI(c.element.getNamespaceURI))
+      (c => matchesComponentURI(c.namespaceURI))
 
     sectionTemplateElementOpt                       flatMap
       (e => frSectionComponent.resolve(e.staticId)) flatMap

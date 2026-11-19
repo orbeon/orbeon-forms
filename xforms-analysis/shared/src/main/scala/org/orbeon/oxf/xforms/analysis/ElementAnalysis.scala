@@ -15,19 +15,23 @@ package org.orbeon.oxf.xforms.analysis
 
 import cats.syntax.option.*
 import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
+import org.orbeon.dom.tree.CompactElement
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.analysis.controls.*
 import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xml.XMLUtils
+import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
 import org.orbeon.oxf.xml.dom.{Extensions, XmlExtendedLocationData}
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.XFormsNames.*
 import org.orbeon.xforms.analysis.Phase
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
+import org.xml.sax.helpers.AttributesImpl
 
+import java.lang as jl
 import scala.annotation.tailrec
+import scala.collection.mutable
 
 
 // xml:lang reference
@@ -76,13 +80,19 @@ abstract class ElementAnalysis(
 
   require(initElement ne null)
 
-  private var _element: Element = initElement
-  final def element: Element = _element
+  val qName: QName = initElement.getQName
 
-  def replaceElementForRuntime(newElement: Element): Unit = {
-    require(newElement ne null)
-    _element = newElement
-  }
+  // Compile-time DOM element; cleared to `null` by `compactForRuntime` after compilation / deserialization
+  private var _compileElement: Element = initElement
+  private var _rawAtts: Array[AnyRef]  = EmptyRawAtts
+
+  final def compileElement: Element =
+    if (_compileElement ne null) _compileElement
+    else throw new IllegalStateException(s"Compile-time DOM element already released for `$prefixedId`")
+
+  final def compileElementOpt: Option[Element] = Option(_compileElement)
+  final def isCompactedForRuntime: Boolean     = _compileElement eq null
+  final def rawAtts: Array[AnyRef]             = _rawAtts
 
   var model: Option[Model] = None
   var lang: LangRef = LangRef.Undefined
@@ -96,13 +106,179 @@ abstract class ElementAnalysis(
       existing
   }
 
-  // Element local name
-  def localName: String = element.getName
+  // Element QName parts
+  final def localName    : String = qName.localName
+  final def namespaceURI : String = qName.namespace.uri
+  final def qualifiedName: String = qName.qualifiedName
+
+  protected def synthesizedUnprefixedAttributeValue(local: String): String =
+    local match {
+      case "id"      => staticId
+      case "context" => context.orNull
+      case "bind"    => bind.orNull
+      case "value"   => value.orNull
+      case "ref"     => ref.orNull
+      case _         => null
+    }
+
+  protected def extraSynthesizedAttributes: List[(QName, String)] = Nil
+
+  protected def isPrunedAttribute(attQName: QName): Boolean =
+    BasePrunedAttributeQNames(attQName)
+
+  final def attributeValue(attQName: QName): String =
+    if (_compileElement ne null) {
+      _compileElement.attributeValue(attQName)
+    } else {
+      val synth =
+        if (attQName.namespace.uri.isEmpty) synthesizedUnprefixedAttributeValue(attQName.localName)
+        else null
+      if (synth ne null) {
+        synth
+      } else {
+        var i = 0
+        while (i < _rawAtts.length) {
+          if (attQName == _rawAtts(i).asInstanceOf[QName])
+            return _rawAtts(i + 1).asInstanceOf[String]
+          i += 2
+        }
+        null
+      }
+    }
+
+  final def attributeValue(name: String): String =
+    if (_compileElement ne null) {
+      _compileElement.attributeValue(name)
+    } else {
+      val synth = synthesizedUnprefixedAttributeValue(name)
+      if (synth ne null) {
+        synth
+      } else {
+        var i = 0
+        while (i < _rawAtts.length) {
+          if (_rawAtts(i).asInstanceOf[QName].localName == name)
+            return _rawAtts(i + 1).asInstanceOf[String]
+          i += 2
+        }
+        null
+      }
+    }
+
+  final def attributeValueOpt(attQName: QName): Option[String] = Option(attributeValue(attQName))
+  final def attributeValueOpt(name: String)   : Option[String] = Option(attributeValue(name))
+
+  final def hasAttribute(attQName: QName): Boolean = attributeValue(attQName) ne null
+  final def hasAttribute(name: String)   : Boolean = attributeValue(name) ne null
+
+  final def attributesIterator: Iterator[(QName, String)] =
+    if (_compileElement ne null) {
+      _compileElement.attributeIterator.map(a => a.getQName -> a.getValue)
+    } else {
+      val b = List.newBuilder[(QName, String)]
+      if (staticId ne null)     b += ID_QNAME      -> staticId
+      context.foreach(v =>      b += CONTEXT_QNAME -> v)
+      bind.foreach(v =>         b += BIND_QNAME    -> v)
+      value.foreach(v =>        b += VALUE_QNAME   -> v)
+      ref.foreach(v =>          b += REF_QNAME     -> v)
+      extraSynthesizedAttributes.foreach(b += _)
+      var i = 0
+      while (i < _rawAtts.length) {
+        b += (_rawAtts(i).asInstanceOf[QName] -> _rawAtts(i + 1).asInstanceOf[String])
+        i += 2
+      }
+      b.result().iterator
+    }
+
+  final def attributesAsSax: AttributesImpl = {
+    val result = new AttributesImpl
+    val it     = attributesIterator
+    while (it.hasNext) {
+      val (qn, v) = it.next()
+      result.addAttribute(qn.namespace.uri, qn.localName, qn.qualifiedName, XMLReceiverHelper.CDATA, v)
+    }
+    result
+  }
+
+  final def toDomElement: Element =
+    if (_compileElement ne null) {
+      _compileElement
+    } else {
+      val pairs = attributesIterator.toArray
+      if (pairs.isEmpty) {
+        new CompactElement(qName, EmptyRawAtts, locationData)
+      } else {
+        val raw = new Array[AnyRef](pairs.length * 2)
+        var i   = 0
+        while (i < pairs.length) {
+          raw(i * 2)     = pairs(i)._1
+          raw(i * 2 + 1) = pairs(i)._2
+          i += 1
+        }
+        new CompactElement(qName, raw, locationData)
+      }
+    }
+
+  final def toDebugString: String =
+    if (_compileElement ne null) {
+      _compileElement.toDebugString
+    } else {
+      val sb = new jl.StringBuilder("<")
+      sb.append(qualifiedName)
+      val it = attributesIterator
+      while (it.hasNext) {
+        val (qn, v) = it.next()
+        sb.append(' ')
+        sb.append(qn.qualifiedName)
+        sb.append("=\"")
+        sb.append(v)
+        sb.append('"')
+      }
+      sb.append("/>")
+      sb.toString
+    }
+
+  final def extendedLocationData(description: String, params: Seq[(String, String)] = Nil): ExtendedLocationData =
+    ExtendedLocationData(
+      if (locationData ne null) locationData.file else null,
+      if (locationData ne null) locationData.line else -1,
+      if (locationData ne null) locationData.col  else -1,
+      Option(description),
+      (("element" -> toDebugString) +: params).filter(_._2 ne null)
+    )
+
+  def compactForRuntime(effectiveXmlBaseOpt: Option[String]): Unit =
+    if (_compileElement ne null) {
+      // Prime `isFunctionsRestricted` before releasing `_compileElement`
+      val _ = isFunctionsRestricted
+
+      val srcElem  = _compileElement
+      val srcCount = srcElem.attributeCount
+      val buf      = new mutable.ArrayBuffer[AnyRef](Math.max(4, srcCount * 2))
+
+      var i = 0
+      while (i < srcCount) {
+        val att   = srcElem.attribute(i)
+        val attQN = att.getQName
+        if (attQN != XMLConstants.XML_BASE_QNAME && ! isPrunedAttribute(attQN)) {
+          buf += attQN
+          buf += att.getValue
+        }
+        i += 1
+      }
+
+      if (effectiveXmlBaseOpt.isDefined) {
+        buf += XMLConstants.XML_BASE_QNAME
+        buf += effectiveXmlBaseOpt.get
+      }
+
+      _rawAtts        = if (buf.isEmpty) EmptyRawAtts else buf.toArray
+      _compileElement = null
+    }
 
   // Restriction on allowed XPath functions
   lazy val isFunctionsRestricted: Boolean =
     closestAncestorInScope.exists(_.isFunctionsRestricted) ||
-    element.attributeValueOpt(XXFORMS_FUNCTIONS_QNAME).contains("restricted")
+    attributeValueOpt(XXFORMS_FUNCTIONS_QNAME).contains("restricted")
 
   // In-scope variables (for XPath analysis)
   // Only overridden anonymously in `VariableAnalysisTrait` where it says "This is bad architecture"
@@ -139,13 +315,13 @@ abstract class ElementAnalysis(
   }
 
   // Location
-  val locationData: ExtendedLocationData = ElementAnalysis.createLocationData(element)
+  val locationData: ExtendedLocationData = ElementAnalysis.createLocationData(initElement)
 
   // Element attributes: @context, @ref, @bind, @value
-  val context: Option[String] = element.attributeValueOpt(XFormsNames.CONTEXT_QNAME)
-  val ref    : Option[String] = ElementAnalysis.getBindingExpression(element)
-  val bind   : Option[String] = element.attributeValueOpt(XFormsNames.BIND_QNAME)
-  val value  : Option[String] = element.attributeValueOpt(XFormsNames.VALUE_QNAME)
+  val context: Option[String] = initElement.attributeValueOpt(XFormsNames.CONTEXT_QNAME)
+  val ref    : Option[String] = ElementAnalysis.getBindingExpression(initElement)
+  val bind   : Option[String] = initElement.attributeValueOpt(XFormsNames.BIND_QNAME)
+  val value  : Option[String] = initElement.attributeValueOpt(XFormsNames.VALUE_QNAME)
 
   // Other
   def hasBinding: Boolean = ref.isDefined || bind.isDefined
@@ -161,8 +337,8 @@ abstract class ElementAnalysis(
   final lazy val extensionAttributes: Map[QName, String] =
     Map.empty ++ (
       CommonExtensionAttributes ++
-      (element.attributeIterator collect { case att if att.getName.startsWith("data-") => att.getQName }) ++
-      allowedExtensionAttributes map (qName => (qName, element.attributeValue(qName))) filter (_._2 ne null)
+      (attributesIterator collect { case (attQName, _) if attQName.localName.startsWith("data-") => attQName }) ++
+      allowedExtensionAttributes map (qName => (qName, attributeValue(qName))) filter (_._2 ne null)
     )
 
   final lazy val nonRelevantExtensionAttributes =
@@ -248,6 +424,17 @@ trait ElementRepeats {
 }
 
 object ElementAnalysis {
+
+  val EmptyRawAtts: Array[AnyRef] = Array.empty[AnyRef]
+
+  val BasePrunedAttributeQNames: Set[QName] = Set(
+    ID_QNAME,
+    CONTEXT_QNAME,
+    BIND_QNAME,
+    VALUE_QNAME,
+    REF_QNAME,
+    NODESET_QNAME
+  )
 
   val CommonExtensionAttributes = Set(STYLE_QNAME, CLASS_QNAME, ROLE_QNAME)
 
@@ -400,15 +587,24 @@ object ElementAnalysis {
   def attSet(element: Element, name: String): Set[String] =
     element.attributeValue(name).tokenizeToSet
 
+  def attSet(analysis: ElementAnalysis, qName: QName): Set[String] =
+    analysis.attributeValue(qName).tokenizeToSet
+
+  def attSet(analysis: ElementAnalysis, name: String): Set[String] =
+    analysis.attributeValue(name).tokenizeToSet
+
   /**
    * Get the value of an attribute containing a space-separated list of QNames as a set.
    */
   def attQNameSet(element: Element, qName: QName, namespaces: NamespaceMapping): Set[QName] =
     attSet(element, qName) flatMap (Extensions.resolveQName(namespaces.mapping.get, _, unprefixedIsNoNamespace = true))
 
+  def attQNameSet(analysis: ElementAnalysis, qName: QName, namespaces: NamespaceMapping): Set[QName] =
+    attSet(analysis, qName) flatMap (Extensions.resolveQName(namespaces.mapping.get, _, unprefixedIsNoNamespace = true))
+
   def findChildElem(elem: ElementAnalysis, name: QName): Option[ElementAnalysis] =
     elem match {
-      case wct: WithChildrenTrait => wct.children collectFirst { case c if c.element.getQName == name => c }
+      case wct: WithChildrenTrait => wct.children collectFirst { case c if c.qName == name => c }
       case _                      => None
     }
 }

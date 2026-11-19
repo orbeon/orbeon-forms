@@ -495,11 +495,10 @@ public class CustomPdfBoxRenderer implements Closeable, PageSupplier {
                         // #7998: fix the "NeedAppearance is present with the value true" error (PDFBox Preflight).
                         // openhtmltopdf creates an empty AcroForm, with NeedAppearances set to true, as soon as the
                         // document contains a form element. PDF/A doesn't allow NeedAppearances set to true.
-                        if (_pdfAConformance != PdfAConformance.NONE) {
-                            PDAcroForm acroForm = _pdfDoc.getDocumentCatalog().getAcroForm(null);
-                            if (acroForm != null && acroForm.getFields().isEmpty())
-                                _pdfDoc.getDocumentCatalog().setAcroForm(null);
-                        }
+                        // #7394: remove the empty AcroForm from all PDFs, not only from PDF/A ones.
+                        PDAcroForm acroForm = _pdfDoc.getDocumentCatalog().getAcroForm(null);
+                        if (acroForm != null && acroForm.getFields().isEmpty())
+                            _pdfDoc.getDocumentCatalog().setAcroForm(null);
                         // #7998: fix the "Trailer Syntax error, /XRef cross reference streams are not allowed" error
                         // from PDFBox Preflight. For PDF/A-1a and PDF/A-1b, the PDF version must be 1.4 and compression
                         // is not supported with that version.

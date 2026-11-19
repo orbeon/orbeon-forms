@@ -434,8 +434,10 @@
     <xsl:template match="*:input[@type = 'hidden']"/>
 
     <!-- Remove xforms-initially-hidden class on the form, normally removed by the script -->
+    <!-- #7394: output a div, as openhtmltopdf creates an interactive form (AcroForm) for any form element. A fillable
+         PDF would need the form element back, and to choose which controls become fields. -->
     <xsl:template match="*:form">
-        <xsl:element name="{local-name()}">
+        <xsl:element name="div">
             <xsl:attribute name="class" select="string-join(p:classes()[. != 'xforms-initially-hidden'], ' ')"/>
             <xsl:apply-templates select="@* except @class | node()"/>
         </xsl:element>

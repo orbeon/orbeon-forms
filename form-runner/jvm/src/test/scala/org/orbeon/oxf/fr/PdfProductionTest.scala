@@ -115,6 +115,17 @@ class PdfProductionTest
       }
     }
 
+    it("#7394: automatic PDF must not contain an interactive form") {
+
+      val (_, content, _) =
+        runFormRunnerReturnContent("tests", "pdf-production", "pdf", documentId = PdfProductionDocumentId.some)
+
+      useAndClose(Loader.loadPDF(new RandomAccessReadBuffer(content.stream))) { pdd =>
+        assert(pdd.getDocumentCatalog.getAcroForm(null) eq null)
+        assert(! pdd.getPages.asScala.exists(_.getAnnotations.asScala.exists(_.getSubtype == "Widget")))
+      }
+    }
+
     it("PDF must contain WebP image attachment") {
       val (_, content, _) =
         runFormRunnerReturnContent("tests", "pdf-production", "pdf", documentId = PdfProductionDocumentId.some)

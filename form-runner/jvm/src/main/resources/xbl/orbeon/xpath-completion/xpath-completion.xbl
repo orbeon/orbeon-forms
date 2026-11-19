@@ -9,28 +9,29 @@
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <xbl:script src="/xbl/fb/xpath-completion/text-expander-element-bundle.js"/>
+    <xbl:script src="/xbl/orbeon/xpath-completion/text-expander-element-bundle.js"/>
     <xbl:binding
-            id="fb-xpath-completion"
+            id="fr-xpath-completion"
             element="
+                fr|xpath-completion,
                 fb|xpath-completion,
                 xf|input[appearance ~= xpath-completion],
                 xf|textarea[appearance ~= xpath-completion]"
             xxbl:mode="binding lhha value external-value javascript-lifecycle allow-minimal-label-hint"
             xxbl:label-for="field"
             xxbl:container="span"
-            xxf:external-events="fb-query-completions">
+            xxf:external-events="fr-query-completions">
 
         <xbl:resources>
-            <xbl:style src="/xbl/fb/xpath-completion/xpath-completion.css"/>
+            <xbl:style src="/xbl/orbeon/xpath-completion/xpath-completion.css"/>
         </xbl:resources>
 
         <xbl:handlers>
-            <xbl:handler event="fb-query-completions" phase="target" defaultAction="cancel">
-                <xf:action type="javascript" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
+            <xbl:handler event="fr-query-completions" phase="target" defaultAction="cancel">
+                <xf:action type="javascript" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
                     <xf:param
                         name="completions"
-                        value="fbf:controlNameCompletionsJson(event('text'), 15, fr:component-param-value('xpath-completion-updates'))"/>
+                        value="frf:controlNameCompletionsJson(event('text'), 15, fr:component-param-value('xpath-completion-updates'))"/>
                     <xf:body>
                         ORBEON.xforms.XBL.instanceForControl(this).returnCompletions(completions);
                     </xf:body>
@@ -39,7 +40,7 @@
         </xbl:handlers>
 
         <xbl:template xxbl:transform="oxf:xslt">
-            <xh:span xsl:version="2.0" class="fb-xpath-completion-wrapper">
+            <xh:span xsl:version="2.0" class="fr-xpath-completion-wrapper">
                 <xsl:choose>
                     <xsl:when test="/*/@avt = ('true', 'false')">
                         <xsl:attribute name="data-avt" select="/*/@avt"/>
@@ -48,13 +49,24 @@
                         <xsl:attribute name="data-avt">{fr:component-param-value('avt') = 'true'}</xsl:attribute>
                     </xsl:when>
                 </xsl:choose>
+                <xsl:choose>
+                    <xsl:when test="/*/@completion = ('true', 'false')">
+                        <xsl:attribute name="data-completion" select="/*/@completion"/>
+                    </xsl:when>
+                    <xsl:when test="exists(/*/@completion)">
+                        <xsl:attribute name="data-completion">{fr:component-param-value('completion') = 'true'}</xsl:attribute>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:attribute name="data-completion">{fr:is-form-builder()}</xsl:attribute>
+                    </xsl:otherwise>
+                </xsl:choose>
 
                 <xf:var
                     name="binding"
-                    value="xxf:binding('fb-xpath-completion')"/>
+                    value="xxf:binding('fr-xpath-completion')"/>
 
-                <xh:div class="fb-xpath-completion-backdrop" aria-hidden="true">
-                    <xh:div class="fb-xpath-completion-highlights"/>
+                <xh:div class="fr-xpath-completion-backdrop" aria-hidden="true">
+                    <xh:div class="fr-xpath-completion-highlights"/>
                 </xh:div>
 
                 <xh:text-expander keys="$" suffix="">
@@ -68,10 +80,10 @@
                 </xh:text-expander>
 
                 <xsl:if test="local-name(/*) = 'textarea'">
-                    <xh:div class="fb-xpath-completion-buttons">
+                    <xh:div class="fr-xpath-completion-buttons">
                         <xh:button
                             type="button"
-                            class="fb-xpath-completion-expand-button"
+                            class="fr-xpath-completion-expand-button"
                             title="Expand"
                             aria-label="Expand"
                             aria-expanded="false"
@@ -81,7 +93,7 @@
                         <xsl:if test="not(/*/@avt = 'true')">
                             <xh:button
                                 type="button"
-                                class="fb-xpath-completion-format-button"
+                                class="fr-xpath-completion-format-button"
                                 title="Format XPath expression (Shift+Alt+F)"
                                 aria-label="Format XPath expression"
                                 tabindex="-1">
@@ -90,7 +102,7 @@
                         </xsl:if>
                         <xh:button
                             type="button"
-                            class="fb-xpath-completion-copy-button"
+                            class="fr-xpath-completion-copy-button"
                             title="Copy to clipboard"
                             aria-label="Copy to clipboard"
                             tabindex="-1">

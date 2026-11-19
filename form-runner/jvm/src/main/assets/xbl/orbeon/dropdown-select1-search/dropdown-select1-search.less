@@ -107,9 +107,11 @@
                 background-color: var(--orbeon-control-read-only-background-color);
                 cursor          : not-allowed;
 
-                .select2-selection__clear,
-                .select2-selection__choice__remove {
-                    display: none;
+                .select2-selection__rendered {
+                    .select2-selection__clear,
+                    .select2-selection__choice .select2-selection__choice__remove {
+                        display: none;
+                    }
                 }
             }
 

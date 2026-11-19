@@ -595,4 +595,23 @@ class XPathFormatterTest extends AnyFunSpec with Matchers {
       ansi shouldBe s"ID: ${XPathTokenType.Punctuation.ansiColor}{${XPathTokenType.AnsiReset}${XPathTokenType.Variable.ansiColor}$$x${XPathTokenType.AnsiReset}${XPathTokenType.Punctuation.ansiColor}}${XPathTokenType.AnsiReset}"
     }
   }
+
+  describe("Type expressions (castable as, cast as, instance of, treat as)") {
+    it("preserves QName types without prepending $") {
+      val input = "if (. castable as xs:date) then format-date(xs:date(.), '[M]/[D]/[Y]', xxf:lang(), (), ()) else ."
+      val formatted = XPathFormatter.format(input)
+      formatted should include("if (. castable as xs:date) then")
+      formatted should not include "$xs:date"
+
+      XPathFormatter.format("'42' cast as xs:integer?") shouldBe "'42' cast as xs:integer?"
+      XPathFormatter.format("'42' cast as xs:integer + 1") shouldBe "'42' cast as xs:integer + 1"
+      XPathFormatter.format("$x instance of xs:string+") shouldBe "$x instance of xs:string+"
+      XPathFormatter.format("$x instance of empty-sequence()") shouldBe "$x instance of empty-sequence()"
+      XPathFormatter.format("$x instance of map(xs:string, item()*)") shouldBe "$x instance of map(xs:string, item()*)"
+      XPathFormatter.format("for $x in $items where $x instance of xs:string return $x treat as xs:string") shouldBe
+        """for $x in $items
+          |where $x instance of xs:string
+          |return $x treat as xs:string""".stripMargin
+    }
+  }
 }

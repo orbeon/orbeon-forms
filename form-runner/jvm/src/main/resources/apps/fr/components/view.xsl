@@ -782,32 +782,21 @@
                 model="fr-resources-model"
                 value="frf:getFormLangSelection($app, $form, $fr-selector-resources/resource/@xml:lang/string())"/>
 
-            <!-- Don't display language selector if there is only one language -->
             <!-- NOTE: Resolve model here, as for now model within XBL component won't resolve -->
-            <!-- FIXME: This logic is duplicated in language-choice.xbl. -->
             <xf:group
                 id="fr-language-selector"
                 model="fr-resources-model"
                 ref="
                     .[
                         xxf:property('oxf.fr.navbar.language-selector.enable') and
-                        not(fr:is-readonly-mode())                             and
-                        count($available-languages) gt 1                       and
-                        empty(
-                            xxf:get-request-header('orbeon-liferay-language')[
-                                xxf:non-blank()
-                            ]
-                        )
+                        not(fr:is-readonly-mode())
                     ]">
-                <xf:select1 ref="$fr-selector-lang" appearance="bootstrap" id="fr-language-selector-select" fr:dropdown-align="right">
-                    <xsl:if test="@appearance">
-                        <xsl:attribute name="appearance" select="@appearance"/>
-                    </xsl:if>
-                    <xf:itemset ref="$available-languages">
-                        <xf:label ref="(xxf:instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>
-                        <xf:value ref="context()"/>
-                    </xf:itemset>
-                </xf:select1>
+                <fr:language-choice
+                    id="fr-language-selector-select"
+                    ref="$fr-selector-lang"
+                    languages-ref="$available-languages"
+                    appearance="{(@appearance, 'bootstrap')[1]}"
+                    fr:dropdown-align="right"/>
             </xf:group>
         </xf:group>
     </xsl:template>

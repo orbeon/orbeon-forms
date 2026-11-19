@@ -14,7 +14,6 @@
 package org.orbeon.builder
 
 import org.orbeon.fr.*
-import org.orbeon.xbl.XPathCompletion
 import org.orbeon.xforms.App
 
 import scala.scalajs.js
@@ -66,7 +65,6 @@ object FormBuilderApp extends App {
     GridWallDnD
     FormSettings
     DialogControlSettings
-    XPathCompletion
 
     BrowserCheck.checkSupportedBrowser()
   }

@@ -420,27 +420,76 @@ class XPathParser(tokens: List[XPathToken]) {
 
     typeOp match {
       case Some(op) =>
-        val typeName = readTypeName()
-        BinaryExpr(lhs, op, VarRef(typeName)) // VarRef or Name as simple node
+        val singleTypeOnly = op == "cast as" || op == "castable as"
+        val typeName = readTypeName(singleTypeOnly = singleTypeOnly)
+        BinaryExpr(lhs, op, TypeLiteral(typeName))
       case None =>
         lhs
     }
   }
 
-  private def readTypeName(): String = {
-    val buf = new java.lang.StringBuilder()
-    var continue = true
-    while (continue && current != EOF && current != RParen && current != RBracket && current != RBrace && current != Comma) {
-      current match {
-        case Name(n) => buf.append(n); advance()
-        case Keyword(k) => buf.append(k); advance()
-        case Question => buf.append("?"); advance()
-        case Plus => buf.append("+"); advance()
-        case Star => buf.append("*"); advance()
-        case LParen => buf.append("("); advance()
-        case RParen => buf.append(")"); advance()
-        case _ => continue = false
+  private def readBalancedTypeParens(buf: java.lang.StringBuilder): Unit =
+    if (current == LParen) {
+      buf.append("(")
+      advance()
+      var depth = 1
+      while (depth > 0 && current != EOF) {
+        current match {
+          case LParen     => buf.append("("); depth += 1; advance()
+          case RParen     => buf.append(")"); depth -= 1; advance()
+          case Comma      => buf.append(", "); advance()
+          case Keyword("as") => buf.append(" as "); advance()
+          case Name(n)    => buf.append(n); advance()
+          case Keyword(k) => buf.append(k); advance()
+          case Question   => buf.append("?"); advance()
+          case Plus       => buf.append("+"); advance()
+          case Star       => buf.append("*"); advance()
+          case other      => buf.append(other.text); advance()
+        }
       }
+    }
+
+  private def readOccurrenceIndicator(buf: java.lang.StringBuilder, singleTypeOnly: Boolean): Unit =
+    current match {
+      case Question                    => buf.append("?"); advance()
+      case Plus if !singleTypeOnly     => buf.append("+"); advance()
+      case Star if !singleTypeOnly     => buf.append("*"); advance()
+      case _                           =>
+    }
+
+  private def readTypeName(singleTypeOnly: Boolean = false): String = {
+    val buf = new java.lang.StringBuilder()
+    current match {
+      case Name("empty-sequence") if !singleTypeOnly && lookAhead() == LParen =>
+        buf.append("empty-sequence")
+        advance()
+        readBalancedTypeParens(buf)
+      case Keyword(k @ ("function" | "map" | "array")) if !singleTypeOnly && lookAhead() == LParen =>
+        buf.append(k)
+        advance()
+        readBalancedTypeParens(buf)
+        if (k == "function" && matchKeyword("as")) {
+          advance()
+          buf.append(" as ").append(readTypeName(singleTypeOnly = false))
+        } else {
+          readOccurrenceIndicator(buf, singleTypeOnly = false)
+        }
+      case LParen if !singleTypeOnly =>
+        readBalancedTypeParens(buf)
+        readOccurrenceIndicator(buf, singleTypeOnly = false)
+      case Name(n) =>
+        buf.append(n)
+        advance()
+        if (!singleTypeOnly && current == LParen)
+          readBalancedTypeParens(buf)
+        readOccurrenceIndicator(buf, singleTypeOnly = singleTypeOnly)
+      case Keyword(k) =>
+        buf.append(k)
+        advance()
+        if (!singleTypeOnly && current == LParen)
+          readBalancedTypeParens(buf)
+        readOccurrenceIndicator(buf, singleTypeOnly = singleTypeOnly)
+      case _ =>
     }
     buf.toString
   }

@@ -43,7 +43,7 @@
         element="
             fr|autosize-textarea,
             xf|textarea[appearance ~= 'xxf:autosize']"
-        xxbl:mode="binding lhha value javascript-lifecycle external-value"
+        xxbl:mode="binding lhha value javascript-lifecycle external-value allow-minimal-label-hint"
         xxbl:label-for="field"
         xxbl:container="span">
 
@@ -95,7 +95,9 @@
                         </xsl:attribute>
                     </xsl:if>
                     <xsl:if test="/*/xf:label/@appearance = 'minimal'">
-                        <xsl:copy-of select="/*/xf:label"/>
+                        <xf:label appearance="minimal" value="xxf:label('fr-autosize-textarea')">
+                            <xsl:copy-of select="/*/xf:label/@mediatype"/>
+                        </xf:label>
                     </xsl:if>
                 </xsl:element>
             </xh:span>

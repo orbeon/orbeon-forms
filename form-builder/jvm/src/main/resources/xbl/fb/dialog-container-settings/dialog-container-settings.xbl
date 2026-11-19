@@ -731,16 +731,16 @@
                                 </xh:tr>
                                 <xh:tr>
                                     <xh:td colspan="2">
-                                        <fb:boolean-or-formula ref="relevant" xpath-completion-updates="{$xpath-completion-updates}">
+                                        <fr:boolean-or-formula ref="relevant" xpath-completion-updates="{$xpath-completion-updates}">
                                             <xf:label ref="$resources/dialog-container-settings/visibility/label"/>
                                             <xf:hint  ref="$resources/dialog-container-settings/visibility/hint"/>
-                                        </fb:boolean-or-formula>
+                                        </fr:boolean-or-formula>
                                     </xh:td>
                                     <xh:td colspan="2">
-                                        <fb:boolean-or-formula ref="readonly" xpath-completion-updates="{$xpath-completion-updates}">
+                                        <fr:boolean-or-formula ref="readonly" xpath-completion-updates="{$xpath-completion-updates}">
                                             <xf:label ref="$resources/dialog-container-settings/readonly/label"/>
                                             <xf:hint  ref="$resources/dialog-container-settings/readonly/hint"/>
-                                        </fb:boolean-or-formula>
+                                        </fr:boolean-or-formula>
                                     </xh:td>
                                 </xh:tr>
                             </fr:grid>
@@ -914,16 +914,16 @@
 
                                     <xh:tr>
                                         <xh:td>
-                                            <fb:boolean-or-formula ref="iteration-relevant" xpath-completion-updates="{$xpath-completion-updates}">
+                                            <fr:boolean-or-formula ref="iteration-relevant" xpath-completion-updates="{$xpath-completion-updates}">
                                                 <xf:label ref="$resources/dialog-container-settings/visibility/label"/>
                                                 <xf:hint  ref="$resources/dialog-container-settings/visibility/hint"/>
-                                            </fb:boolean-or-formula>
+                                            </fr:boolean-or-formula>
                                         </xh:td>
                                         <xh:td>
-                                            <fb:boolean-or-formula ref="iteration-readonly" xpath-completion-updates="{$xpath-completion-updates}">
+                                            <fr:boolean-or-formula ref="iteration-readonly" xpath-completion-updates="{$xpath-completion-updates}">
                                                 <xf:label ref="$resources/dialog-container-settings/readonly/label"/>
                                                 <xf:hint  ref="$resources/dialog-container-settings/readonly/hint"/>
-                                            </fb:boolean-or-formula>
+                                            </fr:boolean-or-formula>
                                         </xh:td>
                                     </xh:tr>
                                 </fr:grid>

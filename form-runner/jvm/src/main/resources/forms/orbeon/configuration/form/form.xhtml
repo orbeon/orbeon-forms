@@ -46,8 +46,8 @@
                 display: flex;
                 align-items: center;
                 gap: 12px;
-                background-color: var(--orbeon-Readonly-Field-Background, #f8f9fa);
-                border: 1px solid var(--orbeon-Field-Border, #dee2e6);
+                background-color: var(--orbeon-control-read-only-background-color);
+                border: 1px solid var(--orbeon-base-border-color);
                 border-radius: 6px;
                 padding: 10px 16px;
                 margin-bottom: 16px;
@@ -109,7 +109,7 @@
             .orbeon .fr-config-category-header {
                 margin: 0 0 12px 0;
                 padding-bottom: 6px;
-                border-bottom: 1px solid var(--orbeon-Field-Border, #e9ecef);
+                border-bottom: 1px solid var(--orbeon-base-border-color);
             }
             .orbeon .fr-config-category-title {
                 margin: 0;
@@ -128,7 +128,7 @@
                 border-radius: 10px;
             }
             /* Hide non-relevant property cells in overrides (e.g. non-profile properties when profiles is set) */
-            .orbeon .fr-config-app-form-overrides-section .fr-grid-css &gt; .fr-grid-body &gt; .fr-grid-td:not(:has(.xforms-control:not(.xforms-disabled))) {
+            .orbeon .fr-config-app-form-overrides-section .fr-grid-css &gt; .fr-grid-body &gt; .fr-grid-td:not(:has(.xforms-control:not(.xforms-disabled):not(.xforms-disabled *))) {
                 display: none !important;
             }
             .orbeon .fr-config-app-form-overrides-section .fr-config-category-tabs {
@@ -149,8 +149,61 @@
                 margin-bottom: 0;
                 opacity: 0.85;
             }
+            .orbeon .fr-grid-td.fr-config-has-override .fr-config-value-control &gt; .xforms-label::after {
+                content: "";
+                display: table;
+                clear: right;
+            }
             .orbeon .fr-grid-td .fr-config-select1 select {
                 width: 100%;
+            }
+            /* CodeMirror JSON Editors */
+            .orbeon .fr-config-code-mirror {
+                display: block;
+            }
+            .orbeon .fr-config-code-mirror .CodeMirror {
+                height: auto;
+                min-height: 96px;
+                font-family: var(--orbeon-code-font-family);
+                font-size: var(--orbeon-code-font-size);
+                background-color: var(--orbeon-control-background-color);
+                color: var(--orbeon-control-color);
+                border: var(--orbeon-control-border-width) var(--orbeon-control-border-style) var(--orbeon-control-border-color);
+                border-radius: var(--orbeon-control-border-radius);
+            }
+            .orbeon .fr-config-code-mirror .CodeMirror-scroll {
+                min-height: 96px;
+                max-height: 260px;
+            }
+            .orbeon .fr-config-code-mirror .CodeMirror-gutters {
+                background-color: var(--orbeon-control-read-only-background-color);
+                border-right: 1px solid var(--orbeon-base-border-color);
+            }
+            .orbeon .fr-config-code-mirror .CodeMirror-linenumber {
+                color: var(--orbeon-hint-color);
+            }
+            .orbeon .fr-config-code-mirror .CodeMirror-cursor {
+                border-left-color: var(--orbeon-control-color);
+            }
+            .orbeon .fr-config-code-mirror .CodeMirror-selected {
+                background-color: var(--orbeon-fb-xpath-selection-background-color);
+            }
+            .orbeon .fr-config-code-mirror.xforms-readonly .CodeMirror {
+                background-color: var(--orbeon-control-read-only-background-color);
+                opacity: 0.75;
+            }
+            .orbeon .fr-config-code-mirror .cm-s-default .cm-property {
+                color: var(--orbeon-fb-xpath-node-test-color);
+            }
+            .orbeon .fr-config-code-mirror .cm-s-default .cm-string {
+                color: var(--orbeon-fb-xpath-string-color);
+            }
+            .orbeon .fr-config-code-mirror .cm-s-default .cm-number {
+                color: var(--orbeon-fb-xpath-number-color);
+            }
+            .orbeon .fr-config-code-mirror .cm-s-default .cm-atom,
+            .orbeon .fr-config-code-mirror .cm-s-default .cm-keyword {
+                color: var(--orbeon-fb-xpath-keyword-color);
             }
             /* Property Name Code Pill in Hints */
             .orbeon .xforms-hint code.fr-config-prop-name {
@@ -159,7 +212,7 @@
                 padding: 1px 5px;
                 font-size: 11px;
                 border-radius: 3px;
-                background-color: rgba(127, 127, 127, 0.12);
+                background-color: var(--orbeon-control-read-only-background-color);
                 color: inherit;
                 opacity: 0.85;
             }
@@ -171,13 +224,13 @@
                 display: block;
                 margin-bottom: 24px;
             }
-            .orbeon .fr-config-filtering .fr-config-category-tabs &gt; .tabs-left &gt; .tab-content &gt; .tab-pane:not(:has(.xbl-fr-grid .xforms-control:not(.xforms-disabled))) {
+            .orbeon .fr-config-filtering .fr-config-category-tabs &gt; .tabs-left &gt; .tab-content &gt; .tab-pane:not(:has(.xbl-fr-grid .xforms-control:not(.xforms-disabled):not(.xforms-disabled *))) {
                 display: none !important;
             }
-            .orbeon .fr-config-filtering .fr-grid-td:not(:has(.xforms-control:not(.xforms-disabled))) {
+            .orbeon .fr-config-filtering .fr-grid-td:not(:has(.xforms-control:not(.xforms-disabled):not(.xforms-disabled *))) {
                 display: none !important;
             }
-            .orbeon .fr-config-filtering .fr-grid-tr:not(:has(.xforms-control:not(.xforms-disabled))) {
+            .orbeon .fr-config-filtering .fr-grid-tr:not(:has(.xforms-control:not(.xforms-disabled):not(.xforms-disabled *))) {
                 display: none !important;
             }
             .orbeon .fr-config-filtering .fr-grid.fr-grid-css &gt; .fr-grid-body &gt; .fr-grid-td {
@@ -231,9 +284,15 @@
                     <xf:bind ref="@value[../@validation = 'xpath2-avt']"                                                       type="xxf:XPath2ValueTemplate" xxf:whitespace="trim"/>
                     <xf:bind ref="@value[../@validation = 'xpath2-or-avt' and starts-with(., '{') and ends-with(., '}')]"      type="xxf:XPath2ValueTemplate" xxf:whitespace="trim"/>
                     <xf:bind ref="@value[../@validation = 'xpath2-or-avt' and not(starts-with(., '{') and ends-with(., '}'))]" type="xxf:XPath2"              xxf:whitespace="trim"/>
+                    <xf:bind ref="@value[local-name(..) = 'warn-when-data-unsafe']"                                            required="string(../@override) = 'true'"/>
                     <xf:bind ref="@value[../@validation = 'non-negative-integer']"                                             constraint=". castable as xs:integer and xs:integer(.) ge 0"/>
+                    <xf:bind ref="@value[../@validation = 'positive-integer']"                                                 constraint=". castable as xs:integer and xs:integer(.) ge 1"/>
+                    <xf:bind ref="@value[../@validation = 'optional-integer-or-unlimited']"                                    xxf:whitespace="trim" constraint="xxf:is-blank() or (. castable as xs:integer and xs:integer(.) ge -1)"/>
+                    <xf:bind ref="@value[../@validation = 'optional-port']"                                                    xxf:whitespace="trim" constraint="xxf:is-blank() or (. castable as xs:integer and xs:integer(.) ge 1 and xs:integer(.) le 65535)"/>
+                    <xf:bind ref="@value[../@validation = 'unit-interval']"                                                    xxf:whitespace="trim" constraint=". castable as xs:decimal and xs:decimal(.) ge 0 and xs:decimal(.) le 1"/>
                     <xf:bind ref="@value[../@validation = 'byte-size-or-percent']"                                             xxf:whitespace="trim" constraint="frf:isValidCacheMaxSizeBytes(.)"/>
                     <xf:bind ref="@value[../@validation = 'duration']"                                                         xxf:whitespace="trim" constraint="frf:isValidCacheDuration(.)"/>
+                    <xf:bind ref="@value[../@validation = 'json']"                                                             xxf:whitespace="trim" constraint="frf:isValidJson(.)"/>
                 </xf:bind>
 
                 <xf:bind
@@ -330,9 +389,19 @@
                         <alerts>
                             <xpath>Invalid XPath expression</xpath>
                             <non-negative-integer>Enter a non-negative integer (0 or greater)</non-negative-integer>
+                            <positive-integer>Enter a positive integer (1 or greater)</positive-integer>
+                            <optional-integer-or-unlimited>Enter an integer (-1 for unlimited, or 0 or greater), or leave blank</optional-integer-or-unlimited>
+                            <port>Enter a valid TCP port (1–65535) or leave blank</port>
+                            <percentage>Enter a percentage between 0% and 100%</percentage>
+                            <json>Invalid JSON syntax</json>
                             <byte-size>Enter a byte size or max-heap percentage (1–100%), e.g. 15%, 256m, 1g, or 0</byte-size>
                             <duration>Enter a duration, e.g. 30m, 2h, 1d, PT30M, or milliseconds</duration>
                         </alerts>
+                        <units>
+                            <ms>ms</ms>
+                            <min>min</min>
+                            <chars>chars</chars>
+                        </units>
                         <system-section>
                             <label>System</label>
                             <console-callout-prefix>Monitor live JVM heap usage, cache hit rates, SIFS disk stores, and compiled static states in the </console-callout-prefix>
@@ -1021,7 +1090,23 @@
                         </toc-position>
                         <toc-modes>
                             <label>Table of Contents Modes</label>
-                            <hint>Space-separated modes in which the TOC is shown &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.modes.*.*&lt;/code&gt;</hint>
+                            <hint>Modes in which the TOC is shown &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.modes.*.*&lt;/code&gt;</hint>
+                            <item>
+                                <label>New</label>
+                                <value>new</value>
+                            </item>
+                            <item>
+                                <label>Edit</label>
+                                <value>edit</value>
+                            </item>
+                            <item>
+                                <label>View</label>
+                                <value>view</value>
+                            </item>
+                            <item>
+                                <label>PDF</label>
+                                <value>pdf</value>
+                            </item>
                         </toc-modes>
                         <messages-appearance>
                             <label>Messages Appearance</label>
@@ -1602,6 +1687,30 @@
                         <home-table-link-to>
                             <label>Forms Admin Table Links</label>
                             <hint>Links shown for each form on the Forms Admin page &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.table.link-to&lt;/code&gt;</hint>
+                            <item>
+                                <label>Default (Summary, then New)</label>
+                                <value>__default__</value>
+                            </item>
+                            <item>
+                                <label>Summary, then New</label>
+                                <value>summary new</value>
+                            </item>
+                            <item>
+                                <label>New, then Summary</label>
+                                <value>new summary</value>
+                            </item>
+                            <item>
+                                <label>Summary only</label>
+                                <value>summary</value>
+                            </item>
+                            <item>
+                                <label>New only</label>
+                                <value>new</value>
+                            </item>
+                            <item>
+                                <label>None</label>
+                                <value/>
+                            </item>
                         </home-table-link-to>
                         <home-search-options-opened-on-load>
                             <label>Open Search Options on Forms Admin Load</label>
@@ -1689,7 +1798,19 @@
                         </import-restrict-to-latest-version>
                         <import-allowed-formats>
                             <label>Allowed Import Formats</label>
-                            <hint>Space-separated list of allowed import formats &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allowed-formats.*.*&lt;/code&gt;</hint>
+                            <hint>Allowed data import formats &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allowed-formats.*.*&lt;/code&gt;</hint>
+                            <item>
+                                <label>Excel (Headings)</label>
+                                <value>excel-headings</value>
+                            </item>
+                            <item>
+                                <label>Excel (Named Ranges)</label>
+                                <value>excel-named-ranges</value>
+                            </item>
+                            <item>
+                                <label>XML Form Structure and Data</label>
+                                <value>xml-form-structure-and-data</value>
+                            </item>
                         </import-allowed-formats>
                         <import-show-app-form-names>
                             <label>Show App/Form Names on Import Page</label>
@@ -1885,7 +2006,7 @@
                         </pdf-long-content-threshold>
                         <pdf-jpeg-compression>
                             <label>PDF JPEG Compression Quality</label>
-                            <hint>JPEG compression quality between 0.0 and 1.0 &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.jpeg.compression&lt;/code&gt;</hint>
+                            <hint>JPEG compression quality percentage from 0% to 100% &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.jpeg.compression&lt;/code&gt;</hint>
                         </pdf-jpeg-compression>
                         <pdf-font-family>
                             <label>Default PDF Font Family</label>
@@ -2448,9 +2569,19 @@
                         <alerts>
                             <xpath>Expression XPath invalide</xpath>
                             <non-negative-integer>Saisissez un entier positif ou nul (0 ou plus)</non-negative-integer>
+                            <positive-integer>Saisissez un entier strictement positif (1 ou plus)</positive-integer>
+                            <optional-integer-or-unlimited>Saisissez un entier (-1 pour illimité, ou 0 ou plus) ou laissez vide</optional-integer-or-unlimited>
+                            <port>Saisissez un port TCP valide (1–65535) ou laissez vide</port>
+                            <percentage>Saisissez un pourcentage compris entre 0 % et 100 %</percentage>
+                            <json>Syntaxe JSON invalide</json>
                             <byte-size>Saisissez une taille en octets ou un pourcentage du tas max (1–100%), ex. 15%, 256m, 1g ou 0</byte-size>
                             <duration>Saisissez une durée, ex. 30m, 2h, 1d, PT30M ou millisecondes</duration>
                         </alerts>
+                        <units>
+                            <ms>ms</ms>
+                            <min>min</min>
+                            <chars>car.</chars>
+                        </units>
                         <system-section>
                             <label>Système</label>
                             <console-callout-prefix>Consultez l'utilisation mémoire JVM, les taux de succès des caches, le stockage disque SIFS et les états statiques compilés dans la </console-callout-prefix>
@@ -3139,7 +3270,23 @@
                         </toc-position>
                         <toc-modes>
                             <label>Modes d'affichage de la table des matières</label>
-                            <hint>Modes séparés par des espaces dans lesquels la table des matières est affichée &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.modes.*.*&lt;/code&gt;</hint>
+                            <hint>Modes dans lesquels la table des matières est affichée &lt;code class="fr-config-prop-name"&gt;oxf.fr.detail.toc.modes.*.*&lt;/code&gt;</hint>
+                            <item>
+                                <label>Nouveau</label>
+                                <value>new</value>
+                            </item>
+                            <item>
+                                <label>Édition</label>
+                                <value>edit</value>
+                            </item>
+                            <item>
+                                <label>Visualisation</label>
+                                <value>view</value>
+                            </item>
+                            <item>
+                                <label>PDF</label>
+                                <value>pdf</value>
+                            </item>
                         </toc-modes>
                         <messages-appearance>
                             <label>Apparence des messages</label>
@@ -3720,6 +3867,30 @@
                         <home-table-link-to>
                             <label>Liens du tableau d'administration des formulaires</label>
                             <hint>Liens affichés pour chaque formulaire sur la page d'administration &lt;code class="fr-config-prop-name"&gt;oxf.fr.home.table.link-to&lt;/code&gt;</hint>
+                            <item>
+                                <label>Par défaut (Sommaire, puis Nouveau)</label>
+                                <value>__default__</value>
+                            </item>
+                            <item>
+                                <label>Sommaire, puis Nouveau</label>
+                                <value>summary new</value>
+                            </item>
+                            <item>
+                                <label>Nouveau, puis Sommaire</label>
+                                <value>new summary</value>
+                            </item>
+                            <item>
+                                <label>Sommaire uniquement</label>
+                                <value>summary</value>
+                            </item>
+                            <item>
+                                <label>Nouveau uniquement</label>
+                                <value>new</value>
+                            </item>
+                            <item>
+                                <label>Aucun</label>
+                                <value/>
+                            </item>
                         </home-table-link-to>
                         <home-search-options-opened-on-load>
                             <label>Ouvrir les options de recherche sur la page d'administration</label>
@@ -3807,7 +3978,19 @@
                         </import-restrict-to-latest-version>
                         <import-allowed-formats>
                             <label>Formats d'import autorisés</label>
-                            <hint>Liste des formats d'import autorisés séparés par des espaces &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allowed-formats.*.*&lt;/code&gt;</hint>
+                            <hint>Formats d'importation de données autorisés &lt;code class="fr-config-prop-name"&gt;oxf.fr.import.allowed-formats.*.*&lt;/code&gt;</hint>
+                            <item>
+                                <label>Excel (En-têtes)</label>
+                                <value>excel-headings</value>
+                            </item>
+                            <item>
+                                <label>Excel (Plages nommées)</label>
+                                <value>excel-named-ranges</value>
+                            </item>
+                            <item>
+                                <label>Structure et données XML du formulaire</label>
+                                <value>xml-form-structure-and-data</value>
+                            </item>
                         </import-allowed-formats>
                         <import-show-app-form-names>
                             <label>Afficher les noms d'application et de formulaire à l'import</label>
@@ -4003,7 +4186,7 @@
                         </pdf-long-content-threshold>
                         <pdf-jpeg-compression>
                             <label>Qualité de compression JPEG PDF</label>
-                            <hint>Qualité de compression JPEG entre 0.0 et 1.0 &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.jpeg.compression&lt;/code&gt;</hint>
+                            <hint>Qualité de compression JPEG en pourcentage de 0 % à 100 % &lt;code class="fr-config-prop-name"&gt;oxf.fr.pdf.jpeg.compression&lt;/code&gt;</hint>
                         </pdf-jpeg-compression>
                         <pdf-font-family>
                             <label>Police PDF par défaut</label>
@@ -4638,10 +4821,10 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="default-language-value-control" ref="default-language/@value" class="fr-config-value-control">
+                                        <fr:language-choice id="default-language-value-control" ref="default-language/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/default-language/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/default-language/hint"/>
-                                        </xf:input>
+                                        </fr:language-choice>
                                     </fr:c>
 
                                     <fr:c x="7" y="1" w="6" class="fr-config-has-override">
@@ -4651,10 +4834,10 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="available-languages-value-control" ref="available-languages/@value" class="fr-config-value-control">
+                                        <fr:language-choice id="available-languages-value-control" ref="available-languages/@value" multiple="true" allow-wildcard="true" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/available-languages/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/available-languages/hint"/>
-                                        </xf:input>
+                                        </fr:language-choice>
                                     </fr:c>
 
                                     <fr:c x="1" y="2" w="6" class="fr-config-has-override">
@@ -4664,10 +4847,10 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="global-available-languages-value-control" ref="global-available-languages/@value" class="fr-config-value-control">
+                                        <fr:language-choice id="global-available-languages-value-control" ref="global-available-languages/@value" multiple="true" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/global-available-languages/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/global-available-languages/hint"/>
-                                        </xf:input>
+                                        </fr:language-choice>
                                     </fr:c>
 
                                     <fr:c x="7" y="2" w="6" class="fr-config-has-override">
@@ -4705,11 +4888,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="cache-documents-size-value-control" ref="cache-documents-size/@value" class="fr-config-value-control">
+                                        <fr:number id="cache-documents-size-value-control" ref="cache-documents-size/@value" digits-after-decimal="0" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/cache-documents-size/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/cache-documents-size/hint"/>
                                             <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
-                                        </xf:input>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="7" y="4" w="6" class="fr-config-has-override">
@@ -4747,11 +4930,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="cache-static-state-size-value-control" ref="cache-static-state-size/@value" class="fr-config-value-control">
+                                        <fr:number id="cache-static-state-size-value-control" ref="cache-static-state-size/@value" digits-after-decimal="0" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/cache-static-state-size/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/cache-static-state-size/hint"/>
                                             <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
-                                        </xf:input>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="1" y="6" w="6" class="fr-config-has-override">
@@ -5125,10 +5308,10 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="custom-css-uri-value-control" ref="custom-css-uri/@value" class="fr-config-value-control">
+                                        <fr:tags-input id="custom-css-uri-value-control" ref="custom-css-uri/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/custom-css-uri/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/custom-css-uri/hint"/>
-                                        </xf:input>
+                                        </fr:tags-input>
                                     </fr:c>
 
                                     <fr:c x="1" y="8" w="6" class="fr-config-has-override">
@@ -5138,10 +5321,10 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="custom-js-uri-value-control" ref="custom-js-uri/@value" class="fr-config-value-control">
+                                        <fr:tags-input id="custom-js-uri-value-control" ref="custom-js-uri/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/custom-js-uri/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/custom-js-uri/hint"/>
-                                        </xf:input>
+                                        </fr:tags-input>
                                     </fr:c>
 
                                     <fr:c x="7" y="8" w="6">
@@ -5270,10 +5453,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="autosave-delay-value-control" ref="autosave-delay/@value" class="fr-config-value-control">
+                                        <fr:number id="autosave-delay-value-control" ref="autosave-delay/@value" digits-after-decimal="0" suffix="ms" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/autosave-delay/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/autosave-delay/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="7" y="2" w="6">
@@ -5403,10 +5587,10 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="toc-min-sections-value-control" ref="toc-min-sections/@value" class="fr-config-value-control">
+                                        <fr:number id="toc-min-sections-value-control" ref="toc-min-sections/@value" digits-after-decimal="0" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/toc-min-sections/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/toc-min-sections/hint"/>
-                                        </xf:input>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="1" y="7" w="6">
@@ -5431,10 +5615,14 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="toc-modes-value-control" ref="toc-modes/@value" class="fr-config-value-control">
+                                        <fr:open-select id="toc-modes-value-control" ref="toc-modes/@value" appearance="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/toc-modes/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/toc-modes/hint"/>
-                                        </xf:input>
+                                            <xf:itemset ref="$form-resources/toc-modes/item">
+                                                <xf:label ref="label"/>
+                                                <xf:value ref="value"/>
+                                            </xf:itemset>
+                                        </fr:open-select>
                                     </fr:c>
 
                                     <fr:c x="1" y="8" w="6">
@@ -5474,10 +5662,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="messages-delay-value-control" ref="messages-delay/@value" class="fr-config-value-control">
+                                        <fr:number id="messages-delay-value-control" ref="messages-delay/@value" digits-after-decimal="0" suffix="ms" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/messages-delay/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/messages-delay/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="7" y="9" w="6">
@@ -5502,10 +5691,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="lease-duration-value-control" ref="lease-duration/@value" class="fr-config-value-control">
+                                        <fr:number id="lease-duration-value-control" ref="lease-duration/@value" digits-after-decimal="0" suffix="min" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/lease-duration/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/lease-duration/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="7" y="10" w="6" class="fr-config-has-override">
@@ -5515,10 +5705,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="lease-renew-threshold-value-control" ref="lease-renew-threshold/@value" class="fr-config-value-control">
+                                        <fr:number id="lease-renew-threshold-value-control" ref="lease-renew-threshold/@value" digits-after-decimal="0" suffix="min" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/lease-renew-threshold/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/lease-renew-threshold/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="1" y="11" w="6" class="fr-config-has-override">
@@ -5528,10 +5719,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="lease-alert-threshold-value-control" ref="lease-alert-threshold/@value" class="fr-config-value-control">
+                                        <fr:number id="lease-alert-threshold-value-control" ref="lease-alert-threshold/@value" digits-after-decimal="0" suffix="min" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/lease-alert-threshold/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/lease-alert-threshold/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="7" y="11" w="6">
@@ -5556,11 +5748,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="warn-when-data-unsafe-value-control" ref="warn-when-data-unsafe/@value" class="fr-config-value-control">
+                                        <fr:boolean-or-formula id="warn-when-data-unsafe-value-control" ref="warn-when-data-unsafe/@value" true-value="true" false-value="false" xpath-completion="false" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/warn-when-data-unsafe/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/warn-when-data-unsafe/hint"/>
                                             <xf:alert ref="$form-resources/alerts/xpath"/>
-                                        </xf:input>
+                                        </fr:boolean-or-formula>
                                     </fr:c>
 
                                     <fr:c x="7" y="12" w="6">
@@ -5684,10 +5876,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="attachment-max-files-per-control-value-control" ref="attachment-max-files-per-control/@value" class="fr-config-value-control">
+                                        <fr:number id="attachment-max-files-per-control-value-control" ref="attachment-max-files-per-control/@value" digits-after-decimal="0" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/attachment-max-files-per-control/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/attachment-max-files-per-control/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/optional-integer-or-unlimited"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="1" y="17" w="6" class="fr-config-has-override">
@@ -5697,10 +5890,10 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="attachment-mediatypes-value-control" ref="attachment-mediatypes/@value" class="fr-config-value-control">
+                                        <fr:tags-input id="attachment-mediatypes-value-control" ref="attachment-mediatypes/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/attachment-mediatypes/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/attachment-mediatypes/hint"/>
-                                        </xf:input>
+                                        </fr:tags-input>
                                     </fr:c>
 
                                     <fr:c x="7" y="17" w="6">
@@ -5941,10 +6134,10 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="formula-allowed-functions-value-control" ref="formula-allowed-functions/@value" class="fr-config-value-control">
+                                        <fr:tags-input id="formula-allowed-functions-value-control" ref="formula-allowed-functions/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/formula-allowed-functions/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/formula-allowed-functions/hint"/>
-                                        </xf:input>
+                                        </fr:tags-input>
                                     </fr:c>
                                 </fr:grid>
                             </fr:tab>
@@ -5972,23 +6165,25 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="landing-page-size-value-control" ref="landing-page-size/@value" class="fr-config-value-control">
+                                        <fr:number id="landing-page-size-value-control" ref="landing-page-size/@value" digits-after-decimal="0" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/landing-page-size/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/landing-page-size/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/positive-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
-                                    <fr:c x="7" y="1" w="6" class="fr-config-has-override">
+                                    <fr:c x="1" y="2" w="12" class="fr-config-has-override">
                                         <fr:checkbox-input id="landing-cards-override-control" ref="landing-cards/@override" class="fr-config-override-checkbox">
                                             <xf:label ref="$form-resources/override/label"/>
                                             <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="landing-cards-value-control" ref="landing-cards/@value" class="fr-config-value-control">
+                                        <fr:code-mirror id="landing-cards-value-control" ref="landing-cards/@value" mediatype="application/json" class="fr-config-value-control fr-config-code-mirror">
                                             <xf:label ref="$form-resources/landing-cards/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/landing-cards/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/json"/>
+                                        </fr:code-mirror>
                                     </fr:c>
                                 </fr:grid>
                             </fr:tab>
@@ -6016,10 +6211,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="summary-page-size-value-control" ref="summary-page-size/@value" class="fr-config-value-control">
+                                        <fr:number id="summary-page-size-value-control" ref="summary-page-size/@value" digits-after-decimal="0" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/summary-page-size/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/summary-page-size/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/positive-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="7" y="1" w="6" class="fr-config-has-override">
@@ -6180,23 +6376,26 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="home-page-size-value-control" ref="home-page-size/@value" class="fr-config-value-control">
+                                        <fr:number id="home-page-size-value-control" ref="home-page-size/@value" digits-after-decimal="0" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/home-page-size/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/home-page-size/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/positive-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
-                                    <fr:c x="7" y="1" w="6" class="fr-config-has-override">
-                                        <fr:checkbox-input id="home-table-link-to-override-control" ref="home-table-link-to/@override" class="fr-config-override-checkbox">
-                                            <xf:label ref="$form-resources/override/label"/>
-                                            <xf:action event="xforms-value-changed" if="string(context()) = 'false'">
-                                                <xf:setvalue ref="../@value" value="../@default"/>
-                                            </xf:action>
-                                        </fr:checkbox-input>
-                                        <xf:input id="home-table-link-to-value-control" ref="home-table-link-to/@value" class="fr-config-value-control">
+                                    <fr:c x="7" y="1" w="6">
+                                        <xf:select1 id="home-table-link-to-value-control" appearance="minimal" ref="home-table-link-to/@selection" class="fr-config-select1">
                                             <xf:label ref="$form-resources/home-table-link-to/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/home-table-link-to/hint"/>
-                                        </xf:input>
+                                            <xf:itemset ref="$form-resources/home-table-link-to/item">
+                                                <xf:label ref="label"/>
+                                                <xf:value ref="value"/>
+                                            </xf:itemset>
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:setvalue ref="../@override" value="if (context() = '__default__') then 'false' else 'true'"/>
+                                                <xf:setvalue ref="../@value"    value="if (context() = '__default__') then ../@default else context()"/>
+                                            </xf:action>
+                                        </xf:select1>
                                     </fr:c>
 
                                     <fr:c x="1" y="2" w="6">
@@ -6221,10 +6420,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:textarea id="home-remote-servers-value-control" ref="home-remote-servers/@value" class="fr-config-value-control">
+                                        <fr:code-mirror id="home-remote-servers-value-control" ref="home-remote-servers/@value" mediatype="application/json" class="fr-config-value-control fr-config-code-mirror">
                                             <xf:label ref="$form-resources/home-remote-servers/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/home-remote-servers/hint"/>
-                                        </xf:textarea>
+                                            <xf:alert ref="$form-resources/alerts/json"/>
+                                        </fr:code-mirror>
                                     </fr:c>
                                 </fr:grid>
                             </fr:tab>
@@ -6312,10 +6512,14 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="import-allowed-formats-value-control" ref="import-allowed-formats/@value" class="fr-config-value-control">
+                                        <fr:box-select id="import-allowed-formats-value-control" ref="import-allowed-formats/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/import-allowed-formats/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/import-allowed-formats/hint"/>
-                                        </xf:input>
+                                            <xf:itemset ref="$form-resources/import-allowed-formats/item">
+                                                <xf:label ref="label"/>
+                                                <xf:value ref="value"/>
+                                            </xf:itemset>
+                                        </fr:box-select>
                                     </fr:c>
 
                                     <fr:c x="7" y="3" w="6">
@@ -6401,11 +6605,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="pdf-filename-value-control" ref="pdf-filename/@value" class="fr-config-value-control">
+                                        <xf:textarea id="pdf-filename-value-control" appearance="xpath-completion" ref="pdf-filename/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/pdf-filename/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/pdf-filename/hint"/>
                                             <xf:alert ref="$form-resources/alerts/xpath"/>
-                                        </xf:input>
+                                        </xf:textarea>
                                     </fr:c>
 
                                     <fr:c x="7" y="2" w="6">
@@ -6505,10 +6709,17 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="pdf-long-content-threshold-value-control" ref="pdf-long-content-threshold/@value" class="fr-config-value-control">
+                                        <fr:number
+                                            id="pdf-long-content-threshold-value-control"
+                                            ref="pdf-long-content-threshold/@value"
+                                            digits-after-decimal="0"
+                                            suffix="{xxf:instance('fr-form-resources')/(resource[@xml:lang = fr:lang()], resource[1])[1]/units/chars}"
+                                            field-width="full"
+                                            class="fr-config-value-control">
                                             <xf:label ref="$form-resources/pdf-long-content-threshold/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/pdf-long-content-threshold/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="1" y="6" w="6" class="fr-config-has-override">
@@ -6518,10 +6729,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="pdf-jpeg-compression-value-control" ref="pdf-jpeg-compression/@value" class="fr-config-value-control">
+                                        <fr:percentage id="pdf-jpeg-compression-value-control" ref="pdf-jpeg-compression/@value" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/pdf-jpeg-compression/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/pdf-jpeg-compression/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/percentage"/>
+                                        </fr:percentage>
                                     </fr:c>
 
                                     <fr:c x="7" y="6" w="6" class="fr-config-has-override">
@@ -6557,10 +6769,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:textarea id="pdf-header-footer-default-value-control" ref="pdf-header-footer-default/@value" class="fr-config-value-control">
+                                        <fr:code-mirror id="pdf-header-footer-default-value-control" ref="pdf-header-footer-default/@value" mediatype="application/json" class="fr-config-value-control fr-config-code-mirror">
                                             <xf:label ref="$form-resources/pdf-header-footer-default/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/pdf-header-footer-default/hint"/>
-                                        </xf:textarea>
+                                            <xf:alert ref="$form-resources/alerts/json"/>
+                                        </fr:code-mirror>
                                     </fr:c>
                                 </fr:grid>
                             </fr:tab>
@@ -6616,10 +6829,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="email-smtp-port-value-control" ref="email-smtp-port/@value" class="fr-config-value-control">
+                                        <fr:number id="email-smtp-port-value-control" ref="email-smtp-port/@value" digits-after-decimal="0" grouping-separator="" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/email-smtp-port/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/email-smtp-port/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/port"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="7" y="2" w="6" class="fr-config-has-override">
@@ -7144,11 +7358,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="format-output-date-value-control" ref="format-output-date/@value" class="fr-config-value-control">
+                                        <xf:textarea id="format-output-date-value-control" appearance="xpath-completion" ref="format-output-date/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/format-output-date/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/format-output-date/hint"/>
                                             <xf:alert ref="$form-resources/alerts/xpath"/>
-                                        </xf:input>
+                                        </xf:textarea>
                                     </fr:c>
 
                                     <fr:c x="7" y="2" w="6" class="fr-config-has-override">
@@ -7158,11 +7372,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="format-output-datetime-value-control" ref="format-output-datetime/@value" class="fr-config-value-control">
+                                        <xf:textarea id="format-output-datetime-value-control" appearance="xpath-completion" ref="format-output-datetime/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/format-output-datetime/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/format-output-datetime/hint"/>
                                             <xf:alert ref="$form-resources/alerts/xpath"/>
-                                        </xf:input>
+                                        </xf:textarea>
                                     </fr:c>
 
                                     <fr:c x="1" y="3" w="6" class="fr-config-has-override">
@@ -7172,11 +7386,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="format-output-time-value-control" ref="format-output-time/@value" class="fr-config-value-control">
+                                        <xf:textarea id="format-output-time-value-control" appearance="xpath-completion" ref="format-output-time/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/format-output-time/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/format-output-time/hint"/>
                                             <xf:alert ref="$form-resources/alerts/xpath"/>
-                                        </xf:input>
+                                        </xf:textarea>
                                     </fr:c>
 
                                     <fr:c x="7" y="3" w="6" class="fr-config-has-override">
@@ -7186,11 +7400,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="format-output-decimal-value-control" ref="format-output-decimal/@value" class="fr-config-value-control">
+                                        <xf:textarea id="format-output-decimal-value-control" appearance="xpath-completion" ref="format-output-decimal/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/format-output-decimal/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/format-output-decimal/hint"/>
                                             <xf:alert ref="$form-resources/alerts/xpath"/>
-                                        </xf:input>
+                                        </xf:textarea>
                                     </fr:c>
 
                                     <fr:c x="1" y="4" w="6" class="fr-config-has-override">
@@ -7200,11 +7414,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="format-output-integer-value-control" ref="format-output-integer/@value" class="fr-config-value-control">
+                                        <xf:textarea id="format-output-integer-value-control" appearance="xpath-completion" ref="format-output-integer/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/format-output-integer/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/format-output-integer/hint"/>
                                             <xf:alert ref="$form-resources/alerts/xpath"/>
-                                        </xf:input>
+                                        </xf:textarea>
                                     </fr:c>
                                 </fr:grid>
                             </fr:tab>
@@ -7247,7 +7461,7 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="auth-user-menu-uri-login-value-control" ref="auth-user-menu-uri-login/@value" class="fr-config-value-control">
+                                        <xf:input id="auth-user-menu-uri-login-value-control" appearance="xpath-completion" avt="true" ref="auth-user-menu-uri-login/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/auth-user-menu-uri-login/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/auth-user-menu-uri-login/hint"/>
                                             <xf:alert ref="$form-resources/alerts/xpath"/>
@@ -7261,7 +7475,7 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="auth-user-menu-uri-logout-value-control" ref="auth-user-menu-uri-logout/@value" class="fr-config-value-control">
+                                        <xf:input id="auth-user-menu-uri-logout-value-control" appearance="xpath-completion" avt="true" ref="auth-user-menu-uri-logout/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/auth-user-menu-uri-logout/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/auth-user-menu-uri-logout/hint"/>
                                             <xf:alert ref="$form-resources/alerts/xpath"/>
@@ -7275,7 +7489,7 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="auth-user-menu-uri-register-value-control" ref="auth-user-menu-uri-register/@value" class="fr-config-value-control">
+                                        <xf:input id="auth-user-menu-uri-register-value-control" appearance="xpath-completion" avt="true" ref="auth-user-menu-uri-register/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/auth-user-menu-uri-register/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/auth-user-menu-uri-register/hint"/>
                                             <xf:alert ref="$form-resources/alerts/xpath"/>
@@ -7289,10 +7503,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:textarea id="permissions-value-control" ref="permissions/@value" class="fr-config-value-control">
+                                        <fr:code-mirror id="permissions-value-control" ref="permissions/@value" mediatype="application/json" class="fr-config-value-control fr-config-code-mirror">
                                             <xf:label ref="$form-resources/permissions/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/permissions/hint"/>
-                                        </xf:textarea>
+                                            <xf:alert ref="$form-resources/alerts/json"/>
+                                        </fr:code-mirror>
                                     </fr:c>
 
                                     <fr:c x="1" y="4" w="6" class="fr-config-has-override">
@@ -7302,10 +7517,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="access-token-validity-value-control" ref="access-token-validity/@value" class="fr-config-value-control">
+                                        <fr:number id="access-token-validity-value-control" ref="access-token-validity/@value" digits-after-decimal="0" suffix="min" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/access-token-validity/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/access-token-validity/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="7" y="4" w="6" class="fr-config-has-override">
@@ -7315,10 +7531,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input id="state-token-validity-value-control" ref="state-token-validity/@value" class="fr-config-value-control">
+                                        <fr:number id="state-token-validity-value-control" ref="state-token-validity/@value" digits-after-decimal="0" suffix="min" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/state-token-validity/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/state-token-validity/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
                                     </fr:c>
                                 </fr:grid>
                             </fr:tab>
@@ -7385,10 +7602,10 @@
                                     </xf:input>
                                 </fr:c>
                                 <fr:c x="9" y="1" w="4">
-                                    <xf:input ref="@profiles">
+                                    <fr:tags-input ref="@profiles" validation-type="pattern" pattern="^[A-Za-z0-9._\-:]+$">
                                         <xf:label ref="$form-resources/app-form-overrides-section/profiles"/>
                                         <xf:hint ref="$form-resources/app-form-overrides-section/profiles-hint"/>
-                                    </xf:input>
+                                    </fr:tags-input>
                                 </fr:c>
                             </fr:grid>
 
@@ -7416,10 +7633,10 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="default-language/@value" class="fr-config-value-control">
+                                        <fr:language-choice ref="default-language/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/default-language/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/default-language/hint"/>
-                                        </xf:input>
+                                        </fr:language-choice>
                                     </fr:c>
 
                                     <fr:c x="7" y="1" w="6" class="fr-config-has-override">
@@ -7429,10 +7646,10 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="available-languages/@value" class="fr-config-value-control">
+                                        <fr:language-choice ref="available-languages/@value" multiple="true" allow-wildcard="true" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/available-languages/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/available-languages/hint"/>
-                                        </xf:input>
+                                        </fr:language-choice>
                                     </fr:c>
                                 </fr:grid>
                             </fr:tab>
@@ -7729,10 +7946,10 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="custom-css-uri/@value" class="fr-config-value-control">
+                                        <fr:tags-input ref="custom-css-uri/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/custom-css-uri/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/custom-css-uri/hint"/>
-                                        </xf:input>
+                                        </fr:tags-input>
                                     </fr:c>
 
                                     <fr:c x="1" y="8" w="6" class="fr-config-has-override">
@@ -7742,10 +7959,10 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="custom-js-uri/@value" class="fr-config-value-control">
+                                        <fr:tags-input ref="custom-js-uri/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/custom-js-uri/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/custom-js-uri/hint"/>
-                                        </xf:input>
+                                        </fr:tags-input>
                                     </fr:c>
 
                                     <fr:c x="7" y="8" w="6">
@@ -7874,10 +8091,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="autosave-delay/@value" class="fr-config-value-control">
+                                        <fr:number ref="autosave-delay/@value" digits-after-decimal="0" suffix="ms" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/autosave-delay/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/autosave-delay/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="7" y="2" w="6">
@@ -8007,10 +8225,10 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="toc-min-sections/@value" class="fr-config-value-control">
+                                        <fr:number ref="toc-min-sections/@value" digits-after-decimal="0" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/toc-min-sections/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/toc-min-sections/hint"/>
-                                        </xf:input>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="1" y="7" w="6">
@@ -8035,10 +8253,14 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="toc-modes/@value" class="fr-config-value-control">
+                                        <fr:open-select ref="toc-modes/@value" appearance="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/toc-modes/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/toc-modes/hint"/>
-                                        </xf:input>
+                                            <xf:itemset ref="$form-resources/toc-modes/item">
+                                                <xf:label ref="label"/>
+                                                <xf:value ref="value"/>
+                                            </xf:itemset>
+                                        </fr:open-select>
                                     </fr:c>
 
                                     <fr:c x="1" y="8" w="6">
@@ -8078,10 +8300,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="messages-delay/@value" class="fr-config-value-control">
+                                        <fr:number ref="messages-delay/@value" digits-after-decimal="0" suffix="ms" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/messages-delay/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/messages-delay/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="7" y="9" w="6">
@@ -8106,10 +8329,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="lease-duration/@value" class="fr-config-value-control">
+                                        <fr:number ref="lease-duration/@value" digits-after-decimal="0" suffix="min" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/lease-duration/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/lease-duration/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="7" y="10" w="6" class="fr-config-has-override">
@@ -8119,10 +8343,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="lease-renew-threshold/@value" class="fr-config-value-control">
+                                        <fr:number ref="lease-renew-threshold/@value" digits-after-decimal="0" suffix="min" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/lease-renew-threshold/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/lease-renew-threshold/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="1" y="11" w="6" class="fr-config-has-override">
@@ -8132,10 +8357,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="lease-alert-threshold/@value" class="fr-config-value-control">
+                                        <fr:number ref="lease-alert-threshold/@value" digits-after-decimal="0" suffix="min" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/lease-alert-threshold/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/lease-alert-threshold/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="7" y="11" w="6">
@@ -8160,11 +8386,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="warn-when-data-unsafe/@value" class="fr-config-value-control">
+                                        <fr:boolean-or-formula ref="warn-when-data-unsafe/@value" true-value="true" false-value="false" xpath-completion="false" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/warn-when-data-unsafe/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/warn-when-data-unsafe/hint"/>
                                             <xf:alert ref="$form-resources/alerts/xpath"/>
-                                        </xf:input>
+                                        </fr:boolean-or-formula>
                                     </fr:c>
 
                                     <fr:c x="7" y="12" w="6">
@@ -8288,10 +8514,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="attachment-max-files-per-control/@value" class="fr-config-value-control">
+                                        <fr:number ref="attachment-max-files-per-control/@value" digits-after-decimal="0" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/attachment-max-files-per-control/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/attachment-max-files-per-control/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/optional-integer-or-unlimited"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="1" y="17" w="6" class="fr-config-has-override">
@@ -8301,10 +8528,10 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="attachment-mediatypes/@value" class="fr-config-value-control">
+                                        <fr:tags-input ref="attachment-mediatypes/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/attachment-mediatypes/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/attachment-mediatypes/hint"/>
-                                        </xf:input>
+                                        </fr:tags-input>
                                     </fr:c>
 
                                     <fr:c x="7" y="17" w="6">
@@ -8515,10 +8742,10 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="formula-allowed-functions/@value" class="fr-config-value-control">
+                                        <fr:tags-input ref="formula-allowed-functions/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/formula-allowed-functions/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/formula-allowed-functions/hint"/>
-                                        </xf:input>
+                                        </fr:tags-input>
                                     </fr:c>
                                 </fr:grid>
                             </fr:tab>
@@ -8546,10 +8773,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="summary-page-size/@value" class="fr-config-value-control">
+                                        <fr:number ref="summary-page-size/@value" digits-after-decimal="0" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/summary-page-size/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/summary-page-size/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/positive-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="7" y="1" w="6" class="fr-config-has-override">
@@ -8770,10 +8998,14 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="import-allowed-formats/@value" class="fr-config-value-control">
+                                        <fr:box-select ref="import-allowed-formats/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/import-allowed-formats/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/import-allowed-formats/hint"/>
-                                        </xf:input>
+                                            <xf:itemset ref="$form-resources/import-allowed-formats/item">
+                                                <xf:label ref="label"/>
+                                                <xf:value ref="value"/>
+                                            </xf:itemset>
+                                        </fr:box-select>
                                     </fr:c>
 
                                     <fr:c x="7" y="3" w="6">
@@ -8859,11 +9091,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="pdf-filename/@value" class="fr-config-value-control">
+                                        <xf:textarea appearance="xpath-completion" ref="pdf-filename/@value" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/pdf-filename/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/pdf-filename/hint"/>
                                             <xf:alert ref="$form-resources/alerts/xpath"/>
-                                        </xf:input>
+                                        </xf:textarea>
                                     </fr:c>
 
                                     <fr:c x="7" y="2" w="6">
@@ -8933,10 +9165,16 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="pdf-long-content-threshold/@value" class="fr-config-value-control">
+                                        <fr:number
+                                            ref="pdf-long-content-threshold/@value"
+                                            digits-after-decimal="0"
+                                            suffix="{xxf:instance('fr-form-resources')/(resource[@xml:lang = fr:lang()], resource[1])[1]/units/chars}"
+                                            field-width="full"
+                                            class="fr-config-value-control">
                                             <xf:label ref="$form-resources/pdf-long-content-threshold/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/pdf-long-content-threshold/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="1" y="5" w="12" class="fr-config-has-override">
@@ -8946,10 +9184,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:textarea ref="pdf-header-footer-default/@value" class="fr-config-value-control">
+                                        <fr:code-mirror ref="pdf-header-footer-default/@value" mediatype="application/json" class="fr-config-value-control fr-config-code-mirror">
                                             <xf:label ref="$form-resources/pdf-header-footer-default/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/pdf-header-footer-default/hint"/>
-                                        </xf:textarea>
+                                            <xf:alert ref="$form-resources/alerts/json"/>
+                                        </fr:code-mirror>
                                     </fr:c>
                                 </fr:grid>
                             </fr:tab>
@@ -9005,10 +9244,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="email-smtp-port/@value" class="fr-config-value-control">
+                                        <fr:number ref="email-smtp-port/@value" digits-after-decimal="0" grouping-separator="" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/email-smtp-port/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/email-smtp-port/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/port"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="7" y="2" w="6" class="fr-config-has-override">
@@ -9267,10 +9507,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:textarea ref="permissions/@value" class="fr-config-value-control">
+                                        <fr:code-mirror ref="permissions/@value" mediatype="application/json" class="fr-config-value-control fr-config-code-mirror">
                                             <xf:label ref="$form-resources/permissions/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/permissions/hint"/>
-                                        </xf:textarea>
+                                            <xf:alert ref="$form-resources/alerts/json"/>
+                                        </fr:code-mirror>
                                     </fr:c>
 
                                     <fr:c x="1" y="2" w="6" class="fr-config-has-override">
@@ -9280,10 +9521,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="access-token-validity/@value" class="fr-config-value-control">
+                                        <fr:number ref="access-token-validity/@value" digits-after-decimal="0" suffix="min" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/access-token-validity/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/access-token-validity/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
                                     </fr:c>
 
                                     <fr:c x="7" y="2" w="6" class="fr-config-has-override">
@@ -9293,10 +9535,11 @@
                                                 <xf:setvalue ref="../@value" value="../@default"/>
                                             </xf:action>
                                         </fr:checkbox-input>
-                                        <xf:input ref="state-token-validity/@value" class="fr-config-value-control">
+                                        <fr:number ref="state-token-validity/@value" digits-after-decimal="0" suffix="min" field-width="full" class="fr-config-value-control">
                                             <xf:label ref="$form-resources/state-token-validity/label"/>
                                             <xf:hint mediatype="text/html" ref="$form-resources/state-token-validity/hint"/>
-                                        </xf:input>
+                                            <xf:alert ref="$form-resources/alerts/non-negative-integer"/>
+                                        </fr:number>
                                     </fr:c>
                                 </fr:grid>
                             </fr:tab>
@@ -9381,10 +9624,10 @@
                                 </xf:textarea>
                             </fr:c>
                             <fr:c x="11" y="1" w="2">
-                                <xf:input id="custom-property-profiles-control" ref="@profiles">
+                                <fr:tags-input id="custom-property-profiles-control" ref="@profiles" validation-type="pattern" pattern="^[A-Za-z0-9._\-:]+$">
                                     <xf:label ref="$form-resources/custom-properties-section/profiles"/>
                                     <xf:hint ref="$form-resources/custom-properties-section/profiles-hint"/>
-                                </xf:input>
+                                </fr:tags-input>
                             </fr:c>
                         </fr:grid>
                     </fr:tab>

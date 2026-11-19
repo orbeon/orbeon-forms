@@ -36,29 +36,12 @@
                 <fr:grid>
                     <xh:tr>
                         <xh:td>
-                            <xf:var
-                                name="languages"
-                                model="fr-resources-model"
-                                value="instance('fr-languages-instance')/language[not(@exclude = 'true')]"/>
-
-                            <xf:select1 ref="$variables/new-language" id="fb-add-language-select1" appearance="search">
+                            <fr:language-choice
+                                id="fb-add-language-select1"
+                                ref="$variables/new-language"
+                                exclude-languages-ref="$resources/resource/@xml:lang">
                                 <xf:label ref="$form-resources/dialog-add-language/new-language/label"/>
-                                <!-- All the languages except the languages already selected -->
-                                <xf:choices>
-                                    <xf:label ref="$form-resources/dialog-add-language/common"/>
-                                    <xf:itemset ref="xxf:sort($languages[@top = 'true' and not(@code = $resources/resource/@xml:lang)], @english-name, 'text', 'ascending')">
-                                        <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
-                                        <xf:value ref="@code"/>
-                                    </xf:itemset>
-                                </xf:choices>
-                                <xf:choices>
-                                    <xf:label ref="$form-resources/dialog-add-language/all"/>
-                                    <xf:itemset ref="$languages[not(@top = 'true') and not(@code = $resources/resource/@xml:lang)]">
-                                        <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
-                                        <xf:value ref="@code"/>
-                                    </xf:itemset>
-                                </xf:choices>
-                            </xf:select1>
+                            </fr:language-choice>
                         </xh:td>
                     </xh:tr>
                 </fr:grid>

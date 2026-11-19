@@ -34,6 +34,7 @@ import scala.scalajs.js.JSConverters.*
 
 object Select1Search {
   XFormsXbl.declareCompanion(name = "fr|dropdown-select1-search" , js.constructorOf[Select1SearchCompanion])
+  XFormsXbl.declareCompanion(name = "fr|dropdown-select-search"  , js.constructorOf[Select1SearchCompanion])
   XFormsXbl.declareCompanion(name = "fr|databound-select1-search", js.constructorOf[Select1SearchCompanion])
   XFormsXbl.declareCompanion(name = "fr|databound-select-search" , js.constructorOf[Select1SearchCompanion])
 
@@ -359,6 +360,23 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         jSelect.asInstanceOf[js.Dynamic].on("select2:close",   ((_: js.Any, _: JQueryEvent) => DomSupport.dispatchChange(select)): js.Function2[js.Any, JQueryEvent, Unit])
         jSelect.asInstanceOf[js.Dynamic].on("select2:open",    ((_: js.Any, _: JQueryEvent) => onOpen())                         : js.Function2[js.Any, JQueryEvent, Unit])
         jSelect.asInstanceOf[js.Dynamic].on("results:focus",   ((_: js.Any, e: JQueryEvent) => onResultsFocus(e))                : js.Function2[js.Any, JQueryEvent, Unit])
+        if (isMultiple) {
+          var unselecting = false
+          jSelect.asInstanceOf[js.Dynamic].on("select2:unselecting", ((_: JQueryEvent) => {
+            unselecting = true
+          }): js.Function1[JQueryEvent, Unit])
+          jSelect.asInstanceOf[js.Dynamic].on("select2:opening", ((e: JQueryEvent) => {
+            if (unselecting) {
+              unselecting = false
+              e.preventDefault()
+            }
+          }): js.Function1[JQueryEvent, Unit])
+          jSelect.asInstanceOf[js.Dynamic].on("select2:unselect", ((_: JQueryEvent) => {
+            if (isDatabound)
+              onChangeDispatchFrChange()
+            DomSupport.dispatchChange(select)
+          }): js.Function1[JQueryEvent, Unit])
+        }
 
         // Add `aria-labelledby` pointing to the label, `aria-describedby` pointing to the help and hint
         val comboboxElement = containerElem.querySelector(".select2-selection")
@@ -564,7 +582,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   // For the non-databound case, when the value of the underlying dropdown changed, typically because it set based
   // on that the server tells the client, tell the Select2 component that the value has changed
   private def onXFormsSelect1ValueChange(event: ValueChangeInternalEvent): Unit =
-    if (containerElem.querySelector(".xforms-select1") == event.control)
+    if (containerElem.querySelector(".xforms-select1, .xforms-select") == event.control)
       $(containerElem).find("select").trigger("change")
 
   private def onOpen(): Unit = {

@@ -152,13 +152,12 @@
                         <xh:td colspan="2">
                             <xf:var name="formula-prefix">{if (</xf:var>
                             <xf:var name="formula-suffix">) then 'open' else ''}</xf:var>
-                            <fb:boolean-or-formula
+                            <fr:boolean-or-formula
                                 ref="xf:element('_',
                                     if      (empty($control/@fb:selection))   then 'false()'
                                     else if ($control/@fb:selection = 'open') then 'true()'
                                     else substring-before(substring-after($control/@fb:selection, $formula-prefix), $formula-suffix)
                                 )"
-                                resources-ref="frf:currentFormResources()"
                                 id="fb-open-selection">
 
                                 <xf:label ref="xxf:r('dialog-control-settings.open-selection.label', '|fr-form-resources|')"/>
@@ -183,7 +182,7 @@
                                         <xf:delete ref="$control/@auto-select-unique-choice"/>
                                     </xf:action>
                                 </xf:action>
-                            </fb:boolean-or-formula>
+                            </fr:boolean-or-formula>
                         </xh:td>
                     </xh:tr>
                     <xh:tr>

@@ -13,6 +13,7 @@ object XPathAst {
   case class DecimalLiteral(raw: String) extends Expr
   case class DoubleLiteral(raw: String) extends Expr
   case class VarRef(name: String) extends Expr
+  case class TypeLiteral(typeName: String) extends Expr
   case object ContextItem extends Expr
   case class SequenceExpr(items: List[Expr]) extends Expr // (expr, expr, ...) or ()
 

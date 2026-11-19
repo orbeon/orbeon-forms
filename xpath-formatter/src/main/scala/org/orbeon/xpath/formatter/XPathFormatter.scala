@@ -69,6 +69,9 @@ class XPathFormatter(val options: XPathFormatterOptions = XPathFormatterOptions.
     case VarRef(name) =>
       List(vr(name))
 
+    case TypeLiteral(typeName) =>
+      List(nt(typeName))
+
     case StringLiteral(value, raw, delim) =>
       List(str(formatStringLiteral(value, raw, delim)))
 

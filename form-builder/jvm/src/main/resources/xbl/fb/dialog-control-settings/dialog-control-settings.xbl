@@ -1538,7 +1538,7 @@
                         </xf:select1>
                     </xsl:variable>
 
-                    <fb:language-choice ref="$li/lang"/>
+                    <fr:language-choice ref="$li/lang" languages-ref="frf:allLangs(fbf:resourcesRoot())" appearance="bootstrap"/>
 
                     <fr:tabbable id="fb-tabbable">
                         <fr:tab id="base-tab">
@@ -1585,13 +1585,13 @@
                                         </xh:tr>
                                         <xh:tr>
                                             <xh:td>
-                                                <fb:boolean-or-formula
+                                                <fr:boolean-or-formula
                                                     id="fb-required-control"
                                                     ref="$i/validations/validation[@type = 'required']/required"
                                                     xpath-completion-updates="{{$xpath-completion-updates}}">
                                                     <xf:label ref="$resources/dialog-control-settings/required/label"/>
                                                     <xf:hint  ref="$resources/dialog-control-settings/required/hint"/>
-                                                </fb:boolean-or-formula>
+                                                </fr:boolean-or-formula>
                                             </xh:td>
                                         </xh:tr>
                                         <xh:tr>
@@ -1878,7 +1878,7 @@
                                             value="@type"/>
 
                                         <xf:group ref=".[$validation-type = 'required']/required">
-                                            <fb:boolean-or-formula
+                                            <fr:boolean-or-formula
                                                 xpath-completion-updates="{{$xpath-completion-updates}}"
                                                 ref="."/>
                                         </xf:group>
@@ -2136,18 +2136,18 @@
                                 </xh:tr>
                                 <xh:tr>
                                     <xh:td>
-                                        <fb:boolean-or-formula id="fb-relevant-control" ref="relevant" xpath-completion-updates="{{$xpath-completion-updates}}">
+                                        <fr:boolean-or-formula id="fb-relevant-control" ref="relevant" xpath-completion-updates="{{$xpath-completion-updates}}">
                                             <xf:label ref="$resources/dialog-control-settings/visibility/label"/>
                                             <xf:hint  ref="$resources/dialog-control-settings/visibility/hint"/>
                                             <xf:help  ref="$resources/dialog-control-settings/visibility/help" mediatype="text/html"/>
-                                        </fb:boolean-or-formula>
+                                        </fr:boolean-or-formula>
                                     </xh:td>
                                     <xh:td>
-                                        <fb:boolean-or-formula id="fb-readonly-control" ref="readonly" xpath-completion-updates="{{$xpath-completion-updates}}">
+                                        <fr:boolean-or-formula id="fb-readonly-control" ref="readonly" xpath-completion-updates="{{$xpath-completion-updates}}">
                                             <xf:label ref="$resources/dialog-control-settings/readonly/label"/>
                                             <xf:hint  ref="$resources/dialog-control-settings/readonly/hint"/>
                                             <xf:help  ref="$resources/dialog-control-settings/readonly/help" mediatype="text/html"/>
-                                        </fb:boolean-or-formula>
+                                        </fr:boolean-or-formula>
                                     </xh:td>
                                 </xh:tr>
                             </fr:grid>

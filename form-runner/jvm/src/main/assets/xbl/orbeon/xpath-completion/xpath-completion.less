@@ -1,48 +1,46 @@
-@import (reference) "../../../../../../../form-runner/jvm/src/main/assets/apps/fr/style/form-runner-common";
+@import (reference) "../../../apps/fr/style/form-runner-common";
 
 .orbeon {
-  .xbl-fb-xpath-completion {
+  .xbl-fr-xpath-completion {
     display: contents;
 
     &.xforms-readonly {
-      .fb-xpath-completion-format-button {
+      & > .fr-xpath-completion-wrapper > .fr-xpath-completion-buttons > .fr-xpath-completion-format-button {
         display: none;
       }
 
-      & > .fb-xpath-completion-wrapper.fb-xpath-completion-empty {
-        .fb-xpath-completion-expand-button {
-          display: none;
-        }
+      & > .fr-xpath-completion-wrapper.fr-xpath-completion-empty > .fr-xpath-completion-buttons > .fr-xpath-completion-expand-button {
+        display: none;
       }
 
-      & > .fb-xpath-completion-wrapper.fb-xpath-completion-expanded {
+      & > .fr-xpath-completion-wrapper {
         background-color: var(--orbeon-control-read-only-background-color);
       }
     }
 
     &.xforms-disabled {
-      .fb-xpath-completion-buttons {
+      & > .fr-xpath-completion-wrapper {
         display: none;
       }
     }
 
-    & > .fb-xpath-completion-wrapper {
+    & > .fr-xpath-completion-wrapper {
       position: relative;
-      display: inline-block;
+      display: block;
       width: 100%;
+      background-color: var(--orbeon-control-background-color);
+      border-radius: var(--orbeon-control-border-radius);
 
       &[data-avt = "true"] {
-        .fb-xpath-completion-format-button {
+        .fr-xpath-completion-format-button {
           display: none;
         }
       }
 
-      &.fb-xpath-completion-expanded {
+      &.fr-xpath-completion-expanded {
         position: fixed;
         z-index: 1050;
-        background-color: var(--orbeon-control-background-color);
-        border-radius: var(--orbeon-control-border-radius);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        box-shadow: var(--orbeon-fb-xpath-expanded-box-shadow);
 
         text-expander {
           width: 100%;
@@ -66,7 +64,7 @@
         }
       }
 
-      & > .fb-xpath-completion-buttons {
+      & > .fr-xpath-completion-buttons {
         position: absolute;
         top: 6px;
         right: 8px;
@@ -100,13 +98,13 @@
             outline: none;
           }
 
-          &.fb-xpath-format-error {
+          &.fr-xpath-format-error {
             color: var(--orbeon-error-color) !important;
             border-color: var(--orbeon-error-color) !important;
             opacity: 1 !important;
           }
 
-          &.fb-xpath-copy-success {
+          &.fr-xpath-copy-success {
             color: var(--orbeon-button-success-background-color) !important;
             border-color: var(--orbeon-button-success-background-color) !important;
             opacity: 1 !important;
@@ -114,12 +112,12 @@
         }
       }
 
-      &:hover > .fb-xpath-completion-buttons > button,
-      &:focus-within > .fb-xpath-completion-buttons > button {
+      &:hover > .fr-xpath-completion-buttons > button,
+      &:focus-within > .fr-xpath-completion-buttons > button {
         opacity: 0.8;
       }
 
-      & > .fb-xpath-completion-backdrop {
+      & > .fr-xpath-completion-backdrop {
         position: absolute;
         top: 0;
         left: 0;
@@ -130,7 +128,7 @@
         z-index: 1;
         box-sizing: border-box;
 
-        .fb-xpath-completion-highlights {
+        .fr-xpath-completion-highlights {
           box-sizing: border-box;
           border: none !important;
           margin: 0;
@@ -151,6 +149,10 @@
         z-index: 2;
         display: block;
 
+        .xforms-input, .xforms-textarea {
+          display: block;
+        }
+
         input-style-clone {
           // Fix black rectangle under text field using text-expander-element after completion
           border: none !important;
@@ -158,6 +160,10 @@
 
         input, textarea {
           position: relative;
+          display: block;
+          width: 100%;
+          margin: 0;
+          box-sizing: border-box;
           background: transparent !important;
           color: transparent !important;
           caret-color: var(--orbeon-base-color);

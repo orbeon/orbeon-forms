@@ -95,4 +95,13 @@ trait FormRunnerPlatformJVM extends FormRunnerPlatform {
     encryptedPrivateModeMetadataOpt
       .flatMap(FormRunnerExternalMode.decryptPrivateModeMetadata(_).toOption)
       .flatMap(_.authorizedOperations)
+
+  private lazy val controlNameCompletionsProviderOpt: Option[ControlNameCompletionsProvider] = {
+    import scala.jdk.CollectionConverters.*
+    java.util.ServiceLoader.load(classOf[ControlNameCompletionsProvider], getClass.getClassLoader).iterator().asScala.nextOption()
+  }
+
+  //@XPathFunction
+  def controlNameCompletionsJson(text: String, limit: Int, updates: String): String =
+    controlNameCompletionsProviderOpt.map(_.controlNameCompletionsJson(text, limit, updates)).getOrElse("[]")
 }

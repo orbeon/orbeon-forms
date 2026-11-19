@@ -22,8 +22,8 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
-import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
+import org.orbeon.oxf.xforms.control.controls.{XFormsSelect1Control, XFormsSelectControl}
+import org.orbeon.oxf.xforms.control.{XFormsSingleNodeControl, XFormsValueComponentControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.state.{XFormsDocumentCache, XFormsStaticStateCache}
 import org.orbeon.oxf.xml.dom.IOSupport
@@ -257,6 +257,26 @@ class ConfigurationPropertiesTest
       assert(byName("oxf.fr.resource.acme.order.fr.buttons.save-final").getValue == "Enregistrer la commande")
       assert(byName("oxf.fr.resource.acme.order.fr.xbl.fr:attachment.empty").getValue == "Aucun fichier joint")
     }
+
+    it("must validate JSON strings via isValidJson and normalize home-table-link-to selection whitespace") {
+      assert(FormRunnerConfiguration.isValidJson(""))
+      assert(FormRunnerConfiguration.isValidJson("   "))
+      assert(FormRunnerConfiguration.isValidJson("""{"apps": []}"""))
+      assert(FormRunnerConfiguration.isValidJson("""[{"label": "Prod", "url": "https://example.org/fr"}]"""))
+      assert(! FormRunnerConfiguration.isValidJson("{bad json"))
+      assert(! FormRunnerConfiguration.isValidJson("[1, 2,]"))
+
+      val propsDoc =
+        IOSupport.readOrbeonDom(
+          """<properties xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            |    <property as="xs:string" name="oxf.fr.home.table.link-to" value="  new   summary "/>
+            |</properties>""".stripMargin
+        )
+      val configDoc = FormRunnerConfiguration.propertiesDomToConfigurationDom(propsDoc)
+      val linkToElem = configDoc.getRootElement.element("curated").element("admin").element("home-table-link-to")
+      assert(linkToElem.attributeValue("override") == "true")
+      assert(linkToElem.attributeValue("selection") == "new summary")
+    }
   }
 
   describe("PersistencePropertyProvider and built-in orbeon/configuration form") {
@@ -292,13 +312,104 @@ class ConfigurationPropertiesTest
             setControlValueWithEventSearchNested(overrideSelectControl.effectiveId, encodedTrue)
             assert(! valueControl.isReadonly)
 
-            // Set the value control to "fr" via client event
+            // Set the value control to "fr" via client event (exercises <fr:language-choice> single-select)
             setControlValueWithEventSearchNested(valueControl.effectiveId, "fr")
 
-            // Test XPath 2.0 validation on pdf-filename-value-control
+            // Test <fr:language-choice multiple="true" allow-wildcard="true"> on available-languages-value-control
+            val availLangOverride       = resolveObject[XFormsSingleNodeControl]("available-languages-override-control").get
+            val availLangOverrideSelect = ControlsIterator(availLangOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val availLangValue          = resolveObject[XFormsValueControl]("available-languages-value-control").get
+
+            assert(availLangValue.getValue(EventCollector.Throw) == "*")
+            setControlValueWithEventSearchNested(availLangOverrideSelect.effectiveId, encodedTrue)
+            // Switch mode radio inside fr:language-choice from '*' ('all') to 'specific', then select multiple languages
+            val availModeSelect = ControlsIterator(availLangValue, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val specificItem    = availModeSelect.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).find(_._2 == Left("")).get._1
+            setControlValueWithEventSearchNested(availModeSelect.effectiveId, specificItem.externalValue(availModeSelect.mustEncodeValues))
+            val availMultiSelect = ControlsIterator(availLangValue, includeSelf = false).collectFirst { case c: XFormsSelectControl => c }.get
+            setControlValueWithEventSearchNested(availMultiSelect.effectiveId, "en fr es")
+            assert(availLangValue.getValue(EventCollector.Throw) == "en fr es")
+
+            // Test <fr:language-choice multiple="true"> on global-available-languages-value-control
+            val globalAvailOverride       = resolveObject[XFormsSingleNodeControl]("global-available-languages-override-control").get
+            val globalAvailOverrideSelect = ControlsIterator(globalAvailOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val globalAvailValue          = resolveObject[XFormsValueControl]("global-available-languages-value-control").get
+
+            setControlValueWithEventSearchNested(globalAvailOverrideSelect.effectiveId, encodedTrue)
+            val globalAvailMultiSelect = ControlsIterator(globalAvailValue, includeSelf = false).collectFirst { case c: XFormsSelectControl => c }.get
+            setControlValueWithEventSearchNested(globalAvailMultiSelect.effectiveId, "en fr de")
+            assert(globalAvailValue.getValue(EventCollector.Throw) == "en fr de")
+
+            // Test <fr:percentage> on pdf-jpeg-compression-value-control (0.9 <-> 90%, unit-interval validation)
+            def numberExternalValue(editValue: String): String =
+              s"""{"displayValue":"","editValue":"$editValue","decimalSeparator":"."}"""
+
+            val jpegOverride       = resolveObject[XFormsSingleNodeControl]("pdf-jpeg-compression-override-control").get
+            val jpegOverrideSelect = ControlsIterator(jpegOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val jpegValue          = resolveObject[XFormsValueControl]("pdf-jpeg-compression-value-control").get
+
+            assert(jpegValue.getExternalValue(EventCollector.Throw) == """{"displayValue":"90","editValue":"90","decimalSeparator":"."}""")
+            assert(jpegValue.getFormattedValue(EventCollector.Throw).contains("90 %"))
+            setControlValueWithEventSearchNested(jpegOverrideSelect.effectiveId, encodedTrue)
+            setControlValueWithEventSearchNested(jpegValue.effectiveId, numberExternalValue("150"))
+            assert(jpegValue.getValue(EventCollector.Throw) == "1.5")
+            assert(! jpegValue.isValid)
+            setControlValueWithEventSearchNested(jpegValue.effectiveId, numberExternalValue("85"))
+            assert(jpegValue.getValue(EventCollector.Throw) == "0.85")
+            assert(jpegValue.isValid)
+
+            // Test <xf:select1> enum dropdown on home-table-link-to-value-control
+            val homeLinksSelect = resolveObject[XFormsSelect1Control]("home-table-link-to-value-control").get
+            val newSummaryItem  = homeLinksSelect.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).find(_._2 == Left("new summary")).get._1
+            setControlValueWithEventSearchNested(homeLinksSelect.effectiveId, newSummaryItem.externalValue(homeLinksSelect.mustEncodeValues))
+
+            // Test <fr:code-mirror> + Circe JSON validation on home-remote-servers-value-control
+            val remoteServersOverride       = resolveObject[XFormsSingleNodeControl]("home-remote-servers-override-control").get
+            val remoteServersOverrideSelect = ControlsIterator(remoteServersOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val remoteServersValue          = resolveObject[XFormsValueControl]("home-remote-servers-value-control").get
+
+            setControlValueWithEventSearchNested(remoteServersOverrideSelect.effectiveId, encodedTrue)
+            setControlValueWithEventSearchNested(remoteServersValue.effectiveId, "[{broken json")
+            assert(! remoteServersValue.isValid)
+            setControlValueWithEventSearchNested(remoteServersValue.effectiveId, """[{"label": "Staging", "url": "https://staging.example.org/fr"}]""")
+            assert(remoteServersValue.isValid)
+
+            // Test <fr:boolean-or-formula> on warn-when-data-unsafe-value-control
+            val warnOverride       = resolveObject[XFormsSingleNodeControl]("warn-when-data-unsafe-override-control").get
+            val warnOverrideSelect = ControlsIterator(warnOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val warnValue          = resolveObject[XFormsSingleNodeControl]("warn-when-data-unsafe-value-control").get
+
+            setControlValueWithEventSearchNested(warnOverrideSelect.effectiveId, encodedTrue)
+            val warnRadioSelect = ControlsIterator(warnValue, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val formulaItem     = warnRadioSelect.getItemset(EventCollector.Throw).allItemsWithValueIterator(reverse = false).find(_._2 == Left("")).get._1
+            setControlValueWithEventSearchNested(warnRadioSelect.effectiveId, formulaItem.externalValue(warnRadioSelect.mustEncodeValues))
+            // Empty formula when overridden must be invalid (required), and malformed XPath must be invalid
+            assert(! warnValue.isValid)
+            val warnTextarea = ControlsIterator(warnValue, includeSelf = false).collectFirst { case c: XFormsValueComponentControl if c.staticControl.commonBinding.bindingElemId.contains("fr-xpath-completion") && c.isRelevant => c }.get
+            setControlValueWithEventSearchNested(warnTextarea.effectiveId, "if (")
+            assert(! warnValue.isValid)
+            setControlValueWithEventSearchNested(warnTextarea.effectiveId, "count(//*[xxf:non-blank()]) gt 0")
+            assert(warnValue.isValid)
+
+            // Test <fr:number> port validation on email-smtp-port-value-control
+            val smtpPortOverride       = resolveObject[XFormsSingleNodeControl]("email-smtp-port-override-control").get
+            val smtpPortOverrideSelect = ControlsIterator(smtpPortOverride, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
+            val smtpPortValue          = resolveObject[XFormsValueControl]("email-smtp-port-value-control").get
+
+            setControlValueWithEventSearchNested(smtpPortOverrideSelect.effectiveId, encodedTrue)
+            setControlValueWithEventSearchNested(smtpPortValue.effectiveId, numberExternalValue("70000"))
+            assert(! smtpPortValue.isValid)
+            setControlValueWithEventSearchNested(smtpPortValue.effectiveId, numberExternalValue("587"))
+            assert(smtpPortValue.isValid)
+
+            // Test XPath 2.0 fr:xpath-completion editor & validation on pdf-filename-value-control and format-output-date-value-control
+            val formatDateControl        = resolveObject[XFormsValueComponentControl]("format-output-date-value-control").get
+            assert(formatDateControl.staticControl.commonBinding.bindingElemId.contains("fr-xpath-completion"))
+
             val pdfOverrideControl       = resolveObject[XFormsSingleNodeControl]("pdf-filename-override-control").get
             val pdfOverrideSelectControl = ControlsIterator(pdfOverrideControl, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
-            val pdfValueControl          = resolveObject[XFormsSingleNodeControl]("pdf-filename-value-control").get
+            val pdfValueControl          = resolveObject[XFormsValueComponentControl]("pdf-filename-value-control").get
+            assert(pdfValueControl.staticControl.commonBinding.bindingElemId.contains("fr-xpath-completion"))
 
             assert(pdfValueControl.isValid)
             setControlValueWithEventSearchNested(pdfOverrideSelectControl.effectiveId, encodedTrue)
@@ -307,10 +418,11 @@ class ConfigurationPropertiesTest
             setControlValueWithEventSearchNested(pdfValueControl.effectiveId, "concat(fr:form-title(), '.pdf')")
             assert(pdfValueControl.isValid)
 
-            // Test XPath 2.0 Value Template (AVT) validation on auth-user-menu-uri-login-value-control
+            // Test XPath 2.0 Value Template (AVT) fr:xpath-completion editor & validation on auth-user-menu-uri-login-value-control
             val loginOverrideControl       = resolveObject[XFormsSingleNodeControl]("auth-user-menu-uri-login-override-control").get
             val loginOverrideSelectControl = ControlsIterator(loginOverrideControl, includeSelf = false).collectFirst { case c: XFormsSelect1Control => c }.get
-            val loginValueControl          = resolveObject[XFormsSingleNodeControl]("auth-user-menu-uri-login-value-control").get
+            val loginValueControl          = resolveObject[XFormsValueComponentControl]("auth-user-menu-uri-login-value-control").get
+            assert(loginValueControl.staticControl.commonBinding.bindingElemId.contains("fr-xpath-completion"))
 
             assert(loginValueControl.isValid)
             setControlValueWithEventSearchNested(loginOverrideSelectControl.effectiveId, encodedTrue)
@@ -345,9 +457,9 @@ class ConfigurationPropertiesTest
             val docsSizeValue          = resolveObject[XFormsSingleNodeControl]("cache-documents-size-value-control").get
 
             setControlValueWithEventSearchNested(docsSizeOverrideSelect.effectiveId, encodedTrue)
-            setControlValueWithEventSearchNested(docsSizeValue.effectiveId, "-5")
+            setControlValueWithEventSearchNested(docsSizeValue.effectiveId, numberExternalValue("-5"))
             assert(! docsSizeValue.isValid)
-            setControlValueWithEventSearchNested(docsSizeValue.effectiveId, "25")
+            setControlValueWithEventSearchNested(docsSizeValue.effectiveId, numberExternalValue("25"))
             assert(docsSizeValue.isValid)
 
             val configInstance = instance("fr-configuration-instance").get
@@ -387,6 +499,13 @@ class ConfigurationPropertiesTest
 
             val store = PropertyLoader.getPropertyStore(Option(ec.getRequest))
             assert(store.globalPropertySet.getString("oxf.fr.default-language.my-app.my-form").contains("fr"))
+            assert(store.globalPropertySet.getString("oxf.fr.available-languages.my-app.my-form").contains("en fr es"))
+            assert(store.globalPropertySet.getString("oxf.fr.available-languages").contains("en fr de"))
+            assert(store.globalPropertySet.getString("oxf.fr.pdf.jpeg.compression").contains("0.85"))
+            assert(store.globalPropertySet.getString("oxf.fr.home.table.link-to").contains("new summary"))
+            assert(store.globalPropertySet.getString("oxf.fr.home.remote-servers").contains("staging.example.org"))
+            assert(store.globalPropertySet.getString("oxf.fr.detail.warn-when-data-unsafe.my-app.my-form").contains("count(//*[xxf:non-blank()]) gt 0"))
+            assert(store.globalPropertySet.getString("oxf.fr.email.smtp.port.my-app.my-form").contains("587"))
             assert(store.globalPropertySet.getIntOpt("oxf.test.custom.persistence.prop").contains(42))
             assert(store.globalPropertySet.getString("oxf.xforms.cache.static-states.max-size-bytes").contains("256m"))
             assert(store.globalPropertySet.getString("oxf.xforms.cache.static-states.max-idle").contains("45m"))

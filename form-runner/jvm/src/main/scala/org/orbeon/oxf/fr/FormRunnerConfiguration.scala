@@ -60,6 +60,13 @@ trait FormRunnerConfiguration {
       case None | Some("0") | Some("-1") => true
       case Some(nonEmpty)                => ObjectCache.parseDurationMillis(nonEmpty).isDefined
     }
+
+  //@XPathFunction
+  def isValidJson(value: String): Boolean =
+    value.trimAllToOpt match {
+      case None           => true
+      case Some(nonEmpty) => io.circe.parser.parse(nonEmpty).isRight
+    }
 }
 
 object FormRunnerConfiguration extends FormRunnerConfiguration {
@@ -487,13 +494,14 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = "edit pdf"
     ),
     CuratedPropertyDef(
-      key          = "autosave-delay",
-      category     = "detail",
-      baseName     = "oxf.fr.detail.autosave-delay",
-      xsType       = "xs:integer",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = "5000"
+      key           = "autosave-delay",
+      category      = "detail",
+      baseName      = "oxf.fr.detail.autosave-delay",
+      xsType        = "xs:integer",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "5000",
+      validationOpt = Some("non-negative-integer")
     ),
     CuratedPropertyDef(
       key          = "data-migration",
@@ -613,13 +621,14 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = "top-right"
     ),
     CuratedPropertyDef(
-      key          = "messages-delay",
-      category     = "detail",
-      baseName     = "oxf.fr.detail.messages.delay",
-      xsType       = "xs:integer",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = "10000"
+      key           = "messages-delay",
+      category      = "detail",
+      baseName      = "oxf.fr.detail.messages.delay",
+      xsType        = "xs:integer",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "10000",
+      validationOpt = Some("non-negative-integer")
     ),
     CuratedPropertyDef(
       key          = "lease-enabled",
@@ -631,31 +640,34 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = "false"
     ),
     CuratedPropertyDef(
-      key          = "lease-duration",
-      category     = "detail",
-      baseName     = "oxf.fr.detail.lease.duration.*",
-      xsType       = "xs:integer",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = "10"
+      key           = "lease-duration",
+      category      = "detail",
+      baseName      = "oxf.fr.detail.lease.duration.*",
+      xsType        = "xs:integer",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "10",
+      validationOpt = Some("non-negative-integer")
     ),
     CuratedPropertyDef(
-      key          = "lease-renew-threshold",
-      category     = "detail",
-      baseName     = "oxf.fr.detail.lease.renew-threshold",
-      xsType       = "xs:integer",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = "1"
+      key           = "lease-renew-threshold",
+      category      = "detail",
+      baseName      = "oxf.fr.detail.lease.renew-threshold",
+      xsType        = "xs:integer",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "1",
+      validationOpt = Some("non-negative-integer")
     ),
     CuratedPropertyDef(
-      key          = "lease-alert-threshold",
-      category     = "detail",
-      baseName     = "oxf.fr.detail.lease.alert-threshold",
-      xsType       = "xs:integer",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = "2"
+      key           = "lease-alert-threshold",
+      category      = "detail",
+      baseName      = "oxf.fr.detail.lease.alert-threshold",
+      xsType        = "xs:integer",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "2",
+      validationOpt = Some("non-negative-integer")
     ),
     CuratedPropertyDef(
       key          = "session-expiration-dialog-enabled",
@@ -749,13 +761,14 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = ""
     ),
     CuratedPropertyDef(
-      key          = "attachment-max-files-per-control",
-      category     = "detail",
-      baseName     = "oxf.fr.detail.attachment.max-files-per-control",
-      xsType       = "xs:string",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = ""
+      key           = "attachment-max-files-per-control",
+      category      = "detail",
+      baseName      = "oxf.fr.detail.attachment.max-files-per-control",
+      xsType        = "xs:string",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "",
+      validationOpt = Some("optional-integer-or-unlimited")
     ),
     CuratedPropertyDef(
       key          = "attachment-mediatypes",
@@ -897,12 +910,13 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
 
     // 6. Summary, Landing, Home & Import/Export
     CuratedPropertyDef(
-      key          = "summary-page-size",
-      category     = "summary",
-      baseName     = "oxf.fr.summary.page-size",
-      xsType       = "xs:integer",
-      hasAppForm   = true,
-      defaultValue = "20"
+      key           = "summary-page-size",
+      category      = "summary",
+      baseName      = "oxf.fr.summary.page-size",
+      xsType        = "xs:integer",
+      hasAppForm    = true,
+      defaultValue  = "20",
+      validationOpt = Some("positive-integer")
     ),
     CuratedPropertyDef(
       key          = "summary-buttons",
@@ -978,30 +992,33 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
     // 7. Landing Page
     CuratedPropertyDef(
-      key          = "landing-page-size",
-      category     = "landing",
-      baseName     = "oxf.fr.landing.page-size",
-      xsType       = "xs:integer",
-      hasAppForm   = false,
-      defaultValue = "8"
+      key           = "landing-page-size",
+      category      = "landing",
+      baseName      = "oxf.fr.landing.page-size",
+      xsType        = "xs:integer",
+      hasAppForm    = false,
+      defaultValue  = "8",
+      validationOpt = Some("positive-integer")
     ),
     CuratedPropertyDef(
-      key          = "landing-cards",
-      category     = "landing",
-      baseName     = "oxf.fr.landing.cards",
-      xsType       = "xs:string",
-      hasAppForm   = false,
-      defaultValue = ""
+      key           = "landing-cards",
+      category      = "landing",
+      baseName      = "oxf.fr.landing.cards",
+      xsType        = "xs:string",
+      hasAppForm    = false,
+      defaultValue  = "",
+      validationOpt = Some("json")
     ),
 
     // 8. Admin Page
     CuratedPropertyDef(
-      key          = "home-page-size",
-      category     = "admin",
-      baseName     = "oxf.fr.home.page-size",
-      xsType       = "xs:integer",
-      hasAppForm   = false,
-      defaultValue = "20"
+      key           = "home-page-size",
+      category      = "admin",
+      baseName      = "oxf.fr.home.page-size",
+      xsType        = "xs:integer",
+      hasAppForm    = false,
+      defaultValue  = "20",
+      validationOpt = Some("positive-integer")
     ),
     CuratedPropertyDef(
       key          = "home-table-link-to",
@@ -1020,12 +1037,13 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = "false"
     ),
     CuratedPropertyDef(
-      key          = "home-remote-servers",
-      category     = "admin",
-      baseName     = "oxf.fr.home.remote-servers",
-      xsType       = "xs:string",
-      hasAppForm   = false,
-      defaultValue = "[]"
+      key           = "home-remote-servers",
+      category      = "admin",
+      baseName      = "oxf.fr.home.remote-servers",
+      xsType        = "xs:string",
+      hasAppForm    = false,
+      defaultValue  = "[]",
+      validationOpt = Some("json")
     ),
 
     // 9. Import & Export Pages
@@ -1168,21 +1186,23 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = "false"
     ),
     CuratedPropertyDef(
-      key          = "pdf-long-content-threshold",
-      category     = "pdf",
-      baseName     = "oxf.fr.detail.pdf.long-content-threshold",
-      xsType       = "xs:integer",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = "512"
+      key           = "pdf-long-content-threshold",
+      category      = "pdf",
+      baseName      = "oxf.fr.detail.pdf.long-content-threshold",
+      xsType        = "xs:integer",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "512",
+      validationOpt = Some("non-negative-integer")
     ),
     CuratedPropertyDef(
-      key          = "pdf-jpeg-compression",
-      category     = "pdf",
-      baseName     = "oxf.fr.pdf.jpeg.compression",
-      xsType       = "xs:string",
-      hasAppForm   = false,
-      defaultValue = "0.9"
+      key           = "pdf-jpeg-compression",
+      category      = "pdf",
+      baseName      = "oxf.fr.pdf.jpeg.compression",
+      xsType        = "xs:string",
+      hasAppForm    = false,
+      defaultValue  = "0.9",
+      validationOpt = Some("unit-interval")
     ),
     CuratedPropertyDef(
       key          = "pdf-font-family",
@@ -1201,13 +1221,14 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = ""
     ),
     CuratedPropertyDef(
-      key          = "pdf-header-footer-default",
-      category     = "pdf",
-      baseName     = "oxf.fr.detail.pdf.header-footer.default",
-      xsType       = "xs:string",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = ""
+      key           = "pdf-header-footer-default",
+      category      = "pdf",
+      baseName      = "oxf.fr.detail.pdf.header-footer.default",
+      xsType        = "xs:string",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "",
+      validationOpt = Some("json")
     ),
 
     // 8. Email
@@ -1230,13 +1251,14 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       defaultValue = ""
     ),
     CuratedPropertyDef(
-      key          = "email-smtp-port",
-      category     = "email",
-      baseName     = "oxf.fr.email.smtp.port",
-      xsType       = "xs:string",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = ""
+      key           = "email-smtp-port",
+      category      = "email",
+      baseName      = "oxf.fr.email.smtp.port",
+      xsType        = "xs:string",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "",
+      validationOpt = Some("optional-port")
     ),
     CuratedPropertyDef(
       key          = "email-smtp-username",
@@ -1602,30 +1624,33 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       validationOpt = Some("xpath2-avt")
     ),
     CuratedPropertyDef(
-      key          = "permissions",
-      category     = "security",
-      baseName     = "oxf.fr.permissions",
-      xsType       = "xs:string",
-      hasAppForm   = true,
-      defaultValue = ""
+      key           = "permissions",
+      category      = "security",
+      baseName      = "oxf.fr.permissions",
+      xsType        = "xs:string",
+      hasAppForm    = true,
+      defaultValue  = "",
+      validationOpt = Some("json")
     ),
     CuratedPropertyDef(
-      key          = "access-token-validity",
-      category     = "security",
-      baseName     = "oxf.fr.access-token.validity",
-      xsType       = "xs:integer",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = "0"
+      key           = "access-token-validity",
+      category      = "security",
+      baseName      = "oxf.fr.access-token.validity",
+      xsType        = "xs:integer",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "0",
+      validationOpt = Some("non-negative-integer")
     ),
     CuratedPropertyDef(
-      key          = "state-token-validity",
-      category     = "security",
-      baseName     = "oxf.fr.state-token.validity",
-      xsType       = "xs:integer",
-      hasAppForm   = true,
-      hasProfiles = true,
-      defaultValue = "15"
+      key           = "state-token-validity",
+      category      = "security",
+      baseName      = "oxf.fr.state-token.validity",
+      xsType        = "xs:integer",
+      hasAppForm    = true,
+      hasProfiles   = true,
+      defaultValue  = "15",
+      validationOpt = Some("non-negative-integer")
     )
   )
 
@@ -1825,7 +1850,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
               case Some(v) =>
                 elem.addAttribute("override", "true")
                 elem.addAttribute("value", v)
-                elem.addAttribute("selection", v)
+                elem.addAttribute("selection", if (c.key == "home-table-link-to") v.splitTo[List]().mkString(" ") else v)
               case None =>
                 elem.addAttribute("override", "false")
                 elem.addAttribute("value", c.defaultValue)

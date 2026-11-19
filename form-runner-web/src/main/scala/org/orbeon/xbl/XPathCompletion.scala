@@ -19,7 +19,7 @@ import scala.scalajs.js.|
 
 object XPathCompletion {
 
-  XFormsXbl.declareCompanion("fb|xpath-completion", js.constructorOf[XPathCompletionCompanion])
+  XFormsXbl.declareCompanion("fr|xpath-completion", js.constructorOf[XPathCompletionCompanion])
 
   private[xbl] class XPathCompletionCompanion(containerElem: dom.html.Element) extends XBLCompanion {
 
@@ -42,6 +42,9 @@ object XPathCompletion {
     private def isAvt: Boolean =
       backdropOpt.flatMap(_.wrapperElemOpt).flatMap(_.attValueOpt("data-avt")).contains("true")
 
+    private def isCompletionEnabled: Boolean =
+      backdropOpt.flatMap(_.wrapperElemOpt).flatMap(_.attValueOpt("data-completion")).contains("true")
+
     private def fieldElemOpt: Option[dom.html.Element] =
       backdropOpt.flatMap(_.fieldElemOpt)
 
@@ -54,7 +57,7 @@ object XPathCompletion {
 
       val backdrop = HighlightBackdrop(
         containerElem = containerElem,
-        classPrefix   = "fb-xpath-completion",
+        classPrefix   = "fr-xpath-completion",
         onInput       = () => updateHighlights()
       )
       backdropOpt = Some(backdrop)
@@ -73,9 +76,9 @@ object XPathCompletion {
         }
       }
 
-      expandButtonOpt = containerElem.querySelectorOpt(".fb-xpath-completion-expand-button")
-      formatButtonOpt = containerElem.querySelectorOpt(".fb-xpath-completion-format-button")
-      copyButtonOpt   = containerElem.querySelectorOpt(".fb-xpath-completion-copy-button")
+      expandButtonOpt = containerElem.querySelectorOpt(".fr-xpath-completion-expand-button")
+      formatButtonOpt = containerElem.querySelectorOpt(".fr-xpath-completion-format-button")
+      copyButtonOpt   = containerElem.querySelectorOpt(".fr-xpath-completion-copy-button")
 
       expandButtonOpt.foreach { expandButton =>
         EventSupport.addListener(expandButton, "mousedown", (event: dom.MouseEvent) => {
@@ -114,7 +117,7 @@ object XPathCompletion {
         EventSupport.addListener(expander, "text-expander-change", (event: CustomEvent) => {
           val details = event.detail.asInstanceOf[TextExpanderChangeEventDetail]
 
-          if (details.key == "$") {
+          if (isCompletionEnabled && details.key == "$") {
 
             val p = Promise[Completions]()
             pendingPromiseOpt = Some(p)
@@ -122,7 +125,7 @@ object XPathCompletion {
 
             AjaxClient.fireEvent(
               AjaxEvent(
-                eventName = "fb-query-completions",
+                eventName = "fr-query-completions",
                 targetId  = this.containerElem.id,
                 properties = Map(
                   "text" -> details.text
@@ -293,7 +296,7 @@ object XPathCompletion {
 
           if (placeholderElemOpt.isEmpty) {
             val placeholder = dom.document.createElement("span").asInstanceOf[dom.html.Element]
-            placeholder.className           = "fb-xpath-completion-placeholder"
+            placeholder.className           = "fr-xpath-completion-placeholder"
             placeholder.style.display       = "inline-block"
             placeholder.style.width         = s"${inlineRect.width}px"
             placeholder.style.height        = s"${inlineRect.height}px"
@@ -303,7 +306,7 @@ object XPathCompletion {
           }
 
           isExpanded = true
-          wrapperElem.classList.add("fb-xpath-completion-expanded")
+          wrapperElem.classList.add("fr-xpath-completion-expanded")
           updateExpandedBounds()
           updateExpandButtonState()
           fieldElemOpt.foreach(_.focus())
@@ -315,7 +318,7 @@ object XPathCompletion {
       if (isExpanded) {
         isExpanded = false
         backdropOpt.flatMap(_.wrapperElemOpt).foreach { wrapperElem =>
-          wrapperElem.classList.remove("fb-xpath-completion-expanded")
+          wrapperElem.classList.remove("fr-xpath-completion-expanded")
           wrapperElem.style.left   = ""
           wrapperElem.style.top    = ""
           wrapperElem.style.width  = ""
@@ -432,9 +435,9 @@ object XPathCompletion {
 
     private def flashFormatError(): Unit =
       formatButtonOpt.foreach { button =>
-        button.classList.add("fb-xpath-format-error")
+        button.classList.add("fr-xpath-format-error")
         dom.window.setTimeout(() => {
-          button.classList.remove("fb-xpath-format-error")
+          button.classList.remove("fr-xpath-format-error")
         }, 1000)
       }
 
@@ -490,14 +493,14 @@ object XPathCompletion {
     private def flashCopySuccess(): Unit =
       copyButtonOpt.foreach { button =>
         button.title = "Copied!"
-        button.classList.add("fb-xpath-copy-success")
+        button.classList.add("fr-xpath-copy-success")
         val iconElemOpt = Option(button.querySelector("i"))
         iconElemOpt.foreach { icon =>
           icon.setAttribute("class", "fa fa-check fa-fw")
         }
         dom.window.setTimeout(() => {
           button.title = DefaultCopyTitle
-          button.classList.remove("fb-xpath-copy-success")
+          button.classList.remove("fr-xpath-copy-success")
           iconElemOpt.foreach { icon =>
             icon.setAttribute("class", "fa fa-copy fa-fw")
           }
@@ -506,16 +509,16 @@ object XPathCompletion {
 
     private def flashCopyError(): Unit =
       copyButtonOpt.foreach { button =>
-        button.classList.add("fb-xpath-format-error")
+        button.classList.add("fr-xpath-format-error")
         dom.window.setTimeout(() => {
-          button.classList.remove("fb-xpath-format-error")
+          button.classList.remove("fr-xpath-format-error")
         }, 1000)
       }
 
     private def updateHighlights(valueOpt: Option[String] = None): Unit = {
       val blank = isBlank(valueOpt)
       val avt   = isAvt
-      backdropOpt.flatMap(_.wrapperElemOpt).foreach(_.toggleClass("fb-xpath-completion-empty", blank))
+      backdropOpt.flatMap(_.wrapperElemOpt).foreach(_.toggleClass("fr-xpath-completion-empty", blank))
       if (isExpanded && !canExpand(valueOpt))
         collapse(valueOpt)
       else

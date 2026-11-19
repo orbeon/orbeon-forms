@@ -1,0 +1,287 @@
+<!--
+  Copyright (C) 2020 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <!-- 1. Standard single-select language control (searchable by default) -->
+    <xbl:binding
+        id="fr-language-choice"
+        element="fr|language-choice"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value focus selection allow-minimal-label-hint"
+        xxbl:label-for="select1">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/language-choice/language-choice.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model id="language-choice-model">
+                <xf:instance
+                    id="languages"
+                    src="oxf:/apps/fr/i18n/languages.xml"
+                    xxf:readonly="true"
+                    xxf:cache="true"/>
+                <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <resource xml:lang="en"><common>Most common languages</common><all>Other languages</all><wildcard>All form languages (*)</wildcard><specific>Specific languages</specific></resource>
+                        <resource xml:lang="fr"><common>Langues les plus courantes</common><all>Autres langues</all><wildcard>Toutes les langues du formulaire (*)</wildcard><specific>Langues spécifiques</specific></resource>
+                        <resource xml:lang="de"><common>Häufig verwendete Sprachen</common><all>Andere Sprachen</all><wildcard>Alle Formularsprachen (*)</wildcard><specific>Bestimmte Sprachen</specific></resource>
+                        <resource xml:lang="es"><common>Idiomas más comunes</common><all>Otros idiomas</all><wildcard>Todos los idiomas del formulario (*)</wildcard><specific>Idiomas específicos</specific></resource>
+                        <resource xml:lang="it"><common>Lingue più comuni</common><all>Altre lingue</all><wildcard>Tutte le lingue del modulo (*)</wildcard><specific>Lingue specifiche</specific></resource>
+                        <resource xml:lang="pt"><common>Línguas mais comuns</common><all>Outras línguas</all><wildcard>Todos os idiomas do formulário (*)</wildcard><specific>Idiomas específicos</specific></resource>
+                        <resource xml:lang="sv"><common>Vanligaste språk</common><all>Övriga språk</all><wildcard>Alla formulärspråk (*)</wildcard><specific>Specifika språk</specific></resource>
+                        <resource xml:lang="fi"><common>Yleisimmät kielet</common><all>Muut kielet</all><wildcard>Kaikki lomakkeen kielet (*)</wildcard><specific>Tietyt kielet</specific></resource>
+                        <resource xml:lang="nl"><common>Meest gangbare talen</common><all>Andere talen</all><wildcard>Alle formuliertalen (*)</wildcard><specific>Specifieke talen</specific></resource>
+                        <resource xml:lang="no"><common>Mest vanlige språk</common><all>Andre språk</all><wildcard>Alle skjemaspråk (*)</wildcard><specific>Spesifikke språk</specific></resource>
+                        <resource xml:lang="pl"><common>Najczęstsze języki</common><all>Inne języki</all><wildcard>Wszystkie języki formularza (*)</wildcard><specific>Wybrane języki</specific></resource>
+                        <resource xml:lang="ru"><common>Наиболее распространенные языки</common><all>Другие языки</all><wildcard>Все языки формы (*)</wildcard><specific>Выбранные языки</specific></resource>
+                        <resource xml:lang="ja"><common>よく使う言語</common><all>その他の言語</all><wildcard>すべてのフォーム言語 (*)</wildcard><specific>特定の言語</specific></resource>
+                        <resource xml:lang="ar"><common>اللغات الأكثر شيوعاً</common><all>لغات أخرى</all><wildcard>جميع لغات النموذج (*)</wildcard><specific>لغات محددة</specific></resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template xxbl:transform="oxf:xslt">
+            <xf:group appearance="xxf:internal" xsl:version="2.0">
+                <xsl:if test="exists(/*/@languages-ref)">
+                    <xf:var name="languages-filter" as="xs:string*">
+                        <xxf:value xxbl:scope="outer" xbl:attr="model context value=languages-ref"/>
+                    </xf:var>
+                </xsl:if>
+                <xsl:if test="exists(/*/@exclude-languages-ref)">
+                    <xf:var name="exclude-languages" as="xs:string*">
+                        <xxf:value xxbl:scope="outer" xbl:attr="model context value=exclude-languages-ref"/>
+                    </xf:var>
+                </xsl:if>
+
+                <xf:var name="common-label" value="fr:r('common')"/>
+                <xf:var name="all-label"    value="fr:r('all')"/>
+                <xf:var name="all-langs"    value="instance('languages')/language"/>
+                <xsl:choose>
+                    <xsl:when test="exists(/*/@exclude-languages-ref)">
+                        <xf:var name="available-langs" value="$all-langs[not(@exclude = 'true') and not(@code = $exclude-languages)]"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xf:var name="available-langs" value="$all-langs[not(@exclude = 'true')]"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+
+                <xf:select1
+                    id="select1"
+                    ref="xxf:binding('fr-language-choice')"
+                    appearance="search"
+                    xxf:encrypt-item-values="false"
+                    xbl:attr="appearance class autocomplete xxf:encrypt-item-values xxf:readonly-appearance">
+                    <xsl:choose>
+                        <xsl:when test="exists(/*/@languages-ref)">
+                            <xf:itemset xxbl:scope="inner" ref="$languages-filter">
+                                <xf:label ref="($all-langs[@code = context()]/@native-name, context())[1]"/>
+                                <xf:value ref="context()"/>
+                            </xf:itemset>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xf:choices xxbl:scope="inner">
+                                <xf:label value="$common-label"/>
+                                <xf:itemset ref="xxf:sort($available-langs[@top = 'true'], @english-name, 'text', 'ascending')">
+                                    <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
+                                    <xf:value ref="@code"/>
+                                </xf:itemset>
+                            </xf:choices>
+                            <xf:choices xxbl:scope="inner">
+                                <xf:label value="$all-label"/>
+                                <xf:itemset ref="$available-langs[not(@top = 'true')]">
+                                    <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
+                                    <xf:value ref="@code"/>
+                                </xf:itemset>
+                            </xf:choices>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xf:select1>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+    <!-- 2. Multi-select language control (multiple="true", with optional allow-wildcard="true") -->
+    <xbl:binding
+        id="fr-language-choice-multiple"
+        element="fr|language-choice[multiple = true]"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value focus allow-minimal-label-hint"
+        xxbl:label-for="select">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/language-choice/language-choice.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model id="language-choice-multiple-model">
+                <xf:instance
+                    id="languages"
+                    src="oxf:/apps/fr/i18n/languages.xml"
+                    xxf:readonly="true"
+                    xxf:cache="true"/>
+                <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <resource xml:lang="en"><common>Most common languages</common><all>Other languages</all><wildcard>All form languages (*)</wildcard><specific>Specific languages</specific></resource>
+                        <resource xml:lang="fr"><common>Langues les plus courantes</common><all>Autres langues</all><wildcard>Toutes les langues du formulaire (*)</wildcard><specific>Langues spécifiques</specific></resource>
+                        <resource xml:lang="de"><common>Häufig verwendete Sprachen</common><all>Andere Sprachen</all><wildcard>Alle Formularsprachen (*)</wildcard><specific>Bestimmte Sprachen</specific></resource>
+                        <resource xml:lang="es"><common>Idiomas más comunes</common><all>Otros idiomas</all><wildcard>Todos los idiomas del formulario (*)</wildcard><specific>Idiomas específicos</specific></resource>
+                        <resource xml:lang="it"><common>Lingue più comuni</common><all>Altre lingue</all><wildcard>Tutte le lingue del modulo (*)</wildcard><specific>Lingue specifiche</specific></resource>
+                        <resource xml:lang="pt"><common>Línguas mais comuns</common><all>Outras línguas</all><wildcard>Todos os idiomas do formulário (*)</wildcard><specific>Idiomas específicos</specific></resource>
+                        <resource xml:lang="sv"><common>Vanligaste språk</common><all>Övriga språk</all><wildcard>Alla formulärspråk (*)</wildcard><specific>Specifika språk</specific></resource>
+                        <resource xml:lang="fi"><common>Yleisimmät kielet</common><all>Muut kielet</all><wildcard>Kaikki lomakkeen kielet (*)</wildcard><specific>Tietyt kielet</specific></resource>
+                        <resource xml:lang="nl"><common>Meest gangbare talen</common><all>Andere talen</all><wildcard>Alle formuliertalen (*)</wildcard><specific>Specifieke talen</specific></resource>
+                        <resource xml:lang="no"><common>Mest vanlige språk</common><all>Andre språk</all><wildcard>Alle skjemaspråk (*)</wildcard><specific>Spesifikke språk</specific></resource>
+                        <resource xml:lang="pl"><common>Najczęstsze języki</common><all>Inne języki</all><wildcard>Wszystkie języki formularza (*)</wildcard><specific>Wybrane języki</specific></resource>
+                        <resource xml:lang="ru"><common>Наиболее распространенные языки</common><all>Другие языки</all><wildcard>Все языки формы (*)</wildcard><specific>Выбранные языки</specific></resource>
+                        <resource xml:lang="ja"><common>よく使う言語</common><all>その他の言語</all><wildcard>すべてのフォーム言語 (*)</wildcard><specific>特定の言語</specific></resource>
+                        <resource xml:lang="ar"><common>اللغات الأكثر شيوعاً</common><all>لغات أخرى</all><wildcard>جميع لغات النموذج (*)</wildcard><specific>لغات محددة</specific></resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template xxbl:transform="oxf:xslt">
+            <xf:group appearance="xxf:internal" xsl:version="2.0">
+                <xf:var name="binding"        value="xxf:binding('fr-language-choice-multiple')"/>
+                <xf:var name="common-label"   value="fr:r('common')"/>
+                <xf:var name="all-label"      value="fr:r('all')"/>
+                <xf:var name="wildcard-label" value="fr:r('wildcard')"/>
+                <xf:var name="specific-label" value="fr:r('specific')"/>
+                <xf:var name="available-langs" value="instance('languages')/language[not(@exclude = 'true')]"/>
+
+                <xsl:choose>
+                    <xsl:when test="/*/@allow-wildcard = 'true'">
+                        <xh:div class="fr-language-choice-wildcard-group fr-component-group">
+                            <xf:select1 id="wildcard-mode" ref="$binding" appearance="full xxf:horizontal">
+                                <xf:item>
+                                    <xf:label value="$wildcard-label"/>
+                                    <xf:value>*</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label value="$specific-label"/>
+                                    <xf:value value="string($binding[. != '*'])"/>
+                                </xf:item>
+                            </xf:select1>
+                            <xf:select
+                                id="select"
+                                ref="$binding[. != '*']"
+                                appearance="search"
+                                xxf:encrypt-item-values="false"
+                                xbl:attr="class xxf:encrypt-item-values xxf:readonly-appearance">
+                                <xf:choices xxbl:scope="inner">
+                                    <xf:label value="$common-label"/>
+                                    <xf:itemset ref="xxf:sort($available-langs[@top = 'true'], @english-name, 'text', 'ascending')">
+                                        <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
+                                        <xf:value ref="@code"/>
+                                    </xf:itemset>
+                                </xf:choices>
+                                <xf:choices xxbl:scope="inner">
+                                    <xf:label value="$all-label"/>
+                                    <xf:itemset ref="$available-langs[not(@top = 'true')]">
+                                        <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
+                                        <xf:value ref="@code"/>
+                                    </xf:itemset>
+                                </xf:choices>
+                            </xf:select>
+                        </xh:div>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xf:select
+                            id="select"
+                            ref="$binding"
+                            appearance="search"
+                            xxf:encrypt-item-values="false"
+                            xbl:attr="class xxf:encrypt-item-values xxf:readonly-appearance">
+                            <xf:choices xxbl:scope="inner">
+                                <xf:label value="$common-label"/>
+                                <xf:itemset ref="xxf:sort($available-langs[@top = 'true'], @english-name, 'text', 'ascending')">
+                                    <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
+                                    <xf:value ref="@code"/>
+                                </xf:itemset>
+                            </xf:choices>
+                            <xf:choices xxbl:scope="inner">
+                                <xf:label value="$all-label"/>
+                                <xf:itemset ref="$available-langs[not(@top = 'true')]">
+                                    <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
+                                    <xf:value ref="@code"/>
+                                </xf:itemset>
+                            </xf:choices>
+                        </xf:select>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+    <!-- 3. Navbar / dialog-header Bootstrap link dropdown switcher -->
+    <xbl:binding
+        id="fr-language-choice-bootstrap"
+        element="
+            fr|language-choice[appearance ~= bootstrap],
+            fr|language-choice[appearance ~= bootstrap5]"
+        xxbl:mode="binding value lhha custom-lhha"
+        class="fr-language-choice-bootstrap">
+
+        <xbl:implementation>
+            <xf:model id="language-choice-bootstrap-model">
+                <xf:instance
+                    id="languages"
+                    src="oxf:/apps/fr/i18n/languages.xml"
+                    xxf:readonly="true"
+                    xxf:cache="true"/>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:var name="available-languages" as="xs:string*">
+                <xxf:value xxbl:scope="outer" xbl:attr="model context value=languages-ref"/>
+            </xf:var>
+            <xf:var name="all-langs" value="instance('languages')/language"/>
+
+            <xf:group
+                ref="
+                    .[
+                        count($available-languages) gt 1 and
+                        xxf:is-blank(xxf:get-request-header('orbeon-liferay-language'))
+                    ]">
+                <xh:div class="fr-language-choice">
+                    <xf:select1
+                        id="select1"
+                        ref="xxf:binding('fr-language-choice-bootstrap')"
+                        appearance="bootstrap"
+                        fr:dropdown-align="right"
+                        xbl:attr="appearance fr:dropdown-align">
+                        <xf:label value="xxf:label('fr-language-choice-bootstrap')"/>
+                        <xf:itemset xxbl:scope="inner" ref="$available-languages">
+                            <xf:label ref="($all-langs[@code = context()]/@native-name, context())[1]"/>
+                            <xf:value ref="context()"/>
+                        </xf:itemset>
+                    </xf:select1>
+                </xh:div>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

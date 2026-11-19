@@ -1,0 +1,143 @@
+<!--
+  Copyright (C) 2018 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fr-boolean-or-formula"
+        element="fr|boolean-or-formula"
+        xxbl:mode="binding lhha"
+        xxbl:label-for="fr-boolean-or-formula-elem">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/boolean-or-formula/boolean-or-formula.css"/>
+        </xbl:resources>
+
+        <xbl:handlers>
+            <xbl:handler event="xforms-select" observer="select1">
+                <xf:dispatch name="xforms-value-changed" targetid="fr-boolean-or-formula">
+                    <xf:property name="xxf:value" value="event('xxf:item-value')"/>
+                </xf:dispatch>
+            </xbl:handler>
+            <xbl:handler event="DOMFocusOut" observer="xpath-textarea">
+                <xf:dispatch name="xforms-value-changed" targetid="fr-boolean-or-formula">
+                    <xf:property name="xxf:value" value="xxf:binding('fr-boolean-or-formula')/string()"/>
+                </xf:dispatch>
+            </xbl:handler>
+            <xbl:handler event="fb-focus-formula fr-focus-formula" phase="target">
+                <xf:setfocus control="xpath-textarea"/>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:implementation>
+            <xf:model id="boolean-or-formula-model">
+                <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <resource xml:lang="en"><yes>Yes</yes><no>No</no><formula-choice>Formula</formula-choice><formula>Formula</formula><alert>Incorrect XPath expression</alert></resource>
+                        <resource xml:lang="fr"><yes>Oui</yes><no>Non</no><formula-choice>Formule</formula-choice><formula>Formule</formula><alert>Expression XPath incorrecte</alert></resource>
+                        <resource xml:lang="de"><yes>Ja</yes><no>Nein</no><formula-choice>XPath</formula-choice><formula>Formel</formula><alert>Ungültiger XPath-Ausdruck</alert></resource>
+                        <resource xml:lang="es"><yes>Si</yes><no>No</no><formula-choice>XPath</formula-choice><formula>Formula</formula><alert>Expresión XPath incorrecta</alert></resource>
+                        <resource xml:lang="it"><yes>Sì</yes><no>No</no><formula-choice>XPath</formula-choice><formula>Formula</formula><alert>Espressione XPath non corretta</alert></resource>
+                        <resource xml:lang="pt"><yes>Sim</yes><no>Não</no><formula-choice>XPath</formula-choice><formula>Fórmula</formula><alert>Expressão de XPath incorrecta</alert></resource>
+                        <resource xml:lang="sv"><yes>Ja</yes><no>Nej</no><formula-choice>Formel</formula-choice><formula>Formel</formula><alert>Felaktigt XPath-uttryck</alert></resource>
+                        <resource xml:lang="fi"><yes>Kyllä</yes><no>Ei</no><formula-choice>XPath</formula-choice><formula>Kaava</formula><alert>Virheellinen XPath-lauseke</alert></resource>
+                        <resource xml:lang="nl"><yes>Ja</yes><no>Nee</no><formula-choice>Formule</formula-choice><formula>Formule</formula><alert>Ongeldige XPath expressie</alert></resource>
+                        <resource xml:lang="no"><yes>Ja</yes><no>Nei</no><formula-choice>XPath</formula-choice><formula>Formel</formula><alert>Galt XPath-uttrykk</alert></resource>
+                        <resource xml:lang="pl"><yes>Tak</yes><no>Nie</no><formula-choice>Formuła</formula-choice><formula>Formuła</formula><alert>Niepoprawne wyrażenie XPath</alert></resource>
+                        <resource xml:lang="ru"><yes>Да</yes><no>Нет</no><formula-choice>XPath</formula-choice><formula>Формула</formula><alert>Некорректное выражение XPath</alert></resource>
+                        <resource xml:lang="ja"><yes>はい</yes><no>いいえ</no><formula-choice>計算式</formula-choice><formula>計算式</formula><alert>XPath式が不正です</alert></resource>
+                        <resource xml:lang="ar"><yes>نعم</yes><no>لا</no><formula-choice>صيغة</formula-choice><formula>صيغة</formula><alert>تعبير XPath غير صحيح</alert></resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template xxbl:transform="oxf:xslt">
+            <xf:group appearance="xxf:internal" xsl:version="2.0">
+                <xsl:variable name="true-val"             select="(/*/@true-value,  'true()')[1]"/>
+                <xsl:variable name="false-val"            select="(/*/@false-value, 'false()')[1]"/>
+                <xsl:variable name="use-xpath-completion" select="not(/*/@xpath-completion = 'false')"/>
+
+                <xf:var name="yes-label"            value="fr:r('yes')"/>
+                <xf:var name="no-label"             value="fr:r('no')"/>
+                <xf:var name="formula-choice-label" value="fr:r('formula-choice')"/>
+                <xf:var name="formula-label"        value="fr:r('formula')"/>
+                <xf:var name="formula-alert"        value="fr:r('alert')"/>
+                <xf:var name="true-value"           value="'{$true-val}'"/>
+                <xf:var name="false-value"          value="'{$false-val}'"/>
+                <xf:var name="binding"              value="xxf:binding('fr-boolean-or-formula')"/>
+                <xf:var name="true-or-false"        value="$binding = ($true-value, $false-value)"/>
+
+                <xh:div id="fr-boolean-or-formula-elem" class="fr-component-group" xxf:control="true">
+                    <xf:select1 ref="$binding" appearance="full xxf:horizontal" id="select1">
+                        <xf:item>
+                            <xf:label value="$yes-label"/>
+                            <xf:value value="$true-value"/>
+                        </xf:item>
+                        <xf:item>
+                            <xf:label value="$no-label"/>
+                            <xf:value value="$false-value"/>
+                        </xf:item>
+                        <xf:item>
+                            <xf:label value="$formula-choice-label"/>
+                            <xf:value value="string($binding[not($true-or-false)])"/>
+                        </xf:item>
+                    </xf:select1>
+                    <xsl:choose>
+                        <xsl:when test="$use-xpath-completion">
+                            <xf:textarea
+                                id="xpath-textarea"
+                                appearance="xpath-completion"
+                                xpath-completion-updates="{{fr:component-param-value('xpath-completion-updates')}}"
+                                ref="if ($true-or-false) then '' else $binding">
+
+                                <xf:label value="$formula-label" appearance="minimal"/>
+                                <xf:alert value="$formula-alert"/>
+
+                                <xf:setfocus
+                                    event="xforms-readwrite"
+                                    if="xxf:is-blank()"
+                                    control="xpath-textarea"/>
+                            </xf:textarea>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xf:textarea
+                                id="xpath-textarea"
+                                appearance="xpath-completion"
+                                completion="false"
+                                ref="$binding[not($true-or-false)]">
+
+                                <xf:label value="$formula-label" appearance="minimal"/>
+                                <xf:alert value="$formula-alert"/>
+
+                                <xf:setfocus
+                                    event="xforms-enabled"
+                                    if="xxf:is-blank()"
+                                    control="xpath-textarea"/>
+                            </xf:textarea>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xh:div>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

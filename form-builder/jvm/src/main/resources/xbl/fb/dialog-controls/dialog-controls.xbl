@@ -382,7 +382,7 @@
                                 </xf:output>
 
                                 <!-- Multi-language switcher -->
-                                <fb:language-choice ref="$li/lang"/>
+                                <fr:language-choice ref="$li/lang" languages-ref="frf:allLangs(fbf:resourcesRoot())" appearance="bootstrap"/>
                             </xh:div>
                         </xh:div>
 

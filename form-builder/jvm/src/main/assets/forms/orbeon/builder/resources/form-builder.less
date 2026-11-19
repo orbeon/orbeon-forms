@@ -1854,36 +1854,25 @@ body.orbeon {
     // All dialogs
     .xforms-dialog {
 
-        .xbl-fb-language-choice {
+        .xbl-fr-language-choice.fr-language-choice-bootstrap {
 
             position: absolute;
             right: 0;
             top: 1px;
             margin-top: 0;
             width: fit-content;
+            padding-right: 10px;
+            --orbeon-button-color: var(--orbeon-base-color);
+            --orbeon-navbar-dropdown-open-toggle-background-color: transparent;
 
-            // Not a real navbar: the class was inert under Bootstrap 2, but Bootstrap 5 styles it, so undo that styling
-            .navbar {
-                margin: 0;
-                background-color: transparent;
-                border-bottom: none;
-                padding: 0;
-                --orbeon-button-color: var(--orbeon-base-color);
-                --orbeon-navbar-dropdown-open-toggle-background-color: transparent;
-                .navbar-inner {
-                    padding-top: 0;
-                    padding-bottom: 0;
-                    padding-right: 10px;
-                    background-color: transparent;
-                    .fr-language-choice {
-                        background-color: var(--orbeon-dialog-title-background-color); // To show over text of a long label
-                    }
-                    .dropdown-toggle {
-                        padding: 5px 10px;
-                        line-height: @baseLineHeight;
-                        border: none;
-                    }
-                }
+            .fr-language-choice {
+                background-color: var(--orbeon-dialog-title-background-color); // To show over text of a long label
+            }
+
+            .dropdown-toggle {
+                padding: 5px 10px;
+                line-height: @baseLineHeight;
+                border: none;
             }
         }
 
@@ -1942,12 +1931,16 @@ body.orbeon {
         }
 
         // Indent all radio controls, except in open select1 / open select, which add their own padding on .fr-component-group
-        .xforms-select1-appearance-full:not(.xbl-fr-open-select1 *, .xbl-fr-open-select *) .xforms-items,
-        .xbl-fb-boolean-or-formula .fr-component-group .xforms-textarea {
+        .xforms-select1-appearance-full:not(.xbl-fr-open-select1 *, .xbl-fr-open-select *) .xforms-items {
             padding: 4px 6px;
         }
 
-        .xbl-fb-boolean-or-formula .xforms-textarea {
+        .xbl-fr-boolean-or-formula .fr-component-group .fr-xpath-completion-wrapper {
+            margin: 4px 6px;
+            width: calc(100% - 12px);
+        }
+
+        .xbl-fr-boolean-or-formula .xforms-textarea {
             display: block;
         }
 
@@ -2816,7 +2809,7 @@ body.orbeon {
                             width: 100% !important;
                         }
 
-                        .fb-xpath-completion-wrapper {
+                        .fr-xpath-completion-wrapper {
                             width: 100%;
                             box-sizing: border-box;
                         }
@@ -3340,9 +3333,13 @@ body.orbeon {
         }
 
         .fb-validations-tab {
-            .xbl-fb-boolean-or-formula .fr-component-group {
+            .xbl-fr-boolean-or-formula .fr-component-group {
                 .xforms-items, .xforms-textarea {
                     padding: 0; // no padding here as we are within a small visible grid cell and want to look like the rest
+                }
+                .fr-xpath-completion-wrapper {
+                    margin: 0;
+                    width: 100%;
                 }
             }
         }
@@ -4114,39 +4111,24 @@ body.orbeon {
                 font-weight: 600;
             }
 
-            .xbl-fb-language-choice {
+            .xbl-fr-language-choice.fr-language-choice-bootstrap {
                 position: static;
                 top: auto;
                 right: auto;
+                padding-right: 0;
                 display: inline-flex;
                 align-items: center;
 
-                .navbar {
-                    margin: 0;
-                    padding: 0;
-                    min-height: 0;
-                    background: none;
-                    border: none;
-
-                    .navbar-inner {
-                        min-height: 0;
-                        padding: 0;
-                        background: none;
-                        border: none;
-                        box-shadow: none;
-                    }
-
-                    .dropdown-toggle {
-                        display: inline-flex;
-                        align-items: center;
-                        height: 30px;
-                        padding: 0 10px;
-                        box-sizing: border-box;
-                        font-size: 12px;
-                        border: 1px solid var(--orbeon-base-border-color);
-                        border-radius: var(--orbeon-control-border-radius);
-                        background-color: var(--orbeon-dialog-background-color);
-                    }
+                .dropdown-toggle {
+                    display: inline-flex;
+                    align-items: center;
+                    height: 30px;
+                    padding: 0 10px;
+                    box-sizing: border-box;
+                    font-size: 12px;
+                    border: 1px solid var(--orbeon-base-border-color);
+                    border-radius: var(--orbeon-control-border-radius);
+                    background-color: var(--orbeon-dialog-background-color);
                 }
             }
         }

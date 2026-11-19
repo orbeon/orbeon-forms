@@ -245,4 +245,43 @@
             </xf:select1>
         </xbl:template>
     </xbl:binding>
+
+    <xbl:binding
+        id="fr-dropdown-select-search"
+        element="
+            fr|dropdown-select-search,
+            xf|select[appearance ~= search]"
+        xxbl:container="span"
+        xxbl:label-for="select"
+        xxbl:mode="lhha binding value focus selection javascript-lifecycle allow-minimal-label-hint">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/dropdown-select1-search/dropdown-select1-search.css"/>
+            <xbl:style src="/webjars/select2/4.0.13/dist/css/select2.css"/>
+        </xbl:resources>
+
+        <xbl:template>
+            <xf:var name="disable-placeholder" value="fr:component-param-value('disable-placeholder') = 'true'"/>
+            <xf:var name="min-input-length"    value="fr:component-param-value('min-input-length')"/>
+
+            <xf:select
+                appearance="minimal"
+                ref="xxf:binding('fr-dropdown-select-search')"
+                id="select"
+                xbl:attr="xxf:encrypt-item-values autocomplete xxf:readonly-appearance"
+                data-placeholder="{
+                    if ($disable-placeholder) then
+                        ''
+                    else if (xxf:label-appearance('select') = 'minimal') then
+                        xxf:label('select')
+                    else
+                        xxf:r('components.labels.please-select', '|fr-fr-resources|')
+                }"
+                data-is-multiple="true"
+                data-min-input-length="{$min-input-length}"
+            >
+                <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+            </xf:select>
+        </xbl:template>
+    </xbl:binding>
 </xbl:xbl>

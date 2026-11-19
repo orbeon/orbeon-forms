@@ -339,7 +339,7 @@
         fr:databound-select1-search
         fr:databound-select-search
         fr:autosize-textarea
-        fb:xpath-completion
+        fr:xpath-completion
         fr:hyperlink
         fr:range
         fr:rating

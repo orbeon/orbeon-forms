@@ -1207,7 +1207,7 @@
                                 else
                                     2"/>
 
-                        <fb:language-choice ref="$i/lang[not($is-new-form)]"/>
+                        <fr:language-choice ref="$i/lang[not($is-new-form)]" languages-ref="frf:allLangs(fbf:resourcesRoot())" appearance="bootstrap"/>
 
                         <fr:tabbable id="fb-tabbable" class="fb-dialog-form-settings-fields">
                             <fr:tab visible="$is-new-form and $show-templates">
@@ -1829,16 +1829,16 @@
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td>
-                                            <fb:boolean-or-formula ref="readonly">
+                                            <fr:boolean-or-formula ref="readonly">
                                                 <xf:label ref="$resources/dialog-control-settings/readonly/label"/>
                                                 <xf:hint  ref="$resources/dialog-control-settings/readonly/hint"/>
-                                            </fb:boolean-or-formula>
+                                            </fr:boolean-or-formula>
                                         </xh:td>
 <!--                                        <xh:td>-->
-<!--                                            <fb:boolean-or-formula ref="relevant">-->
+<!--                                            <fr:boolean-or-formula ref="relevant">-->
 <!--                                                <xf:label ref="$resources/dialog-control-settings/visibility/label"/>-->
 <!--                                                <xf:hint  ref="$resources/dialog-control-settings/visibility/hint"/>-->
-<!--                                            </fb:boolean-or-formula>-->
+<!--                                            </fr:boolean-or-formula>-->
 <!--                                        </xh:td>-->
                                     </xh:tr>
                                     <xh:tr>

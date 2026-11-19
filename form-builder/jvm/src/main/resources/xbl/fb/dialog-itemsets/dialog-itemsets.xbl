@@ -236,7 +236,7 @@
                 <xf:label ref="$resources/dialog-itemsets/label"/>
                 <xh:div class="fb-dialog-body">
 
-                    <fb:language-choice ref="$i/lang"/>
+                    <fr:language-choice ref="$i/lang" languages-ref="frf:allLangs(fbf:resourcesRoot())" appearance="bootstrap"/>
 
                     <!-- Only allow HTML for full appearance -->
                     <fr:checkbox-input ref="$i/html[../appearance = 'full']" class="fb-html-checkbox fb-hide-alert">

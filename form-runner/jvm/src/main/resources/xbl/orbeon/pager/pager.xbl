@@ -136,7 +136,7 @@
                         <xxf:value value="string(.)" xxbl:scope="outer"/>
                         <xf:setvalue
                             event="xforms-enabled xforms-value-changed"
-                            if="$outer-value castable as xs:integer and xs:integer($outer-value) != instance('fr-paging-instance')/page-number/data(.)"
+                            if="$outer-value castable as xs:integer and string(instance('fr-paging-instance')/page-number) != string(xs:integer($outer-value))"
                             ref="instance('fr-paging-instance')/page-number"
                             value="xs:integer($outer-value)"/>
                     </xf:var>
@@ -145,11 +145,15 @@
                             <xxf:value value="." xxbl:scope="outer"/>
                         </xf:var>
                         <xf:var name="value" as="xs:integer" value="data(.)">
-                            <xf:setvalue
-                                event="xforms-enabled xforms-value-changed"
-                                if="string($ref) != string($value)"
-                                ref="$ref"
-                                value="$value"/>
+                            <xf:action event="xforms-enabled xforms-value-changed">
+                                <xf:var
+                                    name="live-inner"
+                                    value="string(instance('fr-paging-instance')/page-number)"/>
+                                <xf:setvalue
+                                    if="exists($ref) and string($ref) != $live-inner"
+                                    ref="$ref"
+                                    value="$live-inner"/>
+                            </xf:action>
                         </xf:var>
                     </xf:group>
                 </xf:group>

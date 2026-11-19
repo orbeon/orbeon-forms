@@ -246,6 +246,52 @@ class PagerTest
             assert(stateVal("to")               == 10)
             assert(rangeTextFor("top-pager")    == "1 to 10 of 25")
             assert(rangeTextFor("bottom-pager") == "1 to 10 of 25")
+
+            // Regression (#7639): navigate to last page, filter down to <= page-size so `bottom-pager` becomes
+            // non-relevant while its internal `page-number` was 3, then unfilter back to > page-size. Must not loop!
+            activateControlWithEvent(findTrigger("top-pager", "fr-navigate-last").effectiveId)
+            assert(stateVal("page-number") == 3)
+            assert(rangeTextFor("bottom-pager") == "21 to 25 of 25")
+
+            withAction {
+              val totalNode = doc.findInstance("fr-form-instance").get.rootElement / "total"
+              XFormsAPI.setvalue(totalNode, "8")
+            }
+            assert(! doc.getControlByEffectiveId("bottom-pager").isRelevant)
+            assert(stateVal("page-number")   == 1)
+            assert(rangeTextFor("top-pager") == "1 to 8 of 8")
+
+            withAction {
+              val totalNode = doc.findInstance("fr-form-instance").get.rootElement / "total"
+              XFormsAPI.setvalue(totalNode, "25")
+            }
+            assert(doc.getControlByEffectiveId("bottom-pager").isRelevant)
+            assert(stateVal("page-number")      == 1)
+            assert(stateVal("from")             == 1)
+            assert(stateVal("to")               == 10)
+            assert(rangeTextFor("top-pager")    == "1 to 10 of 25")
+            assert(rangeTextFor("bottom-pager") == "1 to 10 of 25")
+
+            // Also verify simultaneous `fr-set-current-page(1)` on `top-pager` + clamping on `bottom-pager` (e.g. 35 -> 25 items from page 4)
+            withAction {
+              val totalNode = doc.findInstance("fr-form-instance").get.rootElement / "total"
+              XFormsAPI.setvalue(totalNode, "35")
+            }
+            activateControlWithEvent(findTrigger("top-pager", "fr-navigate-last").effectiveId)
+            assert(stateVal("page-number") == 4)
+
+            withAction {
+              XFormsAPI.dispatch(
+                name       = "fr-set-current-page",
+                targetId   = "top-pager",
+                properties = Map("page-number" -> Some(1))
+              )
+              val totalNode = doc.findInstance("fr-form-instance").get.rootElement / "total"
+              XFormsAPI.setvalue(totalNode, "25")
+            }
+            assert(stateVal("page-number")      == 1)
+            assert(rangeTextFor("top-pager")    == "1 to 10 of 25")
+            assert(rangeTextFor("bottom-pager") == "1 to 10 of 25")
           }
         }
       }

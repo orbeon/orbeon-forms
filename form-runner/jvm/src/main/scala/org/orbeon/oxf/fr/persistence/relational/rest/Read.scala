@@ -273,13 +273,13 @@ trait Read {
       req.lastModifiedOpt match {
         case Some(_) =>
           s"""|SELECT  t.last_modified_time, t.created, t.last_modified_by
-              |        $body
               |        $totalAttachmentSize
               |        ${if (req.forDataNotAttachment) ", t.id" else ""}
               |        ${if (req.forData)              ", t.username, t.groupname, t.organization_id" else ""}
               |        ${if (hasStage)                 ", t.stage"                                    else ""}
               |        ${if (req.forAttachment)        ", t.hash_algorithm, t.hash_value"            else ""}
               |        , t.app, t.form, t.form_version, t.deleted
+              |        $body
               |FROM    $table t
               |WHERE   t.app  = ?
               |        and t.form = ?
@@ -290,13 +290,13 @@ trait Read {
               |""".stripMargin
         case None =>
           s"""|SELECT  t.last_modified_time, t.created, t.last_modified_by
-              |        $body
               |        $totalAttachmentSize
               |        ${if (req.forDataNotAttachment) ", t.id" else ""}
               |        ${if (req.forData)              ", t.username, t.groupname, t.organization_id" else ""}
               |        ${if (hasStage)                 ", t.stage"                                    else ""}
               |        ${if (req.forAttachment)        ", t.hash_algorithm, t.hash_value"            else ""}
               |        , t.app, t.form, t.form_version, t.deleted
+              |        $body
               |FROM    $table t,
               |        (
               |            SELECT   max($maxColumn) $maxColumn, ${idCols.mkString(", ")}
@@ -349,21 +349,8 @@ trait Read {
             groupname = ""
           )
 
-          val bodyStreamOpt: Option[InputStream] = bodyContentOpt.flatMap {
-            case FullAttachment | PartialAttachment(_, _) =>
-              req.provider match {
-                case PostgreSQL | SQLite => Option(resultSet.getBinaryStream("file_content"))
-                case _                   => Option(resultSet.getBlob("file_content")).map(_.getBinaryStream)
-              }
-
-            case Xml =>
-              val readerOpt = req.provider match {
-                case PostgreSQL | SQLite => Option(resultSet.getString("xml")).map(new StringReader(_))
-                case _                   => Option(resultSet.getClob("xml")).map(_.getCharacterStream)
-              }
-              readerOpt.map(reader => ReaderInputStream.builder.setReader(reader).setCharset(CharsetNames.Utf8).get())
-          }
-
+          // Read all metadata columns before opening the body stream: JDBC drivers such as SQL Server's
+          // (`PLPInputStream` with adaptive buffering) close an open column stream as soon as another column is read.
           val fromDb =
             FromDatabase(
               idOpt                = req.forDataNotAttachment.option(resultSet.getInt("id")),
@@ -379,6 +366,21 @@ trait Read {
               hashAlgorithmOpt     = req.forAttachment.option(resultSet.getString("hash_algorithm")),
               hashValueOpt         = req.forAttachment.option(resultSet.getString("hash_value"))
             )
+
+          val bodyStreamOpt: Option[InputStream] = bodyContentOpt.flatMap {
+            case FullAttachment | PartialAttachment(_, _) =>
+              req.provider match {
+                case PostgreSQL | SQLite => Option(resultSet.getBinaryStream("file_content"))
+                case _                   => Option(resultSet.getBlob("file_content")).map(_.getBinaryStream)
+              }
+
+            case Xml =>
+              val readerOpt = req.provider match {
+                case PostgreSQL | SQLite => Option(resultSet.getString("xml")).map(new StringReader(_))
+                case _                   => Option(resultSet.getClob("xml")).map(_.getCharacterStream)
+              }
+              readerOpt.map(reader => ReaderInputStream.builder.setReader(reader).setCharset(CharsetNames.Utf8).get())
+          }
 
           try {
             onRow(fromDb, bodyStreamOpt)

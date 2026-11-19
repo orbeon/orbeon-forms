@@ -61,6 +61,7 @@ class BindingIndexTest
         [appearance $= gaga],
         [appearance *= gaga],
         foo|bar[appearance ~= baz],
+        foo|bar[appearance ~= baz][appearance ~= 'xxf:horizontal'],
         foo|bar[repeat = content],
         foo|bar[appearance ~= baz][repeat = content],
         foo|bar[repeat],
@@ -83,6 +84,7 @@ class BindingIndexTest
     appearanceEndsWithGagaBinding   ::
     appearanceContainsGagaBinding   ::
     fooBarAppearanceBazBinding      ::
+    fooBarAppearanceBazHorizBinding ::
     fooBarRepeatContent             ::
     fooBarAppearanceAndAtt          ::
     fooBarRepeat                    ::
@@ -138,6 +140,8 @@ class BindingIndexTest
     assertElemMatched("""<foo:baz appearance="baz"/>""",                  appearanceTokenBazBinding.some)
     assertElemMatched("""<foo:baz appearance="fuzz baz toto"/>""",        appearanceTokenBazBinding.some)
     assertElemMatched("""<foo:bar appearance="baz"/>""",                  fooBarAppearanceBazBinding.some)
+    assertElemMatched("""<foo:bar appearance="baz xxf:horizontal"/>""",   fooBarAppearanceBazHorizBinding.some)
+    assertElemMatched("""<foo:bar appearance="xxf:horizontal baz"/>""",   fooBarAppearanceBazHorizBinding.some)
     assertElemMatched("""<foo:bar repeat="content"/>""",                  fooBarRepeatContent.some)
     assertElemMatched("""<foo:bar appearance="baz" repeat="content"/>""", fooBarAppearanceAndAtt.some)
     assertElemMatched("""<foo:bar repeat="true"/>""",                     fooBarRepeat.some)

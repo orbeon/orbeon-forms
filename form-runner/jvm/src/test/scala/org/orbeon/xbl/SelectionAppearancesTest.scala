@@ -183,5 +183,105 @@ class SelectionAppearancesTest
         }
       }
     }
+
+    it("must render horizontal appearances across xf:select1, xf:select, cards-select, and open-select") {
+
+      val xhtml =
+        <xh:html
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xh:head>
+            <xf:model id="fr-form-model" xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+              <xf:instance id="fr-form-instance">
+                <form>
+                  <horiz-radio>a</horiz-radio>
+                  <horiz-check>a b</horiz-check>
+                  <horiz-cards1>a</horiz-cards1>
+                  <horiz-cards>a</horiz-cards>
+                  <horiz-open1>a</horiz-open1>
+                  <horiz-open>a</horiz-open>
+                </form>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <xf:select1 id="horiz-radio-control" ref="horiz-radio" appearance="full xxf:horizontal" xxf:encrypt-item-values="false">
+              <xf:label>Horizontal Radio</xf:label>
+              <xf:item><xf:label>A</xf:label><xf:value>a</xf:value></xf:item>
+              <xf:item><xf:label>B</xf:label><xf:value>b</xf:value></xf:item>
+            </xf:select1>
+
+            <xf:select id="horiz-check-control" ref="horiz-check" appearance="full xxf:horizontal" xxf:encrypt-item-values="false">
+              <xf:label>Horizontal Check</xf:label>
+              <xf:item><xf:label>A</xf:label><xf:value>a</xf:value></xf:item>
+              <xf:item><xf:label>B</xf:label><xf:value>b</xf:value></xf:item>
+            </xf:select>
+
+            <xf:select1 id="horiz-cards1-control" ref="horiz-cards1" appearance="cards xxf:horizontal" xxf:encrypt-item-values="false">
+              <xf:label>Horizontal Cards 1</xf:label>
+              <xf:item><xf:label>A</xf:label><xf:value>a</xf:value></xf:item>
+              <xf:item><xf:label>B</xf:label><xf:value>b</xf:value></xf:item>
+            </xf:select1>
+
+            <xf:select id="horiz-cards-control" ref="horiz-cards" appearance="cards xxf:horizontal" xxf:encrypt-item-values="false">
+              <xf:label>Horizontal Cards</xf:label>
+              <xf:item><xf:label>A</xf:label><xf:value>a</xf:value></xf:item>
+              <xf:item><xf:label>B</xf:label><xf:value>b</xf:value></xf:item>
+            </xf:select>
+
+            <fr:open-select1 id="horiz-open1-control" ref="horiz-open1" appearance="full xxf:horizontal" xxf:encrypt-item-values="false">
+              <xf:label>Horizontal Open 1</xf:label>
+              <xf:item><xf:label>A</xf:label><xf:value>a</xf:value></xf:item>
+              <xf:item><xf:label>B</xf:label><xf:value>b</xf:value></xf:item>
+            </fr:open-select1>
+
+            <fr:open-select id="horiz-open-control" ref="horiz-open" appearance="full xxf:horizontal" xxf:encrypt-item-values="false">
+              <xf:label>Horizontal Open</xf:label>
+              <xf:item><xf:label>A</xf:label><xf:value>a</xf:value></xf:item>
+              <xf:item><xf:label>B</xf:label><xf:value>b</xf:value></xf:item>
+            </fr:open-select>
+          </xh:body>
+        </xh:html>.toDocument
+
+      withTestExternalContext { implicit ec =>
+        withXFormsDocument(xhtml) { doc =>
+          withActionAndDoc(doc) {
+
+            val template = AnnotatedTemplate(PartAnalysisBuilder.createFromDocument(xhtml)(XFormsStateManager.newIndentedLogger)._1)
+
+            val receiver = new LocationSAXContentHandler
+            XHTMLOutput.send(doc, template, ec)(receiver)
+            val allElems = receiver.getDocument.getRootElement.descendantElementIterator(includeSelf = true).toList
+
+            def classesOf(id: String): Set[String] =
+              allElems.find(_.attributeValue("id") == id).get.attributeValue("class").splitTo[Set]()
+
+            assert(classesOf("horiz-radio-control").subsetOf(classesOf("horiz-radio-control")))
+            assert(classesOf("horiz-radio-control").contains("xforms-select1-appearance-full"))
+            assert(classesOf("horiz-radio-control").contains("xforms-select1-appearance-xxforms-horizontal"))
+
+            assert(classesOf("horiz-check-control").contains("xforms-select-appearance-full"))
+            assert(classesOf("horiz-check-control").contains("xforms-select-appearance-xxforms-horizontal"))
+
+            assert(classesOf("horiz-cards1-control").contains("xbl-fr-cards-select1"))
+            assert(classesOf("horiz-cards1-control").contains("xforms-select1-appearance-xxforms-horizontal"))
+
+            assert(classesOf("horiz-cards-control").contains("xbl-fr-cards-select"))
+            assert(classesOf("horiz-cards-control").contains("xforms-select-appearance-xxforms-horizontal"))
+
+            assert(classesOf("horiz-open1-control").contains("xbl-fr-open-select1"))
+            assert(classesOf("horiz-open1-control").contains("xforms-open-select1-appearance-xxforms-horizontal"))
+            assert(classesOf("horiz-open1-control≡select1").contains("xforms-select1-appearance-full"))
+            assert(classesOf("horiz-open1-control≡select1").contains("xforms-select1-appearance-xxforms-horizontal"))
+
+            assert(classesOf("horiz-open-control").contains("xbl-fr-open-select"))
+            assert(classesOf("horiz-open-control").contains("xforms-open-select-appearance-xxforms-horizontal"))
+            assert(classesOf("horiz-open-control≡select").contains("xforms-select-appearance-full"))
+          }
+        }
+      }
+    }
   }
 }

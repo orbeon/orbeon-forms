@@ -117,7 +117,7 @@ object BindingIndex {
     includeBindingsWithDatatype: Boolean
   ): BindingIndex[T] =
     bindingDescriptor match {
-      case b @ BindingDescriptor(Some(_), datatypeOpt, None, EmptySet())
+      case b @ BindingDescriptor(Some(_), datatypeOpt, EmptySet(), EmptySet())
         if includeBindingsWithDatatype || datatypeOpt.isEmpty =>
           index.copy(nameOnlySelectors   = (b -> value) :: index.nameOnlySelectors)
       case b @ BindingDescriptor(Some(_), datatypeOpt, _, _)

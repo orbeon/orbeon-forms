@@ -31,76 +31,67 @@ trait FormRunnerComponentsCompileTime {
 
     def buildName(name: QName, datatype: Option[QName], appearance: Option[String]): String = {
 
-      def replaceColon(s: String): String = s.replace(':', '-')
+      def sanitizeToken(s: String): String = s.replace(':', '-').replace(' ', '-')
       def replaceXsXfPrefix(qName: QName): String = {
         val uri = qName.namespace.uri
         if (uri == XMLConstants.XSD_URI || uri == XFormsNames.XFORMS_NAMESPACE_URI)
           qName.localName
         else
-          replaceColon(qName.qualifiedName)
+          sanitizeToken(qName.qualifiedName)
       }
 
-      val nameToken       = replaceColon(name.qualifiedName)
+      val nameToken       = sanitizeToken(name.qualifiedName)
       val datatypeToken   = datatype.map(replaceXsXfPrefix)
-      val appearanceToken = appearance.map(replaceColon).map("appearance-" + _)
+      val appearanceToken = appearance.map(sanitizeToken).map("appearance-" + _)
 
       (nameToken :: datatypeToken.toList ::: appearanceToken.toList ::: Nil).mkString("-")
     }
 
+    val sortedDescriptors =
+      relatedDescriptors.toList.sortBy(- _.appearances.size)
+
     def findByNameAndDatatypeAndAppearance: Option[String] =
-      relatedDescriptors collectFirst {
+      sortedDescriptors collectFirst {
         case
           BindingDescriptor(
             Some(name),
             d @ Some(_),
-            Some(AttributePredicate.Equal(appearance)),
+            appearances,
             _
-          ) => buildName(name, d, Some(appearance))
-        case
-          BindingDescriptor(
-            Some(name),
-            d @ Some(_),
-            Some(AttributePredicate.Token(appearance)),
-            _
-          ) => buildName(name, d, Some(appearance))
+          ) if BindingDescriptor.appearanceValueOpt(appearances).isDefined =>
+            buildName(name, d, BindingDescriptor.appearanceValueOpt(appearances))
       }
 
     def findByNameAndDatatype: Option[String] =
-      relatedDescriptors collectFirst {
+      sortedDescriptors collectFirst {
         case
           BindingDescriptor(
             Some(name),
             d @ Some(_),
-            None,
+            EmptySet(),
             _
           ) => buildName(name, d, None)
       }
 
-  def findByNameAndAppearance: Option[String] =
-      relatedDescriptors collectFirst {
+    def findByNameAndAppearance: Option[String] =
+      sortedDescriptors collectFirst {
         case
           BindingDescriptor(
             Some(name),
             None,
-            Some(AttributePredicate.Equal(appearance)),
+            appearances,
             _
-          ) => buildName(name, None, Some(appearance))
-        case
-          BindingDescriptor(
-            Some(name),
-            None,
-            Some(AttributePredicate.Token(appearance)),
-            _
-          ) => buildName(name, None, Some(appearance))
+          ) if BindingDescriptor.appearanceValueOpt(appearances).isDefined =>
+            buildName(name, None, BindingDescriptor.appearanceValueOpt(appearances))
       }
 
     def findDirect: Option[String] =
-      relatedDescriptors collectFirst {
+      sortedDescriptors collectFirst {
         case
           BindingDescriptor(
             Some(name),
             None,
-            None,
+            EmptySet(),
             EmptySet()
           ) => buildName(name, None, None)
       }

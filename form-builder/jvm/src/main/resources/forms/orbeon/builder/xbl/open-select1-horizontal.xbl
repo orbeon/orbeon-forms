@@ -1,0 +1,66 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fr-open-select1-horizontal"
+        element="
+            fr|open-select1[appearance ~= full][appearance ~= 'xxf:horizontal'],
+            xf|select1[selection = open][appearance ~= full][appearance ~= 'xxf:horizontal']"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value">
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Horizontal Radio Buttons with "Other"</display-name>
+            <display-name lang="fr">Boutons radio horizontaux avec "Autre"</display-name>
+            <display-name lang="no">Horisontale radioknapper med "Annet"</display-name>
+            <display-name lang="ru">Горизонтальные переключатели с вариантом "Другое"</display-name>
+            <display-name lang="it">Scelta unica orizzontale con "Altro"</display-name>
+            <display-name lang="de">Horizontale Auswahl-Buttons mit "Andere"</display-name>
+            <display-name lang="fi">Vaakasuuntaiset valintapainikkeet "Muu"-vaihtoehdolla</display-name>
+            <display-name lang="es">Botones de radio horizontales con "Otros"</display-name>
+            <display-name lang="nl">Horizontale keuzerondjes met "Andere"</display-name>
+            <display-name lang="pt">Botões de rádio horizontais com "Outro"</display-name>
+            <display-name lang="sv">Horisontellt enkelval med "Annat"</display-name>
+            <display-name lang="ar">أزرار اختيار أفقية مع "آخر"</display-name>
+            <display-name lang="pl">Poziome przyciski opcji z "Inne"</display-name>
+            <display-name lang="ja">水平「その他」付きラジオボタン</display-name>
+            <toolbox show="false"/>
+            <icon>
+                <icon-class>fa fa-fw fa-dot-circle-o</icon-class>
+            </icon>
+            <editors static-itemset="true" item-hint="true"/>
+            <templates>
+                <view>
+                    <fr:open-select1 id="" ref="" appearance="full xxf:horizontal" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                        <xf:itemset ref="">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                            <xf:hint  ref="hint"/>
+                        </xf:itemset>
+                    </fr:open-select1>
+                </view>
+            </templates>
+        </metadata>
+
+    </xbl:binding>
+</xbl:xbl>

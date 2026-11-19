@@ -121,8 +121,13 @@
                             <xf:select1
                                 id         = "select1"
                                 ref        = "$binding[not($view and property('xxf:readonly-appearance.static.select1') = 'minimal' and not($closed-value))]"
-                                appearance = "{(/*/@appearance, 'full')[1]}"
-                                xbl:attr   = "appearance xxf:encrypt-item-values"
+                                appearance = "{
+                                    if (tokenize(/*/@appearance, '\s+') = 'minimal') then
+                                        string(/*/@appearance)
+                                    else
+                                        string-join(distinct-values(('full', tokenize(/*/@appearance, '\s+'))), ' ')
+                                }"
+                                xbl:attr   = "xxf:encrypt-item-values"
                                 class      = "xxforms-events-mode-default">
 
                                 <xf:itemset ref="$items">

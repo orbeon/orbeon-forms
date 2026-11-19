@@ -12,7 +12,47 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <xbl:xbl xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:xbl="http://www.w3.org/ns/xbl">
+
+    <xbl:binding id="fb-input-select-full-horizontal" element="xf|select[appearance ~= full][appearance ~= 'xxf:horizontal']">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Horizontal Checkboxes</display-name>
+            <display-name lang="fr">Cases à cocher horizontales</display-name>
+            <display-name lang="no">Horisontale avkryssingsbokser</display-name>
+            <display-name lang="ru">Горизонтальные галочки</display-name>
+            <display-name lang="it">Scelta multipla orizzontale</display-name>
+            <display-name lang="de">Horizontale Mehrfachauswahl</display-name>
+            <display-name lang="fi">Vaakasuuntaiset valintaruudut</display-name>
+            <display-name lang="es">Casillas de verificación horizontales</display-name>
+            <display-name lang="nl">Horizontale selectievakjes</display-name>
+            <display-name lang="pt">Caixas de verificação horizontais</display-name>
+            <display-name lang="sv">Horisontellt multival</display-name>
+            <display-name lang="ar">خانات اختيار أفقية</display-name>
+            <display-name lang="pl">Poziome pola wyboru</display-name>
+            <display-name lang="ja">水平チェックボックス</display-name>
+            <toolbox show="false"/>
+            <icon>
+                <icon-class>fa fa-fw fa-check-square-o</icon-class>
+            </icon>
+            <editors static-itemset="true" item-hint="true"/>
+            <templates>
+                <view>
+                    <xf:select id="" appearance="full xxf:horizontal" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                        <xf:itemset ref="">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                            <xf:hint ref="hint"/>
+                        </xf:itemset>
+                    </xf:select>
+                </view>
+            </templates>
+        </metadata>
+    </xbl:binding>
 
     <xbl:binding id="fb-input-select-full" element="xf|select[appearance ~= full]">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">

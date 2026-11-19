@@ -262,10 +262,7 @@ trait BindingOps {
             val elemName =
               conversionMostSpecificDescriptor.elementName.getOrElse(throw new IllegalStateException)
             val appearanceOpt =
-              conversionMostSpecificDescriptor.appearanceOpt.collect {
-                case AttributePredicate.Equal(value) => value
-                case AttributePredicate.Token(value) => value
-              }
+              BindingDescriptor.appearanceValueOpt(conversionMostSpecificDescriptor.appearances)
             val descriptorAtts =
               conversionMostSpecificDescriptor.otherAtts.collect {
                 case BindingAttributeDescriptor(name, AttributePredicate.Equal(value)) => name -> value
@@ -438,11 +435,12 @@ trait BindingOps {
         elemName -> appearanceOpt
 
     val newTuple =
-      newTupleOpt.getOrElse(virtualName, newAppearanceOpt)
+      newTupleOpt.getOrElse(virtualName -> newAppearanceOpt)
 
-    val oldTuple = (oldElemName, oldAppearances.headOption)
+    val newAppearances =
+      newTuple._2.toSet.flatMap((_: String).tokenizeToSet)
 
-    oldTuple != newTuple option newTuple
+    (oldElemName != newTuple._1 || oldAppearances != newAppearances) option newTuple
   }
 
   private[fb] // for tests
@@ -596,7 +594,7 @@ trait BindingOps {
     // `fr|range, xf|range`).
     val allDirectDescriptorsInOrder =
       index.nameOnlySelectors.reverseIterator.collect {
-        case (b @ BindingDescriptor(Some(_), None, None, EmptySet()), _) => b
+        case (b @ BindingDescriptor(Some(_), None, EmptySet(), EmptySet()), _) => b
       }.toList
 
     val directDescriptorsInOrder =
@@ -696,7 +694,7 @@ trait BindingOps {
             b @ BindingDescriptor(
               Some(`virtualName`),
               d @ (None | Some(Datatype1 | Datatype2)),
-              None,
+              EmptySet(),
               a @ (EmptySet() | MatchesAllAttDescsExtractor(_))
             ) =>
               (None, b.binding, d.isDefined, a.nonEmpty)
@@ -704,18 +702,10 @@ trait BindingOps {
             b @ BindingDescriptor(
               Some(`virtualName`),
               d @ (None | Some(Datatype1 | Datatype2)),
-              Some(AttributePredicate.Equal(appearance)),
+              appearances,
               a @ (EmptySet() | MatchesAllAttDescsExtractor(_))
-            ) =>
-              (Some(appearance), b.binding, d.isDefined, a.nonEmpty)
-          case
-            b @ BindingDescriptor(
-              Some(`virtualName`),
-              d @ (None | Some(Datatype1 | Datatype2)),
-              Some(AttributePredicate.Token(appearance)),
-              a @ (EmptySet() | MatchesAllAttDescsExtractor(_))
-            ) =>
-              (Some(appearance), b.binding, d.isDefined, a.nonEmpty)
+            ) if BindingDescriptor.appearanceValueOpt(appearances).isDefined =>
+              (BindingDescriptor.appearanceValueOpt(appearances), b.binding, d.isDefined, a.nonEmpty)
         }
 
       // Consider bindings that match an attribute first
@@ -775,8 +765,11 @@ trait BindingOps {
     ): List[NodeInfo] = {
 
       def appearanceMatches(appearanceOpt: Option[String]): Boolean = appearanceOpt match {
-        case Some(appearance) => appearancesForSelection contains appearance
-        case None             => appearancesForSelection.isEmpty
+        case Some(appearance) =>
+          val targetTokens = appearance.tokenizeToSet
+          appearancesForSelection.exists(_.tokenizeToSet == targetTokens)
+        case None =>
+          appearancesForSelection.isEmpty
       }
 
       val appearancesXML =
@@ -819,7 +812,7 @@ trait BindingOps {
       relatedDescriptors: Iterable[BindingDescriptor]
     ): Option[(QName, Option[String])] = {
 
-      object AppearanceExtractor extends AppearanceExtractor {
+      object AppearancesExtractor extends AppearancesExtractor {
         def getAtts: Iterable[(QName, String)] = searchAtts
         def getFilterAppearance: AttributePredicate => Boolean = EqualOrTokenAttributePredicateFilter
       }
@@ -828,38 +821,41 @@ trait BindingOps {
         def getAtts: Iterable[(QName, String)] = searchAtts
       }
 
+      val sortedByAppearanceCount =
+        relatedDescriptors.toList.sortBy(- _.appearances.size)
+
       def findByNameAndAppearance: Option[(QName, Some[String])] =
-        relatedDescriptors.collectFirst {
+        sortedByAppearanceCount.collectFirst {
           case
-            BindingDescriptor(
+            d @ BindingDescriptor(
               Some(`searchElemName`),
               None,
-              AppearanceExtractor(appearance),
+              AppearancesExtractor(appearance, _),
               EmptySet() | MatchesAllAttDescsExtractor(_)
-            ) => searchElemName -> Some(appearance)
+            ) => searchElemName -> Some(BindingDescriptor.appearanceValueOpt(d.appearances).getOrElse(appearance))
         }
 
       def findByAppearanceOnly: Option[(QName, Some[String])] =
-        relatedDescriptors.collectFirst {
+        sortedByAppearanceCount.collectFirst {
           case
-            BindingDescriptor(
+            d @ BindingDescriptor(
               Some(elemName),
               None,
-              AppearanceExtractor(appearance),
+              AppearancesExtractor(appearance, _),
               EmptySet() | MatchesAllAttDescsExtractor(_)
-            ) => elemName -> Some(appearance)
+            ) => elemName -> Some(BindingDescriptor.appearanceValueOpt(d.appearances).getOrElse(appearance))
         }
 
       def findByNameAndAtt: Option[(QName, None.type)] =
         if (searchAtts.exists(_._1 == APPEARANCE_QNAME))
           None
         else
-          relatedDescriptors.collectFirst {
+          sortedByAppearanceCount.collectFirst {
             case
               BindingDescriptor(
                 Some(`searchElemName`),
                 None,
-                None,
+                EmptySet(),
                 otherAtts @ MatchesAllAttDescsExtractor(_)
               ) if otherAtts.nonEmpty => searchElemName -> None
           }
@@ -888,7 +884,7 @@ object BindingOps {
         BindingDescriptor(
           Some(elemName),
           None,
-          None,
+          EmptySet(),
           EmptySet()
         ) => elemName
     }.toList.reverse
@@ -902,7 +898,7 @@ object BindingOps {
         b @ BindingDescriptor(
           Some(`directName`),
           None,
-          None,
+          EmptySet(),
           EmptySet()
         ) => b
     }

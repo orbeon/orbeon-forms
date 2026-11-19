@@ -1030,7 +1030,7 @@
                 as="xs:string*"
                 select="(
                     if ($is-pdf-mode and $use-pdf-template)                 then 'pdf-template'
-                    else if ($is-pdf-mode)                                  then 'pdf'
+                    else if ($is-pdf-mode and $has-pdf-automatic-binding)   then 'pdf'
                     else if ($is-readonly-mode and $is-static-readonly)     then 'readonly'
                     else if ($is-readonly-mode)                             then 'dynamic-readonly'
                     else (),

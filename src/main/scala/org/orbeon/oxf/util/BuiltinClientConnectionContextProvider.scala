@@ -11,6 +11,8 @@ case class BuiltinClientConnectionContext(ps: Option[ProcessorService])
 
 class BuiltinClientConnectionContextProvider extends ConnectionContextProvider[BuiltinClientConnectionContext] {
 
+  private val previousValues = new ThreadLocal[List[Option[ProcessorService]]]
+
   def getContext(extension: ju.Map[String, Any]): BuiltinClientConnectionContext =
     BuiltinClientConnectionContext(ProcessorService.currentProcessorService.value)
 
@@ -20,9 +22,29 @@ class BuiltinClientConnectionContextProvider extends ConnectionContextProvider[B
     method   : String,
     headers  : ju.Map[String, Array[String]],
     extension: ju.Map[String, Any]
-  ): Unit =
-    ctx.ps.foreach(ps => ProcessorService.currentProcessorService.value = ps)
+  ): Unit = {
+    val prev = ProcessorService.currentProcessorService.value
+    val tail = Option(previousValues.get()).getOrElse(Nil)
+    previousValues.set(prev :: tail)
+    ctx.ps match {
+      case Some(ps) => ProcessorService.currentProcessorService.value = ps
+      case None     => ProcessorService.currentProcessorService.clear()
+    }
+  }
 
   def popContext(ctx: BuiltinClientConnectionContext): Unit =
-    ProcessorService.currentProcessorService.clear()
+    Option(previousValues.get()) match {
+      case Some(prev :: tail) =>
+        if (tail.isEmpty)
+          previousValues.remove()
+        else
+          previousValues.set(tail)
+        prev match {
+          case Some(ps) => ProcessorService.currentProcessorService.value = ps
+          case None     => ProcessorService.currentProcessorService.clear()
+        }
+      case _ =>
+        previousValues.remove()
+        ProcessorService.currentProcessorService.clear()
+    }
 }

@@ -525,10 +525,13 @@ final class InMemoryFormSessionAnalyticsStore extends FormSessionAnalyticsStore 
           case SubmissionCategory.Other       => None
         }
         timingCatOpt.foreach { timingCat =>
-          val extractedAppFormOpt = docOpt.flatMap(extractFormRunnerDocInfo).map(_.appForm)
+          val uuidOpt    = docOpt.map(_.uuid)
+          val appFormOpt =
+            uuidOpt.flatMap(u => lock.synchronized(activeFormSessions.get(u).map(_.appForm)))
+              .orElse(docOpt.flatMap(extractFormRunnerDocInfo).map(_.appForm))
           recordSubmissionTiming(
-            uuidOpt    = docOpt.map(_.uuid),
-            appFormOpt = extractedAppFormOpt,
+            uuidOpt    = uuidOpt,
+            appFormOpt = appFormOpt,
             category   = timingCat,
             durationMs = durationMs,
             succeeded  = succeeded,

@@ -54,6 +54,7 @@ class RegularSubmission(submission: XFormsModelSubmission)
 
     val detailsLogger   = submission.getDetailsLogger
     val externalContext = XFormsCrossPlatformSupport.externalContext
+    val safeRequestCtx  = SafeRequestContext(externalContext)
 
     val absoluteResolvedURL =
       URI.create(
@@ -81,7 +82,7 @@ class RegularSubmission(submission: XFormsModelSubmission)
         getHeader       = submission.containingDocument.headersGetter
       )(
         logger          = detailsLogger,
-        safeRequestCtx  = SafeRequestContext(externalContext)
+        safeRequestCtx  = safeRequestCtx
       )
 
     val submissionEffectiveId = submission.effectiveId
@@ -137,24 +138,29 @@ class RegularSubmission(submission: XFormsModelSubmission)
       res.isInstanceOf[ConnectResultT.Success[?]] && StatusCode.isSuccessCode(cxr.statusCode)
 
     Some(
-      if (submissionParameters.isAsynchronous || submissionParameters.isDeferredSubmission)
+      if (submissionParameters.isAsynchronous || submissionParameters.isDeferredSubmission) {
+        // Capture thread-bound connection context (`ProcessorService.currentProcessorService`, etc.), request
+        // context, and logger state synchronously on the incoming request thread before shifting to `IO` fibers.
+        val connectIo =
+          Connection.connectAsync(
+            method           = submissionParameters.httpMethod,
+            url              = absoluteResolvedURL,
+            credentials      = submissionParameters.credentialsOpt,
+            content          = messageBody.map(StreamedContent.asyncFromBytes(_, firstItemIgnoreCase(headers, ContentType))),
+            headers          = headers,
+            loadState        = true,
+            logBody          = BaseSubmission.isLogBody
+          )(
+            logger           = detailsLogger,
+            safeRequestCtx   = safeRequestCtx,
+            connectionCtx    = ConnectionContextSupport.findContext(Map.empty),
+            resourceResolver = submission.containingDocument.staticState.resourceResolverOpt
+          )
+
         Right(
           IO.defer {
             val startNs = System.nanoTime()
-            Connection.connectAsync(
-              method           = submissionParameters.httpMethod,
-              url              = absoluteResolvedURL,
-              credentials      = submissionParameters.credentialsOpt,
-              content          = messageBody.map(StreamedContent.asyncFromBytes(_, firstItemIgnoreCase(headers, ContentType))),
-              headers          = headers,
-              loadState        = true,
-              logBody          = BaseSubmission.isLogBody
-            )(
-              logger           = detailsLogger,
-              safeRequestCtx   = SafeRequestContext(externalContext),
-              connectionCtx    = ConnectionContextSupport.findContext(Map.empty),
-              resourceResolver = submission.containingDocument.staticState.resourceResolverOpt
-            ).attempt.flatMap {
+            connectIo.attempt.flatMap {
               case Right(cxr) =>
                 val res = createConnectResult(cxr)
                 recordAnalytics(startNs, isSuccessResult(res, cxr))
@@ -165,7 +171,7 @@ class RegularSubmission(submission: XFormsModelSubmission)
             }
           }
         )
-      else {
+      } else {
         val startNs = System.nanoTime()
         try {
           val cxr =

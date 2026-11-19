@@ -721,5 +721,34 @@ class ConnectionTest
 
       assert(streamedBytesCountStr == totalBytes.toString)
     }
+
+    it("must preserve outer ProcessorService across nested ConnectionContextSupport.withContext calls") {
+      val outerPs = Mockito.mock(classOf[ProcessorService])
+      val innerPs = Mockito.mock(classOf[ProcessorService])
+
+      val innerCtx =
+        ProcessorService.withProcessorService(innerPs) {
+          ConnectionContextSupport.findContext(Map.empty)
+        }
+
+      assert(ProcessorService.currentProcessorService.value.isEmpty)
+
+      ProcessorService.withProcessorService(outerPs) {
+        assert(ProcessorService.currentProcessorService.value.contains(outerPs))
+
+        ConnectionContextSupport.withContext(
+          url       = URI.create("/fr/orbeon/bookshelf/view/123"),
+          method    = HttpMethod.POST,
+          headers   = Map.empty,
+          extension = Map.empty
+        ) {
+          assert(ProcessorService.currentProcessorService.value.contains(innerPs))
+        }(innerCtx)
+
+        assert(ProcessorService.currentProcessorService.value.contains(outerPs))
+      }
+
+      assert(ProcessorService.currentProcessorService.value.isEmpty)
+    }
   }
 }

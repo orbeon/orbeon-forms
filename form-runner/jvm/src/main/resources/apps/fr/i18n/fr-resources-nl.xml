@@ -466,6 +466,151 @@
     <admin>
         <title>Formulierenbeheer</title>
     </admin>
+    <console>
+        <title todo="true">Admin Console</title>
+        <cards>
+            <jvm-heap todo="true">JVM Heap Memory</jvm-heap>
+            <caches-heap todo="true">Estimated Cache Heap</caches-heap>
+            <disk-stores todo="true">Cache Disk Stores</disk-stores>
+            <sessions-documents todo="true">Sessions &amp; Live Documents</sessions-documents>
+        </cards>
+        <tabs>
+            <caches todo="true">Caches &amp; State Stores</caches>
+            <static-states todo="true">XForms Static States</static-states>
+            <live-documents todo="true">Live XForms Documents</live-documents>
+            <jvm todo="true">JVM &amp; Runtime</jvm>
+        </tabs>
+        <sections>
+            <documents-by-path todo="true">Live Documents by Request Path</documents-by-path>
+            <individual-documents todo="true">Live Document Instances</individual-documents>
+            <runtime-info todo="true">Runtime &amp; Memory Flags</runtime-info>
+            <memory-pools todo="true">JVM Memory Pools</memory-pools>
+            <garbage-collectors todo="true">Garbage Collectors</garbage-collectors>
+        </sections>
+        <columns>
+            <cache-name todo="true">Cache / Store</cache-name>
+            <engine todo="true">Engine</engine>
+            <heap-entries todo="true">Heap Entries</heap-entries>
+            <total-entries todo="true">Total Entries</total-entries>
+            <limits todo="true">Limits &amp; Expiration</limits>
+            <est-heap todo="true">Est. Heap</est-heap>
+            <disk-store todo="true">Disk Store (Files)</disk-store>
+            <hits-misses todo="true">Hits / Misses</hits-misses>
+            <hit-rate todo="true">Hit Rate</hit-rate>
+            <evictions todo="true">Evictions</evictions>
+            <actions todo="true">Actions</actions>
+            <form-or-path todo="true">Form / Path</form-or-path>
+            <mode todo="true">Mode</mode>
+            <digest todo="true">Digest</digest>
+            <controls todo="true">Controls</controls>
+            <models todo="true">Models</models>
+            <template-size todo="true">Template</template-size>
+            <static-dom-size todo="true">Static DOM</static-dom-size>
+            <encoded-size todo="true">Encoded State</encoded-size>
+            <compiled todo="true">Compiled</compiled>
+            <idle todo="true">Idle</idle>
+            <request-path todo="true">Request Path</request-path>
+            <document-count todo="true">Documents</document-count>
+            <max-sequence todo="true">Max Sequence</max-sequence>
+            <uuid todo="true">Document UUID</uuid>
+            <status todo="true">Status</status>
+            <sequence todo="true">Ajax Updates</sequence>
+            <pool-name todo="true">Memory Pool</pool-name>
+            <type todo="true">Type</type>
+            <used todo="true">Used</used>
+            <committed todo="true">Committed</committed>
+            <max todo="true">Max</max>
+            <gc-name todo="true">Collector</gc-name>
+            <collections todo="true">Collections</collections>
+            <total-time todo="true">Total Time</total-time>
+        </columns>
+        <labels>
+            <orbeon-version todo="true">Orbeon Forms</orbeon-version>
+            <uptime todo="true">Uptime</uptime>
+            <updated todo="true">Snapshot</updated>
+            <committed todo="true">Committed</committed>
+            <of-max-heap todo="true">of max heap</of-max-heap>
+            <files-on-disk todo="true">files on disk</files-on-disk>
+            <live-docs todo="true">live in heap</live-docs>
+            <http-sessions todo="true">HTTP sessions</http-sessions>
+            <active-requests todo="true">active locks</active-requests>
+            <status-cached todo="true">Cached</status-cached>
+            <status-in-request todo="true">In request</status-in-request>
+            <status-cached-lower todo="true">cached</status-cached-lower>
+            <status-in-request-lower todo="true">in request</status-in-request-lower>
+            <store-entries todo="true">entries</store-entries>
+            <processors todo="true">Processors</processors>
+            <non-heap todo="true">Non-Heap Used</non-heap>
+            <sort-ascending todo="true">ascending</sort-ascending>
+            <sort-descending todo="true">descending</sort-descending>
+            <window todo="true">Window</window>
+            <auto-refresh todo="true">Auto-refresh</auto-refresh>
+            <auto-off todo="true">Off</auto-off>
+            <max-heap todo="true">Max heap</max-heap>
+        </labels>
+        <pages>
+            <summary todo="true">Form Runner Summary</summary>
+            <home todo="true">Forms Admin</home>
+            <landing todo="true">Landing</landing>
+            <console todo="true">Admin Console</console>
+        </pages>
+        <buttons>
+            <refresh todo="true">&lt;i class="fa fa-fw fa-refresh" aria-hidden="true"&gt;&lt;/i&gt; Refresh</refresh>
+            <charts todo="true">&lt;i class="fa fa-fw fa-chart-line" aria-hidden="true"&gt;&lt;/i&gt; Charts</charts>
+            <clear todo="true">Clear</clear>
+        </buttons>
+        <messages>
+            <no-static-states todo="true">No XForms static states are currently cached in memory.</no-static-states>
+            <no-live-documents todo="true">No live XForms documents are currently in JVM heap.</no-live-documents>
+            <live-documents-note todo="true">Only documents currently in JVM heap (cached in xforms.cache.live-documents or actively handling a request) appear below. Open forms evicted when this cache reaches its limit remain active in xforms.store.dynamic-states and rehydrate automatically on interaction.</live-documents-note>
+            <sorted-announcement todo="true">Sorted by {0}, {1}</sorted-announcement>
+            <no-chart-data todo="true">No data available yet.</no-chart-data>
+        </messages>
+        <charts>
+            <memory-trend title="Memory &amp; Disk Trend" subtitle="JVM heap, estimated cache heap, and disk stores"/>
+            <activity-trend title="Cache Throughput &amp; Evictions" subtitle="Aggregate lookup rates and eviction deltas"/>
+            <heap-breakdown title="Estimated Cache Heap Share" subtitle="Top caches and stores by estimated heap footprint"/>
+            <static-anatomy title="Compiled Form Memory Anatomy" subtitle="Top compiled forms by static DOM, HTML template, and XPath/control analysis"/>
+            <live-docs-trend title="Sessions, Live Heap &amp; State Store" subtitle="Open HTTP sessions, live heap documents, and dynamic state store entries"/>
+            <live-docs-by-path title="Live Document Heap by Request Path" subtitle="Top active form paths by total estimated heap"/>
+            <gc-trend title="GC Pause Activity" subtitle="Collection pause time and collection count per sample interval"/>
+            <memory-pools title="JVM Memory Pools" subtitle="Used vs. committed headroom across heap and non-heap pools"/>
+            <series>
+                <heap-used todo="true">JVM Heap Used</heap-used>
+                <cache-heap todo="true">Est. Cache Heap</cache-heap>
+                <disk-store todo="true">Disk Stores</disk-store>
+                <heap-committed todo="true">Heap Committed</heap-committed>
+                <hits-rate todo="true">Hits / sec</hits-rate>
+                <misses-rate todo="true">Misses / sec</misses-rate>
+                <evictions todo="true">Evictions</evictions>
+                <static-dom todo="true">Static DOM</static-dom>
+                <template todo="true">HTML Template</template>
+                <analysis-other todo="true">XPath &amp; Control Analysis</analysis-other>
+                <live-docs todo="true">Live Docs (Heap)</live-docs>
+                <state-store todo="true">Dynamic State Store</state-store>
+                <sessions todo="true">HTTP Sessions</sessions>
+                <live-doc-heap todo="true">Live Document Heap</live-doc-heap>
+                <gc-pause-ms todo="true">GC Pause Time</gc-pause-ms>
+                <gc-collections todo="true">Collections</gc-collections>
+                <pool-used todo="true">Used</pool-used>
+                <pool-headroom todo="true">Committed Headroom</pool-headroom>
+            </series>
+        </charts>
+        <cache-descriptions>
+            <core-cache-pipelines todo="true" title="Pipeline &amp; Resource Cache">Caches compiled XPL pipelines, XSLT stylesheets, and parsed XML configuration files in memory so Orbeon Forms does not have to re-parse them on every request. Entries are automatically invalidated whenever an underlying resource changes, and clearing this cache is safe.</core-cache-pipelines>
+            <core-cache-properties todo="true" title="Configuration Properties Cache">Caches parsed configuration property sets (from XML files and the Configuration UI) along with their change tags so property lookups stay fast on every request. Clearing this cache is safe and forces a fresh reload from property providers on the next request.</core-cache-properties>
+            <core-cache-xpath todo="true" title="XPath Expression Cache">Caches compiled XPath expressions used by formulas, validations, visibility rules, and actions across all forms. Evicting or clearing entries is safe — expressions are recompiled automatically the next time they are evaluated.</core-cache-xpath>
+            <fr-cache-form-metadata todo="true" title="Form Metadata Cache">Caches published form metadata queried from the database (such as latest version numbers, permissions, indexed fields, and encrypted fields) for a short time to reduce database traffic. Publishing a form invalidates its entry automatically, and clearing this cache is safe.</fr-cache-form-metadata>
+            <fr-store-external-modes todo="true" title="External Mode State Store">Temporarily stores encrypted form state tokens when transitioning between Form Runner and external workflows (such as external review, PDF, or callback pages). Entries expire automatically after a short time.</fr-store-external-modes>
+            <xforms-cache-live-documents todo="true" title="Live Form Documents Cache">Keeps recently used open form instances ready in JVM memory for fast interactive updates. When this cache reaches its entry or memory limit, the least recently used open forms are passivated to xforms.store.dynamic-states rather than lost, and rehydrate automatically when the user interacts with them again.</xforms-cache-live-documents>
+            <xforms-cache-shared-instances todo="true" title="Shared Read-Only Instances Cache">Shares read-only XML data instances (such as localized form resources and static lookup lists) across all users viewing the same form so each open form does not keep its own copy in memory. Clearing this cache is safe — shared data is reloaded on demand.</xforms-cache-shared-instances>
+            <xforms-cache-static-states todo="true" title="Compiled Form Definitions Cache">Holds the analyzed structure, formulas, and HTML template of each loaded form in JVM memory, shared by all users opening that form. If an entry is evicted or cleared, Orbeon Forms restores it automatically from xforms.store.static-states (or recompiles the form if needed).</xforms-cache-static-states>
+            <xforms-cache-xbl-bindings todo="true" title="Global XBL Component Library">Holds the shared definitions of built-in and custom UI controls (such as date pickers, dropdowns, grids, and section templates) loaded once for the entire server. Because all forms share this single library in memory, it stays resident for the lifetime of the server.</xforms-cache-xbl-bindings>
+            <xforms-store-asset-bundles todo="true" title="Combined JS &amp; CSS Bundles Store">Maps hashed JavaScript and CSS bundle URLs to the list of scripts and stylesheets needed by each page, overflowing older mappings to disk when needed so browsers can reliably load combined page assets.</xforms-store-asset-bundles>
+            <xforms-store-dynamic-states todo="true" title="Form Session State Store">Stores the initial and passivated data of open user forms (in memory and overflowed to disk) so users never lose their work when a form leaves xforms.cache.live-documents or when navigating back in the browser. Entries are cleaned up automatically when user sessions end or expire.</xforms-store-dynamic-states>
+            <xforms-store-static-states todo="true" title="Compressed Form Definitions Store">Stores compact, compressed snapshots of compiled forms (with disk overflow) behind xforms.cache.static-states. When a large form leaves the in-memory static state cache, it is restored quickly from this store without recompiling from scratch.</xforms-store-static-states>
+        </cache-descriptions>
+    </console>
     <landing>
         <title>Landing</title>
         <titles>
@@ -477,6 +622,7 @@
             <demo-features>Demofuncties</demo-features>
             <quick-links>Snelle koppelingen</quick-links>
             <form-runner-admin>Form Runner-beheer</form-runner-admin>
+            <admin-console todo="true">Admin Console</admin-console>
             <configuration>Configuratie</configuration>
         </titles>
         <descriptions>
@@ -521,6 +667,7 @@
             <reencrypt>Formdefinities opnieuw versleutelen</reencrypt>
             <reload-resources>Resources opnieuw laden</reload-resources>
             <configuration>Configuratie</configuration>
+            <console todo="true">Admin Console</console>
             <reload-properties>Eigenschappen opnieuw laden</reload-properties>
         </buttons>
         <titles>

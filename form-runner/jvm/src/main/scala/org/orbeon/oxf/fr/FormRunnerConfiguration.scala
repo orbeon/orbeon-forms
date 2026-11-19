@@ -117,6 +117,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
   val Categories: List[String] =
     List(
       "system",
+      "caches",
       "navbar",
       "appearance",
       "detail",
@@ -177,9 +178,10 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
       hasAppForm   = false,
       defaultValue = "true"
     ),
+    // 2. Caches
     CuratedPropertyDef(
       key             = "cache-documents-size",
-      category        = "system",
+      category        = "caches",
       baseName        = "oxf.xforms.cache.live-documents.size",
       xsType          = "xs:integer",
       hasAppForm      = false,
@@ -189,7 +191,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
     CuratedPropertyDef(
       key             = "cache-documents-max-size-bytes",
-      category        = "system",
+      category        = "caches",
       baseName        = "oxf.xforms.cache.live-documents.max-size-bytes",
       xsType          = "xs:string",
       hasAppForm      = false,
@@ -199,7 +201,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
     CuratedPropertyDef(
       key             = "cache-documents-max-idle",
-      category        = "system",
+      category        = "caches",
       baseName        = "oxf.xforms.cache.live-documents.max-idle",
       xsType          = "xs:string",
       hasAppForm      = false,
@@ -209,7 +211,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
     CuratedPropertyDef(
       key             = "cache-static-state-size",
-      category        = "system",
+      category        = "caches",
       baseName        = "oxf.xforms.cache.static-states.size",
       xsType          = "xs:integer",
       hasAppForm      = false,
@@ -219,7 +221,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
     CuratedPropertyDef(
       key             = "cache-static-state-max-size-bytes",
-      category        = "system",
+      category        = "caches",
       baseName        = "oxf.xforms.cache.static-states.max-size-bytes",
       xsType          = "xs:string",
       hasAppForm      = false,
@@ -229,7 +231,7 @@ object FormRunnerConfiguration extends FormRunnerConfiguration {
     ),
     CuratedPropertyDef(
       key             = "cache-static-state-max-idle",
-      category        = "system",
+      category        = "caches",
       baseName        = "oxf.xforms.cache.static-states.max-idle",
       xsType          = "xs:string",
       hasAppForm      = false,

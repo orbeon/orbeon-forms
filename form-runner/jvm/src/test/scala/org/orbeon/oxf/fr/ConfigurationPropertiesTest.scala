@@ -53,15 +53,15 @@ class ConfigurationPropertiesTest
       assert(defaultLangElem.attributeValue("override") == "false")
       assert(defaultLangElem.attributeValue("value") == "en")
 
-      val docsSizeElem = curatedElem.element("system").element("cache-documents-size")
+      val docsSizeElem = curatedElem.element("caches").element("cache-documents-size")
       assert(docsSizeElem.attributeValue("override") == "false")
       assert(docsSizeElem.attributeValue("value") == "500")
 
-      val staticSizeElem = curatedElem.element("system").element("cache-static-state-size")
+      val staticSizeElem = curatedElem.element("caches").element("cache-static-state-size")
       assert(staticSizeElem.attributeValue("override") == "false")
       assert(staticSizeElem.attributeValue("value") == "200")
 
-      val staticBytesElem = curatedElem.element("system").element("cache-static-state-max-size-bytes")
+      val staticBytesElem = curatedElem.element("caches").element("cache-static-state-max-size-bytes")
       assert(staticBytesElem.attributeValue("override") == "false")
       assert(staticBytesElem.attributeValue("value") == "15%")
       assert(staticBytesElem.attributeValue("name") == "oxf.xforms.cache.static-states.max-size-bytes")
@@ -74,7 +74,7 @@ class ConfigurationPropertiesTest
             |</properties>""".stripMargin
         )
       val migratedConfigDoc = FormRunnerConfiguration.propertiesDomToConfigurationDom(legacyCachePropsDoc)
-      val migratedDocsElem  = migratedConfigDoc.getRootElement.element("curated").element("system").element("cache-documents-size")
+      val migratedDocsElem  = migratedConfigDoc.getRootElement.element("curated").element("caches").element("cache-documents-size")
       assert(migratedDocsElem.attributeValue("override") == "true")
       assert(migratedDocsElem.attributeValue("value") == "33")
       val migratedOutDoc = FormRunnerConfiguration.configurationDomToPropertiesDom(migratedConfigDoc)

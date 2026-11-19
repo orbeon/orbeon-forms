@@ -1427,6 +1427,15 @@
                         <xf:property name="content-length" value="event('content-length')"/>
                     </xf:dispatch>
 
+                    <xf:dispatch
+                        event="xforms-value-changed"
+                        targetid="fr-image-attachment"
+                        name="{event('xxf:type')}"
+                        propagate="stop"
+                        defaultAction="cancel">
+                        <xf:property name="xxf:value" value="event('xxf:value')"/>
+                    </xf:dispatch>
+
                 </fr:attachment>
                 <xf:output mediatype="image/*" ref="$binding[not($multiple) and xxf:non-blank()]">
                     <xf:filename  ref="@filename"  xxbl:scope="outer"/>

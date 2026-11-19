@@ -52,6 +52,10 @@
                 name="is-configuration-available"
                 value="doc-available('oxf:/forms/orbeon/configuration/form/form.xhtml')"/>
 
+            <xf:var
+                name="is-console-available"
+                value="doc-available('oxf:/apps/fr/console/console.xhtml')"/>
+
             <!-- Similar logic in Form Builder model.xml -->
             <xf:var
                 name="is-allow-form-builder"
@@ -155,7 +159,7 @@
                                         <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
                                     </xh:figure>
                                 </xh:a>
-                                <xh:a href="/fr/console" class="{'xforms-hidden'[not($is-allow-admin)]}">
+                                <xh:a href="/fr/console" class="{'xforms-hidden'[not($is-console-available and $is-allow-admin)]}">
                                     <xh:figure>
                                         <xh:img src="/apps/fr/style/images/orbeon/console.svg" alt="" class="img-thumbnail img-invertible"/>
                                         <xh:figcaption><xf:output value="xxf:r('landing.titles.admin-console', '|fr-fr-resources|')"/></xh:figcaption>

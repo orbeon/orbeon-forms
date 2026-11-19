@@ -25,6 +25,7 @@ import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.analytics.XFormsAnalyticsSupport
 import org.orbeon.oxf.xforms.analysis.PartAnalysisBuilder
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, XFormsStateManager, XFormsStateStore, XFormsStaticStateCache}
 import org.orbeon.oxf.xml.*
@@ -113,6 +114,8 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
 
     implicit val externalContext: ExternalContext = XFormsCrossPlatformSupport.externalContext
     implicit val indentedLogger : IndentedLogger  = XFormsStateManager.newIndentedLogger
+
+    val initStartNs = System.nanoTime()
 
     def newHtmlLogger: IndentedLogger =
       Loggers.newIndentedLogger("html")
@@ -259,9 +262,30 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
       // Scope because dynamic properties can cause lazy XPath evaluations
       XFormsAPI.withContainingDocument(containingDocument) {
         XFormsStateManager.afterInitialResponse(containingDocument, disableDocumentCache = false)
+        if (initializeXFormsDocument) {
+          val durationMs = math.max(0L, (System.nanoTime() - initStartNs) / 1000000L)
+          val req        = externalContext.getRequest
+          val sessionOpt = req.sessionOpt
+          XFormsAnalyticsSupport.withListener(
+            _.onDocumentInitialized(
+              doc            = containingDocument,
+              sessionIdOpt   = sessionOpt.flatMap(s => Option(s.getId)),
+              usernameOpt    = req.credentials.map(_.userAndGroup.username),
+              maxInactiveSec = sessionOpt.map(_.getMaxInactiveInterval).getOrElse(-1),
+              durationMs     = durationMs
+            )
+          )
+        }
       }
     } catch {
       case NonFatal(t) =>
+        val durationMs = math.max(0L, (System.nanoTime() - initStartNs) / 1000000L)
+        XFormsAnalyticsSupport.withListener(
+          _.onDocumentInitFailed(
+            requestPath = Option(externalContext.getRequest).flatMap(r => Option(r.getRequestPath)).getOrElse(""),
+            durationMs  = durationMs
+          )
+        )
         debug("throwable caught during initialization.")(newHtmlLogger)
         throw new OXFException(t)
     }

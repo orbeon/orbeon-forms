@@ -535,6 +535,7 @@
             <home>Administration des formulaires</home>
             <landing>Accueil</landing>
             <console>Console d'administration</console>
+            <analytics>Analytique formulaires</analytics>
         </pages>
         <buttons>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-hidden="true"&gt;&lt;/i&gt; Rafraîchir</refresh>
@@ -593,6 +594,193 @@
             <xforms-store-static-states title="Magasin des définitions compressées XForms">Conserve sur mémoire et disque une copie compressée des définitions compilées en complément de xforms.cache.static-states, permettant une restauration rapide sans recompilation complète.</xforms-store-static-states>
         </cache-descriptions>
     </console>
+    <analytics>
+        <title>Analytique formulaires</title>
+        <cards>
+            <active-sessions>Sessions de formulaires actives</active-sessions>
+            <active-users>Utilisateurs connectés et actifs</active-users>
+            <completion-rate>Taux de complétion</completion-rate>
+            <sessions-with-errors>Sessions avec erreurs</sessions-with-errors>
+            <submitted-data>Données soumises</submitted-data>
+            <published-forms>Formulaires publiés</published-forms>
+        </cards>
+        <tabs>
+            <form-sessions>Sessions</form-sessions>
+            <submitted-data>Données soumises</submitted-data>
+            <published-forms>Formulaires publiés</published-forms>
+            <users>Utilisateurs</users>
+            <timings>Temps de réponse</timings>
+        </tabs>
+        <sections>
+            <funnel-by-form>Entonnoir et résultats des sessions par formulaire</funnel-by-form>
+            <active-recent-sessions>Sessions de formulaires actives et récentes</active-recent-sessions>
+            <submitted-by-form>Données soumises et brouillons par formulaire</submitted-by-form>
+            <workflow-stages>Répartition par étape de workflow</workflow-stages>
+            <apps-summary>Résumé par application</apps-summary>
+            <published-inventory>Inventaire des formulaires publiés</published-inventory>
+            <submitting-users>Répartition des soumissions par utilisateur</submitting-users>
+            <active-user-sessions>Sessions utilisateurs connectées</active-user-sessions>
+            <timings-by-category>Latence par catégorie d'opération</timings-by-category>
+            <timings-by-form>Latence par formulaire</timings-by-form>
+        </sections>
+        <columns>
+            <app>Application</app>
+            <form>Formulaire</form>
+            <title>Titre</title>
+            <version>Version</version>
+            <versions>Versions</versions>
+            <mode>Mode</mode>
+            <status>Statut</status>
+            <user>Utilisateur</user>
+            <opened>Ouvertes</opened>
+            <bounced>Rebonds</bounced>
+            <interacted>Interagies</interacted>
+            <drafts-saved>Brouillons</drafts-saved>
+            <submitted>Soumises</submitted>
+            <in-window>Période</in-window>
+            <drafts>Brouillons</drafts>
+            <abandoned>Abandonnées</abandoned>
+            <completion>Complétion</completion>
+            <errors>Erreurs</errors>
+            <avg-time-spent>Durée moy.</avg-time-spent>
+            <time-spent>Durée</time-spent>
+            <ajax-updates>Mises à jour Ajax</ajax-updates>
+            <active-serialized>Mémoire / Passivé</active-serialized>
+            <expires-in>Expire dans</expires-in>
+            <latest-submission>Dernière activité</latest-submission>
+            <workflow-stage>Étape de workflow</workflow-stage>
+            <share>Part</share>
+            <published-forms>Formulaires</published-forms>
+            <available>Disponibles</available>
+            <unavailable>Indisponibles</unavailable>
+            <last-modified>Modifié le</last-modified>
+            <modified-by>Modifié par</modified-by>
+            <distinct-forms>Formulaires</distinct-forms>
+            <session>Session</session>
+            <active-forms>Formulaires actifs</active-forms>
+            <session-age>Âge session</session-age>
+            <idle>Inactivité</idle>
+            <category>Opération</category>
+            <count>Nombre</count>
+            <avg>Moy.</avg>
+            <p50>p50</p50>
+            <p95>p95</p95>
+            <max>Max</max>
+            <loads>Chargements</loads>
+            <avg-load>Charg. moy.</avg-load>
+            <p95-load>p95 Charg.</p95-load>
+            <avg-ajax>Ajax moy.</avg-ajax>
+            <saves>Sauvegardes</saves>
+            <avg-save>Sauv. moy.</avg-save>
+            <service-calls>Services</service-calls>
+            <avg-service>Service moy.</avg-service>
+            <actions>Actions</actions>
+        </columns>
+        <labels>
+            <updated>Mis à jour</updated>
+            <scope-all>Périmètre : Toutes les applications</scope-all>
+            <scope-restricted>Périmètre : Restreint</scope-restricted>
+            <all-apps>Toutes les applications</all-apps>
+            <all-forms>Tous les formulaires</all-forms>
+            <app-filter>App</app-filter>
+            <form-filter>Formulaire</form-filter>
+            <window>Fenêtre</window>
+            <auto-refresh>Actualisation auto</auto-refresh>
+            <auto-off>Désactivée</auto-off>
+            <in-heap>en mémoire</in-heap>
+            <passivated>passivées</passivated>
+            <active-5m>actives (5m)</active-5m>
+            <http-sessions>sessions HTTP</http-sessions>
+            <authenticated>authentifiés</authenticated>
+            <anonymous>anonymes</anonymous>
+            <anonymous-user>(anonyme)</anonymous-user>
+            <opened-short>ouvertes</opened-short>
+            <submitted-short>soumises</submitted-short>
+            <abandoned-short>abandonnées</abandoned-short>
+            <of-opened>des sessions ouvertes</of-opened>
+            <in-selected-window>sur la période</in-selected-window>
+            <drafts-short>brouillons</drafts-short>
+            <across-apps>sur {0} applications</across-apps>
+            <available-short>disponibles</available-short>
+            <unavailable-short>indisponibles</unavailable-short>
+            <sort-ascending>croissant</sort-ascending>
+            <sort-descending>décroissant</sort-descending>
+        </labels>
+        <states>
+            <active-heap>Active en mémoire</active-heap>
+            <passivated>Passivée</passivated>
+            <submitted>Soumise</submitted>
+            <draft-saved>Brouillon enregistré</draft-saved>
+            <abandoned>Abandonnée</abandoned>
+            <bounced>Rebond (0 int.)</bounced>
+            <error>Erreur</error>
+            <closed>Fermée</closed>
+        </states>
+        <timing-categories>
+            <form-load>Chargement et initialisation</form-load>
+            <ajax-update>Mises à jour interactives Ajax</ajax-update>
+            <save-action>Sauvegarde des données et pièces jointes</save-action>
+            <send-process>Actions d'envoi / Email / PDF</send-process>
+            <service-call>Appels aux services externes</service-call>
+            <persistence-call>Appels à la couche de persistance</persistence-call>
+        </timing-categories>
+        <buttons>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-hidden="true"&gt;&lt;/i&gt; Actualiser</refresh>
+            <charts>&lt;i class="fa fa-fw fa-chart-line" aria-hidden="true"&gt;&lt;/i&gt; Graphiques</charts>
+            <summary>Sommaire</summary>
+        </buttons>
+        <messages>
+            <no-funnel-data>Aucune session de formulaire enregistrée sur la période sélectionnée.</no-funnel-data>
+            <no-sessions>Aucune session active ou récente ne correspond aux filtres sélectionnés.</no-sessions>
+            <no-submitted-data>Aucune donnée soumise ni brouillon trouvé pour le périmètre sélectionné.</no-submitted-data>
+            <no-workflow-stages>Aucun enregistrement soumis avec étape de workflow trouvé.</no-workflow-stages>
+            <no-published-forms>Aucun formulaire publié trouvé pour le périmètre sélectionné.</no-published-forms>
+            <no-submitting-users>Aucune soumission utilisateur trouvée pour le périmètre sélectionné.</no-submitting-users>
+            <no-active-users>Aucune session utilisateur connectée ne correspond au périmètre sélectionné.</no-active-users>
+            <no-form-timings>Aucune mesure de latence par formulaire sur la période sélectionnée.</no-form-timings>
+            <sorted-announcement>Trié par {0}, ordre {1}</sorted-announcement>
+        </messages>
+        <charts>
+            <empty>Aucune donnée sur la période sélectionnée.</empty>
+            <sessions-activity-title>Activité des sessions au fil du temps</sessions-activity-title>
+            <sessions-activity-subtitle>Sessions ouvertes, soumises, abandonnées et en erreur par intervalle</sessions-activity-subtitle>
+            <sessions-funnel-title>Entonnoir de conversion des sessions</sessions-funnel-title>
+            <sessions-funnel-subtitle>Progression et abandon des sessions interactives sur la période</sessions-funnel-subtitle>
+            <data-trend-title>Soumissions et brouillons persistés</data-trend-title>
+            <data-trend-subtitle>Enregistrements créés en base sur la période sélectionnée</data-trend-subtitle>
+            <data-top-forms-title>Principaux formulaires par volume</data-top-forms-title>
+            <data-top-forms-subtitle>Données soumises et brouillons actifs (top 10)</data-top-forms-subtitle>
+            <inventory-forms-title>Formulaires publiés par application</inventory-forms-title>
+            <inventory-forms-subtitle>Définitions disponibles et indisponibles par application</inventory-forms-subtitle>
+            <inventory-data-title>Données stockées par application</inventory-data-title>
+            <inventory-data-subtitle>Total des soumissions et brouillons regroupés par application</inventory-data-subtitle>
+            <users-breakdown-title>Principaux utilisateurs soumetteurs</users-breakdown-title>
+            <users-breakdown-subtitle>Soumissions par utilisateur et soumissions anonymes</users-breakdown-subtitle>
+            <users-trend-title>Utilisateurs actifs et sessions connectées</users-trend-title>
+            <users-trend-subtitle>Pic d'utilisateurs actifs et de sessions HTTP par intervalle</users-trend-subtitle>
+            <timings-trend-title>Latence des requêtes et actions</timings-trend-title>
+            <timings-trend-subtitle>Durée moyenne de chargement, Ajax, sauvegarde et appel service</timings-trend-subtitle>
+            <timings-slowest-title>Formulaires les plus lents (chargement et sauvegarde)</timings-slowest-title>
+            <timings-slowest-subtitle>Durées moyennes d'initialisation et de sauvegarde (top 10)</timings-slowest-subtitle>
+            <series>
+                <sessions-opened>Ouvertes</sessions-opened>
+                <sessions-submitted>Soumises</sessions-submitted>
+                <sessions-abandoned>Abandonnées</sessions-abandoned>
+                <sessions-errors>Avec erreurs</sessions-errors>
+                <funnel-sessions>Sessions</funnel-sessions>
+                <data-submitted>Soumises</data-submitted>
+                <data-drafts>Brouillons</data-drafts>
+                <forms-available>Disponibles</forms-available>
+                <forms-unavailable>Indisponibles</forms-unavailable>
+                <active-users>Utilisateurs actifs</active-users>
+                <connected-sessions>Sessions HTTP</connected-sessions>
+                <avg-form-load>Chargement moy.</avg-form-load>
+                <avg-ajax-update>Ajax moy.</avg-ajax-update>
+                <avg-save-action>Sauvegarde moy.</avg-save-action>
+                <avg-service-call>Service moy.</avg-service-call>
+            </series>
+        </charts>
+    </analytics>
     <landing>
         <title>Landing</title>
         <titles>
@@ -605,6 +793,7 @@
             <quick-links>Raccourcis</quick-links>
             <form-runner-admin>Admin formulaires</form-runner-admin>
             <admin-console>Console d'admin</admin-console>
+            <forms-analytics>Analytique formulaires</forms-analytics>
             <configuration>Configuration</configuration>
         </titles>
         <descriptions>
@@ -650,6 +839,7 @@
             <reload-resources>Recharger les resources</reload-resources>
             <configuration>Configuration</configuration>
             <console>Console d'admin</console>
+            <analytics>Analytique formulaires</analytics>
             <reload-properties>Recharger les propriétés</reload-properties>
         </buttons>
         <titles>

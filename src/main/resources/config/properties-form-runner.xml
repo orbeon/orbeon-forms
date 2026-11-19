@@ -963,4 +963,11 @@
         ]
     </property>
 
+    <!-- === Forms Analytics (/fr/analytics) === -->
+    <property as="xs:boolean" name="oxf.fr.analytics.enable"              value="true"/>
+    <property as="xs:string"  name="oxf.fr.analytics.roles.*.*"           value=""/>
+    <property as="xs:boolean" name="oxf.fr.analytics.show-usernames"      value="true"/>
+    <property as="xs:integer" name="oxf.fr.analytics.max-active-sessions" value="20000"/>
+    <property as="xs:integer" name="oxf.fr.analytics.max-recent-sessions" value="500"/>
+
 </properties>

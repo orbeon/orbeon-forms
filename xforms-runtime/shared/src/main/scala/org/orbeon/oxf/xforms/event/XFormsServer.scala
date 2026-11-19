@@ -13,6 +13,7 @@ import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.{withLock, withUpdateResponse}
 import org.orbeon.oxf.xforms.*
 import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.analytics.XFormsAnalyticsSupport
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
@@ -90,6 +91,8 @@ object XFormsServer {
 
           if (ignoreSequenceNumber || (requestParameters.sequenceOpt contains expectedSequenceNumber)) {
             // We are good: process request and produce new sequence number
+            val ajaxStartNs   = System.nanoTime()
+            val isInteraction = isAjaxRequest && remainingClientEvents.exists(_.eventName != EventNames.XXFormsAllEventsRequired)
             try {
 
               beforeProcessRequest(containingDocument)
@@ -152,88 +155,120 @@ object XFormsServer {
                 }
               }
 
-              Success(
-                withUpdateResponse(containingDocument, ignoreSequenceNumber) {
-                  containingDocument.getReplaceAllFuture match {
-                    case None =>
-                      xmlReceiverOpt match {
-                        case Some(xmlReceiver) =>
+              val res =
+                Success(
+                  withUpdateResponse(containingDocument, ignoreSequenceNumber) {
+                    containingDocument.getReplaceAllFuture match {
+                      case None =>
+                        xmlReceiverOpt match {
+                          case Some(xmlReceiver) =>
 
-                          // Create resulting document if there is a receiver
-                          if (containingDocument.isGotSubmissionRedirect) {
-                            // Redirect already sent
-                            // Output null document so that rest of pipeline doesn't fail and no further processing takes place
-                            debug("handling submission with `replace=\"all\"` with redirect")
-                            XMLReceiverHelper.streamNullDocument(xmlReceiver)
-                          } else {
-                            // This is an Ajax response
-                            withDebug("handling regular Ajax response") {
-                              // Hook-up debug content handler if we must log the response document
-                              // Buffer for retries
-                              val responseStore = new SAXStore
-                              // Two receivers possible
-                              val receivers = new ju.ArrayList[XMLReceiver]
-                              receivers.add(responseStore)
+                            // Create resulting document if there is a receiver
+                            if (containingDocument.isGotSubmissionRedirect) {
+                              // Redirect already sent
+                              // Output null document so that rest of pipeline doesn't fail and no further processing takes place
+                              debug("handling submission with `replace=\"all\"` with redirect")
+                              XMLReceiverHelper.streamNullDocument(xmlReceiver)
+                            } else {
+                              // This is an Ajax response
+                              withDebug("handling regular Ajax response") {
+                                // Hook-up debug content handler if we must log the response document
+                                // Buffer for retries
+                                val responseStore = new SAXStore
+                                // Two receivers possible
+                                val receivers = new ju.ArrayList[XMLReceiver]
+                                receivers.add(responseStore)
 
-                              // Debug output
-                              val debugContentHandlerOpt =
-                                logRequestResponse option {
-                                  val result = new LocationSAXContentHandler
-                                  receivers.add(result)
-                                  result
+                                // Debug output
+                                val debugContentHandlerOpt =
+                                  logRequestResponse option {
+                                    val result = new LocationSAXContentHandler
+                                    receivers.add(result)
+                                    result
+                                  }
+
+                                val responseReceiver = new TeeXMLReceiver(receivers)
+
+                                // Whether we got a request for all events
+                                val allEvents = remainingClientEvents exists
+                                  (_.eventName == EventNames.XXFormsAllEventsRequired)
+
+                                // Prepare and/or output response
+                                outputAjaxResponse(
+                                  containingDocument        = containingDocument,
+                                  eventFindings             = eventsFindingsOpt getOrElse ClientEvents.EmptyEventsFindings,
+                                  allEvents                 = allEvents,
+                                  beforeFocusedControlIdOpt = beforeFocusedControlIdOpt,
+                                  repeatHierarchyOpt        = beforeRepeatHierarchyOpt,
+                                  requestParametersForAll   = requestParametersForAll,
+                                  testOutputAllActions      = false
+                                )(
+                                  xmlReceiver               = responseReceiver,
+                                  externalContext           = externalContext,
+                                  indentedLogger            = indentedLogger
+                                )
+
+                                // Store response in to document
+                                containingDocument.rememberLastAjaxResponse(responseStore)
+
+                                // Actually output response
+                                try {
+                                  responseStore.replay(xmlReceiver)
+                                } catch {
+                                  case NonFatal(_) =>
+                                    debug("retry: got exception while sending response; ignoring and expecting client to retry") // `t: Throwable`
                                 }
 
-                              val responseReceiver = new TeeXMLReceiver(receivers)
-
-                              // Whether we got a request for all events
-                              val allEvents = remainingClientEvents exists
-                                (_.eventName == EventNames.XXFormsAllEventsRequired)
-
-                              // Prepare and/or output response
-                              outputAjaxResponse(
-                                containingDocument        = containingDocument,
-                                eventFindings             = eventsFindingsOpt getOrElse ClientEvents.EmptyEventsFindings,
-                                allEvents                 = allEvents,
-                                beforeFocusedControlIdOpt = beforeFocusedControlIdOpt,
-                                repeatHierarchyOpt        = beforeRepeatHierarchyOpt,
-                                requestParametersForAll   = requestParametersForAll,
-                                testOutputAllActions      = false
-                              )(
-                                xmlReceiver               = responseReceiver,
-                                externalContext           = externalContext,
-                                indentedLogger            = indentedLogger
-                              )
-
-                              // Store response in to document
-                              containingDocument.rememberLastAjaxResponse(responseStore)
-
-                              // Actually output response
-                              try {
-                                responseStore.replay(xmlReceiver)
-                              } catch {
-                                case NonFatal(_) =>
-                                  debug("retry: got exception while sending response; ignoring and expecting client to retry") // `t: Throwable`
-                              }
-
-                              debugContentHandlerOpt foreach { debugContentHandler =>
-                                debugResults(List("ajax response" -> Option(debugContentHandler.getDocument.getRootElement).map(_.serializeToString(XMLWriter.PrettyFormat)).getOrElse("[EMPTY]")))
+                                debugContentHandlerOpt foreach { debugContentHandler =>
+                                  debugResults(List("ajax response" -> Option(debugContentHandler.getDocument.getRootElement).map(_.serializeToString(XMLWriter.PrettyFormat)).getOrElse("[EMPTY]")))
+                                }
                               }
                             }
-                          }
-                        case None =>
-                          // This is the second pass of a submission with replace="all". We ensure that the document is
-                          // not modified.
-                          debug("handling NOP response for submission with `replace=\"all\"`")
-                      }
-                      None
-                    case futureOpt =>
-                      // Check if there is a submission with `replace="all"` that needs processing
-                      futureOpt
+                          case None =>
+                            // This is the second pass of a submission with replace="all". We ensure that the document is
+                            // not modified.
+                            debug("handling NOP response for submission with `replace=\"all\"`")
+                        }
+                        None
+                      case futureOpt =>
+                        // Check if there is a submission with `replace="all"` that needs processing
+                        futureOpt
+                    }
                   }
-                }
-              )
+                )
+              if (isAjaxRequest) {
+                val req        = externalContext.getRequest
+                val sessionOpt = req.sessionOpt
+                XFormsAnalyticsSupport.withListener(
+                  _.onAjaxUpdateCompleted(
+                    doc            = containingDocument,
+                    sessionIdOpt   = sessionOpt.flatMap(s => Option(s.getId)),
+                    usernameOpt    = req.credentials.map(_.userAndGroup.username),
+                    maxInactiveSec = sessionOpt.map(_.getMaxInactiveInterval).getOrElse(-1),
+                    isInteraction  = isInteraction,
+                    durationMs     = math.max(0L, (System.nanoTime() - ajaxStartNs) / 1000000L),
+                    hadServerError = false
+                  )
+                )
+              }
+              res
             } catch {
               case NonFatal(t) =>
+                if (isAjaxRequest) {
+                  val req        = Option(externalContext.getRequest)
+                  val sessionOpt = req.flatMap(_.sessionOpt)
+                  XFormsAnalyticsSupport.withListener(
+                    _.onAjaxUpdateCompleted(
+                      doc            = containingDocument,
+                      sessionIdOpt   = sessionOpt.flatMap(s => Option(s.getId)),
+                      usernameOpt    = req.flatMap(_.credentials).map(_.userAndGroup.username),
+                      maxInactiveSec = sessionOpt.map(_.getMaxInactiveInterval).getOrElse(-1),
+                      isInteraction  = isInteraction,
+                      durationMs     = math.max(0L, (System.nanoTime() - ajaxStartNs) / 1000000L),
+                      hadServerError = true
+                    )
+                  )
+                }
                 // Log body of Ajax request if needed
                 if (XFormsGlobalProperties.getErrorLogging.contains("server-body"))
                   error("error processing Ajax update", List("parameters" -> requestParameters.toString, "events" -> extractedEvents.toString))

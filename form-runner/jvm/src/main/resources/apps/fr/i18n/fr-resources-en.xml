@@ -532,6 +532,7 @@
             <home>Forms Admin</home>
             <landing>Landing</landing>
             <console>Admin Console</console>
+            <analytics>Forms Analytics</analytics>
         </pages>
         <buttons>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-hidden="true"&gt;&lt;/i&gt; Refresh</refresh>
@@ -590,6 +591,193 @@
             <xforms-store-static-states title="Compressed Form Definitions Store">Stores compact, compressed snapshots of compiled forms (with disk overflow) behind xforms.cache.static-states. When a large form leaves the in-memory static state cache, it is restored quickly from this store without recompiling from scratch.</xforms-store-static-states>
         </cache-descriptions>
     </console>
+    <analytics>
+        <title>Forms Analytics</title>
+        <cards>
+            <active-sessions>Active Form Sessions</active-sessions>
+            <active-users>Connected &amp; Active Users</active-users>
+            <completion-rate>Session Completion Rate</completion-rate>
+            <sessions-with-errors>Sessions with Errors</sessions-with-errors>
+            <submitted-data>Submitted Data</submitted-data>
+            <published-forms>Published Forms</published-forms>
+        </cards>
+        <tabs>
+            <form-sessions>Form Sessions</form-sessions>
+            <submitted-data>Submitted Data</submitted-data>
+            <published-forms>Published Forms</published-forms>
+            <users>Users</users>
+            <timings>Timings</timings>
+        </tabs>
+        <sections>
+            <funnel-by-form>Session Funnel &amp; Outcomes by Form</funnel-by-form>
+            <active-recent-sessions>Active &amp; Recent Form Sessions</active-recent-sessions>
+            <submitted-by-form>Submitted Data &amp; Drafts by Form</submitted-by-form>
+            <workflow-stages>Workflow Stages Breakdown</workflow-stages>
+            <apps-summary>Applications Summary</apps-summary>
+            <published-inventory>Published Forms Inventory</published-inventory>
+            <submitting-users>Submitting Users Breakdown</submitting-users>
+            <active-user-sessions>Currently Connected User Sessions</active-user-sessions>
+            <timings-by-category>Latency by Operation Category</timings-by-category>
+            <timings-by-form>Latency by Form</timings-by-form>
+        </sections>
+        <columns>
+            <app>Application</app>
+            <form>Form</form>
+            <title>Title</title>
+            <version>Version</version>
+            <versions>Versions</versions>
+            <mode>Mode</mode>
+            <status>Status</status>
+            <user>User</user>
+            <opened>Opened</opened>
+            <bounced>Bounced</bounced>
+            <interacted>Interacted</interacted>
+            <drafts-saved>Drafts Saved</drafts-saved>
+            <submitted>Submitted</submitted>
+            <in-window>In Window</in-window>
+            <drafts>Drafts</drafts>
+            <abandoned>Abandoned</abandoned>
+            <completion>Completion</completion>
+            <errors>Errors</errors>
+            <avg-time-spent>Avg Time Spent</avg-time-spent>
+            <time-spent>Time Spent</time-spent>
+            <ajax-updates>Ajax Updates</ajax-updates>
+            <active-serialized>Active / Serialized</active-serialized>
+            <expires-in>Expires In</expires-in>
+            <latest-submission>Latest Activity</latest-submission>
+            <workflow-stage>Workflow Stage</workflow-stage>
+            <share>Share</share>
+            <published-forms>Forms</published-forms>
+            <available>Available</available>
+            <unavailable>Unavailable</unavailable>
+            <last-modified>Last Modified</last-modified>
+            <modified-by>Modified By</modified-by>
+            <distinct-forms>Forms</distinct-forms>
+            <session>Session</session>
+            <active-forms>Active Forms</active-forms>
+            <session-age>Session Age</session-age>
+            <idle>Idle</idle>
+            <category>Operation</category>
+            <count>Count</count>
+            <avg>Avg</avg>
+            <p50>p50</p50>
+            <p95>p95</p95>
+            <max>Max</max>
+            <loads>Loads</loads>
+            <avg-load>Avg Load</avg-load>
+            <p95-load>p95 Load</p95-load>
+            <avg-ajax>Avg Ajax</avg-ajax>
+            <saves>Saves</saves>
+            <avg-save>Avg Save</avg-save>
+            <service-calls>Services</service-calls>
+            <avg-service>Avg Service</avg-service>
+            <actions>Actions</actions>
+        </columns>
+        <labels>
+            <updated>Updated</updated>
+            <scope-all>Scope: All applications</scope-all>
+            <scope-restricted>Scope: Restricted</scope-restricted>
+            <all-apps>All applications</all-apps>
+            <all-forms>All forms</all-forms>
+            <app-filter>App</app-filter>
+            <form-filter>Form</form-filter>
+            <window>Window</window>
+            <auto-refresh>Auto-refresh</auto-refresh>
+            <auto-off>Off</auto-off>
+            <in-heap>in memory</in-heap>
+            <passivated>passivated</passivated>
+            <active-5m>active (5m)</active-5m>
+            <http-sessions>HTTP sessions</http-sessions>
+            <authenticated>authenticated</authenticated>
+            <anonymous>anonymous</anonymous>
+            <anonymous-user>(anonymous)</anonymous-user>
+            <opened-short>opened</opened-short>
+            <submitted-short>submitted</submitted-short>
+            <abandoned-short>abandoned</abandoned-short>
+            <of-opened>of opened sessions</of-opened>
+            <in-selected-window>in window</in-selected-window>
+            <drafts-short>drafts</drafts-short>
+            <across-apps>across {0} apps</across-apps>
+            <available-short>available</available-short>
+            <unavailable-short>unavailable</unavailable-short>
+            <sort-ascending>ascending</sort-ascending>
+            <sort-descending>descending</sort-descending>
+        </labels>
+        <states>
+            <active-heap>Active in Memory</active-heap>
+            <passivated>Passivated</passivated>
+            <submitted>Submitted</submitted>
+            <draft-saved>Draft Saved</draft-saved>
+            <abandoned>Abandoned</abandoned>
+            <bounced>Bounced (0 int.)</bounced>
+            <error>Error</error>
+            <closed>Closed</closed>
+        </states>
+        <timing-categories>
+            <form-load>Form Load &amp; Initialization</form-load>
+            <ajax-update>Ajax Interactive Updates</ajax-update>
+            <save-action>Save Data &amp; Attachments</save-action>
+            <send-process>Send / Email / PDF Actions</send-process>
+            <service-call>External Service Submissions</service-call>
+            <persistence-call>Persistence Submissions</persistence-call>
+        </timing-categories>
+        <buttons>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-hidden="true"&gt;&lt;/i&gt; Refresh</refresh>
+            <charts>&lt;i class="fa fa-fw fa-chart-line" aria-hidden="true"&gt;&lt;/i&gt; Charts</charts>
+            <summary>Summary</summary>
+        </buttons>
+        <messages>
+            <no-funnel-data>No form sessions recorded in the selected window yet.</no-funnel-data>
+            <no-sessions>No active or recent form sessions match the current filters.</no-sessions>
+            <no-submitted-data>No submitted form records or drafts found for the selected scope.</no-submitted-data>
+            <no-workflow-stages>No submitted records with workflow stages found.</no-workflow-stages>
+            <no-published-forms>No published form definitions found for the selected scope.</no-published-forms>
+            <no-submitting-users>No user submissions found for the selected scope.</no-submitting-users>
+            <no-active-users>No connected user sessions currently match the selected scope.</no-active-users>
+            <no-form-timings>No per-form request timings recorded in the selected window yet.</no-form-timings>
+            <sorted-announcement>Sorted by {0}, {1}</sorted-announcement>
+        </messages>
+        <charts>
+            <empty>No data in the selected window yet.</empty>
+            <sessions-activity-title>Form Session Activity Over Time</sessions-activity-title>
+            <sessions-activity-subtitle>Opened, submitted, abandoned, and errored sessions per time bucket</sessions-activity-subtitle>
+            <sessions-funnel-title>Session Conversion Funnel</sessions-funnel-title>
+            <sessions-funnel-subtitle>Interactive form session progression and drop-off in window</sessions-funnel-subtitle>
+            <data-trend-title>Persisted Submissions &amp; Drafts Over Time</data-trend-title>
+            <data-trend-subtitle>Records created in relational persistence within the selected window</data-trend-subtitle>
+            <data-top-forms-title>Top Forms by Stored Volume</data-top-forms-title>
+            <data-top-forms-subtitle>Submitted records vs active drafts (top 10 forms)</data-top-forms-subtitle>
+            <inventory-forms-title>Published Forms by Application</inventory-forms-title>
+            <inventory-forms-subtitle>Available vs unavailable form definitions per app</inventory-forms-subtitle>
+            <inventory-data-title>Stored Records by Application</inventory-data-title>
+            <inventory-data-subtitle>Total submitted records and drafts grouped by app</inventory-data-subtitle>
+            <users-breakdown-title>Top Submitting Users</users-breakdown-title>
+            <users-breakdown-subtitle>Submitted records by user and anonymous submissions</users-breakdown-subtitle>
+            <users-trend-title>Active Users &amp; Connected Sessions</users-trend-title>
+            <users-trend-subtitle>Peak active form users and HTTP sessions per bucket</users-trend-subtitle>
+            <timings-trend-title>Request &amp; Action Latency Over Time</timings-trend-title>
+            <timings-trend-subtitle>Average form load, Ajax update, save, and service call latency</timings-trend-subtitle>
+            <timings-slowest-title>Slowest Forms (Load &amp; Save)</timings-slowest-title>
+            <timings-slowest-subtitle>Average initialization and save durations (top 10 forms)</timings-slowest-subtitle>
+            <series>
+                <sessions-opened>Opened</sessions-opened>
+                <sessions-submitted>Submitted</sessions-submitted>
+                <sessions-abandoned>Abandoned</sessions-abandoned>
+                <sessions-errors>With Errors</sessions-errors>
+                <funnel-sessions>Sessions</funnel-sessions>
+                <data-submitted>Submitted</data-submitted>
+                <data-drafts>Drafts</data-drafts>
+                <forms-available>Available</forms-available>
+                <forms-unavailable>Unavailable</forms-unavailable>
+                <active-users>Active Users</active-users>
+                <connected-sessions>HTTP Sessions</connected-sessions>
+                <avg-form-load>Avg Form Load</avg-form-load>
+                <avg-ajax-update>Avg Ajax Update</avg-ajax-update>
+                <avg-save-action>Avg Save</avg-save-action>
+                <avg-service-call>Avg Service Call</avg-service-call>
+            </series>
+        </charts>
+    </analytics>
     <landing>
         <title>Landing</title>
         <titles>
@@ -602,6 +790,7 @@
             <quick-links>Quick Links</quick-links>
             <form-runner-admin>Forms Admin</form-runner-admin>
             <admin-console>Admin Console</admin-console>
+            <forms-analytics>Forms Analytics</forms-analytics>
             <configuration>Configuration</configuration>
         </titles>
         <descriptions>
@@ -647,6 +836,7 @@
             <reload-resources>Reload resources</reload-resources>
             <configuration>Configuration</configuration>
             <console>Admin Console</console>
+            <analytics>Forms Analytics</analytics>
             <reload-properties>Reload properties</reload-properties>
         </buttons>
         <titles>

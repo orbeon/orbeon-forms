@@ -459,7 +459,7 @@
                        have code to do this that is able to handle AVTs. :)
                     if (
                         not(fr:is-form-builder()) and
-                        not(fr:mode() = ('summary', 'home', 'landing', 'console', ''))
+                        not(fr:mode() = ('summary', 'home', 'landing', 'console', 'analytics', ''))
                     ) then
                         let $density-opt := frf:optionFromMetadataOrPropertiesDynamicXPath('density', 'compact')[. = ('compact', 'comfortable', 'roomy')]
                         return
@@ -686,6 +686,12 @@
                     <xsl:when test="$is-console">
                         <xh:img
                             src="/apps/fr/style/images/orbeon/console.svg"
+                            alt=""
+                            class="fr-navbar-title-icon img-invertible"/>
+                    </xsl:when>
+                    <xsl:when test="$is-analytics">
+                        <xh:img
+                            src="/apps/fr/style/images/orbeon/analytics.svg"
                             alt=""
                             class="fr-navbar-title-icon img-invertible"/>
                     </xsl:when>
@@ -967,8 +973,8 @@
             ref=".[
                 not(fr:mode() = 'test') and
                 not(fr:is-embedded())   and (
-                        fr:mode() = ('forms', 'admin', 'landing', 'console')  and xxf:property('oxf.fr.navbar.color-scheme-selector.enable') or
-                    not(fr:mode() = ('forms', 'admin', 'landing', 'console')) and xxf:property(string-join(('oxf.fr.navbar.color-scheme-selector.enable', fr:app-name(), fr:form-name()), '.'))
+                        fr:mode() = ('forms', 'admin', 'landing', 'console', 'analytics')  and xxf:property('oxf.fr.navbar.color-scheme-selector.enable') or
+                    not(fr:mode() = ('forms', 'admin', 'landing', 'console', 'analytics')) and xxf:property(string-join(('oxf.fr.navbar.color-scheme-selector.enable', fr:app-name(), fr:form-name()), '.'))
                 )
             ]">
             <xh:div class="dropdown">
@@ -1279,7 +1285,7 @@
 
         <xf:group
             model="fr-form-model"
-            ref=".[not($fr-mode = ('summary', 'home', 'landing', 'console'))]"
+            ref=".[not($fr-mode = ('summary', 'home', 'landing', 'console', 'analytics'))]"
             class="fr-status-icons nav-item">
 
             <xf:group model="fr-error-summary-model" ref=".[visible-counts/@alert gt 0]">

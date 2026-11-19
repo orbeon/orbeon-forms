@@ -545,6 +545,7 @@
             <home todo="true">Forms Admin</home>
             <landing todo="true">Landing</landing>
             <console todo="true">Admin Console</console>
+            <analytics todo="true">Forms Analytics</analytics>
         </pages>
         <buttons>
             <refresh todo="true">&lt;i class="fa fa-fw fa-refresh" aria-hidden="true"&gt;&lt;/i&gt; Refresh</refresh>
@@ -603,6 +604,193 @@
             <xforms-store-static-states todo="true" title="Compressed Form Definitions Store">Stores compact, compressed snapshots of compiled forms (with disk overflow) behind xforms.cache.static-states. When a large form leaves the in-memory static state cache, it is restored quickly from this store without recompiling from scratch.</xforms-store-static-states>
         </cache-descriptions>
     </console>
+    <analytics>
+        <title todo="true">Forms Analytics</title>
+        <cards>
+            <active-sessions todo="true">Active Form Sessions</active-sessions>
+            <active-users todo="true">Connected &amp; Active Users</active-users>
+            <completion-rate todo="true">Session Completion Rate</completion-rate>
+            <sessions-with-errors todo="true">Sessions with Errors</sessions-with-errors>
+            <submitted-data todo="true">Submitted Data</submitted-data>
+            <published-forms todo="true">Published Forms</published-forms>
+        </cards>
+        <tabs>
+            <form-sessions todo="true">Form Sessions</form-sessions>
+            <submitted-data todo="true">Submitted Data</submitted-data>
+            <published-forms todo="true">Published Forms</published-forms>
+            <users todo="true">Users</users>
+            <timings todo="true">Timings</timings>
+        </tabs>
+        <sections>
+            <funnel-by-form todo="true">Session Funnel &amp; Outcomes by Form</funnel-by-form>
+            <active-recent-sessions todo="true">Active &amp; Recent Form Sessions</active-recent-sessions>
+            <submitted-by-form todo="true">Submitted Data &amp; Drafts by Form</submitted-by-form>
+            <workflow-stages todo="true">Workflow Stages Breakdown</workflow-stages>
+            <apps-summary todo="true">Applications Summary</apps-summary>
+            <published-inventory todo="true">Published Forms Inventory</published-inventory>
+            <submitting-users todo="true">Submitting Users Breakdown</submitting-users>
+            <active-user-sessions todo="true">Currently Connected User Sessions</active-user-sessions>
+            <timings-by-category todo="true">Latency by Operation Category</timings-by-category>
+            <timings-by-form todo="true">Latency by Form</timings-by-form>
+        </sections>
+        <columns>
+            <app todo="true">Application</app>
+            <form todo="true">Form</form>
+            <title todo="true">Title</title>
+            <version todo="true">Version</version>
+            <versions todo="true">Versions</versions>
+            <mode todo="true">Mode</mode>
+            <status todo="true">Status</status>
+            <user todo="true">User</user>
+            <opened todo="true">Opened</opened>
+            <bounced todo="true">Bounced</bounced>
+            <interacted todo="true">Interacted</interacted>
+            <drafts-saved todo="true">Drafts Saved</drafts-saved>
+            <submitted todo="true">Submitted</submitted>
+            <in-window todo="true">In Window</in-window>
+            <drafts todo="true">Drafts</drafts>
+            <abandoned todo="true">Abandoned</abandoned>
+            <completion todo="true">Completion</completion>
+            <errors todo="true">Errors</errors>
+            <avg-time-spent todo="true">Avg Time Spent</avg-time-spent>
+            <time-spent todo="true">Time Spent</time-spent>
+            <ajax-updates todo="true">Ajax Updates</ajax-updates>
+            <active-serialized todo="true">Active / Serialized</active-serialized>
+            <expires-in todo="true">Expires In</expires-in>
+            <latest-submission todo="true">Latest Activity</latest-submission>
+            <workflow-stage todo="true">Workflow Stage</workflow-stage>
+            <share todo="true">Share</share>
+            <published-forms todo="true">Forms</published-forms>
+            <available todo="true">Available</available>
+            <unavailable todo="true">Unavailable</unavailable>
+            <last-modified todo="true">Last Modified</last-modified>
+            <modified-by todo="true">Modified By</modified-by>
+            <distinct-forms todo="true">Forms</distinct-forms>
+            <session todo="true">Session</session>
+            <active-forms todo="true">Active Forms</active-forms>
+            <session-age todo="true">Session Age</session-age>
+            <idle todo="true">Idle</idle>
+            <category todo="true">Operation</category>
+            <count todo="true">Count</count>
+            <avg todo="true">Avg</avg>
+            <p50 todo="true">p50</p50>
+            <p95 todo="true">p95</p95>
+            <max todo="true">Max</max>
+            <loads todo="true">Loads</loads>
+            <avg-load todo="true">Avg Load</avg-load>
+            <p95-load todo="true">p95 Load</p95-load>
+            <avg-ajax todo="true">Avg Ajax</avg-ajax>
+            <saves todo="true">Saves</saves>
+            <avg-save todo="true">Avg Save</avg-save>
+            <service-calls todo="true">Services</service-calls>
+            <avg-service todo="true">Avg Service</avg-service>
+            <actions todo="true">Actions</actions>
+        </columns>
+        <labels>
+            <updated todo="true">Updated</updated>
+            <scope-all todo="true">Scope: All applications</scope-all>
+            <scope-restricted todo="true">Scope: Restricted</scope-restricted>
+            <all-apps todo="true">All applications</all-apps>
+            <all-forms todo="true">All forms</all-forms>
+            <app-filter todo="true">App</app-filter>
+            <form-filter todo="true">Form</form-filter>
+            <window todo="true">Window</window>
+            <auto-refresh todo="true">Auto-refresh</auto-refresh>
+            <auto-off todo="true">Off</auto-off>
+            <in-heap todo="true">in memory</in-heap>
+            <passivated todo="true">passivated</passivated>
+            <active-5m todo="true">active (5m)</active-5m>
+            <http-sessions todo="true">HTTP sessions</http-sessions>
+            <authenticated todo="true">authenticated</authenticated>
+            <anonymous todo="true">anonymous</anonymous>
+            <anonymous-user todo="true">(anonymous)</anonymous-user>
+            <opened-short todo="true">opened</opened-short>
+            <submitted-short todo="true">submitted</submitted-short>
+            <abandoned-short todo="true">abandoned</abandoned-short>
+            <of-opened todo="true">of opened sessions</of-opened>
+            <in-selected-window todo="true">in window</in-selected-window>
+            <drafts-short todo="true">drafts</drafts-short>
+            <across-apps todo="true">across {0} apps</across-apps>
+            <available-short todo="true">available</available-short>
+            <unavailable-short todo="true">unavailable</unavailable-short>
+            <sort-ascending todo="true">ascending</sort-ascending>
+            <sort-descending todo="true">descending</sort-descending>
+        </labels>
+        <states>
+            <active-heap todo="true">Active in Memory</active-heap>
+            <passivated todo="true">Passivated</passivated>
+            <submitted todo="true">Submitted</submitted>
+            <draft-saved todo="true">Draft Saved</draft-saved>
+            <abandoned todo="true">Abandoned</abandoned>
+            <bounced todo="true">Bounced (0 int.)</bounced>
+            <error todo="true">Error</error>
+            <closed todo="true">Closed</closed>
+        </states>
+        <timing-categories>
+            <form-load todo="true">Form Load &amp; Initialization</form-load>
+            <ajax-update todo="true">Ajax Interactive Updates</ajax-update>
+            <save-action todo="true">Save Data &amp; Attachments</save-action>
+            <send-process todo="true">Send / Email / PDF Actions</send-process>
+            <service-call todo="true">External Service Submissions</service-call>
+            <persistence-call todo="true">Persistence Submissions</persistence-call>
+        </timing-categories>
+        <buttons>
+            <refresh todo="true">&lt;i class="fa fa-fw fa-refresh" aria-hidden="true"&gt;&lt;/i&gt; Refresh</refresh>
+            <charts todo="true">&lt;i class="fa fa-fw fa-chart-line" aria-hidden="true"&gt;&lt;/i&gt; Charts</charts>
+            <summary todo="true">Summary</summary>
+        </buttons>
+        <messages>
+            <no-funnel-data todo="true">No form sessions recorded in the selected window yet.</no-funnel-data>
+            <no-sessions todo="true">No active or recent form sessions match the current filters.</no-sessions>
+            <no-submitted-data todo="true">No submitted form records or drafts found for the selected scope.</no-submitted-data>
+            <no-workflow-stages todo="true">No submitted records with workflow stages found.</no-workflow-stages>
+            <no-published-forms todo="true">No published form definitions found for the selected scope.</no-published-forms>
+            <no-submitting-users todo="true">No user submissions found for the selected scope.</no-submitting-users>
+            <no-active-users todo="true">No connected user sessions currently match the selected scope.</no-active-users>
+            <no-form-timings todo="true">No per-form request timings recorded in the selected window yet.</no-form-timings>
+            <sorted-announcement todo="true">Sorted by {0}, {1}</sorted-announcement>
+        </messages>
+        <charts>
+            <empty todo="true">No data in the selected window yet.</empty>
+            <sessions-activity-title todo="true">Form Session Activity Over Time</sessions-activity-title>
+            <sessions-activity-subtitle todo="true">Opened, submitted, abandoned, and errored sessions per time bucket</sessions-activity-subtitle>
+            <sessions-funnel-title todo="true">Session Conversion Funnel</sessions-funnel-title>
+            <sessions-funnel-subtitle todo="true">Interactive form session progression and drop-off in window</sessions-funnel-subtitle>
+            <data-trend-title todo="true">Persisted Submissions &amp; Drafts Over Time</data-trend-title>
+            <data-trend-subtitle todo="true">Records created in relational persistence within the selected window</data-trend-subtitle>
+            <data-top-forms-title todo="true">Top Forms by Stored Volume</data-top-forms-title>
+            <data-top-forms-subtitle todo="true">Submitted records vs active drafts (top 10 forms)</data-top-forms-subtitle>
+            <inventory-forms-title todo="true">Published Forms by Application</inventory-forms-title>
+            <inventory-forms-subtitle todo="true">Available vs unavailable form definitions per app</inventory-forms-subtitle>
+            <inventory-data-title todo="true">Stored Records by Application</inventory-data-title>
+            <inventory-data-subtitle todo="true">Total submitted records and drafts grouped by app</inventory-data-subtitle>
+            <users-breakdown-title todo="true">Top Submitting Users</users-breakdown-title>
+            <users-breakdown-subtitle todo="true">Submitted records by user and anonymous submissions</users-breakdown-subtitle>
+            <users-trend-title todo="true">Active Users &amp; Connected Sessions</users-trend-title>
+            <users-trend-subtitle todo="true">Peak active form users and HTTP sessions per bucket</users-trend-subtitle>
+            <timings-trend-title todo="true">Request &amp; Action Latency Over Time</timings-trend-title>
+            <timings-trend-subtitle todo="true">Average form load, Ajax update, save, and service call latency</timings-trend-subtitle>
+            <timings-slowest-title todo="true">Slowest Forms (Load &amp; Save)</timings-slowest-title>
+            <timings-slowest-subtitle todo="true">Average initialization and save durations (top 10 forms)</timings-slowest-subtitle>
+            <series>
+                <sessions-opened todo="true">Opened</sessions-opened>
+                <sessions-submitted todo="true">Submitted</sessions-submitted>
+                <sessions-abandoned todo="true">Abandoned</sessions-abandoned>
+                <sessions-errors todo="true">With Errors</sessions-errors>
+                <funnel-sessions todo="true">Sessions</funnel-sessions>
+                <data-submitted todo="true">Submitted</data-submitted>
+                <data-drafts todo="true">Drafts</data-drafts>
+                <forms-available todo="true">Available</forms-available>
+                <forms-unavailable todo="true">Unavailable</forms-unavailable>
+                <active-users todo="true">Active Users</active-users>
+                <connected-sessions todo="true">HTTP Sessions</connected-sessions>
+                <avg-form-load todo="true">Avg Form Load</avg-form-load>
+                <avg-ajax-update todo="true">Avg Ajax Update</avg-ajax-update>
+                <avg-save-action todo="true">Avg Save</avg-save-action>
+                <avg-service-call todo="true">Avg Service Call</avg-service-call>
+            </series>
+        </charts>
+    </analytics>
     <landing>
         <title>Pàgina de benvinguda</title>
         <titles>
@@ -615,6 +803,7 @@
             <quick-links>Dreceres</quick-links>
             <form-runner-admin>Administrador de formularis</form-runner-admin>
             <admin-console todo="true">Admin Console</admin-console>
+            <forms-analytics todo="true">Forms Analytics</forms-analytics>
             <configuration>Configuració</configuration>
         </titles>
         <descriptions>
@@ -660,6 +849,7 @@
             <reload-resources>Recarregar recursos</reload-resources>
             <configuration>Configuració</configuration>
             <console todo="true">Admin Console</console>
+            <analytics todo="true">Forms Analytics</analytics>
             <reload-properties>Recarregar propietats</reload-properties>
         </buttons>
         <titles>

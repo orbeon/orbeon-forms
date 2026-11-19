@@ -215,6 +215,13 @@
         <setvalue ref="/*/mode">console</setvalue>
     </page>
 
+    <!-- Forms analytics page -->
+    <page id="fr-analytics" path="/fr/analytics" model="analytics/analytics.xhtml" view="html-view.xpl" default-submission="request-parameters.xml">
+        <setvalue ref="/*/app">*</setvalue>
+        <setvalue ref="/*/form">*</setvalue>
+        <setvalue ref="/*/mode">analytics</setvalue>
+    </page>
+
     <!-- Summary -->
     <page id="summary"
           path="/fr/([^/^.]+)/([^/^.]+)(/summary)"

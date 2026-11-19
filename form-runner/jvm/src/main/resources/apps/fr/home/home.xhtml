@@ -1442,6 +1442,11 @@
                                 </xf:trigger>
 
                                 <xf:trigger class="btn-group">
+                                    <xf:label mediatype="text/html" value="concat('&lt;i class=&quot;fa fa-fw fa-chart-column&quot;&gt;&lt;/i&gt; ', $fr-resources/home/buttons/analytics)"/>
+                                    <xf:load event="DOMActivate" resource="/fr/analytics"/>
+                                </xf:trigger>
+
+                                <xf:trigger class="btn-group">
                                     <xf:label ref="$fr-resources/home/buttons/reload-properties"/>
                                     <xf:action event="DOMActivate" type="xpath">
                                         frf:invalidatePersistencePropertiesCache()

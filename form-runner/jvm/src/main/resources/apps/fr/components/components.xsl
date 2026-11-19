@@ -82,6 +82,7 @@
     <xsl:variable name="is-landing"          select="$major-mode = 'landing'"               as="xs:boolean"/>
     <xsl:variable name="is-home"             select="$major-mode = 'home'"                  as="xs:boolean"/>
     <xsl:variable name="is-console"          select="$major-mode = 'console'"               as="xs:boolean"/>
+    <xsl:variable name="is-analytics"        select="$major-mode = 'analytics'"             as="xs:boolean"/>
     <xsl:variable name="is-import"           select="$major-mode = 'import'"                as="xs:boolean"/>
     <xsl:variable name="is-import-page"      select="exists(doc('input:form-runner-config')/*/is-import-page[. = 'true'])" as="xs:boolean"/>
     <xsl:variable name="is-validate"         select="$major-mode = 'validate'"              as="xs:boolean"/>
@@ -89,10 +90,10 @@
     <xsl:variable name="is-form-builder"       select="$app = 'orbeon' and $form = 'builder'"       as="xs:boolean"/>
     <xsl:variable name="is-form-configuration" select="$app = 'orbeon' and $form = 'configuration'" as="xs:boolean"/>
 
-    <!-- Function restrictions apply only to user forms, excluding internal pages: Form Builder, Form Configuration, Landing, Summary, Forms/Admin, Console, Import page -->
+    <!-- Function restrictions apply only to user forms, excluding internal pages: Form Builder, Form Configuration, Landing, Summary, Forms/Admin, Console, Analytics, Import page -->
     <xsl:variable
         name="is-restricted-form"
-        select="not($is-form-builder or $is-form-configuration or $is-landing or $is-summary or $is-home or $is-console or $is-import-page)"
+        select="not($is-form-builder or $is-form-configuration or $is-landing or $is-summary or $is-home or $is-console or $is-analytics or $is-import-page)"
         as="xs:boolean"/>
 
     <xsl:variable name="input-data" select="/*" as="element(xh:html)"/>
@@ -1018,7 +1019,7 @@
 
             <!-- Compile-time Form Runner diagnostic metadata for `/fr/console` (`XFormsStaticStateImpl`) -->
             <xsl:attribute name="fr:major-mode" select="$major-mode"/>
-            <xsl:if test="not($is-landing or $is-home or $is-console or ($is-summary and not($is-form-builder))) and $app != '*'">
+            <xsl:if test="not($is-landing or $is-home or $is-console or $is-analytics or ($is-summary and not($is-form-builder))) and $app != '*'">
                 <xsl:attribute name="fr:app"  select="$app"/>
                 <xsl:attribute name="fr:form" select="$form"/>
                 <xsl:if test="not($is-form-builder) and exists($form-version)">

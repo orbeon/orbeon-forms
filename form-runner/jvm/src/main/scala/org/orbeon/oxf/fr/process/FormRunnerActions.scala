@@ -20,6 +20,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
 import org.orbeon.oxf.fr.*
 import org.orbeon.oxf.fr.FormRunner.*
+import org.orbeon.oxf.fr.analytics.{InMemoryFormSessionAnalyticsStore, ProcessOutcome}
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.FormRunnerPersistence.*
 import org.orbeon.oxf.fr.Names.*
@@ -78,6 +79,69 @@ trait FormRunnerActions
       ("change-mode"            -> tryChangeMode         _) +
       ("open-rendered-format"   -> tryOpenRenderedFormat _)
 
+  override protected def onAnalyticsValidationFailed(xfcd: XFormsContainingDocument): Unit =
+    InMemoryFormSessionAnalyticsStore.extractFormRunnerDocInfo(xfcd).foreach { info =>
+      FormRunnerAnalytics.store.recordFormProcessOutcome(
+        uuid       = xfcd.uuid,
+        appForm    = info.appForm,
+        outcome    = ProcessOutcome.ValidationError,
+        durationMs = 0L,
+        atMs       = System.currentTimeMillis()
+      )
+    }
+
+  override protected def onAnalyticsSaveCompleted(
+    xfcd       : XFormsContainingDocument,
+    appForm    : AppForm,
+    version    : Int,
+    isDraft    : Boolean,
+    durationMs : Long,
+    succeeded  : Boolean
+  ): Unit =
+    if (appForm.form != Names.LibraryFormName && appForm != AppForm("orbeon", "builder") && appForm != AppForm("orbeon", "configuration"))
+      FormRunnerAnalytics.store.recordFormSave(
+        uuid       = xfcd.uuid,
+        appForm    = appForm,
+        version    = version,
+        isDraft    = isDraft,
+        durationMs = durationMs,
+        succeeded  = succeeded,
+        atMs       = System.currentTimeMillis()
+      )
+
+  private def withAnalyticsProcessTiming[T](outcomeOnSuccess: ProcessOutcome)(body: => T): T = {
+    val startNs = System.nanoTime()
+    val xfcdOpt = Option(inScopeContainingDocument)
+    val infoOpt = xfcdOpt.flatMap(InMemoryFormSessionAnalyticsStore.extractFormRunnerDocInfo)
+    try {
+      val res = body
+      for {
+        xfcd <- xfcdOpt
+        info <- infoOpt
+      } FormRunnerAnalytics.store.recordFormProcessOutcome(
+        uuid       = xfcd.uuid,
+        appForm    = info.appForm,
+        outcome    = outcomeOnSuccess,
+        durationMs = math.max(0L, (System.nanoTime() - startNs) / 1000000L),
+        atMs       = System.currentTimeMillis()
+      )
+      res
+    } catch {
+      case scala.util.control.NonFatal(t) =>
+        for {
+          xfcd <- xfcdOpt
+          info <- infoOpt
+        } FormRunnerAnalytics.store.recordFormProcessOutcome(
+          uuid       = xfcd.uuid,
+          appForm    = info.appForm,
+          outcome    = ProcessOutcome.ProcessError,
+          durationMs = math.max(0L, (System.nanoTime() - startNs) / 1000000L),
+          atMs       = System.currentTimeMillis()
+        )
+        throw t
+    }
+  }
+
   case class SendActionParams(
     uri                   : String,
     method                : HttpMethod,
@@ -123,53 +187,55 @@ trait FormRunnerActions
 
   def trySendEmail(params: ActionParams): ActionResult =
     ActionResult.trySync {
+      withAnalyticsProcessTiming(ProcessOutcome.EmailSent) {
 
-      implicit val formRunnerParams: FormRunnerParams         = FormRunnerParams()
-      implicit val xfcd            : XFormsContainingDocument = inScopeContainingDocument
+        implicit val formRunnerParams: FormRunnerParams         = FormRunnerParams()
+        implicit val xfcd            : XFormsContainingDocument = inScopeContainingDocument
 
-      // https://github.com/orbeon/orbeon-forms/issues/5911
-      val emailDataFormatVersion =
-        paramByNameUseAvt(params, DataFormatVersionName)
-          .map(DataFormatVersion.withName)
-          .getOrElse(DataFormatVersion.V400)
+        // https://github.com/orbeon/orbeon-forms/issues/5911
+        val emailDataFormatVersion =
+          paramByNameUseAvt(params, DataFormatVersionName)
+            .map(DataFormatVersion.withName)
+            .getOrElse(DataFormatVersion.V400)
 
-      // Match first or all templates
-      val templateMatch =
-        paramByNameUseAvt(params, "match")
-          .map(TemplateMatch.withName)
-          .getOrElse(TemplateMatch.First)
+        // Match first or all templates
+        val templateMatch =
+          paramByNameUseAvt(params, "match")
+            .map(TemplateMatch.withName)
+            .getOrElse(TemplateMatch.First)
 
-      val emailContentsFromTemplates = emailsToSend(
-        emailDataFormatVersion = emailDataFormatVersion,
-        templateMatch          = templateMatch,
-        language               = paramByNameUseAvt(params, "lang").getOrElse(FormRunner.currentLang),
-        templateNameOpt        = paramByNameUseAvt(params, "template"),
-        pdfRenderings          =
-          PdfRendering.fromActionParamsPerPdfTemplate(
-            params                       = params,
-            frFormAttachmentsRootElemOpt = FormRunnerActionsCommon.findFrFormAttachmentsRootElem,
-            defaultLang                  = FormRunner.currentLang
-          )
-      )
+        val emailContentsFromTemplates = emailsToSend(
+          emailDataFormatVersion = emailDataFormatVersion,
+          templateMatch          = templateMatch,
+          language               = paramByNameUseAvt(params, "lang").getOrElse(FormRunner.currentLang),
+          templateNameOpt        = paramByNameUseAvt(params, "template"),
+          pdfRenderings          =
+            PdfRendering.fromActionParamsPerPdfTemplate(
+              params                       = params,
+              frFormAttachmentsRootElemOpt = FormRunnerActionsCommon.findFrFormAttachmentsRootElem,
+              defaultLang                  = FormRunner.currentLang
+            )
+        )
 
-      // S3 tests disable the actual sending of email (this parameter is not documented)
-      val sendEmail = booleanParamByNameUseAvt(params, "send-email", default = true)
+        // S3 tests disable the actual sending of email (this parameter is not documented)
+        val sendEmail = booleanParamByNameUseAvt(params, "send-email", default = true)
 
-      if (sendEmail)
-        emailContentsFromTemplates.headOption.foreach { emailContent =>
-          EmailTransport
-            .send(emailContent)
-            .recoverWith { case t =>
-              Failure(ProcessError.fromThrowable(t, defaultErrorType = ProcessErrorType.Email))
-            }
-            .get
-        }
+        if (sendEmail)
+          emailContentsFromTemplates.headOption.foreach { emailContent =>
+            EmailTransport
+              .send(emailContent)
+              .recoverWith { case t =>
+                Failure(ProcessError.fromThrowable(t, defaultErrorType = ProcessErrorType.Email))
+              }
+              .get
+          }
 
-      val s3Store = booleanParamByNameUseAvt(params, "s3-store", default = false)
+        val s3Store = booleanParamByNameUseAvt(params, "s3-store", default = false)
 
-      // Only store email contents to S3 if enabled by parameter
-      if (s3Store)
-        storeEmailContentsToS3(params, emailContentsFromTemplates).get
+        // Only store email contents to S3 if enabled by parameter
+        if (s3Store)
+          storeEmailContentsToS3(params, emailContentsFromTemplates).get
+      }
     }
 
   def emailsToSend(
@@ -396,9 +462,11 @@ trait FormRunnerActions
       val s3Content   = StreamedContent.fromBytes(xmlBytes, contentType.some)
 
       // Write to S3
-      withS3FromProperties(s3ConfigName) { (s3Config, s3Client) =>
-        S3.write(s3Key, s3Content)(s3Config, s3Client).map(_ => ())
-      }.get
+      withAnalyticsProcessTiming(ProcessOutcome.SubmittedSend) {
+        withS3FromProperties(s3ConfigName) { (s3Config, s3Client) =>
+          S3.write(s3Key, s3Content)(s3Config, s3Client).map(_ => ())
+        }.get
+      }
     }
 
   def trySend(params: ActionParams): ActionResult =
@@ -601,7 +669,9 @@ trait FormRunnerActions
         )
 
       debug(s"`send` action sending submission", List("params" -> sendActionParams.toString))
-      trySendImpl(sendActionParams)
+      withAnalyticsProcessTiming(ProcessOutcome.SubmittedSend) {
+        trySendImpl(sendActionParams)
+      }
     }
 
   def trySendImpl(params: SendActionParams): Option[XFormsSubmitDoneEvent] = {
@@ -739,14 +809,16 @@ trait FormRunnerActions
           case RenderedFormat.ExcelWithNamedRanges | RenderedFormat.XmlFormStructureAndData => None
         }
 
-      tryChangeModeImpl(
-        replace            = ReplaceType.All,
-        pathQuery          = pathQuery,
-        sourceModeType     = frParams.modeType(frc.customModes),
-        showProgress       = false,
-        formTargetOpt      = formTargetOpt,
-        responseIsResource = true
-      )
+      withAnalyticsProcessTiming(ProcessOutcome.PdfCreated) {
+        tryChangeModeImpl(
+          replace            = ReplaceType.All,
+          pathQuery          = pathQuery,
+          sourceModeType     = frParams.modeType(frc.customModes),
+          showProgress       = false,
+          formTargetOpt      = formTargetOpt,
+          responseIsResource = true
+        )
+      }
     }
 
   def clearRenderedFormatsResources(): Try[Unit] =

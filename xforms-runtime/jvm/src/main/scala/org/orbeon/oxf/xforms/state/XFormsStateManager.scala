@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.Logging.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.analytics.{DocumentRemovalReason, XFormsAnalyticsSupport}
 import org.orbeon.oxf.xforms.event.events.XXFormsStateRestoredEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, EventCollector, XFormsEvent}
 import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsGlobalProperties}
@@ -86,8 +87,10 @@ object XFormsStateManager
   // Infinispan heap and SIFS disk entries immediately (#1990, #7572), while bounding per-session UUID tracking memory
   // via `oxf.xforms.state.session-max-uuids`.
   def onEvictedFromCache(containingDocument: XFormsContainingDocument): Unit =
-    if (containingDocument.staticState.isServerStateHandling)
+    if (containingDocument.staticState.isServerStateHandling) {
       storeDocumentState(containingDocument, isInitialState = false)
+      XFormsAnalyticsSupport.withListener(_.onDocumentPassivated(containingDocument.uuid, System.currentTimeMillis()))
+    }
 
   /**
     * Called after an update.
@@ -110,6 +113,7 @@ object XFormsStateManager
         debug("Not keeping document in cache following error.")
         // Remove all information about this document from the session and state store
         val uuid = containingDocument.uuid
+        XFormsAnalyticsSupport.withListener(_.onDocumentRemoved(uuid, DocumentRemovalReason.Error, System.currentTimeMillis()))
         removeFromUuidListInSession(uuid)
         removeSessionDocument(uuid)
         XFormsDocumentCache.remove(uuid)
@@ -204,6 +208,9 @@ object XFormsStateManager
         }
       }
 
+      if (! isInitialState && ! disableUpdates)
+        XFormsAnalyticsSupport.withListener(_.onDocumentActivatedFromStore(documentFromStore.uuid, System.currentTimeMillis()))
+
       documentFromStore
     }
   }
@@ -257,6 +264,7 @@ object XFormsStateManager
     unregisterInFlightDocument(uuid)
 
   override protected def onSessionUuidOverflow(session: ExternalContext.Session, evictedUuid: String): Unit = {
+    XFormsAnalyticsSupport.withListener(_.onDocumentRemoved(evictedUuid, DocumentRemovalReason.SessionOverflow, System.currentTimeMillis()))
     unregisterInFlightDocument(evictedUuid)
     session.removeAttribute(Private.getUUIDSessionKey(evictedUuid), ExternalContext.SessionScope.Application)
     XFormsDocumentCache.remove(evictedUuid)
@@ -383,6 +391,13 @@ trait XFormsStateManagerUuidList {
     session.getAttribute(XFormsStateManagerUUIDListKey).getOrElse {
       activeSessionsCounter.incrementAndGet()
       session.setAttribute(XFormsStateManagerUUIDListKey, new BoundedSessionUuidSet(XFormsGlobalProperties.sessionMaxUuids))
+      XFormsAnalyticsSupport.withListener(
+        _.onHttpSessionCreated(
+          sessionId      = Option(session.getId).getOrElse(""),
+          createdAtMs    = System.currentTimeMillis(),
+          maxInactiveSec = session.getMaxInactiveInterval
+        )
+      )
     }
 
   protected def onSessionUuidRemoved(uuid: String): Unit = ()
@@ -393,6 +408,13 @@ trait XFormsStateManagerUuidList {
       activeSessionsCounter.decrementAndGet()
       val uuids = getUuidListInSession(session).snapshot
       session.removeAttribute(XFormsStateManagerUUIDListKey, ExternalContext.SessionScope.Application)
+      XFormsAnalyticsSupport.withListener(
+        _.onHttpSessionDestroyed(
+          sessionId     = Option(session.getId).getOrElse(""),
+          destroyedAtMs = System.currentTimeMillis(),
+          documentUuids = uuids
+        )
+      )
       uuids.foreach { uuid =>
         onSessionUuidRemoved(uuid)
         XFormsDocumentCache.remove(uuid)

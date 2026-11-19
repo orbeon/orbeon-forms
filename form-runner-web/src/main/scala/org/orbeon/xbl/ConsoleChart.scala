@@ -290,7 +290,7 @@ object ConsoleChart {
             val chart  = chartOpt.get
             val labels = buildLabelsJs(spec)
             chart.data.labels         = labels
-            chart.data._fullLabels    = spec.fullCategories.toJSArray
+            chart.data._fullLabels    = buildFullLabelsJs(spec)
             chart.data._categoryMeta  = spec.categoryMeta.toJSArray
             val pointCount = if (spec.kind == "timeseries") spec.timestampsMs.size else spec.categories.size
             spec.series.zipWithIndex.foreach { case (s, idx) =>
@@ -316,9 +316,17 @@ object ConsoleChart {
 
     private def buildLabelsJs(spec: ConsoleChartSpec): js.Array[String] =
       if (spec.kind == "timeseries")
-        spec.timestampsMs.map(ts => formatTimestamp(ts, includeSeconds = spec.window != "24h")).toJSArray
+        spec.timestampsMs.map(ts => formatTimestamp(ts, spec.window)).toJSArray
       else
         spec.categories.toJSArray
+
+    private def buildFullLabelsJs(spec: ConsoleChartSpec): js.Array[String] =
+      if (spec.fullCategories.nonEmpty)
+        spec.fullCategories.toJSArray
+      else if (spec.kind == "timeseries")
+        spec.timestampsMs.map(formatFullTimestamp).toJSArray
+      else
+        js.Array[String]()
 
     private def buildChartConfig(
       spec      : ConsoleChartSpec,
@@ -372,7 +380,7 @@ object ConsoleChart {
       val dataObj = js.Dynamic.literal(
         labels        = buildLabelsJs(spec),
         datasets      = datasets,
-        _fullLabels   = spec.fullCategories.toJSArray,
+        _fullLabels   = buildFullLabelsJs(spec),
         _categoryMeta = spec.categoryMeta.toJSArray
       )
 
@@ -533,16 +541,28 @@ object ConsoleChart {
       if (parsed.isNaN || parsed.isInfinite) 0.0 else parsed
     }
 
-    private def formatTimestamp(epochMs: Long, includeSeconds: Boolean): String = {
+    private def pad2(n: Double): String = {
+      val i = n.toInt
+      if (i < 10) s"0$i" else i.toString
+    }
+
+    private def formatTimestamp(epochMs: Long, window: String): String = {
       val d = new js.Date(epochMs.toDouble)
-      def pad2(n: Double): String = {
-        val i = n.toInt
-        if (i < 10) s"0$i" else i.toString
+      window match {
+        case "30d" =>
+          s"${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}"
+        case "7d" =>
+          s"${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}"
+        case "24h" =>
+          s"${pad2(d.getHours())}:${pad2(d.getMinutes())}"
+        case _ =>
+          s"${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}"
       }
-      if (includeSeconds)
-        s"${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}"
-      else
-        s"${pad2(d.getHours())}:${pad2(d.getMinutes())}"
+    }
+
+    private def formatFullTimestamp(epochMs: Long): String = {
+      val d = new js.Date(epochMs.toDouble)
+      s"${d.getFullYear().toInt}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}"
     }
 
     private def formatBytesValue(bytes: Double): String = {
@@ -558,6 +578,7 @@ object ConsoleChart {
         case "bytes"       => formatBytesValue(value)
         case "rate"        => if (value == 0.0) "0/s" else if (value < 10.0) f"$value%.1f/s" else f"${value.round}/s"
         case "duration-ms" => if (value < 1000.0) f"${value.round} ms" else f"${value / 1000.0}%.1fs"
+        case "percent"     => f"${value.round}%%"
         case _             => f"${value.round}"
       }
 
@@ -566,6 +587,7 @@ object ConsoleChart {
         case "bytes"       => formatBytesValue(value)
         case "rate"        => f"$value%.1f/s"
         case "duration-ms" => if (value < 1000.0) f"${value.round} ms" else f"${value / 1000.0}%.2fs"
+        case "percent"     => f"$value%.1f%%"
         case _             => f"${value.round}"
       }
   }

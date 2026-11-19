@@ -502,16 +502,17 @@ object FormRunnerConsole {
 
           val systemPageOpt =
             if (appOpt.isEmpty)
-              majorModeOpt.filter(Set("summary", "home", "landing", "console"))
+              majorModeOpt.filter(Set("summary", "home", "landing", "console", "analytics"))
             else
               None
 
           val systemPageFallbackNameOpt = systemPageOpt.map {
-            case "summary" => "Form Runner Summary"
-            case "home"    => "Forms Admin"
-            case "landing" => "Landing"
-            case "console" => "Admin Console"
-            case other     => other
+            case "summary"   => "Form Runner Summary"
+            case "home"      => "Forms Admin"
+            case "landing"   => "Landing"
+            case "console"   => "Admin Console"
+            case "analytics" => "Forms Analytics"
+            case other       => other
           }
 
           val displayName =

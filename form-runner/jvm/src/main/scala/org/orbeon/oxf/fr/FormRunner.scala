@@ -14,4 +14,5 @@ object FormRunner
      with FormRunnerRevisionHistory
      with FormRunnerConfiguration
      with FormRunnerConsole
+     with FormRunnerAnalytics
      with FormRunnerPlatformJVM

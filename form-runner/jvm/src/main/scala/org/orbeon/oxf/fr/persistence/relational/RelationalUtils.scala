@@ -115,6 +115,18 @@ object RelationalUtils extends Logging {
         withConnectionHandleTransaction(provider, () => getConnection(dataSource))(thunk)
     }
 
+  private[fr] def withConnectionForDatasource[T](
+    provider       : Provider,
+    datasourceName : String
+  )(
+    thunk          : Connection => T
+  )(implicit
+    indentedLogger : IndentedLogger
+  ): T = {
+    val dataSource = getDataSource(datasourceName)
+    withConnectionHandleTransaction(provider, () => getConnection(dataSource))(thunk)
+  }
+
   /**
     * For cases where we can't use `setString` on a prepared statement
     * - Apache Commons Lang had a `StringEscapeUtils.escapeSql` [1] but it has been deprecated in Commons Lang 3 [2]

@@ -62,6 +62,17 @@ trait FormRunnerActionsCommon {
   def AllowedFormRunnerActions: Map[String, Action]
   implicit def logger: IndentedLogger
 
+  protected def onAnalyticsValidationFailed(xfcd: XFormsContainingDocument): Unit = ()
+
+  protected def onAnalyticsSaveCompleted(
+    xfcd       : XFormsContainingDocument,
+    appForm    : AppForm,
+    version    : Int,
+    isDraft    : Boolean,
+    durationMs : Long,
+    succeeded  : Boolean
+  ): Unit = ()
+
   protected val CommonAllowedFormRunnerActions: Map[String, Action] = Map(
     "pending-uploads"        -> tryPendingUploads,
     "validate"               -> tryValidate,
@@ -119,8 +130,10 @@ trait FormRunnerActionsCommon {
 
       inScopeContainingDocument.synchronizeAndRefresh()
 
-      if (frc.countValidationsByLevel(level) > 0)
+      if (frc.countValidationsByLevel(level) > 0) {
+        onAnalyticsValidationFailed(inScopeContainingDocument)
         throw ProcessError.normal(s"Data has failed validations for level ${level.entryName}")
+      }
     }
 
   def tryUpdateCurrentWizardPageValidity(params: ActionParams): ActionResult =
@@ -218,6 +231,8 @@ trait FormRunnerActionsCommon {
 
       implicit val safeRequestCtx: SafeRequestContext = SafeRequestContext(CoreCrossPlatformSupport.externalContext)
 
+      val saveStartNs = System.nanoTime()
+
       // Saving is an asynchronous operation
       val computation: IO[PutWithAttachmentsResult] =
         frc.putWithAttachments(
@@ -238,8 +253,10 @@ trait FormRunnerActionsCommon {
       // Q: Could we make this an `IO`?
       def continuation(xfcd: XFormsContainingDocument, value: Try[PutWithAttachmentsResult]): Try[Unit] =
         Try {
+          val saveDurationMs = math.max(0L, (System.nanoTime() - saveStartNs) / 1000000L)
           value match {
             case Success(putWithAttachmentsResult) =>
+              onAnalyticsSaveCompleted(xfcd, appForm, formVersion, isDraft, saveDurationMs, succeeded = true)
 
               // Update, in this thread, the attachment paths
               updateAttachments(frc.formInstance.root, putWithAttachmentsResult.savedAttachments, setTmpFileAtt = true)
@@ -269,6 +286,7 @@ trait FormRunnerActionsCommon {
               Success(())
 
             case Failure(t) =>
+              onAnalyticsSaveCompleted(xfcd, appForm, formVersion, isDraft, saveDurationMs, succeeded = false)
 
               val statusCodeOpt    = Option(t).collect { case HttpStatusCodeException(statusCode, _, _) => statusCode }
               val conflictDetected = detectDataConflict && statusCodeOpt.contains(StatusCode.PreconditionFailed)

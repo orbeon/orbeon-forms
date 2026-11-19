@@ -25,7 +25,7 @@ import org.orbeon.xml.NamespaceMapping
 // TODO: only for `xbl:control`, then make abstract
 class ContainerControl(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -35,7 +35,7 @@ class ContainerControl(
   containerScope   : Scope
 ) extends ElementAnalysis(
   index,
-  element,
+  elem,
   parent,
   preceding,
   staticId,

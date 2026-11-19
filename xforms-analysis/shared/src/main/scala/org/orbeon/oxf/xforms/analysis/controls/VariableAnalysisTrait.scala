@@ -32,14 +32,21 @@ trait VariableAnalysisTrait
   // Used below and by `ElementAnalysisTreeXPathAnalyzer`
   def nestedValueAnalysis: Option[ElementAnalysis] = children.find(e => isValueOrSequenceElement(e.element))
 
+  // `def` so server-side static DOM compaction (`replaceElementForRuntime`) does not stay pinned in a cached tuple
+  def valueElement: Element =
+    nestedValueAnalysis match {
+      case Some(valueElem) => valueElem.element
+      case None            => variableSelf.element
+    }
+
   // `lazy` because the children are evaluated after the container
   // All used by `Variable`
-  lazy val (valueElement, hasNestedValue, valueScope, valueNamespaceMapping, valueStaticId, valueIsFunctionsRestricted) =
+  lazy val (hasNestedValue, valueScope, valueNamespaceMapping, valueStaticId, valueIsFunctionsRestricted) =
     nestedValueAnalysis match {
       case Some(valueElem) =>
-        (valueElem.element, true, valueElem.scope, valueElem.namespaceMapping, valueElem.staticId, valueElem.isFunctionsRestricted)
+        (true, valueElem.scope, valueElem.namespaceMapping, valueElem.staticId, valueElem.isFunctionsRestricted)
       case None =>
-        (variableSelf.element, false, variableSelf.scope, variableSelf.namespaceMapping, variableSelf.staticId, variableSelf.isFunctionsRestricted)
+        (false, variableSelf.scope, variableSelf.namespaceMapping, variableSelf.staticId, variableSelf.isFunctionsRestricted)
     }
 
   def variableAnalysis: Option[XPathAnalysis] = valueAnalysis

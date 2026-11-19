@@ -25,7 +25,7 @@ import org.orbeon.xml.NamespaceMapping
 
 class OutputControl(
   index                   : Int,
-  element                 : Element,
+  elem                    : Element,
   parent                  : Option[ElementAnalysis],
   preceding               : Option[ElementAnalysis],
   staticId                : String,
@@ -45,7 +45,7 @@ class OutputControl(
   val sizeBinding          : Option[SingleItemBinding],
   val hashAlgorithmBinding : Option[SingleItemBinding],
   val hashValueBinding     : Option[SingleItemBinding],
-) extends ValueControl(index, element, parent, preceding, staticId, prefixedId,  namespaceMapping,  scope,  containerScope)
+) extends ValueControl(index, elem, parent, preceding, staticId, prefixedId,  namespaceMapping,  scope,  containerScope)
      with OptionalSingleNode
      with WithFileMetadata {
 

@@ -50,7 +50,7 @@ case class InstanceMetadata(
 
 class Instance(
   index                   : Int,
-  element                 : Element,
+  elem                    : Element,
   parent                  : Option[ElementAnalysis],
   preceding               : Option[ElementAnalysis],
   staticId                : String,
@@ -61,7 +61,7 @@ class Instance(
   initialInstanceMetadata : InstanceMetadata
 ) extends ElementAnalysis(
   index,
-  element,
+  elem,
   parent,
   preceding,
   staticId,
@@ -101,11 +101,23 @@ class Instance(
       }
     }
 
-  // Materialize `constantContent` (`TinyTree`) and release the duplicate Orbeon DOM subtree on server-side static states
+  // Materialize `constantContent` (`TinyTree`) and release the duplicate Orbeon DOM subtree on server-side static states;
+  // for mutable inline instances, copy parent namespaces onto the root element and detach it from the enclosing `<xf:instance>`.
   def releaseInlineDom(): Unit =
     if (readonly && useInlineContent) {
       val _ = constantContent
       _instanceMetadata = _instanceMetadata.copy(inlineRootElemOpt = None)
+      element.clearContent()
+    } else if (useInlineContent) {
+      inlineRootElemOpt.foreach { inlineElem =>
+        if (! excludeResultPrefixes("#all")) {
+          val savedParentOpt = inlineElem.parentElemOpt
+          inlineElem.detach()
+          inlineElem.copyMissingNamespacesByPrefix(savedParentOpt, excludeResultPrefixes)
+        } else {
+          inlineElem.detach()
+        }
+      }
       element.clearContent()
     }
 

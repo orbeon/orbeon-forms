@@ -425,7 +425,7 @@ object PartAnalysisBuilder {
       val rootControlAnalysis =
         new RootControl(
           index            = 0,
-          element          = rootElem,
+          elem             = rootElem,
           staticId         = Constants.DocumentId,
           prefixedId       = rootControlPrefixedId,
           namespaceMapping = partAnalysisCtx.getNamespaceMapping(rootControlPrefixedId).orNull,

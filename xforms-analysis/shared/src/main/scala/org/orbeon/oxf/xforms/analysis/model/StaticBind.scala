@@ -16,7 +16,7 @@ import org.orbeon.xml.NamespaceMapping
 // Represent a static `<xf:bind>` element
 class StaticBind(
   index                          : Int,
-  element                        : Element,
+  elem                           : Element,
   parent                         : Option[ElementAnalysis],
   preceding                      : Option[ElementAnalysis],
   staticId                       : String,
@@ -33,7 +33,7 @@ class StaticBind(
   val bindTree                   : BindTree
 ) extends ElementAnalysis(
   index,
-  element,
+  elem,
   parent,
   preceding,
   staticId,

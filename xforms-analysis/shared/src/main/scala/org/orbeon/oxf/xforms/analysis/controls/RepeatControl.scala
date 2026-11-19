@@ -23,7 +23,7 @@ import org.orbeon.xml.NamespaceMapping
 
 class RepeatControl(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -31,7 +31,7 @@ class RepeatControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends ContainerControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ContainerControl(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
    with AppearanceTrait { // for separator appearance
 
   lazy val iteration: Option[RepeatIterationControl] =

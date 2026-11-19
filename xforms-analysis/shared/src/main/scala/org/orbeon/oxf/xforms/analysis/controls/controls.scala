@@ -13,7 +13,7 @@ import org.orbeon.xml.NamespaceMapping
 
 abstract class CoreControl(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -21,7 +21,7 @@ abstract class CoreControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends ElementAnalysis(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ElementAnalysis(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with ViewTrait
      with StaticLHHASupport {
   override def allowMinimalLabelHint: Boolean = false
@@ -29,7 +29,7 @@ abstract class CoreControl(
 
 abstract class ValueControl(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -37,14 +37,14 @@ abstract class ValueControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends CoreControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends CoreControl(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with ValueTrait
      with WithChildrenTrait
      with FormatTrait
 
 class InputValueControl(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -52,7 +52,7 @@ class InputValueControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends ValueControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ValueControl(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with RequiredSingleNode {
   override protected def externalEventsDef: Set[String] = super.externalEventsDef ++ InputValueControl.ExternalEvents
   override val externalEvents = externalEventsDef
@@ -65,7 +65,7 @@ private object InputValueControl {
 
 class SelectionControl(
   index                : Int,
-  element              : Element,
+  elem                 : Element,
   parent               : Option[ElementAnalysis],
   preceding            : Option[ElementAnalysis],
   staticId             : String,
@@ -78,7 +78,7 @@ class SelectionControl(
   val singleItemItemset: Boolean,
   val useCopy          : Boolean,
   val mustEncodeValues : Option[Boolean]
-) extends InputValueControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends InputValueControl(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with SelectionControlTrait {
 
   override protected val allowedExtensionAttributes = (! isMultiple && isFull set XXFORMS_GROUP_QNAME) + XXFORMS_TITLE_QNAME
@@ -86,7 +86,7 @@ class SelectionControl(
 
 class TriggerControl(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -94,7 +94,7 @@ class TriggerControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends CoreControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends CoreControl(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with OptionalSingleNode
      with TriggerAppearanceTrait
      with WithChildrenTrait {
@@ -126,7 +126,7 @@ trait WithFileMetadata extends ElementAnalysis{
 
 class UploadControl(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -141,7 +141,7 @@ class UploadControl(
   val sizeBinding         : Option[SingleItemBinding],
   val hashAlgorithmBinding: Option[SingleItemBinding],
   val hashValueBinding    : Option[SingleItemBinding],
-) extends InputValueControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) with WithFileMetadata {
+) extends InputValueControl(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) with WithFileMetadata {
 
   override protected def externalEventsDef: Set[String] = super.externalEventsDef ++ UploadControl.ExternalEvents
   override val externalEvents = externalEventsDef
@@ -171,7 +171,7 @@ private object UploadControl {
 
 class InputControl(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -179,7 +179,7 @@ class InputControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends InputValueControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
+) extends InputValueControl(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
   override def allowMinimalLabelHint: Boolean = true
   override protected def allowedExtensionAttributes: Set[QName] = InputControl.AllowedExtensionAttributes
 }
@@ -197,7 +197,7 @@ private object InputControl {
 
 class SecretControl(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -205,7 +205,7 @@ class SecretControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends InputValueControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
+) extends InputValueControl(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
   override def allowMinimalLabelHint: Boolean = true
   override protected def allowedExtensionAttributes: Set[QName] = SecretControl.AllowedExtensionAttributes
 }
@@ -221,7 +221,7 @@ private object SecretControl {
 
 class TextareaControl(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -229,7 +229,7 @@ class TextareaControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends InputValueControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
+) extends InputValueControl(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
   override def allowMinimalLabelHint: Boolean = true
   override protected def allowedExtensionAttributes: Set[QName] = TextareaControl.AllowedExtensionAttributes
 }
@@ -245,7 +245,7 @@ private object TextareaControl {
 
 class SwitchControl(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -253,7 +253,7 @@ class SwitchControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends ContainerControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ContainerControl(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with OptionalSingleNode
      with StaticLHHASupport
      with AppearanceTrait {
@@ -269,7 +269,7 @@ class SwitchControl(
 
 class CaseControl(
   index               : Int,
-  element             : Element,
+  elem                : Element,
   parent              : Option[ElementAnalysis],
   preceding           : Option[ElementAnalysis],
   staticId            : String,
@@ -279,7 +279,7 @@ class CaseControl(
   containerScope      : Scope,
   val valueExpression : Option[String],
   val valueLiteral    : Option[String]
-) extends ContainerControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ContainerControl(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with OptionalSingleNode
      with StaticLHHASupport {
 
@@ -290,7 +290,7 @@ class CaseControl(
 
 class GroupControl(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -298,7 +298,7 @@ class GroupControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends ContainerControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ContainerControl(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with OptionalSingleNode
      with StaticLHHASupport {
 
@@ -320,7 +320,7 @@ class GroupControl(
 
 class DialogControl(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -328,7 +328,7 @@ class DialogControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends ContainerControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ContainerControl(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
    with OptionalSingleNode
    with StaticLHHASupport {
 
@@ -342,7 +342,7 @@ class DialogControl(
 
 class PropertyControl(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -350,11 +350,17 @@ class PropertyControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends ElementAnalysis(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ElementAnalysis(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope) {
+  val constantValueOpt: Option[String] =
+    if (VariableAnalysis.valueOrSelectAttribute(element).isEmpty)
+      Option(element.getStringValue).filter(_.nonEmpty)
+    else
+      None
+}
 
 class HeaderControl(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -362,12 +368,12 @@ class HeaderControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends ElementAnalysis(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ElementAnalysis(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with WithChildrenTrait
 
 class NestedNameOrValueControl(
   index                    : Int,
-  element                  : Element,
+  elem                     : Element,
   parent                   : Option[ElementAnalysis],
   preceding                : Option[ElementAnalysis],
   staticId                 : String,
@@ -376,6 +382,6 @@ class NestedNameOrValueControl(
   scope                    : Scope,
   containerScope           : Scope,
   val expressionOrConstant : Either[String, String],
-) extends ElementAnalysis(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ElementAnalysis(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with OptionalSingleNode
      with WithExpressionOrConstantTrait

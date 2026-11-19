@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.state
 
 import org.junit.Assume
+import org.orbeon.dom.tree.CompactElement
 import org.orbeon.oxf.cache.MemorySizeEstimator
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
@@ -215,17 +216,27 @@ class StaticStateMemoryFootprintTest
       val sharedRoots = Seq[AnyRef](GlobalBindingIndex.currentIndex, XFormsGlobalProperties)
       val jolBeforeOpt = MemorySizeEstimator.measureExclusiveBytesWithJol(staticState, sharedRoots).map(_._1)
 
-      // 4. Trim server static state: materializes `constantContent` (`TinyTree`) and releases duplicate Orbeon DOM
+      // 4. Trim server static state: materializes `constantContent` (`TinyTree`), detaches mutable inline instances,
+      // and replaces every `ElementAnalysis.element` with a detached `CompactElement`
       staticState.trimAfterServerCompilation()
 
       assert(resourcesInst.inlineRootElemOpt.isEmpty)
       assert(resourcesInst.element.elements.isEmpty)
       assert(resourcesInst.constantContent.isDefined)
 
+      val formInst = staticState.topLevelPart.findModel("fr-form-model").get.instances("fr-form-instance")
+      assert(formInst.inlineRootElemOpt.isDefined)
+      assert(formInst.inlineRootElemOpt.get.getDocument eq null)
+      assert(formInst.inlineRootElemOpt.get.getParent eq null)
+      assert(formInst.inlineRootElemOpt.get.namespaceForPrefix("acme").contains("http://www.acme.com/xbl"))
+
+      assert(staticState.topLevelPart.controlAnalysisMap.values.forall(_.element.isInstanceOf[CompactElement]))
+      assert(staticState.topLevelPart.controlAnalysisMap.values.forall(_.element.getDocument eq null))
+
       val domBytesAfterServerTrim = staticState.staticDomSizeBytes
       assert(
-        domBytesAfterServerTrim < domBytesBeforeServerTrim / 3,
-        s"Expected >66% DOM reduction after releasing readonly inline instances, got before=$domBytesBeforeServerTrim after=$domBytesAfterServerTrim"
+        domBytesAfterServerTrim < domBytesBeforeServerTrim / 10,
+        s"Expected >90% DOM reduction after CompactElement + readonly TinyTree trim, got before=$domBytesBeforeServerTrim after=$domBytesAfterServerTrim"
       )
 
       jolBeforeOpt.foreach { jolBefore =>
@@ -317,6 +328,71 @@ class StaticStateMemoryFootprintTest
           // `createOrUpdateStaticShadowTree` after initial `freeTransientState()` has already run.
           activateControlWithEvent("insert-cell")
           assert(getControlValue("dyn≡box-1≡cell-1≡cell-out") == "BOUND")
+        }
+      }
+    }
+
+    it("must preserve ancestor xml:base, literal xf:property text, xxf:control-element, and inline xs:schema after CompactElement trim") {
+      val docDom =
+        <xh:html
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xml:base="http://example.org/app/">
+          <xh:head>
+            <xf:model id="main-model">
+              <xs:schema targetNamespace="">
+                <xs:simpleType name="code3">
+                  <xs:restriction base="xs:string">
+                    <xs:length value="3"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:schema>
+              <xf:instance id="main-instance">
+                <data>
+                  <code>ABCD</code>
+                  <prop-out/>
+                  <ctrl-att/>
+                </data>
+              </xf:instance>
+              <xf:bind ref="code" type="code3"/>
+              <xf:action event="my-custom-event">
+                <xf:setvalue ref="prop-out" value="event('greeting')"/>
+                <xf:setvalue ref="ctrl-att" value="xxf:control-element('code-input')/@class"/>
+              </xf:action>
+            </xf:model>
+          </xh:head>
+          <xh:body xml:base="forms/v1/">
+            <xf:input id="code-input" ref="code" class="code-field"/>
+            <xf:output id="prop-out-ctrl" ref="prop-out"/>
+            <xf:output id="ctrl-att-ctrl" ref="ctrl-att"/>
+            <xf:trigger id="fire-btn">
+              <xf:label>Fire</xf:label>
+              <xf:dispatch event="DOMActivate" name="my-custom-event" targetid="main-model">
+                <xf:property name="greeting">Hello from CompactElement</xf:property>
+              </xf:dispatch>
+            </xf:trigger>
+          </xh:body>
+        </xh:html>.toDocument
+
+      withTestExternalContext { implicit ec =>
+        withXFormsDocument(docDom) { implicit doc =>
+          // 1. Model with inline `<xs:schema>` retains schema validation (`"ABCD"` fails length=3)
+          assert(! isValid("code-input"))
+
+          setControlValueWithEventSearchNested("code-input", "XYZ")
+          assert(isValid("code-input"))
+
+          // 2. Ancestor `xml:base` (`http://example.org/app/` + `forms/v1/`) was pre-resolved onto `CompactElement`
+          val codeElem = doc.staticOps.findControlAnalysis("code-input").get.element
+          assert(codeElem.isInstanceOf[CompactElement])
+          assert(doc.resolveXMLBase(codeElem, "lookup.xml").toString == "http://example.org/app/forms/v1/lookup.xml")
+
+          // 3. Literal `<xf:property>` text and `xxf:control-element` work on `CompactElement`
+          activateControlWithEvent("fire-btn")
+          assert(getControlValue("prop-out-ctrl") == "Hello from CompactElement")
+          assert(getControlValue("ctrl-att-ctrl") == "code-field")
         }
       }
     }

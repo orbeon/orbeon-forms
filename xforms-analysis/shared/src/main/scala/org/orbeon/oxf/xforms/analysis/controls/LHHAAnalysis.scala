@@ -25,7 +25,7 @@ import org.orbeon.xml.NamespaceMapping
 
 class LHHAAnalysis(
   index                         : Int,
-  element                       : Element,
+  elem                          : Element,
   parent                        : Option[ElementAnalysis],
   preceding                     : Option[ElementAnalysis],
   staticId                      : String,
@@ -40,7 +40,7 @@ class LHHAAnalysis(
   val hasLocalFullAppearance   : Boolean,
   val hasLocalLeftAppearance   : Boolean,
   val forValidationId          : Option[String],
-) extends ElementAnalysis(index, element, parent, preceding, staticId,  prefixedId,  namespaceMapping,  scope,  containerScope)
+) extends ElementAnalysis(index, elem, parent, preceding, staticId,  prefixedId,  namespaceMapping,  scope,  containerScope)
    with OptionalSingleNode
    with ViewTrait
    with AppearanceTrait

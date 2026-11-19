@@ -11,7 +11,7 @@ import org.orbeon.xml.NamespaceMapping
 
 class ComponentControl(
   index              : Int,
-  element            : Element,
+  elem               : Element,
   parent             : Option[ElementAnalysis],
   preceding          : Option[ElementAnalysis],
   staticId           : String,
@@ -21,7 +21,7 @@ class ComponentControl(
   containerScope     : Scope,
   val isTopLevelPart : Boolean,
   val commonBinding  : CommonBinding,
-) extends ContainerControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ContainerControl(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with WithChildrenTrait
      with OptionalSingleNode { // binding could be mandatory, optional, or prohibited
 
@@ -30,6 +30,13 @@ class ComponentControl(
       element.attributeValueOpt(XFormsNames.XXFORMS_UPDATE_QNAME).contains(XFormsNames.XFORMS_FULL_UPDATE)
 
   var rootElem: Element = element // default, can be updated by `xxf:dynamic`
+
+  override def replaceElementForRuntime(newElement: Element): Unit = {
+    val wasDefaultRoot = rootElem eq element
+    super.replaceElementForRuntime(newElement)
+    if (wasDefaultRoot)
+      rootElem = newElement
+  }
 
   private var _concreteBindingOpt: Option[ConcreteBinding] = None //part.getBinding(prefixedId)
 

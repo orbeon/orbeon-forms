@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.{IndentedLogger, Logging, XPathCache}
 import org.orbeon.oxf.xforms.analysis.EventHandler.PropertyQNames
 import org.orbeon.oxf.xforms.analysis.WithChildrenTrait
-import org.orbeon.oxf.xforms.analysis.controls.{ActionTrait, VariableAnalysis}
+import org.orbeon.oxf.xforms.analysis.controls.{ActionTrait, PropertyControl, VariableAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.EventCollector.ErrorEventCollector
 import org.orbeon.oxf.xforms.event.XFormsEvent.{ActionPropertyGetter, PropertyValue}
@@ -179,7 +179,10 @@ object XFormsAction {
             result
           case None =>
             // Literal text
-            element.getStringValue
+            property match {
+              case p: PropertyControl => p.constantValueOpt.getOrElse("")
+              case _                  => element.getStringValue
+            }
         }
 
         tunnel = element.attributeValueOpt("tunnel").contains("true")

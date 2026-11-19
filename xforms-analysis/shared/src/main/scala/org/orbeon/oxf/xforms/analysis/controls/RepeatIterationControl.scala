@@ -22,7 +22,7 @@ import org.orbeon.xml.NamespaceMapping
 
 class RepeatIterationControl(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -30,7 +30,7 @@ class RepeatIterationControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends ContainerControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ContainerControl(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with RequiredSingleNode {
 
   override protected def externalEventsDef = super.externalEventsDef + XXFORMS_REPEAT_ACTIVATE

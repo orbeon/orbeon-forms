@@ -135,6 +135,15 @@ trait PartXBLAnalysis extends TransientState {
 
   override def freeTransientState(): Unit = {
     super.freeTransientState()
+    if (isTopLevelPart) {
+      abstractBindingsWithGlobals.clear()
+      var i = 0
+      while (i < allGlobals.size) {
+        if (allGlobals(i).compactShadowTree ne null)
+          allGlobals(i) = allGlobals(i).copy(compactShadowTree = null)
+        i += 1
+      }
+    }
     metadata.commitBindingIndex(cleanTransientState = isTopLevelPart)(new IndentedLogger(xbl.Logger))
   }
 }

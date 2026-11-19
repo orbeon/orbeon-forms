@@ -22,7 +22,7 @@ import org.orbeon.xml.NamespaceMapping
 
 class VariableControl(
   index                    : Int,
-  element                  : Element,
+  elem                     : Element,
   parent                   : Option[ElementAnalysis],
   preceding                : Option[ElementAnalysis],
   staticId                 : String,
@@ -32,7 +32,7 @@ class VariableControl(
   containerScope           : Scope,
   val name                 : String,
   val expressionOrConstant : Either[String, String]
-) extends ElementAnalysis(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends ElementAnalysis(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
   with ViewTrait
   with OptionalSingleNode
   with VariableAnalysisTrait {

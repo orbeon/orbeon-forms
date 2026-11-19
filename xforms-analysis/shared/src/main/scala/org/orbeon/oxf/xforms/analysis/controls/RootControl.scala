@@ -26,14 +26,14 @@ import org.orbeon.xml.NamespaceMapping
  */
 class RootControl(
   index               : Int,
-  element             : Element,
+  elem                : Element,
   staticId            : String,
   prefixedId          : String,
   namespaceMapping    : NamespaceMapping,
   scope               : Scope,
   containerScope      : Scope,
   val elementInParent : Option[ElementAnalysis]
-) extends ContainerControl(index, element, None, None, staticId, prefixedId, namespaceMapping, scope, containerScope) {
+) extends ContainerControl(index, elem, None, None, staticId, prefixedId, namespaceMapping, scope, containerScope) {
 
   override protected def externalEventsDef = super.externalEventsDef ++ Set(XXFORMS_LOAD, EventNames.XXFormsPoll)
   override val externalEvents              = externalEventsDef

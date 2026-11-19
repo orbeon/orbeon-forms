@@ -23,7 +23,7 @@ import org.orbeon.xml.NamespaceMapping
 
 class AttributeControl(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -31,7 +31,7 @@ class AttributeControl(
   namespaceMapping : NamespaceMapping,
   scope            : Scope,
   containerScope   : Scope
-) extends CoreControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
+) extends CoreControl(index, elem, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with ValueTrait
      with OptionalSingleNode {
 

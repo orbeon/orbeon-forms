@@ -8,15 +8,14 @@ import org.orbeon.oxf.util.MarkupUtils.*
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.analysis.controls.HeaderControl
 import org.orbeon.oxf.xforms.event.XFormsEvent.{ActionPropertyGetter, TunnelProperties}
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.event.{EventCollector, XFormsEvent}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils.*
 import org.orbeon.oxf.xml.dom.Extensions
-import org.orbeon.oxf.xml.dom.Extensions.DomElemOps
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
-import org.orbeon.xforms.XFormsNames.XFORMS_HEADER_QNAME
 import org.orbeon.xforms.{RelevanceHandling, UrlType, XFormsCrossPlatformSupport}
 
 import scala.concurrent.duration.Duration
@@ -113,7 +112,7 @@ object SubmissionParameters {
       )
 
     def filterQualifiedName(s: String) =
-      staticSubmission.element.resolveStringQName(s, unprefixedIsNoNamespace = true) map (_.localName)
+      Extensions.resolveQName(staticSubmission.namespaceMapping.mapping.get, s, unprefixedIsNoNamespace = true) map (_.localName)
 
     val resolvedReplace =
       staticSubmission.avtReplaceOpt    flatMap
@@ -259,7 +258,7 @@ object SubmissionParameters {
         )                                                                           && // can't let SOAP requests be handled by the browser
         staticSubmission.avtXxfUsernameOpt.isEmpty                                  && // can't optimize if there are authentication credentials
         staticSubmission.avtXxfTargetOpt.isEmpty                                    && // can't optimize if there is a target
-        staticSubmission.element.jElements(XFORMS_HEADER_QNAME).size == 0              // can't optimize if there are headers specified
+        ! staticSubmission.children.exists(_.isInstanceOf[HeaderControl])              // can't optimize if there are headers specified
 
     // TODO: use static for headers
     val incomingMethod: HttpMethod = XFormsCrossPlatformSupport.externalContext.getRequest.getMethod

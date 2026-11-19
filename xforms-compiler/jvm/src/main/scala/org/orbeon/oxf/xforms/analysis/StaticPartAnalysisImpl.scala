@@ -71,7 +71,7 @@ trait PartAnalysisContextMutable extends TransientState {
     controlAnalysisMap.get(prefixedId)
 
   def wrapElement(elem: dom.Element): om.NodeInfo =
-    new DocumentWrapper(elem.getDocument, null, StaticXPath.GlobalConfiguration).wrap(elem)
+    new DocumentWrapper(Option(elem.getDocument).getOrElse(dom.Document()), null, StaticXPath.GlobalConfiguration).wrap(elem)
 
   def reportStaticXPathError(expression: String, throwable: Option[Throwable], details: XPathErrorDetails): Unit
 

@@ -24,7 +24,7 @@ import org.orbeon.xml.NamespaceMapping
 
 class Submission(
   index            : Int,
-  element          : Element,
+  elem             : Element,
   parent           : Option[ElementAnalysis],
   preceding        : Option[ElementAnalysis],
   staticId         : String,
@@ -34,7 +34,7 @@ class Submission(
   containerScope   : Scope
 ) extends ElementAnalysis(
   index,
-  element,
+  elem,
   parent,
   preceding,
   staticId,

@@ -14,7 +14,8 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.datatypes.MaximumSize
-import org.orbeon.dom.{Document, Namespace, QName}
+import org.orbeon.dom.tree.CompactElement
+import org.orbeon.dom.{Document, Element, Namespace, QName}
 import org.orbeon.oxf.cache.{MemorySizeEstimator, SizedCacheable}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -24,10 +25,11 @@ import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.*
 import org.orbeon.oxf.xforms.analysis.*
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
+import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{BindingLoader, XBLAssets}
 import org.orbeon.oxf.xforms.XFormsProperties as P
-import org.orbeon.oxf.xml.EncodeDecode
+import org.orbeon.oxf.xml.{EncodeDecode, XMLConstants}
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.oxf.xml.dom.Extensions.*
 import org.orbeon.scaxon.SimplePath.*
@@ -38,7 +40,7 @@ import java.net.URI
 import java.util as ju
 import scala.collection.immutable.SortedMap
 import scala.collection.mutable
-import scala.jdk.CollectionConverters.*
+import scala.util.Try
 
 
 object XFormsStaticStateImpl {
@@ -58,6 +60,69 @@ object XFormsStaticStateImpl {
   private val FRFormVersionQName = QName("form-version",  FRNamespace)
   private val FRMajorModeQName   = QName("major-mode",    FRNamespace)
   private val FRTraitsQName      = QName("config-traits", FRNamespace)
+
+  private def resolveEffectiveXmlBaseOpt(elem: Element): Option[String] = {
+    var firstXmlBase: String        = null
+    var extraXmlBases: List[String] = Nil
+    var cur                         = elem
+    while (cur ne null) {
+      val b = cur.attributeValue(XMLConstants.XML_BASE_QNAME)
+      if (b ne null) {
+        if (firstXmlBase eq null)
+          firstXmlBase = b
+        else
+          extraXmlBases = b :: extraXmlBases
+      }
+      cur = cur.getParent
+    }
+    if (firstXmlBase eq null) {
+      None
+    } else if (extraXmlBases.isEmpty) {
+      Some(firstXmlBase)
+    } else {
+      val allRootToLeaf = extraXmlBases ::: (firstXmlBase :: Nil)
+      Try {
+        allRootToLeaf.foldLeft(null: URI) { (acc, s) =>
+          val u = URI.create(s)
+          if (acc eq null) u else acc.resolve(u)
+        }.toString
+      }.toOption.orElse(Some(firstXmlBase))
+    }
+  }
+
+  private def compactAnalysisElement(analysis: ElementAnalysis): Unit = {
+    val srcElem = analysis.element
+    if (! srcElem.isInstanceOf[CompactElement]) {
+      val effectiveXmlBaseOpt = resolveEffectiveXmlBaseOpt(srcElem)
+      val effectiveData       = if (analysis.locationData ne null) analysis.locationData else srcElem.getData
+
+      analysis match {
+        case model: Model if srcElem.elements(XMLConstants.XML_SCHEMA_QNAME).nonEmpty =>
+          if ((srcElem.getDocument ne null) || (srcElem.getParent ne null)) {
+            val standalone = Element(srcElem.getQName)
+            standalone.setData(effectiveData)
+            model.namespaceMapping.mapping.foreach { case (prefix, uri) => standalone.addNamespace(prefix, uri) }
+            var i        = 0
+            val attCount = srcElem.attributeCount
+            while (i < attCount) {
+              val att = srcElem.attribute(i)
+              standalone.addAttribute(att.getQName, att.getValue)
+              i += 1
+            }
+            effectiveXmlBaseOpt.foreach(standalone.addAttribute(XMLConstants.XML_BASE_QNAME, _))
+            srcElem.elements(XMLConstants.XML_SCHEMA_QNAME).foreach { schemaElem =>
+              standalone.add(schemaElem.copyAndCopyParentNamespaces)
+            }
+            model.replaceElementForRuntime(standalone)
+          }
+
+        case _ =>
+          analysis.replaceElementForRuntime(
+            CompactElement.fromElement(srcElem, effectiveXmlBaseOpt, effectiveData)
+          )
+      }
+    }
+  }
 
   def apply(
     encodedState        : String,
@@ -262,15 +327,35 @@ class XFormsStaticStateImpl(
     }
   def templateSizeBytes  : Long = template.map(_.saxStore.approximateSizeBytes).getOrElse(0L)
   def staticDomSizeBytes : Long = {
-    val seenDocs = ju.Collections.newSetFromMap(new ju.IdentityHashMap[Document, jl.Boolean])
+    val seenDocs  = ju.Collections.newSetFromMap(new ju.IdentityHashMap[Document, jl.Boolean])
+    val seenElems = ju.Collections.newSetFromMap(new ju.IdentityHashMap[Element, jl.Boolean])
+    var sum       = 0L
+
     for (control <- topLevelPart.controlAnalysisMap.valuesIterator) {
-      val doc = control.element.getDocument
-      if (doc ne null)
-        seenDocs.add(doc)
+      val elem = control.element
+      val doc  = elem.getDocument
+      if (doc ne null) {
+        if (seenDocs.add(doc))
+          sum += MemorySizeEstimator.estimateOrbeonDomDocument(doc)
+      } else if (seenElems.add(elem)) {
+        sum += MemorySizeEstimator.estimateOrbeonDomElement(elem, maxElements = 25000)
+      }
+
+      control match {
+        case inst: Instance =>
+          inst.inlineRootElemOpt.foreach { inlineElem =>
+            val inlineDoc = inlineElem.getDocument
+            if (inlineDoc ne null) {
+              if (seenDocs.add(inlineDoc))
+                sum += MemorySizeEstimator.estimateOrbeonDomDocument(inlineDoc)
+            } else if (seenElems.add(inlineElem)) {
+              sum += MemorySizeEstimator.estimateOrbeonDomElement(inlineElem, maxElements = 25000)
+            }
+          }
+        case _ =>
+      }
     }
-    var sum = 0L
-    for (doc <- seenDocs.asScala)
-      sum += MemorySizeEstimator.estimateOrbeonDomDocument(doc)
+
     sum
   }
 
@@ -335,14 +420,28 @@ class XFormsStaticStateImpl(
       form <- meta.formOpt
     } yield (app, form, meta.titleOpt)
 
-  // Release duplicate Orbeon DOM subtrees on all `readonly && useInlineContent` instances for server-side execution.
+  // Release duplicate Orbeon DOM subtrees on `readonly && useInlineContent` instances, detach mutable inline instance
+  // roots, and replace `ElementAnalysis` `ConcreteElement`s with standalone `CompactElement`s for server-side execution.
   // Offline Scala.js compilation (`XFormsCompiler`) omits this step because `XFormsStaticStateSerializer` reads `inlineRootElemOpt`.
   def trimAfterServerCompilation(): this.type = {
+    import XFormsStaticStateImpl.compactAnalysisElement
+
     val _ = formRunnerStaticStateMetadataOpt
+
+    // 1. Materialize readonly `TinyTree`s and detach mutable inline instance roots first while parent namespaces are intact
     for {
       model <- topLevelPart.iterateModels
       inst  <- model.instances.valuesIterator
     } inst.releaseInlineDom()
+
+    // 2. Replace every `ElementAnalysis.element` with `CompactElement` (preserving `<xs:schema>` children on `Model`)
+    topLevelPart.controlAnalysisMap.valuesIterator.foreach(compactAnalysisElement)
+    topLevelPart.iterateControls.foreach(compactAnalysisElement)
+    for {
+      model <- topLevelPart.iterateModels
+      desc  <- ElementAnalysis.iterateDescendants(model, includeSelf = true)
+    } compactAnalysisElement(desc)
+
     this
   }
 

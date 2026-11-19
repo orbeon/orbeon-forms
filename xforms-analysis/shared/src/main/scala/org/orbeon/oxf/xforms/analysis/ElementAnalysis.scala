@@ -59,7 +59,7 @@ case class RefSingleItemBinding (scope: Scope, model: Option[String], context: O
  */
 abstract class ElementAnalysis(
   val index             : Int, // index of the element in the view
-  val element           : Element,
+  initElement           : Element,
   val parent            : Option[ElementAnalysis],
   val preceding         : Option[ElementAnalysis],
   val staticId          : String,
@@ -74,7 +74,15 @@ abstract class ElementAnalysis(
 
   import ElementAnalysis.*
 
-  require(element ne null)
+  require(initElement ne null)
+
+  private var _element: Element = initElement
+  final def element: Element = _element
+
+  def replaceElementForRuntime(newElement: Element): Unit = {
+    require(newElement ne null)
+    _element = newElement
+  }
 
   var model: Option[Model] = None
   var lang: LangRef = LangRef.Undefined

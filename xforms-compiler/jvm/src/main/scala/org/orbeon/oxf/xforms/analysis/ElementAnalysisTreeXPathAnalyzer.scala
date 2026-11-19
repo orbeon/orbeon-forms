@@ -475,7 +475,7 @@ object ElementAnalysisTreeXPathAnalyzer {
 
                 val nestedAnalysis = new LHHAAnalysis( // TODO: Weird! We have LHH, but also `value` and `copy`.
                   index                     = -1,
-                  element                   = nestedElement,
+                  elem                      = nestedElement,
                   parent                    = itemElementAnalysis.some,
                   preceding                 = None,
                   staticId                  = staticId,

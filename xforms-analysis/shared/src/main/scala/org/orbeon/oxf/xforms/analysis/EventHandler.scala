@@ -33,7 +33,7 @@ import org.orbeon.xml.NamespaceMapping
  */
 class EventHandler(
   index             : Int,
-  element           : Element,
+  elem              : Element,
   parent            : Option[ElementAnalysis],
   preceding         : Option[ElementAnalysis],
   staticId          : String,
@@ -57,7 +57,7 @@ class EventHandler(
   val isXBLHandler          : Boolean
 ) extends ElementAnalysis(
   index,
-  element,
+  elem,
   parent,
   preceding,
   staticId,

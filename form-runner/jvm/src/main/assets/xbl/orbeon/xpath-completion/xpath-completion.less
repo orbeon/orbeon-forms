@@ -27,6 +27,9 @@
     & > .fr-xpath-completion-wrapper {
       position: relative;
       display: block;
+      @media screen {
+        display: flow-root;
+      }
       width: 100%;
       background-color: var(--orbeon-control-background-color);
       border-radius: var(--orbeon-control-border-radius);

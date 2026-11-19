@@ -138,20 +138,22 @@
             .orbeon .fr-grid-td.fr-config-has-override {
                 position: relative;
             }
-            .orbeon .fr-grid-td.fr-config-has-override .fr-config-override-checkbox {
+            .orbeon .xbl-fr-grid .fr-grid .fr-grid-td.fr-config-has-override &gt; .fr-config-override-checkbox {
                 float: right;
-                margin: 0 0 2px 8px;
+                margin-bottom: 2px;
+                margin-left: 8px;
                 font-size: 12px;
+            }
+            .orbeon .xbl-fr-grid .fr-grid .fr-grid-td.fr-config-has-override &gt; .fr-config-override-checkbox .xforms-select-appearance-full .xforms-items {
+                padding: 1px 0;
             }
             .orbeon .fr-grid-td.fr-config-has-override .fr-config-override-checkbox label.checkbox {
                 padding-top: 0;
                 min-height: 0;
-                margin-bottom: 0;
+                margin: 0;
                 opacity: 0.85;
             }
-            .orbeon .fr-grid-td.fr-config-has-override .fr-config-value-control &gt; .xforms-label::after {
-                content: "";
-                display: table;
+            .orbeon .fr-grid-td.fr-config-has-override .fr-config-value-control &gt; :not(.xforms-label):not(.xforms-help) {
                 clear: right;
             }
             .orbeon .fr-grid-td .fr-config-select1 select {

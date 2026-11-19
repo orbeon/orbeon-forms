@@ -85,29 +85,54 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
         color: var(--orbeon-navbar-heading-color);
         display: none; // 2024-12-16: I don't think we need this header, do we? We don't have it in wizard mode.
     }
+    .nav {
+        list-style-type: none;
+        padding: 6px;
+        margin: 0;
+    }
     .nav > li > span > .btn-link {
         display: flex; // for wizard, will hold section state
         align-items: center;
-        line-height: 30px; // line-height: @wizardLineHeight; // to align with section title
-        padding: 3px 1em;
-        margin: 0;
+        gap: 0.5em;
+        line-height: 1.4;
+        padding: 7px 10px;
+        margin: 1px 0;
         border: none;
+        border-radius: var(--orbeon-body-decorations-border-radius);
+        text-align: left;
         text-shadow: none;
+        font-weight: 400;
+        color: var(--orbeon-toc-color);
+        transition: background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                    color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
         & > .fr-toc-title {
             order: 1;
             flex-grow: 1;
-            .text-overflow();
+            min-width: 0;
+            white-space: normal;
+            overflow-wrap: break-word;
         }
         &:hover {
+            color: var(--orbeon-toc-hover-color);
             background-color: var(--orbeon-toc-hover-background-color);
         }
     }
-    .nav > li .btn-link {
-        color: var(--orbeon-toc-color);
-    }
     .fr-toc-body-styling();
     .nav .nav {
-        margin-left: 1em; // nested list for subsection navigation
+        list-style-type: none;
+        margin: 2px 0 4px 10px; // align vertical guide rail with parent text left edge
+        padding: 0 0 0 8px;
+        border-left: 1px solid var(--orbeon-toc-guide-color);
+        & > li > span > .btn-link {
+            font-size: 0.93em;
+            font-weight: 400;
+            line-height: 1.35;
+            padding: 5px 10px;
+            color: var(--orbeon-toc-subsection-color);
+            &:hover {
+                color: var(--orbeon-toc-hover-color);
+            }
+        }
     }
 }
 

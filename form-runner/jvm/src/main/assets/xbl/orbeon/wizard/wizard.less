@@ -28,11 +28,25 @@
 
         .fr-toc-styling();
 
+        &:not(.fr-wizard-separate-toc) .fr-wizard-toc-inner {
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 80px);
+
+            & > [role="navigation"] {
+                overflow-y: auto;
+                min-height: 0;
+            }
+        }
+
         &.fr-wizard-separate-toc {
             .nav {
                 .btn-link {
                     .fr-toc-edit {
                         display: block;
+                    }
+                    &::after {
+                        display: none; // status badge already shown in separate-toc mode
                     }
                 }
             }
@@ -40,20 +54,35 @@
 
         .nav {
 
-            & > li.first-page > span > .btn-link {
-                // Should not appear in PDF, so calc is fine
-                border-top-left-radius : calc(var(--orbeon-body-decorations-border-radius) - @frBodyDecorationsBorderWidth);
-                border-top-right-radius: calc(var(--orbeon-body-decorations-border-radius) - @frBodyDecorationsBorderWidth);
-            }
-
             ul, li {
                 clear: both;
             }
 
-            .active > span > .btn-link,
-            .active > span > .btn-link:hover {
+            // Active parent section (contains the current subsection)
+            li.active:not([aria-current="page"]) > span > .btn-link {
+                color: var(--orbeon-toc-active-parent-color);
+                background-color: var(--orbeon-toc-active-parent-background-color);
+                font-weight: 600;
+            }
+            li.active:not([aria-current="page"]) > span > .btn-link:hover {
+                color: var(--orbeon-toc-active-parent-color);
+                background-color: var(--orbeon-toc-hover-background-color);
+            }
+
+            // Current page
+            li.active[aria-current="page"] > span > .btn-link,
+            li.active[aria-current="page"] > span > .btn-link:hover {
                 color: var(--orbeon-toc-selected-color);
                 background-color: var(--orbeon-toc-selected-background-color);
+                box-shadow: inset 0 0 0 1px var(--orbeon-toc-selected-border-color);
+                font-weight: 600;
+            }
+
+            li.disabled > span > .btn-link,
+            li.disabled > span > .btn-link:hover {
+                color: var(--orbeon-toc-disabled-color);
+                background-color: transparent;
+                cursor: default;
             }
 
             .btn-link {
@@ -83,23 +112,38 @@
                 }
             }
 
-            .visible-invalid > span > .btn-link,
-            .visible-incomplete > span > .btn-link {
+            li.visible-invalid[aria-current] > span > .btn-link,
+            li.visible-incomplete[aria-current] > span > .btn-link {
                 color: var(--orbeon-toc-error-color);
                 background-color: var(--orbeon-toc-error-background-color);
+
+                &:hover {
+                    color: var(--orbeon-toc-error-color);
+                    background-color: var(--orbeon-toc-hover-background-color);
+                }
+
+                &::after {
+                    content: "";
+                    order: 2;
+                    flex: 0 0 auto;
+                    width: 7px;
+                    height: 7px;
+                    border-radius: 50%;
+                    background-color: var(--orbeon-toc-error-color);
+                }
             }
 
-            .active.visible-invalid > span > .btn-link,
-            .active.visible-incomplete > span > .btn-link{
+            li.active[aria-current="page"].visible-invalid > span > .btn-link,
+            li.active[aria-current="page"].visible-invalid > span > .btn-link:hover,
+            li.active[aria-current="page"].visible-incomplete > span > .btn-link,
+            li.active[aria-current="page"].visible-incomplete > span > .btn-link:hover {
                 color: var(--orbeon-toc-selected-error-color);
                 background-color: var(--orbeon-toc-selected-error-background-color);
-            }
+                box-shadow: inset 0 0 0 1px var(--orbeon-toc-selected-error-border-color);
 
-            // Nested navigations
-            .nav {
-                list-style-type: none;
-                padding-right: 0;  // better with no padding
-                padding-left: 1em; // nested list for subsection navigation
+                &::after {
+                    background-color: var(--orbeon-toc-selected-error-color);
+                }
             }
         }
     }
@@ -115,8 +159,12 @@
     }
 
     .fr-wizard-navigation {
+        flex-shrink: 0;
+        border-top: 1px solid var(--orbeon-base-border-color);
+        padding: 8px 6px;
+
         .pagination {
-            margin: 10px 0;
+            margin: 0;
             display: block; // Liferay resets this
 
             ul {
@@ -189,9 +237,11 @@
             order: 1;
             position: static;
 
-            .nav {
-                & > li.first-page > span > .btn-link {
-                    border-top-right-radius: var(--orbeon-body-decorations-border-radius);
+            &:not(.fr-wizard-separate-toc) .fr-wizard-toc-inner {
+                max-height: none;
+
+                & > [role="navigation"] {
+                    overflow-y: visible;
                 }
             }
         }

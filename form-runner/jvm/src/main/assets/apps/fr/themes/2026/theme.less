@@ -341,15 +341,23 @@
   --orbeon-repetition-selected-background-color: @tint-band;
 
   // Regular and wizard table of contents (TOC)
-  --orbeon-toc-color                          : @accent-text;
-  --orbeon-toc-background-color               : var(--orbeon-page-background-color);
-  --orbeon-toc-hover-background-color         : @tint-hover;
-  --orbeon-toc-selected-color                 : white;
-  --orbeon-toc-selected-background-color      : @accent;
+  --orbeon-toc-color                          : var(--orbeon-base-color);
+  --orbeon-toc-subsection-color               : @gray-52;
+  --orbeon-toc-hover-color                    : @gray-15;
+  --orbeon-toc-disabled-color                 : @gray-68;
+  --orbeon-toc-background-color               : var(--orbeon-form-background-color);
+  --orbeon-toc-hover-background-color         : @gray-97;
+  --orbeon-toc-active-parent-color            : var(--orbeon-section-title-color);
+  --orbeon-toc-active-parent-background-color : transparent;
+  --orbeon-toc-selected-color                 : var(--orbeon-section-title-color);
+  --orbeon-toc-selected-background-color      : var(--orbeon-section-title-background-color);
+  --orbeon-toc-selected-border-color          : var(--orbeon-base-border-color);
   --orbeon-toc-error-color                    : var(--orbeon-error-color);
   --orbeon-toc-error-background-color         : transparent;
-  --orbeon-toc-selected-error-color           : white;
-  --orbeon-toc-selected-error-background-color: var(--orbeon-error-color);
+  --orbeon-toc-selected-error-color           : var(--orbeon-error-color);
+  --orbeon-toc-selected-error-background-color: #f8e5e5;
+  --orbeon-toc-selected-error-border-color    : #e4b4b3;
+  --orbeon-toc-guide-color                    : var(--orbeon-base-border-color);
 
   // Navbar
   --orbeon-navbar-color                                : @gray-30;
@@ -588,7 +596,8 @@
   @media screen {
     // @accent
     --orbeon-button-primary-background-color        : var(--orbeon-accent-color);
-    --orbeon-toc-selected-background-color          : var(--orbeon-accent-color);
+    --orbeon-toc-selected-error-background-color    : color-mix(in oklab, var(--orbeon-error-color) 10%, transparent);
+    --orbeon-toc-selected-error-border-color        : color-mix(in oklab, var(--orbeon-error-color) 30%, transparent);
     --orbeon-dropdown-menu-hover-background-color   : var(--orbeon-accent-color);
     --orbeon-dropdown-menu-selected-background-color: var(--orbeon-accent-color);
     --orbeon-progress-bar-background-color          : var(--orbeon-accent-color);
@@ -600,7 +609,6 @@
     --orbeon-button-primary-highlight-background-color: color-mix(in oklab, var(--orbeon-accent-color) 88%, black);
     --orbeon-link-color                               : color-mix(in oklab, var(--orbeon-accent-color) 83%, black);
     --orbeon-link-hover-color                         : color-mix(in oklab, var(--orbeon-accent-color) 62%, black);
-    --orbeon-toc-color                                : var(--orbeon-link-color);
     --orbeon-landing-card-link-color                  : var(--orbeon-link-color);
     --orbeon-landing-card-link-hover-color            : var(--orbeon-link-hover-color);
 
@@ -620,7 +628,7 @@
     // @tint-hover: 5% on gray 94
     --orbeon-add-on-background-color                     : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-94);
     --orbeon-dropdown-selected-background-color          : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-94);
-    --orbeon-toc-hover-background-color                  : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-94);
+    --orbeon-toc-hover-background-color                  : color-mix(in oklab, var(--orbeon-base-color) 5%, transparent);
     --orbeon-table-hover-background-color                : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-94);
     --orbeon-navbar-dropdown-open-toggle-background-color: color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-94);
     --orbeon-progress-background-color                   : color-mix(in oklab, var(--orbeon-accent-color) 5%, @gray-94);
@@ -774,9 +782,13 @@
     --orbeon-repetition-number-color                         : @dark-21;
     --orbeon-repetition-number-background-color              : color-mix(in oklab, var(--orbeon-accent-color) 5%, @dark-62);
     --orbeon-repetition-selected-background-color            : color-mix(in oklab, var(--orbeon-accent-color) 5%, @dark-32);
-    --orbeon-toc-hover-background-color                      : color-mix(in oklab, var(--orbeon-accent-color) 5%, @dark-32);
-    --orbeon-toc-selected-color                              : @dark-96;
-    --orbeon-toc-selected-error-color                        : @dark-21;
+    --orbeon-toc-subsection-color                            : @dark-70;
+    --orbeon-toc-hover-color                                 : @dark-96;
+    --orbeon-toc-disabled-color                              : @dark-55;
+    --orbeon-toc-hover-background-color                      : color-mix(in oklab, var(--orbeon-base-color) 6%, transparent);
+    --orbeon-toc-selected-error-color                        : var(--orbeon-error-color);
+    --orbeon-toc-selected-error-background-color             : color-mix(in oklab, var(--orbeon-error-color) 16%, transparent);
+    --orbeon-toc-selected-error-border-color                 : color-mix(in oklab, var(--orbeon-error-color) 38%, transparent);
     --orbeon-navbar-color                                    : @dark-96;
     --orbeon-navbar-title-color                              : var(--orbeon-base-color);
     --orbeon-navbar-background-color                         : color-mix(in oklab, var(--orbeon-accent-color) 3%, @dark-12);
@@ -881,6 +893,7 @@
       --orbeon-repeater-iteration-border-radius                : 0;
       --orbeon-repeat-menu-background-color                    : white;
       --orbeon-toc-color                                       : black;
+      --orbeon-toc-subsection-color                            : black;
       --orbeon-navbar-title-color                              : black;
       --orbeon-navbar-background-color                         : white;
       --orbeon-navbar-heading-font-size                        : 1.85em;

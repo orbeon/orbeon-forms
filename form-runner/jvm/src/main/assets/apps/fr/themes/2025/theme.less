@@ -298,14 +298,22 @@
 
   // Regular and wizard table of contents (TOC)
   --orbeon-toc-color                          : #0d6efd;
+  --orbeon-toc-subsection-color               : #0d6efd;
+  --orbeon-toc-hover-color                    : #0d6efd;
+  --orbeon-toc-disabled-color                 : #999;
   --orbeon-toc-background-color               : white;
   --orbeon-toc-hover-background-color         : #eee; // @grayLighter;
+  --orbeon-toc-active-parent-color            : #0d6efd;
+  --orbeon-toc-active-parent-background-color : transparent;
   --orbeon-toc-selected-color                 : white;
   --orbeon-toc-selected-background-color      : #0d6efd;
+  --orbeon-toc-selected-border-color          : transparent;
   --orbeon-toc-error-color                    : var(--orbeon-error-color);
   --orbeon-toc-error-background-color         : transparent;
   --orbeon-toc-selected-error-color           : white;
   --orbeon-toc-selected-error-background-color: var(--orbeon-error-color);
+  --orbeon-toc-selected-error-border-color    : transparent;
+  --orbeon-toc-guide-color                    : var(--orbeon-base-border-color);
 
   // Navbar
   --orbeon-navbar-color                                : white;
@@ -694,8 +702,12 @@
     --orbeon-repetition-number-text-shadow-color             : transparent;
     --orbeon-repetition-selected-background-color            : @gray-20;
     --orbeon-toc-color                                       : hsl(@primary-hue, 98%, 63%);
+    --orbeon-toc-subsection-color                            : var(--orbeon-toc-color);
+    --orbeon-toc-hover-color                                 : var(--orbeon-toc-color);
+    --orbeon-toc-disabled-color                              : @gray-46;
     --orbeon-toc-background-color                            : @base-bg;
     --orbeon-toc-hover-background-color                      : @gray-20;
+    --orbeon-toc-active-parent-color                         : var(--orbeon-toc-color);
     --orbeon-toc-selected-color                              : @base-bg;
     --orbeon-toc-selected-background-color                   : var(--orbeon-toc-color);
     --orbeon-toc-selected-error-color                        : @base-bg;
@@ -805,6 +817,7 @@
       --orbeon-section-title-background-color                  : white;
       --orbeon-repeat-menu-background-color                    : white;
       --orbeon-toc-color                                       : black;
+      --orbeon-toc-subsection-color                            : black;
       --orbeon-navbar-background-color                         : white;
       --orbeon-navbar-heading-font-size                        : 1.85em;
       --orbeon-navbar-heading-color                            : black;

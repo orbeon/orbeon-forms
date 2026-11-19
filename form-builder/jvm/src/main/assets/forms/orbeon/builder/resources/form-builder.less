@@ -35,6 +35,61 @@
     color: var(--orbeon-hint-color);
 }
 
+// Framed scrollable table with a sticky header and single 1px borders (overrides `.fr-table-frame`'s
+// `border-collapse: collapse` so the sticky `thead` retains its bottom border while scrolling)
+.fbStickyTableFrame() {
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    margin-bottom: 0;
+    border: 1px solid var(--orbeon-table-border-color);
+    border-radius: var(--orbeon-control-border-radius);
+
+    &:focus-visible {
+        outline: 2px solid var(--orbeon-focus-border-color);
+        outline-offset: 2px;
+    }
+
+    > .table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-style: none;
+        margin-bottom: 0;
+        background-color: var(--orbeon-table-background-color);
+
+        th, td {
+            border: 0;
+            vertical-align: middle;
+
+            &:not(:first-child) {
+                border-left: 1px solid var(--orbeon-table-border-color);
+            }
+        }
+
+        thead th {
+            position: sticky;
+            inset-block-start: 0;
+            z-index: 2;
+            background-color: var(--orbeon-form-background-color);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--orbeon-hint-color);
+            border-bottom: 1px solid var(--orbeon-table-border-color);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        tbody tr:not(.xforms-repeat-begin-end, .xforms-repeat-delimiter, .xforms-repeat-template)
+            ~ tr:not(.xforms-repeat-begin-end, .xforms-repeat-delimiter, .xforms-repeat-template) {
+            > th, > td {
+                border-top: 1px solid var(--orbeon-table-border-color);
+            }
+        }
+    }
+}
+
 // Case of non-embedded Form Builder: size body to take the whole viewport
 body.orbeon {
     position: absolute;
@@ -3690,47 +3745,25 @@ body.orbeon {
             }
 
             .fb-schema-types-table-frame {
+                .fbStickyTableFrame();
                 max-height: 380px;
                 overflow-y: auto;
-                overscroll-behavior: contain;
-                scrollbar-gutter: stable;
-                margin-bottom: 0;
-                border: 1px solid var(--orbeon-base-border-color);
-                border-radius: var(--orbeon-control-border-radius);
             }
 
             .fb-schema-types-table {
-                width: 100%;
-                table-layout: fixed;
-                margin-bottom: 0;
-                background-color: var(--orbeon-table-background-color);
-
                 th:nth-child(1), td:nth-child(1) { width: 38%; }
                 th:nth-child(2), td:nth-child(2) { width: 44%; }
                 th:nth-child(3), td:nth-child(3) { width: 18%; text-align: right; }
 
-                thead th {
-                    position: sticky;
-                    top: 0;
-                    z-index: 1;
-                    background-color: var(--orbeon-form-background-color);
-                    font-size: 12px;
-                    font-weight: 600;
-                    color: var(--orbeon-hint-color);
-                    border-bottom: 1px solid var(--orbeon-base-border-color);
+                thead th,
+                tbody td {
                     padding: 8px 12px;
                 }
 
                 tbody td {
-                    padding: 8px 12px;
-                    vertical-align: middle;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
-                }
-
-                tbody tr:last-child td {
-                    border-bottom: none;
                 }
 
                 .fb-schema-col-type code {
@@ -4131,20 +4164,11 @@ body.orbeon {
         }
 
         .fb-controls-table-frame {
+            .fbStickyTableFrame();
             flex: 0 1 auto;
             min-height: 0;
             overflow: auto;
             max-inline-size: 100%;
-            overscroll-behavior: contain;
-            scrollbar-gutter: stable;
-            margin-bottom: 0;
-            border: 1px solid var(--orbeon-base-border-color);
-            border-radius: var(--orbeon-control-border-radius);
-
-            &:focus-visible {
-                outline: 2px solid var(--orbeon-focus-border-color);
-                outline-offset: 2px;
-            }
 
             &.fb-show-pdf .fb-controls-table {
                 min-width: 1320px;
@@ -4160,13 +4184,6 @@ body.orbeon {
         }
 
         .fb-controls-table {
-            width: 100%;
-            table-layout: fixed;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-bottom: 0;
-            background-color: var(--orbeon-table-background-color);
-
             .fb-col-type  { width: 21%; }
             .fb-col-name  { width: 18%; }
             .fb-col-label { width: 22%; }
@@ -4178,29 +4195,12 @@ body.orbeon {
             .fb-col-excel { width: 155px; }
 
             thead th {
-                position: sticky;
-                inset-block-start: 0;
-                z-index: 2;
-                background-color: var(--orbeon-form-background-color);
-                font-size: 11.5px;
-                font-weight: 600;
-                color: var(--orbeon-hint-color);
-                border-bottom: 1px solid var(--orbeon-base-border-color);
                 padding: 7px 8px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
             }
 
             tbody td {
                 padding: 4px 8px;
-                vertical-align: middle;
-                border-bottom: 1px solid var(--orbeon-base-border-color);
                 font-size: 12.5px;
-            }
-
-            tbody tr:last-child td {
-                border-bottom: none;
             }
 
             tbody tr.fb-controls-kind-section td {

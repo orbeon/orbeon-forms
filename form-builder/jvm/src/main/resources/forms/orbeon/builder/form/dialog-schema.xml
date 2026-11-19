@@ -274,7 +274,7 @@
 
             <xf:group ref=".[exists($simple-types)]">
                 <xh:div class="fb-schema-section-header">
-                    <xh:span class="fb-schema-section-title">
+                    <xh:span id="fb-schema-types-heading" class="fb-schema-section-title">
                         <xf:output value="$schema-resources/schema-type/label"/>
                     </xh:span>
                     <xh:span class="fb-schema-count-pill">
@@ -282,7 +282,11 @@
                     </xh:span>
                 </xh:div>
 
-                <xh:div class="fr-table-frame fb-schema-types-table-frame">
+                <xh:div
+                    tabindex="0"
+                    role="region"
+                    aria-labelledby="fb-schema-types-heading"
+                    class="fr-table-frame fb-schema-types-table-frame">
                     <xh:table class="table fb-schema-types-table">
                         <xh:thead>
                             <xh:tr>

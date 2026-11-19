@@ -84,7 +84,7 @@
         <split-cell>dividi cella</split-cell>
         <merge-cell>unisci cella</merge-cell>
         <control-lhha todo="true">label</control-lhha>
-        <control-settings-batch todo="true">control overview</control-settings-batch>
+        <control-settings-batch>panoramica dei controlli</control-settings-batch>
     </undo-redo>
     <merge-section>
         <label>Unisci modello di sezione</label>
@@ -1814,7 +1814,7 @@
         <apply-ok-dialog>Applica/OK (clicca il pulsante principale)</apply-ok-dialog>
         <open-quick-search>Apri la ricerca rapida controlli</open-quick-search>
         <open-form-settings>Apri impostazioni modulo</open-form-settings>
-        <open-controls todo="true">Open Control Overview</open-controls>
+        <open-controls>Apri panoramica dei controlli</open-controls>
         <open-permissions>Apri permessi</open-permissions>
         <open-email-settings>Apri impostazioni email</open-email-settings>
         <open-messages>Apri messaggi</open-messages>
@@ -2004,47 +2004,47 @@
         <show-all todo="true">Show All Sections</show-all>
     </section-focus>
     <dialog-controls>
-        <label todo="true">Control Overview</label>
-        <search-placeholder todo="true">Filter by name, label, hint, or type…</search-placeholder>
-        <clear-search todo="true">Clear filter</clear-search>
+        <label>Panoramica dei controlli</label>
+        <search-placeholder>Filtra per nome, etichetta, suggerimento o tipo…</search-placeholder>
+        <clear-search>Cancella filtro</clear-search>
         <filter>
-            <all todo="true">All</all>
-            <controls todo="true">Controls</controls>
-            <unnamed todo="true">Unnamed</unnamed>
+            <all>Tutti</all>
+            <controls>Controlli</controls>
+            <unnamed>Senza nome</unnamed>
         </filter>
-        <suggest-all todo="true">Suggest Names</suggest-all>
-        <suggest-all-hint todo="true">Suggest control and section names from labels for default names</suggest-all-hint>
+        <suggest-all>Suggerisci nomi</suggest-all>
+        <suggest-all-hint>Suggerisci i nomi dei controlli e delle sezioni dalle etichette per i nomi predefiniti</suggest-all-hint>
         <columns>
-            <pdf todo="true">PDF Name</pdf>
-            <pdf-hint todo="true">Show or hide PDF Field Name column</pdf-hint>
-            <excel todo="true">Excel Name</excel>
-            <excel-hint todo="true">Show or hide Excel Range Name column</excel-hint>
+            <pdf>Nome PDF</pdf>
+            <pdf-hint>Mostra o nascondi la colonna Nome del campo PDF</pdf-hint>
+            <excel>Nome Excel</excel>
+            <excel-hint>Mostra o nascondi la colonna Nome intervallo Excel</excel-hint>
         </columns>
-        <export-csv todo="true">Download CSV</export-csv>
-        <empty-form todo="true">This form does not contain any sections or controls yet.</empty-form>
-        <no-matches todo="true">No items match the current filter.</no-matches>
+        <export-csv>Scarica CSV</export-csv>
+        <empty-form>Questo modulo non contiene ancora sezioni o controlli.</empty-form>
+        <no-matches>Nessun elemento corrisponde al filtro corrente.</no-matches>
         <headers>
-            <type todo="true">Type</type>
-            <name todo="true">Name</name>
-            <label todo="true">Label</label>
-            <hint todo="true">Hint</hint>
-            <required todo="true">Req.</required>
-            <summary todo="true">Summary</summary>
-            <rules todo="true">Rules</rules>
-            <pdf todo="true">PDF Field Name</pdf>
-            <excel todo="true">Excel Range Name</excel>
+            <type>Tipo</type>
+            <name>Nome</name>
+            <label>Etichetta</label>
+            <hint>Suggerimento</hint>
+            <required>Obbl.</required>
+            <summary>Riepilogo</summary>
+            <rules>Regole</rules>
+            <pdf>Nome del campo PDF</pdf>
+            <excel>Nome intervallo Excel</excel>
         </headers>
         <types>
-            <section todo="true">Section</section>
-            <repeated-section todo="true">Repeated Section</repeated-section>
-            <section-template todo="true">Section Template</section-template>
-            <grid todo="true">Grid</grid>
-            <repeated-grid todo="true">Repeated Grid</repeated-grid>
+            <section>Sezione</section>
+            <repeated-section>Sezione ripetuta</repeated-section>
+            <section-template>Modello di sezione</section-template>
+            <grid>Griglia</grid>
+            <repeated-grid>Griglia ripetuta</repeated-grid>
         </types>
-        <readonly-template-hint todo="true">Read-only (from Section Template library)</readonly-template-hint>
-        <html-readonly-hint todo="true">Formatted as HTML; edit in Control Settings</html-readonly-hint>
-        <summary-encrypted-hint todo="true">Disabled because data encryption is enabled</summary-encrypted-hint>
-        <summary-advanced-hint todo="true">Configured with role restrictions, sorting, or bulk edit in Control Settings</summary-advanced-hint>
-        <invalid-names-error todo="true">{0,choice,1#1 item has an invalid or duplicate name.|1&lt;{0,number,integer} items have invalid or duplicate names.}</invalid-names-error>
+        <readonly-template-hint>Sola lettura (dalla libreria dei modelli di sezione)</readonly-template-hint>
+        <html-readonly-hint>Formattato come HTML; modifica nelle impostazioni del controllo</html-readonly-hint>
+        <summary-encrypted-hint>Disabilitato perché la crittografia dei dati è attiva</summary-encrypted-hint>
+        <summary-advanced-hint>Configurato con restrizioni di ruolo, ordinamento o modifica in blocco nelle impostazioni del controllo</summary-advanced-hint>
+        <invalid-names-error>{0,choice,1#1 elemento ha un nome non valido o duplicato.|1&lt;{0,number,integer} elementi hanno nomi non validi o duplicati.}</invalid-names-error>
     </dialog-controls>
 </resource>

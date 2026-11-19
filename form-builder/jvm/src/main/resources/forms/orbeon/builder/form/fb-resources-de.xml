@@ -88,7 +88,7 @@
         <split-cell>Zelle teilen</split-cell>
         <merge-cell>Zellen zusammenführen</merge-cell>
         <control-lhha todo="true">label</control-lhha>
-        <control-settings-batch todo="true">control overview</control-settings-batch>
+        <control-settings-batch>Steuerelemente-Übersicht</control-settings-batch>
     </undo-redo>
     <merge-section>
         <label>Abschnittsvorlage zusammenführen</label>
@@ -1811,7 +1811,7 @@
         <apply-ok-dialog>Anwenden/OK (klickt auf die Hauptschaltfläche)</apply-ok-dialog>
         <open-quick-search>Schnellsuche für Steuerelemente öffnen</open-quick-search>
         <open-form-settings>Formulareinstellungen öffnen</open-form-settings>
-        <open-controls todo="true">Open Control Overview</open-controls>
+        <open-controls>Steuerelemente-Übersicht öffnen</open-controls>
         <open-permissions>Berechtigungen öffnen</open-permissions>
         <open-email-settings>E-Mail-Einstellungen öffnen</open-email-settings>
         <open-messages>Nachrichten öffnen</open-messages>
@@ -2002,47 +2002,47 @@
         <show-all todo="true">Show All Sections</show-all>
     </section-focus>
     <dialog-controls>
-        <label todo="true">Control Overview</label>
-        <search-placeholder todo="true">Filter by name, label, hint, or type…</search-placeholder>
-        <clear-search todo="true">Clear filter</clear-search>
+        <label>Steuerelemente-Übersicht</label>
+        <search-placeholder>Nach Name, Beschriftung, Hinweis oder Typ filtern…</search-placeholder>
+        <clear-search>Filter löschen</clear-search>
         <filter>
-            <all todo="true">All</all>
-            <controls todo="true">Controls</controls>
-            <unnamed todo="true">Unnamed</unnamed>
+            <all>Alle</all>
+            <controls>Steuerelemente</controls>
+            <unnamed>Unbenannt</unnamed>
         </filter>
-        <suggest-all todo="true">Suggest Names</suggest-all>
-        <suggest-all-hint todo="true">Suggest control and section names from labels for default names</suggest-all-hint>
+        <suggest-all>Namen vorschlagen</suggest-all>
+        <suggest-all-hint>Steuerelement- und Abschnittsnamen aus Beschriftungen für Standardnamen vorschlagen</suggest-all-hint>
         <columns>
-            <pdf todo="true">PDF Name</pdf>
-            <pdf-hint todo="true">Show or hide PDF Field Name column</pdf-hint>
-            <excel todo="true">Excel Name</excel>
-            <excel-hint todo="true">Show or hide Excel Range Name column</excel-hint>
+            <pdf>PDF-Name</pdf>
+            <pdf-hint>Spalte „Name des PDF-Felds“ ein- oder ausblenden</pdf-hint>
+            <excel>Excel-Name</excel>
+            <excel-hint>Spalte „Excel-Bereichsname“ ein- oder ausblenden</excel-hint>
         </columns>
-        <export-csv todo="true">Download CSV</export-csv>
-        <empty-form todo="true">This form does not contain any sections or controls yet.</empty-form>
-        <no-matches todo="true">No items match the current filter.</no-matches>
+        <export-csv>CSV herunterladen</export-csv>
+        <empty-form>Dieses Formular enthält noch keine Abschnitte oder Steuerelemente.</empty-form>
+        <no-matches>Keine Einträge entsprechen dem aktuellen Filter.</no-matches>
         <headers>
-            <type todo="true">Type</type>
-            <name todo="true">Name</name>
-            <label todo="true">Label</label>
-            <hint todo="true">Hint</hint>
-            <required todo="true">Req.</required>
-            <summary todo="true">Summary</summary>
-            <rules todo="true">Rules</rules>
-            <pdf todo="true">PDF Field Name</pdf>
-            <excel todo="true">Excel Range Name</excel>
+            <type>Typ</type>
+            <name>Name</name>
+            <label>Beschriftung</label>
+            <hint>Hinweis</hint>
+            <required>Erford.</required>
+            <summary>Übersicht</summary>
+            <rules>Regeln</rules>
+            <pdf>Name des PDF-Felds</pdf>
+            <excel>Excel-Bereichsname</excel>
         </headers>
         <types>
-            <section todo="true">Section</section>
-            <repeated-section todo="true">Repeated Section</repeated-section>
-            <section-template todo="true">Section Template</section-template>
-            <grid todo="true">Grid</grid>
-            <repeated-grid todo="true">Repeated Grid</repeated-grid>
+            <section>Abschnitt</section>
+            <repeated-section>Wiederholter Abschnitt</repeated-section>
+            <section-template>Abschnittsvorlage</section-template>
+            <grid>Tabelle</grid>
+            <repeated-grid>Wiederholte Tabelle</repeated-grid>
         </types>
-        <readonly-template-hint todo="true">Read-only (from Section Template library)</readonly-template-hint>
-        <html-readonly-hint todo="true">Formatted as HTML; edit in Control Settings</html-readonly-hint>
-        <summary-encrypted-hint todo="true">Disabled because data encryption is enabled</summary-encrypted-hint>
-        <summary-advanced-hint todo="true">Configured with role restrictions, sorting, or bulk edit in Control Settings</summary-advanced-hint>
-        <invalid-names-error todo="true">{0,choice,1#1 item has an invalid or duplicate name.|1&lt;{0,number,integer} items have invalid or duplicate names.}</invalid-names-error>
+        <readonly-template-hint>Schreibgeschützt (aus der Abschnittsvorlagen-Bibliothek)</readonly-template-hint>
+        <html-readonly-hint>Als HTML formatiert; in den Steuerelement-Einstellungen bearbeiten</html-readonly-hint>
+        <summary-encrypted-hint>Deaktiviert, da Datenverschlüsselung aktiviert ist</summary-encrypted-hint>
+        <summary-advanced-hint>Mit Rollenbeschränkungen, Sortierung oder Mehrfachbearbeitung in den Steuerelement-Einstellungen konfiguriert</summary-advanced-hint>
+        <invalid-names-error>{0,choice,1#1 Element hat einen ungültigen oder doppelten Namen.|1&lt;{0,number,integer} Elemente haben ungültige oder doppelte Namen.}</invalid-names-error>
     </dialog-controls>
 </resource>

@@ -96,7 +96,7 @@
         <split-cell>split cell</split-cell>
         <merge-cell>merge cell</merge-cell>
         <control-lhha>label</control-lhha>
-        <control-settings-batch>control overview</control-settings-batch>
+        <control-settings-batch>controls overview</control-settings-batch>
     </undo-redo>
     <merge-section>
         <label>Merge Section Template</label>
@@ -1879,7 +1879,7 @@
         <apply-ok-dialog>Apply/OK dialog (clicks primary button)</apply-ok-dialog>
         <open-quick-search>Open the Quick control search</open-quick-search>
         <open-form-settings>Open Form Settings</open-form-settings>
-        <open-controls>Open Control Overview</open-controls>
+        <open-controls>Open Controls Overview</open-controls>
         <open-permissions>Open Permissions</open-permissions>
         <open-email-settings>Open Email Settings</open-email-settings>
         <open-messages>Open Messages</open-messages>
@@ -2069,7 +2069,7 @@
         <show-all>Show All Sections</show-all>
     </section-focus>
     <dialog-controls>
-        <label>Control Overview</label>
+        <label>Controls Overview</label>
         <search-placeholder>Filter by name, label, hint, or type…</search-placeholder>
         <clear-search>Clear filter</clear-search>
         <filter>

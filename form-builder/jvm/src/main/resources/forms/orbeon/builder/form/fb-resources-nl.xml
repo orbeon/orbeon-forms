@@ -77,7 +77,7 @@
         <split-cell>splits cel</split-cell>
         <merge-cell>voeg cellen samen</merge-cell>
         <control-lhha todo="true">label</control-lhha>
-        <control-settings-batch todo="true">control overview</control-settings-batch>
+        <control-settings-batch>overzicht van controls</control-settings-batch>
     </undo-redo>
     <merge-section>
         <label>Voeg sectietemplate samen</label>
@@ -1842,7 +1842,7 @@
         <apply-ok-dialog>Toepassen/OK (klikt op de hoofdknop)</apply-ok-dialog>
         <open-quick-search>Snelzoeken voor besturingselementen openen</open-quick-search>
         <open-form-settings>Formulierinstellingen openen</open-form-settings>
-        <open-controls todo="true">Open Control Overview</open-controls>
+        <open-controls>Overzicht van controls openen</open-controls>
         <open-permissions>Machtigingen openen</open-permissions>
         <open-email-settings>E-mailinstellingen openen</open-email-settings>
         <open-messages>Berichten openen</open-messages>
@@ -2032,47 +2032,47 @@
         <show-all todo="true">Show All Sections</show-all>
     </section-focus>
     <dialog-controls>
-        <label todo="true">Control Overview</label>
-        <search-placeholder todo="true">Filter by name, label, hint, or type…</search-placeholder>
-        <clear-search todo="true">Clear filter</clear-search>
+        <label>Overzicht van controls</label>
+        <search-placeholder>Filter op naam, label, hint of type…</search-placeholder>
+        <clear-search>Filter wissen</clear-search>
         <filter>
-            <all todo="true">All</all>
-            <controls todo="true">Controls</controls>
-            <unnamed todo="true">Unnamed</unnamed>
+            <all>Alles</all>
+            <controls>Controls</controls>
+            <unnamed>Naamloos</unnamed>
         </filter>
-        <suggest-all todo="true">Suggest Names</suggest-all>
-        <suggest-all-hint todo="true">Suggest control and section names from labels for default names</suggest-all-hint>
+        <suggest-all>Namen voorstellen</suggest-all>
+        <suggest-all-hint>Stel control- en sectienamen voor op basis van labels voor standaardnamen</suggest-all-hint>
         <columns>
-            <pdf todo="true">PDF Name</pdf>
-            <pdf-hint todo="true">Show or hide PDF Field Name column</pdf-hint>
-            <excel todo="true">Excel Name</excel>
-            <excel-hint todo="true">Show or hide Excel Range Name column</excel-hint>
+            <pdf>PDF-naam</pdf>
+            <pdf-hint>Kolom Naam van het PDF-veld tonen of verbergen</pdf-hint>
+            <excel>Excel-naam</excel>
+            <excel-hint>Kolom Excel-bereiknaam tonen of verbergen</excel-hint>
         </columns>
-        <export-csv todo="true">Download CSV</export-csv>
-        <empty-form todo="true">This form does not contain any sections or controls yet.</empty-form>
-        <no-matches todo="true">No items match the current filter.</no-matches>
+        <export-csv>CSV downloaden</export-csv>
+        <empty-form>Dit formulier bevat nog geen secties of controls.</empty-form>
+        <no-matches>Geen items komen overeen met het huidige filter.</no-matches>
         <headers>
-            <type todo="true">Type</type>
-            <name todo="true">Name</name>
-            <label todo="true">Label</label>
-            <hint todo="true">Hint</hint>
-            <required todo="true">Req.</required>
-            <summary todo="true">Summary</summary>
-            <rules todo="true">Rules</rules>
-            <pdf todo="true">PDF Field Name</pdf>
-            <excel todo="true">Excel Range Name</excel>
+            <type>Type</type>
+            <name>Naam</name>
+            <label>Label</label>
+            <hint>Hint</hint>
+            <required>Verpl.</required>
+            <summary>Overzicht</summary>
+            <rules>Regels</rules>
+            <pdf>Naam van het PDF-veld</pdf>
+            <excel>Excel-bereiknaam</excel>
         </headers>
         <types>
-            <section todo="true">Section</section>
-            <repeated-section todo="true">Repeated Section</repeated-section>
-            <section-template todo="true">Section Template</section-template>
-            <grid todo="true">Grid</grid>
-            <repeated-grid todo="true">Repeated Grid</repeated-grid>
+            <section>Sectie</section>
+            <repeated-section>Herhaalde sectie</repeated-section>
+            <section-template>Sectietemplate</section-template>
+            <grid>Grid</grid>
+            <repeated-grid>Herhaald grid</repeated-grid>
         </types>
-        <readonly-template-hint todo="true">Read-only (from Section Template library)</readonly-template-hint>
-        <html-readonly-hint todo="true">Formatted as HTML; edit in Control Settings</html-readonly-hint>
-        <summary-encrypted-hint todo="true">Disabled because data encryption is enabled</summary-encrypted-hint>
-        <summary-advanced-hint todo="true">Configured with role restrictions, sorting, or bulk edit in Control Settings</summary-advanced-hint>
-        <invalid-names-error todo="true">{0,choice,1#1 item has an invalid or duplicate name.|1&lt;{0,number,integer} items have invalid or duplicate names.}</invalid-names-error>
+        <readonly-template-hint>Alleen-lezen (uit de sectietemplatebibliotheek)</readonly-template-hint>
+        <html-readonly-hint>Opgemaakt als HTML; bewerk in Control-instellingen</html-readonly-hint>
+        <summary-encrypted-hint>Uitgeschakeld omdat gegevensversleuteling is ingeschakeld</summary-encrypted-hint>
+        <summary-advanced-hint>Geconfigureerd met rolbeperkingen, sortering of bulkbewerking in Control-instellingen</summary-advanced-hint>
+        <invalid-names-error>{0,choice,1#1 item heeft een ongeldige of dubbele naam.|1&lt;{0,number,integer} items hebben ongeldige of dubbele namen.}</invalid-names-error>
     </dialog-controls>
 </resource>

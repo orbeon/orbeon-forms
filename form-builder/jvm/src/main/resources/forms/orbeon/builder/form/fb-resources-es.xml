@@ -76,7 +76,7 @@
         <split-cell>dividir celda</split-cell>
         <merge-cell>combinar celdas</merge-cell>
         <control-lhha todo="true">label</control-lhha>
-        <control-settings-batch todo="true">control overview</control-settings-batch>
+        <control-settings-batch>vista general de controles</control-settings-batch>
     </undo-redo>
     <merge-section>
         <label>Combinar plantilla de sección</label>
@@ -1855,7 +1855,7 @@
         <apply-ok-dialog>Aplicar/OK (hace clic en el botón principal)</apply-ok-dialog>
         <open-quick-search>Abrir la búsqueda rápida de controles</open-quick-search>
         <open-form-settings>Abrir configuración del formulario</open-form-settings>
-        <open-controls todo="true">Open Control Overview</open-controls>
+        <open-controls>Abrir vista general de controles</open-controls>
         <open-permissions>Abrir permisos</open-permissions>
         <open-email-settings>Abrir configuración de correo electrónico</open-email-settings>
         <open-messages>Abrir mensajes</open-messages>
@@ -2045,47 +2045,47 @@
         <show-all todo="true">Show All Sections</show-all>
     </section-focus>
     <dialog-controls>
-        <label todo="true">Control Overview</label>
-        <search-placeholder todo="true">Filter by name, label, hint, or type…</search-placeholder>
-        <clear-search todo="true">Clear filter</clear-search>
+        <label>Vista general de controles</label>
+        <search-placeholder>Filtrar por nombre, etiqueta, ayuda o tipo…</search-placeholder>
+        <clear-search>Limpiar filtro</clear-search>
         <filter>
-            <all todo="true">All</all>
-            <controls todo="true">Controls</controls>
-            <unnamed todo="true">Unnamed</unnamed>
+            <all>Todos</all>
+            <controls>Controles</controls>
+            <unnamed>Sin nombre</unnamed>
         </filter>
-        <suggest-all todo="true">Suggest Names</suggest-all>
-        <suggest-all-hint todo="true">Suggest control and section names from labels for default names</suggest-all-hint>
+        <suggest-all>Sugerir nombres</suggest-all>
+        <suggest-all-hint>Sugerir nombres de controles y secciones a partir de las etiquetas para nombres predeterminados</suggest-all-hint>
         <columns>
-            <pdf todo="true">PDF Name</pdf>
-            <pdf-hint todo="true">Show or hide PDF Field Name column</pdf-hint>
-            <excel todo="true">Excel Name</excel>
-            <excel-hint todo="true">Show or hide Excel Range Name column</excel-hint>
+            <pdf>Nombre PDF</pdf>
+            <pdf-hint>Mostrar u ocultar la columna Nombre del campo PDF</pdf-hint>
+            <excel>Nombre Excel</excel>
+            <excel-hint>Mostrar u ocultar la columna Nombre de rango de Excel</excel-hint>
         </columns>
-        <export-csv todo="true">Download CSV</export-csv>
-        <empty-form todo="true">This form does not contain any sections or controls yet.</empty-form>
-        <no-matches todo="true">No items match the current filter.</no-matches>
+        <export-csv>Descargar CSV</export-csv>
+        <empty-form>Este formulario aún no contiene secciones ni controles.</empty-form>
+        <no-matches>Ningún elemento coincide con el filtro actual.</no-matches>
         <headers>
-            <type todo="true">Type</type>
-            <name todo="true">Name</name>
-            <label todo="true">Label</label>
-            <hint todo="true">Hint</hint>
-            <required todo="true">Req.</required>
-            <summary todo="true">Summary</summary>
-            <rules todo="true">Rules</rules>
-            <pdf todo="true">PDF Field Name</pdf>
-            <excel todo="true">Excel Range Name</excel>
+            <type>Tipo</type>
+            <name>Nombre</name>
+            <label>Etiqueta</label>
+            <hint>Ayuda</hint>
+            <required>Req.</required>
+            <summary>Resumen</summary>
+            <rules>Reglas</rules>
+            <pdf>Nombre del campo PDF</pdf>
+            <excel>Nombre de rango de Excel</excel>
         </headers>
         <types>
-            <section todo="true">Section</section>
-            <repeated-section todo="true">Repeated Section</repeated-section>
-            <section-template todo="true">Section Template</section-template>
-            <grid todo="true">Grid</grid>
-            <repeated-grid todo="true">Repeated Grid</repeated-grid>
+            <section>Sección</section>
+            <repeated-section>Sección repetida</repeated-section>
+            <section-template>Plantilla de sección</section-template>
+            <grid>Grilla</grid>
+            <repeated-grid>Grilla repetida</repeated-grid>
         </types>
-        <readonly-template-hint todo="true">Read-only (from Section Template library)</readonly-template-hint>
-        <html-readonly-hint todo="true">Formatted as HTML; edit in Control Settings</html-readonly-hint>
-        <summary-encrypted-hint todo="true">Disabled because data encryption is enabled</summary-encrypted-hint>
-        <summary-advanced-hint todo="true">Configured with role restrictions, sorting, or bulk edit in Control Settings</summary-advanced-hint>
-        <invalid-names-error todo="true">{0,choice,1#1 item has an invalid or duplicate name.|1&lt;{0,number,integer} items have invalid or duplicate names.}</invalid-names-error>
+        <readonly-template-hint>Solo lectura (de la biblioteca de plantillas de sección)</readonly-template-hint>
+        <html-readonly-hint>Con formato HTML; editar en Configuración de Controles</html-readonly-hint>
+        <summary-encrypted-hint>Deshabilitado porque el cifrado de datos está habilitado</summary-encrypted-hint>
+        <summary-advanced-hint>Configurado con restricciones de roles, ordenación o edición masiva en Configuración de Controles</summary-advanced-hint>
+        <invalid-names-error>{0,choice,1#1 elemento tiene un nombre no válido o duplicado.|1&lt;{0,number,integer} elementos tienen nombres no válidos o duplicados.}</invalid-names-error>
     </dialog-controls>
 </resource>

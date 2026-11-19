@@ -96,7 +96,7 @@
         <split-cell>dela cell</split-cell>
         <merge-cell>sammanfoga cell</merge-cell>
         <control-lhha todo="true">label</control-lhha>
-        <control-settings-batch todo="true">control overview</control-settings-batch>
+        <control-settings-batch>översikt över kontroller</control-settings-batch>
     </undo-redo>
     <merge-section>
         <label>Sammanfoga sektionsmall</label>
@@ -1889,7 +1889,7 @@
         <apply-ok-dialog>Tillämpa/OK (klickar på huvudknappen)</apply-ok-dialog>
         <open-quick-search>Öppna snabbsökning för kontroller</open-quick-search>
         <open-form-settings>Öppna formulärinställningar</open-form-settings>
-        <open-controls todo="true">Open Control Overview</open-controls>
+        <open-controls>Öppna översikt över kontroller</open-controls>
         <open-permissions>Öppna behörigheter</open-permissions>
         <open-email-settings>Öppna e-postinställningar</open-email-settings>
         <open-messages>Öppna meddelanden</open-messages>
@@ -2079,47 +2079,47 @@
         <show-all todo="true">Show All Sections</show-all>
     </section-focus>
     <dialog-controls>
-        <label todo="true">Control Overview</label>
-        <search-placeholder todo="true">Filter by name, label, hint, or type…</search-placeholder>
-        <clear-search todo="true">Clear filter</clear-search>
+        <label>Översikt över kontroller</label>
+        <search-placeholder>Filtrera efter namn, etikett, anvisning eller typ…</search-placeholder>
+        <clear-search>Rensa filter</clear-search>
         <filter>
-            <all todo="true">All</all>
-            <controls todo="true">Controls</controls>
-            <unnamed todo="true">Unnamed</unnamed>
+            <all>Alla</all>
+            <controls>Kontroller</controls>
+            <unnamed>Namnlösa</unnamed>
         </filter>
-        <suggest-all todo="true">Suggest Names</suggest-all>
-        <suggest-all-hint todo="true">Suggest control and section names from labels for default names</suggest-all-hint>
+        <suggest-all>Föreslå namn</suggest-all>
+        <suggest-all-hint>Föreslå kontroll- och sektionsnamn från etiketter för standardnamn</suggest-all-hint>
         <columns>
-            <pdf todo="true">PDF Name</pdf>
-            <pdf-hint todo="true">Show or hide PDF Field Name column</pdf-hint>
-            <excel todo="true">Excel Name</excel>
-            <excel-hint todo="true">Show or hide Excel Range Name column</excel-hint>
+            <pdf>PDF-namn</pdf>
+            <pdf-hint>Visa eller dölj kolumnen Namn på PDF-fältet</pdf-hint>
+            <excel>Excel-namn</excel>
+            <excel-hint>Visa eller dölj kolumnen Excel-områdesnamn</excel-hint>
         </columns>
-        <export-csv todo="true">Download CSV</export-csv>
-        <empty-form todo="true">This form does not contain any sections or controls yet.</empty-form>
-        <no-matches todo="true">No items match the current filter.</no-matches>
+        <export-csv>Ladda ner CSV</export-csv>
+        <empty-form>Detta formulär innehåller inga sektioner eller kontroller ännu.</empty-form>
+        <no-matches>Inga objekt matchar det aktuella filtret.</no-matches>
         <headers>
-            <type todo="true">Type</type>
-            <name todo="true">Name</name>
-            <label todo="true">Label</label>
-            <hint todo="true">Hint</hint>
-            <required todo="true">Req.</required>
-            <summary todo="true">Summary</summary>
-            <rules todo="true">Rules</rules>
-            <pdf todo="true">PDF Field Name</pdf>
-            <excel todo="true">Excel Range Name</excel>
+            <type>Typ</type>
+            <name>Namn</name>
+            <label>Etikett</label>
+            <hint>Anvisning</hint>
+            <required>Oblig.</required>
+            <summary>Översikt</summary>
+            <rules>Regler</rules>
+            <pdf>Namn på PDF-fältet</pdf>
+            <excel>Excel-områdesnamn</excel>
         </headers>
         <types>
-            <section todo="true">Section</section>
-            <repeated-section todo="true">Repeated Section</repeated-section>
-            <section-template todo="true">Section Template</section-template>
-            <grid todo="true">Grid</grid>
-            <repeated-grid todo="true">Repeated Grid</repeated-grid>
+            <section>Sektion</section>
+            <repeated-section>Upprepad sektion</repeated-section>
+            <section-template>Sektionsmall</section-template>
+            <grid>Rutnät</grid>
+            <repeated-grid>Upprepat rutnät</repeated-grid>
         </types>
-        <readonly-template-hint todo="true">Read-only (from Section Template library)</readonly-template-hint>
-        <html-readonly-hint todo="true">Formatted as HTML; edit in Control Settings</html-readonly-hint>
-        <summary-encrypted-hint todo="true">Disabled because data encryption is enabled</summary-encrypted-hint>
-        <summary-advanced-hint todo="true">Configured with role restrictions, sorting, or bulk edit in Control Settings</summary-advanced-hint>
-        <invalid-names-error todo="true">{0,choice,1#1 item has an invalid or duplicate name.|1&lt;{0,number,integer} items have invalid or duplicate names.}</invalid-names-error>
+        <readonly-template-hint>Skrivskyddad (från sektionsmallsbiblioteket)</readonly-template-hint>
+        <html-readonly-hint>Formaterad som HTML; redigera i kontrollinställningar</html-readonly-hint>
+        <summary-encrypted-hint>Inaktiverad eftersom datakryptering är aktiverad</summary-encrypted-hint>
+        <summary-advanced-hint>Konfigurerad med rollbegränsningar, sortering eller massredigering i kontrollinställningar</summary-advanced-hint>
+        <invalid-names-error>{0,choice,1#1 objekt har ett ogiltigt eller duplicerat namn.|1&lt;{0,number,integer} objekt har ogiltiga eller duplicerade namn.}</invalid-names-error>
     </dialog-controls>
 </resource>

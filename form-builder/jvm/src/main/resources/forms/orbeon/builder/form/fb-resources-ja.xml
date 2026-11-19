@@ -96,7 +96,7 @@
         <split-cell>セルを分割</split-cell>
         <merge-cell>セルを結合</merge-cell>
         <control-lhha todo="true">label</control-lhha>
-        <control-settings-batch todo="true">control overview</control-settings-batch>
+        <control-settings-batch>コントロール一覧</control-settings-batch>
     </undo-redo>
     <merge-section>
         <label>セクションテンプレートを統合</label>
@@ -1853,7 +1853,7 @@
         <apply-ok-dialog>適用/OK（メインボタンをクリック）</apply-ok-dialog>
         <open-quick-search>クイックコントロール検索を開く</open-quick-search>
         <open-form-settings>フォーム設定を開く</open-form-settings>
-        <open-controls todo="true">Open Control Overview</open-controls>
+        <open-controls>コントロール一覧を開く</open-controls>
         <open-permissions>権限を開く</open-permissions>
         <open-email-settings>メール設定を開く</open-email-settings>
         <open-messages>メッセージを開く</open-messages>
@@ -2043,47 +2043,47 @@
         <show-all todo="true">Show All Sections</show-all>
     </section-focus>
     <dialog-controls>
-        <label todo="true">Control Overview</label>
-        <search-placeholder todo="true">Filter by name, label, hint, or type…</search-placeholder>
-        <clear-search todo="true">Clear filter</clear-search>
+        <label>コントロール一覧</label>
+        <search-placeholder>名前、ラベル、ヒント、またはタイプで絞り込み…</search-placeholder>
+        <clear-search>フィルターをクリア</clear-search>
         <filter>
-            <all todo="true">All</all>
-            <controls todo="true">Controls</controls>
-            <unnamed todo="true">Unnamed</unnamed>
+            <all>すべて</all>
+            <controls>コントロール</controls>
+            <unnamed>未命名</unnamed>
         </filter>
-        <suggest-all todo="true">Suggest Names</suggest-all>
-        <suggest-all-hint todo="true">Suggest control and section names from labels for default names</suggest-all-hint>
+        <suggest-all>名前を提案</suggest-all>
+        <suggest-all-hint>デフォルト名のコントロールやセクションの名前をラベルから提案</suggest-all-hint>
         <columns>
-            <pdf todo="true">PDF Name</pdf>
-            <pdf-hint todo="true">Show or hide PDF Field Name column</pdf-hint>
-            <excel todo="true">Excel Name</excel>
-            <excel-hint todo="true">Show or hide Excel Range Name column</excel-hint>
+            <pdf>PDF名</pdf>
+            <pdf-hint>PDFフィールド名列の表示／非表示を切り替え</pdf-hint>
+            <excel>Excel名</excel>
+            <excel-hint>Excel範囲名列の表示／非表示を切り替え</excel-hint>
         </columns>
-        <export-csv todo="true">Download CSV</export-csv>
-        <empty-form todo="true">This form does not contain any sections or controls yet.</empty-form>
-        <no-matches todo="true">No items match the current filter.</no-matches>
+        <export-csv>CSVをダウンロード</export-csv>
+        <empty-form>このフォームにはまだセクションやコントロールがありません。</empty-form>
+        <no-matches>現在のフィルターに一致する項目はありません。</no-matches>
         <headers>
-            <type todo="true">Type</type>
-            <name todo="true">Name</name>
-            <label todo="true">Label</label>
-            <hint todo="true">Hint</hint>
-            <required todo="true">Req.</required>
-            <summary todo="true">Summary</summary>
-            <rules todo="true">Rules</rules>
-            <pdf todo="true">PDF Field Name</pdf>
-            <excel todo="true">Excel Range Name</excel>
+            <type>タイプ</type>
+            <name>名前</name>
+            <label>ラベル</label>
+            <hint>ヒント</hint>
+            <required>必須</required>
+            <summary>サマリー</summary>
+            <rules>ルール</rules>
+            <pdf>PDFフィールド名</pdf>
+            <excel>Excel範囲名</excel>
         </headers>
         <types>
-            <section todo="true">Section</section>
-            <repeated-section todo="true">Repeated Section</repeated-section>
-            <section-template todo="true">Section Template</section-template>
-            <grid todo="true">Grid</grid>
-            <repeated-grid todo="true">Repeated Grid</repeated-grid>
+            <section>セクション</section>
+            <repeated-section>繰り返しセクション</repeated-section>
+            <section-template>セクションテンプレート</section-template>
+            <grid>グリッド</grid>
+            <repeated-grid>繰り返しグリッド</repeated-grid>
         </types>
-        <readonly-template-hint todo="true">Read-only (from Section Template library)</readonly-template-hint>
-        <html-readonly-hint todo="true">Formatted as HTML; edit in Control Settings</html-readonly-hint>
-        <summary-encrypted-hint todo="true">Disabled because data encryption is enabled</summary-encrypted-hint>
-        <summary-advanced-hint todo="true">Configured with role restrictions, sorting, or bulk edit in Control Settings</summary-advanced-hint>
-        <invalid-names-error todo="true">{0,choice,1#1 item has an invalid or duplicate name.|1&lt;{0,number,integer} items have invalid or duplicate names.}</invalid-names-error>
+        <readonly-template-hint>読み取り専用（セクションテンプレートライブラリから）</readonly-template-hint>
+        <html-readonly-hint>HTML形式です。コントロール設定で編集してください</html-readonly-hint>
+        <summary-encrypted-hint>データ暗号化が有効なため無効です</summary-encrypted-hint>
+        <summary-advanced-hint>コントロール設定でロール制限、並び替え、または一括編集が設定されています</summary-advanced-hint>
+        <invalid-names-error>{0,choice,1#1件の項目に無効または重複した名前があります。|1&lt;{0,number,integer}件の項目に無効または重複した名前があります。}</invalid-names-error>
     </dialog-controls>
 </resource>

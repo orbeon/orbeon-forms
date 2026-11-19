@@ -96,7 +96,7 @@
         <split-cell>تقسيم الخلية</split-cell>
         <merge-cell>دمج الخلية</merge-cell>
         <control-lhha todo="true">label</control-lhha>
-        <control-settings-batch todo="true">control overview</control-settings-batch>
+        <control-settings-batch>نظرة عامة على عناصر التحكم</control-settings-batch>
     </undo-redo>
     <merge-section>
         <label>دمج قالب القسم</label>
@@ -1861,7 +1861,7 @@
         <apply-ok-dialog>تطبيق/موافق (النقر على الزر الرئيسي)</apply-ok-dialog>
         <open-quick-search>فتح البحث السريع عن عناصر التحكم</open-quick-search>
         <open-form-settings>فتح إعدادات النموذج</open-form-settings>
-        <open-controls todo="true">Open Control Overview</open-controls>
+        <open-controls>فتح نظرة عامة على عناصر التحكم</open-controls>
         <open-permissions>فتح الأذونات</open-permissions>
         <open-email-settings>فتح إعدادات البريد الإلكتروني</open-email-settings>
         <open-messages>فتح الرسائل</open-messages>
@@ -2051,47 +2051,47 @@
         <show-all todo="true">Show All Sections</show-all>
     </section-focus>
     <dialog-controls>
-        <label todo="true">Control Overview</label>
-        <search-placeholder todo="true">Filter by name, label, hint, or type…</search-placeholder>
-        <clear-search todo="true">Clear filter</clear-search>
+        <label>نظرة عامة على عناصر التحكم</label>
+        <search-placeholder>تصفية حسب الاسم أو التسمية أو التلميح أو النوع…</search-placeholder>
+        <clear-search>مسح التصفية</clear-search>
         <filter>
-            <all todo="true">All</all>
-            <controls todo="true">Controls</controls>
-            <unnamed todo="true">Unnamed</unnamed>
+            <all>الكل</all>
+            <controls>عناصر التحكم</controls>
+            <unnamed>بدون اسم</unnamed>
         </filter>
-        <suggest-all todo="true">Suggest Names</suggest-all>
-        <suggest-all-hint todo="true">Suggest control and section names from labels for default names</suggest-all-hint>
+        <suggest-all>اقتراح الأسماء</suggest-all>
+        <suggest-all-hint>اقتراح أسماء عناصر التحكم والأقسام من التسميات للأسماء الافتراضية</suggest-all-hint>
         <columns>
-            <pdf todo="true">PDF Name</pdf>
-            <pdf-hint todo="true">Show or hide PDF Field Name column</pdf-hint>
-            <excel todo="true">Excel Name</excel>
-            <excel-hint todo="true">Show or hide Excel Range Name column</excel-hint>
+            <pdf>اسم PDF</pdf>
+            <pdf-hint>إظهار أو إخفاء عمود اسم حقل PDF</pdf-hint>
+            <excel>اسم Excel</excel>
+            <excel-hint>إظهار أو إخفاء عمود اسم نطاق Excel</excel-hint>
         </columns>
-        <export-csv todo="true">Download CSV</export-csv>
-        <empty-form todo="true">This form does not contain any sections or controls yet.</empty-form>
-        <no-matches todo="true">No items match the current filter.</no-matches>
+        <export-csv>تنزيل CSV</export-csv>
+        <empty-form>لا يحتوي هذا النموذج على أي أقسام أو عناصر تحكم بعد.</empty-form>
+        <no-matches>لا توجد عناصر تطابق عامل التصفية الحالي.</no-matches>
         <headers>
-            <type todo="true">Type</type>
-            <name todo="true">Name</name>
-            <label todo="true">Label</label>
-            <hint todo="true">Hint</hint>
-            <required todo="true">Req.</required>
-            <summary todo="true">Summary</summary>
-            <rules todo="true">Rules</rules>
-            <pdf todo="true">PDF Field Name</pdf>
-            <excel todo="true">Excel Range Name</excel>
+            <type>النوع</type>
+            <name>الاسم</name>
+            <label>التسمية</label>
+            <hint>التلميح</hint>
+            <required>مطلوب</required>
+            <summary>الملخص</summary>
+            <rules>القواعد</rules>
+            <pdf>اسم حقل PDF</pdf>
+            <excel>اسم نطاق Excel</excel>
         </headers>
         <types>
-            <section todo="true">Section</section>
-            <repeated-section todo="true">Repeated Section</repeated-section>
-            <section-template todo="true">Section Template</section-template>
-            <grid todo="true">Grid</grid>
-            <repeated-grid todo="true">Repeated Grid</repeated-grid>
+            <section>قسم</section>
+            <repeated-section>قسم متكرر</repeated-section>
+            <section-template>قالب قسم</section-template>
+            <grid>شبكة</grid>
+            <repeated-grid>شبكة متكررة</repeated-grid>
         </types>
-        <readonly-template-hint todo="true">Read-only (from Section Template library)</readonly-template-hint>
-        <html-readonly-hint todo="true">Formatted as HTML; edit in Control Settings</html-readonly-hint>
-        <summary-encrypted-hint todo="true">Disabled because data encryption is enabled</summary-encrypted-hint>
-        <summary-advanced-hint todo="true">Configured with role restrictions, sorting, or bulk edit in Control Settings</summary-advanced-hint>
-        <invalid-names-error todo="true">{0,choice,1#1 item has an invalid or duplicate name.|1&lt;{0,number,integer} items have invalid or duplicate names.}</invalid-names-error>
+        <readonly-template-hint>للقراءة فقط (من مكتبة قوالب الأقسام)</readonly-template-hint>
+        <html-readonly-hint>منسق بصيغة HTML؛ عدّل في إعدادات عنصر التحكم</html-readonly-hint>
+        <summary-encrypted-hint>معطل لأن تشفير البيانات مفعل</summary-encrypted-hint>
+        <summary-advanced-hint>مكوّن بقيود الأدوار أو الفرز أو التعديل الجماعي في إعدادات عنصر التحكم</summary-advanced-hint>
+        <invalid-names-error>{0,choice,1#يحتوي عنصر واحد على اسم غير صالح أو مكرر.|1&lt;تحتوي {0,number,integer} عناصر على أسماء غير صالحة أو مكررة.}</invalid-names-error>
     </dialog-controls>
 </resource>

@@ -526,6 +526,9 @@
                             <!-- Optional items; each hides itself when disabled/non-relevant, and the CSS collapses
                                  the then-empty <li> -->
                             <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
+                                <fr:navbar-search-navigation/>
+                            </xh:li>
+                            <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
                                 <fr:navbar-workflow-stage/>
                             </xh:li>
                             <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
@@ -936,6 +939,55 @@
                 <xxf:show
                     event="DOMActivate"
                     dialog="fr-share-dialog"/>
+            </xf:trigger>
+        </xf:group>
+    </xsl:template>
+
+    <xsl:template match="fr:navbar-search-navigation">
+        <xf:group
+            class="fr-navbar-search-navigation"
+            ref=".[
+                xxf:property(string-join(('oxf.fr.navbar.search-navigation.enable', fr:app-name(), fr:form-name()), '.')) and
+                not(fr:is-embedded())                                                                                    and
+                not(fr:is-form-builder())                                                                                and
+                fr:mode() = ('edit', 'view')                                                                             and
+                xxf:non-blank(xxf:instance('fr-search-navigation-instance')/search-param)
+            ]">
+            <xf:var name="nav"   value="xxf:instance('fr-search-navigation-instance')"/>
+            <xf:var name="pos"   value="$nav/position/string()"/>
+            <xf:var name="total" value="xs:integer(($nav/total[. castable as xs:integer], 0)[1])"/>
+
+            <xf:trigger
+                appearance="minimal"
+                class="fr-search-nav-prev"
+                ref="xxf:instance('fr-triggers-instance')/search-prev"
+                xxf:title="{{xxf:r('detail.labels.search-prev', '|fr-fr-resources|')}}">
+                <xf:label>
+                    <xh:i class="fa fa-fw fa-chevron-left" aria-hidden="true"/>
+                    <xh:span class="visually-hidden"><xf:output value="xxf:r('detail.labels.search-prev', '|fr-fr-resources|')"/></xh:span>
+                </xf:label>
+                <xf:action event="DOMActivate" type="xpath">
+                    fr:run-process('oxf.fr.detail.process', 'search-prev')
+                </xf:action>
+            </xf:trigger>
+
+            <xf:output
+                class="fr-search-nav-position"
+                ref=".[$total gt 0]"
+                value="concat(if (xxf:non-blank($pos)) then $pos else '–', ' / ', $total)"/>
+
+            <xf:trigger
+                appearance="minimal"
+                class="fr-search-nav-next"
+                ref="xxf:instance('fr-triggers-instance')/search-next"
+                xxf:title="{{xxf:r('detail.labels.search-next', '|fr-fr-resources|')}}">
+                <xf:label>
+                    <xh:i class="fa fa-fw fa-chevron-right" aria-hidden="true"/>
+                    <xh:span class="visually-hidden"><xf:output value="xxf:r('detail.labels.search-next', '|fr-fr-resources|')"/></xh:span>
+                </xf:label>
+                <xf:action event="DOMActivate" type="xpath">
+                    fr:run-process('oxf.fr.detail.process', 'search-next')
+                </xf:action>
             </xf:trigger>
         </xf:group>
     </xsl:template>

@@ -58,6 +58,8 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Обновить</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Вперед</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Назад</wizard-prev>
+        <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Предыдущий</search-prev>
+        <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Следующий</search-next>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Содержание</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Загрузить снова</reupload>
 
@@ -277,6 +279,8 @@
             <process-error>Произошла ошибка при выполнении процесса. Обратитесь к администратору приложения.</process-error>
             <wizard-prev-error>Исправьте ошибки, прежде чем переходить назад</wizard-prev-error>
             <wizard-next-error>Исправьте ошибки, прежде чем переходить дальше</wizard-next-error>
+            <no-previous-document>Нет предыдущего документа, соответствующего поиску.</no-previous-document>
+            <no-next-document>Нет следующего документа, соответствующего поиску.</no-next-document>
             <clear-confirm-message>Вы уверены, что хотите очистить все поля? Несохраненные данные будут потеряны.</clear-confirm-message>
             <error-dialog-title>Невозможно выполнить действие</error-dialog-title>
             <confirmation-dialog-title>Подтверждение</confirmation-dialog-title>
@@ -343,6 +347,8 @@
             <clear-out-of-range>Очистить значения вне диапазона</clear-out-of-range>
             <captcha-label>Защита от спама</captcha-label>
             <captcha-alert>Введенное значение не совпадает с картинкой. Попробуйте еще раз.</captcha-alert>
+            <search-prev>Предыдущий документ</search-prev>
+            <search-next>Следующий документ</search-next>
         </labels>
         <hints>
             <upload-max-size-per-file>Размер файлов должен быть меньше {0}.</upload-max-size-per-file>

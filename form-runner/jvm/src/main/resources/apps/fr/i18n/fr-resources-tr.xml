@@ -58,6 +58,8 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Yenile</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; İleri</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Geri</wizard-prev>
+        <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Önceki</search-prev>
+        <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Sonraki</search-next>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; İçerik</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Yeniden Yükle</reupload>
 
@@ -283,6 +285,8 @@
             <process-error>İşlem çalıştırılırken bir hata oluştu. Lütfen uygulama yöneticisiyle iletişime geçin.</process-error>
             <wizard-prev-error>Geriye gitmeden önce lütfen hataları düzeltin</wizard-prev-error>
             <wizard-next-error>İleriye gitmeden önce lütfen hataları düzeltin</wizard-next-error>
+            <no-previous-document>Aramayla eşleşen önceki belge yok.</no-previous-document>
+            <no-next-document>Aramayla eşleşen sonraki belge yok.</no-next-document>
             <clear-confirm-message>Bu sayfadaki tüm alanları temizlemek istediğinizden emin misiniz? Kaydetmediyseniz verileriniz kaybolacaktır.</clear-confirm-message>
             <error-dialog-title>İşlem tamamlanamıyor</error-dialog-title>
             <confirmation-dialog-title>Onay</confirmation-dialog-title>
@@ -348,6 +352,8 @@
             <clear-out-of-range>Aralık dışı değer(ler)i temizle</clear-out-of-range>
             <captcha-label>CAPTCHA</captcha-label>
             <captcha-alert>Lütfen CAPTCHA zorluğuna verdiğiniz cevabı kontrol edin</captcha-alert>
+            <search-prev>Önceki belge</search-prev>
+            <search-next>Sonraki belge</search-next>
         </labels>
         <hints>
             <upload-max-size-per-file>Dosyalar {0} altında olmalıdır.</upload-max-size-per-file>

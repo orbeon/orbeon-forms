@@ -174,6 +174,37 @@
     }
   }
 
+  .fr-navbar-search-navigation:not(.xforms-disabled) {
+    display    : inline-flex;
+    align-items: center;
+    white-space: nowrap;
+
+    .btn-link {
+      display        : inline-block;
+      padding        : 5px 8px;
+      border         : 0;
+      border-radius  : var(--orbeon-button-border-radius);
+      line-height    : 1.5;
+      text-decoration: none;
+
+      .fa {
+        color: var(--orbeon-navbar-color);
+      }
+    }
+
+    .xforms-readonly .btn-link,
+    .btn-link:disabled {
+      opacity: 0.35;
+      cursor : default;
+    }
+
+    .fr-search-nav-position {
+      color     : var(--orbeon-navbar-color);
+      padding   : 0 4px;
+      font-size : 0.9em;
+    }
+  }
+
   // Collapse the wrapper <li> of navbar items that hide themselves (xforms-disabled) or render nothing; !important
   // because the items carry d-flex, which is !important too
   .navbar .navbar-nav > .nav-item:not(:has(> :not(.xforms-disabled))) {

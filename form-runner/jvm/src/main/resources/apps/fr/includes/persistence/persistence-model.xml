@@ -821,6 +821,51 @@
             value="$persistence-instance/initial-autosave-status"/>
     </xf:action>
 
+    <!-- Initialize search navigation context when coming from Summary page -->
+    <xf:action
+        event="xforms-ready"
+        if="
+            $mode = ('edit', 'view') and
+            not($is-fb) and
+            not($is-background) and
+            not($is-export) and
+            xxf:non-blank($document) and
+            xxf:non-blank(xxf:get-request-parameter('fr-search'))
+        ">
+        <xf:insert
+            ref="instance('fr-search-navigation-instance')"
+            origin="frf:computeSearchNavigation(
+                $app,
+                $form,
+                $mode,
+                $document,
+                $parameters/draft = 'true' or xxf:get-request-parameter('draft') = 'true',
+                xxf:get-request-parameter('fr-search'),
+                string(xxf:get-request-parameter('fr-search-pos'))
+            )"/>
+    </xf:action>
+
+    <!-- Refresh search navigation position after a non-draft save -->
+    <xf:action
+        event="fr-data-save-done"
+        observer="fr-form-model"
+        if="
+            not(event('draft') = 'true') and
+            xxf:non-blank(instance('fr-search-navigation-instance')/search-param)
+        ">
+        <xf:insert
+            ref="instance('fr-search-navigation-instance')"
+            origin="frf:computeSearchNavigation(
+                $app,
+                $form,
+                $mode,
+                $document,
+                false(),
+                instance('fr-search-navigation-instance')/search-param/string(),
+                instance('fr-search-navigation-instance')/fallback-position/string()
+            )"/>
+    </xf:action>
+
     <!-- Clear operation -->
     <xf:action event="fr-clear">
 
@@ -1311,6 +1356,8 @@
             <can-access-summary/>
             <pdf/>
             <tiff/>
+            <search-prev/>
+            <search-next/>
             <other/>
         </triggers>
     </xf:instance>
@@ -1340,6 +1387,14 @@
                  relevant="fr:is-pe()"
                  readonly="xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))
                            and xxf:readonly(../strict-submit)"/>
+
+        <!-- Search navigation (prev/next from Summary page) -->
+        <xf:bind ref="search-prev"
+                 relevant="xxf:non-blank(instance('fr-search-navigation-instance')/search-param)"
+                 readonly="instance('fr-search-navigation-instance')/has-previous != 'true'"/>
+        <xf:bind ref="search-next"
+                 relevant="xxf:non-blank(instance('fr-search-navigation-instance')/search-param)"
+                 readonly="instance('fr-search-navigation-instance')/has-next != 'true'"/>
     </xf:bind>
 
     <!-- HACK: dependencies: recalculate this model when there is a change in the instance holding error/validity
@@ -1357,6 +1412,17 @@
             <selected-operations/>
             <link/>
         </_>
+    </xf:instance>
+
+    <xf:instance id="fr-search-navigation-instance" xxf:exclude-result-prefixes="#all">
+        <search-navigation>
+            <search-param/>
+            <position/>
+            <fallback-position/>
+            <total>0</total>
+            <has-previous>false</has-previous>
+            <has-next>false</has-next>m
+        </search-navigation>
     </xf:instance>
 
     <xf:bind

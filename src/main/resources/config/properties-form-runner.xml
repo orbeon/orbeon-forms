@@ -166,6 +166,8 @@
     <property as="xs:boolean" name="oxf.fr.navbar.revision-history.enable.orbeon.builder"          value="false"/><!-- explicitly disable for Form Builder so that it must be explicitly enabled -->
     <property as="xs:boolean" name="oxf.fr.navbar.workflow-stage.enable.*.*"                       value="false"/>
     <property as="xs:boolean" name="oxf.fr.navbar.workflow-stage.enable.orbeon.builder"            value="false"/>
+    <property as="xs:boolean" name="oxf.fr.navbar.search-navigation.enable.*.*"                    value="true"/>
+    <property as="xs:boolean" name="oxf.fr.navbar.search-navigation.enable.orbeon.builder"         value="false"/>
 
     <!-- 2022-12-18: Still support buttons, but they look weird on those pages, and we have the navbar link to replace them -->
     <property as="xs:string"  name="oxf.fr.forms.buttons"                                          value=""/>
@@ -295,6 +297,10 @@
     <property as="xs:string"  name="oxf.fr.detail.button.review.visible.*.*"                       value="fr:is-embedded('portlet') or not(fr:is-embedded())"/>
     <property as="xs:string"  name="oxf.fr.detail.button.edit.visible.*.*"                         value="(fr:is-embedded('portlet') or not(fr:is-embedded())) and fr:can-update()"/>
     <property as="xs:string"  name="oxf.fr.detail.button.summary.visible.*.*"                      value="(fr:is-embedded('portlet') or not(fr:is-embedded())) and fr:can-list()"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.search-prev.visible.*.*"                  value="(fr:is-embedded('portlet') or not(fr:is-embedded())) and xxf:non-blank(xxf:instance('fr-search-navigation-instance')/search-param)"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.search-next.visible.*.*"                  value="(fr:is-embedded('portlet') or not(fr:is-embedded())) and xxf:non-blank(xxf:instance('fr-search-navigation-instance')/search-param)"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.search-prev.enabled.*.*"                  value="xxf:instance('fr-search-navigation-instance')/has-previous = 'true'"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.search-next.enabled.*.*"                  value="xxf:instance('fr-search-navigation-instance')/has-next = 'true'"/>
     <property as="xs:string"  name="oxf.fr.detail.button.home.visible.*.*"                         value="fr:is-embedded('portlet') or not(fr:is-embedded())"/>
     <property as="xs:string"  name="oxf.fr.detail.button.lease.show-in-view-mode.visible.*.*"      value="fr:is-embedded('portlet') or not(fr:is-embedded())"/>
     <property as="xs:string"  name="oxf.fr.detail.button.pdf.visible.*.*"                          value="not(fr:is-browser-environment())"/>
@@ -639,10 +645,28 @@
             navigate(
                 uri =
                     "/fr/{fr:app-name()}/{fr:form-name()}/edit/{fr:document-id()}{
-                    if (xxf:get-request-parameter('draft') = 'true') then '?draft=true' else ''}"
+                        let $nav    := xxf:instance('fr-search-navigation-instance'),
+                            $search := $nav/search-param/string(),
+                            $pos    := $nav/fallback-position/string(),
+                            $params := (
+                                'draft=true'[xxf:get-request-parameter('draft') = 'true'],
+                                concat('fr-search=', $search)[xxf:non-blank($search)],
+                                concat('fr-search-pos=', $pos)[xxf:non-blank($search) and xxf:non-blank($pos)]
+                            )
+                        return
+                            if (exists($params)) then concat('?', string-join($params, '&amp;')) else ''
+                    }"
             )
         else
             edit
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.search-prev.*.*">
+        relinquish-lease
+        then search-prev
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.search-next.*.*">
+        relinquish-lease
+        then search-next
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.clear.*.*" >

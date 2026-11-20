@@ -61,6 +61,8 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Actualitzar"</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Següent</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Previ</wizard-prev>
+        <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Anterior</search-prev>
+        <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Següent</search-next>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Contingut</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Tornar a pujar</reupload>
 
@@ -289,6 +291,8 @@
             <process-error>Error amb el procés. Contacti amb els administradors de la aplicació.</process-error>
             <wizard-prev-error>Per favor, corregeix els errors abans d'anar enrere</wizard-prev-error>
             <wizard-next-error>Per favor, corregeix els errors abans d'anar endavant</wizard-next-error>
+            <no-previous-document>No hi ha cap document anterior que coincideixi amb la cerca.</no-previous-document>
+            <no-next-document>No hi ha cap document següent que coincideixi amb la cerca.</no-next-document>
             <clear-confirm-message>Està segur de netejar tots els camps de la pàgina? Es perdran les dades si no les guarda.</clear-confirm-message>
             <error-dialog-title>Impossible completar la acció</error-dialog-title>
             <confirmation-dialog-title>Confirmació</confirmation-dialog-title>
@@ -363,6 +367,8 @@
             <clear-out-of-range>Netejar valors fora de rang</clear-out-of-range>
             <captcha-label>CAPTCHA</captcha-label>
             <captcha-alert>El valor ingressat és diferent de la imatge, torni a intentar-lo</captcha-alert>
+            <search-prev>Document anterior</search-prev>
+            <search-next>Document següent</search-next>
         </labels>
         <hints>
             <upload-max-size-per-file>Els fitxers han de mesurar menys de {0}.</upload-max-size-per-file>

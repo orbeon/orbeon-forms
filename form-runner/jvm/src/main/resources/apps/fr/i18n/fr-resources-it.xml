@@ -58,6 +58,8 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Aggiorna"</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Prossimo</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Precedente</wizard-prev>
+        <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Precedente</search-prev>
+        <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Successivo</search-next>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Contenuti</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Carica di nuovo</reupload>
 
@@ -283,6 +285,8 @@
             <process-error>È apparso un errore durante l'esecuzione del processo. Si prega di contattare l'amministratore.</process-error>
             <wizard-prev-error>Correggi gli errori prima di tornare indietro</wizard-prev-error>
             <wizard-next-error>Correggi gli errori prima di procedere</wizard-next-error>
+            <no-previous-document>Non esiste alcun documento precedente corrispondente alla ricerca.</no-previous-document>
+            <no-next-document>Non esiste alcun documento successivo corrispondente alla ricerca.</no-next-document>
             <clear-confirm-message>Sei sicuro di voler cancellare tutti i campi di questa pagina? Tutti i dati che non sono stati salvati saranno perduti.</clear-confirm-message>
             <error-dialog-title>Non è stato possibile completare questa azione</error-dialog-title>
             <confirmation-dialog-title>Confermazione</confirmation-dialog-title>
@@ -350,6 +354,8 @@
             <clear-out-of-range>Rimuovi i valori fuori dall'intervallo</clear-out-of-range>
             <captcha-label>Codice di sicurezza</captcha-label>
             <captcha-alert>Il valore inserito non corrisponde a quello mostrato nell'immagine</captcha-alert>
+            <search-prev>Documento precedente</search-prev>
+            <search-next>Documento successivo</search-next>
         </labels>
         <hints>
             <upload-max-size-per-file>I file devono essere inferiori a {0}.</upload-max-size-per-file>

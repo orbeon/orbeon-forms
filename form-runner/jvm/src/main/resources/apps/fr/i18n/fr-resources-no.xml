@@ -58,6 +58,8 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Oppdater</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Neste</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Tilbake</wizard-prev>
+        <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Forrige</search-prev>
+        <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Neste</search-next>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Innhold</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Last opp på nytt</reupload>
 
@@ -283,6 +285,8 @@
             <process-error>Feil ved kjøring av prosessen. Vennligst kontakt din systemadministrator.</process-error>
             <wizard-prev-error>Vennligst rett opp feilene før du går tilbake</wizard-prev-error>
             <wizard-next-error>Vennligst rett opp feilene før du går videre</wizard-next-error>
+            <no-previous-document>Det finnes ingen forrige dokumenter som samsvarer med søket.</no-previous-document>
+            <no-next-document>Det finnes ingen neste dokumenter som samsvarer med søket.</no-next-document>
             <clear-confirm-message>Er du sikker på at du vil slette innholdet i alle felter på siden? Innholdet vil bli tapt.</clear-confirm-message>
             <error-dialog-title>Kan ikke fullføre handlingen</error-dialog-title>
             <confirmation-dialog-title>Bekreftelse</confirmation-dialog-title>
@@ -350,6 +354,8 @@
             <clear-out-of-range>Tøm verdier utenfor gyldig område</clear-out-of-range>
             <captcha-label>CAPTCHA</captcha-label>
             <captcha-alert>Verdien du skrev inn samsvarte ikke med bildet, prøv igjen</captcha-alert>
+            <search-prev>Forrige dokument</search-prev>
+            <search-next>Neste dokument</search-next>
         </labels>
         <hints>
             <upload-max-size-per-file>Filer må være under {0}.</upload-max-size-per-file>

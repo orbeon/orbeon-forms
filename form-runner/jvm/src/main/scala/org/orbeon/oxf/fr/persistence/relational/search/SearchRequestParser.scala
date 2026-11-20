@@ -56,8 +56,20 @@ object SearchRequestParser {
     val controlQueryEls  = queryEls.filter(_.hasAtt("path"))
     val metadataQueryEls = queryEls.filter(_.hasAtt("metadata"))
     val draftsElOpt      = searchElement.child("drafts").headOption
+    val aroundDocElOpt   = searchElement.child("around-document").headOption
     val credentials      = PermissionsAuthorization.findCurrentCredentialsFromSession
     val allControls      = searchElement.attValueOpt("return-all-indexed-fields").contains(true.toString)
+
+    val aroundDocumentOpt =
+      aroundDocElOpt.flatMap { el =>
+        el.attValueNonBlankOpt("id").map { id =>
+          AroundDocument(
+            documentId       = id,
+            isDraft          = el.attValueOpt("draft").contains("true"),
+            fallbackPosition = el.attValueNonBlankOpt("position").flatMap(_.toIntOption).filter(_ > 0)
+          )
+        }
+      }
 
     SearchRequest(
       provider            = provider,
@@ -70,7 +82,8 @@ object SearchRequestParser {
       queries             = controlQueries(appForm, version, controlQueryEls, allControls) ++: metadataQueries(metadataQueryEls),
       drafts              = drafts(draftsElOpt, credentials),
       freeTextSearch      = freeTextElOpt.map(_.stringValue).flatMap(trimAllToOpt), // Blank means no search
-      anyOfOperations     = SearchLogic.anyOfOperations(searchElement)
+      anyOfOperations     = SearchLogic.anyOfOperations(searchElement),
+      aroundDocument      = aroundDocumentOpt
     )
   }
 

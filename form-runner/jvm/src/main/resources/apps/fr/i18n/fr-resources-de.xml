@@ -58,6 +58,8 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Aktualisieren"</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Weiter</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Zurück</wizard-prev>
+        <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Zurück</search-prev>
+        <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Weiter</search-next>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Inhalt</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Erneut hochladen</reupload>
 
@@ -283,6 +285,8 @@
             <process-error>Beim Ausführen dieses Prozesses ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Administrator.</process-error>
             <wizard-prev-error>Bitte beheben Sie Fehler, bevor Sie zurückgehen</wizard-prev-error>
             <wizard-next-error>Bitte beheben Sie Fehler, bevor Sie fortfahren</wizard-next-error>
+            <no-previous-document>Es gibt kein vorheriges Dokument, das der Suche entspricht.</no-previous-document>
+            <no-next-document>Es gibt kein nächstes Dokument, das der Suche entspricht.</no-next-document>
             <clear-confirm-message>Sind Sie sich sicher, dass Sie alle Felder auf dieser Seite zurücksetzen wollen? Ungespeicherte Änderungen gehen verloren.</clear-confirm-message>
             <error-dialog-title>Aktion konnte nicht beendet werden</error-dialog-title>
             <confirmation-dialog-title>Bestätigung</confirmation-dialog-title>
@@ -350,6 +354,8 @@
             <clear-out-of-range>Wert(e) außerhalb des Bereichs löschen</clear-out-of-range>
             <captcha-label>Sicherheitscode</captcha-label>
             <captcha-alert>Ungültiger Wert. Bitte versuchen Sie es erneut!</captcha-alert>
+            <search-prev>Vorheriges Dokument</search-prev>
+            <search-next>Nächstes Dokument</search-next>
         </labels>
         <hints>
             <upload-max-size-per-file>Die maximale Dateigröße ist {0}.</upload-max-size-per-file>

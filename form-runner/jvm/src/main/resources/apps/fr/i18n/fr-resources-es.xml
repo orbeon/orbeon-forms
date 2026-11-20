@@ -61,6 +61,8 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Actualizar"</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Siguiente</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Previo</wizard-prev>
+        <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Anterior</search-prev>
+        <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Siguiente</search-next>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Contenido</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Subir de nuevo</reupload>
 
@@ -298,6 +300,8 @@
             <process-error>Error ejecutando el proceso. Contacte al administrador de la aplicación.</process-error>
             <wizard-prev-error>Corrija los errores antes de retroceder</wizard-prev-error>
             <wizard-next-error>Corrija los errores antes de avanzar.</wizard-next-error>
+            <no-previous-document>No hay ningún documento anterior que coincida con la búsqueda.</no-previous-document>
+            <no-next-document>No hay ningún documento siguiente que coincida con la búsqueda.</no-next-document>
             <clear-confirm-message>Esta seguro de limpiar todos los campos de la página? Los datos
                 se perderán sino los guarda.</clear-confirm-message>
             <error-dialog-title>Imposible completar la acción</error-dialog-title>
@@ -374,6 +378,8 @@
             <clear-out-of-range>Borrar valores fuera de rango</clear-out-of-range>
             <captcha-label>CAPTCHA</captcha-label>
             <captcha-alert>El valor ingresado es diferente a la imagen, inténtelo nuevamente</captcha-alert>
+            <search-prev>Documento anterior</search-prev>
+            <search-next>Documento siguiente</search-next>
         </labels>
         <hints>
             <upload-max-size-per-file>Ficheros por debajo de {0}.</upload-max-size-per-file>

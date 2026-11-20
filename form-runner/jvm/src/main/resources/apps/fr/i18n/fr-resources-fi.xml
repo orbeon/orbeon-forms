@@ -58,6 +58,8 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Päivitä</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Seuraava</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Edellinen</wizard-prev>
+        <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Edellinen</search-prev>
+        <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Seuraava</search-next>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Sisältö</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Lataa uudelleen</reupload>
 
@@ -283,6 +285,8 @@
             <process-error>Virhetilanne ajettaessa prosessia. Ota yhteyttä ohjelmiston ylläpitäjään.</process-error>
             <wizard-prev-error>Korjaa virheet ennen siirtymistä taaksepäin</wizard-prev-error>
             <wizard-next-error>Korjaa virheet ennen siirtymistä eteenpäin</wizard-next-error>
+            <no-previous-document>Hakua vastaavaa edellistä asiakirjaa ei ole.</no-previous-document>
+            <no-next-document>Hakua vastaavaa seuraavaa asiakirjaa ei ole.</no-next-document>
             <clear-confirm-message>Oletko varma, että haluat tyhjentää kaikki kentät tällä sivulla? Tiedot häviävät jos et ole tallentanut niitä</clear-confirm-message>
             <error-dialog-title>Kykenemätön suorittamaan toimintaa loppuun</error-dialog-title>
             <confirmation-dialog-title>Varmistus</confirmation-dialog-title>
@@ -350,6 +354,8 @@
             <clear-out-of-range>Tyhjennä sallitun alueen ulkopuoliset arvot</clear-out-of-range>
             <captcha-label>Kuvavarmenne</captcha-label>
             <captcha-alert>Antamasi arvo ei täsmännyt kuvan kanssa, ole hyvä ja yritä uudelleen</captcha-alert>
+            <search-prev>Edellinen asiakirja</search-prev>
+            <search-next>Seuraava asiakirja</search-next>
         </labels>
         <hints>
             <upload-max-size-per-file>Tiedostojen on oltava kooltaan alle {0}.</upload-max-size-per-file>

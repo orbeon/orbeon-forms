@@ -61,6 +61,20 @@ trait PersistenceApiTrait {
     details           : List[String],
   )
 
+  case class SearchNeighbor(
+    documentId: String,
+    isDraft   : Boolean,
+    operations: Option[Operations],
+    position  : Int
+  )
+
+  case class SearchNeighbors(
+    total          : Int,
+    currentPosition: Option[Int],
+    previous       : Option[SearchNeighbor],
+    next           : Option[SearchNeighbor]
+  )
+
   case class DistinctValues(
    controls      : Seq[Control],
    createdBy     : Seq[String],
@@ -205,6 +219,150 @@ trait PersistenceApiTrait {
       )
 
     callPagedService(firstPageOnly, pageNumber => readPage(pageNumber).map(pageToDataDetails))
+  }
+
+  def searchAround(
+    appForm                 : AppForm,
+    searchContext           : SummarySearchContext,
+    around                  : SummarySearchContext.AroundDoc,
+    isInternalAdminUser     : Boolean = false
+  )(implicit
+    logger                  : IndentedLogger,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): Try[SearchNeighbors] = {
+
+    val searchVersion = searchContext.searchVersion
+    debug(s"calling searchAround for `$appForm`/`$searchVersion`, doc=`${around.documentId}` (draft=${around.isDraft})")
+
+    val servicePathQuery =
+      PathUtils.recombineQuery(
+        s"/fr/service/persistence/search/${appForm.app}/${appForm.form}",
+        createInternalAdminUserTokenParam(isInternalAdminUser).toList,
+        overwrite = true
+      )
+
+    def fetchPage(pageNumber: Int, includeAround: Boolean): Try[DocumentNodeInfoType] =
+      documentsXmlTry(
+        servicePath   = servicePathQuery,
+        queryXml      = searchContext.toSearchXmlBytes(if (includeAround) Some(around) else None, SearchPageSize, pageNumber),
+        searchVersion = searchVersion
+      )
+
+    fetchPage(1, includeAround = true).flatMap { firstPage =>
+      val root = firstPage.rootElement
+      if (root.attValueOpt("around-document-supported").contains("true")) {
+        scala.util.Success(parseAroundResponse(root))
+      } else {
+        findNeighborsInPagedResponses(
+          firstPage     = firstPage,
+          around        = around,
+          fetchNextPage = pageNumber => fetchPage(pageNumber, includeAround = false)
+        )
+      }
+    }
+  }
+
+  private def parseAroundResponse(root: om.NodeInfo): SearchNeighbors = {
+    val total           = root.attValueNonBlankOpt("search-total").flatMap(_.toIntOption).getOrElse(0)
+    val currentPosition = root.attValueNonBlankOpt("current-position").flatMap(_.toIntOption)
+
+    def parseNeighbor(relation: String): Option[SearchNeighbor] =
+      (root / "document")
+        .find(_.attValueOpt("relation").contains(relation))
+        .map { el =>
+          SearchNeighbor(
+            documentId = el.attValue("name"),
+            isDraft    = el.attValue("draft") == "true",
+            operations = Operations.parseFromString(el.attValue("operations")),
+            position   = el.attValue("position").toInt
+          )
+        }
+
+    SearchNeighbors(
+      total           = total,
+      currentPosition = currentPosition,
+      previous        = parseNeighbor("previous"),
+      next            = parseNeighbor("next")
+    )
+  }
+
+  def findNeighborsInPagedResponses(
+    firstPage    : DocumentNodeInfoType,
+    around       : SummarySearchContext.AroundDoc,
+    fetchNextPage: Int => Try[DocumentNodeInfoType]
+  ): Try[SearchNeighbors] = {
+    val total = firstPage.rootElement.attValueNonBlankOpt("search-total").flatMap(_.toIntOption).getOrElse(0)
+    if (total == 0) {
+      scala.util.Success(SearchNeighbors(0, None, None, None))
+    } else {
+      val fallbackPrevPosOpt = around.fallbackPosition.map(fp => (fp - 1).min(total)).filter(_ >= 1)
+      val fallbackNextPosOpt = around.fallbackPosition.filter(fp => fp >= 1 && fp <= total)
+
+      var pageNumber           = 1
+      var currentPageTry       = scala.util.Success(firstPage): Try[DocumentNodeInfoType]
+      var globalIndex          = 0
+      var prevCandidate        = Option.empty[SearchNeighbor]
+      var foundPosOpt          = Option.empty[Int]
+      var foundPrevOpt         = Option.empty[SearchNeighbor]
+      var foundNextOpt         = Option.empty[SearchNeighbor]
+      var fallbackPrevOpt      = Option.empty[SearchNeighbor]
+      var fallbackNextOpt      = Option.empty[SearchNeighbor]
+      var done                 = false
+
+      while (! done && currentPageTry.isSuccess) {
+        val docs = (currentPageTry.get.rootElement / "document").toVector
+        if (docs.isEmpty) {
+          done = true
+        } else {
+          val iter = docs.iterator
+          while (iter.hasNext && ! done) {
+            val el = iter.next()
+            globalIndex += 1
+            val neighbor = SearchNeighbor(
+              documentId = el.attValue("name"),
+              isDraft    = el.attValue("draft") == "true",
+              operations = Operations.parseFromString(el.attValue("operations")),
+              position   = globalIndex
+            )
+
+            if (fallbackPrevPosOpt.contains(globalIndex))
+              fallbackPrevOpt = Some(neighbor)
+            if (fallbackNextPosOpt.contains(globalIndex))
+              fallbackNextOpt = Some(neighbor)
+
+            if (foundPosOpt.isDefined) {
+              foundNextOpt = Some(neighbor)
+              done = true
+            } else if (neighbor.documentId == around.documentId && neighbor.isDraft == around.isDraft) {
+              foundPosOpt  = Some(globalIndex)
+              foundPrevOpt = prevCandidate
+              if (globalIndex >= total)
+                done = true
+            } else {
+              prevCandidate = Some(neighbor)
+            }
+          }
+
+          if (! done) {
+            if (globalIndex >= total) {
+              done = true
+            } else {
+              pageNumber += 1
+              currentPageTry = fetchNextPage(pageNumber)
+            }
+          }
+        }
+      }
+
+      currentPageTry.map { _ =>
+        foundPosOpt match {
+          case Some(pos) =>
+            SearchNeighbors(total, Some(pos), foundPrevOpt, foundNextOpt)
+          case None =>
+            SearchNeighbors(total, None, fallbackPrevOpt, fallbackNextOpt)
+        }
+      }
+    }
   }
 
   def distinctValues(

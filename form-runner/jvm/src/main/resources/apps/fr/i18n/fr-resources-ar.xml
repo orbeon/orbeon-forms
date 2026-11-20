@@ -58,6 +58,8 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; تحديث</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; التالي</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; السابق</wizard-prev>
+        <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; السابق</search-prev>
+        <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; التالي</search-next>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; المحتوى</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; إعادة الرفع</reupload>
 
@@ -283,6 +285,8 @@
             <process-error>حدث خطأ أثناء تشغيل العملية. يرجى الاتصال بمسؤول التطبيق.</process-error>
             <wizard-prev-error>يرجى إصلاح الأخطاء قبل الانتقال للخلف</wizard-prev-error>
             <wizard-next-error>يرجى إصلاح الأخطاء قبل الانتقال للأمام</wizard-next-error>
+            <no-previous-document>لا يوجد مستند سابق يطابق البحث.</no-previous-document>
+            <no-next-document>لا يوجد مستند تالٍ يطابق البحث.</no-next-document>
             <clear-confirm-message>هل أنت متأكد من أنك تريد مسح جميع الحقول في هذه الصفحة؟ سيتم فقدان بياناتك إذا لم تقم بحفظها.</clear-confirm-message>
             <error-dialog-title>غير قادر على إكمال الإجراء</error-dialog-title>
             <confirmation-dialog-title>تأكيد</confirmation-dialog-title>
@@ -350,6 +354,8 @@
             <clear-out-of-range>مسح القيم خارج النطاق</clear-out-of-range>
             <captcha-label>كابتشا</captcha-label>
             <captcha-alert>يرجى التحقق من إجابتك على تحدي كابتشا</captcha-alert>
+            <search-prev>المستند السابق</search-prev>
+            <search-next>المستند التالي</search-next>
         </labels>
         <hints>
             <upload-max-size-per-file>يجب أن تكون الملفات أقل من {0}.</upload-max-size-per-file>

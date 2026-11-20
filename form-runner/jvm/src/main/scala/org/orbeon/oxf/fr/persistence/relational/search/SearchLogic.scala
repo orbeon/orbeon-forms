@@ -39,6 +39,166 @@ import scala.collection.mutable
 
 object SearchLogic {
 
+  case class PositionedDocument(
+    document: Document,
+    position: Int
+  )
+
+  case class AroundSearchResult(
+    total          : Int,
+    currentPosition: Option[Int],
+    previous       : Option[PositionedDocument],
+    current        : Option[PositionedDocument],
+    next           : Option[PositionedDocument]
+  )
+
+  private case class PreparedSearchQuery(
+    innerSQL          : String,
+    statementParts    : List[StatementPart],
+    orderedSubquerySQL: String,
+    allStatementParts : List[StatementPart]
+  )
+
+  private def prepareSearchQuery(
+    request                  : SearchRequest,
+    connection               : Connection,
+    commonAndPermissionsParts: List[StatementPart]
+  ): PreparedSearchQuery = {
+    val statementParts = commonAndPermissionsParts ++ metadataPart(request).toList ++ List(
+      columnFilterPart  (request),
+      draftsPart        (request),
+      freeTextFilterPart(request)
+    )
+    val innerSQL       = buildQuery(statementParts)
+    val orderDirection = request.orderQuery.orderDirection.get
+
+    // We'll refer to the order by column as "sort_column"
+    val (orderByAliasing, orderByStatementPartOpt) = request.orderQuery match {
+      case controlQuery @ ControlQuery(controlPath, _, _) =>
+        val aggregateFunction = orderDirection match {
+          case Ascending  => "MIN"
+          case Descending => "MAX"
+        }
+        val controlColumn = s"t.${controlQuery.sqlColumn}"
+        // DB2, Oracle, and SQL Server use CLOB/NTEXT data types for control values, which cannot be used in ORDER
+        // BY clauses, so we cast them to VARCHAR.
+        val controlColumnWithCast = request.provider match {
+          case _         => controlColumn
+        }
+        (
+          s"(SELECT $aggregateFunction($controlColumnWithCast) FROM orbeon_i_control_text t WHERE t.data_id = s.data_id AND t.control = ?) AS sort_column",
+          Some(StatementPart("", List[Setter]((ps, i) => ps.setString(i, controlPath))))
+        )
+      case _ =>
+        (
+          s"c.${request.orderQuery.sqlColumn} AS sort_column",
+          None
+        )
+    }
+
+    // First order by clause (specified by request), with CAST if necessary
+    val firstOrderByClause = s"d.sort_column ${orderDirection.sql}"
+
+    // Second order by clause (we order by last_modified_time DESC as well, if it makes sense)
+    val secondOrderByClause = request.orderQuery match {
+      case MetadataQuery(LastModified, _, _) => ""
+      case _                                 => ", d.last_modified_time DESC"
+    }
+
+    // Deterministic tie-breaker so Summary pagination and Detail prev/next always see identical ordering
+    val orderByClauses = firstOrderByClause + secondOrderByClause + ", d.data_id DESC"
+
+    val rowNumSQL     = Provider.rowNumSQL(
+      provider   = request.provider,
+      connection = connection,
+      orderBy    = orderByClauses
+    )
+    val rowNumCol     = rowNumSQL.col
+    val rowNumOrderBy = rowNumSQL.orderBy
+    val rowNumTable   = rowNumSQL.table match {
+      case Some(table) => table + ","
+      case None        => ""
+    }
+
+    val orderedSubquerySQL =
+      s"""SELECT
+         |    d.*,
+         |    $rowNumCol
+         |FROM
+         |    (
+         |        SELECT
+         |            c.*, $orderByAliasing
+         |        FROM
+         |            $rowNumTable
+         |            (
+         |                $innerSQL
+         |            ) s
+         |        INNER JOIN
+         |            orbeon_i_current c
+         |            ON c.data_id = s.data_id
+         |    ) d
+         |$rowNumOrderBy""".stripMargin
+
+    val allStatementParts = orderByStatementPartOpt.toList ::: statementParts
+
+    PreparedSearchQuery(
+      innerSQL           = innerSQL,
+      statementParts     = statementParts,
+      orderedSubquerySQL = orderedSubquerySQL,
+      allStatementParts  = allStatementParts
+    )
+  }
+
+  private def executeSearchCount(
+    connection    : Connection,
+    innerSQL      : String,
+    statementParts: List[StatementPart]
+  )(implicit
+    indentedLogger: IndentedLogger
+  ): Int = {
+    val sql =
+      s"""SELECT count(*)
+         |  FROM (
+         |       $innerSQL
+         |       ) a
+         |""".stripMargin
+
+    debug(s"search total query\n$sql")
+    executeQuery(connection, sql, statementParts) { rs =>
+      rs.next()
+      rs.getInt(1)
+    }
+  }
+
+  private def readDocumentMetadata(rs: java.sql.ResultSet): DocumentMetadata =
+    DocumentMetadata(
+      documentId       = rs.getString("document_id"),
+      draft            = rs.getString("draft") == "Y",
+      createdTime      = rs.getTimestamp("created"),
+      lastModifiedTime = rs.getTimestamp("last_modified_time"),
+      createdBy        = UserAndGroup.fromStrings(rs.getString("username"),         rs.getString("groupname")),
+      lastModifiedBy   = UserAndGroup.fromStrings(rs.getString("last_modified_by"), ""),
+      workflowStage    = Option(rs.getString("stage")),
+      organizationId   = RelationalUtils.getIntOpt(rs, "organization_id")
+    )
+
+  private def computeOperations(
+    connection        : Connection,
+    request           : SearchRequest,
+    permissions       : SearchPermissions,
+    metadata          : DocumentMetadata,
+    organizationsCache: mutable.Map[Int, Organization]
+  )(implicit
+    externalContext   : ExternalContext,
+    indentedLogger    : IndentedLogger
+  ): String = {
+    def readFromDatabase(id: Int) = OrganizationSupport.read(connection, OrganizationId(id)).get
+    val organization              = metadata.organizationId.map(id => organizationsCache.getOrElseUpdate(id, readFromDatabase(id)))
+    val check                     = CheckWithDataUser(metadata.createdBy, organization)
+    val operations                = PermissionsAuthorization.authorizedOperations(permissions.formPermissions, request.credentials, check)
+    Operations.serialize(operations, normalized = true).mkString(" ")
+  }
+
   // TODO: The methods below are used by the search API, but also by the distinct values API. Should we leave them
   //  here, as they're more closely associated with the search API, or move them elsewhere (e.g. in the parent package),
   //  in which case some classes/methods should be renamed (SearchVersion, SearchPermissions, doSearch, etc.)?
@@ -121,94 +281,14 @@ object SearchLogic {
     ) {
       (connection: Connection, commonAndPermissionsParts: List[StatementPart], permissions: SearchPermissions) =>
 
-        val statementParts = commonAndPermissionsParts ++ metadataPart(request).toList ++ List(
-          columnFilterPart  (request),
-          draftsPart        (request),
-          freeTextFilterPart(request)
-        )
-        val innerSQL       = buildQuery(statementParts)
+        val prepared    = prepareSearchQuery(request, connection, commonAndPermissionsParts)
+        val searchCount = executeSearchCount(connection, prepared.innerSQL, prepared.statementParts)
 
-        val searchCount = {
-          val sql =
-            s"""SELECT count(*)
-               |  FROM (
-               |       $innerSQL
-               |       ) a
-             """.stripMargin
+        val startOffsetZeroBased = (request.pageNumber - 1) * request.pageSize
 
-          debug(s"search total query\n$sql")
-          executeQuery(connection, sql, statementParts) { rs =>
-            rs.next()
-            rs.getInt(1)
-          }
-        }
-
-        val orderDirection = request.orderQuery.orderDirection.get
-
-        // We'll refer to the order by column as "sort_column"
-        val (orderByAliasing, orderByStatementPartOpt) = request.orderQuery match {
-          case controlQuery @ ControlQuery(controlPath, _, _) =>
-            val aggregateFunction = orderDirection match {
-              case Ascending  => "MIN"
-              case Descending => "MAX"
-            }
-            val controlColumn = s"t.${controlQuery.sqlColumn}"
-            // DB2, Oracle, and SQL Server use CLOB/NTEXT data types for control values, which cannot be used in ORDER
-            // BY clauses, so we cast them to VARCHAR.
-            val controlColumnWithCast = request.provider match {
-              case _         => controlColumn
-            }
-            (
-              s"(SELECT $aggregateFunction($controlColumnWithCast) FROM orbeon_i_control_text t WHERE t.data_id = s.data_id AND t.control = ?) AS sort_column",
-              Some(StatementPart("", List[Setter]((ps, i) => ps.setString(i, controlPath))))
-            )
-          case _ =>
-            (
-              s"c.${request.orderQuery.sqlColumn} AS sort_column",
-              None
-            )
-        }
-
-        // First order by clause (specified by request), with CAST if necessary
-        val firstOrderByClause = s"d.sort_column ${orderDirection.sql}"
-
-        // Second order by clause (we order by last_modified_time DESC as well, if it makes sense)
-        val secondOrderByClause = request.orderQuery match {
-          case MetadataQuery(LastModified, _, _) => ""
-          case _                                 => ", d.last_modified_time DESC"
-        }
-
-        val orderByClauses = firstOrderByClause + secondOrderByClause
-
-        // Build SQL and create statement
-        val sql = {
-          val startOffsetZeroBased = (request.pageNumber - 1) * request.pageSize
-          val rowNumSQL            = Provider.rowNumSQL(
-            provider       = request.provider,
-            connection     = connection,
-            orderBy        = orderByClauses,
-          )
-          val rowNumCol            = rowNumSQL.col
-          val rowNumOrderBy        = rowNumSQL.orderBy
-          val rowNumTable          = rowNumSQL.table match {
-            case Some(table) => table + ","
-            case None        => ""
-          }
-
-          /*
-          TODO: Is the INNER JOIN below really necessary? We end up doing it on orbeon_i_current only, i.e.
-                  SELECT c.*
-                  FROM   (SELECT DISTINCT c.data_id
-                          FROM   orbeon_i_current c
-                          WHERE  c.app = ?
-                                 AND c.form = ?
-                                 AND c.form_version = ?) s
-                         INNER JOIN orbeon_i_current c
-                                 ON c.data_id = s.data_id
-           */
-
-          // Use `LEFT JOIN` instead of regular join, in case the form doesn't have any control marked
-          // to be indexed, in which case there won't be anything for it in `orbeon_i_control_text`.
+        // Use `LEFT JOIN` instead of regular join, in case the form doesn't have any control marked
+        // to be indexed, in which case there won't be anything for it in `orbeon_i_control_text`.
+        val sql =
           s"""SELECT
              |    c.*,
              |    t.control,
@@ -216,23 +296,7 @@ object SearchLogic {
              |    t.val
              |FROM
              |    (
-             |        SELECT
-             |            d.*,
-             |            $rowNumCol
-             |        FROM
-             |            (
-             |                SELECT
-             |                    c.*, $orderByAliasing
-             |                FROM
-             |                    $rowNumTable
-             |                    (
-             |                        $innerSQL
-             |                    ) s
-             |                INNER JOIN
-             |                    orbeon_i_current c
-             |                    ON c.data_id = s.data_id
-             |            ) d
-             |        $rowNumOrderBy
+             |        ${prepared.orderedSubquerySQL}
              |    ) c
              | LEFT JOIN
              |    orbeon_i_control_text t
@@ -243,30 +307,19 @@ object SearchLogic {
              |        AND     ${startOffsetZeroBased + request.pageSize}
              | ORDER BY row_num
              |""".stripMargin
-        }
         debug(s"search items query\n$sql")
 
-        val allStatementParts            = orderByStatementPartOpt.toList ::: statementParts
-        val rawDocumentMetadataAndValues = executeQuery(connection, sql, allStatementParts) { documentsResultSet =>
+        val rawDocumentMetadataAndValues = executeQuery(connection, sql, prepared.allStatementParts) { documentsResultSet =>
 
           Iterator.iterateWhile(
             cond = documentsResultSet.next(),
             elem = (
-                DocumentMetadata(
-                  documentId       = documentsResultSet.getString                 ("document_id"),
-                  draft            = documentsResultSet.getString                 ("draft") == "Y",
-                  createdTime      = documentsResultSet.getTimestamp              ("created"),
-                  lastModifiedTime = documentsResultSet.getTimestamp              ("last_modified_time"),
-                  createdBy        = UserAndGroup.fromStrings(documentsResultSet.getString("username"),         documentsResultSet.getString("groupname")),
-                  lastModifiedBy   = UserAndGroup.fromStrings(documentsResultSet.getString("last_modified_by"), ""),
-                  workflowStage    = Option(documentsResultSet.getString          ("stage")),
-                  organizationId   = RelationalUtils.getIntOpt(documentsResultSet, "organization_id")
-                ),
-                DocumentValue(
-                  control          = documentsResultSet.getString                 ("control"),
-                  pos              = documentsResultSet.getInt                    ("pos"),
-                  value            = documentsResultSet.getString                 ("val")
-                )
+              readDocumentMetadata(documentsResultSet),
+              DocumentValue(
+                control = documentsResultSet.getString("control"),
+                pos     = documentsResultSet.getInt("pos"),
+                value   = documentsResultSet.getString("val")
+              )
             )
           ).toList
         }
@@ -281,13 +334,128 @@ object SearchLogic {
 
         // Compute possible operations for each document
         val organizationsCache = mutable.Map[Int, Organization]()
-        val documents = documentMetadataAndValues.map{ case (metadata, values) =>
-            def readFromDatabase(id: Int) = OrganizationSupport.read(connection, OrganizationId(id)).get
-            val organization              = metadata.organizationId.map(id => organizationsCache.getOrElseUpdate(id, readFromDatabase(id)))
-            val check                     = CheckWithDataUser(metadata.createdBy, organization)
-            val operations                = PermissionsAuthorization.authorizedOperations(permissions.formPermissions, request.credentials, check)
-            Document(metadata, Operations.serialize(operations, normalized = true).mkString(" "), values)
-          }
+        val documents = documentMetadataAndValues.map { case (metadata, values) =>
+          val operations = computeOperations(connection, request, permissions, metadata, organizationsCache)
+          Document(metadata, operations, values)
+        }
         (documents, searchCount)
+    }
+
+  def doSearchAround(
+    request        : SearchRequest,
+    around         : AroundDocument,
+    connectionOpt  : Option[Connection]
+  )(implicit
+    externalContext: ExternalContext,
+    indentedLogger : IndentedLogger
+  ): AroundSearchResult =
+    SearchLogic.runBodyIfHasSomePermissions(
+      request           = request,
+      queries           = request.queries,
+      freeTextSearch    = request.freeTextSearch,
+      noPermissionValue = AroundSearchResult(0, None, None, None, None),
+      connectionOpt     = connectionOpt
+    ) {
+      (connection: Connection, commonAndPermissionsParts: List[StatementPart], permissions: SearchPermissions) =>
+
+        val prepared    = prepareSearchQuery(request, connection, commonAndPermissionsParts)
+        val searchCount = executeSearchCount(connection, prepared.innerSQL, prepared.statementParts)
+
+        if (searchCount == 0) {
+          AroundSearchResult(0, None, None, None, None)
+        } else {
+          // 1. Find the 1-based row_num of the target document
+          val findPositionSql =
+            s"""SELECT c.row_num
+               |  FROM (
+               |       ${prepared.orderedSubquerySQL}
+               |       ) c
+               | WHERE c.document_id = ?
+               |   AND c.draft = ?
+               |""".stripMargin
+
+          debug(s"search around position query\n$findPositionSql")
+          val positionParts = prepared.allStatementParts :+ StatementPart(
+            "",
+            List[Setter](
+              (ps, i) => ps.setString(i, around.documentId),
+              (ps, i) => ps.setString(i, if (around.isDraft) "Y" else "N")
+            )
+          )
+          val currentPosOpt: Option[Int] =
+            executeQuery(connection, findPositionSql, positionParts) { rs =>
+              if (rs.next()) Some(rs.getInt(1)) else None
+            }
+
+          val (prevRowNumOpt, currentRowNumOpt, nextRowNumOpt) =
+            currentPosOpt match {
+              case Some(pos) =>
+                (
+                  Option(pos - 1).filter(_ >= 1),
+                  Some(pos),
+                  Option(pos + 1).filter(_ <= searchCount)
+                )
+              case None =>
+                around.fallbackPosition match {
+                  case Some(fallbackPos) =>
+                    (
+                      Option((fallbackPos - 1).min(searchCount)).filter(_ >= 1),
+                      None,
+                      Option(fallbackPos).filter(p => p >= 1 && p <= searchCount)
+                    )
+                  case None =>
+                    (None, None, None)
+                }
+            }
+
+          val targetRowNums = List(prevRowNumOpt, currentRowNumOpt, nextRowNumOpt).flatten.distinct
+
+          if (targetRowNums.isEmpty) {
+            AroundSearchResult(searchCount, currentPosOpt, None, None, None)
+          } else {
+            // 2. Fetch metadata for previous/current/next rows without joining control_text
+            val placeholders = targetRowNums.map(_ => "?").mkString(", ")
+            val neighborsSql =
+              s"""SELECT c.*
+                 |  FROM (
+                 |       ${prepared.orderedSubquerySQL}
+                 |       ) c
+                 | WHERE c.row_num IN ($placeholders)
+                 | ORDER BY c.row_num
+                 |""".stripMargin
+
+            debug(s"search around neighbors query\n$neighborsSql")
+            val neighborParts = prepared.allStatementParts :+ StatementPart(
+              "",
+              targetRowNums.map(rn => ((ps, i) => ps.setInt(i, rn)): Setter)
+            )
+            val rowsByPos: Map[Int, DocumentMetadata] =
+              executeQuery(connection, neighborsSql, neighborParts) { rs =>
+                Iterator.iterateWhile(
+                  cond = rs.next(),
+                  elem = rs.getInt("row_num") -> readDocumentMetadata(rs)
+                ).toMap
+              }
+
+            val organizationsCache = mutable.Map[Int, Organization]()
+
+            def toPositionedDoc(rowNumOpt: Option[Int]): Option[PositionedDocument] =
+              for {
+                rowNum   <- rowNumOpt
+                metadata <- rowsByPos.get(rowNum)
+              } yield {
+                val operations = computeOperations(connection, request, permissions, metadata, organizationsCache)
+                PositionedDocument(Document(metadata, operations, Nil), rowNum)
+              }
+
+            AroundSearchResult(
+              total           = searchCount,
+              currentPosition = currentPosOpt,
+              previous        = toPositionedDoc(prevRowNumOpt),
+              current         = toPositionedDoc(currentRowNumOpt),
+              next            = toPositionedDoc(nextRowNumOpt)
+            )
+          }
+        }
     }
 }

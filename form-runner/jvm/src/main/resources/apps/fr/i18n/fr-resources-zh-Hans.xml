@@ -56,6 +56,8 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; 刷新</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 下一步</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 上一步</wizard-prev>
+        <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 上一个</search-prev>
+        <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 下一个</search-next>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; 内容</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 重新上传</reupload>
 
@@ -278,6 +280,8 @@
             <process-error>运行流程时出错。请联系应用程序管理员。</process-error>
             <wizard-prev-error>请在向后移动前修复错误</wizard-prev-error>
             <wizard-next-error>请在向前移动前修复错误</wizard-next-error>
+            <no-previous-document>没有符合搜索条件的上一篇文档。</no-previous-document>
+            <no-next-document>没有符合搜索条件的下一篇文档。</no-next-document>
             <clear-confirm-message>您确定要清除此页面上的所有字段吗？如果您尚未保存，您的数据将会丢失。</clear-confirm-message>
             <error-dialog-title>无法完成操作</error-dialog-title>
             <confirmation-dialog-title>确认</confirmation-dialog-title>
@@ -345,6 +349,8 @@
             <clear-out-of-range>清除超出范围的值</clear-out-of-range>
             <captcha-label>验证码</captcha-label>
             <captcha-alert>请检查您对验证码挑战的回答</captcha-alert>
+            <search-prev>上一个文档</search-prev>
+            <search-next>下一个文档</search-next>
         </labels>
         <hints>
             <upload-max-size-per-file>文件必须小于{0}。</upload-max-size-per-file>

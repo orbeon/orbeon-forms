@@ -69,4 +69,45 @@ object SearchResult {
 
     NodeConversions.elemToSAX(documentsElem, receiver)
   }
+
+  def outputAroundResult(
+    aroundResult: SearchLogic.AroundSearchResult,
+    receiver    : XMLReceiver
+  )(implicit
+    indentedLogger: IndentedLogger
+  ): Unit = {
+
+    def docElem(relation: String, positioned: SearchLogic.PositionedDocument): xml.Elem = {
+      val doc = positioned.document
+      <document
+        relation            ={relation}
+        position            ={positioned.position.toString}
+        created             ={DateUtils.formatIsoDateTimeUtc(doc.metadata.createdTime.toInstant)}
+        last-modified       ={DateUtils.formatIsoDateTimeUtc(doc.metadata.lastModifiedTime.toInstant)}
+        created-by          ={doc.metadata.createdBy.map(_.username).map(xml.Text(_))}
+        created-by-groupname={doc.metadata.createdBy.flatMap(_.groupname).map(xml.Text(_))}
+        last-modified-by    ={doc.metadata.lastModifiedBy.map(_.username).map(xml.Text(_))}
+        workflow-stage      ={doc.metadata.workflowStage.map(xml.Text(_))}
+        name                ={doc.metadata.documentId}
+        draft               ={doc.metadata.draft.toString}
+        operations          ={doc.operations}/>
+    }
+
+    val entries =
+      aroundResult.previous.map(docElem("previous", _)).toList :::
+      aroundResult.current .map(docElem("current",  _)).toList :::
+      aroundResult.next    .map(docElem("next",     _)).toList
+
+    val documentsElem =
+      <documents
+        search-total           ={aroundResult.total.toString}
+        around-document-supported="true"
+        current-position       ={aroundResult.currentPosition.map(_.toString).map(xml.Text(_))}>{
+        entries
+      }</documents>
+
+    debug(s"search around result: ${documentsElem.toString}")
+
+    NodeConversions.elemToSAX(documentsElem, receiver)
+  }
 }

@@ -77,7 +77,9 @@ trait FormRunnerActions
       ("review"                 -> tryNavigateToReview   _) +
       ("edit"                   -> tryNavigateToEdit     _) +
       ("change-mode"            -> tryChangeMode         _) +
-      ("open-rendered-format"   -> tryOpenRenderedFormat _)
+      ("open-rendered-format"   -> tryOpenRenderedFormat _) +
+      ("search-prev"            -> tryNavigateSearchPrev _) +
+      ("search-next"            -> tryNavigateSearchNext _)
 
   override protected def onAnalyticsValidationFailed(xfcd: XFormsContainingDocument): Unit =
     InMemoryFormSessionAnalyticsStore.extractFormRunnerDocInfo(xfcd).foreach { info =>
@@ -772,12 +774,97 @@ trait FormRunnerActions
       if (! isSupportedDetailMode(modePublicNameString, excludeSecondaryModes = true) || modePublicNameString == FormRunnerDetailMode.Pdf.publicName)
         throw new IllegalArgumentException(s"Unsupported detail mode navigation for mode: `$modePublicNameString`")
 
+      val searchNavParams =
+        topLevelInstance(PersistenceModel, "fr-search-navigation-instance")
+          .map(_.rootElement)
+          .toList
+          .flatMap { navRoot =>
+            val searchParamOpt = navRoot.elemValueOpt("search-param").flatMap(_.trimAllToOpt)
+            val posParamOpt    = navRoot.elemValueOpt("fallback-position").flatMap(_.trimAllToOpt)
+            searchParamOpt.toList.map(SummarySearchContext.SearchParamName -> _) :::
+              posParamOpt.toList.filter(_ => searchParamOpt.isDefined).map(SummarySearchContext.SearchPosParamName -> _)
+          }
+
       tryChangeModeImpl(
         ReplaceType.All,
-        s"/fr/$app/$form/$modePublicNameString/$document" -> Nil,
+        s"/fr/$app/$form/$modePublicNameString/$document" -> searchNavParams,
         formRunnerParams.modeType(frc.customModes),
         preserveRenderedFormats = preserveRenderedFormats
       )
+    }
+
+  def tryNavigateSearchPrev(params: ActionParams): ActionResult =
+    tryNavigateSearchNeighbor(SummarySearchNavigation.Direction.Previous)
+
+  def tryNavigateSearchNext(params: ActionParams): ActionResult =
+    tryNavigateSearchNeighbor(SummarySearchNavigation.Direction.Next)
+
+  private def tryNavigateSearchNeighbor(direction: SummarySearchNavigation.Direction): ActionResult =
+    ActionResult.trySync {
+      implicit val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, mode) = FormRunnerParams()
+
+      val navInstanceOpt = topLevelInstance(PersistenceModel, "fr-search-navigation-instance")
+
+      val encodedSearchOpt =
+        navInstanceOpt
+          .flatMap(_.rootElement.elemValueOpt("search-param"))
+          .flatMap(_.trimAllToOpt)
+
+      encodedSearchOpt.foreach { encodedSearch =>
+        val fallbackPosOpt =
+          navInstanceOpt
+            .flatMap(_.rootElement.elemValueOpt("fallback-position"))
+            .flatMap(SummarySearchNavigation.parsePositionOpt)
+
+        val isDraft =
+          formRunnerParams.isDraft.getOrElse(false)
+
+        val appForm      = AppForm(app, form)
+        val neighborsOpt =
+          SummarySearchNavigation.resolveNeighbors(
+            appForm             = appForm,
+            documentId          = document,
+            isDraft             = isDraft,
+            encodedSearch       = encodedSearch,
+            fallbackPositionOpt = fallbackPosOpt
+          )
+
+        // Update fr-search-navigation-instance with fresh state
+        navInstanceOpt.foreach { navInstance =>
+          val freshXml =
+            SummarySearchNavigation.toNavigationXml(
+              appForm             = appForm,
+              currentMode         = mode,
+              encodedSearch       = encodedSearch,
+              fallbackPositionOpt = fallbackPosOpt,
+              neighborsOpt        = neighborsOpt
+            )
+          insert(into = Nil, after = navInstance.rootElement, origin = freshXml)
+        }
+
+        val targetNeighborOpt =
+          neighborsOpt.flatMap { neighbors =>
+            direction match {
+              case SummarySearchNavigation.Direction.Previous => neighbors.previous
+              case SummarySearchNavigation.Direction.Next     => neighbors.next
+            }
+          }
+
+        val targetHrefOpt =
+          targetNeighborOpt.flatMap(SummarySearchNavigation.buildNeighborHref(appForm, mode, _, encodedSearch))
+
+        targetHrefOpt match {
+          case Some(href) =>
+            tryNavigate(Map(Some("uri") -> href))
+          case None =>
+            val resourceName =
+              direction match {
+                case SummarySearchNavigation.Direction.Previous => "no-previous-document"
+                case SummarySearchNavigation.Direction.Next     => "no-next-document"
+              }
+            trySuccessMessage(Map(Some("resource") -> resourceName))
+        }
+      }
     }
 
   def tryOpenRenderedFormat(params: ActionParams): ActionResult =

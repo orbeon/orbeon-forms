@@ -58,6 +58,8 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Frissítés"</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Következő</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Előző</wizard-prev>
+        <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Előző</search-prev>
+        <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Következő</search-next>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Tartalom</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Újrafeltöltés</reupload>
 
@@ -283,6 +285,8 @@
             <process-error>Hiba történt a folyamat futtatása közben. Kérjük, forduljon az alkalmazás rendszergazdájához.</process-error>
             <wizard-prev-error>A visszalépés előtt javítsa a hibákat</wizard-prev-error>
             <wizard-next-error>A továbblépés előtt javítsa a hibákat</wizard-next-error>
+            <no-previous-document>Nincs a keresésnek megfelelő előző dokumentum.</no-previous-document>
+            <no-next-document>Nincs a keresésnek megfelelő következő dokumentum.</no-next-document>
             <clear-confirm-message>Biztosan törölni szeretné az összes mezőt ezen az oldalon? Az adatok elvesznek, ha nem mentette azokat.</clear-confirm-message>
             <error-dialog-title>A művelet nem hajtható végre</error-dialog-title>
             <confirmation-dialog-title>Megerősítés</confirmation-dialog-title>
@@ -350,6 +354,8 @@
             <clear-out-of-range>Tartományon kívüli érték(ek) törlése</clear-out-of-range>
             <captcha-label>CAPTCHA</captcha-label>
             <captcha-alert>Kérjük, ellenőrizze a választ a CAPTCHA kihívásra</captcha-alert>
+            <search-prev>Előző dokumentum</search-prev>
+            <search-next>Következő dokumentum</search-next>
         </labels>
         <hints>
             <upload-max-size-per-file>A fájloknak {0} alattinak kell lenniük.</upload-max-size-per-file>

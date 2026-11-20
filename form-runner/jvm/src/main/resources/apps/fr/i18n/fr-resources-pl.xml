@@ -58,6 +58,8 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Odśwież</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Następna sekcja</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Poprzednia sekcja</wizard-prev>
+        <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Poprzedni</search-prev>
+        <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Następny</search-next>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Zawartość</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Wgraj ponownie</reupload>
 
@@ -283,6 +285,8 @@
             <process-error>W trakcie wykonywania procesu wystąpił błąd. Skontaktuj się się z administratorem aplikacji.</process-error>
             <wizard-prev-error>Popraw błędy przed przejściem do poprzedniego kroku</wizard-prev-error>
             <wizard-next-error>Popraw błędy przed przejściem do następnego kroku</wizard-next-error>
+            <no-previous-document>Brak poprzedniego dokumentu pasującego do wyszukiwania.</no-previous-document>
+            <no-next-document>Brak następnego dokumentu pasującego do wyszukiwania.</no-next-document>
             <clear-confirm-message>Czy jesteś pewien, że chcesz wyczyścić wszystkie pola na tej stronie? Twoje dane zostaną utraceone, jeśli nie zostały wcześniej zapisane.</clear-confirm-message>
             <error-dialog-title>Nie można ukończyć akcji.</error-dialog-title>
             <confirmation-dialog-title>Potwierdzenie</confirmation-dialog-title>
@@ -351,6 +355,8 @@
             <clear-out-of-range>Wyczyść wartości spoza dozwolonego zakresu</clear-out-of-range>
             <captcha-label>Captcha</captcha-label>
             <captcha-alert>Wprowadzona wartość nie zgadza się z obrazem, spróbuj ponownie.</captcha-alert>
+            <search-prev>Poprzedni dokument</search-prev>
+            <search-next>Następny dokument</search-next>
         </labels>
         <hints>
             <upload-max-size-per-file>Pliki muszą mieć rozmiar poniżej {0}.</upload-max-size-per-file>

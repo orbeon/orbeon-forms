@@ -69,6 +69,44 @@ trait FormRunnerSummary {
     }
 
   //@XPathFunction
+  def encodeSummarySearch(searchInstance: NodeInfo, versionOrAll: String): String =
+    SummarySearchContext.encode(
+      SummarySearchContext.fromSearchInstance(searchInstance, versionOrAll)
+    )
+
+  //@XPathFunction
+  def computeSearchNavigation(
+    app          : String,
+    form         : String,
+    mode         : String,
+    documentId   : String,
+    isDraft      : Boolean,
+    encodedSearch: String,
+    fallbackPos  : String
+  ): NodeInfo = {
+    implicit val indentedLogger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("form-runner")
+    val appForm             = AppForm(app, form)
+    val fallbackPositionOpt = SummarySearchNavigation.parsePositionOpt(fallbackPos)
+    val neighborsOpt        =
+      encodedSearch.trimAllToOpt.flatMap { searchParam =>
+        SummarySearchNavigation.resolveNeighbors(
+          appForm             = appForm,
+          documentId          = documentId,
+          isDraft             = isDraft,
+          encodedSearch       = searchParam,
+          fallbackPositionOpt = fallbackPositionOpt
+        )
+      }
+    SummarySearchNavigation.toNavigationXml(
+      appForm             = appForm,
+      currentMode         = mode,
+      encodedSearch       = encodedSearch.trimAllToEmpty,
+      fallbackPositionOpt = fallbackPositionOpt,
+      neighborsOpt        = neighborsOpt
+    )
+  }
+
+  //@XPathFunction
   def buildSummaryLinkButton(app: String, form: String, buttonName: String, documentId: String, lang: String): String = {
 
     val (mode, params) = buttonName match {
@@ -488,6 +526,8 @@ object FormRunnerSummary extends FormRunnerSummary {
     "have-drafts",
     "have-read-only",
     "labels-class",
+    "encoded-search-context",
+    "search-page-offset",
     "document",
     "current-document-name",
     "selection-token",

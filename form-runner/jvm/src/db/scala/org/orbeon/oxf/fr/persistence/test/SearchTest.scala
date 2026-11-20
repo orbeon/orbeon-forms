@@ -804,6 +804,83 @@ class SearchTest
         }
       }
     }
+
+    it("must support around-document neighbor lookup and fallback position") {
+      withTestSafeRequestContext { implicit safeRequestCtx =>
+        Connect.withOrbeonTables("around-document search") { (_, provider) =>
+          val testForm = TestForm(provider, controls = Seq(TestForm.Control("label")))
+          val version  = Specific(1)
+
+          testForm.putFormDefinition(version)
+
+          val docs = List(
+            FormData(id = "doc-a", singleControlValue = "Alpha"),
+            FormData(id = "doc-b", singleControlValue = "Bravo"),
+            FormData(id = "doc-c", singleControlValue = "Charlie"),
+            FormData(id = "doc-d", singleControlValue = "Delta")
+          )
+          testForm.putFormData(version, docs)
+
+          def aroundSearch(docId: String, fallbackPosOpt: Option[Int] = None, filterOpt: Option[String] = None): Document =
+            NodeConversions.elemToOrbeonDom(
+              <search>
+                <query path="section-1/control-1" match="substring" sort="asc">{filterOpt.getOrElse("")}</query>
+                <around-document id={docId} draft="false" position={fallbackPosOpt.map(_.toString).orNull}/>
+                <page-size>10</page-size>
+                <page-number>1</page-number>
+              </search>
+            )
+
+          def assertAround(
+            req              : Document,
+            expectedTotal    : Int,
+            expectedCurrent  : Option[Int],
+            expectedPrev     : Option[(String, Int)],
+            expectedNext     : Option[(String, Int)]
+          ): Unit =
+            assertCall(
+              actualRequest = HttpCall.SolicitedRequest(
+                path    = HttpCall.searchURL(provider),
+                version = Unspecified,
+                method  = POST,
+                body    = Some(HttpCall.XML(req))
+              ),
+              assertResponse = actualResponse => {
+                assert(actualResponse.code == StatusCode.Ok)
+                val root = IOSupport.readOrbeonDom(new ByteArrayInputStream(actualResponse.body)).getRootElement
+                assert(root.attributeValue("around-document-supported") == "true")
+                assert(root.attributeValue("search-total").toInt == expectedTotal)
+                assert(Option(root.attributeValue("current-position")).map(_.toInt) == expectedCurrent)
+
+                val byRel = root.elements("document").map { e =>
+                  e.attributeValue("relation") -> (e.attributeValue("name"), e.attributeValue("position").toInt)
+                }.toMap
+
+                assert(byRel.get("previous") == expectedPrev)
+                assert(byRel.get("next")     == expectedNext)
+              }
+            )
+
+          // First item (Alpha): no prev, next is Bravo (pos 2)
+          assertAround(aroundSearch("doc-a"), 4, Some(1), None, Some("doc-b" -> 2))
+
+          // Middle item (Bravo): prev is Alpha (1), next is Charlie (3)
+          assertAround(aroundSearch("doc-b"), 4, Some(2), Some("doc-a" -> 1), Some("doc-c" -> 3))
+
+          // Last item (Delta): prev is Charlie (3), no next
+          assertAround(aroundSearch("doc-d"), 4, Some(4), Some("doc-c" -> 3), None)
+
+          // Filtered search ("l" matches Alpha, Charlie, Delta): Charlie is pos 2 of 3
+          assertAround(aroundSearch("doc-c", filterOpt = Some("l")), 3, Some(2), Some("doc-a" -> 1), Some("doc-d" -> 3))
+
+          // Missing document with fallback position 2: prev is pos 1 (Alpha), next is pos 2 (Bravo)
+          assertAround(aroundSearch("doc-missing", fallbackPosOpt = Some(2)), 4, None, Some("doc-a" -> 1), Some("doc-b" -> 2))
+
+          // Missing document with fallback position past end (5): prev is pos 4 (Delta), no next
+          assertAround(aroundSearch("doc-missing", fallbackPosOpt = Some(5)), 4, None, Some("doc-d" -> 4), None)
+        }
+      }
+    }
   }
 
   def testWithSimpleValues(

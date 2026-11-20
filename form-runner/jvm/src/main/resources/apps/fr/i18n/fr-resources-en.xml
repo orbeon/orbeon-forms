@@ -58,6 +58,8 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Refresh"</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Next</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Prev</wizard-prev>
+        <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Previous</search-prev>
+        <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Next</search-next>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Content</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Re-Upload</reupload>
 
@@ -283,6 +285,8 @@
             <process-error>There was an error running the process. Please contact the application administrator.</process-error>
             <wizard-prev-error>Please fix errors before moving backward</wizard-prev-error>
             <wizard-next-error>Please fix errors before moving forward</wizard-next-error>
+            <no-previous-document>There is no previous document matching the search.</no-previous-document>
+            <no-next-document>There is no next document matching the search.</no-next-document>
             <clear-confirm-message>Are you sure you want to clear all the fields on this page? Your data will be lost if you haven't saved it.</clear-confirm-message>
             <error-dialog-title>Unable to complete action</error-dialog-title>
             <confirmation-dialog-title>Confirmation</confirmation-dialog-title>
@@ -350,6 +354,8 @@
             <clear-out-of-range>Clear out of range value(s)</clear-out-of-range>
             <captcha-label>CAPTCHA</captcha-label>
             <captcha-alert>Please check your answer to the CAPTCHA challenge</captcha-alert>
+            <search-prev>Previous document</search-prev>
+            <search-next>Next document</search-next>
         </labels>
         <hints>
             <upload-max-size-per-file>Files must be under {0}.</upload-max-size-per-file>

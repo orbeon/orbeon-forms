@@ -58,6 +58,8 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Verversen"</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Volgende</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Vorige</wizard-prev>
+        <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Vorige</search-prev>
+        <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Volgende</search-next>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Inhoud</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Opnieuw uploaden</reupload>
 
@@ -283,6 +285,8 @@
             <process-error>Er was een probleem bij het starten van het proces. Neem contact op met de databasebeheerder.</process-error>
             <wizard-prev-error>Corrigeer de fouten voordat u teruggaat.</wizard-prev-error>
             <wizard-next-error>Corrigeer de fouten voordat u verdergaat.</wizard-next-error>
+            <no-previous-document>Er is geen vorig document dat overeenkomt met de zoekopdracht.</no-previous-document>
+            <no-next-document>Er is geen volgend document dat overeenkomt met de zoekopdracht.</no-next-document>
             <clear-confirm-message>Weet u zeker dat alle velden op deze pagina wilt wissen? Uw gegevens zijn weg als u deze niet hebt opgeslagen.</clear-confirm-message>
             <error-dialog-title>Kon actie niet voltooien</error-dialog-title>
             <confirmation-dialog-title>Bevestiging</confirmation-dialog-title>
@@ -350,6 +354,8 @@
             <clear-out-of-range>Waarde(n) buiten bereik wissen</clear-out-of-range>
             <captcha-label>CAPTCHA</captcha-label>
             <captcha-alert>De ingevoerde waarde komt niet overeen met de afbeelding, probeer opnieuw</captcha-alert>
+            <search-prev>Vorig document</search-prev>
+            <search-next>Volgend document</search-next>
         </labels>
         <hints>
             <upload-max-size-per-file>Bestanden moeten kleiner zijn dan {0}.</upload-max-size-per-file>

@@ -54,9 +54,14 @@ object SearchRoute extends XmlNativeRoute {
           formDefinitionVersion
         )
 
-      val (result, count) = SearchLogic.doSearch(request, connectionOpt = None)
-
-      SearchResult.outputResult(request, result, count, getResponseXmlReceiverSetContentType)
+      request.aroundDocument match {
+        case Some(around) =>
+          val aroundResult = SearchLogic.doSearchAround(request, around, connectionOpt = None)
+          SearchResult.outputAroundResult(aroundResult, getResponseXmlReceiverSetContentType)
+        case None =>
+          val (result, count) = SearchLogic.doSearch(request, connectionOpt = None)
+          SearchResult.outputResult(request, result, count, getResponseXmlReceiverSetContentType)
+      }
     } catch {
       case e: IllegalArgumentException =>
         throw HttpStatusCodeException(StatusCode.BadRequest, throwable = Some(e))

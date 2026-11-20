@@ -236,8 +236,25 @@
 
             <xf:action event="fr-summary-view" if="$selection-is-one-document">
                 <xf:var
+                    name="encoded-search-context"
+                    value="instance('fr-last-search-context-instance')/encoded/string()"/>
+                <xf:var
+                    name="search-page-offset"
+                    value="xs:integer(instance('fr-last-search-context-instance')/page-offset)"/>
+                <xf:var
+                    name="selected-doc-pos"
+                    value="
+                        index-of(
+                            instance('fr-search-results-instance')/document/concat(if (@draft = 'true') then 'draft' else 'data', '/', @name),
+                            instance('fr-selection-instance')
+                        )[1]"/>
+                <xf:var
                     name="params"
-                    value="if ($selection-data-or-draft = 'draft') then 'draft=true' else ()"/>
+                    value="(
+                        'draft=true'[$selection-data-or-draft = 'draft'],
+                        concat('fr-search=', $encoded-search-context)[xxf:non-blank($encoded-search-context)],
+                        concat('fr-search-pos=', $search-page-offset + $selected-doc-pos)[xxf:non-blank($encoded-search-context) and exists($selected-doc-pos)]
+                    )"/>
                 <xf:load resource="/fr/{$app}/{$form}/view/{$selection-document-id}{if (exists($params)) then concat('?', string-join($params, '&amp;')) else ()}"/>
             </xf:action>
 
@@ -337,6 +354,14 @@
                     <column>last-modified</column>
                     <direction>desc</direction>
                 </order-by>
+            </xf:instance>
+
+            <!-- Last submitted search context passed to Detail pages for prev/next navigation -->
+            <xf:instance id="fr-last-search-context-instance" xxf:exclude-result-prefixes="#all">
+                <_>
+                    <encoded/>
+                    <page-offset>0</page-offset>
+                </_>
             </xf:instance>
 
             <!-- Contains search labels -->
@@ -475,9 +500,11 @@
 
                         <xf:group ref="instance('fr-form-instance')[exists(document)]">
                             <xf:var name="documents"      value="document"/>
-                            <xf:var name="have-drafts"    value="exists($documents[@draft = 'true'])"/>
-                            <xf:var name="have-read-only" value="exists($documents[not(xxf:split(@operations) = ('*', 'update'))])"/>
-                            <xf:var name="labels-class"   value="string-join(('fr-repeat-labels', if ($have-drafts or $have-read-only) then () else 'xforms-hidden'), ' ')"/>
+                            <xf:var name="have-drafts"            value="exists($documents[@draft = 'true'])"/>
+                            <xf:var name="have-read-only"         value="exists($documents[not(xxf:split(@operations) = ('*', 'update'))])"/>
+                            <xf:var name="labels-class"           value="string-join(('fr-repeat-labels', if ($have-drafts or $have-read-only) then () else 'xforms-hidden'), ' ')"/>
+                            <xf:var name="encoded-search-context" value="xxf:instance('fr-last-search-context-instance')/encoded/string()"/>
+                            <xf:var name="search-page-offset"     value="xs:integer(xxf:instance('fr-last-search-context-instance')/page-offset)"/>
 
                             <xh:div class="fr-search-results fr-table-frame">
                                 <xh:table class="table table-condensed">
@@ -521,7 +548,11 @@
                                                         ()"/>
                                             <xf:var
                                                 name="req-parameters-opt"
-                                                value="if ($document/@draft = 'true') then 'draft=true' else ()"/>
+                                                value="(
+                                                    'draft=true'[$document/@draft = 'true'],
+                                                    concat('fr-search=', $encoded-search-context)[xxf:non-blank($encoded-search-context)],
+                                                    concat('fr-search-pos=', $search-page-offset + position())[xxf:non-blank($encoded-search-context)]
+                                                )"/>
                                             <xf:var
                                                 name="current-document-href-opt"
                                                 value="
@@ -1092,6 +1123,12 @@
                     <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>
                 </xf:action>
                 <xf:action event="xforms-submit-done">
+                    <xf:setvalue
+                        ref="instance('fr-last-search-context-instance')/encoded"
+                        value="frf:encodeSummarySearch(instance('fr-search-instance'), if ($show-version-selector) then string(fr:form-version()) else 'all')"/>
+                    <xf:setvalue
+                        ref="instance('fr-last-search-context-instance')/page-offset"
+                        value="(xs:integer(instance('fr-search-instance')/page-number) - 1) * xs:integer(instance('fr-search-instance')/page-size)"/>
                     <xf:var name="i" value="instance('fr-dynamic-instance')//xf:instance[@id = 'fr-form-instance']/*"/>
                     <xf:delete
                         ref="$i/*"/>

@@ -121,6 +121,12 @@ case class MetadataQuery(
   override val sqlColumn: String = metadata.sqlColumn
 }
 
+case class AroundDocument(
+  documentId      : String,
+  isDraft         : Boolean,
+  fallbackPosition: Option[Int]
+)
+
 case class SearchRequest(
   provider           : Provider,
   appForm            : AppForm,
@@ -132,7 +138,8 @@ case class SearchRequest(
   queries            : List[Query],
   drafts             : Drafts,
   freeTextSearch     : Option[String],
-  anyOfOperations    : Option[Set[Operation]]
+  anyOfOperations    : Option[Set[Operation]],
+  aroundDocument     : Option[AroundDocument] = None
 ) extends SearchRequestCommon {
   val orderQuery: Query =
     queries.filter(_.orderDirection.isDefined) match {

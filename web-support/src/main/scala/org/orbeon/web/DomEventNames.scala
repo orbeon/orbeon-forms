@@ -12,6 +12,7 @@ object DomEventNames {
   val FocusOut                 = "focusout"
   val DOMActivate              = "DOMActivate"
   val Input                    = "input"
+  val Paste                    = "paste"
   val MouseOver                = "mouseover"
   val MouseOut                 = "mouseout"
   val Click                    = "click"

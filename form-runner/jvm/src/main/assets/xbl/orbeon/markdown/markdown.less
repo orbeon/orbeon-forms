@@ -97,7 +97,9 @@
         }
 
         .fr-markdown-write-panel {
-            display: block;
+            &:not(.xforms-disabled) {
+                display: block;
+            }
 
             .xforms-textarea {
                 display: block;
@@ -107,7 +109,9 @@
             textarea {
                 display: block;
                 width: 100%;
+                height: auto;
                 min-height: var(--orbeon-textarea-height);
+                field-sizing: content;
                 margin: 0;
                 border: 0;
                 border-radius: 0;
@@ -118,8 +122,16 @@
         }
 
         .fr-markdown-preview-panel {
+            &:not(.xforms-disabled) {
+                display: block;
+            }
+            box-sizing: border-box;
             min-height: var(--orbeon-textarea-height);
             padding: var(--orbeon-control-padding);
+
+            > .xforms-group:not(.xforms-disabled) {
+                display: block;
+            }
         }
 
         .fr-markdown-empty {

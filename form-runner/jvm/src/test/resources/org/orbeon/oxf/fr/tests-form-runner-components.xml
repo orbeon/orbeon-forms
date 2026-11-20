@@ -458,12 +458,13 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-summary≡body" class="fr-error-summary-body fr-level-error"/>
+                        <xxf:attribute for="my-summary≡body" name="role">region</xxf:attribute>
                         <xxf:control class="fr-level-error fr-error-single" id="my-summary≡xf-47⊙1"/>
                         <xxf:control id="my-summary≡xf-51⊙1">
                             <xxf:case id="my-summary≡xf-52⊙1" visibility="visible"/>
                             <xxf:case id="my-summary≡xf-60⊙1" visibility="hidden"/>
                         </xxf:control>
-                        <xxf:control id="my-summary≡xf-53⊙1" label="&lt;span class=&quot;fr-error-number&quot;&gt;1. &lt;/span&gt;&lt;div class=&quot;fr-error-label&quot;&gt;Note&lt;/div&gt;&lt;div class=&quot;fr-error-alert fr-error-alert-error&quot;&gt;Invalid note&lt;/div&gt;"/>
+                        <xxf:control id="my-summary≡xf-53⊙1" label="&lt;span class=&quot;fr-error-number&quot; aria-hidden=&quot;true&quot;&gt;1. &lt;/span&gt;&lt;div class=&quot;fr-error-label&quot;&gt;Note&lt;/div&gt;&lt;div class=&quot;fr-error-alert fr-error-alert-error&quot;&gt;Invalid note&lt;/div&gt;"/>
                         <xxf:control id="my-summary≡xf-61⊙1" relevant="false"/>
                         <xxf:control id="my-summary≡xf-62⊙1" relevant="false"/>
                         <xxf:control class="fr-level-error fr-error-single" id="my-summary≡xf-47⊙2"/>
@@ -471,7 +472,7 @@
                             <xxf:case id="my-summary≡xf-52⊙2" visibility="visible"/>
                             <xxf:case id="my-summary≡xf-60⊙2" visibility="hidden"/>
                         </xxf:control>
-                        <xxf:control id="my-summary≡xf-53⊙2" label="&lt;span class=&quot;fr-error-number&quot;&gt;2. &lt;/span&gt;&lt;div class=&quot;fr-error-label&quot;&gt;Last name&lt;/div&gt;&lt;div class=&quot;fr-error-alert fr-error-alert-error&quot;&gt;Invalid last name&lt;/div&gt;"/>
+                        <xxf:control id="my-summary≡xf-53⊙2" label="&lt;span class=&quot;fr-error-number&quot; aria-hidden=&quot;true&quot;&gt;2. &lt;/span&gt;&lt;div class=&quot;fr-error-label&quot;&gt;Last name&lt;/div&gt;&lt;div class=&quot;fr-error-alert fr-error-alert-error&quot;&gt;Invalid last name&lt;/div&gt;"/>
                         <xxf:control id="my-summary≡xf-61⊙2" relevant="false"/>
                         <xxf:control id="my-summary≡xf-62⊙2" relevant="false"/>
                         <xxf:control id="my-summary≡xf-63" class="fr-show-more-errors" relevant="false"/>

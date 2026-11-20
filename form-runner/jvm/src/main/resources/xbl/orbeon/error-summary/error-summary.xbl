@@ -184,7 +184,7 @@
                             else if ($lowest = 'warning') then
                                 ('error', 'warning')
                             else
-                                'info'"/>
+                                'error'"/>
 
                 <xf:var
                     name="visible-errors-for-section"
@@ -365,7 +365,7 @@
                             </xf:var>
                         </xsl:if>
 
-                        <xh:span aria-live="polite">
+                        <xh:div aria-live="polite">
                             <!-- Only show this group if `show` is true and there are any visible errors -->
                             <xf:group
                                 xxbl:scope="inner"
@@ -399,6 +399,7 @@
                                 <!-- Body of the error summary -->
                                 <xf:group
                                     id="body"
+                                    role="region"
                                     class="fr-error-summary-body {{
                                         if (exists($max-level-opt) ) then
                                             concat('fr-level-', $max-level-opt)
@@ -448,7 +449,7 @@
                                                         value="
                                                             if (xxf:non-blank(@label)) then
                                                                 concat(
-                                                                    '&lt;span class=&quot;fr-error-number&quot;>', position(), '. &lt;/span>',
+                                                                    '&lt;span class=&quot;fr-error-number&quot; aria-hidden=&quot;true&quot;>', position(), '. &lt;/span>',
                                                                     '&lt;div class=&quot;fr-error-label&quot;>',
                                                                     frf:removeOuterDiv(frf:removeAnchorTags(@label)),
                                                                     '&lt;/div>'
@@ -523,7 +524,7 @@
                                 <xbl:content includes=":root > fr|footer > *"/>
 
                             </xf:group>
-                        </xh:span>
+                        </xh:div>
                     </xf:group>
                 </xsl:template>
             </xsl:transform>

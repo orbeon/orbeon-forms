@@ -18,58 +18,116 @@
     clear: both;
     width: 100%;
     padding: 0;
-    margin-top: 4px; // margin needed so that error for reCAPTCHA doesn't touch
+    margin-top: 0.3em; // margin needed so that error for reCAPTCHA doesn't touch
 
     .fr-error-summary-body {
         display: block;
         padding: 0;
-    }
-
-    .fr-error-title {
-        display: block;
-        margin: 0;
-        box-sizing: border-box;
-        width: 100%;
-        padding: 5px 10px;
-        color: var(--orbeon-error-summary-title-color);
-        border-bottom: 1px solid var(--orbeon-error-summary-title-bottom-border-color);
+        border: 1px solid var(--orbeon-base-border-color);
+        border-left-width: 4px;
         border-radius: var(--orbeon-error-summary-border-radius);
-        &.xforms-label {
-            font-weight: inherit;
+        background-color: var(--orbeon-error-summary-item-background-color);
+        overflow: hidden;
+
+        // Multiple levels can be mixed so make sure the strongest wins
+        &.fr-level-info {
+            border-color: var(--orbeon-error-summary-info-border-color);
+            border-left-color: var(--orbeon-info-color);
+        }
+        &.fr-level-warning {
+            border-color: var(--orbeon-error-summary-warning-border-color);
+            border-left-color: var(--orbeon-warning-color);
+        }
+        &.fr-level-error {
+            border-color: var(--orbeon-error-summary-error-border-color);
+            border-left-color: var(--orbeon-error-color);
         }
     }
 
-    .fr-show-more-errors {
-        margin-right: 10px;
+    .fr-error-title {
+        float: left; // keep <legend> inside <fieldset>'s border box
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        margin: 0;
+        box-sizing: border-box;
+        width: 100%;
+        padding: 0.6em 0.9em;
+        color: var(--orbeon-error-summary-title-color);
+        border-bottom: 1px solid var(--orbeon-error-summary-title-bottom-border-color);
+        &.xforms-label {
+            font-weight: 600;
+        }
+
+        &::before {
+            font-family: FontAwesome;
+            font-weight: normal;
+            font-size: 1.1em;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        & ~ * {
+            clear: both;
+        }
+    }
+
+    .fr-show-more-errors, .fr-show-less-errors {
+        display: inline-block;
+        padding: 0.45em 0.9em;
     }
 
     // Multiple levels can be mixed so make sure the strongest wins
-    .fr-level-info    > .fr-error-title { background-color: var(--orbeon-info-color); }
-    .fr-level-warning > .fr-error-title { background-color: var(--orbeon-warning-color); }
-    .fr-level-error   > .fr-error-title { background-color: var(--orbeon-error-color); }
+    .fr-level-info > .fr-error-title {
+        background-color: var(--orbeon-error-summary-info-header-background-color);
+        &::before {
+            content: "\f05a";
+            color: var(--orbeon-error-summary-info-icon-color);
+        }
+    }
+    .fr-level-warning > .fr-error-title {
+        background-color: var(--orbeon-error-summary-warning-header-background-color);
+        &::before {
+            content: "\f071";
+            color: var(--orbeon-error-summary-warning-icon-color);
+        }
+    }
+    .fr-level-error > .fr-error-title {
+        background-color: var(--orbeon-error-summary-error-header-background-color);
+        &::before {
+            content: "\f06a";
+            color: var(--orbeon-error-summary-error-icon-color);
+        }
+    }
 
     .fr-error-group {
 
-        margin: 5px 0;
+        margin: 0;
         padding-left: 0; // the error number is item content, not a list marker; Reboot's 2rem would indent the items
 
         .xforms-mediatype-text-html, .xforms-mediatype-text-html .xforms-output-output {
             display: inline;
         }
 
-        &> li {
-            border: 2px solid;
-            border-radius: var(--orbeon-error-summary-border-radius);
-            padding: 10px;
-            margin-bottom: 5px;
+        & > li:not(.xforms-repeat-begin-end):not(.xforms-repeat-delimiter) {
+            padding: 0;
+            margin: 0;
             list-style: none; // Don't show list number, instead we output it in the label, otherwise the button with
                               // the label shows below the number with long error messages.
-            background-color: var(--orbeon-error-summary-item-background-color);
+            border-top: 1px solid var(--orbeon-error-summary-item-divider-color);
 
-            // Multiple levels can be mixed so make sure the strongest wins
-            &.fr-level-info    { border-color: var(--orbeon-info-color); }
-            &.fr-level-warning { border-color: var(--orbeon-warning-color); }
-            &.fr-level-error   { border-color: var(--orbeon-error-color); }
+            &:not(:has(.btn-link)) {
+                padding: 0.5em 0.9em;
+            }
+        }
+
+        & > li.xforms-repeat-begin-end + .xforms-repeat-delimiter + li,
+        & > li:first-child:not(.xforms-repeat-begin-end):not(.xforms-repeat-delimiter) {
+            border-top: none;
+        }
+
+        .xforms-case-selected > .xforms-trigger {
+            display: block;
         }
 
         .fr-error-link {
@@ -77,51 +135,74 @@
         }
 
         .btn-link {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: left;
             text-decoration: none;
-            white-space: normal;    // prevent wrapping, see https://github.com/orbeon/orbeon-forms/issues/5681
-            border: none;           // to align with list number
-            vertical-align: bottom; // to align with list number
-            padding: 0;             // to align with list number
-            margin: 0;              // probably unneeded
-            appearance: none;       // probably unneeded
-            display: inline;        // probably unneeded
+            white-space: normal;    // allow wrapping, see https://github.com/orbeon/orbeon-forms/issues/5681
+            border: none;
+            border-radius: 0;
+            padding: 0.5em 0.9em;
+            margin: 0;
+            appearance: none;
+            background-color: transparent;
+            color: var(--orbeon-error-summary-alert-color);
+            cursor: pointer;
 
-            .fr-error-number, .fr-error-label, .fr-error-alert {
+            &:hover {
+                background-color: var(--orbeon-error-summary-item-hover-background-color);
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--orbeon-focus-border-color);
+                outline-offset: -2px;
+            }
+
+            .fr-error-label {
                 text-decoration: underline;
+                text-underline-offset: 0.15em;
+                text-decoration-thickness: 1px;
             }
         }
 
-        .fr-error-label:not(:empty):after {
-            content: ": "
+        .fr-error-label {
+            font-weight: 600;
+
+            &:not(:empty)::after {
+                content: ": ";
+                font-weight: normal;
+                display: inline-block;
+                white-space: pre;
+            }
+        }
+
+        .fr-error-number {
+            color: var(--orbeon-error-summary-number-color);
+            font-variant-numeric: tabular-nums;
+            margin-right: 0.2em;
         }
 
         .fr-error-number, .fr-error-label, .fr-error-alert {
             // The error summary produces a div, instead of a span, so block elements it contains are not moved in
             // the DOM, but, if possible, we still want the message to be shown on the same line as the control label.
             display: inline;
-            vertical-align: middle;
+            vertical-align: baseline;
 
             ul {
-                list-style-type: square;
-                margin-bottom: 0;
+                list-style-type: disc;
+                margin: 0.25em 0 0 1.25em;
+                padding-left: 0;
             }
         }
 
-        // Make label and alert both the same color
-        .fr-level-info {
-            .fr-error-number, .fr-error-label, .fr-error-alert {
-                color: var(--orbeon-info-color);
-            }
+        .fr-error-alert {
+            color: var(--orbeon-error-summary-alert-color);
         }
-        .fr-level-warning {
-            .fr-error-number, .fr-error-label, .fr-error-alert {
-                color: var(--orbeon-warning-color);
-            }
-        }
-        .fr-level-error {
-            .fr-error-number, .fr-error-label, .fr-error-alert {
-                color: var(--orbeon-error-color);
-            }
-        }
+
+        // Color the control label according to its severity level
+        .fr-level-info .fr-error-label    { color: var(--orbeon-info-color); }
+        .fr-level-warning .fr-error-label { color: var(--orbeon-warning-color); }
+        .fr-level-error .fr-error-label   { color: var(--orbeon-error-color); }
     }
 }

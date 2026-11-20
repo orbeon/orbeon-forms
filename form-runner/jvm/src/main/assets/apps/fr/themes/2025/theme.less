@@ -472,14 +472,27 @@
   --orbeon-toast-close-hover-opacity: 0.75;
 
   // Errors and error summary
-  --orbeon-error-summary-display                  : block;
-  --orbeon-error-summary-title-color              : white;
-  --orbeon-error-summary-title-bottom-border-color: #e5e5e5;
-  --orbeon-error-summary-item-background-color    : white;
-  --orbeon-error-summary-border-radius            : @baseBorderRadius;
-  --orbeon-info-color                             : @info;
-  --orbeon-warning-color                          : @warning;
-  --orbeon-error-color                            : @error;
+  --orbeon-error-summary-display                         : block;
+  --orbeon-error-summary-title-color                     : white;
+  --orbeon-error-summary-title-bottom-border-color       : #e5e5e5;
+  --orbeon-error-summary-item-background-color           : white;
+  --orbeon-error-summary-item-hover-background-color     : #f7f7f7;
+  --orbeon-error-summary-item-divider-color              : #eeeeee;
+  --orbeon-error-summary-alert-color                     : var(--orbeon-base-color);
+  --orbeon-error-summary-number-color                    : var(--orbeon-hint-color);
+  --orbeon-error-summary-error-header-background-color   : var(--orbeon-error-color);
+  --orbeon-error-summary-warning-header-background-color : var(--orbeon-warning-color);
+  --orbeon-error-summary-info-header-background-color    : var(--orbeon-info-color);
+  --orbeon-error-summary-error-icon-color                : var(--orbeon-error-summary-title-color);
+  --orbeon-error-summary-warning-icon-color              : var(--orbeon-error-summary-title-color);
+  --orbeon-error-summary-info-icon-color                 : var(--orbeon-error-summary-title-color);
+  --orbeon-error-summary-error-border-color              : var(--orbeon-error-color);
+  --orbeon-error-summary-warning-border-color            : var(--orbeon-warning-color);
+  --orbeon-error-summary-info-border-color               : var(--orbeon-info-color);
+  --orbeon-error-summary-border-radius                   : @baseBorderRadius;
+  --orbeon-info-color                                    : @info;
+  --orbeon-warning-color                                 : @warning;
+  --orbeon-error-color                                   : @error;
 
   // Invalid state
   --orbeon-invalid-label-color         : var(--orbeon-label-color);
@@ -770,6 +783,8 @@
     --orbeon-error-summary-title-color                       : @base-bg;
     --orbeon-error-summary-title-bottom-border-color         : transparent;
     --orbeon-error-summary-item-background-color             : @base-bg;
+    --orbeon-error-summary-item-hover-background-color       : @gray-20;
+    --orbeon-error-summary-item-divider-color                : @gray-27;
     --orbeon-info-color                                      : @info;
     --orbeon-warning-color                                   : @warning;
     --orbeon-error-color                                     : @error;

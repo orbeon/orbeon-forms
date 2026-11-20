@@ -516,14 +516,27 @@
   --orbeon-toast-close-hover-opacity: 1;
 
   // Errors and error summary
-  --orbeon-error-summary-display                  : block;
-  --orbeon-error-summary-title-color              : white;
-  --orbeon-error-summary-title-bottom-border-color: var(--orbeon-base-border-color);
-  --orbeon-error-summary-item-background-color    : white;
-  --orbeon-error-summary-border-radius            : @radius-box;
-  --orbeon-info-color                             : @info;
-  --orbeon-warning-color                          : @warning;
-  --orbeon-error-color                            : @error;
+  --orbeon-error-summary-display                         : block;
+  --orbeon-error-summary-title-color                     : @gray-15;
+  --orbeon-error-summary-title-bottom-border-color       : @gray-90;
+  --orbeon-error-summary-item-background-color           : white;
+  --orbeon-error-summary-item-hover-background-color     : @gray-97;
+  --orbeon-error-summary-item-divider-color              : @gray-94;
+  --orbeon-error-summary-alert-color                     : var(--orbeon-base-color);
+  --orbeon-error-summary-number-color                    : var(--orbeon-hint-color);
+  --orbeon-error-summary-error-header-background-color   : #f8ecec;
+  --orbeon-error-summary-warning-header-background-color : #fdf5e6;
+  --orbeon-error-summary-info-header-background-color    : #ebf3f7;
+  --orbeon-error-summary-error-icon-color                : var(--orbeon-error-color);
+  --orbeon-error-summary-warning-icon-color              : var(--orbeon-warning-color);
+  --orbeon-error-summary-info-icon-color                 : var(--orbeon-info-color);
+  --orbeon-error-summary-error-border-color              : #e5c1c0;
+  --orbeon-error-summary-warning-border-color            : #f0d8b0;
+  --orbeon-error-summary-info-border-color               : #bdd8e5;
+  --orbeon-error-summary-border-radius                   : @radius-box;
+  --orbeon-info-color                                    : @info;
+  --orbeon-warning-color                                 : @warning;
+  --orbeon-error-color                                   : @error;
 
   // Invalid state
   --orbeon-invalid-label-color         : var(--orbeon-label-color);
@@ -597,8 +610,15 @@
   @media screen {
     // @accent
     --orbeon-button-primary-background-color        : var(--orbeon-accent-color);
-    --orbeon-toc-selected-error-background-color    : color-mix(in oklab, var(--orbeon-error-color) 10%, transparent);
-    --orbeon-toc-selected-error-border-color        : color-mix(in oklab, var(--orbeon-error-color) 30%, transparent);
+    --orbeon-toc-selected-error-background-color           : color-mix(in oklab, var(--orbeon-error-color) 10%, transparent);
+    --orbeon-toc-selected-error-border-color               : color-mix(in oklab, var(--orbeon-error-color) 30%, transparent);
+    --orbeon-error-summary-item-hover-background-color     : color-mix(in oklab, var(--orbeon-base-color) 4%, transparent);
+    --orbeon-error-summary-error-header-background-color   : color-mix(in oklab, var(--orbeon-error-color) 10%, transparent);
+    --orbeon-error-summary-warning-header-background-color : color-mix(in oklab, var(--orbeon-warning-color) 12%, transparent);
+    --orbeon-error-summary-info-header-background-color    : color-mix(in oklab, var(--orbeon-info-color) 10%, transparent);
+    --orbeon-error-summary-error-border-color              : color-mix(in oklab, var(--orbeon-error-color) 32%, transparent);
+    --orbeon-error-summary-warning-border-color            : color-mix(in oklab, var(--orbeon-warning-color) 35%, transparent);
+    --orbeon-error-summary-info-border-color               : color-mix(in oklab, var(--orbeon-info-color) 32%, transparent);
     --orbeon-dropdown-menu-hover-background-color   : var(--orbeon-accent-color);
     --orbeon-dropdown-menu-selected-background-color: var(--orbeon-accent-color);
     --orbeon-progress-bar-background-color          : var(--orbeon-accent-color);
@@ -846,8 +866,17 @@
     --orbeon-revision-history-entry-background-color         : @dark-32;
     --orbeon-active-alert-color                              : @dark-21;
     --orbeon-alert-border-color                              : var(--orbeon-base-border-color);
-    --orbeon-error-summary-title-color                       : @dark-21;
+    --orbeon-error-summary-title-color                       : @dark-96;
+    --orbeon-error-summary-title-bottom-border-color         : @dark-38;
     --orbeon-error-summary-item-background-color             : @dark-21;
+    --orbeon-error-summary-item-hover-background-color       : color-mix(in oklab, var(--orbeon-base-color) 6%, transparent);
+    --orbeon-error-summary-item-divider-color                : @dark-32;
+    --orbeon-error-summary-error-header-background-color     : color-mix(in oklab, var(--orbeon-error-color) 16%, transparent);
+    --orbeon-error-summary-warning-header-background-color   : color-mix(in oklab, var(--orbeon-warning-color) 16%, transparent);
+    --orbeon-error-summary-info-header-background-color      : color-mix(in oklab, var(--orbeon-info-color) 16%, transparent);
+    --orbeon-error-summary-error-border-color                : color-mix(in oklab, var(--orbeon-error-color) 38%, transparent);
+    --orbeon-error-summary-warning-border-color              : color-mix(in oklab, var(--orbeon-warning-color) 40%, transparent);
+    --orbeon-error-summary-info-border-color                 : color-mix(in oklab, var(--orbeon-info-color) 38%, transparent);
     --orbeon-info-color                                      : @info;
     --orbeon-warning-color                                   : @warning;
     --orbeon-error-color                                     : @error;

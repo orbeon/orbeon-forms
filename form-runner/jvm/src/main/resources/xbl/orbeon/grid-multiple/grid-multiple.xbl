@@ -35,8 +35,6 @@
 
 <!--    fr:grid[ref], fr:grid[nodeset], fr:grid[bind], -->
 
-    <xbl:script src="/webjars/dragula/3.7.3/dist/dragula.min.js"/>
-
     <xbl:binding
         id="fr-grid-multiple-binding"
         element="fr|grid-multiple, fr|grid[repeat = content][ref], fr|grid[repeat = content][nodeset], fr|grid[repeat = content][bind]"
@@ -46,7 +44,6 @@
 
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/grid/grid.css"/>
-            <xbl:style src="/webjars/dragula/3.7.3/dist/dragula.min.css"/>
         </xbl:resources>
 
         <xbl:handlers>

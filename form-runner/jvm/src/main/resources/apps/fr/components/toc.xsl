@@ -192,6 +192,10 @@
             <xsl:variable
                     name="short-label-expr"
                     select="concat('xxf:value(''', $static-section-id,  '-short-label'')')"/>
+            <xsl:variable
+                    name="toc-label-expr"
+                    as="xs:string"
+                    select="if ($static-section-has-short-label) then $short-label-expr else $section-label-expr"/>
 
             <xh:li>
 
@@ -200,6 +204,10 @@
                     'active'             [$fr-toc-section-active or $fr-toc-top-level-section-active],
                     'started'            [$fr-toc-top-level-section-visited],
                     $fr-toc-top-level-section-tokens
+                    <xsl:if test="not($is-wizard) and empty($static-current-section//fr:section)">
+                        ,
+                        'xforms-hidden'      [xxf:is-blank(<xsl:value-of select="$toc-label-expr"/>)]
+                    </xsl:if>
                     <xsl:if test="$is-wizard">
                         ,
                         'first-page'         [$fr-wizard-relevant-top-level-case-ids[1]      = '<xsl:value-of select="$static-section-id"/>-case'],
@@ -224,6 +232,9 @@
                 </xsl:if>
 
                 <xf:trigger appearance="minimal">
+                    <xsl:if test="not($is-wizard)">
+                        <xsl:attribute name="ref" select="concat('.[xxf:non-blank(', $toc-label-expr, ')]')"/>
+                    </xsl:if>
                     <xf:label>
                         <xh:span class="fr-toc-title">
                             <xsl:choose>

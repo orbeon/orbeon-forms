@@ -188,8 +188,8 @@ trait FormBuilderSchemaDialogTests {
 
         // 6. Check Form must flag the dangling XML Schema type
         val checkDialog = openCheckFormDialog(page, ajaxServer)
-        assert(checkDialog.locator(".alert-error").isVisible)
-        assert(checkDialog.locator(".alert-error").textContent().contains("""Control "control-1" uses unknown XML Schema type "bk:publication-year""""))
+        assert(checkDialog.locator(".fb-validation-group-error").isVisible)
+        assert(checkDialog.locator(".fb-validation-group-error").textContent().contains("""Control "control-1" uses unknown XML Schema type "bk:publication-year""""))
         closeCheckFormDialog(checkDialog, ajaxServer)
 
         // 6b. Control Settings on a control with a dangling schema type must show "Use schema type (bk:publication-year)"
@@ -231,8 +231,8 @@ trait FormBuilderSchemaDialogTests {
 
         // 8. Check Form must now report zero issues
         openCheckFormDialog(page, ajaxServer)
-        assert(checkDialog.locator(".alert-success").isVisible)
-        assert(checkDialog.locator(".alert-success").textContent().contains("No issues were found in this form definition."))
+        assert(checkDialog.locator(".fb-validation-success").isVisible)
+        assert(checkDialog.locator(".fb-validation-success").textContent().contains("No issues were found in this form definition."))
         closeCheckFormDialog(checkDialog, ajaxServer)
 
         // 9. Removing the schema now produces no orphaned warning and hides the toolbox badge on Apply

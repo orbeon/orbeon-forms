@@ -1222,6 +1222,37 @@
                     <xf:insert
                         context="$i"
                         origin="instance('fr-search-results-instance')/*"/>
+                    <!-- Keep the browser URL's `fr-search` query parameter in sync with active search/sort options -->
+                    <xf:var
+                        name="default-sort-query"
+                        value="(instance('fr-search-labels-instance')/query[@summary-sort-direction = ('asc', 'desc')])[last()]"/>
+                    <xf:var
+                        name="default-sort-column"
+                        value="($default-sort-query/@path/string(), 'last-modified')[1]"/>
+                    <xf:var
+                        name="default-sort-direction"
+                        value="($default-sort-query/@summary-sort-direction/string(), 'desc')[1]"/>
+                    <xf:var
+                        name="has-active-search"
+                        value="
+                            exists(instance('fr-search-instance')/query[xxf:non-blank(.)]) or
+                            not(instance('fr-order-by')/column = $default-sort-column and instance('fr-order-by')/direction = $default-sort-direction) or
+                            exists(instance('fr-search-instance')/drafts)"/>
+                    <xf:action if="not(fr:is-embedded())">
+                        <xf:action if="$has-active-search" type="javascript">
+                            <xf:param name="encoded" value="instance('fr-last-search-context-instance')/encoded/string()"/>
+                            <xf:body>
+                                ORBEON.fr.private.API.replaceOrAddUrlParameter("fr-search", encoded);
+                                ORBEON.fr.private.API.removeUrlParameter("fr-search-pos");
+                            </xf:body>
+                        </xf:action>
+                        <xf:action if="not($has-active-search)" type="javascript">
+                            <xf:body>
+                                ORBEON.fr.private.API.removeUrlParameter("fr-search");
+                                ORBEON.fr.private.API.removeUrlParameter("fr-search-pos");
+                            </xf:body>
+                        </xf:action>
+                    </xf:action>
                 </xf:action>
                 <xf:action event="xforms-submit-error">
                     <xf:message ref="$fr-resources/errors/search"/>

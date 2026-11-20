@@ -145,6 +145,9 @@ object FormRunnerPrivateAPI extends js.Object {
   def updateLocationFormVersion(version: Int): Unit =
     removeReplaceOrAddUrlParameter("form-version", Some(version.toString))
 
+  def replaceOrAddUrlParameter(name: String, value: String): Unit =
+    removeReplaceOrAddUrlParameter(name, Some(value))
+
   def removeUrlParameter(name: String): Unit =
     removeReplaceOrAddUrlParameter(name, None)
 

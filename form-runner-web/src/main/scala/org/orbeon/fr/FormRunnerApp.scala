@@ -74,6 +74,7 @@ object FormRunnerApp extends App {
     xbl.Select1Search
     xbl.AutosizeTextarea
     xbl.TinyMCE
+    xbl.Markdown
     xbl.AttachmentMultiple
     xbl.ImageAttachment
     xbl.Recaptcha

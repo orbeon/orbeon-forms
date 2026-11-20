@@ -92,6 +92,7 @@ val SqliteJdbcVersion                = "3.54.1.0"
 val PostgresqlVersion                = "42.7.14"
 val OracleJdbcVersion                = "23.26.4.0.0"
 val JsoupVersion                     = "1.23.2"
+val CommonMarkVersion                = "0.24.0"
 val LibPhoneNumberVersion            = "9.0.42"
 val PlaywrightVersion                = "1.65.0"
 
@@ -134,6 +135,11 @@ val WebJarDependencies = Seq(
 
 val CoreLibraryDependencies = Seq(
   "org.jsoup"                   % "jsoup"                           % JsoupVersion,
+  "org.commonmark"              % "commonmark"                      % CommonMarkVersion,
+  "org.commonmark"              % "commonmark-ext-gfm-tables"       % CommonMarkVersion,
+  "org.commonmark"              % "commonmark-ext-gfm-strikethrough"% CommonMarkVersion,
+  "org.commonmark"              % "commonmark-ext-autolink"         % CommonMarkVersion,
+  "org.commonmark"              % "commonmark-ext-task-list-items"  % CommonMarkVersion,
   "com.googlecode.libphonenumber" % "libphonenumber"                % LibPhoneNumberVersion,
   "org.orbeon"                  % "saxon"                           % SaxonJvmVersion, // Java library!
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,

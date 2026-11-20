@@ -149,7 +149,7 @@ object MarkupUtils {
     "a",   "b",      "i",     "ul",    "li",    "ol",    "p",   "span",       "u",   "div",
     "br",  "strong", "em",    "pre",   "img",   "h1",    "h2",  "h3",         "h4",  "h5",
     "h6",  "font",   "table", "tbody", "thead", "tfoot", "tr",  "td", "th",   "blockquote",
-    "sub", "sup",    "kbd",   "code",  "mark",
+    "sub", "sup",    "kbd",   "code",  "mark",  "del", "s",  "hr",
   )
 
   private val CrRegex = """\r""".r

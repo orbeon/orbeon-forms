@@ -199,6 +199,7 @@
         +fr:databound-select-search
         +fr:autosize-textarea
         +fr:tinymce
+        +fr:markdown
         +fr:box-select
         +fr:segmented-select1
         +fr:cards-select1
@@ -303,6 +304,7 @@
         +fr:databound-select-search
         +fr:autosize-textarea
         +fr:tinymce
+        +fr:markdown
         +fr:box-select
         +fr:segmented-select1
         +fr:cards-select1
@@ -754,6 +756,7 @@
         +fr:dropdown-select1-search
         +fr:wpaint
         +fr:tinymce
+        +fr:markdown
         +fr:autosize-textarea
     </property>
 

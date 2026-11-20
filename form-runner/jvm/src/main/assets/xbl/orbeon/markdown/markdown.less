@@ -1,0 +1,263 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+.orbeon {
+
+    .xbl-fr-markdown {
+        display: block;
+
+        .fr-markdown-editor {
+            border: var(--orbeon-control-border-width) var(--orbeon-control-border-style) var(--orbeon-control-border-color);
+            border-radius: var(--orbeon-control-border-radius);
+            background-color: var(--orbeon-control-background-color);
+            overflow: hidden;
+
+            &.fr-markdown-readonly {
+                background-color: var(--orbeon-control-read-only-background-color);
+            }
+        }
+
+        .fr-markdown-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.4em;
+            padding: 0.25em 0.5em;
+            background-color: var(--orbeon-add-on-background-color);
+            border-bottom: 1px solid var(--orbeon-base-border-color);
+        }
+
+        .fr-markdown-tabs {
+            display: flex;
+            align-items: center;
+            gap: 0.25em;
+        }
+
+        .fr-markdown-tab button {
+            padding: 0.25em 0.65em;
+            border: 1px solid transparent;
+            border-radius: var(--orbeon-control-border-radius);
+            background-color: transparent;
+            color: var(--orbeon-hint-color);
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+
+            &:hover {
+                color: var(--orbeon-base-color);
+                background-color: var(--orbeon-button-background-color);
+            }
+        }
+
+        .fr-markdown-tab.fr-markdown-tab-active button {
+            background-color: var(--orbeon-control-background-color);
+            border-color: var(--orbeon-base-border-color);
+            color: var(--orbeon-base-color);
+        }
+
+        .fr-markdown-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.15em;
+        }
+
+        .fr-markdown-tool {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2em;
+            height: 2em;
+            padding: 0;
+            border: 1px solid transparent;
+            border-radius: var(--orbeon-control-border-radius);
+            background-color: transparent;
+            color: var(--orbeon-add-on-color);
+            cursor: pointer;
+
+            &:hover {
+                background-color: var(--orbeon-button-background-color);
+                color: var(--orbeon-base-color);
+            }
+
+            &:focus-visible {
+                outline: none;
+                box-shadow: var(--orbeon-control-focus-ring);
+            }
+        }
+
+        .fr-markdown-write-panel {
+            display: block;
+
+            .xforms-textarea {
+                display: block;
+                width: 100%;
+            }
+
+            textarea {
+                display: block;
+                width: 100%;
+                min-height: var(--orbeon-textarea-height);
+                margin: 0;
+                border: 0;
+                border-radius: 0;
+                box-shadow: none;
+                resize: var(--orbeon-textarea-resize);
+                font-family: var(--orbeon-control-font-family);
+            }
+        }
+
+        .fr-markdown-preview-panel {
+            min-height: var(--orbeon-textarea-height);
+            padding: var(--orbeon-control-padding);
+        }
+
+        .fr-markdown-empty {
+            color: var(--orbeon-hint-color);
+            font-style: italic;
+        }
+    }
+
+    .xbl-fr-markdown-output {
+        display: block;
+        padding: var(--orbeon-control-padding);
+        border: var(--orbeon-control-border-width) var(--orbeon-control-border-style) var(--orbeon-base-border-color);
+        border-radius: var(--orbeon-control-border-radius);
+        background-color: var(--orbeon-control-read-only-background-color);
+    }
+
+    .fr-markdown-rendered {
+        color: var(--orbeon-control-color);
+        line-height: 1.5;
+        overflow-wrap: break-word;
+
+        h1, h2, h3, h4, h5, h6 {
+            margin: 0.75em 0 0.4em;
+            font-weight: 600;
+            line-height: 1.25;
+            color: var(--orbeon-base-color);
+
+            &:first-child {
+                margin-top: 0;
+            }
+        }
+
+        h1 { font-size: 1.5em; }
+        h2 { font-size: 1.3em; }
+        h3 { font-size: 1.15em; }
+        h4 { font-size: 1.05em; }
+
+        p {
+            margin: 0 0 0.65em;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        ul, ol {
+            margin: 0 0 0.65em;
+            padding-left: 1.5em;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        li + li {
+            margin-top: 0.2em;
+        }
+
+        a {
+            color: var(--orbeon-link-color);
+            text-decoration: underline;
+
+            &:hover {
+                color: var(--orbeon-link-hover-color);
+            }
+        }
+
+        blockquote {
+            margin: 0 0 0.65em;
+            padding: 0.25em 0.75em;
+            border-left: 3px solid var(--orbeon-control-border-color);
+            color: var(--orbeon-hint-color);
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        code {
+            padding: 0.1em 0.35em;
+            border-radius: 3px;
+            background-color: var(--orbeon-add-on-background-color);
+            font-size: 0.9em;
+        }
+
+        pre {
+            margin: 0 0 0.65em;
+            padding: 0.65em 0.85em;
+            border: 1px solid var(--orbeon-base-border-color);
+            border-radius: var(--orbeon-control-border-radius);
+            background-color: var(--orbeon-add-on-background-color);
+            overflow-x: auto;
+
+            code {
+                padding: 0;
+                background-color: transparent;
+                font-size: 0.9em;
+            }
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        table {
+            width: 100%;
+            margin: 0 0 0.65em;
+            border-collapse: collapse;
+
+            th, td {
+                padding: 0.35em 0.6em;
+                border: 1px solid var(--orbeon-base-border-color);
+                text-align: left;
+            }
+
+            th {
+                background-color: var(--orbeon-add-on-background-color);
+                font-weight: 600;
+            }
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        hr {
+            margin: 0.85em 0;
+            border: 0;
+            border-top: 1px solid var(--orbeon-base-border-color);
+        }
+
+        .fr-markdown-task-checkbox {
+            margin-right: 0.25em;
+            color: var(--orbeon-hint-color);
+
+            &.fr-markdown-task-checked {
+                color: var(--orbeon-accent-color);
+            }
+        }
+    }
+}

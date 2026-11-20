@@ -1,0 +1,453 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:MarkdownSupport="java:org.orbeon.xbl.MarkdownSupportJava">
+
+    <xbl:binding
+        id="fr-markdown"
+        element="fr|markdown, xf|textarea[mediatype = 'text/markdown']"
+        xxbl:mode="lhha binding value focus javascript-lifecycle allow-minimal-label-hint"
+        xxbl:label-for="textarea"
+    >
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xf="http://www.w3.org/2002/xforms">
+            <display-name lang="en">Markdown Text Area</display-name>
+            <display-name lang="fr">Zone de texte Markdown</display-name>
+            <display-name lang="no">Markdown-tekstområde</display-name>
+            <display-name lang="ru">Текстовая область Markdown</display-name>
+            <display-name lang="it">Area di testo Markdown</display-name>
+            <display-name lang="de">Markdown-Textbereich</display-name>
+            <display-name lang="fi">Markdown-tekstialue</display-name>
+            <display-name lang="es">Área de texto Markdown</display-name>
+            <display-name lang="nl">Markdown-tekstvak</display-name>
+            <display-name lang="pt">Área de texto Markdown</display-name>
+            <display-name lang="sv">Markdown-textområde</display-name>
+            <display-name lang="ar">منطقة نص Markdown</display-name>
+            <display-name lang="pl">Obszar tekstu Markdown</display-name>
+            <display-name lang="ja">Markdownテキストエリア</display-name>
+            <icon>
+                <icon-class>fa-brands fa-fw fa-markdown</icon-class>
+            </icon>
+            <templates>
+                <view>
+                    <xf:textarea mediatype="text/markdown" id="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint  ref=""/>
+                        <xf:help  ref=""/>
+                        <xf:alert ref=""/>
+                    </xf:textarea>
+                </view>
+            </templates>
+            <conversions element="xf|textarea"/>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/markdown/markdown.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="orbeon-state">
+                    <state>
+                        <mode>write</mode>
+                    </state>
+                </xf:instance>
+                <xf:instance id="orbeon-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <resource xml:lang="en">
+                            <write>Write</write>
+                            <preview>Preview</preview>
+                            <bold>Bold</bold>
+                            <italic>Italic</italic>
+                            <heading>Heading</heading>
+                            <link>Link</link>
+                            <bullet-list>Bulleted list</bullet-list>
+                            <numbered-list>Numbered list</numbered-list>
+                            <quote>Quote</quote>
+                            <code>Code</code>
+                            <nothing-to-preview>Nothing to preview</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="fr">
+                            <write>Écrire</write>
+                            <preview>Aperçu</preview>
+                            <bold>Gras</bold>
+                            <italic>Italique</italic>
+                            <heading>Titre</heading>
+                            <link>Lien</link>
+                            <bullet-list>Liste à puces</bullet-list>
+                            <numbered-list>Liste numérotée</numbered-list>
+                            <quote>Citation</quote>
+                            <code>Code</code>
+                            <nothing-to-preview>Rien à prévisualiser</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="ar">
+                            <write>كتابة</write>
+                            <preview>معاينة</preview>
+                            <bold>غامق</bold>
+                            <italic>مائل</italic>
+                            <heading>عنوان</heading>
+                            <link>رابط</link>
+                            <bullet-list>قائمة نقطية</bullet-list>
+                            <numbered-list>قائمة مرقمة</numbered-list>
+                            <quote>اقتباس</quote>
+                            <code>شيفرة</code>
+                            <nothing-to-preview>لا يوجد شيء للمعاينة</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="ca">
+                            <write>Escriure</write>
+                            <preview>Previsualització</preview>
+                            <bold>Negreta</bold>
+                            <italic>Cursiva</italic>
+                            <heading>Encapçalament</heading>
+                            <link>Enllaç</link>
+                            <bullet-list>Llista amb pics</bullet-list>
+                            <numbered-list>Llista numerada</numbered-list>
+                            <quote>Cita</quote>
+                            <code>Codi</code>
+                            <nothing-to-preview>Res a previsualitzar</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="da">
+                            <write>Skriv</write>
+                            <preview>Forhåndsvisning</preview>
+                            <bold>Fed</bold>
+                            <italic>Kursiv</italic>
+                            <heading>Overskrift</heading>
+                            <link>Link</link>
+                            <bullet-list>Punktliste</bullet-list>
+                            <numbered-list>Nummereret liste</numbered-list>
+                            <quote>Citat</quote>
+                            <code>Kode</code>
+                            <nothing-to-preview>Intet at forhåndsvise</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="de">
+                            <write>Schreiben</write>
+                            <preview>Vorschau</preview>
+                            <bold>Fett</bold>
+                            <italic>Kursiv</italic>
+                            <heading>Überschrift</heading>
+                            <link>Link</link>
+                            <bullet-list>Aufzählung</bullet-list>
+                            <numbered-list>Nummerierte Liste</numbered-list>
+                            <quote>Zitat</quote>
+                            <code>Code</code>
+                            <nothing-to-preview>Nichts zur Vorschau vorhanden</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="es">
+                            <write>Escribir</write>
+                            <preview>Vista previa</preview>
+                            <bold>Negrita</bold>
+                            <italic>Cursiva</italic>
+                            <heading>Encabezado</heading>
+                            <link>Enlace</link>
+                            <bullet-list>Lista con viñetas</bullet-list>
+                            <numbered-list>Lista numerada</numbered-list>
+                            <quote>Cita</quote>
+                            <code>Código</code>
+                            <nothing-to-preview>Nada que previsualizar</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="fi">
+                            <write>Kirjoita</write>
+                            <preview>Esikatselu</preview>
+                            <bold>Lihavointi</bold>
+                            <italic>Kursivointi</italic>
+                            <heading>Otsikko</heading>
+                            <link>Linkki</link>
+                            <bullet-list>Luettelo</bullet-list>
+                            <numbered-list>Numeroitu luettelo</numbered-list>
+                            <quote>Lainaus</quote>
+                            <code>Koodi</code>
+                            <nothing-to-preview>Ei esikatseltavaa</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="hu">
+                            <write>Írás</write>
+                            <preview>Előnézet</preview>
+                            <bold>Félkövér</bold>
+                            <italic>Dőlt</italic>
+                            <heading>Címsor</heading>
+                            <link>Hivatkozás</link>
+                            <bullet-list>Felsorolás</bullet-list>
+                            <numbered-list>Számozott lista</numbered-list>
+                            <quote>Idézet</quote>
+                            <code>Kód</code>
+                            <nothing-to-preview>Nincs mit megjeleníteni</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="it">
+                            <write>Scrivi</write>
+                            <preview>Anteprima</preview>
+                            <bold>Grassetto</bold>
+                            <italic>Corsivo</italic>
+                            <heading>Intestazione</heading>
+                            <link>Collegamento</link>
+                            <bullet-list>Elenco puntato</bullet-list>
+                            <numbered-list>Elenco numerato</numbered-list>
+                            <quote>Citazione</quote>
+                            <code>Codice</code>
+                            <nothing-to-preview>Nulla da visualizzare in anteprima</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="ja">
+                            <write>編集</write>
+                            <preview>プレビュー</preview>
+                            <bold>太字</bold>
+                            <italic>斜体</italic>
+                            <heading>見出し</heading>
+                            <link>リンク</link>
+                            <bullet-list>箇条書き</bullet-list>
+                            <numbered-list>番号付きリスト</numbered-list>
+                            <quote>引用</quote>
+                            <code>コード</code>
+                            <nothing-to-preview>プレビューする内容がありません</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="nl">
+                            <write>Schrijven</write>
+                            <preview>Voorbeeld</preview>
+                            <bold>Vet</bold>
+                            <italic>Cursief</italic>
+                            <heading>Kop</heading>
+                            <link>Link</link>
+                            <bullet-list>Opsommingslijst</bullet-list>
+                            <numbered-list>Genummerde lijst</numbered-list>
+                            <quote>Citaat</quote>
+                            <code>Code</code>
+                            <nothing-to-preview>Niets om weer te geven</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="no">
+                            <write>Skriv</write>
+                            <preview>Forhåndsvisning</preview>
+                            <bold>Fet</bold>
+                            <italic>Kursiv</italic>
+                            <heading>Overskrift</heading>
+                            <link>Lenke</link>
+                            <bullet-list>Punktliste</bullet-list>
+                            <numbered-list>Nummerert liste</numbered-list>
+                            <quote>Sitat</quote>
+                            <code>Kode</code>
+                            <nothing-to-preview>Ingenting å forhåndsvise</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="pl">
+                            <write>Edytuj</write>
+                            <preview>Podgląd</preview>
+                            <bold>Pogrubienie</bold>
+                            <italic>Kursywa</italic>
+                            <heading>Nagłówek</heading>
+                            <link>Link</link>
+                            <bullet-list>Lista punktowana</bullet-list>
+                            <numbered-list>Lista numerowana</numbered-list>
+                            <quote>Cytat</quote>
+                            <code>Kod</code>
+                            <nothing-to-preview>Brak treści do podglądu</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="pt">
+                            <write>Escrever</write>
+                            <preview>Pré-visualizar</preview>
+                            <bold>Negrito</bold>
+                            <italic>Itálico</italic>
+                            <heading>Título</heading>
+                            <link>Ligação</link>
+                            <bullet-list>Lista com marcadores</bullet-list>
+                            <numbered-list>Lista numerada</numbered-list>
+                            <quote>Citação</quote>
+                            <code>Código</code>
+                            <nothing-to-preview>Nada para pré-visualizar</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="ru">
+                            <write>Редактировать</write>
+                            <preview>Предпросмотр</preview>
+                            <bold>Жирный</bold>
+                            <italic>Курсив</italic>
+                            <heading>Заголовок</heading>
+                            <link>Ссылка</link>
+                            <bullet-list>Маркированный список</bullet-list>
+                            <numbered-list>Нумерованный список</numbered-list>
+                            <quote>Цитата</quote>
+                            <code>Код</code>
+                            <nothing-to-preview>Нечего отображать</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="sv">
+                            <write>Skriv</write>
+                            <preview>Förhandsgranska</preview>
+                            <bold>Fet</bold>
+                            <italic>Kursiv</italic>
+                            <heading>Rubrik</heading>
+                            <link>Länk</link>
+                            <bullet-list>Punktlista</bullet-list>
+                            <numbered-list>Numrerad lista</numbered-list>
+                            <quote>Citat</quote>
+                            <code>Kod</code>
+                            <nothing-to-preview>Inget att förhandsgranska</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="tr">
+                            <write>Yaz</write>
+                            <preview>Önizleme</preview>
+                            <bold>Kalın</bold>
+                            <italic>İtalik</italic>
+                            <heading>Başlık</heading>
+                            <link>Bağlantı</link>
+                            <bullet-list>Madde işaretli liste</bullet-list>
+                            <numbered-list>Numaralı liste</numbered-list>
+                            <quote>Alıntı</quote>
+                            <code>Kod</code>
+                            <nothing-to-preview>Önizlenecek içerik yok</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="zh-Hans">
+                            <write>编辑</write>
+                            <preview>预览</preview>
+                            <bold>粗体</bold>
+                            <italic>斜体</italic>
+                            <heading>标题</heading>
+                            <link>链接</link>
+                            <bullet-list>无序列表</bullet-list>
+                            <numbered-list>有序列表</numbered-list>
+                            <quote>引用</quote>
+                            <code>代码</code>
+                            <nothing-to-preview>暂无预览内容</nothing-to-preview>
+                        </resource>
+                        <resource xml:lang="zh-Hant">
+                            <write>編輯</write>
+                            <preview>預覽</preview>
+                            <bold>粗體</bold>
+                            <italic>斜體</italic>
+                            <heading>標題</heading>
+                            <link>連結</link>
+                            <bullet-list>項目符號清單</bullet-list>
+                            <numbered-list>編號清單</numbered-list>
+                            <quote>引用</quote>
+                            <code>程式碼</code>
+                            <nothing-to-preview>沒有可預覽的內容</nothing-to-preview>
+                        </resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:var
+                name="binding"
+                value="xxf:binding('fr-markdown')"/>
+            <xf:var
+                name="is-readonly"
+                value="xxf:readonly($binding)"/>
+            <xf:var
+                name="mode"
+                value="instance('orbeon-state')/mode"/>
+            <xf:var
+                name="show-preview"
+                value="$is-readonly or $mode = 'preview'"/>
+
+            <xh:div class="fr-markdown-editor{' fr-markdown-readonly'[$is-readonly]}">
+                <xf:group ref=".[not($is-readonly)]">
+                    <xh:div class="fr-markdown-header">
+                        <xh:div class="fr-markdown-tabs" role="tablist">
+                            <xf:trigger
+                                id="write-tab"
+                                appearance="minimal"
+                                class="fr-markdown-tab{' fr-markdown-tab-active'[not($show-preview)]}">
+                                <xf:label value="xxf:r('write')"/>
+                                <xf:setvalue event="DOMActivate" ref="instance('orbeon-state')/mode" value="'write'"/>
+                            </xf:trigger>
+                            <xf:trigger
+                                id="preview-tab"
+                                appearance="minimal"
+                                class="fr-markdown-tab{' fr-markdown-tab-active'[$show-preview]}">
+                                <xf:label value="xxf:r('preview')"/>
+                                <xf:setvalue event="DOMActivate" ref="instance('orbeon-state')/mode" value="'preview'"/>
+                            </xf:trigger>
+                        </xh:div>
+                        <xf:group ref=".[not($show-preview)]">
+                            <xh:div class="fr-markdown-toolbar" role="toolbar">
+                                <xh:button type="button" class="fr-markdown-tool" data-md-action="bold" title="{xxf:r('bold')}" aria-label="{xxf:r('bold')}">
+                                    <xh:i class="fa fa-fw fa-bold" aria-hidden="true"/>
+                                </xh:button>
+                                <xh:button type="button" class="fr-markdown-tool" data-md-action="italic" title="{xxf:r('italic')}" aria-label="{xxf:r('italic')}">
+                                    <xh:i class="fa fa-fw fa-italic" aria-hidden="true"/>
+                                </xh:button>
+                                <xh:button type="button" class="fr-markdown-tool" data-md-action="heading" title="{xxf:r('heading')}" aria-label="{xxf:r('heading')}">
+                                    <xh:i class="fa fa-fw fa-heading" aria-hidden="true"/>
+                                </xh:button>
+                                <xh:button type="button" class="fr-markdown-tool" data-md-action="link" title="{xxf:r('link')}" aria-label="{xxf:r('link')}">
+                                    <xh:i class="fa fa-fw fa-link" aria-hidden="true"/>
+                                </xh:button>
+                                <xh:button type="button" class="fr-markdown-tool" data-md-action="bullet-list" title="{xxf:r('bullet-list')}" aria-label="{xxf:r('bullet-list')}">
+                                    <xh:i class="fa fa-fw fa-list-ul" aria-hidden="true"/>
+                                </xh:button>
+                                <xh:button type="button" class="fr-markdown-tool" data-md-action="numbered-list" title="{xxf:r('numbered-list')}" aria-label="{xxf:r('numbered-list')}">
+                                    <xh:i class="fa fa-fw fa-list-ol" aria-hidden="true"/>
+                                </xh:button>
+                                <xh:button type="button" class="fr-markdown-tool" data-md-action="quote" title="{xxf:r('quote')}" aria-label="{xxf:r('quote')}">
+                                    <xh:i class="fa fa-fw fa-quote-left" aria-hidden="true"/>
+                                </xh:button>
+                                <xh:button type="button" class="fr-markdown-tool" data-md-action="code" title="{xxf:r('code')}" aria-label="{xxf:r('code')}">
+                                    <xh:i class="fa fa-fw fa-code" aria-hidden="true"/>
+                                </xh:button>
+                            </xh:div>
+                        </xf:group>
+                    </xh:div>
+                </xf:group>
+
+                <xf:group ref=".[not($show-preview)]" class="fr-markdown-write-panel">
+                    <xf:textarea
+                        id="textarea"
+                        ref="$binding"
+                        xbl:attr="navindex navindex=tabindex xxf:maxlength autocomplete"/>
+                </xf:group>
+
+                <xf:group ref=".[$show-preview]" class="fr-markdown-preview-panel">
+                    <xf:group ref=".[xxf:non-blank($binding)]">
+                        <xh:div class="fr-markdown-rendered">
+                            <xf:output
+                                id="preview-output"
+                                mediatype="text/html"
+                                value="MarkdownSupport:markdownToSanitizedHtml(string($binding))"/>
+                        </xh:div>
+                    </xf:group>
+                    <xf:group ref=".[xxf:is-blank($binding) and not($is-readonly)]">
+                        <xh:div class="fr-markdown-empty">
+                            <xf:output value="xxf:r('nothing-to-preview')"/>
+                        </xh:div>
+                    </xf:group>
+                </xf:group>
+            </xh:div>
+        </xbl:template>
+    </xbl:binding>
+
+    <xbl:binding
+        id="fr-markdown-output"
+        element="
+            fr|markdown[fr|static-readonly = true],
+            fr|markdown[fr|pdf-template = true],
+            xf|textarea[mediatype = 'text/markdown'][fr|static-readonly = true],
+            xf|textarea[mediatype = 'text/markdown'][fr|pdf-template = true]"
+        xxbl:mode="lhha binding value"
+        xxbl:label-for="output"
+    >
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/markdown/markdown.css"/>
+        </xbl:resources>
+        <xbl:template>
+            <xh:div class="xbl-fr-markdown-output fr-markdown-rendered">
+                <xf:output
+                    id="output"
+                    mediatype="text/html"
+                    value="MarkdownSupport:markdownToSanitizedHtml(string(xxf:binding('fr-markdown-output')))"/>
+            </xh:div>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

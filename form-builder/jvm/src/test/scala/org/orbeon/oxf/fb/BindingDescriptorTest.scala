@@ -592,6 +592,18 @@ class BindingDescriptorTest
           isCurrent     = isSameQName(current, FR -> "tinymce")
         ),
         ConversionResult(
+          fullLabelOpt  = Some("Markdown Text Area"),
+          value         = FR -> "markdown",
+          elemName      = XF -> "textarea",
+          appearanceOpt = None,
+          datatypeOpt   = None,
+          addAtts       = Set(QName("mediatype") -> "text/markdown"),
+          removeAtts    = Set.empty,
+          iconPathOpt   = None,
+          iconClasses   = "fa-brands fa-fw fa-markdown",
+          isCurrent     = isSameQName(current, FR -> "markdown")
+        ),
+        ConversionResult(
           fullLabelOpt  = Some("Number"),
           value         = FR -> "number",
           elemName      = FR -> "number",

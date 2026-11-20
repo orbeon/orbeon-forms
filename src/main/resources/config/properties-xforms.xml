@@ -317,6 +317,7 @@
         fr:grid-single
         fr:grid-multiple
         fr:tinymce
+        fr:markdown
         fr:dropdown-select1
         fr:dropdown-date
         fr:dropdown-year

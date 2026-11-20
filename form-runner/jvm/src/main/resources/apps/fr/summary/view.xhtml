@@ -933,9 +933,9 @@
                 </xf:action>
 
                 <!-- Restore search state when returning from a Detail page with `fr-search` -->
-                <xf:action if="not(instance('fr-last-search-context-instance')/restored-from-param = 'true') and xxf:non-blank(xxf:get-request-parameter('fr-search'))">
+                <xf:action if="not(instance('fr-last-search-context-instance')/restored-from-param = 'true') and xxf:non-blank(xxf:get-request-parameter('fr-search')[1])">
                     <xf:setvalue ref="instance('fr-last-search-context-instance')/restored-from-param" value="'true'"/>
-                    <xf:var name="decoded" value="frf:decodeSummarySearch(xxf:get-request-parameter('fr-search'))"/>
+                    <xf:var name="decoded" value="frf:decodeSummarySearch(xxf:get-request-parameter('fr-search')[1])"/>
 
                     <xf:setvalue
                         ref="instance('fr-last-search-context-instance')/restored-structured-filters"
@@ -1001,7 +1001,7 @@
                         origin="$decoded/operations"/>
 
                     <!-- Restore page number from `fr-search-pos` if provided -->
-                    <xf:var name="search-pos-str" value="string(xxf:get-request-parameter('fr-search-pos'))"/>
+                    <xf:var name="search-pos-str" value="string(xxf:get-request-parameter('fr-search-pos')[1])"/>
                     <xf:action if="$search-pos-str castable as xs:integer and xs:integer($search-pos-str) gt 0">
                         <xf:var name="page-size" value="xs:integer(instance('fr-search-instance')/page-size)"/>
                         <xf:setvalue

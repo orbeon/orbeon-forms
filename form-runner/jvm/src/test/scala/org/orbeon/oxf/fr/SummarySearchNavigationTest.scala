@@ -13,18 +13,25 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.fr.SummarySearchContext.AroundDoc
 import org.orbeon.oxf.fr.permission.{AnyOperation, Operation, Operations, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi.{SearchNeighbor, SearchNeighbors}
-import org.orbeon.oxf.test.ResourceManagerSupport
+import org.orbeon.oxf.fr.process.SimpleProcess
+import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.scaxon.NodeConversions
-import org.scalatest.funspec.AnyFunSpec
+import org.orbeon.scaxon.SimplePath.*
+import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.util.Success
 
 
-class SummarySearchNavigationTest extends AnyFunSpec with ResourceManagerSupport {
+class SummarySearchNavigationTest
+  extends DocumentTestBase
+     with ResourceManagerSupport
+     with AnyFunSpecLike
+     with FormRunnerSupport {
 
   private val appForm = AppForm("acme", "order")
   private val encoded = "e30"
@@ -121,6 +128,96 @@ class SummarySearchNavigationTest extends AnyFunSpec with ResourceManagerSupport
       assert(last.currentPosition.contains(2))
       assert(last.previous.map(_.documentId).contains("d1"))
       assert(last.next.isEmpty)
+    }
+  }
+
+  describe("Detail page mode change and request parameter handling with `fr-search`") {
+
+    it("preserves single `fr-search` / `fr-search-pos` across `edit` -> `review` mode change and tolerates duplicate params") {
+      withTempSQLite { connection =>
+        val docId      = "b1a724db78a99a060adfd169db1ce31e0eb41f4f"
+        val encodedCtx = SummarySearchContext.encode(SummarySearchContext(version = Some(1), lang = Some("en")))
+
+        val addDataSql =
+          """|INSERT INTO orbeon_form_data (
+             |    created, last_modified_time,
+             |    app, form, form_version, document_id, draft,
+             |    deleted, xml
+             |) VALUES (
+             |    ?, ?,
+             |    ?, ?, ?, ?, ?,
+             |    ?, ?
+             |)""".stripMargin
+        useAndClose(connection.prepareStatement(addDataSql)) { ps =>
+          val now = new java.sql.Timestamp(System.currentTimeMillis())
+          ps.setTimestamp(1, now)
+          ps.setTimestamp(2, now)
+          ps.setString   (3, "issue")
+          ps.setString   (4, "7343")
+          ps.setInt      (5, 1)
+          ps.setString   (6, docId)
+          ps.setString   (7, "N")
+          ps.setString   (8, "N")
+          ps.setString   (9, """<form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0"><file/></form>""")
+          ps.executeUpdate()
+        }
+
+        // 1. Open in `edit` mode with `fr-search` & `fr-search-pos` and verify mode-change query params do not duplicate them
+        val (processorService, editDocOpt, _) =
+          runFormRunner(
+            app        = "issue",
+            form       = "7343",
+            mode       = "edit",
+            documentId = Some(docId),
+            query      = List(
+              SummarySearchContext.SearchParamName    -> encodedCtx,
+              SummarySearchContext.SearchPosParamName -> "1"
+            )
+          )
+
+        val editDoc = editDocOpt.get
+        withTestExternalContext { _ =>
+          withFormRunnerDocument(processorService, editDoc) {
+            implicit val frParams: FormRunnerParams = FormRunnerParams()
+            val navRoot = editDoc.findObjectByEffectiveId("fr-search-navigation-instance").get.asInstanceOf[org.orbeon.oxf.xforms.model.XFormsInstance].rootElement
+            val searchNavParams = List(
+              SummarySearchContext.SearchParamName    -> navRoot.elemValue("search-param"),
+              SummarySearchContext.SearchPosParamName -> "3" // simulate updated fallback-position after save
+            )
+            val queryParams = SimpleProcess.buildModeChangeQueryParams(
+              currentDataFormatVersion = DataFormatVersion.Edge,
+              preserveRenderedFormats  = false,
+              extraParams              = searchNavParams,
+              paramsToExclude          = Set(SummarySearchContext.SearchParamName, SummarySearchContext.SearchPosParamName)
+            )
+            assert(queryParams.filter(_._1 == SummarySearchContext.SearchParamName)    == List(SummarySearchContext.SearchParamName -> encodedCtx))
+            assert(queryParams.filter(_._1 == SummarySearchContext.SearchPosParamName) == List(SummarySearchContext.SearchPosParamName -> "3"))
+          }
+        }
+
+        // 2. Also verify loading Detail directly with duplicate `fr-search` / `fr-search-pos` parameters does not fail
+        //    and places `.fr-navbar-search-navigation` in `.navbar .container-fluid` outside `.navbar-nav`
+        val (_, bufferedContent, _) =
+          runFormRunnerReturnContent(
+            app        = "issue",
+            form       = "7343",
+            mode       = "view",
+            documentId = Some(docId),
+            query      = List(
+              SummarySearchContext.SearchParamName    -> encodedCtx,
+              SummarySearchContext.SearchParamName    -> encodedCtx,
+              SummarySearchContext.SearchPosParamName -> "1",
+              SummarySearchContext.SearchPosParamName -> "1"
+            )
+          )
+
+        val htmlString = new String(bufferedContent.body, org.orbeon.io.CharsetNames.Utf8)
+        assert(htmlString.contains("fr-navbar-start"))
+        assert(htmlString.contains("fr-navbar-search-navigation"))
+        val searchNavIdx  = htmlString.indexOf("fr-navbar-search-navigation")
+        val navbarNavIdx  = htmlString.indexOf("navbar-nav")
+        assert(searchNavIdx > 0 && navbarNavIdx > searchNavIdx)
+      }
     }
   }
 }

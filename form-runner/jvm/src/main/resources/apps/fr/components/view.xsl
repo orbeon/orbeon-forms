@@ -510,8 +510,11 @@
                 <xsl:variable name="default-objects" as="element()+">
                     <fr:goto-content/>
                     <!-- These are typically to the left -->
-                    <fr:logo/>
-                    <fr:title/>
+                    <xh:div class="fr-navbar-start">
+                        <fr:logo/>
+                        <fr:title/>
+                    </xh:div>
+                    <fr:navbar-search-navigation/>
                     <xh:button class="navbar-toggler" type="button" data-orbeon-bs-toggle="collapse" data-orbeon-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <xh:span class="navbar-toggler-icon"></xh:span>
                     </xh:button>
@@ -525,9 +528,6 @@
                             </xh:li>
                             <!-- Optional items; each hides itself when disabled/non-relevant, and the CSS collapses
                                  the then-empty <li> -->
-                            <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
-                                <fr:navbar-search-navigation/>
-                            </xh:li>
                             <xh:li class="nav-item px-0 py-1 py-lg-1 d-flex align-items-center">
                                 <fr:navbar-workflow-stage/>
                             </xh:li>

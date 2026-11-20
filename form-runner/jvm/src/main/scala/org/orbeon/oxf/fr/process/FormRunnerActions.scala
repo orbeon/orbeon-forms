@@ -708,26 +708,45 @@ trait FormRunnerActions
     }.get
   }
 
+  private[fr] def buildModeChangeQueryParams(
+    currentDataFormatVersion: DataFormatVersion,
+    preserveRenderedFormats : Boolean,
+    extraParams             : List[(String, String)],
+    paramsToExclude         : Set[String] = Set.empty,
+  )(implicit
+    formRunnerParams        : FormRunnerParams
+  ): List[(String, String)] = {
+    val excludedNames = paramsToExclude ++ extraParams.map(_._1)
+    buildPublicStateParamsFromCurrent :::
+    buildUserAndStandardParamsForModeChangeFromCurrent(currentDataFormatVersion, preserveRenderedFormats)
+      .filterNot { case (name, _) => excludedNames(name) } :::
+    extraParams
+  }
+
   private def tryChangeModeImpl(
     replace                : ReplaceType,
-    pathQuery              : PathWithParams, // may only include rendered format params
+    pathQuery              : PathWithParams, // may include rendered format or search navigation params
     sourceModeType         : ModeType,
     formTargetOpt          : Option[String] = None,
     showProgress           : Boolean        = true,
     responseIsResource     : Boolean        = false,
     preserveRenderedFormats: Boolean        = false,
+    paramsToExclude        : Set[String]    = Set.empty,
   )(implicit
     formRunnerParams   : FormRunnerParams
   ): Option[XFormsSubmitDoneEvent] = {
 
     val currentDataFormatVersion = getOrGuessFormDataFormatVersion(frc.metadataInstance.map(_.rootElement))
 
-    val (path, maybeRenderFormatParams) = pathQuery
+    val (path, extraParams) = pathQuery
 
     val queryParams =
-      buildPublicStateParamsFromCurrent :::
-      buildUserAndStandardParamsForModeChangeFromCurrent(currentDataFormatVersion, preserveRenderedFormats) :::
-      maybeRenderFormatParams
+      buildModeChangeQueryParams(
+        currentDataFormatVersion = currentDataFormatVersion,
+        preserveRenderedFormats  = preserveRenderedFormats,
+        extraParams              = extraParams,
+        paramsToExclude          = paramsToExclude,
+      )
 
     trySendImpl(
       SendActionParams(
@@ -774,8 +793,10 @@ trait FormRunnerActions
       if (! isSupportedDetailMode(modePublicNameString, excludeSecondaryModes = true) || modePublicNameString == FormRunnerDetailMode.Pdf.publicName)
         throw new IllegalArgumentException(s"Unsupported detail mode navigation for mode: `$modePublicNameString`")
 
+      val searchNavInstanceOpt = topLevelInstance(PersistenceModel, "fr-search-navigation-instance")
+
       val searchNavParams =
-        topLevelInstance(PersistenceModel, "fr-search-navigation-instance")
+        searchNavInstanceOpt
           .map(_.rootElement)
           .toList
           .flatMap { navRoot =>
@@ -789,7 +810,12 @@ trait FormRunnerActions
         ReplaceType.All,
         s"/fr/$app/$form/$modePublicNameString/$document" -> searchNavParams,
         formRunnerParams.modeType(frc.customModes),
-        preserveRenderedFormats = preserveRenderedFormats
+        preserveRenderedFormats = preserveRenderedFormats,
+        paramsToExclude         =
+          if (searchNavInstanceOpt.isDefined)
+            Set(SummarySearchContext.SearchParamName, SummarySearchContext.SearchPosParamName)
+          else
+            Set.empty
       )
     }
 

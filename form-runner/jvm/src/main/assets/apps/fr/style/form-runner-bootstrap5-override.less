@@ -62,6 +62,35 @@
     padding-right: 15px;
   }
 
+  .navbar .fr-navbar-start {
+    display    : flex;
+    align-items: center;
+    min-width  : 0;
+  }
+
+  @media screen {
+    .navbar .container-fluid:has(> .fr-navbar-search-navigation:not(.xforms-disabled)) {
+      display              : grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(auto, 1fr);
+      align-items          : center;
+      column-gap           : 0.75em;
+
+      > .fr-navbar-start {
+        grid-column: 1;
+      }
+
+      > .fr-navbar-search-navigation {
+        grid-column : 2;
+        justify-self: center;
+      }
+
+      > .navbar-collapse {
+        grid-column : 3;
+        justify-self: end;
+      }
+    }
+  }
+
   // Logo-to-title gap, measured against Bootstrap 2
   .navbar .navbar-brand {
     margin-right: 20px;

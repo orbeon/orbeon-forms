@@ -1535,7 +1535,11 @@
 
     <xsl:template match="fr:toc[exists($toc-position-opt)]" name="fr-toc">
         <!-- This is statically built in XSLT instead of using XForms -->
-        <xh:div class="fr-toc sidebar-nav">
+        <xf:group
+            model="fr-form-model"
+            ref="instance('fr-form-instance')[$_fr-show-form-data]"
+            class="fr-toc sidebar-nav"
+            xxf:element="div">
             <xh:ul class="nav">
                 <xh:li class="nav-header"><xf:output ref="$fr-resources/summary/titles/toc"/></xh:li>
                 <xsl:apply-templates select="$body" mode="fr-toc-sections">
@@ -1546,7 +1550,7 @@
                     <xsl:with-param name="static-subsections-toc" select="'all'"   tunnel="yes"/>
                 </xsl:apply-templates>
             </xh:ul>
-        </xh:div>
+        </xf:group>
     </xsl:template>
 
 </xsl:stylesheet>

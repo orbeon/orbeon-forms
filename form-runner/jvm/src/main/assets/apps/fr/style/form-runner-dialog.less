@@ -17,6 +17,7 @@
         &[open] { display: flex }     // Don't override the user agent `display: none` closed
         flex-direction: column;
         max-width: 500px;  // Keep the dialog fairly narrow to increase legibility, but allow it to be narrower on phones
+        color: var(--orbeon-base-color); // Override user-agent `dialog { color: CanvasText }`
         background-color: rgba(0, 0, 0, 0); // For the rounded to show
         border: none;
         padding: 0;
@@ -132,4 +133,12 @@
     .fr-session-expiration-dialog {
         width: ~"min(400px, 80%)";  // Don't let less calculate this, instead output as is
     }
+
+    .dark-mode({
+        .xforms-dialog, .xforms-message-dialog {
+            .container-close {
+                filter: invert(1) grayscale(100%) brightness(200%);
+            }
+        }
+    });
 }

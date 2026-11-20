@@ -146,31 +146,104 @@ class SecureUtilsTest
     }
   }
 
-  describe("AES-GCM (Tink-compatible field encryption)") {
+  describe("AES-GCM (Tink-compatible and FIPS PBKDF2-SHA256 field encryption)") {
 
     val TestPassword = "ForTestsOnly-1!T42mMw*pgH9.EfTZx!4r"
 
-    it("must round-trip encrypt and decrypt across sizes") {
+    def withProperties[T](url: String)(body: => T): T = {
+      org.orbeon.oxf.properties.Properties.initialize(url)
+      try body
+      finally {
+        org.orbeon.oxf.properties.Properties.initialize("oxf:/ops/unit-tests/properties.xml")
+      }
+    }
+
+    it("must round-trip encrypt and decrypt Version 0 across sizes") {
       for (size <- Sizes) {
         val bytes     = randomBytes(size)
-        val encrypted = SecureUtils.AesGcm.encryptWithPassword(TestPassword, bytes)
+        val encrypted = SecureUtils.AesGcm.encryptWithPassword(TestPassword, bytes, fipsMode = false)
         val decrypted = SecureUtils.AesGcm.decryptWithPassword(TestPassword, encrypted)
         assert(bytes sameElements decrypted)
         assert(encrypted.length == 12 + size + 16)
       }
     }
 
-    it("must decrypt ciphertext produced by Google Tink AesGcmJce") {
-      val expectedText   = "Hello, Orbeon Forms! Testing Tink backward compatibility."
-      val tinkCiphertext = "7eFI2d4BL5WqHPs7yf2iEfM0hnnKgVfNe8cUqIZCA+B9nAOlT7JIRosHdZ4wyWOvQoE+FWUEz/hiOIRyubF6t13gH/LPt171Cr+g/ZnSpcWio/1l+w=="
-
-      assert(SecureUtils.AesGcm.decryptWithPassword(TestPassword, tinkCiphertext) == expectedText)
+    it("must round-trip encrypt and decrypt Version 1 (PBKDF2WithHmacSHA256) across sizes") {
+      for (size <- Sizes) {
+        val bytes      = randomBytes(size)
+        val encrypted1 = SecureUtils.AesGcm.encryptWithPassword(TestPassword, bytes, fipsMode = true, iterations = 10000)
+        val encrypted2 = SecureUtils.AesGcm.encryptWithPassword(TestPassword, bytes, fipsMode = true, iterations = 10000)
+        assert(encrypted1(0) == 0x01.toByte)
+        assert(encrypted1.length == 1 + 16 + 12 + size + 16)
+        assert(! (encrypted1 sameElements encrypted2))
+        val decrypted = SecureUtils.AesGcm.decryptWithPassword(TestPassword, encrypted1, iterations = 10000)
+        assert(bytes sameElements decrypted)
+      }
     }
 
-    it("must fail when tampering with AES-GCM ciphertext") {
-      val encrypted = SecureUtils.AesGcm.encryptWithPassword(TestPassword, randomBytes(64))
-      encrypted(encrypted.length - 1) = (encrypted(encrypted.length - 1) ^ 0x01).toByte
-      assert(Try(SecureUtils.AesGcm.decryptWithPassword(TestPassword, encrypted)).isFailure)
+    it("must decrypt ciphertexts produced by Google Tink 1.20.0 AesGcmJce (including 0x01-leading IV)") {
+      val stringVectors = List(
+        "Hello, Orbeon Forms! Testing Tink backward compatibility." -> "7eFI2d4BL5WqHPs7yf2iEfM0hnnKgVfNe8cUqIZCA+B9nAOlT7JIRosHdZ4wyWOvQoE+FWUEz/hiOIRyubF6t13gH/LPt171Cr+g/ZnSpcWio/1l+w==",
+        "43"                                                        -> "4gcE0cY39H6A28IYyjzcaHwT4nCtlfVOISljZ6qD",
+        ""                                                          -> "LZWoG8U5rfXUY2Yqe/bI1HHCiF2r5KKO8mR2Ow==",
+        """<tag attr="a&b">Café 日本語</tag>"""                      -> "BRh7wFxXvHbI99rOI+Orafi4MLQ/aOG/zwudmpOQ953pugSTcwjOdF/magRW+GtWeMp1P1EwlNzyxiRWEG+FLMA=",
+        "Value whose legacy Tink IV starts with 0x01"               -> "AUHFTmyiuv251TtpAfW6wDemP1+AQvuQKvL+XNxZ8/ZdcJgjxS87nyXWGlfNusCThfi90aiTNVEgdt0VPIXveM1jzD8mlpU="
+      )
+
+      for ((expectedText, tinkCiphertext) <- stringVectors)
+        assert(SecureUtils.AesGcm.decryptWithPassword(TestPassword, tinkCiphertext) == expectedText)
+
+      // Confirm the 0x01-leading-IV vector genuinely starts with byte 0x01 and meets Version 1 minimum length
+      val iv01Bytes = java.util.Base64.getDecoder.decode("AUHFTmyiuv251TtpAfW6wDemP1+AQvuQKvL+XNxZ8/ZdcJgjxS87nyXWGlfNusCThfi90aiTNVEgdt0VPIXveM1jzD8mlpU=")
+      assert(iv01Bytes(0) == 0x01.toByte)
+      assert(iv01Bytes.length >= 1 + 16 + 12 + 16)
+    }
+
+    it("must fail when tampering with Version 0 or Version 1 AES-GCM ciphertext") {
+      for (fipsMode <- List(false, true)) {
+        val encrypted = SecureUtils.AesGcm.encryptWithPassword(TestPassword, randomBytes(64), fipsMode = fipsMode, iterations = 10000)
+        encrypted(encrypted.length - 1) = (encrypted(encrypted.length - 1) ^ 0x01).toByte
+        assert(Try(SecureUtils.AesGcm.decryptWithPassword(TestPassword, encrypted, iterations = 10000)).isFailure)
+      }
+    }
+
+    it("must honor oxf.crypto.fips-mode for AesGcm, ephemeral encrypt/decrypt, provider lookup, and password length") {
+      withProperties("oxf:/ops/unit-tests/properties-encryption-fips-1.xml") {
+        assert(SecureUtils.isFipsMode)
+
+        // In FIPS mode, legacy `SunJCE` default must not be forced
+        assert(! SecureUtils.preferredProviderOpt("Cipher", "AES/GCM/NoPadding").exists(_.getName == "SunJCE"))
+
+        // AesGcm writes Version 1 (`0x01` prefix) and reads both Version 1 and legacy Tink Version 0
+        val v1Encrypted = SecureUtils.AesGcm.encrypt("FIPS secret value")
+        val v1Bytes     = java.util.Base64.getDecoder.decode(v1Encrypted)
+        assert(v1Bytes(0) == 0x01.toByte)
+        assert(SecureUtils.AesGcm.decrypt(v1Encrypted) == "FIPS secret value")
+        assert(SecureUtils.AesGcm.decrypt("AUHFTmyiuv251TtpAfW6wDemP1+AQvuQKvL+XNxZ8/ZdcJgjxS87nyXWGlfNusCThfi90aiTNVEgdt0VPIXveM1jzD8mlpU=") == "Value whose legacy Tink IV starts with 0x01")
+
+        // Ephemeral `SecureUtils.encrypt` / `decrypt` round-trips in FIPS mode (PBKDF2WithHmacSHA256 + AES/GCM/NoPadding)
+        val payload    = randomBytes(128)
+        val encrypted1 = SecureUtils.encrypt(SecureUtils.KeyUsage.General, payload)
+        val encrypted2 = SecureUtils.encrypt(SecureUtils.KeyUsage.General, payload)
+        assert(encrypted1 != encrypted2)
+        assert(SecureUtils.decrypt(SecureUtils.KeyUsage.General, encrypted1) sameElements payload)
+        assert(SecureUtils.decrypt(SecureUtils.KeyUsage.General, encrypted2) sameElements payload)
+      }
+
+      // Rotated password in FIPS mode still decrypts pre-change Tink data via read-fallback
+      withProperties("oxf:/ops/unit-tests/properties-encryption-fips-2.xml") {
+        assert(SecureUtils.isFipsMode)
+        assert(SecureUtils.AesGcm.decrypt("4gcE0cY39H6A28IYyjzcaHwT4nCtlfVOISljZ6qD") == "43")
+        assert(SecureUtils.AesGcm.decrypt("AUHFTmyiuv251TtpAfW6wDemP1+AQvuQKvL+XNxZ8/ZdcJgjxS87nyXWGlfNusCThfi90aiTNVEgdt0VPIXveM1jzD8mlpU=") == "Value whose legacy Tink IV starts with 0x01")
+      }
+
+      // Short password (< 15 bytes) must fail fast in FIPS mode even when password strength check is disabled
+      withProperties("oxf:/ops/unit-tests/properties-encryption-fips-short-password.xml") {
+        assert(SecureUtils.isFipsMode)
+        intercept[org.orbeon.oxf.common.ConfigurationException] {
+          SecureUtils.AesGcm.encrypt("hello")
+        }
+      }
     }
   }
 

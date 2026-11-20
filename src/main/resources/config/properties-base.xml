@@ -26,6 +26,8 @@
     <property as="xs:integer" name="oxf.crypto.key-length"                           value="128"/>
     <property as="xs:string"  name="oxf.crypto.hash-algorithm"                       value="SHA-256"/>
     <property as="xs:string"  name="oxf.crypto.preferred-provider"                   value="SunJCE"/>
+    <property as="xs:boolean" name="oxf.crypto.fips-mode"                            value="false"/>
+    <property as="xs:integer" name="oxf.crypto.kdf.iterations"                       value="310000"/>
 
     <!-- Global properties -->
     <property as="xs:string"  name="oxf.properties.providers.classnames"             value="org.orbeon.oxf.fr.persistence.PersistencePropertyProvider org.orbeon.oxf.properties.ResourcesPropertyProvider"/>

@@ -51,8 +51,16 @@ object SecureUtils extends SecureUtilsTrait {
   private val KeyLengthProperty                       = "oxf.crypto.key-length"
   private val HashAlgorithmProperty                   = "oxf.crypto.hash-algorithm"
   private val PreferredProviderProperty               = "oxf.crypto.preferred-provider"
+  private val FipsModeProperty                        = "oxf.crypto.fips-mode"
+  private val KdfIterationsProperty                   = "oxf.crypto.kdf.iterations"
 
-  private val RandomHexIdBits = 128
+  private val DefaultKdfIterations                    = 310000
+  private val LegacyKdfIterations                     = 65536
+  private val FipsMinPasswordBytes                    = 15
+  private val DefaultNonFipsProviderName              = "SunJCE"
+  private val BcFipsProviderName                      = "BCFIPS"
+
+  private val RandomHexIdBits  = 128
   private val RandomHexIdBytes = RandomHexIdBits / 8
 
   // Length of a value returned by `randomHexId` and other functions
@@ -61,17 +69,30 @@ object SecureUtils extends SecureUtilsTrait {
 
   private val HexDigits = Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')
 
-  private val KeyCipherAlgorithm = "PBKDF2WithHmacSHA1"
+  private val LegacyKeyCipherAlgorithm       = "PBKDF2WithHmacSHA1"
+  private val FipsKeyCipherAlgorithm         = "PBKDF2WithHmacSHA256"
   private val EncryptionCipherTransformation = "AES/CBC/PKCS5Padding"
-  private val AesGcmCipherTransformation = "AES/GCM/NoPadding"
-  private val DigestAlgorithm = "SHA-256"
+  private val AesGcmCipherTransformation     = "AES/GCM/NoPadding"
+  private val DigestAlgorithm                = "SHA-256"
 
   private val AESBlockSize = 128
   private val AESIVSize    = AESBlockSize / 8
 
-  private val AesGcmIvSize        = 12
-  private val AesGcmTagByteLength = 16
-  private val AesGcmTagBitLength  = AesGcmTagByteLength * 8
+  private val AesGcmVersion1Byte: Byte = 0x01
+  private val AesGcmSaltSize           = 16
+  private val AesGcmIvSize             = 12
+  private val AesGcmTagByteLength      = 16
+  private val AesGcmTagBitLength       = AesGcmTagByteLength * 8
+  private val AesGcmV1KeyBitLength     = 256
+  private val AesGcmV1MinLength        = 1 + AesGcmSaltSize + AesGcmIvSize + AesGcmTagByteLength
+
+  private def validatePasswordForFips(propertyName: String, password: String): String = {
+    if (isFipsMode && password.getBytes(CharsetNames.Utf8).length < FipsMinPasswordBytes)
+      throw new ConfigurationException(
+        s"Password for property `$propertyName` must be at least $FipsMinPasswordBytes bytes in FIPS mode"
+      )
+    password
+  }
 
   private def getPassword(keyUsage: KeyUsage): String = {
 
@@ -92,15 +113,15 @@ object SecureUtils extends SecureUtilsTrait {
 
     (keyUsage, propertyOpt) match {
       case (KeyUsage.GeneralNoCheck, Some(property)) =>
-        property.stringValue
+        validatePasswordForFips(property.name, property.stringValue)
       case (KeyUsage.GeneralNoCheck, None) =>
-        randomHexId
+        defaultGeneralNoCheckPassword
       case (_, Some(property)) if ! checkPasswordStrengthProperty =>
-        property.stringValue
+        validatePasswordForFips(property.name, property.stringValue)
       case (_, Some(property)) =>
         val isValid = property.associatedValue(_ => PasswordChecker.checkAndLog(property.name, property.stringValue))
         isValid match {
-          case true  => property.stringValue
+          case true  => validatePasswordForFips(property.name, property.stringValue)
           case false => throw new ConfigurationException(s"Invalid password for property `${property.name}` property, see log for details")
         }
       case (_, None) =>
@@ -109,35 +130,82 @@ object SecureUtils extends SecureUtilsTrait {
   }
 
   private lazy val secureRandom = new SecureRandom
+  private lazy val defaultGeneralNoCheckPassword: String = randomHexId
 
-  // Secret keys valid for the life of the classloader
-  private val secretKeys: java.util.concurrent.ConcurrentHashMap[KeyUsage, SecretKey] =
+  // Ephemeral secret keys cached by `(KeyUsage, fipsMode)` and `(password, iterations)` so dynamic property updates take effect
+  private val secretKeys: java.util.concurrent.ConcurrentHashMap[(KeyUsage, Boolean), (String, Int, SecretKey)] =
     new java.util.concurrent.ConcurrentHashMap
 
-  private def getOrComputeSecretKey(keyUsage: KeyUsage): SecretKey = {
+  private def getOrComputeSecretKey(keyUsage: KeyUsage, fipsMode: Boolean): SecretKey = {
+    val password   = getPassword(keyUsage)
+    val iterations = if (fipsMode) getKdfIterations else LegacyKdfIterations
 
-    def computeSecretKey: SecretKey = {
-
-      // Random seeded salt
-      val salt = new Array[Byte](16)
+    def computeSecretKey(): SecretKey = {
+      // Random seeded salt (ephemeral per-JVM key)
+      val salt = new Array[Byte](AesGcmSaltSize)
       secureRandom.nextBytes(salt)
 
-      val spec = new PBEKeySpec(getPassword(keyUsage).toCharArray, salt, 65536, getKeyLength)
+      val keyAlgorithm = if (fipsMode) FipsKeyCipherAlgorithm else LegacyKeyCipherAlgorithm
+      val keyBitLength = if (fipsMode) AesGcmV1KeyBitLength else getKeyLength
+      val spec         = new PBEKeySpec(password.toCharArray, salt, iterations, keyBitLength)
 
-      val factory = getSecretKeyFactory(KeyCipherAlgorithm)
-      new SecretKeySpec(factory.generateSecret(spec).getEncoded, "AES")
+      val factory = getSecretKeyFactory(keyAlgorithm)
+      try new SecretKeySpec(factory.generateSecret(spec).getEncoded, "AES")
+      finally spec.clearPassword()
     }
 
-    secretKeys.computeIfAbsent(keyUsage, _ => computeSecretKey)
+    secretKeys.compute(
+      (keyUsage, fipsMode),
+      (_, existing) =>
+        if ((existing ne null) && existing._1 == password && existing._2 == iterations)
+          existing
+        else
+          (password, iterations, computeSecretKey())
+    )._3
+  }
+
+  private val aesGcmPool = new SoftReferenceObjectPool(new BasePoolableObjectFactory[Cipher] {
+    def makeObject(): Cipher = getCipher(AesGcmCipherTransformation)
+  })
+
+  private def withAesGcmCipher[T](body: Cipher => T): T = {
+    val cipher = aesGcmPool.borrowObject()
+    try body(cipher)
+    finally aesGcmPool.returnObject(cipher)
   }
 
   // 2023-04-12: Used by `FieldEncryption` only
   object AesGcm {
 
-    private val aesGcmSecretKeys: java.util.concurrent.ConcurrentHashMap[String, SecretKey] =
+    private val v0SecretKeys: java.util.concurrent.ConcurrentHashMap[String, SecretKey] =
       new java.util.concurrent.ConcurrentHashMap
 
-    private def computeSecretKey(password: String): SecretKey = {
+    private final case class Pbkdf2CacheKey(password: String, salt: Vector[Byte], iterations: Int)
+
+    private val Pbkdf2KeyCacheMaxSize = 256
+    private val pbkdf2KeyCache: java.util.LinkedHashMap[Pbkdf2CacheKey, SecretKey] =
+      new java.util.LinkedHashMap[Pbkdf2CacheKey, SecretKey](Pbkdf2KeyCacheMaxSize + 1, 0.75f, true) {
+        override def removeEldestEntry(eldest: java.util.Map.Entry[Pbkdf2CacheKey, SecretKey]): Boolean =
+          size() > Pbkdf2KeyCacheMaxSize
+      }
+
+    private val SaltRotationIntervalMs = 3600L * 1000L // 1 hour
+    @volatile private var currentSaltAndTimestamp: (Array[Byte], Long) = null
+
+    private def currentEncryptionSalt(): Array[Byte] = {
+      val now      = System.currentTimeMillis()
+      val existing = currentSaltAndTimestamp
+      if ((existing ne null) && (now - existing._2) < SaltRotationIntervalMs) {
+        existing._1
+      } else {
+        val newSalt = new Array[Byte](AesGcmSaltSize)
+        secureRandom.nextBytes(newSalt)
+        currentSaltAndTimestamp = (newSalt, now)
+        newSalt
+      }
+    }
+
+    private def computeV0SecretKey(password: String): SecretKey = {
       val messageDigest = getMessageDigest(DigestAlgorithm)
       messageDigest.update(password.getBytes(CharsetNames.Utf8))
       val key256Bit = messageDigest.digest()
@@ -147,41 +215,82 @@ object SecureUtils extends SecureUtilsTrait {
       new SecretKeySpec(key128Bit, "AES")
     }
 
-    private def getOrComputeSecretKey(keyUsage: KeyUsage): SecretKey =
-      aesGcmSecretKeys.computeIfAbsent(getPassword(keyUsage), computeSecretKey)
+    private def getOrComputeV0SecretKey(password: String): SecretKey =
+      v0SecretKeys.computeIfAbsent(password, computeV0SecretKey)
 
-    private val aesGcmPool = new SoftReferenceObjectPool(new BasePoolableObjectFactory[Cipher] {
-      def makeObject(): Cipher = getCipher(AesGcmCipherTransformation)
-    })
-
-    private def withAesGcmCipher[T](body: Cipher => T): T = {
-      val cipher = aesGcmPool.borrowObject()
-      try body(cipher)
-      finally aesGcmPool.returnObject(cipher)
+    private def getOrComputeV1SecretKey(password: String, salt: Array[Byte], iterations: Int): SecretKey = {
+      val cacheKey  = Pbkdf2CacheKey(password, salt.toVector, iterations)
+      val cachedOpt = pbkdf2KeyCache.synchronized {
+        Option(pbkdf2KeyCache.get(cacheKey))
+      }
+      cachedOpt.getOrElse {
+        val spec    = new PBEKeySpec(password.toCharArray, salt, iterations, AesGcmV1KeyBitLength)
+        val factory = getSecretKeyFactory(FipsKeyCipherAlgorithm)
+        val secretKey =
+          try new SecretKeySpec(factory.generateSecret(spec).getEncoded, "AES")
+          finally spec.clearPassword()
+        pbkdf2KeyCache.synchronized {
+          pbkdf2KeyCache.put(cacheKey, secretKey)
+        }
+        secretKey
+      }
     }
 
-    private def encryptWithKey(plaintext: Array[Byte], secretKey: SecretKey): Array[Byte] = {
+    private def encryptV0WithPassword(password: String, plaintext: Array[Byte]): Array[Byte] = {
       val iv = new Array[Byte](AesGcmIvSize)
       secureRandom.nextBytes(iv)
+      val secretKey = getOrComputeV0SecretKey(password)
       withAesGcmCipher { cipher =>
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, new GCMParameterSpec(AesGcmTagBitLength, iv))
         iv ++ cipher.doFinal(plaintext)
       }
     }
 
-    private def decryptWithKey(ciphertext: Array[Byte], secretKey: SecretKey): Array[Byte] = {
+    private def encryptV1WithPassword(password: String, plaintext: Array[Byte], iterations: Int): Array[Byte] = {
+      val salt      = currentEncryptionSalt()
+      val iv        = new Array[Byte](AesGcmIvSize)
+      secureRandom.nextBytes(iv)
+      val secretKey = getOrComputeV1SecretKey(password, salt, iterations)
+      withAesGcmCipher { cipher =>
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, new GCMParameterSpec(AesGcmTagBitLength, iv))
+        val encrypted = cipher.doFinal(plaintext)
+        val out       = new Array[Byte](1 + AesGcmSaltSize + AesGcmIvSize + encrypted.length)
+        out(0) = AesGcmVersion1Byte
+        System.arraycopy(salt,      0, out, 1,                                AesGcmSaltSize)
+        System.arraycopy(iv,        0, out, 1 + AesGcmSaltSize,               AesGcmIvSize)
+        System.arraycopy(encrypted, 0, out, 1 + AesGcmSaltSize + AesGcmIvSize, encrypted.length)
+        out
+      }
+    }
+
+    private def decryptV0WithPassword(password: String, ciphertext: Array[Byte]): Array[Byte] = {
       if (ciphertext.length < AesGcmIvSize + AesGcmTagByteLength)
         throw new GeneralSecurityException("ciphertext too short")
+      val secretKey = getOrComputeV0SecretKey(password)
       withAesGcmCipher { cipher =>
         cipher.init(Cipher.DECRYPT_MODE, secretKey, new GCMParameterSpec(AesGcmTagBitLength, ciphertext, 0, AesGcmIvSize))
         cipher.doFinal(ciphertext, AesGcmIvSize, ciphertext.length - AesGcmIvSize)
       }
     }
 
+    private def decryptV1WithPassword(password: String, ciphertext: Array[Byte], iterations: Int): Array[Byte] = {
+      val salt       = java.util.Arrays.copyOfRange(ciphertext, 1, 1 + AesGcmSaltSize)
+      val ivOffset   = 1 + AesGcmSaltSize
+      val dataOffset = ivOffset + AesGcmIvSize
+      val secretKey  = getOrComputeV1SecretKey(password, salt, iterations)
+      withAesGcmCipher { cipher =>
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, new GCMParameterSpec(AesGcmTagBitLength, ciphertext, ivOffset, AesGcmIvSize))
+        cipher.doFinal(ciphertext, dataOffset, ciphertext.length - dataOffset)
+      }
+    }
+
+    private def decodeBase64(ciphertext: String): Array[Byte] =
+      JBase64.getDecoder.decode(ciphertext.filterNot(_.isWhitespace))
+
     def encrypt(plaintext: Array[Byte], keyUsage: KeyUsage = KeyUsage.FieldEncryption): Array[Byte] =
       keyUsage match {
         case KeyUsage.GeneralNoCheck | KeyUsage.Token | KeyUsage.McpToken | KeyUsage.FieldEncryption =>
-          encryptWithKey(plaintext, getOrComputeSecretKey(keyUsage))
+          encryptWithPassword(getPassword(keyUsage), plaintext, fipsMode = isFipsMode, iterations = getKdfIterations)
         case KeyUsage.General | KeyUsage.FieldEncryptionFallback =>
           throw new IllegalArgumentException(s"Unsupported key usage for AES-GCM encryption: `$keyUsage`")
       }
@@ -189,13 +298,13 @@ object SecureUtils extends SecureUtilsTrait {
     def decrypt(ciphertext: Array[Byte], keyUsage: KeyUsage = KeyUsage.FieldEncryption): Array[Byte] =
       keyUsage match {
         case KeyUsage.GeneralNoCheck | KeyUsage.Token | KeyUsage.McpToken =>
-          decryptWithKey(ciphertext, getOrComputeSecretKey(keyUsage))
+          decryptWithPassword(getPassword(keyUsage), ciphertext, iterations = getKdfIterations)
         case KeyUsage.FieldEncryption =>
           try {
-            decryptWithKey(ciphertext, getOrComputeSecretKey(KeyUsage.FieldEncryption))
+            decryptWithPassword(getPassword(KeyUsage.FieldEncryption), ciphertext, iterations = getKdfIterations)
           } catch {
             case _: GeneralSecurityException if checkPasswordForKeyUsage(KeyUsage.FieldEncryptionFallback) =>
-              decryptWithKey(ciphertext, getOrComputeSecretKey(KeyUsage.FieldEncryptionFallback))
+              decryptWithPassword(getPassword(KeyUsage.FieldEncryptionFallback), ciphertext, iterations = getKdfIterations)
           }
         case KeyUsage.General | KeyUsage.FieldEncryptionFallback =>
           throw new IllegalArgumentException(s"Unsupported key usage for AES-GCM decryption: `$keyUsage`")
@@ -205,17 +314,45 @@ object SecureUtils extends SecureUtilsTrait {
       JBase64.getEncoder.encodeToString(encrypt(plaintext.getBytes(CharsetNames.Utf8), keyUsage))
 
     def decrypt(ciphertext: String, keyUsage: KeyUsage = KeyUsage.FieldEncryption): String =
-      new String(decrypt(JBase64.getMimeDecoder.decode(ciphertext), keyUsage), CharsetNames.Utf8)
+      new String(decrypt(decodeBase64(ciphertext), keyUsage), CharsetNames.Utf8)
 
-    private[util] def encryptWithPassword(password: String, plaintext: Array[Byte]): Array[Byte] =
-      encryptWithKey(plaintext, aesGcmSecretKeys.computeIfAbsent(password, computeSecretKey))
+    private[util] def encryptWithPassword(
+      password  : String,
+      plaintext : Array[Byte],
+      fipsMode  : Boolean = isFipsMode,
+      iterations: Int     = getKdfIterations
+    ): Array[Byte] =
+      if (fipsMode)
+        encryptV1WithPassword(password, plaintext, iterations)
+      else
+        encryptV0WithPassword(password, plaintext)
 
-    private[util] def decryptWithPassword(password: String, ciphertext: Array[Byte]): Array[Byte] =
-      decryptWithKey(ciphertext, aesGcmSecretKeys.computeIfAbsent(password, computeSecretKey))
+    private[util] def decryptWithPassword(
+      password  : String,
+      ciphertext: Array[Byte],
+      iterations: Int = getKdfIterations
+    ): Array[Byte] =
+      if (ciphertext.length >= AesGcmV1MinLength && ciphertext(0) == AesGcmVersion1Byte) {
+        try {
+          decryptV1WithPassword(password, ciphertext, iterations)
+        } catch {
+          case _: GeneralSecurityException =>
+            // Fallback for pre-change Version 0 (Tink) ciphertexts whose random 12-byte IV happens to start with `0x01`
+            decryptV0WithPassword(password, ciphertext)
+        }
+      } else {
+        decryptV0WithPassword(password, ciphertext)
+      }
 
     private[util] def decryptWithPassword(password: String, ciphertext: String): String =
-      new String(decryptWithPassword(password, JBase64.getMimeDecoder.decode(ciphertext)), CharsetNames.Utf8)
+      new String(decryptWithPassword(password, decodeBase64(ciphertext)), CharsetNames.Utf8)
   }
+
+  def isFipsMode: Boolean =
+    Properties.instance.getPropertySet.getBoolean(FipsModeProperty, default = false)
+
+  def getKdfIterations: Int =
+    Properties.instance.getPropertySet.getInteger(KdfIterationsProperty, DefaultKdfIterations)
 
   private def checkPasswordStrengthProperty: Boolean =
     Properties.instance.getPropertySet.getBoolean(CheckPasswordStrengthProperty, default = true)
@@ -232,11 +369,23 @@ object SecureUtils extends SecureUtilsTrait {
   // See: https://github.com/orbeon/orbeon-forms/pull/1745
   private[oxf] def preferredProviderOpt(serviceType: String, algorithm: String): Option[Provider] = {
     val baseAlgorithm = algorithm.takeWhile(_ != '/')
-    getPreferredProvider flatMap { preferredProvider =>
+
+    def supportsService(provider: Provider): Boolean =
+      (provider.getService(serviceType, algorithm) ne null) ||
+        (provider.getService(serviceType, baseAlgorithm) ne null)
+
+    val effectiveProviderNameOpt =
+      getPreferredProvider match {
+        case Some(DefaultNonFipsProviderName) if isFipsMode =>
+          // In FIPS mode, do not force the legacy `SunJCE` default over a registered `BCFIPS` / provider #1
+          Some(BcFipsProviderName)
+        case other =>
+          other
+      }
+
+    effectiveProviderNameOpt flatMap { preferredProvider =>
       Security.getProviders find { provider =>
-        provider.getName == preferredProvider &&
-          ((provider.getService(serviceType, algorithm) ne null) ||
-           (provider.getService(serviceType, baseAlgorithm) ne null))
+        provider.getName == preferredProvider && supportsService(provider)
       }
     }
   }
@@ -279,18 +428,36 @@ object SecureUtils extends SecureUtilsTrait {
 
   // Public for tests
   def encryptIV(keyUsage: KeyUsage, bytes: Array[Byte], ivOption: Option[Array[Byte]]): String =
-    withCipher { cipher =>
-      ivOption match {
-        case Some(iv) =>
-          cipher.init(Cipher.ENCRYPT_MODE, getOrComputeSecretKey(keyUsage), new IvParameterSpec(iv))
-          // Don't prepend IV
-          Base64.encode(cipher.doFinal(bytes), useLineBreaks = false)
-        case None =>
-          cipher.init(Cipher.ENCRYPT_MODE, getOrComputeSecretKey(keyUsage))
-          val params = cipher.getParameters
-          val iv = params.getParameterSpec(classOf[IvParameterSpec]).getIV
-          // Prepend the IV to the ciphertext
-          Base64.encode(iv ++ cipher.doFinal(bytes), useLineBreaks = false)
+    if (isFipsMode) {
+      val secretKey = getOrComputeSecretKey(keyUsage, fipsMode = true)
+      withAesGcmCipher { cipher =>
+        ivOption match {
+          case Some(iv) =>
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, new GCMParameterSpec(AesGcmTagBitLength, iv))
+            // Don't prepend IV
+            Base64.encode(cipher.doFinal(bytes), useLineBreaks = false)
+          case None =>
+            val iv = new Array[Byte](AesGcmIvSize)
+            secureRandom.nextBytes(iv)
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, new GCMParameterSpec(AesGcmTagBitLength, iv))
+            // Prepend the IV to the ciphertext
+            Base64.encode(iv ++ cipher.doFinal(bytes), useLineBreaks = false)
+        }
+      }
+    } else {
+      withCipher { cipher =>
+        ivOption match {
+          case Some(iv) =>
+            cipher.init(Cipher.ENCRYPT_MODE, getOrComputeSecretKey(keyUsage, fipsMode = false), new IvParameterSpec(iv))
+            // Don't prepend IV
+            Base64.encode(cipher.doFinal(bytes), useLineBreaks = false)
+          case None =>
+            cipher.init(Cipher.ENCRYPT_MODE, getOrComputeSecretKey(keyUsage, fipsMode = false))
+            val params = cipher.getParameters
+            val iv = params.getParameterSpec(classOf[IvParameterSpec]).getIV
+            // Prepend the IV to the ciphertext
+            Base64.encode(iv ++ cipher.doFinal(bytes), useLineBreaks = false)
+        }
       }
     }
 
@@ -298,19 +465,34 @@ object SecureUtils extends SecureUtilsTrait {
   def decrypt(keyUsage: KeyUsage, text: String): Array[Byte] = decryptIV(keyUsage, text, None)
 
   private def decryptIV(keyUsage: KeyUsage, text: String, ivOption: Option[Array[Byte]]): Array[Byte] =
-    withCipher { cipher =>
-      val (iv, message) =
-        ivOption match {
-          case Some(iv) =>
-            // The IV was passed
-            (iv, Base64.decode(text))
-          case None =>
-            // The IV was prepended to the message
-            Base64.decode(text).splitAt(AESIVSize)
-        }
+    if (isFipsMode) {
+      val secretKey = getOrComputeSecretKey(keyUsage, fipsMode = true)
+      withAesGcmCipher { cipher =>
+        val (iv, message) =
+          ivOption match {
+            case Some(iv) =>
+              (iv, Base64.decode(text))
+            case None =>
+              Base64.decode(text).splitAt(AesGcmIvSize)
+          }
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, new GCMParameterSpec(AesGcmTagBitLength, iv))
+        cipher.doFinal(message)
+      }
+    } else {
+      withCipher { cipher =>
+        val (iv, message) =
+          ivOption match {
+            case Some(iv) =>
+              // The IV was passed
+              (iv, Base64.decode(text))
+            case None =>
+              // The IV was prepended to the message
+              Base64.decode(text).splitAt(AESIVSize)
+          }
 
-      cipher.init(Cipher.DECRYPT_MODE, getOrComputeSecretKey(keyUsage), new IvParameterSpec(iv))
-      cipher.doFinal(message)
+        cipher.init(Cipher.DECRYPT_MODE, getOrComputeSecretKey(keyUsage, fipsMode = false), new IvParameterSpec(iv))
+        cipher.doFinal(message)
+      }
     }
 
   def digestStringJava(text: String, algorithm: String, encoding: String): String =

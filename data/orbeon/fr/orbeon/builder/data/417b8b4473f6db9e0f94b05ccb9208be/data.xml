@@ -323,7 +323,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                     </xf:bind>
                     <xf:bind id="grid-6-bind" ref="grid-6" name="grid-6">
                         <xf:bind id="secret-bind" ref="secret" name="secret" required="true()" constraint=". = '42'"></xf:bind>
-                        <xf:bind id="masked-input-bind" ref="masked-input" name="masked-input" type="fr:masked-input" xxf:default="'AB-1234'"></xf:bind>
+                        <xf:bind id="masked-input-bind" ref="masked-input" name="masked-input" type="fr:masked-input" xxf:default="'AB1234'"></xf:bind>
                         <xf:bind id="url-bind" ref="url" name="url" type="fr:url" xxf:whitespace="trim" xxf:default="'https://www.orbeon.com/'"></xf:bind>
                         <xf:bind id="tags-bind" ref="tags" name="tags" type="fr:tags-input" xxf:default="'alpha beta gamma'"></xf:bind>
                         <xf:bind id="code-input-bind" ref="code-input" name="code-input" type="fr:code-input" xxf:default="'048291'"></xf:bind>

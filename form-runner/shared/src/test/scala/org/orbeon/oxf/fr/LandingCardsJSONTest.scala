@@ -55,7 +55,7 @@ class LandingCardsJSONTest extends AnyFunSpecLike {
         {
           "card-type": "form-data",
           "title": "landing.titles.form-builder-forms",
-          "description": "landing.description.form-builder-forms",
+          "description": "landing.descriptions.form-builder-forms",
           "thumbnail": "/apps/fr/style/images/orbeon/library.svg",
           "app": "orbeon",
           "form": "builder",
@@ -107,7 +107,7 @@ class LandingCardsJSONTest extends AnyFunSpecLike {
         ),
         FormData(
           title = Some(ByResource("landing.titles.form-builder-forms")),
-          description = Some(ByResource("landing.description.form-builder-forms")),
+          description = Some(ByResource("landing.descriptions.form-builder-forms")),
           thumbnail = Some("/apps/fr/style/images/orbeon/library.svg"),
           app = "orbeon",
           form = "builder",
@@ -227,11 +227,18 @@ class LandingCardsJSONTest extends AnyFunSpecLike {
     }
 
     it("must parse legacy tokens correctly") {
-      val legacy = LandingCardsJSON.legacyTokensToCaseClasses("demo-forms published-forms")
+      val legacy = LandingCardsJSON.legacyTokensToCaseClasses("demo-forms published-forms form-builder-forms")
       assert(legacy.collect { case p: PublishedForms => p.linkTo } == List(
         List(LinkTo.Summary),
         List(LinkTo.New),
         List(LinkTo.Summary)
+      ))
+      assert(legacy.collect { case f: FormData => (f.title, f.description, f.thumbnail) } == List(
+        (
+          Some(ByResource("landing.titles.form-builder-forms")),
+          Some(ByResource("landing.descriptions.form-builder-forms")),
+          Some("/apps/fr/style/images/orbeon/library.svg")
+        )
       ))
     }
 

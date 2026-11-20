@@ -26,7 +26,7 @@
                 <xf:var name="items" value="xxf:itemset('hidden-select', 'xml')//item"/>
 
                 <xh:h2 class="card-title card-header text-center"><xf:output value="xxf:label('fr-card')"/></xh:h2>
-                <xh:div class="card-body text-center" xxf:control="true" ref=".[not(fr:component-param-value('loading') = 'true')]">
+                <xh:div class="card-body text-center" xxf:control="true" ref=".[not(fr:component-param-value('status') = ('loading', 'error'))]">
                     <xbl:content includes=":root > fr|card-body > *, :root > fr|card-thumbnail > *"/>
                 </xh:div>
                 <xh:div class="card-body text-center" xxf:control="true" ref=".[fr:component-param-value('status') = 'loading']">
@@ -40,14 +40,16 @@
                 <xf:var name="columns" value="(fr:component-param-value('columns')[xxf:non-blank()], '1')[1]"/>
                 <xh:ul class="list-group list-group-flush fr-card-cols-{{$columns}}">
                     <xsl:if test="exists(/*/fr:headings)">
-                        <xh:li class="list-group-item fr-card-head text-truncate">
+                        <xsl:attribute name="role">table</xsl:attribute>
+                        <xsl:attribute name="aria-label">{{xxf:label('fr-card')}}</xsl:attribute>
+                        <xh:li class="list-group-item fr-card-head text-truncate" role="row">
                             <xbl:content includes=":root > fr|headings > *"/>
                         </xh:li>
                     </xsl:if>
-                    <xf:repeat ref="$items/value/string()">
-                        <xf:var name="value" value="."/>
-                        <xf:var name="label" value="$items[value = $value]/label/string()"/>
-                        <xf:var name="hint"  value="$items[value = $value]/hint/string()"/>
+                    <xf:repeat ref="$items">
+                        <xf:var name="value" value="value/string()"/>
+                        <xf:var name="label" value="label/string()"/>
+                        <xf:var name="hint"  value="hint/string()"/>
                         <xf:var name="parts" value="for $p in xxf:split($label, '|') return xxf:trim($p)"/>
                         <xf:var name="is-single-cell" value="count($parts) le 1"/>
                         <xh:li class="list-group-item text-truncate">

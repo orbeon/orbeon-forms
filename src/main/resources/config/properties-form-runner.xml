@@ -804,6 +804,8 @@
         },
         {
           "card-type": "form-data",
+          "title": "landing.titles.form-builder-forms",
+          "description": "landing.descriptions.form-builder-forms",
           "thumbnail": "/apps/fr/style/images/orbeon/library.svg",
           "app": "orbeon",
           "form": "builder",

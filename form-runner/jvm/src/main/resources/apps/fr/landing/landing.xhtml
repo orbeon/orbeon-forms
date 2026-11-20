@@ -206,11 +206,29 @@
                 <xf:repeat ref="instance('fr-cards-config-xml')/_[card-type = 'form-data' and ($is-allow-form-builder or not(app = 'orbeon' and form = 'builder'))]">
                     <fr:card-form-data
                         id="form-data-card"
+                        ref="."
                         app="{app}"
                         form="{form}"
                         version="{version}"
                         thumbnail="{thumbnail}"
-                    />
+                    >
+                        <xf:label
+                            ref="
+                                if (title/@type = 'object') then
+                                    title/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
+                                else if (xxf:non-blank(title)) then
+                                    xxf:r(title, '|fr-fr-resources|')
+                                else
+                                    ()"/>
+                        <xf:help
+                            ref="
+                                if (description/@type = 'object') then
+                                    description/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
+                                else if (xxf:non-blank(description)) then
+                                    xxf:r(description, '|fr-fr-resources|')
+                                else
+                                    ()"/>
+                    </fr:card-form-data>
                 </xf:repeat>
             </xh:div>
         </fr:view>

@@ -93,7 +93,7 @@
 
                         <xf:setvalue
                             ref="instance('fr-search-request-instance')/@xml:lang"
-                            value="xxf:lang()"/>
+                            value="(xxf:instance('fr-fr-language-instance')[xxf:non-blank()], 'en')[1]"/>
 
                         <xf:delete
                             ref="instance('fr-search-request-instance')/*"/>
@@ -122,6 +122,14 @@
             </xf:model>
         </xbl:implementation>
         <xbl:template>
+            <xf:var
+                name="language-watch"
+                value="xxf:instance('fr-fr-language-instance')">
+                <xf:send event="xforms-value-changed" submission="fr-read-demo-forms-submission"/>
+            </xf:var>
+            <xf:var
+                name="latest-modified-dt"
+                value="max(instance('fr-forms-instance')/*/last-modified-time[. castable as xs:dateTime]/xs:dateTime(.))"/>
             <fr:card
                     status="{(instance('fr-forms-instance')/@state, 'done')[1]}"
                 >
@@ -186,26 +194,22 @@
                     <xh:img src="{fr:component-param-value('thumbnail')}" class="img-thumbnail img-invertible"/>
                 </fr:card-thumbnail>
                 <fr:card-footer>
-                    <xh:span>
+                    <xh:span class="{'xforms-hidden'[empty($latest-modified-dt)]}">
                         <xf:output value="
-                            (: TODO: Make this a reusable function :)
-                            let $date-time := max(instance('fr-forms-instance')/*/last-modified-time/xs:dateTime(.)),
-                                $v :=
+                            if (empty($latest-modified-dt)) then
+                                ''
+                            else
+                                let $v :=
                                     if (exists($tz)) then
-                                        adjust-dateTime-to-timezone(
-                                            $date-time,
-                                            $tz
-                                        )
+                                        adjust-dateTime-to-timezone($latest-modified-dt, $tz)
                                     else
-                                        adjust-dateTime-to-timezone(
-                                            $date-time
-                                        )
-                            return
-                                if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
-                                then format-dateTime($v, xxf:r('common.formats.within-day', '|fr-fr-resources|'), xxf:lang(), (), ())
-                                else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
-                                then format-dateTime($v, xxf:r('common.formats.day-this-year', '|fr-fr-resources|'), xxf:lang(), (), ())
-                                else format-dateTime($v, xxf:r('common.formats.short-date', '|fr-fr-resources|'), xxf:lang(), (), ())">
+                                        adjust-dateTime-to-timezone($latest-modified-dt)
+                                return
+                                    if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
+                                    then format-dateTime($v, xxf:r('common.formats.within-day', '|fr-fr-resources|'), xxf:lang(), (), ())
+                                    else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
+                                    then format-dateTime($v, xxf:r('common.formats.day-this-year', '|fr-fr-resources|'), xxf:lang(), (), ())
+                                    else format-dateTime($v, xxf:r('common.formats.short-date', '|fr-fr-resources|'), xxf:lang(), (), ())">
                             <xf:label ref="xxf:r('home-summary.titles.last-modified', '|fr-fr-resources|')"/>
                         </xf:output>
                     </xh:span>

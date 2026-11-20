@@ -14,6 +14,31 @@
         xxbl:mode="lhha custom-lhha binding"
         class=""
     >
+        <xbl:handlers>
+            <xbl:handler event="fr-sync-aria-sort" phase="target">
+                <xf:action type="javascript">
+                    <xf:param name="col" value="event('col')"/>
+                    <xf:param name="dir" value="event('dir')"/>
+                    <xf:body>
+                        const root = this;
+                        if (root &amp;&amp; root.querySelectorAll) {
+                            const sync = () =&gt; {
+                                const ariaVal = dir === 'asc' ? 'ascending' : (dir === 'desc' ? 'descending' : '');
+                                for (const h of root.querySelectorAll('.fr-card-heading')) {
+                                    if (col &amp;&amp; h.getAttribute('data-col-path') === col &amp;&amp; ariaVal)
+                                        h.setAttribute('aria-sort', ariaVal);
+                                    else
+                                        h.removeAttribute('aria-sort');
+                                }
+                            };
+                            sync();
+                            window.requestAnimationFrame(sync);
+                        }
+                    </xf:body>
+                </xf:action>
+            </xbl:handler>
+        </xbl:handlers>
+
         <xbl:implementation>
             <xf:model id="model">
 
@@ -27,17 +52,17 @@
                         for $offset in frf:defaultTimezoneToOffsetString()
                         return xs:dayTimeDuration($offset)"/>
 
-                <!-- FIXME: `xxf:lang()` doesn't work from here. -->
+                <!-- `xxf:lang()` isn't available inside `xf:model`, so read `fr-fr-language-instance` directly -->
                 <xf:var
                     name="datelang"
                     value="(xxf:instance('fr-fr-language-instance')[frf:hasXPathNumberer(.)], 'en')[1]"/>
 
                 <xf:var name="app"     value="fr:component-param-value('app')"/>
                 <xf:var name="form"    value="fr:component-param-value('form')"/>
-                <xf:var name="version" value="xs:integer(fr:component-param-value('version'))"/>
+                <xf:var name="version" value="xs:integer((fr:component-param-value('version')[. castable as xs:integer], 1)[1])"/>
 
                 <xf:instance id="fr-state-instance" xxf:exclude-result-prefixes="#all">
-                    <_ state="initial"/>
+                    <_ state="initial" latest-modified=""/>
                 </xf:instance>
 
                 <!-- TODO -->
@@ -167,23 +192,30 @@
                         ref="instance('fr-state-instance')/@state"
                         value="'error'"/>
 
-                    <xf:setvalue
-                        event="xforms-submit-done"
-                        ref="instance('fr-state-instance')/@state"
-                        value="'done'"/>
+                    <xf:action event="xforms-submit-done">
+                        <xf:setvalue ref="instance('fr-state-instance')/@state" value="'done'"/>
+                        <xf:var name="returned-docs" value="instance('fr-search-results-instance')/document"/>
+                        <xf:var name="search-total"  value="xs:integer((instance('fr-search-results-instance')/@search-total[. castable as xs:integer], 0)[1])"/>
+                        <xf:setvalue
+                            ref="instance('fr-state-instance')/@latest-modified"
+                            value="
+                                if ($search-total le 0 or empty($returned-docs)) then
+                                    ''
+                                else if (instance('fr-order-by')/column = 'last-modified' and instance('fr-order-by')/direction = 'desc') then
+                                    string($returned-docs[1]/@last-modified)
+                                else
+                                    string(
+                                        max((
+                                            instance('fr-state-instance')/@latest-modified[. castable as xs:dateTime]/xs:dateTime(.),
+                                            $returned-docs/@last-modified[. castable as xs:dateTime]/xs:dateTime(.)
+                                        ))
+                                    )"/>
+                    </xf:action>
 
                     <!-- Set language upon submitting -->
                     <xf:action event="xforms-submit">
                         <xf:setvalue ref="page-size" value="$page-size + 1"/>
-                        <xf:setvalue ref="lang" value="'en'"/>
-                        <!-- NOTE: xxf:lang() doesn't seem to work here -->
-    <!--                    <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>-->
-<!--                        <xf:setvalue-->
-<!--                            ref="instance('fr-search-results-instance')/query[ends-with(@path, '/application-name')]"-->
-<!--                            value="fr:component-param-value('app')"/>-->
-<!--                        <xf:setvalue-->
-<!--                            ref="instance('fr-search-results-instance')/query[ends-with(@path, '/application-name')]"-->
-<!--                            value="fr:component-param-value('form')"/>-->
+                        <xf:setvalue ref="lang" value="(xxf:instance('fr-fr-language-instance')[xxf:non-blank()], 'en')[1]"/>
                     </xf:action>
 
                 </xf:submission>
@@ -273,11 +305,38 @@
                 name="show-more"
                 value="$document-count-to-show lt instance('fr-search-results-instance')/@search-total/xs:integer(.)"/>
 
+            <xf:var
+                name="param-thumbnail"
+                value="fr:component-param-value('thumbnail')[xxf:non-blank()]"/>
+
+            <xf:var
+                name="metadata-thumbnail"
+                value="instance('fr-form-metadata-instance')/thumbnail[xxf:non-blank()]"/>
+
+            <xf:var
+                name="svg-thumbnail"
+                value="($param-thumbnail, if (empty($metadata-thumbnail) and $app = 'orbeon' and $form = 'builder') then '/apps/fr/style/images/orbeon/library.svg' else ())[1]"/>
+
+            <xf:var
+                name="latest-modified-dt"
+                value="instance('fr-state-instance')/@latest-modified[. castable as xs:dateTime]/xs:dateTime(.)"/>
+
+            <xf:var
+                name="language-watch"
+                value="xxf:instance('fr-fr-language-instance')">
+                <xf:send event="xforms-value-changed" submission="fr-search-submission"/>
+            </xf:var>
+
             <fr:card
                 status="{(instance('fr-state-instance')/@state, 'done')[1]}"
-                columns="{count($detail-positions)}"
+                columns="{max((count($detail-positions), 1))}"
             >
-                <xf:label value="instance('fr-form-metadata-instance')/(title[@xml:lang = xxf:lang()], title)[1]"/>
+                <xf:label
+                    value="(
+                        xxf:label('fr-card-form-data')[xxf:non-blank()],
+                        instance('fr-form-metadata-instance')/(title[@xml:lang = xxf:lang()], title)[xxf:non-blank()],
+                        $form
+                    )[1]"/>
                 <fr:headings>
                     <xf:repeat ref="instance('fr-search-labels-instance')/query[@name and @summary-show = 'true']">
                         <xf:var name="path" value="@path"/>
@@ -289,7 +348,7 @@
                             else
                                 '&#x25BC;'
                         "/>
-                        <xh:span class="fr-card-col fr-card-heading">
+                        <xh:span class="fr-card-col fr-card-heading" role="columnheader" data-col-path="{$path}">
                             <xf:trigger appearance="minimal" class="fr-card-sort-trigger">
                                 <xf:label>
                                     <xh:span class="fr-card-col-text text-truncate">
@@ -325,6 +384,11 @@
                                     <xf:setvalue ref="instance('fr-order-by')/column" value="$next-col"/>
                                     <xf:setvalue ref="instance('fr-order-by')/direction" value="$next-dir"/>
 
+                                    <xf:dispatch name="fr-sync-aria-sort" targetid="fr-card-form-data">
+                                        <xf:property name="col" value="if ($next-col = 'last-modified') then '' else string($next-col)"/>
+                                        <xf:property name="dir" value="$next-dir"/>
+                                    </xf:dispatch>
+
                                     <!-- Delete sort attribute from all queries -->
                                     <xf:delete ref="instance('fr-search-instance')/query/@sort"/>
 
@@ -344,21 +408,25 @@
                         </xh:span>
                     </xf:repeat>
                 </fr:headings>
-<!--                <xh:span class="badge rounded-pill bg-primary">-->
-<!--                        <xf:output value="instance('fr-search-results-instance')/@search-total" appearance="minimal"/>-->
-<!--                    </xh:span>-->
                 <fr:card-body>
-                    <xf:output value="instance('fr-form-metadata-instance')/(description[@xml:lang = xxf:lang()], description)[1]"/>
+                    <xf:output
+                        value="(
+                            xxf:help('fr-card-form-data')[xxf:non-blank()],
+                            instance('fr-form-metadata-instance')/(description[@xml:lang = xxf:lang()], description)[xxf:non-blank()]
+                        )[1]"/>
                 </fr:card-body>
                 <fr:card-thumbnail>
                     <!-- https://github.com/orbeon/orbeon-forms/issues/6696 -->
                     <xf:output
                         mediatype="image/*"
-                        ref="instance('fr-form-metadata-instance')/thumbnail[xxf:non-blank()]"
+                        ref="$metadata-thumbnail[empty($param-thumbnail)]"
                         class="img-thumbnail"/>
-                    <xh:img
-                        src="{fr:component-param-value('thumbnail')}"
-                        class="img-thumbnail img-invertible"/>
+                    <xf:group ref=".[exists($svg-thumbnail)]">
+                        <xh:img
+                            src="{($svg-thumbnail, 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')[1]}"
+                            alt=""
+                            class="img-thumbnail img-invertible"/>
+                    </xf:group>
                 </fr:card-thumbnail>
 
                 <xf:itemset ref="instance('fr-search-results-instance')/document[position() le $document-count-to-show]">
@@ -512,47 +580,44 @@
                 </xf:itemset>
                 <xf:itemset ref=".[$show-more]">
                     <xf:label ref="xxf:r('landing.show-more', '|fr-fr-resources|')"/>
-                    <xf:value ref="concat('/fr/', $app, '/', $form, '/summary?form-version=', $version)"/>
+                    <xf:value
+                        ref="
+                            concat(
+                                '/fr/',
+                                $app,
+                                '/',
+                                $form,
+                                '/summary',
+                                if (
+                                    $version != 1 and
+                                    xxf:property(string-join(('oxf.fr.summary.show-version-selector', $app, $form), '.'))
+                                ) then
+                                    concat('?form-version=', $version)
+                                else
+                                    ''
+                            )"/>
                 </xf:itemset>
-]
-<!--                                    <xf:switch-->
-<!--                                        caseref="starts-with(normalize-space($detail), '&lt;div')"-->
-<!--                                        xxf:update="full">-->
-<!--                                        <xf:case value="true()">-->
-<!--                                            <xf:output mediatype="text/html" value="frf:maybeFilterHtml($detail)"/>-->
-<!--                                        </xf:case>-->
-<!--                                        <xf:case value="false()">-->
-<!--                                            <xf:output value="$detail"/>-->
-<!--                                        </xf:case>-->
-<!--                                    </xf:switch>-->
-<!--                    <xf:repeat ref="1 to $page-size + 1 - $document-count-to-show - (if ($show-more) then 1 else 0)">-->
-<!--                        <xh:li class="list-group-item text-truncate">-->
-<!--                            &#160;-->
-<!--                        </xh:li>-->
-<!--                    </xf:repeat>-->
 
                 <fr:card-footer>
-                    <xf:output value="
-                        (: TODO: Make this a reusable function :)
-                        let $date-time := $documents[1]/@last-modified/xs:dateTime(.),
-                            $v :=
-                                if (exists($tz)) then
-                                    adjust-dateTime-to-timezone(
-                                        $date-time,
-                                        $tz
-                                    )
-                                else
-                                    adjust-dateTime-to-timezone(
-                                        $date-time
-                                    )
-                        return
-                            if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
-                            then format-dateTime($v, xxf:r('common.formats.within-day', '|fr-fr-resources|'), xxf:lang(), (), ())
-                            else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
-                            then format-dateTime($v, xxf:r('common.formats.day-this-year', '|fr-fr-resources|'), xxf:lang(), (), ())
-                            else format-dateTime($v, xxf:r('common.formats.short-date', '|fr-fr-resources|'), xxf:lang(), (), ())">
-                        <xf:label ref="xxf:r('home-summary.titles.last-modified', '|fr-fr-resources|')"/>
-                    </xf:output>
+                    <xh:span class="{'xforms-hidden'[empty($latest-modified-dt)]}">
+                        <xf:output value="
+                            if (empty($latest-modified-dt)) then
+                                ''
+                            else
+                                let $v :=
+                                    if (exists($tz)) then
+                                        adjust-dateTime-to-timezone($latest-modified-dt, $tz)
+                                    else
+                                        adjust-dateTime-to-timezone($latest-modified-dt)
+                                return
+                                    if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
+                                    then format-dateTime($v, xxf:r('common.formats.within-day', '|fr-fr-resources|'), xxf:lang(), (), ())
+                                    else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
+                                    then format-dateTime($v, xxf:r('common.formats.day-this-year', '|fr-fr-resources|'), xxf:lang(), (), ())
+                                    else format-dateTime($v, xxf:r('common.formats.short-date', '|fr-fr-resources|'), xxf:lang(), (), ())">
+                            <xf:label ref="xxf:r('home-summary.titles.last-modified', '|fr-fr-resources|')"/>
+                        </xf:output>
+                    </xh:span>
                 </fr:card-footer>
 
             </fr:card>

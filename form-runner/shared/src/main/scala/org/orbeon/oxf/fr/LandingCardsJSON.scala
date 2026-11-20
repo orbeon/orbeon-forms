@@ -152,7 +152,7 @@ object LandingCardsJSON {
         List(
           LandingCard.FormData(
             title       = Some(LocalizedString.ByResource("landing.titles.form-builder-forms")),
-            description = Some(LocalizedString.ByResource("landing.description.form-builder-forms")),
+            description = Some(LocalizedString.ByResource("landing.descriptions.form-builder-forms")),
             thumbnail   = Some("/apps/fr/style/images/orbeon/library.svg"),
             app         = "orbeon",
             form        = "builder",

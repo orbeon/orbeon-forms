@@ -1031,7 +1031,7 @@
             class="fr-navbar-home-link"
             xxf:update="full"
             caseref="
-                not(fr:mode() = 'test')                        and
+                not(fr:mode() = ('test', 'landing'))           and
                 xxf:property('oxf.fr.navbar.home-link.enable') and
                 not(fr:is-embedded())">
             <xf:case value="true()">

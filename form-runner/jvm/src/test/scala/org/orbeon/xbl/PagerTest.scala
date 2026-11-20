@@ -72,6 +72,9 @@ class PagerTest
               <to>0</to>
               <page-number>1</page-number>
               <changed-count>0</changed-count>
+              <observed-page-number>0</observed-page-number>
+              <observed-from>0</observed-from>
+              <observed-to>0</observed-to>
             </state>
           </xf:instance>
           <xf:bind ref="instance('fr-form-instance')/*" type="xs:integer"/>
@@ -86,10 +89,12 @@ class PagerTest
           from-ref="instance('fr-form-instance')/from"
           to-ref="instance('fr-form-instance')/to"
           page-number-ref="instance('fr-form-instance')/page-number">
-          <xf:setvalue
-            event="fr-pager-changed"
-            ref="instance('fr-form-instance')/changed-count"
-            value=". + 1"/>
+          <xf:action event="fr-pager-changed">
+            <xf:setvalue ref="instance('fr-form-instance')/changed-count"        value=". + 1"/>
+            <xf:setvalue ref="instance('fr-form-instance')/observed-page-number" value="instance('fr-form-instance')/page-number"/>
+            <xf:setvalue ref="instance('fr-form-instance')/observed-from"        value="instance('fr-form-instance')/from"/>
+            <xf:setvalue ref="instance('fr-form-instance')/observed-to"          value="instance('fr-form-instance')/to"/>
+          </xf:action>
         </fr:pager>
 
         <xf:group model="fr-form-model" ref=".[instance('fr-form-instance')/total gt 10]">
@@ -98,10 +103,10 @@ class PagerTest
             page-size="10"
             total-value="instance('fr-form-instance')/total"
             page-number-ref="instance('fr-form-instance')/page-number">
-            <xf:setvalue
-              event="fr-pager-changed"
-              ref="instance('fr-form-instance')/changed-count"
-              value=". + 1"/>
+            <xf:action event="fr-pager-changed">
+              <xf:setvalue ref="instance('fr-form-instance')/changed-count"        value=". + 1"/>
+              <xf:setvalue ref="instance('fr-form-instance')/observed-page-number" value="instance('fr-form-instance')/page-number"/>
+            </xf:action>
           </fr:pager>
         </xf:group>
       </xh:body>
@@ -219,22 +224,52 @@ class PagerTest
 
             // Click "Next" on bottom pager -> top pager, from, to, and page-number all advance to page 2 (only 1 changed event!)
             activateControlWithEvent(findTrigger("bottom-pager", "fr-navigate-next").effectiveId)
-            assert(stateVal("page-number")   == 2)
-            assert(stateVal("from")          == 11)
-            assert(stateVal("to")            == 20)
-            assert(stateVal("changed-count") == 1)
-            assert(rangeTextFor("top-pager")    == "11 to 20 of 25")
-            assert(rangeTextFor("bottom-pager") == "11 to 20 of 25")
+            assert(stateVal("observed-page-number") == 2)
+            assert(stateVal("page-number")          == 2)
+            assert(stateVal("from")                 == 11)
+            assert(stateVal("to")                   == 20)
+            assert(stateVal("changed-count")        == 1)
+            assert(rangeTextFor("top-pager")        == "11 to 20 of 25")
+            assert(rangeTextFor("bottom-pager")     == "11 to 20 of 25")
 
-            // Click "Last" on top pager -> bottom pager syncs to page 3 ("21 to 25 of 25")
+            // Click "Last" on top pager -> bottom pager syncs to page 3 ("21 to 25 of 25"), and outer refs are already updated upon `fr-pager-changed`
             activateControlWithEvent(findTrigger("top-pager", "fr-navigate-last").effectiveId)
-            assert(stateVal("page-number")   == 3)
-            assert(stateVal("from")          == 21)
-            assert(stateVal("to")            == 25)
-            assert(stateVal("changed-count") == 2)
-            assert(rangeTextFor("top-pager")    == "21 to 25 of 25")
-            assert(rangeTextFor("bottom-pager") == "21 to 25 of 25")
+            assert(stateVal("observed-page-number") == 3)
+            assert(stateVal("observed-from")        == 21)
+            assert(stateVal("observed-to")          == 25)
+            assert(stateVal("page-number")          == 3)
+            assert(stateVal("from")                 == 21)
+            assert(stateVal("to")                   == 25)
+            assert(stateVal("changed-count")        == 2)
+            assert(rangeTextFor("top-pager")        == "21 to 25 of 25")
+            assert(rangeTextFor("bottom-pager")     == "21 to 25 of 25")
             assert(findTrigger("bottom-pager", "fr-navigate-next").isReadonly)
+
+            // Click "First" on top pager right after "Last" -> outer refs must already be page 1 (1 to 10) upon `fr-pager-changed`
+            activateControlWithEvent(findTrigger("top-pager", "fr-navigate-first").effectiveId)
+            assert(stateVal("observed-page-number") == 1)
+            assert(stateVal("observed-from")        == 1)
+            assert(stateVal("observed-to")          == 10)
+            assert(stateVal("page-number")          == 1)
+            assert(stateVal("from")                 == 1)
+            assert(stateVal("to")                   == 10)
+            assert(stateVal("changed-count")        == 3)
+            assert(rangeTextFor("top-pager")        == "1 to 10 of 25")
+            assert(rangeTextFor("bottom-pager")     == "1 to 10 of 25")
+
+            // Click "Next" then "Prev" on top pager -> outer refs must reflect page 2 then page 1 synchronously upon `fr-pager-changed`
+            activateControlWithEvent(findTrigger("top-pager", "fr-navigate-next").effectiveId)
+            assert(stateVal("observed-page-number") == 2)
+            assert(stateVal("observed-from")        == 11)
+            assert(stateVal("observed-to")          == 20)
+            activateControlWithEvent(findTrigger("top-pager", "fr-navigate-prev").effectiveId)
+            assert(stateVal("observed-page-number") == 1)
+            assert(stateVal("observed-from")        == 1)
+            assert(stateVal("observed-to")          == 10)
+
+            // Navigate to last page again before testing external reset
+            activateControlWithEvent(findTrigger("top-pager", "fr-navigate-last").effectiveId)
+            assert(stateVal("observed-page-number") == 3)
 
             // External reset of shared `page-number` node (e.g. `fr-reset-search` on Summary page) resets both pagers to page 1
             withAction {

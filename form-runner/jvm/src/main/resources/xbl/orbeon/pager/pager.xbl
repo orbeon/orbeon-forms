@@ -24,6 +24,8 @@
                 <xf:var name="current-page"  value="event('page-number')"/>
 
                 <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="$current-page"/>
+                <xf:recalculate/>
+                <xf:dispatch name="fr-sync-outer" targetid="fr-pager-sync"/>
             </xbl:handler>
 
             <xbl:handler event="fr-page-number-changed" phase="target">
@@ -100,6 +102,15 @@
                     </xf:var>
                 </xf:group>
 
+                <xf:group id="fr-pager-sync" appearance="xxf:internal">
+                    <xf:action event="fr-navigate-to-page">
+                        <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="event('page-number')"/>
+                        <xf:recalculate/>
+                        <xf:dispatch name="fr-sync-outer" targetid="fr-pager-sync"/>
+                        <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
+                    </xf:action>
+                </xf:group>
+
                 <xf:group
                     fr:keep-if-param-non-blank="from-ref"
                     xbl:attr="model context ref=from-ref" appearance="xxf:internal" xxbl:scope="outer"
@@ -109,8 +120,25 @@
                             <xxf:value value="." xxbl:scope="outer"/>
                         </xf:var>
                         <xf:var name="value" as="xs:integer" value="data(.)">
-                            <xf:setvalue event="xforms-enabled xforms-value-changed" ref="$ref" value="$value"/>
+                            <xf:action event="xforms-enabled xforms-value-changed">
+                                <xf:var
+                                    name="live-inner"
+                                    value="string(instance('fr-paging-instance')/from)"/>
+                                <xf:setvalue
+                                    if="exists($ref) and string($ref) != $live-inner"
+                                    ref="$ref"
+                                    value="$live-inner"/>
+                            </xf:action>
                         </xf:var>
+                        <xf:action observer="fr-pager-sync" event="fr-sync-outer">
+                            <xf:var
+                                name="live-inner"
+                                value="string(instance('fr-paging-instance')/from)"/>
+                            <xf:setvalue
+                                if="exists($ref) and string($ref) != $live-inner"
+                                ref="$ref"
+                                value="$live-inner"/>
+                        </xf:action>
                     </xf:group>
                 </xf:group>
 
@@ -123,8 +151,25 @@
                             <xxf:value value="." xxbl:scope="outer"/>
                         </xf:var>
                         <xf:var name="value" as="xs:integer" value="data(.)">
-                            <xf:setvalue event="xforms-enabled xforms-value-changed" ref="$ref" value="$value"/>
+                            <xf:action event="xforms-enabled xforms-value-changed">
+                                <xf:var
+                                    name="live-inner"
+                                    value="string(instance('fr-paging-instance')/to)"/>
+                                <xf:setvalue
+                                    if="exists($ref) and string($ref) != $live-inner"
+                                    ref="$ref"
+                                    value="$live-inner"/>
+                            </xf:action>
                         </xf:var>
+                        <xf:action observer="fr-pager-sync" event="fr-sync-outer">
+                            <xf:var
+                                name="live-inner"
+                                value="string(instance('fr-paging-instance')/to)"/>
+                            <xf:setvalue
+                                if="exists($ref) and string($ref) != $live-inner"
+                                ref="$ref"
+                                value="$live-inner"/>
+                        </xf:action>
                     </xf:group>
                 </xf:group>
 
@@ -155,6 +200,15 @@
                                     value="$live-inner"/>
                             </xf:action>
                         </xf:var>
+                        <xf:action observer="fr-pager-sync" event="fr-sync-outer">
+                            <xf:var
+                                name="live-inner"
+                                value="string(instance('fr-paging-instance')/page-number)"/>
+                            <xf:setvalue
+                                if="exists($ref) and string($ref) != $live-inner"
+                                ref="$ref"
+                                value="$live-inner"/>
+                        </xf:action>
                     </xf:group>
                 </xf:group>
 
@@ -167,10 +221,9 @@
                                 <xh:i class="fa fa-fw fa-step-backward" aria-hidden="true"/>
                                 <xh:span class="visually-hidden"><xf:output value="concat(xxf:r('summary.paging.page', '|fr-fr-resources|'), ' 1')"/></xh:span>
                             </xf:label>
-                            <xf:action event="DOMActivate">
-                                <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="1"/>
-                                <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
-                            </xf:action>
+                            <xf:dispatch event="DOMActivate" name="fr-navigate-to-page" targetid="fr-pager-sync">
+                                <xf:property name="page-number" value="1"/>
+                            </xf:dispatch>
                         </xf:trigger>
                     </xh:li>
                     <xh:li class="fr-pager-prev{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then ' disabled' else ''}{if ($single-page) then ' xforms-hidden' else ''}">
@@ -179,10 +232,9 @@
                                 <xh:i class="fa fa-fw fa-chevron-left" aria-hidden="true"/>
                                 <xh:span class="visually-hidden"><xf:output value="xxf:r('buttons.previous', '|fr-fr-resources|')"/></xh:span>
                             </xf:label>
-                            <xf:action event="DOMActivate">
-                                <xf:setvalue ref="instance('fr-paging-instance')/page-number" value=". - 1"/>
-                                <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
-                            </xf:action>
+                            <xf:dispatch event="DOMActivate" name="fr-navigate-to-page" targetid="fr-pager-sync">
+                                <xf:property name="page-number" value="instance('fr-paging-instance')/page-number - 1"/>
+                            </xf:dispatch>
                         </xf:trigger>
                     </xh:li>
                     <!-- Some results -->
@@ -238,10 +290,9 @@
                                 <xh:i class="fa fa-fw fa-chevron-right" aria-hidden="true"/>
                                 <xh:span class="visually-hidden"><xf:output value="xxf:r('buttons.next', '|fr-fr-resources|')"/></xh:span>
                             </xf:label>
-                            <xf:action event="DOMActivate">
-                                <xf:setvalue ref="instance('fr-paging-instance')/page-number" value=". + 1"/>
-                                <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
-                            </xf:action>
+                            <xf:dispatch event="DOMActivate" name="fr-navigate-to-page" targetid="fr-pager-sync">
+                                <xf:property name="page-number" value="instance('fr-paging-instance')/page-number + 1"/>
+                            </xf:dispatch>
                         </xf:trigger>
                     </xh:li>
                     <xh:li class="fr-pager-last{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then ' disabled' else ''}{if ($single-page) then ' xforms-hidden' else ''}">
@@ -250,10 +301,9 @@
                                 <xh:i class="fa fa-fw fa-step-forward" aria-hidden="true"/>
                                 <xh:span class="visually-hidden"><xf:output value="concat(xxf:r('summary.paging.page', '|fr-fr-resources|'), ' ', instance('fr-paging-instance')/page-count)"/></xh:span>
                             </xf:label>
-                            <xf:action event="DOMActivate">
-                                <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="instance('fr-paging-instance')/page-count"/>
-                                <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
-                            </xf:action>
+                            <xf:dispatch event="DOMActivate" name="fr-navigate-to-page" targetid="fr-pager-sync">
+                                <xf:property name="page-number" value="instance('fr-paging-instance')/page-count"/>
+                            </xf:dispatch>
                         </xf:trigger>
                     </xh:li>
                 </xh:ul>

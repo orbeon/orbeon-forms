@@ -800,6 +800,19 @@
             <demo-features>Probeer demo's van specifieke Orbeon Forms-functies uit</demo-features>
         </descriptions>
         <show-more>Meer weergeven…</show-more>
+        <buttons>
+            <refresh>Vernieuwen</refresh>
+            <new>Nieuw</new>
+            <summary>Overzicht</summary>
+            <sort-by-title>Sorteren op titel</sort-by-title>
+            <sort-by-last-modified>Sorteren op wijzigingsdatum</sort-by-last-modified>
+        </buttons>
+        <messages>
+            <no-forms>Geen gepubliceerde formulieren</no-forms>
+            <no-data>Geen formuliergegevens</no-data>
+            <sorted-by-ascending>Gesorteerd op {0}, oplopend</sorted-by-ascending>
+            <sorted-by-descending>Gesorteerd op {0}, aflopend</sorted-by-descending>
+        </messages>
     </landing>
     <home>
         <title>Gepubliceerde forms</title>

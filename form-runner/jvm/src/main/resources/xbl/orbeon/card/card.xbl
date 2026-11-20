@@ -10,7 +10,7 @@
         id="fr-card"
         element="fr|card"
         xxbl:mode="lhha custom-lhha binding"
-        class="p-2 h-100"
+        class="h-100"
     >
         <xbl:template
             xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -19,26 +19,81 @@
         >
             <xh:div class="card h-100" xsl:version="2.0">
 
-                <xf:var name="binding" value="xxf:binding('fr-card')"/>
-                <xf:select ref="xf:element('_')" appearance="xxf:internal" id="hidden-select">
-                    <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
-                </xf:select>
-                <xf:var name="items" value="xxf:itemset('hidden-select', 'xml')//item"/>
+                <xf:var name="binding"       value="xxf:binding('fr-card')"/>
+                <xf:var name="status"        value="(fr:component-param-value('status')[xxf:non-blank()], 'done')[1]"/>
+                <xf:var name="has-loaded"    value="if (xxf:non-blank(fr:component-param-value('has-loaded'))) then fr:component-param-value('has-loaded') = 'true' else $status = 'done'"/>
+                <xf:var name="count"         value="fr:component-param-value('count')[xxf:non-blank()]"/>
+                <xf:var name="empty-message" value="fr:component-param-value('empty-message')"/>
+                <xf:var name="columns"       value="(fr:component-param-value('columns')[xxf:non-blank()], '1')[1]"/>
 
-                <xh:h2 class="card-title card-header text-center"><xf:output value="xxf:label('fr-card')"/></xh:h2>
-                <xh:div class="card-body text-center" xxf:control="true" ref=".[not(fr:component-param-value('status') = ('loading', 'error'))]">
-                    <xbl:content includes=":root > fr|card-body > *, :root > fr|card-thumbnail > *"/>
+                <xsl:choose>
+                    <xsl:when test="exists(/*/fr:rows)">
+                        <xf:var name="is-empty" value="fr:component-param-value('is-empty') = 'true'"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xf:select ref="xf:element('_')" appearance="xxf:internal" id="hidden-select">
+                            <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+                        </xf:select>
+                        <xf:var name="items"    value="xxf:itemset('hidden-select', 'xml')//item"/>
+                        <xf:var name="is-empty" value="empty($items)"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+
+                <xsl:if test="exists(/*/fr:card-status)">
+                    <xh:div role="status" class="fr-sr-status">
+                        <xbl:content includes=":root > fr|card-status > *"/>
+                    </xh:div>
+                </xsl:if>
+
+                <xh:div class="card-header fr-card-header">
+                    <xh:div class="fr-card-header-main">
+                        <xh:h2 class="card-title"><xf:output value="xxf:label('fr-card')"/></xh:h2>
+                        <xh:span class="fr-card-count-pill {{'xforms-hidden'[empty($count) or not($has-loaded)]}}">
+                            <xf:output value="$count"/>
+                        </xh:span>
+                    </xh:div>
+                    <xsl:if test="exists(/*/fr:card-actions)">
+                        <xh:div class="fr-card-header-actions">
+                            <xbl:content includes=":root > fr|card-actions > *"/>
+                        </xh:div>
+                    </xsl:if>
                 </xh:div>
-                <xh:div class="card-body text-center" xxf:control="true" ref=".[fr:component-param-value('status') = 'loading']">
-                    <xh:div class="spinner lds-ellipsis"><xh:div/><xh:div/><xh:div/><xh:div/></xh:div>
+
+                <xh:div class="card-body fr-card-intro">
+                    <xh:div class="fr-card-intro-text">
+                        <xbl:content includes=":root > fr|card-body > *"/>
+                    </xh:div>
+                    <xsl:if test="exists(/*/fr:card-thumbnail)">
+                        <xh:div class="fr-card-intro-media">
+                            <xbl:content includes=":root > fr|card-thumbnail > *"/>
+                        </xh:div>
+                    </xsl:if>
                 </xh:div>
-                <xh:div class="card-body text-center" xxf:control="true" ref=".[fr:component-param-value('status') = 'error']">
+
+                <xh:div class="fr-card-state fr-card-state-error" xxf:control="true" ref=".[$status = 'error']">
                     <xh:div class="alert alert-warning" role="alert">
                         <xf:output value="xxf:r('detail.messages.database-error', '|fr-fr-resources|')"/>
                     </xh:div>
                 </xh:div>
-                <xf:var name="columns" value="(fr:component-param-value('columns')[xxf:non-blank()], '1')[1]"/>
-                <xh:ul class="list-group list-group-flush fr-card-cols-{{$columns}}">
+
+                <xh:div class="fr-card-skeleton" role="status" aria-busy="true" xxf:control="true" ref=".[$status = ('initial', 'loading') and not($has-loaded)]">
+                    <xh:div class="fr-card-skeleton-row"><xh:span class="fr-card-skeleton-bar"/></xh:div>
+                    <xh:div class="fr-card-skeleton-row"><xh:span class="fr-card-skeleton-bar"/></xh:div>
+                    <xh:div class="fr-card-skeleton-row"><xh:span class="fr-card-skeleton-bar"/></xh:div>
+                    <xh:div class="fr-card-skeleton-row"><xh:span class="fr-card-skeleton-bar"/></xh:div>
+                    <xh:div class="fr-card-skeleton-row"><xh:span class="fr-card-skeleton-bar"/></xh:div>
+                </xh:div>
+
+                <xh:div
+                    class="fr-card-state fr-card-state-empty {{'fr-card-is-refreshing'[$status = 'loading']}}"
+                    xxf:control="true"
+                    ref=".[$has-loaded and $status != 'error' and $is-empty]">
+                    <xf:output value="$empty-message"/>
+                </xh:div>
+
+                <xh:ul
+                    class="list-group list-group-flush fr-card-cols-{{$columns}} {{'fr-card-is-refreshing'[$status = 'loading']}} {{'xforms-hidden'[not($has-loaded and $status != 'error' and not($is-empty))]}}"
+                >
                     <xsl:if test="exists(/*/fr:headings)">
                         <xsl:attribute name="role">table</xsl:attribute>
                         <xsl:attribute name="aria-label">{{xxf:label('fr-card')}}</xsl:attribute>
@@ -46,32 +101,36 @@
                             <xbl:content includes=":root > fr|headings > *"/>
                         </xh:li>
                     </xsl:if>
-                    <xf:repeat ref="$items">
-                        <xf:var name="value" value="value/string()"/>
-                        <xf:var name="label" value="label/string()"/>
-                        <xf:var name="hint"  value="hint/string()"/>
-                        <xf:var name="parts" value="for $p in xxf:split($label, '|') return xxf:trim($p)"/>
-                        <xf:var name="is-single-cell" value="count($parts) le 1"/>
-                        <xh:li class="list-group-item text-truncate">
-                            <xh:a href="{{$value}}" title="{{$hint}}">
-                                <xf:repeat ref="$parts">
-                                    <xh:span class="fr-card-col {{if ($is-single-cell) then 'fr-card-col-single' else ''}}">
-                                        <xh:span class="fr-card-col-text text-truncate">
-                                            <xf:output value="."/>
-                                        </xh:span>
-                                    </xh:span>
-                                </xf:repeat>
-                            </xh:a>
-<!--                            <xh:br/>-->
-<!--                            <xf:output value="$hint"/>-->
-                        </xh:li>
-                    </xf:repeat>
+                    <xsl:choose>
+                        <xsl:when test="exists(/*/fr:rows)">
+                            <xbl:content includes=":root > fr|rows > *"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xf:repeat ref="$items">
+                                <xf:var name="value"          value="value/string()"/>
+                                <xf:var name="label"          value="label/string()"/>
+                                <xf:var name="hint"           value="hint/string()"/>
+                                <xf:var name="parts"          value="for $p in xxf:split($label, '|') return xxf:trim($p)"/>
+                                <xf:var name="is-single-cell" value="count($parts) le 1"/>
+                                <xh:li class="list-group-item text-truncate">
+                                    <xh:a href="{{$value}}" title="{{$hint}}" class="fr-card-row-primary">
+                                        <xf:repeat ref="$parts">
+                                            <xh:span class="fr-card-col {{if ($is-single-cell) then 'fr-card-col-single' else ''}}">
+                                                <xh:span class="fr-card-col-text text-truncate">
+                                                    <xf:output value="."/>
+                                                </xh:span>
+                                            </xh:span>
+                                        </xf:repeat>
+                                    </xh:a>
+                                </xh:li>
+                            </xf:repeat>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xh:ul>
+
                 <xsl:if test="exists(/*/fr:card-footer)">
-                    <xh:div class="card-footer text-center">
-                        <xh:small>
-                            <xbl:content includes=":root > fr|card-footer > *"/>
-                        </xh:small>
+                    <xh:div class="card-footer fr-card-footer">
+                        <xbl:content includes=":root > fr|card-footer > *"/>
                     </xh:div>
                 </xsl:if>
             </xh:div>

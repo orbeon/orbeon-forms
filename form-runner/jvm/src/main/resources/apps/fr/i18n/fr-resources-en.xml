@@ -800,6 +800,19 @@
             <demo-features>Try out demos of specific Orbeon Forms features</demo-features>
         </descriptions>
         <show-more>Show more…</show-more>
+        <buttons>
+            <refresh>Refresh</refresh>
+            <new>New</new>
+            <summary>Summary</summary>
+            <sort-by-title>Sort by title</sort-by-title>
+            <sort-by-last-modified>Sort by modification date</sort-by-last-modified>
+        </buttons>
+        <messages>
+            <no-forms>No published forms</no-forms>
+            <no-data>No form data</no-data>
+            <sorted-by-ascending>Sorted by {0}, ascending</sorted-by-ascending>
+            <sorted-by-descending>Sorted by {0}, descending</sorted-by-descending>
+        </messages>
     </landing>
     <home>
         <title>Published Forms</title>

@@ -10,9 +10,11 @@
 
          class="orbeon"
          lang="{xxf:instance('fr-fr-language-instance')}"
-         xml:lang="{xxf:instance('fr-fr-language-instance')}">
+         xml:lang="{xxf:instance('fr-fr-language-instance')}"
+         xxf:external-events="fr-landing-refresh">
 
     <xh:head>
+        <xh:meta name="color-scheme" content="light dark"/>
         <xh:title><xf:output ref="$fr-resources/landing/title"/></xh:title>
         <xh:link rel="stylesheet" href="/apps/fr/style/form-runner-landing.css" type="text/css" media="all"/>
 
@@ -30,7 +32,6 @@
             <xf:var
                 name="page-size"
                 value="xs:integer(xxf:property('oxf.fr.landing.page-size'))"/>
-
 
             <xf:var
                 name="link-to-tokens"
@@ -73,7 +74,6 @@
                     $fb-permissions/app/@name = '*' or exists($fb-permissions/app[1]/@name[xxf:non-blank()])"/>
 
             <!-- Don't use `xxf:exclude-result-prefixes="#all"` as eXist search needs the `xh` and `xf` namespaces -->
-            <!-- TODO: Could we now get rid of the `<query>` elements since eXist support is no longer needed? -->
             <xf:instance id="fr-search-instance">
                 <search xmlns="" return-all-indexed-fields="true">
                     <query/>
@@ -99,6 +99,10 @@
                 <_/>
             </xf:instance>
 
+            <xf:instance id="fr-landing-ui-instance" xxf:exclude-result-prefixes="#all">
+                <ui refresh-token="0"/>
+            </xf:instance>
+
             <xf:action event="xforms-model-construct-done">
                 <xf:var
                     name="cards-config-xml"
@@ -111,69 +115,109 @@
                 </xf:action>
             </xf:action>
 
+            <xf:action event="xforms-ready" type="javascript">
+                <xf:body>
+                    if (!window.__frLandingVisibilityBound) {
+                        window.__frLandingVisibilityBound = true;
+                        let hiddenAt = 0;
+                        const STALE_MS = 5000;
+                        const maybeRefresh = (force) =&gt; {
+                            if (document.visibilityState !== 'visible') return;
+                            const now = Date.now();
+                            if (force || (hiddenAt &gt; 0 &amp;&amp; (now - hiddenAt) &gt;= STALE_MS)) {
+                                hiddenAt = 0;
+                                ORBEON.xforms.Document.dispatchEvent({
+                                    targetId: 'fr-form-model',
+                                    eventName: 'fr-landing-refresh',
+                                    showProgress: false
+                                });
+                            }
+                        };
+                        document.addEventListener('visibilitychange', () =&gt; {
+                            if (document.visibilityState === 'hidden') {
+                                hiddenAt = Date.now();
+                            } else {
+                                maybeRefresh(false);
+                            }
+                        });
+                        window.addEventListener('pageshow', (e) =&gt; {
+                            if (e.persisted) maybeRefresh(true);
+                        });
+                    }
+                </xf:body>
+            </xf:action>
+
+            <xf:action event="fr-landing-refresh">
+                <xf:setvalue
+                    ref="instance('fr-landing-ui-instance')/@refresh-token"
+                    value="xs:integer(.) + 1"/>
+            </xf:action>
+
         </xf:model>
     </xh:head>
     <xh:body>
         <fr:view fluid="true">
             <fr:navbar/>
             <fr:config-check/>
-            <xh:div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xxl-4 gx-2 gy-2">
+            <xh:div class="fr-landing-grid">
 
-                <xh:div class="{'xforms-hidden'[not(instance('fr-cards-config-xml')/_/card-type = 'quick-links')]}">
-                    <xh:div class="p-2 h-100">
-                        <xh:div class="card h-100 fr-landing-quick-links-card">
-                            <xh:h2 class="card-title card-header text-center"><xf:output value="xxf:r('landing.titles.quick-links', '|fr-fr-resources|')"/></xh:h2>
-                            <xh:div>
-                                <xh:a href="/fr/orbeon/builder/new" class="{'xforms-hidden'[not($is-allow-form-builder)]}">
-                                    <xh:figure>
-                                        <xh:img src="/apps/fr/style/images/orbeon/crane.svg" alt="" class="img-thumbnail img-invertible"/>
-                                        <xh:figcaption><xf:output value="xxf:r('landing.titles.form-builder-new', '|fr-fr-resources|')"/></xh:figcaption>
-                                        <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
-                                    </xh:figure>
-                                </xh:a>
-                                <xh:a href="/fr/orbeon/builder/summary" class="{'xforms-hidden'[not($is-allow-form-builder)]}">
-                                    <xh:figure>
-                                        <xh:img src="/apps/fr/style/images/orbeon/library.svg" alt="" class="img-thumbnail img-invertible"/>
-                                        <xh:figcaption><xf:output value="xxf:r('landing.titles.form-builder-summary', '|fr-fr-resources|')"/></xh:figcaption>
-                                        <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
-                                    </xh:figure>
-                                </xh:a>
-                                <xh:a href="/fr/forms">
-                                    <xh:figure>
-                                        <xh:img src="/apps/fr/style/images/orbeon/book.svg" alt="" class="img-thumbnail img-invertible"/>
-                                        <xh:figcaption><xf:output value="xxf:r('landing.titles.published-forms', '|fr-fr-resources|')"/></xh:figcaption>
-                                        <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
-                                    </xh:figure>
-                                </xh:a>
-                                <xh:a href="/fr/admin" class="{'xforms-hidden'[not($is-allow-admin)]}">
-                                    <xh:figure>
-                                        <xh:img src="/apps/fr/style/images/orbeon/cogwheels.svg" alt="" class="img-thumbnail img-invertible"/>
-                                        <xh:figcaption><xf:output value="xxf:r('landing.titles.form-runner-admin', '|fr-fr-resources|')"/></xh:figcaption>
-                                        <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
-                                    </xh:figure>
-                                </xh:a>
-                                <xh:a href="/fr/orbeon/configuration/new" class="{'xforms-hidden'[not($is-configuration-available and $is-allow-admin)]}">
-                                    <xh:figure>
-                                        <xh:img src="/apps/fr/style/images/orbeon/configuration.svg" alt="" class="img-thumbnail img-invertible"/>
-                                        <xh:figcaption><xf:output value="xxf:r('landing.titles.configuration', '|fr-fr-resources|')"/></xh:figcaption>
-                                        <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
-                                    </xh:figure>
-                                </xh:a>
-                                <xh:a href="/fr/console" class="{'xforms-hidden'[not($is-console-available and $is-allow-admin)]}">
-                                    <xh:figure>
-                                        <xh:img src="/apps/fr/style/images/orbeon/console.svg" alt="" class="img-thumbnail img-invertible"/>
-                                        <xh:figcaption><xf:output value="xxf:r('landing.titles.admin-console', '|fr-fr-resources|')"/></xh:figcaption>
-                                        <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
-                                    </xh:figure>
-                                </xh:a>
-                                <xh:a href="/fr/analytics" class="{'xforms-hidden'[not(frf:isAnalyticsAuthorized())]}">
-                                    <xh:figure>
-                                        <xh:img src="/apps/fr/style/images/orbeon/analytics.svg" alt="" class="img-thumbnail img-invertible"/>
-                                        <xh:figcaption><xf:output value="xxf:r('landing.titles.forms-analytics', '|fr-fr-resources|')"/></xh:figcaption>
-                                        <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
-                                    </xh:figure>
-                                </xh:a>
+                <xh:div class="fr-landing-card-cell {'xforms-hidden'[not(instance('fr-cards-config-xml')/_/card-type = 'quick-links')]}">
+                    <xh:div class="card h-100 fr-landing-quick-links-card">
+                        <xh:div class="card-header fr-card-header">
+                            <xh:div class="fr-card-header-main">
+                                <xh:h2 class="card-title"><xf:output value="xxf:r('landing.titles.quick-links', '|fr-fr-resources|')"/></xh:h2>
                             </xh:div>
+                        </xh:div>
+                        <xh:div class="fr-landing-quick-links-list">
+                            <xh:a href="/fr/orbeon/builder/new" class="{'xforms-hidden'[not($is-allow-form-builder)]}">
+                                <xh:figure>
+                                    <xh:img src="/apps/fr/style/images/orbeon/crane.svg" alt="" class="img-thumbnail img-invertible"/>
+                                    <xh:figcaption><xf:output value="xxf:r('landing.titles.form-builder-new', '|fr-fr-resources|')"/></xh:figcaption>
+                                    <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
+                                </xh:figure>
+                            </xh:a>
+                            <xh:a href="/fr/orbeon/builder/summary" class="{'xforms-hidden'[not($is-allow-form-builder)]}">
+                                <xh:figure>
+                                    <xh:img src="/apps/fr/style/images/orbeon/library.svg" alt="" class="img-thumbnail img-invertible"/>
+                                    <xh:figcaption><xf:output value="xxf:r('landing.titles.form-builder-summary', '|fr-fr-resources|')"/></xh:figcaption>
+                                    <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
+                                </xh:figure>
+                            </xh:a>
+                            <xh:a href="/fr/forms">
+                                <xh:figure>
+                                    <xh:img src="/apps/fr/style/images/orbeon/book.svg" alt="" class="img-thumbnail img-invertible"/>
+                                    <xh:figcaption><xf:output value="xxf:r('landing.titles.published-forms', '|fr-fr-resources|')"/></xh:figcaption>
+                                    <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
+                                </xh:figure>
+                            </xh:a>
+                            <xh:a href="/fr/admin" class="{'xforms-hidden'[not($is-allow-admin)]}">
+                                <xh:figure>
+                                    <xh:img src="/apps/fr/style/images/orbeon/cogwheels.svg" alt="" class="img-thumbnail img-invertible"/>
+                                    <xh:figcaption><xf:output value="xxf:r('landing.titles.form-runner-admin', '|fr-fr-resources|')"/></xh:figcaption>
+                                    <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
+                                </xh:figure>
+                            </xh:a>
+                            <xh:a href="/fr/orbeon/configuration/new" class="{'xforms-hidden'[not($is-configuration-available and $is-allow-admin)]}">
+                                <xh:figure>
+                                    <xh:img src="/apps/fr/style/images/orbeon/configuration.svg" alt="" class="img-thumbnail img-invertible"/>
+                                    <xh:figcaption><xf:output value="xxf:r('landing.titles.configuration', '|fr-fr-resources|')"/></xh:figcaption>
+                                    <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
+                                </xh:figure>
+                            </xh:a>
+                            <xh:a href="/fr/console" class="{'xforms-hidden'[not($is-console-available and $is-allow-admin)]}">
+                                <xh:figure>
+                                    <xh:img src="/apps/fr/style/images/orbeon/console.svg" alt="" class="img-thumbnail img-invertible"/>
+                                    <xh:figcaption><xf:output value="xxf:r('landing.titles.admin-console', '|fr-fr-resources|')"/></xh:figcaption>
+                                    <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
+                                </xh:figure>
+                            </xh:a>
+                            <xh:a href="/fr/analytics" class="{'xforms-hidden'[not(frf:isAnalyticsAuthorized())]}">
+                                <xh:figure>
+                                    <xh:img src="/apps/fr/style/images/orbeon/analytics.svg" alt="" class="img-thumbnail img-invertible"/>
+                                    <xh:figcaption><xf:output value="xxf:r('landing.titles.forms-analytics', '|fr-fr-resources|')"/></xh:figcaption>
+                                    <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
+                                </xh:figure>
+                            </xh:a>
                         </xh:div>
                     </xh:div>
                 </xh:div>
@@ -187,6 +231,7 @@
                         sort-by="{sort-by}"
                         sort-direction="{sort-direction}"
                         link-to="{link-to}"
+                        refresh-token="{instance('fr-landing-ui-instance')/@refresh-token}"
                     >
                         <xf:label
                             ref="
@@ -211,6 +256,7 @@
                         form="{form}"
                         version="{version}"
                         thumbnail="{thumbnail}"
+                        refresh-token="{instance('fr-landing-ui-instance')/@refresh-token}"
                     >
                         <xf:label
                             ref="

@@ -15,25 +15,57 @@
 .orbeon {
 
     html& {
+        color-scheme: light dark;
         // The "orbeon" class on the html element in landing.xhtml makes it possible to access the CSS variable here
         font-size: var(--orbeon-base-font-size); // Bootstrap 5 keeps the 16px browser default
         font-weight: var(--orbeon-base-font-weight);
         background-color: var(--orbeon-page-background-color);
     }
 
-    .fr-mode-landing {
-        .row {
-            justify-content: start; // https://github.com/orbeon/orbeon-forms/issues/7239
-            & > * {
-                max-width: 400px;
-            }
-        }
+    .fr-sr-status {
+        position: absolute;
+        clip-path: inset(50%);
+        overflow: hidden;
+        inline-size: 1px;
+        block-size: 1px;
+        margin: -1px;
+        padding: 0;
+        border: 0;
+        white-space: nowrap;
     }
 
     .fr-config-check {
-        margin-top: 13px;  // was 1rem at the 13px base
-        margin-left: 6.5px;  // same inset as the cards' `p-2`
-        margin-right: 6.5px;
+        margin-block-start: 0.85em;
+        margin-inline: 0.25em;
+    }
+
+    .fr-landing-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 26.5em), 1fr));
+        gap: 1.15em;
+        padding: 0.85em 0.25em 2em;
+
+        // Hide XForms repeat markers and non-relevant items so they never occupy grid tracks
+        & > .xforms-hidden,
+        & > .xforms-disabled,
+        & > .xforms-repeat-begin-end,
+        & > .xforms-repeat-delimiter,
+        & > span:not(:has(*)) {
+            display: none !important;
+        }
+
+        & > .fr-landing-card-cell,
+        & > .xbl-fr-card-published-forms,
+        & > .xbl-fr-card-form-data {
+            min-inline-size: 0;
+            display: flex;
+            flex-direction: column;
+
+            & > .xbl-fr-card {
+                flex: 1 1 auto;
+                min-inline-size: 0;
+            }
+        }
     }
 
     a {
@@ -43,19 +75,235 @@
             outline: 0;
 
             &:focus-visible > figure {
-                transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+                transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
                 .focusDecorations();
             }
         }
     }
 
+    .card {
+        display: flex;
+        flex-direction: column;
+        color: var(--orbeon-base-color);
+        background-color: var(--orbeon-form-background-color);
+        border: 1px solid var(--orbeon-landing-card-border-color);
+        border-radius: var(--orbeon-landing-card-border-radius);
+        overflow: clip;
+        --bs-card-border-radius: var(--orbeon-landing-card-border-radius);
+        --bs-card-inner-border-radius: calc(var(--orbeon-landing-card-border-radius) - var(--bs-card-border-width));
+
+        @media (forced-colors: active) {
+            border-color: CanvasText;
+        }
+
+        .card-header.fr-card-header {
+            display: flex;
+            align-items: safe center;
+            justify-content: space-between;
+            gap: 0.5em;
+            min-block-size: 2.85em;
+            padding: 0.55em 0.85em 0.55em 1em;
+            color: var(--orbeon-landing-card-header-color);
+            background-color: var(--orbeon-landing-card-header-background-color);
+            border-bottom: 1px solid var(--orbeon-landing-card-border-color);
+
+            .fr-card-header-main {
+                display: flex;
+                align-items: safe center;
+                gap: 0.5em;
+                min-inline-size: 0;
+                flex: 1 1 auto;
+
+                .card-title {
+                    margin: 0;
+                    font-size: 1.08em;
+                    font-weight: 600;
+                    line-height: 1.3;
+                    color: inherit;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .fr-card-count-pill {
+                    flex: 0 0 auto;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-inline-size: 1.75em;
+                    padding: 0.1em 0.55em;
+                    border-radius: 9999px;
+                    border: 1px solid var(--orbeon-pill-muted-border-color);
+                    background-color: var(--orbeon-pill-muted-background-color);
+                    color: var(--orbeon-pill-muted-color);
+                    font-size: 0.82em;
+                    font-weight: 600;
+                    line-height: 1.25;
+                    font-variant-numeric: tabular-nums;
+
+                    &.xforms-hidden {
+                        display: none;
+                    }
+                }
+            }
+
+            .fr-card-header-actions {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.15em;
+                flex: 0 0 auto;
+
+                .fr-card-action-btn {
+                    &.xforms-hidden,
+                    &.xforms-disabled {
+                        display: none !important;
+                    }
+                }
+
+                a.fr-card-action-btn,
+                .fr-card-action-btn button.btn-link {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-inline-size: 26px;
+                    min-block-size: 26px;
+                    padding: 0 0.35em;
+                    margin: 0;
+                    border: 1px solid transparent;
+                    border-radius: var(--orbeon-landing-tile-border-radius);
+                    background: transparent;
+                    color: var(--orbeon-landing-card-footer-color);
+                    font-size: 0.92em;
+                    line-height: 1;
+                    text-decoration: none;
+                    box-shadow: none;
+                    cursor: pointer;
+                    transition: color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+                    @media (prefers-reduced-motion: reduce) {
+                        transition: none;
+                    }
+
+                    @media (hover: hover) {
+                        &:hover {
+                            color: var(--orbeon-base-color);
+                            background-color: var(--orbeon-pill-muted-background-color);
+                            border-color: var(--orbeon-pill-muted-border-color);
+                            text-decoration: none;
+                        }
+                    }
+
+                    &:focus-visible {
+                        color: var(--orbeon-base-color);
+                        outline: 2px solid var(--orbeon-focus-border-color);
+                        outline-offset: -2px;
+                    }
+                }
+
+                .fr-card-refresh-btn.is-spinning i.fa {
+                    animation: fr-landing-spin 0.8s linear infinite;
+
+                    @media (prefers-reduced-motion: reduce) {
+                        animation-duration: 3s;
+                    }
+                }
+            }
+        }
+
+        figure {
+            block-size: 100%;
+            margin-bottom: 0;
+            border: 1px solid var(--orbeon-landing-card-border-color);
+            border-radius: var(--orbeon-landing-tile-border-radius);
+        }
+
+        figcaption {
+            color: var(--orbeon-base-color);
+            font-weight: 500;
+            margin: 0 0 .5em;
+            padding-inline: .25em;
+            overflow-wrap: break-word;
+        }
+    }
+
+    @keyframes fr-landing-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    // Unified top description + icon area across all data/form cards
+    .card .card-body.fr-card-intro {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        column-gap: 0.85em;
+        padding: 0.8em 1em;
+        border-bottom: 1px solid var(--orbeon-landing-card-border-color);
+        text-align: start;
+
+        &:not(:has(.card-text:not(:empty))):not(:has(.fr-card-intro-media img)):not(:has(.fr-card-intro-media .xforms-output:not(.xforms-disabled))) {
+            display: none;
+        }
+
+        .fr-card-intro-text {
+            flex: 1 1 auto;
+            min-inline-size: 0;
+
+            .card-text {
+                margin: 0;
+                font-size: 0.95em;
+                line-height: 1.42;
+                color: var(--orbeon-hint-color);
+            }
+        }
+
+        .fr-card-intro-media {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+
+            &:not(:has(> .xforms-group:not(.xforms-disabled))):not(:has(> img)):not(:has(> .xforms-output:not(.xforms-disabled))) {
+                display: none;
+            }
+
+            .img-thumbnail {
+                padding: 0;
+                border: 0;
+                background-color: transparent;
+            }
+
+            img.img-thumbnail.img-invertible {
+                display: block;
+                inline-size: 3.1em;
+                block-size: 3.1em;
+                aspect-ratio: 1;
+            }
+
+            .fr-card-metadata-thumbnail img {
+                display: block;
+                max-inline-size: 4.4em;
+                max-block-size: 3.1em;
+                object-fit: cover;
+                object-position: top;
+                border-radius: var(--orbeon-landing-tile-border-radius);
+                box-shadow: 0 0 0 1px var(--orbeon-landing-card-image-border);
+            }
+        }
+    }
+
+    // Quick Links card
     .fr-landing-quick-links-card {
-        & > div {
+        .fr-landing-quick-links-list {
             display: flex;
             flex-direction: column;
-            gap    : 0.65em;
+            gap: 0.6em;
             padding: 0.85em;
         }
+
         a {
             &:not(.xforms-hidden) {
                 display: block;
@@ -67,335 +315,7 @@
                 color: var(--orbeon-base-color);
             }
         }
-    }
 
-    .card {
-        background-color: var(--orbeon-form-background-color);
-        border: 1px solid var(--orbeon-landing-card-border-color);
-        .card-header {
-            font-size: 1.25em;
-            color: var(--orbeon-landing-card-header-color);
-            background-color: var(--orbeon-landing-card-header-background-color);
-            border-bottom: 1px solid var(--orbeon-landing-card-border-color);
-        }
-    }
-
-    .card .list-group {
-        display: grid;
-        overflow-x: auto;
-        overscroll-behavior-x: contain;
-        column-gap: 0.5rem;
-
-        --orbeon-card-columns: 1;
-
-        each(range(1, 30), {
-            &.fr-card-cols-@{value} {
-                --orbeon-card-columns: @value;
-            }
-        });
-
-        // At most 3 columns are shown on the tile at once; any additional columns are accessible via horizontal scrolling
-        --orbeon-card-visible-columns: ~"min(var(--orbeon-card-columns, 1), 3)";
-        --orbeon-card-column-width: calc((100% - (var(--orbeon-card-visible-columns) - 1) * 0.5rem) / var(--orbeon-card-visible-columns));
-
-        grid-template-columns: repeat(var(--orbeon-card-columns, 1), var(--orbeon-card-column-width));
-
-        // Prevent delimiter and empty repeat items from creating phantom tracks
-        & > .xforms-repeat-begin-end,
-        & > .xforms-repeat-delimiter,
-        & > span:not(:has(*)) {
-            display: none !important;
-        }
-    }
-
-    .card .list-group-item {
-        background-color: var(--orbeon-form-background-color);
-        border-bottom: 1px solid var(--orbeon-landing-card-border-color);
-        padding: 0.5em 1em;
-
-        grid-column: 1 / -1;
-        display: grid;
-        grid-template-columns: repeat(var(--orbeon-card-columns, 1), minmax(0, 1fr)); // Fallback
-        grid-template-columns: subgrid;
-        align-items: center;
-
-        &.fr-card-head {
-            padding-top: 0;
-            padding-bottom: 0;
-            font-weight: 600;
-            color: var(--orbeon-landing-card-header-color);
-            background-color: var(--orbeon-landing-card-header-background-color);
-            border-bottom: 1px solid var(--orbeon-landing-card-border-color);
-
-            // Hide delimiter and non-column spans
-            & > .xforms-repeat-begin-end,
-            & > .xforms-repeat-delimiter,
-            & > span:not(.fr-card-col) {
-                display: none !important;
-            }
-
-            // Hide completely if there are no heading columns
-            &:not(:has(.fr-card-col)) {
-                display: none !important;
-            }
-        }
-
-        a {
-            color: var(--orbeon-landing-card-link-color);
-            &:hover {
-                color: var(--orbeon-landing-card-link-hover-color);
-            }
-            padding: 0;
-            min-width: 0;
-
-            grid-column: 1 / -1;
-            display: grid;
-            grid-template-columns: repeat(var(--orbeon-card-columns, 1), minmax(0, 1fr)); // Fallback
-            grid-template-columns: subgrid;
-            align-items: center;
-
-            // Hide delimiter and non-column spans inside link
-            & > .xforms-repeat-begin-end,
-            & > .xforms-repeat-delimiter,
-            & > span:not(.fr-card-col) {
-                display: none !important;
-            }
-        }
-        &:has(a:focus-visible) {
-            box-shadow: 0 0 0 3px inset var(--orbeon-focus-highlight-color);
-        }
-    }
-
-    .fr-card-col {
-        min-width: 0;
-        display: flex;
-        align-items: center;
-
-        &.fr-card-col-single {
-            grid-column: 1 / -1;
-            position: sticky;
-            left: 1em;
-        }
-
-        & + .fr-card-col::before {
-            content: "|";
-            margin-right: 0.5rem;
-            color: var(--orbeon-landing-card-border-color);
-            flex: 0 0 auto;
-        }
-
-        .fr-card-col-text {
-            min-width: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            flex: 1 1 auto;
-
-            .xforms-output,
-            .xforms-output-output {
-                display: inline;
-                min-width: 0;
-            }
-        }
-    }
-
-    .fr-card-heading {
-        .fr-card-sort-trigger {
-            min-width: 0;
-            flex: 1 1 auto;
-            display: flex;
-            align-items: center;
-
-            &:has(.fr-card-sort-caret.active-caret) {
-                color: var(--orbeon-table-header-sorted-color);
-                box-shadow: inset 0 -2px 0 var(--orbeon-table-header-sorted-border-color);
-            }
-
-            button.btn-link {
-                border: 0;
-                border-radius: 0;
-                padding: 0.5em 0;
-                margin: 0;
-                width: 100%;
-                min-width: 0;
-                display: flex;
-                align-items: center;
-                background: transparent;
-                color: inherit;
-                font: inherit;
-                font-weight: 600;
-                text-decoration: none;
-                cursor: pointer;
-                box-shadow: none;
-
-                &:hover {
-                    color: var(--orbeon-landing-card-link-hover-color);
-                    text-decoration: none;
-                }
-
-                @media (hover: hover) {
-                    &:hover .fr-card-sort-caret.hover-caret {
-                        opacity: 0.45;
-                    }
-                }
-
-                &:focus-visible .fr-card-sort-caret.hover-caret {
-                    opacity: 0.45;
-                }
-
-                .fr-card-col-text {
-                    flex: 0 1 auto;
-                }
-
-                .fr-card-sort-caret {
-                    margin-left: 0.35rem;
-                    font-size: 0.7em;
-                    flex: 0 0 auto;
-                    line-height: 1;
-
-                    &.hover-caret {
-                        opacity: 0;
-                        transition: opacity var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
-
-                        @media (prefers-reduced-motion: reduce) {
-                            transition: none;
-                        }
-                    }
-
-                    &.no-caret {
-                        display: none !important;
-                    }
-
-                    .xforms-output,
-                    .xforms-output-output {
-                        display: inline;
-                        line-height: inherit;
-                    }
-                }
-            }
-        }
-    }
-
-    .xbl-component {
-        .card {
-            color: inherit;
-            .card-body {
-                color: inherit;
-                .card-text {
-                    margin-bottom: 0;
-                }
-                .img-thumbnail {
-                    padding: 0;
-                    border: none;
-                }
-                img.img-thumbnail, .img-thumbnail img {
-                    max-width: 7em;
-                }
-            }
-        }
-    }
-
-    .xbl-fr-card-form-data {
-        .card {
-            .card-body {
-                .img-thumbnail img {
-                    box-shadow: 0 0 0 1px var(--orbeon-landing-card-image-border);
-                    padding: .5%;
-                    border-radius: 1em;
-                }
-            }
-        }
-    }
-
-    a figure, .card .list-group-item:not(.fr-card-head) {
-        &:hover {
-            background-color: var(--orbeon-landing-card-hover-background-color);
-        }
-    }
-
-    .card-footer {
-        color: var(--orbeon-landing-card-footer-color);
-        background-color: var(--orbeon-landing-card-footer-background-color);
-
-        .xforms-output .xforms-label {
-            margin-right: 3px;
-            font-weight: bold;
-            color: inherit;
-            &:after {
-                content: ":"
-            }
-        }
-
-        .xforms-field {
-            width: auto;
-            min-height: 0;
-            padding: 0;
-            border: 0;
-            color: inherit;
-            background-color: transparent;
-            box-shadow: none;
-            cursor: default;
-        }
-    }
-
-    // 2022-11-28: This will not work with Firefox yet but it's cosmetic
-    .list-group-item:has(+ .xforms-repeat-begin-end) {
-        border-bottom: none;
-    }
-
-    // Hide empty repeat items so they don't take part in the enclosing `display: flex`
-    .xforms-repeat-begin-end ~ span:not(:has(*)) {
-        display: none;
-    }
-
-    .card-img-top {
-        border-top: 40px solid transparent;
-        border-right: 40px solid transparent;
-        border-left: 40px solid transparent;
-    }
-
-    .card-img {
-        img {
-            width: 100%;
-        }
-    }
-
-    .card {
-        --bs-card-border-radius      : var(--orbeon-landing-card-border-radius);
-        --bs-card-inner-border-radius: calc(var(--orbeon-landing-card-border-radius) - var(--bs-card-border-width));
-
-        figure {
-            block-size: 100%;
-            margin-bottom: 0;
-            border: 1px solid var(--orbeon-landing-card-border-color);
-            border-radius: var(--orbeon-landing-tile-border-radius);
-        }
-        figcaption {
-            color: var(--orbeon-base-color);
-            font-weight: 500;
-            margin: 0 0 .5em;
-            padding-inline: .25em;
-            overflow-wrap: break-word;
-        }
-    }
-
-    .fr-landing-quick-links-card, .xbl-fr-card-published-forms, .xbl-fr-card-form-data {
-        .img-thumbnail {
-            background-color: transparent;
-        }
-    }
-
-    // #8011: propagate the correct color scheme (light, dark, system) to the SVG icons
-    .img-invertible {
-        color-scheme: light;
-    }
-    .dark-mode({
-        .img-invertible {
-            color-scheme: dark;
-        }
-    });
-
-    .fr-landing-quick-links-card {
         figure {
             display: flex;
             align-items: safe center;
@@ -414,7 +334,7 @@
             min-inline-size: 0;
             margin: 0;
             padding-inline: 0;
-            font-size: 1.05em;
+            font-size: 1.02em;
             font-weight: 500;
             line-height: 1.3;
         }
@@ -422,12 +342,13 @@
         .img-thumbnail {
             display: block;
             flex: 0 0 auto;
-            inline-size: 3.25em;
-            block-size: 3.25em;
+            inline-size: 3.1em;
+            block-size: 3.1em;
             aspect-ratio: 1;
             padding: 0;
-            border: none;
+            border: 0;
             border-radius: 0;
+            background-color: transparent;
             transition: transform 120ms ease;
 
             @media (prefers-reduced-motion: reduce) {
@@ -467,127 +388,558 @@
         }
     }
 
-    .card-body {
+    // #8011: propagate the correct color scheme (light, dark, system) to the SVG icons
+    .img-invertible {
+        color-scheme: light;
+    }
+    .dark-mode({
+        .img-invertible {
+            color-scheme: dark;
+        }
+    });
+
+    // Card skeleton, empty, and error states
+    .fr-card-skeleton {
+        &:not(.xforms-disabled) {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .fr-card-skeleton-row {
+            padding: 0.65em 1em;
+            border-bottom: 1px solid var(--orbeon-landing-card-border-color);
+
+            &:nth-child(2) .fr-card-skeleton-bar { inline-size: 62%; }
+            &:nth-child(3) .fr-card-skeleton-bar { inline-size: 84%; }
+            &:nth-child(4) .fr-card-skeleton-bar { inline-size: 54%; }
+            &:nth-child(5) .fr-card-skeleton-bar { inline-size: 72%; }
+        }
+
+        .fr-card-skeleton-bar {
+            display: block;
+            inline-size: 76%;
+            block-size: 0.85em;
+            border-radius: 9999px;
+            background-color: var(--orbeon-pill-muted-background-color);
+            animation: fr-landing-pulse 1.4s ease-in-out infinite;
+
+            @media (prefers-reduced-motion: reduce) {
+                animation: none;
+            }
+        }
+    }
+
+    @keyframes fr-landing-pulse {
+        0%, 100% { opacity: 0.45; }
+        50%      { opacity: 0.9; }
+    }
+
+    .fr-card-state {
+        &:not(.xforms-disabled) {
+            flex: 1 1 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.75em 1em;
+            text-align: center;
+        }
+
+        &.fr-card-state-empty {
+            color: var(--orbeon-hint-color);
+            font-size: 0.95em;
+        }
+
+        &.fr-card-state-error .alert {
+            margin: 0;
+            inline-size: 100%;
+        }
+
+        &.fr-card-is-refreshing {
+            opacity: 0.6;
+        }
+    }
+
+    // List & multi-column table grid inside cards
+    .card .list-group {
+        flex: 0 0 auto;
+        display: grid;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        column-gap: 0.75em;
+
+        &.xforms-hidden {
+            display: none !important;
+        }
+
+        &.fr-card-is-refreshing {
+            opacity: 0.6;
+            transition: opacity var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+            @media (prefers-reduced-motion: reduce) {
+                transition: none;
+            }
+        }
+
+        --orbeon-card-columns: 1;
+
+        each(range(1, 30), {
+            &.fr-card-cols-@{value} {
+                --orbeon-card-columns: @value;
+            }
+        });
+
+        // At most 3 columns are shown on the card at once; any additional columns are accessible via horizontal scrolling
+        --orbeon-card-visible-columns: ~"min(var(--orbeon-card-columns, 1), 3)";
+        --orbeon-card-column-width: calc((100% - (var(--orbeon-card-visible-columns) - 1) * 0.75em) / var(--orbeon-card-visible-columns));
+
+        grid-template-columns: repeat(var(--orbeon-card-columns, 1), var(--orbeon-card-column-width));
+
+        // Prevent delimiter and empty repeat items from creating phantom tracks
+        & > .xforms-repeat-begin-end,
+        & > .xforms-repeat-delimiter,
+        & > span:not(:has(*)) {
+            display: none !important;
+        }
+    }
+
+    .card .list-group-item {
+        position: relative;
+        background-color: var(--orbeon-form-background-color);
+        border-top: 0;
+        border-inline: 0;
+        border-bottom: 1px solid var(--orbeon-landing-card-border-color);
+        padding: 0.52em 1em;
+
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(var(--orbeon-card-columns, 1), minmax(0, 1fr)); // Fallback
+        grid-template-columns: subgrid;
+        align-items: center;
+
+        // Hide delimiter and non-column spans inside rows
+        & > .xforms-repeat-begin-end,
+        & > .xforms-repeat-delimiter,
+        & > span:not(.fr-card-col) {
+            display: none !important;
+        }
+
+        &.fr-card-head {
+            padding-block: 0;
+            font-size: 0.92em;
+            font-weight: 600;
+            color: var(--orbeon-landing-card-header-color);
+            background-color: var(--orbeon-landing-card-header-background-color);
+            border-bottom: 1px solid var(--orbeon-landing-card-border-color);
+
+            // Hide completely if there are no heading columns
+            &:not(:has(.fr-card-col)) {
+                display: none !important;
+            }
+        }
+
+        // Published Forms row: primary link + optional app pill + optional secondary action
+        &.fr-card-published-row {
+            display: flex;
+            align-items: safe center;
+            gap: 0.35em;
+            padding: 0.3em 0.65em 0.3em 1em;
+
+            .fr-card-row-primary {
+                flex: 1 1 auto;
+                min-inline-size: 0;
+                display: flex;
+                align-items: safe center;
+                padding-block: 0.22em;
+                color: var(--orbeon-landing-card-link-color);
+                font-weight: 500;
+
+                &:hover {
+                    color: var(--orbeon-landing-card-link-hover-color);
+                }
+
+                .fr-card-col-single {
+                    display: flex;
+                    align-items: safe center;
+                    gap: 0.5em;
+                    inline-size: 100%;
+                    min-inline-size: 0;
+                    position: static;
+                }
+            }
+
+            .fr-card-app-pill {
+                flex: 0 0 auto;
+                margin-inline-start: auto;
+                padding: 0.08em 0.55em;
+                border-radius: 9999px;
+                border: 1px solid var(--orbeon-pill-muted-border-color);
+                background-color: var(--orbeon-pill-muted-background-color);
+                color: var(--orbeon-pill-muted-color);
+                font-family: var(--orbeon-code-font-family);
+                font-size: 0.8em;
+                font-weight: 500;
+                line-height: 1.35;
+
+                &.xforms-hidden {
+                    display: none;
+                }
+            }
+
+            .fr-card-row-secondary {
+                flex: 0 0 auto;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-inline-size: 26px;
+                min-block-size: 26px;
+                border-radius: var(--orbeon-landing-tile-border-radius);
+                border: 1px solid transparent;
+                color: var(--orbeon-landing-card-footer-color);
+                font-size: 0.85em;
+                transition: opacity var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                            color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                            background-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                            border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+                &.xforms-hidden {
+                    display: none;
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+                    transition: none;
+                }
+
+                @media (hover: hover) {
+                    opacity: 0;
+
+                    &:hover {
+                        opacity: 1;
+                        color: var(--orbeon-landing-card-link-hover-color);
+                        background-color: var(--orbeon-pill-background-color);
+                        border-color: var(--orbeon-pill-border-color);
+                    }
+                }
+
+                &:focus-visible {
+                    opacity: 1;
+                    color: var(--orbeon-landing-card-link-color);
+                    outline: 2px solid var(--orbeon-focus-border-color);
+                    outline-offset: -2px;
+                }
+            }
+
+            @media (hover: hover) {
+                &:hover .fr-card-row-secondary {
+                    opacity: 1;
+                }
+            }
+
+            &:focus-within .fr-card-row-secondary {
+                opacity: 1;
+            }
+
+            &:has(.fr-card-row-primary:focus-visible) {
+                box-shadow: 0 0 0 2px inset var(--orbeon-focus-border-color);
+            }
+        }
+
+        // Form Data row: full-row stretched link in primary column + neutral secondary columns
+        &.fr-card-data-row {
+            .fr-card-col-primary {
+                font-weight: 500;
+            }
+
+            .fr-card-col-secondary {
+                color: var(--orbeon-base-color);
+            }
+
+            .fr-card-stretched-link {
+                display: flex;
+                align-items: center;
+                inline-size: 100%;
+                min-inline-size: 0;
+                color: var(--orbeon-landing-card-link-color);
+
+                &.xforms-hidden {
+                    display: none;
+                }
+
+                &::after {
+                    content: "";
+                    position: absolute;
+                    inset: 0;
+                    z-index: 1;
+                }
+
+                &:hover {
+                    color: var(--orbeon-landing-card-link-hover-color);
+                }
+            }
+
+            .fr-card-col-text.xforms-hidden {
+                display: none;
+            }
+
+            &:has(.fr-card-stretched-link:focus-visible) {
+                box-shadow: 0 0 0 2px inset var(--orbeon-focus-border-color);
+            }
+        }
+
+        // Legacy itemset row fallback
+        & > a.fr-card-row-primary {
+            color: var(--orbeon-landing-card-link-color);
+            padding: 0;
+            min-inline-size: 0;
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(var(--orbeon-card-columns, 1), minmax(0, 1fr));
+            grid-template-columns: subgrid;
+            align-items: center;
+
+            &:hover {
+                color: var(--orbeon-landing-card-link-hover-color);
+            }
+
+            & > .xforms-repeat-begin-end,
+            & > .xforms-repeat-delimiter,
+            & > span:not(.fr-card-col) {
+                display: none !important;
+            }
+        }
+    }
+
+    .list-group-item:has(+ .xforms-repeat-begin-end) {
+        border-bottom: none;
+    }
+
+    a figure,
+    .card .list-group-item.fr-card-published-row,
+    .card .list-group-item.fr-card-data-row-clickable {
+        @media (hover: hover) {
+            &:hover {
+                background-color: var(--orbeon-landing-card-hover-background-color);
+            }
+        }
+    }
+
+    .fr-card-col {
+        min-inline-size: 0;
         display: flex;
         align-items: center;
-        column-gap: .5em;
-        p {
-            width: 100%;
-        }
-    }
 
-    .card {
-        .spinner {
-            // Center horizontally
-            margin-left: auto;
-            margin-right: auto;
+        &.fr-card-col-single {
+            grid-column: 1 / -1;
+            position: sticky;
+            inset-inline-start: 1em;
         }
 
-        // https://loading.io/css/
-        .lds-ring {
-            display: inline-block;
-            position: relative;
-            width: 80px;
-            height: 80px;
-        }
+        .fr-card-col-text {
+            min-inline-size: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1 1 auto;
 
-        .lds-ring div {
-            box-sizing: border-box;
-            display: block;
-            position: absolute;
-            width: 64px;
-            height: 64px;
-            margin: 8px;
-            border: 8px solid var(--orbeon-base-border-color);
-            border-radius: 50%;
-            animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-            border-color: var(--orbeon-base-border-color) transparent transparent transparent;
-        }
-
-        .lds-ring div:nth-child(1) {
-            animation-delay: -0.45s;
-        }
-
-        .lds-ring div:nth-child(2) {
-            animation-delay: -0.3s;
-        }
-
-        .lds-ring div:nth-child(3) {
-            animation-delay: -0.15s;
-        }
-
-        @keyframes lds-ring {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .lds-ellipsis {
-            display: inline-block;
-            position: relative;
-            width: 80px;
-            height: 80px;
-        }
-
-        .lds-ellipsis div {
-            position: absolute;
-            top: 33px;
-            width: 13px;
-            height: 13px;
-            border-radius: 50%;
-            //background: #fff;
-            background: var(--orbeon-base-border-color);
-            animation-timing-function: cubic-bezier(0, 1, 1, 0);
-        }
-
-        .lds-ellipsis div:nth-child(1) {
-            left: 8px;
-            animation: lds-ellipsis1 0.6s infinite;
-        }
-
-        .lds-ellipsis div:nth-child(2) {
-            left: 8px;
-            animation: lds-ellipsis2 0.6s infinite;
-        }
-
-        .lds-ellipsis div:nth-child(3) {
-            left: 32px;
-            animation: lds-ellipsis2 0.6s infinite;
-        }
-
-        .lds-ellipsis div:nth-child(4) {
-            left: 56px;
-            animation: lds-ellipsis3 0.6s infinite;
-        }
-
-        @keyframes lds-ellipsis1 {
-            0% {
-                transform: scale(0);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
-        @keyframes lds-ellipsis3 {
-            0% {
-                transform: scale(1);
-            }
-            100% {
-                transform: scale(0);
-            }
-        }
-        @keyframes lds-ellipsis2 {
-            0% {
-                transform: translate(0, 0);
-            }
-            100% {
-                transform: translate(24px, 0);
+            .xforms-output,
+            .xforms-output-output {
+                display: inline;
+                min-inline-size: 0;
             }
         }
     }
 
+    .fr-card-heading {
+        &[aria-sort] .fr-card-sort-trigger,
+        .fr-card-sort-trigger:has(.fr-card-sort-caret.active-caret) {
+            color: var(--orbeon-table-header-sorted-color);
+            box-shadow: inset 0 -2px 0 var(--orbeon-table-header-sorted-border-color);
+        }
 
+        .fr-card-sort-trigger {
+            min-inline-size: 0;
+            flex: 1 1 auto;
+            display: flex;
+            align-items: center;
+
+            button.btn-link {
+                border: 0;
+                border-radius: 0;
+                min-block-size: 28px;
+                padding: 0.48em 0;
+                margin: 0;
+                inline-size: 100%;
+                min-inline-size: 0;
+                display: flex;
+                align-items: center;
+                background: transparent;
+                color: inherit;
+                font: inherit;
+                font-weight: 600;
+                text-decoration: none;
+                cursor: pointer;
+                box-shadow: none;
+
+                &:hover {
+                    color: var(--orbeon-landing-card-link-hover-color);
+                    text-decoration: none;
+                }
+
+                &:focus-visible {
+                    outline: 2px solid var(--orbeon-focus-border-color);
+                    outline-offset: -2px;
+                }
+
+                @media (hover: hover) {
+                    &:hover .fr-card-sort-caret.hover-caret {
+                        opacity: 0.45;
+                    }
+                }
+
+                &:focus-visible .fr-card-sort-caret.hover-caret {
+                    opacity: 0.45;
+                }
+
+                .fr-card-col-text {
+                    flex: 0 1 auto;
+                }
+
+                .fr-card-sort-caret {
+                    margin-inline-start: 0.35em;
+                    font-size: 0.7em;
+                    flex: 0 0 auto;
+                    line-height: 1;
+
+                    &.hover-caret {
+                        opacity: 0;
+                        transition: opacity var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+                        @media (prefers-reduced-motion: reduce) {
+                            transition: none;
+                        }
+                    }
+
+                    &.no-caret {
+                        display: none !important;
+                    }
+
+                    .xforms-output,
+                    .xforms-output-output {
+                        display: inline;
+                        line-height: inherit;
+                    }
+                }
+            }
+        }
+    }
+
+    // Card footer: Modified timestamp on the left, Show more... link on the right
+    .card .card-footer.fr-card-footer {
+        margin-block-start: auto;
+        display: flex;
+        align-items: safe center;
+        justify-content: space-between;
+        gap: 0.75em;
+        padding: 0.52em 1em;
+        font-size: 0.86em;
+        font-variant-numeric: tabular-nums;
+        color: var(--orbeon-landing-card-footer-color);
+        background-color: var(--orbeon-landing-card-footer-background-color);
+        border-top: 1px solid var(--orbeon-landing-card-border-color);
+
+        &:not(:has(> :not(.xforms-hidden):not(.xforms-disabled))) {
+            display: none;
+        }
+
+        .fr-card-footer-meta {
+            min-inline-size: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            &.xforms-hidden {
+                display: none;
+            }
+        }
+
+        .xforms-output .xforms-label {
+            display: inline;
+            margin-inline-end: 0.25em;
+            font-weight: 500;
+            color: inherit;
+
+            &::after {
+                content: ":";
+            }
+        }
+
+        .xforms-field {
+            inline-size: auto;
+            min-block-size: 0;
+            padding: 0;
+            border: 0;
+            color: inherit;
+            background-color: transparent;
+            box-shadow: none;
+            cursor: default;
+        }
+
+        .fr-card-show-more {
+            flex: 0 0 auto;
+            margin-inline-start: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35em;
+            font-weight: 500;
+            color: var(--orbeon-landing-card-link-color);
+            white-space: nowrap;
+
+            &.xforms-hidden {
+                display: none;
+            }
+
+            i.fa {
+                font-size: 0.85em;
+                transition: transform 120ms ease;
+
+                @media (prefers-reduced-motion: reduce) {
+                    transition: none;
+                }
+            }
+
+            &:hover {
+                color: var(--orbeon-landing-card-link-hover-color);
+
+                i.fa {
+                    transform: translateX(2px);
+
+                    @media (prefers-reduced-motion: reduce) {
+                        transform: none;
+                    }
+                }
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--orbeon-focus-border-color);
+                outline-offset: 2px;
+                border-radius: 3px;
+            }
+        }
+    }
+
+    // Hide empty repeat items so they don't take part in enclosing flex/grid layouts
+    .xforms-repeat-begin-end ~ span:not(:has(*)) {
+        display: none;
+    }
+
+    // Legacy fr:link-card styles
+    .card-img-top {
+        border-top: 40px solid transparent;
+        border-right: 40px solid transparent;
+        border-left: 40px solid transparent;
+    }
+
+    .card-img img {
+        inline-size: 100%;
+    }
 }

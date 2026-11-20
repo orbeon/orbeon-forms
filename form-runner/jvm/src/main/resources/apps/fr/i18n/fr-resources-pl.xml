@@ -801,6 +801,19 @@
             <demo-features>Wypróbuj demonstracje wybranych funkcji Orbeon Forms</demo-features>
         </descriptions>
         <show-more>Pokaż więcej…</show-more>
+        <buttons>
+            <refresh>Odśwież</refresh>
+            <new>Nowy</new>
+            <summary>Podsumowanie</summary>
+            <sort-by-title>Sortuj według tytułu</sort-by-title>
+            <sort-by-last-modified>Sortuj według daty modyfikacji</sort-by-last-modified>
+        </buttons>
+        <messages>
+            <no-forms>Brak opublikowanych formularzy</no-forms>
+            <no-data>Brak danych formularza</no-data>
+            <sorted-by-ascending>Posortowano według {0}, rosnąco</sorted-by-ascending>
+            <sorted-by-descending>Posortowano według {0}, malejąco</sorted-by-descending>
+        </messages>
     </landing>
     <home>
         <title>Opublikowane formularze</title>

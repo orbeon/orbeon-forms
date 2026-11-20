@@ -800,6 +800,19 @@
             <demo-features>Tutustu yksittäisten Orbeon Forms -ominaisuuksien esimerkkeihin</demo-features>
         </descriptions>
         <show-more>Näytä lisää…</show-more>
+        <buttons>
+            <refresh>Päivitä</refresh>
+            <new>Uusi</new>
+            <summary>Yhteenveto</summary>
+            <sort-by-title>Järjestä otsikon mukaan</sort-by-title>
+            <sort-by-last-modified>Järjestä muokkauspäivän mukaan</sort-by-last-modified>
+        </buttons>
+        <messages>
+            <no-forms>Ei julkaistuja lomakkeita</no-forms>
+            <no-data>Ei lomaketietoja</no-data>
+            <sorted-by-ascending>Järjestetty sarakkeen {0} mukaan, nouseva</sorted-by-ascending>
+            <sorted-by-descending>Järjestetty sarakkeen {0} mukaan, laskeva</sorted-by-descending>
+        </messages>
     </landing>
     <home>
         <title>Form Runner -koti</title>

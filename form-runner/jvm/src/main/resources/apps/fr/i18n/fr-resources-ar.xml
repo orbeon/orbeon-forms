@@ -800,6 +800,19 @@
             <demo-features>جرب العروض التوضيحية لميزات محددة من Orbeon Forms</demo-features>
         </descriptions>
         <show-more>إظهار المزيد…</show-more>
+        <buttons>
+            <refresh>تحديث</refresh>
+            <new>جديد</new>
+            <summary>ملخص</summary>
+            <sort-by-title>ترتيب حسب العنوان</sort-by-title>
+            <sort-by-last-modified>ترتيب حسب تاريخ التعديل</sort-by-last-modified>
+        </buttons>
+        <messages>
+            <no-forms>لا توجد نماذج منشورة</no-forms>
+            <no-data>لا توجد بيانات</no-data>
+            <sorted-by-ascending>مرتب حسب {0}، تصاعديًا</sorted-by-ascending>
+            <sorted-by-descending>مرتب حسب {0}، تنازليًا</sorted-by-descending>
+        </messages>
     </landing>
     <home>
         <title>النماذج المنشورة</title>

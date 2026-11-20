@@ -798,6 +798,19 @@
             <demo-features>Belirli Orbeon Forms özelliklerinin demolarını deneyin</demo-features>
         </descriptions>
         <show-more>Daha fazla göster…</show-more>
+        <buttons>
+            <refresh>Yenile</refresh>
+            <new>Yeni</new>
+            <summary>Özet</summary>
+            <sort-by-title>Başlığa göre sırala</sort-by-title>
+            <sort-by-last-modified>Değiştirilme tarihine göre sırala</sort-by-last-modified>
+        </buttons>
+        <messages>
+            <no-forms>Yayınlanmış form yok</no-forms>
+            <no-data>Form verisi yok</no-data>
+            <sorted-by-ascending>{0} sütununa göre artan sırada</sorted-by-ascending>
+            <sorted-by-descending>{0} sütununa göre azalan sırada</sorted-by-descending>
+        </messages>
     </landing>
     <home>
         <title>Yayınlanan Formlar</title>

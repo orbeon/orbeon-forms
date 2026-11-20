@@ -794,6 +794,19 @@
             <demo-features>Prøv demoer af specifikke Orbeon Forms-funktioner</demo-features>
         </descriptions>
         <show-more>Vis mere…</show-more>
+        <buttons>
+            <refresh>Opdater</refresh>
+            <new>Ny</new>
+            <summary>Oversigt</summary>
+            <sort-by-title>Sortér efter titel</sort-by-title>
+            <sort-by-last-modified>Sortér efter ændringsdato</sort-by-last-modified>
+        </buttons>
+        <messages>
+            <no-forms>Ingen publicerede formularer</no-forms>
+            <no-data>Ingen formulardata</no-data>
+            <sorted-by-ascending>Sorteret efter {0}, stigende</sorted-by-ascending>
+            <sorted-by-descending>Sorteret efter {0}, faldende</sorted-by-descending>
+        </messages>
     </landing>
     <home>
         <title>Blanketbehandler start</title>

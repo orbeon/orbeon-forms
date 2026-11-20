@@ -800,6 +800,19 @@
             <demo-features>試用 Orbeon Forms 特定功能的演示</demo-features>
         </descriptions>
         <show-more>顯示更多…</show-more>
+        <buttons>
+            <refresh>重新整理</refresh>
+            <new>新增</new>
+            <summary>摘要</summary>
+            <sort-by-title>依標題排序</sort-by-title>
+            <sort-by-last-modified>依修改日期排序</sort-by-last-modified>
+        </buttons>
+        <messages>
+            <no-forms>尚無已發佈的表單</no-forms>
+            <no-data>尚無表單資料</no-data>
+            <sorted-by-ascending>已依 {0} 升冪排列</sorted-by-ascending>
+            <sorted-by-descending>已依 {0} 降冪排列</sorted-by-descending>
+        </messages>
     </landing>
     <home>
         <title>已發布的表單</title>

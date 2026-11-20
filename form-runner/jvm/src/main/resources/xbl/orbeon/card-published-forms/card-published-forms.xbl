@@ -5,12 +5,13 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xbl:binding
         id="fr-card-published-forms"
         element="fr|card-published-forms"
         xxbl:mode="lhha custom-lhha binding"
+        class="h-100"
     >
         <xbl:implementation>
             <xf:model>
@@ -36,12 +37,16 @@
                                 $tokens
                     "/>
 
+                <xf:instance id="fr-ui-instance" xxf:exclude-result-prefixes="#all">
+                    <ui state="initial" has-loaded="false" sort-by="" sort-direction="" sort-announcement=""/>
+                </xf:instance>
+
                 <xf:instance id="fr-search-request-instance" xxf:exclude-result-prefixes="#all">
                     <search ignore-admin-permissions="true" xml:lang=""/>
                 </xf:instance>
 
                 <xf:instance id="fr-forms-instance" xxf:exclude-result-prefixes="#all">
-                    <_ state="initial"/>
+                    <_/>
                 </xf:instance>
 
                 <xf:submission
@@ -55,6 +60,7 @@
                     targetref="instance('fr-forms-instance')"
                     mode="asynchronous"
                     xxf:response-must-await="200ms"
+                    xxf:show-progress="false"
                 >
                     <xf:action event="xforms-submit">
                         <xf:var
@@ -63,12 +69,12 @@
 
                         <xf:var
                             name="sort-by"
-                            value="(fr:component-param-value('sort-by')[xxf:non-blank()], 'last-modified')[1]"/>
+                            value="(instance('fr-ui-instance')/@sort-by[xxf:non-blank()], fr:component-param-value('sort-by')[xxf:non-blank()], 'last-modified')[1]"/>
 
                         <xf:var
                             name="sort-direction"
                             value="
-                                let $direction := fr:component-param-value('sort-direction')[. = ('asc', 'desc', 'ascending', 'descending')],
+                                let $direction := (instance('fr-ui-instance')/@sort-direction[xxf:non-blank()], fr:component-param-value('sort-direction')[. = ('asc', 'desc', 'ascending', 'descending')])[1],
                                     $adjusted  := if ($direction = 'ascending') then 'asc' else if ($direction = 'descending') then 'desc' else $direction
                                 return
                                     if (empty($adjusted)) then
@@ -87,9 +93,9 @@
                                     ' '
                                 )"/>
 
-                        <xf:insert
-                            ref="instance('fr-forms-instance')"
-                            origin="xf:element('_', xf:attribute('state', 'loading'))"/>
+                        <xf:setvalue ref="instance('fr-ui-instance')/@state"          value="'loading'"/>
+                        <xf:setvalue ref="instance('fr-ui-instance')/@sort-by"        value="$sort-by"/>
+                        <xf:setvalue ref="instance('fr-ui-instance')/@sort-direction" value="$sort-direction"/>
 
                         <xf:setvalue
                             ref="instance('fr-search-request-instance')/@xml:lang"
@@ -110,9 +116,14 @@
                                 )"/>
                     </xf:action>
 
+                    <xf:action event="xforms-submit-done">
+                        <xf:setvalue ref="instance('fr-ui-instance')/@state"      value="'done'"/>
+                        <xf:setvalue ref="instance('fr-ui-instance')/@has-loaded" value="'true'"/>
+                    </xf:action>
+
                     <xf:setvalue
                         event="xforms-submit-error"
-                        ref="instance('fr-forms-instance')/@state"
+                        ref="instance('fr-ui-instance')/@state"
                         value="'error'"/>
                 </xf:submission>
 
@@ -122,79 +133,206 @@
             </xf:model>
         </xbl:implementation>
         <xbl:template>
+
+            <xf:var name="app-filter" value="fr:component-param-value('app')[xxf:non-blank()]"/>
+            <xf:var name="forms"      value="instance('fr-forms-instance')/*"/>
+            <xf:var name="form-count" value="count($forms)"/>
+            <xf:var name="show-more"  value="$form-count gt $page-size"/>
             <xf:var
-                name="language-watch"
-                value="xxf:instance('fr-fr-language-instance')">
-                <xf:send event="xforms-value-changed" submission="fr-read-demo-forms-submission"/>
-            </xf:var>
+                name="show-more-href"
+                value="
+                    string-join(
+                        (
+                            '/fr/forms',
+                            if (exists($app-filter)) then
+                                ('?fr-search-app=exact:', $app-filter)
+                            else
+                                ()
+                        ),
+                        ''
+                    )"/>
             <xf:var
                 name="latest-modified-dt"
-                value="max(instance('fr-forms-instance')/*/last-modified-time[. castable as xs:dateTime]/xs:dateTime(.))"/>
+                value="max($forms/last-modified-time[. castable as xs:dateTime]/xs:dateTime(.))"/>
+            <xf:var name="is-sorted-by-title" value="instance('fr-ui-instance')/@sort-by = 'title'"/>
+            <xf:var
+                name="sort-toggle-label"
+                value="
+                    if ($is-sorted-by-title) then
+                        xxf:r('landing.buttons.sort-by-last-modified', '|fr-fr-resources|')
+                    else
+                        xxf:r('landing.buttons.sort-by-title', '|fr-fr-resources|')"/>
+            <xf:var name="refresh-label" value="xxf:r('landing.buttons.refresh', '|fr-fr-resources|')"/>
+
+            <xf:var
+                name="refresh-watch"
+                value="concat(fr:component-param-value('refresh-token'), '|', xxf:instance('fr-fr-language-instance'))">
+                <xf:send
+                    event="xforms-value-changed"
+                    if="instance('fr-ui-instance')/@has-loaded = 'true'"
+                    submission="fr-read-demo-forms-submission"/>
+            </xf:var>
+
             <fr:card
-                    status="{(instance('fr-forms-instance')/@state, 'done')[1]}"
-                >
+                status="{instance('fr-ui-instance')/@state}"
+                has-loaded="{instance('fr-ui-instance')/@has-loaded}"
+                count="{$form-count}"
+                is-empty="{empty($forms)}"
+                empty-message="{xxf:r('landing.messages.no-forms', '|fr-fr-resources|')}"
+            >
                 <xf:label ref="xxf:label('fr-card-published-forms')"/>
-                <xf:itemset ref="instance('fr-forms-instance')/*[position() le $page-size]">
-                    <!-- 2022-12-30: Don't use `<description>` as 1. it's not present with relational and 2. it can
-                         be in HTML and shows unescaped markup in the list. Not ideal. -->
-<!--                        <xf:label ref="string-join(((title[@xml:lang = xxf:lang()], title)[normalize-space()][1], (description[@xml:lang = xxf:lang()], description)[normalize-space()][1]), ' - ')"/>-->
-                    <xf:label ref="(title[@xml:lang = xxf:lang()], title)[normalize-space()][1]"/>
-                    <xf:value ref="
-                        let $ops                  := xxf:split(@operations),
-                            $can-navigate-summary := $ops = ('*', 'list'),
-                            $can-navigate-new     := $ops = ('*', 'create'),
-                            $link-to              := $link-to-tokens[
-                                                         (. = 'summary' and $can-navigate-summary) or
-                                                         (. = 'new'     and $can-navigate-new)
-                                                     ][1]
-                        return
-                            if (empty($link-to)) then (: This should not happen as we search only for forms which have at least one of the permissions :)
-                                concat('#', string-join((application-name, form-name, form-version), '/'))
-                            else
+
+                <fr:card-status>
+                    <xf:output value="instance('fr-ui-instance')/@sort-announcement"/>
+                </fr:card-status>
+
+                <fr:card-actions>
+                    <xf:trigger
+                        appearance="minimal"
+                        class="fr-card-action-btn fr-card-sort-mode-btn {'xforms-hidden'[$form-count le 1]}">
+                        <xf:label>
+                            <xh:i class="fa {if ($is-sorted-by-title) then 'fa-arrow-down-a-z' else 'fa-clock'}" aria-hidden="true"/>
+                            <xh:span class="xforms-hidden"><xf:output value="$sort-toggle-label"/></xh:span>
+                        </xf:label>
+                        <xf:hint value="$sort-toggle-label"/>
+                        <xf:action event="DOMActivate">
+                            <xf:var name="next-sort-by"  value="if ($is-sorted-by-title) then 'last-modified' else 'title'"/>
+                            <xf:var name="next-sort-dir" value="if ($next-sort-by = 'title') then 'asc' else 'desc'"/>
+                            <xf:setvalue ref="instance('fr-ui-instance')/@sort-by"        value="$next-sort-by"/>
+                            <xf:setvalue ref="instance('fr-ui-instance')/@sort-direction" value="$next-sort-dir"/>
+                            <xf:setvalue
+                                ref="instance('fr-ui-instance')/@sort-announcement"
+                                value="
+                                    if ($next-sort-by = 'title') then
+                                        xxf:format-message(
+                                            xxf:r('landing.messages.sorted-by-ascending', '|fr-fr-resources|'),
+                                            xxf:r('home-summary.titles.form-title', '|fr-fr-resources|')
+                                        )
+                                    else
+                                        xxf:format-message(
+                                            xxf:r('landing.messages.sorted-by-descending', '|fr-fr-resources|'),
+                                            xxf:r('home-summary.titles.last-modified', '|fr-fr-resources|')
+                                        )"/>
+                            <xf:send submission="fr-read-demo-forms-submission"/>
+                        </xf:action>
+                    </xf:trigger>
+
+                    <xf:trigger
+                        appearance="minimal"
+                        class="fr-card-action-btn fr-card-refresh-btn {'is-spinning'[instance('fr-ui-instance')/@state = 'loading' and instance('fr-ui-instance')/@has-loaded = 'true']}">
+                        <xf:label>
+                            <xh:i class="fa fa-rotate-right" aria-hidden="true"/>
+                            <xh:span class="xforms-hidden"><xf:output value="$refresh-label"/></xh:span>
+                        </xf:label>
+                        <xf:hint value="$refresh-label"/>
+                        <xf:send event="DOMActivate" submission="fr-read-demo-forms-submission"/>
+                    </xf:trigger>
+                </fr:card-actions>
+
+                <fr:card-body>
+                    <xh:p class="card-text"><xf:output ref="xxf:help('fr-card-published-forms')"/></xh:p>
+                </fr:card-body>
+
+                <fr:card-thumbnail>
+                    <xh:img src="{fr:component-param-value('thumbnail')}" alt="" class="img-thumbnail img-invertible"/>
+                </fr:card-thumbnail>
+
+                <fr:rows>
+                    <xf:repeat ref="$forms[position() le $page-size]">
+                        <xf:var name="form-app"     value="string(application-name)"/>
+                        <xf:var name="form-name"    value="string(form-name)"/>
+                        <xf:var name="form-version" value="string(form-version)"/>
+                        <xf:var name="form-title"   value="string((title[@xml:lang = xxf:lang()], title, form-name)[normalize-space()][1])"/>
+                        <xf:var name="ops"          value="xxf:split(@operations)"/>
+                        <xf:var name="can-summary"  value="$ops = ('*', 'list')"/>
+                        <xf:var name="can-new"      value="$ops = ('*', 'create')"/>
+                        <xf:var
+                            name="summary-href"
+                            value="
                                 concat(
                                     '/fr/',
-                                    application-name,
+                                    $form-app,
                                     '/',
-                                    form-name,
-                                    '/',
-                                    $link-to,
+                                    $form-name,
+                                    '/summary',
                                     if (
-                                        $link-to = 'summary' and
-                                        form-version != '1'  and
-                                        xxf:property(string-join(('oxf.fr.summary.show-version-selector', application-name, form-name), '.'))
+                                        $form-version != '1' and
+                                        xxf:property(string-join(('oxf.fr.summary.show-version-selector', $form-app, $form-name), '.'))
                                     ) then
-                                        concat('?form-version=', form-version)
+                                        concat('?form-version=', $form-version)
                                     else
                                         ''
                                 )"/>
-                    <!-- This doesn't work because we remove the form description from the metadata -->
-<!--                        <xf:hint ref="(description[@xml:lang = xxf:lang()], description)[normalize-space()][1]"/>-->
-                </xf:itemset>
-                <xf:itemset ref=".[count(instance('fr-forms-instance')/*) gt $page-size]">
-                    <xf:label ref="xxf:r('landing.show-more', '|fr-fr-resources|')"/>
-                    <!-- https://github.com/orbeon/orbeon-forms/issues/5255
-                         https://github.com/orbeon/orbeon-forms/issues/5274 -->
-                    <xf:value
-                        ref="
-                            string-join(
-                                (
-                                    '/fr/forms',
-                                    if (xxf:non-blank(fr:component-param-value('app'))) then
-                                        ('?fr-search-app=exact:', fr:component-param-value('app'))
-                                    else
-                                        ()
-                                ),
-                                ''
-                            )"/>
-                </xf:itemset>
-                <fr:card-body>
-                    <xh:p class="card-text lead"><xf:output ref="xxf:help('fr-card-published-forms')"/></xh:p>
-                </fr:card-body>
-                <fr:card-thumbnail>
-                    <xh:img src="{fr:component-param-value('thumbnail')}" class="img-thumbnail img-invertible"/>
-                </fr:card-thumbnail>
+                        <xf:var name="new-href" value="concat('/fr/', $form-app, '/', $form-name, '/new')"/>
+                        <xf:var
+                            name="primary-mode"
+                            value="
+                                $link-to-tokens[
+                                    (. = 'summary' and $can-summary) or
+                                    (. = 'new'     and $can-new)
+                                ][1]"/>
+                        <xf:var
+                            name="primary-href"
+                            value="
+                                if ($primary-mode = 'new') then
+                                    $new-href
+                                else if ($primary-mode = 'summary') then
+                                    $summary-href
+                                else
+                                    concat('#', string-join(($form-app, $form-name, $form-version), '/'))"/>
+                        <xf:var
+                            name="secondary-mode"
+                            value="
+                                if ($primary-mode = 'summary' and $can-new) then
+                                    'new'
+                                else if ($primary-mode = 'new' and $can-summary) then
+                                    'summary'
+                                else
+                                    ()"/>
+                        <xf:var
+                            name="secondary-href"
+                            value="
+                                if ($secondary-mode = 'new') then
+                                    $new-href
+                                else if ($secondary-mode = 'summary') then
+                                    $summary-href
+                                else
+                                    '#'"/>
+                        <xf:var
+                            name="secondary-label"
+                            value="
+                                if ($secondary-mode = 'new') then
+                                    xxf:r('landing.buttons.new', '|fr-fr-resources|')
+                                else
+                                    xxf:r('landing.buttons.summary', '|fr-fr-resources|')"/>
+
+                        <xh:li class="list-group-item fr-card-published-row">
+                            <xh:a
+                                href="{$primary-href}"
+                                title="{if (empty($app-filter)) then concat($form-title, ' (', $form-app, '/', $form-name, ')') else $form-title}"
+                                class="fr-card-row-primary">
+                                <xh:span class="fr-card-col fr-card-col-single">
+                                    <xh:span class="fr-card-col-text text-truncate">
+                                        <xf:output value="$form-title"/>
+                                    </xh:span>
+                                    <xh:span class="fr-card-app-pill {'xforms-hidden'[exists($app-filter)]}">
+                                        <xf:output value="$form-app"/>
+                                    </xh:span>
+                                </xh:span>
+                            </xh:a>
+                            <xh:a
+                                href="{$secondary-href}"
+                                title="{concat($secondary-label, ': ', $form-title)}"
+                                aria-label="{concat($secondary-label, ': ', $form-title)}"
+                                class="fr-card-row-secondary {'xforms-hidden'[empty($secondary-mode)]}">
+                                <xh:i class="fa {if ($secondary-mode = 'new') then 'fa-plus' else 'fa-list'}" aria-hidden="true"/>
+                            </xh:a>
+                        </xh:li>
+                    </xf:repeat>
+                </fr:rows>
+
                 <fr:card-footer>
-                    <xh:span class="{'xforms-hidden'[empty($latest-modified-dt)]}">
+                    <xh:span class="fr-card-footer-meta {'xforms-hidden'[empty($latest-modified-dt)]}">
                         <xf:output value="
                             if (empty($latest-modified-dt)) then
                                 ''
@@ -213,6 +351,10 @@
                             <xf:label ref="xxf:r('home-summary.titles.last-modified', '|fr-fr-resources|')"/>
                         </xf:output>
                     </xh:span>
+                    <xh:a href="{$show-more-href}" class="fr-card-show-more {'xforms-hidden'[not($show-more)]}">
+                        <xh:span><xf:output value="xxf:r('landing.show-more', '|fr-fr-resources|')"/></xh:span>
+                        <xh:i class="fa fa-arrow-right" aria-hidden="true"/>
+                    </xh:a>
                 </fr:card-footer>
             </fr:card>
         </xbl:template>

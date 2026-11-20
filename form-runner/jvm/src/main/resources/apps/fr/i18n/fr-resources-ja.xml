@@ -787,6 +787,19 @@
             <demo-features>Orbeon Formsの特定機能のデモを試す</demo-features>
         </descriptions>
         <show-more>もっと見る…</show-more>
+        <buttons>
+            <refresh>更新</refresh>
+            <new>新規</new>
+            <summary>サマリー</summary>
+            <sort-by-title>タイトル順に並べ替え</sort-by-title>
+            <sort-by-last-modified>更新日時順に並べ替え</sort-by-last-modified>
+        </buttons>
+        <messages>
+            <no-forms>公開済みのフォームはありません</no-forms>
+            <no-data>フォームデータはありません</no-data>
+            <sorted-by-ascending>{0} の昇順で並べ替えました</sorted-by-ascending>
+            <sorted-by-descending>{0} の降順で並べ替えました</sorted-by-descending>
+        </messages>
     </landing>
     <home>
         <title>公開済みフォーム</title>

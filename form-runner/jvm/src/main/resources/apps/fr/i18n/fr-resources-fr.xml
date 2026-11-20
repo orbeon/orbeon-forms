@@ -803,6 +803,19 @@
             <demo-features>Essayez les exemples de fonctions spécifiques d'Orbeon Forms</demo-features>
         </descriptions>
         <show-more>Voir plus…</show-more>
+        <buttons>
+            <refresh>Actualiser</refresh>
+            <new>Nouveau</new>
+            <summary>Résumé</summary>
+            <sort-by-title>Trier par titre</sort-by-title>
+            <sort-by-last-modified>Trier par date de modification</sort-by-last-modified>
+        </buttons>
+        <messages>
+            <no-forms>Aucun formulaire publié</no-forms>
+            <no-data>Aucune donnée de formulaire</no-data>
+            <sorted-by-ascending>Trié par {0}, ordre croissant</sorted-by-ascending>
+            <sorted-by-descending>Trié par {0}, ordre décroissant</sorted-by-descending>
+        </messages>
     </landing>
     <home>
         <title>Formulaires Publiés</title>

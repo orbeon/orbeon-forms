@@ -800,6 +800,19 @@
             <demo-features>Prova demonstrationer av specifika Orbeon Forms-funktioner</demo-features>
         </descriptions>
         <show-more>Visa fler…</show-more>
+        <buttons>
+            <refresh>Uppdatera</refresh>
+            <new>Ny</new>
+            <summary>Översikt</summary>
+            <sort-by-title>Sortera efter titel</sort-by-title>
+            <sort-by-last-modified>Sortera efter ändringsdatum</sort-by-last-modified>
+        </buttons>
+        <messages>
+            <no-forms>Inga publicerade formulär</no-forms>
+            <no-data>Inga formulärdata</no-data>
+            <sorted-by-ascending>Sorterat efter {0}, stigande</sorted-by-ascending>
+            <sorted-by-descending>Sorterat efter {0}, fallande</sorted-by-descending>
+        </messages>
     </landing>
     <home>
         <title>Publicerade formulär</title>

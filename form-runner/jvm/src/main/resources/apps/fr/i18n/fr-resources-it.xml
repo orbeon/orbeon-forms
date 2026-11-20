@@ -800,6 +800,19 @@
             <demo-features>Prova le demo di funzionalità di Orbeon Forms</demo-features>
         </descriptions>
         <show-more>Mostra altro…</show-more>
+        <buttons>
+            <refresh>Aggiorna</refresh>
+            <new>Nuovo</new>
+            <summary>Riepilogo</summary>
+            <sort-by-title>Ordina per titolo</sort-by-title>
+            <sort-by-last-modified>Ordina per data di modifica</sort-by-last-modified>
+        </buttons>
+        <messages>
+            <no-forms>Nessun modulo pubblicato</no-forms>
+            <no-data>Nessun dato disponibile</no-data>
+            <sorted-by-ascending>Ordinato per {0}, crescente</sorted-by-ascending>
+            <sorted-by-descending>Ordinato per {0}, decrescente</sorted-by-descending>
+        </messages>
     </landing>
     <home>
         <title>Moduli pubblicati</title>

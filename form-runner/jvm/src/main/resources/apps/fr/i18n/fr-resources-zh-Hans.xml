@@ -795,6 +795,19 @@
             <demo-features>试用 Orbeon Forms 特定功能的演示</demo-features>
         </descriptions>
         <show-more>显示更多…</show-more>
+        <buttons>
+            <refresh>刷新</refresh>
+            <new>新建</new>
+            <summary>汇总</summary>
+            <sort-by-title>按标题排序</sort-by-title>
+            <sort-by-last-modified>按修改日期排序</sort-by-last-modified>
+        </buttons>
+        <messages>
+            <no-forms>暂无已发布的表单</no-forms>
+            <no-data>暂无表单数据</no-data>
+            <sorted-by-ascending>已按 {0} 升序排列</sorted-by-ascending>
+            <sorted-by-descending>已按 {0} 降序排列</sorted-by-descending>
+        </messages>
     </landing>
     <home>
         <title>已发布的表单</title>

@@ -296,6 +296,66 @@ class FormDefinitionValidatorTest
         case _                                    => false
       })
     }
+
+    it("must allow section-template control names and validate section-name on new actions (#8108)") {
+      val form = toRootElem(
+        <xh:html
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xh:head>
+            <xf:model id="fr-form-model">
+              <xf:instance id="fr-form-instance">
+                <form>
+                  <section-1>
+                    <a/>
+                  </section-1>
+                  <address-us/>
+                </form>
+              </xf:instance>
+              <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                  <xf:bind id="a-bind" name="a" ref="a"/>
+                </xf:bind>
+                <xf:bind id="address-us-bind" name="address-us" ref="address-us"/>
+              </xf:bind>
+              <fr:action name="valid-section-template-action" version="2018.2">
+                <fr:control-setvalue control="us-address-street-1" value="'1600 Amphitheatre Parkway'" section-name="address-us"/>
+                <fr:control-clear control="us-address-city" section-name="address-us"/>
+              </fr:action>
+              <fr:action name="invalid-section-template-action" version="2018.2">
+                <fr:control-setvalue control="us-address-street-1" value="'x'" section-name="missing-section"/>
+                <fr:control-setvalue control="us-address-city" value="'y'" section-name="a"/>
+                <fr:control-setvalue control="missing-control" value="'z'" section-name=""/>
+              </fr:action>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <fr:view>
+              <fr:body>
+                <fr:section id="section-1-section" bind="section-1-bind">
+                  <fr:grid id="grid-1-grid">
+                    <fr:c x="1" y="1" w="12"><xf:input id="a-control" bind="a-bind"/></fr:c>
+                  </fr:grid>
+                </fr:section>
+                <fr:section id="address-us-section" bind="address-us-bind"/>
+              </fr:body>
+            </fr:view>
+          </xh:body>
+        </xh:html>
+      )
+
+      val issues = validateFormDefinition(form)
+
+      assert(
+        issues == List(
+          UnresolvedControlReference(None, "action:invalid-section-template-action", "missing-control"),
+          UnresolvedControlReference(None, "action:invalid-section-template-action", "missing-section"),
+          UnresolvedControlReference(None, "action:invalid-section-template-action", "a")
+        )
+      )
+    }
   }
 
   describe("Token permission warning checks (#5437)") {

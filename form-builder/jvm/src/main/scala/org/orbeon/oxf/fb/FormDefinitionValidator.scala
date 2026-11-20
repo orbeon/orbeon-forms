@@ -726,8 +726,20 @@ object FormDefinitionValidator {
       val actionName = action.attValueOpt("name").orElse(action.idOpt.map(_.stripSuffix("-binding"))).getOrElse("action")
       val location   = s"action:$actionName"
 
-      for (att <- action descendant * att (ControlTest || RepeatTest || LeftTest || RightTest))
+      for {
+        att <- action descendant * att (ControlTest || RepeatTest || LeftTest || RightTest)
+        if ! (att.localname == "control" && att.parentOption.exists(_.attValue("section-name").trimAllToOpt.isDefined))
+      } locally {
         issues ++= checkControlName(None, location, att.stringValue)
+      }
+
+      for {
+        att         <- action descendant * att "section-name"
+        sectionName <- att.stringValue.trimAllToOpt
+        if ! validSectionNames(sectionName)
+      } locally {
+        issues += UnresolvedControlReference(None, location, sectionName)
+      }
 
       for (att <- action descendant * att (ValueTest || RefTest || ItemsTest || LabelTest || HintTest || ConditionTest))
         issues ++= validateExpression(att, avt = false, None, location)

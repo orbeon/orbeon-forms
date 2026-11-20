@@ -47,6 +47,10 @@
                     value="xs:integer(xxf:property('oxf.fr.landing.page-size'))"/>
 
                 <xf:var
+                    name="max-rows"
+                    value="$page-size + 6"/>
+
+                <xf:var
                     name="tz"
                     value="
                         for $offset in frf:defaultTimezoneToOffsetString()
@@ -188,7 +192,7 @@
 
                     <xf:action event="xforms-submit">
                         <xf:setvalue ref="instance('fr-state-instance')/@state" value="'loading'"/>
-                        <xf:setvalue ref="page-size" value="$page-size"/>
+                        <xf:setvalue ref="page-size" value="$max-rows"/>
                         <xf:setvalue ref="lang" value="(xxf:instance('fr-fr-language-instance')[xxf:non-blank()], 'en')[1]"/>
                     </xf:action>
 
@@ -259,7 +263,7 @@
 
                     <xf:setvalue
                         ref="instance('fr-search-instance')/page-size"
-                        value="$page-size"/>
+                        value="$max-rows"/>
 
                     <!-- Create elements holding structured search data -->
                     <xf:delete
@@ -307,12 +311,12 @@
                 value="xs:integer((instance('fr-search-results-instance')/@search-total[. castable as xs:integer], count($documents))[1])"/>
 
             <xf:var
-                name="document-count-to-show"
-                value="min((count($documents), $page-size))"/>
+                name="document-count-to-render"
+                value="min((count($documents), $max-rows))"/>
 
             <xf:var
                 name="show-more"
-                value="$document-count-to-show lt $search-total"/>
+                value="$search-total gt $page-size"/>
 
             <xf:var
                 name="ops"
@@ -547,7 +551,8 @@
                         name="column-labels"
                         value="for $q in $summary-queries return string(($q/resources[@lang = xxf:lang()]/label, $q/resources/label, $q/@name)[1])"/>
 
-                    <xf:repeat ref="$documents[position() le $document-count-to-show]">
+                    <xf:repeat ref="$documents[position() le $document-count-to-render]">
+                        <xf:var name="is-extra-row" value="position() gt $page-size"/>
                         <xf:var name="document" value="."/>
                         <xf:var
                             name="cell-values"
@@ -699,7 +704,7 @@
                         <xf:var name="is-single-cell" value="count($cell-values) le 1"/>
 
                         <xh:li
-                            class="list-group-item fr-card-data-row {'fr-card-data-row-clickable'[xxf:non-blank($row-href)]}"
+                            class="list-group-item fr-card-data-row {'fr-card-data-row-clickable'[xxf:non-blank($row-href)]} {'fr-card-extra-row fr-card-extra-row-hidden'[$is-extra-row]}"
                             role="row"
                             title="{$row-tooltip}">
                             <xf:repeat ref="1 to count($cell-values)">

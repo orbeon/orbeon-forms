@@ -482,6 +482,7 @@
         overflow-x: auto;
         overscroll-behavior-x: contain;
         column-gap: 0.75em;
+        margin-block-end: -1px; // Merge last visible row's bottom border with `.card-footer` top border when flush
 
         &.xforms-hidden {
             display: none !important;
@@ -539,7 +540,12 @@
             display: none !important;
         }
 
+        &.fr-card-extra-row-hidden {
+            display: none !important;
+        }
+
         &.fr-card-head {
+            min-block-size: 2.84em; // Match data row block-size (`36.5px` at `0.92em` font-size)
             padding-block: 0;
             font-size: 0.92em;
             font-weight: 600;
@@ -724,10 +730,6 @@
         }
     }
 
-    .list-group-item:has(+ .xforms-repeat-begin-end) {
-        border-bottom: none;
-    }
-
     a figure,
     .card .list-group-item.fr-card-published-row,
     .card .list-group-item.fr-card-data-row-clickable {
@@ -850,6 +852,7 @@
 
     // Card footer: Modified timestamp on the left, Show more... link on the right
     .card .card-footer.fr-card-footer {
+        position: relative;
         margin-block-start: auto;
         display: flex;
         align-items: safe center;
@@ -909,7 +912,8 @@
             color: var(--orbeon-landing-card-link-color);
             white-space: nowrap;
 
-            &.xforms-hidden {
+            &.xforms-hidden,
+            .card.fr-card-all-shown & {
                 display: none;
             }
 

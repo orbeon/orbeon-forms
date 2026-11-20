@@ -21,6 +21,10 @@
                     value="xs:integer(xxf:property('oxf.fr.landing.page-size'))"/>
 
                 <xf:var
+                    name="max-rows"
+                    value="$page-size + 6"/>
+
+                <xf:var
                     name="tz"
                     value="
                         for $offset in frf:defaultTimezoneToOffsetString()
@@ -238,7 +242,8 @@
                 </fr:card-thumbnail>
 
                 <fr:rows>
-                    <xf:repeat ref="$forms[position() le $page-size]">
+                    <xf:repeat ref="$forms[position() le $max-rows]">
+                        <xf:var name="is-extra-row" value="position() gt $page-size"/>
                         <xf:var name="form-app"     value="string(application-name)"/>
                         <xf:var name="form-name"    value="string(form-name)"/>
                         <xf:var name="form-version" value="string(form-version)"/>
@@ -306,7 +311,7 @@
                                 else
                                     xxf:r('landing.buttons.summary', '|fr-fr-resources|')"/>
 
-                        <xh:li class="list-group-item fr-card-published-row">
+                        <xh:li class="list-group-item fr-card-published-row {'fr-card-extra-row fr-card-extra-row-hidden'[$is-extra-row]}">
                             <xh:a
                                 href="{$primary-href}"
                                 title="{if (empty($app-filter)) then concat($form-title, ' (', $form-app, '/', $form-name, ')') else $form-title}"

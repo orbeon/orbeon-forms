@@ -105,6 +105,7 @@ object FormRunnerApp extends App {
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-duplicate-tab-dialog"                    , initDuplicateTabDialog)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-color-scheme-nav"                        , initColorSchemeSelector)
       DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-data-icon, .orbeon .fr-validity-icon"    , initStatusIconPopover)
+      DomSupport.onElementFoundOrAdded(document.body, ".orbeon .fr-landing-grid"                            , initLandingCardExtraRows)
     }
   }
 
@@ -456,6 +457,146 @@ object FormRunnerApp extends App {
       dialogElem.closestOpt(s"form.$InitiallyHiddenClass").foreach(_.classList.remove(InitiallyHiddenClass))
       dialogElem.asInstanceOf[HTMLDialogElement].showModal()
     }
+
+  private def initLandingCardExtraRows(gridElem: html.Element): Unit = {
+
+    val ExtraRowClass       = "fr-card-extra-row"
+    val ExtraRowHiddenClass = "fr-card-extra-row-hidden"
+    val AllShownClass       = "fr-card-all-shown"
+    val RowTopTolerancePx   = 8.0
+    val FitTolerancePx      = 4.0
+
+    case class CardMetrics(
+      card         : html.Element,
+      top          : Double,
+      naturalHeight: Double,
+      baseRows     : List[html.Element],
+      extraRows    : List[html.Element],
+      totalCountOpt: Option[Int]
+    )
+
+    var scheduled = false
+
+    def visibleHeight(elemOpt: Option[html.Element]): Double =
+      elemOpt.map(_.getBoundingClientRect().height).filter(_ > 0).getOrElse(0.0)
+
+    def update(): Unit = {
+      val cards =
+        gridElem
+          .querySelectorAllT(".card")
+          .iterator
+          .filter { card =>
+            val r = card.getBoundingClientRect()
+            r.width > 0 && r.height > 0
+          }
+          .toList
+
+      if (cards.nonEmpty) {
+        val metrics =
+          cards.map { card =>
+            val cardRect   = card.getBoundingClientRect()
+            val borderV    = math.max(0.0, cardRect.height - card.clientHeight)
+            val headerH    = visibleHeight(card.querySelectorOpt(":scope > .card-header"))
+            val introH     = visibleHeight(card.querySelectorOpt(":scope > .fr-card-intro"))
+            val quickLinkH = visibleHeight(card.querySelectorOpt(":scope > .fr-landing-quick-links-list"))
+            val footerH    = visibleHeight(card.querySelectorOpt(":scope > .card-footer"))
+
+            val listOpt =
+              card
+                .querySelectorOpt(":scope > ul.list-group:not(.xforms-hidden)")
+                .filter(_.getBoundingClientRect().height > 0)
+
+            val (baseListH, baseRows, extraRows) =
+              listOpt match {
+                case Some(list) =>
+                  val dataRows      = list.childrenT.iterator.filter(el => el.hasClass("list-group-item") && !el.hasClass("fr-card-head")).toList
+                  val base          = dataRows.filterNot(_.hasClass(ExtraRowClass))
+                  val extra         = dataRows.filter(_.hasClass(ExtraRowClass))
+                  val shownExtraSum = extra.iterator.filterNot(_.hasClass(ExtraRowHiddenClass)).map(_.getBoundingClientRect().height).sum
+                  // Subtract 1px for `margin-block-end: -1px` on `ul.list-group`
+                  val rawBaseListH  = math.max(0.0, list.getBoundingClientRect().height - shownExtraSum - 1.0)
+                  (rawBaseListH, base, extra)
+                case None =>
+                  (0.0, Nil, Nil)
+              }
+
+            val naturalH      = borderV + headerH + introH + quickLinkH + baseListH + footerH
+            val totalCountOpt = card.attValueOpt("data-total-count").flatMap(_.trimAllToOpt).flatMap(_.toIntOption)
+
+            CardMetrics(
+              card          = card,
+              top           = cardRect.top,
+              naturalHeight = naturalH,
+              baseRows      = baseRows,
+              extraRows     = extraRows,
+              totalCountOpt = totalCountOpt
+            )
+          }
+
+        val rows = scala.collection.mutable.ListBuffer.empty[scala.collection.mutable.ListBuffer[CardMetrics]]
+        metrics.sortBy(_.top).foreach { cm =>
+          rows.lastOption match {
+            case Some(currentRow) if math.abs(cm.top - currentRow.head.top) <= RowTopTolerancePx =>
+              currentRow += cm
+            case _ =>
+              rows += scala.collection.mutable.ListBuffer(cm)
+          }
+        }
+
+        rows.foreach { rowCards =>
+          val rowTargetHeight = rowCards.iterator.map(_.naturalHeight).max
+          rowCards.foreach { cm =>
+            if (cm.extraRows.nonEmpty && cm.baseRows.nonEmpty) {
+              val availableSlack = rowTargetHeight - cm.naturalHeight
+              val defaultRowH    = cm.baseRows.iterator.map(_.getBoundingClientRect().height).max
+              var usedH          = 0.0
+              var shownExtra     = 0
+
+              cm.extraRows.foreach { row =>
+                val rowH =
+                  if (!row.hasClass(ExtraRowHiddenClass))
+                    row.getBoundingClientRect().height
+                  else
+                    defaultRowH
+                val canFit = (usedH + rowH) <= (availableSlack + FitTolerancePx)
+                if (canFit) {
+                  usedH      += rowH
+                  shownExtra += 1
+                }
+                val shouldHide = !canFit
+                if (row.hasClass(ExtraRowHiddenClass) != shouldHide)
+                  row.toggleClass(ExtraRowHiddenClass, shouldHide)
+              }
+
+              val visibleCount = cm.baseRows.size + shownExtra
+              val allShown     = cm.totalCountOpt.exists(total => total > 0 && visibleCount >= total)
+              if (cm.card.hasClass(AllShownClass) != allShown)
+                cm.card.toggleClass(AllShownClass, allShown)
+            } else if (cm.card.hasClass(AllShownClass)) {
+              cm.card.classList.remove(AllShownClass)
+            }
+          }
+        }
+      }
+    }
+
+    val scheduleUpdate: () => Unit = () =>
+      if (!scheduled) {
+        scheduled = true
+        window.requestAnimationFrame { _ =>
+          scheduled = false
+          update()
+        }
+      }
+
+    val resizeObserver = new ResizeObserver((_, _) => scheduleUpdate())
+    resizeObserver.observe(gridElem)
+    GlobalEventListenerSupport.addListener(window, "resize", (_: dom.Event) => scheduleUpdate())
+    GlobalEventListenerSupport.addListener(gridElem, "load", (_: dom.Event) => scheduleUpdate(), useCapture = true)
+    AjaxClient.ajaxResponseProcessed.add(_ => scheduleUpdate())
+
+    scheduleUpdate()
+  }
 
   def onPageContainsFormsMarkup(): Unit =
     XFormsApp.onPageContainsFormsMarkup()

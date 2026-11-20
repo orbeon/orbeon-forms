@@ -17,7 +17,7 @@
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
             xxbl:transform="oxf:unsafe-xslt"
         >
-            <xh:div class="card h-100" xsl:version="2.0">
+            <xh:div class="card h-100" xsl:version="2.0" data-total-count="{{$count}}">
 
                 <xf:var name="binding"       value="xxf:binding('fr-card')"/>
                 <xf:var name="status"        value="(fr:component-param-value('status')[xxf:non-blank()], 'done')[1]"/>

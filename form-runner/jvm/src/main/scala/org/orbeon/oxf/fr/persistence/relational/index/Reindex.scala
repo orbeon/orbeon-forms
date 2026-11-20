@@ -362,7 +362,11 @@ trait Reindex extends FormDefinition {
 
                   // Extract and insert value for each indexed control
                   for (controlXPath <- indexedControlsXPaths) {
-                    val nodes = scaxon.XPath.evalNodes(dataRootElement, controlXPath, FbNamespaceMapping)
+                    val rawNodes = scaxon.XPath.evalNodes(dataRootElement, controlXPath, FbNamespaceMapping)
+                    val nodes    = rawNodes.flatMap { n =>
+                      val items = n / "_"
+                      if (items.nonEmpty) items else List(n)
+                    }
                     for ((node, pos) <- nodes.zipWithIndex) {
                       val nodeValue = truncateValue(provider, node.getStringValue)
                       // For indexing, we are not interested in empty values

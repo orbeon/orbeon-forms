@@ -295,12 +295,20 @@
         <xbl:template>
 
             <xf:var
+                name="non-card-controls"
+                value="('attachment', 'image-attachment', 'video-attachment', 'audio-attachment', 'handwritten-signature', 'wpaint')"/>
+
+            <xf:var
+                name="card-query-paths"
+                value="instance('fr-search-instance')/query[@name and @summary-show = 'true' and not(@control = $non-card-controls)]/@path"/>
+
+            <xf:var
                 name="summary-queries"
-                value="instance('fr-search-labels-instance')/query[@name and @summary-show = 'true']"/>
+                value="instance('fr-search-labels-instance')/query[@name and @summary-show = 'true' and @path = $card-query-paths]"/>
 
             <xf:var
                 name="detail-positions"
-                value="instance('fr-search-instance')/query[@name and @summary-show = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
+                value="instance('fr-search-instance')/query[@name and @summary-show = 'true' and not(@control = $non-card-controls)]/(count(preceding-sibling::query[@name]) + 1)"/>
 
             <xf:var
                 name="documents"

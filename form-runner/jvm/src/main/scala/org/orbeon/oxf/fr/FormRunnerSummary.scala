@@ -311,10 +311,11 @@ trait FormRunnerSummary {
             (fieldAlignOpt.isEmpty && RightAlignedControlLocalNames(elem.getName))
 
         PreparedSummaryColumn(
-          xpath      = ic.xpath,
-          detailPos  = detailPos,
-          controlElem = elem,
-          alignRight = alignRight
+          xpath            = ic.xpath,
+          detailPos        = detailPos,
+          controlElem      = elem,
+          controlLocalName = ic.control,
+          alignRight       = alignRight
         )
       }
 
@@ -339,7 +340,8 @@ trait FormRunnerSummary {
           s"xxf:instance('fr-search-labels-instance')/query[@path = '$escapedPath']/resources[1]/label, " +
           s"xf:element('label'))[1]"
         )
-        sortableTh.addAttribute("sort-supported", "{$sort-supported}")
+        val isSortable = ! NonSortableControlLocalNames(col.controlLocalName)
+        sortableTh.addAttribute("sort-supported", if (isSortable) "{$sort-supported}" else "false")
         sortableTh.addAttribute("instance",       "xxf:instance('fr-order-by')")
         sortableTh.addAttribute("column",         col.xpath)
       }
@@ -488,6 +490,7 @@ object FormRunnerSummary extends FormRunnerSummary {
   private val XhAQName                   = QName("a",                   XhNamespace)
   private val FrSortableThQName          = QName("sortable-th",         FRNamespace)
   private val FrStaticReadonlyQName      = QName("static-readonly",     FRNamespace)
+  private val FrSummaryQName             = QName("summary",             FRNamespace)
   private val XxfElementQName            = QName("element",             XxfNamespace)
   private val XxfUpdateQName             = QName("update",              XxfNamespace)
   private val XxfReadonlyAppearanceQName = QName("readonly-appearance", XxfNamespace)
@@ -497,6 +500,9 @@ object FormRunnerSummary extends FormRunnerSummary {
 
   private val RightAlignedControlLocalNames: Set[String] =
     Set("number", "number-stepper", "currency", "percentage")
+
+  private val NonSortableControlLocalNames: Set[String] =
+    Set("attachment", "image-attachment", "video-attachment", "audio-attachment", "handwritten-signature", "wpaint")
 
   private val EditOnlyAppearances: Set[String] =
     Set("character-counter", "xxf:autosize")
@@ -552,10 +558,11 @@ object FormRunnerSummary extends FormRunnerSummary {
   private val VarRefFallbackRegex = """\$([A-Za-z_][\w.\-]*)""".r
 
   private case class PreparedSummaryColumn(
-    xpath      : String,
-    detailPos  : Int,
-    controlElem: dom.Element,
-    alignRight : Boolean
+    xpath           : String,
+    detailPos       : Int,
+    controlElem     : dom.Element,
+    controlLocalName: String,
+    alignRight      : Boolean
   )
 
   private def escapeXPathSingleQuotes(s: String): String =
@@ -648,6 +655,7 @@ object FormRunnerSummary extends FormRunnerSummary {
     elem.addAttribute("id",                      s"fr-summary-col-$detailPos-control")
     elem.addAttribute("bind",                    s"fr-col-$detailPos-bind")
     elem.addAttribute(FrStaticReadonlyQName,      "true")
+    elem.addAttribute(FrSummaryQName,             "true")
     elem.addAttribute(XxfReadonlyAppearanceQName, "static")
 
     childElements(elem).filter(c => SummaryStripChildQNames(c.getQName)).toList.foreach(elem.remove)

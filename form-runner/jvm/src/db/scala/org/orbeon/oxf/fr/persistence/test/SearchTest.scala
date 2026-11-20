@@ -881,6 +881,66 @@ class SearchTest
         }
       }
     }
+
+    it("indexes multiple-attachment <_> child elements as separate values") {
+      withTestSafeRequestContext { implicit safeRequestCtx =>
+        Connect.withOrbeonTables("multiple-attachment <_> indexing") { (_, provider) =>
+          val testForm = TestForm(provider, controls = Seq(TestForm.Control("Gallery")))
+          val version  = Specific(1)
+
+          testForm.putFormDefinition(version)
+
+          val uri1 = s"/fr/service/persistence/crud/${provider.entryName}/form/data/doc-multi/img-1.bin"
+          val uri2 = s"/fr/service/persistence/crud/${provider.entryName}/form/data/doc-multi/img-2.bin"
+          val uri3 = s"/fr/service/persistence/crud/${provider.entryName}/form/data/doc-multi/img-3.bin"
+
+          val multiDoc =
+            <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+              <section-1>
+                <control-1>
+                  <_ filename="one.webp" mediatype="image/webp" size="100">{uri1}</_>
+                  <_ filename="two.webp" mediatype="image/webp" size="200">{uri2}</_>
+                  <_ filename="three.webp" mediatype="image/webp" size="300">{uri3}</_>
+                </control-1>
+              </section-1>
+            </form>.toDocument
+
+          HttpAssert.put(
+            url          = testForm.formDataURL("doc-multi"),
+            version      = version,
+            body         = HttpCall.XML(multiDoc),
+            expectedCode = StatusCode.Created
+          )
+
+          val searchRequest =
+            <search>
+              <query/>
+              <query path="section-1/control-1"/>
+              <drafts>include</drafts>
+              <page-size>10</page-size>
+              <page-number>1</page-number>
+              <lang>en</lang>
+            </search>.toDocument
+
+          eventually(timeout(Span(10, Seconds)), interval(Span(1, Second))) {
+            assertCall(
+              actualRequest = HttpCall.SolicitedRequest(
+                path    = HttpCall.searchURL(provider),
+                version = Unspecified,
+                method  = POST,
+                body    = Some(HttpCall.XML(searchRequest))
+              ),
+              assertResponse = actualResponse => {
+                assert(actualResponse.code == StatusCode.Ok)
+                val root   = IOSupport.readOrbeonDom(new ByteArrayInputStream(actualResponse.body)).getRootElement
+                val detail = root.element("document").element("details").element("detail").getText
+                assert(detail == s"$uri1, $uri2, $uri3")
+              }
+            )
+          }
+        }
+      }
+    }
   }
 
   def testWithSimpleValues(

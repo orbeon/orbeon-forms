@@ -312,6 +312,7 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.scale.end-label"                           value=""/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.scale.allow-clear"                         value="true"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.duration.fields"                           value="hours minutes"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.image-attachment.lightbox"                 value="true"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.library" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
         fr:grid-single
@@ -362,6 +363,7 @@
         fr:url
         fr:handwritten-signature
         fr:timestamp
+        fr:image-attachment
     </property>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.tinymce.config">

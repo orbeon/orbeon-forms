@@ -874,5 +874,290 @@ class SummaryDynamicTest
         }
       }
     }
+
+    it("renders single and multiple `fr:image-attachment` controls via `fr:summary='true'` binding with `+N` badge and non-sortable headers") {
+
+      val sourceForm =
+        <xh:html
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <xh:head>
+            <xf:model id="fr-form-model">
+              <xf:instance id="fr-form-instance">
+                <form>
+                  <main>
+                    <title/>
+                    <hero filename="" mediatype="" size=""/>
+                    <gallery/>
+                  </main>
+                </form>
+              </xf:instance>
+              <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="main-bind" name="main" ref="main">
+                  <xf:bind id="title-bind" name="title" ref="title"/>
+                  <xf:bind id="hero-bind" name="hero" ref="hero" type="xf:anyURI"/>
+                  <xf:bind id="gallery-bind" name="gallery" ref="gallery"/>
+                </xf:bind>
+              </xf:bind>
+              <xf:instance id="fr-form-resources" xxf:readonly="true">
+                <resources>
+                  <resource xml:lang="en">
+                    <title><label>Title</label></title>
+                    <hero><label>Hero</label></hero>
+                    <gallery><label>Gallery</label></gallery>
+                  </resource>
+                </resources>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <fr:view>
+              <fr:body>
+                <fr:section id="main-section" bind="main-bind">
+                  <fr:grid id="main-grid">
+                    <fr:c x="1" y="1" w="4">
+                      <xf:input id="title-control" bind="title-bind">
+                        <fr:index><fr:summary-show/></fr:index>
+                        <xf:label ref="$form-resources/title/label"/>
+                      </xf:input>
+                    </fr:c>
+                    <fr:c x="5" y="1" w="4">
+                      <fr:image-attachment id="hero-control" bind="hero-bind" class="fr-attachment">
+                        <fr:index><fr:summary-show/></fr:index>
+                        <xf:label ref="$form-resources/hero/label"/>
+                      </fr:image-attachment>
+                    </fr:c>
+                    <fr:c x="9" y="1" w="4">
+                      <fr:image-attachment id="gallery-control" bind="gallery-bind" multiple="true" class="fr-attachment">
+                        <fr:index><fr:summary-show/></fr:index>
+                        <xf:label ref="$form-resources/gallery/label"/>
+                      </fr:image-attachment>
+                    </fr:c>
+                  </fr:grid>
+                </fr:section>
+              </fr:body>
+            </fr:view>
+          </xh:body>
+        </xh:html>
+
+      val dynamicNode =
+        FormRunnerSummary.buildSummaryDynamicFormImpl(
+          formDoc                   = elemToDocumentInfo(sourceForm),
+          templateNode              = summaryTemplateNode,
+          appForm                   = AppForm("ebruchez", "typewriter-collection"),
+          databaseDataFormatVersion = DataFormatVersion.V20191,
+          resourcesRootElemOpt      = None,
+          functionLibrary           = FormRunnerFunctionLibrary
+        )
+
+      val dynamicRootElem = StaticXPath.tinyTreeToOrbeonDom(dynamicNode).getRootElement
+
+      // Verify `fr:summary="true"` is stamped on Summary controls and `sort-supported="false"` on image-attachment headers
+      val frSummaryQName = dom.QName("summary", XMLNames.FRNamespace)
+      val summaryControlIds = List("fr-summary-col-1-control", "fr-summary-col-2-control", "fr-summary-col-3-control")
+      summaryControlIds.foreach { ctrlId =>
+        val ctrlElem = dynamicRootElem.descendantElementIterator(includeSelf = true).find(_.attributeValue("id") == ctrlId).get
+        assert(ctrlElem.attributeValue(frSummaryQName) == "true")
+      }
+
+      val sortableThs =
+        dynamicRootElem
+          .descendantElementIterator(includeSelf = true)
+          .filter(_.getQName == dom.QName("sortable-th", XMLNames.FRNamespace))
+          .filter(_.attributeValueOpt("column").exists(_.startsWith("main/")))
+          .toList
+      assert(sortableThs.map(th => th.attributeValue("column") -> th.attributeValue("sort-supported")) == List(
+        "main/title"   -> "{$sort-supported}",
+        "main/hero"    -> "false",
+        "main/gallery" -> "false"
+      ))
+
+      val sampleImgUri = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+
+      val innerFormInstance =
+        dynamicRootElem
+          .descendantElementIterator(includeSelf = true)
+          .find(e => e.getName == "instance" && e.attributeValue("id") == "fr-form-instance")
+          .get
+      innerFormInstance.clearContent()
+      innerFormInstance.add(
+        <documents search-total="2">
+          <document
+            name="doc-1"
+            created="2026-05-01T10:00:00Z"
+            last-modified="2026-05-02T12:00:00Z"
+            operations="*">
+            <details>
+              <detail path="main/title">1961 Hermes Baby</detail>
+              <detail path="main/hero">{sampleImgUri}</detail>
+              <detail path="main/gallery">{s"$sampleImgUri, $sampleImgUri, $sampleImgUri"}</detail>
+            </details>
+          </document>
+          <document
+            name="doc-2"
+            created="2026-05-03T10:00:00Z"
+            last-modified="2026-05-04T12:00:00Z"
+            operations="read">
+            <details>
+              <detail path="main/title">Sheet Only Machine</detail>
+              <detail path="main/hero"/>
+              <detail path="main/gallery">{sampleImgUri}</detail>
+            </details>
+          </document>
+        </documents>.toDocument.getRootElement.createCopy
+      )
+
+      val hostDocDom =
+        <xh:html
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+          <xh:head>
+            <xf:model
+              id="fr-form-model"
+              xxf:lang="en"
+              xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary"
+              xxf:readonly-appearance.static.select="minimal"
+              xxf:readonly-appearance.static.select1="minimal">
+              <xf:instance id="fr-parameters-instance">
+                <parameters>
+                  <app>ebruchez</app>
+                  <form>typewriter-collection</form>
+                  <form-version>1</form-version>
+                  <mode>summary</mode>
+                </parameters>
+              </xf:instance>
+              <xf:instance id="fr-language-instance"><lang>en</lang></xf:instance>
+              <xf:instance id="fr-authorized-operations"><operations>*</operations></xf:instance>
+              <xf:instance id="fr-selection-instance"><selection/></xf:instance>
+              <xf:instance id="fr-order-by">
+                <order-by>
+                  <column>last-modified</column>
+                  <direction>desc</direction>
+                </order-by>
+              </xf:instance>
+              <xf:instance id="fr-search-labels-instance">
+                <searchable-values>
+                  <query path="main/title"><resources lang="en"><label>Title</label></resources></query>
+                  <query path="main/hero"><resources lang="en"><label>Hero</label></resources></query>
+                  <query path="main/gallery"><resources lang="en"><label>Gallery</label></resources></query>
+                </searchable-values>
+              </xf:instance>
+              <xf:instance id="fr-source-form-instance">
+                <xh:html>
+                  <xh:head>
+                    <xf:model>
+                      <xf:instance id="fr-form-metadata">
+                        <metadata>
+                          <summary-metadata-columns>
+                            <column name="created" show="false"/>
+                            <column name="last-modified" show="false"/>
+                            <column name="workflow-stage" show="false"/>
+                            <column name="created-by" show="false"/>
+                            <column name="last-modified-by" show="false"/>
+                          </summary-metadata-columns>
+                        </metadata>
+                      </xf:instance>
+                    </xf:model>
+                  </xh:head>
+                </xh:html>
+              </xf:instance>
+              <xf:instance id="fr-last-search-context-instance">
+                <ctx><encoded/><page-offset>0</page-offset></ctx>
+              </xf:instance>
+              <xf:instance id="fr-dynamic-instance"><_/></xf:instance>
+            </xf:model>
+            <xf:model id="fr-resources-model">
+              <xf:instance id="fr-fr-resources">
+                <resources>
+                  <resource xml:lang="en">
+                    <summary>
+                      <titles>
+                        <edit>Edit</edit>
+                        <view>View</view>
+                      </titles>
+                    </summary>
+                  </resource>
+                </resources>
+              </xf:instance>
+            </xf:model>
+          </xh:head>
+          <xh:body>
+            <xxf:dynamic id="fr-summary-dynamic" ref="instance('fr-dynamic-instance')"/>
+          </xh:body>
+        </xh:html>.toDocument
+
+      val outerDynamicInst =
+        hostDocDom.getRootElement
+          .descendantElementIterator(includeSelf = true)
+          .find(e => e.getName == "instance" && e.attributeValue("id") == "fr-dynamic-instance")
+          .get
+      outerDynamicInst.clearContent()
+      outerDynamicInst.add(dynamicRootElem.createCopy)
+
+      withTestExternalContext { implicit ec =>
+        withXFormsDocument(hostDocDom) { doc =>
+          withActionAndDoc(doc) {
+
+            val template = AnnotatedTemplate(PartAnalysisBuilder.createFromDocument(hostDocDom)(XFormsStateManager.newIndentedLogger)._1)
+
+            def renderXhtml(): dom.Document = {
+              val receiver = new LocationSAXContentHandler
+              XHTMLOutput.send(doc, template, ec)(receiver)
+              receiver.getDocument
+            }
+
+            val rendered = renderXhtml()
+            val root     = rendered.getRootElement
+
+            // Zero lightbox `<dialog>` elements or `<fr:attachment>` filename controls rendered in Summary cells
+            assert(! root.descendantElementIterator(includeSelf = true).exists(_.attributeValueOpt("class").exists(_.contains("fr-image-attachment-lightbox"))))
+            assert(! root.descendantElementIterator(includeSelf = true).exists(_.attributeValueOpt("class").exists(_.contains("fr-attachment-filename"))))
+
+            val cellValueDivs =
+              root.descendantElementIterator(includeSelf = true)
+                .filter(_.attributeValueOpt("class").exists(_.splitTo[Set]().contains("fr-summary-cell-value")))
+                .toVector
+            assert(cellValueDivs.size == 6)
+
+            def isVisiblyRendered(elem: dom.Element): Boolean =
+              Iterator.iterate[dom.Element](elem)(_.getParent).takeWhile(_ ne null).forall { a =>
+                ! a.attributeValueOpt("class").exists(_.splitTo[Set]().contains("xforms-disabled"))
+              }
+
+            def hasVisibleThumbnail(cell: dom.Element): Boolean =
+              cell.descendantElementIterator(includeSelf = true).exists { e =>
+                val classes = e.attributeValueOpt("class").map(_.splitTo[Set]()).getOrElse(Set.empty)
+                classes("fr-image-attachment-summary-frame") && isVisiblyRendered(e)
+              }
+
+            def activeBadgeTexts(cell: dom.Element): List[String] =
+              cell.descendantElementIterator(includeSelf = true)
+                .filter { e =>
+                  val classes = e.attributeValueOpt("class").map(_.splitTo[Set]()).getOrElse(Set.empty)
+                  classes("fr-image-attachment-summary-badge") && isVisiblyRendered(e)
+                }
+                .map(_.getStringValue.trimAllToEmpty)
+                .toList
+
+            // Row 1: hero (1 image, no badge) + gallery (3 images -> "+2" badge)
+            assert(hasVisibleThumbnail(cellValueDivs(1)))
+            assert(activeBadgeTexts(cellValueDivs(1)).isEmpty)
+
+            assert(hasVisibleThumbnail(cellValueDivs(2)))
+            assert(activeBadgeTexts(cellValueDivs(2)) == List("+2"))
+
+            // Row 2: blank hero (no visible frame) + 1-image gallery (visible frame, no badge)
+            assert(! hasVisibleThumbnail(cellValueDivs(4)))
+            assert(hasVisibleThumbnail(cellValueDivs(5)))
+            assert(activeBadgeTexts(cellValueDivs(5)).isEmpty)
+          }
+        }
+      }
+    }
   }
 }

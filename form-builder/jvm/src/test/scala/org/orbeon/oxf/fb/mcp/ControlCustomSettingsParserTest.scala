@@ -317,6 +317,7 @@ class ControlCustomSettingsParserTest
       assert(imageAttachmentSpec.localName == "image-attachment")
       assert(imageAttachmentSpec.settings.map(_.name) == List(
         "size",
+        "lightbox",
         "viewMode",
         "carouselSize",
         "columns",
@@ -327,6 +328,7 @@ class ControlCustomSettingsParserTest
         "transformFormat"
       ))
       assert(imageAttachmentSpec.findSetting("size").exists(_.allowedValues.contains(Set("auto", "small", "medium", "large"))))
+      assert(imageAttachmentSpec.findSetting("lightbox").exists(_.settingType == BooleanType))
       assert(imageAttachmentSpec.findSetting("carouselSize").exists(_.allowedValues.contains(Set("small", "medium", "large"))))
     }
   }

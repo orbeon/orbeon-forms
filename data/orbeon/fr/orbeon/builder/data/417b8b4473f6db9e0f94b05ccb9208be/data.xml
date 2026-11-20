@@ -26,7 +26,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <htmlarea>&lt;div style="text-align: left;"&gt;
 &lt;p&gt;&lt;strong&gt;Giuseppe Fortunino Francesco Verdi&lt;/strong&gt;&amp;nbsp;(Italian:&amp;nbsp;&lt;a title="Help:IPA for Italian" href="https://en.wikipedia.org/wiki/Help:IPA_for_Italian" shape="rect"&gt;[d͡ʒuˈzɛppe ˈverdi]&lt;/a&gt;; 9 or 10 October 1813&amp;nbsp;– 27 January 1901) was an&amp;nbsp;&lt;a title="Italians" href="https://en.wikipedia.org/wiki/Italians" shape="rect"&gt;Italian&lt;/a&gt;&amp;nbsp;&lt;a title="Romantic music" href="https://en.wikipedia.org/wiki/Romantic_music" shape="rect"&gt;Romantic&lt;/a&gt;&amp;nbsp;composer primarily known for his operas. He is considered, together with&amp;nbsp;&lt;a title="Richard Wagner" href="https://en.wikipedia.org/wiki/Richard_Wagner" shape="rect"&gt;Richard Wagner&lt;/a&gt;, the preeminent opera composer of the nineteenth century.&amp;nbsp;Verdi dominated the Italian opera scene after the eras of&amp;nbsp;&lt;a title="Vincenzo Bellini" href="https://en.wikipedia.org/wiki/Vincenzo_Bellini" shape="rect"&gt;Bellini&lt;/a&gt;,&amp;nbsp;&lt;a title="Gaetano Donizetti" href="https://en.wikipedia.org/wiki/Gaetano_Donizetti" shape="rect"&gt;Donizetti&lt;/a&gt;&amp;nbsp;and&amp;nbsp;&lt;a title="Gioachino Rossini" href="https://en.wikipedia.org/wiki/Gioachino_Rossini" shape="rect"&gt;Rossini&lt;/a&gt;. His works are frequently performed in opera houses throughout the world and, transcending the boundaries of the genre, some of his themes have long since taken root in popular culture, as "&lt;a title="La donna è mobile" href="https://en.wikipedia.org/wiki/La_donna_%C3%A8_mobile" shape="rect"&gt;La donna è mobile&lt;/a&gt;" from&amp;nbsp;&lt;em&gt;&lt;a class="mw-redirect" title="Rigoletto (opera)" href="https://en.wikipedia.org/wiki/Rigoletto_(opera)" shape="rect"&gt;Rigoletto&lt;/a&gt;&lt;/em&gt;, "&lt;a title="Libiamo ne' lieti calici" href="https://en.wikipedia.org/wiki/Libiamo_ne%27_lieti_calici" shape="rect"&gt;Libiamo ne' lieti calici&lt;/a&gt;" (The Drinking Song) from&amp;nbsp;&lt;em&gt;&lt;a title="La traviata" href="https://en.wikipedia.org/wiki/La_traviata" shape="rect"&gt;La traviata&lt;/a&gt;&lt;/em&gt;, "&lt;a title="Va, pensiero" href="https://en.wikipedia.org/wiki/Va,_pensiero" shape="rect"&gt;Va, pensiero&lt;/a&gt;" (The Chorus of the Hebrew Slaves) from&amp;nbsp;&lt;em&gt;&lt;a title="Nabucco" href="https://en.wikipedia.org/wiki/Nabucco" shape="rect"&gt;Nabucco&lt;/a&gt;&lt;/em&gt;, the "Coro di zingari" (&lt;a title="Anvil Chorus" href="https://en.wikipedia.org/wiki/Anvil_Chorus" shape="rect"&gt;Anvil Chorus&lt;/a&gt;) from&amp;nbsp;&lt;em&gt;&lt;a title="Il trovatore" href="https://en.wikipedia.org/wiki/Il_trovatore" shape="rect"&gt;Il trovatore&lt;/a&gt;&lt;/em&gt;&amp;nbsp;and the "&lt;a title="Triumphal March" href="https://en.wikipedia.org/wiki/Triumphal_March" shape="rect"&gt;Grand March&lt;/a&gt;" from&amp;nbsp;&lt;em&gt;&lt;a title="Aida" href="https://en.wikipedia.org/wiki/Aida" shape="rect"&gt;Aida&lt;/a&gt;&lt;/em&gt;.&lt;/p&gt;
 &lt;p&gt;Moved by the death of compatriot&amp;nbsp;&lt;a title="Alessandro Manzoni" href="https://en.wikipedia.org/wiki/Alessandro_Manzoni" shape="rect"&gt;Alessandro Manzoni&lt;/a&gt;, Verdi wrote&amp;nbsp;&lt;em&gt;&lt;a title="Requiem (Verdi)" href="https://en.wikipedia.org/wiki/Requiem_(Verdi)" shape="rect"&gt;Messa da Requiem&lt;/a&gt;&lt;/em&gt;&amp;nbsp;in 1874 in Manzoni's honour, a work now regarded as a masterpiece of the&amp;nbsp;&lt;a title="Oratorio" href="https://en.wikipedia.org/wiki/Oratorio" shape="rect"&gt;oratorio&lt;/a&gt;&amp;nbsp;tradition and a testimony to his capacity outside the field of opera.&amp;nbsp;Visionary and politically engaged, he remains – alongside&amp;nbsp;&lt;a title="Giuseppe Garibaldi" href="https://en.wikipedia.org/wiki/Giuseppe_Garibaldi" shape="rect"&gt;Garibaldi&lt;/a&gt;&amp;nbsp;and&amp;nbsp;&lt;a title="Camillo Benso, Count of Cavour" href="https://en.wikipedia.org/wiki/Camillo_Benso,_Count_of_Cavour" shape="rect"&gt;Cavour&lt;/a&gt;&amp;nbsp;– an emblematic figure of the reunification process of the&amp;nbsp;&lt;a class="mw-redirect" title="Italian peninsula" href="https://en.wikipedia.org/wiki/Italian_peninsula" shape="rect"&gt;Italian peninsula&lt;/a&gt;&amp;nbsp;(the&amp;nbsp;&lt;em&gt;&lt;a class="mw-redirect" title="Risorgimento" href="https://en.wikipedia.org/wiki/Risorgimento" shape="rect"&gt;Risorgimento&lt;/a&gt;&lt;/em&gt;).&lt;/p&gt;
-&lt;/div&gt;</htmlarea>
+&lt;/div&gt;</htmlarea><markdown></markdown>
                         </grid-2>
                         <grid-6>
                             <secret>42</secret>
@@ -319,7 +319,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind id="textarea-clipboard-bind" ref="textarea-clipboard" name="textarea-clipboard" xxf:whitespace="trim"></xf:bind>
                     </xf:bind>
                     <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
-                        <xf:bind ref="htmlarea" id="htmlarea-bind" name="htmlarea"></xf:bind>
+                        <xf:bind ref="htmlarea" id="htmlarea-bind" name="htmlarea"></xf:bind><xf:bind id="markdown-bind" ref="markdown" name="markdown" xxf:default="string-join(('### Giuseppe Verdi — Selected Operas', '', '**Giuseppe Verdi** (1813–1901) composed some of the most enduring works in the *operatic repertoire*, including [*La traviata*](https://en.wikipedia.org/wiki/La_traviata) and [*Aida*](https://en.wikipedia.org/wiki/Aida).', '', '| Opera | Premiere | Famous Aria or Chorus |', '| :--- | :---: | :--- |', '| *Nabucco* | 1842 | *Va, pensiero* |', '| *Rigoletto* | 1851 | *La donna è mobile* |', '| *La traviata* | 1853 | *Libiamo ne'' lieti calici* |', '', '&gt; &#34;You may have the universe if I may have Italy.&#34;'), codepoints-to-string(10))"></xf:bind>
                     </xf:bind>
                     <xf:bind id="grid-6-bind" ref="grid-6" name="grid-6">
                         <xf:bind id="secret-bind" ref="secret" name="secret" required="true()" constraint=". = '42'"></xf:bind>
@@ -1663,7 +1663,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                        </htmlarea>
+                        </htmlarea><markdown><label>Markdown Text Area</label><hint>Markdown editor with live preview</hint></markdown>
                         <number-controls>
                             <label>Number Controls</label>
                             <help></help>
@@ -2776,7 +2776,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
 
-                        </htmlarea>
+                        </htmlarea><markdown><label>Zone de texte Markdown</label><hint>Éditeur Markdown avec aperçu</hint></markdown>
                         <number-controls>
                             <label>Contrôles numériques</label>
                             <help></help>
@@ -2903,7 +2903,12 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
 
                             </fr:tinymce>
-                        </fr:c>
+                        </fr:c><fr:c x="1" y="2" w="12"><xf:textarea mediatype="text/markdown" id="markdown-control" bind="markdown-bind">
+                        <xf:label ref="$form-resources/markdown/label"></xf:label>
+                        <xf:hint ref="$form-resources/markdown/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </xf:textarea></fr:c>
                     </fr:grid>
                     <fr:grid id="grid-6-grid" bind="grid-6-bind">
                         <fr:c x="1" y="1" w="6">

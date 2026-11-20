@@ -152,6 +152,15 @@
                                         </xf:action>
                                     </xf:action>
 
+                                    <!-- If cleared (empty selection), clear comment and reset validation without published form comparison -->
+                                    <xf:action event="xforms-value-changed" if="xxf:is-blank(.)">
+                                        <xf:setvalue ref="instance()/selected-comment"/>
+                                        <xf:delete ref="instance()/validation"/>
+                                        <xf:insert
+                                            context="instance()"
+                                            origin="fbf:validateForm(xxf:instance('fb-form-instance'), (), $form-resources)"/>
+                                    </xf:action>
+
                                 </xf:select1>
                             </xh:td>
                         </xh:tr>
@@ -239,7 +248,7 @@
                                         </xh:div>
                                     </xh:div>
                                 </xf:group>
-                                <xf:group ref=".[$latest-version gt 0 and ($versioning-supported and instance()/selected-version != 'next' or not($versioning-supported))]">
+                                <xf:group ref=".[$latest-version gt 0 and ($versioning-supported and xxf:non-blank(instance()/selected-version) and instance()/selected-version != 'next' or not($versioning-supported))]">
                                     <xf:var name="compat" value="instance()/validation/@data-compatibility/string()"/>
                                     <xf:var name="ver"    value="if (instance()/existing-version gt 0) then instance()/existing-version/data(.) else 1"/>
                                     <xf:group ref=".[$compat = 'compatible']">

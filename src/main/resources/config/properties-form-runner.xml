@@ -625,8 +625,20 @@
                     fr:app-name()
                 }/{
                     fr:form-name()
-            }/summary?form-version={
-                fr:form-version()
+                }/summary{
+                    let
+                        $show-version-selector-name  := ('oxf.fr.summary.show-version-selector', fr:app-name(), fr:form-name()),
+                        $show-version-selector-value := xxf:property(string-join($show-version-selector-name, '.')),
+                        $nav    := xxf:instance('fr-search-navigation-instance'),
+                        $search := $nav/search-param/string(),
+                        $pos    := $nav/fallback-position/string(),
+                        $params := (
+                            concat('form-version=', fr:form-version())[$show-version-selector-value],
+                            concat('fr-search=', $search)[xxf:non-blank($search)],
+                            concat('fr-search-pos=', $pos)[xxf:non-blank($search) and xxf:non-blank($pos)]
+                        )
+                    return
+                        if (exists($params)) then concat('?', string-join($params, '&amp;')) else ''
                 }"
         )
     </property>

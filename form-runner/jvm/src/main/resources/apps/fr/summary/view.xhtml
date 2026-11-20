@@ -361,6 +361,8 @@
                 <_>
                     <encoded/>
                     <page-offset>0</page-offset>
+                    <restored-from-param>false</restored-from-param>
+                    <restored-structured-filters>false</restored-structured-filters>
                 </_>
             </xf:instance>
 
@@ -930,6 +932,88 @@
                     </xf:action>
                 </xf:action>
 
+                <!-- Restore search state when returning from a Detail page with `fr-search` -->
+                <xf:action if="not(instance('fr-last-search-context-instance')/restored-from-param = 'true') and xxf:non-blank(xxf:get-request-parameter('fr-search'))">
+                    <xf:setvalue ref="instance('fr-last-search-context-instance')/restored-from-param" value="'true'"/>
+                    <xf:var name="decoded" value="frf:decodeSummarySearch(xxf:get-request-parameter('fr-search'))"/>
+
+                    <xf:setvalue
+                        ref="instance('fr-last-search-context-instance')/restored-structured-filters"
+                        value="string($decoded/@has-structured-filters)"/>
+
+                    <!-- Free-text query -->
+                    <xf:setvalue
+                        if="exists($decoded/free-text)"
+                        ref="instance('fr-search-instance')/query[empty(@path) and empty(@metadata)]"
+                        value="$decoded/free-text"/>
+
+                    <!-- Structured control queries -->
+                    <xf:action iterate="$decoded/control">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue
+                            ref="instance('fr-search-instance')/query[@path = $c/@path]"
+                            value="$c"/>
+                    </xf:action>
+
+                    <!-- Metadata queries -->
+                    <xf:action iterate="$decoded/metadata">
+                        <xf:var name="m"        value="."/>
+                        <xf:var name="meta-name" value="string($m/@name)"/>
+                        <xf:var name="match"     value="string($m/@match)"/>
+                        <xf:action if="$meta-name = ('created-by', 'last-modified-by', 'workflow-stage')">
+                            <xf:setvalue
+                                ref="instance('fr-metadata-search-instance')/*[local-name() = $meta-name]"
+                                value="$m"/>
+                        </xf:action>
+                        <xf:action if="$meta-name = ('created', 'last-modified')">
+                            <xf:setvalue
+                                ref="instance('fr-search-instance')/query[@metadata = $meta-name and @match = $match]"
+                                value="$m"/>
+                            <xf:setvalue
+                                ref="instance('fr-metadata-search-instance')/*[local-name() = $meta-name]"
+                                value="'custom'"/>
+                            <xf:setvalue
+                                if="$match = 'gte'"
+                                ref="instance('fr-metadata-search-instance')/*[local-name() = concat($meta-name, '-after')]"
+                                value="substring($m, 1, 10)"/>
+                            <xf:setvalue
+                                if="$match = 'lt'"
+                                ref="instance('fr-metadata-search-instance')/*[local-name() = concat($meta-name, '-before')]"
+                                value="substring($m, 1, 10)"/>
+                        </xf:action>
+                    </xf:action>
+
+                    <!-- Sort order -->
+                    <xf:action if="exists($decoded/sort)">
+                        <xf:setvalue ref="instance('fr-order-by')/column"    value="$decoded/sort/@column"/>
+                        <xf:setvalue ref="instance('fr-order-by')/direction" value="$decoded/sort/@direction"/>
+                        <xf:dispatch name="fr-set-search-instance-sort-attribute" targetid="fr-form-model"/>
+                    </xf:action>
+
+                    <!-- Drafts & operations -->
+                    <xf:insert
+                        if="exists($decoded/drafts) and empty(instance('fr-search-instance')/drafts)"
+                        context="instance('fr-search-instance')"
+                        origin="$decoded/drafts"/>
+                    <xf:insert
+                        if="exists($decoded/operations) and empty(instance('fr-search-instance')/operations)"
+                        context="instance('fr-search-instance')"
+                        origin="$decoded/operations"/>
+
+                    <!-- Restore page number from `fr-search-pos` if provided -->
+                    <xf:var name="search-pos-str" value="string(xxf:get-request-parameter('fr-search-pos'))"/>
+                    <xf:action if="$search-pos-str castable as xs:integer and xs:integer($search-pos-str) gt 0">
+                        <xf:var name="page-size" value="xs:integer(instance('fr-search-instance')/page-size)"/>
+                        <xf:setvalue
+                            if="$page-size gt 0"
+                            ref="instance('fr-search-instance')/page-number"
+                            value="((xs:integer($search-pos-str) - 1) idiv $page-size) + 1"/>
+                    </xf:action>
+
+                    <!-- Ensure calculated metadata queries in fr-search-instance reflect restored values before submitting -->
+                    <xf:recalculate/>
+                </xf:action>
+
                 <!-- Query initial list of documents -->
                 <xf:send submission="fr-summary-search-submission"/>
 
@@ -953,8 +1037,11 @@
                 <xf:var
                     name="show-search-options-because-app-form-provided"
                     value="exists($fr-search-app-param-opt) or exists($fr-search-form-param-opt)"/>
+                <xf:var
+                    name="show-search-options-because-restored-search"
+                    value="instance('fr-last-search-context-instance')/restored-structured-filters = 'true'"/>
                 <xf:toggle
-                    if="$show-search-options-because-property or $show-search-options-because-app-form-provided"
+                    if="$show-search-options-because-property or $show-search-options-because-app-form-provided or $show-search-options-because-restored-search"
                     case="fr-search-options-case"/>
             </xf:action>
 

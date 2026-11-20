@@ -75,6 +75,16 @@ trait FormRunnerSummary {
     )
 
   //@XPathFunction
+  def decodeSummarySearch(encodedSearch: String): NodeInfo = {
+    val elem =
+      SummarySearchContext
+        .decode(encodedSearch)
+        .map(_.toDecodedElem)
+        .getOrElse(<search has-structured-filters="false"/>)
+    org.orbeon.scaxon.NodeConversions.elemToDocumentInfo(elem).rootElement
+  }
+
+  //@XPathFunction
   def computeSearchNavigation(
     app          : String,
     form         : String,

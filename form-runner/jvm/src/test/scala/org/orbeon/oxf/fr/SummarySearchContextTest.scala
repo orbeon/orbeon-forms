@@ -138,4 +138,26 @@ class SummarySearchContextTest extends AnyFunSpec with ResourceManagerSupport {
       assert((elem \ "query").exists(q => (q \ "@path").isEmpty && (q \ "@metadata").isEmpty && q.text == "invoice"))
     }
   }
+
+  describe("SummarySearchContext.toDecodedElem") {
+
+    it("serializes decoded search criteria for Summary page restoration") {
+      val freeOnly = SummarySearchContext(freeText = Some("werther")).toDecodedElem
+      assert((freeOnly \ "@has-structured-filters").text == "false")
+      assert((freeOnly \ "free-text").text == "werther")
+
+      val structured = SummarySearchContext(
+        controlQueries  = List(ControlFilter("details/title", Some("substring"), None, "Red")),
+        metadataQueries = List(MetadataFilter("workflow-stage", "exact", "review")),
+        sort            = Some(SortSpec("details/title", isMetadata = false, "asc"))
+      ).toDecodedElem
+      assert((structured \ "@has-structured-filters").text == "true")
+      assert((structured \ "control").head.text == "Red")
+      assert(((structured \ "control").head \ "@path").text == "details/title")
+      assert((structured \ "metadata").head.text == "review")
+      assert(((structured \ "metadata").head \ "@name").text == "workflow-stage")
+      assert(((structured \ "sort").head \ "@column").text == "details/title")
+      assert(((structured \ "sort").head \ "@direction").text == "asc")
+    }
+  }
 }

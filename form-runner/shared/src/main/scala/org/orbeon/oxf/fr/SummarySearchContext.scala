@@ -133,6 +133,22 @@ case class SummarySearchContext(
     pageNumber  : Int
   ): Array[Byte] =
     toSearchElem(aroundDocOpt, pageSize, pageNumber).toString.getBytes(CharsetNames.Utf8)
+
+  def toDecodedElem: Elem = {
+    val hasStructuredFilters = controlQueries.nonEmpty || metadataQueries.nonEmpty
+    <search has-structured-filters={hasStructuredFilters.toString}>{
+      freeText.map(q => <free-text>{q}</free-text>).toList :::
+      controlQueries.map(cq => <control path={cq.path} match={cq.matchType.orNull}>{cq.value}</control>) :::
+      metadataQueries.map(mq => <metadata name={mq.metadata} match={mq.matchType}>{mq.value}</metadata>) :::
+      sort.map(s => <sort column={s.column} is-metadata={s.isMetadata.toString} direction={s.direction}/>).toList :::
+      drafts.map(d =>
+        <drafts
+          for-never-saved-document={if (d.forNeverSavedDocument) "true" else null}
+          for-document-id={d.forDocumentId.orNull}>{d.value}</drafts>
+      ).toList :::
+      anyOfOperations.map(ops => <operations any-of={ops}/>).toList
+    }</search>
+  }
 }
 
 object SummarySearchContext {

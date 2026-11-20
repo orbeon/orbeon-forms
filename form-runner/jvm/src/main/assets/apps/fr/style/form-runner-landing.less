@@ -257,6 +257,9 @@
         .fr-card-intro-text {
             flex: 1 1 auto;
             min-inline-size: 0;
+            min-block-size: 3.1em; // Match `.fr-card-intro-media` icon/thumbnail block-size so cards without media align
+            display: flex;
+            align-items: center;
 
             .card-text {
                 margin: 0;

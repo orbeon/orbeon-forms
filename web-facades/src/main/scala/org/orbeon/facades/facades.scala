@@ -20,14 +20,6 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobal
 
 @js.native
-@JSGlobal("autosize")
-object Autosize extends js.Function1[html.TextArea, Unit] {
-  def apply  (textarea: html.TextArea): Unit = js.native
-  def update (textarea: html.TextArea): Unit = js.native
-  def destroy(textarea: html.TextArea): Unit = js.native
-}
-
-@js.native
 trait Ladda extends js.Object {
   def start()                    : Unit    = js.native
   def setProgress(width: Double) : Unit    = js.native

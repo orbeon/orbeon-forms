@@ -19,31 +19,12 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xbl:script src="/xbl/orbeon/autosize-textarea/autosize.min.js"/>
-
-    <!--
-        See https://github.com/orbeon/orbeon-forms/issues/4138.
-
-        Until that bug was fixed, we didn't have a concrete binding at runtime. The binding was only present at design-time for
-        Form Builder. The JavaScript code was handling initializations and updates on its own.
-
-        However, in order to ensure the proper handling of JavaScript initializations and updates, we need to enable
-        `javascript-lifecycle`. There is currently no way to just have `javascript-lifecycle` without having an actual concrete
-        binding with `<xbl:template>`. So below, we create such a template, which just wraps the `<xf:textarea>` without providing
-        extra functionality.
-
-        We also need the JavaScript to be notified when the control's value changes, so we also enable `external-value`, even though
-        the JavaScript doesn't strictly need to know about the value.
-
-        See also https://github.com/orbeon/orbeon-forms/issues/4143.
-    -->
-
     <xbl:binding
         id="fr-autosize-textarea"
         element="
             fr|autosize-textarea,
             xf|textarea[appearance ~= 'xxf:autosize']"
-        xxbl:mode="binding lhha value javascript-lifecycle external-value allow-minimal-label-hint"
+        xxbl:mode="binding lhha value allow-minimal-label-hint"
         xxbl:label-for="field"
         xxbl:container="span">
 
@@ -77,6 +58,10 @@
                 </view>
             </templates>
         </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/autosize-textarea/autosize-textarea.css"/>
+        </xbl:resources>
 
         <xbl:template
             xmlns:xsl="http://www.w3.org/1999/XSL/Transform"

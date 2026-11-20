@@ -72,7 +72,6 @@ object FormRunnerApp extends App {
     xbl.HrefButton
     xbl.LaddaButton
     xbl.Select1Search
-    xbl.AutosizeTextarea
     xbl.TinyMCE
     xbl.Markdown
     xbl.AttachmentMultiple

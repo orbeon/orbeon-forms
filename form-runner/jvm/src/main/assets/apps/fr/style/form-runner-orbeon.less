@@ -466,9 +466,16 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
         border-radius: var(--orbeon-active-alert-border-radius);
         margin-top: var(--orbeon-active-alert-margin-top);
 
+        &::before {
+            display    : var(--orbeon-active-alert-icon-display);
+            font-family: FontAwesome;
+            font-weight: normal;
+            margin-right: 0.4em;
+        }
+
         // https://github.com/orbeon/orbeon-forms/issues/6349
         @media (prefers-contrast: no-preference), (prefers-contrast: less) {
-            &:before {
+            &::after {
                 content: "";
                 position: absolute;
                 left: 10px;
@@ -481,16 +488,18 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
         }
     }
 
-    .fr-active-alert-state(@bg, @border-color, @pointer-color) {
+    .fr-active-alert-state(@color, @bg, @border-color, @pointer-color, @icon) {
+        color       : @color;
         background  : @bg;
         border-color: @border-color;
         border-width: var(--orbeon-active-alert-border-width);
         border-style: var(--orbeon-active-alert-border-style);
-        &:before { border-color: @pointer-color transparent; }
+        &::before { content: @icon; }
+        &::after  { border-color: @pointer-color transparent; }
     }
-    .xforms-invalid > .xforms-alert.xforms-active { .fr-active-alert-state(var(--orbeon-invalid-alert-background-color), var(--orbeon-invalid-alert-border-color), var(--orbeon-invalid-alert-pointer-color)); }
-    .xforms-warning > .xforms-alert.xforms-active { .fr-active-alert-state(var(--orbeon-warning-alert-background-color), var(--orbeon-warning-alert-border-color), var(--orbeon-warning-alert-pointer-color)); }
-    .xforms-info    > .xforms-alert.xforms-active { .fr-active-alert-state(var(--orbeon-info-alert-background-color),    var(--orbeon-info-alert-border-color),    var(--orbeon-info-alert-pointer-color)   ); }
+    .xforms-invalid > .xforms-alert.xforms-active { .fr-active-alert-state(var(--orbeon-invalid-alert-color), var(--orbeon-invalid-alert-background-color), var(--orbeon-invalid-alert-border-color), var(--orbeon-invalid-alert-pointer-color), "\f06a"); }
+    .xforms-warning > .xforms-alert.xforms-active { .fr-active-alert-state(var(--orbeon-warning-alert-color), var(--orbeon-warning-alert-background-color), var(--orbeon-warning-alert-border-color), var(--orbeon-warning-alert-pointer-color), "\f071"); }
+    .xforms-info    > .xforms-alert.xforms-active { .fr-active-alert-state(var(--orbeon-info-alert-color),    var(--orbeon-info-alert-background-color),    var(--orbeon-info-alert-border-color),    var(--orbeon-info-alert-pointer-color),    "\f05a"); }
 
     .xforms-invalid.xforms-visited {
         .xforms-label {

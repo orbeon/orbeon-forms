@@ -820,7 +820,7 @@
                     .dropdown {
                         display: block;
                         // Margin around button, but not menu itself, which also has the `dropdown` class
-                        &:not(.open) {
+                        &:not(.fr-grid-dropdown-menu) {
                             margin: @frGridCellPadding
                         }
                     }
@@ -912,9 +912,8 @@
                         opacity: 0.42;
                     }
 
-                    .dropdown {
+                    .dropdown:not(.fr-grid-dropdown-menu) {
                         position: relative;
-                        z-index: 1;
 
                         & > .fr-grid-dropdown-button {
                             box-shadow: 0 0 0 2px var(--orbeon-form-background-color);

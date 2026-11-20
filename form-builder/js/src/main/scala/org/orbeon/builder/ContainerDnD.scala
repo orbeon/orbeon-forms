@@ -44,11 +44,12 @@ object ContainerDnD {
   }
 
   private case class DropTarget(
-    intoSectionOpt    : Option[html.Element],
-    afterContainerOpt : Option[html.Element],
-    top               : Double,
-    left              : Double,
-    width             : Double
+    intoSectionOpt     : Option[html.Element],
+    afterContainerOpt  : Option[html.Element],
+    top                : Double,
+    left               : Double,
+    width              : Double,
+    isOriginalPosition : Boolean = false
   )
 
   private case class TreeRow(
@@ -61,13 +62,14 @@ object ContainerDnD {
   )
 
   private case class TreeDropTarget(
-    intoContainerOpt : Option[TreeRow],
-    afterIdOpt      : Option[String],
-    level            : Int,
-    boundaryTop      : Double,
-    anchorTop        : Double,
-    left             : Double,
-    width            : Double
+    intoContainerOpt   : Option[TreeRow],
+    afterIdOpt         : Option[String],
+    level              : Int,
+    boundaryTop        : Double,
+    anchorTop          : Double,
+    left               : Double,
+    width              : Double,
+    isOriginalPosition : Boolean = false
   )
 
   private var _isDragging: Boolean = false
@@ -253,45 +255,54 @@ object ContainerDnD {
             (Position.adjustedOffset(contentEl).left + 10.0, Math.max(0.0, contentEl.outerWidth - 20.0))
         }
 
-      val firstSlotOpt =
-        if (isSameParent && draggedIdx == 0)
-          None
-        else {
-          val firstTop =
-            children.headOption match {
-              case Some(firstChild) =>
-                Position.adjustedOffset(firstChild).top
-              case None =>
-                val contentEl =
-                  intoOpt
-                    .flatMap(_.querySelectorOpt(".fr-section-content"))
-                    .getOrElse(dom.document.querySelectorT(".fb-body"))
-                Position.adjustedOffset(contentEl).top + 10.0
-            }
-          Some(DropTarget(intoOpt, None, firstTop, slotLeft, slotWidth))
-        }
+      val firstSlotOpt = {
+        val firstTop =
+          children.headOption match {
+            case Some(firstChild) =>
+              Position.adjustedOffset(firstChild).top
+            case None =>
+              val contentEl =
+                intoOpt
+                  .flatMap(_.querySelectorOpt(".fr-section-content"))
+                  .getOrElse(dom.document.querySelectorT(".fb-body"))
+              Position.adjustedOffset(contentEl).top + 10.0
+          }
+        Some(
+          DropTarget(
+            intoSectionOpt     = intoOpt,
+            afterContainerOpt  = None,
+            top                = firstTop,
+            left               = slotLeft,
+            width              = slotWidth,
+            isOriginalPosition = isSameParent && draggedIdx == 0
+          )
+        )
+      }
 
       val afterSlots =
-        children.indices.flatMap { idx =>
-          if (isSameParent && (idx == draggedIdx || idx == draggedIdx - 1)) {
-            None
-          } else {
-            val child = children(idx)
-            val boxEl =
-              if (child.matches(BlockCache.SectionSelector))
-                child.childrenT(".fr-section-container").headOption.getOrElse(child)
-              else
-                child
-            val boxBottom = Position.adjustedOffset(boxEl).top + boxEl.outerHeight
-            val afterTop =
-              if (idx + 1 < children.length) {
-                val nextChild = children(idx + 1)
-                (boxBottom + Position.adjustedOffset(nextChild).top) / 2.0
-              } else {
-                boxBottom + 2.0
-              }
-            Some(DropTarget(intoOpt, Some(child), afterTop, slotLeft, slotWidth))
-          }
+        children.indices.map { idx =>
+          val child = children(idx)
+          val boxEl =
+            if (child.matches(BlockCache.SectionSelector))
+              child.childrenT(".fr-section-container").headOption.getOrElse(child)
+            else
+              child
+          val boxBottom = Position.adjustedOffset(boxEl).top + boxEl.outerHeight
+          val afterTop =
+            if (idx + 1 < children.length) {
+              val nextChild = children(idx + 1)
+              (boxBottom + Position.adjustedOffset(nextChild).top) / 2.0
+            } else {
+              boxBottom + 2.0
+            }
+          DropTarget(
+            intoSectionOpt     = intoOpt,
+            afterContainerOpt  = Some(child),
+            top                = afterTop,
+            left               = slotLeft,
+            width              = slotWidth,
+            isOriginalPosition = isSameParent && (idx == draggedIdx || idx == draggedIdx - 1)
+          )
         }
 
       firstSlotOpt.toList ++ afterSlots
@@ -472,62 +483,55 @@ object ContainerDnD {
             .getOrElse(0.0)
         val slotWidth = Math.max(20.0, slotRight - slotLeft)
 
-        val firstSlotOpt =
-          if (isSameParent && draggedIdx == 0)
-            None
-          else {
-            val firstBoundaryTop =
-              intoOpt match {
-                case Some(parentContainer) =>
-                  val parentBottom = parentContainer.el.getOffset.top + parentContainer.el.outerHeight
-                  children.headOption match {
-                    case Some(firstChild) => (parentBottom + firstChild.el.getOffset.top) / 2.0
-                    case None             => parentBottom
-                  }
-                case None =>
-                  allRows.headOption.map(_.el.getOffset.top).getOrElse(0.0)
-              }
+        val firstSlotOpt = {
+          val firstBoundaryTop =
+            intoOpt match {
+              case Some(parentContainer) =>
+                val parentBottom = parentContainer.el.getOffset.top + parentContainer.el.outerHeight
+                children.headOption match {
+                  case Some(firstChild) => (parentBottom + firstChild.el.getOffset.top) / 2.0
+                  case None             => parentBottom
+                }
+              case None =>
+                allRows.headOption.map(_.el.getOffset.top).getOrElse(0.0)
+            }
 
-            Some(
-              TreeDropTarget(
-                intoContainerOpt = intoOpt,
-                afterIdOpt      = None,
-                level            = targetLevel,
-                boundaryTop      = firstBoundaryTop,
-                anchorTop        = firstBoundaryTop,
-                left             = slotLeft,
-                width            = slotWidth
-              )
+          Some(
+            TreeDropTarget(
+              intoContainerOpt   = intoOpt,
+              afterIdOpt         = None,
+              level              = targetLevel,
+              boundaryTop        = firstBoundaryTop,
+              anchorTop          = firstBoundaryTop,
+              left               = slotLeft,
+              width              = slotWidth,
+              isOriginalPosition = isSameParent && draggedIdx == 0
             )
-          }
+          )
+        }
 
         val afterSlots =
-          children.indices.flatMap { idx =>
-            if (isSameParent && (idx == draggedIdx || idx == draggedIdx - 1)) {
-              None
-            } else {
-              val child         = children(idx)
-              val lastRow       = lastDescendantOrSelfRow(child)
-              val lastRowBottom = lastRow.el.getOffset.top + lastRow.el.outerHeight
-              val nextRowOpt    = allRows.dropWhile(_.id != lastRow.id).drop(1).headOption
-              val boundaryTop =
-                nextRowOpt match {
-                  case Some(nextRow) => (lastRowBottom + nextRow.el.getOffset.top) / 2.0
-                  case None          => lastRowBottom + 1.0
-                }
+          children.indices.map { idx =>
+            val child         = children(idx)
+            val lastRow       = lastDescendantOrSelfRow(child)
+            val lastRowBottom = lastRow.el.getOffset.top + lastRow.el.outerHeight
+            val nextRowOpt    = allRows.dropWhile(_.id != lastRow.id).drop(1).headOption
+            val boundaryTop =
+              nextRowOpt match {
+                case Some(nextRow) => (lastRowBottom + nextRow.el.getOffset.top) / 2.0
+                case None          => lastRowBottom + 1.0
+              }
 
-              Some(
-                TreeDropTarget(
-                  intoContainerOpt = intoOpt,
-                  afterIdOpt      = Some(child.id),
-                  level            = targetLevel,
-                  boundaryTop      = boundaryTop,
-                  anchorTop        = boundaryTop,
-                  left             = slotLeft,
-                  width            = slotWidth
-                )
-              )
-            }
+            TreeDropTarget(
+              intoContainerOpt   = intoOpt,
+              afterIdOpt         = Some(child.id),
+              level              = targetLevel,
+              boundaryTop        = boundaryTop,
+              anchorTop          = boundaryTop,
+              left               = slotLeft,
+              width              = slotWidth,
+              isOriginalPosition = isSameParent && (idx == draggedIdx || idx == draggedIdx - 1)
+            )
           }
 
         firstSlotOpt.toList ++ afterSlots
@@ -626,7 +630,7 @@ object ContainerDnD {
       source match {
         case DragSource.Canvas(sourceBlock) =>
           dropTargets = computeDropTargets(sourceBlock.el)
-          dropTargets.nonEmpty
+          dropTargets.exists(! _.isOriginalPosition)
 
         case DragSource.Outline(sourceRow) =>
           val allRows      = outlineRowsInPanel()
@@ -638,7 +642,7 @@ object ContainerDnD {
             canBeTopLevel  = refreshedRow.isContainer,
             canLeaveParent = allRows.count(_.parentIdOpt == refreshedRow.parentIdOpt) > 1
           )
-          if (treeDropTargets.nonEmpty) {
+          if (treeDropTargets.exists(! _.isOriginalPosition)) {
             val rowById = allRows.map(r => r.id -> r).toMap
             dimmedTreeRows =
               allRows
@@ -659,7 +663,7 @@ object ContainerDnD {
             canBeTopLevel  = true,
             canLeaveParent = true
           )
-          if (treeDropTargets.nonEmpty) {
+          if (treeDropTargets.exists(! _.isOriginalPosition)) {
             val rowById = allRows.map(r => r.id -> r).toMap
             dimmedTreeRows =
               allRows
@@ -749,7 +753,7 @@ object ContainerDnD {
         highlightedSectionOpt.foreach { sec =>
           sec.childrenT(".fr-section-container").foreach(_.classList.remove("fb-dnd-drop-into"))
         }
-        highlightedSectionOpt = activeDropTargetOpt.flatMap(_.intoSectionOpt)
+        highlightedSectionOpt = activeDropTargetOpt.filterNot(_.isOriginalPosition).flatMap(_.intoSectionOpt)
         highlightedSectionOpt.foreach { sec =>
           sec.childrenT(".fr-section-container").foreach(_.classList.add("fb-dnd-drop-into"))
         }
@@ -765,6 +769,7 @@ object ContainerDnD {
                 )
               )
               indicatorEl.setWidth(target.width)
+              indicatorEl.classList.toggle("fb-container-drop-indicator-noop", target.isOriginalPosition)
             case None =>
               indicatorEl.hide()
           }
@@ -783,7 +788,7 @@ object ContainerDnD {
           el.classList.remove("fb-outline-dnd-drop-into")
           el.classList.remove("fb-dnd-drop-into")
         }
-        highlightedTreeRowOpt = activeTreeDropTargetOpt.flatMap(_.intoContainerOpt).map(_.el)
+        highlightedTreeRowOpt = activeTreeDropTargetOpt.filterNot(_.isOriginalPosition).flatMap(_.intoContainerOpt).map(_.el)
         highlightedTreeRowOpt.foreach { el =>
           if (el.hasClass("fb-outline-row"))
             el.classList.add("fb-outline-dnd-drop-into")
@@ -802,6 +807,7 @@ object ContainerDnD {
                 )
               )
               indicatorEl.setWidth(target.width)
+              indicatorEl.classList.toggle("fb-container-drop-indicator-noop", target.isOriginalPosition)
             case None =>
               indicatorEl.hide()
           }
@@ -951,7 +957,7 @@ object ContainerDnD {
 
       sourceOpt match {
         case Some(DragSource.Canvas(sourceBlock)) =>
-          canvasDropTargetOpt.foreach { target =>
+          canvasDropTargetOpt.filterNot(_.isOriginalPosition).foreach { target =>
             FormBuilderRpcClient.api.containerMove(
               containerId         = sourceBlock.el.id,
               intoSectionIdOpt    = target.intoSectionOpt.map(_.id),
@@ -960,7 +966,7 @@ object ContainerDnD {
           }
 
         case Some(DragSource.Outline(sourceRow)) =>
-          treeDropTargetOpt.foreach { target =>
+          treeDropTargetOpt.filterNot(_.isOriginalPosition).foreach { target =>
             FormBuilderRpcClient.api.containerMove(
               containerId         = sourceRow.id,
               intoSectionIdOpt    = target.intoContainerOpt.map(_.id),
@@ -969,7 +975,7 @@ object ContainerDnD {
           }
 
         case Some(DragSource.ActionStep(sourceRow)) =>
-          treeDropTargetOpt.foreach { target =>
+          treeDropTargetOpt.filterNot(_.isOriginalPosition).foreach { target =>
             val intoId  = target.intoContainerOpt.fold("")(_.id)
             val afterId = target.afterIdOpt.getOrElse("")
             AjaxClient.fireEvent(

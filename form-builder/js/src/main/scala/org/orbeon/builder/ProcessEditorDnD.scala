@@ -54,13 +54,14 @@ object ProcessEditorDnD {
   )
 
   private case class ProcessDropTarget(
-    intoOpt          : Option[ProcessRow],
-    afterRowIndexOpt : Option[Int],
-    level            : Int,
-    boundaryY        : Double,
-    anchorY          : Double,
-    left             : Double,
-    width            : Double
+    intoOpt            : Option[ProcessRow],
+    afterRowIndexOpt   : Option[Int],
+    level              : Int,
+    boundaryY          : Double,
+    anchorY            : Double,
+    left               : Double,
+    width              : Double,
+    isOriginalPosition : Boolean = false
   )
 
   private var _isDragging: Boolean = false
@@ -250,69 +251,62 @@ object ProcessEditorDnD {
                 (0.0, 0.0)
             }
 
-          val firstSlotOpt =
-            if (isSameParent && draggedIdx == 0)
-              None
-            else {
-              val firstBoundaryY =
-                intoOpt match {
-                  case Some(headerRow) =>
-                    children
-                      .headOption
-                      .map(_.mainEl.getBoundingClientRect().top)
-                      .getOrElse(headerRow.mainEl.getBoundingClientRect().bottom)
-                  case None =>
-                    allRows
-                      .headOption
-                      .map(_.mainEl.getBoundingClientRect().top)
-                      .getOrElse(0.0)
-                }
+          val firstSlotOpt = {
+            val firstBoundaryY =
+              intoOpt match {
+                case Some(headerRow) =>
+                  children
+                    .headOption
+                    .map(_.mainEl.getBoundingClientRect().top)
+                    .getOrElse(headerRow.mainEl.getBoundingClientRect().bottom)
+                case None =>
+                  allRows
+                    .headOption
+                    .map(_.mainEl.getBoundingClientRect().top)
+                    .getOrElse(0.0)
+              }
 
-              Some(
-                ProcessDropTarget(
-                  intoOpt          = intoOpt,
-                  afterRowIndexOpt = None,
-                  level            = targetLevel,
-                  boundaryY        = firstBoundaryY,
-                  anchorY          = firstBoundaryY,
-                  left             = slotLeft,
-                  width            = slotWidth
-                )
+            Some(
+              ProcessDropTarget(
+                intoOpt            = intoOpt,
+                afterRowIndexOpt   = None,
+                level              = targetLevel,
+                boundaryY          = firstBoundaryY,
+                anchorY            = firstBoundaryY,
+                left               = slotLeft,
+                width              = slotWidth,
+                isOriginalPosition = isSameParent && draggedIdx == 0
               )
-            }
+            )
+          }
 
           val afterSlots =
-            children.indices.flatMap { idx =>
-              if (isSameParent && (idx == draggedIdx || idx == draggedIdx - 1)) {
-                None
-              } else {
-                val child   = children(idx)
-                val lastRow = lastDescendantOrSelfRow(child)
-                val boundaryY =
-                  if (idx + 1 < children.length) {
-                    children(idx + 1).mainEl.getBoundingClientRect().top
-                  } else if (targetLevel == 0) {
-                    lastRow.mainEl.getBoundingClientRect().bottom + 2.0
-                  } else {
-                    lastRow
-                      .mainEl
-                      .querySelectorOpt(s".fb-process-box-slice[data-orbeon-body-level='$targetLevel']")
-                      .map(_.getBoundingClientRect().bottom)
-                      .getOrElse(lastRow.mainEl.getBoundingClientRect().bottom)
-                  }
+            children.indices.map { idx =>
+              val child   = children(idx)
+              val lastRow = lastDescendantOrSelfRow(child)
+              val boundaryY =
+                if (idx + 1 < children.length) {
+                  children(idx + 1).mainEl.getBoundingClientRect().top
+                } else if (targetLevel == 0) {
+                  lastRow.mainEl.getBoundingClientRect().bottom + 2.0
+                } else {
+                  lastRow
+                    .mainEl
+                    .querySelectorOpt(s".fb-process-box-slice[data-orbeon-body-level='$targetLevel']")
+                    .map(_.getBoundingClientRect().bottom)
+                    .getOrElse(lastRow.mainEl.getBoundingClientRect().bottom)
+                }
 
-                Some(
-                  ProcessDropTarget(
-                    intoOpt          = intoOpt,
-                    afterRowIndexOpt = Some(child.rowIndex),
-                    level            = targetLevel,
-                    boundaryY        = boundaryY,
-                    anchorY          = boundaryY,
-                    left             = slotLeft,
-                    width            = slotWidth
-                  )
-                )
-              }
+              ProcessDropTarget(
+                intoOpt            = intoOpt,
+                afterRowIndexOpt   = Some(child.rowIndex),
+                level              = targetLevel,
+                boundaryY          = boundaryY,
+                anchorY            = boundaryY,
+                left               = slotLeft,
+                width              = slotWidth,
+                isOriginalPosition = isSameParent && (idx == draggedIdx || idx == draggedIdx - 1)
+              )
             }
 
           firstSlotOpt.toList ++ afterSlots
@@ -416,7 +410,7 @@ object ProcessEditorDnD {
     allRows.find(_.rowIndex == ctx.sourceRowIndex) match {
       case Some(draggedRow) =>
         dropTargets = computeDropTargets(draggedRow, allRows)
-        if (dropTargets.isEmpty) {
+        if (! dropTargets.exists(! _.isOriginalPosition)) {
           cleanupDrag()
         } else {
           _isDragging = true
@@ -459,7 +453,7 @@ object ProcessEditorDnD {
     activeDropTargetOpt = dropTargets.minByOption(t => Math.abs(clientY - t.anchorY))
 
     highlightedRowOpt.foreach(_.classList.remove("fb-process-dnd-drop-into"))
-    highlightedRowOpt = activeDropTargetOpt.flatMap(_.intoOpt).map(_.el)
+    highlightedRowOpt = activeDropTargetOpt.filterNot(_.isOriginalPosition).flatMap(_.intoOpt).map(_.el)
     highlightedRowOpt.foreach(_.classList.add("fb-process-dnd-drop-into"))
 
     indicatorElOpt.foreach { indicatorEl =>
@@ -469,6 +463,7 @@ object ProcessEditorDnD {
           indicatorEl.style.left  = s"${target.left}px"
           indicatorEl.style.top   = s"${target.boundaryY - 1.5}px"
           indicatorEl.style.width = s"${target.width}px"
+          indicatorEl.classList.toggle("fb-container-drop-indicator-noop", target.isOriginalPosition)
         case None =>
           indicatorEl.hide()
       }
@@ -581,6 +576,7 @@ object ProcessEditorDnD {
         for {
           ctx    <- ctxOpt
           target <- targetOpt
+          if ! target.isOriginalPosition
         } {
           val targetId =
             ctx.dialogEl

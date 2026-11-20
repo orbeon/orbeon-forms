@@ -31,6 +31,7 @@
         <xsl:param name="to-control-name" as="xs:string"/>
         <xsl:param name="at"              as="xs:string?"/>
         <xsl:param name="library-name"    as="xs:string?"/>
+        <xsl:param name="section-name"    as="xs:string?"/>
 
         <xsl:choose>
             <xsl:when test="exists($at)">
@@ -54,6 +55,20 @@
                             else
                                 error(),
                             ']'
+                        )"/>
+            </xsl:when>
+            <xsl:when test="exists($section-name)">
+                <xsl:attribute
+                    name="iterate"
+                    select="
+                        concat(
+                            'frf:resolveTargetRelativeToActionSource(xxf:get-document-attribute($current-action-id, ''action-source''), ''',
+                            $to-control-name,
+                            ''', true(), ',
+                            if (exists($library-name)) then concat('''', $library-name, '''') else '()',
+                            ', ''',
+                            $section-name,
+                            ''')'
                         )"/>
             </xsl:when>
             <xsl:otherwise>
@@ -849,9 +864,10 @@
         <xsl:param tunnel="yes" name="model-id"     as="xs:string"/>
         <xsl:param tunnel="yes" name="library-name" as="xs:string?"/>
 
-        <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
-        <xsl:variable name="value-expr"      select="@value/string()"   as="xs:string"/>
-        <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
+        <xsl:variable name="to-control-name" select="@control/string()"      as="xs:string"/>
+        <xsl:variable name="value-expr"      select="@value/string()"        as="xs:string"/>
+        <xsl:variable name="at"              select="@at/string()"           as="xs:string?"/>
+        <xsl:variable name="section-name"    select="@section-name/string()[normalize-space() != '']" as="xs:string?"/>
 
         <xxf:log
             class="fr-action-impl"
@@ -872,7 +888,7 @@
             <xf:recalculate/>
 
             <xf:action>
-                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at, $library-name)"/>
+                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at, $library-name, $section-name)"/>
                 <xf:setvalue
                     ref="."
                     value="$value"/>
@@ -891,6 +907,7 @@
 
         <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
+        <xsl:variable name="section-name"    select="@section-name/string()[normalize-space() != '']" as="xs:string?"/>
 
         <xxf:log
             class="fr-action-impl"
@@ -906,7 +923,7 @@
             <xf:recalculate/>
 
             <xf:action>
-                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at, $library-name)"/>
+                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at, $library-name, $section-name)"/>
                 <!-- https://github.com/orbeon/orbeon-forms/issues/5471 -->
                 <xf:delete
                     ref="_"/>
@@ -1212,6 +1229,7 @@
 
         <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
+        <xsl:variable name="section-name"    select="@section-name/string()[normalize-space() != '']" as="xs:string?"/>
 
         <xxf:log
             class="fr-action-impl"
@@ -1230,7 +1248,7 @@
             <xf:recalculate/>
 
             <xf:action>
-                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at, $library-name)"/>
+                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at, $library-name, $section-name)"/>
                 <xf:setvalue
                     ref="image, ."
                     value="$value"/>
@@ -1259,6 +1277,7 @@
         <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
         <xsl:variable name="value-expr"      select="@value/string()"   as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
+        <xsl:variable name="section-name"    select="@section-name/string()[normalize-space() != '']" as="xs:string?"/>
 
         <xxf:log
             class="fr-action-impl"
@@ -1279,7 +1298,7 @@
             <xf:recalculate/>
 
             <xf:action>
-                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at, $library-name)"/>
+                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at, $library-name, $section-name)"/>
                 <xsl:variable
                     name="ref"
                     as="xs:string"
@@ -1580,7 +1599,7 @@
                         <!--<xf:recalculate/>-->
 
                         <xf:action>
-                            <xsl:copy-of select="fr:build-iterate-att($model-id, $right-name, $right-at, $library-name)"/>
+                            <xsl:copy-of select="fr:build-iterate-att($model-id, $right-name, $right-at, $library-name, ())"/>
                             <xf:setvalue
                                 ref="."
                                 value="$value"/>

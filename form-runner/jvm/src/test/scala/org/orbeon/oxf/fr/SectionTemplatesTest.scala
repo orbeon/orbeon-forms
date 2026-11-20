@@ -191,6 +191,31 @@ class SectionTemplatesTest
     }
   }
 
+  describe("`<fr:control-setvalue>` and `<fr:control-clear>` with `section-name`") {
+
+    it("must target controls inside the specified section template instance") {
+
+      val (processorService, Some(xfcd), _) =
+        runFormRunner("tests", "section-template-setvalue", "new")
+
+      withTestExternalContext { _ =>
+        withFormRunnerDocument(processorService, xfcd) {
+
+          def valueInSection(componentStaticId: String, controlStaticId: String): String =
+            resolveObjectInsideComponent[XFormsValueControl](
+              componentStaticOrAbsoluteId = componentStaticId,
+              targetStaticOrAbsoluteId    = controlStaticId
+            ).get.getValue(EventCollector.Throw)
+
+          assert(valueInSection("my-section-1-content-control", "first-name-control") == "Alice")
+          assert(valueInSection("my-section-1-content-control", "last-name-control")  == "Smith")
+          assert(valueInSection("my-section-2-content-control", "first-name-control") == "Bob")
+          assert(valueInSection("my-section-2-content-control", "last-name-control")  == "")
+        }
+      }
+    }
+  }
+
   describe("`<fr:repeat-*>` actions in section template") {
 
     it("must add, remove, and clear iterations of a repeated grid inside a section template") {

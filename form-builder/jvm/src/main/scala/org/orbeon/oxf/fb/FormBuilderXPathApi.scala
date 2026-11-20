@@ -1202,6 +1202,60 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
+  def getSectionTemplateControlsLabelValueItemset(): Iterable[NodeInfo] = {
+
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+
+    val currentLang      = FormBuilder.currentLang
+    val someResourcesMap =
+      Some(FormBuilder.currentResources.child(*).map(r => r.localname -> r).toMap)
+
+    for {
+      sectionElem   <- FormRunner.findSectionsWithTemplates
+      sectionName   <- FormRunner.getControlNameOpt(sectionElem).toList
+      componentElem <- FormRunner.findComponentElemForSection(sectionElem).toList
+      bindingElem   <- FormRunner.findXblBinding(ctx.bodyElem, componentElem.uriQualifiedName).toList
+      sectionLabel   = FormBuilder.getControlResourceOrEmpty(
+                         sectionName,
+                         "label",
+                         removeHtmlTags  = true,
+                         resourcesMapOpt = someResourcesMap
+                       )
+      tmplResources  = FormRunner.findXblInstance(bindingElem, fr.Names.FormResources)
+                         .flatMap { inst =>
+                           val allLangRes = inst / * / *
+                           allLangRes.find(_.attValueOpt(XMLConstants.XML_LANG_QNAME).contains(currentLang))
+                             .orElse(allLangRes.headOption)
+                         }
+                         .map(r => (r / *).map(h => h.localname -> h).toMap)
+                         .getOrElse(Map.empty)
+      controlElem   <- (bindingElem / org.orbeon.oxf.fr.XMLNames.XBLTemplateTest descendant *)
+                         .filter(e => FormRunner.IsControl(e) && ! FormRunner.IsContainer(e) && e.hasId)
+      controlName    = FormRunner.controlNameFromId(controlElem.id)
+    } yield {
+      val controlLabel =
+        tmplResources.get(controlName)
+          .flatMap(_.child("label").headOption)
+          .map { e =>
+            if (e.attValueOpt("mediatype").contains("text/html"))
+              FormRunner.removeHtmlTags(e.stringValue)
+            else
+              e.stringValue
+          }
+          .getOrElse("")
+      val sectionPrefix = if (sectionLabel.nonEmpty) s"$sectionLabel / " else ""
+      elemToNodeInfo(
+        <item
+          label={s"$sectionPrefix$controlLabel ($sectionName / $controlName)"}
+          value={s"$sectionName/$controlName"}
+          section-name={sectionName}
+          control-name={controlName}
+          local-name={controlElem.localname}/>
+      )
+    }
+  }
+
+  //@XPathFunction
   def getRepeatsLabelValueItemset(): Iterable[NodeInfo] = {
 
     implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()

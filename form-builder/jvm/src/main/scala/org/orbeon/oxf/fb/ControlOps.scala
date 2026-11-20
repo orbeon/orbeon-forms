@@ -888,9 +888,15 @@ trait ControlOps extends ResourcesOps {
 
       val newActions = findNewActions(ctx.modelElemOpt)
 
-      // `fr:action//(@control | @repeat)`
+      // `fr:action//(@control | @repeat | @left | @right)` (skip `@control` when `@section-name` targets a section template)
       newActions descendant * att
         (ControlTest || RepeatTest || LeftTest || RightTest) filter
+        (att => att.stringValue == oldName && ! (att.localname == "control" && att.parentOption.exists(_.attValue("section-name").trimAllToOpt.isDefined))) foreach
+        updateNode(newName)
+
+      // `fr:action//@section-name`
+      newActions descendant * att
+        "section-name" filter
         (_.stringValue == oldName) foreach
         updateNode(newName)
 

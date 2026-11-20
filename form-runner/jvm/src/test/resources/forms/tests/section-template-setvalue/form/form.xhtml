@@ -1,0 +1,147 @@
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:exf="http://www.exforms.org/exf/1-0">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <my-section-1>
+                        <grid-1>
+                            <first-name/>
+                            <last-name/>
+                        </grid-1>
+                    </my-section-1>
+                    <my-section-2>
+                        <grid-1>
+                            <first-name/>
+                            <last-name/>
+                        </grid-1>
+                    </my-section-2>
+                </form>
+            </xf:instance>
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="my-section-1-bind" ref="my-section-1" name="my-section-1"/>
+                <xf:bind id="my-section-2-bind" ref="my-section-2" name="my-section-2"/>
+            </xf:bind>
+
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>tests</application-name>
+                    <form-name>section-template-setvalue</form-name>
+                    <title xml:lang="en">Section template setvalue with section-name</title>
+                    <description xml:lang="en"/>
+                    <library-versions>
+                        <orbeon>1</orbeon>
+                        <app>1</app>
+                    </library-versions>
+                </metadata>
+            </xf:instance>
+
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <my-section-1><label>My Section 1</label></my-section-1>
+                        <my-section-2><label>My Section 2</label></my-section-2>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+            <fr:listener
+                version="2018.2"
+                modes="new"
+                events="form-load-after-controls"
+                actions="init-section-templates"/>
+
+            <fr:action name="init-section-templates" version="2018.2">
+                <fr:control-setvalue section-name="my-section-1" control="first-name" value="'Alice'"/>
+                <fr:control-setvalue section-name="my-section-1" control="last-name"  value="'Smith'"/>
+                <fr:control-setvalue section-name="my-section-2" control="first-name" value="'Bob'"/>
+                <fr:control-setvalue section-name="my-section-2" control="last-name"  value="'Jones'"/>
+                <fr:control-clear    section-name="my-section-2" control="last-name"/>
+            </fr:action>
+
+        </xf:model>
+        <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+            <xbl:binding xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/tests/library"
+                         id="tests-my-section-component"
+                         element="component|my-section"
+                         data-library-version="1"
+                         class="fr-section-component">
+                <xbl:implementation>
+                    <xf:model id="my-section-model">
+                        <xf:instance id="fr-form-template">
+                            <my-section>
+                                <grid-1>
+                                    <first-name/>
+                                    <last-name/>
+                                </grid-1>
+                            </my-section>
+                        </xf:instance>
+                        <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                            <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                                <xf:bind id="first-name-bind" ref="first-name" name="first-name"/>
+                                <xf:bind id="last-name-bind"  ref="last-name"  name="last-name"/>
+                            </xf:bind>
+                        </xf:bind>
+                        <xf:instance id="fr-form-resources" xxf:readonly="true">
+                            <resources>
+                                <resource xml:lang="en">
+                                    <my-section><label>My Section</label></my-section>
+                                    <first-name><label>First Name</label><hint/></first-name>
+                                    <last-name><label>Last Name</label><hint/></last-name>
+                                </resource>
+                            </resources>
+                        </xf:instance>
+                        <xf:instance id="fr-form-metadata" xxf:readonly="true">
+                            <metadata/>
+                        </xf:instance>
+                    </xf:model>
+                </xbl:implementation>
+                <xbl:template>
+                    <xf:group appearance="xxf:internal" model="my-section-model" id="fr-section-template-view">
+                        <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                            <fr:c x="1" y="1" w="6">
+                                <xf:input id="first-name-control" bind="first-name-bind">
+                                    <xf:label ref="$form-resources/first-name/label"/>
+                                    <xf:hint ref="$form-resources/first-name/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </fr:c>
+                            <fr:c x="7" y="1" w="6">
+                                <xf:input id="last-name-control" bind="last-name-bind">
+                                    <xf:label ref="$form-resources/last-name/label"/>
+                                    <xf:hint ref="$form-resources/last-name/hint"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </fr:c>
+                        </fr:grid>
+                    </xf:group>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:xbl="http://www.w3.org/ns/xbl">
+                <fr:section id="my-section-1-section" bind="my-section-1-bind">
+                    <xf:label ref="$form-resources/my-section-1/label"/>
+                    <component:my-section
+                        xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/tests/library"
+                        id="my-section-1-content-control"/>
+                </fr:section>
+                <fr:section id="my-section-2-section" bind="my-section-2-bind">
+                    <xf:label ref="$form-resources/my-section-2/label"/>
+                    <component:my-section
+                        xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/tests/library"
+                        id="my-section-2-content-control"/>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

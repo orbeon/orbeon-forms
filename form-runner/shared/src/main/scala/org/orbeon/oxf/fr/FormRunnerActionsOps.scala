@@ -84,13 +84,30 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     targetControlName      : String,
     followIndexes          : Boolean,
     libraryName            : String
+  ): SequenceIterator =
+    resolveTargetRelativeToActionSource(
+      actionSourceAbsoluteId,
+      targetControlName,
+      followIndexes,
+      libraryName,
+      sectionName = null
+    )
+
+  //@XPathFunction
+  def resolveTargetRelativeToActionSource(
+    actionSourceAbsoluteId : String,
+    targetControlName      : String,
+    followIndexes          : Boolean,
+    libraryName            : String,
+    sectionName            : String
   ): SequenceIterator = {
     implicit val xfc: XFormsFunction.Context = XFormsFunction.context
     resolveTargetRelativeToActionSourceOpt(
       actionSourceAbsoluteId,
       targetControlName,
       followIndexes,
-      libraryName.trimAllToOpt.map(Left.apply)
+      Option(sectionName).flatMap(_.trimAllToOpt).map(Right.apply)
+        .orElse(Option(libraryName).flatMap(_.trimAllToOpt).map(Left.apply))
     ).map(_.toList) // https://github.com/orbeon/orbeon-forms/issues/6016
   }
 

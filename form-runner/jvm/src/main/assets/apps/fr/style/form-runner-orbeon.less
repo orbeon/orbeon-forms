@@ -26,7 +26,60 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
     display: flex;
     flex-direction: column;
     row-gap: 10px;
-    .fr-toc {
+    @media screen {
+        .fr-toc {
+            .nav-header {
+                display: flex;
+                align-items: center;
+                gap: 0.45em;
+                font-size: 0.86em;
+                font-weight: 600;
+                color: var(--orbeon-hint-color);
+
+                &::before {
+                    content: "\f03a";
+                    font-family: FontAwesome;
+                    font-weight: normal;
+                    font-size: 0.95em;
+                    line-height: 1;
+                }
+            }
+
+            &:has(.nav .nav) .nav-header {
+                background-color: var(--orbeon-section-title-background-color);
+                border-bottom: 1px solid var(--orbeon-base-border-color);
+                padding: 0.55em 0.85em;
+                margin: -6px -6px 6px -6px;
+                border-radius: var(--orbeon-body-decorations-border-radius) var(--orbeon-body-decorations-border-radius) 0 0;
+            }
+
+            &:not(:has(.nav .nav)) {
+                & > .nav {
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    gap: 4px 6px;
+
+                    & > .nav-header {
+                        padding: 0.25em 0.75em 0.25em 0.4em;
+                        margin-right: 0.2em;
+                        border-right: 1px solid var(--orbeon-base-border-color);
+                    }
+
+                    & > li > span > .btn-link {
+                        width: auto;
+                        margin: 0;
+                        padding: 5px 10px;
+                        font-weight: 500;
+                        background-color: var(--orbeon-section-title-background-color);
+
+                        &:hover {
+                            background-color: var(--orbeon-toc-hover-background-color);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -52,6 +105,51 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
         position: sticky;
 
         top: 60px;
+    }
+    .fr-toc {
+        max-height: calc(100vh - 80px);
+        overflow-y: auto;
+
+        .nav-header {
+            display: flex;
+            align-items: center;
+            gap: 0.45em;
+            font-size: 0.86em;
+            font-weight: 600;
+            color: var(--orbeon-hint-color);
+            background-color: var(--orbeon-section-title-background-color);
+            border-bottom: 1px solid var(--orbeon-base-border-color);
+            padding: 0.55em 0.85em;
+            margin: -6px -6px 6px -6px;
+            border-radius: var(--orbeon-body-decorations-border-radius) var(--orbeon-body-decorations-border-radius) 0 0;
+
+            &::before {
+                content: "\f03a";
+                font-family: FontAwesome;
+                font-weight: normal;
+                font-size: 0.95em;
+                line-height: 1;
+            }
+        }
+
+        .nav > li > span > .btn-link {
+            font-weight: 500;
+
+            &::after {
+                content: "\f105";
+                font-family: FontAwesome;
+                font-weight: normal;
+                order: 2;
+                flex: 0 0 auto;
+                color: var(--orbeon-hint-color);
+                opacity: 0.45;
+                transition: opacity var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+            }
+
+            &:hover::after {
+                opacity: 1;
+            }
+        }
     }
     .fr-body, .fr-wizard-body {
         grid-row: 1;
@@ -100,6 +198,7 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
         border: none;
         border-radius: var(--orbeon-body-decorations-border-radius);
         text-align: left;
+        text-decoration: none;
         text-shadow: none;
         font-weight: 400;
         color: var(--orbeon-toc-color);

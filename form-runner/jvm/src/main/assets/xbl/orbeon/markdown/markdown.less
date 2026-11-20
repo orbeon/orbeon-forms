@@ -118,6 +118,9 @@
                 box-shadow: none;
                 resize: var(--orbeon-textarea-resize);
                 font-family: var(--orbeon-control-font-family);
+                font-size: var(--orbeon-control-font-size);
+                font-weight: var(--orbeon-control-font-weight);
+                line-height: 1.5;
             }
         }
 
@@ -150,11 +153,14 @@
 
     .fr-markdown-rendered {
         color: var(--orbeon-control-color);
+        font-family: var(--orbeon-control-font-family);
+        font-size: var(--orbeon-control-font-size);
+        font-weight: var(--orbeon-control-font-weight);
         line-height: 1.5;
         overflow-wrap: break-word;
 
         h1, h2, h3, h4, h5, h6 {
-            margin: 0.75em 0 0.4em;
+            margin: 1em 0 0.5em;
             font-weight: 600;
             line-height: 1.25;
             color: var(--orbeon-base-color);
@@ -170,7 +176,7 @@
         h4 { font-size: 1.05em; }
 
         p {
-            margin: 0 0 0.65em;
+            margin: 0 0 1em;
 
             &:last-child {
                 margin-bottom: 0;
@@ -178,7 +184,7 @@
         }
 
         ul, ol {
-            margin: 0 0 0.65em;
+            margin: 0 0 1em;
             padding-left: 1.5em;
 
             &:last-child {
@@ -187,7 +193,11 @@
         }
 
         li + li {
-            margin-top: 0.2em;
+            margin-top: 0.25em;
+        }
+
+        li:has(> p) + li {
+            margin-top: 1em;
         }
 
         a {
@@ -200,7 +210,7 @@
         }
 
         blockquote {
-            margin: 0 0 0.65em;
+            margin: 0 0 1em;
             padding: 0.25em 0.75em;
             border-left: 3px solid var(--orbeon-control-border-color);
             color: var(--orbeon-hint-color);
@@ -218,7 +228,7 @@
         }
 
         pre {
-            margin: 0 0 0.65em;
+            margin: 0 0 1em;
             padding: 0.65em 0.85em;
             border: 1px solid var(--orbeon-base-border-color);
             border-radius: var(--orbeon-control-border-radius);
@@ -238,7 +248,7 @@
 
         table {
             width: 100%;
-            margin: 0 0 0.65em;
+            margin: 0 0 1em;
             border-collapse: collapse;
 
             th, td {

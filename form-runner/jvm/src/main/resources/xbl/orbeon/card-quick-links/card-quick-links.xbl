@@ -109,7 +109,11 @@
                 name="card-description"
                 value="xxf:help('fr-card-quick-links')[xxf:non-blank()]"/>
 
-            <xh:div class="card h-100 fr-landing-quick-links-card {'xforms-hidden'[empty($visible-links)]}">
+            <xf:var
+                name="layout"
+                value="(fr:component-param-value('layout')[. = ('tiles', 'list')], 'tiles')[1]"/>
+
+            <xh:div class="card h-100 fr-landing-quick-links-card fr-quick-links-layout-{$layout} {'xforms-hidden'[empty($visible-links)]}">
                 <xh:div class="card-header fr-card-header">
                     <xh:div class="fr-card-header-main">
                         <xh:h2 class="card-title"><xf:output value="$card-title"/></xh:h2>

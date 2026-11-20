@@ -11,9 +11,10 @@ sealed trait LandingCard
 
 object LandingCard {
   case class QuickLinks(
-    title      : Option[LocalizedString] = None,
-    description: Option[LocalizedString] = None,
-    links      : List[QuickLinkToken]    = Nil
+    title      : Option[LocalizedString]  = None,
+    description: Option[LocalizedString]  = None,
+    links      : List[QuickLinkToken]     = Nil,
+    layout     : Option[QuickLinksLayout] = None
   ) extends LandingCard
 
   case class PublishedForms(
@@ -47,6 +48,12 @@ object QuickLinkToken {
   case object Configuration      extends QuickLinkToken
   case object AdminConsole       extends QuickLinkToken
   case object FormsAnalytics     extends QuickLinkToken
+}
+
+sealed trait QuickLinksLayout
+object QuickLinksLayout {
+  case object Tiles extends QuickLinksLayout
+  case object List  extends QuickLinksLayout
 }
 
 sealed trait LinkTo
@@ -98,13 +105,14 @@ object LandingCardsJSON {
   def serializeToJson(landingCards: Iterable[LandingCard]): Json =
     Json.fromValues(
       landingCards.map {
-        case QuickLinks(title, description, links) =>
+        case QuickLinks(title, description, links, layout) =>
           Json.obj(
             "card-type" -> Json.fromString("quick-links")
           )
-            .deepMerge(title      .map(t => Json.obj("title"       -> serializeLocalizedString(t))).getOrElse(Json.obj()))
-            .deepMerge(description.map(d => Json.obj("description" -> serializeLocalizedString(d))).getOrElse(Json.obj()))
-            .deepMerge(if (links.nonEmpty) Json.obj("links" -> serializeQuickLinks(links)) else Json.obj())
+            .deepMerge(title      .map(t => Json.obj("title"       -> serializeLocalizedString(t))) .getOrElse(Json.obj()))
+            .deepMerge(description.map(d => Json.obj("description" -> serializeLocalizedString(d))) .getOrElse(Json.obj()))
+            .deepMerge(if (links.nonEmpty) Json.obj("links" -> serializeQuickLinks(links))          else Json.obj())
+            .deepMerge(layout     .map(l => Json.obj("layout"      -> serializeQuickLinksLayout(l))).getOrElse(Json.obj()))
         case PublishedForms(title, description, thumbnail, app, linkTo, sort) =>
           Json.obj(
             "card-type"   -> Json.fromString("published-forms"),
@@ -229,6 +237,14 @@ object LandingCardsJSON {
         }.mkString(" ")
       )
 
+    def serializeQuickLinksLayout(layout: QuickLinksLayout): Json =
+      Json.fromString(
+        layout match {
+          case QuickLinksLayout.Tiles => "tiles"
+          case QuickLinksLayout.List  => "list"
+        }
+      )
+
     def serializeLinkTo(linkTo: List[LinkTo]): Json =
       Json.fromString(
         linkTo.map {
@@ -275,8 +291,21 @@ object LandingCardsJSON {
       QuickLinks(
         title       = o("title")      .filterNot(_.isNull).map(parseLocalizedString),
         description = o("description").filterNot(_.isNull).map(parseLocalizedString),
-        links       = o("links")      .filterNot(_.isNull).map(parseQuickLinkTokens).getOrElse(Nil)
+        links       = o("links")      .filterNot(_.isNull).map(parseQuickLinkTokens).getOrElse(Nil),
+        layout      = o("layout")     .filterNot(_.isNull).flatMap(parseQuickLinksLayout)
       )
+
+    def parseQuickLinksLayout(json: Json): Option[QuickLinksLayout] =
+      json.asString match {
+        case Some(s) =>
+          s.trimAllToOpt.map {
+            case "tiles" => QuickLinksLayout.Tiles
+            case "list"  => QuickLinksLayout.List
+            case other   => error(s"Unknown quick-links `layout`: $other")
+          }
+        case None =>
+          error("Expected string for `layout`")
+      }
 
     def parseQuickLinkTokens(json: Json): List[QuickLinkToken] =
       json.asString match {

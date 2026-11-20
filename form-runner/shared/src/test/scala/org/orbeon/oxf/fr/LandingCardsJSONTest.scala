@@ -140,10 +140,10 @@ class LandingCardsJSONTest extends AnyFunSpecLike {
       val quickLinksJson =
         """[
           |  {"card-type": "quick-links"},
-          |  {"card-type": "quick-links", "links": null},
-          |  {"card-type": "quick-links", "links": ""},
-          |  {"card-type": "quick-links", "links": "main"},
-          |  {"card-type": "quick-links", "title": "landing.titles.admin", "links": "admin"},
+          |  {"card-type": "quick-links", "links": null, "layout": null},
+          |  {"card-type": "quick-links", "links": "", "layout": "   "},
+          |  {"card-type": "quick-links", "links": "main", "layout": "tiles"},
+          |  {"card-type": "quick-links", "title": "landing.titles.admin", "links": "admin", "layout": "list"},
           |  {"card-type": "quick-links", "title": {"en": "Tools"}, "description": {"en": "Server tools"}, "links": ["forms-admin", "configuration", "admin-console", "forms-analytics"]},
           |  {"card-type": "quick-links", "links": "form-builder-new form-builder-forms published-forms form-runner-admin"}
           |]""".stripMargin
@@ -153,8 +153,8 @@ class LandingCardsJSONTest extends AnyFunSpecLike {
         QuickLinks(),
         QuickLinks(),
         QuickLinks(),
-        QuickLinks(links = List(QuickLinkToken.Main)),
-        QuickLinks(title = Some(ByResource("landing.titles.admin")), links = List(QuickLinkToken.Admin)),
+        QuickLinks(links = List(QuickLinkToken.Main), layout = Some(QuickLinksLayout.Tiles)),
+        QuickLinks(title = Some(ByResource("landing.titles.admin")), links = List(QuickLinkToken.Admin), layout = Some(QuickLinksLayout.List)),
         QuickLinks(
           title       = Some(ByLanguage(Map("en" -> "Tools"))),
           description = Some(ByLanguage(Map("en" -> "Server tools"))),
@@ -179,6 +179,12 @@ class LandingCardsJSONTest extends AnyFunSpecLike {
 
       val invalidArrayElem = """[{"card-type": "quick-links", "links": ["forms-admin", 42]}]"""
       assertThrows[IllegalArgumentException](LandingCardsJSON.parseString(invalidArrayElem).get)
+
+      val invalidLayout = """[{"card-type": "quick-links", "layout": "carousel"}]"""
+      assertThrows[IllegalArgumentException](LandingCardsJSON.parseString(invalidLayout).get)
+
+      val invalidLayoutType = """[{"card-type": "quick-links", "layout": true}]"""
+      assertThrows[IllegalArgumentException](LandingCardsJSON.parseString(invalidLayoutType).get)
     }
 
     it("must fail with invalid json") {

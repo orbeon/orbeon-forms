@@ -158,6 +158,7 @@
                         id="quick-links-card"
                         ref=".[card-type = 'quick-links']"
                         links="{string-join(if (links/@type = 'array') then links/_ else links, ' ')}"
+                        layout="{layout}"
                     >
                         <xf:label
                             ref="

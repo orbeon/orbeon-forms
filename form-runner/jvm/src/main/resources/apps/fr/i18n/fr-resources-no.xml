@@ -788,6 +788,7 @@
             <demo-forms>Demoskjema</demo-forms>
             <demo-features>Demofunksjoner</demo-features>
             <quick-links>Hurtiglenker</quick-links>
+            <admin>Administrasjon</admin>
             <form-runner-admin>Skjemabehandling</form-runner-admin>
             <admin-console todo="true">Admin Console</admin-console>
             <forms-analytics todo="true">Forms Analytics</forms-analytics>

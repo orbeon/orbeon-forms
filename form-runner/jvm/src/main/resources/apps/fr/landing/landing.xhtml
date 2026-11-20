@@ -48,14 +48,6 @@
                 name="is-form-builder-available"
                 value="doc-available('oxf:/forms/orbeon/builder/form/form.xhtml')"/>
 
-            <xf:var
-                name="is-configuration-available"
-                value="doc-available('oxf:/forms/orbeon/configuration/form/form.xhtml')"/>
-
-            <xf:var
-                name="is-console-available"
-                value="doc-available('oxf:/apps/fr/console/console.xhtml')"/>
-
             <!-- Similar logic in Form Builder model.xml -->
             <xf:var
                 name="is-allow-form-builder"
@@ -66,11 +58,6 @@
                         exists($fb-permissions/app[1]/@name[xxf:non-blank()])
                     )
                 "/>
-
-            <xf:var
-                name="is-allow-admin"
-                value="
-                    $fb-permissions/app/@name = '*' or exists($fb-permissions/app[1]/@name[xxf:non-blank()])"/>
 
             <!-- Don't use `xxf:exclude-result-prefixes="#all"` as eXist search needs the `xh` and `xf` namespaces -->
             <xf:instance id="fr-search-instance">
@@ -159,72 +146,41 @@
             <fr:navbar/>
             <fr:config-check/>
             <xh:div class="fr-landing-grid">
+                <xf:repeat ref="instance('fr-cards-config-xml')/_">
+                    <xf:var
+                        name="is-published-forms"
+                        value="card-type = 'published-forms'"/>
+                    <xf:var
+                        name="is-form-data"
+                        value="card-type = 'form-data' and ($is-allow-form-builder or not(app = 'orbeon' and form = 'builder'))"/>
 
-                <xh:div class="fr-landing-card-cell {'xforms-hidden'[not(instance('fr-cards-config-xml')/_/card-type = 'quick-links')]}">
-                    <xh:div class="card h-100 fr-landing-quick-links-card">
-                        <xh:div class="card-header fr-card-header">
-                            <xh:div class="fr-card-header-main">
-                                <xh:h2 class="card-title"><xf:output value="xxf:r('landing.titles.quick-links', '|fr-fr-resources|')"/></xh:h2>
-                            </xh:div>
-                        </xh:div>
-                        <xh:div class="fr-landing-quick-links-list">
-                            <xh:a href="/fr/orbeon/builder/new" class="{'xforms-hidden'[not($is-allow-form-builder)]}">
-                                <xh:figure>
-                                    <xh:img src="/apps/fr/style/images/orbeon/crane.svg" alt="" class="img-thumbnail img-invertible"/>
-                                    <xh:figcaption><xf:output value="xxf:r('landing.titles.form-builder-new', '|fr-fr-resources|')"/></xh:figcaption>
-                                    <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
-                                </xh:figure>
-                            </xh:a>
-                            <xh:a href="/fr/orbeon/builder/summary" class="{'xforms-hidden'[not($is-allow-form-builder)]}">
-                                <xh:figure>
-                                    <xh:img src="/apps/fr/style/images/orbeon/library.svg" alt="" class="img-thumbnail img-invertible"/>
-                                    <xh:figcaption><xf:output value="xxf:r('landing.titles.form-builder-summary', '|fr-fr-resources|')"/></xh:figcaption>
-                                    <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
-                                </xh:figure>
-                            </xh:a>
-                            <xh:a href="/fr/forms">
-                                <xh:figure>
-                                    <xh:img src="/apps/fr/style/images/orbeon/book.svg" alt="" class="img-thumbnail img-invertible"/>
-                                    <xh:figcaption><xf:output value="xxf:r('landing.titles.published-forms', '|fr-fr-resources|')"/></xh:figcaption>
-                                    <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
-                                </xh:figure>
-                            </xh:a>
-                            <xh:a href="/fr/admin" class="{'xforms-hidden'[not($is-allow-admin)]}">
-                                <xh:figure>
-                                    <xh:img src="/apps/fr/style/images/orbeon/cogwheels.svg" alt="" class="img-thumbnail img-invertible"/>
-                                    <xh:figcaption><xf:output value="xxf:r('landing.titles.form-runner-admin', '|fr-fr-resources|')"/></xh:figcaption>
-                                    <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
-                                </xh:figure>
-                            </xh:a>
-                            <xh:a href="/fr/orbeon/configuration/new" class="{'xforms-hidden'[not($is-configuration-available and $is-allow-admin)]}">
-                                <xh:figure>
-                                    <xh:img src="/apps/fr/style/images/orbeon/configuration.svg" alt="" class="img-thumbnail img-invertible"/>
-                                    <xh:figcaption><xf:output value="xxf:r('landing.titles.configuration', '|fr-fr-resources|')"/></xh:figcaption>
-                                    <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
-                                </xh:figure>
-                            </xh:a>
-                            <xh:a href="/fr/console" class="{'xforms-hidden'[not($is-console-available and $is-allow-admin)]}">
-                                <xh:figure>
-                                    <xh:img src="/apps/fr/style/images/orbeon/console.svg" alt="" class="img-thumbnail img-invertible"/>
-                                    <xh:figcaption><xf:output value="xxf:r('landing.titles.admin-console', '|fr-fr-resources|')"/></xh:figcaption>
-                                    <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
-                                </xh:figure>
-                            </xh:a>
-                            <xh:a href="/fr/analytics" class="{'xforms-hidden'[not(frf:isAnalyticsAuthorized())]}">
-                                <xh:figure>
-                                    <xh:img src="/apps/fr/style/images/orbeon/analytics.svg" alt="" class="img-thumbnail img-invertible"/>
-                                    <xh:figcaption><xf:output value="xxf:r('landing.titles.forms-analytics', '|fr-fr-resources|')"/></xh:figcaption>
-                                    <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
-                                </xh:figure>
-                            </xh:a>
-                        </xh:div>
-                    </xh:div>
-                </xh:div>
+                    <fr:card-quick-links
+                        id="quick-links-card"
+                        ref=".[card-type = 'quick-links']"
+                        links="{string-join(if (links/@type = 'array') then links/_ else links, ' ')}"
+                    >
+                        <xf:label
+                            ref="
+                                if (title/@type = 'object') then
+                                    title/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
+                                else if (xxf:non-blank(title)) then
+                                    xxf:r(title, '|fr-fr-resources|')
+                                else
+                                    ()"/>
+                        <xf:help
+                            ref="
+                                if (description/@type = 'object') then
+                                    description/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
+                                else if (xxf:non-blank(description)) then
+                                    xxf:r(description, '|fr-fr-resources|')
+                                else
+                                    ()"/>
+                    </fr:card-quick-links>
 
-                <xf:repeat ref="instance('fr-cards-config-xml')/_[card-type = 'published-forms']">
                     <fr:card-published-forms
                         id="published-form-card"
-                        ref="."
+                        ref=".[$is-published-forms]"
+                        active="{$is-published-forms}"
                         app="{app}"
                         thumbnail="{thumbnail}"
                         sort-by="{sort-by}"
@@ -236,21 +192,24 @@
                             ref="
                                 if (title/@type = 'object') then
                                     title/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
+                                else if (xxf:non-blank(title)) then
+                                    xxf:r(title, '|fr-fr-resources|')
                                 else
-                                    xxf:r(title, '|fr-fr-resources|')"/>
+                                    ()"/>
                         <xf:help
                             ref="
                                 if (description/@type = 'object') then
                                     description/(*[local-name() = xxf:lang()], *[local-name() = '_'], *)[1]
+                                else if (xxf:non-blank(description)) then
+                                    xxf:r(description, '|fr-fr-resources|')
                                 else
-                                    xxf:r(description, '|fr-fr-resources|')"/>
+                                    ()"/>
                     </fr:card-published-forms>
-                </xf:repeat>
 
-                <xf:repeat ref="instance('fr-cards-config-xml')/_[card-type = 'form-data' and ($is-allow-form-builder or not(app = 'orbeon' and form = 'builder'))]">
                     <fr:card-form-data
                         id="form-data-card"
-                        ref="."
+                        ref=".[$is-form-data]"
+                        active="{$is-form-data}"
                         app="{app}"
                         form="{form}"
                         version="{version}"

@@ -788,6 +788,7 @@
             <demo-forms>Demó űrlapok</demo-forms>
             <demo-features>Demó funkciók</demo-features>
             <quick-links>Gyors linkek</quick-links>
+            <admin>Adminisztráció</admin>
             <form-runner-admin>Űrlapok adminisztrációja</form-runner-admin>
             <admin-console todo="true">Admin Console</admin-console>
             <forms-analytics todo="true">Forms Analytics</forms-analytics>

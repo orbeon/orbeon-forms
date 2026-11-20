@@ -813,6 +813,7 @@
             <demo-forms>Formularios de demostración</demo-forms>
             <demo-features>Demostración de funciones</demo-features>
             <quick-links>Enlaces rápidos</quick-links>
+            <admin>Administración</admin>
             <form-runner-admin>Administración de formularios</form-runner-admin>
             <admin-console todo="true">Admin Console</admin-console>
             <forms-analytics todo="true">Forms Analytics</forms-analytics>

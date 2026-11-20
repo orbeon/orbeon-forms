@@ -788,6 +788,7 @@
             <demo-forms>演示表單</demo-forms>
             <demo-features>功能演示</demo-features>
             <quick-links>快速鏈接</quick-links>
+            <admin>管理</admin>
             <form-runner-admin>表單管理</form-runner-admin>
             <admin-console todo="true">Admin Console</admin-console>
             <forms-analytics todo="true">Forms Analytics</forms-analytics>

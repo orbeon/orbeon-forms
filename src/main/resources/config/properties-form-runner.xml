@@ -775,7 +775,13 @@
     <property as="xs:string"  name="oxf.fr.landing.cards">
       [
         {
-          "card-type": "quick-links"
+          "card-type": "quick-links",
+          "links": "main"
+        },
+        {
+          "card-type": "quick-links",
+          "title": "landing.titles.admin",
+          "links": "admin"
         },
         {
           "card-type": "published-forms",

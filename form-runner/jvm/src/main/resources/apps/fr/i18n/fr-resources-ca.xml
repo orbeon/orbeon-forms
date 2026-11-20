@@ -801,6 +801,7 @@
             <demo-forms>Formularis de demostració</demo-forms>
             <demo-features>Demostració de funcions</demo-features>
             <quick-links>Dreceres</quick-links>
+            <admin>Administració</admin>
             <form-runner-admin>Administrador de formularis</form-runner-admin>
             <admin-console todo="true">Admin Console</admin-console>
             <forms-analytics todo="true">Forms Analytics</forms-analytics>

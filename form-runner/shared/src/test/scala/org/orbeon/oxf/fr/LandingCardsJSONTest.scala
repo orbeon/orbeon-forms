@@ -16,6 +16,11 @@ class LandingCardsJSONTest extends AnyFunSpecLike {
           "card-type": "quick-links"
         },
         {
+          "card-type": "quick-links",
+          "title": "landing.titles.admin",
+          "links": "admin"
+        },
+        {
           "card-type": "published-forms",
           "title": {
             "en": "My demo forms",
@@ -72,7 +77,11 @@ class LandingCardsJSONTest extends AnyFunSpecLike {
 
     val expected: List[LandingCard] =
       List(
-        QuickLinks,
+        QuickLinks(),
+        QuickLinks(
+          title = Some(ByResource("landing.titles.admin")),
+          links = List(QuickLinkToken.Admin)
+        ),
         PublishedForms(
           title       = ByLanguage(Map("en" -> "My demo forms", "fr" -> "Mes formulaires de démonstration")),
           description = ByLanguage(Map("en" -> "A collection of forms demonstrating various features of Orbeon Forms.", "fr" -> "Une collection de formulaires démontrant diverses fonctionnalités d'''Orbeon Forms.")),
@@ -125,6 +134,51 @@ class LandingCardsJSONTest extends AnyFunSpecLike {
 
     it("must parse the json correctly") {
       assert(LandingCardsJSON.parseString(json).toOption.flatten.map(_._1).contains(expected))
+    }
+
+    it("must parse and serialize quick-links options correctly") {
+      val quickLinksJson =
+        """[
+          |  {"card-type": "quick-links"},
+          |  {"card-type": "quick-links", "links": null},
+          |  {"card-type": "quick-links", "links": ""},
+          |  {"card-type": "quick-links", "links": "main"},
+          |  {"card-type": "quick-links", "title": "landing.titles.admin", "links": "admin"},
+          |  {"card-type": "quick-links", "title": {"en": "Tools"}, "description": {"en": "Server tools"}, "links": ["forms-admin", "configuration", "admin-console", "forms-analytics"]},
+          |  {"card-type": "quick-links", "links": "form-builder-new form-builder-forms published-forms form-runner-admin"}
+          |]""".stripMargin
+
+      val cards = LandingCardsJSON.parseString(quickLinksJson).get.get._1.collect { case q: QuickLinks => q }
+      assert(cards == List(
+        QuickLinks(),
+        QuickLinks(),
+        QuickLinks(),
+        QuickLinks(links = List(QuickLinkToken.Main)),
+        QuickLinks(title = Some(ByResource("landing.titles.admin")), links = List(QuickLinkToken.Admin)),
+        QuickLinks(
+          title       = Some(ByLanguage(Map("en" -> "Tools"))),
+          description = Some(ByLanguage(Map("en" -> "Server tools"))),
+          links       = List(QuickLinkToken.FormsAdmin, QuickLinkToken.Configuration, QuickLinkToken.AdminConsole, QuickLinkToken.FormsAnalytics)
+        ),
+        QuickLinks(
+          links = List(QuickLinkToken.FormBuilderNew, QuickLinkToken.FormBuilderSummary, QuickLinkToken.PublishedForms, QuickLinkToken.FormsAdmin)
+        )
+      ))
+
+      val serialized = LandingCardsJSON.serializeToJson(cards)
+      val reparsed   = LandingCardsJSON.parseString(serialized.noSpaces).get.get._1.collect { case q: QuickLinks => q }
+      assert(reparsed == cards)
+    }
+
+    it("must fail with invalid quick-links options") {
+      val invalidLink = """[{"card-type": "quick-links", "links": "unknown-link"}]"""
+      assertThrows[IllegalArgumentException](LandingCardsJSON.parseString(invalidLink).get)
+
+      val invalidLinksType = """[{"card-type": "quick-links", "links": 123}]"""
+      assertThrows[IllegalArgumentException](LandingCardsJSON.parseString(invalidLinksType).get)
+
+      val invalidArrayElem = """[{"card-type": "quick-links", "links": ["forms-admin", 42]}]"""
+      assertThrows[IllegalArgumentException](LandingCardsJSON.parseString(invalidArrayElem).get)
     }
 
     it("must fail with invalid json") {
@@ -227,7 +281,14 @@ class LandingCardsJSONTest extends AnyFunSpecLike {
     }
 
     it("must parse legacy tokens correctly") {
-      val legacy = LandingCardsJSON.legacyTokensToCaseClasses("demo-forms published-forms form-builder-forms")
+      val legacy = LandingCardsJSON.legacyTokensToCaseClasses("quick-links admin demo-forms published-forms form-builder-forms")
+      assert(legacy.collect { case q: QuickLinks => q } == List(
+        QuickLinks(),
+        QuickLinks(
+          title = Some(ByResource("landing.titles.admin")),
+          links = List(QuickLinkToken.Admin)
+        )
+      ))
       assert(legacy.collect { case p: PublishedForms => p.linkTo } == List(
         List(LinkTo.Summary),
         List(LinkTo.New),

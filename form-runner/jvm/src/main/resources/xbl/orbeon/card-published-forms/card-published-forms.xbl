@@ -127,7 +127,7 @@
                         value="'error'"/>
                 </xf:submission>
 
-                <xf:action event="xforms-model-construct-done">
+                <xf:action event="xforms-model-construct-done" if="not(fr:component-param-value('active') = 'false')">
                     <xf:send submission="fr-read-demo-forms-submission"/>
                 </xf:action>
             </xf:model>

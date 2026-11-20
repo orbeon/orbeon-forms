@@ -1,0 +1,168 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+
+    <xbl:binding
+        id="fr-card-quick-links"
+        element="fr|card-quick-links"
+        xxbl:mode="lhha custom-lhha binding"
+        class="h-100"
+    >
+        <xbl:template>
+
+            <xf:var name="fb-permissions"             value="xxf:instance('fb-permissions')"/>
+            <xf:var name="has-any-matching-roles"     value="not($fb-permissions/@has-roles = 'false')"/>
+            <xf:var name="is-form-builder-available"  value="doc-available('oxf:/forms/orbeon/builder/form/form.xhtml')"/>
+            <xf:var name="is-configuration-available" value="doc-available('oxf:/forms/orbeon/configuration/form/form.xhtml')"/>
+            <xf:var name="is-console-available"       value="doc-available('oxf:/apps/fr/console/console.xhtml')"/>
+
+            <xf:var
+                name="is-allow-form-builder"
+                value="
+                    $is-form-builder-available and (
+                        not($has-any-matching-roles)    or
+                        $fb-permissions/app/@name = '*' or
+                        exists($fb-permissions/app[1]/@name[xxf:non-blank()])
+                    )"/>
+
+            <xf:var
+                name="is-allow-admin"
+                value="$fb-permissions/app/@name = '*' or exists($fb-permissions/app[1]/@name[xxf:non-blank()])"/>
+
+            <xf:var
+                name="is-allow-analytics"
+                value="frf:isAnalyticsAuthorized()"/>
+
+            <xf:var
+                name="raw-tokens"
+                value="
+                    let $tokens := xxf:split(fr:component-param-value('links'))
+                    return
+                        if (empty($tokens)) then
+                            'all'
+                        else
+                            $tokens"/>
+
+            <xf:var
+                name="expanded-tokens"
+                value="
+                    distinct-values(
+                        for $token in $raw-tokens
+                        return
+                            if ($token = 'main') then
+                                ('form-builder-new', 'form-builder-summary', 'published-forms')
+                            else if ($token = 'admin') then
+                                ('forms-admin', 'configuration', 'admin-console', 'forms-analytics')
+                            else if ($token = 'all') then
+                                ('form-builder-new', 'form-builder-summary', 'published-forms', 'forms-admin', 'configuration', 'admin-console', 'forms-analytics')
+                            else if ($token = 'form-builder-forms') then
+                                'form-builder-summary'
+                            else if ($token = 'form-runner-admin') then
+                                'forms-admin'
+                            else
+                                $token
+                    )"/>
+
+            <xf:var
+                name="visible-links"
+                value="
+                    for $link in $expanded-tokens
+                    return
+                        if      ($link = 'form-builder-new'     and $is-allow-form-builder)                          then $link
+                        else if ($link = 'form-builder-summary' and $is-allow-form-builder)                          then $link
+                        else if ($link = 'published-forms')                                                          then $link
+                        else if ($link = 'forms-admin'          and $is-allow-admin)                                 then $link
+                        else if ($link = 'configuration'        and $is-configuration-available and $is-allow-admin) then $link
+                        else if ($link = 'admin-console'        and $is-console-available and $is-allow-admin)       then $link
+                        else if ($link = 'forms-analytics'      and $is-allow-analytics)                             then $link
+                        else                                                                                              ()"/>
+
+            <xf:var
+                name="card-title"
+                value="(
+                    xxf:label('fr-card-quick-links')[xxf:non-blank()],
+                    if (count($raw-tokens) = 1 and $raw-tokens = 'admin') then
+                        xxf:r('landing.titles.admin', '|fr-fr-resources|')
+                    else
+                        xxf:r('landing.titles.quick-links', '|fr-fr-resources|')
+                )[1]"/>
+
+            <xf:var
+                name="card-description"
+                value="xxf:help('fr-card-quick-links')[xxf:non-blank()]"/>
+
+            <xh:div class="card h-100 fr-landing-quick-links-card {'xforms-hidden'[empty($visible-links)]}">
+                <xh:div class="card-header fr-card-header">
+                    <xh:div class="fr-card-header-main">
+                        <xh:h2 class="card-title"><xf:output value="$card-title"/></xh:h2>
+                    </xh:div>
+                </xh:div>
+                <xh:div class="card-body fr-card-intro {'xforms-hidden'[empty($card-description)]}">
+                    <xh:div class="fr-card-intro-text">
+                        <xh:p class="card-text"><xf:output value="$card-description"/></xh:p>
+                    </xh:div>
+                </xh:div>
+                <xh:div class="fr-landing-quick-links-list">
+                    <xf:repeat ref="$visible-links">
+                        <xf:var name="link-id" value="."/>
+                        <xf:var
+                            name="href"
+                            value="
+                                if      ($link-id = 'form-builder-new')     then '/fr/orbeon/builder/new'
+                                else if ($link-id = 'form-builder-summary') then '/fr/orbeon/builder/summary'
+                                else if ($link-id = 'published-forms')      then '/fr/forms'
+                                else if ($link-id = 'forms-admin')          then '/fr/admin'
+                                else if ($link-id = 'configuration')        then '/fr/orbeon/configuration/new'
+                                else if ($link-id = 'admin-console')        then '/fr/console'
+                                else                                             '/fr/analytics'"/>
+                        <xf:var
+                            name="icon-src"
+                            value="
+                                if      ($link-id = 'form-builder-new')     then '/apps/fr/style/images/orbeon/crane.svg'
+                                else if ($link-id = 'form-builder-summary') then '/apps/fr/style/images/orbeon/library.svg'
+                                else if ($link-id = 'published-forms')      then '/apps/fr/style/images/orbeon/book.svg'
+                                else if ($link-id = 'forms-admin')          then '/apps/fr/style/images/orbeon/cogwheels.svg'
+                                else if ($link-id = 'configuration')        then '/apps/fr/style/images/orbeon/configuration.svg'
+                                else if ($link-id = 'admin-console')        then '/apps/fr/style/images/orbeon/console.svg'
+                                else                                             '/apps/fr/style/images/orbeon/analytics.svg'"/>
+                        <xf:var
+                            name="title-key"
+                            value="
+                                if      ($link-id = 'form-builder-new')     then 'landing.titles.form-builder-new'
+                                else if ($link-id = 'form-builder-summary') then 'landing.titles.form-builder-summary'
+                                else if ($link-id = 'published-forms')      then 'landing.titles.published-forms'
+                                else if ($link-id = 'forms-admin')          then 'landing.titles.form-runner-admin'
+                                else if ($link-id = 'configuration')        then 'landing.titles.configuration'
+                                else if ($link-id = 'admin-console')        then 'landing.titles.admin-console'
+                                else                                             'landing.titles.forms-analytics'"/>
+                        <xh:a href="{$href}">
+                            <xh:figure>
+                                <xh:img src="{$icon-src}" alt="" class="img-thumbnail img-invertible"/>
+                                <xh:figcaption><xf:output value="xxf:r($title-key, '|fr-fr-resources|')"/></xh:figcaption>
+                                <xh:i class="fa fa-chevron-right fr-quick-link-chevron" aria-hidden="true"/>
+                            </xh:figure>
+                        </xh:a>
+                    </xf:repeat>
+                </xh:div>
+            </xh:div>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

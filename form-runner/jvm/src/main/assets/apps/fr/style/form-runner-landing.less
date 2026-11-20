@@ -44,18 +44,20 @@
         gap: 1.15em;
         padding: 0.85em 0.25em 2em;
 
-        // Hide XForms repeat markers and non-relevant items so they never occupy grid tracks
+        // Hide XForms repeat markers, non-relevant items, and empty quick-links cards so they never occupy grid tracks
         & > .xforms-hidden,
         & > .xforms-disabled,
         & > .xforms-repeat-begin-end,
         & > .xforms-repeat-delimiter,
-        & > span:not(:has(*)) {
+        & > span:not(:has(*)),
+        & > .xbl-fr-card-quick-links:has(> .xforms-hidden) {
             display: none !important;
         }
 
-        & > .fr-landing-card-cell,
-        & > .xbl-fr-card-published-forms,
-        & > .xbl-fr-card-form-data {
+        & > .fr-landing-card-cell:not(.xforms-hidden),
+        & > .xbl-fr-card-quick-links:not(.xforms-disabled):not(:has(> .xforms-hidden)),
+        & > .xbl-fr-card-published-forms:not(.xforms-disabled),
+        & > .xbl-fr-card-form-data:not(.xforms-disabled) {
             min-inline-size: 0;
             display: flex;
             flex-direction: column;
@@ -244,6 +246,10 @@
         border-bottom: 1px solid var(--orbeon-landing-card-border-color);
         text-align: start;
 
+        &.xforms-hidden {
+            display: none;
+        }
+
         &:not(:has(.card-text:not(:empty))):not(:has(.fr-card-intro-media img)):not(:has(.fr-card-intro-media .xforms-output:not(.xforms-disabled))) {
             display: none;
         }
@@ -294,13 +300,23 @@
         }
     }
 
-    // Quick Links card
+    // Quick Links / Admin card
     .fr-landing-quick-links-card {
+        &.xforms-hidden {
+            display: none;
+        }
+
         .fr-landing-quick-links-list {
             display: flex;
             flex-direction: column;
             gap: 0.6em;
             padding: 0.85em;
+
+            & > .xforms-repeat-begin-end,
+            & > .xforms-repeat-delimiter,
+            & > span:not(:has(*)) {
+                display: none !important;
+            }
         }
 
         a {

@@ -221,7 +221,9 @@
 
                 </xf:submission>
 
-                <xf:action event="xforms-model-construct-done">
+                <xf:action
+                    event="xforms-model-construct-done"
+                    if="not(fr:component-param-value('active') = 'false') and xxf:non-blank($app) and xxf:non-blank($form)">
                     <xf:send submission="fr-get-source-form-submission"/>
                 </xf:action>
 

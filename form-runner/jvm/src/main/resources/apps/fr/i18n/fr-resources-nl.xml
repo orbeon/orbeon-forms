@@ -788,6 +788,7 @@
             <demo-forms>Demoforms</demo-forms>
             <demo-features>Demofuncties</demo-features>
             <quick-links>Snelle koppelingen</quick-links>
+            <admin>Beheer</admin>
             <form-runner-admin>Form Runner-beheer</form-runner-admin>
             <admin-console todo="true">Admin Console</admin-console>
             <forms-analytics todo="true">Forms Analytics</forms-analytics>

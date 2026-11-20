@@ -10,7 +10,11 @@ import scala.util.{Success, Try}
 sealed trait LandingCard
 
 object LandingCard {
-  case object QuickLinks extends LandingCard
+  case class QuickLinks(
+    title      : Option[LocalizedString] = None,
+    description: Option[LocalizedString] = None,
+    links      : List[QuickLinkToken]    = Nil
+  ) extends LandingCard
 
   case class PublishedForms(
     title      : LocalizedString,
@@ -29,6 +33,20 @@ object LandingCard {
     form       : String,
     version    : Option[Int]
   ) extends LandingCard
+}
+
+sealed trait QuickLinkToken
+object QuickLinkToken {
+  case object Main               extends QuickLinkToken
+  case object Admin              extends QuickLinkToken
+  case object All                extends QuickLinkToken
+  case object FormBuilderNew     extends QuickLinkToken
+  case object FormBuilderSummary extends QuickLinkToken
+  case object PublishedForms     extends QuickLinkToken
+  case object FormsAdmin         extends QuickLinkToken
+  case object Configuration      extends QuickLinkToken
+  case object AdminConsole       extends QuickLinkToken
+  case object FormsAnalytics     extends QuickLinkToken
 }
 
 sealed trait LinkTo
@@ -63,6 +81,7 @@ object LocalizedString {
 object LandingCardsJSON {
 
   import LandingCard.*
+  import Private.*
 
   def parseString(jsonString: String): Try[Option[(Seq[LandingCard], Json)]] =
     jsonString.trimAllToOpt match {
@@ -79,10 +98,13 @@ object LandingCardsJSON {
   def serializeToJson(landingCards: Iterable[LandingCard]): Json =
     Json.fromValues(
       landingCards.map {
-        case QuickLinks =>
+        case QuickLinks(title, description, links) =>
           Json.obj(
             "card-type" -> Json.fromString("quick-links")
           )
+            .deepMerge(title      .map(t => Json.obj("title"       -> serializeLocalizedString(t))).getOrElse(Json.obj()))
+            .deepMerge(description.map(d => Json.obj("description" -> serializeLocalizedString(d))).getOrElse(Json.obj()))
+            .deepMerge(if (links.nonEmpty) Json.obj("links" -> serializeQuickLinks(links)) else Json.obj())
         case PublishedForms(title, description, thumbnail, app, linkTo, sort) =>
           Json.obj(
             "card-type"   -> Json.fromString("published-forms"),
@@ -105,19 +127,24 @@ object LandingCardsJSON {
             "app"        -> Json.fromString(app),
             "form"       -> Json.fromString(form)
           )
-          .deepMerge(title      .map(t => Json.obj("title"       -> serializeLocalizedString(t))).getOrElse(Json.obj()))
-          .deepMerge(description.map(d => Json.obj("description" -> serializeLocalizedString(d))).getOrElse(Json.obj()))
-          .deepMerge(thumbnail  .map(t => Json.obj("thumbnail"   -> Json.fromString(t)))         .getOrElse(Json.obj()))
-          .deepMerge(version    .map(v => Json.obj("version"     -> Json.fromInt(v)))            .getOrElse(Json.obj()))
+            .deepMerge(title      .map(t => Json.obj("title"       -> serializeLocalizedString(t))).getOrElse(Json.obj()))
+            .deepMerge(description.map(d => Json.obj("description" -> serializeLocalizedString(d))).getOrElse(Json.obj()))
+            .deepMerge(thumbnail  .map(t => Json.obj("thumbnail"   -> Json.fromString(t)))         .getOrElse(Json.obj()))
+            .deepMerge(version    .map(v => Json.obj("version"     -> Json.fromInt(v)))            .getOrElse(Json.obj()))
       }
     )
-
-  private val AppFormVersionRegex = """([A-Za-z0-9\-_]+)/([A-Za-z0-9\-_]+)/(\d+)""".r
 
   def legacyTokensToCaseClasses(v: String): List[LandingCard] =
     v.splitTo[List]().flatMap {
       case "quick-links"          =>
-        List(LandingCard.QuickLinks)
+        List(LandingCard.QuickLinks())
+      case "admin"                =>
+        List(
+          LandingCard.QuickLinks(
+            title = Some(LocalizedString.ByResource("landing.titles.admin")),
+            links = List(QuickLinkToken.Admin)
+          )
+        )
       case "demo-forms"           =>
         List(
           LandingCard.PublishedForms(
@@ -174,134 +201,192 @@ object LandingCardsJSON {
         throw new IllegalArgumentException(other)
     }
 
-  private def serializeLocalizedString(ls: LocalizedString): Json =
-    ls match {
-      case LocalizedString.ByLanguage(values) =>
-        Json.obj(values.view.mapValues(Json.fromString).toSeq*)
-      case LocalizedString.ByResource(key) =>
-        Json.fromString(key)
-    }
+  private object Private {
 
-  private def serializeLinkTo(linkTo: List[LinkTo]): Json =
-    Json.fromString(
-      linkTo.map {
-        case LinkTo.New     => "new"
-        case LinkTo.Summary => "summary"
-      }.mkString(" ")
-    )
+    val AppFormVersionRegex = """([A-Za-z0-9\-_]+)/([A-Za-z0-9\-_]+)/(\d+)""".r
 
-  private def serializeSortBy(sortBy: SortBy): Json =
-    Json.fromString(
-      sortBy match {
-        case SortBy.AppName        => "application-name"
-        case SortBy.FormName       => "form-name"
-        case SortBy.FormVersion    => "form-version"
-        case SortBy.Created        => "created"
-        case SortBy.LastModified   => "last-modified"
-        case SortBy.LastModifiedBy => "last-modified-by"
-        case SortBy.Title          => "title"
+    def serializeLocalizedString(ls: LocalizedString): Json =
+      ls match {
+        case LocalizedString.ByLanguage(values) =>
+          Json.obj(values.view.mapValues(Json.fromString).toSeq*)
+        case LocalizedString.ByResource(key) =>
+          Json.fromString(key)
       }
-    )
 
-  private def serializeSortDirection(sortDirection: SortDirection): Json =
-    Json.fromString(
-      sortDirection match {
-        case SortDirection.Ascending  => "ascending"
-        case SortDirection.Descending => "descending"
+    def serializeQuickLinks(links: List[QuickLinkToken]): Json =
+      Json.fromString(
+        links.map {
+          case QuickLinkToken.Main               => "main"
+          case QuickLinkToken.Admin              => "admin"
+          case QuickLinkToken.All                => "all"
+          case QuickLinkToken.FormBuilderNew     => "form-builder-new"
+          case QuickLinkToken.FormBuilderSummary => "form-builder-summary"
+          case QuickLinkToken.PublishedForms     => "published-forms"
+          case QuickLinkToken.FormsAdmin         => "forms-admin"
+          case QuickLinkToken.Configuration      => "configuration"
+          case QuickLinkToken.AdminConsole       => "admin-console"
+          case QuickLinkToken.FormsAnalytics     => "forms-analytics"
+        }.mkString(" ")
+      )
+
+    def serializeLinkTo(linkTo: List[LinkTo]): Json =
+      Json.fromString(
+        linkTo.map {
+          case LinkTo.New     => "new"
+          case LinkTo.Summary => "summary"
+        }.mkString(" ")
+      )
+
+    def serializeSortBy(sortBy: SortBy): Json =
+      Json.fromString(
+        sortBy match {
+          case SortBy.AppName        => "application-name"
+          case SortBy.FormName       => "form-name"
+          case SortBy.FormVersion    => "form-version"
+          case SortBy.Created        => "created"
+          case SortBy.LastModified   => "last-modified"
+          case SortBy.LastModifiedBy => "last-modified-by"
+          case SortBy.Title          => "title"
+        }
+      )
+
+    def serializeSortDirection(sortDirection: SortDirection): Json =
+      Json.fromString(
+        sortDirection match {
+          case SortDirection.Ascending  => "ascending"
+          case SortDirection.Descending => "descending"
+        }
+      )
+
+    def error(message: String): Nothing =
+      throw new IllegalArgumentException(message)
+
+    def parseCard(json: Json): LandingCard = {
+      val o = json.asObject.getOrElse(error("Expected a card object"))
+      o("card-type").flatMap(_.asString).getOrElse(error("Missing card-type")) match {
+        case "quick-links"     => parseQuickLinks(o)
+        case "published-forms" => parsePublishedForms(o)
+        case "form-data"       => parseFormData(o)
+        case other             => error(s"Unknown card type: $other")
       }
-    )
-
-  private def error(message: String): Nothing =
-    throw new IllegalArgumentException(message)
-
-  private def parseCard(json: Json): LandingCard = {
-    val o = json.asObject.getOrElse(error("Expected a card object"))
-    o("card-type").flatMap(_.asString).getOrElse(error("Missing card-type")) match {
-      case "quick-links"     => parseQuickLinks(o)
-      case "published-forms" => parsePublishedForms(o)
-      case "form-data"       => parseFormData(o)
-      case other             => error(s"Unknown card type: $other")
-    }
-  }
-
-  private def parseQuickLinks(o: JsonObject): QuickLinks.type =
-    QuickLinks
-
-  private def parsePublishedForms(o: JsonObject): PublishedForms = {
-    val sortByOpt        = o("sort-by").filterNot(_.isNull).map(parseSortBy)
-    val sortDirectionOpt = o("sort-direction").filterNot(_.isNull).map(parseSortDirection)
-
-    if (sortByOpt.isEmpty && sortDirectionOpt.isDefined)
-      error("Missing `sort-by` when `sort-direction` is present")
-
-    PublishedForms(
-      title       = o("title").map(parseLocalizedString).getOrElse(error("Missing `title` for `published-forms`")),
-      description = o("description").map(parseLocalizedString).getOrElse(error("Missing `description` for `published-forms`")),
-      thumbnail   = o("thumbnail").flatMap(_.asString).getOrElse(error("Missing `thumbnail` for `published-forms`")),
-      app         = o("app").flatMap(_.asString),
-      linkTo      = o("link-to").filterNot(_.isNull).map(parseLinkTo).getOrElse(Nil),
-      sort        = sortByOpt.map(sortBy => (sortBy, sortDirectionOpt))
-    )
-  }
-
-  private def parseLinkTo(json: Json): List[LinkTo] =
-    json.asString match {
-      case Some(s) =>
-        s.splitTo[List]().distinct.map {
-          case "new"     => LinkTo.New
-          case "summary" => LinkTo.Summary
-          case other     => error(s"Unknown `link-to`: $other")
-        }
-      case None =>
-        error("Expected string for `link-to`")
     }
 
-  private def parseSortBy(json: Json): SortBy =
-    json.asString match {
-      case Some("application-name" | "app-name") => SortBy.AppName
-      case Some("form-name")                     => SortBy.FormName
-      case Some("form-version")                  => SortBy.FormVersion
-      case Some("created")                       => SortBy.Created
-      case Some("last-modified")                 => SortBy.LastModified
-      case Some("last-modified-by")              => SortBy.LastModifiedBy
-      case Some("title")                         => SortBy.Title
-      case Some(other)                           => error(s"Unknown `sort-by`: $other")
-      case None                                  => error("Expected string for `sort-by`")
+    def parseQuickLinks(o: JsonObject): QuickLinks =
+      QuickLinks(
+        title       = o("title")      .filterNot(_.isNull).map(parseLocalizedString),
+        description = o("description").filterNot(_.isNull).map(parseLocalizedString),
+        links       = o("links")      .filterNot(_.isNull).map(parseQuickLinkTokens).getOrElse(Nil)
+      )
+
+    def parseQuickLinkTokens(json: Json): List[QuickLinkToken] =
+      json.asString match {
+        case Some(s) =>
+          s.splitTo[List]().distinct.map(parseQuickLinkToken)
+        case None =>
+          json.asArray match {
+            case Some(arr) =>
+              arr.toList
+                .flatMap { elem =>
+                  elem.asString.getOrElse(error("Expected string in `links` array")).splitTo[List]()
+                }
+                .distinct
+                .map(parseQuickLinkToken)
+            case None =>
+              error("Expected string or array of strings for `links`")
+          }
+      }
+
+    def parseQuickLinkToken(token: String): QuickLinkToken =
+      token match {
+        case "main"                                        => QuickLinkToken.Main
+        case "admin"                                       => QuickLinkToken.Admin
+        case "all"                                         => QuickLinkToken.All
+        case "form-builder-new"                            => QuickLinkToken.FormBuilderNew
+        case "form-builder-summary" | "form-builder-forms" => QuickLinkToken.FormBuilderSummary
+        case "published-forms"                             => QuickLinkToken.PublishedForms
+        case "forms-admin" | "form-runner-admin"           => QuickLinkToken.FormsAdmin
+        case "configuration"                               => QuickLinkToken.Configuration
+        case "admin-console"                               => QuickLinkToken.AdminConsole
+        case "forms-analytics"                             => QuickLinkToken.FormsAnalytics
+        case other                                         => error(s"Unknown quick link: $other")
+      }
+
+    def parsePublishedForms(o: JsonObject): PublishedForms = {
+      val sortByOpt        = o("sort-by").filterNot(_.isNull).map(parseSortBy)
+      val sortDirectionOpt = o("sort-direction").filterNot(_.isNull).map(parseSortDirection)
+
+      if (sortByOpt.isEmpty && sortDirectionOpt.isDefined)
+        error("Missing `sort-by` when `sort-direction` is present")
+
+      PublishedForms(
+        title       = o("title").map(parseLocalizedString).getOrElse(error("Missing `title` for `published-forms`")),
+        description = o("description").map(parseLocalizedString).getOrElse(error("Missing `description` for `published-forms`")),
+        thumbnail   = o("thumbnail").flatMap(_.asString).getOrElse(error("Missing `thumbnail` for `published-forms`")),
+        app         = o("app").flatMap(_.asString),
+        linkTo      = o("link-to").filterNot(_.isNull).map(parseLinkTo).getOrElse(Nil),
+        sort        = sortByOpt.map(sortBy => (sortBy, sortDirectionOpt))
+      )
     }
 
-  private def parseSortDirection(json: Json): SortDirection =
-    json.asString match {
-      case Some("ascending"  | "asc")  => SortDirection.Ascending
-      case Some("descending" | "desc") => SortDirection.Descending
-      case Some(other)                 => error(s"Unknown `sort-direction`: $other")
-      case None                        => error("Expected string for `sort-direction`")
-    }
+    def parseLinkTo(json: Json): List[LinkTo] =
+      json.asString match {
+        case Some(s) =>
+          s.splitTo[List]().distinct.map {
+            case "new"     => LinkTo.New
+            case "summary" => LinkTo.Summary
+            case other     => error(s"Unknown `link-to`: $other")
+          }
+        case None =>
+          error("Expected string for `link-to`")
+      }
 
-  private def parseFormData(o: JsonObject): FormData =
-    FormData(
-      title       = o("title").map(parseLocalizedString),
-      description = o("description").map(parseLocalizedString),
-      thumbnail   = o("thumbnail").flatMap(_.asString),
-      app         = o("app").flatMap(_.asString).getOrElse(error("Missing `app` for `form-data`")),
-      form        = o("form").flatMap(_.asString).getOrElse(error("Missing `form` for `form-data`")),
-      version     = o("version").flatMap(_.asNumber).flatMap(_.toInt)
-    )
+    def parseSortBy(json: Json): SortBy =
+      json.asString match {
+        case Some("application-name" | "app-name") => SortBy.AppName
+        case Some("form-name")                     => SortBy.FormName
+        case Some("form-version")                  => SortBy.FormVersion
+        case Some("created")                       => SortBy.Created
+        case Some("last-modified")                 => SortBy.LastModified
+        case Some("last-modified-by")              => SortBy.LastModifiedBy
+        case Some("title")                         => SortBy.Title
+        case Some(other)                           => error(s"Unknown `sort-by`: $other")
+        case None                                  => error("Expected string for `sort-by`")
+      }
 
-  private def parseLocalizedString(json: Json): LocalizedString = {
-    json.asObject match {
-      case Some(o) if o.isEmpty =>
-        error("`LocalizedString` object cannot be empty")
-      case Some(o) =>
-        LocalizedString.ByLanguage(
-          o.toMap.map { case (k, v) => k -> v.asString.getOrElse(error(s"Expected string value for language `$k`")) }
-        )
-      case None =>
-        json.asString match {
-          case Some(key) =>
-            LocalizedString.ByResource(key)
-          case None =>
-            error("Expected a `LocalizedString` object")
-        }
+    def parseSortDirection(json: Json): SortDirection =
+      json.asString match {
+        case Some("ascending"  | "asc")  => SortDirection.Ascending
+        case Some("descending" | "desc") => SortDirection.Descending
+        case Some(other)                 => error(s"Unknown `sort-direction`: $other")
+        case None                        => error("Expected string for `sort-direction`")
+      }
+
+    def parseFormData(o: JsonObject): FormData =
+      FormData(
+        title       = o("title").map(parseLocalizedString),
+        description = o("description").map(parseLocalizedString),
+        thumbnail   = o("thumbnail").flatMap(_.asString),
+        app         = o("app").flatMap(_.asString).getOrElse(error("Missing `app` for `form-data`")),
+        form        = o("form").flatMap(_.asString).getOrElse(error("Missing `form` for `form-data`")),
+        version     = o("version").flatMap(_.asNumber).flatMap(_.toInt)
+      )
+
+    def parseLocalizedString(json: Json): LocalizedString = {
+      json.asObject match {
+        case Some(o) if o.isEmpty =>
+          error("`LocalizedString` object cannot be empty")
+        case Some(o) =>
+          LocalizedString.ByLanguage(
+            o.toMap.map { case (k, v) => k -> v.asString.getOrElse(error(s"Expected string value for language `$k`")) }
+          )
+        case None =>
+          json.asString match {
+            case Some(key) =>
+              LocalizedString.ByResource(key)
+            case None =>
+              error("Expected a `LocalizedString` object")
+          }
+      }
     }
   }
 }

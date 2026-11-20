@@ -788,6 +788,7 @@
             <demo-forms>Demo Forms</demo-forms>
             <demo-features>Demo Features</demo-features>
             <quick-links>Quick Links</quick-links>
+            <admin>Admin</admin>
             <form-runner-admin>Forms Admin</form-runner-admin>
             <admin-console>Admin Console</admin-console>
             <forms-analytics>Forms Analytics</forms-analytics>

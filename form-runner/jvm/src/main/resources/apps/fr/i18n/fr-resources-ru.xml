@@ -781,6 +781,7 @@
             <demo-forms>Демонстрационные формы</demo-forms>
             <demo-features>Демонстрационные возможности</demo-features>
             <quick-links>Быстрые ссылки</quick-links>
+            <admin>Администрирование</admin>
             <form-runner-admin>Администрирование форм</form-runner-admin>
             <admin-console todo="true">Admin Console</admin-console>
             <forms-analytics todo="true">Forms Analytics</forms-analytics>

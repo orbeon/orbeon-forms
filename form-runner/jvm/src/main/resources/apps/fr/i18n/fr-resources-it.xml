@@ -788,6 +788,7 @@
             <demo-forms>Moduli demo</demo-forms>
             <demo-features>Funzionalità demo</demo-features>
             <quick-links>Link rapidi</quick-links>
+            <admin>Amministrazione</admin>
             <form-runner-admin>Amministrazione moduli</form-runner-admin>
             <admin-console todo="true">Admin Console</admin-console>
             <forms-analytics todo="true">Forms Analytics</forms-analytics>

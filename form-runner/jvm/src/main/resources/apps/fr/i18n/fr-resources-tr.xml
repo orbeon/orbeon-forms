@@ -786,6 +786,7 @@
             <demo-forms>Demo Formları</demo-forms>
             <demo-features>Demo Özellikler</demo-features>
             <quick-links>Hızlı Bağlantılar</quick-links>
+            <admin>Yönetim</admin>
             <form-runner-admin>Form Yönetimi</form-runner-admin>
             <admin-console todo="true">Admin Console</admin-console>
             <forms-analytics todo="true">Forms Analytics</forms-analytics>

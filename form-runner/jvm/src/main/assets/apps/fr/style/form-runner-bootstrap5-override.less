@@ -204,13 +204,17 @@
   }
 
   .fr-navbar-search-navigation:not(.xforms-disabled) {
-    display    : inline-flex;
-    align-items: center;
-    white-space: nowrap;
+    display         : inline-flex;
+    align-items     : center;
+    white-space     : nowrap;
+    padding         : 2px 4px;
+    border          : 1px solid var(--orbeon-navbar-search-navigation-border-color);
+    border-radius   : var(--orbeon-button-border-radius);
+    background-color: var(--orbeon-navbar-search-navigation-background-color);
 
     .btn-link {
       display        : inline-block;
-      padding        : 5px 8px;
+      padding        : 3px 7px;
       border         : 0;
       border-radius  : var(--orbeon-button-border-radius);
       line-height    : 1.5;
@@ -219,17 +223,25 @@
       .fa {
         color: var(--orbeon-navbar-color);
       }
+
+      &:hover:not(:disabled) {
+        background-color: var(--orbeon-navbar-dropdown-open-toggle-background-color);
+      }
     }
 
     .xforms-readonly .btn-link,
     .btn-link:disabled {
       opacity: 0.35;
       cursor : default;
+
+      &:hover {
+        background-color: transparent;
+      }
     }
 
     .fr-search-nav-position {
       color     : var(--orbeon-navbar-color);
-      padding   : 0 4px;
+      padding   : 0 6px;
       font-size : 0.9em;
     }
   }

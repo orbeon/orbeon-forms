@@ -250,7 +250,15 @@
                     data-fb-recent-label="{$form-resources/search-controls/recent}"
                     data-fb-insert-control-label="{$form-resources/search-controls/insert-control}"
                     data-fb-no-results-label="{$form-resources/search-controls/no-results}"
-                    data-fb-placeholder="{$form-resources/search-controls/placeholder}">
+                    data-fb-placeholder="{$form-resources/search-controls/placeholder}"
+                    data-fb-tab-all-label="{$form-resources/search-controls/tab-all}"
+                    data-fb-tab-go-to-label="{$form-resources/search-controls/tab-go-to}"
+                    data-fb-tab-insert-label="{$form-resources/search-controls/tab-insert}"
+                    data-fb-go-to-group-label="{$form-resources/search-controls/go-to-group}"
+                    data-fb-insert-group-label="{$form-resources/search-controls/insert-group}"
+                    data-fb-palette-placeholder="{$form-resources/search-controls/palette-placeholder}"
+                    data-fb-go-to-placeholder="{$form-resources/search-controls/go-to-placeholder}"
+                    data-fb-open-settings-label="{$form-resources/search-controls/open-settings}">
                     <xh:button
                         type="button"
                         class="fb-toolbox-search-toggle"

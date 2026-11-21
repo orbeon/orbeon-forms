@@ -18,6 +18,12 @@ import org.orbeon.datatypes.Direction
 import scala.concurrent.Future
 
 
+case class FormControlSummary(
+  controlName : String,
+  label       : String,
+  sectionLabel: String
+)
+
 trait FormBuilderRpcApi {
 
   def unsupportedBrowser(browserName: String, browserVersion: Double): Future[Unit]
@@ -51,4 +57,7 @@ trait FormBuilderRpcApi {
   def containerMerge      (containerId: String): Future[Unit]
 
   def pasteItemsetFromClipboard(tsvString: String): Future[Unit]
+
+  def listFormControls(): Future[List[FormControlSummary]]
+  def selectControlByName(controlName: String, openSettings: Boolean): Future[Unit]
 }

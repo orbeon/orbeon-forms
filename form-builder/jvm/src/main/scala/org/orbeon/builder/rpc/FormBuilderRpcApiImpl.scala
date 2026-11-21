@@ -367,4 +367,61 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     }
     rows.toSeq
   }
+
+  def listFormControls(): Future[List[FormControlSummary]] = Future.successful {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+
+    val someResourcesMap =
+      Some(FormBuilder.currentResources.child(*).map(r => r.localname -> r).toMap)
+
+    FormRunner.getAllControlsWithIdsExcludeContainers.map { controlElem =>
+      val controlName = FormRunner.controlNameFromId(controlElem.id)
+      val label =
+        FormBuilder.getControlResourceOrEmpty(
+          controlName,
+          "label",
+          removeHtmlTags  = true,
+          resourcesMapOpt = someResourcesMap
+        )
+      val sectionLabel =
+        controlElem
+          .ancestor(org.orbeon.oxf.fr.XMLNames.FRSectionTest)
+          .headOption
+          .map(sec => FormRunner.controlNameFromId(sec.id))
+          .map { sectionName =>
+            FormBuilder.getControlResourceOrEmpty(
+              sectionName,
+              "label",
+              removeHtmlTags  = true,
+              resourcesMapOpt = someResourcesMap
+            )
+          }
+          .getOrElse("")
+
+      FormControlSummary(
+        controlName  = controlName,
+        label        = label,
+        sectionLabel = sectionLabel
+      )
+    }.toList
+  }
+
+  def selectControlByName(controlName: String, openSettings: Boolean): Future[Unit] = Future.successful {
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+
+    FormRunner.findControlIdByName(controlName).foreach { controlId =>
+      FormBuilderXPathApi.selectCellForControlId(controlId)
+      XFormsAPI.dispatch(
+        name     = "fb-move-selected-cell-into-view",
+        targetId = "fr-form-model"
+      )
+      if (openSettings) {
+        XFormsAPI.dispatch(
+          name       = "fb-show-dialog",
+          targetId   = "dialog-control-settings",
+          properties = Map("control-id" -> Some(controlId))
+        )
+      }
+    }
+  }
 }

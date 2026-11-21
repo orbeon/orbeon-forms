@@ -118,6 +118,14 @@
         <no-results>لا توجد عناصر تحكم مطابقة</no-results>
         <recent>الأخيرة</recent>
         <insert-control>إدراج عنصر تحكم</insert-control>
+        <tab-all>الكل</tab-all>
+        <tab-go-to>الانتقال إلى</tab-go-to>
+        <tab-insert>إدراج</tab-insert>
+        <go-to-group>الانتقال إلى عنصر تحكم</go-to-group>
+        <insert-group>إدراج</insert-group>
+        <palette-placeholder>الانتقال إلى عنصر تحكم أو إدراج…</palette-placeholder>
+        <go-to-placeholder>الانتقال إلى عنصر تحكم في النموذج…</go-to-placeholder>
+        <open-settings>إعدادات عنصر التحكم</open-settings>
     </search-controls>
     <i18n>
         <label>التدويل</label>

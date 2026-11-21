@@ -118,6 +118,14 @@
         <no-results>Brak pasujących kontrolek</no-results>
         <recent>Ostatnio używane</recent>
         <insert-control>Wstaw kontrolkę</insert-control>
+        <tab-all>Wszystko</tab-all>
+        <tab-go-to>Przejdź do</tab-go-to>
+        <tab-insert>Wstaw</tab-insert>
+        <go-to-group>Przejdź do kontrolki</go-to-group>
+        <insert-group>Wstaw</insert-group>
+        <palette-placeholder>Przejdź do kontrolki lub wstaw…</palette-placeholder>
+        <go-to-placeholder>Przejdź do kontrolki w formularzu…</go-to-placeholder>
+        <open-settings>Ustawienia kontrolki</open-settings>
     </search-controls>
     <i18n>
         <label>Międzynarodizacja</label>

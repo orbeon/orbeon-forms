@@ -118,6 +118,14 @@
         <no-results>Ei vastaavia kenttiä</no-results>
         <recent>Viimeisimmät</recent>
         <insert-control>Lisää kenttä</insert-control>
+        <tab-all>Kaikki</tab-all>
+        <tab-go-to>Siirry</tab-go-to>
+        <tab-insert>Lisää</tab-insert>
+        <go-to-group>Siirry kenttään</go-to-group>
+        <insert-group>Lisää</insert-group>
+        <palette-placeholder>Siirry kenttään tai lisää…</palette-placeholder>
+        <go-to-placeholder>Siirry lomakkeen kenttään…</go-to-placeholder>
+        <open-settings>Kentän asetukset</open-settings>
     </search-controls>
     <i18n>
         <label>Kansainvälistyminen</label>

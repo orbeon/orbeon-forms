@@ -55,10 +55,18 @@ object ToolboxSearch {
   }
 
   case class UiLabels(
-    recent       : String,
-    insertControl: String,
-    noResults    : String,
-    placeholder  : String
+    recent            : String,
+    insertControl     : String,
+    noResults         : String,
+    placeholder       : String,
+    tabAll            : String,
+    tabGoTo           : String,
+    tabInsert         : String,
+    goToGroup         : String,
+    insertGroup       : String,
+    palettePlaceholder: String,
+    goToPlaceholder   : String,
+    openSettings      : String
   )
 
   private val SearchContainerSelector = ".fb-toolbox-search"
@@ -96,10 +104,18 @@ object ToolboxSearch {
         .getOrElse(default)
 
     UiLabels(
-      recent        = attrOr("data-fb-recent-label", "Recent"),
-      insertControl = attrOr("data-fb-insert-control-label", "Insert control"),
-      noResults     = attrOr("data-fb-no-results-label", "No matching controls"),
-      placeholder   = attrOr("data-fb-placeholder", "Search controls…")
+      recent             = attrOr("data-fb-recent-label", "Recent"),
+      insertControl      = attrOr("data-fb-insert-control-label", "Insert control"),
+      noResults          = attrOr("data-fb-no-results-label", "No matching controls"),
+      placeholder        = attrOr("data-fb-placeholder", "Search controls…"),
+      tabAll             = attrOr("data-fb-tab-all-label", "All"),
+      tabGoTo            = attrOr("data-fb-tab-go-to-label", "Go to"),
+      tabInsert          = attrOr("data-fb-tab-insert-label", "Insert"),
+      goToGroup          = attrOr("data-fb-go-to-group-label", "Go to Control"),
+      insertGroup        = attrOr("data-fb-insert-group-label", "Insert"),
+      palettePlaceholder = attrOr("data-fb-palette-placeholder", "Go to control or insert…"),
+      goToPlaceholder    = attrOr("data-fb-go-to-placeholder", "Go to control in form…"),
+      openSettings       = attrOr("data-fb-open-settings-label", "Control Settings")
     )
   }
 

@@ -110,6 +110,14 @@
         <no-results>Keine passenden Steuerelemente</no-results>
         <recent>Zuletzt verwendet</recent>
         <insert-control>Steuerelement einfügen</insert-control>
+        <tab-all>Alle</tab-all>
+        <tab-go-to>Gehe zu</tab-go-to>
+        <tab-insert>Einfügen</tab-insert>
+        <go-to-group>Zu Steuerelement gehen</go-to-group>
+        <insert-group>Einfügen</insert-group>
+        <palette-placeholder>Zu Steuerelement gehen oder einfügen…</palette-placeholder>
+        <go-to-placeholder>Zu Steuerelement im Formular gehen…</go-to-placeholder>
+        <open-settings>Steuerelement-Einstellungen</open-settings>
     </search-controls>
     <i18n>
         <label>Internationalisierung</label>

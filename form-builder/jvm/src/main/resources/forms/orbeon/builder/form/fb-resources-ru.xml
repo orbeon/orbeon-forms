@@ -98,6 +98,14 @@
         <no-results>Подходящих элементов не найдено</no-results>
         <recent>Недавние</recent>
         <insert-control>Вставить элемент управления</insert-control>
+        <tab-all>Все</tab-all>
+        <tab-go-to>Перейти</tab-go-to>
+        <tab-insert>Вставить</tab-insert>
+        <go-to-group>Перейти к элементу</go-to-group>
+        <insert-group>Вставить</insert-group>
+        <palette-placeholder>Перейти к элементу или вставить…</palette-placeholder>
+        <go-to-placeholder>Перейти к элементу в форме…</go-to-placeholder>
+        <open-settings>Настройки элемента</open-settings>
     </search-controls>
     <i18n>
         <label>Перевод</label>

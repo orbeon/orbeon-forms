@@ -106,6 +106,14 @@
         <no-results>Nessun controllo corrispondente</no-results>
         <recent>Recenti</recent>
         <insert-control>Inserisci controllo</insert-control>
+        <tab-all>Tutto</tab-all>
+        <tab-go-to>Vai a</tab-go-to>
+        <tab-insert>Inserisci</tab-insert>
+        <go-to-group>Vai al controllo</go-to-group>
+        <insert-group>Inserisci</insert-group>
+        <palette-placeholder>Vai al controllo o inserisci…</palette-placeholder>
+        <go-to-placeholder>Vai al controllo nel modulo…</go-to-placeholder>
+        <open-settings>Impostazioni controllo</open-settings>
     </search-controls>
     <i18n>
         <label>Internazionalizzazione</label>

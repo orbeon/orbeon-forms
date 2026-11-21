@@ -118,6 +118,14 @@
         <no-results>Inga matchande kontroller</no-results>
         <recent>Senaste</recent>
         <insert-control>Infoga kontroll</insert-control>
+        <tab-all>Alla</tab-all>
+        <tab-go-to>Gå till</tab-go-to>
+        <tab-insert>Infoga</tab-insert>
+        <go-to-group>Gå till kontroll</go-to-group>
+        <insert-group>Infoga</insert-group>
+        <palette-placeholder>Gå till kontroll eller infoga…</palette-placeholder>
+        <go-to-placeholder>Gå till kontroll i formulär…</go-to-placeholder>
+        <open-settings>Kontrollinställningar</open-settings>
     </search-controls>
     <i18n>
         <label>Internationalisering</label>

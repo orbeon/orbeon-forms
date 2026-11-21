@@ -98,6 +98,14 @@
         <no-results>No hay controles coincidentes</no-results>
         <recent>Recientes</recent>
         <insert-control>Insertar control</insert-control>
+        <tab-all>Todo</tab-all>
+        <tab-go-to>Ir a</tab-go-to>
+        <tab-insert>Insertar</tab-insert>
+        <go-to-group>Ir al control</go-to-group>
+        <insert-group>Insertar</insert-group>
+        <palette-placeholder>Ir al control o insertar…</palette-placeholder>
+        <go-to-placeholder>Ir al control en el formulario…</go-to-placeholder>
+        <open-settings>Configuración del control</open-settings>
     </search-controls>
     <i18n>
         <label>Internacionalización</label>

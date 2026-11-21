@@ -99,6 +99,14 @@
         <no-results>Nenhum controle correspondente</no-results>
         <recent>Recentes</recent>
         <insert-control>Inserir controle</insert-control>
+        <tab-all>Tudo</tab-all>
+        <tab-go-to>Ir para</tab-go-to>
+        <tab-insert>Inserir</tab-insert>
+        <go-to-group>Ir para controle</go-to-group>
+        <insert-group>Inserir</insert-group>
+        <palette-placeholder>Ir para controle ou inserir…</palette-placeholder>
+        <go-to-placeholder>Ir para controle no formulário…</go-to-placeholder>
+        <open-settings>Configurações do controle</open-settings>
     </search-controls>
     <i18n>
         <label>Internacionalização</label>

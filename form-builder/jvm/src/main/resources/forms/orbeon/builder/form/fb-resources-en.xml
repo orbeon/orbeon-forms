@@ -118,6 +118,14 @@
         <no-results>No matching controls</no-results>
         <recent>Recent</recent>
         <insert-control>Insert control</insert-control>
+        <tab-all>All</tab-all>
+        <tab-go-to>Go to</tab-go-to>
+        <tab-insert>Insert</tab-insert>
+        <go-to-group>Go to Control</go-to-group>
+        <insert-group>Insert</insert-group>
+        <palette-placeholder>Go to control or insert…</palette-placeholder>
+        <go-to-placeholder>Go to control in form…</go-to-placeholder>
+        <open-settings>Control Settings</open-settings>
     </search-controls>
     <i18n>
         <label>Internationalization</label>

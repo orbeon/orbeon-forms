@@ -116,6 +116,14 @@
         <no-results>Aucun contrôle correspondant</no-results>
         <recent>Récents</recent>
         <insert-control>Insérer un contrôle</insert-control>
+        <tab-all>Tout</tab-all>
+        <tab-go-to>Aller à</tab-go-to>
+        <tab-insert>Insérer</tab-insert>
+        <go-to-group>Aller au contrôle</go-to-group>
+        <insert-group>Insérer</insert-group>
+        <palette-placeholder>Aller à un contrôle ou insérer…</palette-placeholder>
+        <go-to-placeholder>Aller à un contrôle du formulaire…</go-to-placeholder>
+        <open-settings>Paramètres du contrôle</open-settings>
     </search-controls>
     <i18n>
         <label>Internationalisation</label>

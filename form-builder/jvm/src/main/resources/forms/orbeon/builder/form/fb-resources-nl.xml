@@ -99,6 +99,14 @@
         <no-results>Geen overeenkomende besturingselementen</no-results>
         <recent>Recent</recent>
         <insert-control>Besturingselement invoegen</insert-control>
+        <tab-all>Alles</tab-all>
+        <tab-go-to>Ga naar</tab-go-to>
+        <tab-insert>Invoegen</tab-insert>
+        <go-to-group>Ga naar besturingselement</go-to-group>
+        <insert-group>Invoegen</insert-group>
+        <palette-placeholder>Ga naar besturingselement of voeg in…</palette-placeholder>
+        <go-to-placeholder>Ga naar besturingselement in formulier…</go-to-placeholder>
+        <open-settings>Instellingen besturingselement</open-settings>
     </search-controls>
     <i18n>
         <label>Internationalisatie</label>

@@ -98,6 +98,14 @@
         <no-results>Ingen samsvarende kontroller</no-results>
         <recent>Nylig brukt</recent>
         <insert-control>Sett inn kontroll</insert-control>
+        <tab-all>Alle</tab-all>
+        <tab-go-to>Gå til</tab-go-to>
+        <tab-insert>Sett inn</tab-insert>
+        <go-to-group>Gå til kontroll</go-to-group>
+        <insert-group>Sett inn</insert-group>
+        <palette-placeholder>Gå til kontroll eller sett inn…</palette-placeholder>
+        <go-to-placeholder>Gå til kontroll i skjema…</go-to-placeholder>
+        <open-settings>Kontrollinnstillinger</open-settings>
     </search-controls>
     <i18n>
         <label>Internasjonalisering</label>

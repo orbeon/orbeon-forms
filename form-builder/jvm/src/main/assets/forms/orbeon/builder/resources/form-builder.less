@@ -5590,9 +5590,9 @@ body.orbeon {
         overflow: hidden;
 
         &.fb-quick-insert-palette {
-            width: 440px;
+            width: 500px;
             max-width: calc(100vw - 32px);
-            max-height: 440px;
+            max-height: 480px;
         }
 
         &.fb-quick-insert-popover {
@@ -5652,6 +5652,55 @@ body.orbeon {
             border: 1px solid var(--orbeon-kbd-border-color);
             border-radius: 4px;
             color: var(--orbeon-kbd-color);
+        }
+
+        .fb-quick-insert-tabs {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 10px;
+            border-bottom: 1px solid var(--orbeon-base-border-color);
+            background-color: var(--orbeon-tab-bar-background-color);
+        }
+
+        .fb-quick-insert-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border: 1px solid transparent;
+            border-radius: var(--orbeon-body-decorations-border-radius);
+            background-color: transparent;
+            color: var(--orbeon-tab-inactive-color);
+            font-size: 0.85em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 100ms ease, color 100ms ease, border-color 100ms ease;
+
+            &:hover {
+                color: var(--orbeon-tab-inactive-hover-color);
+                background-color: var(--orbeon-fb-hover-background-color);
+            }
+
+            &.active {
+                background-color: var(--orbeon-dialog-background-color);
+                border-color: var(--orbeon-base-border-color);
+                color: var(--orbeon-base-color);
+            }
+
+            .fb-quick-insert-tab-count {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 1.4em;
+                padding: 0 5px;
+                font-size: 0.82em;
+                line-height: 1.45;
+                border-radius: 999px;
+                background-color: var(--orbeon-kbd-background-color);
+                border: 1px solid var(--orbeon-kbd-border-color);
+                color: var(--orbeon-fb-empty-message-color);
+            }
         }
 
         .fb-quick-insert-list {
@@ -5726,6 +5775,41 @@ body.orbeon {
                 font-size: 0.94em;
             }
 
+            .fb-quick-insert-control-name {
+                flex: 0 1 auto;
+                padding: 1px 5px;
+                font-size: 0.78em;
+                border-radius: 3px;
+                background-color: var(--orbeon-kbd-background-color);
+                border: 1px solid var(--orbeon-kbd-border-color);
+                color: var(--orbeon-fb-empty-message-color);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                max-width: 140px;
+            }
+
+            .fb-quick-insert-settings-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 22px;
+                height: 22px;
+                padding: 0;
+                border: none;
+                border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+                background-color: transparent;
+                color: var(--orbeon-fb-empty-message-color);
+                cursor: pointer;
+
+                &:hover,
+                &:focus-visible {
+                    background-color: var(--orbeon-dialog-background-color);
+                    color: var(--orbeon-fb-active-color);
+                    outline: none;
+                }
+            }
+
             .fb-quick-insert-item-meta {
                 display: inline-flex;
                 align-items: center;
@@ -5758,6 +5842,33 @@ body.orbeon {
             text-align: center;
             font-size: 0.92em;
             color: var(--orbeon-fb-empty-message-color);
+        }
+
+        .fb-quick-insert-footer {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 10px;
+            border-top: 1px solid var(--orbeon-base-border-color);
+            background-color: var(--orbeon-tab-bar-background-color);
+            font-size: 0.78em;
+            color: var(--orbeon-fb-empty-message-color);
+
+            span {
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+            }
+
+            kbd {
+                padding: 1px 4px;
+                font-size: 0.92em;
+                line-height: 14px;
+                background-color: var(--orbeon-kbd-background-color);
+                border: 1px solid var(--orbeon-kbd-border-color);
+                border-radius: 3px;
+                color: var(--orbeon-kbd-color);
+            }
         }
     }
 

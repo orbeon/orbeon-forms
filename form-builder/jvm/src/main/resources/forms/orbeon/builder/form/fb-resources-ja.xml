@@ -118,6 +118,14 @@
         <no-results>一致するコントロールがありません</no-results>
         <recent>最近使用した項目</recent>
         <insert-control>コントロールを挿入</insert-control>
+        <tab-all>すべて</tab-all>
+        <tab-go-to>移動</tab-go-to>
+        <tab-insert>挿入</tab-insert>
+        <go-to-group>コントロールへ移動</go-to-group>
+        <insert-group>挿入</insert-group>
+        <palette-placeholder>コントロールへ移動または挿入…</palette-placeholder>
+        <go-to-placeholder>フォーム内のコントロールへ移動…</go-to-placeholder>
+        <open-settings>コントロール設定</open-settings>
     </search-controls>
     <i18n>
         <label>多言語</label>

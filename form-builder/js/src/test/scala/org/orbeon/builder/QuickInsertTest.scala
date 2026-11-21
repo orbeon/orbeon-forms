@@ -133,6 +133,19 @@ class QuickInsertTest extends AnyFunSpecLike {
           |      </div>
           |    </div>
           |  </div>
+          |</div>
+          |<div class="fb-main">
+          |  <div class="xbl-fr-section">
+          |    <div class="fr-section-label"><button class="btn-link">Customer Info</button></div>
+          |    <div class="fr-grid fr-editable">
+          |      <div class="fr-grid-td fb-selected" id="cell-1">
+          |        <div id="fb≡customer-section≡grid-1≡first-name-control">
+          |          <label class="xforms-label">First Name</label>
+          |        </div>
+          |      </div>
+          |      <div class="fr-grid-td" id="cell-2"></div>
+          |    </div>
+          |  </div>
           |</div>""".stripMargin
       dom.document.body.appendChild(root)
       try body
@@ -143,12 +156,13 @@ class QuickInsertTest extends AnyFunSpecLike {
       }
     }
 
-    it("opens palette with Recent section when recent items exist and closes cleanly") {
+    it("opens palette in Insert tab with Recent section when recent items exist and closes cleanly") {
       withFormBuilderDom {
         ToolboxSearch.recordRecentItem("fb-insert-control-fr-date")
-        QuickInsert.openPalette()
+        QuickInsert.openPalette(QuickInsert.TabInsert)
 
         assert(QuickInsert.isOpen)
+        assert(QuickInsert.activePaletteTabOpt.contains(QuickInsert.TabInsert))
         val groupTitles = dom.document.querySelectorAllT(".fb-quick-insert-group-title").map(_.textContent)
         assert(groupTitles.headOption.contains("Recent"))
         assert(dom.document.querySelectorAllT(".fb-quick-insert-item").length == 3) // 1 recent + 2 categorized
@@ -156,6 +170,38 @@ class QuickInsertTest extends AnyFunSpecLike {
         QuickInsert.close()
         assert(! QuickInsert.isOpen)
         assert(dom.document.querySelectorOpt(".fb-quick-insert-panel").isEmpty)
+      }
+    }
+
+    it("collects existing form controls and opens Go to tab (Cmd+J behavior)") {
+      withFormBuilderDom {
+        val controls = QuickInsert.collectFormControls()
+        assert(controls.length == 1)
+        assert(controls.head.controlName == "first-name")
+        assert(controls.head.label == "First Name")
+        assert(controls.head.sectionLabel == "Customer Info")
+
+        QuickInsert.openPalette(QuickInsert.TabGoTo)
+        assert(QuickInsert.activePaletteTabOpt.contains(QuickInsert.TabGoTo))
+        assert(dom.document.querySelectorAllT(".fb-quick-insert-goto-item").length == 1)
+        assert(dom.document.querySelectorOpt(".fb-quick-insert-settings-btn").isDefined)
+      }
+    }
+
+    it("orders Go to ahead of Insert in All tab when a populated cell is selected, and Insert first when an empty cell is selected") {
+      withFormBuilderDom {
+        // cell-1 (populated) is selected initially
+        QuickInsert.openPalette(QuickInsert.TabAll)
+        val populatedOrder = dom.document.querySelectorAllT(".fb-quick-insert-group-title").map(_.textContent)
+        assert(populatedOrder == Seq("Go to Control", "Insert"))
+        QuickInsert.close()
+
+        // Switch selection to cell-2 (empty)
+        dom.document.getElementById("cell-1").classList.remove("fb-selected")
+        dom.document.getElementById("cell-2").classList.add("fb-selected")
+        QuickInsert.openPalette(QuickInsert.TabAll)
+        val emptyOrder = dom.document.querySelectorAllT(".fb-quick-insert-group-title").map(_.textContent)
+        assert(emptyOrder == Seq("Insert", "Go to Control"))
       }
     }
   }

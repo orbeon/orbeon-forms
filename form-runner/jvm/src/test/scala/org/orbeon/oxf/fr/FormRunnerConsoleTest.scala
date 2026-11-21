@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import io.circe.generic.auto.*
 import io.circe.parser.decode
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.test.TestHttpClient.StaticState
@@ -38,6 +39,8 @@ class FormRunnerConsoleTest
   describe("Form Runner /fr/console access control and cache diagnostics") {
 
     it("must deny access (403) to /fr/console when no admin roles are configured") {
+      assume(Version.isPE)
+
       val (_, consoleResponse, _, _) =
         TestHttpClient.connect(
           url     = "/fr/console",

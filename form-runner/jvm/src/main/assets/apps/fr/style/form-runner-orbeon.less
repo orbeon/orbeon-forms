@@ -304,6 +304,13 @@ body.orbeon { background-color: var(--orbeon-page-background-color); }
                 border          : var(--orbeon-section-border);
                 border-radius   : var(--orbeon-section-border-radius);
                 background-color: var(--orbeon-section-background-color);
+                transition      : border-color var(--orbeon-transition-duration) var(--orbeon-transition-timing-function),
+                                  box-shadow   var(--orbeon-transition-duration) var(--orbeon-transition-timing-function);
+
+                &:hover {
+                    border-color: var(--orbeon-section-hover-border-color);
+                    box-shadow  : var(--orbeon-section-hover-box-shadow);
+                }
             }
         }
     }

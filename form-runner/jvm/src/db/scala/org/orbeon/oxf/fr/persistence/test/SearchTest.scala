@@ -835,8 +835,10 @@ class SearchTest
             req              : Document,
             expectedTotal    : Int,
             expectedCurrent  : Option[Int],
+            expectedFirst    : Option[(String, Int)],
             expectedPrev     : Option[(String, Int)],
-            expectedNext     : Option[(String, Int)]
+            expectedNext     : Option[(String, Int)],
+            expectedLast     : Option[(String, Int)]
           ): Unit =
             assertCall(
               actualRequest = HttpCall.SolicitedRequest(
@@ -856,28 +858,30 @@ class SearchTest
                   e.attributeValue("relation") -> (e.attributeValue("name"), e.attributeValue("position").toInt)
                 }.toMap
 
+                assert(byRel.get("first")    == expectedFirst)
                 assert(byRel.get("previous") == expectedPrev)
                 assert(byRel.get("next")     == expectedNext)
+                assert(byRel.get("last")     == expectedLast)
               }
             )
 
-          // First item (Alpha): no prev, next is Bravo (pos 2)
-          assertAround(aroundSearch("doc-a"), 4, Some(1), None, Some("doc-b" -> 2))
+          // First item (Alpha): no first/prev, next is Bravo (pos 2), last is Delta (pos 4)
+          assertAround(aroundSearch("doc-a"), 4, Some(1), None, None, Some("doc-b" -> 2), Some("doc-d" -> 4))
 
-          // Middle item (Bravo): prev is Alpha (1), next is Charlie (3)
-          assertAround(aroundSearch("doc-b"), 4, Some(2), Some("doc-a" -> 1), Some("doc-c" -> 3))
+          // Middle item (Bravo): first/prev is Alpha (1), next is Charlie (3), last is Delta (4)
+          assertAround(aroundSearch("doc-b"), 4, Some(2), Some("doc-a" -> 1), Some("doc-a" -> 1), Some("doc-c" -> 3), Some("doc-d" -> 4))
 
-          // Last item (Delta): prev is Charlie (3), no next
-          assertAround(aroundSearch("doc-d"), 4, Some(4), Some("doc-c" -> 3), None)
+          // Last item (Delta): first is Alpha (1), prev is Charlie (3), no next/last
+          assertAround(aroundSearch("doc-d"), 4, Some(4), Some("doc-a" -> 1), Some("doc-c" -> 3), None, None)
 
           // Filtered search ("l" matches Alpha, Charlie, Delta): Charlie is pos 2 of 3
-          assertAround(aroundSearch("doc-c", filterOpt = Some("l")), 3, Some(2), Some("doc-a" -> 1), Some("doc-d" -> 3))
+          assertAround(aroundSearch("doc-c", filterOpt = Some("l")), 3, Some(2), Some("doc-a" -> 1), Some("doc-a" -> 1), Some("doc-d" -> 3), Some("doc-d" -> 3))
 
-          // Missing document with fallback position 2: prev is pos 1 (Alpha), next is pos 2 (Bravo)
-          assertAround(aroundSearch("doc-missing", fallbackPosOpt = Some(2)), 4, None, Some("doc-a" -> 1), Some("doc-b" -> 2))
+          // Missing document with fallback position 2: first/prev is pos 1 (Alpha), next is pos 2 (Bravo), last is pos 4 (Delta)
+          assertAround(aroundSearch("doc-missing", fallbackPosOpt = Some(2)), 4, None, Some("doc-a" -> 1), Some("doc-a" -> 1), Some("doc-b" -> 2), Some("doc-d" -> 4))
 
-          // Missing document with fallback position past end (5): prev is pos 4 (Delta), no next
-          assertAround(aroundSearch("doc-missing", fallbackPosOpt = Some(5)), 4, None, Some("doc-d" -> 4), None)
+          // Missing document with fallback position past end (5): first is pos 1 (Alpha), prev is pos 4 (Delta), no next/last
+          assertAround(aroundSearch("doc-missing", fallbackPosOpt = Some(5)), 4, None, Some("doc-a" -> 1), Some("doc-d" -> 4), None, None)
         }
       }
     }

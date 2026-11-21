@@ -58,8 +58,10 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Uppdatera</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Nästa</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Föregående</wizard-prev>
+        <search-first>&lt;i class="fa fa-fw fa-step-backward"&gt;&lt;/i&gt; Första</search-first>
         <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Föregående</search-prev>
         <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Nästa</search-next>
+        <search-last>&lt;i class="fa fa-fw fa-step-forward"&gt;&lt;/i&gt; Sista</search-last>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Innehåll</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Ladda upp igen</reupload>
 
@@ -354,8 +356,10 @@
             <clear-out-of-range>Rensa värde(n) utanför tillåtet intervall</clear-out-of-range>
             <captcha-label>Robotfilter</captcha-label>
             <captcha-alert>Inmatningen motsvarade inte bilden. Vänligen försök igen.</captcha-alert>
+            <search-first>Första dokumentet</search-first>
             <search-prev>Föregående dokument</search-prev>
             <search-next>Nästa dokument</search-next>
+            <search-last>Sista dokumentet</search-last>
         </labels>
         <hints>
             <upload-max-size-per-file>Filer måste vara mindre än {0}.</upload-max-size-per-file>

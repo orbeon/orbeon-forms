@@ -92,9 +92,26 @@ class SummarySearchNavigationTest
 
       assert(result.total == 5)
       assert(result.currentPosition.contains(2))
+      assert(result.first.map(n => (n.documentId, n.position)).contains(("d1", 1)))
       assert(result.previous.map(n => (n.documentId, n.position)).contains(("d1", 1)))
       assert(result.next.map(n => (n.documentId, n.position)).contains(("d3", 3)))
+      assert(result.last.isEmpty) // did not fetch page 3 when fetchLast = false
       assert(fetchedPages == List(2)) // did not fetch page 3
+
+      // When fetchLast = true, jumps directly to the last page
+      var fetchedPagesWithLast = List.empty[Int]
+      val resultWithLast = PersistenceApi.findNeighborsInPagedResponses(
+        firstPage     = p1,
+        around        = AroundDoc("d2", isDraft = false, fallbackPosition = Some(2)),
+        fetchNextPage = { p =>
+          fetchedPagesWithLast = fetchedPagesWithLast :+ p
+          Success(if (p == 2) p2 else p3)
+        },
+        fetchLast     = true
+      ).get
+      assert(resultWithLast.first.map(n => (n.documentId, n.position)).contains(("d1", 1)))
+      assert(resultWithLast.last.map(n => (n.documentId, n.position)).contains(("d5", 5)))
+      assert(fetchedPagesWithLast == List(2, 3))
     }
 
     it("uses fallbackPosition when the current document is no longer in search results") {
@@ -108,8 +125,10 @@ class SummarySearchNavigationTest
 
       assert(result.total == 4)
       assert(result.currentPosition.isEmpty)
+      assert(result.first.map(n => (n.documentId, n.position)).contains(("d1", 1)))
       assert(result.previous.map(n => (n.documentId, n.position)).contains(("d2", 2)))
       assert(result.next.map(n => (n.documentId, n.position)).contains(("d4", 3)))
+      assert(result.last.map(n => (n.documentId, n.position)).contains(("d5", 4)))
     }
 
     it("handles first and last positions cleanly") {
@@ -119,15 +138,19 @@ class SummarySearchNavigationTest
         p1, AroundDoc("d1", isDraft = false, None), _ => fail("unexpected")
       ).get
       assert(first.currentPosition.contains(1))
+      assert(first.first.isEmpty)
       assert(first.previous.isEmpty)
       assert(first.next.map(_.documentId).contains("d2"))
+      assert(first.last.map(_.documentId).contains("d2"))
 
       val last = PersistenceApi.findNeighborsInPagedResponses(
         p1, AroundDoc("d2", isDraft = false, None), _ => fail("unexpected")
       ).get
       assert(last.currentPosition.contains(2))
+      assert(last.first.map(_.documentId).contains("d1"))
       assert(last.previous.map(_.documentId).contains("d1"))
       assert(last.next.isEmpty)
+      assert(last.last.isEmpty)
     }
   }
 
@@ -214,6 +237,10 @@ class SummarySearchNavigationTest
         val htmlString = new String(bufferedContent.body, org.orbeon.io.CharsetNames.Utf8)
         assert(htmlString.contains("fr-navbar-start"))
         assert(htmlString.contains("fr-navbar-search-navigation"))
+        assert(htmlString.contains("fr-search-nav-first"))
+        assert(htmlString.contains("fr-search-nav-prev"))
+        assert(htmlString.contains("fr-search-nav-next"))
+        assert(htmlString.contains("fr-search-nav-last"))
         val searchNavIdx  = htmlString.indexOf("fr-navbar-search-navigation")
         val navbarNavIdx  = htmlString.indexOf("navbar-nav")
         assert(searchNavIdx > 0 && navbarNavIdx > searchNavIdx)

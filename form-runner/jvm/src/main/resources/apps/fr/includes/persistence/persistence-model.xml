@@ -1356,8 +1356,10 @@
             <can-access-summary/>
             <pdf/>
             <tiff/>
+            <search-first/>
             <search-prev/>
             <search-next/>
+            <search-last/>
             <other/>
         </triggers>
     </xf:instance>
@@ -1388,13 +1390,19 @@
                  readonly="xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))
                            and xxf:readonly(../strict-submit)"/>
 
-        <!-- Search navigation (prev/next from Summary page) -->
+        <!-- Search navigation (first/prev/next/last from Summary page) -->
+        <xf:bind ref="search-first"
+                 relevant="xxf:non-blank(instance('fr-search-navigation-instance')/search-param)"
+                 readonly="instance('fr-search-navigation-instance')/has-first != 'true'"/>
         <xf:bind ref="search-prev"
                  relevant="xxf:non-blank(instance('fr-search-navigation-instance')/search-param)"
                  readonly="instance('fr-search-navigation-instance')/has-previous != 'true'"/>
         <xf:bind ref="search-next"
                  relevant="xxf:non-blank(instance('fr-search-navigation-instance')/search-param)"
                  readonly="instance('fr-search-navigation-instance')/has-next != 'true'"/>
+        <xf:bind ref="search-last"
+                 relevant="xxf:non-blank(instance('fr-search-navigation-instance')/search-param)"
+                 readonly="instance('fr-search-navigation-instance')/has-last != 'true'"/>
     </xf:bind>
 
     <!-- HACK: dependencies: recalculate this model when there is a change in the instance holding error/validity
@@ -1420,8 +1428,10 @@
             <position/>
             <fallback-position/>
             <total>0</total>
+            <has-first>false</has-first>
             <has-previous>false</has-previous>
-            <has-next>false</has-next>m
+            <has-next>false</has-next>
+            <has-last>false</has-last>
         </search-navigation>
     </xf:instance>
 

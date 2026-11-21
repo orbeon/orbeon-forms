@@ -58,8 +58,10 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Verversen"</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Volgende</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Vorige</wizard-prev>
+        <search-first>&lt;i class="fa fa-fw fa-step-backward"&gt;&lt;/i&gt; Eerste</search-first>
         <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Vorige</search-prev>
         <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Volgende</search-next>
+        <search-last>&lt;i class="fa fa-fw fa-step-forward"&gt;&lt;/i&gt; Laatste</search-last>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Inhoud</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Opnieuw uploaden</reupload>
 
@@ -354,8 +356,10 @@
             <clear-out-of-range>Waarde(n) buiten bereik wissen</clear-out-of-range>
             <captcha-label>CAPTCHA</captcha-label>
             <captcha-alert>De ingevoerde waarde komt niet overeen met de afbeelding, probeer opnieuw</captcha-alert>
+            <search-first>Eerste document</search-first>
             <search-prev>Vorig document</search-prev>
             <search-next>Volgend document</search-next>
+            <search-last>Laatste document</search-last>
         </labels>
         <hints>
             <upload-max-size-per-file>Bestanden moeten kleiner zijn dan {0}.</upload-max-size-per-file>

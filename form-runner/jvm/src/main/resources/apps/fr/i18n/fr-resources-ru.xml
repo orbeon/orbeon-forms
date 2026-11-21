@@ -58,8 +58,10 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Обновить</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Вперед</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Назад</wizard-prev>
+        <search-first>&lt;i class="fa fa-fw fa-step-backward"&gt;&lt;/i&gt; Первый</search-first>
         <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Предыдущий</search-prev>
         <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Следующий</search-next>
+        <search-last>&lt;i class="fa fa-fw fa-step-forward"&gt;&lt;/i&gt; Последний</search-last>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Содержание</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Загрузить снова</reupload>
 
@@ -347,8 +349,10 @@
             <clear-out-of-range>Очистить значения вне диапазона</clear-out-of-range>
             <captcha-label>Защита от спама</captcha-label>
             <captcha-alert>Введенное значение не совпадает с картинкой. Попробуйте еще раз.</captcha-alert>
+            <search-first>Первый документ</search-first>
             <search-prev>Предыдущий документ</search-prev>
             <search-next>Следующий документ</search-next>
+            <search-last>Последний документ</search-last>
         </labels>
         <hints>
             <upload-max-size-per-file>Размер файлов должен быть меньше {0}.</upload-max-size-per-file>

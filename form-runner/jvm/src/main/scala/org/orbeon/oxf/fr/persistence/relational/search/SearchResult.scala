@@ -94,9 +94,11 @@ object SearchResult {
     }
 
     val entries =
+      aroundResult.first   .map(docElem("first",    _)).toList :::
       aroundResult.previous.map(docElem("previous", _)).toList :::
       aroundResult.current .map(docElem("current",  _)).toList :::
-      aroundResult.next    .map(docElem("next",     _)).toList
+      aroundResult.next    .map(docElem("next",     _)).toList :::
+      aroundResult.last    .map(docElem("last",     _)).toList
 
     val documentsElem =
       <documents

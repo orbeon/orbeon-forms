@@ -58,8 +58,10 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Yenile</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; İleri</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Geri</wizard-prev>
+        <search-first>&lt;i class="fa fa-fw fa-step-backward"&gt;&lt;/i&gt; İlk</search-first>
         <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Önceki</search-prev>
         <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Sonraki</search-next>
+        <search-last>&lt;i class="fa fa-fw fa-step-forward"&gt;&lt;/i&gt; Son</search-last>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; İçerik</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Yeniden Yükle</reupload>
 
@@ -352,8 +354,10 @@
             <clear-out-of-range>Aralık dışı değer(ler)i temizle</clear-out-of-range>
             <captcha-label>CAPTCHA</captcha-label>
             <captcha-alert>Lütfen CAPTCHA zorluğuna verdiğiniz cevabı kontrol edin</captcha-alert>
+            <search-first>İlk belge</search-first>
             <search-prev>Önceki belge</search-prev>
             <search-next>Sonraki belge</search-next>
+            <search-last>Son belge</search-last>
         </labels>
         <hints>
             <upload-max-size-per-file>Dosyalar {0} altında olmalıdır.</upload-max-size-per-file>

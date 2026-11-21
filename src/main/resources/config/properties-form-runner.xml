@@ -297,10 +297,14 @@
     <property as="xs:string"  name="oxf.fr.detail.button.review.visible.*.*"                       value="fr:is-embedded('portlet') or not(fr:is-embedded())"/>
     <property as="xs:string"  name="oxf.fr.detail.button.edit.visible.*.*"                         value="(fr:is-embedded('portlet') or not(fr:is-embedded())) and fr:can-update()"/>
     <property as="xs:string"  name="oxf.fr.detail.button.summary.visible.*.*"                      value="(fr:is-embedded('portlet') or not(fr:is-embedded())) and fr:can-list()"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.search-first.visible.*.*"                 value="(fr:is-embedded('portlet') or not(fr:is-embedded())) and xxf:non-blank(xxf:instance('fr-search-navigation-instance')/search-param)"/>
     <property as="xs:string"  name="oxf.fr.detail.button.search-prev.visible.*.*"                  value="(fr:is-embedded('portlet') or not(fr:is-embedded())) and xxf:non-blank(xxf:instance('fr-search-navigation-instance')/search-param)"/>
     <property as="xs:string"  name="oxf.fr.detail.button.search-next.visible.*.*"                  value="(fr:is-embedded('portlet') or not(fr:is-embedded())) and xxf:non-blank(xxf:instance('fr-search-navigation-instance')/search-param)"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.search-last.visible.*.*"                  value="(fr:is-embedded('portlet') or not(fr:is-embedded())) and xxf:non-blank(xxf:instance('fr-search-navigation-instance')/search-param)"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.search-first.enabled.*.*"                 value="xxf:instance('fr-search-navigation-instance')/has-first = 'true'"/>
     <property as="xs:string"  name="oxf.fr.detail.button.search-prev.enabled.*.*"                  value="xxf:instance('fr-search-navigation-instance')/has-previous = 'true'"/>
     <property as="xs:string"  name="oxf.fr.detail.button.search-next.enabled.*.*"                  value="xxf:instance('fr-search-navigation-instance')/has-next = 'true'"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.search-last.enabled.*.*"                  value="xxf:instance('fr-search-navigation-instance')/has-last = 'true'"/>
     <property as="xs:string"  name="oxf.fr.detail.button.home.visible.*.*"                         value="fr:is-embedded('portlet') or not(fr:is-embedded())"/>
     <property as="xs:string"  name="oxf.fr.detail.button.lease.show-in-view-mode.visible.*.*"      value="fr:is-embedded('portlet') or not(fr:is-embedded())"/>
     <property as="xs:string"  name="oxf.fr.detail.button.pdf.visible.*.*"                          value="not(fr:is-browser-environment())"/>
@@ -672,6 +676,10 @@
         else
             edit
     </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.search-first.*.*">
+        relinquish-lease
+        then search-first
+    </property>
     <property as="xs:string"  name="oxf.fr.detail.process.search-prev.*.*">
         relinquish-lease
         then search-prev
@@ -679,6 +687,10 @@
     <property as="xs:string"  name="oxf.fr.detail.process.search-next.*.*">
         relinquish-lease
         then search-next
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.search-last.*.*">
+        relinquish-lease
+        then search-last
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.clear.*.*" >

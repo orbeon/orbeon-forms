@@ -58,8 +58,10 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Oppdater</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Neste</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Tilbake</wizard-prev>
+        <search-first>&lt;i class="fa fa-fw fa-step-backward"&gt;&lt;/i&gt; Første</search-first>
         <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Forrige</search-prev>
         <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Neste</search-next>
+        <search-last>&lt;i class="fa fa-fw fa-step-forward"&gt;&lt;/i&gt; Siste</search-last>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Innhold</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Last opp på nytt</reupload>
 
@@ -354,8 +356,10 @@
             <clear-out-of-range>Tøm verdier utenfor gyldig område</clear-out-of-range>
             <captcha-label>CAPTCHA</captcha-label>
             <captcha-alert>Verdien du skrev inn samsvarte ikke med bildet, prøv igjen</captcha-alert>
+            <search-first>Første dokument</search-first>
             <search-prev>Forrige dokument</search-prev>
             <search-next>Neste dokument</search-next>
+            <search-last>Siste dokument</search-last>
         </labels>
         <hints>
             <upload-max-size-per-file>Filer må være under {0}.</upload-max-size-per-file>

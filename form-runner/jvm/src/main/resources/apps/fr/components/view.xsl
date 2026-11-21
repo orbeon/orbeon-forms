@@ -959,6 +959,22 @@
 
             <xf:trigger
                 appearance="minimal"
+                xxf:readonly-appearance="dynamic"
+                class="fr-search-nav-first"
+                ref="xxf:instance('fr-triggers-instance')/search-first"
+                xxf:title="{{xxf:r('detail.labels.search-first', '|fr-fr-resources|')}}">
+                <xf:label>
+                    <xh:i class="fa fa-fw fa-step-backward" aria-hidden="true"/>
+                    <xh:span class="visually-hidden"><xf:output value="xxf:r('detail.labels.search-first', '|fr-fr-resources|')"/></xh:span>
+                </xf:label>
+                <xf:action event="DOMActivate" type="xpath">
+                    fr:run-process('oxf.fr.detail.process', 'search-first')
+                </xf:action>
+            </xf:trigger>
+
+            <xf:trigger
+                appearance="minimal"
+                xxf:readonly-appearance="dynamic"
                 class="fr-search-nav-prev"
                 ref="xxf:instance('fr-triggers-instance')/search-prev"
                 xxf:title="{{xxf:r('detail.labels.search-prev', '|fr-fr-resources|')}}">
@@ -978,6 +994,7 @@
 
             <xf:trigger
                 appearance="minimal"
+                xxf:readonly-appearance="dynamic"
                 class="fr-search-nav-next"
                 ref="xxf:instance('fr-triggers-instance')/search-next"
                 xxf:title="{{xxf:r('detail.labels.search-next', '|fr-fr-resources|')}}">
@@ -987,6 +1004,21 @@
                 </xf:label>
                 <xf:action event="DOMActivate" type="xpath">
                     fr:run-process('oxf.fr.detail.process', 'search-next')
+                </xf:action>
+            </xf:trigger>
+
+            <xf:trigger
+                appearance="minimal"
+                xxf:readonly-appearance="dynamic"
+                class="fr-search-nav-last"
+                ref="xxf:instance('fr-triggers-instance')/search-last"
+                xxf:title="{{xxf:r('detail.labels.search-last', '|fr-fr-resources|')}}">
+                <xf:label>
+                    <xh:i class="fa fa-fw fa-step-forward" aria-hidden="true"/>
+                    <xh:span class="visually-hidden"><xf:output value="xxf:r('detail.labels.search-last', '|fr-fr-resources|')"/></xh:span>
+                </xf:label>
+                <xf:action event="DOMActivate" type="xpath">
+                    fr:run-process('oxf.fr.detail.process', 'search-last')
                 </xf:action>
             </xf:trigger>
         </xf:group>

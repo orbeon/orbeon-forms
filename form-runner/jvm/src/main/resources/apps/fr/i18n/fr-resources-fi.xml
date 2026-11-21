@@ -58,8 +58,10 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Päivitä</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Seuraava</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Edellinen</wizard-prev>
+        <search-first>&lt;i class="fa fa-fw fa-step-backward"&gt;&lt;/i&gt; Ensimmäinen</search-first>
         <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Edellinen</search-prev>
         <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Seuraava</search-next>
+        <search-last>&lt;i class="fa fa-fw fa-step-forward"&gt;&lt;/i&gt; Viimeinen</search-last>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Sisältö</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Lataa uudelleen</reupload>
 
@@ -354,8 +356,10 @@
             <clear-out-of-range>Tyhjennä sallitun alueen ulkopuoliset arvot</clear-out-of-range>
             <captcha-label>Kuvavarmenne</captcha-label>
             <captcha-alert>Antamasi arvo ei täsmännyt kuvan kanssa, ole hyvä ja yritä uudelleen</captcha-alert>
+            <search-first>Ensimmäinen asiakirja</search-first>
             <search-prev>Edellinen asiakirja</search-prev>
             <search-next>Seuraava asiakirja</search-next>
+            <search-last>Viimeinen asiakirja</search-last>
         </labels>
         <hints>
             <upload-max-size-per-file>Tiedostojen on oltava kooltaan alle {0}.</upload-max-size-per-file>

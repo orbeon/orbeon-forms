@@ -61,8 +61,10 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Actualizar"</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Siguiente</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Previo</wizard-prev>
+        <search-first>&lt;i class="fa fa-fw fa-step-backward"&gt;&lt;/i&gt; Primero</search-first>
         <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Anterior</search-prev>
         <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Siguiente</search-next>
+        <search-last>&lt;i class="fa fa-fw fa-step-forward"&gt;&lt;/i&gt; Último</search-last>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Contenido</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Subir de nuevo</reupload>
 
@@ -378,8 +380,10 @@
             <clear-out-of-range>Borrar valores fuera de rango</clear-out-of-range>
             <captcha-label>CAPTCHA</captcha-label>
             <captcha-alert>El valor ingresado es diferente a la imagen, inténtelo nuevamente</captcha-alert>
+            <search-first>Primer documento</search-first>
             <search-prev>Documento anterior</search-prev>
             <search-next>Documento siguiente</search-next>
+            <search-last>Último documento</search-last>
         </labels>
         <hints>
             <upload-max-size-per-file>Ficheros por debajo de {0}.</upload-max-size-per-file>

@@ -78,8 +78,10 @@ trait FormRunnerActions
       ("edit"                   -> tryNavigateToEdit     _) +
       ("change-mode"            -> tryChangeMode         _) +
       ("open-rendered-format"   -> tryOpenRenderedFormat _) +
-      ("search-prev"            -> tryNavigateSearchPrev _) +
-      ("search-next"            -> tryNavigateSearchNext _)
+      ("search-first"           -> tryNavigateSearchFirst _) +
+      ("search-prev"            -> tryNavigateSearchPrev  _) +
+      ("search-next"            -> tryNavigateSearchNext  _) +
+      ("search-last"            -> tryNavigateSearchLast  _)
 
   override protected def onAnalyticsValidationFailed(xfcd: XFormsContainingDocument): Unit =
     InMemoryFormSessionAnalyticsStore.extractFormRunnerDocInfo(xfcd).foreach { info =>
@@ -819,11 +821,17 @@ trait FormRunnerActions
       )
     }
 
+  def tryNavigateSearchFirst(params: ActionParams): ActionResult =
+    tryNavigateSearchNeighbor(SummarySearchNavigation.Direction.First)
+
   def tryNavigateSearchPrev(params: ActionParams): ActionResult =
     tryNavigateSearchNeighbor(SummarySearchNavigation.Direction.Previous)
 
   def tryNavigateSearchNext(params: ActionParams): ActionResult =
     tryNavigateSearchNeighbor(SummarySearchNavigation.Direction.Next)
+
+  def tryNavigateSearchLast(params: ActionParams): ActionResult =
+    tryNavigateSearchNeighbor(SummarySearchNavigation.Direction.Last)
 
   private def tryNavigateSearchNeighbor(direction: SummarySearchNavigation.Direction): ActionResult =
     ActionResult.trySync {
@@ -852,7 +860,8 @@ trait FormRunnerActions
             documentId          = document,
             isDraft             = isDraft,
             encodedSearch       = encodedSearch,
-            fallbackPositionOpt = fallbackPosOpt
+            fallbackPositionOpt = fallbackPosOpt,
+            fetchLast           = direction == SummarySearchNavigation.Direction.Last
           )
 
         // Update fr-search-navigation-instance with fresh state
@@ -871,8 +880,10 @@ trait FormRunnerActions
         val targetNeighborOpt =
           neighborsOpt.flatMap { neighbors =>
             direction match {
+              case SummarySearchNavigation.Direction.First    => neighbors.first
               case SummarySearchNavigation.Direction.Previous => neighbors.previous
               case SummarySearchNavigation.Direction.Next     => neighbors.next
+              case SummarySearchNavigation.Direction.Last     => neighbors.last
             }
           }
 
@@ -885,8 +896,8 @@ trait FormRunnerActions
           case None =>
             val resourceName =
               direction match {
-                case SummarySearchNavigation.Direction.Previous => "no-previous-document"
-                case SummarySearchNavigation.Direction.Next     => "no-next-document"
+                case SummarySearchNavigation.Direction.First | SummarySearchNavigation.Direction.Previous => "no-previous-document"
+                case SummarySearchNavigation.Direction.Next  | SummarySearchNavigation.Direction.Last     => "no-next-document"
               }
             trySuccessMessage(Map(Some("resource") -> resourceName))
         }

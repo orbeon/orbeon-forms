@@ -58,8 +58,10 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; 更新</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 次へ</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 前へ</wizard-prev>
+        <search-first>&lt;i class="fa fa-fw fa-step-backward"&gt;&lt;/i&gt; 最初</search-first>
         <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 前へ</search-prev>
         <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 次へ</search-next>
+        <search-last>&lt;i class="fa fa-fw fa-step-forward"&gt;&lt;/i&gt; 最後</search-last>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; 目次</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 再アップロード</reupload>
 
@@ -341,8 +343,10 @@
             <clear-out-of-range>範囲外の値をクリア</clear-out-of-range>
             <captcha-label>CAPTCHA</captcha-label>
             <captcha-alert>CAPTCHAの回答を確認してください</captcha-alert>
+            <search-first>最初のドキュメント</search-first>
             <search-prev>前のドキュメント</search-prev>
             <search-next>次のドキュメント</search-next>
+            <search-last>最後のドキュメント</search-last>
         </labels>
         <hints>
             <upload-max-size-per-file>ファイルサイズは{0}以下にしてください。</upload-max-size-per-file>

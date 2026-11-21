@@ -58,8 +58,10 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Frissítés"</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Következő</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Előző</wizard-prev>
+        <search-first>&lt;i class="fa fa-fw fa-step-backward"&gt;&lt;/i&gt; Első</search-first>
         <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Előző</search-prev>
         <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Következő</search-next>
+        <search-last>&lt;i class="fa fa-fw fa-step-forward"&gt;&lt;/i&gt; Utolsó</search-last>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Tartalom</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Újrafeltöltés</reupload>
 
@@ -354,8 +356,10 @@
             <clear-out-of-range>Tartományon kívüli érték(ek) törlése</clear-out-of-range>
             <captcha-label>CAPTCHA</captcha-label>
             <captcha-alert>Kérjük, ellenőrizze a választ a CAPTCHA kihívásra</captcha-alert>
+            <search-first>Első dokumentum</search-first>
             <search-prev>Előző dokumentum</search-prev>
             <search-next>Következő dokumentum</search-next>
+            <search-last>Utolsó dokumentum</search-last>
         </labels>
         <hints>
             <upload-max-size-per-file>A fájloknak {0} alattinak kell lenniük.</upload-max-size-per-file>

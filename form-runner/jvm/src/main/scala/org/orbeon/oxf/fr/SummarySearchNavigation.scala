@@ -29,8 +29,10 @@ object SummarySearchNavigation {
 
   sealed trait Direction
   object Direction {
+    case object First    extends Direction
     case object Previous extends Direction
     case object Next     extends Direction
+    case object Last     extends Direction
   }
 
   def resolveNeighbors(
@@ -38,7 +40,8 @@ object SummarySearchNavigation {
     documentId         : String,
     isDraft            : Boolean,
     encodedSearch      : String,
-    fallbackPositionOpt: Option[Int]
+    fallbackPositionOpt: Option[Int],
+    fetchLast          : Boolean = false
   )(implicit
     logger             : IndentedLogger
   ): Option[SearchNeighbors] =
@@ -51,7 +54,8 @@ object SummarySearchNavigation {
           documentId       = documentId,
           isDraft          = isDraft,
           fallbackPosition = fallbackPositionOpt
-        )
+        ),
+        fetchLast     = fetchLast
       )(logger, CoreCrossPlatformSupport).toOption
     } yield neighbors
 
@@ -95,16 +99,22 @@ object SummarySearchNavigation {
     val elem =
       neighborsOpt match {
         case Some(neighbors) =>
+          val firstHrefOpt    = neighbors.first   .flatMap(buildNeighborHref(appForm, currentMode, _, encodedSearch))
           val prevHrefOpt     = neighbors.previous.flatMap(buildNeighborHref(appForm, currentMode, _, encodedSearch))
-          val nextHrefOpt     = neighbors.next.flatMap(buildNeighborHref(appForm, currentMode, _, encodedSearch))
+          val nextHrefOpt     = neighbors.next    .flatMap(buildNeighborHref(appForm, currentMode, _, encodedSearch))
+          val lastHrefOpt     = neighbors.last    .flatMap(buildNeighborHref(appForm, currentMode, _, encodedSearch))
+          val hasFirst        = firstHrefOpt.isDefined || prevHrefOpt.isDefined
+          val hasLast         = lastHrefOpt.isDefined  || nextHrefOpt.isDefined
           val effectivePosOpt = neighbors.currentPosition.orElse(fallbackPositionOpt)
           <search-navigation>
             <search-param>{encodedSearch}</search-param>
             <position>{neighbors.currentPosition.map(_.toString).getOrElse("")}</position>
             <fallback-position>{effectivePosOpt.map(_.toString).getOrElse("")}</fallback-position>
             <total>{neighbors.total}</total>
+            <has-first>{hasFirst}</has-first>
             <has-previous>{prevHrefOpt.isDefined}</has-previous>
             <has-next>{nextHrefOpt.isDefined}</has-next>
+            <has-last>{hasLast}</has-last>
           </search-navigation>
         case None =>
           <search-navigation>
@@ -112,8 +122,10 @@ object SummarySearchNavigation {
             <position/>
             <fallback-position/>
             <total>0</total>
+            <has-first>false</has-first>
             <has-previous>false</has-previous>
             <has-next>false</has-next>
+            <has-last>false</has-last>
           </search-navigation>
       }
 

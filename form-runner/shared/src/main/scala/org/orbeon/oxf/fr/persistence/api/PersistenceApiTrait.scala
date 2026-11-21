@@ -71,8 +71,10 @@ trait PersistenceApiTrait {
   case class SearchNeighbors(
     total          : Int,
     currentPosition: Option[Int],
+    first          : Option[SearchNeighbor],
     previous       : Option[SearchNeighbor],
-    next           : Option[SearchNeighbor]
+    next           : Option[SearchNeighbor],
+    last           : Option[SearchNeighbor]
   )
 
   case class DistinctValues(
@@ -225,6 +227,7 @@ trait PersistenceApiTrait {
     appForm                 : AppForm,
     searchContext           : SummarySearchContext,
     around                  : SummarySearchContext.AroundDoc,
+    fetchLast               : Boolean = false,
     isInternalAdminUser     : Boolean = false
   )(implicit
     logger                  : IndentedLogger,
@@ -256,7 +259,8 @@ trait PersistenceApiTrait {
         findNeighborsInPagedResponses(
           firstPage     = firstPage,
           around        = around,
-          fetchNextPage = pageNumber => fetchPage(pageNumber, includeAround = false)
+          fetchNextPage = pageNumber => fetchPage(pageNumber, includeAround = false),
+          fetchLast     = fetchLast
         )
       }
     }
@@ -281,26 +285,32 @@ trait PersistenceApiTrait {
     SearchNeighbors(
       total           = total,
       currentPosition = currentPosition,
+      first           = parseNeighbor("first"),
       previous        = parseNeighbor("previous"),
-      next            = parseNeighbor("next")
+      next            = parseNeighbor("next"),
+      last            = parseNeighbor("last")
     )
   }
 
   def findNeighborsInPagedResponses(
     firstPage    : DocumentNodeInfoType,
     around       : SummarySearchContext.AroundDoc,
-    fetchNextPage: Int => Try[DocumentNodeInfoType]
+    fetchNextPage: Int => Try[DocumentNodeInfoType],
+    fetchLast    : Boolean = false
   ): Try[SearchNeighbors] = {
     val total = firstPage.rootElement.attValueNonBlankOpt("search-total").flatMap(_.toIntOption).getOrElse(0)
     if (total == 0) {
-      scala.util.Success(SearchNeighbors(0, None, None, None))
+      scala.util.Success(SearchNeighbors(0, None, None, None, None, None))
     } else {
       val fallbackPrevPosOpt = around.fallbackPosition.map(fp => (fp - 1).min(total)).filter(_ >= 1)
       val fallbackNextPosOpt = around.fallbackPosition.filter(fp => fp >= 1 && fp <= total)
 
       var pageNumber           = 1
+      var firstPageSize        = 0
       var currentPageTry       = scala.util.Success(firstPage): Try[DocumentNodeInfoType]
       var globalIndex          = 0
+      var firstCandidateOpt    = Option.empty[SearchNeighbor]
+      var lastCandidateOpt     = Option.empty[SearchNeighbor]
       var prevCandidate        = Option.empty[SearchNeighbor]
       var foundPosOpt          = Option.empty[Int]
       var foundPrevOpt         = Option.empty[SearchNeighbor]
@@ -311,6 +321,8 @@ trait PersistenceApiTrait {
 
       while (! done && currentPageTry.isSuccess) {
         val docs = (currentPageTry.get.rootElement / "document").toVector
+        if (pageNumber == 1)
+          firstPageSize = docs.size
         if (docs.isEmpty) {
           done = true
         } else {
@@ -324,6 +336,11 @@ trait PersistenceApiTrait {
               operations = Operations.parseFromString(el.attValue("operations")),
               position   = globalIndex
             )
+
+            if (globalIndex == 1)
+              firstCandidateOpt = Some(neighbor)
+            if (globalIndex == total)
+              lastCandidateOpt = Some(neighbor)
 
             if (fallbackPrevPosOpt.contains(globalIndex))
               fallbackPrevOpt = Some(neighbor)
@@ -354,12 +371,41 @@ trait PersistenceApiTrait {
         }
       }
 
-      currentPageTry.map { _ =>
-        foundPosOpt match {
-          case Some(pos) =>
-            SearchNeighbors(total, Some(pos), foundPrevOpt, foundNextOpt)
-          case None =>
-            SearchNeighbors(total, None, fallbackPrevOpt, fallbackNextOpt)
+      currentPageTry.flatMap { _ =>
+        val (prevOpt, nextOpt) =
+          foundPosOpt match {
+            case Some(_) => (foundPrevOpt, foundNextOpt)
+            case None    => (fallbackPrevOpt, fallbackNextOpt)
+          }
+
+        val resolvedLastTry: Try[Option[SearchNeighbor]] =
+          if (nextOpt.isEmpty) {
+            scala.util.Success(None)
+          } else if (lastCandidateOpt.isDefined || ! fetchLast || firstPageSize <= 0) {
+            scala.util.Success(lastCandidateOpt)
+          } else {
+            val lastPageNum = ((total - 1) / firstPageSize) + 1
+            fetchNextPage(lastPageNum).map { lastPageDoc =>
+              (lastPageDoc.rootElement / "document").lastOption.map { el =>
+                SearchNeighbor(
+                  documentId = el.attValue("name"),
+                  isDraft    = el.attValue("draft") == "true",
+                  operations = Operations.parseFromString(el.attValue("operations")),
+                  position   = total
+                )
+              }
+            }
+          }
+
+        resolvedLastTry.map { resolvedLastOpt =>
+          SearchNeighbors(
+            total           = total,
+            currentPosition = foundPosOpt,
+            first           = prevOpt.flatMap(_ => firstCandidateOpt),
+            previous        = prevOpt,
+            next            = nextOpt,
+            last            = resolvedLastOpt
+          )
         }
       }
     }

@@ -47,9 +47,11 @@ object SearchLogic {
   case class AroundSearchResult(
     total          : Int,
     currentPosition: Option[Int],
+    first          : Option[PositionedDocument],
     previous       : Option[PositionedDocument],
     current        : Option[PositionedDocument],
-    next           : Option[PositionedDocument]
+    next           : Option[PositionedDocument],
+    last           : Option[PositionedDocument]
   )
 
   private case class PreparedSearchQuery(
@@ -353,7 +355,7 @@ object SearchLogic {
       request           = request,
       queries           = request.queries,
       freeTextSearch    = request.freeTextSearch,
-      noPermissionValue = AroundSearchResult(0, None, None, None, None),
+      noPermissionValue = AroundSearchResult(0, None, None, None, None, None, None),
       connectionOpt     = connectionOpt
     ) {
       (connection: Connection, commonAndPermissionsParts: List[StatementPart], permissions: SearchPermissions) =>
@@ -362,7 +364,7 @@ object SearchLogic {
         val searchCount = executeSearchCount(connection, prepared.innerSQL, prepared.statementParts)
 
         if (searchCount == 0) {
-          AroundSearchResult(0, None, None, None, None)
+          AroundSearchResult(0, None, None, None, None, None, None)
         } else {
           // 1. Find the 1-based row_num of the target document
           val findPositionSql =
@@ -408,10 +410,13 @@ object SearchLogic {
                 }
             }
 
-          val targetRowNums = List(prevRowNumOpt, currentRowNumOpt, nextRowNumOpt).flatten.distinct
+          val firstRowNumOpt = prevRowNumOpt.map(_ => 1)
+          val lastRowNumOpt  = nextRowNumOpt.map(_ => searchCount)
+
+          val targetRowNums = List(firstRowNumOpt, prevRowNumOpt, currentRowNumOpt, nextRowNumOpt, lastRowNumOpt).flatten.distinct
 
           if (targetRowNums.isEmpty) {
-            AroundSearchResult(searchCount, currentPosOpt, None, None, None)
+            AroundSearchResult(searchCount, currentPosOpt, None, None, None, None, None)
           } else {
             // 2. Fetch metadata for previous/current/next rows without joining control_text
             val placeholders = targetRowNums.map(_ => "?").mkString(", ")
@@ -451,9 +456,11 @@ object SearchLogic {
             AroundSearchResult(
               total           = searchCount,
               currentPosition = currentPosOpt,
+              first           = toPositionedDoc(firstRowNumOpt),
               previous        = toPositionedDoc(prevRowNumOpt),
               current         = toPositionedDoc(currentRowNumOpt),
-              next            = toPositionedDoc(nextRowNumOpt)
+              next            = toPositionedDoc(nextRowNumOpt),
+              last            = toPositionedDoc(lastRowNumOpt)
             )
           }
         }

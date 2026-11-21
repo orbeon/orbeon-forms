@@ -61,8 +61,10 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Actualitzar"</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Següent</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Previ</wizard-prev>
+        <search-first>&lt;i class="fa fa-fw fa-step-backward"&gt;&lt;/i&gt; Primer</search-first>
         <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Anterior</search-prev>
         <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Següent</search-next>
+        <search-last>&lt;i class="fa fa-fw fa-step-forward"&gt;&lt;/i&gt; Últim</search-last>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Contingut</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Tornar a pujar</reupload>
 
@@ -367,8 +369,10 @@
             <clear-out-of-range>Netejar valors fora de rang</clear-out-of-range>
             <captcha-label>CAPTCHA</captcha-label>
             <captcha-alert>El valor ingressat és diferent de la imatge, torni a intentar-lo</captcha-alert>
+            <search-first>Primer document</search-first>
             <search-prev>Document anterior</search-prev>
             <search-next>Document següent</search-next>
+            <search-last>Últim document</search-last>
         </labels>
         <hints>
             <upload-max-size-per-file>Els fitxers han de mesurar menys de {0}.</upload-max-size-per-file>

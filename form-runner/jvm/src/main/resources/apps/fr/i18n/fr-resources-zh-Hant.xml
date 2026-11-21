@@ -58,8 +58,10 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; 刷新</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 下一步</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 上一步</wizard-prev>
+        <search-first>&lt;i class="fa fa-fw fa-step-backward"&gt;&lt;/i&gt; 第一個</search-first>
         <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 上一個</search-prev>
         <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; 下一個</search-next>
+        <search-last>&lt;i class="fa fa-fw fa-step-forward"&gt;&lt;/i&gt; 最後一個</search-last>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; 目錄</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; 重新上傳</reupload>
 
@@ -354,8 +356,10 @@
             <clear-out-of-range>清除超出範圍的值</clear-out-of-range>
             <captcha-label>驗證碼</captcha-label>
             <captcha-alert>請檢查您對驗證碼挑戰的回答</captcha-alert>
+            <search-first>第一個文件</search-first>
             <search-prev>上一個文件</search-prev>
             <search-next>下一個文件</search-next>
+            <search-last>最後一個文件</search-last>
         </labels>
         <hints>
             <upload-max-size-per-file>文件必須小於 {0}。</upload-max-size-per-file>

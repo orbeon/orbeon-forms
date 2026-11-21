@@ -58,8 +58,10 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; تحديث</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; التالي</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; السابق</wizard-prev>
+        <search-first>&lt;i class="fa fa-fw fa-step-backward"&gt;&lt;/i&gt; الأول</search-first>
         <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; السابق</search-prev>
         <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; التالي</search-next>
+        <search-last>&lt;i class="fa fa-fw fa-step-forward"&gt;&lt;/i&gt; الأخير</search-last>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; المحتوى</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; إعادة الرفع</reupload>
 
@@ -354,8 +356,10 @@
             <clear-out-of-range>مسح القيم خارج النطاق</clear-out-of-range>
             <captcha-label>كابتشا</captcha-label>
             <captcha-alert>يرجى التحقق من إجابتك على تحدي كابتشا</captcha-alert>
+            <search-first>المستند الأول</search-first>
             <search-prev>المستند السابق</search-prev>
             <search-next>المستند التالي</search-next>
+            <search-last>المستند الأخير</search-last>
         </labels>
         <hints>
             <upload-max-size-per-file>يجب أن تكون الملفات أقل من {0}.</upload-max-size-per-file>

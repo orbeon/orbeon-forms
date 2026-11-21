@@ -58,8 +58,10 @@
         <refresh-full>&lt;i class="fa fa-fw fa-refresh"&gt;&lt;/i&gt; Odśwież</refresh-full>
         <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Następna sekcja</wizard-next>
         <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Poprzednia sekcja</wizard-prev>
+        <search-first>&lt;i class="fa fa-fw fa-step-backward"&gt;&lt;/i&gt; Pierwszy</search-first>
         <search-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Poprzedni</search-prev>
         <search-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Następny</search-next>
+        <search-last>&lt;i class="fa fa-fw fa-step-forward"&gt;&lt;/i&gt; Ostatni</search-last>
         <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Zawartość</wizard-toc>
         <reupload>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Wgraj ponownie</reupload>
 
@@ -355,8 +357,10 @@
             <clear-out-of-range>Wyczyść wartości spoza dozwolonego zakresu</clear-out-of-range>
             <captcha-label>Captcha</captcha-label>
             <captcha-alert>Wprowadzona wartość nie zgadza się z obrazem, spróbuj ponownie.</captcha-alert>
+            <search-first>Pierwszy dokument</search-first>
             <search-prev>Poprzedni dokument</search-prev>
             <search-next>Następny dokument</search-next>
+            <search-last>Ostatni dokument</search-last>
         </labels>
         <hints>
             <upload-max-size-per-file>Pliki muszą mieć rozmiar poniżej {0}.</upload-max-size-per-file>

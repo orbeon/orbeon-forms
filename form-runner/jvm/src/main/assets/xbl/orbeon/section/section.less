@@ -164,9 +164,16 @@
     }
 
     // Between top-level sections, the spacing is outside the sections, so it shows between them if the theme shows them as cards
-    .fr-view-appearance-full > .xbl-fr-section:has(+ .xbl-fr-section > .fr-section-title, + .xbl-fr-section > .xforms-group > .fr-section-title) {
-        padding-bottom: 0;
-        margin-bottom: var(--orbeon-section-gap);
+    .fr-view-appearance-full > .xbl-fr-section {
+        &:has(~ .xbl-fr-section:not(.xforms-disabled)) {
+            padding-bottom: 0;
+            margin-bottom: var(--orbeon-section-untitled-gap);
+        }
+        &:has(+ .xbl-fr-section:not(.xforms-disabled) > .fr-section-title),
+        &:has(+ .xbl-fr-section:not(.xforms-disabled) > .xforms-group > .fr-section-title) {
+            padding-bottom: 0;
+            margin-bottom: var(--orbeon-section-gap);
+        }
     }
 
     .fr-mode-view, .fr-mode-pdf {

@@ -1121,6 +1121,115 @@ class BindingDescriptorTest
         assert(findControlByName(Control1).map(_.name).contains("fr:range"))
         assert(findControlByName(Control1).flatMap(_.attValueOpt("appearance")).isEmpty)
         assert(findBindByName(Control1).flatMap(_.attValueOpt("type")).contains("fr:range"))
+
+        // 6. Universal conversion: Text Field -> Searchable Combobox (`xf:select1[@appearance='search'][@selection='open']`)
+        FormBuilder.saveControlElemAtts(
+          controlName          = Control1,
+          controlElemAtts      = <xf:input xmlns:xf="http://www.w3.org/2002/xforms"/>,
+          keepCurrentAtts      = false,
+          newAppearanceOrEmpty = "",
+          newDatatypeOrEmpty   = "string"
+        )
+        FormBuilder.writeAlertsAndValidationsAsXML(
+          controlName        = Control1,
+          newAppearance      = "",
+          defaultAlertElem   = globalAlertAsXML,
+          validationElems    = List(datatypeValidationXml("string")),
+          controlElemUpdated = true
+        )
+
+        FormBuilder.saveControlElemAtts(
+          controlName          = Control1,
+          controlElemAtts      = <xf:select1 xmlns:xf="http://www.w3.org/2002/xforms" selection="open"/>,
+          keepCurrentAtts      = false,
+          newAppearanceOrEmpty = "search",
+          newDatatypeOrEmpty   = "string"
+        )
+        FormBuilder.writeAlertsAndValidationsAsXML(
+          controlName        = Control1,
+          newAppearance      = "search",
+          defaultAlertElem   = globalAlertAsXML,
+          validationElems    = List(datatypeValidationXml("string")),
+          controlElemUpdated = true
+        )
+
+        val comboboxCtrl = findControlByName(Control1).get
+        assert(comboboxCtrl.name == "xf:select1")
+        assert(comboboxCtrl.attValueOpt("appearance").contains("search"))
+        assert(comboboxCtrl.attValueOpt("selection").contains("open"))
+        assert((comboboxCtrl / "*:itemset" /@ "ref").stringValue == s"$$form-resources/$Control1/item")
+        assert(FormBuilder.findResourceHolders(Control1).forall(h => (h / "item").size == 3))
+
+        // 7. Universal conversion back: Searchable Combobox -> Text Field removes `<xf:itemset>` and `<item>` resources
+        FormBuilder.saveControlElemAtts(
+          controlName          = Control1,
+          controlElemAtts      = <xf:input xmlns:xf="http://www.w3.org/2002/xforms"/>,
+          keepCurrentAtts      = false,
+          newAppearanceOrEmpty = "",
+          newDatatypeOrEmpty   = "string"
+        )
+        FormBuilder.writeAlertsAndValidationsAsXML(
+          controlName        = Control1,
+          newAppearance      = "",
+          defaultAlertElem   = globalAlertAsXML,
+          validationElems    = List(datatypeValidationXml("string")),
+          controlElemUpdated = true
+        )
+
+        val inputCtrl = findControlByName(Control1).get
+        assert(inputCtrl.name == "xf:input")
+        assert(inputCtrl.attValueOpt("selection").isEmpty)
+        assert((inputCtrl / "*:itemset").isEmpty)
+        assert(FormBuilder.findResourceHolders(Control1).forall(h => (h / "item").isEmpty))
+      }
+    }
+
+    it("must discover two-tier universal conversion targets while excluding non-value controls") {
+      withActionAndFBDoc(TemplateWithSingleControlDoc) { implicit ctx =>
+
+        val inputAll = FormBuilder.findPossibleControlConversions2(
+          originalControlElemAtts = <xf:input xmlns:xf="http://www.w3.org/2002/xforms"/>,
+          originalDatatype        = XS_STRING_QNAME,
+          originalAppearanceOpt   = None,
+          lang                    = "en",
+          includeAllControls      = true
+        )
+
+        val compatibleValues = inputAll.filter(_.compatible).map(_.value).toSet
+        val universalResults = inputAll.filterNot(_.compatible)
+        val universalValues  = universalResults.map(_.value).toSet
+        val universalLabels  = universalResults.flatMap(_.fullLabelOpt).toSet
+
+        // Compatible tier unchanged
+        assert(compatibleValues.contains(XFORMS_INPUT_QNAME))
+        assert(compatibleValues.contains(XFORMS_TEXTAREA_QNAME))
+        assert(! compatibleValues.contains(QName("open-select1", "fr", FR)))
+
+        // Universal tier includes appearance-specific toolbox controls directly by display name
+        assert(universalLabels.contains("Searchable Combobox"))
+        assert(universalLabels.contains("Dropdown with \"Other\""))
+        assert(universalLabels.contains("Radio Buttons"))
+        assert(universalLabels.contains("Checkboxes"))
+        assert(universalLabels.contains("Partial Date"))
+        assert(universalValues.contains(QName("partial-date", "fr", FR)))
+        assert(universalValues.contains(QName("dropdown-select1", "fr", FR)))
+        assert(universalValues.contains(QName("attachment", "fr", FR)))
+
+        // Non-value / incompatible controls excluded from universal tier
+        assert(! universalValues.contains(XFORMS_TRIGGER_QNAME))
+        assert(! universalValues.contains(QName("explanation", "fr", FR)))
+        assert(! universalValues.contains(QName("image", "fr", FR)))
+        assert(! universalValues.contains(QName("wpaint", "fr", FR)))
+
+        // Non-value source controls do not receive universal conversion targets
+        val triggerAll = FormBuilder.findPossibleControlConversions2(
+          originalControlElemAtts = <xf:trigger xmlns:xf="http://www.w3.org/2002/xforms"/>,
+          originalDatatype        = XS_STRING_QNAME,
+          originalAppearanceOpt   = None,
+          lang                    = "en",
+          includeAllControls      = true
+        )
+        assert(triggerAll.filterNot(_.compatible).isEmpty)
       }
     }
   }

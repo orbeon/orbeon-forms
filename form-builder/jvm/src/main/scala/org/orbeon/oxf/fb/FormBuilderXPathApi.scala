@@ -1491,14 +1491,18 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def saveControlElemAtts(
-    controlName    : String,
-    controlElemAtts: NodeInfo,
-    keepCurrentAtts: Boolean
+    controlName         : String,
+    controlElemAtts     : NodeInfo,
+    keepCurrentAtts     : Boolean,
+    newAppearanceOrEmpty: String,
+    newDatatypeOrEmpty  : String
   ): Unit =
     FormBuilder.saveControlElemAtts(
-      controlName     = controlName,
-      controlElemAtts = controlElemAtts,
-      keepCurrentAtts = keepCurrentAtts
+      controlName          = controlName,
+      controlElemAtts      = controlElemAtts,
+      keepCurrentAtts      = keepCurrentAtts,
+      newAppearanceOrEmpty = newAppearanceOrEmpty,
+      newDatatypeOrEmpty   = newDatatypeOrEmpty
     )(FormBuilderDocContext())
 
   private def renamingDetailsToXPath(renamingDetails: Option[Seq[(String, String, Boolean)]]): SequenceIterator =
@@ -2000,7 +2004,8 @@ object FormBuilderXPathApi {
     controlElemAtts   : NodeInfo,
     newDatatypeOrEmpty: String,
     desiredAppearance : String,
-    lang              : String
+    lang              : String,
+    includeAllControls: Boolean
   ): Array[NodeInfo] = {
 
     implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
@@ -2010,7 +2015,8 @@ object FormBuilderXPathApi {
       controlElemAtts,
       newDatatypeOrEmpty,
       desiredAppearance,
-      lang
+      lang,
+      includeAllControls
     ).toArray
   }
 

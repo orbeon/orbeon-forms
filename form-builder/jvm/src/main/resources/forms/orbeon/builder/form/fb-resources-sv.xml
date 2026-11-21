@@ -707,6 +707,10 @@
         </control-appearance>
         <control-conversion>
             <label todo="true">Change Control To</label>
+            <show-all>Visa alla kontrolltyper</show-all>
+            <compatible-group>Kompatibla</compatible-group>
+            <other-group>Övriga</other-group>
+            <cross-type-warning>Konvertering till en annan kontrolltyp kan ändra dataformatet eller ta bort befintliga alternativ och inställningar.</cross-type-warning>
         </control-conversion>
         <whitespace>
             <item>

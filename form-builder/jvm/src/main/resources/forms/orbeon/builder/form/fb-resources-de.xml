@@ -699,6 +699,10 @@
         </control-appearance>
         <control-conversion>
             <label todo="true">Change Control To</label>
+            <show-all>Alle Steuerelementtypen anzeigen</show-all>
+            <compatible-group>Kompatibel</compatible-group>
+            <other-group>Andere</other-group>
+            <cross-type-warning>Die Umwandlung in einen anderen Steuerelementtyp kann das Datenformat ändern oder bestehende Auswahlmöglichkeiten und Einstellungen entfernen.</cross-type-warning>
         </control-conversion>
         <whitespace>
             <item>

@@ -17,12 +17,12 @@ import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.{AttributePredicate, ElementWithFiltersSelector, Selector, TypeSelector}
 import org.orbeon.dom.QName
 import org.orbeon.oxf.fb.XMLNames.*
-import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerLang, XMLNames as FRXMLNames}
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.NodeInfoFactory.*
-import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, insert, rename}
+import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, insert, rename, setvalue}
 import org.orbeon.oxf.xforms.analysis.model.{MipName, Types}
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor.*
 import org.orbeon.oxf.xforms.xbl.BindingIndex.DatatypeMatch
@@ -108,7 +108,8 @@ trait BindingOps {
     controlElemAtts       : NodeInfo,
     currentDatatypeOrEmpty: String,
     desiredAppearance     : String,
-    lang                  : String
+    lang                  : String,
+    includeAllControls    : Boolean = false
   )(implicit
     ctx                   : FormBuilderDocContext
   ): List[NodeInfo] = {
@@ -119,7 +120,8 @@ trait BindingOps {
       controlElemAtts,
       currentDatatype,
       desiredAppearance.trimAllToOpt,
-      lang
+      lang,
+      includeAllControls
     ).map { conversionResult =>
       val (builtinType, schemaType) =
         conversionResult.datatypeOpt match {
@@ -128,9 +130,9 @@ trait BindingOps {
           case None                                        => ("string", "")
         }
 
-      <conversion current={conversionResult.isCurrent.toString}>
+      <conversion current={conversionResult.isCurrent.toString} compatible={conversionResult.compatible.toString}>
         <full-label>{conversionResult.fullLabelOpt.getOrElse("")}</full-label>
-        <value>{conversionResult.value.uriQualifiedName}</value>
+        <value>{conversionResult.itemValueOpt.getOrElse(conversionResult.value.uriQualifiedName)}</value>
         <element-name>{conversionResult.elemName.uriQualifiedName}</element-name>
         <element>
           {
@@ -186,14 +188,17 @@ trait BindingOps {
     standardClasses: String = "",
     iconPathOpt    : Option[String],
     iconClasses    : String,
-    isCurrent      : Boolean
+    isCurrent      : Boolean,
+    compatible     : Boolean = true,
+    itemValueOpt   : Option[String] = None
   )
 
   def findPossibleControlConversions2(
     originalControlElemAtts: NodeInfo, // `appearance` attribute is ignored
     originalDatatype       : QName,
     originalAppearanceOpt  : Option[String],
-    lang                   : String
+    lang                   : String,
+    includeAllControls     : Boolean = false
   )(implicit
     ctx                    : FormBuilderDocContext
   ): List[ConversionResult] = {
@@ -218,7 +223,7 @@ trait BindingOps {
 
     val datatypeMatch = DatatypeMatch.makeExcludeStringMatch(originalDatatype)
 
-    def resolveDirectWithConversions(atts: Iterable[(QName, String)]): Option[QName] =
+    def resolveDirect(atts: Iterable[(QName, String)], requireConversions: Boolean): Option[(QName, Option[NodeInfo])] =
       for {
         specificDescriptor <- findMostSpecificBindingUseEqualOrToken(
           searchElemName = originalVirtualName,
@@ -226,114 +231,197 @@ trait BindingOps {
           searchAtts     = atts
         )
         relatedDescriptors = findRelatedDescriptors(specificDescriptor)
-        directQName        <- BindingOps.findAllDirectInRelated(relatedDescriptors).find(ctx.conversions.contains)
+        directQNames       = BindingOps.findAllDirectInRelated(relatedDescriptors)
+        directQName        <- if (requireConversions) directQNames.find(ctx.conversions.contains) else directQNames.headOption
       } yield
-        directQName
+        directQName -> specificDescriptor.binding
 
-    val originalDirectQNameOpt =
-      resolveDirectWithConversions(effectiveAttsIncludingAppearance)
-        .orElse(resolveDirectWithConversions(originalAttsWithoutAppearance))
+    val originalDirectOpt =
+      resolveDirect(effectiveAttsIncludingAppearance, requireConversions = true)
+        .orElse(resolveDirect(originalAttsWithoutAppearance, requireConversions = true))
+        .orElse(
+          includeAllControls.flatOption(
+            resolveDirect(effectiveAttsIncludingAppearance, requireConversions = false)
+              .orElse(resolveDirect(originalAttsWithoutAppearance, requireConversions = false))
+          )
+        )
 
     val originalNonCommonAtts =
       BindingOps.filterCommonAtts(originalAttsWithoutAppearance).toSet
 
-    for {
-      originalDirectQName              <- originalDirectQNameOpt.toList
-      conversionDirectQName            <- ctx.conversions.getOrElse(originalDirectQName, Set.empty)
-      conversionDirectDescriptor       <- BindingOps.findDescriptorForDirectName(conversionDirectQName)
-      conversionRelatedDescriptors     = findRelatedDescriptors(conversionDirectDescriptor)
-      conversionMostSpecificDescriptor <- findMostSpecificStaticBindingInRelated(conversionRelatedDescriptors)
-      conversionBindingElem            <- conversionMostSpecificDescriptor.binding
-    } yield {
+    def buildConversionResult(
+      originalDirectQName  : QName,
+      conversionDirectQName: QName,
+      compatible           : Boolean
+    ): Option[(NodeInfo, ConversionResult)] =
+      for {
+        conversionDirectDescriptor       <- BindingOps.findDescriptorForDirectName(conversionDirectQName)
+        conversionRelatedDescriptors     = findRelatedDescriptors(conversionDirectDescriptor)
+        conversionMostSpecificDescriptor <- findMostSpecificStaticBindingInRelated(conversionRelatedDescriptors)
+        conversionBindingElem            <- conversionMostSpecificDescriptor.binding
+      } yield {
 
-      val viewTemplateOpt =
-        FormBuilder.findViewTemplate(conversionBindingElem, forEnclosingSection = false)
+        val viewTemplateOpt =
+          FormBuilder.findViewTemplate(conversionBindingElem, forEnclosingSection = false)
 
-      val (conversionStaticElemName, conversionStaticAppearanceOpt, templateAtts, conversionStandardClasses) =
-        viewTemplateOpt match {
-          case Some(viewTemplate) =>
-            (
-              viewTemplate.qName,
-              viewTemplate.attValueOpt(APPEARANCE_QNAME).flatMap(_.trimAllToOpt),
-              BindingOps.filterCommonAtts(getAtts(viewTemplate)).toSet,
-              viewTemplate.attValue("class").splitTo[List]().filter(BindingOps.StandardControlClasses).mkString(" ")
-            )
-          case None =>
-            val elemName =
-              conversionMostSpecificDescriptor.elementName.getOrElse(throw new IllegalStateException)
-            val appearanceOpt =
-              BindingDescriptor.appearanceValueOpt(conversionMostSpecificDescriptor.appearances)
-            val descriptorAtts =
-              conversionMostSpecificDescriptor.otherAtts.collect {
-                case BindingAttributeDescriptor(name, AttributePredicate.Equal(value)) => name -> value
-                case BindingAttributeDescriptor(name, AttributePredicate.Token(value)) => name -> value
+        val (conversionStaticElemName, conversionStaticAppearanceOpt, templateAtts, conversionStandardClasses) =
+          viewTemplateOpt match {
+            case Some(viewTemplate) =>
+              (
+                viewTemplate.qName,
+                viewTemplate.attValueOpt(APPEARANCE_QNAME).flatMap(_.trimAllToOpt),
+                BindingOps.filterCommonAtts(getAtts(viewTemplate)).toSet,
+                viewTemplate.attValue("class").splitTo[List]().filter(BindingOps.StandardControlClasses).mkString(" ")
+              )
+            case None =>
+              val elemName =
+                conversionMostSpecificDescriptor.elementName.getOrElse(throw new IllegalStateException)
+              val appearanceOpt =
+                BindingDescriptor.appearanceValueOpt(conversionMostSpecificDescriptor.appearances)
+              val descriptorAtts =
+                conversionMostSpecificDescriptor.otherAtts.collect {
+                  case BindingAttributeDescriptor(name, AttributePredicate.Equal(value)) => name -> value
+                  case BindingAttributeDescriptor(name, AttributePredicate.Token(value)) => name -> value
+                }
+              (elemName, appearanceOpt, descriptorAtts, "")
+          }
+
+        val templateDatatypeOpt =
+          findBindTemplateNameValues(conversionBindingElem, forEnclosingSection = false).collectFirst {
+            case (elem, TYPE_QNAME, value) => elem.resolveQName(value)
+          }
+
+        val possibleDatatypes =
+          findPossibleDatatypes(conversionRelatedDescriptors).toList
+
+        val originalMatchesPossibleDatatype =
+          possibleDatatypes.exists { dt =>
+            dt == originalDatatype || Types.getVariationTypeOrKeep(dt) == originalDatatype
+          }
+
+        def normalizedOriginalDatatype: QName =
+          if (Types.isForBuiltinType(originalDatatype))
+            Types.qNameForBuiltinTypeName(originalDatatype.localName, required = false)
+          else
+            originalDatatype
+
+        // Keep the original datatype when compatible with the target control's supported datatypes (e.g. `xs:integer` on
+        // `fr:number`), otherwise use the target template's datatype.
+        val conversionDatatypeOpt =
+          if (templateDatatypeOpt.isDefined) {
+            if (originalMatchesPossibleDatatype)
+              Some(normalizedOriginalDatatype)
+            else
+              templateDatatypeOpt
+          } else if (viewTemplateOpt.isEmpty && conversionRelatedDescriptors.exists(d => d.datatype.isDefined && ! d.elementName.contains(conversionDirectQName))) {
+            if (originalMatchesPossibleDatatype)
+              Some(normalizedOriginalDatatype)
+            else
+              possibleDatatypes.headOption.map { dt =>
+                if (Types.isForBuiltinType(dt)) Types.qNameForBuiltinTypeName(dt.localName, required = false) else dt
               }
-            (elemName, appearanceOpt, descriptorAtts, "")
-        }
+          } else {
+            None
+          }
 
-      val templateDatatypeOpt =
-        findBindTemplateNameValues(conversionBindingElem, forEnclosingSection = false).collectFirst {
-          case (elem, TYPE_QNAME, value) => elem.resolveQName(value)
-        }
+        val conversionMetadata =
+          bindingMetadata(conversionBindingElem)
+            .headOption
+            .toList
 
-      val possibleDatatypes =
-        findPossibleDatatypes(conversionRelatedDescriptors).toList
+        val conversionDisplayNameOpt = findMetadata(lang, conversionMetadata / FBDisplayNameTest)
+        val conversionIconClasses    = findMetadata(lang, conversionMetadata / FBIconTest / FBIconClassTest).getOrElse("fa fa-fw fa-puzzle-piece")
+        val conversionIconPathOpt    = findMetadata(lang, conversionMetadata / FBIconTest / FBSmallIconTest)
 
-      val originalMatchesPossibleDatatype =
-        possibleDatatypes.exists { dt =>
-          dt == originalDatatype || Types.getVariationTypeOrKeep(dt) == originalDatatype
-        }
+        val attsToAdd    = templateAtts
+        val attsToRemove = originalNonCommonAtts.collect { case (name, _) if ! templateAtts.exists(_._1 == name) => name }
 
-      def normalizedOriginalDatatype: QName =
-        if (Types.isForBuiltinType(originalDatatype))
-          Types.qNameForBuiltinTypeName(originalDatatype.localName, required = false)
-        else
-          originalDatatype
+        conversionBindingElem -> ConversionResult(
+          fullLabelOpt    = conversionDisplayNameOpt,
+          value           = conversionDirectQName,
+          elemName        = conversionStaticElemName,
+          appearanceOpt   = conversionStaticAppearanceOpt,
+          datatypeOpt     = conversionDatatypeOpt,
+          addAtts         = attsToAdd,
+          removeAtts      = attsToRemove,
+          standardClasses = conversionStandardClasses,
+          iconPathOpt     = conversionIconPathOpt,
+          iconClasses     = conversionIconClasses,
+          isCurrent       = originalDirectQName == conversionDirectQName,
+          compatible      = compatible
+        )
+      }
 
-      // Keep the original datatype when compatible with the target control's supported datatypes (e.g. `xs:integer` on
-      // `fr:number`), otherwise use the target template's datatype.
-      val conversionDatatypeOpt =
-        if (templateDatatypeOpt.isDefined) {
-          if (originalMatchesPossibleDatatype)
-            Some(normalizedOriginalDatatype)
-          else
-            templateDatatypeOpt
-        } else if (viewTemplateOpt.isEmpty && conversionRelatedDescriptors.exists(d => d.datatype.isDefined && ! d.elementName.contains(conversionDirectQName))) {
-          if (originalMatchesPossibleDatatype)
-            Some(normalizedOriginalDatatype)
-          else
-            possibleDatatypes.headOption.map { dt =>
-              if (Types.isForBuiltinType(dt)) Types.qNameForBuiltinTypeName(dt.localName, required = false) else dt
-            }
-        } else {
-          None
-        }
+    originalDirectOpt match {
+      case None =>
+        Nil
+      case Some((originalDirectQName, originalBindingElemOpt)) =>
+        val compatibleQNames =
+          ctx.conversions.get(originalDirectQName) match {
+            case Some(group) => group.toList
+            case None if includeAllControls => List(originalDirectQName)
+            case None => Nil
+          }
 
-      val conversionMetadata =
-        bindingMetadata(conversionBindingElem)
-          .headOption
-          .toList
+        val compatiblePairs =
+          compatibleQNames.flatMap(buildConversionResult(originalDirectQName, _, compatible = true))
 
-      val conversionDisplayNameOpt = findMetadata(lang, conversionMetadata / FBDisplayNameTest)
-      val conversionIconClasses    = findMetadata(lang, conversionMetadata / FBIconTest / FBIconClassTest).getOrElse("fa fa-fw fa-puzzle-piece")
-      val conversionIconPathOpt    = findMetadata(lang, conversionMetadata / FBIconTest / FBSmallIconTest)
+        val universalResults =
+          if (includeAllControls && originalBindingElemOpt.exists(isEligibleForUniversalConversion)) {
+            val seenBindings = compatiblePairs.map(_._1).toSet
 
-      val attsToAdd    = templateAtts
-      val attsToRemove = originalNonCommonAtts.collect { case (name, _) if ! templateAtts.exists(_._1 == name) => name }
+            val allBindings =
+              bindingIndex.iterateDescriptors.flatMap(_.binding).toList.keepDistinctBy(identity)
 
-      ConversionResult(
-        fullLabelOpt    = conversionDisplayNameOpt,
-        value           = conversionDirectQName,
-        elemName        = conversionStaticElemName,
-        appearanceOpt   = conversionStaticAppearanceOpt,
-        datatypeOpt     = conversionDatatypeOpt,
-        addAtts         = attsToAdd,
-        removeAtts      = attsToRemove,
-        standardClasses = conversionStandardClasses,
-        iconPathOpt     = conversionIconPathOpt,
-        iconClasses     = conversionIconClasses,
-        isCurrent       = originalDirectQName == conversionDirectQName
-      )
+            val extraResults =
+              for {
+                bElem        <- allBindings
+                if ! seenBindings.contains(bElem) && isEligibleForUniversalConversion(bElem)
+                viewTemplate <- FormBuilder.findViewTemplate(bElem, forEnclosingSection = false).toList
+                metadata     <- bindingMetadata(bElem).headOption.toList
+                displayName  <- findMetadata(lang, metadata / FBDisplayNameTest).filter(_.nonAllBlank).toList
+              } yield {
+                val conversionStaticElemName      = viewTemplate.qName
+                val conversionStaticAppearanceOpt = viewTemplate.attValueOpt(APPEARANCE_QNAME).flatMap(_.trimAllToOpt)
+                val templateAtts                  = BindingOps.filterCommonAtts(getAtts(viewTemplate)).toSet
+                val conversionStandardClasses     = viewTemplate.attValue("class").splitTo[List]().filter(BindingOps.StandardControlClasses).mkString(" ")
+                val templateDatatypeOpt =
+                  findBindTemplateNameValues(bElem, forEnclosingSection = false).collectFirst {
+                    case (elem, TYPE_QNAME, value) => elem.resolveQName(value)
+                  }
+                val conversionIconClasses = findMetadata(lang, metadata / FBIconTest / FBIconClassTest).getOrElse("fa fa-fw fa-puzzle-piece")
+                val conversionIconPathOpt = findMetadata(lang, metadata / FBIconTest / FBSmallIconTest)
+                val attsToRemove          = originalNonCommonAtts.collect { case (name, _) if ! templateAtts.exists(_._1 == name) => name }
+                val uniqueItemValue =
+                  s"${conversionStaticElemName.uriQualifiedName}|${conversionStaticAppearanceOpt.getOrElse("")}|${
+                    templateAtts.toList.sortBy(_._1.qualifiedName).map { case (k, v) => s"${k.qualifiedName}=$v" }.mkString(",")
+                  }"
+
+                ConversionResult(
+                  fullLabelOpt    = Some(displayName),
+                  value           = conversionStaticElemName,
+                  elemName        = conversionStaticElemName,
+                  appearanceOpt   = conversionStaticAppearanceOpt,
+                  datatypeOpt     = templateDatatypeOpt,
+                  addAtts         = templateAtts,
+                  removeAtts      = attsToRemove,
+                  standardClasses = conversionStandardClasses,
+                  iconPathOpt     = conversionIconPathOpt,
+                  iconClasses     = conversionIconClasses,
+                  isCurrent       = false,
+                  compatible      = false,
+                  itemValueOpt    = Some(uniqueItemValue)
+                )
+              }
+
+            extraResults
+              .keepDistinctBy(r => (r.fullLabelOpt, r.elemName, r.appearanceOpt, r.addAtts))
+              .sortBy(_.fullLabelOpt.getOrElse("").toLowerCase)
+          } else {
+            Nil
+          }
+
+        compatiblePairs.map(_._2) ::: universalResults
     }
   }
 
@@ -374,13 +462,20 @@ trait BindingOps {
   }
 
   def saveControlElemAtts(
-    controlName    : String,
-    controlElemAtts: NodeInfo,
-    keepCurrentAtts: Boolean = false
+    controlName         : String,
+    controlElemAtts     : NodeInfo,
+    keepCurrentAtts     : Boolean = false,
+    newAppearanceOrEmpty: String  = "",
+    newDatatypeOrEmpty  : String  = ""
   )(implicit
-    ctx            : FormBuilderDocContext
-  ): Unit =
+    ctx                 : FormBuilderDocContext
+  ): Unit = {
+
+    import ctx.bindingIndex
+
     FormRunner.findControlByName(controlName).foreach { controlElem =>
+      val oldBindingElemOpt = bindingForControlElement(controlElem)
+
       val updatedElem = rename(controlElem, controlElemAtts.qName)
 
       // Clear `@appearance` here; `writeAlertsAndValidationsAsXML` re-applies `$i/appearances/@selection`.
@@ -401,7 +496,31 @@ trait BindingOps {
         if (newAtts.nonEmpty)
           insert(into = updatedElem, origin = newAtts)
       }
+
+      val newDatatype =
+        if (newDatatypeOrEmpty.nonAllBlank)
+          resolveDatatypeOrEmpty(controlName, newDatatypeOrEmpty)
+        else
+          Types.qNameForBuiltinTypeName("string", required = false)
+      val newAttsWithAppearance =
+        updateAttAppearance(BindingDescriptor.getAtts(updatedElem), newAppearanceOrEmpty.trimAllToOpt)
+
+      val newBindingElemOpt =
+        findMostSpecificBindingUseEqualOrToken(
+          searchElemName = updatedElem.uriQualifiedName,
+          datatypeMatch  = DatatypeMatch.makeExcludeStringMatch(newDatatype),
+          searchAtts     = newAttsWithAppearance
+        ).flatMap(_.binding)
+
+      if (oldBindingElemOpt != newBindingElemOpt)
+        reconcileConvertedControlStructure(
+          controlName       = controlName,
+          updatedElem       = updatedElem,
+          oldBindingElemOpt = oldBindingElemOpt,
+          newBindingElemOpt = newBindingElemOpt
+        )
     }
+  }
 
   // Return a new element name and appearance for the control if needed.
   // See `BindingDescriptorTest`'s "New element name" test for examples.
@@ -666,6 +785,122 @@ trait BindingOps {
 
     def bindingMetadata(binding: NodeInfo): NodeColl =
       binding / FBMetadataTest
+
+    def bindingHasEditor(binding: NodeInfo, editor: String): Boolean =
+      (bindingMetadata(binding) / FBEditorsTest /@ editor).headOption.exists(_.stringValue == "true")
+
+    val XFormsItemsetTest: Test = Namespaces.XF -> "itemset"
+    val XFormsItemElemsTest: Test =
+      (Namespaces.XF -> "itemset") ||
+      (Namespaces.XF -> "item")    ||
+      (Namespaces.XF -> "choices")
+
+    def isEligibleForUniversalConversion(bindingElem: NodeInfo): Boolean =
+      bindingMetadata(bindingElem).headOption.exists { metadata =>
+        val hasDisplayName      = (metadata / FBDisplayNameTest).nonEmpty
+        val toolboxOpt          = metadata.firstChildOpt(FBToolboxTest)
+        val isDeprecated        = toolboxOpt.flatMap(_.attValueOpt("deprecated")).contains(true.toString)
+        val isHiddenFromToolbox = toolboxOpt.flatMap(_.attValueOpt("show")).contains(false.toString)
+        val isSectionTemplate   = bindingElem.attTokens("class").contains("fr-section-component")
+        val isNonPersisted      = (metadata / FBTemplatesTest / FBBindTest).exists(_.attValueOpt(FRXMLNames.FRPersistQName).contains("false()"))
+        val viewTemplateOpt     = FormBuilder.findViewTemplate(bindingElem, forEnclosingSection = false)
+        val isTrigger           = viewTemplateOpt.exists(_.qName == XFormsNames.XFORMS_TRIGGER_QNAME)
+        val isStaticAttachment  = viewTemplateOpt.exists(_.attTokens("class").contains("fr-static-attachment"))
+        val isValueOrAttachment =
+          bindingElem.attValueOpt(XFormsNames.XXBL_MODE_QNAME).forall(_.tokenizeToSet.contains("value")) ||
+          viewTemplateOpt.exists(_.attTokens("class").contains("fr-attachment"))
+        val hasNestedInstance   = (metadata / FBTemplatesTest / FBInstanceTest / *).nonEmpty
+
+        hasDisplayName &&
+          ! isDeprecated &&
+          ! isHiddenFromToolbox &&
+          ! isSectionTemplate &&
+          ! isNonPersisted &&
+          viewTemplateOpt.isDefined &&
+          ! isTrigger &&
+          ! isStaticAttachment &&
+          isValueOrAttachment &&
+          ! hasNestedInstance
+      }
+
+    def reconcileConvertedControlStructure(
+      controlName      : String,
+      updatedElem      : NodeInfo,
+      oldBindingElemOpt: Option[NodeInfo],
+      newBindingElemOpt: Option[NodeInfo]
+    )(implicit
+      ctx              : FormBuilderDocContext
+    ): Unit = {
+
+      val oldIsStaticItemset  = oldBindingElemOpt.exists(bindingHasEditor(_, "static-itemset"))
+      val newIsStaticItemset  = newBindingElemOpt.exists(bindingHasEditor(_, "static-itemset"))
+      val newHasItemHint      = newBindingElemOpt.exists(bindingHasEditor(_, "item-hint"))
+      val newViewTemplateOpt  = newBindingElemOpt.flatMap(FormBuilder.findViewTemplate(_, forEnclosingSection = false))
+      val newTemplateItemsets = newViewTemplateOpt.toList.flatMap(_ / XFormsItemsetTest)
+
+      // 1. Reconcile `<xf:itemset>` / `<xf:item>` / `<xf:choices>` on the control element
+      if (newTemplateItemsets.nonEmpty) {
+        if ((updatedElem / XFormsItemsetTest).isEmpty || oldIsStaticItemset != newIsStaticItemset) {
+          delete(updatedElem / XFormsItemElemsTest)
+          insert(
+            into   = updatedElem,
+            after  = updatedElem / *,
+            origin = newTemplateItemsets.map(copyElementInfoWithoutExtraNamespaces(_, None))
+          )
+          if (newIsStaticItemset)
+            setvalue(updatedElem / XFormsItemsetTest /@ "ref", FormBuilder.buildResourcePointer(controlName, "item", None))
+        }
+      } else {
+        delete(updatedElem / XFormsItemElemsTest)
+      }
+
+      // 2. Reconcile `<item>` resources in `fr-form-resources` for all form languages
+      if (newIsStaticItemset) {
+        for ((formLang, holder) <- FormRunner.findResourceHoldersWithLang(controlName, ctx.resourcesRootElem)) {
+          if ((holder / "item").isEmpty) {
+            val fbResourceInFormLang  = FormRunnerLang.formResourcesInLang(formLang)
+            val originalTemplateItems = fbResourceInFormLang / "template" / "items" / "item"
+            val itemsResourceEls =
+              if (newHasItemHint)
+                originalTemplateItems
+              else
+                originalTemplateItems.map { item =>
+                  elementInfo("item", (item / *).filter(_.localname != "hint"))
+                }
+            if (itemsResourceEls.nonEmpty)
+              insert(
+                into   = holder,
+                after  = holder / *,
+                origin = itemsResourceEls.map(copyElementInfoWithoutExtraNamespaces(_, None))
+              )
+          }
+        }
+      } else if (oldIsStaticItemset) {
+        for ((_, holder) <- FormRunner.findResourceHoldersWithLang(controlName, ctx.resourcesRootElem))
+          delete(holder / "item")
+      }
+
+      // 3. Reconcile data holder attributes from `<fb:templates><fb:instance>` while preserving element text
+      val oldInstanceAttNames =
+        oldBindingElemOpt.toList.flatMap(_ / FBMetadataTest / FBTemplatesTest / FBInstanceTest /@ @*).map(_.qName).toSet
+      val newInstanceAtts =
+        newBindingElemOpt.toList.flatMap(_ / FBMetadataTest / FBTemplatesTest / FBInstanceTest /@ @*)
+      val newInstanceAttNames =
+        newInstanceAtts.map(_.qName).toSet
+      val attsToRemove =
+        oldInstanceAttNames -- newInstanceAttNames
+
+      if (attsToRemove.nonEmpty || newInstanceAtts.nonEmpty) {
+        for (dataHolder <- FormRunner.findDataHolders(controlName)) {
+          if (attsToRemove.nonEmpty)
+            delete((dataHolder /@ @*).filter(a => attsToRemove(a.qName)))
+          for (att <- newInstanceAtts) {
+            if ((dataHolder /@ @*).forall(_.qName != att.qName))
+              insert(into = dataHolder, origin = attributeInfo(att.qName, att.stringValue))
+          }
+        }
+      }
+    }
 
     // In other words we leave Type and Required and custom MIPs except `fr:persist` as they are
     // This must match what is done in annotate.xpl

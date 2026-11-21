@@ -723,6 +723,10 @@
         </control-appearance>
         <control-conversion>
             <label>Changer le contrôle en</label>
+            <show-all>Afficher tous les types de contrôles</show-all>
+            <compatible-group>Compatibles</compatible-group>
+            <other-group>Autres</other-group>
+            <cross-type-warning>La conversion vers un autre type de contrôle peut modifier le format des données ou supprimer les choix et paramètres existants.</cross-type-warning>
         </control-conversion>
         <whitespace>
             <item>

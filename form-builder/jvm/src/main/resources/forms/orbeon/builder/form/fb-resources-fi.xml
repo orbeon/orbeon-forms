@@ -708,6 +708,10 @@
         </control-appearance>
         <control-conversion>
             <label todo="true">Change Control To</label>
+            <show-all>Näytä kaikki kenttätyypit</show-all>
+            <compatible-group>Yhteensopivat</compatible-group>
+            <other-group>Muut</other-group>
+            <cross-type-warning>Muuntaminen toiseen kenttätyyppiin voi muuttaa tietomuotoa tai poistaa olemassa olevat vaihtoehdot ja asetukset.</cross-type-warning>
         </control-conversion>
         <whitespace>
             <item>

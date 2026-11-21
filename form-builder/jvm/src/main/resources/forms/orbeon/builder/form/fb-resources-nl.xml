@@ -688,6 +688,10 @@
         </control-appearance>
         <control-conversion>
             <label todo="true">Change Control To</label>
+            <show-all>Alle besturingstypen weergeven</show-all>
+            <compatible-group>Compatibel</compatible-group>
+            <other-group>Overige</other-group>
+            <cross-type-warning>Converteren naar een ander besturingstype kan het gegevensformaat wijzigen of bestaande keuzes en instellingen verwijderen.</cross-type-warning>
         </control-conversion>
         <whitespace>
             <item>

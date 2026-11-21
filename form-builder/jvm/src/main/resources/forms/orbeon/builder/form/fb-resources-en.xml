@@ -725,6 +725,10 @@
         </control-appearance>
         <control-conversion>
             <label>Change Control To</label>
+            <show-all>Show all control types</show-all>
+            <compatible-group>Compatible</compatible-group>
+            <other-group>Other</other-group>
+            <cross-type-warning>Converting to a different control type may change the data format or remove existing choices and settings.</cross-type-warning>
         </control-conversion>
         <whitespace>
             <item>

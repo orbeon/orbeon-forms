@@ -707,6 +707,10 @@
         </control-appearance>
         <control-conversion>
             <label todo="true">Change Control To</label>
+            <show-all>إظهار جميع أنواع عناصر التحكم</show-all>
+            <compatible-group>متوافقة</compatible-group>
+            <other-group>أخرى</other-group>
+            <cross-type-warning>قد يؤدي التحويل إلى نوع عنصر تحكم مختلف إلى تغيير تنسيق البيانات أو إزالة الخيارات والإعدادات الحالية.</cross-type-warning>
         </control-conversion>
         <whitespace>
             <item>

@@ -687,6 +687,10 @@
         </control-appearance>
         <control-conversion>
             <label todo="true">Change Control To</label>
+            <show-all>Показать все типы элементов управления</show-all>
+            <compatible-group>Совместимые</compatible-group>
+            <other-group>Другие</other-group>
+            <cross-type-warning>Преобразование в другой тип элемента управления может изменить формат данных или удалить существующие варианты и настройки.</cross-type-warning>
         </control-conversion>
         <whitespace>
             <item>

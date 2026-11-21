@@ -695,6 +695,10 @@
         </control-appearance>
         <control-conversion>
             <label todo="true">Change Control To</label>
+            <show-all>Mostra tutti i tipi di controllo</show-all>
+            <compatible-group>Compatibili</compatible-group>
+            <other-group>Altri</other-group>
+            <cross-type-warning>La conversione a un tipo di controllo diverso può modificare il formato dei dati o rimuovere scelte e impostazioni esistenti.</cross-type-warning>
         </control-conversion>
         <whitespace>
             <item>

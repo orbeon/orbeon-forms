@@ -688,6 +688,10 @@
         </control-appearance>
         <control-conversion>
             <label todo="true">Change Control To</label>
+            <show-all>Mostrar todos os tipos de controle</show-all>
+            <compatible-group>Compatíveis</compatible-group>
+            <other-group>Outros</other-group>
+            <cross-type-warning>Converter para um tipo de controle diferente pode alterar o formato dos dados ou remover opções e configurações existentes.</cross-type-warning>
         </control-conversion>
         <whitespace>
             <item>

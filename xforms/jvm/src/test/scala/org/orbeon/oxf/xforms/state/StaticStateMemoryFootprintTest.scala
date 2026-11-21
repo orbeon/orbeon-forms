@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.state
 
-import org.junit.Assume
 import org.orbeon.dom.tree.CompactElement
 import org.orbeon.oxf.cache.MemorySizeEstimator
 import org.orbeon.oxf.common.Version
@@ -125,7 +124,7 @@ class StaticStateMemoryFootprintTest
   describe("XFormsStaticStateImpl memory footprint optimizations (#7252)") {
 
     it("must detach dead static DOM subtrees, clear transient XPath analysis, and preserve runtime behavior") {
-      Assume.assumeTrue(Version.isPE)
+      assume(Version.isPE)
 
       // Ensure `Instance` does not retain a duplicate immutable `InstanceMetadata` field alongside `_instanceMetadata`
       val metadataFields = classOf[Instance].getDeclaredFields.filter(_.getType == classOf[InstanceMetadata])

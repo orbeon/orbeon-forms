@@ -44,7 +44,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <currency>10.99</currency>
                             <currency-right>10.99</currency-right>
                             <percentage></percentage>
-                            <slider></slider>
+                            <slider></slider><quantity-weight unit=""></quantity-weight><quantity-temperature unit=""></quantity-temperature>
                         </grid-11>
                     </number-controls>
                     <date-time-controls>
@@ -338,7 +338,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind ref="currency" id="currency-bind" type="xf:decimal" name="currency"></xf:bind>
                         <xf:bind ref="currency-right" id="currency-right-bind" type="xf:decimal" name="currency-right"></xf:bind>
                         <xf:bind id="percentage-bind" ref="percentage" name="percentage" type="xf:decimal" xxf:default="'42'"></xf:bind>
-                        <xf:bind id="slider-bind" ref="slider" name="slider" type="fr:range" xxf:default="'50'"></xf:bind>
+                        <xf:bind id="slider-bind" ref="slider" name="slider" type="fr:range" xxf:default="'50'"></xf:bind><xf:bind id="quantity-weight-bind" ref="quantity-weight" name="quantity-weight" type="xf:decimal"></xf:bind><xf:bind id="quantity-temperature-bind" ref="quantity-temperature" name="quantity-temperature" type="xf:decimal"></xf:bind>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="date-time-controls-bind" ref="date-time-controls" name="date-time-controls">
@@ -1410,7 +1410,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <slider>
                             <label>Slider</label>
                             <hint>Slider field</hint>
-                        </slider>
+                        </slider><quantity-weight><label>Quantity (Weight)</label><hint>Enter a numeric weight and choose a unit</hint></quantity-weight><quantity-temperature><label>Quantity (Temperature, Auto-Convert)</label><hint>Changing the unit automatically converts the value</hint></quantity-temperature>
                         <input>
                             <label>Text Field</label>
                             <hint>Standard input field</hint>
@@ -2539,7 +2539,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <slider>
                             <label>Curseur</label>
                             <hint>Curseur</hint>
-                        </slider>
+                        </slider><quantity-weight><label>Quantité (Poids)</label><hint>Saisissez un poids numérique et choisissez une unité</hint></quantity-weight><quantity-temperature><label>Quantité (Température, conversion auto)</label><hint>Changer l'unité convertit automatiquement la valeur</hint></quantity-temperature>
                         <input>
                             <label>Champ de texte</label>
                             <hint>Champ de texte standard</hint>
@@ -3044,7 +3044,17 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
                                 <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
                             </fr:range>
-                        </fr:c>
+                        </fr:c><fr:c x="1" y="4" w="6"><fr:quantity id="quantity-weight-control" bind="quantity-weight-bind" default-unit="lb" digits-after-decimal="2" unit-preset="mass" units="lb oz kg g">
+                        <xf:label ref="$form-resources/quantity-weight/label"></xf:label>
+                        <xf:hint ref="$form-resources/quantity-weight/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </fr:quantity></fr:c><fr:c x="7" y="4" w="6"><fr:quantity id="quantity-temperature-control" bind="quantity-temperature-bind" convert-on-unit-change="true" default-unit="C" digits-after-decimal="1" units="C F" unit-preset="temperature">
+                        <xf:label ref="$form-resources/quantity-temperature/label"></xf:label>
+                        <xf:hint ref="$form-resources/quantity-temperature/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </fr:quantity></fr:c>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="date-time-controls-section" bind="date-time-controls-bind">

@@ -41,6 +41,7 @@ object Select2 {
     val sorter             : js.UndefOr[js.Function1[js.Array[Option], js.Array[Option]]]         = js.undefined
     val templateResult     : js.UndefOr[js.Function2[Option, html.Element, String]]               = js.undefined
     val templateSelection  : js.UndefOr[js.Function2[Option, html.Element, String]]               = js.undefined
+    val createTag          : js.UndefOr[js.Function1[ParamsData, js.Any]]                         = js.undefined
   }
 
   implicit class OptionsOps(val o: Options) extends AnyVal {
@@ -55,7 +56,8 @@ object Select2 {
       newMatcher            : js.UndefOr[js.Function2[ParamsData, Option, Option]]         = o.matcher,
       newSorter             : js.UndefOr[js.Function1[js.Array[Option], js.Array[Option]]] = o.sorter,
       newTemplateResult     : js.UndefOr[js.Function2[Option, html.Element, String]]       = o.templateResult,
-      newTemplateSelection  : js.UndefOr[js.Function2[Option, html.Element, String]]       = o.templateSelection
+      newTemplateSelection  : js.UndefOr[js.Function2[Option, html.Element, String]]       = o.templateSelection,
+      newCreateTag          : js.UndefOr[js.Function1[ParamsData, js.Any]]                 = o.createTag
     ): Options = {
       new Options {
         val placeholder        = newPlaceholder
@@ -69,6 +71,7 @@ object Select2 {
         override val sorter            = newSorter
         override val templateResult    = newTemplateResult
         override val templateSelection = newTemplateSelection
+        override val createTag         = newCreateTag
       }
     }
   }

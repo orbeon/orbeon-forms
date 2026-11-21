@@ -113,12 +113,25 @@ trait FormDefinition {
       }
     }
 
-    // Look for indexed controls with fr:index sub-element or fr-index, fr-summary, etc. classes (legacy)
-    val indexedControlBindPathHolders =
-      FormRunner.searchControlsInFormBySubElement(subElements = Set("*:index"),   databaseDataFormatVersion) ++
-      FormRunner.searchControlsInFormByClass     (classes     = ClassesPredicate, databaseDataFormatVersion)
-
     def pathString(path: List[PathElem]) = path.map(_.value).mkString("/")
+
+    // Look for indexed controls with fr:index sub-element, fr-index/fr-summary/fr-search classes (legacy),
+    // or suggest-existing="true" (for Searchable Combobox distinct-values suggestions)
+    val indexedControlBindPathHolders = {
+      val bySubElementOrClass =
+        FormRunner.searchControlsInFormBySubElement(subElements = Set("*:index"),   databaseDataFormatVersion) ++
+        FormRunner.searchControlsInFormByClass     (classes     = ClassesPredicate, databaseDataFormatVersion)
+
+      val alreadyIndexedPaths = bySubElementOrClass.map(c => pathString(c.path)).toSet
+
+      val bySuggestExisting =
+        FormRunner.searchControlsInFormByControlPredicate(
+          controlPredicate  = _.attValueOpt("suggest-existing").contains("true"),
+          dataFormatVersion = databaseDataFormatVersion
+        ).filterNot(c => alreadyIndexedPaths.contains(pathString(c.path)))
+
+      bySubElementOrClass ++ bySuggestExisting
+    }
 
     val distinctValuesOpt = searchVersionOpt.toSeq.map { searchVersion =>
       val dynamicControlPaths = indexedControlBindPathHolders.filter { controlInfo =>

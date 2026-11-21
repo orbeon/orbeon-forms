@@ -18,7 +18,8 @@
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:OpenSelect1SearchSupport="java:org.orbeon.xbl.OpenSelect1SearchSupportJava">
 
     <xbl:script src="/webjars/select2/4.0.13/dist/js/select2.full.js"/>
     <xbl:binding
@@ -81,23 +82,32 @@
                     </xf:select1>
                 </view>
             </templates>
-            <!-- TODO: This is duplicated from `dropdown-select1.xbl` except for one line (`dropdown` vs. `search`) -->
             <custom-settings>
                 <setting name="fr:pdf-appearance" type="xs:string" values="search full"/>
+                <setting name="selection"         type="xs:string" values="closed open"/>
+                <setting name="suggest-existing"  type="xs:boolean"/>
             </custom-settings>
             <control-details>
                 <xf:model xmlns="" id="fb-editor-dropdown-select1-model">
 
-                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
-                        <xf:var name="c" value="."/>
-                        <xf:setvalue ref="$c" value="instance()/@*[local-name() = name($c)]"/>
+                    <xf:action event="xforms-model-construct-done">
+                        <xf:setvalue ref="instance('local')/pdf-appearance"   value="instance()/@fr:pdf-appearance"/>
+                        <xf:setvalue ref="instance('local')/open-selection"   value="instance()/@selection = 'open'"/>
+                        <xf:setvalue ref="instance('local')/suggest-existing" value="instance()/@suggest-existing = 'true'"/>
                     </xf:action>
 
                     <xf:instance id="local" xxf:exclude-result-prefixes="#all">
                         <_>
                             <pdf-appearance/>
+                            <open-selection/>
+                            <suggest-existing/>
                         </_>
                     </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind ref="open-selection"   type="xs:boolean"/>
+                        <xf:bind ref="suggest-existing" type="xs:boolean" relevant="../open-selection = 'true'"/>
+                    </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true">
                         <_>
@@ -105,71 +115,85 @@
                                 <automatic-pdf>Automatic PDF</automatic-pdf>
                                 <selected-only>Show the selected value only</selected-only>
                                 <show-all>Show all values as radio buttons</show-all>
+                                <suggest-existing>Suggest values from existing records</suggest-existing>
                             </resource>
                             <resource xml:lang="fr">
                                 <automatic-pdf>PDF automatique</automatic-pdf>
                                 <selected-only>Montrer la valeur sélectionnée seulement</selected-only>
                                 <show-all>Montrer toutes les valeurs comme boutons radio</show-all>
+                                <suggest-existing>Suggérer les valeurs des enregistrements existants</suggest-existing>
                             </resource>
                             <resource xml:lang="no">
                                 <automatic-pdf>Automatisk PDF</automatic-pdf>
                                 <selected-only>Vis bare valgt verdi</selected-only>
                                 <show-all>Vis alle verdier som radioknapper</show-all>
+                                <suggest-existing>Foreslå verdier fra eksisterende oppføringer</suggest-existing>
                             </resource>
                             <resource xml:lang="ru">
                                 <automatic-pdf>Автоматический PDF</automatic-pdf>
                                 <selected-only>Показывать только выбранное значение</selected-only>
                                 <show-all>Показать все значения как переключатели</show-all>
+                                <suggest-existing>Предлагать значения из существующих записей</suggest-existing>
                             </resource>
                             <resource xml:lang="it">
                                 <automatic-pdf>PDF automatico</automatic-pdf>
                                 <selected-only>Mostra solo il valore selezionato</selected-only>
                                 <show-all>Mostra tutti i valori come pulsanti di scelta</show-all>
+                                <suggest-existing>Suggerisci valori dai record esistenti</suggest-existing>
                             </resource>
                             <resource xml:lang="de">
                                 <automatic-pdf>Automatisches PDF</automatic-pdf>
                                 <selected-only>Nur ausgewählten Wert anzeigen</selected-only>
                                 <show-all>Alle Werte als Optionsfelder anzeigen</show-all>
+                                <suggest-existing>Werte aus vorhandenen Einträgen vorschlagen</suggest-existing>
                             </resource>
                             <resource xml:lang="fi">
                                 <automatic-pdf>Automaattinen PDF</automatic-pdf>
                                 <selected-only>Näytä vain valittu arvo</selected-only>
                                 <show-all>Näytä kaikki arvot radiopainikkeina</show-all>
+                                <suggest-existing>Ehdota arvoja olemassa olevista tietueista</suggest-existing>
                             </resource>
                             <resource xml:lang="es">
                                 <automatic-pdf>PDF automático</automatic-pdf>
                                 <selected-only>Mostrar solo el valor seleccionado</selected-only>
                                 <show-all>Mostrar todos los valores como botones de opción</show-all>
+                                <suggest-existing>Sugerir valores de registros existentes</suggest-existing>
                             </resource>
                             <resource xml:lang="nl">
                                 <automatic-pdf>Automatische PDF</automatic-pdf>
                                 <selected-only>Alleen geselecteerde waarde tonen</selected-only>
                                 <show-all>Alle waarden als keuzerondjes tonen</show-all>
+                                <suggest-existing>Waarden uit bestaande records voorstellen</suggest-existing>
                             </resource>
                             <resource xml:lang="pt">
                                 <automatic-pdf>PDF automático</automatic-pdf>
                                 <selected-only>Mostrar apenas o valor selecionado</selected-only>
                                 <show-all>Mostrar todos os valores como botões de opção</show-all>
+                                <suggest-existing>Sugerir valores de registros existentes</suggest-existing>
                             </resource>
                             <resource xml:lang="sv">
                                 <automatic-pdf>Automatisk PDF</automatic-pdf>
                                 <selected-only>Visa bara valt värde</selected-only>
                                 <show-all>Visa alla värden som radioknappar</show-all>
+                                <suggest-existing>Föreslå värden från befintliga poster</suggest-existing>
                             </resource>
                             <resource xml:lang="ar">
                                 <automatic-pdf>PDF تلقائي</automatic-pdf>
                                 <selected-only>إظهار القيمة المحددة فقط</selected-only>
                                 <show-all>إظهار جميع القيم كأزرار اختيار</show-all>
+                                <suggest-existing>اقتراح قيم من السجلات الموجودة</suggest-existing>
                             </resource>
                             <resource xml:lang="pl">
                                 <automatic-pdf>Automatyczny PDF</automatic-pdf>
                                 <selected-only>Pokazuj tylko wybraną wartość</selected-only>
                                 <show-all>Pokaż wszystkie wartości jako przyciski opcji</show-all>
+                                <suggest-existing>Podpowiadaj wartości z istniejących rekordów</suggest-existing>
                             </resource>
                             <resource xml:lang="ja">
                                 <automatic-pdf>自動PDF</automatic-pdf>
                                 <selected-only>選択値だけ表示</selected-only>
                                 <show-all>すべての値をラジオボタンで表示</show-all>
+                                <suggest-existing>既存のレコードから値を提案する</suggest-existing>
                             </resource>
                         </_>
                     </xf:instance>
@@ -194,6 +218,21 @@
                             </xf:select1>
                         </xh:td>
                     </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <fr:checkbox-input ref="instance('local')/open-selection" id="open-selection-control">
+                                <xf:label ref="xxf:r('dialog-control-settings.open-selection.label', '|fr-form-resources|')"/>
+                                <xf:help  ref="xxf:r('dialog-control-settings.open-selection.help',  '|fr-form-resources|')"/>
+                            </fr:checkbox-input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <fr:checkbox-input ref="instance('local')/suggest-existing" id="suggest-existing-control">
+                                <xf:label ref="xxf:r('suggest-existing')"/>
+                            </fr:checkbox-input>
+                        </xh:td>
+                    </xh:tr>
                 </fr:grid>
                 <xf:action
                     id="fb-editor-dropdown-select1-action"
@@ -209,6 +248,37 @@
                     <xf:delete
                         if="xxf:is-blank($new-value)"
                         ref="instance()/@*[local-name() = $name]"/>
+                </xf:action>
+                <xf:action
+                    id="fb-editor-open-selection-action"
+                    event="xforms-value-changed"
+                    observer="open-selection-control">
+
+                    <xf:var name="is-open" value="string(event('xxf:binding')) = 'true'"/>
+                    <xf:insert
+                        context="instance()"
+                        if="$is-open"
+                        origin="xf:attribute('selection', 'open')"/>
+                    <xf:delete
+                        if="not($is-open)"
+                        ref="instance()/@selection"/>
+                    <xf:delete
+                        if="not($is-open)"
+                        ref="instance()/@suggest-existing"/>
+                </xf:action>
+                <xf:action
+                    id="fb-editor-suggest-existing-action"
+                    event="xforms-value-changed"
+                    observer="suggest-existing-control">
+
+                    <xf:var name="enabled" value="string(event('xxf:binding')) = 'true'"/>
+                    <xf:insert
+                        context="instance()"
+                        if="$enabled"
+                        origin="xf:attribute('suggest-existing', 'true')"/>
+                    <xf:delete
+                        if="not($enabled)"
+                        ref="instance()/@suggest-existing"/>
                 </xf:action>
             </control-details>
         </metadata>
@@ -282,6 +352,112 @@
             >
                 <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
             </xf:select>
+        </xbl:template>
+    </xbl:binding>
+
+    <xbl:binding
+        id="fr-open-select1-search"
+        element="
+            fr|open-select1-search,
+            fr|dropdown-select1-search[selection = open],
+            xf|select1[appearance ~= search][selection = open],
+            fr|open-select1[appearance ~= search]"
+        xxbl:container="span"
+        xxbl:label-for="select1"
+        xxbl:mode="lhha binding value focus selection javascript-lifecycle allow-minimal-label-hint"
+        xxf:external-events="fr-change">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/dropdown-select1-search/dropdown-select1-search.css"/>
+            <xbl:style src="/webjars/select2/4.0.13/dist/css/select2.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model id="open-select1-search-model">
+                <xf:instance id="existing-values" xxf:exclude-result-prefixes="#all">
+                    <_/>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:handlers>
+            <xbl:handler event="fr-change">
+                <xf:var name="binding"><xxf:value value="." xxbl:scope="outer"/></xf:var>
+                <xf:setvalue ref="$binding" value="event('fr-value')"/>
+            </xbl:handler>
+            <xbl:handler event="xforms-enabled" phase="target">
+                <xf:var name="suggest-existing" value="fr:component-param-value('suggest-existing') = 'true'"/>
+                <xf:action if="$suggest-existing and empty(instance('existing-values')/value)">
+                    <xf:var name="binding"><xxf:value value="." xxbl:scope="outer"/></xf:var>
+                    <xf:var name="path-full" value="string-join($binding/ancestor-or-self::*[ancestor::form]/local-name(), '/')"/>
+                    <xf:var name="path-400"  value="string-join($binding/ancestor-or-self::*[ancestor::form and not(matches(local-name(), '^grid-\d+$'))]/local-name(), '/')"/>
+                    <xf:var
+                        name="distinct-vals"
+                        value="
+                            OpenSelect1SearchSupport:distinctValuesForControl(
+                                fr:app-name(),
+                                fr:form-name(),
+                                string(fr:form-version()),
+                                $path-full,
+                                $path-400
+                            )"/>
+                    <xf:insert
+                        context="instance('existing-values')"
+                        origin="for $v in $distinct-vals return xf:element('value', $v)"/>
+                </xf:action>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:template>
+            <xf:var name="binding"             value="xxf:binding('fr-open-select1-search')"/>
+            <xf:var name="disable-placeholder" value="fr:component-param-value('disable-placeholder') = 'true'"/>
+            <xf:var name="min-input-length"    value="fr:component-param-value('min-input-length')"/>
+
+            <!-- Internal select1 so xxf:itemset() returns the static itemset -->
+            <xf:select1 id="internal-select1" ref="$binding" appearance="xxf:internal">
+                <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+            </xf:select1>
+
+            <xf:var name="static-items"        value="xxf:itemset('internal-select1', 'xml')/itemset/choices/item"/>
+            <xf:var name="static-values-lower" value="$static-items/value/lower-case(string(.))"/>
+            <xf:var name="static-labels-lower" value="$static-items/label/lower-case(string(.))"/>
+            <xf:var
+                name="existing-items"
+                value="instance('existing-values')/value[not(lower-case(string(.)) = ($static-values-lower, $static-labels-lower))]"/>
+            <xf:var
+                name="all-known-values"
+                value="($static-items/value/string(.), $existing-items/string(.))"/>
+
+            <xf:select1
+                appearance="minimal"
+                ref="$binding"
+                id="select1"
+                xbl:attr="xxf:encrypt-item-values autocomplete xxf:readonly-appearance"
+                data-placeholder="{
+                    if ($disable-placeholder) then
+                        ''
+                    else if (xxf:label-appearance('select1') = 'minimal') then
+                        xxf:label('select1')
+                    else
+                        xxf:r('components.labels.please-select', '|fr-fr-resources|')
+                }"
+                data-is-open-selection="true"
+                data-min-input-length="{$min-input-length}"
+            >
+                <xf:itemset ref="''[not($disable-placeholder)]">
+                    <xf:label/>
+                    <xf:value/>
+                </xf:itemset>
+                <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+                <xf:itemset ref="$existing-items">
+                    <xf:label ref="."/>
+                    <xf:value ref="."/>
+                </xf:itemset>
+                <xf:itemset ref="$binding[xxf:non-blank() and not(string(.) = $all-known-values)]">
+                    <xf:label ref="."/>
+                    <xf:value ref="."/>
+                </xf:itemset>
+            </xf:select1>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

@@ -1,0 +1,252 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fr-open-select1-search"
+        element="
+            fr|open-select1[appearance ~= search],
+            xf|select1[selection = open][appearance ~= search]"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value">
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Searchable Combobox</display-name>
+            <display-name lang="fr">Liste déroulante modifiable</display-name>
+            <display-name lang="no">Søkbar kombinasjonsboks</display-name>
+            <display-name lang="ru">Поле со списком и поиском</display-name>
+            <display-name lang="it">Casella combinata con ricerca</display-name>
+            <display-name lang="de">Kombinationsfeld mit Suche</display-name>
+            <display-name lang="fi">Haettava yhdistelmäruutu</display-name>
+            <display-name lang="es">Cuadro combinado con búsqueda</display-name>
+            <display-name lang="nl">Zoekbare keuzelijst met vrije invoer</display-name>
+            <display-name lang="pt">Caixa combinada com pesquisa</display-name>
+            <display-name lang="sv">Sökbar kombinationsruta</display-name>
+            <display-name lang="ar">مربع تحرير وسرد مع بحث</display-name>
+            <display-name lang="pl">Pole kombi z wyszukiwaniem</display-name>
+            <display-name lang="ja">検索付きコンボボックス</display-name>
+            <appearance-display-name lang="en">With Search &amp; Free Entry</appearance-display-name>
+            <appearance-display-name lang="fr">Avec recherche et saisie libre</appearance-display-name>
+            <appearance-display-name lang="no">Med søk og fritekst</appearance-display-name>
+            <appearance-display-name lang="ru">С поиском и свободным вводом</appearance-display-name>
+            <appearance-display-name lang="it">Con ricerca e inserimento libero</appearance-display-name>
+            <appearance-display-name lang="de">Mit Suche und Freitext</appearance-display-name>
+            <appearance-display-name lang="fi">Haulla ja vapaalla syötöllä</appearance-display-name>
+            <appearance-display-name lang="es">Con búsqueda y entrada libre</appearance-display-name>
+            <appearance-display-name lang="nl">Met zoeken en vrije invoer</appearance-display-name>
+            <appearance-display-name lang="pt">Com pesquisa e entrada livre</appearance-display-name>
+            <appearance-display-name lang="sv">Med sökning och fritext</appearance-display-name>
+            <appearance-display-name lang="ar">مع بحث وإدخال حر</appearance-display-name>
+            <appearance-display-name lang="pl">Z wyszukiwaniem i dowolnym wpisem</appearance-display-name>
+            <appearance-display-name lang="ja">検索・自由入力付き</appearance-display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-search</icon-class>
+            </icon>
+            <editors static-itemset="true" item-hint="true"/>
+            <templates>
+                <view>
+                    <xf:select1 id="" ref="" appearance="search" selection="open" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                        <xf:itemset ref="">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                            <xf:hint  ref="hint"/>
+                        </xf:itemset>
+                    </xf:select1>
+                </view>
+            </templates>
+            <custom-settings>
+                <setting name="fr:pdf-appearance" type="xs:string" values="search full"/>
+                <setting name="selection"         type="xs:string" values="closed open"/>
+                <setting name="suggest-existing"  type="xs:boolean"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-open-select1-search-model">
+
+                    <xf:action event="xforms-model-construct-done">
+                        <xf:setvalue ref="instance('local')/pdf-appearance"   value="instance()/@fr:pdf-appearance"/>
+                        <xf:setvalue ref="instance('local')/suggest-existing" value="instance()/@suggest-existing = 'true'"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <pdf-appearance/>
+                            <suggest-existing/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind ref="suggest-existing" type="xs:boolean"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true">
+                        <_>
+                            <resource xml:lang="en">
+                                <automatic-pdf>Automatic PDF</automatic-pdf>
+                                <selected-only>Show the selected value only</selected-only>
+                                <show-all>Show all values as radio buttons</show-all>
+                                <suggest-existing>Suggest values from existing records</suggest-existing>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <automatic-pdf>PDF automatique</automatic-pdf>
+                                <selected-only>Montrer la valeur sélectionnée seulement</selected-only>
+                                <show-all>Montrer toutes les valeurs comme boutons radio</show-all>
+                                <suggest-existing>Suggérer les valeurs des enregistrements existants</suggest-existing>
+                            </resource>
+                            <resource xml:lang="no">
+                                <automatic-pdf>Automatisk PDF</automatic-pdf>
+                                <selected-only>Vis bare valgt verdi</selected-only>
+                                <show-all>Vis alle verdier som radioknapper</show-all>
+                                <suggest-existing>Foreslå verdier fra eksisterende oppføringer</suggest-existing>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <automatic-pdf>Автоматический PDF</automatic-pdf>
+                                <selected-only>Показывать только выбранное значение</selected-only>
+                                <show-all>Показать все значения как переключатели</show-all>
+                                <suggest-existing>Предлагать значения из существующих записей</suggest-existing>
+                            </resource>
+                            <resource xml:lang="it">
+                                <automatic-pdf>PDF automatico</automatic-pdf>
+                                <selected-only>Mostra solo il valore selezionato</selected-only>
+                                <show-all>Mostra tutti i valori come pulsanti di scelta</show-all>
+                                <suggest-existing>Suggerisci valori dai record esistenti</suggest-existing>
+                            </resource>
+                            <resource xml:lang="de">
+                                <automatic-pdf>Automatisches PDF</automatic-pdf>
+                                <selected-only>Nur ausgewählten Wert anzeigen</selected-only>
+                                <show-all>Alle Werte als Optionsfelder anzeigen</show-all>
+                                <suggest-existing>Werte aus vorhandenen Einträgen vorschlagen</suggest-existing>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <automatic-pdf>Automaattinen PDF</automatic-pdf>
+                                <selected-only>Näytä vain valittu arvo</selected-only>
+                                <show-all>Näytä kaikki arvot radiopainikkeina</show-all>
+                                <suggest-existing>Ehdota arvoja olemassa olevista tietueista</suggest-existing>
+                            </resource>
+                            <resource xml:lang="es">
+                                <automatic-pdf>PDF automático</automatic-pdf>
+                                <selected-only>Mostrar solo el valor seleccionado</selected-only>
+                                <show-all>Mostrar todos los valores como botones de opción</show-all>
+                                <suggest-existing>Sugerir valores de registros existentes</suggest-existing>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <automatic-pdf>Automatische PDF</automatic-pdf>
+                                <selected-only>Alleen geselecteerde waarde tonen</selected-only>
+                                <show-all>Alle waarden als keuzerondjes tonen</show-all>
+                                <suggest-existing>Waarden uit bestaande records voorstellen</suggest-existing>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <automatic-pdf>PDF automático</automatic-pdf>
+                                <selected-only>Mostrar apenas o valor selecionado</selected-only>
+                                <show-all>Mostrar todos os valores como botões de opção</show-all>
+                                <suggest-existing>Sugerir valores de registros existentes</suggest-existing>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <automatic-pdf>Automatisk PDF</automatic-pdf>
+                                <selected-only>Visa bara valt värde</selected-only>
+                                <show-all>Visa alla värden som radioknappar</show-all>
+                                <suggest-existing>Föreslå värden från befintliga poster</suggest-existing>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <automatic-pdf>PDF تلقائي</automatic-pdf>
+                                <selected-only>إظهار القيمة المحددة فقط</selected-only>
+                                <show-all>إظهار جميع القيم كأزرار اختيار</show-all>
+                                <suggest-existing>اقتراح قيم من السجلات الموجودة</suggest-existing>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <automatic-pdf>Automatyczny PDF</automatic-pdf>
+                                <selected-only>Pokazuj tylko wybraną wartość</selected-only>
+                                <show-all>Pokaż wszystkie wartości jako przyciski opcji</show-all>
+                                <suggest-existing>Podpowiadaj wartości z istniejących rekordów</suggest-existing>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <automatic-pdf>自動PDF</automatic-pdf>
+                                <selected-only>選択値だけ表示</selected-only>
+                                <show-all>すべての値をラジオボタンで表示</show-all>
+                                <suggest-existing>既存のレコードから値を提案する</suggest-existing>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-open-select1-search-grid">
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:select1 ref="instance('local')/pdf-appearance" appearance="full" id="show-all-items-control">
+                                <xf:label ref="xxf:r('automatic-pdf')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('selected-only')"/>
+                                    <xf:value>search</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('show-all')"/>
+                                    <xf:value>full</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <fr:checkbox-input ref="instance('local')/suggest-existing" id="suggest-existing-control">
+                                <xf:label ref="xxf:r('suggest-existing')"/>
+                            </fr:checkbox-input>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-open-select1-search-pdf-action"
+                    event="xforms-value-changed"
+                    observer="show-all-items-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute(concat('fr:', $name), $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[local-name() = $name]"/>
+                </xf:action>
+                <xf:action
+                    id="fb-editor-open-select1-search-suggest-action"
+                    event="xforms-value-changed"
+                    observer="suggest-existing-control">
+
+                    <xf:var name="enabled" value="string(event('xxf:binding')) = 'true'"/>
+                    <xf:insert
+                        context="instance()"
+                        if="$enabled"
+                        origin="xf:attribute('suggest-existing', 'true')"/>
+                    <xf:delete
+                        if="not($enabled)"
+                        ref="instance()/@suggest-existing"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+    </xbl:binding>
+</xbl:xbl>

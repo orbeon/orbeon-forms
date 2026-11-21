@@ -34,6 +34,7 @@ import scala.scalajs.js.JSConverters.*
 
 object Select1Search {
   XFormsXbl.declareCompanion(name = "fr|dropdown-select1-search" , js.constructorOf[Select1SearchCompanion])
+  XFormsXbl.declareCompanion(name = "fr|open-select1-search"     , js.constructorOf[Select1SearchCompanion])
   XFormsXbl.declareCompanion(name = "fr|dropdown-select-search"  , js.constructorOf[Select1SearchCompanion])
   XFormsXbl.declareCompanion(name = "fr|databound-select1-search", js.constructorOf[Select1SearchCompanion])
   XFormsXbl.declareCompanion(name = "fr|databound-select-search" , js.constructorOf[Select1SearchCompanion])
@@ -269,6 +270,26 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     }
   }
 
+  private def customCreateTag(select: html.Select)(params: Select2.ParamsData): js.Any =
+    params.term.toOption.flatMap(_.trimAllToOpt) match {
+      case None =>
+        null
+      case Some(trimmed) =>
+        val normTerm = Select1Search.normalizeText(trimmed)
+        val alreadyExists =
+          (0 until select.options.length).exists { i =>
+            val opt = select.options(i)
+            opt.text.nonEmpty && (
+              Select1Search.normalizeText(opt.text) == normTerm ||
+              Select1Search.normalizeText(opt.value) == normTerm
+            )
+          }
+        if (alreadyExists)
+          null
+        else
+          js.Dynamic.literal(id = trimmed, text = trimmed, newTag = true)
+    }
+
   private def customSorter(
     isCountry : Boolean
   )(
@@ -280,7 +301,11 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
       results
         .zipWithIndex
         .sortBy { case (opt, idx) =>
-          (Select1Search.matchTier(opt, currentSearchTerm, isCountry).getOrElse(Int.MaxValue), idx)
+          val isNewTag = opt.asInstanceOf[js.Dynamic].newTag.asInstanceOf[js.UndefOr[Boolean]].contains(true)
+          val tier =
+            if (isNewTag) Int.MaxValue - 1
+            else          Select1Search.matchTier(opt, currentSearchTerm, isCountry).getOrElse(Int.MaxValue)
+          (tier, idx)
         }
         .map(_._1)
         .toJSArray
@@ -309,10 +334,13 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     val elementWithData  = queryElementWithData
     if (! isStaticReadonly && ! elementWithData.hasClass("xforms-disabled"))
       for (select <- Option(querySelect)) {
-        val isDatabound   = DataboundClasses.exists(containerElem.hasClass)
-        val isCountry     = isCountryControl
-        val isPhone       = isPhoneControl
-        val placeholderId = findPlaceholderOptionId(select)
+        val isDatabound       = DataboundClasses.exists(containerElem.hasClass)
+        val isStaticOpen      = ! isDatabound && Option(elementWithData.getAttribute(DataIsOpenSelection)).contains("true")
+        val isCountry         = isCountryControl
+        val isPhone           = isPhoneControl
+        val placeholderId     = findPlaceholderOptionId(select)
+        if (isStaticOpen)
+          isOpenSelection = true
 
         // Prevent the propagation of `focusout` so the client doesn't send an `xxforms-value` event when users click on the dropdown,
         // as at that point the `<span class="select2-selection--single">` looses the focus, and since Select2 places that element inside
@@ -335,13 +363,14 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
               val dropdownParent           = containerElem.closestOpt("dialog").orUndefined
               val ajax                     = if (isDatabound) Select2Ajax else null
               val width                    = "100%" // For Select2 width to update as the viewport width changes
-              val tags                     = false
+              val tags                     = isStaticOpen
               val minimumInputLength       = Option(queryElementWithData.getAttribute(DataMinimumInputLength)).filter(_.nonEmpty).map(_.toInt).getOrElse(0)
               val placeholder              = placeholderOpt.orUndefined
               override val matcher           = (! isDatabound).option(js.Any.fromFunction2(customMatcher(isCountry, placeholderId))).orUndefined
               override val sorter            = (! isDatabound).option(js.Any.fromFunction1(customSorter(isCountry))).orUndefined
               override val templateResult    = (! isDatabound).option(js.Any.fromFunction2(customTemplateResult)).orUndefined
               override val templateSelection = isPhone.option(js.Any.fromFunction2(customTemplateSelection)).orUndefined
+              override val createTag         = isStaticOpen.option(js.Any.fromFunction1(customCreateTag(select))).orUndefined
             }
           )
         }
@@ -357,7 +386,38 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         // Listen on `select2:close` instead of `change` as the latter is not triggered the first time an open value is selected
         if (isDatabound)
           jSelect.asInstanceOf[js.Dynamic].on("select2:close", ((_: js.Any, _: JQueryEvent) => onChangeDispatchFrChange())       : js.Function2[js.Any, JQueryEvent, Unit])
-        jSelect.asInstanceOf[js.Dynamic].on("select2:close",   ((_: js.Any, _: JQueryEvent) => DomSupport.dispatchChange(select)): js.Function2[js.Any, JQueryEvent, Unit])
+        var pendingStaticNewTag = false
+        if (isStaticOpen) {
+          jSelect.asInstanceOf[js.Dynamic].on("select2:select", ((e: js.Dynamic) => {
+            val data = e.params.data
+            if (data.newTag.asInstanceOf[js.UndefOr[Boolean]].contains(true)) {
+              pendingStaticNewTag = true
+              AjaxClient.fireEvent(
+                AjaxEvent(
+                  eventName  = "fr-change",
+                  targetId   = containerElem.id,
+                  properties = Map("fr-value" -> data.id.asInstanceOf[String])
+                )
+              )
+            }
+          }): js.Function1[js.Dynamic, Unit])
+          jSelect.asInstanceOf[js.Dynamic].on("select2:clear", ((_: js.Any) => {
+            pendingStaticNewTag = true
+            AjaxClient.fireEvent(
+              AjaxEvent(
+                eventName  = "fr-change",
+                targetId   = containerElem.id,
+                properties = Map("fr-value" -> "")
+              )
+            )
+          }): js.Function1[js.Any, Unit])
+        }
+        jSelect.asInstanceOf[js.Dynamic].on("select2:close",   ((_: js.Any, _: JQueryEvent) => {
+          if (pendingStaticNewTag)
+            pendingStaticNewTag = false
+          else
+            DomSupport.dispatchChange(select)
+        }): js.Function2[js.Any, JQueryEvent, Unit])
         jSelect.asInstanceOf[js.Dynamic].on("select2:open",    ((_: js.Any, _: JQueryEvent) => onOpen())                         : js.Function2[js.Any, JQueryEvent, Unit])
         jSelect.asInstanceOf[js.Dynamic].on("results:focus",   ((_: js.Any, e: JQueryEvent) => onResultsFocus(e))                : js.Function2[js.Any, JQueryEvent, Unit])
         if (isMultiple) {

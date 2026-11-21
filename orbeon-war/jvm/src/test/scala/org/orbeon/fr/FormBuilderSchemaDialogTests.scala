@@ -3,6 +3,7 @@ package org.orbeon.fr
 import com.microsoft.playwright.{Locator, Page}
 import com.microsoft.playwright.options.{FilePayload, SelectOption, WaitForSelectorState}
 import org.orbeon.fr.DockerSupport.eventually
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.util.StringUtils.*
 import org.scalatest.funspec.FixtureAnyFunSpecLike
 
@@ -18,6 +19,8 @@ trait FormBuilderSchemaDialogTests {
   describe("Form Builder XML Schema dialog") {
 
     it("must validate uploads, stage changes safely, and discard staged schema on Cancel") { _ =>
+      assume(Version.isPE)
+
       withNewFormBuilderForm { case FormRunnerWindow(xformsWindow, _) =>
         val page       = xformsWindow.page
         val ajaxServer = xformsWindow.ajaxServer
@@ -86,6 +89,8 @@ trait FormBuilderSchemaDialogTests {
     }
 
     it("must track control type usage, warn on dangling schema types, report in Check Form, and optionally reset to String") { _ =>
+      assume(Version.isPE)
+
       withNewFormBuilderForm { case FormRunnerWindow(xformsWindow, _) =>
         val page       = xformsWindow.page
         val ajaxServer = xformsWindow.ajaxServer
@@ -244,6 +249,8 @@ trait FormBuilderSchemaDialogTests {
     }
 
     it("must show and update the attached PDF Templates count badge in the toolbox") { _ =>
+      assume(Version.isPE)
+
       withNewFormBuilderForm { case FormRunnerWindow(xformsWindow, _) =>
         val page       = xformsWindow.page
         val ajaxServer = xformsWindow.ajaxServer

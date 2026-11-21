@@ -8,7 +8,7 @@ import org.orbeon.oxf.fr.FormRunnerPersistence.{OrbeonFormDefinitionApp, OrbeonF
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi.headerFromRFC1123OrIso
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunner, FormRunnerParams, Version}
-import org.orbeon.oxf.http.{Headers, HttpMethod}
+import org.orbeon.oxf.http.{Headers, HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorOutput, ScalaProcessorOutputImpl}
 import org.orbeon.oxf.util.*
@@ -64,8 +64,14 @@ class ReadFormProcessor extends ProcessorImpl {
 
   import ReadFormProcessor.*
 
-  private def readParams()(implicit pc: PipelineContext): FormRunnerParams =
-    FormRunnerParams(readCacheInputAsTinyTree(pc, XPath.GlobalConfiguration, "params").rootElement)
+  private def readParams()(implicit pc: PipelineContext, ec: ExternalContext): FormRunnerParams =
+    FormRunnerParams(readCacheInputAsTinyTree(pc, XPath.GlobalConfiguration, "params").rootElement).tap { params =>
+      if (
+        ! FormRunner.isServicePath(ec.getRequest.getRequestPath) &&
+        ! FormRunner.isSupportedDetailMode(params.mode, excludeSecondaryModes = false)(params)
+      )
+        throw HttpStatusCodeException(StatusCode.NotFound)
+    }
 
   private def createDataOutput(outputName: String): ProcessorOutput =
     new ScalaProcessorOutputImpl(ReadFormProcessor.this, outputName) with ReadFormOutputBase {

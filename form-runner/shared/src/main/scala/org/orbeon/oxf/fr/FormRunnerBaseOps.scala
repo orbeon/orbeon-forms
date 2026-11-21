@@ -550,10 +550,15 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   //@XPathFunction
   def isSupportedMode(modePublicNameString: String): Boolean =
     FormRunnerDetailMode.SupportedNonDetailModes(modePublicNameString) ||
-      isSupportedDetailMode(modePublicNameString, excludeSecondaryModes = false)
+      isSupportedDetailMode(modePublicNameString, excludeSecondaryModes = false)(FormRunnerParams())
 
-  def isSupportedDetailMode(modePublicNameString: String, excludeSecondaryModes: Boolean): Boolean =
-    ModeType.modeFromPublicName(modePublicNameString, excludeSecondaryModes, customModes(FormRunnerParams())).isDefined
+  def isSupportedDetailMode(
+    modePublicNameString : String,
+    excludeSecondaryModes: Boolean
+  )(implicit
+    p                    : FormRunnerParams
+  ): Boolean =
+    ModeType.modeFromPublicName(modePublicNameString, excludeSecondaryModes, customModes).isDefined
 
   def isReadonlyModeFromString(app: String, form: String, modePublicName: String): Boolean =
     ModeType.modeTypeFromPublicName(modePublicName, excludeSecondaryModes = false, customModes(FormRunnerParams(AppForm(app, form), modePublicName /* unused */)))

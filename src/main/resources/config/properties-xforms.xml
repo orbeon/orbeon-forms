@@ -219,6 +219,19 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.percentage.field-width"                    value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.percentage.field-align"                    value=""/>
 
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.quantity.unit-preset"                      value="mass"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.quantity.units"                            value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.quantity.custom-units"                     value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.quantity.default-unit"                     value=""/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.quantity.convert-on-unit-change"           value="false"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.quantity.digits-after-decimal"             value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.quantity.decimal-separator"                value="."/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.quantity.grouping-separator"               value=","/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.quantity.round-when-formatting"            value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.quantity.round-when-storing"               value="false"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.quantity.field-width"                      value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.quantity.field-align"                      value=""/>
+
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.prefix"                             value=""/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.suffix"                             value=""/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.digits-after-decimal"               value=""/>
@@ -366,6 +379,7 @@
         fr:number-stepper
         fr:currency
         fr:percentage
+        fr:quantity
         fr:color
         fr:masked-input
         fr:url

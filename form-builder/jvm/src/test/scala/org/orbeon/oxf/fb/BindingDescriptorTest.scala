@@ -616,6 +616,18 @@ class BindingDescriptorTest
           isCurrent     = isSameQName(current, FR -> "number")
         ),
         ConversionResult(
+          fullLabelOpt  = Some("Quantity"),
+          value         = FR -> "quantity",
+          elemName      = FR -> "quantity",
+          appearanceOpt = None,
+          datatypeOpt   = Some(XF -> "decimal"),
+          addAtts       = Set.empty,
+          removeAtts    = removed,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-balance-scale",
+          isCurrent     = isSameQName(current, FR -> "quantity")
+        ),
+        ConversionResult(
           fullLabelOpt  = Some("Calculated Value"),
           value         = XF -> "output",
           elemName      = XF -> "output",
@@ -912,6 +924,7 @@ class BindingDescriptorTest
         (<fr:percentage xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,           XF -> "decimal",      None,                      expectedTextConversions(FR -> "number")),
         (<xf:input xmlns:xf="http://www.w3.org/2002/xforms"/>,                        XF -> "decimal",      Some("xxf:percentage"),    expectedTextConversions(FR -> "number")),
         (<fr:number-stepper xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,       XF -> "integer",      None,                      expectedTextConversions(FR -> "number", numberDatatype = XF -> "integer")),
+        (<fr:quantity xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,             XF -> "decimal",      None,                      expectedTextConversions(FR -> "quantity")),
         (<xf:output xmlns:xf="http://www.w3.org/2002/xforms"/>,                       XS -> "string",       None,                      expectedTextConversions(XF -> "output")),
         (<xf:output xmlns:xf="http://www.w3.org/2002/xforms"/>,                       XS -> "string",       Some("full"),              expectedTextConversions(XF -> "output")),
         (<fr:hidden xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,               XS -> "string",       None,                      expectedTextConversions(FR -> "hidden")),

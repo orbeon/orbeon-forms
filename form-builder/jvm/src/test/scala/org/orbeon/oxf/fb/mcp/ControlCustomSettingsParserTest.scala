@@ -311,6 +311,21 @@ class ControlCustomSettingsParserTest
       assert(partialDateSpec.constraints.size == 1)
     }
 
+    it("must parse `<fr:quantity>` custom settings") {
+      import org.orbeon.scaxon.SimplePath.*
+
+      val quantityDoc = new org.orbeon.dom.saxon.DocumentWrapper(
+        org.orbeon.oxf.resources.ResourceManagerWrapper.instance.getContentAsOrbeonDom("/xbl/orbeon/quantity/quantity.xbl"),
+        null,
+        org.orbeon.oxf.util.XPath.GlobalConfiguration
+      )
+      val quantitySpec = ControlCustomSettingsParser.fromBinding((quantityDoc.rootElement / "*:binding").head).get
+      assert(quantitySpec.localName == "quantity")
+      assert(quantitySpec.settings.map(_.name) == List("unitPreset", "units", "customUnits", "defaultUnit", "convertOnUnitChange", "digitsAfterDecimal", "fieldWidth", "fieldAlign"))
+      assert(quantitySpec.findSetting("convertOnUnitChange").exists(_.settingType == BooleanType))
+      assert(quantitySpec.findSetting("unitPreset").exists(_.allowedValues.exists(_.contains("mass"))))
+    }
+
     it("must parse `<fr:dropdown-select1-search>` and `<fr:open-select1-search>` custom settings") {
       import org.orbeon.scaxon.SimplePath.*
 

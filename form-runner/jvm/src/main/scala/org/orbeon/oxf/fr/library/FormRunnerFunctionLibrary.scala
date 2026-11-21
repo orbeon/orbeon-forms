@@ -61,7 +61,7 @@ import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
 import org.orbeon.scaxon.Implicits
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps}
-import org.orbeon.xbl.{DateRangeSupport, ErrorSummary, PartialDateSupport, Wizard}
+import org.orbeon.xbl.{DateRangeSupport, ErrorSummary, PartialDateSupport, QuantitySupport, Wizard}
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_URI
 import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
@@ -280,6 +280,13 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     )
     Fun("partial-date-year", classOf[FRPartialDateYear], op = 0, min = 1, INTEGER, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, ALLOWS_ZERO_OR_ONE)
+    )
+    Fun("quantity-convert", classOf[FRQuantityConvert], op = 0, min = 2, DECIMAL, ALLOWS_ZERO_OR_ONE,
+      Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE),
+      Arg(STRING, EXACTLY_ONE)
+    )
+    Fun("quantity-unit", classOf[FRQuantityUnit], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
+      Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE)
     )
 
     // Import functions
@@ -1289,6 +1296,34 @@ class FRPartialDateYear extends FunctionSupport with DefaultFunctionSupport {
       .flatMap(PartialDateSupport.exactYearOpt)
       .map(y => new Int64Value(y.toLong))
       .orNull
+  }
+}
+
+class FRQuantityConvert extends FunctionSupport with DefaultFunctionSupport {
+  override def evaluateItem(xpathContext: XPathContext): DecimalValue = {
+    implicit val xpc: XPathContext = xpathContext
+    val targetUnit = stringArgument(1)
+    (for {
+      item     <- itemArgumentOpt(0)
+      node     <- item match { case n: NodeInfo => Some(n); case _ => None }
+      raw      <- node.getStringValue.trimAllToOpt
+      fromUnit <- node.attValueOpt("unit").flatMap(_.trimAllToOpt)
+      bd       <- scala.util.Try(BigDecimal(raw)).toOption
+      conv     <- QuantitySupport.convert(bd, fromUnit, targetUnit)
+    } yield
+      new DecimalValue(conv.bigDecimal)).orNull
+  }
+}
+
+class FRQuantityUnit extends FunctionSupport with DefaultFunctionSupport {
+  override def evaluateItem(xpathContext: XPathContext): StringValue = {
+    implicit val xpc: XPathContext = xpathContext
+    (for {
+      item <- itemArgumentOpt(0)
+      node <- item match { case n: NodeInfo => Some(n); case _ => None }
+      unit <- node.attValueOpt("unit").flatMap(_.trimAllToOpt)
+    } yield
+      StringValue.makeStringValue(unit)).orNull
   }
 }
 

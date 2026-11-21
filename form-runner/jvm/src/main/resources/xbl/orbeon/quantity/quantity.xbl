@@ -1,0 +1,815 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava"
+    xmlns:QuantitySupport="java:org.orbeon.xbl.QuantitySupportJava">
+
+    <xbl:binding
+        id="fr-quantity"
+        element="fr|quantity"
+        xxbl:mode="lhha binding value focus allow-minimal-label-hint"
+        xxbl:label-for="number-input"
+        xxbl:format="
+            let $b := xxf:binding('fr-quantity')
+            return
+                if (xxf:is-blank(string($b))) then
+                    ''
+                else
+                    let $num := NumberSupport:getDisplayValueJava(
+                            $b,
+                            fr:component-param-value('decimal-separator'),
+                            fr:component-param-value('grouping-separator'),
+                            '',
+                            fr:component-param-value('digits-after-decimal'),
+                            string(fr:component-param-value('round-when-formatting')) = 'true',
+                            string(fr:component-param-value('round-when-storing'))    = 'true'
+                        ),
+                        $unit := (string($b/@unit)[xxf:non-blank()], fr:component-param-value('default-unit')[xxf:non-blank()])[1]
+                    return
+                        QuantitySupport:formatReadonly($num, string($unit), string(fr:component-param-value('custom-units')))"
+    >
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Quantity</display-name>
+            <display-name lang="fr">Quantité</display-name>
+            <display-name lang="no">Mengde</display-name>
+            <display-name lang="ru">Количество</display-name>
+            <display-name lang="it">Quantità</display-name>
+            <display-name lang="de">Menge</display-name>
+            <display-name lang="fi">Määrä</display-name>
+            <display-name lang="es">Cantidad</display-name>
+            <display-name lang="nl">Hoeveelheid</display-name>
+            <display-name lang="pt">Quantidade</display-name>
+            <display-name lang="sv">Kvantitet</display-name>
+            <display-name lang="ar">الكمية</display-name>
+            <display-name lang="pl">Ilość</display-name>
+            <display-name lang="ja">数量</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-balance-scale</icon-class>
+            </icon>
+            <templates>
+                <bind type="xf:decimal"/>
+                <instance unit=""/>
+                <view>
+                    <fr:quantity id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:quantity>
+                </view>
+            </templates>
+            <conversions element="fr|number"/>
+            <custom-settings>
+                <setting name="unit-preset"            type="xs:string" values="mass length area volume temperature speed data custom" default="mass"/>
+                <setting name="units"                  type="xs:string"/>
+                <setting name="custom-units"           type="xs:string"/>
+                <setting name="default-unit"           type="xs:string"/>
+                <setting name="convert-on-unit-change" type="xs:boolean" default="false"/>
+                <setting name="digits-after-decimal"   type="xs:integer" min="0"/>
+                <setting name="field-width"            type="xs:string" values="full natural"/>
+                <setting name="field-align"            type="xs:string" values="left right"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-quantity-model">
+
+                    <xf:action event="xforms-model-construct-done">
+                        <xf:action iterate="instance('local')/*">
+                            <xf:var name="c" value="."/>
+                            <xf:setvalue
+                                ref="$c"
+                                value="(instance()/@*[name() = name($c)][xxf:non-blank()], $c/@default)[1]"/>
+                        </xf:action>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <unit-preset default="mass"/>
+                            <units/>
+                            <custom-units/>
+                            <default-unit/>
+                            <convert-on-unit-change default="false"/>
+                            <digits-after-decimal/>
+                            <field-width/>
+                            <field-align/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind ref="units"        relevant="../unit-preset != 'custom'"/>
+                        <xf:bind ref="custom-units" relevant="../unit-preset = 'custom'"/>
+                        <xf:bind ref="convert-on-unit-change" relevant="../unit-preset != 'custom'"/>
+                        <xf:bind ref="digits-after-decimal" type="xf:integer" constraint="xxf:is-blank() or xs:integer(.) ge 0"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <unit-preset>
+                                    <label>Unit Preset</label>
+                                    <mass>Mass / Weight</mass>
+                                    <length>Length / Distance</length>
+                                    <area>Area</area>
+                                    <volume>Volume</volume>
+                                    <temperature>Temperature</temperature>
+                                    <speed>Speed</speed>
+                                    <data>Data Size</data>
+                                    <custom>Custom</custom>
+                                </unit-preset>
+                                <units>
+                                    <label>Allowed Units</label>
+                                    <hint>Leave all unchecked to allow all units in the preset</hint>
+                                </units>
+                                <custom-units>
+                                    <label>Custom Units</label>
+                                    <hint>Comma-separated codes or code=Symbol pairs (e.g. cpi=CPI, dpi=DPI)</hint>
+                                </custom-units>
+                                <default-unit>
+                                    <label>Default Unit</label>
+                                </default-unit>
+                                <convert-on-unit-change>
+                                    <label>Convert value when changing unit</label>
+                                </convert-on-unit-change>
+                                <digits-after-decimal>
+                                    <label>Digits after decimal</label>
+                                </digits-after-decimal>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <unit-preset>
+                                    <label>Catégorie d'unités</label>
+                                    <mass>Masse / Poids</mass>
+                                    <length>Longueur / Distance</length>
+                                    <area>Surface</area>
+                                    <volume>Volume</volume>
+                                    <temperature>Température</temperature>
+                                    <speed>Vitesse</speed>
+                                    <data>Taille de données</data>
+                                    <custom>Personnalisé</custom>
+                                </unit-preset>
+                                <units>
+                                    <label>Unités autorisées</label>
+                                    <hint>Laisser vide pour autoriser toutes les unités de la catégorie</hint>
+                                </units>
+                                <custom-units>
+                                    <label>Unités personnalisées</label>
+                                    <hint>Codes séparés par des virgules ou paires code=Symbole (ex. cpi=CPI, dpi=DPI)</hint>
+                                </custom-units>
+                                <default-unit>
+                                    <label>Unité par défaut</label>
+                                </default-unit>
+                                <convert-on-unit-change>
+                                    <label>Convertir la valeur lors du changement d'unité</label>
+                                </convert-on-unit-change>
+                                <digits-after-decimal>
+                                    <label>Chiffres après la virgule</label>
+                                </digits-after-decimal>
+                            </resource>
+                            <resource xml:lang="no">
+                                <unit-preset>
+                                    <label>Enhetskategori</label>
+                                    <mass>Masse / Vekt</mass>
+                                    <length>Lengde / Avstand</length>
+                                    <area>Areal</area>
+                                    <volume>Volum</volume>
+                                    <temperature>Temperatur</temperature>
+                                    <speed>Hastighet</speed>
+                                    <data>Datastørrelse</data>
+                                    <custom>Egendefinert</custom>
+                                </unit-preset>
+                                <units>
+                                    <label>Tillatte enheter</label>
+                                    <hint>La alle være umerket for å tillate alle enheter i kategorien</hint>
+                                </units>
+                                <custom-units>
+                                    <label>Egendefinerte enheter</label>
+                                    <hint>Kommaseparerte koder eller kode=Symbol-par (f.eks. cpi=CPI, dpi=DPI)</hint>
+                                </custom-units>
+                                <default-unit>
+                                    <label>Standardenhet</label>
+                                </default-unit>
+                                <convert-on-unit-change>
+                                    <label>Konverter verdi ved endring av enhet</label>
+                                </convert-on-unit-change>
+                                <digits-after-decimal>
+                                    <label>Siffer etter desimaltegn</label>
+                                </digits-after-decimal>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <unit-preset>
+                                    <label>Категория единиц</label>
+                                    <mass>Масса / Вес</mass>
+                                    <length>Длина / Расстояние</length>
+                                    <area>Площадь</area>
+                                    <volume>Объём</volume>
+                                    <temperature>Температура</temperature>
+                                    <speed>Скорость</speed>
+                                    <data>Размер данных</data>
+                                    <custom>Пользовательский</custom>
+                                </unit-preset>
+                                <units>
+                                    <label>Допустимые единицы</label>
+                                    <hint>Оставьте пустым, чтобы разрешить все единицы категории</hint>
+                                </units>
+                                <custom-units>
+                                    <label>Пользовательские единицы</label>
+                                    <hint>Коды через запятую или пары код=Символ (напр. cpi=CPI, dpi=DPI)</hint>
+                                </custom-units>
+                                <default-unit>
+                                    <label>Единица по умолчанию</label>
+                                </default-unit>
+                                <convert-on-unit-change>
+                                    <label>Преобразовывать значение при смене единицы</label>
+                                </convert-on-unit-change>
+                                <digits-after-decimal>
+                                    <label>Цифр после запятой</label>
+                                </digits-after-decimal>
+                            </resource>
+                            <resource xml:lang="it">
+                                <unit-preset>
+                                    <label>Categoria unità</label>
+                                    <mass>Massa / Peso</mass>
+                                    <length>Lunghezza / Distanza</length>
+                                    <area>Area</area>
+                                    <volume>Volume</volume>
+                                    <temperature>Temperatura</temperature>
+                                    <speed>Velocità</speed>
+                                    <data>Dimensione dati</data>
+                                    <custom>Personalizzato</custom>
+                                </unit-preset>
+                                <units>
+                                    <label>Unità consentite</label>
+                                    <hint>Lasciare deselezionato per consentire tutte le unità della categoria</hint>
+                                </units>
+                                <custom-units>
+                                    <label>Unità personalizzate</label>
+                                    <hint>Codici separati da virgola o coppie codice=Simbolo (es. cpi=CPI, dpi=DPI)</hint>
+                                </custom-units>
+                                <default-unit>
+                                    <label>Unità predefinita</label>
+                                </default-unit>
+                                <convert-on-unit-change>
+                                    <label>Converti valore al cambio di unità</label>
+                                </convert-on-unit-change>
+                                <digits-after-decimal>
+                                    <label>Cifre dopo la virgola</label>
+                                </digits-after-decimal>
+                            </resource>
+                            <resource xml:lang="de">
+                                <unit-preset>
+                                    <label>Einheitengruppe</label>
+                                    <mass>Masse / Gewicht</mass>
+                                    <length>Länge / Entfernung</length>
+                                    <area>Fläche</area>
+                                    <volume>Volumen</volume>
+                                    <temperature>Temperatur</temperature>
+                                    <speed>Geschwindigkeit</speed>
+                                    <data>Datengröße</data>
+                                    <custom>Benutzerdefiniert</custom>
+                                </unit-preset>
+                                <units>
+                                    <label>Zulässige Einheiten</label>
+                                    <hint>Leer lassen, um alle Einheiten der Gruppe zuzulassen</hint>
+                                </units>
+                                <custom-units>
+                                    <label>Benutzerdefinierte Einheiten</label>
+                                    <hint>Kommagetrennte Codes oder Code=Symbol-Paare (z. B. cpi=CPI, dpi=DPI)</hint>
+                                </custom-units>
+                                <default-unit>
+                                    <label>Standardeinheit</label>
+                                </default-unit>
+                                <convert-on-unit-change>
+                                    <label>Wert beim Ändern der Einheit umrechnen</label>
+                                </convert-on-unit-change>
+                                <digits-after-decimal>
+                                    <label>Nachkommastellen</label>
+                                </digits-after-decimal>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <unit-preset>
+                                    <label>Yksikköryhmä</label>
+                                    <mass>Massa / Paino</mass>
+                                    <length>Pituus / Etäisyys</length>
+                                    <area>Pinta-ala</area>
+                                    <volume>Tilavuus</volume>
+                                    <temperature>Lämpötila</temperature>
+                                    <speed>Nopeus</speed>
+                                    <data>Tietokoko</data>
+                                    <custom>Mukautettu</custom>
+                                </unit-preset>
+                                <units>
+                                    <label>Sallitut yksiköt</label>
+                                    <hint>Jätä tyhjäksi salliaksesi kaikki ryhmän yksiköt</hint>
+                                </units>
+                                <custom-units>
+                                    <label>Mukautetut yksiköt</label>
+                                    <hint>Pilkuilla erotetut koodit tai koodi=Tunnus-parit (esim. cpi=CPI, dpi=DPI)</hint>
+                                </custom-units>
+                                <default-unit>
+                                    <label>Oletusyksikkö</label>
+                                </default-unit>
+                                <convert-on-unit-change>
+                                    <label>Muunna arvo yksikköä vaihdettaessa</label>
+                                </convert-on-unit-change>
+                                <digits-after-decimal>
+                                    <label>Desimaalien määrä</label>
+                                </digits-after-decimal>
+                            </resource>
+                            <resource xml:lang="es">
+                                <unit-preset>
+                                    <label>Categoría de unidades</label>
+                                    <mass>Masa / Peso</mass>
+                                    <length>Longitud / Distancia</length>
+                                    <area>Área</area>
+                                    <volume>Volumen</volume>
+                                    <temperature>Temperatura</temperature>
+                                    <speed>Velocidad</speed>
+                                    <data>Tamaño de datos</data>
+                                    <custom>Personalizado</custom>
+                                </unit-preset>
+                                <units>
+                                    <label>Unidades permitidas</label>
+                                    <hint>Dejar sin marcar para permitir todas las unidades de la categoría</hint>
+                                </units>
+                                <custom-units>
+                                    <label>Unidades personalizadas</label>
+                                    <hint>Códigos separados por comas o pares código=Símbolo (p. ej. cpi=CPI, dpi=DPI)</hint>
+                                </custom-units>
+                                <default-unit>
+                                    <label>Unidad predeterminada</label>
+                                </default-unit>
+                                <convert-on-unit-change>
+                                    <label>Convertir valor al cambiar de unidad</label>
+                                </convert-on-unit-change>
+                                <digits-after-decimal>
+                                    <label>Dígitos después del decimal</label>
+                                </digits-after-decimal>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <unit-preset>
+                                    <label>Eenhedengroep</label>
+                                    <mass>Massa / Gewicht</mass>
+                                    <length>Lengte / Afstand</length>
+                                    <area>Oppervlakte</area>
+                                    <volume>Volume</volume>
+                                    <temperature>Temperatuur</temperature>
+                                    <speed>Snelheid</speed>
+                                    <data>Gegevensgrootte</data>
+                                    <custom>Aangepast</custom>
+                                </unit-preset>
+                                <units>
+                                    <label>Toegestane eenheden</label>
+                                    <hint>Laat leeg om alle eenheden in de groep toe te staan</hint>
+                                </units>
+                                <custom-units>
+                                    <label>Aangepaste eenheden</label>
+                                    <hint>Kommagescheiden codes of code=Symbool-paren (bijv. cpi=CPI, dpi=DPI)</hint>
+                                </custom-units>
+                                <default-unit>
+                                    <label>Standaardeenheid</label>
+                                </default-unit>
+                                <convert-on-unit-change>
+                                    <label>Waarde omrekenen bij wijzigen van eenheid</label>
+                                </convert-on-unit-change>
+                                <digits-after-decimal>
+                                    <label>Cijfers achter de komma</label>
+                                </digits-after-decimal>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <unit-preset>
+                                    <label>Categoria de unidades</label>
+                                    <mass>Massa / Peso</mass>
+                                    <length>Comprimento / Distância</length>
+                                    <area>Área</area>
+                                    <volume>Volume</volume>
+                                    <temperature>Temperatura</temperature>
+                                    <speed>Velocidade</speed>
+                                    <data>Tamanho de dados</data>
+                                    <custom>Personalizado</custom>
+                                </unit-preset>
+                                <units>
+                                    <label>Unidades permitidas</label>
+                                    <hint>Deixe desmarcado para permitir todas as unidades da categoria</hint>
+                                </units>
+                                <custom-units>
+                                    <label>Unidades personalizadas</label>
+                                    <hint>Códigos separados por vírgula ou pares código=Símbolo (ex. cpi=CPI, dpi=DPI)</hint>
+                                </custom-units>
+                                <default-unit>
+                                    <label>Unidade padrão</label>
+                                </default-unit>
+                                <convert-on-unit-change>
+                                    <label>Converter valor ao alterar a unidade</label>
+                                </convert-on-unit-change>
+                                <digits-after-decimal>
+                                    <label>Dígitos após a vírgula</label>
+                                </digits-after-decimal>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <unit-preset>
+                                    <label>Enhetskategori</label>
+                                    <mass>Massa / Vikt</mass>
+                                    <length>Längd / Avstånd</length>
+                                    <area>Area</area>
+                                    <volume>Volym</volume>
+                                    <temperature>Temperatur</temperature>
+                                    <speed>Hastighet</speed>
+                                    <data>Datastorlek</data>
+                                    <custom>Anpassad</custom>
+                                </unit-preset>
+                                <units>
+                                    <label>Tillåtna enheter</label>
+                                    <hint>Lämna tomt för att tillåta alla enheter i kategorin</hint>
+                                </units>
+                                <custom-units>
+                                    <label>Anpassade enheter</label>
+                                    <hint>Kommaseparerade koder eller kod=Symbol-par (t.ex. cpi=CPI, dpi=DPI)</hint>
+                                </custom-units>
+                                <default-unit>
+                                    <label>Standardenhet</label>
+                                </default-unit>
+                                <convert-on-unit-change>
+                                    <label>Konvertera värde vid byte av enhet</label>
+                                </convert-on-unit-change>
+                                <digits-after-decimal>
+                                    <label>Decimaler</label>
+                                </digits-after-decimal>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <unit-preset>
+                                    <label>فئة الوحدات</label>
+                                    <mass>الكتلة / الوزن</mass>
+                                    <length>الطول / المسافة</length>
+                                    <area>المساحة</area>
+                                    <volume>الحجم</volume>
+                                    <temperature>درجة الحرارة</temperature>
+                                    <speed>السرعة</speed>
+                                    <data>حجم البيانات</data>
+                                    <custom>مخصص</custom>
+                                </unit-preset>
+                                <units>
+                                    <label>الوحدات المسموح بها</label>
+                                    <hint>اتركه فارغاً للسماح بجميع الوحدات في الفئة</hint>
+                                </units>
+                                <custom-units>
+                                    <label>وحدات مخصصة</label>
+                                    <hint>رموز مفصولة بفواصل أو أزواج رمز=علامة (مثل cpi=CPI, dpi=DPI)</hint>
+                                </custom-units>
+                                <default-unit>
+                                    <label>الوحدة الافتراضية</label>
+                                </default-unit>
+                                <convert-on-unit-change>
+                                    <label>تحويل القيمة عند تغيير الوحدة</label>
+                                </convert-on-unit-change>
+                                <digits-after-decimal>
+                                    <label>الأرقام بعد الفاصلة العشرية</label>
+                                </digits-after-decimal>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <unit-preset>
+                                    <label>Kategoria jednostek</label>
+                                    <mass>Masa / Waga</mass>
+                                    <length>Długość / Odległość</length>
+                                    <area>Powierzchnia</area>
+                                    <volume>Objętość</volume>
+                                    <temperature>Temperatura</temperature>
+                                    <speed>Prędkość</speed>
+                                    <data>Rozmiar danych</data>
+                                    <custom>Niestandardowe</custom>
+                                </unit-preset>
+                                <units>
+                                    <label>Dozwolone jednostki</label>
+                                    <hint>Pozostaw puste, aby zezwolić na wszystkie jednostki w kategorii</hint>
+                                </units>
+                                <custom-units>
+                                    <label>Jednostki niestandardowe</label>
+                                    <hint>Kody oddzielone przecinkami lub pary kod=Symbol (np. cpi=CPI, dpi=DPI)</hint>
+                                </custom-units>
+                                <default-unit>
+                                    <label>Jednostka domyślna</label>
+                                </default-unit>
+                                <convert-on-unit-change>
+                                    <label>Przelicz wartość przy zmianie jednostki</label>
+                                </convert-on-unit-change>
+                                <digits-after-decimal>
+                                    <label>Cyfry po przecinku</label>
+                                </digits-after-decimal>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <unit-preset>
+                                    <label>単位プリセット</label>
+                                    <mass>質量 / 重さ</mass>
+                                    <length>長さ / 距離</length>
+                                    <area>面積</area>
+                                    <volume>体積</volume>
+                                    <temperature>温度</temperature>
+                                    <speed>速度</speed>
+                                    <data>データサイズ</data>
+                                    <custom>カスタム</custom>
+                                </unit-preset>
+                                <units>
+                                    <label>許可する単位</label>
+                                    <hint>すべて未選択にするとプリセット内のすべての単位を許可します</hint>
+                                </units>
+                                <custom-units>
+                                    <label>カスタム単位</label>
+                                    <hint>カンマ区切りのコードまたはコード=記号のペア（例: cpi=CPI, dpi=DPI）</hint>
+                                </custom-units>
+                                <default-unit>
+                                    <label>デフォルトの単位</label>
+                                </default-unit>
+                                <convert-on-unit-change>
+                                    <label>単位変更時に値を換算する</label>
+                                </convert-on-unit-change>
+                                <digits-after-decimal>
+                                    <label>小数点以下の桁数</label>
+                                </digits-after-decimal>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-quantity-grid">
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:select1 ref="instance('local')/unit-preset" appearance="minimal" id="unit-preset-control">
+                                <xf:label ref="xxf:r('unit-preset.label')"/>
+                                <xf:item><xf:label ref="xxf:r('unit-preset.mass')"/><xf:value>mass</xf:value></xf:item>
+                                <xf:item><xf:label ref="xxf:r('unit-preset.length')"/><xf:value>length</xf:value></xf:item>
+                                <xf:item><xf:label ref="xxf:r('unit-preset.area')"/><xf:value>area</xf:value></xf:item>
+                                <xf:item><xf:label ref="xxf:r('unit-preset.volume')"/><xf:value>volume</xf:value></xf:item>
+                                <xf:item><xf:label ref="xxf:r('unit-preset.temperature')"/><xf:value>temperature</xf:value></xf:item>
+                                <xf:item><xf:label ref="xxf:r('unit-preset.speed')"/><xf:value>speed</xf:value></xf:item>
+                                <xf:item><xf:label ref="xxf:r('unit-preset.data')"/><xf:value>data</xf:value></xf:item>
+                                <xf:item><xf:label ref="xxf:r('unit-preset.custom')"/><xf:value>custom</xf:value></xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:select ref="instance('local')/units" appearance="full xxf:horizontal" id="units-control">
+                                <xf:label ref="xxf:r('units.label')"/>
+                                <xf:hint  ref="xxf:r('units.hint')"/>
+                                <xf:itemset ref="QuantitySupport:unitCodes(instance('local')/unit-preset, '', '')">
+                                    <xf:label value="QuantitySupport:symbolForUnit(., '')"/>
+                                    <xf:value ref="."/>
+                                </xf:itemset>
+                            </xf:select>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:input ref="instance('local')/custom-units" id="custom-units-control">
+                                <xf:label ref="xxf:r('custom-units.label')"/>
+                                <xf:hint  ref="xxf:r('custom-units.hint')"/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/default-unit" appearance="minimal" id="default-unit-control">
+                                <xf:label ref="xxf:r('default-unit.label')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:itemset ref="QuantitySupport:unitCodes(instance('local')/unit-preset, instance('local')/units, instance('local')/custom-units)">
+                                    <xf:label value="QuantitySupport:symbolForUnit(., instance('local')/custom-units)"/>
+                                    <xf:value ref="."/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <xf:input ref="instance('local')/digits-after-decimal" id="digits-after-decimal-control">
+                                <xf:label ref="xxf:r('digits-after-decimal.label')"/>
+                            </xf:input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <fr:checkbox-input ref="instance('local')/convert-on-unit-change" id="convert-on-unit-change-control">
+                                <xf:label ref="xxf:r('convert-on-unit-change.label')"/>
+                            </fr:checkbox-input>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/field-width" appearance="full" id="field-width-control">
+                                <xf:label ref="xxf:r('xbl-control-settings.field-width', '|fr-form-resources|')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.full', '|fr-form-resources|')"/>
+                                    <xf:value>full</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.natural', '|fr-form-resources|')"/>
+                                    <xf:value>natural</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/field-align" appearance="full" id="field-align-control">
+                                <xf:label ref="xxf:r('xbl-control-settings.field-align', '|fr-form-resources|')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.left', '|fr-form-resources|')"/>
+                                    <xf:value>left</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.right', '|fr-form-resources|')"/>
+                                    <xf:value>right</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-quantity-preset-reset-action"
+                    event="xforms-value-changed"
+                    observer="unit-preset-control">
+                    <xf:setvalue ref="instance('local')/units" value="''"/>
+                    <xf:setvalue ref="instance('local')/default-unit" value="''"/>
+                    <xf:delete ref="instance()/(@units | @default-unit)"/>
+                </xf:action>
+                <xf:action
+                    id="fb-editor-quantity-action"
+                    event="xforms-value-changed"
+                    observer="unit-preset-control units-control custom-units-control default-unit-control convert-on-unit-change-control digits-after-decimal-control field-width-control field-align-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:var name="default"   value="string(event('xxf:binding')/@default)"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value) and $new-value != $default"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value) or $new-value = $default"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/quantity/quantity.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model id="quantity-model">
+                <xf:instance id="i" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <selected-unit/>
+                        <previous-unit/>
+                    </_>
+                </xf:instance>
+                <xf:bind
+                    ref="instance('i')/selected-unit"
+                    readonly="xxf:readonly(xxf:binding('fr-quantity'))"/>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:handlers>
+            <xbl:handler event="xforms-enabled" phase="target">
+                <xf:var name="binding"      value="xxf:binding('fr-quantity')"/>
+                <xf:var name="preset"       value="(fr:component-param-value('unit-preset')[xxf:non-blank()], 'mass')[1]"/>
+                <xf:var name="units-param"  value="string(fr:component-param-value('units'))"/>
+                <xf:var name="custom-units" value="string(fr:component-param-value('custom-units'))"/>
+                <xf:var name="unit-codes"   value="QuantitySupport:unitCodes($preset, $units-param, $custom-units)"/>
+                <xf:var name="default-unit" value="(fr:component-param-value('default-unit')[xxf:non-blank()], $unit-codes[1])[1]"/>
+                <xf:var name="initial-unit" value="(string($binding/@unit)[xxf:non-blank()], $default-unit)[1]"/>
+
+                <xf:setvalue ref="instance('i')/selected-unit" value="$initial-unit"/>
+                <xf:setvalue ref="instance('i')/previous-unit" value="$initial-unit"/>
+
+                <!-- Ensure existing numeric data without `@unit` (e.g. migrated from Number/Text) gets the default unit -->
+                <xf:action if="xxf:non-blank(string($binding)) and xxf:is-blank(string($binding/@unit)) and xxf:non-blank($initial-unit) and not(xxf:readonly($binding))">
+                    <xf:insert if="empty($binding/@unit)" context="$binding" origin="xf:attribute('unit', $initial-unit)"/>
+                    <xf:setvalue if="exists($binding/@unit)" ref="$binding/@unit" value="$initial-unit"/>
+                </xf:action>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:template>
+            <xf:var name="binding"      value="xxf:binding('fr-quantity')"/>
+            <xf:var name="preset"       value="(fr:component-param-value('unit-preset')[xxf:non-blank()], 'mass')[1]"/>
+            <xf:var name="units-param"  value="string(fr:component-param-value('units'))"/>
+            <xf:var name="custom-units" value="string(fr:component-param-value('custom-units'))"/>
+            <xf:var name="unit-codes"   value="QuantitySupport:unitCodes($preset, $units-param, $custom-units)"/>
+            <xf:var name="default-unit" value="(fr:component-param-value('default-unit')[xxf:non-blank()], $unit-codes[1])[1]"/>
+            <xf:var name="single-unit"  value="count($unit-codes) = 1"/>
+
+            <xf:group class="fr-quantity-group{for $v in fr:component-param-value('field-width') return concat(' fr-field-width-', $v)}">
+                <fr:number
+                    id="number-input"
+                    ref="$binding"
+                    field-width="full"
+                    xbl:attr="decimal-separator grouping-separator digits-after-decimal round-when-formatting round-when-storing field-align autocomplete">
+                    <xf:action event="xforms-value-changed">
+                        <xf:var name="u" value="(string(instance('i')/selected-unit)[xxf:non-blank()], $default-unit)[1]"/>
+                        <xf:action if="xxf:non-blank(string($binding)) and not(xxf:readonly($binding))">
+                            <xf:insert if="empty($binding/@unit)" context="$binding" origin="xf:attribute('unit', $u)"/>
+                            <xf:setvalue if="exists($binding/@unit)" ref="$binding/@unit" value="$u"/>
+                        </xf:action>
+                        <xf:action if="xxf:is-blank(string($binding)) and exists($binding/@unit) and not(xxf:readonly($binding))">
+                            <xf:setvalue ref="$binding/@unit" value="''"/>
+                        </xf:action>
+                    </xf:action>
+                </fr:number>
+
+                <xf:select1
+                    id="unit-select"
+                    ref="instance('i')/selected-unit[not($single-unit) and exists($unit-codes)]"
+                    appearance="minimal"
+                    xxf:encrypt-item-values="false"
+                    class="fr-quantity-unit-select">
+                    <xf:itemset ref="$unit-codes">
+                        <xf:label value="QuantitySupport:symbolForUnit(., $custom-units)"/>
+                        <xf:value ref="."/>
+                    </xf:itemset>
+                    <xf:action event="xforms-value-changed">
+                        <xf:var name="old-unit" value="string(instance('i')/previous-unit)"/>
+                        <xf:var name="new-unit" value="string(instance('i')/selected-unit)"/>
+                        <xf:action if="xxf:non-blank(string($binding)) and not(xxf:readonly($binding))">
+                            <xf:action if="string(fr:component-param-value('convert-on-unit-change')) = 'true' and xxf:non-blank($old-unit) and $old-unit != $new-unit">
+                                <xf:var
+                                    name="converted"
+                                    value="QuantitySupport:convertValue(string($binding), $old-unit, $new-unit, string(fr:component-param-value('digits-after-decimal')))"/>
+                                <xf:setvalue if="xxf:non-blank($converted)" ref="$binding" value="$converted"/>
+                            </xf:action>
+                            <xf:insert if="empty($binding/@unit)" context="$binding" origin="xf:attribute('unit', $new-unit)"/>
+                            <xf:setvalue if="exists($binding/@unit)" ref="$binding/@unit" value="$new-unit"/>
+                        </xf:action>
+                        <xf:setvalue ref="instance('i')/previous-unit" value="$new-unit"/>
+                    </xf:action>
+                </xf:select1>
+
+                <xf:group ref=".[$single-unit]" class="fr-quantity-unit-addon">
+                    <xf:output value="QuantitySupport:symbolForUnit($unit-codes[1], $custom-units)"/>
+                </xf:group>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+    <xbl:binding
+        id="fr-quantity-output"
+        element="
+            fr|quantity[fr|static-readonly = true],
+            fr|quantity[fr|pdf-template = true],
+            fr|quantity[fr|summary = true]"
+        xxbl:mode="lhha binding value allow-minimal-label-hint"
+        xxbl:label-for="output"
+        xxbl:format="
+            let $b := xxf:binding('fr-quantity-output')
+            return
+                if (xxf:is-blank(string($b))) then
+                    ''
+                else if (not(string($b) castable as xs:decimal)) then
+                    string($b)
+                else
+                    let $num := NumberSupport:getDisplayValueJava(
+                            $b,
+                            fr:component-param-value('decimal-separator'),
+                            fr:component-param-value('grouping-separator'),
+                            '',
+                            fr:component-param-value('digits-after-decimal'),
+                            string(fr:component-param-value('round-when-formatting')) = 'true',
+                            string(fr:component-param-value('round-when-storing'))    = 'true'
+                        ),
+                        $unit := (string($b/@unit)[xxf:non-blank()], fr:component-param-value('default-unit')[xxf:non-blank()])[1]
+                    return
+                        QuantitySupport:formatReadonly($num, string($unit), string(fr:component-param-value('custom-units')))"
+    >
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/quantity/quantity.css"/>
+        </xbl:resources>
+        <xbl:template>
+            <xf:input
+                id="output"
+                class="{for $v in fr:component-param-value('field-align') return concat('fr-field-align-', $v)}"
+                ref="xxf:binding('fr-quantity-output')"
+                xxf:format="xxf:formatted-value('fr-quantity-output')"/>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

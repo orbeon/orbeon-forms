@@ -177,6 +177,7 @@
         +fr:number-stepper
         +fr:currency
         +fr:percentage
+        +fr:quantity
         +fr:time
         +fr:datetime
         +fr:date-range
@@ -283,6 +284,7 @@
         +fr:number-stepper
         +fr:currency
         +fr:percentage
+        +fr:quantity
         +fr:time
         +fr:datetime
         +fr:date-range
@@ -445,6 +447,7 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-number-stepper.*"               value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-currency.*"                     value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-percentage.*"                   value="input-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-quantity.*"                     value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-date.*"                         value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-partial-date.*"                 value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-year.*"                         value="input-string"/>

@@ -39,6 +39,7 @@
         oxf:/xbl/orbeon/number-stepper/number-stepper.xbl
         oxf:/xbl/orbeon/currency/currency.xbl
         oxf:/xbl/orbeon/percentage/percentage.xbl
+        oxf:/xbl/orbeon/quantity/quantity.xbl
         oxf:/xbl/orbeon/range/range.xbl
     </property>
 
@@ -347,6 +348,7 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.field-width.orbeon.builder"     value="full"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.field-width.orbeon.builder"   value="full"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.percentage.field-width.orbeon.builder" value="full"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.quantity.field-width.orbeon.builder"   value="full"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.date.field-width.orbeon.builder"     value="full"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.time.field-width.orbeon.builder"     value="full"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.datetime.field-width.orbeon.builder"   value="full"/>

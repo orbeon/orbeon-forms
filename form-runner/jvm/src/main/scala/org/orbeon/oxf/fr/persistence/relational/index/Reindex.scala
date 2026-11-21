@@ -28,6 +28,7 @@ import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging.*
+import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon
@@ -368,7 +369,20 @@ trait Reindex extends FormDefinition {
                       if (items.nonEmpty) items else List(n)
                     }
                     for ((node, pos) <- nodes.zipWithIndex) {
-                      val nodeValue = truncateValue(provider, node.getStringValue)
+                      val rawText = node.getStringValue
+                      val rawValueWithUnit =
+                        if (rawText.nonEmpty) {
+                          node.attValueOpt("unit").flatMap(_.trimAllToOpt) match {
+                            case Some(unit) =>
+                              val symbol = org.orbeon.xbl.QuantitySupport.symbolForUnit(unit, None)
+                              if (symbol.nonEmpty) s"$rawText $symbol" else rawText
+                            case None =>
+                              rawText
+                          }
+                        } else {
+                          rawText
+                        }
+                      val nodeValue = truncateValue(provider, rawValueWithUnit)
                       // For indexing, we are not interested in empty values
                       if (nodeValue.nonEmpty) {
                         val position = Iterator.from(1)

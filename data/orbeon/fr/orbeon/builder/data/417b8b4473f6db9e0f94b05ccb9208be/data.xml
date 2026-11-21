@@ -67,7 +67,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <datetime></datetime>
                             <date-range></date-range>
                             <duration></duration>
-                            <timestamp></timestamp>
+                            <timestamp></timestamp><partial-date></partial-date>
                         </grid-4>
                     </date-time-controls>
                     <selection-controls>
@@ -83,7 +83,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                 <open-selection-1>false</open-selection-1>
                                 <open-selection-2>false</open-selection-2>
                                 <open-selection-3>false</open-selection-3>
-                                <dynamic-multiselect>ca mx us</dynamic-multiselect>
+                                <dynamic-multiselect>ca mx us</dynamic-multiselect><searchable-combobox></searchable-combobox>
                             </grid-12>
                         </dropdown-controls>
                         <single-selection-controls>
@@ -361,7 +361,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime" xxf:default="adjust-dateTime-to-timezone(current-dateTime(), ())"></xf:bind>
                         <xf:bind id="date-range-bind" ref="date-range" name="date-range" type="fr:date-range" xxf:default="'2026-06-01/2026-06-15'"></xf:bind>
                         <xf:bind id="duration-bind" ref="duration" name="duration" type="xf:dayTimeDuration" xxf:default="'PT2H30M'"></xf:bind>
-                        <xf:bind id="timestamp-bind" ref="timestamp" name="timestamp" type="xf:dateTime" xxf:default="current-dateTime()"></xf:bind>
+                        <xf:bind id="timestamp-bind" ref="timestamp" name="timestamp" type="xf:dateTime" xxf:default="current-dateTime()"></xf:bind><xf:bind id="partial-date-bind" ref="partial-date" name="partial-date" type="fr:partial-date"></xf:bind>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="selection-controls-bind" ref="selection-controls" name="selection-controls">
@@ -377,7 +377,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                             <xf:bind id="open-selection-1-bind" ref="open-selection-1" name="open-selection-1" type="xf:boolean" xxf:default="false()"></xf:bind>
                             <xf:bind id="open-selection-2-bind" ref="open-selection-2" name="open-selection-2" type="xf:boolean" xxf:default="false()"></xf:bind>
                             <xf:bind id="open-selection-3-bind" ref="open-selection-3" name="open-selection-3" type="xf:boolean" xxf:default="false()"></xf:bind>
-                            <xf:bind id="dynamic-multiselect-bind" ref="dynamic-multiselect" name="dynamic-multiselect"></xf:bind>
+                            <xf:bind id="dynamic-multiselect-bind" ref="dynamic-multiselect" name="dynamic-multiselect"></xf:bind><xf:bind id="searchable-combobox-bind" ref="searchable-combobox" name="searchable-combobox"></xf:bind>
                         </xf:bind>
                     </xf:bind>
                     <xf:bind id="single-selection-controls-bind" ref="single-selection-controls" name="single-selection-controls">
@@ -1075,7 +1075,23 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <dynamic-multiselect>
                             <label>Dynamic Multiselect</label>
                             <hint></hint>
-                        </dynamic-multiselect>
+                        </dynamic-multiselect><searchable-combobox><label>Searchable Combobox</label><hint>Search existing choices or type a new value</hint><item>
+            <label>Cat</label>
+            <hint></hint>
+            <value>cat</value>
+          </item><item>
+            <label>Dog</label>
+            <hint></hint>
+            <value>dog</value>
+          </item><item>
+            <label>Bird</label>
+            <hint></hint>
+            <value>bird</value>
+          </item><item>
+            <label>Fish</label>
+            <hint></hint>
+            <value>fish</value>
+          </item></searchable-combobox>
                         <explanatory-text>
                             <text>&lt;div&gt;&lt;strong&gt;This is an explanatory text:&lt;/strong&gt;&lt;/div&gt;
 &lt;div&gt; &lt;/div&gt;
@@ -1324,7 +1340,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <timestamp>
                             <label>Timestamp</label>
                             <hint>Timestamp output</hint>
-                        </timestamp>
+                        </timestamp><partial-date><label>Partial / Approximate Date</label><hint>Exact date, month, year, decade, or range (e.g. 2021-11, 1961?, 192X)</hint></partial-date>
                         <email>
                             <label>Email Address</label>
                             <hint>Email field with validation</hint>
@@ -2186,7 +2202,23 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <dynamic-multiselect>
                             <label>Sélection multiple dynamique</label>
                             <hint></hint>
-                        </dynamic-multiselect>
+                        </dynamic-multiselect><searchable-combobox><label>Liste déroulante modifiable avec recherche</label><hint>Recherchez un choix existant ou saisissez une nouvelle valeur</hint><item>
+            <label>Chat</label>
+            <hint></hint>
+            <value>cat</value>
+          </item><item>
+            <label>Chien</label>
+            <hint></hint>
+            <value>dog</value>
+          </item><item>
+            <label>Oiseau</label>
+            <hint></hint>
+            <value>bird</value>
+          </item><item>
+            <label>Poisson</label>
+            <hint></hint>
+            <value>fish</value>
+          </item></searchable-combobox>
                         <explanatory-text>
                             <text>&lt;div&gt;
 &lt;div&gt;&lt;strong&gt;Ceci est un texte explicatif :&lt;/strong&gt;&lt;/div&gt;
@@ -2437,7 +2469,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                         <timestamp>
                             <label>Horodatage</label>
                             <hint>Sortie horodatage</hint>
-                        </timestamp>
+                        </timestamp><partial-date><label>Date partielle / approximative</label><hint>Date exacte, mois, année, décennie ou intervalle (ex. 2021-11, 1961?, 192X)</hint></partial-date>
                         <email>
                             <label>Adresse email</label>
                             <hint>Champ email avec validation</hint>
@@ -3186,7 +3218,12 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
 
 
                             </fr:timestamp>
-                        </fr:c>
+                        </fr:c><fr:c x="1" y="8" w="6"><fr:partial-date id="partial-date-control" bind="partial-date-bind" allow-intervals="true" allow-qualifiers="true" precisions="day month year decade century">
+                        <xf:label ref="$form-resources/partial-date/label"></xf:label>
+                        <xf:hint ref="$form-resources/partial-date/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                    </fr:partial-date></fr:c><fr:c x="7" y="8" w="6"></fr:c>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="selection-controls-section" bind="selection-controls-bind">
@@ -3317,8 +3354,18 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-clipboard>
                                     </xf:itemset>
                                 </fr:databound-select>
                             </fr:c>
-                            <fr:c x="7" y="4" w="3"></fr:c>
-                            <fr:c x="10" y="4" w="3"></fr:c>
+                            <fr:c x="7" y="4" w="6"><xf:select1 id="searchable-combobox-control" appearance="search" selection="open" bind="searchable-combobox-bind">
+                        <xf:label ref="$form-resources/searchable-combobox/label"></xf:label>
+                        <xf:hint ref="$form-resources/searchable-combobox/hint"></xf:hint>
+                        
+                        <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                        <xf:itemset ref="$form-resources/searchable-combobox/item">
+                            <xf:label ref="label"></xf:label>
+                            <xf:value ref="value"></xf:value>
+                            <xf:hint ref="hint"></xf:hint>
+                        </xf:itemset>
+                    </xf:select1></fr:c>
+                            
                         </fr:grid>
                     </fr:section>
                     <fr:section id="single-selection-controls-section" bind="single-selection-controls-bind">

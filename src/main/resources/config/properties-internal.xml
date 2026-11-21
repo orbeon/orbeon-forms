@@ -180,6 +180,7 @@
         +fr:time
         +fr:datetime
         +fr:date-range
+        +fr:partial-date
         +fr:duration
         +fr:hidden
         +fr:character-counter
@@ -285,6 +286,7 @@
         +fr:time
         +fr:datetime
         +fr:date-range
+        +fr:partial-date
         +fr:duration
         +fr:hidden
         +fr:character-counter
@@ -444,6 +446,7 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-currency.*"                     value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-percentage.*"                   value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-date.*"                         value="input-string"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-partial-date.*"                 value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-year.*"                         value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-dropdown-year.*"                value="select-value"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-time.*"                         value="input-time-string"/>

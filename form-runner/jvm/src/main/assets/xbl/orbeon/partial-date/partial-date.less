@@ -1,0 +1,47 @@
+// Copyright (C) 2026 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
+.xbl-fr-partial-date {
+    .fr-field-width-natural {
+        display: block;
+        max-width: 14em;
+    }
+
+    .input-append {
+        .add-on {
+            i { margin-top: 0; }
+            .focusHighlightGroup();
+            &:focus {
+                z-index: 3;
+            }
+        }
+    }
+
+    &.xforms-readonly .input-append .add-on {
+        cursor: not-allowed;
+    }
+
+    .fr-partial-date-no-picker {
+        .add-on {
+            display: none;
+        }
+        input {
+            border-radius: var(--orbeon-control-border-radius);
+        }
+    }
+}
+
+.fr-mode-view .xbl-fr-partial-date .fr-field-width-natural {
+    max-width: none;
+}

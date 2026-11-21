@@ -1,0 +1,587 @@
+<!--
+  Copyright (C) 2026 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:PartialDateSupport="java:org.orbeon.xbl.PartialDateSupportJava">
+
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/js/bootstrap-datepicker.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.ar.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.ca.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.zh-CN.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.zh-TW.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.hu.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.ja.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.fr.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.sv.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.pt.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.it.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.de.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.es.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.fi.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.nl.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.no.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.ru.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.pl.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.da.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.cs.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.tr.min.js"/>
+
+    <xbl:binding
+        id="fr-partial-date"
+        element="fr|partial-date"
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle"
+        xxbl:type="xs:string"
+        xxbl:label-for="input"
+        xxf:external-events="DOMActivate"
+        xxbl:constraint="
+            PartialDateSupport:isValidPartialDate(
+                string(.),
+                string(fr:component-param-value('precisions')),
+                string(fr:component-param-value('allow-qualifiers')),
+                string(fr:component-param-value('allow-intervals')),
+                string(fr:component-param-value('min-year')),
+                string(fr:component-param-value('max-year'))
+            )">
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Partial Date</display-name>
+            <display-name lang="fr">Date partielle</display-name>
+            <display-name lang="no">Delvis dato</display-name>
+            <display-name lang="ru">Неполная дата</display-name>
+            <display-name lang="it">Data parziale</display-name>
+            <display-name lang="de">Unvollständiges Datum</display-name>
+            <display-name lang="fi">Osittainen päivämäärä</display-name>
+            <display-name lang="es">Fecha parcial</display-name>
+            <display-name lang="nl">Gedeeltelijke datum</display-name>
+            <display-name lang="pt">Data parcial</display-name>
+            <display-name lang="sv">Partiellt datum</display-name>
+            <display-name lang="ar">تاريخ جزئي</display-name>
+            <display-name lang="pl">Data częściowa</display-name>
+            <display-name lang="ja">部分日付</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-calendar</icon-class>
+            </icon>
+            <templates>
+                <bind type="fr:partial-date"/>
+                <view>
+                    <fr:partial-date id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:partial-date>
+                </view>
+            </templates>
+            <conversions element="fr|date"/>
+            <custom-settings>
+                <setting name="field-width"      type="xs:string"  values="full natural"/>
+                <setting name="precisions"       type="xs:string"/>
+                <setting name="allow-qualifiers" type="xs:boolean"/>
+                <setting name="allow-intervals"  type="xs:boolean"/>
+                <setting name="min-year"         type="xs:integer"/>
+                <setting name="max-year"         type="xs:integer"/>
+                <constraint
+                    test="not(min-year castable as xs:integer and max-year castable as xs:integer) or xs:integer(min-year) le xs:integer(max-year)"
+                    message="Maximum year must be greater than or equal to minimum year"/>
+            </custom-settings>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-partial-date-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue ref="$c" value="instance()/@*[name() = name($c)]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <field-width/>
+                            <precisions/>
+                            <allow-qualifiers/>
+                            <allow-intervals/>
+                            <min-year/>
+                            <max-year/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind ref="min-year | max-year" type="xf:integer"/>
+                        <xf:bind
+                            ref="max-year"
+                            constraint="not(../min-year castable as xs:integer and . castable as xs:integer) or xs:integer(../min-year) le xs:integer(.)"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <precisions>
+                                    <label>Allowed Precisions</label>
+                                    <day>Full date (YYYY-MM-DD)</day>
+                                    <month>Year and month (YYYY-MM)</month>
+                                    <year>Year only (YYYY)</year>
+                                    <decade>Decade / unspecified digits (192X)</decade>
+                                </precisions>
+                                <allow-qualifiers>Allow uncertain / approximate (?, ~, %)</allow-qualifiers>
+                                <allow-intervals>Allow intervals (1926/1937)</allow-intervals>
+                                <min-year>Minimum Year</min-year>
+                                <max-year>Maximum Year</max-year>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <precisions>
+                                    <label>Précisions autorisées</label>
+                                    <day>Date complète (AAAA-MM-JJ)</day>
+                                    <month>Année et mois (AAAA-MM)</month>
+                                    <year>Année seule (AAAA)</year>
+                                    <decade>Décennie / chiffres non précisés (192X)</decade>
+                                </precisions>
+                                <allow-qualifiers>Autoriser incertain / approximatif (?, ~, %)</allow-qualifiers>
+                                <allow-intervals>Autoriser les intervalles (1926/1937)</allow-intervals>
+                                <min-year>Année minimale</min-year>
+                                <max-year>Année maximale</max-year>
+                            </resource>
+                            <resource xml:lang="no">
+                                <precisions>
+                                    <label>Tillatte presisjoner</label>
+                                    <day>Full dato (ÅÅÅÅ-MM-DD)</day>
+                                    <month>År og måned (ÅÅÅÅ-MM)</month>
+                                    <year>Kun år (ÅÅÅÅ)</year>
+                                    <decade>Tiår / uspesifiserte sifre (192X)</decade>
+                                </precisions>
+                                <allow-qualifiers>Tillat usikker / omtrentlig (?, ~, %)</allow-qualifiers>
+                                <allow-intervals>Tillat intervaller (1926/1937)</allow-intervals>
+                                <min-year>Minimumsår</min-year>
+                                <max-year>Maksimumsår</max-year>
+                            </resource>
+                            <resource xml:lang="ru">
+                                <precisions>
+                                    <label>Допустимая точность</label>
+                                    <day>Полная дата (ГГГГ-ММ-ДД)</day>
+                                    <month>Год и месяц (ГГГГ-ММ)</month>
+                                    <year>Только год (ГГГГ)</year>
+                                    <decade>Десятилетие / неуказанные цифры (192X)</decade>
+                                </precisions>
+                                <allow-qualifiers>Разрешить неточные / приблизительные (?, ~, %)</allow-qualifiers>
+                                <allow-intervals>Разрешить интервалы (1926/1937)</allow-intervals>
+                                <min-year>Минимальный год</min-year>
+                                <max-year>Максимальный год</max-year>
+                            </resource>
+                            <resource xml:lang="it">
+                                <precisions>
+                                    <label>Precisioni consentite</label>
+                                    <day>Data completa (AAAA-MM-GG)</day>
+                                    <month>Anno e mese (AAAA-MM)</month>
+                                    <year>Solo anno (AAAA)</year>
+                                    <decade>Decennio / cifre non specificate (192X)</decade>
+                                </precisions>
+                                <allow-qualifiers>Consenti incerto / approssimativo (?, ~, %)</allow-qualifiers>
+                                <allow-intervals>Consenti intervalli (1926/1937)</allow-intervals>
+                                <min-year>Anno minimo</min-year>
+                                <max-year>Anno massimo</max-year>
+                            </resource>
+                            <resource xml:lang="de">
+                                <precisions>
+                                    <label>Erlaubte Genauigkeiten</label>
+                                    <day>Vollständiges Datum (JJJJ-MM-TT)</day>
+                                    <month>Jahr und Monat (JJJJ-MM)</month>
+                                    <year>Nur Jahr (JJJJ)</year>
+                                    <decade>Jahrzehnt / unspezifizierte Ziffern (192X)</decade>
+                                </precisions>
+                                <allow-qualifiers>Unsicher / ungefähr erlauben (?, ~, %)</allow-qualifiers>
+                                <allow-intervals>Intervalle erlauben (1926/1937)</allow-intervals>
+                                <min-year>Mindestjahr</min-year>
+                                <max-year>Höchstjahr</max-year>
+                            </resource>
+                            <resource xml:lang="fi">
+                                <precisions>
+                                    <label>Sallitut tarkkuudet</label>
+                                    <day>Täysi päivämäärä (VVVV-KK-PP)</day>
+                                    <month>Vuosi ja kuukausi (VVVV-KK)</month>
+                                    <year>Vain vuosi (VVVV)</year>
+                                    <decade>Vuosikymmen / tarkentamattomat numerot (192X)</decade>
+                                </precisions>
+                                <allow-qualifiers>Salli epävarma / likimääräinen (?, ~, %)</allow-qualifiers>
+                                <allow-intervals>Salli aikavälit (1926/1937)</allow-intervals>
+                                <min-year>Vähimmäisvuosi</min-year>
+                                <max-year>Enimmäisvuosi</max-year>
+                            </resource>
+                            <resource xml:lang="es">
+                                <precisions>
+                                    <label>Precisiones permitidas</label>
+                                    <day>Fecha completa (AAAA-MM-DD)</day>
+                                    <month>Año y mes (AAAA-MM)</month>
+                                    <year>Solo año (AAAA)</year>
+                                    <decade>Década / dígitos sin especificar (192X)</decade>
+                                </precisions>
+                                <allow-qualifiers>Permitir incierto / aproximado (?, ~, %)</allow-qualifiers>
+                                <allow-intervals>Permitir intervalos (1926/1937)</allow-intervals>
+                                <min-year>Año mínimo</min-year>
+                                <max-year>Año máximo</max-year>
+                            </resource>
+                            <resource xml:lang="nl">
+                                <precisions>
+                                    <label>Toegestane precisies</label>
+                                    <day>Volledige datum (JJJJ-MM-DD)</day>
+                                    <month>Jaar en maand (JJJJ-MM)</month>
+                                    <year>Alleen jaar (JJJJ)</year>
+                                    <decade>Decennium / niet-gespecificeerde cijfers (192X)</decade>
+                                </precisions>
+                                <allow-qualifiers>Onzeker / bij benadering toestaan (?, ~, %)</allow-qualifiers>
+                                <allow-intervals>Intervallen toestaan (1926/1937)</allow-intervals>
+                                <min-year>Minimumjaar</min-year>
+                                <max-year>Maximumjaar</max-year>
+                            </resource>
+                            <resource xml:lang="pt">
+                                <precisions>
+                                    <label>Precisões permitidas</label>
+                                    <day>Data completa (AAAA-MM-DD)</day>
+                                    <month>Ano e mês (AAAA-MM)</month>
+                                    <year>Apenas ano (AAAA)</year>
+                                    <decade>Década / dígitos não especificados (192X)</decade>
+                                </precisions>
+                                <allow-qualifiers>Permitir incerto / aproximado (?, ~, %)</allow-qualifiers>
+                                <allow-intervals>Permitir intervalos (1926/1937)</allow-intervals>
+                                <min-year>Ano mínimo</min-year>
+                                <max-year>Ano máximo</max-year>
+                            </resource>
+                            <resource xml:lang="sv">
+                                <precisions>
+                                    <label>Tillåtna precisioner</label>
+                                    <day>Fullständigt datum (ÅÅÅÅ-MM-DD)</day>
+                                    <month>År och månad (ÅÅÅÅ-MM)</month>
+                                    <year>Endast år (ÅÅÅÅ)</year>
+                                    <decade>Årtionde / ospecificerade siffror (192X)</decade>
+                                </precisions>
+                                <allow-qualifiers>Tillåt osäkert / ungefärligt (?, ~, %)</allow-qualifiers>
+                                <allow-intervals>Tillåt intervall (1926/1937)</allow-intervals>
+                                <min-year>Lägsta år</min-year>
+                                <max-year>Högsta år</max-year>
+                            </resource>
+                            <resource xml:lang="ar">
+                                <precisions>
+                                    <label>الدقة المسموح بها</label>
+                                    <day>تاريخ كامل (YYYY-MM-DD)</day>
+                                    <month>السنة والشهر (YYYY-MM)</month>
+                                    <year>السنة فقط (YYYY)</year>
+                                    <decade>عقد / أرقام غير محددة (192X)</decade>
+                                </precisions>
+                                <allow-qualifiers>السماح بغير مؤكد / تقريبي (?, ~, %)</allow-qualifiers>
+                                <allow-intervals>السماح بالفترات الزمنية (1926/1937)</allow-intervals>
+                                <min-year>الحد الأدنى للسنة</min-year>
+                                <max-year>الحد الأقصى للسنة</max-year>
+                            </resource>
+                            <resource xml:lang="pl">
+                                <precisions>
+                                    <label>Dozwolona precyzja</label>
+                                    <day>Pełna data (RRRR-MM-DD)</day>
+                                    <month>Rok i miesiąc (RRRR-MM)</month>
+                                    <year>Tylko rok (RRRR)</year>
+                                    <decade>Dekada / nieokreślone cyfry (192X)</decade>
+                                </precisions>
+                                <allow-qualifiers>Zezwól na niepewne / przybliżone (?, ~, %)</allow-qualifiers>
+                                <allow-intervals>Zezwól na przedziały (1926/1937)</allow-intervals>
+                                <min-year>Minimalny rok</min-year>
+                                <max-year>Maksymalny rok</max-year>
+                            </resource>
+                            <resource xml:lang="ja">
+                                <precisions>
+                                    <label>許可する精度</label>
+                                    <day>完全な日付 (YYYY-MM-DD)</day>
+                                    <month>年月 (YYYY-MM)</month>
+                                    <year>年のみ (YYYY)</year>
+                                    <decade>年代・不確定桁 (192X)</decade>
+                                </precisions>
+                                <allow-qualifiers>不確定・おおよそを許可 (?, ~, %)</allow-qualifiers>
+                                <allow-intervals>期間を許可 (1926/1937)</allow-intervals>
+                                <min-year>最小年</min-year>
+                                <max-year>最大年</max-year>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-partial-date-grid">
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:select1 ref="instance('local')/field-width" appearance="full xxf:horizontal" id="field-width-control">
+                                <xf:label ref="xxf:r('xbl-control-settings.field-width', '|fr-form-resources|')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.full', '|fr-form-resources|')"/>
+                                    <xf:value>full</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.natural', '|fr-form-resources|')"/>
+                                    <xf:value>natural</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:select ref="instance('local')/precisions" appearance="full" id="precisions-control">
+                                <xf:label ref="xxf:r('precisions.label')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('precisions.day')"/>
+                                    <xf:value>day</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('precisions.month')"/>
+                                    <xf:value>month</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('precisions.year')"/>
+                                    <xf:value>year</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('precisions.decade')"/>
+                                    <xf:value>decade</xf:value>
+                                </xf:item>
+                            </xf:select>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/allow-qualifiers" appearance="full xxf:horizontal" id="allow-qualifiers-control">
+                                <xf:label ref="xxf:r('allow-qualifiers')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('yes', '|fr-form-resources|')"/>
+                                    <xf:value>true</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('no', '|fr-form-resources|')"/>
+                                    <xf:value>false</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/allow-intervals" appearance="full xxf:horizontal" id="allow-intervals-control">
+                                <xf:label ref="xxf:r('allow-intervals')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('yes', '|fr-form-resources|')"/>
+                                    <xf:value>true</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('no', '|fr-form-resources|')"/>
+                                    <xf:value>false</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                    <xh:tr>
+                        <xh:td colspan="3">
+                            <fr:number ref="instance('local')/min-year" id="min-year-control">
+                                <xf:label ref="xxf:r('min-year')"/>
+                            </fr:number>
+                        </xh:td>
+                        <xh:td colspan="3">
+                            <fr:number ref="instance('local')/max-year" id="max-year-control">
+                                <xf:label ref="xxf:r('max-year')"/>
+                            </fr:number>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-partial-date-action"
+                    event="xforms-value-changed"
+                    observer="field-width-control precisions-control allow-qualifiers-control allow-intervals-control min-year-control max-year-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute($name, $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+            </control-details>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/partial-date/partial-date.css"/>
+            <xbl:style src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/css/bootstrap-datepicker.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
+                    <_>
+                        <resource xml:lang="en"><format>MDY</format></resource>
+                        <resource xml:lang="fr"><format>MJA</format></resource>
+                        <resource xml:lang="de"><format>MTJ</format></resource>
+                        <resource xml:lang="pl"><format>MDR</format></resource>
+                        <resource xml:lang="cs"><format>MDR</format></resource>
+                        <resource xml:lang="hu"><format>HNÉ</format></resource>
+                        <resource xml:lang="da"><format>MDÅ</format></resource>
+                        <resource xml:lang="tr"><format>AGY</format></resource>
+                        <resource xml:lang="es"><format>MDA</format></resource>
+                        <resource xml:lang="ar"><format>شيس</format></resource>
+                        <resource xml:lang="ca"><format>MDA</format></resource>
+                        <resource xml:lang="fi"><format>KPV</format></resource>
+                        <resource xml:lang="it"><format>MGA</format></resource>
+                        <resource xml:lang="ja"><format>月日年</format></resource>
+                        <resource xml:lang="nl"><format>MDJ</format></resource>
+                        <resource xml:lang="no"><format>MDÅ</format></resource>
+                        <resource xml:lang="pt"><format>MDA</format></resource>
+                        <resource xml:lang="ru"><format>МДГ</format></resource>
+                        <resource xml:lang="sv"><format>MDÅ</format></resource>
+                        <resource xml:lang="zh-Hans"><format>月日年</format></resource>
+                        <resource xml:lang="zh-Hant"><format>月日年</format></resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:var
+                name="date-format"
+                value="
+                    (
+                        fr:component-param-value('output-format')[xxf:non-blank()],
+                        xxf:property('oxf.xforms.xbl.fr.date.output-format')[xxf:non-blank()],
+                        property('xxf:format.input.date')
+                    )[1]"/>
+            <xf:var
+                name="precisions"
+                value="string(fr:component-param-value('precisions'))"/>
+            <xf:var
+                name="allow-qualifiers"
+                value="string(fr:component-param-value('allow-qualifiers'))"/>
+            <xf:var
+                name="allow-intervals"
+                value="string(fr:component-param-value('allow-intervals'))"/>
+            <xf:var
+                name="has-picker"
+                value="
+                    let $tokens := tokenize($precisions, '\s+')[xxf:non-blank()]
+                    return empty($tokens) or $tokens = ('day', 'month')"/>
+
+            <xf:group
+                ref="xxf:binding('fr-partial-date')"
+                class="xforms-help-popover-control input-append date fr-field-width-{
+                        fr:component-param-value('field-width')
+                    } {
+                        if ($has-picker) then '' else 'fr-partial-date-no-picker'
+                    } fr-today-highlight-{
+                        fr:component-param-value('today-highlight')
+                    }">
+                <xh:input
+                    id="input"
+                    xh:type="text"
+                    data-format="{$date-format}"
+                    data-precisions="{$precisions}"
+                    data-allow-qualifiers="{$allow-qualifiers}"
+                    data-allow-intervals="{$allow-intervals}"
+                    placeholder="{
+                        PartialDateSupport:generatePlaceholder(
+                            $date-format,
+                            $precisions,
+                            $allow-qualifiers,
+                            $allow-intervals,
+                            instance('orbeon-resources')/resource[@xml:lang = 'en']/format,
+                            fr:r('format')
+                        )
+                    }"
+                    xxf:control="true"
+                    xbl:attr="autocomplete"/>
+                <xh:span
+                    class="add-on"
+                    tabindex="0"
+                    role="button"
+                    aria-label="{fr:r('components.date-time.select-date', '|fr-fr-resources|')}"
+                    aria-haspopup="dialog">
+                    <xh:i class="fa fa-fw fa-calendar"/>
+                </xh:span>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+    <xbl:binding
+        id="fr-partial-date-output"
+        element="
+            fr|partial-date[fr|static-readonly = true],
+            fr|partial-date[fr|pdf-template = true],
+            fr|partial-date[fr|summary = true]"
+        xxbl:mode="lhha binding value"
+        xxbl:label-for="input">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/partial-date/partial-date.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
+                    <_>
+                        <resource xml:lang="en"><approx-prefix>c.</approx-prefix><decade-pattern>{decade}s</decade-pattern></resource>
+                        <resource xml:lang="fr"><approx-prefix>v.</approx-prefix><decade-pattern>années {decade}</decade-pattern></resource>
+                        <resource xml:lang="de"><approx-prefix>ca.</approx-prefix><decade-pattern>{decade}er</decade-pattern></resource>
+                        <resource xml:lang="es"><approx-prefix>c.</approx-prefix><decade-pattern>años {decade}</decade-pattern></resource>
+                        <resource xml:lang="it"><approx-prefix>c.</approx-prefix><decade-pattern>anni {decade}</decade-pattern></resource>
+                        <resource xml:lang="pt"><approx-prefix>c.</approx-prefix><decade-pattern>anos {decade}</decade-pattern></resource>
+                        <resource xml:lang="nl"><approx-prefix>ca.</approx-prefix><decade-pattern>jaren {decade}</decade-pattern></resource>
+                        <resource xml:lang="sv"><approx-prefix>ca</approx-prefix><decade-pattern>{decade}-talet</decade-pattern></resource>
+                        <resource xml:lang="no"><approx-prefix>ca.</approx-prefix><decade-pattern>{decade}-tallet</decade-pattern></resource>
+                        <resource xml:lang="da"><approx-prefix>ca.</approx-prefix><decade-pattern>{decade}'erne</decade-pattern></resource>
+                        <resource xml:lang="fi"><approx-prefix>n.</approx-prefix><decade-pattern>{decade}-luku</decade-pattern></resource>
+                        <resource xml:lang="pl"><approx-prefix>ok.</approx-prefix><decade-pattern>lata {decade}.</decade-pattern></resource>
+                        <resource xml:lang="ru"><approx-prefix>ок.</approx-prefix><decade-pattern>{decade}-е</decade-pattern></resource>
+                        <resource xml:lang="ca"><approx-prefix>c.</approx-prefix><decade-pattern>anys {decade}</decade-pattern></resource>
+                        <resource xml:lang="hu"><approx-prefix>kb.</approx-prefix><decade-pattern>{decade}-es évek</decade-pattern></resource>
+                        <resource xml:lang="tr"><approx-prefix>yak.</approx-prefix><decade-pattern>{decade}'ler</decade-pattern></resource>
+                        <resource xml:lang="ar"><approx-prefix>حوالي</approx-prefix><decade-pattern>عقد {decade}</decade-pattern></resource>
+                        <resource xml:lang="ja"><approx-prefix>約</approx-prefix><decade-pattern>{decade}年代</decade-pattern></resource>
+                        <resource xml:lang="zh-Hans"><approx-prefix>约</approx-prefix><decade-pattern>{decade}年代</decade-pattern></resource>
+                        <resource xml:lang="zh-Hant"><approx-prefix>約</approx-prefix><decade-pattern>{decade}年代</decade-pattern></resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <xf:input
+                id="input"
+                ref="xxf:binding('fr-partial-date-output')"
+                xbl:attr="xxf:readonly-appearance"
+                xxf:format="
+                    PartialDateSupport:formatReadonlyModePartialDate(
+                        .,
+                        (
+                            fr:component-param-value('output-format')[xxf:non-blank()],
+                            xxf:property('oxf.xforms.xbl.fr.date.output-format')[xxf:non-blank()],
+                            property('xxf:format.input.date')
+                        )[1],
+                        fr:r('approx-prefix'),
+                        fr:r('decade-pattern')
+                    )"/>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

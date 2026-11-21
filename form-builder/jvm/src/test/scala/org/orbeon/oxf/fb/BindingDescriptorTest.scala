@@ -706,6 +706,18 @@ class BindingDescriptorTest
           iconPathOpt   = None,
           iconClasses   = "fa fa-fw fa-calendar-o",
           isCurrent     = isSameQName(current, FR -> "datetime")
+        ),
+        ConversionResult(
+          fullLabelOpt  = Some("Partial Date"),
+          value         = FR -> "partial-date",
+          elemName      = FR -> "partial-date",
+          appearanceOpt = None,
+          datatypeOpt   = Some(FR -> "partial-date"),
+          addAtts       = Set.empty,
+          removeAtts    = removeAtts,
+          iconPathOpt   = None,
+          iconClasses   = "fa fa-fw fa-calendar",
+          isCurrent     = isSameQName(current, FR -> "partial-date")
         )
       )
 
@@ -909,6 +921,7 @@ class BindingDescriptorTest
         (<fr:dropdown-year xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,        XF -> "gYear",        None,                      expectedDateTimeConversions(FR -> "year")),
         (<fr:time xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,                 XF -> "time",         None,                      expectedDateTimeConversions(FR -> "time")),
         (<fr:datetime xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,             XF -> "dateTime",     None,                      expectedDateTimeConversions(FR -> "datetime")),
+        (<fr:partial-date xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>,         FR -> "partial-date", None,                      expectedDateTimeConversions(FR -> "partial-date")),
         (<fr:attachment xmlns:fr="http://orbeon.org/oxf/xml/form-runner" class="fr-attachment"/>,
           XF -> "anyURI", None, expectedAttachmentConversions(FR -> "attachment")),
         (<fr:image-attachment xmlns:fr="http://orbeon.org/oxf/xml/form-runner" class="fr-attachment"/>,

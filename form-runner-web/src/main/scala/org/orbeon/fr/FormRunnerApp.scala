@@ -92,6 +92,7 @@ object FormRunnerApp extends App {
     xbl.FrRating
     xbl.FrScale
     xbl.FrDuration
+    xbl.PartialDate
     xbl.FrOpenSelect
     xbl.FrCodeInput
     xbl.ConsoleChart

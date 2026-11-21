@@ -295,6 +295,22 @@ class ControlCustomSettingsParserTest
       assert(dateRangeSpec.constraints.size == 1)
     }
 
+    it("must parse `<fr:partial-date>` custom settings and constraints") {
+      import org.orbeon.scaxon.SimplePath.*
+
+      val partialDateDoc = new org.orbeon.dom.saxon.DocumentWrapper(
+        org.orbeon.oxf.resources.ResourceManagerWrapper.instance.getContentAsOrbeonDom("/xbl/orbeon/partial-date/partial-date.xbl"),
+        null,
+        org.orbeon.oxf.util.XPath.GlobalConfiguration
+      )
+      val partialDateSpec = ControlCustomSettingsParser.fromBinding((partialDateDoc.rootElement / "*:binding").head).get
+      assert(partialDateSpec.localName == "partial-date")
+      assert(partialDateSpec.settings.map(_.name) == List("fieldWidth", "precisions", "allowQualifiers", "allowIntervals", "minYear", "maxYear"))
+      assert(partialDateSpec.findSetting("allowQualifiers").exists(_.settingType == BooleanType))
+      assert(partialDateSpec.findSetting("allowIntervals").exists(_.settingType == BooleanType))
+      assert(partialDateSpec.constraints.size == 1)
+    }
+
     it("must parse `<fr:image>` and `<fr:image-attachment>` custom settings") {
       import org.orbeon.scaxon.SimplePath.*
 

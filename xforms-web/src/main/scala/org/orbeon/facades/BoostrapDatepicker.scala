@@ -33,6 +33,8 @@ object BoostrapDatepicker {
     var language         : String                   = "en"
     var container        : js.UndefOr[Element]      = js.undefined
     var weekStart        : js.UndefOr[Int]          = js.undefined
+    var minViewMode      : js.UndefOr[Int]          = js.undefined
+    var startView        : js.UndefOr[Int]          = js.undefined
   }
 
   implicit class DatePickerOps(private val datePicker: DatePicker) extends AnyVal {

@@ -61,7 +61,7 @@ import org.orbeon.saxon.{ArrayFunctions, MapFunctions}
 import org.orbeon.scaxon.Implicits
 import org.orbeon.scaxon.Implicits.*
 import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps}
-import org.orbeon.xbl.{DateRangeSupport, ErrorSummary, Wizard}
+import org.orbeon.xbl.{DateRangeSupport, ErrorSummary, PartialDateSupport, Wizard}
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames.XFORMS_NAMESPACE_URI
 import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
@@ -270,6 +270,15 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Arg(STRING, ALLOWS_ZERO_OR_ONE)
     )
     Fun("date-range-days", classOf[FRDateRangeDays], op = 0, min = 1, INTEGER, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
+    )
+    Fun("partial-date-earliest", classOf[FRPartialDateEarliest], op = 0, min = 1, DATE, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
+    )
+    Fun("partial-date-latest", classOf[FRPartialDateLatest], op = 0, min = 1, DATE, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
+    )
+    Fun("partial-date-year", classOf[FRPartialDateYear], op = 0, min = 1, INTEGER, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, ALLOWS_ZERO_OR_ONE)
     )
 
@@ -1249,6 +1258,36 @@ class FRDateRangeDays extends FunctionSupport with DefaultFunctionSupport {
     stringArgumentOpt(0)
       .flatMap(DateRangeSupport.daysBetweenOpt)
       .map(new Int64Value(_))
+      .orNull
+  }
+}
+
+class FRPartialDateEarliest extends FunctionSupport with DefaultFunctionSupport {
+  override def evaluateItem(xpathContext: XPathContext): DateValue = {
+    implicit val xpc: XPathContext = xpathContext
+    stringArgumentOpt(0)
+      .flatMap(PartialDateSupport.earliestIsoDateOpt)
+      .map(iso => new DateValue(iso.toIsoString))
+      .orNull
+  }
+}
+
+class FRPartialDateLatest extends FunctionSupport with DefaultFunctionSupport {
+  override def evaluateItem(xpathContext: XPathContext): DateValue = {
+    implicit val xpc: XPathContext = xpathContext
+    stringArgumentOpt(0)
+      .flatMap(PartialDateSupport.latestIsoDateOpt)
+      .map(iso => new DateValue(iso.toIsoString))
+      .orNull
+  }
+}
+
+class FRPartialDateYear extends FunctionSupport with DefaultFunctionSupport {
+  override def evaluateItem(xpathContext: XPathContext): Int64Value = {
+    implicit val xpc: XPathContext = xpathContext
+    stringArgumentOpt(0)
+      .flatMap(PartialDateSupport.exactYearOpt)
+      .map(y => new Int64Value(y.toLong))
       .orNull
   }
 }

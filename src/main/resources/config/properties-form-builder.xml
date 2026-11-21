@@ -53,6 +53,7 @@
         oxf:/xbl/orbeon/time/time.xbl
         oxf:/xbl/orbeon/datetime/datetime.xbl
         oxf:/xbl/orbeon/date-range/date-range.xbl
+        oxf:/xbl/orbeon/partial-date/partial-date.xbl
         oxf:/xbl/orbeon/duration/duration.xbl
         oxf:/xbl/orbeon/timestamp/timestamp.xbl
     </property>
@@ -348,7 +349,8 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.date.field-width.orbeon.builder"     value="full"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.time.field-width.orbeon.builder"     value="full"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.datetime.field-width.orbeon.builder"   value="full"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.date-range.field-width.orbeon.builder" value="full"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.date-range.field-width.orbeon.builder"   value="full"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.partial-date.field-width.orbeon.builder" value="full"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.year.field-width.orbeon.builder"     value="full"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.us-phone.field-width.orbeon.builder" value="full"/>
 

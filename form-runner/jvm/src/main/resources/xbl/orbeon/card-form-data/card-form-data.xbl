@@ -6,7 +6,8 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:OpenSelectSupport="java:org.orbeon.xbl.OpenSelectSupportJava">
+         xmlns:OpenSelectSupport="java:org.orbeon.xbl.OpenSelectSupportJava"
+         xmlns:PartialDateSupport="java:org.orbeon.xbl.PartialDateSupportJava">
 
     <xbl:binding
         id="fr-card-form-data"
@@ -599,6 +600,17 @@
                                                         )
                                                     else
                                                         $raw
+                                                else if ($control = 'partial-date') then
+                                                    PartialDateSupport:formatReadonlyModePartialDate(
+                                                        $raw,
+                                                        (
+                                                            xxf:property(string-join(('oxf.xforms.xbl.fr.date.output-format', $app, $form), '.'))[xxf:non-blank()],
+                                                            xxf:property('oxf.xforms.xbl.fr.date.output-format')[xxf:non-blank()],
+                                                            property('xxf:format.input.date')
+                                                        )[1],
+                                                        'c.',
+                                                        '{decade}s'
+                                                    )
                                                 else if (frf:isSingleSelectionControl($control)) then
                                                     for $code in $raw return
                                                         ($form-resources/*[local-name() = $query/@name]/item[value = $code]/label, $code)[1]

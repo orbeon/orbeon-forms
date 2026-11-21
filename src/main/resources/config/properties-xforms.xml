@@ -250,6 +250,12 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.time.native-picker"                        value="ios"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.datetime.field-width"                      value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.date-range.field-width"                    value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.partial-date.field-width"                  value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.partial-date.output-format"                value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.partial-date.precisions"                   value="day month year"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.partial-date.allow-qualifiers"             value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.partial-date.allow-intervals"              value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.partial-date.today-highlight"              value="true"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.year.field-width"                          value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.phone.default-country"                     value=""/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.phone.preferred-countries"                 value=""/>
@@ -352,6 +358,7 @@
         fr:time
         fr:datetime
         fr:date-range
+        fr:partial-date
         fr:duration
         fr:year
         fr:number

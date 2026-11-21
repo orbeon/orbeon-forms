@@ -135,7 +135,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
                   submissionParameters.isReadonly,
                   staticInstance.exposeXPathTypes,
                   loadFn(submissionParameters, serializationParameters)
-                )(detailsLogger)
+                )(IndentedLogger.withNewIndentation(detailsLogger))
 
               // xxx probably not?
               Right(newDocumentInfoIo.map(createReplacerAndConnectionResult2)).some

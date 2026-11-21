@@ -36,6 +36,12 @@ object IndentedLogger {
   def apply(logger: IndentedLogger, debugEnabled: Boolean): IndentedLogger =
     new IndentedLogger(logger.logger, debugEnabled, logger.indentation, logger.categoryOpt)
 
+  def withNewIndentation(logger: IndentedLogger): IndentedLogger =
+    new IndentedLogger(logger.logger, logger.debugEnabled, new Indentation(logger.indentation.indentation), logger.categoryOpt)
+
+  def withNewIndentation(logger: IndentedLogger, debugEnabled: Boolean): IndentedLogger =
+    new IndentedLogger(logger.logger, debugEnabled, new Indentation(logger.indentation.indentation), logger.categoryOpt)
+
   private val Separator = " - "
 
   private def getLogIndentSpaces(level: Int): String = {
@@ -143,34 +149,39 @@ class IndentedLogger(
   }
 
   private def startHandleOperation(`type`: String, message: String, parameters: String*): Unit =
-    if (debugEnabled) {
-      stack ::= new Operation(`type`, message)
-      logDebug(`type`, "start " + message, parameters*)
-      indentation.indentation += 1
-    }
+    if (debugEnabled)
+      synchronized {
+        stack ::= new Operation(`type`, message)
+        logDebug(`type`, "start " + message, parameters*)
+        indentation.indentation += 1
+      }
 
   private def endHandleOperation(success: Boolean = true): Unit =
     if (debugEnabled)
-      stack match {
-        case operation :: tail =>
+      synchronized {
+        stack match {
+          case operation :: tail =>
 
-          stack = tail
-          indentation.indentation -= 1
+            stack = tail
+            indentation.indentation = math.max(0, indentation.indentation - 1)
 
-          val newParams =
-            "time (ms)" :: operation.timeElapsed.toString :: operation.resultParameters.toList
+            val newParams =
+              "time (ms)" :: operation.timeElapsed.toString :: operation.resultParameters.toList
 
-          logDebug(
-            operation.`type`,
-            s"end ${operation.message} with ${if (success) "success" else "failure"}",
-            newParams*
-          )
-        case _ =>
+            logDebug(
+              operation.`type`,
+              s"end ${operation.message} with ${if (success) "success" else "failure"}",
+              newParams*
+            )
+          case _ =>
+        }
       }
 
   def setDebugResults(parameters: String*): Unit =
     if (debugEnabled)
-      stack.head.resultParameters = parameters
+      synchronized {
+        stack.headOption.foreach(_.resultParameters = parameters)
+      }
 
   def log(level: log4s.LogLevel, `type`: String, message: String, parameters: String*): Unit =
     if (!((level eq log4s.Debug) && ! debugEnabled))

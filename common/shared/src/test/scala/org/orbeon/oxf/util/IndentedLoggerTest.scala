@@ -37,5 +37,24 @@ class IndentedLoggerTest extends AnyFunSpec {
     it("must succeed") {
       assert(42 == result)
     }
+
+    it("must not throw when setDebugResults is called with an empty stack") {
+      val debugLogger = new IndentedLogger(logger, isDebugEnabled = true)
+      debugLogger.setDebugResults("k", "v")
+      assert(debugLogger.indentation.indentation == 0)
+    }
+
+    it("must isolate indentation with withNewIndentation") {
+      val parent = new IndentedLogger(logger, isDebugEnabled = true)
+      parent.indentation.indentation = 3
+      val child = IndentedLogger.withNewIndentation(parent)
+      assert(child.indentation.indentation == 3)
+      child.withDebug("test", "child op") {
+        assert(child.indentation.indentation == 4)
+        assert(parent.indentation.indentation == 3)
+      }
+      assert(child.indentation.indentation == 3)
+      assert(parent.indentation.indentation == 3)
+    }
   }
 }

@@ -173,7 +173,7 @@
                 value="concat(fr:component-param-value('refresh-token'), '|', xxf:instance('fr-fr-language-instance'))">
                 <xf:send
                     event="xforms-value-changed"
-                    if="instance('fr-ui-instance')/@has-loaded = 'true'"
+                    if="instance('fr-ui-instance')/@has-loaded = 'true' or instance('fr-ui-instance')/@state = 'error'"
                     submission="fr-read-demo-forms-submission"/>
             </xf:var>
 

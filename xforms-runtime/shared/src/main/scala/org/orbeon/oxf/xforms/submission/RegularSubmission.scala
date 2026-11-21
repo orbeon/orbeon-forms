@@ -93,12 +93,12 @@ class RegularSubmission(submission: XFormsModelSubmission)
       else
         None
 
-    def createConnectResult[S](cxr: ConnectionResultT[S]): ConnectResultT[S] =
+    def createConnectResult[S](cxr: ConnectionResultT[S])(implicit indentedLogger: IndentedLogger): ConnectResultT[S] =
       withDebug("creating connect result") {
         try {
           ConnectResultT.Success(
             submissionEffectiveId,
-            submission.getReplacer(cxr, submissionParameters)(submission.getIndentedLogger),
+            submission.getReplacer(cxr, submissionParameters)(indentedLogger),
             cxr
           )
         } catch {
@@ -141,6 +141,11 @@ class RegularSubmission(submission: XFormsModelSubmission)
       if (submissionParameters.isAsynchronous || submissionParameters.isDeferredSubmission) {
         // Capture thread-bound connection context (`ProcessorService.currentProcessorService`, etc.), request
         // context, and logger state synchronously on the incoming request thread before shifting to `IO` fibers.
+        // Use independent `IndentedLogger` instances so concurrent async submissions do not share mutable
+        // operation stacks or indentation levels.
+        val asyncIndentedLogger = IndentedLogger.withNewIndentation(indentedLogger)
+        val asyncDetailsLogger  = IndentedLogger.withNewIndentation(detailsLogger)
+
         val connectIo =
           Connection.connectAsync(
             method           = submissionParameters.httpMethod,
@@ -151,7 +156,7 @@ class RegularSubmission(submission: XFormsModelSubmission)
             loadState        = true,
             logBody          = BaseSubmission.isLogBody
           )(
-            logger           = detailsLogger,
+            logger           = asyncDetailsLogger,
             safeRequestCtx   = safeRequestCtx,
             connectionCtx    = ConnectionContextSupport.findContext(Map.empty),
             resourceResolver = submission.containingDocument.staticState.resourceResolverOpt
@@ -162,7 +167,7 @@ class RegularSubmission(submission: XFormsModelSubmission)
             val startNs = System.nanoTime()
             connectIo.attempt.flatMap {
               case Right(cxr) =>
-                val res = createConnectResult(cxr)
+                val res = createConnectResult(cxr)(asyncIndentedLogger)
                 recordAnalytics(startNs, isSuccessResult(res, cxr))
                 IO.pure(res)
               case Left(t) =>

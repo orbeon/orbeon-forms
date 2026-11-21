@@ -67,7 +67,7 @@
                 <xf:var name="version" value="xs:integer((fr:component-param-value('version')[. castable as xs:integer], 1)[1])"/>
 
                 <xf:instance id="fr-state-instance" xxf:exclude-result-prefixes="#all">
-                    <_ state="initial" has-loaded="false" operations="" latest-modified="" sort-announcement=""/>
+                    <_ state="initial" has-loaded="false" source-form-loaded="false" operations="" latest-modified="" sort-announcement=""/>
                 </xf:instance>
 
                 <xf:instance id="fr-source-form-instance" xxf:readonly="false" xxf:exclude-result-prefixes="#all">
@@ -287,6 +287,10 @@
                     <xf:delete
                         ref="instance('fr-search-instance')/query/*"/>
 
+                    <xf:setvalue
+                        ref="instance('fr-state-instance')/@source-form-loaded"
+                        value="'true'"/>
+
                     <!-- Query initial list of documents -->
                     <xf:send submission="fr-search-submission"/>
 
@@ -388,10 +392,14 @@
             <xf:var
                 name="refresh-watch"
                 value="concat(fr:component-param-value('refresh-token'), '|', xxf:instance('fr-fr-language-instance'))">
-                <xf:send
-                    event="xforms-value-changed"
-                    if="instance('fr-state-instance')/@has-loaded = 'true'"
-                    submission="fr-search-submission"/>
+                <xf:action event="xforms-value-changed">
+                    <xf:send
+                        if="instance('fr-state-instance')/@has-loaded = 'true' and instance('fr-state-instance')/@source-form-loaded = 'true'"
+                        submission="fr-search-submission"/>
+                    <xf:send
+                        if="instance('fr-state-instance')/@state = 'error' and not(instance('fr-state-instance')/@source-form-loaded = 'true')"
+                        submission="fr-get-source-form-submission"/>
+                </xf:action>
             </xf:var>
 
             <fr:card
@@ -436,7 +444,14 @@
                             <xh:span class="xforms-hidden"><xf:output value="$refresh-label"/></xh:span>
                         </xf:label>
                         <xf:hint value="$refresh-label"/>
-                        <xf:send event="DOMActivate" submission="fr-search-submission"/>
+                        <xf:action event="DOMActivate">
+                            <xf:send
+                                if="instance('fr-state-instance')/@source-form-loaded = 'true'"
+                                submission="fr-search-submission"/>
+                            <xf:send
+                                if="not(instance('fr-state-instance')/@source-form-loaded = 'true')"
+                                submission="fr-get-source-form-submission"/>
+                        </xf:action>
                     </xf:trigger>
                 </fr:card-actions>
 

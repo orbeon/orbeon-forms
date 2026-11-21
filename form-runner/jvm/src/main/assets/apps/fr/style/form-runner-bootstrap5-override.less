@@ -135,6 +135,10 @@
     i {
       color: var(--orbeon-navbar-color);
     }
+
+    &:hover {
+      background-color: var(--orbeon-navbar-hover-background-color);
+    }
   }
 
   // Navbar status icons: Bootstrap 2's navbar icon color (the default text color is invisible on the dark navbar)
@@ -162,6 +166,10 @@
         margin-left: 0;
         outline    : 0;
         box-shadow : none;
+      }
+
+      &:hover:not(.show) {
+        background-color: var(--orbeon-navbar-hover-background-color);
       }
 
       &:focus-within:not(.show) {
@@ -199,6 +207,10 @@
       line-height  : 1.5;
       .fa {
         color: var(--orbeon-navbar-color);
+      }
+
+      &:hover {
+        background-color: var(--orbeon-navbar-hover-background-color);
       }
     }
   }
@@ -310,6 +322,10 @@
     &.show {
       background-color: var(--orbeon-navbar-dropdown-open-toggle-background-color);
     }
+  }
+
+  .navbar .dropdown .btn-secondary.dropdown-toggle:not(.disabled):not([disabled]):not(.show):hover {
+    background-color: var(--orbeon-navbar-hover-background-color);
   }
 
   .fr-language-choice .dropdown .btn-secondary {

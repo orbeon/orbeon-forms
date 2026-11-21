@@ -5376,6 +5376,9 @@ body.orbeon {
                     &:focus {
                         color: var(--orbeon-fb-navbar-hover-color);
                     }
+                    &:hover {
+                        background-color: var(--orbeon-navbar-hover-background-color);
+                    }
                     .fa {
                         color: inherit;
                     }
@@ -5460,6 +5463,9 @@ body.orbeon {
                     outline: 0;
                     box-shadow: none;
                 }
+                &:hover:not(.show) {
+                    background-color: var(--orbeon-navbar-hover-background-color);
+                }
                 &:focus-visible:not(.show) {
                     .focusDecorations();
                 }
@@ -5485,6 +5491,9 @@ body.orbeon {
                 &:hover,
                 &:focus {
                     color: var(--orbeon-fb-navbar-hover-color);
+                }
+                &:hover:not(.show) {
+                    background-color: var(--orbeon-navbar-hover-background-color);
                 }
                 &:focus {
                     outline: 0;

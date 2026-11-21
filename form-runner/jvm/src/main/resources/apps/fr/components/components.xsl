@@ -756,6 +756,16 @@
                            )"/>
             </xh:title>
 
+            <!-- Viewport -->
+            <xsl:if test="not(xh:meta[@name = 'viewport'])">
+                <xh:meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes"/>
+            </xsl:if>
+
+            <!-- Orbeon Forms version -->
+            <xsl:if test="$version">
+                <xh:meta name="generator" content="{$version}"/>
+            </xsl:if>
+
             <!-- Favicon -->
             <xsl:choose>
                 <xsl:when test="xh:link[@rel = 'icon']">

@@ -79,6 +79,7 @@
                                                 then $app-style
                                                 else if ($is-embeddable) then p:property('oxf.epilogue.theme.embeddable')
                                                      else if ($is-renderer) then p:property('oxf.epilogue.theme.renderer')
+                                                     else if ($app = 'fr') then ()
                                                      else p:property('oxf.epilogue.theme')))"/>
                         <p:output name="data" id="theme-config"/>
                     </p:processor>
@@ -86,8 +87,8 @@
             </p:choose>
 
             <!-- Apply theme if needed -->
-            <p:choose href="#request"><!-- dummy test input -->
-                <p:when test="not(p:property('oxf.epilogue.use-theme') = false())">
+            <p:choose href="#theme-config">
+                <p:when test="not(p:property('oxf.epilogue.use-theme') = false()) and normalize-space(/config) != ''">
                     <!-- Theme -->
                     <p:processor name="oxf:url-generator">
                         <p:input name="config" href="#theme-config"/>

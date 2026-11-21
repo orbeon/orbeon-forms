@@ -389,8 +389,7 @@
                 <xf:var name="suggest-existing" value="fr:component-param-value('suggest-existing') = 'true'"/>
                 <xf:action if="$suggest-existing and empty(instance('existing-values')/value)">
                     <xf:var name="binding"><xxf:value value="." xxbl:scope="outer"/></xf:var>
-                    <xf:var name="path-full" value="string-join($binding/ancestor-or-self::*[ancestor::form]/local-name(), '/')"/>
-                    <xf:var name="path-400"  value="string-join($binding/ancestor-or-self::*[ancestor::form and not(matches(local-name(), '^grid-\d+$'))]/local-name(), '/')"/>
+                    <xf:var name="path-edge" value="string-join($binding/ancestor-or-self::*[ancestor::form]/local-name(), '/')"/>
                     <xf:var
                         name="distinct-vals"
                         value="
@@ -398,8 +397,7 @@
                                 fr:app-name(),
                                 fr:form-name(),
                                 string(fr:form-version()),
-                                $path-full,
-                                $path-400
+                                $path-edge
                             )"/>
                     <xf:insert
                         context="instance('existing-values')"

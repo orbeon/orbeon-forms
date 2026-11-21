@@ -244,5 +244,28 @@ class OpenSelect1SearchControlTest
         }
       }
     }
+
+    it("must adjust Edge control paths to the persistence DataFormatVersion using form migration metadata") {
+      val metadataElem = elemToNodeInfo(
+        <metadata>
+          <migration version="2019.1.0">{"""{"migrations":[{"containerPath":[{"value":"overview-section"}],"newGridElem":{"value":"overview-grid"},"afterElem":null,"content":[{"value":"brand"}],"topLevel":true}]}"""}</migration>
+        </metadata>
+      )
+
+      assert(
+        OpenSelect1SearchSupport.adjustedControlPath(
+          controlPathEdge   = "overview-section/overview-grid/brand",
+          dataFormatVersion = DataFormatVersion.V400,
+          metadataElemOpt   = Some(metadataElem)
+        ) == "overview-section/brand"
+      )
+      assert(
+        OpenSelect1SearchSupport.adjustedControlPath(
+          controlPathEdge   = "overview-section/overview-grid/brand",
+          dataFormatVersion = DataFormatVersion.V20191,
+          metadataElemOpt   = Some(metadataElem)
+        ) == "overview-section/overview-grid/brand"
+      )
+    }
   }
 }

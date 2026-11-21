@@ -13,10 +13,13 @@
   */
 package org.orbeon.xbl
 
+import org.orbeon.oxf.fr.datamigration.{MigrationSupport, PathElem}
 import org.orbeon.oxf.fr.persistence.api.PersistenceApi
-import org.orbeon.oxf.fr.{AppForm, SearchVersion}
+import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, FormRunner, FormRunnerPersistence, SearchVersion}
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
+import org.orbeon.saxon.om.NodeInfo
 
 import scala.util.Try
 
@@ -27,26 +30,63 @@ object OpenSelect1SearchSupport {
 
   private implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
 
+  def adjustedControlPath(
+    controlPathEdge  : String,
+    dataFormatVersion: DataFormatVersion,
+    metadataElemOpt  : Option[NodeInfo]
+  ): String = {
+    val pathElems = controlPathEdge.splitTo[List]("/").map(PathElem.apply)
+    val adjustedElems =
+      dataFormatVersion match {
+        case DataFormatVersion.Edge =>
+          pathElems
+        case _ =>
+          val (_, migrationOpsToApply) =
+            MigrationSupport.findMigrationOps(
+              srcVersion = DataFormatVersion.Edge,
+              dstVersion = dataFormatVersion
+            )
+
+          val pathMigrationFunctions =
+            for {
+              metadataElem <- metadataElemOpt.toList
+              ops          <- migrationOpsToApply
+              json         <- MigrationSupport.findMigrationForVersion(metadataElem, ops.version)
+            } yield
+              ops.adjustPathTo40(ops.decodeMigrationSetFromJson(json), _)
+
+          (pathMigrationFunctions.iterator flatMap (_.apply(pathElems))).nextOption() getOrElse pathElems
+      }
+
+    adjustedElems.map(_.value).mkString("/")
+  }
+
   def distinctValuesForControl(
     app            : String,
     form           : String,
     formVersion    : String,
-    controlPathFull: String,
-    controlPath400 : String
+    controlPathEdge: String
   ): Seq[String] = {
     val appOpt  = Option(app).flatMap(_.trimAllToOpt)
     val formOpt = Option(form).flatMap(_.trimAllToOpt)
+    val pathOpt = Option(controlPathEdge).flatMap(_.trimAllToOpt)
 
-    val candidatePaths =
-      List(Option(controlPathFull), Option(controlPath400))
-        .flatten
-        .flatMap(_.trimAllToOpt)
-        .distinct
-
-    (appOpt, formOpt) match {
-      case (Some(a), Some(f)) if candidatePaths.nonEmpty && ! (a == "orbeon" && f == "builder") =>
+    (appOpt, formOpt, pathOpt) match {
+      case (Some(a), Some(f), Some(edgePath)) if ! (a == "orbeon" && f == "builder") =>
         Try {
           implicit val indentedLogger: IndentedLogger = new IndentedLogger(logger)
+          implicit val propertySet   : PropertySet    = CoreCrossPlatformSupport.properties
+
+          val appForm = AppForm(a, f)
+          val databaseDataFormatVersion =
+            FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
+
+          val indexedPath =
+            adjustedControlPath(
+              controlPathEdge   = edgePath,
+              dataFormatVersion = databaseDataFormatVersion,
+              metadataElemOpt   = FormRunner.metadataInstance.map(_.rootElement)
+            )
 
           val searchVersion =
             Option(formVersion)
@@ -57,9 +97,9 @@ object OpenSelect1SearchSupport {
               .getOrElse(SearchVersion.Unspecified)
 
           val result = PersistenceApi.distinctValues(
-            appForm       = AppForm(a, f),
+            appForm       = appForm,
             searchVersion = searchVersion,
-            controlPaths  = candidatePaths
+            controlPaths  = List(indexedPath)
           )
 
           val rawValues = result.controls.flatMap(_.distinctValues).flatMap(_.trimAllToOpt)
@@ -83,10 +123,9 @@ object OpenSelect1SearchSupportJava {
     app            : String,
     form           : String,
     formVersion    : String,
-    controlPathFull: String,
-    controlPath400 : String
+    controlPathEdge: String
   ): Array[String] =
     OpenSelect1SearchSupport
-      .distinctValuesForControl(app, form, formVersion, controlPathFull, controlPath400)
+      .distinctValuesForControl(app, form, formVersion, controlPathEdge)
       .toArray
 }

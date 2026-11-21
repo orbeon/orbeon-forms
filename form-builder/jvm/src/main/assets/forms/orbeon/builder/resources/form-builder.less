@@ -1220,6 +1220,7 @@ body.orbeon {
     // Show keyboard shortcuts hints on hover, except if `oxf.fr.keyboard-shortcuts.show-hints.*.*` is set to `false`
                                   .fb-toolbox .tab-content:hover kbd:not(:empty)   { display: block; } // `not(:empty)` for case where a keyboard shortcut hasn't been defined
     .fr-mode-view                 .fb-toolbox .tab-content:hover kbd               { display: none;  }
+    .fr-mode-view                 .fb-toolbox .fb-toolbox-search                   { display: none;  }
     .fr-keyboard-shortcuts-hidden .fb-toolbox .tab-content:hover kbd               { display: none;  }
 
     .fb-toolbox {
@@ -1541,6 +1542,140 @@ body.orbeon {
                 .fb-tools {
                     margin-bottom: 14px;
                     &:last-child { margin-bottom: 0 }
+
+                    &.fb-tools-search-hidden {
+                        display: none;
+                    }
+                }
+
+                .fb-tool {
+                    &.fb-tool-search-hidden {
+                        display: none;
+                    }
+
+                    &.fb-tool-search-selected button.btn {
+                        background-color: var(--orbeon-fb-hover-background-color);
+                        box-shadow: inset 0 0 0 1px var(--orbeon-fb-active-color);
+                    }
+                }
+
+                .fb-toolbox-search {
+                    position: relative;
+                    height: 0;
+                    margin: 0;
+
+                    .fb-toolbox-search-toggle {
+                        position: absolute;
+                        top: -1px;
+                        right: 2px;
+                        z-index: 2;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 22px;
+                        height: 22px;
+                        padding: 0;
+                        border: none;
+                        background-color: transparent;
+                        color: var(--orbeon-fb-empty-message-color);
+                        border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+                        cursor: pointer;
+                        transition: background-color 100ms ease, color 100ms ease;
+
+                        &:hover,
+                        &:focus-visible {
+                            background-color: var(--orbeon-fb-hover-background-color);
+                            color: var(--orbeon-base-color);
+                            outline: none;
+                        }
+                    }
+
+                    .fb-toolbox-search-bar {
+                        display: none;
+                        align-items: center;
+                        position: relative;
+                    }
+
+                    &.fb-toolbox-search-open {
+                        position: sticky;
+                        top: -10px;
+                        z-index: 3;
+                        height: auto;
+                        margin: -10px -8px 8px -8px;
+                        padding: 8px 8px 6px 8px;
+                        background-color: var(--orbeon-tab-background-color);
+                        border-bottom: 1px solid var(--orbeon-base-border-color);
+
+                        .fb-toolbox-search-toggle {
+                            display: none;
+                        }
+
+                        .fb-toolbox-search-bar {
+                            display: flex;
+                        }
+                    }
+
+                    .fb-toolbox-search-icon {
+                        position: absolute;
+                        left: 6px;
+                        pointer-events: none;
+                        color: var(--orbeon-fb-empty-message-color);
+                        font-size: 0.9em;
+                    }
+
+                    .fb-toolbox-search-input {
+                        width: 100%;
+                        height: 26px;
+                        box-sizing: border-box;
+                        margin: 0;
+                        padding: 2px 24px 2px 24px;
+                        font-size: 0.92em;
+                        background-color: var(--orbeon-form-background-color);
+                        color: var(--orbeon-base-color);
+                        border: 1px solid var(--orbeon-base-border-color);
+                        border-radius: var(--orbeon-body-decorations-border-radius);
+                        box-shadow: none;
+
+                        &::placeholder {
+                            color: var(--orbeon-fb-empty-message-color);
+                        }
+
+                        &:focus {
+                            border-color: var(--orbeon-focus-border-color);
+                            box-shadow: var(--orbeon-focus-ring);
+                            outline: none;
+                        }
+                    }
+
+                    .fb-toolbox-search-clear {
+                        position: absolute;
+                        right: 3px;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 20px;
+                        height: 20px;
+                        padding: 0;
+                        border: none;
+                        background-color: transparent;
+                        color: var(--orbeon-fb-empty-message-color);
+                        border-radius: calc(var(--orbeon-body-decorations-border-radius) - 2px);
+                        cursor: pointer;
+
+                        &:hover,
+                        &:focus-visible {
+                            background-color: var(--orbeon-fb-hover-background-color);
+                            color: var(--orbeon-base-color);
+                            outline: none;
+                        }
+                    }
+                }
+
+                .fb-toolbox-search-empty {
+                    padding: 14px 6px;
+                    text-align: center;
+                    font-size: 0.92em;
+                    color: var(--orbeon-fb-empty-message-color);
                 }
 
                 > div {

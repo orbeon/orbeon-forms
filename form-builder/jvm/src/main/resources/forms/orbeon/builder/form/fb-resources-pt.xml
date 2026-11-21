@@ -91,6 +91,13 @@
     <controls>
         <label>Controlos</label>
     </controls>
+    <search-controls>
+        <label>Pesquisar controles</label>
+        <hint>Pesquisar controles (/)</hint>
+        <placeholder>Pesquisar controles…</placeholder>
+        <clear>Limpar pesquisa</clear>
+        <no-results>Nenhum controle correspondente</no-results>
+    </search-controls>
     <i18n>
         <label>Internacionalização</label>
     </i18n>

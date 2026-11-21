@@ -110,6 +110,13 @@
     <controls>
         <label>Kontrolki</label>
     </controls>
+    <search-controls>
+        <label>Szukaj kontrolek</label>
+        <hint>Szukaj kontrolek (/)</hint>
+        <placeholder>Szukaj kontrolek…</placeholder>
+        <clear>Wyczyść wyszukiwanie</clear>
+        <no-results>Brak pasujących kontrolek</no-results>
+    </search-controls>
     <i18n>
         <label>Międzynarodizacja</label>
     </i18n>

@@ -50,6 +50,7 @@ object FormBuilderApp extends App {
 
     BlockCache
     SectionFocus
+    ToolboxSearch
     FormBuilderPreferencesClient.init()
 
     DialogItemset

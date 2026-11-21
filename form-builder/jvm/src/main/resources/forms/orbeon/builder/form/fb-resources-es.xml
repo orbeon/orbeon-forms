@@ -90,6 +90,13 @@
     <controls>
         <label>Controles</label>
     </controls>
+    <search-controls>
+        <label>Buscar controles</label>
+        <hint>Buscar controles (/)</hint>
+        <placeholder>Buscar controles…</placeholder>
+        <clear>Borrar búsqueda</clear>
+        <no-results>No hay controles coincidentes</no-results>
+    </search-controls>
     <i18n>
         <label>Internacionalización</label>
     </i18n>

@@ -244,12 +244,41 @@
             <fr:tab id="fb-toolbox-controls-tab" active="$toolbar/@toolbox-tab != 'advanced'">
                 <xf:label value="$form-resources/controls/label"/>
 
+                <!-- Quick control search -->
+                <xh:div class="fb-toolbox-search">
+                    <xh:button
+                        type="button"
+                        class="fb-toolbox-search-toggle"
+                        title="{$form-resources/search-controls/hint}"
+                        aria-label="{$form-resources/search-controls/label}"
+                        aria-expanded="false">
+                        <xh:i class="fa fa-search fa-fw"/>
+                    </xh:button>
+                    <xh:div class="fb-toolbox-search-bar">
+                        <xh:i class="fa fa-search fa-fw fb-toolbox-search-icon" aria-hidden="true"/>
+                        <xh:input
+                            type="text"
+                            class="fb-toolbox-search-input"
+                            placeholder="{$form-resources/search-controls/placeholder}"
+                            aria-label="{$form-resources/search-controls/label}"
+                            autocomplete="off"
+                            spellcheck="false"/>
+                        <xh:button
+                            type="button"
+                            class="fb-toolbox-search-clear"
+                            title="{$form-resources/search-controls/clear}"
+                            aria-label="{$form-resources/search-controls/clear}">
+                            <xh:i class="fa fa-times fa-fw"/>
+                        </xh:button>
+                    </xh:div>
+                </xh:div>
+
                 <!-- Sections, grids, etc. toolbox -->
                 <xh:div class="fb-tools">
                     <xf:group>
                         <xf:label class="fb-tools-title" value="$form-resources/form-structure/label"/>
                         <!-- Add new section -->
-                        <xh:div class="fb-tool">
+                        <xh:div class="fb-tool" data-fb-search-terms="section container structure">
                             <fr:trigger id="insert-new-section-trigger" ref="instance('fb-variables')/section-trigger" name="toolbox.insert-section">
                                 <xf:label>
                                     <xh:i class="fa fa-fw fa-newspaper-o"/>
@@ -266,7 +295,7 @@
                             </fr:trigger>
                         </xh:div>
                         <!-- Add grids -->
-                        <xh:div class="fb-tool">
+                        <xh:div class="fb-tool" data-fb-search-terms="grid table layout columns rows">
                             <fr:trigger id="insert-new-grid-trigger" ref="instance('fb-variables')/grid-trigger" name="toolbox.insert-grid">
                                 <xf:label>
                                     <xh:i class="fa fa-fw fa-table"/>
@@ -277,7 +306,7 @@
                                 </xf:action>
                             </fr:trigger>
                         </xh:div>
-                        <xh:div class="fb-tool">
+                        <xh:div class="fb-tool" data-fb-search-terms="repeated grid repeat table list">
                             <fr:trigger id="insert-new-repeated-grid-trigger" ref="instance('fb-variables')/grid-trigger" name="toolbox.insert-repeated-grid">
                                 <xf:label>
                                     <xh:i class="fa fa-fw fa-table"/>
@@ -406,7 +435,19 @@
 
                                 <!-- TODO: link/button to edit library if `$is-section-component` -->
 
-                                <xh:div class="fb-tool">
+                                <xh:div
+                                    class="fb-tool"
+                                    data-fb-search-terms="{
+                                        string-join(
+                                            (
+                                                $metadata/fb:display-name[@lang = 'en']/string(),
+                                                $metadata/fb:keywords[@lang = $lang]/string(),
+                                                $metadata/fb:keywords[@lang = 'en']/string(),
+                                                translate($binding/@fb:binding-class-name, '-_', ' ')
+                                            )[xxf:non-blank(.)],
+                                            ' '
+                                        )
+                                    }">
                                     <!-- The class is added so unit tests can find the trigger more easily -->
                                     <!-- 2024-11-26: Reworked to be automatically based on the selector names, also
                                          used for configuration keyboard shortcuts. -->
@@ -481,6 +522,10 @@
                             </xf:group>
                     </xf:group>
                 </xf:repeat>
+
+                <xh:div class="fb-toolbox-search-empty xforms-hidden" role="status" aria-live="polite">
+                    <xf:output value="$form-resources/search-controls/no-results"/>
+                </xh:div>
             </fr:tab>
             <fr:tab id="fb-toolbox-advanced-tab" active="$toolbar/@toolbox-tab = 'advanced'">
                 <xf:label value="$form-resources/advanced/label"/>

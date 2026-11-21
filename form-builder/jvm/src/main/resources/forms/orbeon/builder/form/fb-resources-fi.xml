@@ -110,6 +110,13 @@
     <controls>
         <label>Kontrolli</label>
     </controls>
+    <search-controls>
+        <label>Hae kenttiä</label>
+        <hint>Hae kenttiä (/)</hint>
+        <placeholder>Hae kenttiä…</placeholder>
+        <clear>Tyhjennä haku</clear>
+        <no-results>Ei vastaavia kenttiä</no-results>
+    </search-controls>
     <i18n>
         <label>Kansainvälistyminen</label>
     </i18n>

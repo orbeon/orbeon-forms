@@ -90,6 +90,13 @@
     <controls>
         <label>Skjemaelementer</label>
     </controls>
+    <search-controls>
+        <label>Søk etter kontroller</label>
+        <hint>Søk etter kontroller (/)</hint>
+        <placeholder>Søk etter kontroller…</placeholder>
+        <clear>Tøm søk</clear>
+        <no-results>Ingen samsvarende kontroller</no-results>
+    </search-controls>
     <i18n>
         <label>Internasjonalisering</label>
     </i18n>

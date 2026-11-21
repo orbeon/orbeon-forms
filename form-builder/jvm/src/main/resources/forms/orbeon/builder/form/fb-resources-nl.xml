@@ -91,6 +91,13 @@
     <controls>
         <label>Controls</label>
     </controls>
+    <search-controls>
+        <label>Besturingselementen zoeken</label>
+        <hint>Besturingselementen zoeken (/)</hint>
+        <placeholder>Besturingselementen zoeken…</placeholder>
+        <clear>Zoekopdracht wissen</clear>
+        <no-results>Geen overeenkomende besturingselementen</no-results>
+    </search-controls>
     <i18n>
         <label>Internationalisatie</label>
     </i18n>

@@ -98,6 +98,13 @@
     <controls>
         <label>Controlli</label>
     </controls>
+    <search-controls>
+        <label>Cerca controlli</label>
+        <hint>Cerca controlli (/)</hint>
+        <placeholder>Cerca controlli…</placeholder>
+        <clear>Cancella ricerca</clear>
+        <no-results>Nessun controllo corrispondente</no-results>
+    </search-controls>
     <i18n>
         <label>Internazionalizzazione</label>
     </i18n>

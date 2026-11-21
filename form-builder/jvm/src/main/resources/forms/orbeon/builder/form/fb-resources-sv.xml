@@ -110,6 +110,13 @@
     <controls>
         <label>Kontroller</label>
     </controls>
+    <search-controls>
+        <label>Sök kontroller</label>
+        <hint>Sök kontroller (/)</hint>
+        <placeholder>Sök kontroller…</placeholder>
+        <clear>Rensa sökning</clear>
+        <no-results>Inga matchande kontroller</no-results>
+    </search-controls>
     <i18n>
         <label>Internationalisering</label>
     </i18n>

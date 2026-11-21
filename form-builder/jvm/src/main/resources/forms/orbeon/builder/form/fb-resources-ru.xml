@@ -90,6 +90,13 @@
     <controls>
         <label>Элементы</label>
     </controls>
+    <search-controls>
+        <label>Поиск элементов управления</label>
+        <hint>Поиск элементов управления (/)</hint>
+        <placeholder>Поиск элементов…</placeholder>
+        <clear>Очистить поиск</clear>
+        <no-results>Подходящих элементов не найдено</no-results>
+    </search-controls>
     <i18n>
         <label>Перевод</label>
     </i18n>

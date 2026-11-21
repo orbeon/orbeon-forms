@@ -102,6 +102,13 @@
     <controls>
         <label>Standard</label>
     </controls>
+    <search-controls>
+        <label>Steuerelemente suchen</label>
+        <hint>Steuerelemente suchen (/)</hint>
+        <placeholder>Steuerelemente suchen…</placeholder>
+        <clear>Suche löschen</clear>
+        <no-results>Keine passenden Steuerelemente</no-results>
+    </search-controls>
     <i18n>
         <label>Internationalisierung</label>
     </i18n>

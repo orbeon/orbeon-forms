@@ -51,6 +51,7 @@ object FormBuilderApp extends App {
     BlockCache
     SectionFocus
     ToolboxSearch
+    QuickInsert.init()
     FormBuilderPreferencesClient.init()
 
     DialogItemset

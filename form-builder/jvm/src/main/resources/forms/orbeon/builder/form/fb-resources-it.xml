@@ -104,6 +104,8 @@
         <placeholder>Cerca controlli…</placeholder>
         <clear>Cancella ricerca</clear>
         <no-results>Nessun controllo corrispondente</no-results>
+        <recent>Recenti</recent>
+        <insert-control>Inserisci controllo</insert-control>
     </search-controls>
     <i18n>
         <label>Internazionalizzazione</label>

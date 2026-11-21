@@ -97,6 +97,8 @@
         <placeholder>Pesquisar controles…</placeholder>
         <clear>Limpar pesquisa</clear>
         <no-results>Nenhum controle correspondente</no-results>
+        <recent>Recentes</recent>
+        <insert-control>Inserir controle</insert-control>
     </search-controls>
     <i18n>
         <label>Internacionalização</label>

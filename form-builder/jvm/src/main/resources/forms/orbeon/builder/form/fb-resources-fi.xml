@@ -116,6 +116,8 @@
         <placeholder>Hae kenttiä…</placeholder>
         <clear>Tyhjennä haku</clear>
         <no-results>Ei vastaavia kenttiä</no-results>
+        <recent>Viimeisimmät</recent>
+        <insert-control>Lisää kenttä</insert-control>
     </search-controls>
     <i18n>
         <label>Kansainvälistyminen</label>

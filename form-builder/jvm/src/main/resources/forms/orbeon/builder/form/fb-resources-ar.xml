@@ -116,6 +116,8 @@
         <placeholder>البحث في عناصر التحكم…</placeholder>
         <clear>مسح البحث</clear>
         <no-results>لا توجد عناصر تحكم مطابقة</no-results>
+        <recent>الأخيرة</recent>
+        <insert-control>إدراج عنصر تحكم</insert-control>
     </search-controls>
     <i18n>
         <label>التدويل</label>

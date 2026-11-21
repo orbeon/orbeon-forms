@@ -108,6 +108,8 @@
         <placeholder>Steuerelemente suchen…</placeholder>
         <clear>Suche löschen</clear>
         <no-results>Keine passenden Steuerelemente</no-results>
+        <recent>Zuletzt verwendet</recent>
+        <insert-control>Steuerelement einfügen</insert-control>
     </search-controls>
     <i18n>
         <label>Internationalisierung</label>

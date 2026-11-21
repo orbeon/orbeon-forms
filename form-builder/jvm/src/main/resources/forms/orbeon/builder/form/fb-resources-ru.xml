@@ -96,6 +96,8 @@
         <placeholder>Поиск элементов…</placeholder>
         <clear>Очистить поиск</clear>
         <no-results>Подходящих элементов не найдено</no-results>
+        <recent>Недавние</recent>
+        <insert-control>Вставить элемент управления</insert-control>
     </search-controls>
     <i18n>
         <label>Перевод</label>

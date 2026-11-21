@@ -97,6 +97,8 @@
         <placeholder>Besturingselementen zoeken…</placeholder>
         <clear>Zoekopdracht wissen</clear>
         <no-results>Geen overeenkomende besturingselementen</no-results>
+        <recent>Recent</recent>
+        <insert-control>Besturingselement invoegen</insert-control>
     </search-controls>
     <i18n>
         <label>Internationalisatie</label>

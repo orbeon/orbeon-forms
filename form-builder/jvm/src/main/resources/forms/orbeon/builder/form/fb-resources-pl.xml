@@ -116,6 +116,8 @@
         <placeholder>Szukaj kontrolek…</placeholder>
         <clear>Wyczyść wyszukiwanie</clear>
         <no-results>Brak pasujących kontrolek</no-results>
+        <recent>Ostatnio używane</recent>
+        <insert-control>Wstaw kontrolkę</insert-control>
     </search-controls>
     <i18n>
         <label>Międzynarodizacja</label>

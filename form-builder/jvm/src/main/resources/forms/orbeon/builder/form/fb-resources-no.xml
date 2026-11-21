@@ -96,6 +96,8 @@
         <placeholder>Søk etter kontroller…</placeholder>
         <clear>Tøm søk</clear>
         <no-results>Ingen samsvarende kontroller</no-results>
+        <recent>Nylig brukt</recent>
+        <insert-control>Sett inn kontroll</insert-control>
     </search-controls>
     <i18n>
         <label>Internasjonalisering</label>

@@ -116,6 +116,8 @@
         <placeholder>Search controls…</placeholder>
         <clear>Clear search</clear>
         <no-results>No matching controls</no-results>
+        <recent>Recent</recent>
+        <insert-control>Insert control</insert-control>
     </search-controls>
     <i18n>
         <label>Internationalization</label>

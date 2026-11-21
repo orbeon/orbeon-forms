@@ -116,6 +116,8 @@
         <placeholder>Sök kontroller…</placeholder>
         <clear>Rensa sökning</clear>
         <no-results>Inga matchande kontroller</no-results>
+        <recent>Senaste</recent>
+        <insert-control>Infoga kontroll</insert-control>
     </search-controls>
     <i18n>
         <label>Internationalisering</label>

@@ -171,5 +171,14 @@ class ToolboxSearchTest extends AnyFunSpecLike {
         assert(dom.document.getElementById("tool-input").classList.contains("fb-tool-search-hidden"))
       }
     }
+
+    it("treats component buttons as enabled even when enclosing fb-tools group is xforms-readonly") {
+      withToolboxDom {
+        dom.document.getElementById("group-date").classList.add("xforms-readonly")
+        val items = ToolboxSearch.collectItems()
+        val dateItem = items.find(_.label == "Date")
+        assert(dateItem.exists(_.enabled))
+      }
+    }
   }
 }

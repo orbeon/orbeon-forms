@@ -34,6 +34,33 @@ object ToolboxSearch {
     enabled   : Boolean
   )
 
+  case class ToolboxItem(
+    id        : String,
+    label     : String,
+    category  : String,
+    extraTerms: String,
+    iconHtml  : String,
+    shortcut  : Option[String],
+    isControl : Boolean,
+    enabled   : Boolean,
+    button    : html.Element
+  ) {
+    def toSearchEntry: SearchEntry =
+      SearchEntry(
+        label      = label,
+        category   = category,
+        extraTerms = extraTerms,
+        enabled    = enabled
+      )
+  }
+
+  case class UiLabels(
+    recent       : String,
+    insertControl: String,
+    noResults    : String,
+    placeholder  : String
+  )
+
   private val SearchContainerSelector = ".fb-toolbox-search"
   private val SearchToggleSelector    = ".fb-toolbox-search-toggle"
   private val SearchInputSelector     = ".fb-toolbox-search-input"
@@ -46,8 +73,96 @@ object ToolboxSearch {
   private val ToolHiddenClass         = "fb-tool-search-hidden"
   private val GroupHiddenClass        = "fb-tools-search-hidden"
   private val ToolSelectedClass       = "fb-tool-search-selected"
+  private val MaxRecentItems          = 6
 
   private var selectedToolOpt: Option[html.Element] = None
+  private var _recentItemIds : List[String]         = Nil
+
+  def recentItemIds: List[String] = _recentItemIds
+
+  def recordRecentItem(id: String): Unit =
+    if (id.nonEmpty)
+      _recentItemIds = (id :: _recentItemIds.filterNot(_ == id)).take(MaxRecentItems)
+
+  def clearRecentItems(): Unit =
+    _recentItemIds = Nil
+
+  def uiLabels(): UiLabels = {
+    val containerOpt = findSearchContainer()
+    def attrOr(name: String, default: String): String =
+      containerOpt
+        .flatMap(el => Option(el.getAttribute(name)))
+        .flatMap(_.trimAllToOpt)
+        .getOrElse(default)
+
+    UiLabels(
+      recent        = attrOr("data-fb-recent-label", "Recent"),
+      insertControl = attrOr("data-fb-insert-control-label", "Insert control"),
+      noResults     = attrOr("data-fb-no-results-label", "No matching controls"),
+      placeholder   = attrOr("data-fb-placeholder", "Search controls…")
+    )
+  }
+
+  /**
+   * Collects all toolbox items currently rendered in the Controls tab.
+   */
+  def collectItems(): List[ToolboxItem] =
+    findControlsTab().map { controlsTab =>
+      val groups = controlsTab.querySelectorAllT(".fb-tools")
+      groups.flatMap { group =>
+        val categoryLabel =
+          group.querySelectorOpt(".fb-tools-title, legend")
+            .map(cleanLabelText)
+            .getOrElse("")
+
+        group.querySelectorAllT(".fb-tool").flatMap { tool =>
+          tool.querySelectorOpt("button").map { btn =>
+            val entry      = extractEntry(tool, categoryLabel)
+            val id         = extractItemId(tool, entry.label)
+            val iconHtml   = btn.querySelectorOpt("i, img").map(_.outerHTML).getOrElse("")
+            val shortcut   = btn.querySelectorOpt("kbd").flatMap(k => Option(k.textContent)).flatMap(_.trimAllToOpt)
+            val isControl  = tool.querySelectorOpt(".fb-insert-control").isDefined
+            ToolboxItem(
+              id         = id,
+              label      = entry.label,
+              category   = entry.category,
+              extraTerms = entry.extraTerms,
+              iconHtml   = iconHtml,
+              shortcut   = shortcut,
+              isControl  = isControl,
+              enabled    = entry.enabled,
+              button     = btn
+            )
+          }
+        }
+      }.toList
+    }.getOrElse(Nil)
+
+  /**
+   * Filters and ranks items for a given query, breaking ties using `recentIds`
+   * and original DOM order.
+   */
+  def filterAndRankItems(
+    items    : List[ToolboxItem],
+    query    : String,
+    recentIds: List[String]
+  ): List[ToolboxItem] = {
+    val trimmed = query.trimAllToEmpty
+    if (trimmed.isEmpty) {
+      items
+    } else {
+      val recentRankMap = recentIds.zipWithIndex.toMap
+      items.zipWithIndex
+        .flatMap { case (item, domIdx) =>
+          matchScore(item.toSearchEntry, trimmed).map { score =>
+            val recentRank = recentRankMap.getOrElse(item.id, Int.MaxValue)
+            (item, (score, recentRank, domIdx))
+          }
+        }
+        .sortBy(_._2)
+        .map(_._1)
+    }
+  }
 
   /**
    * Normalizes text for case-insensitive, diacritic-insensitive matching.
@@ -197,6 +312,15 @@ object ToolboxSearch {
               case _ =>
                 closeSearch()
             }
+          } else {
+            for {
+              tool <- targetEl.closestOpt(".fb-tool")
+              if findControlsTab().exists(_.contains(tool))
+              btn  <- targetEl.closestOpt("button")
+            } locally {
+              val label = cleanLabelText(btn)
+              recordRecentItem(extractItemId(tool, label))
+            }
           }
         }
       }
@@ -307,6 +431,23 @@ object ToolboxSearch {
       Option(clone.textContent).getOrElse("").trimAllToEmpty
     }
 
+    def extractItemId(tool: html.Element, fallbackLabel: String): String =
+      tool.querySelectorOpt("[class*='fb-insert-']")
+        .flatMap { el =>
+          el.className
+            .splitTo[List]()
+            .find(c => c.startsWith("fb-insert-control-") || c.startsWith("fb-insert-template-"))
+        }
+        .orElse(tool.querySelectorOpt("[id]").map(_.id).filter(_.nonEmpty))
+        .getOrElse(fallbackLabel)
+
+    def isButtonEnabled(btn: html.Element): Boolean =
+      ! btn.hasAttribute("disabled") &&
+      ! btn.classList.contains("disabled") &&
+      ! btn.closestOpt(".xforms-trigger, .xbl-fr-trigger").exists { t =>
+        t.classList.contains("xforms-disabled") || t.classList.contains("xforms-readonly")
+      }
+
     def extractEntry(tool: html.Element, categoryLabel: String): SearchEntry = {
       val buttonOpt = tool.querySelectorOpt("button")
       val label =
@@ -317,11 +458,7 @@ object ToolboxSearch {
           .getOrElse("")
 
       val extraTerms = Option(tool.getAttribute("data-fb-search-terms")).getOrElse("")
-      val enabled = buttonOpt.exists { btn =>
-        ! btn.hasAttribute("disabled") &&
-        ! btn.classList.contains("disabled") &&
-        btn.closestOpt(".xforms-disabled, .xforms-readonly").isEmpty
-      }
+      val enabled    = buttonOpt.exists(isButtonEnabled)
 
       SearchEntry(
         label      = label,
@@ -351,13 +488,7 @@ object ToolboxSearch {
     def moveSelection(delta: Int): Unit = {
       val candidates = {
         val allVisible = visibleMatchingTools()
-        val enabledOnly = allVisible.filter { tool =>
-          tool.querySelectorOpt("button").exists { btn =>
-            ! btn.hasAttribute("disabled") &&
-            ! btn.classList.contains("disabled") &&
-            btn.closestOpt(".xforms-disabled, .xforms-readonly").isEmpty
-          }
-        }
+        val enabledOnly = allVisible.filter(_.querySelectorOpt("button").exists(isButtonEnabled))
         if (enabledOnly.nonEmpty) enabledOnly else allVisible
       }
 
@@ -377,11 +508,7 @@ object ToolboxSearch {
         .orElse(visibleMatchingTools().headOption)
         .flatMap(_.querySelectorOpt("button"))
         .foreach { btn =>
-          val isDisabled =
-            btn.hasAttribute("disabled") ||
-            btn.classList.contains("disabled") ||
-            btn.closestOpt(".xforms-disabled, .xforms-readonly").isDefined
-          if (! isDisabled) {
+          if (isButtonEnabled(btn)) {
             btn.click()
             closeSearch()
           }

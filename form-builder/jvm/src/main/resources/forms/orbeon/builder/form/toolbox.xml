@@ -245,7 +245,12 @@
                 <xf:label value="$form-resources/controls/label"/>
 
                 <!-- Quick control search -->
-                <xh:div class="fb-toolbox-search">
+                <xh:div
+                    class="fb-toolbox-search"
+                    data-fb-recent-label="{$form-resources/search-controls/recent}"
+                    data-fb-insert-control-label="{$form-resources/search-controls/insert-control}"
+                    data-fb-no-results-label="{$form-resources/search-controls/no-results}"
+                    data-fb-placeholder="{$form-resources/search-controls/placeholder}">
                     <xh:button
                         type="button"
                         class="fb-toolbox-search-toggle"

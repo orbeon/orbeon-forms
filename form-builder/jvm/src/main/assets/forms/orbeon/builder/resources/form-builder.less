@@ -5565,6 +5565,230 @@ body.orbeon {
         // Make popover a bit narrower so it fits in the dialog
         max-width: 350px;
     }
+
+    // Quick-insert command palette (Cmd/Ctrl+K) & in-canvas empty-cell popover
+    .fb-quick-insert-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 1060;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 13vh;
+        background-color: color-mix(in oklab, var(--orbeon-lightbox-backdrop-color) 32%, transparent);
+    }
+
+    .fb-quick-insert-panel {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        background-color: var(--orbeon-dialog-background-color);
+        color: var(--orbeon-base-color);
+        border: 1px solid var(--orbeon-base-border-color);
+        border-radius: var(--orbeon-dialog-border-radius);
+        box-shadow: var(--orbeon-help-box-shadow);
+        overflow: hidden;
+
+        &.fb-quick-insert-palette {
+            width: 440px;
+            max-width: calc(100vw - 32px);
+            max-height: 440px;
+        }
+
+        &.fb-quick-insert-popover {
+            position: fixed;
+            z-index: 1055;
+            width: 290px;
+            max-width: calc(100vw - 16px);
+            max-height: 320px;
+
+            .fb-quick-insert-item-category {
+                display: none;
+            }
+        }
+
+        .fb-quick-insert-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--orbeon-base-border-color);
+            background-color: var(--orbeon-dialog-background-color);
+        }
+
+        .fb-quick-insert-search-icon {
+            color: var(--orbeon-fb-empty-message-color);
+            flex: 0 0 auto;
+        }
+
+        .fb-quick-insert-input {
+            flex: 1 1 auto;
+            min-width: 0;
+            height: 26px;
+            margin: 0;
+            padding: 0;
+            border: none;
+            background-color: transparent;
+            color: var(--orbeon-base-color);
+            font-size: 1em;
+            box-shadow: none;
+
+            &::placeholder {
+                color: var(--orbeon-fb-empty-message-color);
+            }
+
+            &:focus {
+                outline: none;
+                box-shadow: none;
+            }
+        }
+
+        .fb-quick-insert-esc {
+            flex: 0 0 auto;
+            padding: 1px 5px;
+            font-size: 0.78em;
+            line-height: 16px;
+            background-color: var(--orbeon-kbd-background-color);
+            border: 1px solid var(--orbeon-kbd-border-color);
+            border-radius: 4px;
+            color: var(--orbeon-kbd-color);
+        }
+
+        .fb-quick-insert-list {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding: 6px;
+        }
+
+        .fb-quick-insert-group-title {
+            padding: 6px 8px 3px 8px;
+            font-size: 0.78em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--orbeon-fb-empty-message-color);
+
+            &:first-child {
+                padding-top: 2px;
+            }
+        }
+
+        .fb-quick-insert-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 6px 8px;
+            border: none;
+            border-radius: calc(var(--orbeon-body-decorations-border-radius) - 1px);
+            background-color: transparent;
+            color: var(--orbeon-base-color);
+            text-align: left;
+            cursor: pointer;
+
+            &.fb-quick-insert-item-selected {
+                background-color: var(--orbeon-fb-hover-background-color);
+                box-shadow: inset 0 0 0 1px var(--orbeon-fb-active-color);
+            }
+
+            &.fb-quick-insert-item-disabled {
+                opacity: 0.45;
+                cursor: not-allowed;
+            }
+
+            .fb-quick-insert-item-main {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                min-width: 0;
+            }
+
+            .fb-quick-insert-item-icon {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 18px;
+                flex: 0 0 18px;
+                color: var(--orbeon-fb-empty-message-color);
+
+                img {
+                    width: 16px;
+                    height: 16px;
+                }
+            }
+
+            .fb-quick-insert-item-label {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                font-size: 0.94em;
+            }
+
+            .fb-quick-insert-item-meta {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                flex: 0 0 auto;
+            }
+
+            .fb-quick-insert-item-category {
+                font-size: 0.8em;
+                color: var(--orbeon-fb-empty-message-color);
+                max-width: 130px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            kbd {
+                padding: 1px 5px;
+                font-size: 0.78em;
+                line-height: 15px;
+                background-color: var(--orbeon-kbd-background-color);
+                border: 1px solid var(--orbeon-kbd-border-color);
+                border-radius: 4px;
+                color: var(--orbeon-kbd-color);
+            }
+        }
+
+        .fb-quick-insert-empty {
+            padding: 18px 8px;
+            text-align: center;
+            font-size: 0.92em;
+            color: var(--orbeon-fb-empty-message-color);
+        }
+    }
+
+    // Subtle "+" quick-insert button centered inside hovered/selected empty grid cells
+    .fb-cell-quick-insert-btn {
+        position: fixed;
+        z-index: 4;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        border: 1px solid var(--orbeon-base-border-color);
+        border-radius: 50%;
+        background-color: var(--orbeon-form-background-color);
+        color: var(--orbeon-fb-empty-message-color);
+        cursor: pointer;
+        opacity: 0.85;
+        transition: background-color 100ms ease, border-color 100ms ease, color 100ms ease, opacity 100ms ease, transform 100ms ease;
+
+        &:hover,
+        &:focus-visible {
+            opacity: 1;
+            border-color: var(--orbeon-fb-active-color);
+            color: var(--orbeon-fb-active-color);
+            background-color: var(--orbeon-fb-hover-background-color);
+            transform: scale(1.06);
+            outline: none;
+        }
+    }
 }
 
 // ***** Other media ***************************************************************************************************

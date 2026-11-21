@@ -116,6 +116,8 @@
         <placeholder>コントロールを検索…</placeholder>
         <clear>検索をクリア</clear>
         <no-results>一致するコントロールがありません</no-results>
+        <recent>最近使用した項目</recent>
+        <insert-control>コントロールを挿入</insert-control>
     </search-controls>
     <i18n>
         <label>多言語</label>

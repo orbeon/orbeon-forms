@@ -15,9 +15,9 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.{AttributePredicate, ElementWithFiltersSelector, Selector, TypeSelector}
-import org.orbeon.dom.QName
+import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.fb.XMLNames.*
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerLang, XMLNames as FRXMLNames}
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerLang, SchemaOps, XMLNames as FRXMLNames}
 import org.orbeon.oxf.util.CollectionUtils.*
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StringUtils.*
@@ -778,10 +778,23 @@ trait BindingOps {
     )(implicit
       ctx            : FormBuilderDocContext
     ): QName =
-      if (datatypeOrEmpty.contains(":"))
-        FormRunner.findBindByName(controlName).get.resolveQName(datatypeOrEmpty) // require the bind just for ns resolution
-      else
+      if (datatypeOrEmpty.contains(":")) {
+        val bind            = FormRunner.findBindByName(controlName).get // require the bind just for ns resolution
+        val (prefix, local) = SaxonUtils.parseQName(datatypeOrEmpty)
+        val uriOpt =
+          bind.namespaceMappings.toMap.get(prefix).orElse(
+            if (SchemaOps.findSchemaPrefix(bind).contains(prefix))
+              SchemaOps.findSchemaNamespace(bind)
+            else
+              None
+          )
+        uriOpt match {
+          case Some(uri) => QName(local, Namespace(prefix, uri))
+          case None      => QName(local, Namespace.EmptyNamespace)
+        }
+      } else {
         Types.qNameForBuiltinTypeName(datatypeOrEmpty, required = false)
+      }
 
     def bindingMetadata(binding: NodeInfo): NodeColl =
       binding / FBMetadataTest

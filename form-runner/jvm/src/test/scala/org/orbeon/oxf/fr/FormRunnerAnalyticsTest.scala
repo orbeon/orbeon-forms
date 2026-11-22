@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import io.circe.generic.auto.*
 import io.circe.parser.decode
 import org.orbeon.io.IOUtils.useAndClose
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.{Credentials, SimpleRole, UserAndGroup}
 import org.orbeon.oxf.fr.analytics.*
 import org.orbeon.oxf.http.HttpMethod.GET
@@ -54,6 +55,7 @@ class FormRunnerAnalyticsTest
   describe("Form Runner /fr/analytics access control, session funnel, timings, and persistence aggregation") {
 
     it("must deny access (403) to /fr/analytics when neither form-builder-permissions nor oxf.fr.analytics.roles grants access") {
+      assume(Version.isPE)
       val (_, anonResp, _, _) =
         TestHttpClient.connect(
           url     = "/fr/analytics",
@@ -111,34 +113,36 @@ class FormRunnerAnalyticsTest
       assert(! scope.allowsAppForm(AppForm("hr", "salary-review")))
       assert(! scope.allowsAppForm(AppForm("finance", "ledger")))
 
-      // End-to-end HTTP GET `/fr/analytics` with `oxf.fr.analytics.roles.acme.*`
-      val analystCreds = Credentials(UserAndGroup("dana", Some("analysts")), List(SimpleRole("acme-analyst")), Nil)
-      val (_, analyticsResp, _, _) =
-        TestHttpClient.connect(
-          url         = "/fr/analytics",
-          method      = GET,
-          headers     = Map.empty,
-          content     = None,
-          credentials = Some(analystCreds),
-          attributes  = propertiesOverride(
-            PropertyParams(Map.empty, "oxf.fr.analytics.roles.acme.*", XS_STRING_QNAME, "acme-analyst")
+      if (Version.isPE) {
+        // End-to-end HTTP GET `/fr/analytics` with `oxf.fr.analytics.roles.acme.*`
+        val analystCreds = Credentials(UserAndGroup("dana", Some("analysts")), List(SimpleRole("acme-analyst")), Nil)
+        val (_, analyticsResp, _, _) =
+          TestHttpClient.connect(
+            url         = "/fr/analytics",
+            method      = GET,
+            headers     = Map.empty,
+            content     = None,
+            credentials = Some(analystCreds),
+            attributes  = propertiesOverride(
+              PropertyParams(Map.empty, "oxf.fr.analytics.roles.acme.*", XS_STRING_QNAME, "acme-analyst")
+            )
+          )
+        assert(analyticsResp.statusCode == 200)
+
+        // Also verify `/fr/console` classifies `/fr/analytics` static state as `Forms Analytics`
+        val consoleStaticStates =
+          FormRunnerConsole.buildConsoleSnapshotDom().getRootElement
+            .element("static-states")
+            .elements("static-state")
+            .toList
+        assert(
+          consoleStaticStates.exists(e =>
+            e.attributeValue("system-page")  == "analytics" &&
+            e.attributeValue("major-mode")   == "analytics" &&
+            e.attributeValue("display-name") == "Forms Analytics"
           )
         )
-      assert(analyticsResp.statusCode == 200)
-
-      // Also verify `/fr/console` classifies `/fr/analytics` static state as `Forms Analytics`
-      val consoleStaticStates =
-        FormRunnerConsole.buildConsoleSnapshotDom().getRootElement
-          .element("static-states")
-          .elements("static-state")
-          .toList
-      assert(
-        consoleStaticStates.exists(e =>
-          e.attributeValue("system-page")  == "analytics" &&
-          e.attributeValue("major-mode")   == "analytics" &&
-          e.attributeValue("display-name") == "Forms Analytics"
-        )
-      )
+      }
     }
 
     it("must track live Form Runner loads, conversion funnels, read-only exclusion, passivation durations, and latency percentiles") {

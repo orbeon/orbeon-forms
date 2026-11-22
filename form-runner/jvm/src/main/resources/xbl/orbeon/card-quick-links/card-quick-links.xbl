@@ -33,6 +33,7 @@
             <xf:var name="is-form-builder-available"  value="doc-available('oxf:/forms/orbeon/builder/form/form.xhtml')"/>
             <xf:var name="is-configuration-available" value="doc-available('oxf:/forms/orbeon/configuration/form/form.xhtml')"/>
             <xf:var name="is-console-available"       value="doc-available('oxf:/apps/fr/console/console.xhtml')"/>
+            <xf:var name="is-analytics-available"     value="doc-available('oxf:/apps/fr/analytics/analytics.xhtml')"/>
 
             <xf:var
                 name="is-allow-form-builder"
@@ -92,7 +93,7 @@
                         else if ($link = 'forms-admin'          and $is-allow-admin)                                 then $link
                         else if ($link = 'configuration'        and $is-configuration-available and $is-allow-admin) then $link
                         else if ($link = 'admin-console'        and $is-console-available and $is-allow-admin)       then $link
-                        else if ($link = 'forms-analytics'      and $is-allow-analytics)                             then $link
+                        else if ($link = 'forms-analytics'      and $is-analytics-available and $is-allow-analytics) then $link
                         else                                                                                              ()"/>
 
             <xf:var

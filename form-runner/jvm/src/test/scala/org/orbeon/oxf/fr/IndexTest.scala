@@ -565,4 +565,81 @@ class IndexTest
       )
     }
   }
+
+  describe("Dynamic Summary search items for open-selection single controls") {
+
+    it("must detect open-selection single controls and exclude regular or multi-selection controls") {
+      val openSearchSelect1 =
+        elemToNodeInfo(<xf:select1 xmlns:xf="http://www.w3.org/2002/xforms" appearance="search" selection="open"/>)
+      val suggestExistingSelect1 =
+        elemToNodeInfo(<xf:select1 xmlns:xf="http://www.w3.org/2002/xforms" appearance="search" suggest-existing="true"/>)
+      val closedSelect1 =
+        elemToNodeInfo(<xf:select1 xmlns:xf="http://www.w3.org/2002/xforms" appearance="search"/>)
+      val openMultiSelect =
+        elemToNodeInfo(<xf:select xmlns:xf="http://www.w3.org/2002/xforms" selection="open"/>)
+      val inputSuggestExisting =
+        elemToNodeInfo(<xf:input xmlns:xf="http://www.w3.org/2002/xforms" suggest-existing="true"/>)
+
+      assert(Index.isOpenSelectionSingleControl(openSearchSelect1))
+      assert(Index.isOpenSelectionSingleControl(suggestExistingSelect1))
+      assert(! Index.isOpenSelectionSingleControl(closedSelect1))
+      assert(! Index.isOpenSelectionSingleControl(openMultiSelect))
+      assert(! Index.isOpenSelectionSingleControl(inputSuggestExisting))
+    }
+
+    it("must populate distinct DB values when preserving or replacing static items") {
+      val emptyResource =
+        "en" -> elemToNodeInfo(
+          <brand>
+            <label>Brand</label>
+          </brand>
+        )
+
+      val withStaticItemsResource =
+        "en" -> elemToNodeInfo(
+          <brand>
+            <label>Brand</label>
+            <item>
+              <label>Hermes (Switzerland)</label>
+              <value>Hermes</value>
+            </item>
+          </brand>
+        )
+
+      def extractItems(res: collection.Seq[(String, org.orbeon.saxon.om.NodeInfo)]): Seq[(String, String)] = {
+        val elem = nodeInfoToElem(res.head._2)
+        (elem \ "item").map(i => ((i \ "label").text, (i \ "value").text))
+      }
+
+      // Open-selection with no static items: injects non-empty distinct values
+      val populatedEmpty = Index.withDynamicItems(
+        resources           = List(emptyResource),
+        distinctValues      = List("", "Alpina", "Hermes"),
+        preserveStaticItems = true
+      )
+      assert(extractItems(populatedEmpty) == Seq("Alpina" -> "Alpina", "Hermes" -> "Hermes"))
+
+      // Open-selection with static items: preserves static item label and avoids duplicates
+      val preservedStatic = Index.withDynamicItems(
+        resources           = List(withStaticItemsResource),
+        distinctValues      = List("Alpina", "Hermes", "Olivetti", ""),
+        preserveStaticItems = true
+      )
+      assert(
+        extractItems(preservedStatic) == Seq(
+          "Hermes (Switzerland)" -> "Hermes",
+          "Alpina"               -> "Alpina",
+          "Olivetti"             -> "Olivetti"
+        )
+      )
+
+      // Databound control (`preserveStaticItems = false`): replaces static items
+      val replacedStatic = Index.withDynamicItems(
+        resources           = List(withStaticItemsResource),
+        distinctValues      = List("Alpina", "Olivetti"),
+        preserveStaticItems = false
+      )
+      assert(extractItems(replacedStatic) == Seq("Alpina" -> "Alpina", "Olivetti" -> "Olivetti"))
+    }
+  }
 }

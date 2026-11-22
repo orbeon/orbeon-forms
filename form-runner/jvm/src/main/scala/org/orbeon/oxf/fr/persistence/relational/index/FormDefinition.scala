@@ -46,28 +46,45 @@ trait FormDefinition {
   private val databoundControlLocalNames =
     Set[QName](FRDataboundSelect1QName, FRDataboundSelect1SearchQName).map(_.localName)
 
+  private def isDataboundControl(control: NodeInfo): Boolean =
+    databoundControlLocalNames.contains(control.localname)
+
+  private[fr] def isOpenSelectionSingleControl(control: NodeInfo): Boolean =
+    FormRunner.isSingleSelectionControl(control.localname) &&
+      (control.attValueOpt("selection").contains("open") || control.attValueOpt("suggest-existing").contains("true"))
+
   private          val logger                   = LoggerFactory.createLogger(classOf[FormDefinition])
 //  private implicit val indentedLogger           = new IndentedLogger(logger)
   private implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
 
-  private def withDynamicItems(
-    resources     : collection.Seq[(String, NodeInfo)],
-    distinctValues: Seq[String]
-  ): collection.Seq[(String, NodeInfo)] = {
-    // Remove empty values as they're not allowed for dropdown values and use them as labels
-    val items = distinctValues.filter(_.nonEmpty).map { value =>
-      <item>
-        <label>{value}</label>
-        <value>{value}</value>
-      </item>
-    }
-
+  private[fr] def withDynamicItems(
+    resources          : collection.Seq[(String, NodeInfo)],
+    distinctValues     : Seq[String],
+    preserveStaticItems: Boolean
+  ): collection.Seq[(String, NodeInfo)] =
     // Inject items retrieved from database into resources
     for ((lang, resourceHolder) <- resources) yield {
       val resourceElem = nodeInfoToElem(resourceHolder)
-      lang -> (resourceElem.copy(child = resourceElem.child.filterNot(_.label == "item") ++ items): NodeInfo)
+      val existingValues =
+        if (preserveStaticItems)
+          resourceElem.child.filter(_.label == "item").map(item => (item \ "value").text).toSet
+        else
+          Set.empty[String]
+
+      // Remove empty values as they're not allowed for dropdown values and use them as labels
+      val items = distinctValues.filter(v => v.nonEmpty && ! existingValues(v)).map { value =>
+        <item>
+          <label>{value}</label>
+          <value>{value}</value>
+        </item>
+      }
+
+      val baseChildren =
+        if (preserveStaticItems) resourceElem.child
+        else                     resourceElem.child.filterNot(_.label == "item")
+
+      lang -> (resourceElem.copy(child = baseChildren ++ items): NodeInfo)
     }
-  }
 
 
 
@@ -135,8 +152,8 @@ trait FormDefinition {
 
     val distinctValuesOpt = searchVersionOpt.toSeq.map { searchVersion =>
       val dynamicControlPaths = indexedControlBindPathHolders.filter { controlInfo =>
-        // Is the control databound/dynamic?
-        databoundControlLocalNames.contains(controlInfo.control.localname)
+        // Is the control databound/dynamic or open-selection single control (e.g. Searchable Combobox)?
+        isDataboundControl(controlInfo.control) || isOpenSelectionSingleControl(controlInfo.control)
       }.map { controlInfo =>
         pathString(controlInfo.path)
       }
@@ -154,8 +171,10 @@ trait FormDefinition {
       val controlPath = pathString(path)
 
       val resourcesWithDynamicItems = distinctValuesByControlPath.get(controlPath) match {
-        case Some(distinctValues) => withDynamicItems(resources, distinctValues)
-        case None                 => resources
+        case Some(distinctValues) =>
+          withDynamicItems(resources, distinctValues, preserveStaticItems = isOpenSelectionSingleControl(control))
+        case None =>
+          resources
       }
 
       IndexedControl(
